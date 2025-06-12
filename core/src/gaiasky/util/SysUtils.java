@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 
 /**
@@ -70,7 +71,7 @@ public class SysUtils {
 
 
     static {
-        OS = System.getProperty("os.name").toLowerCase();
+        OS = System.getProperty("os.name").toLowerCase(Locale.ROOT);
         linux = OS.contains("linux");
         mac = OS.contains("macos") || OS.contains("mac os");
         windows = OS.contains("win");

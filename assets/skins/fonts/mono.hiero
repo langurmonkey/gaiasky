@@ -1,5 +1,5 @@
-font.name=Inter Display
-font.size=30
+font.name=Liberation Mono
+font.size=22
 font.bold=false
 font.italic=false
 font.gamma=0.0
@@ -17,7 +17,7 @@ pad.advance.y=0
 
 glyph.native.rendering=false
 glyph.page.width=512
-glyph.page.height=512
+glyph.page.height=256
 glyph.text=AÀÁÄÂBCDEÈÉËÊFGĞHIÌÍÏÎİJKLMNOÒÓÔÖPQRSŞTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfgğhiìíîïıjȷklmnoòóôöpqrsştuùúûüvwxyzñç\n1234567890!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥°ℏÅ⊙☉☼☀¶ß©®£€¼½¾²³čžšČŽŠ„“
 
 render_type=0

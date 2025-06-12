@@ -1612,7 +1612,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                     }
                 }
             }
-            case SCENE_RELOAD_NAMES_CMD -> postRunnable(() -> scene.updateLocalizedNames());
+            case SCENE_RELOAD_NAMES_CMD -> postRunnable(() -> {
+                scene.updateLocalizedNames();
+            });
             case UI_SCALE_RECOMPUTE_CMD -> {
                 int height;
                 if (data != null && data.length > 0) {

@@ -5,7 +5,7 @@ font.italic=false
 font.gamma=0.0
 font.mono=false
 
-font2.file=/home/tsagrista/Downloads/fonts/FogSans-Re46.otf
+font2.file=/home/tsagrista/.dotfiles/fonts/ttf/InterVariable.ttf
 font2.use=false
 
 pad.top=1
@@ -18,7 +18,7 @@ pad.advance.y=0
 glyph.native.rendering=false
 glyph.page.width=512
 glyph.page.height=256
-glyph.text=AÀÁÄÂBCDEÈÉËÊFGĞHIÌÍÏÎİJKLMNOÒÓÔÖPQRSŞTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfgğhiìíîïıjȷklmnoòóôöpqrsştuùúûüvwxyzñç\n1234567890\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμ\nΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥\n°ℏÅ⊙ ☉ ☼ ☀¶ß©®£€¼½¾²³\nčžšČŽŠ„“
+glyph.text=AÀÁÄÂBCDEÈÉËÊFGĞHIÌÍÏÎİJKLMNOÒÓÔÖPQRSŞTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfgğhiìíîïıjȷklmnoòóôöpqrsştuùúûüvwxyzñç\n1234567890!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥°ℏÅ⊙☉☼☀¶ß©®£€¼½¾²³čžšČŽŠ„“
 
 render_type=0
 

@@ -98,6 +98,12 @@ public interface IFocus {
     String getClosestName();
 
     /**
+     * Gets the name of the closest object, localized.
+     * @return The localized name.
+     */
+    String getClosestLocalizedName();
+
+    /**
      * Return the name of the focus candidate of this object. Defaults to
      * {@link IFocus#getName()}.
      *

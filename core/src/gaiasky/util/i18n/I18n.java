@@ -150,6 +150,19 @@ public class I18n {
         return has(objects, key);
     }
 
+    public static  String localize(String name) {
+        if (name == null) {
+            return null;
+        }
+        String base = name.toLowerCase(Locale.ROOT)
+                .replace(' ', '_');
+        if (hasObject(base)) {
+            return obj(base);
+        } else {
+            return name;
+        }
+    }
+
     private static String get(I18NBundle b, String key) {
         return b.get(key);
     }

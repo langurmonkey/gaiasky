@@ -447,7 +447,7 @@ public class Settings extends SettingsObject {
         @Override
         public String toString() {
             try {
-                String name = I18n.msg("gui.reproj.mode." + this.name().toLowerCase());
+                String name = I18n.msg("gui.reproj.mode." + this.name().toLowerCase(Locale.ROOT));
                 if (name != null && !name.isEmpty()) {
                     return name;
                 } else {
@@ -661,7 +661,7 @@ public class Settings extends SettingsObject {
         }
 
         public String toString() {
-            return I18n.msg("gui.upscale." + this.name().toLowerCase());
+            return I18n.msg("gui.upscale." + this.name().toLowerCase(Locale.ROOT));
         }
     }
 

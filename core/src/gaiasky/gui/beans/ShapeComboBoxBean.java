@@ -9,6 +9,8 @@ package gaiasky.gui.beans;
 
 import gaiasky.util.i18n.I18n;
 
+import java.util.Locale;
+
 public class ShapeComboBoxBean {
 
     public String name;
@@ -16,7 +18,7 @@ public class ShapeComboBoxBean {
 
     public ShapeComboBoxBean(Shape shape) {
         this.shape = shape;
-        this.name = I18n.msg("gui.shape." + shape.name().toLowerCase());
+        this.name = I18n.msg("gui.shape." + shape.name().toLowerCase(Locale.ROOT));
     }
 
     public static ShapeComboBoxBean[] defaultShapes() {

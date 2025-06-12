@@ -9,6 +9,7 @@ package gaiasky.util.math;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -821,7 +822,7 @@ public class QuadrupleParser {
          * @return the <b>owner</b> with the values of the fields modified to correspond to the value presented by the <b>source</b>
          */
         public static Quadruple parse(String source, Quadruple owner) {
-            source = source.trim().toLowerCase();
+            source = source.trim().toLowerCase(Locale.ROOT);
 
             final Quadruple qConst = QUADRUPLE_CONSTANTS.get(source);
             if (qConst != null)

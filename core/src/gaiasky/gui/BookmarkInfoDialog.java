@@ -10,6 +10,7 @@ import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -40,7 +41,7 @@ public class BookmarkInfoDialog extends GenericDialog {
         if (bookmark != null) {
 
             // Type
-            String type = TextUtils.trueCapitalise(I18n.msg("gui.bookmark.info.type." + bookmark.type.name().toLowerCase()));
+            String type = TextUtils.trueCapitalise(I18n.msg("gui.bookmark.info.type." + bookmark.type.name().toLowerCase(Locale.ROOT)));
             OwnLabel bookmarkType = new OwnLabel(type, skin, "default-blue");
             content.add(new OwnLabel(I18n.msg("gui.bookmark.info.type"), skin, "header-s")).left().padRight(pad34).padBottom(pad10).minWidth(minWidth);
             content.add(bookmarkType).pad(pad, 0, pad20, pad).left().padBottom(pad10).minWidth(minWidth).row();

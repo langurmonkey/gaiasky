@@ -35,6 +35,7 @@ import net.jafama.FastMath;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class GamepadConfigWindow extends GenericDialog implements IObserver {
@@ -68,7 +69,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
             this.mappings = new GamepadMappings(this.controllerName);
         }
 
-        none = "-" + I18n.msg("gui.none").toLowerCase() + "-";
+        none = "-" + I18n.msg("gui.none").toLowerCase(Locale.ROOT) + "-";
         button = I18n.msg("gui.controller.button");
         axis = I18n.msg("gui.controller.axis");
 

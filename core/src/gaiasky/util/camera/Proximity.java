@@ -18,6 +18,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.RotationComponent;
 import gaiasky.scene.view.FocusView;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -321,6 +322,11 @@ public class Proximity {
         @Override
         public String getClosestName() {
             return name;
+        }
+
+        @Override
+        public String getClosestLocalizedName() {
+            return I18n.localize(getClosestName());
         }
 
         @Override

@@ -278,7 +278,7 @@ public class GamepadGui extends AbstractGui {
                 if (!searchField.getText().equals(currentInputText) && !searchField.getText().isBlank()) {
                     // Process only if text changed
                     currentInputText = searchField.getText();
-                    String name = currentInputText.toLowerCase().trim();
+                    String name = currentInputText.toLowerCase(Locale.ROOT).trim();
                     if (!checkString(name, scene)) {
                         if (name.matches("[0-9]+")) {
                             // Check with 'HIP '

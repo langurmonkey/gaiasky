@@ -11,6 +11,7 @@ import gaiasky.util.Bits;
 import gaiasky.util.i18n.I18n;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 
@@ -133,7 +134,7 @@ public class ComponentTypes extends Bits {
         public final String style;
 
         ComponentType(String icon) {
-            this.key = "element." + name().toLowerCase();
+            this.key = "element." + name().toLowerCase(Locale.ROOT);
             this.style = icon;
         }
 

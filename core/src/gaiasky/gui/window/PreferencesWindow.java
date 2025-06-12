@@ -782,7 +782,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ElevationComboBoxBean[] ecbb = new ElevationComboBoxBean[ElevationType.values().length];
         i = 0;
         for (ElevationType et : ElevationType.values()) {
-            ecbb[i] = new ElevationComboBoxBean(I18n.msg("gui.elevation.type." + et.toString().toLowerCase()), et);
+            ecbb[i] = new ElevationComboBoxBean(I18n.msg("gui.elevation.type." + et.toString().toLowerCase(Locale.ROOT)), et);
             i++;
         }
         elevationSb = new OwnSelectBox<>(skin);
@@ -1806,13 +1806,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (ProgramAction action : keyboardMappings.keySet()) {
             Array<TreeSet<Integer>> keys = keyboardMappings.get(action);
 
-            String[] act = new String[1 + keys.size];
-            act[0] = action.actionName;
-            for (int j = 0; j < keys.size; j++) {
-                act[j + 1] = keysToString(keys.get(j));
-            }
+            if (keys != null) {
+                String[] act = new String[1 + keys.size];
+                act[0] = action.actionName;
+                for (int j = 0; j < keys.size; j++) {
+                    act[j + 1] = keysToString(keys.get(j));
+                }
 
-            data[i] = act;
+                data[i] = act;
+            } else {
+                data[i] = new String[]{"?"};
+            }
             i++;
         }
 
@@ -3042,6 +3046,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.UI_SCALE_FACTOR_CMD, this, factor);
         EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
 
+        // Interface language
         boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.getLocale());
         boolean reloadUI = reloadLang ||
                 !settings.program.ui.theme.equals(newTheme.value) ||
@@ -3051,6 +3056,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.program.locale = languageBean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"),
                        new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
+
+        // UI theme
         settings.program.ui.theme = newTheme.value;
         boolean previousPointerCoords = settings.program.pointer.coordinates;
         settings.program.pointer.coordinates = pointerCoords.isChecked();
@@ -3279,6 +3286,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private void reloadLanguage() {
         EventManager.publish(Event.SCENE_RELOAD_NAMES_CMD, this);
+        // Reinitialize key bindings.
+        KeyBindings.initialize(true);
     }
 
     private void reloadUI(final GlobalResources globalResources) {

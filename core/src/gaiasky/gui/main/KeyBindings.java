@@ -61,7 +61,11 @@ public class KeyBindings {
     }
 
     public static void initialize() {
-        if (instance == null) {
+        initialize(false);
+    }
+
+    public static void initialize(boolean force) {
+        if (instance == null || force) {
             instance = new KeyBindings();
         }
     }

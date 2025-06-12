@@ -12,8 +12,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import gaiasky.gui.main.GSKeys;
 
+import java.util.Locale;
+
 public class OsUtils {
-    private static final String OS = System.getProperty("os.name", "").toLowerCase();
+    private static final String OS = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
     private static final boolean WINDOWS = OS.contains("win");
     private static final boolean MAC = OS.contains("mac");
     private static final boolean UNIX = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");

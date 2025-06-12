@@ -83,7 +83,7 @@ public class LocationLogManager implements IObserver {
         if (object != null) {
             final Instant entryTime = Instant.now();
             final Instant simulationTime = time.getTime();
-            final String name = object.getClosestName();
+            final String name = object.getClosestLocalizedName();
 
             // Check if the new record is already in the 10 most recent items
             boolean found = false;

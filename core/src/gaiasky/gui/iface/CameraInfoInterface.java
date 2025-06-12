@@ -39,6 +39,7 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 /**
  * Builds the pane that contains information on the current camera state.
@@ -613,7 +614,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 try {
                     focusType.setText(I18n.msg("element." + ComponentType.values()[view.getCt()
                             .getFirstOrdinal()].toString()
-                            .toLowerCase() + ".singular"));
+                            .toLowerCase(Locale.ROOT) + ".singular"));
                 } catch (Exception e) {
                     focusType.setText("");
                 }

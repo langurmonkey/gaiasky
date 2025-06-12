@@ -559,7 +559,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setShadingStyle(String style) {
         try {
-            this.shadingStyle = ShadingStyle.valueOf(style.toUpperCase());
+            this.shadingStyle = ShadingStyle.valueOf(style.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             Logger.getLogger(this.getClass()
                                      .getSimpleName())
@@ -1067,17 +1067,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public String getLocalizedName() {
-        String name = getName();
-        if (name == null) {
-            return null;
-        }
-        String base = name.toLowerCase(Locale.ROOT)
-                .replace(' ', '_');
-        if (I18n.hasObject(base)) {
-            return I18n.obj(base);
-        } else {
-            return name;
-        }
+        return I18n.localize(getName());
     }
 
     public long getCandidateId() {
@@ -1111,6 +1101,10 @@ public class ParticleSet implements Component, IDisposable {
 
     public String getClosestName() {
         return this.proximity.updating[0].name;
+    }
+
+    public String getClosestLocalizedName() {
+        return I18n.localize(getClosestName());
     }
 
     public boolean canSelect(FilterView view) {

@@ -1,11 +1,11 @@
-font.name=SpaceMono Nerd Font Mono
-font.size=22
-font.bold=false
+font.name=Liberation Mono
+font.size=32
+font.bold=true
 font.italic=false
 font.gamma=0.0
 font.mono=false
 
-font2.file=/home/tsagrista/.local/share/fonts/ttf/JetBrains Mono Medium Nerd Font Complete Mono.ttf
+font2.file=/home/tsagrista/.dotfiles/fonts/ttf/InterVariable.ttf
 font2.use=false
 
 pad.top=1
@@ -17,8 +17,8 @@ pad.advance.y=0
 
 glyph.native.rendering=false
 glyph.page.width=512
-glyph.page.height=128
-glyph.text=AÀÁÄÂBCDEÈÉËÊFGĞHIÌÍÏÎİJKLMNOÒÓÔÖPQRSŞTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfgğhiìíîïıjȷklmnoòóôöpqrsştuùúûüvwxyzñç\n1234567890\n"!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμ\nΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥\n°ℏÅ⊙ ☉ ☼ ☀¶ß©®£€¼½¾²³\nčžšČŽŠ„“
+glyph.page.height=512
+glyph.text=AÀÁÄÂBCDEÈÉËÊFGĞHIÌÍÏÎİJKLMNOÒÓÔÖPQRSŞTUÙÚÜÛVWXYZÑÇ\naàáäâbcdeèéêëfgğhiìíîïıjȷklmnoòóôöpqrsştuùúûüvwxyzñç\n1234567890!`?'.,;:()[]{}<>|/@\^$-%+=#_&~*\nθωερτψυιοπασδφγηςκλζχξωβνμΘΩΕΡΤΨΥΙΟΠΑΣΔΦΓΗςΚΛΖΧΞΩΒΝΜ\nАаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя\n±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥°ℏÅ⊙☉☼☀¶ß©®£€¼½¾²³čžšČŽŠ„“
 
 render_type=0
 

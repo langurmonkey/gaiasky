@@ -7,6 +7,8 @@
 
 package gaiasky.util.ucd;
 
+import java.util.Locale;
+
 /**
  * Represents the UCD (universal content descriptor) for a column of a table.
  */
@@ -26,7 +28,7 @@ public class UCD implements Comparable<UCD> {
         if (originalUCD != null && !originalUCD.isEmpty()) {
             this.originalUCD = originalUCD;
             // Convert UCD1 to
-            this.converted = originalUCD.toLowerCase().replace("_", ".");
+            this.converted = originalUCD.toLowerCase(Locale.ROOT).replace("_", ".");
 
             this.UCDStrings = this.converted.split(";");
 

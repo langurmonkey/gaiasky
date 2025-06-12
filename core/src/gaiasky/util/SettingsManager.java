@@ -158,7 +158,7 @@ public class SettingsManager {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 if (getRequestorType() == RequestorType.PROXY) {
-                    String protocol = getRequestingProtocol().toLowerCase();
+                    String protocol = getRequestingProtocol().toLowerCase(Locale.ROOT);
                     String host = System.getProperty(protocol + ".proxyHost", "");
                     String port = System.getProperty(protocol + ".proxyPort", "80");
                     String user = System.getProperty(protocol + ".proxyUser", "");

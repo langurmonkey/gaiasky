@@ -2,6 +2,8 @@ package gaiasky.gui.beans;
 
 import gaiasky.util.i18n.I18n;
 
+import java.util.Locale;
+
 public class OrientationComboBoxBean {
 
     public String name;
@@ -9,7 +11,7 @@ public class OrientationComboBoxBean {
 
     public OrientationComboBoxBean(ShapeOrientation orientation) {
         this.orientation = orientation;
-        this.name = I18n.msg("gui.shape.orientation." + orientation.name().toLowerCase());
+        this.name = I18n.msg("gui.shape.orientation." + orientation.name().toLowerCase(Locale.ROOT));
     }
 
     public static OrientationComboBoxBean[] defaultOrientations() {

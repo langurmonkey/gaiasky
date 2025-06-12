@@ -43,10 +43,7 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public final class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
@@ -819,7 +816,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
 
     public void setBlendMode(String blendModeString) {
         if (blendModeString != null && !blendModeString.isBlank()) {
-            blendMode = BlendMode.valueOf(blendModeString.trim().toUpperCase());
+            blendMode = BlendMode.valueOf(blendModeString.trim().toUpperCase(Locale.ROOT));
         }
     }
 
@@ -1032,7 +1029,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     public void setPrimitiveType(String primitiveType) {
-        this.primitiveType = Primitive.valueOf(primitiveType.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+        this.primitiveType = Primitive.valueOf(primitiveType.toUpperCase(Locale.ROOT)).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
     }
 
     public String toString() {

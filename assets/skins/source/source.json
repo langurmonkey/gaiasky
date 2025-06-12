@@ -49,12 +49,9 @@
       "file": "skins/fonts/ui-21.fnt"
     },
     "ui-22": {
-      "file": "skins/fonts/ui-21.fnt"
+      "file": "skins/fonts/ui-22.fnt"
     },
     "ui-23": {
-      "file": "skins/fonts/ui-23.fnt"
-    },
-    "ui-24": {
       "file": "skins/fonts/ui-23.fnt"
     },
     "ui-25": {
@@ -79,10 +76,10 @@
       "file": "skins/fonts/ui-33.fnt"
     },
     "mono": {
-      "file": "skins/fonts/mono-large.fnt"
+      "file": "skins/fonts/mono.fnt"
     },
     "mono-big": {
-      "file": "skins/fonts/mono-huge.fnt"
+      "file": "skins/fonts/mono-large.fnt"
     }
   },
   "com.badlogic.gdx.graphics.Color": {

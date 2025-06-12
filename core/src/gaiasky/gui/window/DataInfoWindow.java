@@ -53,6 +53,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DataInfoWindow extends GenericDialog {
@@ -351,7 +352,7 @@ public class DataInfoWindow extends GenericDialog {
         try {
             objectType.setText(TextUtils.capitalise(
                     I18n.msg("element." +
-                            ComponentTypes.ComponentType.values()[object.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular")));
+                            ComponentTypes.ComponentType.values()[object.getCt().getFirstOrdinal()].toString().toLowerCase(Locale.ROOT) + ".singular")));
         } catch (Exception e) {
             objectType.setText("");
         }
