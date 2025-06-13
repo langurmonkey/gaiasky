@@ -74,7 +74,6 @@ import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
-import gaiasky.util.math.Quadruple;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
@@ -124,8 +123,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     private final Deque<Settings> settingsStack;
 
-    public EventScriptingInterface(final AssetManager manager,
-                                   final CatalogManager catalogManager) {
+    public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
         this.em = EventManager.instance;
         this.manager = manager;
         this.catalogManager = catalogManager;
@@ -160,8 +158,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     private double[] dArray(List<?> l) {
-        if (l == null)
-            return null;
+        if (l == null) return null;
         double[] res = new double[l.size()];
         int i = 0;
         for (Object o : l) {
@@ -171,8 +168,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     private int[] iArray(List<?> l) {
-        if (l == null)
-            return null;
+        if (l == null) return null;
         int[] res = new int[l.size()];
         int i = 0;
         for (Object o : l) {
@@ -199,15 +195,13 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void displayPopupNotification(String message,
-                                         float duration) {
+    public void displayPopupNotification(String message, float duration) {
         if (checkString(message, "message")) {
             em.post(Event.POST_POPUP_NOTIFICATION, this, message, duration);
         }
     }
 
-    public void displayPopupNotification(String message,
-                                         Double duration) {
+    public void displayPopupNotification(String message, Double duration) {
         displayPopupNotification(message, duration.floatValue());
     }
 
@@ -257,25 +251,28 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setCameraFocus(final String focusName,
-                               final float waitTimeSeconds) {
+    public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
         if (checkString(focusName, "focusName") && checkFocusName(focusName)) {
             Entity entity = getEntity(focusName);
-            if (Mapper.focus.has(entity)) {
-                synchronized (focusView) {
-                    focusView.setEntity(entity);
-                    focusView.getFocus(focusName);
+            setCameraFocus(entity, waitTimeSeconds);
+        }
+    }
+
+    public void setCameraFocus(final Entity entity, final float waitTimeSeconds) {
+        if (checkNotNull(entity, "Entity is null")) {
+            synchronized (focusView) {
+                focusView.setEntity(entity);
+                if (Mapper.focus.has(entity)) {
                     NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
                     changeFocus(focusView, cam, waitTimeSeconds);
+                } else {
+                    logger.error("Object can't be set as focus: " + focusView.getName());
                 }
-            } else {
-                logger.error("FOCUS_MODE object does not exist: " + focusName);
             }
         }
     }
 
-    public void setCameraFocus(final String focusName,
-                               final int waitTimeSeconds) {
+    public void setCameraFocus(final String focusName, final int waitTimeSeconds) {
         setCameraFocus(focusName, (float) waitTimeSeconds);
     }
 
@@ -297,11 +294,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     Vector3Q dir = new Vector3Q();
                     synchronized (focusView) {
                         focusView.setEntity(entity);
-                        focusView.getAbsolutePosition(dir)
-                                .sub(camPos);
+                        focusView.getAbsolutePosition(dir).sub(camPos);
                     }
-                    em.post(Event.CAMERA_DIR_CMD, this, (Object) dir.nor()
-                            .valuesD());
+                    em.post(Event.CAMERA_DIR_CMD, this, (Object) dir.nor().valuesD());
                 });
                 // Make sure the last action is flushed
                 sleepFrames(2);
@@ -316,8 +311,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         setCameraFocusInstantAndGo(focusName, true);
     }
 
-    public void setCameraFocusInstantAndGo(final String focusName,
-                                           final boolean sleep) {
+    public void setCameraFocusInstantAndGo(final String focusName, final boolean sleep) {
         if (checkString(focusName, "focusName")) {
             Entity entity = getEntity(focusName);
             if (Mapper.focus.has(entity)) {
@@ -329,8 +323,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     em.post(Event.GO_TO_OBJECT_CMD, this);
                 }
                 // Make sure the last action is flushed
-                if (sleep)
-                    sleepFrames(2);
+                if (sleep) sleepFrames(2);
             }
         }
     }
@@ -356,52 +349,36 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setCameraPosition(double x,
-                                  double y,
-                                  double z) {
+    public void setCameraPosition(double x, double y, double z) {
         setCameraPosition(new double[]{x, y, z});
     }
 
     @Override
-    public void setCameraPosition(double x,
-                                  double y,
-                                  double z,
-                                  String units) {
+    public void setCameraPosition(double x, double y, double z, String units) {
         setCameraPosition(new double[]{x, y, z}, units);
     }
 
     @Override
-    public void setCameraPosition(double x,
-                                  double y,
-                                  double z,
-                                  boolean immediate) {
+    public void setCameraPosition(double x, double y, double z, boolean immediate) {
         setCameraPosition(new double[]{x, y, z}, immediate);
     }
 
     @Override
-    public void setCameraPosition(double x,
-                                  double y,
-                                  double z,
-                                  String units,
-                                  boolean immediate) {
+    public void setCameraPosition(double x, double y, double z, String units, boolean immediate) {
         setCameraPosition(new double[]{x, y, z}, units, immediate);
     }
 
-    public void setCameraPosition(final List<?> vec,
-                                  boolean immediate) {
+    public void setCameraPosition(final List<?> vec, boolean immediate) {
         setCameraPosition(dArray(vec), immediate);
     }
 
     @Override
-    public void setCameraPosition(double[] position,
-                                  boolean immediate) {
+    public void setCameraPosition(double[] position, boolean immediate) {
         setCameraPosition(position, "km", immediate);
     }
 
     @Override
-    public void setCameraPosition(double[] position,
-                                  String units,
-                                  boolean immediate) {
+    public void setCameraPosition(double[] position, String units, boolean immediate) {
         if (checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
             if (immediate) {
@@ -413,14 +390,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     }
 
-    public void setCameraPosition(List<Double> position,
-                                  String units,
-                                  boolean immediate) {
+    public void setCameraPosition(List<Double> position, String units, boolean immediate) {
         setCameraPosition(dArray(position), units, immediate);
     }
 
-    private void cameraPositionEvent(double[] position,
-                                     DistanceUnits units) {
+    private void cameraPositionEvent(double[] position, DistanceUnits units) {
         // Convert to km
         position[0] = units.toInternalUnits(position[0]);
         position[1] = units.toInternalUnits(position[1]);
@@ -438,8 +412,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public double[] getCameraPosition(String units) {
         if (checkDistanceUnits(units, "units")) {
             var u = DistanceUnits.valueOf(units.toUpperCase());
-            Vector3D campos = GaiaSky.instance.cameraManager.getPos()
-                    .tov3d(aux3d1);
+            Vector3D campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
             return new double[]{u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z)};
         }
         return null;
@@ -451,8 +424,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setCameraPosition(double[] position,
-                                  String units) {
+    public void setCameraPosition(double[] position, String units) {
         setCameraPosition(position, units, false);
     }
 
@@ -460,19 +432,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         setCameraPosition(vec, "km");
     }
 
-    public void setCameraPosition(final List<?> vec,
-                                  String units) {
+    public void setCameraPosition(final List<?> vec, String units) {
         setCameraPosition(dArray(vec), units);
     }
 
-    public void setCameraDirection(final List<?> dir,
-                                   final boolean immediate) {
+    public void setCameraDirection(final List<?> dir, final boolean immediate) {
         setCameraDirection(dArray(dir), immediate);
     }
 
     @Override
-    public void setCameraDirection(double[] direction,
-                                   boolean immediate) {
+    public void setCameraDirection(double[] direction, boolean immediate) {
         if (checkLength(direction, 3, "direction")) {
             if (immediate) {
                 cameraDirectionEvent(direction);
@@ -506,24 +475,15 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             // Direction.
             aux3d1.set(FastMath.toRadians(alpha), FastMath.toRadians(delta), Constants.PC_TO_U);
             var targetPoint = Coordinates.sphericalToCartesian(aux3d1, aux3d2);
-            var dir = targetPoint.sub(GaiaSky.instance.cameraManager.getPos())
-                    .nor();
+            var dir = targetPoint.sub(GaiaSky.instance.cameraManager.getPos()).nor();
 
             // Up.
             aux3d3.set(0, FastMath.PI / 2.0, Constants.PC_TO_U);
-            var targetUp = Coordinates.sphericalToCartesian(aux3d3, aux3d4)
-                    .nor();
-            dir.put(aux3d5)
-                    .crs(targetUp);
-            var up = aux3d5.crs(dir)
-                    .nor();
+            var targetUp = Coordinates.sphericalToCartesian(aux3d3, aux3d4).nor();
+            dir.put(aux3d5).crs(targetUp);
+            var up = aux3d5.crs(dir).nor();
 
-            cameraOrientationTransition(new double[]{dir.x, dir.y, dir.z},
-                                        new double[]{up.x, up.y, up.z},
-                                        2.5,
-                                        "logisticsigmoid",
-                                        0.2,
-                                        false);
+            cameraOrientationTransition(new double[]{dir.x, dir.y, dir.z}, new double[]{up.x, up.y, up.z}, 2.5, "logisticsigmoid", 0.2, false);
         }
     }
 
@@ -539,14 +499,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         setCameraDirection(dArray(dir));
     }
 
-    public void setCameraUp(final List<?> up,
-                            final boolean immediate) {
+    public void setCameraUp(final List<?> up, final boolean immediate) {
         setCameraUp(dArray(up), immediate);
     }
 
     @Override
-    public void setCameraUp(final double[] up,
-                            final boolean immediate) {
+    public void setCameraUp(final double[] up, final boolean immediate) {
         if (checkLength(up, 3, "up")) {
             if (immediate) {
                 cameraUpEvent(up);
@@ -602,15 +560,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setCameraPositionAndFocus(String focus,
-                                          String other,
-                                          double rotation,
-                                          double solidAngle) {
+    public void setCameraPositionAndFocus(String focus, String other, double rotation, double solidAngle) {
         if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
-            if (scene.index()
-                    .containsEntity(focus) && scene.index()
-                    .containsEntity(other)) {
+            if (scene.index().containsEntity(focus) && scene.index().containsEntity(other)) {
                 Entity focusObj, otherObj;
                 synchronized (focusView) {
                     focusObj = scene.findFocus(focus);
@@ -626,28 +579,20 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    public void setCameraPositionAndFocus(String focus,
-                                          String other,
-                                          long rotation,
-                                          long solidAngle) {
+    public void setCameraPositionAndFocus(String focus, String other, long rotation, long solidAngle) {
         setCameraPositionAndFocus(focus, other, (double) rotation, (double) solidAngle);
     }
 
-    public void pointAtSkyCoordinate(double ra,
-                                     double dec) {
+    public void pointAtSkyCoordinate(double ra, double dec) {
         em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
         em.post(Event.FREE_MODE_COORD_CMD, this, ra, dec);
     }
 
-    public void pointAtSkyCoordinate(long ra,
-                                     long dec) {
+    public void pointAtSkyCoordinate(long ra, long dec) {
         pointAtSkyCoordinate((double) ra, (double) dec);
     }
 
-    private void setCameraPositionAndFocus(Entity focus,
-                                           Entity other,
-                                           double rotation,
-                                           double solidAngle) {
+    private void setCameraPositionAndFocus(Entity focus, Entity other, double rotation, double solidAngle) {
         if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
@@ -670,22 +615,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 focusView.clearEntity();
 
                 Vector3Q otherToFocus = aux3b3;
-                otherToFocus.set(focusPos)
-                        .sub(otherPos)
-                        .nor();
+                otherToFocus.set(focusPos).sub(otherPos).nor();
                 Vector3D focusToOther = aux3d4.set(otherToFocus);
-                focusToOther.scl(-dist)
-                        .rotate(up, rotation);
+                focusToOther.scl(-dist).rotate(up, rotation);
 
                 // New camera position
-                Vector3D newCamPos = aux3d5.set(focusToOther)
-                        .add(focusPos)
-                        .scl(Constants.U_TO_KM);
+                Vector3D newCamPos = aux3d5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
 
                 // New camera direction
                 Vector3D newCamDir = aux3d6.set(focusToOther);
-                newCamDir.scl(-1)
-                        .nor();
+                newCamDir.scl(-1).nor();
 
                 // Finally, set values
                 setCameraPosition(newCamPos.values());
@@ -703,9 +642,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setCameraSpeed(final float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this,
-                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED,
-                                                            Constants.MAX_CAM_SPEED), false));
+            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD,
+                                       this,
+                                       MathUtilsDouble.lint(speed,
+                                                            Constants.MIN_SLIDER,
+                                                            Constants.MAX_SLIDER,
+                                                            Constants.MIN_CAM_SPEED,
+                                                            Constants.MAX_CAM_SPEED),
+                                       false));
         }
     }
 
@@ -716,8 +660,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setCameraRotationSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this,
-                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED,
+            postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD,
+                                       this,
+                                       MathUtilsDouble.lint(speed,
+                                                            Constants.MIN_SLIDER,
+                                                            Constants.MAX_SLIDER,
+                                                            Constants.MIN_ROT_SPEED,
                                                             Constants.MAX_ROT_SPEED)));
         }
     }
@@ -738,8 +686,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setCameraTurningSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this,
-                                       MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED,
+            postRunnable(() -> em.post(Event.TURNING_SPEED_CMD,
+                                       this,
+                                       MathUtilsDouble.lint(speed,
+                                                            Constants.MIN_SLIDER,
+                                                            Constants.MAX_SLIDER,
+                                                            Constants.MIN_TURN_SPEED,
                                                             Constants.MAX_TURN_SPEED),
                                        false));
         }
@@ -761,8 +713,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setCameraSpeedLimit(int index) {
-        if (checkNum(index, 0, 21, "index"))
-            postRunnable(() -> em.post(Event.SPEED_LIMIT_CMD, this, index));
+        if (checkNum(index, 0, 21, "index")) postRunnable(() -> em.post(Event.SPEED_LIMIT_CMD, this, index));
     }
 
     @Override
@@ -791,8 +742,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void cameraForward(final double cameraForward) {
-        if (checkNum(cameraForward, -100d, 100d, "cameraForward"))
-            postRunnable(() -> em.post(Event.CAMERA_FWD, this, cameraForward));
+        if (checkNum(cameraForward, -100d, 100d, "cameraForward")) postRunnable(() -> em.post(Event.CAMERA_FWD, this, cameraForward));
     }
 
     public void cameraForward(final long value) {
@@ -800,26 +750,22 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void cameraRotate(final double deltaX,
-                             final double deltaY) {
+    public void cameraRotate(final double deltaX, final double deltaY) {
         if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY"))
             postRunnable(() -> em.post(Event.CAMERA_ROTATE, this, deltaX, deltaY));
     }
 
-    public void cameraRotate(final double deltaX,
-                             final long deltaY) {
+    public void cameraRotate(final double deltaX, final long deltaY) {
         cameraRotate(deltaX, (double) deltaY);
     }
 
-    public void cameraRotate(final long deltaX,
-                             final double deltaY) {
+    public void cameraRotate(final long deltaX, final double deltaY) {
         cameraRotate((double) deltaX, deltaY);
     }
 
     @Override
     public void cameraRoll(final double roll) {
-        if (checkNum(roll, -100d, 100d, "roll"))
-            postRunnable(() -> em.post(Event.CAMERA_ROLL, this, roll));
+        if (checkNum(roll, -100d, 100d, "roll")) postRunnable(() -> em.post(Event.CAMERA_ROLL, this, roll));
     }
 
     public void cameraRoll(final long roll) {
@@ -827,25 +773,21 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void cameraTurn(final double deltaX,
-                           final double deltaY) {
+    public void cameraTurn(final double deltaX, final double deltaY) {
         if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY")) {
             postRunnable(() -> em.post(Event.CAMERA_TURN, this, deltaX, deltaY));
         }
     }
 
-    public void cameraTurn(final double deltaX,
-                           final long deltaY) {
+    public void cameraTurn(final double deltaX, final long deltaY) {
         cameraTurn(deltaX, (double) deltaY);
     }
 
-    public void cameraTurn(final long deltaX,
-                           final double deltaY) {
+    public void cameraTurn(final long deltaX, final double deltaY) {
         cameraTurn((double) deltaX, deltaY);
     }
 
-    public void cameraTurn(final long deltaX,
-                           final long deltaY) {
+    public void cameraTurn(final long deltaX, final long deltaY) {
         cameraTurn((double) deltaX, (double) deltaY);
     }
 
@@ -886,8 +828,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setFov(final float newFov) {
         if (!SlaveManager.projectionActive()) {
-            if (checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
-                postRunnable(() -> em.post(Event.FOV_CHANGED_CMD, this, newFov));
+            if (checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov")) postRunnable(() -> em.post(Event.FOV_CHANGED_CMD, this, newFov));
         }
     }
 
@@ -896,14 +837,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setVisibility(final String key,
-                              final boolean visible) {
+    public void setVisibility(final String key, final boolean visible) {
         setComponentTypeVisibility(key, visible);
     }
 
     @Override
-    public void setComponentTypeVisibility(String key,
-                                           boolean visible) {
+    public void setComponentTypeVisibility(String key, boolean visible) {
         if (checkCtKeyNull(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentType[] cts = ComponentType.values();
@@ -943,10 +882,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 posPrec.put(posFloat);
                 posPrec.put(posDouble);
                 if (camera.getCamera().direction.dot(posFloat) > 0) {
-                    camera.getCamera()
-                            .project(posFloat);
-                    if (posFloat.x < 0 || posFloat.x > Gdx.graphics.getWidth()
-                            || posFloat.y < 0 || posFloat.y > Gdx.graphics.getHeight()) {
+                    camera.getCamera().project(posFloat);
+                    if (posFloat.x < 0 || posFloat.x > Gdx.graphics.getWidth() || posFloat.y < 0 || posFloat.y > Gdx.graphics.getHeight()) {
                         // Off screen.
                         return null;
                     }
@@ -958,8 +895,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean setObjectVisibility(String name,
-                                       boolean visible) {
+    public boolean setObjectVisibility(String name, boolean visible) {
         if (checkObjectName(name)) {
             Entity obj = getEntity(name);
 
@@ -977,17 +913,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             boolean visible;
             synchronized (focusView) {
                 focusView.setEntity(obj);
-                visible = focusView.isVisible(name.toLowerCase()
-                                                      .strip());
+                visible = focusView.isVisible(name.toLowerCase().strip());
             }
             return visible;
         }
         return false;
     }
 
-    private boolean setObjectQuaternionOrientation(String name,
-                                                   String file,
-                                                   boolean slerp) {
+    private boolean setObjectQuaternionOrientation(String name, String file, boolean slerp) {
         if (checkObjectName(name)) {
             var entity = getObject(name);
             if (Mapper.orientation.has(entity.getEntity())) {
@@ -1021,8 +954,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean setObjectQuaternionSlerpOrientation(String name,
-                                                       String file) {
+    public boolean setObjectQuaternionSlerpOrientation(String name, String file) {
         return setObjectQuaternionOrientation(name, file, true);
     }
 
@@ -1039,8 +971,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setForceDisplayLabel(String name,
-                                     boolean forceLabel) {
+    public void setForceDisplayLabel(String name, boolean forceLabel) {
         if (checkObjectName(name)) {
             Entity obj = getEntity(name);
             em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, name, forceLabel);
@@ -1048,16 +979,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setLabelColor(String name,
-                              double[] color) {
+    public void setLabelColor(String name, double[] color) {
         if (checkObjectName(name)) {
             Entity obj = getEntity(name);
             em.post(Event.LABEL_COLOR_CMD, this, obj, name, GlobalResources.toFloatArray(color));
         }
     }
 
-    public void setLabelColor(String name,
-                              final List<?> color) {
+    public void setLabelColor(String name, final List<?> color) {
         setLabelColor(name, dArray(color));
     }
 
@@ -1098,8 +1027,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this,
-                                                MathUtilsDouble.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR,
+        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD,
+                                                this,
+                                                MathUtilsDouble.lint(factor,
+                                                                     Constants.MIN_SLIDER,
+                                                                     Constants.MAX_SLIDER,
+                                                                     Constants.MIN_PM_NUM_FACTOR,
                                                                      Constants.MAX_PM_NUM_FACTOR)));
     }
 
@@ -1178,13 +1111,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setSimulationTime(int year,
-                                  int month,
-                                  int day,
-                                  int hour,
-                                  int min,
-                                  int sec,
-                                  int millisec) {
+    public void setSimulationTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
         if (checkDateTime(year, month, day, hour, min, sec, millisec)) {
             LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
             em.post(Event.TIME_CHANGE_CMD, this, date.toInstant(ZoneOffset.UTC));
@@ -1194,14 +1121,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public long getSimulationTime() {
         ITimeFrameProvider time = GaiaSky.instance.time;
-        return time.getTime()
-                .toEpochMilli();
+        return time.getTime().toEpochMilli();
     }
 
     @Override
     public void setSimulationTime(final long time) {
-        if (checkNum(time, -Long.MAX_VALUE, Long.MAX_VALUE, "time"))
-            em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
+        if (checkNum(time, -Long.MAX_VALUE, Long.MAX_VALUE, "time")) em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
     }
 
     @Override
@@ -1259,16 +1184,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setTargetTime(int year,
-                              int month,
-                              int day,
-                              int hour,
-                              int min,
-                              int sec,
-                              int millisec) {
+    public void setTargetTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
         if (checkDateTime(year, month, day, hour, min, sec, millisec)) {
-            em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec)
-                    .toInstant(ZoneOffset.UTC));
+            em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
         }
     }
 
@@ -1297,17 +1215,22 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public float getStarBrightness() {
-        return (float) MathUtilsDouble.lint(Settings.settings.scene.star.brightness, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS,
+        return (float) MathUtilsDouble.lint(Settings.settings.scene.star.brightness,
+                                            Constants.MIN_STAR_BRIGHTNESS,
+                                            Constants.MAX_STAR_BRIGHTNESS,
                                             Constants.MIN_SLIDER,
                                             Constants.MAX_SLIDER);
     }
 
     @Override
     public void setStarBrightness(final float brightness) {
-        if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness"))
-            em.post(Event.STAR_BRIGHTNESS_CMD, this,
-                    MathUtilsDouble.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS,
-                                         Constants.MAX_STAR_BRIGHTNESS));
+        if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness")) em.post(Event.STAR_BRIGHTNESS_CMD,
+                                                                                                    this,
+                                                                                                    MathUtilsDouble.lint(brightness,
+                                                                                                                         Constants.MIN_SLIDER,
+                                                                                                                         Constants.MAX_SLIDER,
+                                                                                                                         Constants.MIN_STAR_BRIGHTNESS,
+                                                                                                                         Constants.MAX_STAR_BRIGHTNESS));
     }
 
     public void setStarBrightness(final int brightness) {
@@ -1316,7 +1239,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public float getPointSize() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE,
+        return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize,
+                                    Constants.MIN_STAR_POINT_SIZE,
+                                    Constants.MAX_STAR_POINT_SIZE,
                                     Constants.MIN_SLIDER,
                                     Constants.MAX_SLIDER);
     }
@@ -1328,8 +1253,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setPointSize(final float size) {
-        if (checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size"))
-            em.post(Event.STAR_POINT_SIZE_CMD, this, size);
+        if (checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size")) em.post(Event.STAR_POINT_SIZE_CMD, this, size);
     }
 
     @Override
@@ -1343,7 +1267,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public float getStarBaseOpacity() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY,
+        return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0],
+                                    Constants.MIN_STAR_MIN_OPACITY,
+                                    Constants.MAX_STAR_MIN_OPACITY,
                                     Constants.MIN_SLIDER,
                                     Constants.MAX_SLIDER);
     }
@@ -1434,11 +1360,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setProjectionFov(float newFov) {
-        if (checkNum(newFov, Constants.MIN_FOV, 170f, "newFov"))
-            postRunnable(() -> {
-                SlaveManager.instance.cameraFov = newFov;
-                em.post(Event.FOV_CHANGED_CMD, this, newFov);
-            });
+        if (checkNum(newFov, Constants.MIN_FOV, 170f, "newFov")) postRunnable(() -> {
+            SlaveManager.instance.cameraFov = newFov;
+            em.post(Event.FOV_CHANGED_CMD, this, newFov);
+        });
     }
 
     @Override
@@ -1454,12 +1379,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void configureScreenshots(int width,
-                                     int height,
-                                     String directory,
-                                     String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkString(directory, "directory")
-                && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
+    public void configureScreenshots(int width, int height, String directory, String namePrefix) {
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkString(directory,
+                                                                                                                              "directory") && checkDirectoryExists(
+                directory,
+                "directory") && checkString(namePrefix, "namePrefix")) {
             em.post(Event.SCREENSHOT_CMD, this, width, height, directory);
         }
     }
@@ -1472,7 +1396,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
         if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode")) {
             em.post(Event.SCREENSHOT_MODE_CMD, this, screenshotMode);
-            postRunnable(() -> em.post(Event.SCREENSHOT_SIZE_UPDATE, this, Settings.settings.screenshot.resolution[0],
+            postRunnable(() -> em.post(Event.SCREENSHOT_SIZE_UPDATE,
+                                       this,
+                                       Settings.settings.screenshot.resolution[0],
                                        Settings.settings.screenshot.resolution[1]));
         }
     }
@@ -1489,36 +1415,25 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void configureFrameOutput(int width,
-                                     int height,
-                                     int fps,
-                                     String directory,
-                                     String namePrefix) {
+    public void configureFrameOutput(int width, int height, int fps, String directory, String namePrefix) {
         configureFrameOutput(width, height, (double) fps, directory, namePrefix);
     }
 
     @Override
-    public void configureFrameOutput(int width,
-                                     int height,
-                                     double fps,
-                                     String directory,
-                                     String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS,
+    public void configureFrameOutput(int width, int height, double fps, String directory, String namePrefix) {
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps,
+                                                                                                                           Constants.MIN_FPS,
                                                                                                                            Constants.MAX_FPS,
                                                                                                                            "FPS") && checkString(
-                directory, "directory")
-                && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
+                directory,
+                "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
             em.post(Event.FRAME_OUTPUT_MODE_CMD, this, Settings.ScreenshotMode.ADVANCED);
             em.post(Event.CONFIG_FRAME_OUTPUT_CMD, this, width, height, fps, directory, namePrefix);
         }
     }
 
     @Override
-    public void configureRenderOutput(int width,
-                                      int height,
-                                      int fps,
-                                      String directory,
-                                      String namePrefix) {
+    public void configureRenderOutput(int width, int height, int fps, String directory, String namePrefix) {
         configureFrameOutput(width, height, fps, directory, namePrefix);
     }
 
@@ -1563,8 +1478,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public FocusView getObject(String name,
-                               double timeOutSeconds) {
+    public FocusView getObject(String name, double timeOutSeconds) {
         if (checkObjectName(name, timeOutSeconds)) {
             Entity object = getEntity(name, timeOutSeconds);
             return new FocusView(object);
@@ -1578,8 +1492,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public VertsView getLineObject(String name,
-                                   double timeOutSeconds) {
+    public VertsView getLineObject(String name, double timeOutSeconds) {
         if (checkObjectName(name, timeOutSeconds)) {
             Entity object = getEntity(name, timeOutSeconds);
             if (Mapper.verts.has(object)) {
@@ -1596,8 +1509,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return getEntity(name, 0);
     }
 
-    public Entity getEntity(String name,
-                            double timeOutSeconds) {
+    public Entity getEntity(String name, double timeOutSeconds) {
         Entity obj = scene.getEntity(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -1609,8 +1521,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
 
         // If negative, no limit in waiting
-        if (timeOutSeconds < 0)
-            timeOutSeconds = Double.MAX_VALUE;
+        if (timeOutSeconds < 0) timeOutSeconds = Double.MAX_VALUE;
 
         double startMs = System.currentTimeMillis();
         double elapsedSeconds = 0;
@@ -1631,16 +1542,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setObjectSizeScaling(String name,
-                                     double scalingFactor) {
+    public void setObjectSizeScaling(String name, double scalingFactor) {
         if (checkObjectName(name)) {
             Entity object = getEntity(name);
             setObjectSizeScaling(object, scalingFactor);
         }
     }
 
-    public void setObjectSizeScaling(Entity object,
-                                     double scalingFactor) {
+    public void setObjectSizeScaling(Entity object, double scalingFactor) {
         if (checkNotNull(object, "Entity")) {
             if (Mapper.modelScaffolding.has(object)) {
                 var scaffolding = Mapper.modelScaffolding.get(object);
@@ -1656,8 +1565,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setOrbitCoordinatesScaling(String name,
-                                           double scalingFactor) {
+    public void setOrbitCoordinatesScaling(String name, double scalingFactor) {
         int modified = 0;
         String className, objectName;
         if (name.contains(":")) {
@@ -1671,12 +1579,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         // Coordinates provider.
         List<AbstractOrbitCoordinates> aocs = AbstractOrbitCoordinates.getInstances();
         for (AbstractOrbitCoordinates aoc : aocs) {
-            if (aoc.getClass()
-                    .getSimpleName()
-                    .equalsIgnoreCase(className)) {
+            if (aoc.getClass().getSimpleName().equalsIgnoreCase(className)) {
                 if (objectName != null) {
-                    if (aoc.getOrbitName() != null && aoc.getOrbitName()
-                            .contains(objectName)) {
+                    if (aoc.getOrbitName() != null && aoc.getOrbitName().contains(objectName)) {
                         aoc.setScaling(scalingFactor);
                         modified++;
                     }
@@ -1747,40 +1652,42 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void goToObject(String name,
-                           double angle) {
+    public void goToObject(String name, double angle) {
         goToObject(name, angle, -1);
     }
 
     @Override
-    public void goToObject(String name,
-                           double solidAngle,
-                           float waitTimeSeconds) {
+    public void goToObject(String name, double solidAngle, float waitTimeSeconds) {
         goToObject(name, solidAngle, waitTimeSeconds, null);
     }
 
-    public void goToObject(String name,
-                           double solidAngle,
-                           int waitTimeSeconds) {
+    /**
+     * Same as {@link IScriptingInterface#goToObject(String, double, float)}, but using an integer for <code>waitTimeSeconds</code>.
+     */
+    public void goToObject(String name, double solidAngle, int waitTimeSeconds) {
         goToObject(name, solidAngle, (float) waitTimeSeconds);
     }
 
-    public void goToObject(String name,
-                           long solidAngle,
-                           int waitTimeSeconds) {
+    /**
+     * Same as {@link IScriptingInterface#goToObject(String, double, float)}, but using an integer for <code>waitTimeSeconds</code>, and
+     * a long for <code>solidAngle</code>.
+     */
+    public void goToObject(String name, long solidAngle, int waitTimeSeconds) {
         goToObject(name, (double) solidAngle, (float) waitTimeSeconds);
     }
 
-    public void goToObject(String name,
-                           long solidAngle,
-                           float waitTimeSeconds) {
+    /**
+     * Same as {@link IScriptingInterface#goToObject(String, double, float)}, but using a long for <code>solidAngle</code>.
+     */
+    public void goToObject(String name, long solidAngle, float waitTimeSeconds) {
         goToObject(name, (double) solidAngle, waitTimeSeconds);
     }
 
-    private void goToObject(String name,
-                            double solidAngle,
-                            float waitTimeSeconds,
-                            AtomicBoolean stop) {
+    /**
+     * Version of {@link IScriptingInterface#goToObject(String, double, float)} that gets an optional {@link AtomicBoolean} that
+     * enables stopping the execution of the call when its value changes.
+     */
+    private void goToObject(String name, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkString(name, "name") && checkObjectName(name)) {
             Entity focus = scene.findFocus(name);
             focusView.setEntity(focus);
@@ -1789,17 +1696,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    public void goToObject(String name,
-                           double solidAngle,
-                           int waitTimeSeconds,
-                           AtomicBoolean stop) {
+    /**
+     * Version of {@link EventScriptingInterface#goToObject(String, double, int)} that gets an optional {@link AtomicBoolean} that
+     * enables stopping the execution of the call when its value changes.
+     */
+    public void goToObject(String name, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
         goToObject(name, solidAngle, (float) waitTimeSeconds, stop);
     }
 
-    void goToObject(Entity object,
-                    double solidAngle,
-                    float waitTimeSeconds,
-                    AtomicBoolean stop) {
+    /**
+     * Version of {@link EventScriptingInterface#goToObject(String, double, float, AtomicBoolean)} that gets the actual entity
+     * object as an {@link Entity} instead of the entity name as a {@link String}.
+     */
+    void goToObject(Entity object, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(solidAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "solidAngle")) {
             stops.add(stop);
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
@@ -1860,10 +1769,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    public void goToObject(Entity object,
-                           double solidAngle,
-                           int waitTimeSeconds,
-                           AtomicBoolean stop) {
+    /**
+     * Version of {@link EventScriptingInterface#goToObject(Entity, double, float, AtomicBoolean)} that gets the <code>waitTimeSeconds</code>
+     * as an integer instead of a float.
+     */
+    public void goToObject(Entity object, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
         goToObject(object, solidAngle, (float) waitTimeSeconds, stop);
     }
 
@@ -1902,6 +1812,15 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     public void goToObjectSmooth(Entity object, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
+        goToObjectSmooth(object, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync, null);
+    }
+
+    public void goToObjectSmooth(Entity object,
+                                 double solidAngle,
+                                 double positionDurationSeconds,
+                                 double orientationDurationSeconds,
+                                 boolean sync,
+                                 AtomicBoolean stop) {
         focusView.setEntity(object);
         // Get focus radius.
         var radius = focusView.getRadius();
@@ -1918,17 +1837,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
 
             // Camera to object vector.
-            var camObj = aux3b4.set(o)
-                    .sub(c);
+            var camObj = aux3b4.set(o).sub(c);
             // Direction is object - camera.
-            var dir = aux3b5.set(camObj)
-                    .nor();
+            var dir = aux3b5.set(camObj).nor();
             // Up vector from current camera up.
-            var up = aux3b1.set(camUp)
-                    .crs(dir)
-                    .crs(dir)
-                    .scl(-1)
-                    .nor();
+            var up = aux3b1.set(camUp).crs(dir).crs(dir).scl(-1).nor();
 
             // Length between camera and object, computed from the solid angle.
             double targetAngle = FastMath.toRadians(solidAngle);
@@ -1946,12 +1859,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 }
             }
             var targetDistance = radius / FastMath.tan(targetAngle * 0.5);
-            var len = camObj.len()
-                    .subtract(new Quadruple(targetDistance));
+            var len = camObj.len().subtract(new Quadruple(targetDistance));
             // Final position.
-            var pos = camObj.nor()
-                    .scl(len)
-                    .add(c);
+            var pos = camObj.nor().scl(len).add(c);
 
 
             cameraTransition(pos.valuesD(),
@@ -1964,7 +1874,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                              orientationDurationSeconds,
                              "logisticsigmoid",
                              17.0,
-                             sync);
+                             sync,
+                             stop);
         }
     }
 
@@ -1982,8 +1893,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    void landOnObject(Entity object,
-                      AtomicBoolean stop) {
+    void landOnObject(Entity object, AtomicBoolean stop) {
         if (checkNotNull(object, "object")) {
 
             stops.add(stop);
@@ -2006,9 +1916,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD, this,
-                            (float) MathUtilsDouble.flint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED,
-                                                          Constants.MAX_TURN_SPEED), false);
+                    em.post(Event.TURNING_SPEED_CMD,
+                            this,
+                            (float) MathUtilsDouble.flint(20d,
+                                                          Constants.MIN_SLIDER,
+                                                          Constants.MAX_SLIDER,
+                                                          Constants.MIN_TURN_SPEED,
+                                                          Constants.MAX_TURN_SPEED),
+                            false);
 
                     // Save cinematic
                     boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -2023,9 +1938,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     double target = 100 * Constants.M_TO_U;
 
                     Vector3Q camObj = aux3b1;
-                    focusView.getAbsolutePosition(camObj)
-                            .add(cam.posInv)
-                            .nor();
+                    focusView.getAbsolutePosition(camObj).add(cam.posInv).nor();
                     Vector3D dir = cam.direction;
 
                     // Add forward movement while distance > target distance
@@ -2038,10 +1951,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                         long dt = TimeUtils.timeSinceMillis(prevTime);
                         prevTime = TimeUtils.millis();
 
-                        if (distanceNotMet)
-                            em.post(Event.CAMERA_FWD, this, 0.1d * dt);
-                        else
-                            cam.stopForwardMovement();
+                        if (distanceNotMet) em.post(Event.CAMERA_FWD, this, 0.1d * dt);
+                        else cam.stopForwardMovement();
 
                         if (viewNotMet) {
                             if (focusView.getDistToCamera() - focusView.getRadius() < focusView.getRadius() * 5)
@@ -2068,12 +1979,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     // Roll till done
                     Vector3D up = cam.up;
                     // aux1 <- camera-object
-                    camObj = focusView.getAbsolutePosition(aux3b1)
-                            .sub(cam.pos);
+                    camObj = focusView.getAbsolutePosition(aux3b1).sub(cam.pos);
                     double ang1 = up.angle(camObj);
-                    double ang2 = up.cpy()
-                            .rotate(cam.direction, 1)
-                            .angle(camObj);
+                    double ang2 = up.cpy().rotate(cam.direction, 1).angle(camObj);
                     double rollSign = ang1 < ang2 ? -1d : 1d;
 
                     if (ang1 < 170) {
@@ -2110,14 +2018,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void landAtObjectLocation(String name,
-                                     String locationName) {
+    public void landAtObjectLocation(String name, String locationName) {
         landAtObjectLocation(name, locationName, null);
     }
 
-    public void landAtObjectLocation(String name,
-                                     String locationName,
-                                     AtomicBoolean stop) {
+    public void landAtObjectLocation(String name, String locationName, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             stops.add(stop);
             Entity entity = getEntity(name);
@@ -2131,17 +2036,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    public void landAtObjectLocation(Entity object,
-                                     String locationName,
-                                     AtomicBoolean stop) {
+    public void landAtObjectLocation(Entity object, String locationName, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
 
             stops.add(stop);
             if (Mapper.atmosphere.has(object)) {
                 synchronized (focusView) {
                     focusView.setEntity(object);
-                    Entity loc = focusView.getChildByNameAndArchetype(locationName, scene.archetypes()
-                            .get("Loc"));
+                    Entity loc = focusView.getChildByNameAndArchetype(locationName, scene.archetypes().get("Loc"));
                     if (loc != null) {
                         var locMark = Mapper.loc.get(loc);
                         landAtObjectLocation(object, locMark.location.x, locMark.location.y, stop);
@@ -2154,9 +2056,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void landAtObjectLocation(String name,
-                                     double longitude,
-                                     double latitude) {
+    public void landAtObjectLocation(String name, double longitude, double latitude) {
         if (checkString(name, "name")) {
             Entity entity = getEntity(name);
             if (Mapper.focus.has(entity)) {
@@ -2169,20 +2069,15 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    void landAtObjectLocation(Entity entity,
-                              double longitude,
-                              double latitude,
-                              AtomicBoolean stop) {
+    void landAtObjectLocation(Entity entity, double longitude, double latitude, AtomicBoolean stop) {
         if (checkNotNull(entity, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, -360d, 360d, "longitude")) {
             synchronized (focusView) {
                 focusView.setEntity(entity);
                 stops.add(stop);
                 String nameStub = focusView.getCandidateName() + " [loc]";
 
-                if (!scene.index()
-                        .containsEntity(nameStub)) {
-                    var archetype = scene.archetypes()
-                            .get("Invisible");
+                if (!scene.index().containsEntity(nameStub)) {
+                    var archetype = scene.archetypes().get("Invisible");
                     Entity invisible = archetype.createEntity();
                     var base = Mapper.base.get(invisible);
                     base.setName(nameStub);
@@ -2219,14 +2114,22 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD, this,
-                            (float) MathUtilsDouble.flint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED,
+                    em.post(Event.TURNING_SPEED_CMD,
+                            this,
+                            (float) MathUtilsDouble.flint(50d,
+                                                          Constants.MIN_SLIDER,
+                                                          Constants.MAX_SLIDER,
+                                                          Constants.MIN_TURN_SPEED,
                                                           Constants.MAX_TURN_SPEED));
 
                     // Save rotation speed, set it to 20
                     double rotationSpeedBak = Settings.settings.scene.camera.rotate;
-                    em.post(Event.ROTATION_SPEED_CMD, this,
-                            (float) MathUtilsDouble.flint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED,
+                    em.post(Event.ROTATION_SPEED_CMD,
+                            this,
+                            (float) MathUtilsDouble.flint(20d,
+                                                          Constants.MIN_SLIDER,
+                                                          Constants.MAX_SLIDER,
+                                                          Constants.MIN_ROT_SPEED,
                                                           Constants.MAX_ROT_SPEED));
 
                     // Save cinematic
@@ -2245,7 +2148,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     Vector3Q objectPosition = focusView.getAbsolutePosition(aux3b2);
 
                     // Check intersection with object
-                    boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1),
+                    boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3),
+                                                                                       target.tov3d(aux3d1),
                                                                                        objectPosition.tov3d(aux3d2),
                                                                                        focusView.getRadius());
 
@@ -2257,7 +2161,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                         sleep(0.1f);
 
                         objectPosition = focusView.getAbsolutePosition(aux3b2);
-                        intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1),
+                        intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3),
+                                                                                   target.tov3d(aux3d1),
                                                                                    objectPosition.tov3d(aux3d2),
                                                                                    focusView.getRadius());
                     }
@@ -2293,12 +2198,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    private void rollAndWait(double roll,
-                             double target,
-                             long sleep,
-                             NaturalCamera cam,
-                             Vector3Q camobj,
-                             AtomicBoolean stop) {
+    private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3Q camobj, AtomicBoolean stop) {
         // Apply roll and wait
         double ang = cam.up.angle(camobj);
 
@@ -2324,9 +2224,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 focusView.getFocus(name);
                 if (focusView.getSet() != null) {
                     var pos = focusView.getAbsolutePosition(name, aux3b1);
-                    return pos.sub(GaiaSky.instance.getICamera()
-                                           .getPos())
-                            .lenDouble() * Constants.U_TO_KM;
+                    return pos.sub(GaiaSky.instance.getICamera().getPos()).lenDouble() * Constants.U_TO_KM;
                 } else {
                     return (focusView.getDistToCamera() - focusView.getRadius()) * Constants.U_TO_KM;
                 }
@@ -2359,16 +2257,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public double[] getObjectPosition(String name,
-                                      String units) {
+    public double[] getObjectPosition(String name, String units) {
         if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
             Entity entity = getEntity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getAbsolutePosition(name, aux3b1);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(
-                    aux3b1.z.doubleValue())};
+            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
     }
@@ -2379,81 +2275,64 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public double[] getObjectPredictedPosition(String name,
-                                               String units) {
+    public double[] getObjectPredictedPosition(String name, String units) {
         if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
             Entity entity = getEntity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
-            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(
-                    aux3b1.z.doubleValue())};
+            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
     }
 
     @Override
-    public void setObjectPosition(String name,
-                                  double[] position) {
+    public void setObjectPosition(String name, double[] position) {
         setObjectPosition(name, position, "internal");
     }
 
     @Override
-    public void setObjectPosition(String name,
-                                  double[] position,
-                                  String units) {
+    public void setObjectPosition(String name, double[] position, String units) {
         if (checkObjectName(name)) {
             setObjectPosition(getObject(name), position, units);
         }
 
     }
 
-    public void setObjectPosition(String name,
-                                  List<?> position) {
+    public void setObjectPosition(String name, List<?> position) {
         setObjectPosition(name, position, "internal");
     }
 
-    public void setObjectPosition(String name,
-                                  List<?> position,
-                                  String units) {
+    public void setObjectPosition(String name, List<?> position, String units) {
         setObjectPosition(name, dArray(position), units);
     }
 
     @Override
-    public void setObjectPosition(FocusView object,
-                                  double[] position) {
+    public void setObjectPosition(FocusView object, double[] position) {
         setObjectPosition(object, position, "internal");
     }
 
     @Override
-    public void setObjectPosition(FocusView object,
-                                  double[] position,
-                                  String units) {
+    public void setObjectPosition(FocusView object, double[] position, String units) {
         setObjectPosition(object.getEntity(), position, units);
     }
 
-    public void setObjectPosition(FocusView object,
-                                  List<?> position) {
+    public void setObjectPosition(FocusView object, List<?> position) {
         setObjectPosition(object, position, "internal");
     }
 
-    public void setObjectPosition(FocusView object,
-                                  List<?> position,
-                                  String units) {
+    public void setObjectPosition(FocusView object, List<?> position, String units) {
         setObjectPosition(object, dArray(position), units);
     }
 
     @Override
-    public void setObjectPosition(Entity object,
-                                  double[] position) {
+    public void setObjectPosition(Entity object, double[] position) {
         setObjectPosition(object, position, "internal");
     }
 
     @Override
-    public void setObjectPosition(Entity object,
-                                  double[] position,
-                                  String units) {
+    public void setObjectPosition(Entity object, double[] position, String units) {
         if (checkNotNull(object, "object") && checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
 
             DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
@@ -2466,8 +2345,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setObjectCoordinatesProvider(String name,
-                                             IPythonCoordinatesProvider provider) {
+    public void setObjectCoordinatesProvider(String name, IPythonCoordinatesProvider provider) {
         if (checkObjectName(name) && checkNotNull(provider, "provider")) {
             var object = getObject(name);
             if (checkNotNull(object.getEntity(), "object")) {
@@ -2499,8 +2377,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     }
 
-    public void setObjectPosition(Entity object,
-                                  List<?> position) {
+    public void setObjectPosition(Entity object, List<?> position) {
         setObjectPosition(object, dArray(position));
     }
 
@@ -2555,12 +2432,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    public void displayMessageObject(final int id,
-                                     final String message,
-                                     final double x,
-                                     final double y,
-                                     final List<?> color,
-                                     final double fontSize) {
+    public void displayMessageObject(final int id, final String message, final double x, final double y, final List<?> color, final double fontSize) {
         displayMessageObject(id, message, x, y, dArray(color), fontSize);
     }
 
@@ -2621,30 +2493,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void displayImageObject(final int id,
-                                   final String path,
-                                   final double x,
-                                   final double y,
-                                   final double[] color) {
+    public void displayImageObject(final int id, final String path, final double x, final double y, final double[] color) {
         if (checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
             displayImageObject(id, path, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a);
         }
     }
 
-    public void displayImageObject(final int id,
-                                   final String path,
-                                   final double x,
-                                   final double y,
-                                   final List<?> color) {
+    public void displayImageObject(final int id, final String path, final double x, final double y, final List<?> color) {
         displayImageObject(id, path, x, y, dArray(color));
     }
 
     @Override
-    public void displayImageObject(final int id,
-                                   final String path,
-                                   final float x,
-                                   final float y) {
+    public void displayImageObject(final int id, final String path, final float x, final float y) {
         postRunnable(() -> {
             Texture tex = getTexture(path);
             em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y);
@@ -2682,7 +2543,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void expandUIPane(String panelName) {
-        if (checkString(panelName, new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
+        if (checkString(panelName,
+                        new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
                         "panelName")) {
             postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", true));
         }
@@ -2690,7 +2552,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void collapseUIPane(String panelName) {
-        if (checkString(panelName, new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
+        if (checkString(panelName,
+                        new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
                         "panelName")) {
             postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", false));
         }
@@ -2707,23 +2570,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setGuiPosition(final float x,
-                               final float y) {
+    public void setGuiPosition(final float x, final float y) {
         postRunnable(() -> em.post(Event.GUI_MOVE_CMD, this, x, y));
     }
 
-    public void setGuiPosition(final int x,
-                               final int y) {
+    public void setGuiPosition(final int x, final int y) {
         setGuiPosition((float) x, (float) y);
     }
 
-    public void setGuiPosition(final float x,
-                               final int y) {
+    public void setGuiPosition(final float x, final int y) {
         setGuiPosition(x, (float) y);
     }
 
-    public void setGuiPosition(final int x,
-                               final float y) {
+    public void setGuiPosition(final int x, final float y) {
         setGuiPosition((float) x, y);
     }
 
@@ -2768,9 +2627,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public float[] getPositionAndSizeGui(String name) {
         IGui gui = GaiaSky.instance.mainGui;
-        Actor actor = gui.getGuiStage()
-                .getRoot()
-                .findActor(name);
+        Actor actor = gui.getGuiStage().getRoot().findActor(name);
         if (actor != null) {
             float x = actor.getX();
             float y = actor.getY();
@@ -2791,15 +2648,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public String getVersion() {
-        return Settings.settings.version.version +
-                '\n' +
-                Settings.settings.version.build +
-                '\n' +
-                Settings.settings.version.system +
-                '\n' +
-                Settings.settings.version.builder +
-                '\n' +
-                Settings.settings.version.buildTime;
+        return Settings.settings.version.version + '\n' + Settings.settings.version.build + '\n' + Settings.settings.version.system + '\n' + Settings.settings.version.builder + '\n' + Settings.settings.version.buildTime;
     }
 
     @Override
@@ -2813,12 +2662,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean waitFocus(String name,
-                             long timeoutMs) {
+    public boolean waitFocus(String name, long timeoutMs) {
         long iniTime = TimeUtils.millis();
         NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
-        while (cam.focus == null || !cam.focus.getName()
-                .equalsIgnoreCase(name)) {
+        while (cam.focus == null || !cam.focus.getName().equalsIgnoreCase(name)) {
             sleepFrames(1);
             long spent = TimeUtils.millis() - iniTime;
             if (timeoutMs > 0 && spent > timeoutMs) {
@@ -2884,9 +2731,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void startRecordingCameraPath(String fileName) {
-        em.post(Event.RECORD_CAMERA_CMD, this, true, Path.of(fileName)
-                .getFileName()
-                .toString());
+        em.post(Event.RECORD_CAMERA_CMD, this, true, Path.of(fileName).getFileName().toString());
     }
 
     @Override
@@ -2895,14 +2740,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void playCameraPath(String file,
-                               boolean sync) {
+    public void playCameraPath(String file, boolean sync) {
         runCameraPath(file, sync);
     }
 
     @Override
-    public void runCameraPath(String file,
-                              boolean sync) {
+    public void runCameraPath(String file, boolean sync) {
         em.post(Event.PLAY_CAMERA_CMD, this, true, file);
 
         // Wait if needed
@@ -2950,105 +2793,59 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void cameraTransitionKm(double[] camPos,
-                                   double[] camDir,
-                                   double[] camUp,
-                                   double seconds) {
+    public void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds) {
         cameraTransition(camPos, "km", camDir, camUp, seconds, true);
     }
 
-    public void cameraTransitionKm(List<?> camPos,
-                                   List<?> camDir,
-                                   List<?> camUp,
-                                   double seconds) {
+    public void cameraTransitionKm(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
         cameraTransitionKm(dArray(camPos), dArray(camDir), dArray(camUp), seconds);
     }
 
-    public void cameraTransitionKm(List<?> camPos,
-                                   List<?> camDir,
-                                   List<?> camUp,
-                                   long seconds) {
+    public void cameraTransitionKm(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
         cameraTransitionKm(camPos, camDir, camUp, (double) seconds);
     }
 
     @Override
-    public void cameraTransition(double[] camPos,
-                                 double[] camDir,
-                                 double[] camUp,
-                                 double seconds) {
+    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
     @Override
-    public void cameraTransition(double[] camPos,
-                                 String units,
-                                 double[] camDir,
-                                 double[] camUp,
-                                 double seconds) {
+    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds) {
         cameraTransition(camPos, units, camDir, camUp, seconds, true);
     }
 
-    public void cameraTransition(double[] camPos,
-                                 double[] camDir,
-                                 double[] camUp,
-                                 long seconds) {
+    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, long seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
-    public void cameraTransition(double[] camPos,
-                                 String units,
-                                 double[] camDir,
-                                 double[] camUp,
-                                 long seconds) {
+    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, long seconds) {
         cameraTransition(camPos, units, camDir, camUp, (double) seconds);
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 double seconds) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 String units,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 double seconds) {
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, double seconds) {
         cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds);
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 long seconds) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds);
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 String units,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 long seconds) {
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, long seconds) {
         cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds);
     }
 
     @Override
-    public void cameraTransition(double[] camPos,
-                                 double[] camDir,
-                                 double[] camUp,
-                                 double seconds,
-                                 boolean sync) {
+    public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
     }
 
     @Override
-    public void cameraTransition(double[] camPos,
-                                 String units,
-                                 double[] camDir,
-                                 double[] camUp,
-                                 double seconds,
-                                 boolean sync) {
+    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds, boolean sync) {
         cameraTransition(camPos, units, camDir, camUp, seconds, "none", 0, seconds, "none", 0, sync);
     }
 
@@ -3060,9 +2857,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                  double positionSmoothFactor,
                                  String orientationSmoothType,
                                  double orientationSmoothFactor) {
-        cameraTransition(dArray(camPos), "internal", dArray(camDir), dArray(camUp), seconds, positionSmoothType, positionSmoothFactor, seconds,
+        cameraTransition(dArray(camPos),
+                         "internal",
+                         dArray(camDir),
+                         dArray(camUp),
+                         seconds,
+                         positionSmoothType,
+                         positionSmoothFactor,
+                         seconds,
                          orientationSmoothType,
-                         orientationSmoothFactor, true);
+                         orientationSmoothFactor,
+                         true);
     }
 
     @Override
@@ -3075,9 +2880,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                  double orientationDurationSeconds,
                                  String orientationSmoothType,
                                  double orientationSmoothFactor) {
-        cameraTransition(camPos, "internal", camDir, camUp, positionDurationSeconds, positionSmoothType, positionSmoothFactor,
+        cameraTransition(camPos,
+                         "internal",
+                         camDir,
+                         camUp,
+                         positionDurationSeconds,
+                         positionSmoothType,
+                         positionSmoothFactor,
                          orientationDurationSeconds,
-                         orientationSmoothType, orientationSmoothFactor, true);
+                         orientationSmoothType,
+                         orientationSmoothFactor,
+                         true);
     }
 
     public void cameraTransition(List<?> camPos,
@@ -3091,8 +2904,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                  String orientationSmoothType,
                                  double orientationSmoothFactor,
                                  boolean sync) {
-        cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), positionDurationSeconds, positionSmoothType, positionSmoothFactor,
-                         orientationDurationSeconds, orientationSmoothType, orientationSmoothFactor, sync);
+        cameraTransition(dArray(camPos),
+                         units,
+                         dArray(camDir),
+                         dArray(camUp),
+                         positionDurationSeconds,
+                         positionSmoothType,
+                         positionSmoothFactor,
+                         orientationDurationSeconds,
+                         orientationSmoothType,
+                         orientationSmoothFactor,
+                         sync);
     }
 
     @Override
@@ -3107,9 +2929,34 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                  String orientationSmoothType,
                                  double orientationSmoothFactor,
                                  boolean sync) {
-        if (checkDistanceUnits(units, "units") &&
-                checkSmoothType(positionSmoothType, "positionSmoothType") &&
-                checkSmoothType(orientationSmoothType, "orientationSmoothType")) {
+        cameraTransition(camPos,
+                         units,
+                         camDir,
+                         camUp,
+                         positionDurationSeconds,
+                         positionSmoothType,
+                         positionSmoothFactor,
+                         orientationDurationSeconds,
+                         orientationSmoothType,
+                         orientationSmoothFactor,
+                         sync,
+                         null);
+    }
+
+    public void cameraTransition(double[] camPos,
+                                 String units,
+                                 double[] camDir,
+                                 double[] camUp,
+                                 double positionDurationSeconds,
+                                 String positionSmoothType,
+                                 double positionSmoothFactor,
+                                 double orientationDurationSeconds,
+                                 String orientationSmoothType,
+                                 double orientationSmoothFactor,
+                                 boolean sync,
+                                 AtomicBoolean stop) {
+        if (checkDistanceUnits(units, "units") && checkSmoothType(positionSmoothType, "positionSmoothType") && checkSmoothType(orientationSmoothType,
+                                                                                                                               "orientationSmoothType")) {
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
             // Put camera in free mode.
@@ -3118,8 +2965,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             // Set up final actions
             String name = "cameraTransition" + (cTransSeq++);
             Runnable end = null;
-            if (!sync)
-                end = () -> unparkRunnable(name);
+            if (!sync) end = () -> unparkRunnable(name);
 
             var u = DistanceUnits.valueOf(units.toUpperCase());
             double[] finalPosition = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
@@ -3135,7 +2981,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                                                       orientationDurationSeconds,
                                                                       orientationSmoothType,
                                                                       orientationSmoothFactor,
-                                                                      end);
+                                                                      end,
+                                                                      stop);
             parkRunnable(name, r);
 
             if (sync) {
@@ -3161,8 +3008,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                          String smoothType,
                                          double smoothFactor,
                                          boolean sync) {
-        if (checkDistanceUnits(units, "units") &&
-                checkSmoothType(smoothType, "smoothType")) {
+        cameraPositionTransition(camPos, units, durationSeconds, smoothType, smoothFactor, sync, null);
+    }
+
+    public void cameraPositionTransition(double[] camPos,
+                                         String units,
+                                         double durationSeconds,
+                                         String smoothType,
+                                         double smoothFactor,
+                                         boolean sync,
+                                         AtomicBoolean stop) {
+        if (checkDistanceUnits(units, "units") && checkSmoothType(smoothType, "smoothType")) {
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
             // Put camera in free mode.
@@ -3171,19 +3027,13 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             // Set up final actions
             String name = "cameraTransition" + (cTransSeq++);
             Runnable end = null;
-            if (!sync)
-                end = () -> unparkRunnable(name);
+            if (!sync) end = () -> unparkRunnable(name);
 
             var u = DistanceUnits.valueOf(units.toUpperCase());
             double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
 
             // Create and park position transition runnable
-            CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
-                                                                      posUnits,
-                                                                      durationSeconds,
-                                                                      smoothType,
-                                                                      smoothFactor,
-                                                                      end);
+            CameraTransitionRunnable r = new CameraTransitionRunnable(cam, posUnits, durationSeconds, smoothType, smoothFactor, end, stop);
             parkRunnable(name, r);
 
             if (sync) {
@@ -3210,6 +3060,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                             String smoothType,
                                             double smoothFactor,
                                             boolean sync) {
+        cameraOrientationTransition(camDir, camUp, durationSeconds, smoothType, smoothFactor, sync, null);
+    }
+
+    public void cameraOrientationTransition(double[] camDir,
+                                            double[] camUp,
+                                            double durationSeconds,
+                                            String smoothType,
+                                            double smoothFactor,
+                                            boolean sync,
+                                            AtomicBoolean stop) {
         if (checkSmoothType(smoothType, "smoothType")) {
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
@@ -3219,17 +3079,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             // Set up final actions
             String name = "cameraTransition" + (cTransSeq++);
             Runnable end = null;
-            if (!sync)
-                end = () -> unparkRunnable(name);
+            if (!sync) end = () -> unparkRunnable(name);
 
             // Create and park orientation transition runnable
-            CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
-                                                                      camDir,
-                                                                      camUp,
-                                                                      durationSeconds,
-                                                                      smoothType,
-                                                                      smoothFactor,
-                                                                      end);
+            CameraTransitionRunnable r = new CameraTransitionRunnable(cam, camDir, camUp, durationSeconds, smoothType, smoothFactor, end, stop);
             parkRunnable(name, r);
 
             if (sync) {
@@ -3249,37 +3102,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 double seconds,
-                                 boolean sync) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds, boolean sync) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 String units,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 double seconds,
-                                 boolean sync) {
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, double seconds, boolean sync) {
         cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds, sync);
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 long seconds,
-                                 boolean sync) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds, boolean sync) {
         cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
     }
 
-    public void cameraTransition(List<?> camPos,
-                                 String units,
-                                 List<?> camDir,
-                                 List<?> camUp,
-                                 long seconds,
-                                 boolean sync) {
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, long seconds, boolean sync) {
         cameraTransition(camPos, units, camDir, camUp, (double) seconds, sync);
     }
 
@@ -3292,12 +3127,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         cameraOrientationTransition(dArray(camDir), dArray(camUp), durationSeconds, smoothType, smoothFactor, sync);
     }
 
-    public void cameraPositionTransition(List<?> camPos,
-                                         String units,
-                                         double durationSeconds,
-                                         String smoothType,
-                                         double smoothFactor,
-                                         boolean sync) {
+    public void cameraPositionTransition(List<?> camPos, String units, double durationSeconds, String smoothType, double smoothFactor, boolean sync) {
         cameraPositionTransition(dArray(camPos), units, durationSeconds, smoothType, smoothFactor, sync);
     }
 
@@ -3313,12 +3143,26 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                String smoothType,
                                double smoothFactor,
                                boolean sync) {
+        timeTransition(year, month, day, hour, min, sec, milliseconds, durationSeconds, smoothType, smoothFactor, sync, null);
+    }
+
+    public void timeTransition(int year,
+                               int month,
+                               int day,
+                               int hour,
+                               int min,
+                               int sec,
+                               int milliseconds,
+                               double durationSeconds,
+                               String smoothType,
+                               double smoothFactor,
+                               boolean sync,
+                               AtomicBoolean stop) {
         if (checkDateTime(year, month, day, hour, min, sec, milliseconds)) {
             // Set up final actions
             String name = "timeTransition" + (cTransSeq++);
             Runnable end = null;
-            if (!sync)
-                end = () -> unparkRunnable(name);
+            if (!sync) end = () -> unparkRunnable(name);
 
             // Create and park orientation transition runnable
             TimeTransitionRunnable r = new TimeTransitionRunnable(year,
@@ -3331,7 +3175,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                                                   durationSeconds,
                                                                   smoothType,
                                                                   smoothFactor,
-                                                                  end);
+                                                                  end,
+                                                                  stop);
             parkRunnable(name, r);
 
             if (sync) {
@@ -3354,8 +3199,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void sleep(float seconds) {
         if (checkNum(seconds, 0f, Float.MAX_VALUE, "seconds")) {
-            if (seconds == 0f)
-                return;
+            if (seconds == 0f) return;
 
             if (isFrameOutputActive()) {
                 sleepFrames(Math.max(1, FastMath.round(getFrameOutputFps() * seconds)));
@@ -3399,9 +3243,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
      * @param waitTimeSeconds Max time to wait for the camera to face the focus, in
      *                        seconds. If negative, we wait until the end.
      */
-    private void changeFocus(FocusView object,
-                             NaturalCamera cam,
-                             double waitTimeSeconds) {
+    private void changeFocus(FocusView object, NaturalCamera cam, double waitTimeSeconds) {
         // Post focus change and wait, if needed
         FocusView currentFocus = (FocusView) cam.getFocus();
         if (currentFocus == null || currentFocus.isSet() || currentFocus.getEntity() != object.getEntity()) {
@@ -3427,82 +3269,61 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public double[] galacticToInternalCartesian(double l,
-                                                double b,
-                                                double r) {
+    public double[] galacticToInternalCartesian(double l, double b, double r) {
         Vector3D pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3D());
         pos.mul(Coordinates.galacticToEquatorial());
         return new double[]{pos.x, pos.y, pos.z};
     }
 
-    public double[] galacticToInternalCartesian(int l,
-                                                int b,
-                                                int r) {
+    public double[] galacticToInternalCartesian(int l, int b, int r) {
         return galacticToInternalCartesian((double) l, (double) b, (double) r);
     }
 
     @Override
-    public double[] eclipticToInternalCartesian(double l,
-                                                double b,
-                                                double r) {
+    public double[] eclipticToInternalCartesian(double l, double b, double r) {
         Vector3D pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3D());
         pos.mul(Coordinates.eclipticToEquatorial());
         return new double[]{pos.x, pos.y, pos.z};
     }
 
-    public double[] eclipticToInternalCartesian(int l,
-                                                int b,
-                                                int r) {
+    public double[] eclipticToInternalCartesian(int l, int b, int r) {
         return eclipticToInternalCartesian((double) l, (double) b, (double) r);
     }
 
     @Override
-    public double[] equatorialToInternalCartesian(double ra,
-                                                  double dec,
-                                                  double r) {
+    public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
         Vector3D pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3D());
         return new double[]{pos.x, pos.y, pos.z};
     }
 
-    public double[] equatorialToInternalCartesian(int ra,
-                                                  int dec,
-                                                  int r) {
+    public double[] equatorialToInternalCartesian(int ra, int dec, int r) {
         return equatorialToInternalCartesian((double) ra, (double) dec, (double) r);
     }
 
-    public double[] internalCartesianToEquatorial(double x,
-                                                  double y,
-                                                  double z) {
+    public double[] internalCartesianToEquatorial(double x, double y, double z) {
         Vector3Q in = aux3b1.set(x, y, z);
         Vector3D out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
         return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble()};
     }
 
-    public double[] internalCartesianToEquatorial(int x,
-                                                  int y,
-                                                  int z) {
+    public double[] internalCartesianToEquatorial(int x, int y, int z) {
         return internalCartesianToEquatorial((double) x, (double) y, (double) z);
     }
 
     @Override
-    public double[] equatorialCartesianToInternalCartesian(double[] eq,
-                                                           double kmFactor) {
-        aux3d1.set(eq)
-                .scl(kmFactor)
-                .scl(Constants.KM_TO_U);
+    public double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor) {
+        aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
         return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
     }
 
-    public double[] equatorialCartesianToInternalCartesian(final List<?> eq,
-                                                           double kmFactor) {
+    public double[] equatorialCartesianToInternalCartesian(final List<?> eq, double kmFactor) {
         return equatorialCartesianToInternalCartesian(dArray(eq), kmFactor);
     }
 
     @Override
     public double[] equatorialToGalactic(double[] eq) {
-        aux3d1.set(eq)
-                .mul(Coordinates.eqToGal());
+        aux3d1.set(eq).mul(Coordinates.eqToGal());
         return aux3d1.values();
     }
 
@@ -3512,8 +3333,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public double[] equatorialToEcliptic(double[] eq) {
-        aux3d1.set(eq)
-                .mul(Coordinates.eqToEcl());
+        aux3d1.set(eq).mul(Coordinates.eqToEcl());
         return aux3d1.values();
     }
 
@@ -3523,8 +3343,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public double[] galacticToEquatorial(double[] gal) {
-        aux3d1.set(gal)
-                .mul(Coordinates.galToEq());
+        aux3d1.set(gal).mul(Coordinates.galToEq());
         return aux3d1.values();
     }
 
@@ -3534,8 +3353,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public double[] eclipticToEquatorial(double[] ecl) {
-        aux3d1.set(ecl)
-                .mul(Coordinates.eclToEq());
+        aux3d1.set(ecl).mul(Coordinates.eclToEq());
         return aux3d1.values();
     }
 
@@ -3545,8 +3363,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setBrightnessLevel(double level) {
-        if (checkNum(level, -1d, 1d, "brightness"))
-            postRunnable(() -> em.post(Event.BRIGHTNESS_CMD, this, (float) level));
+        if (checkNum(level, -1d, 1d, "brightness")) postRunnable(() -> em.post(Event.BRIGHTNESS_CMD, this, (float) level));
     }
 
     public void setBrightnessLevel(long level) {
@@ -3555,8 +3372,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setContrastLevel(double level) {
-        if (checkNum(level, 0d, 2d, "contrast"))
-            postRunnable(() -> em.post(Event.CONTRAST_CMD, this, (float) level));
+        if (checkNum(level, 0d, 2d, "contrast")) postRunnable(() -> em.post(Event.CONTRAST_CMD, this, (float) level));
     }
 
     public void setContrastLevel(long level) {
@@ -3565,8 +3381,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setHueLevel(double level) {
-        if (checkNum(level, 0d, 2d, "hue"))
-            postRunnable(() -> em.post(Event.HUE_CMD, this, (float) level));
+        if (checkNum(level, 0d, 2d, "hue")) postRunnable(() -> em.post(Event.HUE_CMD, this, (float) level));
     }
 
     public void setHueLevel(long level) {
@@ -3575,8 +3390,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setSaturationLevel(double level) {
-        if (checkNum(level, 0d, 2d, "saturation"))
-            postRunnable(() -> em.post(Event.SATURATION_CMD, this, (float) level));
+        if (checkNum(level, 0d, 2d, "saturation")) postRunnable(() -> em.post(Event.SATURATION_CMD, this, (float) level));
     }
 
     public void setSaturationLevel(long level) {
@@ -3585,8 +3399,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setGammaCorrectionLevel(double level) {
-        if (checkNum(level, 0d, 3d, "gamma correction"))
-            postRunnable(() -> em.post(Event.GAMMA_CMD, this, (float) level));
+        if (checkNum(level, 0d, 3d, "gamma correction")) postRunnable(() -> em.post(Event.GAMMA_CMD, this, (float) level));
     }
 
     public void setGammaCorrectionLevel(long level) {
@@ -3601,8 +3414,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setExposureToneMappingLevel(double level) {
-        if (checkNum(level, 0d, 20d, "exposure"))
-            postRunnable(() -> em.post(Event.EXPOSURE_CMD, this, (float) level));
+        if (checkNum(level, 0d, 20d, "exposure")) postRunnable(() -> em.post(Event.EXPOSURE_CMD, this, (float) level));
     }
 
     public void setExposureToneMappingLevel(long level) {
@@ -3610,8 +3422,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setCubemapMode(boolean state,
-                               String projection) {
+    public void setCubemapMode(boolean state, String projection) {
         if (checkStringEnum(projection, CubemapProjection.class, "projection")) {
             CubmeapProjectionEffect.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
             postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
@@ -3741,155 +3552,104 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public double[] rotate3(double[] vector,
-                            double[] axis,
-                            double angle) {
+    public double[] rotate3(double[] vector, double[] axis, double angle) {
         Vector3D v = aux3d1.set(vector);
         Vector3D a = aux3d2.set(axis);
-        return v.rotate(a, angle)
-                .values();
+        return v.rotate(a, angle).values();
     }
 
-    public double[] rotate3(double[] vector,
-                            double[] axis,
-                            long angle) {
+    public double[] rotate3(double[] vector, double[] axis, long angle) {
         return rotate3(vector, axis, (double) angle);
     }
 
-    public double[] rotate3(List<?> vector,
-                            List<?> axis,
-                            double angle) {
+    public double[] rotate3(List<?> vector, List<?> axis, double angle) {
         return rotate3(dArray(vector), dArray(axis), angle);
     }
 
-    public double[] rotate3(List<?> vector,
-                            List<?> axis,
-                            long angle) {
+    public double[] rotate3(List<?> vector, List<?> axis, long angle) {
         return rotate3(vector, axis, (double) angle);
     }
 
     @Override
-    public double[] rotate2(double[] vector,
-                            double angle) {
+    public double[] rotate2(double[] vector, double angle) {
         Vector2D v = aux2d1.set(vector);
-        return v.rotate(angle)
-                .values();
+        return v.rotate(angle).values();
     }
 
-    public double[] rotate2(double[] vector,
-                            long angle) {
+    public double[] rotate2(double[] vector, long angle) {
         return rotate2(vector, (double) angle);
     }
 
-    public double[] rotate2(List<?> vector,
-                            double angle) {
+    public double[] rotate2(List<?> vector, double angle) {
         return rotate2(dArray(vector), angle);
     }
 
-    public double[] rotate2(List<?> vector,
-                            long angle) {
+    public double[] rotate2(List<?> vector, long angle) {
         return rotate2(vector, (double) angle);
     }
 
     @Override
-    public double[] cross3(double[] vec1,
-                           double[] vec2) {
-        return aux3d1.set(vec1)
-                .crs(aux3d2.set(vec2))
-                .values();
+    public double[] cross3(double[] vec1, double[] vec2) {
+        return aux3d1.set(vec1).crs(aux3d2.set(vec2)).values();
     }
 
-    public double[] cross3(List<?> vec1,
-                           List<?> vec2) {
+    public double[] cross3(List<?> vec1, List<?> vec2) {
         return cross3(dArray(vec1), dArray(vec2));
     }
 
     @Override
-    public double dot3(double[] vec1,
-                       double[] vec2) {
-        return aux3d1.set(vec1)
-                .dot(aux3d2.set(vec2));
+    public double dot3(double[] vec1, double[] vec2) {
+        return aux3d1.set(vec1).dot(aux3d2.set(vec2));
     }
 
-    public double dot3(List<?> vec1,
-                       List<?> vec2) {
+    public double dot3(List<?> vec1, List<?> vec2) {
         return dot3(dArray(vec1), dArray(vec2));
     }
 
     @Override
-    public void addTrajectoryLine(String name,
-                                  double[] points,
-                                  double[] color) {
+    public void addTrajectoryLine(String name, double[] points, double[] color) {
         var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
-    public void addTrajectoryLine(String name,
-                                  List<?> points,
-                                  List<?> color) {
+    public void addTrajectoryLine(String name, List<?> points, List<?> color) {
         var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
     @Override
-    public void addTrajectoryLine(String name,
-                                  double[] points,
-                                  double[] color,
-                                  double trailMap) {
+    public void addTrajectoryLine(String name, double[] points, double[] color, double trailMap) {
         var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trailMap, "Orbit");
     }
 
-    public void addTrajectoryLine(String name,
-                                  List<?> points,
-                                  List<?> color,
-                                  double trailMap) {
+    public void addTrajectoryLine(String name, List<?> points, List<?> color, double trailMap) {
         addTrajectoryLine(name, dArray(points), dArray(color), trailMap);
     }
 
     @Override
-    public void addPolyline(String name,
-                            double[] points,
-                            double[] color) {
+    public void addPolyline(String name, double[] points, double[] color) {
         addPolyline(name, points, color, 1f);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color) {
+    public void addPolyline(String name, List<?> points, List<?> color) {
         addPolyline(name, points, color, 1f);
     }
 
     @Override
-    public void addPolyline(String name,
-                            double[] points,
-                            double[] color,
-                            double lineWidth) {
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth) {
         addPolyline(name, points, color, lineWidth, false);
     }
 
     @Override
-    public void addPolyline(String name,
-                            double[] points,
-                            double[] color,
-                            double lineWidth,
-                            boolean arrowCaps) {
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth, boolean arrowCaps) {
         addPolyline(name, points, color, lineWidth, GL20.GL_LINE_STRIP, arrowCaps);
     }
 
     @Override
-    public void addPolyline(String name,
-                            double[] points,
-                            double[] color,
-                            double lineWidth,
-                            int primitive) {
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive) {
         addPolyline(name, points, color, lineWidth, primitive, false);
     }
 
     @Override
-    public void addPolyline(String name,
-                            double[] points,
-                            double[] color,
-                            double lineWidth,
-                            int primitive,
-                            boolean arrowCaps) {
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
         addLineObject(name, points, color, lineWidth, primitive, arrowCaps, -1f, "Polyline");
     }
 
@@ -3913,8 +3673,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                 double trailMap,
                                 String archetypeName) {
         if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth") && checkNum(primitive, 1, 3, "primitive")) {
-            var archetype = scene.archetypes()
-                    .get(archetypeName);
+            var archetype = scene.archetypes().get(archetypeName);
             var entity = archetype.createEntity();
 
             var base = Mapper.base.get(entity);
@@ -3968,82 +3727,43 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return null;
     }
 
-    public void addPolyline(String name,
-                            double[] points,
-                            double[] color,
-                            int lineWidth) {
+    public void addPolyline(String name, double[] points, double[] color, int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
     }
 
-    public void addPolyline(String name,
-                            double[] points,
-                            double[] color,
-                            int lineWidth,
-                            int primitive) {
+    public void addPolyline(String name, double[] points, double[] color, int lineWidth, int primitive) {
         addPolyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            float lineWidth) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth) {
         addPolyline(name, dArray(points), dArray(color), lineWidth);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            float lineWidth,
-                            boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, boolean arrowCaps) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, arrowCaps);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            float lineWidth,
-                            int primitive) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, int primitive) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, primitive);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            float lineWidth,
-                            int primitive,
-                            boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, int primitive, boolean arrowCaps) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, primitive, arrowCaps);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            int lineWidth) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            int lineWidth,
-                            boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, boolean arrowCaps) {
         addPolyline(name, points, color, (float) lineWidth, arrowCaps);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            int lineWidth,
-                            int primitive) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, int primitive) {
         addPolyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void addPolyline(String name,
-                            List<?> points,
-                            List<?> color,
-                            int lineWidth,
-                            int primitive,
-                            boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, int primitive, boolean arrowCaps) {
         addPolyline(name, points, color, (float) lineWidth, primitive, arrowCaps);
     }
 
@@ -4060,22 +3780,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void parkRunnable(String id,
-                             Runnable runnable) {
+    public void parkRunnable(String id, Runnable runnable) {
         parkSceneRunnable(id, runnable);
     }
 
     @Override
-    public void parkSceneRunnable(String id,
-                                  Runnable runnable) {
+    public void parkSceneRunnable(String id, Runnable runnable) {
         if (checkString(id, "id")) {
             em.post(Event.PARK_RUNNABLE, this, id, runnable);
         }
     }
 
     @Override
-    public void parkCameraRunnable(String id,
-                                   Runnable runnable) {
+    public void parkCameraRunnable(String id, Runnable runnable) {
         if (checkString(id, "id")) {
             em.post(Event.PARK_CAMERA_RUNNABLE, this, id, runnable);
         }
@@ -4083,8 +3800,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void removeRunnable(String id) {
-        if (checkString(id, "id"))
-            em.post(Event.UNPARK_RUNNABLE, this, id);
+        if (checkString(id, "id")) em.post(Event.UNPARK_RUNNABLE, this, id);
     }
 
     @Override
@@ -4093,9 +3809,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setCameraState(double[] pos,
-                               double[] dir,
-                               double[] up) {
+    public void setCameraState(double[] pos, double[] dir, double[] up) {
         postRunnable(() -> {
             em.post(Event.CAMERA_POS_CMD, this, (Object) pos);
             em.post(Event.CAMERA_DIR_CMD, this, (Object) dir);
@@ -4103,27 +3817,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         });
     }
 
-    public void setCameraState(List<?> pos,
-                               List<?> dir,
-                               List<?> up) {
+    public void setCameraState(List<?> pos, List<?> dir, List<?> up) {
         setCameraState(dArray(pos), dArray(dir), dArray(up));
     }
 
     @Override
-    public void setCameraStateAndTime(double[] pos,
-                                      double[] dir,
-                                      double[] up,
-                                      long time) {
+    public void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time) {
         postRunnable(() -> {
             em.post(Event.CAMERA_PROJECTION_CMD, this, pos, dir, up);
             em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
         });
     }
 
-    public void setCameraStateAndTime(List<?> pos,
-                                      List<?> dir,
-                                      List<?> up,
-                                      long time) {
+    public void setCameraStateAndTime(List<?> pos, List<?> dir, List<?> up, long time) {
         setCameraStateAndTime(dArray(pos), dArray(dir), dArray(up), time);
     }
 
@@ -4133,22 +3839,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean loadDataset(String dsName,
-                               String absolutePath) {
+    public boolean loadDataset(String dsName, String absolutePath) {
         return loadDataset(dsName, absolutePath, CatalogInfoSource.SCRIPT, true);
     }
 
     @Override
-    public boolean loadDataset(String dsName,
-                               String path,
-                               boolean sync) {
+    public boolean loadDataset(String dsName, String path, boolean sync) {
         return loadDataset(dsName, path, CatalogInfoSource.SCRIPT, sync);
     }
 
-    public boolean loadDataset(String dsName,
-                               String path,
-                               CatalogInfoSource type,
-                               boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, true);
         } else {
@@ -4158,11 +3858,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    public boolean loadDataset(String dsName,
-                               String path,
-                               CatalogInfoSource type,
-                               DatasetOptions datasetOptions,
-                               boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, datasetOptions, true);
         } else {
@@ -4172,11 +3868,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    public boolean loadDataset(String dsName,
-                               DataSource ds,
-                               CatalogInfoSource type,
-                               DatasetOptions datasetOptions,
-                               boolean sync) {
+    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, ds, type, datasetOptions, true);
         } else {
@@ -4187,34 +3879,21 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean loadStarDataset(String dsName,
-                                   String path,
-                                   boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
-    public boolean loadStarDataset(String dsName,
-                                   String path,
-                                   double magnitudeScale,
-                                   boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
-    public boolean loadStarDataset(String dsName,
-                                   String path,
-                                   double magnitudeScale,
-                                   double[] labelColor,
-                                   boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, labelColor, null, null, sync);
     }
 
-    public boolean loadStarDataset(String dsName,
-                                   String path,
-                                   double magnitudeScale,
-                                   final List<?> labelColor,
-                                   boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, boolean sync) {
         return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), sync);
     }
 
@@ -4261,8 +3940,18 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        double particleSize,
                                        String ct,
                                        boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{1.5d, 100d}, ct,
-                                   null, null, sync);
+        return loadParticleDataset(dsName,
+                                   path,
+                                   profileDecay,
+                                   particleColor,
+                                   colorNoise,
+                                   labelColor,
+                                   particleSize,
+                                   new double[]{1.5d, 100d},
+                                   ct,
+                                   null,
+                                   null,
+                                   sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -4274,7 +3963,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        double particleSize,
                                        String ct,
                                        boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, null, null,
+        return loadParticleDataset(dsName,
+                                   path,
+                                   profileDecay,
+                                   dArray(particleColor),
+                                   colorNoise,
+                                   dArray(labelColor),
+                                   particleSize,
+                                   ct,
+                                   null,
+                                   null,
                                    sync);
     }
 
@@ -4290,8 +3988,18 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        double[] fadeIn,
                                        double[] fadeOut,
                                        boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize,
-                                   new double[]{Math.tan(Math.toRadians(0.1)), FastMath.tan(Math.toRadians(6.0))}, ct, fadeIn, fadeOut, sync);
+        return loadParticleDataset(dsName,
+                                   path,
+                                   profileDecay,
+                                   particleColor,
+                                   colorNoise,
+                                   labelColor,
+                                   particleSize,
+                                   new double[]{Math.tan(Math.toRadians(0.1)), FastMath.tan(Math.toRadians(6.0))},
+                                   ct,
+                                   fadeIn,
+                                   fadeOut,
+                                   sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -4305,8 +4013,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        final List<?> fadeIn,
                                        final List<?> fadeOut,
                                        boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct,
-                                   dArray(fadeIn), dArray(fadeOut),
+        return loadParticleDataset(dsName,
+                                   path,
+                                   profileDecay,
+                                   dArray(particleColor),
+                                   colorNoise,
+                                   dArray(labelColor),
+                                   particleSize,
+                                   ct,
+                                   dArray(fadeIn),
+                                   dArray(fadeOut),
                                    sync);
     }
 
@@ -4324,8 +4040,18 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        double[] fadeOut,
                                        boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, compType, fadeIn,
-                                   fadeOut, sync);
+        return loadParticleDataset(dsName,
+                                   path,
+                                   profileDecay,
+                                   particleColor,
+                                   colorNoise,
+                                   labelColor,
+                                   particleSize,
+                                   sizeLimits,
+                                   compType,
+                                   fadeIn,
+                                   fadeOut,
+                                   sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -4340,9 +4066,18 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        final List<?> fadeIn,
                                        final List<?> fadeOut,
                                        boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize,
-                                   dArray(sizeLimits), ct,
-                                   dArray(fadeIn), dArray(fadeOut), sync);
+        return loadParticleDataset(dsName,
+                                   path,
+                                   profileDecay,
+                                   dArray(particleColor),
+                                   colorNoise,
+                                   dArray(labelColor),
+                                   particleSize,
+                                   dArray(sizeLimits),
+                                   ct,
+                                   dArray(fadeIn),
+                                   dArray(fadeOut),
+                                   sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -4357,9 +4092,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        double[] fadeIn,
                                        double[] fadeOut,
                                        boolean sync) {
-        return loadParticleDataset(dsName, path, CatalogInfoSource.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize,
-                                   sizeLimits, ct, fadeIn,
-                                   fadeOut, sync);
+        return loadParticleDataset(dsName,
+                                   path,
+                                   CatalogInfoSource.SCRIPT,
+                                   profileDecay,
+                                   particleColor,
+                                   colorNoise,
+                                   labelColor,
+                                   particleSize,
+                                   sizeLimits,
+                                   ct,
+                                   fadeIn,
+                                   fadeOut,
+                                   sync);
     }
 
     public boolean loadParticleDataset(String dsName,
@@ -4375,28 +4120,25 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                        double[] fadeIn,
                                        double[] fadeOut,
                                        boolean sync) {
-        DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(dsName, profileDecay, particleColor, colorNoise, labelColor, particleSize,
-                                                                       sizeLimits, ct, fadeIn,
+        DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(dsName,
+                                                                       profileDecay,
+                                                                       particleColor,
+                                                                       colorNoise,
+                                                                       labelColor,
+                                                                       particleSize,
+                                                                       sizeLimits,
+                                                                       ct,
+                                                                       fadeIn,
                                                                        fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
     @Override
-    public boolean loadStarClusterDataset(String dsName,
-                                          String path,
-                                          double[] particleColor,
-                                          double[] fadeIn,
-                                          double[] fadeOut,
-                                          boolean sync) {
+    public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] fadeIn, double[] fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, particleColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName,
-                                          String path,
-                                          List<?> particleColor,
-                                          List<?> fadeIn,
-                                          List<?> fadeOut,
-                                          boolean sync) {
+    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> fadeIn, List<?> fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
@@ -4492,18 +4234,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName,
-                                         String path,
-                                         CatalogInfoSource type,
-                                         boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoSource type, boolean sync) {
         return loadDatasetImmediate(dsName, path, type, null, sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName,
-                                         String path,
-                                         CatalogInfoSource type,
-                                         DatasetOptions datasetOptions,
-                                         boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         Path p = Paths.get(path);
         if (Files.exists(p) && Files.isReadable(p)) {
             try {
@@ -4517,9 +4252,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return false;
     }
 
-    private List<IParticleRecord> loadParticleBeans(DataSource ds,
-                                                    DatasetOptions datasetOptions,
-                                                    STILDataProvider provider) {
+    private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions datasetOptions, STILDataProvider provider) {
         provider.setDatasetOptions(datasetOptions);
         String catalogName = datasetOptions != null && datasetOptions.catalogName != null ? datasetOptions.catalogName : ds.getName();
         return provider.loadData(ds, 1.0f, () -> {
@@ -4536,27 +4269,20 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         });
     }
 
-    public boolean loadJsonCatalog(String dsName,
-                                   String path) {
+    public boolean loadJsonCatalog(String dsName, String path) {
         return loadJsonDataset(dsName, path, true);
     }
 
     @Override
-    public boolean loadJsonDataset(String dsName,
-                                   String path) {
+    public boolean loadJsonDataset(String dsName, String path) {
         return loadJsonDataset(dsName, path, true);
     }
 
-    public boolean loadJsonDataset(String dsName,
-                                   String pathString,
-                                   boolean sync) {
+    public boolean loadJsonDataset(String dsName, String pathString, boolean sync) {
         return loadJsonDataset(dsName, pathString, false, sync);
     }
 
-    public boolean loadJsonDataset(String dsName,
-                                   String pathString,
-                                   boolean select,
-                                   boolean sync) {
+    public boolean loadJsonDataset(String dsName, String pathString, boolean select, boolean sync) {
         // Load internal JSON dataset file.
         try {
             logger.info(I18n.msg("notif.catalog.loading", pathString));
@@ -4576,25 +4302,24 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     objects.forEach(scene::addToIndex);
 
                     // Wait for entity in new task.
-                    GaiaSky.instance.getExecutorService()
-                            .execute(() -> {
-                                while (!GaiaSky.instance.assetManager.isFinished()) {
-                                    // Active wait
-                                    sleepFrames(1);
-                                }
+                    GaiaSky.instance.getExecutorService().execute(() -> {
+                        while (!GaiaSky.instance.assetManager.isFinished()) {
+                            // Active wait
+                            sleepFrames(1);
+                        }
 
-                                // Finish initialization and touch scene graph.
-                                GaiaSky.postRunnable(() -> {
-                                    objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
-                                    objects.forEach(scene::setUpEntity);
-                                    GaiaSky.instance.touchSceneGraph();
+                        // Finish initialization and touch scene graph.
+                        GaiaSky.postRunnable(() -> {
+                            objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
+                            objects.forEach(scene::setUpEntity);
+                            GaiaSky.instance.touchSceneGraph();
 
-                                    if (select) {
-                                        focusView.setEntity(objects.get(0));
-                                        setCameraFocus(focusView.getName());
-                                    }
-                                });
-                            });
+                            if (select) {
+                                focusView.setEntity(objects.get(0));
+                                setCameraFocus(focusView.getName());
+                            }
+                        });
+                    });
                 });
             }
 
@@ -4609,8 +4334,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         notifyErrorPopup(message, null);
     }
 
-    private void notifyErrorPopup(String message,
-                                  Exception e) {
+    private void notifyErrorPopup(String message, Exception e) {
         if (e != null) {
             logger.error(message, e);
         } else {
@@ -4619,11 +4343,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, message);
     }
 
-    private boolean loadDatasetImmediate(String dsName,
-                                         DataSource ds,
-                                         CatalogInfoSource type,
-                                         DatasetOptions datasetOptions,
-                                         boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         try {
             logger.info(I18n.msg("notif.catalog.loading", dsName));
 
@@ -4649,9 +4369,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     }
                 }
 
-                if (path != null && path.getFileName()
-                        .toString()
-                        .endsWith(".json")) {
+                if (path != null && path.getFileName().toString().endsWith(".json")) {
                     // Only local files allowed for JSON.
                     loadJsonDataset(dsName, path.toString(), sync);
                 } else if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
@@ -4661,10 +4379,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                         // STAR GROUP
                         AtomicReference<Entity> starGroup = new AtomicReference<>();
                         postRunnable(() -> {
-                            if (datasetOptions != null)
-                                datasetOptions.initializeCatalogInfo = false;
-                            starGroup.set(
-                                    SetUtils.createStarSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions, false));
+                            if (datasetOptions != null) datasetOptions.initializeCatalogInfo = false;
+                            starGroup.set(SetUtils.createStarSet(scene,
+                                                                 dsName,
+                                                                 ds.getName(),
+                                                                 data,
+                                                                 provider.getColumnInfoList(),
+                                                                 datasetOptions,
+                                                                 false));
 
                             // Catalog info.
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
@@ -4673,11 +4395,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                             // Add to catalog manager -> setUp.
                             scene.setUpEntity(starGroup.get());
 
-                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ?
-                                    I18n.msg("gui.dsload.stars.name") :
-                                    I18n.msg("gui.dsload.variablestars.name");
+                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.msg("gui.dsload.stars.name") : I18n.msg(
+                                    "gui.dsload.variablestars.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                                 this,
                                                  dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
@@ -4693,13 +4415,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                         AtomicReference<Entity> particleGroup = new AtomicReference<>();
                         postRunnable(() -> {
                             datasetOptions.initializeCatalogInfo = false;
-                            particleGroup.set(
-                                    SetUtils.createParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions,
-                                                               false));
+                            particleGroup.set(SetUtils.createParticleSet(scene,
+                                                                         dsName,
+                                                                         ds.getName(),
+                                                                         data,
+                                                                         provider.getColumnInfoList(),
+                                                                         datasetOptions,
+                                                                         false));
 
                             // Catalog info
-                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL()
-                                    .toString(), type, 1.5f, particleGroup.get());
+                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                             // Add to catalog manager -> setUp
@@ -4707,7 +4432,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
                             String typeStr = I18n.msg("gui.dsload.objects.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                                 this,
                                                  dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
@@ -4723,13 +4449,16 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                         AtomicReference<Entity> particleGroup = new AtomicReference<>();
                         postRunnable(() -> {
                             datasetOptions.initializeCatalogInfo = false;
-                            particleGroup.set(
-                                    SetUtils.createParticleSet(scene, dsName, ds.getName(), data, provider.getColumnInfoList(), datasetOptions,
-                                                               false));
+                            particleGroup.set(SetUtils.createParticleSet(scene,
+                                                                         dsName,
+                                                                         ds.getName(),
+                                                                         data,
+                                                                         provider.getColumnInfoList(),
+                                                                         datasetOptions,
+                                                                         false));
 
                             // Catalog info
-                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL()
-                                    .toString(), type, 1.5f, particleGroup.get());
+                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                             // Add to catalog manager -> setUp
@@ -4737,7 +4466,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
                             String typeStr = I18n.msg("gui.dsload.objects.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                                 this,
                                                  dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
@@ -4747,8 +4477,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     }
                 } else if (datasetOptions.type == DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
-                    var archetype = scene.archetypes()
-                            .get("GenericCatalog");
+                    var archetype = scene.archetypes().get("GenericCatalog");
                     var entity = archetype.createEntity();
 
                     var base = Mapper.base.get(entity);
@@ -4801,7 +4530,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
                             String typeStr = I18n.msg("gui.dsload.clusters.name");
                             logger.info(I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                                 this,
                                                  dsName + ": " + I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
                         }
                     });
@@ -4835,8 +4565,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean setDatasetTransformationMatrix(String dsName,
-                                                  double[] matrix) {
+    public boolean setDatasetTransformationMatrix(String dsName, double[] matrix) {
         if (checkString(dsName, "datasetName") && checkDatasetName(dsName) && checkNotNull(matrix, "matrix")) {
             var ci = catalogManager.get(dsName);
             if (ci != null && ci.entity != null) {
@@ -4893,8 +4622,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean highlightDataset(String dsName,
-                                    boolean highlight) {
+    public boolean highlightDataset(String dsName, boolean highlight) {
         if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
             CatalogInfo ci = this.catalogManager.get(dsName);
             postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
@@ -4904,20 +4632,13 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean highlightDataset(String dsName,
-                                    int colorIndex,
-                                    boolean highlight) {
+    public boolean highlightDataset(String dsName, int colorIndex, boolean highlight) {
         float[] color = ColorUtils.getColorFromIndex(colorIndex);
         return highlightDataset(dsName, color[0], color[1], color[2], color[3], highlight);
     }
 
     @Override
-    public boolean highlightDataset(String dsName,
-                                    float r,
-                                    float g,
-                                    float b,
-                                    float a,
-                                    boolean highlight) {
+    public boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight) {
         if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
             CatalogInfo ci = this.catalogManager.get(dsName);
             ci.plainColor = true;
@@ -4932,12 +4653,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean highlightDataset(String dsName,
-                                    String attributeName,
-                                    String colorMap,
-                                    double minMap,
-                                    double maxMap,
-                                    boolean highlight) {
+    public boolean highlightDataset(String dsName, String attributeName, String colorMap, double minMap, double maxMap, boolean highlight) {
         if (checkString(dsName, "datasetName") && checkDatasetName(dsName)) {
             CatalogInfo ci = this.catalogManager.get(dsName);
             IAttribute attribute = getAttributeByName(attributeName, ci);
@@ -4950,10 +4666,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 ci.hlCmapAttribute = attribute;
                 postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
             } else {
-                if (attribute == null)
-                    logger.error("Could not find attribute with name '" + attributeName + "'");
-                if (cmapIndex < 0)
-                    logger.error("Could not find color map with name '" + colorMap + "'");
+                if (attribute == null) logger.error("Could not find attribute with name '" + attributeName + "'");
+                if (cmapIndex < 0) logger.error("Could not find color map with name '" + colorMap + "'");
             }
             return true;
         }
@@ -4962,21 +4676,18 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     private int getCmapIndexByName(String name) {
         for (Pair<String, Integer> cmap : ColormapPicker.cmapList) {
-            if (name.equalsIgnoreCase(cmap.getFirst()))
-                return cmap.getSecond();
+            if (name.equalsIgnoreCase(cmap.getFirst())) return cmap.getSecond();
         }
         return -1;
     }
 
-    private IAttribute getAttributeByName(String name,
-                                          CatalogInfo ci) {
+    private IAttribute getAttributeByName(String name, CatalogInfo ci) {
         try {
             // One of the default attributes
             Class<?> clazz = Class.forName("gaiasky.util.filter.attrib.Attribute" + name);
-            Constructor<?> ctor = clazz.getConstructor();
-            return (IAttribute) ctor.newInstance();
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
+            Constructor<?> constructor = clazz.getConstructor();
+            return (IAttribute) constructor.newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             // Try extra attributes
 
             // New
@@ -4986,13 +4697,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                     synchronized (focusView) {
                         focusView.setEntity(entity);
                         if (focusView.isSet()) {
-                            ObjectMap.Keys<UCD> ucds = focusView.getSet()
-                                    .data()
-                                    .get(0)
-                                    .extraKeys();
+                            ObjectMap.Keys<UCD> ucds = focusView.getSet().data().getFirst().extraKeys();
                             for (UCD ucd : ucds)
-                                if (ucd.colName.equalsIgnoreCase(name))
-                                    return new AttributeUCD(ucd);
+                                if (ucd.colName.equalsIgnoreCase(name)) return new AttributeUCD(ucd);
                         }
                     }
                 }
@@ -5002,9 +4709,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean setDatasetHighlightSizeFactor(String dsName,
-                                                 float sizeFactor) {
-        if (checkString(dsName, "datasetName") && checkNum(sizeFactor, Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR,
+    public boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor) {
+        if (checkString(dsName, "datasetName") && checkNum(sizeFactor,
+                                                           Constants.MIN_DATASET_SIZE_FACTOR,
+                                                           Constants.MAX_DATASET_SIZE_FACTOR,
                                                            "sizeFactor")) {
 
             boolean exists = this.catalogManager.contains(dsName);
@@ -5020,8 +4728,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public boolean setDatasetHighlightAllVisible(String dsName,
-                                                 boolean allVisible) {
+    public boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible) {
         if (checkString(dsName, "datasetName")) {
 
             boolean exists = this.catalogManager.contains(dsName);
@@ -5037,8 +4744,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void setDatasetPointSizeMultiplier(String dsName,
-                                              double multiplier) {
+    public void setDatasetPointSizeMultiplier(String dsName, double multiplier) {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
@@ -5061,7 +4767,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                      float a,
                                      boolean showLabel,
                                      boolean trackObject) {
-        addShapeAroundObject(shapeName, shapeType, primitive, ShapeOrientation.EQUATORIAL.toString(), size, objectName, r, g, b, a, showLabel,
+        addShapeAroundObject(shapeName,
+                             shapeType,
+                             primitive,
+                             ShapeOrientation.EQUATORIAL.toString(),
+                             size,
+                             objectName,
+                             r,
+                             g,
+                             b,
+                             a,
+                             showLabel,
                              trackObject);
     }
 
@@ -5078,21 +4794,19 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                      float a,
                                      boolean showLabel,
                                      boolean trackObject) {
-        if (checkString(shapeName, "shapeName")
-                && checkStringEnum(shapeType, Shape.class, "shape")
-                && checkStringEnum(primitive, Primitive.class, "primitive")
-                && checkStringEnum(orientation, ShapeOrientation.class, "orientation")
-                && checkNum(size, 0, Double.MAX_VALUE, "size")
-                && checkObjectName(objectName)) {
+        if (checkString(shapeName, "shapeName") && checkStringEnum(shapeType, Shape.class, "shape") && checkStringEnum(primitive,
+                                                                                                                       Primitive.class,
+                                                                                                                       "primitive") && checkStringEnum(
+                orientation,
+                ShapeOrientation.class,
+                "orientation") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
             final var shapeLc = shapeType.toLowerCase();
             postRunnable(() -> {
                 Entity trackingObject = getFocusEntity(objectName);
                 float[] color = new float[]{r, g, b, a};
-                int primitiveInt = Primitive.valueOf(primitive.toUpperCase())
-                        .equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
                 // Create shape
-                Archetype at = scene.archetypes()
-                        .get("ShapeObject");
+                Archetype at = scene.archetypes().get("ShapeObject");
                 Entity newShape = at.createEntity();
 
                 var base = Mapper.base.get(newShape);
@@ -5308,10 +5022,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public List<String> listDatasets() {
         Set<String> names = this.catalogManager.getDatasetNames();
-        if (names != null)
-            return new ArrayList<>(names);
-        else
-            return new ArrayList<>();
+        if (names != null) return new ArrayList<>(names);
+        else return new ArrayList<>();
     }
 
     @Override
@@ -5321,58 +5033,42 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public String getDefaultFramesDir() {
-        return SysUtils.getDefaultFramesDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getDefaultFramesDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultScreenshotsDir() {
-        return SysUtils.getDefaultScreenshotsDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getDefaultScreenshotsDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultCameraDir() {
-        return SysUtils.getDefaultCameraDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getDefaultCameraDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultMusicDir() {
-        return SysUtils.getDefaultMusicDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getDefaultMusicDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDefaultMappingsDir() {
-        return SysUtils.getDefaultMappingsDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getDefaultMappingsDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getDataDir() {
-        return SysUtils.getDataDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getDataDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getConfigDir() {
-        return SysUtils.getConfigDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getConfigDir().toAbsolutePath().toString();
     }
 
     @Override
     public String getLocalDataDir() {
-        return SysUtils.getLocalDataDir()
-                .toAbsolutePath()
-                .toString();
+        return SysUtils.getLocalDataDir().toAbsolutePath().toString();
     }
 
     @Override
@@ -5396,16 +5092,13 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     @Override
-    public void notify(final Event event,
-                       Object source,
-                       final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
             case INPUT_EVENT -> inputCode = (Integer) data[0];
             case DISPOSE -> {
                 // Stop all
                 for (AtomicBoolean stop : stops) {
-                    if (stop != null)
-                        stop.set(true);
+                    if (stop != null) stop.set(true);
                 }
             }
             case SCENE_LOADED -> {
@@ -5418,10 +5111,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     }
 
-    private boolean checkNum(int value,
-                             int min,
-                             int max,
-                             String name) {
+    private boolean checkNum(int value, int min, int max, String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -5429,10 +5119,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkNum(long value,
-                             long min,
-                             long max,
-                             String name) {
+    private boolean checkNum(long value, long min, long max, String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -5440,10 +5127,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkNum(float value,
-                             float min,
-                             float max,
-                             String name) {
+    private boolean checkNum(float value, float min, float max, String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -5451,10 +5135,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkNum(double value,
-                             double min,
-                             double max,
-                             String name) {
+    private boolean checkNum(double value, double min, double max, String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
             return false;
@@ -5462,8 +5143,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkFinite(float value,
-                                String name) {
+    private boolean checkFinite(float value, String name) {
         if (!Float.isFinite(value)) {
             logger.error(name + " must be finite: " + value);
             return false;
@@ -5471,8 +5151,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkFinite(double value,
-                                String name) {
+    private boolean checkFinite(double value, String name) {
         if (!Double.isFinite(value)) {
             logger.error(name + " must be finite: " + value);
             return false;
@@ -5480,10 +5159,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkLengths(double[] array,
-                                 int length1,
-                                 int length2,
-                                 String name) {
+    private boolean checkLengths(double[] array, int length1, int length2, String name) {
         if (array.length != length1 && array.length != length2) {
             logger.error(name + " must have a length of " + length1 + " or " + length2 + ". Current length is " + array.length);
             return false;
@@ -5491,9 +5167,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkLength(double[] array,
-                                int length,
-                                String name) {
+    private boolean checkLength(double[] array, int length, String name) {
         if (array.length != length) {
             logger.error(name + " must have a length of " + length + ". Current length is " + array.length);
             return false;
@@ -5501,8 +5175,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkString(String value,
-                                String name) {
+    private boolean checkString(String value, String name) {
         if (value == null || value.isEmpty()) {
             logger.error(name + " can't be null nor empty");
             return false;
@@ -5510,13 +5183,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkString(String value,
-                                String[] possibleValues,
-                                String name) {
+    private boolean checkString(String value, String[] possibleValues, String name) {
         if (checkString(value, name)) {
             for (String v : possibleValues) {
-                if (value.equals(v))
-                    return true;
+                if (value.equals(v)) return true;
             }
             logPossibleValues(value, possibleValues, name);
             return false;
@@ -5525,8 +5195,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return false;
     }
 
-    private boolean checkDirectoryExists(String location,
-                                         String name) {
+    private boolean checkDirectoryExists(String location, String name) {
         if (location == null) {
             logger.error(name + ": location can't be null");
             return false;
@@ -5547,8 +5216,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkObjectName(String name,
-                                    double timeOutSeconds) {
+    private boolean checkObjectName(String name, double timeOutSeconds) {
         if (getEntity(name, timeOutSeconds) == null) {
             logger.error(name + ": object with this name does not exist");
             return false;
@@ -5572,13 +5240,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return entity != null;
     }
 
-    private boolean checkDateTime(int year,
-                                  int month,
-                                  int day,
-                                  int hour,
-                                  int min,
-                                  int sec,
-                                  int millisec) {
+    private boolean checkDateTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
         boolean ok;
         ok = checkNum(month, 1, 12, "month");
         ok = ok && checkNum(day, 1, 31, "month");
@@ -5599,17 +5261,13 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return ok;
     }
 
-    private void logPossibleValues(String value,
-                                   String[] possibleValues,
-                                   String name) {
+    private void logPossibleValues(String value, String[] possibleValues, String name) {
         logger.error(name + " value not valid: " + value + ". Possible values are:");
         for (String v : possibleValues)
             logger.error(v);
     }
 
-    private <T extends Enum<T>> boolean checkStringEnum(String value,
-                                                        Class<T> clazz,
-                                                        String name) {
+    private <T extends Enum<T>> boolean checkStringEnum(String value, Class<T> clazz, String name) {
         if (checkString(value, name)) {
             for (Enum<T> en : EnumSet.allOf(clazz)) {
                 if (value.equalsIgnoreCase(en.toString()) || value.equalsIgnoreCase(en.name())) {
@@ -5624,8 +5282,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return false;
     }
 
-    private boolean checkNotNull(Object o,
-                                 String name) {
+    private boolean checkNotNull(Object o, String name) {
         if (o == null) {
             logger.error(name + " can't be null");
             return false;
@@ -5633,8 +5290,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         return true;
     }
 
-    private boolean checkDistanceUnits(String units,
-                                       String name) {
+    private boolean checkDistanceUnits(String units, String name) {
         try {
             DistanceUnits.valueOf(units.toUpperCase());
             return true;
@@ -5643,15 +5299,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         }
     }
 
-    private boolean checkSmoothType(String type,
-                                    String name) {
+    private boolean checkSmoothType(String type, String name) {
         return type.equalsIgnoreCase("logit") || type.equalsIgnoreCase("logisticsigmoid") || type.equalsIgnoreCase("none");
     }
 
     enum TransitionType {
-        POSITION,
-        ORIENTATION,
-        ALL;
+        POSITION, ORIENTATION, ALL;
 
         public boolean isPosition() {
             return this == ALL || this == POSITION;
@@ -5669,6 +5322,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     class TimeTransitionRunnable implements Runnable {
         final Object lock;
         final Long currentTimeMs;
+        final AtomicBoolean stop;
         Long targetTimeMs;
         Long dt;
         final double duration;
@@ -5698,6 +5352,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          *                        <li>"none": no smoothing is applied.</li>
          *                        </ul>
          * @param smoothFactor    Smoothing factor (depends on type, see #smoothType).
+         * @param end             An optional runnable that is executed when the transition has completed.
+         * @param stop            A reference to a boolean value as an {@link AtomicBoolean} that stops the execution of the runnable
+         *                        when it changes to true.
          */
         public TimeTransitionRunnable(int year,
                                       int month,
@@ -5709,14 +5366,15 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                       double durationSeconds,
                                       String smoothType,
                                       double smoothFactor,
-                                      Runnable end) {
+                                      Runnable end,
+                                      AtomicBoolean stop) {
 
             lock = new Object();
             duration = durationSeconds;
             this.start = GaiaSky.instance.getT();
-            this.currentTimeMs = GaiaSky.instance.time.getTime()
-                    .toEpochMilli();
+            this.currentTimeMs = GaiaSky.instance.time.getTime().toEpochMilli();
             this.mapper = getMapper(smoothType, smoothFactor);
+            this.stop = stop;
 
             try {
                 LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, milliseconds);
@@ -5728,8 +5386,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             }
         }
 
-        private Function<Double, Double> getMapper(String smoothingType,
-                                                   double smoothingFactor) {
+        private Function<Double, Double> getMapper(String smoothingType, double smoothingFactor) {
             Function<Double, Double> mapper;
             if (Objects.equals(smoothingType, "logisticsigmoid")) {
                 final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
@@ -5755,7 +5412,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(t));
 
             // Finish if needed.
-            if (elapsed >= duration) {
+            if ((stop != null && stop.get()) || elapsed >= duration) {
                 // On end, run runnable if present, otherwise notify lock
                 if (end != null) {
                     end.run();
@@ -5771,6 +5428,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     class CameraTransitionRunnable implements Runnable {
         final Object lock;
         final Vector3D v3d1, v3d2, v3d3;
+        final AtomicBoolean stop;
         NaturalCamera cam;
         /** Duration of the position interpolation, in seconds. **/
         double posDuration;
@@ -5799,24 +5457,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          * @param up      The final up vector.
          * @param seconds The number of seconds to complete the transition.
          * @param end     An optional runnable that is executed when the transition has completed.
+         * @param stop    A reference to a boolean value as an {@link AtomicBoolean} that stops the execution of the runnable
+         *                when it changes to true.
          */
         public CameraTransitionRunnable(NaturalCamera cam,
                                         double[] pos,
                                         double[] dir,
                                         double[] up,
                                         double seconds,
-                                        Runnable end) {
-            this(cam,
-                 pos,
-                 dir,
-                 up,
-                 seconds,
-                 "",
-                 0,
-                 seconds,
-                 "",
-                 0,
-                 end);
+                                        Runnable end,
+                                        AtomicBoolean stop) {
+            this(cam, pos, dir, up, seconds, "", 0, seconds, "", 0, end, stop);
         }
 
         /**
@@ -5830,6 +5481,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          * @param smoothType      Position smooth type.
          * @param smoothFactor    Position smooth factor (depends on type).
          * @param end             An optional runnable that is executed when the transition has completed.
+         * @param stop            A reference to a boolean value as an {@link AtomicBoolean} that stops the execution of the runnable
+         *                        when it changes to true.
          */
         public CameraTransitionRunnable(NaturalCamera cam,
                                         double[] dir,
@@ -5837,18 +5490,9 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                         double durationSeconds,
                                         String smoothType,
                                         double smoothFactor,
-                                        Runnable end) {
-            this(cam,
-                 null,
-                 dir,
-                 up,
-                 -1,
-                 null,
-                 -1,
-                 durationSeconds,
-                 smoothType,
-                 smoothFactor,
-                 end);
+                                        Runnable end,
+                                        AtomicBoolean stop) {
+            this(cam, null, dir, up, -1, null, -1, durationSeconds, smoothType, smoothFactor, end, stop);
         }
 
         /**
@@ -5861,24 +5505,17 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          * @param smoothType      Position smooth type.
          * @param smoothFactor    Position smooth factor (depends on type).
          * @param end             An optional runnable that is executed when the transition has completed.
+         * @param stop            A reference to a boolean value as an {@link AtomicBoolean} that stops the execution of the runnable
+         *                        when it changes to true.
          */
         public CameraTransitionRunnable(NaturalCamera cam,
                                         double[] pos,
                                         double durationSeconds,
                                         String smoothType,
                                         double smoothFactor,
-                                        Runnable end) {
-            this(cam,
-                 pos,
-                 null,
-                 null,
-                 durationSeconds,
-                 smoothType,
-                 smoothFactor,
-                 -1,
-                 null,
-                 -1,
-                 end);
+                                        Runnable end,
+                                        AtomicBoolean stop) {
+            this(cam, pos, null, null, durationSeconds, smoothType, smoothFactor, -1, null, -1, end, stop);
         }
 
         /**
@@ -5897,6 +5534,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          * @param orientationSmoothType      Orientation smooth type.
          * @param orientationSmoothFactor    Orientation smooth factor (depends on type).
          * @param end                        An optional runnable that is executed when the transition has completed.
+         * @param stop                       A reference to a boolean value as an {@link AtomicBoolean} that stops the execution of the runnable
+         *                                   when it changes to true.
          */
         public CameraTransitionRunnable(NaturalCamera cam,
                                         double[] pos,
@@ -5908,7 +5547,8 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                         double orientationDurationSeconds,
                                         String orientationSmoothType,
                                         double orientationSmoothFactor,
-                                        Runnable end) {
+                                        Runnable end,
+                                        AtomicBoolean stop) {
             if (pos == null) {
                 type = TransitionType.ORIENTATION;
             } else if (dir == null || up == null) {
@@ -5929,20 +5569,18 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             this.elapsed = 0;
             this.end = end;
             this.lock = new Object();
+            this.stop = stop;
 
             if (type.isPosition()) {
                 // Mappers.
-                String posType = positionSmoothType.toLowerCase()
-                        .strip();
+                String posType = positionSmoothType.toLowerCase().strip();
                 positionMapper = getMapper(posType, positionSmoothFactor);
                 // Set up interpolation.
-                posInterpolator = getPath(cam.getPos()
-                                                  .tov3d(aux3d3), pos);
+                posInterpolator = getPath(cam.getPos().tov3d(aux3d3), pos);
             }
 
             if (type.isOrientation()) {
-                String orientationType = orientationSmoothType.toLowerCase()
-                        .strip();
+                String orientationType = orientationSmoothType.toLowerCase().strip();
                 orientationMapper = getMapper(orientationType, orientationSmoothFactor);
 
                 // Start and end orientations.
@@ -5960,8 +5598,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             qd = new QuaternionDouble();
         }
 
-        private Function<Double, Double> getMapper(String smoothingType,
-                                                   double smoothingFactor) {
+        private Function<Double, Double> getMapper(String smoothingType, double smoothingFactor) {
             Function<Double, Double> mapper;
             if (Objects.equals(smoothingType, "logisticsigmoid")) {
                 final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
@@ -5983,8 +5620,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
          *
          * @return The linear interpolation path.
          */
-        private PathDouble<Vector3D> getPath(Vector3D p0,
-                                             double[] p1) {
+        private PathDouble<Vector3D> getPath(Vector3D p0, double[] p1) {
             Vector3D[] points = new Vector3D[]{new Vector3D(p0), new Vector3D(p1)};
             return new LinearDouble<>(points);
         }
@@ -6006,8 +5642,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 double alphaOrientation = MathUtilsDouble.clamp(elapsed / orientationDuration, 0.0, 0.999999999999999999);
 
                 // Interpolate camera orientation using quaternions.
-                qd.set(startOrientation)
-                        .slerp(endOrientation, orientationMapper.apply(alphaOrientation));
+                qd.set(startOrientation).slerp(endOrientation, orientationMapper.apply(alphaOrientation));
                 var up = qd.getUp(v3d3);
                 cam.setUp(up);
                 var direction = qd.getDirection(v3d3);
@@ -6015,7 +5650,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             }
 
             // Finish if needed.
-            if (elapsed >= posDuration && elapsed >= orientationDuration) {
+            if ((stop != null && stop.get()) || (elapsed >= posDuration && elapsed >= orientationDuration)) {
                 // On end, run runnable if present, otherwise notify lock
                 if (end != null) {
                     end.run();

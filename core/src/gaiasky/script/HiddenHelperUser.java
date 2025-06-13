@@ -140,16 +140,19 @@ public class HiddenHelperUser implements IObserver {
     }
 
     private static class GoToObjectTask extends HelperTask {
-        Entity body;
+        private final Entity body;
+        private final EventScriptingInterface scripting;
 
         GoToObjectTask(Entity entity, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = entity;
+            this.scripting = (EventScriptingInterface) GaiaSky.instance.scripting();
         }
 
         @Override
         public void run() {
-            ((EventScriptingInterface) GaiaSky.instance.scripting()).goToObject(body, -1, 1, stop);
+            scripting.goToObjectSmooth(body, -1, 10.0, 4.0, true, stop);
+            scripting.setCameraFocus(body, -1);
             currentTasks.removeValue(this, true);
         }
 
