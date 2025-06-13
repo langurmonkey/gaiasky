@@ -1486,7 +1486,7 @@ public class GamepadGui extends AbstractGui {
     private void addTextKey(String text, Actor[][] m, int i, int j, boolean nl) {
         addTextKey(text, (event) -> {
             if (event instanceof ChangeEvent) {
-                searchField.setText(searchField.getText() + text.toLowerCase());
+                searchField.setText(searchField.getText() + text.toLowerCase(Locale.ROOT));
             }
             return false;
         }, m, i, j, nl, -1, 1);

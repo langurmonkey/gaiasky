@@ -10,6 +10,8 @@ package gaiasky.input;
 import com.badlogic.gdx.Input.Keys;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Locale;
+
 import static com.badlogic.gdx.Input.Keys.NUM_4;
 
 
@@ -32,7 +34,7 @@ public class InputUtils {
     public static String physicalKeyCodeToLogicalKeyString(final int keyCode) {
         String keyName = GLFW.glfwGetKeyName(getGlfwKeyCode(keyCode), 0);
         if (keyName != null && !keyName.isEmpty()) {
-            return keyName.toUpperCase();
+            return keyName.toUpperCase(Locale.ROOT);
         }
         return Keys.toString(keyCode);
     }

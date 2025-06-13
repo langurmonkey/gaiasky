@@ -30,6 +30,7 @@ public abstract class AbstractSceneLoader implements ISceneLoader {
     protected Scene scene;
     protected Set<String> loggedArchetypes;
     protected String parentName;
+    /** Index reference, used to keep track of loaded objects names in case they need to be updated. **/
     protected Map<String, Entity> index;
 
     @Override

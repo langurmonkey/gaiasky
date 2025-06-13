@@ -74,14 +74,22 @@ public class FileChooser extends GenericDialog {
     private DirectoryStream.Filter<Path> filter;
     /** Allows setting filters on the files which are to be selected **/
     private PathnameFilter pathnameFilter;
+
     public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target) {
         this(title, skin, stage, baseDir, target, null);
     }
+
     public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target, EventListener selectionListener) {
         this(title, skin, stage, baseDir, target, selectionListener, true);
     }
 
-    public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target, EventListener selectionListener, boolean directoryBrowsingEnabled) {
+    public FileChooser(String title,
+                       final Skin skin,
+                       Stage stage,
+                       Path baseDir,
+                       FileChooserTarget target,
+                       EventListener selectionListener,
+                       boolean directoryBrowsingEnabled) {
         super(title, skin, stage);
         this.baseDir = baseDir;
         this.selectionListener = selectionListener;
@@ -279,8 +287,7 @@ public class FileChooser extends GenericDialog {
             fileList.addListener(selectionListener);
         // Lookup with keyboard
         fileList.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyTyped) {
                     char ch = ie.getCharacter();
                     Array<FileListItem> l = fileList.getItems();
@@ -409,13 +416,14 @@ public class FileChooser extends GenericDialog {
 
         final Array<FileListItem> items = new Array<>();
 
-        DirectoryStream<Path> list = Files.newDirectoryStream(directory, filter);
-        for (final Path p : list) {
-            // Only list hidden if user chooses it
-            if (showHidden || !p.getFileName().toString().startsWith(".")) {
-                if (pathnameFilter != null && pathnameFilter.accept(p) || Files.isDirectory(p) && directoryBrowsingEnabled) {
-                    FileListItem fli = new FileListItem(p);
-                    items.add(fli);
+        try (DirectoryStream<Path> list = Files.newDirectoryStream(directory, filter)) {
+            for (final Path p : list) {
+                // Only list hidden if user chooses it
+                if (showHidden || !p.getFileName().toString().startsWith(".")) {
+                    if (pathnameFilter != null && pathnameFilter.accept(p) || Files.isDirectory(p) && directoryBrowsingEnabled) {
+                        FileListItem fli = new FileListItem(p);
+                        items.add(fli);
+                    }
                 }
             }
         }
@@ -495,7 +503,7 @@ public class FileChooser extends GenericDialog {
         String path = currentDir.toAbsolutePath() + "/";
         if (result != null && !result.isEmpty()) {
             var fileName = currentDir.getFileName();
-            String folder =  fileName != null ? fileName.toString() : "";
+            String folder = fileName != null ? fileName.toString() : "";
             if (folder.equals(result)) {
                 if (Files.exists(Paths.get(path, result))) {
                     path += result;

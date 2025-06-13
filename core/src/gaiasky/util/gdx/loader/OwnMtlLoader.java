@@ -20,6 +20,7 @@ import gaiasky.util.gdx.model.data.OwnModelTexture;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 public class OwnMtlLoader {
     private static final Log logger = Logger.getLogger(OwnMtlLoader.class);
@@ -65,7 +66,7 @@ public class OwnMtlLoader {
                 } else if (tokens[0].charAt(0) == '#')
                     continue;
                 else {
-                    final String key = tokens[0].toLowerCase();
+                    final String key = tokens[0].toLowerCase(Locale.ROOT);
                     switch (key) {
                     case "newmtl" -> {
                         addCurrentMat(curMatName, difcolor, speccolor, emicolor, metcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texMetallicFilename, materials);

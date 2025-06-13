@@ -153,7 +153,7 @@ public class JsonLoader extends AbstractSceneLoader {
             while (child != null) {
                 String name = child.getString("name");
                 if (name != null) {
-                    String nameLowerCase = name.toLowerCase().trim();
+                    String nameLowerCase = name.toLowerCase(Locale.ROOT).trim();
                     if (index.containsKey(nameLowerCase)) {
                         var entity = index.get(nameLowerCase);
                         if (entity != null) {
@@ -189,7 +189,7 @@ public class JsonLoader extends AbstractSceneLoader {
      */
     private void addToIndex(Entity entity) {
         var base = Mapper.base.get(entity);
-        var name = base.getName().toLowerCase().trim();
+        var name = base.getName().toLowerCase(Locale.ROOT).trim();
         if (!index.containsKey(name)) {
             index.put(name, entity);
         }

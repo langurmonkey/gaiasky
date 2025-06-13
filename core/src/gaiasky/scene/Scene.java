@@ -35,10 +35,7 @@ import gaiasky.util.tree.OctreeNode;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -724,7 +721,7 @@ public class Scene {
     public double[] getObjectPosition(String name,
                                       double[] out) {
         if (out.length >= 3 && name != null) {
-            name = name.toLowerCase().trim();
+            name = name.toLowerCase(Locale.ROOT).trim();
             if (index.containsEntity(name)) {
                 Entity entity = index.getEntity(name);
                 focusView.setEntity(entity);
@@ -779,7 +776,7 @@ public class Scene {
         var copy = getSimpleCopy(entity);
         // Add to copy index.
         var base = Mapper.base.get(copy);
-        index.put(base.getName().toLowerCase(), copy);
+        index.put(base.getName().toLowerCase(Locale.ROOT), copy);
         var graph = Mapper.graph.get(entity);
         if (graph.parent != null) {
             var parentCopy = getLineCopy(graph.parent, index);

@@ -13,6 +13,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 
 /**
  * Defines the keys used in Gaia Sky.
@@ -165,7 +166,7 @@ public class GSKeys {
         int code = ANY_KEY;
 
         try {
-            Field f = GSKeys.class.getField(name.toUpperCase());
+            Field f = GSKeys.class.getField(name.toUpperCase(Locale.ROOT));
             code = f.getInt(null);
         } catch (Exception e) {
             logger.error(e, "Error getting value of field GSKeys." + name);

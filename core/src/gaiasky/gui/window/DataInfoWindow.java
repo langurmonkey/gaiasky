@@ -227,7 +227,9 @@ public class DataInfoWindow extends GenericDialog {
                 // Check prefixes
                 var hit = false;
                 for (var prefix : prefixes) {
-                    if (wikiName.startsWith(prefix) || wikiName.startsWith(prefix.toLowerCase()) || wikiName.startsWith(prefix.toUpperCase())) {
+                    if (wikiName.startsWith(prefix)
+                            || wikiName.startsWith(prefix.toLowerCase(Locale.ROOT))
+                            || wikiName.startsWith(prefix.toUpperCase(Locale.ROOT))) {
                         var locNum = prefix.length();
                         var location = wikiName.charAt(locNum);
                         if (location != '_') {

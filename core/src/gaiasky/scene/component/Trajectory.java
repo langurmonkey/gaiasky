@@ -22,6 +22,8 @@ import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
+import java.util.Locale;
+
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);
 
@@ -289,7 +291,7 @@ public class Trajectory implements Component {
 
     public void setSampling(String sampling) {
         try {
-            this.sampling = OrbitSamplingStrategy.valueOf(sampling.toUpperCase());
+            this.sampling = OrbitSamplingStrategy.valueOf(sampling.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             logger.error("Unknown orbit sampling value: " + sampling, e);
         }

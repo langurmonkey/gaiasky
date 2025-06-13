@@ -9,8 +9,6 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.Position;
@@ -21,6 +19,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -69,7 +68,7 @@ public class Index {
      * @return The entity, or null if it does not exist.
      */
     public Entity getEntity(String name) {
-        name = name.toLowerCase()
+        name = name.toLowerCase(Locale.ROOT)
                 .strip();
         return index.get(name);
     }
@@ -82,7 +81,7 @@ public class Index {
      * @return True if the index contains an entity with the given name. False otherwise.
      */
     public boolean containsEntity(String name) {
-        return index.containsKey(name.toLowerCase()
+        return index.containsKey(name.toLowerCase(Locale.ROOT)
                                          .trim());
     }
 
@@ -101,7 +100,7 @@ public class Index {
             if (base.names != null) {
                 if (mustAddToIndex(entity)) {
                     for (String name : base.names) {
-                        String nameLowerCase = name.toLowerCase()
+                        String nameLowerCase = name.toLowerCase(Locale.ROOT)
                                 .trim();
                         if (!index.containsKey(nameLowerCase)) {
                             index.put(nameLowerCase, entity);
@@ -111,8 +110,8 @@ public class Index {
                             var entityArchetype = conflictBase.archetype;
                             var conflictArchetype = Mapper.base.get(conflict).archetype;
                             logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName()
-                                    .toLowerCase() + ")", conflictBase.getName() + " (" + conflictArchetype.getName()
-                                    .toLowerCase() + ")"));
+                                    .toLowerCase(Locale.ROOT) + ")", conflictBase.getName() + " (" + conflictArchetype.getName()
+                                    .toLowerCase(Locale.ROOT) + ")"));
                             String[] names1 = base.names;
                             String[] names2 = conflictBase.names;
                             boolean same = names1.length == names2.length;
@@ -238,7 +237,7 @@ public class Index {
         var base = Mapper.base.get(entity);
         if (base.names != null) {
             for (String name : base.names) {
-                index.remove(name.toLowerCase()
+                index.remove(name.toLowerCase(Locale.ROOT)
                                      .trim());
             }
 
@@ -289,7 +288,7 @@ public class Index {
      */
     public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
         String[] keys = index.keys();
-        name = name.toLowerCase()
+        name = name.toLowerCase(Locale.ROOT)
                 .trim();
 
         int i = 0;

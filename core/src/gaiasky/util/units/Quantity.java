@@ -12,32 +12,34 @@ import gaiasky.util.units.Quantity.Brightness.BrightnessUnit;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
 import net.jafama.FastMath;
 
+import java.util.Locale;
+
 public class Quantity {
 
     private static LengthUnit parseLength(String unit) throws IllegalArgumentException {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+]")) {
-            return LengthUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
+            return LengthUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase(Locale.ROOT)); //-V6009
         } else {
-            return LengthUnit.valueOf(unit.toUpperCase());
+            return LengthUnit.valueOf(unit.toUpperCase(Locale.ROOT));
         }
     }
 
     private static AngleUnit parseAngle(String unit) throws IllegalArgumentException {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+]")) {
-            return AngleUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
+            return AngleUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase(Locale.ROOT)); //-V6009
         } else {
-            return AngleUnit.valueOf(unit.toUpperCase());
+            return AngleUnit.valueOf(unit.toUpperCase(Locale.ROOT));
         }
     }
 
     private static BrightnessUnit parseMag(String unit) throws IllegalArgumentException {
         // Check format 'measure[unit]'
         if (unit.matches("[^\\[\\]]+\\[[^\\[\\]]+]")) {
-            return BrightnessUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase()); //-V6009
+            return BrightnessUnit.valueOf(unit.substring(unit.indexOf('[') + 1, unit.indexOf(']')).toUpperCase(Locale.ROOT)); //-V6009
         } else {
-            return BrightnessUnit.valueOf(unit.toUpperCase());
+            return BrightnessUnit.valueOf(unit.toUpperCase(Locale.ROOT));
         }
     }
 

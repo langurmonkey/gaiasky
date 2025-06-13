@@ -13,6 +13,8 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.NVXGPUMemoryInfo;
 import org.lwjgl.opengl.WGLAMDGPUAssociation;
 
+import java.util.Locale;
+
 /**
  * Gathers and provides information on video memory.
  */
@@ -23,10 +25,10 @@ public class VMemInfo {
     private static boolean crash = false;
 
     public static void initialize() {
-        String extensions = GlobalResources.getGLExtensions().toLowerCase();
-        boolean nvxGPU = extensions.contains("GL_NVX_gpu_memory_info".toLowerCase());
-        boolean amdGPUAssoc = extensions.contains("WGL_AMD_gpu_association".toLowerCase());
-        boolean atiMemInfo = extensions.contains("GL_ATI_meminfo".toLowerCase());
+        String extensions = GlobalResources.getGLExtensions().toLowerCase(Locale.ROOT);
+        boolean nvxGPU = extensions.contains("GL_NVX_gpu_memory_info".toLowerCase(Locale.ROOT));
+        boolean amdGPUAssoc = extensions.contains("WGL_AMD_gpu_association".toLowerCase(Locale.ROOT));
+        boolean atiMemInfo = extensions.contains("GL_ATI_meminfo".toLowerCase(Locale.ROOT));
         if (nvxGPU) {
             // Nvidia
             try {

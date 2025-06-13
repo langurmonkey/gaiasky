@@ -633,9 +633,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 objectVisibility.addListener(new OwnTextTooltip(I18n.msg("action.visibility", currentFocus.getName()), skin));
 
                 // Force label
-                labelVisibility.setCheckedNoFire(!currentFocus.isForceLabel(currentFocus.getName()
-                                                                                    .toLowerCase()
-                                                                                    .trim()));
+                labelVisibility.setCheckedNoFire(!currentFocus.isForceLabel(currentFocus.getName()));
                 labelVisibility.addListener(new OwnTextTooltip(I18n.msg("action.forcelabel", currentFocus.getName()), skin));
 
                 // ID, names

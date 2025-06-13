@@ -30,6 +30,8 @@ import gaiasky.util.scene2d.*;
 import gaiasky.util.ucd.UCD;
 import gaiasky.util.validator.FloatValidator;
 
+import java.util.Locale;
+
 /**
  * Window to define filters for a dataset.
  */
@@ -127,7 +129,7 @@ public class DatasetFiltersWindow extends GenericDialog {
             OwnSelectBox<String> operation = new OwnSelectBox<>(skin);
             operation.setWidth(minSelectWidth);
             operation.setItems("and", "or", "xor");
-            operation.setSelected(filter.getOperationString().toLowerCase());
+            operation.setSelected(filter.getOperationString().toLowerCase(Locale.ROOT));
             operation.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     String newOp = operation.getSelected();

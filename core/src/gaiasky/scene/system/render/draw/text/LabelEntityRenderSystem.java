@@ -30,9 +30,10 @@ import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
@@ -312,7 +313,7 @@ public class LabelEntityRenderSystem {
                         }
 
                         textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, pb.names()[0], labelPosition, distToCamera,
+                        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, I18n.localize(pb.names()[0]), labelPosition, distToCamera,
                                       view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(),
                                       view.label.forceLabel);
                     }
@@ -351,7 +352,7 @@ public class LabelEntityRenderSystem {
                 }
             }
             var it = set.forceLabel.iterator();
-            while(it.hasNext) {
+            while (it.hasNext) {
                 var i = it.next();
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
                     renderStarLabel(view, set, i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
@@ -396,7 +397,7 @@ public class LabelEntityRenderSystem {
             }
 
             var textSize = alpha * distToCamera * 0.5f;
-            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, star.names()[0], labelPosition, distToCamera,
+            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, I18n.localize(star.names()[0]), labelPosition, distToCamera,
                           view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
         }
     }

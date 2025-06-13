@@ -42,6 +42,7 @@ import gaiasky.util.scene2d.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class BookmarksComponent extends GuiComponent implements IObserver {
@@ -80,7 +81,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         searchBox.addListener(event -> {
             if (event instanceof InputEvent ie) {
                 if (ie.getType() == Type.keyUp && !searchBox.getText().isEmpty()) {
-                    String text = searchBox.getText().toLowerCase().trim();
+                    String text = searchBox.getText().toLowerCase(Locale.ROOT).trim();
                     if (scene.index().containsEntity(text)) {
                         Entity node = scene.getEntity(text);
                         if (Mapper.focus.has(node)) {

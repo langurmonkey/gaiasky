@@ -55,6 +55,7 @@ import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -1642,7 +1643,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 final Entity newTrackingObject = (Entity) data[0];
                 final String newTrackingName = (String) data[1];
                 synchronized (updateLock) {
-                    this.setTrackingObject(newTrackingObject, newTrackingName != null ? newTrackingName.toLowerCase() : null);
+                    this.setTrackingObject(newTrackingObject, newTrackingName != null ? newTrackingName.toLowerCase(Locale.ROOT) : null);
                 }
             }
             default -> {

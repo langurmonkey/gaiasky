@@ -39,6 +39,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -131,7 +132,7 @@ public class SearchDialog extends GenericDialog {
                         // Process only if text changed
                         if (suggestions) {
                             currentInputText = searchInput.getText();
-                            String name = currentInputText.toLowerCase().trim();
+                            String name = currentInputText.toLowerCase(Locale.ROOT).trim();
 
                             // New task
                             Task task = new Task() {

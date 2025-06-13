@@ -109,7 +109,8 @@ public class ParticleSet implements Component, IDisposable {
     public String datafile;
 
     /**
-     * Model file to use (<code>obj</code>, <code>g3db</code>, <code>g3dj</code>, <code>gltf</code>, <code>glb</code>). If present, modelType and modelParams are ignored.
+     * Model file to use (<code>obj</code>, <code>g3db</code>, <code>g3dj</code>, <code>gltf</code>, <code>glb</code>). If present, modelType and
+     * modelParams are ignored.
      * The model should have only positions (vector-3), normals (vector-3) and texture coordinates (vector-2) as vertex
      * attributes.
      * Only the first mesh of the model is used. Textures, lighting and material are ignored.
@@ -405,8 +406,17 @@ public class ParticleSet implements Component, IDisposable {
                 IParticleRecord pb = pointData.get(i);
                 if (pb.names() != null) {
                     final int idx = i;
-                    for(var name : pb.names())
-                        index.put(name.toLowerCase(), idx);
+                    for (var name : pb.names()) {
+                        var nlc = name.toLowerCase(Locale.ROOT);
+                        index.put(nlc, idx);
+                        if (I18n.hasLocalizedVersion(nlc)) {
+                            var loc = I18n.localize(nlc);
+                            if (!loc.equals(nlc)) {
+                                // We still use root locale here, by design.
+                                index.put(I18n.localize(nlc).toLowerCase(Locale.ROOT), idx);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -683,7 +693,7 @@ public class ParticleSet implements Component, IDisposable {
     public void setFocusIndex(String name) {
         synchronized (indexSync) {
             if (index != null) {
-                candidateFocusIndex = index.get(name.toLowerCase()
+                candidateFocusIndex = index.get(name.toLowerCase(Locale.ROOT)
                                                         .trim());
             }
         }
@@ -808,7 +818,7 @@ public class ParticleSet implements Component, IDisposable {
     public Vector3Q getAbsolutePosition(String name,
                                         Instant date,
                                         Vector3Q out) {
-        name = name.toLowerCase()
+        name = name.toLowerCase(Locale.ROOT)
                 .trim();
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
@@ -876,7 +886,7 @@ public class ParticleSet implements Component, IDisposable {
      */
     public Vector3Q getAbsolutePosition(String name,
                                         Vector3Q out) {
-        name = name.toLowerCase()
+        name = name.toLowerCase(Locale.ROOT)
                 .trim();
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
@@ -1146,7 +1156,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setForceLabel(Boolean forceLabel,
                               String name) {
-        name = name.toLowerCase()
+        name = name.toLowerCase(Locale.ROOT)
                 .trim();
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
@@ -1165,7 +1175,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public boolean isForceLabel(String name) {
-        name = name.toLowerCase()
+        name = name.toLowerCase(Locale.ROOT)
                 .trim();
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
@@ -1178,7 +1188,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setLabelColor(float[] color,
                               String name) {
-        name = name.toLowerCase()
+        name = name.toLowerCase(Locale.ROOT)
                 .trim();
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {

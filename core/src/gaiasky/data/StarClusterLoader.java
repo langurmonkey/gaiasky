@@ -39,10 +39,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Loads star clusters in CSV or in STIL-supported formats.
@@ -288,10 +285,10 @@ public class StarClusterLoader extends AbstractSceneLoader {
                 double val = ((Number) obj).doubleValue();
                 if (Angle.isAngle(unit)) {
                     Angle angle = new Angle(val, unit);
-                    return angle.get(AngleUnit.valueOf(defaultUnit.toUpperCase()));
+                    return angle.get(AngleUnit.valueOf(defaultUnit.toUpperCase(Locale.ROOT)));
                 } else if (Length.isLength(unit)) {
                     Length length = new Length(val, unit);
-                    return length.get(LengthUnit.valueOf(defaultUnit.toUpperCase()));
+                    return length.get(LengthUnit.valueOf(defaultUnit.toUpperCase(Locale.ROOT)));
                 } else {
                     // We just assume default unit
                     return val;

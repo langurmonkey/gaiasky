@@ -7,6 +7,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -91,7 +92,7 @@ public class TimedOrbitCoordinates implements IBodyCoordinates {
 
         // Update parent.
         if (parentName != null) {
-            var key = parentName.toLowerCase();
+            var key = parentName.toLowerCase(Locale.ROOT);
             if (index.containsKey(key)) {
                 parent = index.get(key);
             }

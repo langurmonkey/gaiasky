@@ -823,7 +823,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             // Type
             if (params.containsKey("type")) {
                 String typeStr = (String) params.get("type");
-                dOps.type = DatasetLoadType.valueOf(typeStr.toUpperCase());
+                dOps.type = DatasetLoadType.valueOf(typeStr.toUpperCase(Locale.ROOT));
             }
 
             // Label color

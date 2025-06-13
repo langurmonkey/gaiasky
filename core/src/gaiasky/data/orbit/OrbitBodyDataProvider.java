@@ -24,6 +24,7 @@ import net.jafama.FastMath;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Locale;
 
 /**
  * This class provides orbit data by using the coordinates provider of the attached
@@ -128,7 +129,7 @@ public class OrbitBodyDataProvider implements IOrbitDataProvider {
 
                 if (writeData) {
                     try {
-                        OrbitDataWriter.writeOrbitData(writeDataPath + "orb." + bodyDesc.toUpperCase() + ".dat", data);
+                        OrbitDataWriter.writeOrbitData(writeDataPath + "orb." + bodyDesc.toUpperCase(Locale.ROOT) + ".dat", data);
                     } catch (IOException e) {
                         Logger.getLogger(this.getClass()).error(e);
                     }

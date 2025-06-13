@@ -43,14 +43,13 @@ public class UCD implements Comparable<UCD> {
             // Type
             String currType = this.UCD[0][0];
             try {
-                this.type = UCDType.valueOf(currType.toUpperCase());
+                this.type = UCDType.valueOf(currType.toUpperCase(Locale.ROOT));
             } catch (Exception e) {
                 this.type = UCDType.UNKNOWN;
             }
         } else {
             this.type = UCDType.MISSING;
         }
-
     }
 
     @Override

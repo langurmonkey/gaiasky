@@ -36,10 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Convert old settings (properties files) to new settings (YAML-based).
@@ -93,7 +90,7 @@ public class SettingsMorph {
 
         graphics.backBufferScale = f64("graphics.backbuffer.scale", p);
         graphics.dynamicResolution = bool("graphics.dynamic.resolution", p);
-        graphics.quality = GraphicsQuality.valueOf(str("scene.graphics.quality", p).toUpperCase());
+        graphics.quality = GraphicsQuality.valueOf(str("scene.graphics.quality", p).toUpperCase(Locale.ROOT));
         s.graphics = graphics;
 
         // Frame
@@ -106,18 +103,18 @@ public class SettingsMorph {
         frame.location = str("graphics.render.folder", p);
         frame.prefix = str("graphics.render.filename", p);
         frame.time = bool("graphics.render.time", p);
-        frame.format = ImageFormat.valueOf(str("graphics.render.format", p).toUpperCase());
+        frame.format = ImageFormat.valueOf(str("graphics.render.format", p).toUpperCase(Locale.ROOT));
         frame.quality = f32("graphics.render.quality", p);
         s.frame = frame;
 
         // Screenshot
         var screenshot = new ScreenshotSettings();
-        screenshot.mode = screenshotMode(str("screenshot.mode", p).toUpperCase());
+        screenshot.mode = screenshotMode(str("screenshot.mode", p).toUpperCase(Locale.ROOT));
         int sw = i32("screenshot.width", p);
         int sh = i32("screenshot.height", p);
         screenshot.resolution = new int[] { sw, sh };
         screenshot.location = str("screenshot.folder", p);
-        screenshot.format = ImageFormat.valueOf(str("screenshot.format", p).toUpperCase());
+        screenshot.format = ImageFormat.valueOf(str("screenshot.format", p).toUpperCase(Locale.ROOT));
         screenshot.quality = f32("screenshot.quality", p);
         s.screenshot = screenshot;
 
@@ -212,7 +209,7 @@ public class SettingsMorph {
         renderer.shadow.resolution = i32("scene.shadowmapping.resolution", p);
         renderer.shadow.number = i32("scene.shadowmapping.nshadows", p);
         renderer.elevation = new ElevationSettings();
-        renderer.elevation.type = ElevationType.valueOf(str("scene.elevation.type", p).toUpperCase());
+        renderer.elevation.type = ElevationType.valueOf(str("scene.elevation.type", p).toUpperCase(Locale.ROOT));
         renderer.elevation.multiplier = f64("scene.elevation.multiplier", p);
         renderer.elevation.quality = f64("scene.tessellation.quality", p);
         var line = new LineSettings();
@@ -354,7 +351,7 @@ public class SettingsMorph {
         if (value.equalsIgnoreCase("redraw")) {
             value = "ADVANCED";
         }
-        return ScreenshotMode.valueOf(value.toUpperCase());
+        return ScreenshotMode.valueOf(value.toUpperCase(Locale.ROOT));
     }
 
     private static float[] arr(final String key, final Properties properties) {

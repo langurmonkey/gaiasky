@@ -14,6 +14,7 @@ import gaiasky.util.math.*;
 import net.jafama.FastMath;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Coordinates {
@@ -731,13 +732,13 @@ public class Coordinates {
     public static Matrix4D getTransformD(String name) {
         if (name == null || name.isEmpty() || !mapf.containsKey(name))
             return mat4didt;
-        return mapd.get(name.toLowerCase());
+        return mapd.get(name.toLowerCase(Locale.ROOT));
     }
 
     public static Matrix4 getTransformF(String name) {
         if (name == null || name.isEmpty() || !mapf.containsKey(name))
             return mat4fidt;
-        return mapf.get(name.toLowerCase());
+        return mapf.get(name.toLowerCase(Locale.ROOT));
     }
 
     public static Matrix4D idt() {

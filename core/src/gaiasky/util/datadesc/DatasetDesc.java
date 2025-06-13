@@ -19,6 +19,7 @@ import gaiasky.util.update.VersionChecker;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 
 public class DatasetDesc {
     private final Log logger = Logger.getLogger(DatasetDesc.class);
@@ -226,12 +227,12 @@ public class DatasetDesc {
      */
     public boolean filter(String filterText) {
         if (filterText != null) {
-            filterText = filterText.toLowerCase();
+            filterText = filterText.toLowerCase(Locale.ROOT);
             return filterText.isBlank()
-                    || (this.name != null && this.name.toLowerCase().contains(filterText))
-                    || (this.description != null && this.description.toLowerCase().contains(filterText))
-                    || (this.key != null && this.key.toLowerCase().contains(filterText))
-                    || (this.type != null && this.type.toLowerCase().contains(filterText));
+                    || (this.name != null && this.name.toLowerCase(Locale.ROOT).contains(filterText))
+                    || (this.description != null && this.description.toLowerCase(Locale.ROOT).contains(filterText))
+                    || (this.key != null && this.key.toLowerCase(Locale.ROOT).contains(filterText))
+                    || (this.type != null && this.type.toLowerCase(Locale.ROOT).contains(filterText));
         } else {
             return true;
         }

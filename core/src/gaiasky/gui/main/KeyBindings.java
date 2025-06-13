@@ -707,7 +707,7 @@ public class KeyBindings {
 
         @Override
         public int compareTo(ProgramAction other) {
-            return actionName.toLowerCase().compareTo(other.actionName.toLowerCase());
+            return actionName.toLowerCase(Locale.ROOT).compareTo(other.actionName.toLowerCase(Locale.ROOT));
         }
 
     }

@@ -102,7 +102,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         OwnLabel s2 = new OwnLabel("|", skin, "mono");
 
-        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(Settings.settings.scene.homeObject, maxNameLen)), skin, "mono");
+        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(Settings.settings.scene.homeObject), maxNameLen)), skin, "mono");
         home.setName("home tii");
         home.setColor(ColorUtils.aOrangeC);
 
@@ -154,7 +154,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         case CAMERA_CLOSEST_INFO -> {
             IFocus closestObject = (IFocus) data[0];
             if (closestObject != null) {
-                closest.setText(TextUtils.capString(closestObject.getClosestName(), maxNameLen));
+                closest.setText(TextUtils.capString(closestObject.getClosestLocalizedName(), maxNameLen));
                 closest.setText(I18n.msg("gui.top.closest", closest.getText()));
             } else {
                 closest.setText("");
@@ -186,7 +186,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
                     f = view;
                 }
                 if (f != null) {
-                    String candidate = f.getCandidateName();
+                    String candidate = I18n.localize(f.getCandidateName());
                     if (candidate != null) {
                         lastFocusName = TextUtils.capString(candidate, maxNameLen);
                         focus.setText(I18n.msg("gui.top.focus", lastFocusName));

@@ -35,6 +35,8 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
+import java.util.Locale;
+
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     private final Vector3D D31 = new Vector3D();
@@ -1085,7 +1087,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             Entity child = graph.children.get(i);
             if (child != null) {
                 var base = Mapper.base.get(child);
-                if (base.getName().equalsIgnoreCase(name.toLowerCase().trim()) && archetype.matches(child)) {
+                if (base.getName().equalsIgnoreCase(name.trim()) && archetype.matches(child)) {
                     return child;
                 }
             }

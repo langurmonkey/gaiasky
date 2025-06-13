@@ -21,6 +21,7 @@ import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Random;
 
 public final class NoiseComponent extends NamedComponent {
@@ -181,7 +182,7 @@ public final class NoiseComponent extends NamedComponent {
 
     public void setType(String noiseType) {
         try {
-            this.type = NoiseType.valueOf(noiseType.toUpperCase());
+            this.type = NoiseType.valueOf(noiseType.toUpperCase(Locale.ROOT));
         } catch (Exception e) {
             this.type = NoiseType.SIMPLEX;
         }

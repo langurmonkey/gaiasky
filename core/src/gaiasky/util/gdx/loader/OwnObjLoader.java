@@ -29,6 +29,7 @@ import gaiasky.util.gdx.model.data.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameters> {
     public static boolean logWarning = false;
@@ -84,7 +85,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
 
                 if (tokens[0].isEmpty()) {
                     // Nothing.
-                } else if ((firstChar = tokens[0].toLowerCase().charAt(0)) == '#') {
+                } else if ((firstChar = tokens[0].toLowerCase(Locale.ROOT).charAt(0)) == '#') {
                     // Nothing.
                 } else if (firstChar == 'v') {
                     if (tokens[0].length() == 1) {

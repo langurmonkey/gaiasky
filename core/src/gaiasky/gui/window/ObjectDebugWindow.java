@@ -120,7 +120,7 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
                         currentInputText = searchInput.getText();
-                        String name = currentInputText.toLowerCase().trim();
+                        String name = currentInputText.toLowerCase(Locale.ROOT).trim();
 
                         // New task
                         Timer.Task task = new Timer.Task() {

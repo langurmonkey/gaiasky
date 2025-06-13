@@ -19,6 +19,7 @@ import gaiasky.util.math.Vector3D;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
@@ -128,7 +129,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
        if(owner != null) {
            var base = Mapper.base.get(owner);
            if (base != null) {
-               var newOwner = index.get(base.getName().toLowerCase());
+               var newOwner = index.get(base.getName().toLowerCase(Locale.ROOT));
                if(newOwner != null) {
                    owner = newOwner;
                }

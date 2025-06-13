@@ -2735,7 +2735,7 @@ public class Settings extends SettingsObject {
 
             public void setOrigin(final String originString) {
                 try {
-                    origin = OriginType.valueOf(originString.toUpperCase());
+                    origin = OriginType.valueOf(originString.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
                     // Default.
                     origin = OriginType.REFSYS;
@@ -2744,7 +2744,7 @@ public class Settings extends SettingsObject {
 
             public void setStyle(final String styleString) {
                 try {
-                    style = GridStyle.valueOf(styleString.toUpperCase());
+                    style = GridStyle.valueOf(styleString.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
                     // Default.
                     style = GridStyle.CIRCULAR;
@@ -2810,7 +2810,7 @@ public class Settings extends SettingsObject {
                 if (profileString.equalsIgnoreCase("ANAGLYPH")) {
                     profileString = StereoProfile.ANAGLYPH_RED_CYAN.toString();
                 }
-                this.profile = StereoProfile.valueOf(profileString.toUpperCase());
+                this.profile = StereoProfile.valueOf(profileString.toUpperCase(Locale.ROOT));
             }
 
             @JsonIgnore
@@ -2864,7 +2864,7 @@ public class Settings extends SettingsObject {
             public float celestialSphereIndexOfRefraction;
 
             public void setProjection(final String projectionString) {
-                projection = CubemapProjection.valueOf(projectionString.toUpperCase());
+                projection = CubemapProjection.valueOf(projectionString.toUpperCase(Locale.ROOT));
             }
 
             /**
@@ -3159,7 +3159,7 @@ public class Settings extends SettingsObject {
                     // Default
                     distanceUnits = "PC";
                 }
-                this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase());
+                this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase(Locale.ROOT));
             }
 
             @Override
@@ -3522,7 +3522,7 @@ public class Settings extends SettingsObject {
         public int[] resolution;
 
         public void setFormat(final String formatString) {
-            format = ImageFormat.valueOf(formatString.toUpperCase());
+            format = ImageFormat.valueOf(formatString.toUpperCase(Locale.ROOT));
         }
 
         public void setMode(final String modeString) {
@@ -3555,7 +3555,7 @@ public class Settings extends SettingsObject {
                         ScreenshotMode mode = null;
                         if (newMode instanceof String) {
                             try {
-                                mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
+                                mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase(Locale.ROOT));
                             } catch (IllegalArgumentException e) {
                                 logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
                             }
@@ -3632,7 +3632,7 @@ public class Settings extends SettingsObject {
                         ScreenshotMode mode = null;
                         if (newMode instanceof String) {
                             try {
-                                mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
+                                mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase(Locale.ROOT));
                             } catch (IllegalArgumentException e) {
                                 logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
                             }
@@ -3754,7 +3754,7 @@ public class Settings extends SettingsObject {
                 if (str.equalsIgnoreCase("SPLINE")) {
                     str = KeyframesManager.PathType.CATMULL_ROM_SPLINE.toString();
                 }
-                return KeyframesManager.PathType.valueOf(str.toUpperCase());
+                return KeyframesManager.PathType.valueOf(str.toUpperCase(Locale.ROOT));
             }
 
             @Override
@@ -3786,7 +3786,7 @@ public class Settings extends SettingsObject {
         public GeometryWarpSettings warpingMesh;
 
         public void setUpscaleFilter(final String upscaleFilterString) {
-            upscaleFilter = UpscaleFilter.valueOf(upscaleFilterString.toUpperCase());
+            upscaleFilter = UpscaleFilter.valueOf(upscaleFilterString.toUpperCase(Locale.ROOT));
         }
 
         /** This is for compatibility with the old antialias configuration. **/
@@ -3838,7 +3838,7 @@ public class Settings extends SettingsObject {
                     case TONEMAPPING_TYPE_CMD -> {
                         ToneMapping newTM;
                         if (data[0] instanceof String) {
-                            newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
+                            newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase(Locale.ROOT));
                         } else {
                             newTM = (ToneMapping) data[0];
                         }
@@ -4180,7 +4180,7 @@ public class Settings extends SettingsObject {
             public float fboScale = 0.4f;
 
             public void setType(String type) {
-                this.type = LensFlareType.valueOf(type.toUpperCase());
+                this.type = LensFlareType.valueOf(type.toUpperCase(Locale.ROOT));
             }
 
             @Override
@@ -4268,7 +4268,7 @@ public class Settings extends SettingsObject {
             public float exposure;
 
             public void setType(final String typeString) {
-                type = ToneMapping.valueOf(typeString.toUpperCase());
+                type = ToneMapping.valueOf(typeString.toUpperCase(Locale.ROOT));
             }
 
             @Override
@@ -4355,7 +4355,7 @@ public class Settings extends SettingsObject {
             public ReprojectionMode mode;
 
             public void setReprojection(final String reprojectionString) {
-                mode = ReprojectionMode.valueOf(reprojectionString.toUpperCase());
+                mode = ReprojectionMode.valueOf(reprojectionString.toUpperCase(Locale.ROOT));
             }
 
             @Override

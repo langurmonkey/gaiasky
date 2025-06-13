@@ -14,6 +14,8 @@ import gaiasky.scene.component.ParticleExtra;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 
+import java.util.Locale;
+
 /**
  * View of an entity for rendering purposes.
  * Adds particle extra, particle set, and star set cached components to whatever is in base view.
@@ -72,7 +74,7 @@ public class RenderView extends BaseView implements IRenderable {
     /** Text color for the star with the given name in a star set. **/
     public float[] textColour(String name) {
         assert starSet != null : "Called the wrong method!";
-        name = name.toLowerCase().trim();
+        name = name.toLowerCase(Locale.ROOT).trim();
         if (starSet.index.containsKey(name)) {
             int idx = starSet.index.get(name);
             if (starSet.labelColors.containsKey(idx)) {

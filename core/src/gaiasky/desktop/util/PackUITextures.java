@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -114,7 +115,7 @@ public class PackUITextures {
             }
 
             for (File file : Objects.requireNonNull(inputDir.listFiles())) {
-                if (!file.getName().toLowerCase().endsWith(".png")) continue;
+                if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".png")) continue;
 
                 BufferedImage img = ImageIO.read(file);
 

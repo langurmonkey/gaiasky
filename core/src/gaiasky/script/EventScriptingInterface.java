@@ -380,7 +380,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setCameraPosition(double[] position, String units, boolean immediate) {
         if (checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             if (immediate) {
                 cameraPositionEvent(position, u);
             } else {
@@ -411,7 +411,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public double[] getCameraPosition(String units) {
         if (checkDistanceUnits(units, "units")) {
-            var u = DistanceUnits.valueOf(units.toUpperCase());
+            var u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             Vector3D campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
             return new double[]{u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z)};
         }
@@ -913,7 +913,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             boolean visible;
             synchronized (focusView) {
                 focusView.setEntity(obj);
-                visible = focusView.isVisible(name.toLowerCase().strip());
+                visible = focusView.isVisible(name.toLowerCase(Locale.ROOT).strip());
             }
             return visible;
         }
@@ -2263,7 +2263,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getAbsolutePosition(name, aux3b1);
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
@@ -2281,7 +2281,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
         }
         return null;
@@ -2335,7 +2335,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     public void setObjectPosition(Entity object, double[] position, String units) {
         if (checkNotNull(object, "object") && checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
 
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             double[] posUnits = new double[]{u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2])};
 
             var body = Mapper.body.get(object);
@@ -2967,7 +2967,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             Runnable end = null;
             if (!sync) end = () -> unparkRunnable(name);
 
-            var u = DistanceUnits.valueOf(units.toUpperCase());
+            var u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             double[] finalPosition = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
 
             // Create and park runnable
@@ -3029,7 +3029,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
             Runnable end = null;
             if (!sync) end = () -> unparkRunnable(name);
 
-            var u = DistanceUnits.valueOf(units.toUpperCase());
+            var u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             double[] posUnits = new double[]{u.toInternalUnits(camPos[0]), u.toInternalUnits(camPos[1]), u.toInternalUnits(camPos[2])};
 
             // Create and park position transition runnable
@@ -3409,7 +3409,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setHDRToneMappingType(String type) {
         if (checkString(type, new String[]{"auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE"}, "tone mapping type"))
-            postRunnable(() -> em.post(Event.TONEMAPPING_TYPE_CMD, this, Settings.ToneMapping.valueOf(type.toUpperCase())));
+            postRunnable(() -> em.post(Event.TONEMAPPING_TYPE_CMD, this, Settings.ToneMapping.valueOf(type.toUpperCase(Locale.ROOT))));
     }
 
     @Override
@@ -3424,7 +3424,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setCubemapMode(boolean state, String projection) {
         if (checkStringEnum(projection, CubemapProjection.class, "projection")) {
-            CubmeapProjectionEffect.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
+            CubmeapProjectionEffect.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase(Locale.ROOT));
             postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
         }
     }
@@ -3437,7 +3437,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setReprojectionMode(String mode) {
         if (checkStringEnum(mode, ReprojectionMode.class, "re-projection mode")) {
-            ReprojectionMode newMode = ReprojectionMode.valueOf(mode.toUpperCase());
+            ReprojectionMode newMode = ReprojectionMode.valueOf(mode.toUpperCase(Locale.ROOT));
             postRunnable(() -> em.post(Event.REPROJECTION_CMD, this, newMode != ReprojectionMode.DISABLED, newMode));
         }
     }
@@ -3470,7 +3470,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void setCubemapProjection(String projection) {
         if (checkStringEnum(projection, CubemapProjection.class, "projection")) {
-            CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
+            CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase(Locale.ROOT));
             em.post(Event.CUBEMAP_PROJECTION_CMD, this, newProj);
         }
     }
@@ -4800,11 +4800,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                 orientation,
                 ShapeOrientation.class,
                 "orientation") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
-            final var shapeLc = shapeType.toLowerCase();
+            final var shapeLc = shapeType.toLowerCase(Locale.ROOT);
             postRunnable(() -> {
                 Entity trackingObject = getFocusEntity(objectName);
                 float[] color = new float[]{r, g, b, a};
-                int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                int primitiveInt = Primitive.valueOf(primitive.toUpperCase(Locale.ROOT)).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
                 // Create shape
                 Archetype at = scene.archetypes().get("ShapeObject");
                 Entity newShape = at.createEntity();
@@ -4834,7 +4834,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
                 var trf = Mapper.transform.get(newShape);
                 var m = new Matrix4();
-                var orient = ShapeOrientation.valueOf(orientation.toUpperCase());
+                var orient = ShapeOrientation.valueOf(orientation.toUpperCase(Locale.ROOT));
                 switch (orient) {
                     case CAMERA -> {
                         var camera = GaiaSky.instance.cameraManager.getCamera();
@@ -5292,7 +5292,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     private boolean checkDistanceUnits(String units, String name) {
         try {
-            DistanceUnits.valueOf(units.toUpperCase());
+            DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             return true;
         } catch (Exception e) {
             return false;
@@ -5573,14 +5573,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
             if (type.isPosition()) {
                 // Mappers.
-                String posType = positionSmoothType.toLowerCase().strip();
+                String posType = positionSmoothType.toLowerCase(Locale.ROOT).strip();
                 positionMapper = getMapper(posType, positionSmoothFactor);
                 // Set up interpolation.
                 posInterpolator = getPath(cam.getPos().tov3d(aux3d3), pos);
             }
 
             if (type.isOrientation()) {
-                String orientationType = orientationSmoothType.toLowerCase().strip();
+                String orientationType = orientationSmoothType.toLowerCase(Locale.ROOT).strip();
                 orientationMapper = getMapper(orientationType, orientationSmoothFactor);
 
                 // Start and end orientations.

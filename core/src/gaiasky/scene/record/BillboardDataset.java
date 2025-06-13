@@ -19,6 +19,7 @@ import gaiasky.util.Settings.GraphicsQuality;
 import net.jafama.FastMath;
 
 import java.util.List;
+import java.util.Locale;
 
 public class BillboardDataset {
     private static final Log logger = Logger.getLogger(BillboardDataset.class);
@@ -91,7 +92,7 @@ public class BillboardDataset {
 
     public void setType(String type) {
         if (type != null && !type.isBlank()) {
-            this.type = ParticleType.valueOf(type.toUpperCase());
+            this.type = ParticleType.valueOf(type.toUpperCase(Locale.ROOT));
         }
     }
 
@@ -134,7 +135,7 @@ public class BillboardDataset {
     }
 
     public void setBlending(String blending) {
-        this.blending = BlendMode.valueOf(blending.toUpperCase());
+        this.blending = BlendMode.valueOf(blending.toUpperCase(Locale.ROOT));
     }
 
     /**

@@ -23,6 +23,7 @@ import gaiasky.util.coord.AstroUtils;
 import net.jafama.FastMath;
 
 import java.nio.file.Files;
+import java.util.Locale;
 
 public class ParticleSetUpdater extends AbstractUpdateSystem {
 
@@ -78,7 +79,7 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                         if (Files.exists(path)) {
                             // Remove current bean from index.
                             for (var key : bean.names()) {
-                                var k = key.toLowerCase()
+                                var k = key.toLowerCase(Locale.ROOT)
                                         .trim();
                                 GaiaSky.instance.scene.index()
                                         .remove(k);

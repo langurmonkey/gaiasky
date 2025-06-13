@@ -10,6 +10,8 @@ package gaiasky.util.filter;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.api.IParticleRecord;
 
+import java.util.Locale;
+
 public class Filter {
     private final Array<FilterRule> rules;
     private IOperation operation;
@@ -76,7 +78,7 @@ public class Filter {
     }
 
     public IOperation getOperationFromString(String op) {
-        return switch (op.toLowerCase()) {
+        return switch (op.toLowerCase(Locale.ROOT)) {
             case "or" -> new OperationOr();
             case "xor" -> new OperationXor();
             default -> new OperationAnd();
