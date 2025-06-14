@@ -47,7 +47,6 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
 
     private final double BRIGHTNESS_FACTOR;
 
-    private final Vector3 aux1;
     private final float[] alphaSizeBrRc;
     private final float[] opacityLimitsHlShowAll;
     private final Colormap cmap;
@@ -62,7 +61,6 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
 
         alphaSizeBrRc = new float[4];
         opacityLimitsHlShowAll = new float[]{2, 4};
-        aux1 = new Vector3();
         cmap = new Colormap();
         utils = new ParticleUtils();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
@@ -123,7 +121,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
             shaderProgram.begin();
             // Global uniforms
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+            shaderProgram.setUniformf("u_camPos", camera.getPos());
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
             shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
             shaderProgram.setUniformf("u_brightnessPower", Settings.settings.scene.star.power);

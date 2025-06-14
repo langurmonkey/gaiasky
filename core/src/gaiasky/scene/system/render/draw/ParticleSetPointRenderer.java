@@ -40,7 +40,6 @@ import org.lwjgl.opengl.GL30;
 import java.util.Random;
 
 public class ParticleSetPointRenderer extends PointCloudRenderer implements IObserver {
-    private final Vector3 aux1;
     private final Random rand;
     private final Colormap cmap;
     private final ParticleUtils utils;
@@ -57,7 +56,6 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         cmap = new Colormap();
 
         rand = new Random(123);
-        aux1 = new Vector3();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_PARTICLE_GROUP);
     }
 
@@ -90,8 +88,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
         shaderProgram.setUniformf("u_camPos", camera.getCurrent()
-                .getPos()
-                .put(aux1));
+                .getPos());
         shaderProgram.setUniformf("u_camDir", camera.getCurrent()
                 .getCamera().direction);
         shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);

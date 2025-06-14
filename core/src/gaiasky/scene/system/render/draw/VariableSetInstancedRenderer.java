@@ -40,7 +40,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;
     protected static final Log logger = Logger.getLogger(VariableSetInstancedRenderer.class);
-    private final Vector3 aux1;
     private final Colormap cmap;
     private StarSetQuadComponent triComponent;
 
@@ -51,7 +50,6 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         super(sceneRenderer, rg, alphas, shaders);
         cmap = new Colormap();
 
-        aux1 = new Vector3();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD,
@@ -105,7 +103,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-        shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        shaderProgram.setUniformf("u_camPos", camera.getPos());
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }

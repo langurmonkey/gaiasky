@@ -89,7 +89,8 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-        shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        shaderProgram.setUniformf("u_camPos", camera.getPos());
+        shaderProgram.setUniformf("u_camVel", camera.getVelocity());
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }

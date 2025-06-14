@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -50,7 +49,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
     /** Whether to use the extended particle set mode or not. **/
     private final boolean extended;
-    private final Vector3 aux1 = new Vector3();
     private final Random rand;
     private final Colormap cmap;
 
@@ -118,8 +116,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-        shaderProgram.setUniformf("u_camPos", camera.getPos()
-                .put(aux1));
+        shaderProgram.setUniformf("u_camPos", camera.getPos());
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }

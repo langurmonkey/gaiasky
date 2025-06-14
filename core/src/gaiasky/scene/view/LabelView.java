@@ -316,7 +316,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
                 rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90f : -90f);
             }
 
-            shader.setUniformf("u_pos", pos.put(F31));
+            shader.setUniformf("u_pos", pos);
 
             // Enable or disable blending
             ((I3DTextRenderable) this).textDepthBuffer();

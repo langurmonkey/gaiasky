@@ -59,8 +59,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
     private static final String texFolder = Constants.DATA_LOCATION_TOKEN + "galaxy/sprites/";
 
-    private final Vector3 aux3f1;
-
     private final Map<Render, MeshDataWrap[]> meshes;
     private final Map<Render, GpuData[]> gpus;
     private final Map<Render, Integer> loadIndices;
@@ -75,7 +73,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                                 float[] alphas,
                                 ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
-        aux3f1 = new Vector3();
 
         starColorGenerator = new StarColorGenerator();
         dustColorGenerator = new DustColorGenerator();
@@ -380,7 +377,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                 ta.bind(0);
             }
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
+            shaderProgram.setUniformf("u_camPos", camera.getPos());
             addCameraUpCubemapMode(shaderProgram, camera);
             shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha * 1.5f);
             shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);

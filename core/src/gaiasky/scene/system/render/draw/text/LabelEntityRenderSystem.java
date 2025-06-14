@@ -698,7 +698,7 @@ public class LabelEntityRenderSystem {
                 rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90f : -90f);
             }
 
-            shader.setUniformf("u_pos", labelPosition.put(F31));
+            shader.setUniformf("u_pos", labelPosition);
 
             // Enable or disable blending
             view.textDepthBuffer();

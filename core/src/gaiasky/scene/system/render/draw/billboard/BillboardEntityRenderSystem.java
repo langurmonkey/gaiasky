@@ -79,7 +79,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         var scaffolding = Mapper.modelScaffolding.get(entity);
         float size = (float) (getRenderSizeBillboardGalaxy(camera, view.body, scaffolding) / Constants.DISTANCE_SCALE_FACTOR);
 
-        shader.setUniformf("u_pos", view.graph.translation.put(F31));
+        shader.setUniformf("u_pos", view.graph.translation);
         shader.setUniformf("u_size", size);
 
         shader.setUniformf("u_color", body.color[0], body.color[1], body.color[2], alpha);
@@ -122,9 +122,8 @@ public class BillboardEntityRenderSystem implements IObserver {
                 // Ease into billboard.
                 alpha *= (float) MathUtilsDouble.flint(solidAngle, thPointTimesFovFactor, thPointTimesFovFactor * 2f, 0, 1);
 
-                Vector3 pos = starPos.put(F31);
                 shader.setUniformMatrix("u_matrix", camera.getCamera().view);
-                shader.setUniformf("u_pos", pos);
+                shader.setUniformf("u_pos", starPos);
                 shader.setUniformf("u_size", (float) fuzzySize);
 
                 shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
@@ -322,7 +321,7 @@ public class BillboardEntityRenderSystem implements IObserver {
 
         float fa = (1 - cluster.fadeAlpha) * 0.6f;
 
-        shader.setUniformf("u_pos", graph.translation.put(F31));
+        shader.setUniformf("u_pos", graph.translation);
         shader.setUniformf("u_size", body.size);
         shader.setUniformf("u_color", body.color[0] * fa, body.color[1] * fa, body.color[2] * fa,
                            body.color[3] * alpha * base.opacity * 6.5f);

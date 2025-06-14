@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -45,7 +44,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ElementsSetRenderer.class);
 
-    private final Vector3 aux1;
     private final Matrix4 aux, refSysTransformF;
     private int posOffset;
     private int uvOffset;
@@ -60,7 +58,6 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                                float[] alphas,
                                ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
-        aux1 = new Vector3();
         aux = new Matrix4();
         refSysTransformF = new Matrix4();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
@@ -182,7 +179,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-                shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+                shaderProgram.setUniformf("u_camPos", camera.getPos());
                 addCameraUpCubemapMode(shaderProgram, camera);
                 shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
@@ -244,8 +241,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                        Object source,
                        final Object... data) {
         if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
-            if (source instanceof Render) {
-                var render = (Render) source;
+            if (source instanceof Render render) {
                 int offset = getOffset(render);
                 if (offset >= 0) {
                     clearMeshData(offset);

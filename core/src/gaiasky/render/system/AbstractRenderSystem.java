@@ -201,7 +201,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
             shaderProgram.setUniformf("u_camUp", aux3f.set(Float.NaN, 0, 0));
         } else {
             // Add real camera up.
-            shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux3f));
+            shaderProgram.setUniformf("u_camUp", camera.getUp());
         }
     }
 

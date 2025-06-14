@@ -164,7 +164,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-                shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+                shaderProgram.setUniformf("u_camPos", camera.getPos());
                 addCameraUpCubemapMode(shaderProgram, camera);
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * first.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);

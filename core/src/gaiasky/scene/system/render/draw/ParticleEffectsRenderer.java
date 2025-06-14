@@ -27,8 +27,8 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
@@ -39,7 +39,6 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
     private static final int N_PARTICLES = (Settings.settings.graphics.quality.ordinal() + 1) * 100;
 
     private final Random rand;
-    private final Vector3 aux1f;
     private final Vector3D aux1, aux2, aux5;
     private final Vector3Q aux1b;
     private final ComponentTypes ct;
@@ -51,7 +50,6 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
 
     public ParticleEffectsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super(sceneRenderer, rg, alphas, programs);
-        aux1f = new Vector3();
         aux1 = new Vector3D();
         aux2 = new Vector3D();
         aux5 = new Vector3D();
@@ -229,7 +227,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-                shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1f));
+                shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos());
                 shaderProgram.setUniformf("u_alpha", alpha * 0.6f);
                 shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor);
                 shaderProgram.setUniformf("u_t", getT());

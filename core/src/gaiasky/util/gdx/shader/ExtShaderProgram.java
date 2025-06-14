@@ -22,6 +22,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import org.lwjgl.opengl.GL33;
 
 import java.io.File;
@@ -940,6 +942,30 @@ public class ExtShaderProgram implements Disposable {
     public void setUniformf(String name,
                             Vector3 values) {
         setUniformf(name, values.x, values.y, values.z);
+    }
+
+    /**
+     * Sets the uniform with the given name. The {@link ExtShaderProgram} must be bound for this to work.
+     * Uses a {@link Vector3D}.
+     *
+     * @param name   the name of the uniform
+     * @param values x, y and z as the first, second and third values respectively
+     */
+    public void setUniformf(String name,
+                            Vector3D values) {
+        setUniformf(name, (float) values.x, (float) values.y, (float) values.z);
+    }
+
+    /**
+     * Sets the uniform with the given name. The {@link ExtShaderProgram} must be bound for this to work.
+     * Uses a {@link Vector3Q}.
+     *
+     * @param name   the name of the uniform
+     * @param values x, y and z as the first, second and third values respectively
+     */
+    public void setUniformf(String name,
+                            Vector3Q values) {
+        setUniformf(name, values.x.floatValue(), values.y.floatValue(), values.z.floatValue());
     }
 
     public void setUniformf(int location,
