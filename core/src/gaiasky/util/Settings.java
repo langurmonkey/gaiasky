@@ -1543,8 +1543,10 @@ public class Settings extends SettingsObject {
          */
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class StarSettings extends SettingsObject implements IObserver {
+            /** Render stars as textured sphere models. **/
             public boolean renderStarSpheres;
-            public boolean trailEffectShader = true;
+            /** Elongate stars in the direction of motion. **/
+            public boolean streaksShader = true;
             public float brightness;
             public float power;
             public float pointSize;

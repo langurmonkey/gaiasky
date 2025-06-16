@@ -914,7 +914,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Stops the camera movement.
      *
      * @return True if the camera had any movement at all and it has been stopped.
-     * False if camera was already still.
+     *         False if camera was already still.
      */
     public boolean stopMovement() {
         boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0 || horizontal.y != 0);
@@ -956,12 +956,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         vel.setZero();
     }
 
-    /**
-     * Updates the position of this entity using the current force
-     */
-    protected void updatePosition(double dt,
-                                  double multiplier,
-                                  double speedScaling) {
+    protected void updateVelocity(double dt, double multiplier, double speedScaling) {
+
         boolean cinematic = Settings.settings.scene.camera.cinematic;
         // Calculate velocity if coming from gamepad
         if (velocityGamepad != 0) {
@@ -1045,17 +1041,27 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
 
             vel.clamp(0, multiplier * speedMultiplier);
-            // Aux1 is the step to take
-            aux1b.set(vel)
-                    .scl(dt);
-            // Aux2 contains the new position
-            pos.add(aux1b);
-
-            accel.setZero();
-
-            lastVel.set(vel);
-            force.setZero();
         }
+    }
+
+    /**
+     * Updates the position of this entity using the current force
+     */
+    protected void updatePosition(double dt,
+                                  double multiplier,
+                                  double speedScaling) {
+
+        updateVelocity(dt, multiplier, speedScaling);
+        // Aux1 is the step to take
+        aux1b.set(vel)
+                .scl(dt);
+        // Aux2 contains the new position
+        pos.add(aux1b);
+
+        accel.setZero();
+
+        lastVel.set(vel);
+        force.setZero();
         posInv.set(pos)
                 .scl(-1);
     }
@@ -1332,7 +1338,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Computes the final distance to use for the speed scaling, given the closest object's radius and distance. This method takes into account
-     * the focus object if the camera is in focus mode, and creates a smoothing function between the distance of the closest object and that of the focus.
+     * the focus object if the camera is in focus mode, and creates a smoothing function between the distance of the closest object and that of the
+     * focus.
      *
      * @param distance           The distance to the closest object.
      * @param smoothingDistance0 First interpolation distance for smoothing.
@@ -1628,8 +1635,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     setCenterFocus((Boolean) data[0]);
                 }
             }
-            case CONTROLLER_CONNECTED_INFO ->
-                    Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
+            case CONTROLLER_CONNECTED_INFO -> Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
             case CONTROLLER_DISCONNECTED_INFO -> {
                 // Empty.
             }
@@ -2152,7 +2158,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Projects to screen.
      *
      * @return False if projected point falls outside the screen bounds, true
-     * otherwise.
+     *         otherwise.
      */
     private boolean projectToScreen(Vector3D vec,
                                     Vector3 out,

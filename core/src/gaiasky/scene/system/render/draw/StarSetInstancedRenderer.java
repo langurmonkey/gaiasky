@@ -31,7 +31,6 @@ import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Vector3D;
 
 /**
  * Renders star sets as instanced triangles.
@@ -90,7 +89,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos());
         updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
-        if (Settings.settings.scene.star.trailEffectShader && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
+        if (Settings.settings.scene.star.streaksShader && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
             shaderProgram.setUniformf("u_camVel", smoothedCamVel);
         } else {
             shaderProgram.setUniformf("u_camVel", 0, 0, 0);

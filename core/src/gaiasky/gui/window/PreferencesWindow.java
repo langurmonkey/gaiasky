@@ -102,7 +102,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox ssr;
     private OwnCheckBox eclipses;
     private OwnCheckBox eclipseOutlines;
-    private OwnCheckBox starSpheres, starDistanceScaling, starTrailEffect;
+    private OwnCheckBox starSpheres, starDistanceScaling, starStreaks;
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
@@ -1320,10 +1320,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // Star trail effect
-        OwnLabel starTrailEffectLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.trail.effect"), skin);
-        starTrailEffect = new OwnCheckBox("", skin);
-        starTrailEffect.setChecked(settings.scene.star.trailEffectShader);
+        // Star streaks
+        OwnLabel starStreaksLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.streaks"), skin);
+        starStreaks = new OwnCheckBox("", skin);
+        starStreaks.setChecked(settings.scene.star.streaksShader);
 
         // Star distance to compute camera speed scaling
         OwnLabel starDistanceScalingLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.distance.scaling"), skin);
@@ -1336,8 +1336,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(glowOverObjects).left().padRight(pad18).padBottom(pad10).row();
-        starsTable.add(starTrailEffectLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(starTrailEffect).left().padRight(pad18).padBottom(pad10).row();
+        starsTable.add(starStreaksLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(starStreaks).left().padRight(pad18).padBottom(pad10).row();
         if (textureIndex != null) {
             starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
@@ -3001,7 +3001,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.scene.star.renderStarSpheres = starSpheres.isChecked();
 
         // Star trail effect
-        settings.scene.star.trailEffectShader = starTrailEffect.isChecked();
+        settings.scene.star.streaksShader = starStreaks.isChecked();
 
         // Star distance scaling
         settings.scene.camera.starDistanceScaling = starDistanceScaling.isChecked();

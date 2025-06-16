@@ -144,8 +144,8 @@ scene:
   star:
     # Render star spheres.
     renderStarSpheres: true
-    # Enable/disable star trail effect.
-    trailEffectShader: false
+    # Enable/disable star streaks.
+    streaksShader: false
     # Star brightness factor.
     brightness: 2.0
     # Modulate the brightness of stars.
