@@ -105,8 +105,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos());
-        if (Settings.settings.scene.star.trailEffectShader && !camera.isRotating()) {
-            updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
+        updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
+        if (Settings.settings.scene.star.trailEffectShader && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
             shaderProgram.setUniformf("u_camVel", smoothedCamVel);
         } else {
             shaderProgram.setUniformf("u_camVel", 0, 0, 0);
