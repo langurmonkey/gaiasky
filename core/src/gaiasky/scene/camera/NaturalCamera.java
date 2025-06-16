@@ -2270,6 +2270,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return scene;
     }
 
+    @Override
+    public boolean isRotating() {
+        return getMode().isFocus() && (FastMath.abs(horizontal.y) > 1e-6 || FastMath.abs(vertical.y) > 1e-6);
+    }
+
     private boolean isTracking() {
         return trackingObject != null && trackingName != null;
     }

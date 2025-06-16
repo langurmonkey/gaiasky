@@ -143,6 +143,12 @@ public interface ICamera {
     double getDistance();
 
     /**
+     * Check whether the camera is currently rotating around the (possible) focus object.
+     * @return Whether the camera is rotating.
+     */
+    boolean isRotating();
+
+    /**
      * Returns the focus if any.
      *
      * @return The focus object if it is in focus mode. Null otherwise.

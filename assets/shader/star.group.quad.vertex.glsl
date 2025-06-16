@@ -12,6 +12,7 @@ uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform vec3 u_camVel;
+uniform float u_pcToU;
 uniform vec2 u_solidAngleMap;
 // x - alpha
 // y - point size/fov factor
@@ -126,7 +127,7 @@ void main() {
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = quadSize;
-    #include <shader/snippet/billboard.glsl>
+    #include <shader/snippet/billboard.stretch.glsl>
 
     gl_Position = gpos;
 

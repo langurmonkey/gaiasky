@@ -7,11 +7,11 @@
 
 package gaiasky.scene.system.render.draw;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -31,6 +31,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector3D;
 
 /**
  * Renders star sets as instanced triangles.
@@ -38,7 +39,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 public class StarSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(StarSetInstancedRenderer.class);
 
-    private final Vector3 aux1;
     private final Colormap cmap;
     private StarSetQuadComponent triComponent;
 
@@ -49,7 +49,6 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         super(sceneRenderer, rg, alphas, shaders);
         cmap = new Colormap();
 
-        aux1 = new Vector3();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD,
@@ -90,10 +89,17 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos());
-        shaderProgram.setUniformf("u_camVel", camera.getVelocity());
+        updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
+        if (Settings.settings.scene.star.trailEffectShader && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
+            shaderProgram.setUniformf("u_camVel", smoothedCamVel);
+        } else {
+            shaderProgram.setUniformf("u_camVel", 0, 0, 0);
+        }
+        shaderProgram.setUniformf("u_pcToU", (float) Constants.PC_TO_U);
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }
+
 
     protected void renderObject(ExtShaderProgram shaderProgram,
                                 IRenderable renderable) {

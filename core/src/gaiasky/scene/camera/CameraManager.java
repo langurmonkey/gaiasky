@@ -555,6 +555,11 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
+    public boolean isRotating() {
+        return current.isRotating();
+    }
+
+    @Override
     public PerspectiveCamera getCameraStereoLeft() {
         return current.getCameraStereoLeft();
     }

@@ -26,6 +26,7 @@ import gaiasky.util.gdx.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector3D;
 
 import java.util.HashMap;
 import java.util.List;
@@ -506,5 +507,15 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         }
     }
 
+
+    /** Smoothed camera velocity for star trail time-lapse effect. **/
+    protected Vector3D smoothedCamVel = new Vector3D(0.0, 0.0, 0.0);
+
+    protected void updateCameraVelocity(Vector3D rawVel, double deltaTime) {
+        // tau: smoothing time constant in seconds ? higher = smoother, slower response
+        double tau = 0.1;
+        double alpha = 1.0 - Math.exp(-deltaTime / tau);
+        smoothedCamVel.lerp(rawVel, alpha);
+    }
 
 }

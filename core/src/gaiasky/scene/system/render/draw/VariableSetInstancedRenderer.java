@@ -7,6 +7,7 @@
 
 package gaiasky.scene.system.render.draw;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -104,6 +105,13 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos());
+        if (Settings.settings.scene.star.trailEffectShader && !camera.isRotating()) {
+            updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
+            shaderProgram.setUniformf("u_camVel", smoothedCamVel);
+        } else {
+            shaderProgram.setUniformf("u_camVel", 0, 0, 0);
+        }
+        shaderProgram.setUniformf("u_pcToU", (float) Constants.PC_TO_U);
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }

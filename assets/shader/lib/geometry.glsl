@@ -113,6 +113,10 @@ vec3 rotate_vector(vec3 v, vec4 r) {
     vec4 r_c = r * vec4(-1, -1, -1, 1);
     return qmul(r, qmul(vec4(v, 0), r_c)).xyz;
 }
+vec3 qrot(vec4 q, vec3 v) {
+    return rotate_vector(v, q);
+}
+
 
 vec3 rotate_vector_at(vec3 v, vec3 center, vec4 r) {
     vec3 dir = v - center;

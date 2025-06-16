@@ -1544,6 +1544,7 @@ public class Settings extends SettingsObject {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class StarSettings extends SettingsObject implements IObserver {
             public boolean renderStarSpheres;
+            public boolean trailEffectShader = true;
             public float brightness;
             public float power;
             public float pointSize;

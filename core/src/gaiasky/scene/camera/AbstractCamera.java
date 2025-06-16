@@ -425,4 +425,9 @@ public abstract class AbstractCamera implements ICamera {
     public double getSpeedScalingCapped() {
         return 1;
     }
+
+    @Override
+    public boolean isRotating() {
+        return false;
+    }
 }

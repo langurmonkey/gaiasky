@@ -123,7 +123,7 @@ scene:
     fov: 45.0
     # Cinematic camera
     cinematic: false
-    # Use distance to closest star to compute camera velocity scaling
+    # Use distance to nearest star to compute camera velocity scaling
     starDistanceScaling: true
     # Target on in free mode. This scales the velocity of the camera according
     # to the distance to the closest object.
@@ -144,6 +144,8 @@ scene:
   star:
     # Render star spheres.
     renderStarSpheres: false
+    # Enable/disable star trail effect.
+    trailEffectShader: true
     # Star brightness factor.
     brightness: 2.22
     # Modulate the brightness of stars.

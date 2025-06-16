@@ -102,7 +102,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox ssr;
     private OwnCheckBox eclipses;
     private OwnCheckBox eclipseOutlines;
-    private OwnCheckBox starSpheres, starDistanceScaling;
+    private OwnCheckBox starSpheres, starDistanceScaling, starTrailEffect;
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
@@ -1307,18 +1307,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         starSpheres.setChecked(settings.scene.star.renderStarSpheres);
 
 
-        // LIGHT GLOW
-        OwnLabel lightGlowLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
-        CheckBox lightGlow = new OwnCheckBox("", skin);
-        lightGlow.setName("light scattering");
-        lightGlow.setChecked(settings.postprocess.lightGlow.active);
-        lightGlow.addListener(event -> {
+        // Star glow over objects
+        OwnLabel glowOverObjectsLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
+        CheckBox glowOverObjects = new OwnCheckBox("", skin);
+        glowOverObjects.setName("light scattering");
+        glowOverObjects.setChecked(settings.postprocess.lightGlow.active);
+        glowOverObjects.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LIGHT_GLOW_CMD, lightGlow, lightGlow.isChecked());
+                EventManager.publish(Event.LIGHT_GLOW_CMD, glowOverObjects, glowOverObjects.isChecked());
                 return true;
             }
             return false;
         });
+
+        // Star trail effect
+        OwnLabel starTrailEffectLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.trail.effect"), skin);
+        starTrailEffect = new OwnCheckBox("", skin);
+        starTrailEffect.setChecked(settings.scene.star.trailEffectShader);
 
         // Star distance to compute camera speed scaling
         OwnLabel starDistanceScalingLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.distance.scaling"), skin);
@@ -1326,11 +1331,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         starDistanceScaling.setChecked(settings.scene.camera.starDistanceScaling);
 
         // Add labels
-        labels.add(textureIndexLabel, starSpheresLabel, starDistanceScalingLabel, lightGlowLabel);
+        labels.add(textureIndexLabel, starSpheresLabel, starDistanceScalingLabel, glowOverObjectsLabel);
 
         // Add to table
-        starsTable.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(lightGlow).left().padRight(pad18).padBottom(pad10).row();
+        starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(glowOverObjects).left().padRight(pad18).padBottom(pad10).row();
+        starsTable.add(starTrailEffectLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(starTrailEffect).left().padRight(pad18).padBottom(pad10).row();
         if (textureIndex != null) {
             starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
@@ -2992,6 +2999,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Star spheres
         settings.scene.star.renderStarSpheres = starSpheres.isChecked();
+
+        // Star trail effect
+        settings.scene.star.trailEffectShader = starTrailEffect.isChecked();
 
         // Star distance scaling
         settings.scene.camera.starDistanceScaling = starDistanceScaling.isChecked();
