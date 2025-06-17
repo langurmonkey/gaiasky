@@ -89,7 +89,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos());
         updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
-        if (Settings.settings.scene.star.streaksShader && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
+        if (Settings.settings.scene.particleGroups.motionTrails && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
             shaderProgram.setUniformf("u_camVel", smoothedCamVel);
         } else {
             shaderProgram.setUniformf("u_camVel", 0, 0, 0);

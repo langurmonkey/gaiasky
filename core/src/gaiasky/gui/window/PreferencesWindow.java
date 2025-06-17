@@ -102,7 +102,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox ssr;
     private OwnCheckBox eclipses;
     private OwnCheckBox eclipseOutlines;
-    private OwnCheckBox starSpheres, starDistanceScaling, starStreaks;
+    private OwnCheckBox starSpheres, starDistanceScaling, motionTrails;
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
@@ -1302,7 +1302,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // Render stars as spheres
-        OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.starspheres"), skin);
+        OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.spheres"), skin);
         starSpheres = new OwnCheckBox("", skin);
         starSpheres.setChecked(settings.scene.star.renderStarSpheres);
 
@@ -1320,10 +1320,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // Star streaks
-        OwnLabel starStreaksLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.streaks"), skin);
-        starStreaks = new OwnCheckBox("", skin);
-        starStreaks.setChecked(settings.scene.star.streaksShader);
+        // Motion trails
+        OwnLabel motionTrailsLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.trails"), skin);
+        motionTrails = new OwnCheckBox("", skin);
+        motionTrails.setChecked(settings.scene.particleGroups.motionTrails);
 
         // Star distance to compute camera speed scaling
         OwnLabel starDistanceScalingLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.distance.scaling"), skin);
@@ -1336,8 +1336,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
         starsTable.add(glowOverObjects).left().padRight(pad18).padBottom(pad10).row();
-        starsTable.add(starStreaksLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(starStreaks).left().padRight(pad18).padBottom(pad10).row();
+        starsTable.add(motionTrailsLabel).left().padRight(pad34).padBottom(pad10);
+        starsTable.add(motionTrails).left().padRight(pad18).padBottom(pad10).row();
         if (textureIndex != null) {
             starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
@@ -3000,8 +3000,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Star spheres
         settings.scene.star.renderStarSpheres = starSpheres.isChecked();
 
-        // Star trail effect
-        settings.scene.star.streaksShader = starStreaks.isChecked();
+        // Particle motion trails effect
+        settings.scene.particleGroups.motionTrails = motionTrails.isChecked();
 
         // Star distance scaling
         settings.scene.camera.starDistanceScaling = starDistanceScaling.isChecked();

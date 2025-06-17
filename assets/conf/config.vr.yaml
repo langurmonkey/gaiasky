@@ -140,12 +140,12 @@ scene:
     numLabels: 0
     # Default billboard texture for particles and particle groups.
     texBillboard: $data/default-data/tex/base/sso.png
+    # Enable/disable particle motion trails.
+    motionTrails: false
   # Star settings.
   star:
     # Render star spheres.
     renderStarSpheres: true
-    # Enable/disable star streaks.
-    streaksShader: false
     # Star brightness factor.
     brightness: 2.0
     # Modulate the brightness of stars.

@@ -1515,6 +1515,8 @@ public class Settings extends SettingsObject {
              * Default number of labels for particle groups.
              **/
             public int numLabels = 0;
+            /** Elongate particles in the direction of motion. **/
+            public boolean motionTrails = true;
 
             @Override
             public ParticleSettings clone() {
@@ -1545,8 +1547,6 @@ public class Settings extends SettingsObject {
         public static class StarSettings extends SettingsObject implements IObserver {
             /** Render stars as textured sphere models. **/
             public boolean renderStarSpheres;
-            /** Elongate stars in the direction of motion. **/
-            public boolean streaksShader = true;
             public float brightness;
             public float power;
             public float pointSize;
