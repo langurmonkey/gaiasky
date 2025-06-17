@@ -52,7 +52,7 @@ if (all(equal(u_camVel, vec3(0.0, 0.0, 0.0)))) {
     // Compute final position and return
     gpos = s_proj_view * vert_pos;
 } else {
-    // STAR STREAKS BASED ON ANGULAR SPEED
+    // MOTION TRAILS BASED ON ANGULAR SPEED
 
     // Compute rotation quaternion for the quad
     vec4 s_quat = q_look_at(s_obj, s_up);
