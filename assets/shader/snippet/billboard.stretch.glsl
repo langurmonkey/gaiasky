@@ -78,7 +78,7 @@ if (all(equal(u_camVel, vec3(0.0, 0.0, 0.0)))) {
     float screenVel = length(ndc_now - ndc_next);
 
     // Use screen velocity to drive stretch
-    float stretch = pow(screenVel * 300.0, 2.5);
+    float stretch = pow(screenVel * 350.0, 2.0);
     stretch = clamp(stretch, 0.0, 5.0);
 
     // --- Distance-based fadeout ---
