@@ -11,7 +11,7 @@ uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform vec3 u_camVel;
 uniform float u_dt;
-uniform float u_uToPc;
+uniform float u_uToMpc;
 uniform float u_alpha;
 uniform float u_sizeFactor;
 uniform vec2 u_sizeLimits;

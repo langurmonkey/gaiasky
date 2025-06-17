@@ -8,6 +8,7 @@
 package gaiasky.render.system;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
@@ -21,6 +22,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.Vector3D;
 
 import java.util.Comparator;
 import java.util.List;
@@ -36,7 +38,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;
     protected Array<RenderSystemRunnable> preRunners, postRunners;
-    private boolean vrScaleFlag = false, depthBufferFlag = false;
+    private boolean vrScaleFlag = false, depthBufferFlag = false, unitsFlag = false;
 
     protected final Vector3 aux3f = new Vector3();
 
@@ -99,7 +101,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
      * @param renderable The renderable
      *
      * @return The alpha value as the product of all the alphas of its component
-     * types.
+     *         types.
      */
     public float getAlpha(IRenderable renderable) {
         return getAlpha(renderable.getComponentType());
@@ -136,6 +138,34 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         addGravWaveUniforms(shaderProgram);
         addDepthBufferUniforms(shaderProgram, camera);
         addVRScale(shaderProgram);
+    }
+
+
+    /** Smoothed camera velocity for star trail time-lapse effect. **/
+    private final Vector3D smoothedCamVel = new Vector3D(0.0, 0.0, 0.0);
+
+    private void updateCameraVelocity(Vector3D rawVel, double deltaTime) {
+        // tau: smoothing time constant in seconds ? higher = smoother, slower response
+        double tau = 0.1;
+        double alpha = 1.0 - Math.exp(-deltaTime / tau);
+        smoothedCamVel.lerp(rawVel, alpha);
+    }
+
+    /** Uniforms related to the motion trails effect for particle and star groups. **/
+    protected void addMotionTrailsUniforms(ExtShaderProgram shaderProgram,
+                                           ICamera camera) {
+        if (!unitsFlag) {
+            shaderProgram.setUniformf("u_uToMpc", (float) (Constants.U_TO_PC * 1.0e-6));
+            unitsFlag = true;
+        }
+        updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
+        if (Settings.settings.scene.particleGroups.motionTrails && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
+            shaderProgram.setUniformf("u_camVel", smoothedCamVel);
+        } else {
+            shaderProgram.setUniformf("u_camVel", 0, 0, 0);
+        }
+        // Delta time for the motion trails.
+        shaderProgram.setUniformf("u_dt", Gdx.graphics.getDeltaTime());
     }
 
     protected void addVRScale(ExtShaderProgram shaderProgram) {

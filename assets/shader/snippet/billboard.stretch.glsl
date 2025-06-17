@@ -78,18 +78,18 @@ if (all(equal(u_camVel, vec3(0.0, 0.0, 0.0)))) {
     float screenVel = length(ndc_now - ndc_next);
 
     // Use screen velocity to drive stretch
-    float stretch = pow(screenVel * 350.0, 2.0);
-    stretch = clamp(stretch, 0.0, 5.0);
+    float stretch = pow(screenVel * 450.0, 2.0);
+    stretch = clamp(stretch, 0.0, 6.0);
 
     // --- Distance-based fadeout ---
-    float distMpc = length(s_obj_pos) * u_uToPc * 1e-6; // faster than division
+    float distMpc = length(s_obj_pos) * u_uToMpc;
     float fade = smoothstep(50.0, 30.0, distMpc); // fade = 1.0 below 30 Mpc, fades to 0 at 50
 
     // Apply fade
     stretch *= fade;
 
     // Threshold cutoff
-    if (screenVel < 0.001 || fade < 0.01) {
+    if (screenVel < 0.0001 || fade < 0.01) {
         stretch = 0.0;
     } else {
         // Apply directional stretch in local (quad) space
