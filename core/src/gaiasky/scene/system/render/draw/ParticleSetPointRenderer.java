@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -87,10 +86,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
-        shaderProgram.setUniformf("u_camPos", camera.getCurrent()
-                .getPos());
-        shaderProgram.setUniformf("u_camDir", camera.getCurrent()
-                .getCamera().direction);
+        shaderProgram.setUniformf("u_camPos", camera.getCurrent() .getPos());
+        shaderProgram.setUniformf("u_camDir", camera.getCurrent() .getCamera().direction);
         shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
         addEffectsUniforms(shaderProgram, camera);
     }

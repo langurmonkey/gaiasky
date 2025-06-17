@@ -117,6 +117,14 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos());
+        updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
+        if (!camera.isRotating() && smoothedCamVel.len() > 1e-6) {
+            shaderProgram.setUniformf("u_camVel", smoothedCamVel);
+        } else {
+            shaderProgram.setUniformf("u_camVel", 0, 0, 0);
+        }
+        shaderProgram.setUniformf("u_uToPc", (float) (1.0 / Constants.PC_TO_U));
+        shaderProgram.setUniformf("u_dt", Gdx.graphics.getDeltaTime());
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }
@@ -326,7 +334,13 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 }
                 shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 
+                // Affine transformations.
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
+                // Override streak if needed.
+                if(!set.allowStreaks) {
+                    shaderProgram.setUniformf("u_camVel", 0, 0, 0);
+                }
 
                 try {
                     Gdx.gl30.glEnable(GL30.GL_CULL_FACE);

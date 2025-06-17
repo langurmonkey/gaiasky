@@ -12,7 +12,8 @@ uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform vec3 u_camVel;
-uniform float u_pcToU;
+uniform float u_dt;
+uniform float u_uToPc;
 uniform vec2 u_solidAngleMap;
 // x - alpha
 // y - point size/fov factor

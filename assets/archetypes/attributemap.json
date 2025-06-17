@@ -780,6 +780,10 @@
           "shadingstyle"
         ]
       },
+      "allowStreaks": {
+        "description": "Allow the star streaks effect for this set, where particles get stretched in the direction of motion when the camera moves. Note that there is a global setting (star streaks) that needs to be on for this to work.",
+        "unit": "Boolean"
+      },
       "modelFile": {
         "description": "Path to the model file to use (``obj``, ``obj.gz`` ``g3db``, ``g3dj``, ``gltf``, ``glb``). If present, the ``modelType`` and ``modelParams`` attributes are ignored. The model should have only positions (vector-3), normals (vector-3), and texture coordinates (vector-2) as vertex attributes. Only the first mesh of the model is used. Textures, lighting and material are ignored. This is only used in extended particle groups.",
         "unit": "String"

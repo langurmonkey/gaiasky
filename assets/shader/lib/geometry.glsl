@@ -12,7 +12,7 @@
 #define QUATERNION_IDENTITY vec4(0.0, 0.0, 0.0, 1.0)
 #endif // QUATERNION_IDENTITY
 
-// Returns >=0 if visible, <0 if not visible 
+// Returns >=0 if visible, <0 if not visible
 float in_view(vec3 pos, vec3 dir, float dist, float angle_edge) {
     return angle_edge - acos(dot(pos, dir) / dist);
 }

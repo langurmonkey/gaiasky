@@ -110,7 +110,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         } else {
             shaderProgram.setUniformf("u_camVel", 0, 0, 0);
         }
-        shaderProgram.setUniformf("u_pcToU", (float) Constants.PC_TO_U);
+        shaderProgram.setUniformf("u_uToPc", (float) (1.0 / Constants.PC_TO_U));
+        shaderProgram.setUniformf("u_dt", Gdx.graphics.getDeltaTime());
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
     }
@@ -222,6 +223,11 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
 
                 // Affine transformations.
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
+                // Override streak if needed.
+                if(!set.allowStreaks) {
+                    shaderProgram.setUniformf("u_camVel", 0, 0, 0);
+                }
 
                 try {
                     curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numVertices, getCount(render));

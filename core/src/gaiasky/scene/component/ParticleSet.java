@@ -246,6 +246,9 @@ public class ParticleSet implements Component, IDisposable {
     /** Whether to generate an index or not. Defaults to false for particle sets. Unused in star sets. **/
     public boolean generateIndex = false;
 
+    /** Whether to allow the star streaks effect, where particles get stretched in the direction of motion when the camera moves. **/
+    public boolean allowStreaks = true;
+
     /**
      * The mean distance from the origin of all points in this group.
      * Gives a sense of the scale.

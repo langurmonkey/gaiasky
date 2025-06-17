@@ -509,7 +509,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
 
 
     /** Smoothed camera velocity for star trail time-lapse effect. **/
-    protected Vector3D smoothedCamVel = new Vector3D(0.0, 0.0, 0.0);
+    protected final Vector3D smoothedCamVel = new Vector3D(0.0, 0.0, 0.0);
 
     protected void updateCameraVelocity(Vector3D rawVel, double deltaTime) {
         // tau: smoothing time constant in seconds ? higher = smoother, slower response

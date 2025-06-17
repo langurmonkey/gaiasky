@@ -33,7 +33,7 @@ if (isnan(u_camUp.x)) {
 }
 
 vec4 gpos;
-if (all(equal(u_camPos, vec3(0.0)))) {
+if (all(equal(u_camVel, vec3(0.0, 0.0, 0.0)))) {
     // NO TRAIL EFFECT
     //vec4 s_quat = billboard_quaternion(s_obj, s_up, s_right);
     vec4 s_quat = q_look_at(s_obj, s_up);
@@ -52,48 +52,56 @@ if (all(equal(u_camPos, vec3(0.0)))) {
     // Compute final position and return
     gpos = s_proj_view * vert_pos;
 } else {
-    // STAR TRAIL EFFECT BASED ON CAM_VEL
+    // STAR STREAKS BASED ON ANGULAR SPEED
+
     // Compute rotation quaternion for the quad
     vec4 s_quat = q_look_at(s_obj, s_up);
     vec4 s_quat_inv = q_conj(s_quat);
-
     vec3 local_pos = s_vert_pos.xyz;
-
     // Offset to center of quad
     vec3 centered_pos = local_pos;
-
-    // Stretching
-    float stretch = 0.0;
-    vec3 stretch_dir = vec3(0.0);
-    // Camera velocity in local (quad) space
     vec3 local_cam_vel = qrot(s_quat_inv, u_camVel);
-    float stretchLen = length(local_cam_vel);
 
-    if (stretchLen > 0.0) {
-        // Avoid division by zero
-        stretch_dir = normalize(vec3(local_cam_vel.x, local_cam_vel.y, 0.0));
+    // Precompute screen movement direction
+    vec3 stretch_dir = normalize(vec2(local_cam_vel.x, local_cam_vel.y).xyx);
 
-        vec3 vdir = normalize(u_camVel);
-        float angularFactor = pow(length(cross(vdir, s_obj)), 0.5); // sin(theta), 0 = aligned, 1 = perpendicular
-        float stretch = stretchLen * angularFactor * 5.8e-8;
-        //float stretchFactor = abs(dot(normalize(u_camVel), s_obj));
-        //float stretch = stretchLen * stretchFactor * 5.8e-8; // The last term controls the stretching strength
+    // Estimate movement of the object in screen space
+    vec3 obj_world = s_obj_pos;
+    vec3 obj_next = obj_world - u_camVel * u_dt;
 
-        // Modulate stretch based on star distance
-        float dist = length(s_obj_pos) / (u_pcToU * 6.0);
-        float distFalloff = 1.0 / pow(dist + 1.0, 1.4);
-        // Set a maximum to the stretch factor
-        stretch = min(6.0, stretch * distFalloff);
+    vec4 clip_now = s_proj_view * vec4(obj_world, 1.0);
+    vec4 clip_next = s_proj_view * vec4(obj_next, 1.0);
 
+    // Approximate screen-space velocity using NDC delta
+    vec2 ndc_now = clip_now.xy / clip_now.w;
+    vec2 ndc_next = clip_next.xy / clip_next.w;
+    float screenVel = length(ndc_now - ndc_next);
+
+    // Use screen velocity to drive stretch
+    float stretch = pow(screenVel * 300.0, 2.5);
+    stretch = clamp(stretch, 0.0, 5.0);
+
+    // --- Distance-based fadeout ---
+    float distMpc = length(s_obj_pos) * u_uToPc * 1e-6; // faster than division
+    float fade = smoothstep(50.0, 30.0, distMpc); // fade = 1.0 below 30 Mpc, fades to 0 at 50
+
+    // Apply fade
+    stretch *= fade;
+
+    // Threshold cutoff
+    if (screenVel < 0.001 || fade < 0.01) {
+        stretch = 0.0;
+    } else {
+        // Apply directional stretch in local (quad) space
         float taper = dot(stretch_dir, centered_pos);
         centered_pos += stretch * taper * stretch_dir;
 
-        // Correct brightness with stretch factor
-        float brightnessScale = min(1.0, 1.8 / (1.0 + stretch));
-        v_col.a *= brightnessScale;
+        // Brightness correction to conserve "energy"
+        float brightnessScale = 2.0 / (1.0 + stretch);
+        v_col.rgb *= clamp(brightnessScale, 0.0, 1.0);
     }
 
-    // Re-center and scale
+    // Recenter and scale
     local_pos = centered_pos * s_size;
 
     // Rotate into world space
