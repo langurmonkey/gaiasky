@@ -9,7 +9,7 @@
 //   s_obj_pos (vec3) - object position wrt camera
 //   s_proj_view (mat4) - camera view-projection matrix
 //   s_size (float) - quad size
-//   u_camUp (vec3) - camera up (first component is NaN when mode is cubemap.
+//   u_camUp (vec3) - camera up (first component is NaN when mode is cubemap)
 // Returns:
 //   gpos (vec4) - the vertex position
 vec3 s_obj, s_up, s_right;
