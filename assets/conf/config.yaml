@@ -453,6 +453,8 @@ program:
     modeChangeInfo: true
     # Preferred distance units [M|KM|AU|PC|LY|INTERNAL].
     distanceUnits: PC
+    # Display notifications at the bottom
+    notifications: false
     # Use the new UI, with anchored buttons, instead of the controls window.
     newUI: true
     # In the new UI, panes expand by clicking on buttons by default. This flag

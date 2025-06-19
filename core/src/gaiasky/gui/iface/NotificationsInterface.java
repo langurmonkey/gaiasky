@@ -59,6 +59,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     boolean writeDates = true;
     /** Whether to show the notification sources. **/
     boolean showSources = false;
+    /** Ignore {@link Settings.ProgramSettings.UiSettings#notifications} setting for this instance. **/
+    boolean ignoreDisplaySetting = false;
 
     /**
      * Initializes the notifications interface.
@@ -84,7 +86,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param historicalLog Save logs to historical list
      * @param bg            Apply background
      */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean historicalLog, boolean bg) {
+    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean historicalLog,
+                                  boolean bg) {
         this(skin, lock, multiple, writeDates, bg);
         this.historicalLog = historicalLog;
     }
@@ -125,20 +128,33 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         if (multiple) {
             message2 = new OwnLabel("", skin, "hud-med");
             message2.setName("message2");
-            c2 = this.add(message2).left();
+            c2 = this.add(message2)
+                    .left();
             c2.row();
         }
         // Create message
         message1 = new OwnLabel("", skin, "hud-med");
         message1.setName("message1");
-        c1 = this.add(message1).left();
+        c1 = this.add(message1)
+                .left();
 
-        this.df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
-        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD,
-                Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD,
-                Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO,
-                Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD,
-                Event.OCTREE_PARTICLE_FADE_CMD, Event.SCREEN_NOTIFICATION_CMD, Event.MODE_POPUP_CMD, Event.CAMERA_CINEMATIC_CMD);
+        this.df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+                .withLocale(I18n.locale)
+                .withZone(ZoneOffset.UTC);
+        EventManager.instance.subscribe(this,
+                                        Event.POST_NOTIFICATION, Event.SHOW_NOTIFICATIONS_CMD,
+                                        Event.FOCUS_CHANGED, Event.TIME_STATE_CMD,
+                                        Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO,
+                                        Event.FOCUS_LOCK_CMD,
+                                        Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO,
+                                        Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD,
+                                        Event.STEREO_PROFILE_CMD,
+                                        Event.OCTREE_PARTICLE_FADE_CMD, Event.SCREEN_NOTIFICATION_CMD, Event.MODE_POPUP_CMD,
+                                        Event.CAMERA_CINEMATIC_CMD);
+    }
+
+    public void setIgnoreDisplaySetting(boolean value) {
+        ignoreDisplaySetting = value;
     }
 
     public static List<MessageBean> getHistorical() {
@@ -154,42 +170,46 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     }
 
     private void addMessage(String msg, boolean permanent, LoggerLevel level) {
-        GaiaSky.postRunnable(() -> {
-            MessageBean messageBean = new MessageBean(msg);
+        if (ignoreDisplaySetting || Settings.settings.program.ui.notifications)
+            GaiaSky.postRunnable(() -> {
+                MessageBean messageBean = new MessageBean(msg);
 
-            boolean debug = level.equals(LoggerLevel.DEBUG);
-            boolean add = !debug || Gdx.app.getLogLevel() >= Application.LOG_DEBUG;
+                boolean debug = level.equals(LoggerLevel.DEBUG);
+                boolean add = !debug || Gdx.app.getLogLevel() >= Application.LOG_DEBUG;
 
-            if (add) {
-                if (multiple && !historical.isEmpty() && !historical.getLast().finished(msTimeout)) {
-                    // Move current up
-                    setText(message2, c2, message1.getText());
+                if (add) {
+                    if (multiple && !historical.isEmpty() && !historical.getLast()
+                            .finished(msTimeout)) {
+                        // Move current up
+                        setText(message2, c2, message1.getText());
+                    }
+                    // Set 1
+                    setText(message1, c1, formatMessage(messageBean, level));
+
+                    this.displaying = true;
+                    this.permanent = permanent;
+
+                    if (historicalLog)
+                        historical.add(messageBean);
                 }
-                // Set 1
-                setText(message1, c1, formatMessage(messageBean, level));
-
-                this.displaying = true;
-                this.permanent = permanent;
-
-                if (historicalLog)
-                    historical.add(messageBean);
-            }
-        });
-
+            });
     }
 
     private String formatMessage(MessageBean msgBean, LoggerLevel level) {
         String lvl = level.equals(LoggerLevel.DEBUG) ? " DEBUG" : "";
-        return (writeDates ? df.format(msgBean.date()) + lvl + TAG_SEPARATOR : (lvl.isBlank() ? "" : lvl + TAG_SEPARATOR)) + msgBean.msg();
+        return (writeDates ? df.format(
+                msgBean.date()) + lvl + TAG_SEPARATOR : (lvl.isBlank() ? "" : lvl + TAG_SEPARATOR)) + msgBean.msg();
     }
 
     public void update() {
         if (displaying && !permanent) {
-            if (multiple && historical.size() > 1 && historical.get(historical.size() - 2).finished(msTimeout)) {
+            if (multiple && historical.size() > 1 && historical.get(historical.size() - 2)
+                    .finished(msTimeout)) {
                 clearText(message2, c2);
             }
 
-            if (historical.getLast().finished(msTimeout)) {
+            if (historical.getLast()
+                    .finished(msTimeout)) {
                 displaying = false;
                 clearText(message1, c1);
             }
@@ -221,6 +241,9 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
             switch (event) {
+                case SHOW_NOTIFICATIONS_CMD -> {
+                    this.setVisible(ignoreDisplaySetting || (boolean) data[0]);
+                }
                 case POST_NOTIFICATION -> {
                     LoggerLevel level = (LoggerLevel) data[0];
                     Object[] dat = (Object[]) data[1];
@@ -262,7 +285,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 }
                 case TOGGLE_VISIBILITY_CMD -> {
                     if (data.length == 2)
-                        addMessage(I18n.msg("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.msg((String) data[0])));
+                        addMessage(
+                                I18n.msg("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.msg((String) data[0])));
                     else
                         addMessage(I18n.msg("notif.visibility.toggle", I18n.msg((String) data[0])));
                 }
@@ -307,7 +331,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                     }
                 }
                 case ORBIT_DATA_LOADED ->
-                        addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, LoggerLevel.DEBUG);
+                        addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false,
+                                   LoggerLevel.DEBUG);
                 case SCREENSHOT_INFO -> addMessage(I18n.msg("notif.screenshot", data[0]));
                 case STEREOSCOPIC_CMD -> {
                     if (!Settings.settings.runtime.openXr)
@@ -353,7 +378,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                                         msg.append("+");
                                     }
                                 }
-                                msg.append("> ").append(action);
+                                msg.append("> ")
+                                        .append(action);
                                 addMessage(msg.toString());
                             }
                         }

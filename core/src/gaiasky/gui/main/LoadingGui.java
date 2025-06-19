@@ -173,6 +173,7 @@ public class LoadingGui extends AbstractGui {
 
         // MESSAGE INTERFACE - BOTTOM
         notificationsInterface = new NotificationsInterface(skin, lock, false, false, false);
+        notificationsInterface.setIgnoreDisplaySetting(true);
         centerContent.add(notificationsInterface);
 
         // Add to center.

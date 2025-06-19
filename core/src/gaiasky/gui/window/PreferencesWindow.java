@@ -86,6 +86,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox invertY;
     private OwnCheckBox highAccuracyPositions;
     private OwnCheckBox shadowsCb;
+    private OwnCheckBox displayNotifications;
     private OwnCheckBox displayTimeNoUi;
     private OwnCheckBox pointerCoords;
     private OwnCheckBox modeChangeInfo;
@@ -1490,6 +1491,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         distUnitsSelect.setWidth(selectWidth);
         distUnitsSelect.setSelectedIndex(settings.program.ui.distanceUnits.ordinal());
 
+        // DISPLAY NOTIFICATIONS
+        OwnLabel displayNotificationsLabel = new OwnLabel(I18n.msg("gui.ui.notifications"), skin);
+        displayNotifications = new OwnCheckBox("", skin);
+        displayNotifications.setChecked(settings.program.ui.notifications);
+
         // DISPLAY TIME in NO-UI MODE
         OwnLabel displayTimeNoUiLabel = new OwnLabel(I18n.msg("gui.ui.nogui.time"), skin);
         displayTimeNoUi = new OwnCheckBox("", skin);
@@ -1527,6 +1533,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ui.add(minimapSize).colspan(2).left().padRight(pad10).padBottom(pad18).row();
         ui.add(distUnitsLabel).left().padRight(pad10).padBottom(pad18);
         ui.add(distUnitsSelect).colspan(2).left().padRight(pad10).padBottom(pad18).row();
+        ui.add(displayNotificationsLabel).left().padRight(pad10).padBottom(pad18);
+        ui.add(displayNotifications).colspan(2).left().padRight(pad10).padBottom(pad18).row();
         ui.add(displayTimeNoUiLabel).left().padRight(pad10).padBottom(pad18);
         ui.add(displayTimeNoUi).colspan(2).left().padRight(pad10).padBottom(pad18).row();
         ui.add(modeChangeInfoLabel).left().padRight(pad10).padBottom(pad18);
@@ -3048,7 +3056,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             }
         }
 
-        // Interface
+        // User Interface
         LangComboBoxBean languageBean = lang.getSelected();
         StringComobBoxBean newTheme = theme.getSelected();
         // UI scale
@@ -3074,6 +3082,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (previousPointerCoords != settings.program.pointer.coordinates) {
             EventManager.publish(Event.DISPLAY_POINTER_COORDS_CMD, this, settings.program.pointer.coordinates);
         }
+
+        // Notifications
+        EventManager.publish(Event.SHOW_NOTIFICATIONS_CMD, this, displayNotifications.isChecked());
 
         // Cross-hairs
         EventManager.publish(Event.CROSSHAIR_FOCUS_CMD, this, crosshairFocus.isChecked());

@@ -834,6 +834,10 @@ public enum Event {
      **/
     POST_NOTIFICATION,
     /**
+     * Shows and hides notifications. Contains a boolean with the state.
+     */
+    SHOW_NOTIFICATIONS_CMD,
+    /**
      * Post a notification that is to be displayed with a screen pop-up. Contains
      * the string message and an optional float duration, in seconds.
      * The notifications sent via this event are not logged.

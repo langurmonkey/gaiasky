@@ -2472,6 +2472,7 @@ public class Settings extends SettingsObject {
                             logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
                         }
                     }
+                    case SHOW_NOTIFICATIONS_CMD -> ui.notifications = (boolean) data[0];
                     case INDEXOFREFRACTION_CMD -> modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
                     case CUBEMAP_RESOLUTION_CMD -> modeCubemap.faceResolution = (int) data[0];
                     case MINIMAP_DISPLAY_CMD -> minimap.active = (boolean) (Boolean) data[0];
@@ -2554,7 +2555,8 @@ public class Settings extends SettingsObject {
                                             Event.POINTER_GUIDES_CMD,
                                             Event.UI_SCALE_FACTOR_CMD,
                                             Event.UV_GRID_FRAME_COORDINATES_CMD,
-                                            Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD);
+                                            Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD,
+                                            Event.SHOW_NOTIFICATIONS_CMD);
 
             minimap.setupListeners();
             fileChooser.setupListeners();
@@ -3132,6 +3134,8 @@ public class Settings extends SettingsObject {
             public boolean newUI = true;
             public boolean expandOnMouseOver = false;
             public boolean modeChangeInfo;
+            /** Show notification messages at the bottom. **/
+            public boolean notifications = false;
             public DistanceUnits distanceUnits;
 
             /**
