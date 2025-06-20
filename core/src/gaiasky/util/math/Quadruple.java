@@ -686,7 +686,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param other the {@code Quadruple} to compare with
      *
      * @return a negative integer, zero, or a positive integer as the value of this instance is less than,
-     * equal to, or greater than the value of the specified instance.
+     *         equal to, or greater than the value of the specified instance.
      */
     @Override
     public int compareTo(Quadruple other) {
@@ -720,7 +720,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param other the {@code long} value to compare with
      *
      * @return a negative integer, zero, or a positive integer as the value of this instance is less than,
-     * equal to, or greater than the specified {@code long} value.
+     *         equal to, or greater than the specified {@code long} value.
      */
     public int compareTo(long other) {
         return compareTo(new Quadruple(other));
@@ -734,7 +734,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param other the {@code double} value to compare with
      *
      * @return a negative integer, zero, or a positive integer as the value of this instance is less than,
-     * equal to, or greater than the specified {@code double} value.
+     *         equal to, or greater than the specified {@code double} value.
      */
     public int compareTo(double other) {
         return compareTo(new Quadruple(other));
@@ -746,7 +746,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param obj the object to compare with
      *
      * @return {@code true} if the given object is Quadruple and its value is equal to
-     * the value of this {@code Quadruple} instance, {@code false} otherwise.
+     *         the value of this {@code Quadruple} instance, {@code false} otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -787,7 +787,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param q2 the instance to compare with
      *
      * @return a negative integer, zero, or a positive integer as the value of the first
-     * instance is less than, equal to, or greater than the value of the second instance.
+     *         instance is less than, equal to, or greater than the value of the second instance.
      */
     public static int compare(Quadruple q1, Quadruple q2) {
         return q1.compareTo(q2);
@@ -800,7 +800,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param other the Quadruple to compare with
      *
      * @return 1 if this instance is greater in magnitude than the {@code other} instance,
-     * 0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
+     *         0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
      */
     public int compareMagnitudeTo(final Quadruple other) {
         if (isNaN())
@@ -829,7 +829,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param q2 first operand to compare
      *
      * @return a new instance of {@code Quadruple} whose value is
-     * equal to the value of the greater of the operands.
+     *         equal to the value of the greater of the operands.
      */
     public static Quadruple max(Quadruple q1, Quadruple q2) {
         if (q1.compareTo(q2) > 0)
@@ -846,7 +846,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param q2 first operand to compare
      *
      * @return a new instance of {@code Quadruple} whose value is
-     * equal to the value of the lesser of the operands.
+     *         equal to the value of the lesser of the operands.
      */
     public static Quadruple min(Quadruple q1, Quadruple q2) {
         if (q1.compareTo(q2) < 0)
@@ -862,7 +862,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param summand the value to add
      *
      * @return the reference to this object, which holds a new value that equals
-     * the sum of its previous value and the value of the summand
+     *         the sum of its previous value and the value of the summand
      */
     public Quadruple add(final Quadruple summand) {
         if (isNaN() || summand.isNaN()) return assignNaN();
@@ -902,7 +902,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param summand the value to add
      *
      * @return the reference to this object, which holds a new value that equals
-     * the sum of its previous value and the value of the summand
+     *         the sum of its previous value and the value of the summand
      */
     public Quadruple add(long summand) {
         return add(new Quadruple(summand));
@@ -916,7 +916,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param summand the value to add
      *
      * @return the reference to this object, which holds a new value that equals
-     * the sum of its previous value and the value of the summand
+     *         the sum of its previous value and the value of the summand
      */
     public Quadruple add(double summand) {
         return add(new Quadruple(summand));
@@ -976,7 +976,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param subtrahend the value to be subtracted from the current value of this Quadruple
      *
      * @return the reference to this object, which holds a new value that equals
-     * the difference between its previous value and the value of the subtrahend
+     *         the difference between its previous value and the value of the subtrahend
      */
     public Quadruple subtract(Quadruple subtrahend) {
         if (isNaN() || subtrahend.isNaN()) return assignNaN();
@@ -1017,7 +1017,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param subtrahend the value to be subtracted from the current value of this Quadruple
      *
      * @return the reference to this object, which holds a new value that equals
-     * the difference between its previous value and the value of the subtrahend
+     *         the difference between its previous value and the value of the subtrahend
      */
     public Quadruple subtract(double subtrahend) {
         return subtract(new Quadruple(subtrahend));
@@ -1030,7 +1030,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param factor the value to multiply the current value of this Quadruple by.
      *
      * @return the reference to this object, which holds a new value that equals
-     * the product of its previous value and the value of the factor
+     *         the product of its previous value and the value of the factor
      */
     public Quadruple multiply(Quadruple factor) {
         if (isNaN() || factor.isNaN()) return assignNaN();
@@ -1063,7 +1063,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param factor the value to multiply the current value of this Quadruple by.
      *
      * @return the reference to this object, which holds a new value that equals
-     * the product of its previous value and the value of the factor
+     *         the product of its previous value and the value of the factor
      */
     public Quadruple multiply(long factor) {
         return multiply(new Quadruple(factor));
@@ -1077,7 +1077,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param factor the value to multiply the current value of this Quadruple by.
      *
      * @return the reference to this object, which holds a new value that equals
-     * the product of its previous value and the value of the factor
+     *         the product of its previous value and the value of the factor
      */
     public Quadruple multiply(double factor) {
         return multiply(new Quadruple(factor));
@@ -1090,7 +1090,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param divisor the divisor to divide the current value of this Quadruple by
      *
      * @return the reference to this object, which holds a new value that equals
-     * the quotient of the previous value of this Quadruple divided by the given divisor
+     *         the quotient of the previous value of this Quadruple divided by the given divisor
      */
     public Quadruple divide(Quadruple divisor) {
         if (isNaN() || divisor.isNaN()) return assignNaN();
@@ -1127,7 +1127,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param divisor the divisor to divide the current value of this Quadruple by
      *
      * @return the reference to this object, which holds a new value that equals
-     * the quotient of the previous value of this Quadruple divided by the given divisor
+     *         the quotient of the previous value of this Quadruple divided by the given divisor
      */
     public Quadruple divide(double divisor) {
         return divide(new Quadruple(divisor));
@@ -1138,7 +1138,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * and replaces the old value of this instance with the newly-computed value.
      *
      * @return the reference to this instance, which holds a new value that equals
-     * to the square root of its previous value
+     *         to the square root of its previous value
      */
     public Quadruple sqrt() {
         if (negative) return assignNaN();
@@ -1205,7 +1205,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * Changes the sign of this Quadruple.
      *
      * @return the reference to this object, which holds a new value that
-     * equals the previous value in magnitude, but with opposite sign
+     *         equals the previous value in magnitude, but with opposite sign
      */
     public Quadruple negate() {
         negative = !negative;
@@ -1761,7 +1761,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
     }
 
     /**
-     * Assigns the value of {@code Quadruple.MIN_VALUE)
+     * Assigns the value of {@code Quadruple.MIN_VALUE}
      * (2^-2147483774 = 6.67282948260747430814835377499134611597699952e-646457032)
      * to the instance.
      *
@@ -1981,7 +1981,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * Shifts the mantissa of this instance by {@code shift} bits to the right,
      * without setting the implicit unity,
      * and returns the bits of the former mantissa that don't fit in 128 bits after the shift (shifted-out bits).
-     * (e.g. if the value of {@code shift} was 3, the lowest 3 bits of {@code mantLo} will be returned in bits 63-61 of the result, the other bits will be 0)
+     * (e.g. if the value of {@code shift} was 3, the lowest 3 bits of {@code mantLo} will be returned in bits 63-61 of the result, the other bits
+     * will be 0)
      *
      * @param shift the distance to shift the mantissa
      *
@@ -2338,7 +2339,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * Calculates the number of leading zeros in the mantissa
      *
      * @return the number of leading zeros in the mantissa
-     * <br>Covered
+     *         <br>Covered
      */
     private int numberOfLeadingZeros() {
         int lz = Long.numberOfLeadingZeros(mantHi);
@@ -2526,7 +2527,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param buffer2         a buffer to hold unpacked mantissa of the other factor
      *
      * @return the exponent of the product, corrected in case if one of the factors is subnormal
-     * <br>Covered
+     *         <br>Covered
      */
     private long normalizeAndUnpack(Quadruple factor, long productExponent, long[] buffer1, long[] buffer2) {
         // If one of the numbers is subnormal, put its mantissa in mantHi, mantLo
@@ -2594,7 +2595,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * i.e. bit 31 of buffer[6], is 1, the content of buffer[1] -- buffer[5] gets incremented.
      *
      * @return a flag signifying that the number is actually rounded up,
-     * used to prevent unnecessary rounding in the future
+     *         used to prevent unnecessary rounding in the future
      */
     private boolean roundBuffer(long[] buffer) {
         buffer[6] += 0x8000_0000L;
@@ -2721,7 +2722,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *               <p>
      *
      * @return the buffer holding the unpacked value (the same reference as passed
-     * in as the {@code buffer} parameter
+     *         in as the {@code buffer} parameter
      */
     private static void unpack_To5x32(long mantHi, long mantLo, long[] buffer) {
         buffer[0] = 1;
@@ -2845,7 +2846,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param divisorBuff      the buffer to unpack the divisor into
      *
      * @return the exponent of the quotient, adjusted accordingly to the normalization results
-     * <br>Covered
+     *         <br>Covered
      */
     private long normalizeAndUnpackSubnormals(long quotientExponent, Quadruple divisor, int[] divisorBuff) {
         if (exponent == 0)
@@ -2864,8 +2865,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * and higher 64 bits of the fractional part in mantHi)
      *
      * @return the number of bits the mantissa is shifted by, minus one (e.g. 0 for MIN_NORMAL / 2)
-     * to use as an exponent correction
-     * <br>Covered
+     *         to use as an exponent correction
+     *         <br>Covered
      */
     private long normalizeMantissa() {
         int shift = Long.numberOfLeadingZeros(mantHi);
@@ -2884,8 +2885,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param buffer  a buffer of at least 5 longs to unpack the mantissa to
      *
      * @return the number of bits the mantissa is shifted by, minus one (e.g. 0 for MIN_NORMAL / 2)
-     * to use as an exponent correction
-     * <br>Covered
+     *         to use as an exponent correction
+     *         <br>Covered
      */
     private static long normalizeAndUnpackDivisor(Quadruple divisor, int[] buffer) {
         long mantHi = divisor.mantHi, mantLo = divisor.mantLo;
@@ -2958,7 +2959,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *                integer 1 in divisor[1], 4 x 32 bits of the mantissa in divisor[1..4]
      *
      * @return a positive value if the mantissa of this instance is greater, zero if the mantissas are equal,
-     * or a negative value if the mantissa of this instance is less than the mantissa of the other Quadruple.
+     *         or a negative value if the mantissa of this instance is less than the mantissa of the other Quadruple.
      */
     private int compareMantissaWith(int[] divisor) {
         final int cmp = Long.compareUnsigned(mantHi, ((long) divisor[1] << 32) | (divisor[2] & LOWER_32_BITS));
@@ -3008,7 +3009,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * <br>Uses static arrays
      * <b><i>BUFFER_5x32_B_INT</i></b>
      *
-     * @param dividend         a buffer of 10 longs containing unpacked mantissa of the dividend (integer 1 (or up to 3 in case of doubling) in dividend[1],
+     * @param dividend         a buffer of 10 longs containing unpacked mantissa of the dividend (integer 1 (or up to 3 in case of doubling) in
+     *                         dividend[1],
      *                         the fractional part of the mantissa in the lower halves of dividend[2] -- dividend[5])
      * @param divisor          a buffer of 5 longs containing unpacked mantissa of the divisor (integer part (implicit unity) in divisor[0],
      *                         the fractional part of the mantissa in the lower halves of divisor[1] -- divisor[4])
@@ -3042,7 +3044,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param quotient a buffer that gets filled with the mantissa of the quotient
      *
      * @return the next bit of the quotient (half the LSB), to be used for rounding the result
-     * <br>Covered
+     *         <br>Covered
      */
     private static long divideArrays(int[] dividend, int[] divisor, int[] quotient) {
 

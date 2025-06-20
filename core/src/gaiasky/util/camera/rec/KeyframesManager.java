@@ -488,7 +488,7 @@ public class KeyframesManager implements IObserver {
                             .toList();
                     var outputFileLocation = outputFile.toAbsolutePath().toString();
                     if (!lines.isEmpty()) {
-                        outputFileLocation = lines.get(lines.size() - 1).substring(23);
+                        outputFileLocation = lines.getLast().substring(23);
                     }
                     // Popup notification.
                     GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFileLocation), 10, this);

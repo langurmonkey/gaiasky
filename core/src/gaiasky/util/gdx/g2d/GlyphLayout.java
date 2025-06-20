@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  *   https://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -95,7 +95,7 @@ public class GlyphLayout implements Poolable {
 
         boolean markupEnabled = fontData.markupEnabled;
 
-        Pool<GlyphRun> glyphRunPool = Pools.get(GlyphRun.class);
+        Pool<GlyphRun> glyphRunPool = Pools.get(GlyphRun::new);
         Array<GlyphRun> runs = this.runs;
         glyphRunPool.freeAll(runs);
         runs.clear();
@@ -107,7 +107,7 @@ public class GlyphLayout implements Poolable {
         Array<Color> colorStack = this.colorStack;
         Color nextColor = color;
         colorStack.add(color);
-        Pool<Color> colorPool = Pools.get(Color.class);
+        Pool<Color> colorPool = Pools.get(Color::new);
 
         int runStart = start;
         outer:
@@ -498,7 +498,7 @@ public class GlyphLayout implements Poolable {
     }
 
     public void reset() {
-        Pools.get(GlyphRun.class).freeAll(runs);
+        Pools.get(GlyphRun::new).freeAll(runs);
         runs.clear();
 
         width = 0;
