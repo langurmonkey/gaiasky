@@ -7,13 +7,16 @@
 
 package gaiasky.gui.api;
 
+/**
+ * Interface that defines an API that maps physical actions to gamepad input codes.
+ */
 public interface IGamepadMappings {
 
     /**
      * The configured axis zero point. Axis values below this value
      * are considered zero.
-     * <p>
-     * return The zero point.
+     *
+     * @return The zero point.
      */
     double getZeroPoint();
 
@@ -36,7 +39,9 @@ public interface IGamepadMappings {
     int getAxisLstickH();
 
     /**
-     * Sensitivity of left stick axis
+     * Sensitivity of left stick axis.
+     *
+     * @return The sensitivity.
      **/
     double getAxisLstickHSensitivity();
 
@@ -52,7 +57,9 @@ public interface IGamepadMappings {
     int getAxisRstickH();
 
     /**
-     * Sensitivity of pitch axis
+     * Sensitivity of pitch axis.
+     *
+     * @return The sensitivity.
      **/
     double getAxisRstickHSensitivity();
 
