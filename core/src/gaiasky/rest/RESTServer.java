@@ -145,8 +145,7 @@ public class RESTServer {
             Parameter p = methodParams[i];
             ret.append(String.format("%s%s=(%s)", ((i == 0) ? "?" : "&"), p.getName(), p.getType().getSimpleName()));
         }
-        // \u27F6 is "⟶"
-        ret.append(String.format(" \u27F6 %s", method.getReturnType().getSimpleName()));
+        ret.append(String.format(" ⟶ %s", method.getReturnType().getSimpleName()));
         return ret.toString();
     }
 

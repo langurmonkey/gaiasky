@@ -3215,14 +3215,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     /**
      * <p>
      * Parks an update {@link Runnable} to the main loop thread, and keeps it running every frame
-     * until it finishes or it is unparked by {@link #unparkRunnable(String)}.
+     * until it finishes, or it is removed by {@link #removeRunnable(String)}.
      * This object runs after the update-scene stage and before the render stage,
      * so it is intended for updating scene objects.
      * </p>
      * <p>
      * Be careful with this function, as it probably needs a cleanup before the script is finished. Otherwise,
      * all parked runnables will keep running until Gaia Sky is restarted, so make sure to
-     * remove them with {@link #unparkRunnable(String)} if needed.
+     * remove them with {@link #removeRunnable(String)} if needed.
      * </p>
      *
      * @param id       The string id to identify the runnable.
@@ -3234,14 +3234,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     /**
      * <p>
      * Parks a camera update {@link Runnable} to the main loop thread, and keeps it running every frame
-     * until it finishes or it is unparked by {@link #unparkRunnable(String)}.
+     * until it finishes, or it is removed by {@link #removeRunnable(String)}.
      * This object runs after the update-camera stage and before the update-scene, so it is intended for updating the
      * camera only.
      * </p>
      * <p>
      * Be careful with this function, as it probably needs a cleanup before the script is finished. Otherwise,
      * all parked runnables will keep running until Gaia Sky is restarted, so make sure to
-     * remove them with {@link #unparkRunnable(String)} if needed.
+     * remove them with {@link #removeRunnable(String)} if needed.
      * </p>
      *
      * @param id       The string id to identify the runnable.

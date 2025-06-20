@@ -57,6 +57,7 @@ import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
+import gaiasky.script.v2.APIv2;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
@@ -123,6 +124,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     private final Deque<Settings> settingsStack;
 
+
+    /** APIv2 object reference. This is the gateway to access the methods and calls in APIv2. **/
+    public final APIv2 apiv2;
+
     public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
         this.em = EventManager.instance;
         this.manager = manager;
@@ -130,7 +135,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
         this.focusView = new FocusView();
         this.vertsView = new VertsView();
         this.settingsStack = new ConcurrentLinkedDeque<>();
-        new FocusView();
+        this.apiv2 = new APIv2(manager, catalogManager);
 
         stops = new HashSet<>();
 
