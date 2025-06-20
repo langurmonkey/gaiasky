@@ -344,7 +344,7 @@ public class LabelEntityRenderSystem {
             var active = set.indices;
 
             Vector3Q starPosition = B31;
-            int n = active.length;
+            int n = FastMath.min(active.length, set.numLabels);
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
                 if (idx >= 0 && set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {

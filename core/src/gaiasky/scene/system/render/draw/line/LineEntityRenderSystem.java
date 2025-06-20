@@ -423,7 +423,7 @@ public class LineEntityRenderSystem {
 
         alpha *= GaiaSky.instance.sceneRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
-        int n = (int) getMaxProperMotionLines(entity, set);
+        int n = (int) (getMaxVelocityVectors(entity, set) * (Settings.settings.scene.properMotion.number * 0.1));
         for (int i = n - 1; i >= 0; i--) {
             if (set.indices[i] < 0) {
                 // We are done.
@@ -438,7 +438,7 @@ public class LineEntityRenderSystem {
             // Rest of attributes
             float distToCamera = (float) lPos.lenDouble();
             float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
-            if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.vx() != 0 || star.vy() != 0 || star.vz() != 0)) {
+            if (viewAngle >= thPointTimesFovFactor && (star.vx() != 0 || star.vy() != 0 || star.vz() != 0)) {
                 Vector3D p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
                 Vector3D ppm = D32.set(star.vx(), star.vy(), star.vz()).scl(Settings.settings.scene.properMotion.length);
                 double p1p2len = ppm.len();
@@ -538,9 +538,9 @@ public class LineEntityRenderSystem {
         }
     }
 
-    private long getMaxProperMotionLines(Entity entity, StarSet set) {
+    private long getMaxVelocityVectors(Entity entity, StarSet set) {
         // Star sets in octrees get their number tuned down, because usually there's many of them in view.
-        return FastMath.min(FastMath.min(set.pointData.size(), set.indices.length),
+        return FastMath.min(set.indices.length,
                             FastMath.max(Math.round(Settings.settings.scene.star.group.numVelocityVector / (Mapper.octant.has(entity) ? 5f : 1f)),
                                          Constants.MIN_VELOCITY_VECTORS_STAR_GROUP));
     }

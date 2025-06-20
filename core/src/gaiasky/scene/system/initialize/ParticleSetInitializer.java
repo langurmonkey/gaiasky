@@ -47,7 +47,10 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Initializer class for particle and star sets ({@link ParticleSet}, {@link StarSet}.
@@ -406,8 +409,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         particleSet.metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order.
+        var numFromGroupSettings = particleSet instanceof StarSet ?
+                Settings.settings.scene.star.group.getMaxNumIndices()
+                : Settings.settings.scene.particleGroups.numLabels;
         var K = FastMath.max(particleSet.numLabels,
-                             FastMath.max(Settings.settings.scene.star.group.numLabels, Settings.settings.scene.particleGroups.numLabels));
+                             numFromGroupSettings);
         K = FastMath.min(pointData.size(), K);
         particleSet.indices = new int[K];
         for (int i = 0; i < K; i++) {

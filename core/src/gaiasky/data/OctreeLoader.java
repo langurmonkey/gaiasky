@@ -36,6 +36,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
@@ -251,7 +252,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
             // Override number of labels in case we have a compact octree (~3 octants tops).
             if (root.octant.numChildrenRec + 1 < 4 && Settings.settings.scene.star.group.numLabels <= 50) {
-                long numLabels = FastMath.max(Settings.settings.scene.star.group.numLabels, (long) (50.0 / (root.octant.numChildrenRec + 1)));
+                long numLabels = FastMath.max(Settings.settings.scene.star.group.getMaxNumIndices(),
+                                              (long) (50.0 / (root.octant.numChildrenRec + 1)));
                 updateNumLabelsRecursive(root.octant, numLabels);
             }
 
@@ -264,7 +266,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             for (var sg : octant.objects) {
                 if (sg instanceof OctreeObjectView oov && oov.set != null) {
                     var set = oov.set;
-                    var n = Math.max(numLabels, oov.set.numLabels);
+                    var n = MathUtilsDouble.max(numLabels, oov.set.numLabels);
                     set.updateNumLabelsValue((int) n, oov.getEntity());
                 }
             }

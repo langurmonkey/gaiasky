@@ -67,7 +67,7 @@ public class Settings extends SettingsObject {
      * 3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      **/
-    public static final int SOURCE_VERSION = 3060801;
+    public static final int SOURCE_VERSION = 3060901;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the
@@ -1747,6 +1747,11 @@ public class Settings extends SettingsObject {
                 public int numBillboard;
                 public int numLabels = 30;
                 public int numVelocityVector;
+
+                @JsonIgnore
+                public int getMaxNumIndices() {
+                    return MathUtilsDouble.max(numLabels, numVelocityVector, numBillboard);
+                }
 
                 /**
                  * Compatibility with old 'numLabel' property, renamed to 'numLabels'.

@@ -175,6 +175,65 @@ public final class MathUtilsDouble {
         return FastMath.min(value, max);
     }
 
+    static public double max(double... values) {
+        double max = Double.MIN_VALUE;
+        for (var v : values) {
+            if (v > max) {
+                max = v;
+            }
+        }
+        return max;
+    }
+    static public float max(float... values) {
+        float max = Float.MIN_VALUE;
+        for (var v : values) {
+            if (v > max) {
+                max = v;
+            }
+        }
+        return max;
+    }
+
+    static public int max(int... values) {
+        int max = Integer.MIN_VALUE;
+        for (var v : values) {
+            if (v > max) {
+                max = v;
+            }
+        }
+        return max;
+    }
+
+    static public double min(double... values) {
+        double max = Double.MAX_VALUE;
+        for (var v : values) {
+            if (v < max) {
+                max = v;
+            }
+        }
+        return max;
+    }
+
+    static public float min(float... values) {
+        float max = Float.MAX_VALUE;
+        for (var v : values) {
+            if (v < max) {
+                max = v;
+            }
+        }
+        return max;
+    }
+
+    static public int min(int... values) {
+        int max = Integer.MAX_VALUE;
+        for (var v : values) {
+            if (v < max) {
+                max = v;
+            }
+        }
+        return max;
+    }
+
     /**
      * Returns true if the value is zero (using the default tolerance as upper
      * bound)

@@ -22,6 +22,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
@@ -166,7 +167,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
             shaderProgram.setUniformf("u_camVel", 0, 0, 0);
         }
         // Delta time for the motion trails.
-        shaderProgram.setUniformf("u_dt", (float) FastMath.min(0.02, Gdx.graphics.getDeltaTime()));
+        shaderProgram.setUniformf("u_dt", MathUtilsDouble.clamp(Gdx.graphics.getDeltaTime(), 0.01f, 0.02f));
     }
 
     protected void addVRScale(ExtShaderProgram shaderProgram) {
