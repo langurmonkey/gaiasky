@@ -21,17 +21,20 @@ def view_from_earth(target_name: str):
     et = target_pos - earth_pos
     earth_target = et / np.linalg.norm(et)
 
-    # Final position of our camera, 10_000 kilometers away in +Y direction
-    pos = earth_pos + np.array([0.0, 10_000_000 * m_to_u, 0.0])
+    # Final position of our camera, 30_000 kilometers away in +Y direction
+    pos = earth_pos + np.array([0.0, 30_000_000 * m_to_u, 0.0])
 
     # Up, arbitrary
     up = np.cross(earth_target, np.array([1.0, 0.0, 0.0]))
     
-    # Create transition, 10 seconds
-    gs.cameraTransition(pos.tolist(), earth_target.tolist(), up.tolist(), 10.0)
+    # Create transition, 15 seconds
+    gs.cameraTransition(pos.tolist(), earth_target.tolist(), up.tolist(), 15.0)
 
     # Once we face the new target, we change focus
     gs.setCameraFocus(target_name)
 
 
-view_from_earth("Bellatrix")
+target_name = input("Enter the name of the target object: ")
+view_from_earth(target_name)
+
+gateway.shutdown()
