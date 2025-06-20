@@ -43,14 +43,19 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
      */
     protected long buttonPollDelay = 400;
 
+    /** Reference to the global event manager. **/
     protected final EventManager em;
+    /** Is this listener active? **/
     protected final AtomicBoolean active = new AtomicBoolean(true);
+    /** Reference to the last gaming controller that registered an input. **/
     protected Controller lastControllerUsed = null;
+    /** Gamepad mappings instance. **/
     protected IGamepadMappings mappings;
     /** Last axis event time. **/
     protected long lastAxisEvtTime = 0;
     /** Last button poll time. **/
     protected long lastButtonPollTime = 0;
+    /** CLI arguments. **/
     private final CLIArgs cliArgs;
 
     protected AbstractGamepadListener(String mappingsFile) {
@@ -69,6 +74,11 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         return FastMath.abs(value) >= FastMath.max(mappings.getZeroPoint(), MIN_ZERO_POINT) ? value : 0;
     }
 
+    /**
+     * Get the mappings instance.
+     *
+     * @return The {@link IGamepadMappings} instance for this listener.
+     */
     public IGamepadMappings getMappings() {
         return mappings;
     }
@@ -141,6 +151,14 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         return anyPressed(lastControllerUsed, buttonCodes);
     }
 
+    /**
+     * Returns true if any of the buttons are pressed in the given controller.
+     *
+     * @param controller  The controller.
+     * @param buttonCodes The buttons to test.
+     *
+     * @return True if any of the given buttons is pressed.
+     */
     public boolean anyPressed(Controller controller,
                               int... buttonCodes) {
         if (controller == null) {
@@ -200,6 +218,11 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         active.set(false);
     }
 
+    /**
+     * Is this listener active?
+     *
+     * @return True if the listener is currently active.
+     */
     public boolean isActive() {
         return active.get();
     }

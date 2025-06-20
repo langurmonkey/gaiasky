@@ -4,4 +4,7 @@
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
+/**
+ * Contains utilities related to capturing frames and saving them as screenshot images to disk.
+ */
 package gaiasky.util.screenshot;

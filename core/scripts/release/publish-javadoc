@@ -50,10 +50,7 @@ mv "$GS/core/build/docs/javadoc" "$GS/core/build/docs/$VERSION"
 # Copy to server
 echo "Copying directory $GS/core/build/docs/$VERSION to tsagrista@andromeda:/gaiasky/docs/javadoc/$VERSION"
     
-rsync -avh "$GS/core/build/docs/$VERSION" "tsagrista@andromeda:/gaiasky/docs/javadoc/"
-
-# Clean up
-#rm -rf /tmp/javadoc
+#rsync -avh "$GS/core/build/docs/$VERSION" "tsagrista@andromeda:/gaiasky/docs/javadoc/"
 
 # Update listing
 COMMAND="~/bin/dir2html '/gaiasky/docs/javadoc/' '/javadoc' 'gaia.ari.uni-heidelberg.de/gaiasky' 'Gaia Sky javadoc'"

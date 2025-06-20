@@ -7,11 +7,17 @@
 
 package gaiasky.gui.api;
 
+/**
+ * Input listener interface.
+ */
 public interface IInputListener {
 
+    /** Update the listener. **/
     void update();
 
+    /** Activate the listener. **/
     void activate();
 
+    /** Deactivate the listener. **/
     void deactivate();
 }

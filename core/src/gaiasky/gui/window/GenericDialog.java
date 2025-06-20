@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
@@ -384,6 +383,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     /**
      * Closes the window with the cancel action.
+     *
+     * @return Whether the cancel operation succeeded.
      */
     public boolean closeCancel() {
         cancel();
@@ -412,6 +413,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
     /**
      * {@link #pack() Packs} the dialog and adds it to the stage with custom
      * action which can be null for instant show.
+     *
+     * @param stage  The stage.
+     * @param action Action to run.
+     *
+     * @return The generic dialog instance.
      */
     public GenericDialog show(Stage stage, Action action) {
         clearActions();

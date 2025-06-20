@@ -37,7 +37,7 @@ import java.util.Arrays;
  * <p>
  * The biased exponent values stored in the {@code exponent} field are as following:
  *
- * <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="">
+ * <table class="memberSummary" border="1">
  * <tr>
  * <th class="colLast" scope="col">biased value</th>
  * <th class="colLast" scope="col">const name</th>
@@ -86,6 +86,7 @@ import java.util.Arrays;
  * <td>{@code Infinity}</td>
  * <td>{@code 0x8000_0000 =  2147483648 =  Integer.MIN_VALUE}</td>
  * </tr>
+ * <caption>Quadruple constants and information.</caption>
  * </table>
  * <br>The boundaries of the range are:
  * <pre>{@code

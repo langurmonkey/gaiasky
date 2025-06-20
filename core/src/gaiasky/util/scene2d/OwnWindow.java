@@ -195,6 +195,8 @@ public class OwnWindow extends Table {
      * Returns the window's style. Modifying the returned style may not have an effect until
      * {@link #setStyle(WindowStyle)} is
      * called.
+     *
+     * @return The window style.
      */
     public WindowStyle getStyle() {
         return style;
@@ -254,7 +256,7 @@ public class OwnWindow extends Table {
                 stageToLocalCoordinates(tmpSize.set(stage.getWidth(), stage.getHeight()));
             }
             drawStageBackground(batch, parentAlpha, getX() + tmpPosition.x, getY() + tmpPosition.y, getX() + tmpSize.x,
-                    getY() + tmpSize.y);
+                                getY() + tmpSize.y);
         }
 
         super.draw(batch, parentAlpha);
