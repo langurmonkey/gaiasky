@@ -27,7 +27,6 @@ public class ScriptingServer {
     private static final AtomicInteger connections = new AtomicInteger(0);
     private static ClientServer gatewayServer;
     private static GatewayServerListener listener;
-    private static IScriptingInterface scriptingInterface;
 
     public static void initialize(IScriptingInterface scriptingInterface) {
         initialize(scriptingInterface, false);
@@ -35,7 +34,6 @@ public class ScriptingServer {
 
     public static void initialize(IScriptingInterface scriptingInterface, boolean force) {
         if (!Settings.settings.program.net.slave.active) {
-            ScriptingServer.scriptingInterface = scriptingInterface;
             if (force && gatewayServer != null) {
                 // Shutdown
                 try {
