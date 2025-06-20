@@ -99,7 +99,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
 
     /**
      * Calculates the outer product of two given vectors <code>v</code> and
-     * <code>w</code> and returns the result as a new {@link Vector3D}GVector3d</code>.
+     * <code>w</code> and returns the result as a new {@link Vector3D}.
      *
      * @param v left operand
      * @param w right operand

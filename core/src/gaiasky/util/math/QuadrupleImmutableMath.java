@@ -18,8 +18,8 @@ public final class QuadrupleImmutableMath {
 
     /**
      * High-level arctan for any x:
-     * If |x|<=1, directly use series;
-     * else use identity atan(x)=sign(x)*(π/2 − atan(1/|x|)).
+     * If |x|&leq;1, directly use series;
+     * else use identity <code>atan(x)=sign(x)*(π/2 − atan(1/|x|))</code>.
      */
     public static QuadrupleImmutable atan(QuadrupleImmutable x) {
         // Fast fallback via double: accurate to double-precision (tests use doubleValue())

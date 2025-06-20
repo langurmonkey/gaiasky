@@ -47,7 +47,10 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     protected final AtomicBoolean active = new AtomicBoolean(true);
     protected Controller lastControllerUsed = null;
     protected IGamepadMappings mappings;
-    protected long lastAxisEvtTime = 0, lastButtonPollTime = 0;
+    /** Last axis event time. **/
+    protected long lastAxisEvtTime = 0;
+    /** Last button poll time. **/
+    protected long lastButtonPollTime = 0;
     private final CLIArgs cliArgs;
 
     protected AbstractGamepadListener(String mappingsFile) {

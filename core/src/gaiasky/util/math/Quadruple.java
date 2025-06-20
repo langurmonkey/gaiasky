@@ -1764,9 +1764,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * Assigns the value of {@code Quadruple.MIN_VALUE)
      * (2^-2147483774 = 6.67282948260747430814835377499134611597699952e-646457032)
      * to the instance.
-     * <p>
      *
-     * @return this instance with the new value
+     * @return this instance with the new value.
      */
     public Quadruple assignMinValue() {
         negative = false;
