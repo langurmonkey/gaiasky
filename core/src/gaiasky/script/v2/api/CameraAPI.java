@@ -1,0 +1,755 @@
+/*
+ * Copyright (c) 2025 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
+package gaiasky.script.v2.api;
+
+import gaiasky.scene.api.IFocus;
+import gaiasky.script.v2.impl.CameraModule;
+
+/**
+ * Public API definition for the camera module, {@link CameraModule}.
+ * <p>
+ * The camera module contains methods and calls that modify and query the camera.
+ */
+public interface CameraAPI {
+
+    /**
+     * Set the camera in focus mode with the focus object identified by the given
+     * <code>focusName</code>. It returns immediately, i.e., it does not wait for
+     * the camera direction to finish the transition that makes it point to the new focus object.
+     *
+     * @param focusName The name of the new focus object.
+     */
+    void focus_mode(final String focusName);
+
+    /**
+     * Set the camera in focus mode with the focus object identified by the given
+     * <code>focusName</code>. Additionally, <code>waitTimeSeconds</code> contains the amount of time, in seconds, to wait for the camera
+     * transition that makes it point to the new focus object to finish. If the transition has not finished after this amount of time, the call
+     * returns. If the transition finishes before this amount of time, it returns immediately after finishing.
+     *
+     * @param focusName       The name of the new focus object.
+     * @param waitTimeSeconds Maximum time, in seconds, to wait for the camera to face the
+     *                        focus. If negative, the call waits until the camera transition is finished.
+     */
+    void focus_mode(final String focusName, final float waitTimeSeconds);
+
+    /**
+     * Set the camera in focus mode with the focus object identified by the given <code>focusName</code>.
+     * This call is different from {@link #focus_mode(String)} in that the camera direction vector is set to point towards the focus object
+     * instantly.
+     *
+     * @param focusName The name of the new focus object.
+     */
+    void focus_mode_instant(final String focusName);
+
+    /**
+     * Set the camera in focus mode with the focus object identified by the given <code>focusName</code>.
+     * This call is different from {@link #focus_mode(String)} in that the camera is moved to the vicinity of the focus object instantly, and its
+     * direction vector is set to point towards the focus object, also instantly.
+     *
+     * @param focusName The name of the new focus object.
+     */
+    void focus_mode_instant_go(final String focusName);
+
+    /**
+     * Activates or deactivates the camera lock to the focus reference system
+     * when in focus mode.
+     *
+     * @param lock Activate or deactivate the lock.
+     */
+    void set_focus_lock(boolean lock);
+
+    /**
+     * Set the center focus property of the camera. If set to <code>true</code>,
+     * the camera centers the focus in view. If set to <code>false</code>,
+     * the camera does not seek to center the focus object, leaving the camera in a 'free view' state.
+     * <p>
+     * Note that the camera is in focus mode, so its movement is determined by the focus object.
+     * 'Free view' state and free mode are not the same thing.
+     * Use {@link #free_mode()} to set the camera in free mode.
+     *
+     * @param centerFocus Whether to center the focus or not.
+     */
+    void center_focus(boolean centerFocus);
+
+    /**
+     * Lock or unlock the orientation of the camera to the focus object's
+     * rotation.
+     *
+     * @param lock Whether to lock or unlock the camera orientation to the focus.
+     */
+    void set_orientation_lock(boolean lock);
+
+    /**
+     * Set the camera in free mode.
+     */
+    void free_mode();
+
+    /**
+     * Set the camera position to the given coordinates, in the internal reference system and kilometres.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link #set_position(double[], boolean)},
+     * with the boolean set to <code>true</code>.
+     *
+     * @param position Vector of three components in internal coordinates and Km.
+     */
+    void set_position(double[] position);
+
+    /**
+     * Set the camera position to the given coordinates, in the internal reference system and kilometres.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
+     *
+     * @param position  Vector of three components in internal coordinates and Km.
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void set_position(double[] position,
+                      boolean immediate);
+
+
+    /**
+     * Set the camera position to the given coordinates, in the internal reference system and in the requested units.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
+     *
+     * @param position  Vector of three components in internal coordinates and the requested units.
+     * @param units     The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void set_position(double[] position,
+                      String units,
+                      boolean immediate);
+
+    /**
+     * Component-wise version of {@link #set_position(double[])}.
+     */
+    void set_position(double x,
+                      double y,
+                      double z);
+
+    /**
+     * Component-wise version of {@link #set_position(double[], String)}.
+     */
+    void set_position(double x,
+                      double y,
+                      double z,
+                      String units);
+
+    /**
+     * Component-wise version of {@link #set_position(double[], boolean)}.
+     */
+    void set_position(double x,
+                      double y,
+                      double z,
+                      boolean immediate);
+
+    /**
+     * Component-wise version of {@link #set_position(double[], String, boolean)}.
+     */
+    void set_position(double x,
+                      double y,
+                      double z,
+                      String units,
+                      boolean immediate);
+
+    /**
+     * Get the current camera position, in km.
+     *
+     * @return The camera position coordinates in the internal reference system,
+     *         in km.
+     */
+    double[] get_position();
+
+    /**
+     * Get the current camera position, in the requested units.
+     *
+     * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     *
+     * @return The camera position coordinates in the internal reference system and in the requested units.
+     */
+    double[] get_position(String units);
+
+    /**
+     * Set the camera position to the given coordinates, in the internal reference system and the given units.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link #set_position(double[], boolean)},
+     * with the boolean set to <code>true</code>.
+     *
+     * @param position Vector of three components in internal coordinates and the given units.
+     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     */
+    void set_position(double[] position,
+                      String units);
+
+    /**
+     * Set the camera direction vector to the given vector, in the internal reference system.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
+     *
+     * @param direction The direction vector in the internal reference system.
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void set_direction(double[] direction,
+                       boolean immediate);
+
+    /**
+     * Get the current camera direction vector.
+     *
+     * @return The camera direction vector in the internal reference system.
+     */
+    double[] get_direction();
+
+    /**
+     * Set the camera direction vector to the given vector, in the internal reference system.
+     * <p>
+     * You can convert from spherical coordinates using the following methods:
+     * <ul>
+     * <li>
+     * {@link RefsysAPI#equatorial_cartesian_to_internal(double[], double)}
+     * </li>
+     * <li>
+     * {@link RefsysAPI#galactic_to_cartesian(double, double, double)}
+     * </li>
+     * <li>
+     * {@link RefsysAPI#ecliptic_to_cartesian(double, double, double)}
+     * </li>
+     * </ul>
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link #set_direction(double[], boolean)},
+     * with the boolean set to <code>true</code>.
+     *
+     * @param dir The direction vector in equatorial cartesian coordinates.
+     */
+    void set_direction(double[] dir);
+
+    /**
+     * Create a smooth camera orientation transition from the current camera orientation
+     * to the given sky coordinates, in equatorial coordinates.
+     * This method sets the camera in free mode.
+     *
+     * @param alpha The right ascension, in decimal degrees.
+     * @param delta The declination, in decimal degrees.
+     */
+    void set_direction_equatorial(double alpha, double delta);
+
+    /**
+     * Create a smooth camera orientation transition from the current camera orientation
+     * to the given sky coordinates, in galactic coordinates.
+     * This method sets the camera in free mode.
+     *
+     * @param l The galactic longitude, in decimal degrees.
+     * @param b The galactic latitude, in decimal degrees.
+     */
+    void set_direction_galactic(double l, double b);
+
+    /**
+     * Set the camera up vector to the given vector, in the internal reference system.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
+     *
+     * @param up        The up vector in equatorial coordinates.
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void set_up(double[] up,
+                boolean immediate);
+
+    /**
+     * Get the current camera up vector.
+     *
+     * @return The camera up vector in the internal reference system.
+     */
+    double[] get_up();
+
+    /**
+     * Set the camera up vector to the given vector, in the internal reference system.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link #set_up(double[], boolean)},
+     * with the boolean set to <code>true</code>.
+     *
+     * @param up The up vector in equatorial coordinates.
+     */
+    void set_up(double[] up);
+
+    /**
+     * Set the camera orientation to the given quaternion, given as an array of [x, y, z, w].
+     *
+     * @param quaternion The 4-component quaternion.
+     */
+    void set_orientation_quaternion(double[] quaternion);
+
+    /**
+     * Get the current camera orientation quaternion.
+     *
+     * @return The current camera orientation quaternion, as an array of [x, y, z, w].
+     */
+    double[] get_orientation_quaternion();
+
+    /**
+     * Set the focus and instantly moves the camera to a point in the line
+     * defined by <code>focus</code>-<code>other</code> and rotated
+     * <code>rotation</code> degrees around <code>focus</code> using the camera
+     * up vector as a rotation axis.
+     *
+     * @param focus      The name of the focus object.
+     * @param other      The name of the other object, to the fine a line from this to
+     *                   focus. Usually a light source.
+     * @param rotation   The rotation angle, in degrees.
+     * @param solidAngle The target solid angle which determines the distance, in degrees.
+     */
+    void set_position_and_focus(String focus,
+                                String other,
+                                double rotation,
+                                double solidAngle);
+
+    /**
+     * Set the camera in free mode and points it to the given coordinates in equatorial system.
+     *
+     * @param ra  Right ascension in degrees.
+     * @param dec Declination in degrees.
+     */
+    void point_at_equatorial(double ra,
+                             double dec);
+
+
+    /**
+     * Set the camera in focus mode with the given focus object and instantly moves
+     * the camera next to the focus object.
+     *
+     * @param name The name of the new focus object.
+     */
+    void go_to_object_instant(String name);
+
+    /**
+     * Move the camera to the object identified by the given name, internally using smooth camera transition calls,
+     * like {@link #transition(double[], double[], double[], double)}.
+     * The target position and orientation are computed first during the call execution and are not subsequently updated. This means that
+     * the camera does not follow the object if it moves. If time is activated, and the object moves, this call does not go to the
+     * object's current position at the end, but at the beginning.
+     *
+     * @param name                       The name of the object to go to.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     */
+    void go_to_object_smooth(String name, double positionDurationSeconds, double orientationDurationSeconds);
+
+    /**
+     * Same as {@link #go_to_object_smooth(String, double, double)}, but with the target solid angle of the object.
+     *
+     * @param name                       The name of the object to go to.
+     * @param solidAngle                 The target solid angle of the object, in degrees. This
+     *                                   is used to compute the final distance to the object. The angle
+     *                                   gets larger and larger as we approach the object.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     */
+    void go_to_object_smooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds);
+
+    /**
+     * Same as {@link #go_to_object_smooth(String, double, double)}, but with a boolean that indicates whether the call is synchronous.
+     *
+     * @param name                       The name of the object to go to.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param sync                       If true, the call is synchronous and waits for the camera
+     *                                   file to finish. Otherwise, it returns immediately.
+     */
+    void go_to_object_smooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
+
+    /**
+     * Same as {@link #go_to_object_smooth(String, double, double, boolean)}, but with the target solid angle of the object.
+     *
+     * @param name                       The name of the object to go to.
+     * @param solidAngle                 The target solid angle of the object, in degrees. This
+     *                                   is used to compute the final distance to the object. The angle
+     *                                   gets larger and larger as we approach the object.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param sync                       If true, the call is synchronous and waits for the camera
+     *                                   file to finish. Otherwise, it returns immediately.
+     */
+    void go_to_object_smooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
+
+    /**
+     * Stop all camera motion.
+     */
+    void stop();
+
+    /**
+     * Center the camera to the focus, removing any deviation of the line of
+     * sight. Useful to center the focus object again after turning.
+     */
+    void cameraCenter();
+
+    /**
+     * Set the speed limit of the camera given an index. The index corresponds
+     * to the following:
+     * <ul>
+     * <li>0 - 1 Km/h</li>
+     * <li>1 - 10 Km/h</li>
+     * <li>2 - 100 Km/h</li>
+     * <li>3 - 1000 Km/h</li>
+     * <li>4 - 1 Km/s</li>
+     * <li>5 - 10 Km/s</li>
+     * <li>6 - 100 Km/s</li>
+     * <li>7 - 1000 Km/s</li>
+     * <li>8 - 0.01 c</li>
+     * <li>9 - 0.1 c</li>
+     * <li>10 - 0.5 c</li>
+     * <li>11 - 0.8 c</li>
+     * <li>12 - 0.9 c</li>
+     * <li>13 - 0.99 c</li>
+     * <li>14 - 0.99999 c</li>
+     * <li>15 - 1 c</li>
+     * <li>16 - 2 c</li>
+     * <li>17 - 10 c</li>
+     * <li>18 - 1e3 c</li>
+     * <li>19 - 1 AU/s</li>
+     * <li>20 - 10 AU/s</li>
+     * <li>21 - 1000 AU/s</li>
+     * <li>22 - 10000 AU/s</li>
+     * <li>23 - 1 pc/s</li>
+     * <li>24 - 2 pc/s</li>
+     * <li>25 - 10 pc/s</li>
+     * <li>26 - 1000 pc/s</li>
+     * <li>27 - unlimited</li>
+     * </ul>
+     *
+     * @param index The index of the top speed.
+     */
+    void set_speed_limit(int index);
+
+    /**
+     * Set the camera to track the object with the given name. In this mode,
+     * the position of the camera is still dependent on the focus object (if any), but
+     * its direction points to the tracking object.
+     *
+     * @param objectName The name of the new tracking object.
+     */
+    void set_tracking_object(String objectName);
+
+    /**
+     * Remove the tracking object from the camera, if any.
+     */
+    void remove_tracking_object();
+
+    /**
+     * Return the closest object to the camera in this instant as a
+     * {@link IFocus}.
+     *
+     * @return The closest object to the camera.
+     */
+    IFocus get_closest_object();
+
+    /**
+     * Change the field of view of the camera.
+     *
+     * @param newFov The new field of view value in degrees, between {@link gaiasky.util.Constants#MIN_FOV} and
+     *               {@link gaiasky.util.Constants#MAX_FOV}.
+     */
+    void setFov(float newFov);
+
+    /**
+     * Set the camera state (position, direction and up vector).
+     *
+     * @param pos The position of the camera in internal units, not Km.
+     * @param dir The direction of the camera.
+     * @param up  The up vector of the camera.
+     */
+    void set_state(double[] pos,
+                   double[] dir,
+                   double[] up);
+
+    /**
+     * Set the camera state (position, direction and up vector) plus the current time.
+     *
+     * @param pos  The position of the camera in internal units, not Km.
+     * @param dir  The direction of the camera.
+     * @param up   The up vector of the camera.
+     * @param time The new time of the camera as the
+     *             number of milliseconds since the epoch (Jan 1, 1970).
+     */
+    void set_state_and_time(double[] pos,
+                            double[] dir,
+                            double[] up,
+                            long time);
+    /**
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. This function waits for the transition to finish and then returns control
+     * to the script.
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos  The target camera position in the internal reference system.
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     */
+    void transition(double[] camPos,
+                    double[] camDir,
+                    double[] camUp,
+                    double seconds);
+
+    /**
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. This function waits for the transition to finish and then returns control
+     * to the script.
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos  The target camera position in the internal reference system and the given distance units.
+     * @param units   The distance units to use. One of "m", "km", "AU", "ly", "pc", "internal".
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     */
+    void transition(double[] camPos,
+                    String units,
+                    double[] camDir,
+                    double[] camUp,
+                    double seconds);
+
+    /**
+     * Same as {@link #transition(double[], double[], double[], double)} but the
+     * camera position is given in Km.
+     *
+     * @param camPos  The target camera position in Km.
+     * @param camDir  The target camera direction vector.
+     * @param camUp   The target camera up vector.
+     * @param seconds The duration of the transition in seconds.
+     */
+    void transition_km(double[] camPos,
+                       double[] camDir,
+                       double[] camUp,
+                       double seconds);
+
+    /**
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
+     * current script.
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos  The target camera position in the internal reference system.
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns
+     *                immediately.
+     */
+    void transition(double[] camPos,
+                    double[] camDir,
+                    double[] camUp,
+                    double seconds,
+                    boolean sync);
+
+    /**
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
+     * current script.
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos  The target camera position in the internal reference system and the given distance units.
+     * @param units   The distance units to use. One of "m", "km", "AU", "ly", "pc", "internal".
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns
+     *                immediately.
+     */
+    void transition(double[] camPos,
+                    String units,
+                    double[] camDir,
+                    double[] camUp,
+                    double seconds,
+                    boolean sync);
+
+    /**
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds.
+     * <p>
+     * This function accepts smoothing types and factors for the position and orientation.
+     * <p>
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos                     The target camera position in the internal reference system and the given
+     *                                   distance units.
+     * @param camDir                     The target camera direction in the internal reference system.
+     * @param camUp                      The target camera up in the internal reference system.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param positionSmoothType         The function type to use for the smoothing of positions. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param positionSmoothFactor       Smooth factor for the positions (depends on type).
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param orientationSmoothType      The function type to use for the smoothing of orientations. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param orientationSmoothFactor    Smooth factor for the orientations (depends on type).
+     */
+    void transition(double[] camPos,
+                    double[] camDir,
+                    double[] camUp,
+                    double positionDurationSeconds,
+                    String positionSmoothType,
+                    double positionSmoothFactor,
+                    double orientationDurationSeconds,
+                    String orientationSmoothType,
+                    double orientationSmoothFactor);
+
+    /**
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds.
+     * <p>
+     * This function accepts smoothing types and factors for the position and orientation.
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     * <p>
+     * This function puts the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos                     The target camera position in the internal reference system and the given
+     *                                   distance units.
+     * @param units                      The distance units to use. One of "m", "km", "AU", "ly", "pc", "internal".
+     * @param camDir                     The target camera direction in the internal reference system.
+     * @param camUp                      The target camera up in the internal reference system.
+     * @param positionDurationSeconds    The duration of the transition in position, in seconds.
+     * @param positionSmoothType         The function type to use for the smoothing of positions. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param positionSmoothFactor       Smooth factor for the positions (depends on type).
+     * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
+     * @param orientationSmoothType      The function type to use for the smoothing of orientations. Either "logit",
+     *                                   "logisticsigmoid" or "none".
+     *                                   <ul>
+     *                                   <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                                   an effect, otherwise, linear interpolation is used.</li>
+     *                                   <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                                   0.09 and 0.01.</li>
+     *                                   <li>"none": no smoothing is applied.</li>
+     *                                   </ul>
+     * @param orientationSmoothFactor    Smooth factor for the orientations (depends on type).
+     * @param sync                       If true, the call waits for the transition to finish before returning,
+     *                                   otherwise it returns immediately.
+     */
+    void transition(double[] camPos,
+                    String units,
+                    double[] camDir,
+                    double[] camUp,
+                    double positionDurationSeconds,
+                    String positionSmoothType,
+                    double positionSmoothFactor,
+                    double orientationDurationSeconds,
+                    String orientationSmoothType,
+                    double orientationSmoothFactor,
+                    boolean sync);
+
+    /**
+     * Create a smooth transition from the current camera position to the given camera position in
+     * the given number of seconds.
+     * <p>
+     * This function accepts smoothing type and factor.
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     * <p>
+     * This function puts the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos          The target camera position in the internal reference system and the given
+     *                        distance units.
+     * @param units           The distance units to use. One of "m", "km", "AU", "ly", "pc", "internal".
+     * @param durationSeconds The duration of the transition in position, in seconds.
+     * @param smoothType      The function type to use for the smoothing of positions. Either "logit",
+     *                        "logisticsigmoid" or "none".
+     *                        <ul>
+     *                        <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        an effect, otherwise, linear interpolation is used.</li>
+     *                        <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                        0.09 and 0.01.</li>
+     *                        <li>"none": no smoothing is applied.</li>
+     *                        </ul>
+     * @param smoothFactor    Smooth factor for the positions (depends on type).
+     * @param sync            If true, the call waits for the transition to finish before returning,
+     *                        otherwise it returns immediately.
+     */
+    void transition_position(double[] camPos,
+                             String units,
+                             double durationSeconds,
+                             String smoothType,
+                             double smoothFactor,
+                             boolean sync);
+
+    /**
+     * Create a smooth transition from the current camera orientation to the given camera orientation {camDir, camUp}
+     * in the given number of seconds.
+     * <p>
+     * This function accepts smoothing type and factor.
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     * <p>
+     * This function puts the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camDir          The target camera direction in the internal reference system.
+     * @param camUp           The target camera up in the internal reference system.
+     * @param durationSeconds The duration of the transition in orientation, in seconds.
+     * @param smoothType      The function type to use for the smoothing of orientations. Either "logit",
+     *                        "logisticsigmoid" or "none".
+     *                        <ul>
+     *                        <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        an effect, otherwise, linear interpolation is used.</li>
+     *                        <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                        0.09 and 0.01.</li>
+     *                        <li>"none": no smoothing is applied.</li>
+     *                        </ul>
+     * @param smoothFactor    Smooth factor for the orientations (depends on type).
+     * @param sync            If true, the call waits for the transition to finish before returning,
+     *                        otherwise it returns immediately.
+     */
+    void transition_orientation(double[] camDir,
+                                double[] camUp,
+                                double durationSeconds,
+                                String smoothType,
+                                double smoothFactor,
+                                boolean sync);
+}

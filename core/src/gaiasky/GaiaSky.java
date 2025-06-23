@@ -403,9 +403,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
 
     /**
-     * Posts a runnable that will run once after the current frame.
+     * Post a {@link Runnable} on the main loop thread that runs once after the current frame.
      *
-     * @param r The runnable to post.
+     * @param r The runnable.
      */
     public static synchronized void postRunnable(final Runnable r) {
         if (instance != null && instance.window != null) instance.window.postRunnable(r);

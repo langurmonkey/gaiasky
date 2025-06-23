@@ -5,21 +5,20 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.script.v2;
+package gaiasky.script.v2.impl;
 
 import com.badlogic.gdx.Input;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.main.GSKeys;
+import gaiasky.script.v2.api.InputAPI;
 
 import java.util.Objects;
 
 /**
- * The input module contains methods and calls to manage input data like keyboard and/or mouse
- * input events.
+ * The camera module contains methods and calls to access and modify the input system.
  */
-public class InputModule extends APIModule implements IObserver {
+public class InputModule extends APIModule implements IObserver, InputAPI {
     /** Last keyboard input code. **/
     private int inputCode = -1;
 
@@ -35,10 +34,17 @@ public class InputModule extends APIModule implements IObserver {
         em.subscribe(this, Event.INPUT_EVENT);
     }
 
-    /**
-     * Blocks the execution until any kind of input (keyboard, mouse, etc.) is
-     * received.
-     */
+    @Override
+    public void disable() {
+        api.base.post_runnable(() -> em.post(Event.INPUT_ENABLED_CMD, this, false));
+    }
+
+    @Override
+    public void enable() {
+        api.base.post_runnable(() -> em.post(Event.INPUT_ENABLED_CMD, this, true));
+    }
+
+    @Override
     public void wait_input() {
         while (inputCode < 0) {
             api.base.sleep_frames(1);
@@ -48,9 +54,7 @@ public class InputModule extends APIModule implements IObserver {
 
     }
 
-    /**
-     * Blocks the execution until the Enter key is pressed.
-     */
+    @Override
     public void wait_enter() {
         while (inputCode != Input.Keys.ENTER) {
             api.base.sleep_frames(1);
@@ -59,12 +63,7 @@ public class InputModule extends APIModule implements IObserver {
         inputCode = -1;
     }
 
-    /**
-     * Blocks the execution until the given key or button is pressed.
-     *
-     * @param keyCode The key or button code. Please see
-     *                {@link Input.Keys} and {@link GSKeys}.
-     */
+    @Override
     public void wait_input(int keyCode) {
         while (inputCode != keyCode) {
             api.base.sleep_frames(1);

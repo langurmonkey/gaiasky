@@ -5,20 +5,20 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.script.v2;
+package gaiasky.script.v2.impl;
 
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.script.v2.api.TimeAPI;
 
 /**
- * The time module contains methods and calls that query and manipulate the simulation time and
- * other time frames.
+ * The time module contains methods and calls to access, modify, and query the time subsystem.
  */
-public class TimeModule extends APIModule{
+public class TimeModule extends APIModule implements TimeAPI {
     /**
      * Create a new module with the given attributes.
      *
-     * @param em Reference to the event manager.
+     * @param em   Reference to the event manager.
      * @param api  Reference to the API class.
      * @param name Name of the module.
      */
@@ -26,20 +26,12 @@ public class TimeModule extends APIModule{
         super(em, api, name);
     }
 
-    /**
-     * Sets the current time frame to <b>real time</b>. All the commands
-     * executed after this command becomes active will be in the <b>real
-     * time</b> frame (clock ticks).
-     */
+    @Override
     public void activate_real_time_frame() {
         api.base.post_runnable(() -> em.post(Event.EVENT_TIME_FRAME_CMD, this, EventManager.TimeFrame.REAL_TIME));
     }
 
-    /**
-     * Sets the current time frame to <b>simulation time</b>. All the commands
-     * executed after this command becomes active will be in the <b>simulation
-     * time</b> frame (simulation clock in the app).
-     */
+    @Override
     public void activate_simulation_time_Frame() {
         api.base.post_runnable(() -> em.post(Event.EVENT_TIME_FRAME_CMD, this, EventManager.TimeFrame.SIMULATION_TIME));
     }

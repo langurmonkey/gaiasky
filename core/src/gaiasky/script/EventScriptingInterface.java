@@ -57,7 +57,7 @@ import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
-import gaiasky.script.v2.APIv2;
+import gaiasky.script.v2.impl.APIv2;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;

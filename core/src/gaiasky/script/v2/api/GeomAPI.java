@@ -1,0 +1,19 @@
+/*
+ * Copyright (c) 2025 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
+package gaiasky.script.v2.api;
+
+import gaiasky.script.v2.impl.GeomModule;
+
+/**
+ * API definition for the geometry module, {@link GeomModule}.
+ * <p>
+ * The geometry module provides calls and methods to carry out geometrical operations directly
+ * within the scripting system.
+ */
+public interface GeomAPI {
+}

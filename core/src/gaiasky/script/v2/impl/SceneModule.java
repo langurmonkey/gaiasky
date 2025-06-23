@@ -5,21 +5,21 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.script.v2;
+package gaiasky.script.v2.impl;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Scene;
+import gaiasky.script.v2.api.SceneAPI;
 
 import java.util.Objects;
 
 /**
- * The scene module contains methods and calls to manipulate and query objects in the main
- * scene of Gaia Sky.
+ * The scene module contains methods and calls that modify and query the internal scene in Gaia Sky.
  */
-public class SceneModule extends APIModule implements IObserver {
+public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     /** Reference to the main {@link Scene} object in Gaia Sky. **/
     private Scene scene;
@@ -37,24 +37,13 @@ public class SceneModule extends APIModule implements IObserver {
         em.subscribe(this, Event.SCENE_LOADED);
     }
 
-    /**
-     * Gets the reference to an entity given its name.
-     *
-     * @param name Entity name.
-     **/
-    Entity getEntity(String name) {
-        return getEntity(name, 0);
+    @Override
+    public Entity get_entity(String name) {
+        return get_entity(name, 0);
     }
 
-    /**
-     * Gets the reference to an entity given its name and a timeout in seconds.
-     * If the entity is not in the scene after the timeout has passed, ths method
-     * returns null.
-     *
-     * @param name           Entity name.
-     * @param timeOutSeconds Timeout time, in seconds.
-     **/
-    Entity getEntity(String name, double timeOutSeconds) {
+    @Override
+    public Entity get_entity(String name, double timeOutSeconds) {
         Entity obj = scene.getEntity(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -78,21 +67,15 @@ public class SceneModule extends APIModule implements IObserver {
         return obj;
     }
 
-    /**
-     * Gets a focus object from the scene given its name.
-     *
-     * @param name The name of the focus object.
-     *
-     * @return The reference to the object if it exists, null otherwise.
-     */
-    Entity getFocus(String name) {
+    @Override
+    public Entity get_focus(String name) {
         return scene.findFocus(name);
     }
 
     /**
-     * Alias to {@link #getFocus(String)}.
+     * Alias to {@link #get_focus(String)}.
      */
-    Entity getFocusEntity(String name) {
+    public Entity get_focus_entity(String name) {
         return scene.findFocus(name);
     }
 

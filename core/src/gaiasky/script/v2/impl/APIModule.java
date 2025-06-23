@@ -5,15 +5,19 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.script.v2;
+package gaiasky.script.v2.impl;
 
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.util.Logger;
 
-/**
- * Abstract API module, containing common attributes and functionality.
- */
+import java.util.Locale;
+
+import static gaiasky.util.Logger.getLogger;
+
 public abstract class APIModule {
+    protected final Logger.Log logger;
+
     /** Reference to self. **/
     final APIModule me;
     /** Reference to event manager. **/
@@ -34,6 +38,8 @@ public abstract class APIModule {
         this.em = em;
         this.api = api;
         this.name = name;
+
+        this.logger = getLogger(name.toUpperCase(Locale.ROOT) + "Module");
 
         this.me = this;
     }

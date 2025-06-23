@@ -5,7 +5,7 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.script.v2;
+package gaiasky.script.v2.impl;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.util.Logger;
@@ -21,7 +21,7 @@ import java.util.Locale;
 import static gaiasky.util.Logger.getLogger;
 
 /**
- * Contains utilities to check and validate parameters of {@link APIv2}.
+ * This class contains utility methods to check the validity of different parameter types.
  */
 public class ParameterValidator {
     protected final static Logger.Log logger = getLogger(ParameterValidator.class.getSimpleName());
@@ -131,7 +131,7 @@ public class ParameterValidator {
     }
 
     boolean checkObjectName(String name) {
-        if (api.scene.getEntity(name) == null) {
+        if (api.scene.get_entity(name) == null) {
             logger.error(name + ": object with this name does not exist");
             return false;
         }
@@ -139,7 +139,7 @@ public class ParameterValidator {
     }
 
     boolean checkObjectName(String name, double timeOutSeconds) {
-        if (api.scene.getEntity(name, timeOutSeconds) == null) {
+        if (api.scene.get_entity(name, timeOutSeconds) == null) {
             logger.error(name + ": object with this name does not exist");
             return false;
         }
@@ -155,7 +155,7 @@ public class ParameterValidator {
     }
 
     boolean checkFocusName(String name) {
-        Entity entity = api.scene.getFocus(name);
+        Entity entity = api.scene.get_focus(name);
         if (entity == null) {
             logger.error(name + ": focus with this name does not exist");
         }
@@ -206,13 +206,18 @@ public class ParameterValidator {
         return true;
     }
 
-    boolean checkDistanceUnits(String units, String name) {
+    boolean checkDistanceUnits(String units) {
         try {
             Settings.DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             return true;
         } catch (Exception e) {
+            logger.error("Unknown distance units: " + units);
             return false;
         }
+    }
+
+    boolean checkSmoothType(String type, String name) {
+        return type.equalsIgnoreCase("logit") || type.equalsIgnoreCase("logisticsigmoid") || type.equalsIgnoreCase("none");
     }
 
     private void logPossibleValues(String value, String[] possibleValues, String name) {
@@ -221,8 +226,4 @@ public class ParameterValidator {
             logger.error(v);
     }
 
-
-    private boolean checkSmoothType(String type, String name) {
-        return type.equalsIgnoreCase("logit") || type.equalsIgnoreCase("logisticsigmoid") || type.equalsIgnoreCase("none");
-    }
 }
