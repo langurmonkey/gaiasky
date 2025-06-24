@@ -357,7 +357,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    void land_on(Entity object, AtomicBoolean stop) {
+    public void land_on(Entity object, AtomicBoolean stop) {
         if (api.validator.checkNotNull(object, "object")) {
 
             stops.add(stop);

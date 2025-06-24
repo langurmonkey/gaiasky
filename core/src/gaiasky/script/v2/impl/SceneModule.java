@@ -169,7 +169,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     @Override
     public double[] get_object_position(String name, String units) {
-        if (api.validator.checkObjectName(name) && api.validator.checkDistanceUnits(units, "units")) {
+        if (api.validator.checkObjectName(name) && api.validator.checkDistanceUnits(units)) {
             Entity entity = get_entity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);
@@ -187,7 +187,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     @Override
     public double[] get_object_predicted_position(String name, String units) {
-        if (api.validator.checkObjectName(name) && api.validator.checkDistanceUnits(units, "units")) {
+        if (api.validator.checkObjectName(name) && api.validator.checkDistanceUnits(units)) {
             Entity entity = get_entity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);

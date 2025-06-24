@@ -92,7 +92,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
      * @param waitTimeSeconds Maximum time, in seconds, to wait for the camera to face the
      *                        focus. If negative, the call waits until the camera transition is finished.
      */
-    private void focus_mode(final Entity entity, final float waitTimeSeconds) {
+    public void focus_mode(final Entity entity, final float waitTimeSeconds) {
         if (api.validator.checkNotNull(entity, "Entity is null")) {
             synchronized (focusView) {
                 focusView.setEntity(entity);

@@ -152,7 +152,7 @@ public class HiddenHelperUser implements IObserver {
         @Override
         public void run() {
             scripting.goToObjectSmooth(body, -1, 10.0, 4.0, true, stop);
-            scripting.setCameraFocus(body, -1);
+            scripting.setCameraFocus(body, -1f);
             currentTasks.removeValue(this, true);
         }
 

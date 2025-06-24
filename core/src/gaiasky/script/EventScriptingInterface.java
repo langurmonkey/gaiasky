@@ -245,7 +245,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     }
 
     public void setCameraFocus(final String focusName, final int waitTimeSeconds) {
-        setCameraFocus(focusName, (float) waitTimeSeconds);
+        apiv2.camera.focus_mode(focusName, waitTimeSeconds);
+    }
+
+    public void setCameraFocus(final Entity entity, final float waitTimeSeconds) {
+        apiv2.camera.focus_mode(entity, waitTimeSeconds);
     }
 
     @Override
@@ -1180,6 +1184,10 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
     @Override
     public void landOnObject(String name) {
         apiv2.camera.interactive.land_on(name);
+    }
+
+    void landOnObject(Entity object, AtomicBoolean stop) {
+        apiv2.camera.interactive.land_on(object, stop);
     }
 
     @Override
