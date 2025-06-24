@@ -214,12 +214,12 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void add_forward(final double cameraForward) {
-        if (api.validator.checkNum(cameraForward, -100d, 100d, "cameraForward"))
-            api.base.post_runnable(() -> em.post(Event.CAMERA_FWD, this, cameraForward));
+    public void add_forward(final double value) {
+        if (api.validator.checkNum(value, -100d, 100d, "cameraForward"))
+            api.base.post_runnable(() -> em.post(Event.CAMERA_FWD, this, value));
     }
 
-    public void cameraForward(final long value) {
+    public void add_forward(final long value) {
         add_forward((double) value);
     }
 
@@ -239,8 +239,8 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void add_roll(final double roll) {
-        if (api.validator.checkNum(roll, -100d, 100d, "roll")) api.base.post_runnable(() -> em.post(Event.CAMERA_ROLL, this, roll));
+    public void add_roll(final double value) {
+        if (api.validator.checkNum(value, -100d, 100d, "roll")) api.base.post_runnable(() -> em.post(Event.CAMERA_ROLL, this, value));
     }
 
     public void add_roll(final long roll) {
@@ -304,7 +304,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    public void set_speed(final int speed) {
+    public void speed_setting(final int speed) {
         speed_setting((float) speed);
     }
 
@@ -321,7 +321,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    public void set_rotation_speed(final int speed) {
+    public void rotation_speed_setting(final int speed) {
         this.rotation_speed_setting((float) speed);
     }
 
@@ -339,7 +339,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    public void set_turning_speed(final int speed) {
+    public void turning_speed_setting(final int speed) {
         this.turning_speed_setting((float) speed);
     }
 
@@ -498,7 +498,6 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-
     @Override
     public void land_at_location(String name, String locationName) {
         land_at_location(name, locationName, null);
@@ -551,7 +550,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    void land_at_location(Entity entity, double longitude, double latitude, AtomicBoolean stop) {
+    public void land_at_location(Entity entity, double longitude, double latitude, AtomicBoolean stop) {
         if (api.validator.checkNotNull(entity, "object")
                 && api.validator.checkNum(latitude, -90d, 90d, "latitude")
                 && api.validator.checkNum(longitude, -360d, 360d, "longitude")) {

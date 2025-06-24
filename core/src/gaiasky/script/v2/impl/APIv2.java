@@ -49,6 +49,8 @@ public class APIv2 implements IObserver {
     public final TimeModule time;
     /** Scene module. **/
     public final SceneModule scene;
+    /** Graphics module. **/
+    public final GraphicsModule graphics;
     /** Input module. **/
     public final InputModule input;
     /** Output module. **/
@@ -57,6 +59,8 @@ public class APIv2 implements IObserver {
     public final UiModule ui;
     /** Camcorder module. **/
     public final CamcorderModule camcorder;
+    /** Instances module. **/
+    public final InstancesModule instances;
 
     /** List with all the modules. **/
     final Array<APIModule> modules;
@@ -84,13 +88,15 @@ public class APIv2 implements IObserver {
         this.camera = new CameraModule(em, this, "camera");
         this.time = new TimeModule(em, this, "time");
         this.scene = new SceneModule(em, this, "scene");
+        this.graphics = new GraphicsModule(em, this, "graphics");
         this.input = new InputModule(em, this, "input");
         this.output = new OutputModule(em, this, "output");
         this.ui = new UiModule(em, this, "ui");
         this.camcorder = new CamcorderModule(em, this, "camcorder");
+        this.instances = new InstancesModule(em, this, "instances");
 
         // Add all to list.
-        this.modules.addAll(base, camera, time, scene, input, output, ui, camcorder);
+        this.modules.addAll(base, camera, time, scene, graphics, input, output, ui, camcorder, instances);
 
         // Auxiliary vectors
         aux3d1 = new Vector3D();

@@ -57,6 +57,19 @@ public interface CameraAPI {
     void focus_mode_instant_go(final String focusName);
 
     /**
+     * This method blocks until the focus is the object indicated by the name.
+     * There is an optional timeout time, given in milliseconds. If the focus has not been acquired after this timeout,
+     * the call returns.
+     *
+     * @param name      The name of the focus to wait for.
+     * @param timeoutMs Timeout to wait, in milliseconds. Set negative to use no timeout.
+     *
+     * @return True if the timeout triggered the return. False otherwise.
+     */
+    boolean wait_focus(String name,
+                       long timeoutMs);
+
+    /**
      * Activates or deactivates the camera lock to the focus reference system
      * when in focus mode.
      *
@@ -347,10 +360,10 @@ public interface CameraAPI {
      * @param positionDurationSeconds    The duration of the transition in position, in seconds.
      * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
      */
-    void go_to_object_smooth(String name, double positionDurationSeconds, double orientationDurationSeconds);
+    void go_to_object(String name, double positionDurationSeconds, double orientationDurationSeconds);
 
     /**
-     * Same as {@link #go_to_object_smooth(String, double, double)}, but with the target solid angle of the object.
+     * Same as {@link #go_to_object(String, double, double)}, but with the target solid angle of the object.
      *
      * @param name                       The name of the object to go to.
      * @param solidAngle                 The target solid angle of the object, in degrees. This
@@ -359,10 +372,10 @@ public interface CameraAPI {
      * @param positionDurationSeconds    The duration of the transition in position, in seconds.
      * @param orientationDurationSeconds The duration of the transition in orientation, in seconds.
      */
-    void go_to_object_smooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds);
+    void go_to_object(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds);
 
     /**
-     * Same as {@link #go_to_object_smooth(String, double, double)}, but with a boolean that indicates whether the call is synchronous.
+     * Same as {@link #go_to_object(String, double, double)}, but with a boolean that indicates whether the call is synchronous.
      *
      * @param name                       The name of the object to go to.
      * @param positionDurationSeconds    The duration of the transition in position, in seconds.
@@ -370,10 +383,10 @@ public interface CameraAPI {
      * @param sync                       If true, the call is synchronous and waits for the camera
      *                                   file to finish. Otherwise, it returns immediately.
      */
-    void go_to_object_smooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
+    void go_to_object(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
 
     /**
-     * Same as {@link #go_to_object_smooth(String, double, double, boolean)}, but with the target solid angle of the object.
+     * Same as {@link #go_to_object(String, double, double, boolean)}, but with the target solid angle of the object.
      *
      * @param name                       The name of the object to go to.
      * @param solidAngle                 The target solid angle of the object, in degrees. This
@@ -384,7 +397,19 @@ public interface CameraAPI {
      * @param sync                       If true, the call is synchronous and waits for the camera
      *                                   file to finish. Otherwise, it returns immediately.
      */
-    void go_to_object_smooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
+    void go_to_object(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync);
+
+    /**
+     * Return the distance from the current postion of the camera to the surface of the object identified with the
+     * given <code>name</code>. If the object is an abstract node or does not
+     * exist, it returns a negative distance.
+     *
+     * @param name The name or id (HIP, TYC, sourceId) of the object.
+     *
+     * @return The distance to the object in km if it exists, a negative value
+     *         otherwise.
+     */
+    double get_distance_to_object(String name);
 
     /**
      * Stop all camera motion.
@@ -392,48 +417,50 @@ public interface CameraAPI {
     void stop();
 
     /**
-     * Center the camera to the focus, removing any deviation of the line of
+     * Center the camera so that its direction vector is aligned with the direction to the focus object, removing any deviation of the line of
      * sight. Useful to center the focus object again after turning.
+     * <p>
+     * This method only has effect if the camera is in {@link #focus_mode(String)}.
      */
-    void cameraCenter();
+    void center();
 
     /**
-     * Set the speed limit of the camera given an index. The index corresponds
-     * to the following:
-     * <ul>
-     * <li>0 - 1 Km/h</li>
-     * <li>1 - 10 Km/h</li>
-     * <li>2 - 100 Km/h</li>
-     * <li>3 - 1000 Km/h</li>
-     * <li>4 - 1 Km/s</li>
-     * <li>5 - 10 Km/s</li>
-     * <li>6 - 100 Km/s</li>
-     * <li>7 - 1000 Km/s</li>
-     * <li>8 - 0.01 c</li>
-     * <li>9 - 0.1 c</li>
-     * <li>10 - 0.5 c</li>
-     * <li>11 - 0.8 c</li>
-     * <li>12 - 0.9 c</li>
-     * <li>13 - 0.99 c</li>
-     * <li>14 - 0.99999 c</li>
-     * <li>15 - 1 c</li>
-     * <li>16 - 2 c</li>
-     * <li>17 - 10 c</li>
-     * <li>18 - 1e3 c</li>
-     * <li>19 - 1 AU/s</li>
-     * <li>20 - 10 AU/s</li>
-     * <li>21 - 1000 AU/s</li>
-     * <li>22 - 10000 AU/s</li>
-     * <li>23 - 1 pc/s</li>
-     * <li>24 - 2 pc/s</li>
-     * <li>25 - 10 pc/s</li>
-     * <li>26 - 1000 pc/s</li>
-     * <li>27 - unlimited</li>
-     * </ul>
+     * Set the maximum speed of the camera as an index pointing to a pre-set value. The index corresponds
+     * to one of the following values:
+     * <ol start="0">
+     * <li>1 Km/h</li>
+     * <li>10 Km/h</li>
+     * <li>100 Km/h</li>
+     * <li>1000 Km/h</li>
+     * <li>1 Km/s</li>
+     * <li>10 Km/s</li>
+     * <li>100 Km/s</li>
+     * <li>1000 Km/s</li>
+     * <li>0.01 c</li>
+     * <li>0.1 c</li>
+     * <li>0.5 c</li>
+     * <li>0.8 c</li>
+     * <li>0.9 c</li>
+     * <li>0.99 c</li>
+     * <li>0.99999 c</li>
+     * <li>1 c</li>
+     * <li>2 c</li>
+     * <li>10 c</li>
+     * <li>1e3 c</li>
+     * <li>1 AU/s</li>
+     * <li>10 AU/s</li>
+     * <li>1000 AU/s</li>
+     * <li>10000 AU/s</li>
+     * <li>1 pc/s</li>
+     * <li>2 pc/s</li>
+     * <li>10 pc/s</li>
+     * <li>1000 pc/s</li>
+     * <li>unlimited</li>
+     * </ol>
      *
-     * @param index The index of the top speed.
+     * @param index The index of the maximum speed setting.
      */
-    void set_speed_limit(int index);
+    void set_max_speed(int index);
 
     /**
      * Set the camera to track the object with the given name. In this mode,
@@ -458,12 +485,12 @@ public interface CameraAPI {
     IFocus get_closest_object();
 
     /**
-     * Change the field of view of the camera.
+     * Set the field of view of the perspective matrix of the camera, in degrees.
      *
      * @param newFov The new field of view value in degrees, between {@link gaiasky.util.Constants#MIN_FOV} and
      *               {@link gaiasky.util.Constants#MAX_FOV}.
      */
-    void setFov(float newFov);
+    void set_fov(float newFov);
 
     /**
      * Set the camera state (position, direction and up vector).
@@ -489,6 +516,7 @@ public interface CameraAPI {
                             double[] dir,
                             double[] up,
                             long time);
+
     /**
      * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. This function waits for the transition to finish and then returns control

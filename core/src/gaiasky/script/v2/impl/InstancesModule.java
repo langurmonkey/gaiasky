@@ -7,8 +7,12 @@
 
 package gaiasky.script.v2.impl;
 
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.script.v2.api.InstancesAPI;
+import gaiasky.util.Constants;
+import gaiasky.util.Settings;
+import gaiasky.util.SlaveManager;
 
 /**
  * The instances module contains methods and calls to access, modify, and query the connected instances
@@ -23,5 +27,44 @@ public class InstancesModule extends APIModule implements InstancesAPI {
      */
     public InstancesModule(EventManager em, APIv2 api, String name) {
         super(em, api, name);
+    }
+
+    @Override
+    public void set_projection_yaw(float yaw) {
+        if (SlaveManager.projectionActive()) {
+            api.base.post_runnable(() -> {
+                Settings.settings.program.net.slave.yaw = yaw;
+                SlaveManager.instance.yaw = yaw;
+            });
+        }
+    }
+
+    @Override
+    public void set_projection_pitch(float pitch) {
+        if (SlaveManager.projectionActive()) {
+            api.base.post_runnable(() -> {
+                Settings.settings.program.net.slave.pitch = pitch;
+                SlaveManager.instance.pitch = pitch;
+            });
+        }
+    }
+
+    @Override
+    public void set_projection_roll(float roll) {
+        if (SlaveManager.projectionActive()) {
+            api.base.post_runnable(() -> {
+                Settings.settings.program.net.slave.roll = roll;
+                SlaveManager.instance.roll = roll;
+            });
+        }
+    }
+
+    @Override
+    public void set_projection_fov(float fov) {
+        if (api.validator.checkNum(fov, Constants.MIN_FOV, 170f, "newFov"))
+            api.base.post_runnable(() -> {
+                SlaveManager.instance.cameraFov = fov;
+                em.post(Event.FOV_CHANGED_CMD, this, fov);
+            });
     }
 }

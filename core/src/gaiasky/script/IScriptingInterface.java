@@ -297,7 +297,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void removeObject(int id);
 
     /**
-     * Removes the items with the given ids. They can either messages, images or
+     * Removes the items with the given ids. They can either be messages, images or
      * whatever else.
      *
      * @param ids Vector with the integer ids of the objects to remove
@@ -464,7 +464,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * Gets the current camera position, in km.
      *
      * @return The camera position coordinates in the internal reference system,
-     * in km.
+     *         in km.
      */
     double[] getCameraPosition();
 
@@ -676,40 +676,40 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setTurningCameraSpeed(float speed);
 
     /**
-     * Sets the speed limit of the camera given an index. The index corresponds
-     * to the following:
-     * <ul>
-     * <li>0 - 1 Km/h</li>
-     * <li>1 - 10 Km/h</li>
-     * <li>2 - 100 Km/h</li>
-     * <li>3 - 1000 Km/h</li>
-     * <li>4 - 1 Km/s</li>
-     * <li>5 - 10 Km/s</li>
-     * <li>6 - 100 Km/s</li>
-     * <li>7 - 1000 Km/s</li>
-     * <li>8 - 0.01 c</li>
-     * <li>9 - 0.1 c</li>
-     * <li>10 - 0.5 c</li>
-     * <li>11 - 0.8 c</li>
-     * <li>12 - 0.9 c</li>
-     * <li>13 - 0.99 c</li>
-     * <li>14 - 0.99999 c</li>
-     * <li>15 - 1 c</li>
-     * <li>16 - 2 c</li>
-     * <li>17 - 10 c</li>
-     * <li>18 - 1e3 c</li>
-     * <li>19 - 1 AU/s</li>
-     * <li>20 - 10 AU/s</li>
-     * <li>21 - 1000 AU/s</li>
-     * <li>22 - 10000 AU/s</li>
-     * <li>23 - 1 pc/s</li>
-     * <li>24 - 2 pc/s</li>
-     * <li>25 - 10 pc/s</li>
-     * <li>26 - 1000 pc/s</li>
-     * <li>27 - unlimited</li>
-     * </ul>
+     * Set the maximum speed of the camera as an index pointing to a pre-set value. The index corresponds
+     * to one of the following values:
+     * <ol start="0">
+     * <li>1 Km/h</li>
+     * <li>10 Km/h</li>
+     * <li>100 Km/h</li>
+     * <li>1000 Km/h</li>
+     * <li>1 Km/s</li>
+     * <li>10 Km/s</li>
+     * <li>100 Km/s</li>
+     * <li>1000 Km/s</li>
+     * <li>0.01 c</li>
+     * <li>0.1 c</li>
+     * <li>0.5 c</li>
+     * <li>0.8 c</li>
+     * <li>0.9 c</li>
+     * <li>0.99 c</li>
+     * <li>0.99999 c</li>
+     * <li>1 c</li>
+     * <li>2 c</li>
+     * <li>10 c</li>
+     * <li>1e3 c</li>
+     * <li>1 AU/s</li>
+     * <li>10 AU/s</li>
+     * <li>1000 AU/s</li>
+     * <li>10000 AU/s</li>
+     * <li>1 pc/s</li>
+     * <li>2 pc/s</li>
+     * <li>10 pc/s</li>
+     * <li>1000 pc/s</li>
+     * <li>unlimited</li>
+     * </ol>
      *
-     * @param index The index of the top speed.
+     * @param index The index of the maximum speed setting.
      */
     void setCameraSpeedLimit(int index);
 
@@ -886,8 +886,8 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param name The name of the object to get the screen coordinates for.
      *
      * @return An array with the x and y screen coordinates, in pixels, with the origin at the bottom-left. If the
-     * object with the given name does not exist, or it falls
-     * off-screen, it returns null.
+     *         object with the given name does not exist, or it falls
+     *         off-screen, it returns null.
      */
     double[] getObjectScreenCoordinates(String name);
 
@@ -1134,15 +1134,15 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * Returns the current UTC simulation time in an array.
      *
      * @return The current simulation time in an array with the given indices.
-     * <ul>
-     * <li>0 - The year.</li>
-     * <li>1 - The month, from 1 (January) to 12 (December).</li>
-     * <li>2 - The day-of-month, from 1 to 31.</li>
-     * <li>3 - The hour-of-day, from 0 to 23.</li>
-     * <li>4 - The minute-of-hour, from 0 to 59.</li>
-     * <li>5 - The second-of-minute, from 0 to 59.</li>
-     * <li>6 - The millisecond-of-second, from 0 to 999.</li>
-     * </ul>
+     *         <ul>
+     *         <li>0 - The year.</li>
+     *         <li>1 - The month, from 1 (January) to 12 (December).</li>
+     *         <li>2 - The day-of-month, from 1 to 31.</li>
+     *         <li>3 - The hour-of-day, from 0 to 23.</li>
+     *         <li>4 - The minute-of-hour, from 0 to 59.</li>
+     *         <li>5 - The second-of-minute, from 0 to 59.</li>
+     *         <li>6 - The millisecond-of-second, from 0 to 999.</li>
+     *         </ul>
      */
     int[] getSimulationTimeArr();
 
@@ -1173,10 +1173,10 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * Sets the simulation time warp factor. Positive values make time advance forward, while negative values make time
      * run backwards. A warp factor of 1 sets a real time pace to the simulation time.
      *
-     * @param warpFactor The warp as a factor. A value of 2.0 sets the
-     *                   Gaia Sky time to be twice as fast as real world time.
+     * @param warp The warp as a factor. A value of 2.0 sets the
+     *             Gaia Sky time to be twice as fast as real world time.
      */
-    void setTimeWarp(double warpFactor);
+    void setTimeWarp(double warp);
 
     /**
      * Sets a time bookmark in the global clock that, when reached, the clock
@@ -1558,7 +1558,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param name The name or id (HIP, TYC, Gaia SourceId) of the object.
      *
      * @return The object as a {@link gaiasky.scene.view.FocusView}, or null
-     * if it does not exist.
+     *         if it does not exist.
      */
     FocusView getObject(String name);
 
@@ -1571,7 +1571,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *                       If negative, it waits indefinitely.
      *
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
-     * the timeout has passed.
+     *         the timeout has passed.
      */
     FocusView getObject(String name,
                         double timeoutSeconds);
@@ -1582,7 +1582,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param name The name of the line object.
      *
      * @return The line object as a {@link gaiasky.scene.view.VertsView}, or null
-     * if it does not exist.
+     *         if it does not exist.
      */
     VertsView getLineObject(String name);
 
@@ -1594,7 +1594,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *                       If negative, it waits indefinitely.
      *
      * @return The line object as a {@link gaiasky.scene.view.VertsView}, or null
-     * if it does not exist.
+     *         if it does not exist.
      */
     VertsView getLineObject(String name,
                             double timeoutSeconds);
@@ -1659,14 +1659,13 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void forceUpdateScene();
 
     /**
-     * Gets the size of the object identified by <code>name</code>, in Km, by
-     * name or id (HIP, TYC, sourceId).
+     * Gets the size of the object identified by <code>name</code>, in kilometres.
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      *
-     * @return The radius of the object in Km. If the object identified by name
-     * or id (HIP, TYC, sourceId). does not exist, it returns a negative
-     * value.
+     * @return The radius of the object in kilometres. If the object identified by name
+     *         or id (HIP, TYC, sourceId) does not exist, it returns a negative
+     *         value.
      */
     double getObjectRadius(String name);
 
@@ -1823,7 +1822,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      *
      * @return The distance to the object in km if it exists, a negative value
-     * otherwise.
+     *         otherwise.
      */
     double getDistanceTo(String name);
 
@@ -1834,8 +1833,8 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param starId The star identifier or name.
      *
      * @return An array with (ra [deg], dec [deg], parallax [mas], pmra [mas/yr], pmdec [mas/yr], radvel [km/s], appmag
-     * [mag], red [0,1], green [0,1], blue [0,1]) if the
-     * star exists and is loaded, null otherwise.
+     *         [mag], red [0,1], green [0,1], blue [0,1]) if the
+     *         star exists and is loaded, null otherwise.
      */
     double[] getStarParameters(String starId);
 
@@ -2286,8 +2285,8 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param name The name of the gui element.
      *
      * @return A vector of floats with the position (0, 1) of the bottom left
-     * corner in pixels from the bottom-left of the screen and the size
-     * (2, 3) in pixels of the element.
+     *         corner in pixels from the bottom-left of the screen and the size
+     *         (2, 3) in pixels of the element.
      */
     float[] getPositionAndSizeGui(String name);
 
@@ -2769,7 +2768,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param r The distance in Km.
      *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
-     * internal reference system, in internal units.
+     *         internal reference system, in internal units.
      */
     double[] galacticToInternalCartesian(double l,
                                          double b,
@@ -2784,7 +2783,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param r The distance in Km.
      *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
-     * internal reference system, in internal units.
+     *         internal reference system, in internal units.
      */
     double[] eclipticToInternalCartesian(double l,
                                          double b,
@@ -2799,7 +2798,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param r   The distance in Km.
      *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
-     * internal reference system, in internal units.
+     *         internal reference system, in internal units.
      */
     double[] equatorialToInternalCartesian(double ra,
                                            double dec,
@@ -2814,9 +2813,9 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param z The z component, in any distance units.
      *
      * @return An array of doubles containing <code>[ra, dec, distance]</code>
-     * with <code>ra</code> and <code>dec</code> in degrees and
-     * <code>distance</code> in the same distance units as the input
-     * position.
+     *         with <code>ra</code> and <code>dec</code> in degrees and
+     *         <code>distance</code> in the same distance units as the input
+     *         position.
      */
     double[] internalCartesianToEquatorial(double x,
                                            double y,
@@ -3305,7 +3304,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync   Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadDataset(final String dsName,
                         final String path,
@@ -3333,7 +3332,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync    Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadDataset(final String dsName,
                         final String path,
@@ -3355,7 +3354,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync   Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -3377,7 +3376,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -3400,7 +3399,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -3428,7 +3427,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName,
                             String path,
@@ -3460,7 +3459,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName,
                                 String path,
@@ -3498,7 +3497,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName,
                                 String path,
@@ -3539,7 +3538,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync               Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadParticleDataset(String dsName,
                                 String path,
@@ -3575,7 +3574,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -3605,7 +3604,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -3638,7 +3637,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -3671,7 +3670,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadStarClusterDataset(String dsName,
                                    String path,
@@ -3708,7 +3707,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
-     * <code>sync</code> is false.
+     *         <code>sync</code> is false.
      */
     boolean loadVariableStarDataset(String dsName,
                                     String path,

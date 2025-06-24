@@ -8,6 +8,7 @@
 package gaiasky.script.v2.impl;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -44,6 +45,9 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     private final Set<AtomicBoolean> stops;
     /** Internal camera transition sequence number. **/
     private int cTransSeq = 0;
+
+    /** Axuiliary vector. **/
+    private final Vector3Q aux3b1 = new Vector3Q();
 
     /** The interactive camera module, to manipulate the camera in interactive mode. **/
     public InteractiveCameraModule interactive;
@@ -202,6 +206,22 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
+    public boolean wait_focus(String name, long timeoutMs) {
+        long iniTime = TimeUtils.millis();
+        NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
+        while (cam.focus == null || !cam.focus.getName().equalsIgnoreCase(name)) {
+            api.base.sleep_frames(1);
+            long spent = TimeUtils.millis() - iniTime;
+            if (timeoutMs > 0 && spent > timeoutMs) {
+                // Timeout!
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Override
     public void set_focus_lock(final boolean lock) {
         api.base.post_runnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, lock));
     }
@@ -219,7 +239,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void cameraCenter() {
+    public void center() {
         api.base.post_runnable(() -> em.post(Event.CAMERA_CENTER, this));
     }
 
@@ -427,6 +447,10 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         set_up(up, false);
     }
 
+    public void set_up(final List<?> up) {
+        set_up(api.dArray(up));
+    }
+
     @Override
     public void set_state(double[] pos, double[] dir, double[] up) {
         api.base.post_runnable(() -> {
@@ -477,10 +501,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         QuaternionDouble q = new QuaternionDouble();
         q.setFromCamera(cam.getDirection(), cam.getUp());
         return q.values();
-    }
-
-    public void set_up(final List<?> up) {
-        set_up(api.dArray(up));
     }
 
     @Override
@@ -569,48 +589,48 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void go_to_object_smooth(String name, double positionDurationSeconds, double orientationDurationSeconds) {
-        go_to_object_smooth(name, positionDurationSeconds, orientationDurationSeconds, true);
+    public void go_to_object(String name, double positionDurationSeconds, double orientationDurationSeconds) {
+        go_to_object(name, positionDurationSeconds, orientationDurationSeconds, true);
     }
 
     @Override
-    public void go_to_object_smooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds) {
-        go_to_object_smooth(name, solidAngle, positionDurationSeconds, orientationDurationSeconds, true);
+    public void go_to_object(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds) {
+        go_to_object(name, solidAngle, positionDurationSeconds, orientationDurationSeconds, true);
     }
 
     @Override
-    public void go_to_object_smooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
-        go_to_object_smooth(name, -1.0, positionDurationSeconds, orientationDurationSeconds, true);
+    public void go_to_object(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
+        go_to_object(name, -1.0, positionDurationSeconds, orientationDurationSeconds, true);
     }
 
     @Override
-    public void go_to_object_smooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
+    public void go_to_object(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
         if (api.validator.checkString(name, "name") && api.validator.checkObjectName(name)) {
             Entity focus = scene.findFocus(name);
-            go_to_object_smooth(focus, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync);
+            go_to_object(focus, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync);
         } else {
             logger.error("Could not find position of " + name);
         }
     }
 
-    public void go_to_object_smooth(Entity object, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
-        go_to_object_smooth(object, -1.0, positionDurationSeconds, orientationDurationSeconds, sync);
+    public void go_to_object(Entity object, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
+        go_to_object(object, -1.0, positionDurationSeconds, orientationDurationSeconds, sync);
     }
 
-    public void go_to_object_smooth(Entity object,
-                                    double solidAngle,
-                                    double positionDurationSeconds,
-                                    double orientationDurationSeconds,
-                                    boolean sync) {
-        go_to_object_smooth(object, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync, null);
+    public void go_to_object(Entity object,
+                             double solidAngle,
+                             double positionDurationSeconds,
+                             double orientationDurationSeconds,
+                             boolean sync) {
+        go_to_object(object, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync, null);
     }
 
-    public void go_to_object_smooth(Entity object,
-                                    double solidAngle,
-                                    double positionDurationSeconds,
-                                    double orientationDurationSeconds,
-                                    boolean sync,
-                                    AtomicBoolean stop) {
+    public void go_to_object(Entity object,
+                             double solidAngle,
+                             double positionDurationSeconds,
+                             double orientationDurationSeconds,
+                             boolean sync,
+                             AtomicBoolean stop) {
         focusView.setEntity(object);
         // Get focus radius.
         var radius = focusView.getRadius();
@@ -669,9 +689,27 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         }
     }
 
+    @Override
+    public double get_distance_to_object(String name) {
+        if (api.validator.checkObjectName(name)) {
+            Entity entity = api.scene.get_entity(name);
+            if (Mapper.focus.has(entity)) {
+                focusView.setEntity(entity);
+                focusView.getFocus(name);
+                if (focusView.getSet() != null) {
+                    var pos = focusView.getAbsolutePosition(name, aux3b1);
+                    return pos.sub(GaiaSky.instance.getICamera().getPos()).lenDouble() * Constants.U_TO_KM;
+                } else {
+                    return (focusView.getDistToCamera() - focusView.getRadius()) * Constants.U_TO_KM;
+                }
+            }
+        }
+
+        return -1;
+    }
 
     @Override
-    public void set_speed_limit(int index) {
+    public void set_max_speed(int index) {
         if (api.validator.checkNum(index, 0, 21, "index")) api.base.post_runnable(() -> em.post(Event.SPEED_LIMIT_CMD, this, index));
     }
 
@@ -705,15 +743,15 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void setFov(final float newFov) {
+    public void set_fov(final float newFov) {
         if (!SlaveManager.projectionActive()) {
             if (api.validator.checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
                 api.base.post_runnable(() -> em.post(Event.FOV_CHANGED_CMD, this, newFov));
         }
     }
 
-    public void setFov(final int newFov) {
-        setFov((float) newFov);
+    public void set_fov(final int newFov) {
+        set_fov((float) newFov);
     }
 
     @Override

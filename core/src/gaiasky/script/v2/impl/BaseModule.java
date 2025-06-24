@@ -11,6 +11,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.script.v2.api.BaseAPI;
+import gaiasky.util.Settings;
 import gaiasky.util.camera.rec.Camcorder;
 import net.jafama.FastMath;
 
@@ -28,6 +29,21 @@ public class BaseModule extends APIModule implements BaseAPI {
      */
     public BaseModule(EventManager em, APIv2 api, String name) {
         super(em, api, name);
+    }
+
+    @Override
+    public String get_version() {
+        return Settings.settings.version.version + '\n' + Settings.settings.version.build + '\n' + Settings.settings.version.system + '\n' + Settings.settings.version.builder + '\n' + Settings.settings.version.buildTime;
+    }
+
+    @Override
+    public String get_version_number() {
+        return Settings.settings.version.version;
+    }
+
+    @Override
+    public String get_build_string() {
+        return Settings.settings.version.build;
     }
 
     @Override

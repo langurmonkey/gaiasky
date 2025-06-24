@@ -15,6 +15,27 @@ import gaiasky.script.v2.impl.BaseModule;
  */
 public interface BaseAPI {
     /**
+     * Return a string with the version number, the build string, the system, the builder, and the build time.
+     *
+     * @return A string with the full version information.
+     */
+    String get_version();
+
+    /**
+     * Return the version number string.
+     *
+     * @return The version number string.
+     */
+    String get_version_number();
+
+    /**
+     * Return the build string.
+     *
+     * @return The build string.
+     */
+    String get_build_string();
+
+    /**
      * Sleep for the given number of seconds in the application time (FPS), so
      * if we are capturing frames and the frame rate is set to 30 FPS, the
      * command sleep(1) will put the script to sleep for 30 frames.
@@ -75,7 +96,7 @@ public interface BaseAPI {
      * @param id       The string id to identify the runnable.
      * @param runnable The camera update runnable to park.
      */
-     void park_camera_runnable(String id, Runnable runnable);
+    void park_camera_runnable(String id, Runnable runnable);
 
     /**
      * Remove the runnable with the given id, if any. Use this method to remove previously parked scene and camera
@@ -83,5 +104,5 @@ public interface BaseAPI {
      *
      * @param id The id of the runnable to remove.
      */
-     void remove_runnable(String id);
+    void remove_runnable(String id);
 }

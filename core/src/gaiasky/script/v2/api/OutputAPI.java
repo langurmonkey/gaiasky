@@ -17,6 +17,94 @@ import gaiasky.script.v2.impl.OutputModule;
  */
 public interface OutputAPI {
     /**
+     * Configures the screenshot system, setting the resolution of the images,
+     * the output directory and the image name prefix.
+     *
+     * @param width      Width of images.
+     * @param height     Height of images.
+     * @param directory  The output directory path.
+     * @param namePrefix The file name prefix.
+     */
+    void configure_screenshots(int width,
+                               int height,
+                               String directory,
+                               String namePrefix);
+
+    /**
+     * Set the screenshot mode. Possible values are <code>simple</code> and <code>advanced</code>.
+     * <p>
+     * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
+     * resolution and containing the UI elements.
+     * The <b>advanced</b> mode redraws the last frame using the resolution configured using
+     * {@link #configure_screenshots(int, int, String, String)} and
+     * it does not draw the UI.
+     *
+     * @param screenshotMode The screenshot mode. <code>simple</code> or <code>advanced</code>.
+     */
+    void screenshot_mode(String screenshotMode);
+
+    /**
+     * Take a screenshot of the current frame and saves it to the configured
+     * location (see {@link #configure_screenshots(int, int, String, String)}).
+     */
+    void screenshot();
+
+    /**
+     * Configure the frame output system, setting the resolution of the images,
+     * the target frames per second, the output directory and the image name
+     * prefix. This function sets the frame output mode to 'advanced'.
+     *
+     * @param width      Width of images.
+     * @param height     Height of images.
+     * @param fps        Target frames per second (number of images per second).
+     * @param directory  The output directory path.
+     * @param namePrefix The file name prefix.
+     */
+    void configure_frame_output(int width,
+                                int height,
+                                int fps,
+                                String directory,
+                                String namePrefix);
+
+    /**
+     * Configure the frame output system, setting the resolution of the images,
+     * the target frames per second, the output directory and the image name
+     * prefix. This function sets the frame output mode to 'advanced'.
+     *
+     * @param width      Width of images.
+     * @param height     Height of images.
+     * @param fps        Target frames per second (number of images per second).
+     * @param directory  The output directory path.
+     * @param namePrefix The file name prefix.
+     */
+    void configure_frame_output(int width,
+                                int height,
+                                double fps,
+                                String directory,
+                                String namePrefix);
+
+    /**
+     * Set the frame output mode. Possible values are <code>simple</code> and <code>advanced</code>.
+     * <p>
+     * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
+     * resolution and containing the UI elements.
+     * The <b>advanced</b> mode redraws the last frame using the resolution configured using
+     * {@link #configure_frame_output(int, int, int, String, String)} and
+     * it does not draw the UI.
+     *
+     * @param screenshotMode The screenshot mode. <code>simple</code> or <code>advanced</code>.
+     */
+    void frame_output_mode(String screenshotMode);
+
+    /**
+     * Activate or deactivate the frame output system. If called with true,
+     * the system starts outputting images right away.
+     *
+     * @param active Whether to activate or deactivate the frame output system.
+     */
+    void frame_output(boolean active);
+
+    /**
      * Check whether the frame output system is currently on (i.e. frames are being saved to disk).
      *
      * @return True if the render output is active.

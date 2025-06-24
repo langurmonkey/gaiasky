@@ -9,30 +9,21 @@ package gaiasky.script;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.SceneJsonLoader;
 import gaiasky.data.StarClusterLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
-import gaiasky.data.orientation.QuaternionNlerpOrientationServer;
-import gaiasky.data.orientation.QuaternionSlerpOrientationServer;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.EventManager.TimeFrame;
 import gaiasky.event.IObserver;
-import gaiasky.gui.api.IGui;
 import gaiasky.gui.beans.OrientationComboBoxBean.ShapeOrientation;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
@@ -50,7 +41,6 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.NaturalCamera;
-import gaiasky.scene.component.AttitudeComponent;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.SetUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
@@ -63,16 +53,15 @@ import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ReprojectionMode;
-import gaiasky.util.Settings.ScreenshotSettings;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.coord.*;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.IPythonCoordinatesProvider;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.screenshot.ImageRenderer;
-import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 import uk.ac.starlink.util.DataSource;
@@ -87,7 +76,6 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -184,97 +172,76 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void activateRealTimeFrame() {
-        postRunnable(() -> em.post(Event.EVENT_TIME_FRAME_CMD, this, TimeFrame.REAL_TIME));
+        apiv2.time.activate_real_time_frame();
     }
 
     @Override
     public void activateSimulationTimeFrame() {
-        postRunnable(() -> em.post(Event.EVENT_TIME_FRAME_CMD, this, TimeFrame.SIMULATION_TIME));
+        apiv2.time.activate_simulation_time_frame();
     }
 
     @Override
     public void displayPopupNotification(String message) {
-        if (checkString(message, "message")) {
-            em.post(Event.POST_POPUP_NOTIFICATION, this, message);
-        }
+        apiv2.ui.display_popup_notification(message);
     }
 
     @Override
     public void displayPopupNotification(String message, float duration) {
-        if (checkString(message, "message")) {
-            em.post(Event.POST_POPUP_NOTIFICATION, this, message, duration);
-        }
+        apiv2.ui.display_popup_notification(message, duration);
     }
 
     public void displayPopupNotification(String message, Double duration) {
-        displayPopupNotification(message, duration.floatValue());
+        apiv2.ui.display_popup_notification(message, duration);
     }
 
     @Override
     public void setHeadlineMessage(final String headline) {
-        postRunnable(() -> em.post(Event.POST_HEADLINE_MESSAGE, this, headline));
+        apiv2.ui.set_headline_message(headline);
     }
 
     @Override
     public void setSubheadMessage(final String subhead) {
-        postRunnable(() -> em.post(Event.POST_SUBHEAD_MESSAGE, this, subhead));
+        apiv2.ui.set_subhead_message(subhead);
     }
 
     @Override
     public void clearHeadlineMessage() {
-        postRunnable(() -> em.post(Event.CLEAR_HEADLINE_MESSAGE, this));
+        apiv2.ui.clear_headline_message();
     }
 
     @Override
     public void clearSubheadMessage() {
-        postRunnable(() -> em.post(Event.CLEAR_SUBHEAD_MESSAGE, this));
+        apiv2.ui.clear_subhead_message();
     }
 
     @Override
     public void clearAllMessages() {
-        postRunnable(() -> em.post(Event.CLEAR_MESSAGES, this));
+        apiv2.ui.clear_all_messages();
     }
 
     @Override
     public void disableInput() {
-        postRunnable(() -> em.post(Event.INPUT_ENABLED_CMD, this, false));
+        apiv2.input.disable();
     }
 
     @Override
     public void enableInput() {
-        postRunnable(() -> em.post(Event.INPUT_ENABLED_CMD, this, true));
+        apiv2.input.enable();
     }
 
     @Override
     public void setCinematicCamera(boolean cinematic) {
-        postRunnable(() -> em.post(Event.CAMERA_CINEMATIC_CMD, this, cinematic));
+        apiv2.camera.interactive.set_cinematic(cinematic);
     }
 
     @Override
     public void setCameraFocus(final String focusName) {
-        setCameraFocus(focusName, 0.0f);
+        apiv2.camera.focus_mode(focusName);
     }
 
     @Override
     public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
-        if (checkString(focusName, "focusName") && checkFocusName(focusName)) {
-            Entity entity = getEntity(focusName);
-            setCameraFocus(entity, waitTimeSeconds);
-        }
-    }
-
-    public void setCameraFocus(final Entity entity, final float waitTimeSeconds) {
-        if (checkNotNull(entity, "Entity is null")) {
-            synchronized (focusView) {
-                focusView.setEntity(entity);
-                if (Mapper.focus.has(entity)) {
-                    NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
-                    changeFocus(focusView, cam, waitTimeSeconds);
-                } else {
-                    logger.error("Object can't be set as focus: " + focusView.getName());
-                }
-            }
-        }
+        apiv2.camera.focus_mode(focusName, waitTimeSeconds);
     }
 
     public void setCameraFocus(final String focusName, final int waitTimeSeconds) {
@@ -283,1394 +250,858 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public void setCameraFocusInstant(final String focusName) {
-        if (checkString(focusName, "focusName")) {
-            Entity entity = getEntity(focusName);
-            if (Mapper.focus.has(entity)) {
-                synchronized (focusView) {
-                    focusView.setEntity(entity);
-                    focusView.getFocus(focusName);
-                    em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
-                    em.post(Event.FOCUS_CHANGE_CMD, this, focusView.getEntity());
-                }
-
-                postRunnable(() -> {
-                    // Instantly set the camera direction to look towards the focus
-                    Vector3Q camPos = GaiaSky.instance.cameraManager.getPos();
-                    Vector3Q dir = new Vector3Q();
-                    synchronized (focusView) {
-                        focusView.setEntity(entity);
-                        focusView.getAbsolutePosition(dir).sub(camPos);
-                    }
-                    em.post(Event.CAMERA_DIR_CMD, this, (Object) dir.nor().valuesD());
-                });
-                // Make sure the last action is flushed
-                sleepFrames(2);
-            } else {
-                logger.error("FOCUS_MODE object does not exist: " + focusName);
-            }
-        }
+        apiv2.camera.focus_mode_instant(focusName);
     }
 
     @Override
     public void setCameraFocusInstantAndGo(final String focusName) {
-        setCameraFocusInstantAndGo(focusName, true);
+        apiv2.camera.focus_mode_instant_go(focusName);
     }
 
     public void setCameraFocusInstantAndGo(final String focusName, final boolean sleep) {
-        if (checkString(focusName, "focusName")) {
-            Entity entity = getEntity(focusName);
-            if (Mapper.focus.has(entity)) {
-                synchronized (focusView) {
-                    focusView.setEntity(entity);
-                    focusView.getFocus(focusName);
-                    em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
-                    em.post(Event.FOCUS_CHANGE_CMD, this, focusView.getEntity(), true);
-                    em.post(Event.GO_TO_OBJECT_CMD, this);
-                }
-                // Make sure the last action is flushed
-                if (sleep) sleepFrames(2);
-            }
-        }
+        apiv2.camera.focus_mode_instant_go(focusName, sleep);
     }
 
     @Override
     public void setCameraLock(final boolean lock) {
-        postRunnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, lock));
+        apiv2.camera.set_focus_lock(lock);
     }
 
     @Override
     public void setCameraCenterFocus(boolean centerFocus) {
-        postRunnable(() -> em.post(Event.CAMERA_CENTER_FOCUS_CMD, this, centerFocus));
+        apiv2.camera.center_focus(centerFocus);
     }
 
     @Override
     public void setCameraFree() {
-        postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE));
+        apiv2.camera.free_mode();
     }
 
     @Override
     public void setCameraPostion(final double[] vec) {
-        setCameraPosition(vec);
+        apiv2.camera.set_position(vec);
     }
 
     @Override
     public void setCameraPosition(double x, double y, double z) {
-        setCameraPosition(new double[]{x, y, z});
+        apiv2.camera.set_position(x, y, z);
     }
 
     @Override
     public void setCameraPosition(double x, double y, double z, String units) {
-        setCameraPosition(new double[]{x, y, z}, units);
+        apiv2.camera.set_position(x, y, z, units);
     }
 
     @Override
     public void setCameraPosition(double x, double y, double z, boolean immediate) {
-        setCameraPosition(new double[]{x, y, z}, immediate);
+        apiv2.camera.set_position(x, y, z, immediate);
     }
 
     @Override
     public void setCameraPosition(double x, double y, double z, String units, boolean immediate) {
-        setCameraPosition(new double[]{x, y, z}, units, immediate);
+        apiv2.camera.set_position(x, y, z, units, immediate);
     }
 
     public void setCameraPosition(final List<?> vec, boolean immediate) {
-        setCameraPosition(dArray(vec), immediate);
+        apiv2.camera.set_position(vec, immediate);
     }
 
     @Override
     public void setCameraPosition(double[] position, boolean immediate) {
-        setCameraPosition(position, "km", immediate);
+        apiv2.camera.set_position(position, immediate);
     }
 
     @Override
     public void setCameraPosition(double[] position, String units, boolean immediate) {
-        if (checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
-            if (immediate) {
-                cameraPositionEvent(position, u);
-            } else {
-                postRunnable(() -> cameraPositionEvent(position, u));
-            }
-        }
-
+        apiv2.camera.set_position(position, units, immediate);
     }
 
     public void setCameraPosition(List<Double> position, String units, boolean immediate) {
-        setCameraPosition(dArray(position), units, immediate);
-    }
-
-    private void cameraPositionEvent(double[] position, DistanceUnits units) {
-        // Convert to km
-        position[0] = units.toInternalUnits(position[0]);
-        position[1] = units.toInternalUnits(position[1]);
-        position[2] = units.toInternalUnits(position[2]);
-        // Send event
-        em.post(Event.CAMERA_POS_CMD, this, (Object) position);
+        apiv2.camera.set_position(position, units, immediate);
     }
 
     @Override
     public double[] getCameraPosition() {
-        return getCameraPosition("km");
+        return apiv2.camera.get_position();
     }
 
     @Override
     public double[] getCameraPosition(String units) {
-        if (checkDistanceUnits(units, "units")) {
-            var u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
-            Vector3D campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
-            return new double[]{u.fromInternalUnits(campos.x), u.fromInternalUnits(campos.y), u.fromInternalUnits(campos.z)};
-        }
-        return null;
+        return apiv2.camera.get_position(units);
     }
 
     @Override
     public void setCameraPosition(final double[] position) {
-        setCameraPosition(position, "km", false);
+        apiv2.camera.set_position(position);
     }
 
     @Override
     public void setCameraPosition(double[] position, String units) {
-        setCameraPosition(position, units, false);
+        apiv2.camera.set_position(position, units);
     }
 
     public void setCameraPosition(final List<?> vec) {
-        setCameraPosition(vec, "km");
+        apiv2.camera.set_position(vec);
     }
 
     public void setCameraPosition(final List<?> vec, String units) {
-        setCameraPosition(dArray(vec), units);
+        apiv2.camera.set_position(vec, units);
     }
 
     public void setCameraDirection(final List<?> dir, final boolean immediate) {
-        setCameraDirection(dArray(dir), immediate);
+        apiv2.camera.set_direction(dir, immediate);
     }
 
     @Override
     public void setCameraDirection(double[] direction, boolean immediate) {
-        if (checkLength(direction, 3, "direction")) {
-            if (immediate) {
-                cameraDirectionEvent(direction);
-            } else {
-                postRunnable(() -> cameraDirectionEvent(direction));
-            }
-        }
-    }
-
-    private void cameraDirectionEvent(final double[] direction) {
-        em.post(Event.CAMERA_DIR_CMD, this, (Object) direction);
+        apiv2.camera.set_direction(direction, immediate);
     }
 
     @Override
     public double[] getCameraDirection() {
-        Vector3D camDir = GaiaSky.instance.cameraManager.getDirection();
-        return new double[]{camDir.x, camDir.y, camDir.z};
+        return apiv2.camera.get_direction();
     }
 
     @Override
     public void setCameraDirection(final double[] direction) {
-        setCameraDirection(direction, false);
+        apiv2.camera.set_direction(direction);
     }
 
     @Override
     public void setCameraDirectionEquatorial(double alpha, double delta) {
-        if (checkNum(delta, -90.0, 90.0, "declination")) {
-            // Camera free.
-            setCameraFree();
-
-            // Direction.
-            aux3d1.set(FastMath.toRadians(alpha), FastMath.toRadians(delta), Constants.PC_TO_U);
-            var targetPoint = Coordinates.sphericalToCartesian(aux3d1, aux3d2);
-            var dir = targetPoint.sub(GaiaSky.instance.cameraManager.getPos()).nor();
-
-            // Up.
-            aux3d3.set(0, FastMath.PI / 2.0, Constants.PC_TO_U);
-            var targetUp = Coordinates.sphericalToCartesian(aux3d3, aux3d4).nor();
-            dir.put(aux3d5).crs(targetUp);
-            var up = aux3d5.crs(dir).nor();
-
-            cameraOrientationTransition(new double[]{dir.x, dir.y, dir.z}, new double[]{up.x, up.y, up.z}, 2.5, "logisticsigmoid", 0.2, false);
-        }
+        apiv2.camera.set_direction_equatorial(alpha, delta);
     }
 
     @Override
     public void setCameraDirectionGalactic(double l, double b) {
-        if (checkNum(b, -90.0, 90.0, "galactic latitude")) {
-            var eq = Coordinates.galacticToEquatorial(FastMath.toRadians(l), FastMath.toRadians(b), new Vector2D());
-            setCameraDirectionEquatorial(FastMath.toDegrees(eq.x), FastMath.toDegrees(eq.y));
-        }
+        apiv2.camera.set_direction_galactic(l, b);
     }
 
     public void setCameraDirection(final List<?> dir) {
-        setCameraDirection(dArray(dir));
+        apiv2.camera.set_direction(dir);
     }
 
     public void setCameraUp(final List<?> up, final boolean immediate) {
-        setCameraUp(dArray(up), immediate);
+        apiv2.camera.set_up(up, immediate);
     }
 
     @Override
     public void setCameraUp(final double[] up, final boolean immediate) {
-        if (checkLength(up, 3, "up")) {
-            if (immediate) {
-                cameraUpEvent(up);
-            } else {
-                postRunnable(() -> cameraUpEvent(up));
-            }
-        }
-    }
-
-    private void cameraUpEvent(final double[] up) {
-        em.post(Event.CAMERA_UP_CMD, this, (Object) up);
+        apiv2.camera.set_up(up, immediate);
     }
 
     @Override
     public double[] getCameraUp() {
-        Vector3D camUp = GaiaSky.instance.cameraManager.getUp();
-        return new double[]{camUp.x, camUp.y, camUp.z};
+        return apiv2.camera.get_up();
     }
 
     @Override
     public void setCameraUp(final double[] up) {
-        setCameraUp(up, false);
+        apiv2.camera.set_up(up);
+    }
+
+    public void setCameraUp(final List<?> up) {
+        apiv2.camera.set_up(up);
     }
 
     @Override
     public void setCameraOrientationQuaternion(double[] quaternion) {
-        if (checkLength(quaternion, 4, "quaternion")) {
-            QuaternionDouble q = new QuaternionDouble(quaternion[0], quaternion[1], quaternion[2], quaternion[3]);
-            var dir = aux3d1;
-            var up = aux3d2;
-            q.getDirection(dir);
-            q.getUp(up);
-
-            em.post(Event.CAMERA_DIR_CMD, this, (Object) dir.values());
-            em.post(Event.CAMERA_UP_CMD, this, (Object) up.values());
-        }
+        apiv2.camera.set_orientation_quaternion(quaternion);
     }
 
     public void setCameraOrientationQuaternion(List<?> quaternion) {
-        setCameraOrientationQuaternion(dArray(quaternion));
+        apiv2.camera.set_orientation_quaternion(quaternion);
     }
 
     @Override
     public double[] getCameraOrientationQuaternion() {
-        var cam = GaiaSky.instance.getICamera();
-        QuaternionDouble q = new QuaternionDouble();
-        q.setFromCamera(cam.getDirection(), cam.getUp());
-        return q.values();
+        return apiv2.camera.get_orientation_quaternion();
     }
 
-    public void setCameraUp(final List<?> up) {
-        setCameraUp(dArray(up));
+    public void pointAtSkyCoordinate(double ra, double dec) {
+        apiv2.camera.point_at_equatorial(ra, dec);
+    }
+
+    public void pointAtSkyCoordinate(long ra, long dec) {
+        apiv2.camera.point_at_equatorial(ra, dec);
     }
 
     @Override
     public void setCameraPositionAndFocus(String focus, String other, double rotation, double solidAngle) {
-        if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
-
-            if (scene.index().containsEntity(focus) && scene.index().containsEntity(other)) {
-                Entity focusObj, otherObj;
-                synchronized (focusView) {
-                    focusObj = scene.findFocus(focus);
-                    focusView.setEntity(focusObj);
-                    focusView.getFocus(focus);
-
-                    otherObj = scene.findFocus(other);
-                    focusView.setEntity(otherObj);
-                    focusView.getFocus(other);
-                }
-                setCameraPositionAndFocus(focusObj, otherObj, rotation, solidAngle);
-            }
-        }
+        apiv2.camera.set_position_and_focus(focus, other, rotation, solidAngle);
     }
 
     public void setCameraPositionAndFocus(String focus, String other, long rotation, long solidAngle) {
-        setCameraPositionAndFocus(focus, other, (double) rotation, (double) solidAngle);
+        apiv2.camera.set_position_and_focus(focus, other, rotation, solidAngle);
     }
 
-    public void pointAtSkyCoordinate(double ra, double dec) {
-        em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
-        em.post(Event.FREE_MODE_COORD_CMD, this, ra, dec);
-    }
-
-    public void pointAtSkyCoordinate(long ra, long dec) {
-        pointAtSkyCoordinate((double) ra, (double) dec);
-    }
-
-    private void setCameraPositionAndFocus(Entity focus, Entity other, double rotation, double solidAngle) {
-        if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
-
-            em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
-            em.post(Event.FOCUS_CHANGE_CMD, this, focus);
-
-            synchronized (focusView) {
-                focusView.setEntity(focus);
-                double radius = focusView.getRadius();
-                double dist = radius / FastMath.tan(Math.toRadians(solidAngle / 2)) + radius;
-
-                // Up to ecliptic north pole
-                Vector3D up = new Vector3D(0, 1, 0).mul(Coordinates.eclToEq());
-
-                Vector3Q focusPos = aux3b1;
-                focusView.getAbsolutePosition(focusPos);
-
-                focusView.setEntity(other);
-                Vector3Q otherPos = aux3b2;
-                focusView.getAbsolutePosition(otherPos);
-                focusView.clearEntity();
-
-                Vector3Q otherToFocus = aux3b3;
-                otherToFocus.set(focusPos).sub(otherPos).nor();
-                Vector3D focusToOther = aux3d4.set(otherToFocus);
-                focusToOther.scl(-dist).rotate(up, rotation);
-
-                // New camera position
-                Vector3D newCamPos = aux3d5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
-
-                // New camera direction
-                Vector3D newCamDir = aux3d6.set(focusToOther);
-                newCamDir.scl(-1).nor();
-
-                // Finally, set values
-                setCameraPosition(newCamPos.values());
-                setCameraDirection(newCamDir.values());
-                setCameraUp(up.values());
-            }
-        }
-    }
 
     @Override
     public double getCameraSpeed() {
-        return GaiaSky.instance.cameraManager.getSpeed();
+        return apiv2.camera.interactive.get_speed();
     }
 
     @Override
     public void setCameraSpeed(final float speed) {
-        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD,
-                                       this,
-                                       MathUtilsDouble.lint(speed,
-                                                            Constants.MIN_SLIDER,
-                                                            Constants.MAX_SLIDER,
-                                                            Constants.MIN_CAM_SPEED,
-                                                            Constants.MAX_CAM_SPEED),
-                                       false));
-        }
+        apiv2.camera.interactive.speed_setting(speed);
     }
 
     public void setCameraSpeed(final int speed) {
-        setCameraSpeed((float) speed);
+        apiv2.camera.interactive.speed_setting(speed);
     }
 
     @Override
     public void setCameraRotationSpeed(float speed) {
-        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD,
-                                       this,
-                                       MathUtilsDouble.lint(speed,
-                                                            Constants.MIN_SLIDER,
-                                                            Constants.MAX_SLIDER,
-                                                            Constants.MIN_ROT_SPEED,
-                                                            Constants.MAX_ROT_SPEED)));
-        }
+        apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
     public void setCameraRotationSpeed(final int speed) {
-        setRotationCameraSpeed((float) speed);
+        apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
     @Override
     public void setRotationCameraSpeed(final float speed) {
-        setCameraRotationSpeed(speed);
+        apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
     public void setRotationCameraSpeed(final int speed) {
-        setRotationCameraSpeed((float) speed);
+        apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
     @Override
     public void setCameraTurningSpeed(float speed) {
-        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.TURNING_SPEED_CMD,
-                                       this,
-                                       MathUtilsDouble.lint(speed,
-                                                            Constants.MIN_SLIDER,
-                                                            Constants.MAX_SLIDER,
-                                                            Constants.MIN_TURN_SPEED,
-                                                            Constants.MAX_TURN_SPEED),
-                                       false));
-        }
+        apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
     public void setCameraTurningSpeed(final int speed) {
-        setTurningCameraSpeed((float) speed);
+        apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
     @Override
     public void setTurningCameraSpeed(final float speed) {
-        setCameraTurningSpeed(speed);
-
+        apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
     public void setTurningCameraSpeed(final int speed) {
-        setTurningCameraSpeed((float) speed);
+        apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
     @Override
     public void setCameraSpeedLimit(int index) {
-        if (checkNum(index, 0, 21, "index")) postRunnable(() -> em.post(Event.SPEED_LIMIT_CMD, this, index));
+        apiv2.camera.set_max_speed(index);
     }
 
     @Override
     public void setCameraTrackingObject(String objectName) {
-        if (objectName == null) {
-            removeCameraTrackingObject();
-        } else if (checkFocusName(objectName)) {
-            synchronized (focusView) {
-                Entity trackingObject = getFocus(objectName);
-                em.post(Event.CAMERA_TRACKING_OBJECT_CMD, this, trackingObject, objectName);
-            }
-        } else {
-            removeCameraTrackingObject();
-        }
+        apiv2.camera.set_tracking_object(objectName);
     }
 
     @Override
     public void removeCameraTrackingObject() {
-        em.post(Event.CAMERA_TRACKING_OBJECT_CMD, this, null, null);
+        apiv2.camera.remove_tracking_object();
     }
 
     @Override
     public void setCameraOrientationLock(boolean lock) {
-        postRunnable(() -> em.post(Event.ORIENTATION_LOCK_CMD, this, lock));
+        apiv2.camera.set_orientation_lock(lock);
     }
 
     @Override
-    public void cameraForward(final double cameraForward) {
-        if (checkNum(cameraForward, -100d, 100d, "cameraForward")) postRunnable(() -> em.post(Event.CAMERA_FWD, this, cameraForward));
+    public void cameraForward(final double value) {
+        apiv2.camera.interactive.add_forward(value);
     }
 
     public void cameraForward(final long value) {
-        cameraForward((double) value);
+        apiv2.camera.interactive.add_forward(value);
     }
 
     @Override
     public void cameraRotate(final double deltaX, final double deltaY) {
-        if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY"))
-            postRunnable(() -> em.post(Event.CAMERA_ROTATE, this, deltaX, deltaY));
+        apiv2.camera.interactive.add_rotation(deltaX, deltaY);
     }
 
     public void cameraRotate(final double deltaX, final long deltaY) {
-        cameraRotate(deltaX, (double) deltaY);
+        apiv2.camera.interactive.add_rotation(deltaX, deltaY);
     }
 
     public void cameraRotate(final long deltaX, final double deltaY) {
-        cameraRotate((double) deltaX, deltaY);
+        apiv2.camera.interactive.add_rotation(deltaX, deltaY);
     }
 
     @Override
     public void cameraRoll(final double roll) {
-        if (checkNum(roll, -100d, 100d, "roll")) postRunnable(() -> em.post(Event.CAMERA_ROLL, this, roll));
+        apiv2.camera.interactive.add_roll(roll);
     }
 
     public void cameraRoll(final long roll) {
-        cameraRoll((double) roll);
+        apiv2.camera.interactive.add_roll(roll);
     }
 
     @Override
     public void cameraTurn(final double deltaX, final double deltaY) {
-        if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY")) {
-            postRunnable(() -> em.post(Event.CAMERA_TURN, this, deltaX, deltaY));
-        }
+        apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
     public void cameraTurn(final double deltaX, final long deltaY) {
-        cameraTurn(deltaX, (double) deltaY);
+        apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
     public void cameraTurn(final long deltaX, final double deltaY) {
-        cameraTurn((double) deltaX, deltaY);
+        apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
     public void cameraTurn(final long deltaX, final long deltaY) {
-        cameraTurn((double) deltaX, (double) deltaY);
+        apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
     @Override
     public void cameraYaw(final double amount) {
-        cameraTurn(amount, 0d);
+        apiv2.camera.interactive.add_yaw(amount);
     }
 
     public void cameraYaw(final long amount) {
-        cameraYaw((double) amount);
+        apiv2.camera.interactive.add_yaw(amount);
     }
 
     @Override
     public void cameraPitch(final double amount) {
-        cameraTurn(0d, amount);
+        apiv2.camera.interactive.add_pitch(amount);
     }
 
     public void cameraPitch(final long amount) {
-        cameraPitch((double) amount);
+        apiv2.camera.interactive.add_pitch(amount);
     }
 
     @Override
     public void cameraStop() {
-        postRunnable(() -> em.post(Event.CAMERA_STOP, this));
+        apiv2.camera.stop();
 
     }
 
     @Override
     public void cameraCenter() {
-        postRunnable(() -> em.post(Event.CAMERA_CENTER, this));
+        apiv2.camera.center();
     }
 
     @Override
     public IFocus getClosestObjectToCamera() {
-        return GaiaSky.instance.cameraManager.getClosestBody();
+        return apiv2.camera.get_closest_object();
     }
 
     @Override
     public void setFov(final float newFov) {
-        if (!SlaveManager.projectionActive()) {
-            if (checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov")) postRunnable(() -> em.post(Event.FOV_CHANGED_CMD, this, newFov));
-        }
+        apiv2.camera.set_fov(newFov);
     }
 
     public void setFov(final int newFov) {
-        setFov((float) newFov);
+        apiv2.camera.set_fov(newFov);
     }
 
     @Override
     public void setVisibility(final String key, final boolean visible) {
-        setComponentTypeVisibility(key, visible);
+        apiv2.scene.set_component_type_visibility(key, visible);
     }
 
     @Override
     public void setComponentTypeVisibility(String key, boolean visible) {
-        if (checkCtKeyNull(key)) {
-            logger.error("Element '" + key + "' does not exist. Possible values are:");
-            ComponentType[] cts = ComponentType.values();
-            for (ComponentType ct : cts)
-                logger.error(ct.key);
-        } else {
-            postRunnable(() -> em.post(Event.TOGGLE_VISIBILITY_CMD, this, key, visible));
-        }
+        apiv2.scene.set_component_type_visibility(key, visible);
     }
 
     @Override
     public boolean getComponentTypeVisibility(String key) {
-        if (checkCtKeyNull(key)) {
-            logger.error("Element '" + key + "' does not exist. Possible values are:");
-            ComponentType[] cts = ComponentType.values();
-            for (ComponentType ct : cts)
-                logger.error(ct.key);
-            return false;
-        } else {
-            ComponentType ct = ComponentType.getFromKey(key);
-            return Settings.settings.scene.visibility.get(ct.key);
-        }
+        return apiv2.scene.get_component_type_visibility(key);
     }
 
     @Override
     public double[] getObjectScreenCoordinates(String name) {
-        if (checkObjectName(name)) {
-            var entity = getEntity(name);
-            var camera = GaiaSky.instance.cameraManager;
-            Vector3 posFloat = new Vector3();
-            Vector3D posDouble = new Vector3D();
-            Vector3Q posPrec = new Vector3Q();
-            synchronized (focusView) {
-                focusView.setEntity(entity);
-                focusView.getAbsolutePosition(name, posPrec);
-                posPrec.add(camera.getInversePos());
-                posPrec.put(posFloat);
-                posPrec.put(posDouble);
-                if (camera.getCamera().direction.dot(posFloat) > 0) {
-                    camera.getCamera().project(posFloat);
-                    if (posFloat.x < 0 || posFloat.x > Gdx.graphics.getWidth() || posFloat.y < 0 || posFloat.y > Gdx.graphics.getHeight()) {
-                        // Off screen.
-                        return null;
-                    }
-                    return new double[]{posFloat.x, posFloat.y};
-                }
-            }
-        }
-        return null;
+        return apiv2.scene.get_object_screen_coordinates(name);
     }
 
     @Override
     public boolean setObjectVisibility(String name, boolean visible) {
-        if (checkObjectName(name)) {
-            Entity obj = getEntity(name);
-
-            postRunnable(() -> EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, name, visible));
-            return true;
-        }
-        return false;
+        return apiv2.scene.set_object_visibility(name, visible);
     }
 
     @Override
     public boolean getObjectVisibility(String name) {
-        if (checkObjectName(name)) {
-            Entity obj = getEntity(name);
-
-            boolean visible;
-            synchronized (focusView) {
-                focusView.setEntity(obj);
-                visible = focusView.isVisible(name.toLowerCase(Locale.ROOT).strip());
-            }
-            return visible;
-        }
-        return false;
-    }
-
-    private boolean setObjectQuaternionOrientation(String name, String file, boolean slerp) {
-        if (checkObjectName(name)) {
-            var entity = getObject(name);
-            if (Mapper.orientation.has(entity.getEntity())) {
-                var orientation = Mapper.orientation.get(entity.getEntity());
-
-                postRunnable(() -> {
-
-                    try {
-                        // Set new quaternion orientation.
-                        var quatOri = new AttitudeComponent();
-                        if (slerp) {
-                            quatOri.orientationServer = new QuaternionSlerpOrientationServer(file);
-                        } else {
-                            quatOri.orientationServer = new QuaternionNlerpOrientationServer(file);
-                        }
-                        orientation.attitudeComponent = quatOri;
-                    } catch (Exception e) {
-                        logger.error(e);
-                    } finally {
-                        // Remove rigid rotation, if it has one.
-                        if (orientation.rotationComponent != null) {
-                            orientation.rotationComponent = null;
-                        }
-                    }
-                });
-                return true;
-            }
-        }
-        return false;
-
+        return apiv2.scene.get_object_visibility(name);
     }
 
     @Override
     public boolean setObjectQuaternionSlerpOrientation(String name, String file) {
-        return setObjectQuaternionOrientation(name, file, true);
+        return apiv2.scene.set_object_quaternion_slerp_orientation(name, file);
     }
 
     @Override
     public boolean setObjectQuaternionNlerpOrientation(String name, String file) {
-        return setObjectQuaternionOrientation(name, file, false);
+        return apiv2.scene.set_object_quaternion_nlerp_orientation(name, file);
     }
 
     @Override
     public void setLabelSizeFactor(float factor) {
-        if (checkNum(factor, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, "labelSizeFactor")) {
-            postRunnable(() -> em.post(Event.LABEL_SIZE_CMD, this, factor));
-        }
+        apiv2.scene.set_label_size_factor(factor);
+    }
+
+    public void setLabelSizeFactor(int factor) {
+        apiv2.scene.set_label_size_factor(factor);
     }
 
     @Override
     public void setForceDisplayLabel(String name, boolean forceLabel) {
-        if (checkObjectName(name)) {
-            Entity obj = getEntity(name);
-            em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, name, forceLabel);
-        }
+        apiv2.scene.set_force_display_label(name, forceLabel);
     }
 
     @Override
     public void setLabelColor(String name, double[] color) {
-        if (checkObjectName(name)) {
-            Entity obj = getEntity(name);
-            em.post(Event.LABEL_COLOR_CMD, this, obj, name, GlobalResources.toFloatArray(color));
-        }
+        apiv2.scene.set_label_color(name, color);
     }
 
     public void setLabelColor(String name, final List<?> color) {
-        setLabelColor(name, dArray(color));
+        apiv2.scene.set_label_color(name, color);
     }
 
     @Override
     public boolean getForceDisplayLabel(String name) {
-        if (checkFocusName(name)) {
-            Entity obj = getEntity(name);
-
-            boolean ret;
-            synchronized (focusView) {
-                focusView.setEntity(obj);
-                ret = focusView.isForceLabel(name);
-            }
-            return ret;
-        }
-        return false;
-    }
-
-    public void setLabelSizeFactor(int factor) {
-        setLabelSizeFactor((float) factor);
+        return apiv2.scene.get_force_dispaly_label(name);
     }
 
     @Override
     public void setLineWidthFactor(final float factor) {
-        if (checkNum(factor, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, "lineWidthFactor")) {
-            postRunnable(() -> em.post(Event.LINE_WIDTH_CMD, this, factor));
-        }
+        apiv2.scene.set_line_width_factor(factor);
     }
 
     public void setLineWidthFactor(int factor) {
-        setLineWidthFactor((float) factor);
-    }
-
-    private boolean checkCtKeyNull(String key) {
-        ComponentType ct = ComponentType.getFromKey(key);
-        return ct == null;
+        apiv2.scene.set_line_width_factor(factor);
     }
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD,
-                                                this,
-                                                MathUtilsDouble.lint(factor,
-                                                                     Constants.MIN_SLIDER,
-                                                                     Constants.MAX_SLIDER,
-                                                                     Constants.MIN_PM_NUM_FACTOR,
-                                                                     Constants.MAX_PM_NUM_FACTOR)));
+        apiv2.scene.set_velocity_vectors_number_factor(factor);
+    }
+
+    public void setProperMotionsNumberFactor(int factor) {
+        apiv2.scene.set_velocity_vectors_number_factor(factor);
+    }
+
+    public void setUnfilteredProperMotionsNumberFactor(float factor) {
+        apiv2.scene.set_unfiltered_velocity_vectors_number_factor(factor);
     }
 
     @Override
     public void setProperMotionsColorMode(int mode) {
-        postRunnable(() -> EventManager.publish(Event.PM_COLOR_MODE_CMD, this, mode % 6));
+        apiv2.scene.set_velocity_vectors_color_mode(mode);
     }
 
     @Override
     public void setProperMotionsArrowheads(boolean arrowheadsEnabled) {
-        postRunnable(() -> EventManager.publish(Event.PM_ARROWHEADS_CMD, this, arrowheadsEnabled));
-    }
-
-    public void setProperMotionsNumberFactor(int factor) {
-        setProperMotionsNumberFactor((float) factor);
-    }
-
-    public void setUnfilteredProperMotionsNumberFactor(float factor) {
-        Settings.settings.scene.properMotion.number = factor;
+        apiv2.scene.set_velocity_vectors_arrowheads(arrowheadsEnabled);
     }
 
     @Override
     public void setProperMotionsLengthFactor(float factor) {
-        postRunnable(() -> EventManager.publish(Event.PM_LEN_FACTOR_CMD, this, factor));
+        apiv2.scene.set_velocity_vectors_length_factor(factor);
     }
 
     public void setProperMotionsLengthFactor(int factor) {
-        setProperMotionsLengthFactor((float) factor);
+        apiv2.scene.set_velocity_vectors_length_factor(factor);
     }
 
     @Override
     public long getProperMotionsMaxNumber() {
-        return Settings.settings.scene.star.group.numVelocityVector;
+        return apiv2.scene.get_velocity_vector_max_number();
     }
 
     @Override
     public void setProperMotionsMaxNumber(long maxNumber) {
-        Settings.settings.scene.star.group.numVelocityVector = (int) maxNumber;
+        apiv2.scene.set_velocity_vector_max_number(maxNumber);
     }
 
     @Override
     public void setCrosshairVisibility(boolean visible) {
-        setFocusCrosshairVisibility(visible);
-        setClosestCrosshairVisibility(visible);
-        setHomeCrosshairVisibility(visible);
+        apiv2.ui.set_crosshair_visibility(visible);
     }
 
     @Override
     public void setFocusCrosshairVisibility(boolean visible) {
-        postRunnable(() -> em.post(Event.CROSSHAIR_FOCUS_CMD, this, visible));
+        apiv2.ui.set_focus_crosshair_visibility(visible);
     }
 
     @Override
     public void setClosestCrosshairVisibility(boolean visible) {
-        postRunnable(() -> em.post(Event.CROSSHAIR_CLOSEST_CMD, this, visible));
+        apiv2.ui.set_closest_crosshair_visibility(visible);
     }
 
     @Override
     public void setHomeCrosshairVisibility(boolean visible) {
-        postRunnable(() -> em.post(Event.CROSSHAIR_HOME_CMD, this, visible));
+        apiv2.ui.set_home_crosshair_visibility(visible);
     }
 
     @Override
     public void setMinimapVisibility(boolean visible) {
-        postRunnable(() -> em.post(Event.MINIMAP_DISPLAY_CMD, this, visible));
+        apiv2.ui.set_minimap_visibility(visible);
     }
 
     @Override
-    public void setAmbientLight(final float ambientLight) {
-        if (checkNum(ambientLight, Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, "ambientLight"))
-            postRunnable(() -> em.post(Event.AMBIENT_LIGHT_CMD, this, ambientLight));
+    public void setAmbientLight(final float value) {
+        apiv2.graphics.set_ambient_light(value);
     }
 
     public void setAmbientLight(final int value) {
-        setAmbientLight((float) value);
+        apiv2.graphics.set_ambient_light(value);
     }
 
     @Override
     public void setSimulationTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
-        if (checkDateTime(year, month, day, hour, min, sec, millisec)) {
-            LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
-            em.post(Event.TIME_CHANGE_CMD, this, date.toInstant(ZoneOffset.UTC));
-        }
-    }
-
-    @Override
-    public long getSimulationTime() {
-        ITimeFrameProvider time = GaiaSky.instance.time;
-        return time.getTime().toEpochMilli();
+        apiv2.time.set_clock(year, month, day, hour, min, sec, millisec);
     }
 
     @Override
     public void setSimulationTime(final long time) {
-        if (checkNum(time, -Long.MAX_VALUE, Long.MAX_VALUE, "time")) em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
+        apiv2.time.set_clock(time);
+    }
+
+    @Override
+    public long getSimulationTime() {
+        return apiv2.time.get_clock();
     }
 
     @Override
     public int[] getSimulationTimeArr() {
-        ITimeFrameProvider time = GaiaSky.instance.time;
-        Instant instant = time.getTime();
-        LocalDateTime c = LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        int[] result = new int[7];
-        result[0] = c.get(ChronoField.YEAR_OF_ERA);
-        result[1] = c.getMonthValue();
-        result[2] = c.getDayOfMonth();
-        result[3] = c.getHour();
-        result[4] = c.getMinute();
-        result[5] = c.getSecond();
-        result[6] = c.get(ChronoField.MILLI_OF_SECOND);
-        return result;
+        return apiv2.time.get_clock_array();
     }
 
     @Override
     public void startSimulationTime() {
-        em.post(Event.TIME_STATE_CMD, this, true);
+        apiv2.time.start_clock();
     }
 
     @Override
     public void stopSimulationTime() {
-        em.post(Event.TIME_STATE_CMD, this, false);
+        apiv2.time.stop_clock();
     }
 
     @Override
     public boolean isSimulationTimeOn() {
-        return GaiaSky.instance.time.isTimeOn();
+        return apiv2.time.is_clock_on();
     }
 
     @Override
     public void setSimulationPace(final double warp) {
-        setTimeWarp(warp);
+        apiv2.time.set_time_warp(warp);
     }
 
     public void setSimulationPace(final long warp) {
-        setSimulationPace((double) warp);
+        apiv2.time.set_time_warp(warp);
     }
 
     @Override
-    public void setTimeWarp(final double warpFactor) {
-        em.post(Event.TIME_WARP_CMD, this, warpFactor);
+    public void setTimeWarp(final double warp) {
+        apiv2.time.set_time_warp(warp);
     }
 
     public void setTimeWarp(final long warp) {
-        setTimeWarp((double) warp);
+        apiv2.time.set_time_warp(warp);
     }
 
     @Override
     public void setTargetTime(long ms) {
-        em.post(Event.TARGET_TIME_CMD, this, Instant.ofEpochMilli(ms));
+        apiv2.time.set_target_time(ms);
     }
 
     @Override
     public void setTargetTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
-        if (checkDateTime(year, month, day, hour, min, sec, millisec)) {
-            em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
-        }
+        apiv2.time.set_target_time(year, month, day, hour, min, sec, millisec);
     }
 
     @Override
     public void unsetTargetTime() {
-        em.post(Event.TARGET_TIME_CMD, this);
+        apiv2.time.remove_target_time();
     }
 
     @Override
     public void setStarBrightnessPower(float power) {
-        if (checkFinite(power, "brightness-pow")) {
-            // Default to 1 in case of overflow to maintain compatibility.
-            if (power < Constants.MIN_STAR_BRIGHTNESS_POW || power > Constants.MAX_STAR_BRIGHTNESS_POW) {
-                power = 1.0f;
-            }
-            em.post(Event.STAR_BRIGHTNESS_POW_CMD, this, power);
-        }
+        apiv2.graphics.set_star_brightness_power(power);
     }
 
     @Override
     public void setStarGlowFactor(float glowFactor) {
-        if (checkNum(glowFactor, 0.001, 5, "glow-factor")) {
-            em.post(Event.STAR_GLOW_FACTOR_CMD, this, glowFactor);
-        }
+        apiv2.graphics.set_star_glow_factor(glowFactor);
     }
 
     @Override
     public float getStarBrightness() {
-        return (float) MathUtilsDouble.lint(Settings.settings.scene.star.brightness,
-                                            Constants.MIN_STAR_BRIGHTNESS,
-                                            Constants.MAX_STAR_BRIGHTNESS,
-                                            Constants.MIN_SLIDER,
-                                            Constants.MAX_SLIDER);
+        return apiv2.graphics.get_star_brightness();
     }
 
     @Override
     public void setStarBrightness(final float brightness) {
-        if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness")) em.post(Event.STAR_BRIGHTNESS_CMD,
-                                                                                                    this,
-                                                                                                    MathUtilsDouble.lint(brightness,
-                                                                                                                         Constants.MIN_SLIDER,
-                                                                                                                         Constants.MAX_SLIDER,
-                                                                                                                         Constants.MIN_STAR_BRIGHTNESS,
-                                                                                                                         Constants.MAX_STAR_BRIGHTNESS));
+        apiv2.graphics.set_star_brightness(brightness);
     }
 
     public void setStarBrightness(final int brightness) {
-        setStarBrightness((float) brightness);
+        apiv2.graphics.set_star_brightness(brightness);
     }
 
     @Override
     public float getPointSize() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize,
-                                    Constants.MIN_STAR_POINT_SIZE,
-                                    Constants.MAX_STAR_POINT_SIZE,
-                                    Constants.MIN_SLIDER,
-                                    Constants.MAX_SLIDER);
+        return apiv2.graphics.get_point_size();
     }
 
     @Override
     public float getStarSize() {
-        return getPointSize();
+        return apiv2.graphics.get_point_size();
     }
 
     @Override
     public void setPointSize(final float size) {
-        if (checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size")) em.post(Event.STAR_POINT_SIZE_CMD, this, size);
+        apiv2.graphics.set_point_size(size);
     }
 
     @Override
     public void setStarSize(final float size) {
-        setPointSize(size);
+        apiv2.graphics.set_point_size(size);
     }
 
     public void setStarSize(final int size) {
-        setStarSize((float) size);
+        apiv2.graphics.set_point_size(size);
     }
 
     @Override
     public float getStarBaseOpacity() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0],
-                                    Constants.MIN_STAR_MIN_OPACITY,
-                                    Constants.MAX_STAR_MIN_OPACITY,
-                                    Constants.MIN_SLIDER,
-                                    Constants.MAX_SLIDER);
+        return apiv2.graphics.get_star_base_opacity();
     }
 
     @Override
     public float getStarMinOpacity() {
-        return getStarBaseOpacity();
+        return apiv2.graphics.get_star_base_opacity();
     }
 
     @Override
     public void setStarBaseOpacity(float opacity) {
-        if (checkNum(opacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
-            EventManager.publish(Event.STAR_BASE_LEVEL_CMD, this, opacity);
+        apiv2.graphics.set_star_base_opacity(opacity);
     }
 
     @Override
     public void setStarMinOpacity(float minOpacity) {
-        setStarBaseOpacity(minOpacity);
+        apiv2.graphics.set_star_base_opacity(minOpacity);
     }
 
     public float getMinStarOpacity() {
-        return getStarMinOpacity();
+        return apiv2.graphics.get_star_base_opacity();
     }
 
     public void setMinStarOpacity(float minOpacity) {
-        setStarMinOpacity(minOpacity);
+        apiv2.graphics.set_star_base_opacity(minOpacity);
     }
 
     public void setMinStarOpacity(int opacity) {
-        setMinStarOpacity((float) opacity);
+        apiv2.graphics.set_star_base_opacity(opacity);
     }
 
     @Override
     public void setStarTextureIndex(int index) {
-        if (checkNum(index, 1, 4, "index")) {
-            EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, index);
-        }
+        apiv2.graphics.set_star_texture_index(index);
     }
 
     @Override
     public void setStarGroupNearestNumber(int n) {
-        if (checkNum(n, 1, 1000000, "nNearest")) {
-            EventManager.publish(Event.STAR_GROUP_NEAREST_CMD, this, n);
-        }
+        apiv2.graphics.set_star_set_metadata_size(n);
     }
 
     @Override
     public void setStarGroupBillboard(boolean flag) {
-        EventManager.publish(Event.STAR_GROUP_BILLBOARD_CMD, this, flag);
+        apiv2.graphics.set_star_set_billboard(flag);
     }
 
     @Override
     public void setOrbitSolidAngleThreshold(float angleDeg) {
-        if (checkNum(angleDeg, 0.0f, 180f, "solid-angle")) {
-            postRunnable(() -> EventManager.publish(Event.ORBIT_SOLID_ANGLE_TH_CMD, this, (double) angleDeg));
-        }
+        apiv2.graphics.set_orbit_solid_angle_threshold(angleDeg);
     }
 
     @Override
     public void setProjectionYaw(float yaw) {
-        if (SlaveManager.projectionActive()) {
-            postRunnable(() -> {
-                Settings.settings.program.net.slave.yaw = yaw;
-                SlaveManager.instance.yaw = yaw;
-            });
-        }
+        apiv2.instances.set_projection_yaw(yaw);
     }
 
     @Override
     public void setProjectionPitch(float pitch) {
-        if (SlaveManager.projectionActive()) {
-            postRunnable(() -> {
-                Settings.settings.program.net.slave.pitch = pitch;
-                SlaveManager.instance.pitch = pitch;
-            });
-        }
+        apiv2.instances.set_projection_pitch(pitch);
     }
 
     @Override
     public void setProjectionRoll(float roll) {
-        if (SlaveManager.projectionActive()) {
-            postRunnable(() -> {
-                Settings.settings.program.net.slave.roll = roll;
-                SlaveManager.instance.roll = roll;
-            });
-        }
+        apiv2.instances.set_projection_roll(roll);
     }
 
     @Override
-    public void setProjectionFov(float newFov) {
-        if (checkNum(newFov, Constants.MIN_FOV, 170f, "newFov")) postRunnable(() -> {
-            SlaveManager.instance.cameraFov = newFov;
-            em.post(Event.FOV_CHANGED_CMD, this, newFov);
-        });
+    public void setProjectionFov(float fov) {
+        apiv2.instances.set_projection_fov(fov);
     }
 
     @Override
     public void setLimitFps(double limitFps) {
-        if (checkNum(limitFps, -Double.MAX_VALUE, Constants.MAX_FPS, "limitFps")) {
-            em.post(Event.LIMIT_FPS_CMD, this, limitFps);
-        }
+        apiv2.graphics.set_limit_fps(limitFps);
     }
 
     @Override
     public void setLimitFps(int limitFps) {
-        setLimitFps((double) limitFps);
+        apiv2.graphics.set_limit_fps(limitFps);
     }
 
     @Override
     public void configureScreenshots(int width, int height, String directory, String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkString(directory,
-                                                                                                                              "directory") && checkDirectoryExists(
-                directory,
-                "directory") && checkString(namePrefix, "namePrefix")) {
-            em.post(Event.SCREENSHOT_CMD, this, width, height, directory);
-        }
+        apiv2.output.configure_screenshots(width, height, directory, namePrefix);
     }
 
     @Override
-    public void setScreenshotsMode(String screenshotMode) {
-        // Hack to keep compatibility with old scripts
-        if (screenshotMode != null && screenshotMode.equalsIgnoreCase("redraw")) {
-            screenshotMode = "ADVANCED";
-        }
-        if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode")) {
-            em.post(Event.SCREENSHOT_MODE_CMD, this, screenshotMode);
-            postRunnable(() -> em.post(Event.SCREENSHOT_SIZE_UPDATE,
-                                       this,
-                                       Settings.settings.screenshot.resolution[0],
-                                       Settings.settings.screenshot.resolution[1]));
-        }
+    public void setScreenshotsMode(String mode) {
+        apiv2.output.screenshot_mode(mode);
     }
 
     @Override
     public void saveScreenshot() {
-        ScreenshotSettings ss = Settings.settings.screenshot;
-        em.post(Event.SCREENSHOT_CMD, this, ss.resolution[0], ss.resolution[1], ss.location);
+        apiv2.output.screenshot();
     }
 
     @Override
     public void takeScreenshot() {
-        saveScreenshot();
+        apiv2.output.screenshot();
     }
 
     @Override
     public void configureFrameOutput(int width, int height, int fps, String directory, String namePrefix) {
-        configureFrameOutput(width, height, (double) fps, directory, namePrefix);
+        apiv2.output.configure_frame_output(width, height, fps, directory, namePrefix);
     }
 
     @Override
     public void configureFrameOutput(int width, int height, double fps, String directory, String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps,
-                                                                                                                           Constants.MIN_FPS,
-                                                                                                                           Constants.MAX_FPS,
-                                                                                                                           "FPS") && checkString(
-                directory,
-                "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
-            em.post(Event.FRAME_OUTPUT_MODE_CMD, this, Settings.ScreenshotMode.ADVANCED);
-            em.post(Event.CONFIG_FRAME_OUTPUT_CMD, this, width, height, fps, directory, namePrefix);
-        }
+        apiv2.output.configure_frame_output(width, height, fps, directory, namePrefix);
     }
 
     @Override
     public void configureRenderOutput(int width, int height, int fps, String directory, String namePrefix) {
-        configureFrameOutput(width, height, fps, directory, namePrefix);
+        apiv2.output.configure_frame_output(width, height, fps, directory, namePrefix);
     }
 
     @Override
-    public void setFrameOutputMode(String screenshotMode) {
-        // Hack to keep compatibility with old scripts
-        if (screenshotMode != null && screenshotMode.equalsIgnoreCase("redraw")) {
-            screenshotMode = "ADVANCED";
-        }
-        if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode"))
-            em.post(Event.FRAME_OUTPUT_MODE_CMD, this, screenshotMode);
+    public void setFrameOutputMode(String mode) {
+        apiv2.output.frame_output_mode(mode);
     }
 
     @Override
     public boolean isFrameOutputActive() {
-        return Settings.settings.frame.active;
+        return apiv2.output.is_frame_output_active();
     }
 
     @Override
     public boolean isRenderOutputActive() {
-        return isFrameOutputActive();
+        return apiv2.output.is_frame_output_active();
     }
 
     @Override
     public double getFrameOutputFps() {
-        return Settings.settings.frame.targetFps;
+        return apiv2.output.get_frame_output_fps();
     }
 
     @Override
     public double getRenderOutputFps() {
-        return getFrameOutputFps();
+        return apiv2.output.get_frame_output_fps();
     }
 
     @Override
     public void setFrameOutput(boolean active) {
-        em.post(Event.FRAME_OUTPUT_CMD, this, active);
+        apiv2.output.frame_output(active);
     }
 
     @Override
     public FocusView getObject(String name) {
-        return getObject(name, 0);
+        return apiv2.scene.get_object(name);
     }
 
     @Override
     public FocusView getObject(String name, double timeOutSeconds) {
-        if (checkObjectName(name, timeOutSeconds)) {
-            Entity object = getEntity(name, timeOutSeconds);
-            return new FocusView(object);
-        }
-        return null;
+        return apiv2.scene.get_object(name, timeOutSeconds);
     }
 
     @Override
     public VertsView getLineObject(String name) {
-        return getLineObject(name, 0);
+        return apiv2.scene.get_line_object(name);
     }
 
     @Override
     public VertsView getLineObject(String name, double timeOutSeconds) {
-        if (checkObjectName(name, timeOutSeconds)) {
-            Entity object = getEntity(name, timeOutSeconds);
-            if (Mapper.verts.has(object)) {
-                return new VertsView(object);
-            } else {
-                logger.error(name + " is not a verts object.");
-                return null;
-            }
-        }
-        return null;
+        return apiv2.scene.get_line_object(name, timeOutSeconds);
     }
 
     public Entity getEntity(String name) {
-        return getEntity(name, 0);
+        return apiv2.scene.get_entity(name);
     }
 
     public Entity getEntity(String name, double timeOutSeconds) {
-        Entity obj = scene.getEntity(name);
-        if (obj == null) {
-            if (name.matches("[0-9]+")) {
-                // Check with 'HIP '
-                obj = scene.getEntity("hip " + name);
-            } else if (name.matches("hip [0-9]+")) {
-                obj = scene.getEntity(name.substring(4));
-            }
-        }
-
-        // If negative, no limit in waiting
-        if (timeOutSeconds < 0) timeOutSeconds = Double.MAX_VALUE;
-
-        double startMs = System.currentTimeMillis();
-        double elapsedSeconds = 0;
-        while (obj == null && elapsedSeconds < timeOutSeconds) {
-            sleepFrames(1);
-            obj = scene.getEntity(name);
-            elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
-        }
-        return obj;
+        return apiv2.scene.get_entity(name, timeOutSeconds);
     }
 
     private Entity getFocus(String name) {
-        return scene.findFocus(name);
+        return apiv2.scene.get_focus(name);
     }
 
     private Entity getFocusEntity(String name) {
-        return scene.findFocus(name);
+        return apiv2.scene.get_focus_entity(name);
     }
 
     @Override
     public void setObjectSizeScaling(String name, double scalingFactor) {
-        if (checkObjectName(name)) {
-            Entity object = getEntity(name);
-            setObjectSizeScaling(object, scalingFactor);
-        }
+        apiv2.scene.set_object_size_scaling(name, scalingFactor);
     }
 
     public void setObjectSizeScaling(Entity object, double scalingFactor) {
-        if (checkNotNull(object, "Entity")) {
-            if (Mapper.modelScaffolding.has(object)) {
-                var scaffolding = Mapper.modelScaffolding.get(object);
-                scaffolding.setSizeScaleFactor(scalingFactor);
-            } else if (Mapper.trajectory.has(object)) {
-                var trajectory = Mapper.trajectory.get(object);
-                trajectory.params.multiplier = scalingFactor;
-            } else {
-                var base = Mapper.base.get(object);
-                logger.error("Object '" + base.getName() + "' is not a model or trajectory object");
-            }
-        }
+        apiv2.scene.set_object_size_scaling(object, scalingFactor);
     }
 
     @Override
     public void setOrbitCoordinatesScaling(String name, double scalingFactor) {
-        int modified = 0;
-        String className, objectName;
-        if (name.contains(":")) {
-            int idx = name.indexOf(":");
-            className = name.substring(0, idx);
-            objectName = name.substring(idx + 1);
-        } else {
-            className = name;
-            objectName = null;
-        }
-        // Coordinates provider.
-        List<AbstractOrbitCoordinates> aocs = AbstractOrbitCoordinates.getInstances();
-        for (AbstractOrbitCoordinates aoc : aocs) {
-            if (aoc.getClass().getSimpleName().equalsIgnoreCase(className)) {
-                if (objectName != null) {
-                    if (aoc.getOrbitName() != null && aoc.getOrbitName().contains(objectName)) {
-                        aoc.setScaling(scalingFactor);
-                        modified++;
-                    }
-                } else {
-                    aoc.setScaling(scalingFactor);
-                    modified++;
-                }
-            }
-        }
-
-        logger.info(name + ": modified scaling of " + modified + " orbits");
-    }
-
-    private void initializeTrajectoryUtils() {
-        if (trajectoryUtils == null) {
-            trajectoryUtils = new TrajectoryUtils();
-        }
+        apiv2.scene.set_orbit_coordinates_scaling(name, scalingFactor);
     }
 
     @Override
     public void refreshAllOrbits() {
-        initializeTrajectoryUtils();
-        postRunnable(() -> {
-            var orbits = scene.findEntitiesByFamily(scene.getFamilies().orbits);
-            for (Entity orbit : orbits) {
-                var trajectory = Mapper.trajectory.get(orbit);
-                var verts = Mapper.verts.get(orbit);
-                trajectoryUtils.refreshOrbit(trajectory, verts, true);
-            }
-        });
+        apiv2.scene.refresh_all_orbits();
     }
 
     @Override
     public void forceUpdateScene() {
-        postRunnable(() -> em.post(Event.SCENE_FORCE_UPDATE, this));
+        apiv2.scene.force_update_scene();
     }
 
     public void refreshObjectOrbit(String name) {
-        String orbitName = name + " orbit";
-        if (checkObjectName(orbitName)) {
-            FocusView view = getObject(orbitName);
-            var trajectory = Mapper.trajectory.get(view.getEntity());
-            var verts = Mapper.verts.get(view.getEntity());
-            if (trajectory != null && verts != null) {
-                initializeTrajectoryUtils();
-                postRunnable(() -> {
-                    trajectoryUtils.refreshOrbit(trajectory, verts, true);
-                });
-            }
-        }
+        apiv2.scene.refresh_object_orbit(name);
     }
 
     @Override
     public double getObjectRadius(String name) {
-        if (checkObjectName(name)) {
-            Entity object = scene.findFocus(name);
-
-            focusView.setEntity(object);
-            focusView.getFocus(name);
-            return focusView.getRadius() * Constants.U_TO_KM;
-        }
-        return -1;
+        return apiv2.scene.get_object_radius(name);
     }
 
     @Override
     public void goToObject(String name) {
-        goToObject(name, -1);
+        apiv2.camera.interactive.go_to_object(name);
     }
 
     @Override
-    public void goToObject(String name, double angle) {
-        goToObject(name, angle, -1);
+    public void goToObject(String name, double solidAngle) {
+        apiv2.camera.interactive.go_to_object(name, solidAngle);
     }
 
     @Override
     public void goToObject(String name, double solidAngle, float waitTimeSeconds) {
-        goToObject(name, solidAngle, waitTimeSeconds, null);
+        apiv2.camera.interactive.go_to_object(name, solidAngle, waitTimeSeconds);
     }
 
     /**
      * Same as {@link IScriptingInterface#goToObject(String, double, float)}, but using an integer for <code>waitTimeSeconds</code>.
      */
     public void goToObject(String name, double solidAngle, int waitTimeSeconds) {
-        goToObject(name, solidAngle, (float) waitTimeSeconds);
+        apiv2.camera.interactive.go_to_object(name, solidAngle, waitTimeSeconds);
     }
 
     /**
@@ -1678,27 +1109,14 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
      * a long for <code>solidAngle</code>.
      */
     public void goToObject(String name, long solidAngle, int waitTimeSeconds) {
-        goToObject(name, (double) solidAngle, (float) waitTimeSeconds);
+        apiv2.camera.interactive.go_to_object(name, solidAngle, waitTimeSeconds);
     }
 
     /**
      * Same as {@link IScriptingInterface#goToObject(String, double, float)}, but using a long for <code>solidAngle</code>.
      */
     public void goToObject(String name, long solidAngle, float waitTimeSeconds) {
-        goToObject(name, (double) solidAngle, waitTimeSeconds);
-    }
-
-    /**
-     * Version of {@link IScriptingInterface#goToObject(String, double, float)} that gets an optional {@link AtomicBoolean} that
-     * enables stopping the execution of the call when its value changes.
-     */
-    private void goToObject(String name, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        if (checkString(name, "name") && checkObjectName(name)) {
-            Entity focus = scene.findFocus(name);
-            focusView.setEntity(focus);
-            focusView.getFocus(name);
-            goToObject(focus, solidAngle, waitTimeSeconds, stop);
-        }
+        apiv2.camera.interactive.go_to_object(name, solidAngle, waitTimeSeconds);
     }
 
     /**
@@ -1706,118 +1124,48 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
      * enables stopping the execution of the call when its value changes.
      */
     public void goToObject(String name, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
-        goToObject(name, solidAngle, (float) waitTimeSeconds, stop);
+        apiv2.camera.interactive.go_to_object(name, solidAngle, waitTimeSeconds);
     }
 
     /**
-     * Version of {@link EventScriptingInterface#goToObject(String, double, float, AtomicBoolean)} that gets the actual entity
-     * object as an {@link Entity} instead of the entity name as a {@link String}.
-     */
-    void goToObject(Entity object, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        if (checkNotNull(object, "object") && checkNum(solidAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "solidAngle")) {
-            stops.add(stop);
-            NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
-
-            focusView.setEntity(object);
-            changeFocus(focusView, cam, waitTimeSeconds);
-
-            /* target angle */
-            double target = FastMath.toRadians(solidAngle);
-            if (target < 0) {
-                // Particles have different sizes to the rest.
-                if (focusView.isParticleSet()) {
-                    var rx0 = 1.31; // pc
-                    var rx1 = 2805.0; // pc
-                    var y0 = 1.0;
-                    var y1 = 0.001;
-                    target = FastMath.toRadians(y0 + (y1 - y0) * (focusView.getAbsolutePosition(aux3b1)
-                            .lenDouble() * Constants.U_TO_PC - rx0) / (rx1 - rx0));
-
-                } else {
-                    target = FastMath.toRadians(20.0);
-                }
-            }
-
-            long prevTime = TimeUtils.millis();
-            if (focusView.getSolidAngle() < target) {
-                // Add forward movement while distance > target distance.
-                while (focusView.getSolidAngle() < target && (stop == null || !stop.get())) {
-                    // dt in ms.
-                    long dt = TimeUtils.timeSinceMillis(prevTime);
-                    prevTime = TimeUtils.millis();
-
-                    em.post(Event.CAMERA_FWD, this, (double) dt);
-                    try {
-                        sleep(0.1f);
-                    } catch (Exception e) {
-                        logger.error(e);
-                    }
-                }
-            } else {
-                // Add backward movement while distance > target distance
-                while (focusView.getSolidAngleApparent() > target && (stop == null || !stop.get())) {
-                    // dt in ms
-                    long dt = TimeUtils.timeSinceMillis(prevTime);
-                    prevTime = TimeUtils.millis();
-
-                    em.post(Event.CAMERA_FWD, this, (double) -dt);
-                    try {
-                        sleep(0.1f);
-                    } catch (Exception e) {
-                        logger.error(e);
-                    }
-                }
-            }
-
-            // We can stop now
-            em.post(Event.CAMERA_STOP, this);
-        }
-    }
-
-    /**
-     * Version of {@link EventScriptingInterface#goToObject(Entity, double, float, AtomicBoolean)} that gets the <code>waitTimeSeconds</code>
-     * as an integer instead of a float.
+     * Version of {@link EventScriptingInterface#goToObject(String, double, int, AtomicBoolean)} that gets an {@link Entity} reference
+     * instead of its name.
      */
     public void goToObject(Entity object, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
-        goToObject(object, solidAngle, (float) waitTimeSeconds, stop);
+        apiv2.camera.interactive.go_to_object(object, solidAngle, waitTimeSeconds, stop);
     }
 
     @Override
     public void goToObjectInstant(String name) {
-        setCameraFocusInstantAndGo(name);
+        apiv2.camera.go_to_object_instant(name);
     }
 
     @Override
     public void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds) {
-        goToObjectSmooth(name, positionDurationSeconds, orientationDurationSeconds, true);
+        apiv2.camera.go_to_object(name, positionDurationSeconds, orientationDurationSeconds);
     }
 
     @Override
     public void goToObjectSmooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds) {
-        goToObjectSmooth(name, solidAngle, positionDurationSeconds, orientationDurationSeconds, true);
+        apiv2.camera.go_to_object(name, solidAngle, positionDurationSeconds, orientationDurationSeconds);
     }
 
     @Override
     public void goToObjectSmooth(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
-        goToObjectSmooth(name, -1.0, positionDurationSeconds, orientationDurationSeconds, true);
+        apiv2.camera.go_to_object(name, positionDurationSeconds, orientationDurationSeconds, sync);
     }
 
     @Override
     public void goToObjectSmooth(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
-        if (checkString(name, "name") && checkObjectName(name)) {
-            Entity focus = scene.findFocus(name);
-            goToObjectSmooth(focus, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync);
-        } else {
-            logger.error("Could not find position of " + name);
-        }
+        apiv2.camera.go_to_object(name, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync);
     }
 
     public void goToObjectSmooth(Entity object, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
-        goToObjectSmooth(object, -1.0, positionDurationSeconds, orientationDurationSeconds, sync);
+        apiv2.camera.go_to_object(object, positionDurationSeconds, orientationDurationSeconds, sync);
     }
 
     public void goToObjectSmooth(Entity object, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
-        goToObjectSmooth(object, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync, null);
+        apiv2.camera.go_to_object(object, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync);
     }
 
     public void goToObjectSmooth(Entity object,
@@ -1826,584 +1174,146 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                  double orientationDurationSeconds,
                                  boolean sync,
                                  AtomicBoolean stop) {
-        focusView.setEntity(object);
-        // Get focus radius.
-        var radius = focusView.getRadius();
-        // Get object position.
-        var objectPos = focusView.getAbsolutePosition(focusView.getName(), aux3b1);
-        // Get start position.
-        var camPos = aux3b2.set(GaiaSky.instance.cameraManager.getPos());
-        var camUp = aux3b3.set(GaiaSky.instance.cameraManager.getUp());
-
-        if (objectPos != null && camPos != null) {
-            var o = objectPos;
-            var c = camPos;
-            var u = camUp;
-
-
-            // Camera to object vector.
-            var camObj = aux3b4.set(o).sub(c);
-            // Direction is object - camera.
-            var dir = aux3b5.set(camObj).nor();
-            // Up vector from current camera up.
-            var up = aux3b1.set(camUp).crs(dir).crs(dir).scl(-1).nor();
-
-            // Length between camera and object, computed from the solid angle.
-            double targetAngle = FastMath.toRadians(solidAngle);
-            if (targetAngle < 0.0) {
-                // Particles have different sizes to the rest.
-                if (focusView.isParticleSet()) {
-                    var rx0 = 1.31; // pc
-                    var rx1 = 2805.0; // pc
-                    var y0 = 1.0;
-                    var y1 = 0.001;
-                    targetAngle = FastMath.toRadians(y0 + (y1 - y0) * (focusView.getAbsolutePosition(aux3b1)
-                            .lenDouble() * Constants.U_TO_PC - rx0) / (rx1 - rx0));
-                } else {
-                    targetAngle = FastMath.toRadians(20.0);
-                }
-            }
-            var targetDistance = radius / FastMath.tan(targetAngle * 0.5);
-            var len = camObj.len().subtract(new Quadruple(targetDistance));
-            // Final position.
-            var pos = camObj.nor().scl(len).add(c);
-
-
-            cameraTransition(pos.valuesD(),
-                             "internal",
-                             dir.valuesD(),
-                             up.valuesD(),
-                             positionDurationSeconds,
-                             "logisticsigmoid",
-                             60.0,
-                             orientationDurationSeconds,
-                             "logisticsigmoid",
-                             17.0,
-                             sync,
-                             stop);
-        }
+        apiv2.camera.go_to_object(object, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync, stop);
     }
 
     @Override
     public void landOnObject(String name) {
-        if (checkString(name, "name")) {
-            Entity target = getEntity(name);
-            if (Mapper.focus.has(target)) {
-                synchronized (focusView) {
-                    focusView.setEntity(target);
-                    focusView.getFocus(name);
-                }
-                landOnObject(target, null);
-            }
-        }
-    }
-
-    void landOnObject(Entity object, AtomicBoolean stop) {
-        if (checkNotNull(object, "object")) {
-
-            stops.add(stop);
-
-            synchronized (focusView) {
-                if (Mapper.atmosphere.has(object)) {
-                    focusView.setEntity(object);
-                    // Planets.
-                    NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
-                    // FOCUS_MODE wait - 2 seconds
-                    float waitTimeSeconds = -1;
-
-                    /*
-                     * SAVE
-                     */
-
-                    // Save speed, set it to 50
-                    double speed = Settings.settings.scene.camera.speed;
-                    em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f, false);
-
-                    // Save turn speed, set it to 50
-                    double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD,
-                            this,
-                            (float) MathUtilsDouble.flint(20d,
-                                                          Constants.MIN_SLIDER,
-                                                          Constants.MAX_SLIDER,
-                                                          Constants.MIN_TURN_SPEED,
-                                                          Constants.MAX_TURN_SPEED),
-                            false);
-
-                    // Save cinematic
-                    boolean cinematic = Settings.settings.scene.camera.cinematic;
-                    Settings.settings.scene.camera.cinematic = true;
-
-                    /*
-                     * FOCUS
-                     */
-                    changeFocus(focusView, cam, waitTimeSeconds);
-
-                    /* target distance */
-                    double target = 100 * Constants.M_TO_U;
-
-                    Vector3Q camObj = aux3b1;
-                    focusView.getAbsolutePosition(camObj).add(cam.posInv).nor();
-                    Vector3D dir = cam.direction;
-
-                    // Add forward movement while distance > target distance
-                    boolean distanceNotMet = (focusView.getDistToCamera() - focusView.getRadius()) > target;
-                    boolean viewNotMet = FastMath.abs(dir.angle(camObj)) < 90;
-
-                    long prevTime = TimeUtils.millis();
-                    while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
-                        // dt in ms
-                        long dt = TimeUtils.timeSinceMillis(prevTime);
-                        prevTime = TimeUtils.millis();
-
-                        if (distanceNotMet) em.post(Event.CAMERA_FWD, this, 0.1d * dt);
-                        else cam.stopForwardMovement();
-
-                        if (viewNotMet) {
-                            if (focusView.getDistToCamera() - focusView.getRadius() < focusView.getRadius() * 5)
-                                // Start turning where we are at n times the radius
-                                em.post(Event.CAMERA_TURN, this, 0d, dt / 500d);
-                        } else {
-                            cam.stopRotateMovement();
-                        }
-
-                        try {
-                            sleepFrames(1);
-                        } catch (Exception e) {
-                            logger.error(e);
-                        }
-
-                        // focus.transform.getTranslation(aux);
-                        viewNotMet = FastMath.abs(dir.angle(camObj)) < 90;
-                        distanceNotMet = (focusView.getDistToCamera() - focusView.getRadius()) > target;
-                    }
-
-                    // STOP
-                    em.post(Event.CAMERA_STOP, this);
-
-                    // Roll till done
-                    Vector3D up = cam.up;
-                    // aux1 <- camera-object
-                    camObj = focusView.getAbsolutePosition(aux3b1).sub(cam.pos);
-                    double ang1 = up.angle(camObj);
-                    double ang2 = up.cpy().rotate(cam.direction, 1).angle(camObj);
-                    double rollSign = ang1 < ang2 ? -1d : 1d;
-
-                    if (ang1 < 170) {
-                        rollAndWait(rollSign * 0.02d, 170d, 50L, cam, camObj, stop);
-
-                        // STOP
-                        cam.stopMovement();
-
-                        rollAndWait(rollSign * 0.006d, 176d, 50L, cam, camObj, stop);
-                        // STOP
-                        cam.stopMovement();
-
-                        rollAndWait(rollSign * 0.003d, 178d, 50L, cam, camObj, stop);
-                    }
-
-                    /*
-                     * RESTORE
-                     */
-
-                    // We can stop now
-                    em.post(Event.CAMERA_STOP, this);
-
-                    // Restore cinematic
-                    Settings.settings.scene.camera.cinematic = cinematic;
-
-                    // Restore speed
-                    em.post(Event.CAMERA_SPEED_CMD, this, (float) speed, false);
-
-                    // Restore turning speed
-                    em.post(Event.TURNING_SPEED_CMD, this, (float) turnSpeedBak, false);
-                }
-            }
-        }
+        apiv2.camera.interactive.land_on(name);
     }
 
     @Override
     public void landAtObjectLocation(String name, String locationName) {
-        landAtObjectLocation(name, locationName, null);
+        apiv2.camera.interactive.land_at_location(name, locationName);
     }
 
     public void landAtObjectLocation(String name, String locationName, AtomicBoolean stop) {
-        if (checkString(name, "name")) {
-            stops.add(stop);
-            Entity entity = getEntity(name);
-            if (Mapper.focus.has(entity)) {
-                synchronized (focusView) {
-                    focusView.setEntity(entity);
-                    focusView.getFocus(name);
-                }
-                landAtObjectLocation(entity, locationName, stop);
-            }
-        }
+        apiv2.camera.interactive.land_at_location(name, locationName, stop);
     }
 
     public void landAtObjectLocation(Entity object, String locationName, AtomicBoolean stop) {
-        if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
-
-            stops.add(stop);
-            if (Mapper.atmosphere.has(object)) {
-                synchronized (focusView) {
-                    focusView.setEntity(object);
-                    Entity loc = focusView.getChildByNameAndArchetype(locationName, scene.archetypes().get("Loc"));
-                    if (loc != null) {
-                        var locMark = Mapper.loc.get(loc);
-                        landAtObjectLocation(object, locMark.location.x, locMark.location.y, stop);
-                        return;
-                    }
-                    logger.info("Location '" + locationName + "' not found on object '" + focusView.getCandidateName() + "'");
-                }
-            }
-        }
+        apiv2.camera.interactive.land_at_location(object, locationName, stop);
     }
 
     @Override
     public void landAtObjectLocation(String name, double longitude, double latitude) {
-        if (checkString(name, "name")) {
-            Entity entity = getEntity(name);
-            if (Mapper.focus.has(entity)) {
-                synchronized (focusView) {
-                    focusView.setEntity(entity);
-                    focusView.getFocus(name);
-                }
-                landAtObjectLocation(entity, longitude, latitude, null);
-            }
-        }
+        apiv2.camera.interactive.land_at_location(name, longitude, latitude);
     }
 
-    void landAtObjectLocation(Entity entity, double longitude, double latitude, AtomicBoolean stop) {
-        if (checkNotNull(entity, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, -360d, 360d, "longitude")) {
-            synchronized (focusView) {
-                focusView.setEntity(entity);
-                stops.add(stop);
-                String nameStub = focusView.getCandidateName() + " [loc]";
-
-                if (!scene.index().containsEntity(nameStub)) {
-                    var archetype = scene.archetypes().get("Invisible");
-                    Entity invisible = archetype.createEntity();
-                    var base = Mapper.base.get(invisible);
-                    base.setName(nameStub);
-                    base.setCt("Others");
-                    var graph = Mapper.graph.get(invisible);
-                    graph.translation = new Vector3Q();
-                    graph.setParent(Scene.ROOT_NAME);
-                    scene.initializeEntity(invisible);
-                    scene.setUpEntity(invisible);
-                    EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, invisible, true);
-                }
-                Entity invisible = scene.getEntity(nameStub);
-
-                if (Mapper.atmosphere.has(entity)) {
-                    NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
-
-                    double targetAngle = 35 * MathUtilsDouble.degRad;
-                    if (focusView.getSolidAngle() > targetAngle) {
-                        // Zoom out
-                        while (focusView.getSolidAngle() > targetAngle && (stop == null || !stop.get())) {
-                            cam.addForwardForce(-5d);
-                            sleepFrames(1);
-                        }
-                        // STOP
-                        cam.stopMovement();
-                    }
-
-                    // Go to object
-                    goToObject(focusView.getEntity(), 15, -1, stop);
-
-                    // Save speed, set it to 50
-                    double speed = Settings.settings.scene.camera.speed;
-                    em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f);
-
-                    // Save turn speed, set it to 50
-                    double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD,
-                            this,
-                            (float) MathUtilsDouble.flint(50d,
-                                                          Constants.MIN_SLIDER,
-                                                          Constants.MAX_SLIDER,
-                                                          Constants.MIN_TURN_SPEED,
-                                                          Constants.MAX_TURN_SPEED));
-
-                    // Save rotation speed, set it to 20
-                    double rotationSpeedBak = Settings.settings.scene.camera.rotate;
-                    em.post(Event.ROTATION_SPEED_CMD,
-                            this,
-                            (float) MathUtilsDouble.flint(20d,
-                                                          Constants.MIN_SLIDER,
-                                                          Constants.MAX_SLIDER,
-                                                          Constants.MIN_ROT_SPEED,
-                                                          Constants.MAX_ROT_SPEED));
-
-                    // Save cinematic
-                    boolean cinematic = Settings.settings.scene.camera.cinematic;
-                    Settings.settings.scene.camera.cinematic = true;
-
-                    // Save crosshair
-                    boolean crosshair = Settings.settings.scene.crosshair.focus;
-                    Settings.settings.scene.crosshair.focus = false;
-
-                    // Get target position
-                    Vector3Q target = aux3b1;
-                    focusView.getPositionAboveSurface(longitude, latitude, 50, target);
-
-                    // Get object position
-                    Vector3Q objectPosition = focusView.getAbsolutePosition(aux3b2);
-
-                    // Check intersection with object
-                    boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3),
-                                                                                       target.tov3d(aux3d1),
-                                                                                       objectPosition.tov3d(aux3d2),
-                                                                                       focusView.getRadius());
-
-                    if (intersects) {
-                        cameraRotate(5d, 5d);
-                    }
-
-                    while (intersects && (stop == null || !stop.get())) {
-                        sleep(0.1f);
-
-                        objectPosition = focusView.getAbsolutePosition(aux3b2);
-                        intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3),
-                                                                                   target.tov3d(aux3d1),
-                                                                                   objectPosition.tov3d(aux3d2),
-                                                                                   focusView.getRadius());
-                    }
-
-                    cameraStop();
-
-                    Mapper.base.get(invisible).ct = focusView.getCt();
-                    Mapper.body.get(invisible).pos.set(target);
-
-                    // Go to object
-                    goToObject(nameStub, 20, 0, stop);
-
-                    // Restore cinematic
-                    Settings.settings.scene.camera.cinematic = cinematic;
-
-                    // Restore speed
-                    em.post(Event.CAMERA_SPEED_CMD, this, (float) speed);
-
-                    // Restore turning speed
-                    em.post(Event.TURNING_SPEED_CMD, this, (float) turnSpeedBak);
-
-                    // Restore rotation speed
-                    em.post(Event.ROTATION_SPEED_CMD, this, (float) rotationSpeedBak);
-
-                    // Restore crosshair
-                    Settings.settings.scene.crosshair.focus = crosshair;
-
-                    // Land
-                    landOnObject(focusView.getEntity(), stop);
-                }
-                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, this, invisible, true);
-            }
-        }
-    }
-
-    private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3Q camobj, AtomicBoolean stop) {
-        // Apply roll and wait
-        double ang = cam.up.angle(camobj);
-
-        while (ang < target && (stop == null || !stop.get())) {
-            cam.addRoll(roll, false);
-
-            try {
-                sleep(sleep);
-            } catch (Exception e) {
-                logger.error(e);
-            }
-
-            ang = cam.up.angle(aux3d1);
-        }
+    public void landAtObjectLocation(Entity object, double longitude, double latitude, AtomicBoolean stop) {
+        apiv2.camera.interactive.land_at_location(object, longitude, latitude, stop);
     }
 
     @Override
     public double getDistanceTo(String name) {
-        if (checkObjectName(name)) {
-            Entity entity = getEntity(name);
-            if (Mapper.focus.has(entity)) {
-                focusView.setEntity(entity);
-                focusView.getFocus(name);
-                if (focusView.getSet() != null) {
-                    var pos = focusView.getAbsolutePosition(name, aux3b1);
-                    return pos.sub(GaiaSky.instance.getICamera().getPos()).lenDouble() * Constants.U_TO_KM;
-                } else {
-                    return (focusView.getDistToCamera() - focusView.getRadius()) * Constants.U_TO_KM;
-                }
-            }
-        }
-
-        return -1;
+        return apiv2.camera.get_distance_to_object(name);
     }
 
     @Override
     public double[] getStarParameters(String id) {
-        if (checkObjectName(id)) {
-            Entity entity = getEntity(id);
-            if (Mapper.starSet.has(entity)) {
-                var set = Mapper.starSet.get(entity);
-                // This star group contains the star
-                IParticleRecord sb = set.getCandidateBean();
-                if (sb != null) {
-                    double[] rgb = sb.rgb();
-                    return new double[]{sb.ra(), sb.dec(), sb.parallax(), sb.muAlpha(), sb.muDelta(), sb.radVel(), sb.appMag(), rgb[0], rgb[1], rgb[2]};
-                }
-            }
-        }
-        return null;
+        return apiv2.scene.get_star_parameters(id);
     }
 
     @Override
     public double[] getObjectPosition(String name) {
-        return getObjectPosition(name, "internal");
+        return apiv2.scene.get_object_position(name);
     }
 
     @Override
     public double[] getObjectPosition(String name, String units) {
-        if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
-            Entity entity = getEntity(name);
-            focusView.setEntity(entity);
-            focusView.getFocus(name);
-            focusView.getAbsolutePosition(name, aux3b1);
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
-            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
-        }
-        return null;
+        return apiv2.scene.get_object_position(name, units);
     }
 
     @Override
     public double[] getObjectPredictedPosition(String name) {
-        return getObjectPredictedPosition(name, "internal");
+        return apiv2.scene.get_object_predicted_position(name);
     }
 
     @Override
     public double[] getObjectPredictedPosition(String name, String units) {
-        if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
-            Entity entity = getEntity(name);
-            focusView.setEntity(entity);
-            focusView.getFocus(name);
-            focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
-            return new double[]{u.fromInternalUnits(aux3b1.x.doubleValue()), u.fromInternalUnits(aux3b1.y.doubleValue()), u.fromInternalUnits(aux3b1.z.doubleValue())};
-        }
-        return null;
+        return apiv2.scene.get_object_predicted_position(name, units);
     }
 
     @Override
     public void setObjectPosition(String name, double[] position) {
-        setObjectPosition(name, position, "internal");
+         apiv2.scene.set_object_posiiton(name, position);
     }
 
     @Override
     public void setObjectPosition(String name, double[] position, String units) {
-        if (checkObjectName(name)) {
-            setObjectPosition(getObject(name), position, units);
-        }
-
+        apiv2.scene.set_object_posiiton(name, position, units);
     }
 
     public void setObjectPosition(String name, List<?> position) {
-        setObjectPosition(name, position, "internal");
+        apiv2.scene.set_object_posiiton(name, position);
     }
 
     public void setObjectPosition(String name, List<?> position, String units) {
-        setObjectPosition(name, dArray(position), units);
+        apiv2.scene.set_object_posiiton(name, position, units);
     }
 
     @Override
     public void setObjectPosition(FocusView object, double[] position) {
-        setObjectPosition(object, position, "internal");
+        apiv2.scene.set_object_posiiton(object, position);
     }
 
     @Override
     public void setObjectPosition(FocusView object, double[] position, String units) {
-        setObjectPosition(object.getEntity(), position, units);
+        apiv2.scene.set_object_posiiton(object, position, units);
     }
 
     public void setObjectPosition(FocusView object, List<?> position) {
-        setObjectPosition(object, position, "internal");
+        apiv2.scene.set_object_posiiton(object, position);
     }
 
     public void setObjectPosition(FocusView object, List<?> position, String units) {
-        setObjectPosition(object, dArray(position), units);
+        apiv2.scene.set_object_posiiton(object, position, units);
     }
 
     @Override
     public void setObjectPosition(Entity object, double[] position) {
-        setObjectPosition(object, position, "internal");
+        apiv2.scene.set_object_posiiton(object, position);
     }
 
     @Override
     public void setObjectPosition(Entity object, double[] position, String units) {
-        if (checkNotNull(object, "object") && checkLength(position, 3, "position") && checkDistanceUnits(units, "units")) {
-
-            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
-            double[] posUnits = new double[]{u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2])};
-
-            var body = Mapper.body.get(object);
-            body.pos.set(posUnits);
-            body.positionSetInScript = true;
-        }
+        apiv2.scene.set_object_posiiton(object, position, units);
     }
 
     @Override
     public void setObjectCoordinatesProvider(String name, IPythonCoordinatesProvider provider) {
-        if (checkObjectName(name) && checkNotNull(provider, "provider")) {
-            var object = getObject(name);
-            if (checkNotNull(object.getEntity(), "object")) {
-                var coord = Mapper.coordinates.get(object.getEntity());
-                if (checkNotNull(coord, "coordinates")) {
-                    IBodyCoordinates coordinates = new PythonBodyCoordinates(provider);
-                    postRunnable(() -> {
-                        coord.coordinates = coordinates;
-                        GaiaSky.instance.touchSceneGraph();
-                    });
-                }
-            }
-        }
-
+        apiv2.scene.set_object_coordinates_provider(name, provider);
     }
 
     @Override
     public void removeObjectCoordinatesProvider(String name) {
-        if (checkObjectName(name)) {
-            var object = getObject(name);
-            if (checkNotNull(object.getEntity(), "object")) {
-                var coord = Mapper.coordinates.get(object.getEntity());
-                if (checkNotNull(coord, "coordinates")) {
-                    postRunnable(() -> coord.coordinates = null);
-                }
-
-            }
-        }
-
+        apiv2.scene.remove_object_coordinates_provider(name);
     }
 
     public void setObjectPosition(Entity object, List<?> position) {
-        setObjectPosition(object, dArray(position));
+        apiv2.scene.set_object_posiiton(object, position);
     }
 
     @Override
     public void setGuiScrollPosition(final float pixelY) {
+        // This is removed from APIv2
         postRunnable(() -> em.post(Event.GUI_SCROLL_POSITION_CMD, this, pixelY));
 
     }
 
     public void setGuiScrollPosition(final int pixelY) {
+        // This is removed from APIv2
         setGuiScrollPosition((float) pixelY);
     }
 
     @Override
     public void enableGui() {
-        postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode")));
+        apiv2.ui.enable();
     }
 
     @Override
     public void disableGui() {
-        postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, false, I18n.msg("notif.cleanmode")));
+        apiv2.ui.disable();
     }
 
     @Override
@@ -2421,7 +1331,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                      final float b,
                                      final float a,
                                      final float fontSize) {
-        postRunnable(() -> em.post(Event.ADD_CUSTOM_MESSAGE, this, id, message, x, y, r, g, b, a, fontSize));
+        apiv2.ui.display_message(id, message, x, y, r ,g, b, a, fontSize);
     }
 
     @Override
@@ -2431,14 +1341,11 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                      final double y,
                                      final double[] color,
                                      final double fontSize) {
-        if (checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
-            float a = color.length > 3 ? (float) color[3] : 1f;
-            displayMessageObject(id, message, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a, (float) fontSize);
-        }
+        apiv2.ui.display_message(id, message, x, y, color, fontSize);
     }
 
     public void displayMessageObject(final int id, final String message, final double x, final double y, final List<?> color, final double fontSize) {
-        displayMessageObject(id, message, x, y, dArray(color), fontSize);
+        apiv2.ui.display_message(id, message, x, y, color, fontSize);
     }
 
     public void displayMessageObject(final int id,
@@ -2450,7 +1357,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                      final float b,
                                      final float a,
                                      final int fontSize) {
-        displayMessageObject(id, message, x, y, r, g, b, a, (float) fontSize);
+        apiv2.ui.display_message(id, message, x, y, r, g, b, a, fontSize);
     }
 
     @Override
@@ -2465,7 +1372,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                   final float b,
                                   final float a,
                                   final float fontSize) {
-        postRunnable(() -> em.post(Event.ADD_CUSTOM_TEXT, this, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize));
+        apiv2.ui.display_text(id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize);
     }
 
     public void displayTextObject(final int id,
@@ -2479,7 +1386,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                   final float b,
                                   final float a,
                                   final int fontSize) {
-        displayTextObject(id, text, x, y, maxWidth, maxHeight, r, g, b, a, (float) fontSize);
+        apiv2.ui.display_text(id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize);
     }
 
     @Override
@@ -2491,169 +1398,128 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
                                    final float g,
                                    final float b,
                                    final float a) {
-        postRunnable(() -> {
-            Texture tex = getTexture(path);
-            em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y, r, g, b, a);
-        });
+        apiv2.ui.display_image(id, path, x, y, r, g, b, a);
     }
 
     @Override
     public void displayImageObject(final int id, final String path, final double x, final double y, final double[] color) {
-        if (checkNotNull(color, "color") && checkLengths(color, 3, 4, "color")) {
-            float a = color.length > 3 ? (float) color[3] : 1f;
-            displayImageObject(id, path, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a);
-        }
+        apiv2.ui.display_image(id, path, x, y, color);
     }
 
     public void displayImageObject(final int id, final String path, final double x, final double y, final List<?> color) {
-        displayImageObject(id, path, x, y, dArray(color));
+        apiv2.ui.display_image(id, path, x, y, color);
     }
 
     @Override
     public void displayImageObject(final int id, final String path, final float x, final float y) {
-        postRunnable(() -> {
-            Texture tex = getTexture(path);
-            em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y);
-        });
+        apiv2.ui.display_image(id, path, x, y);
     }
 
     @Override
     public void removeAllObjects() {
-        postRunnable(() -> em.post(Event.REMOVE_ALL_OBJECTS, this));
+        apiv2.ui.remove_all_objects();
     }
 
     @Override
     public void removeObject(final int id) {
-        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[]{id}));
+        apiv2.ui.remove_object(id);
     }
 
     @Override
     public void removeObjects(final int[] ids) {
-        postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) ids));
+        apiv2.ui.remove_objects(ids);
     }
 
     public void removeObjects(final List<?> ids) {
-        removeObjects(iArray(ids));
+        apiv2.ui.remove_objects(ids);
     }
 
     @Override
     public void maximizeInterfaceWindow() {
+        // Removed from APIv2
         postRunnable(() -> em.post(Event.GUI_FOLD_CMD, this, false));
     }
 
     @Override
     public void minimizeInterfaceWindow() {
+        // Removed from APIv2
         postRunnable(() -> em.post(Event.GUI_FOLD_CMD, this, true));
     }
 
     @Override
-    public void expandUIPane(String panelName) {
-        if (checkString(panelName,
-                        new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
-                        "panelName")) {
-            postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", true));
-        }
+    public void expandUIPane(String paneName) {
+        apiv2.ui.expand_pane(paneName);
     }
 
     @Override
-    public void collapseUIPane(String panelName) {
-        if (checkString(panelName,
-                        new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
-                        "panelName")) {
-            postRunnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, panelName + "Component", false));
-        }
+    public void collapseUIPane(String paneName) {
+        apiv2.ui.collapse_pane(paneName);
     }
 
     @Override
-    public void expandGuiComponent(String name) {
-        expandUIPane(name);
+    public void expandGuiComponent(String paneName) {
+        apiv2.ui.expand_pane(paneName);
     }
 
     @Override
-    public void collapseGuiComponent(String name) {
-        collapseUIPane(name);
+    public void collapseGuiComponent(String paneName) {
+        apiv2.ui.collapse_pane(paneName);
     }
 
     @Override
     public void setGuiPosition(final float x, final float y) {
+        // Removed in APIv2
         postRunnable(() -> em.post(Event.GUI_MOVE_CMD, this, x, y));
     }
 
     public void setGuiPosition(final int x, final int y) {
+        // Removed in APIv2
         setGuiPosition((float) x, (float) y);
     }
 
     public void setGuiPosition(final float x, final int y) {
+        // Removed in APIv2
         setGuiPosition(x, (float) y);
     }
 
     public void setGuiPosition(final int x, final float y) {
+        // Removed in APIv2
         setGuiPosition((float) x, y);
     }
 
     @Override
     public void waitForInput() {
-        while (inputCode < 0) {
-            sleepFrames(1);
-        }
-        // Consume
-        inputCode = -1;
-
+        apiv2.input.wait_input();
     }
 
     @Override
     public void waitForEnter() {
-        while (inputCode != Keys.ENTER) {
-            sleepFrames(1);
-        }
-        // Consume
-        inputCode = -1;
+        apiv2.input.wait_enter();
     }
 
     @Override
     public void waitForInput(int keyCode) {
-        while (inputCode != keyCode) {
-            sleepFrames(1);
-        }
-        // Consume
-        inputCode = -1;
+        apiv2.input.wait_input(keyCode);
     }
 
     @Override
     public int getScreenWidth() {
-        return Gdx.graphics.getWidth();
+        return apiv2.ui.get_client_width();
     }
 
     @Override
     public int getScreenHeight() {
-        return Gdx.graphics.getHeight();
+        return apiv2.ui.get_client_height();
     }
 
     @Override
     public float[] getPositionAndSizeGui(String name) {
-        IGui gui = GaiaSky.instance.mainGui;
-        Actor actor = gui.getGuiStage().getRoot().findActor(name);
-        if (actor != null) {
-            float x = actor.getX();
-            float y = actor.getY();
-            // x and y relative to parent, so we need to add coordinates of
-            // parents up to top
-            Group parent = actor.getParent();
-            while (parent != null) {
-                x += parent.getX();
-                y += parent.getY();
-                parent = parent.getParent();
-            }
-            return new float[]{x, y, actor.getWidth(), actor.getHeight()};
-        } else {
-            return null;
-        }
-
+        return apiv2.ui.get_position_and_size(name);
     }
 
     @Override
     public String getVersion() {
-        return Settings.settings.version.version + '\n' + Settings.settings.version.build + '\n' + Settings.settings.version.system + '\n' + Settings.settings.version.builder + '\n' + Settings.settings.version.buildTime;
+        return apiv2.base.get_version();
     }
 
     @Override
@@ -2663,22 +1529,12 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public String getBuildString() {
-        return Settings.settings.version.build;
+        return apiv2.base.get_build_string();
     }
 
     @Override
     public boolean waitFocus(String name, long timeoutMs) {
-        long iniTime = TimeUtils.millis();
-        NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
-        while (cam.focus == null || !cam.focus.getName().equalsIgnoreCase(name)) {
-            sleepFrames(1);
-            long spent = TimeUtils.millis() - iniTime;
-            if (timeoutMs > 0 && spent > timeoutMs) {
-                // Timeout!
-                return true;
-            }
-        }
-        return false;
+        return apiv2.camera.wait_focus(name, timeoutMs);
     }
 
     @Override
@@ -2695,14 +1551,7 @@ public final class EventScriptingInterface implements IScriptingInterface, IObse
 
     @Override
     public double getCamcorderFps() {
-        return Settings.settings.camrecorder.targetFps;
-    }
-
-    private Texture getTexture(String path) {
-        if (textures == null || !textures.containsKey(path)) {
-            preloadTexture(path);
-        }
-        return textures.get(path);
+        return apiv2.camcorder.get_camcorder_fps();
     }
 
     @Override
