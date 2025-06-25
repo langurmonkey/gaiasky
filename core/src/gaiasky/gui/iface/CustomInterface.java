@@ -18,15 +18,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Keys;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.api.IGuiInterface;
+import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.util.*;
 
+/**
+ * Simple interface to display custom elements (messages, texts, textures), set
+ * from the API. See {@link gaiasky.script.v2.impl.UiModule}.
+ */
 public class CustomInterface implements IObserver, IGuiInterface {
     private final Object lock;
     private final Skin skin;
@@ -74,8 +80,9 @@ public class CustomInterface implements IObserver, IGuiInterface {
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        float width = Gdx.graphics.getWidth();
-        float height = Gdx.graphics.getHeight();
+        float unitsPerPixel = GaiaSky.instance.getUnitsPerPixel();
+        float width = Gdx.graphics.getWidth() * unitsPerPixel;
+        float height = Gdx.graphics.getHeight() * unitsPerPixel;
         synchronized (lock) {
             switch (event) {
                 case ADD_CUSTOM_IMAGE -> {

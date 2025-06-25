@@ -18,6 +18,10 @@ import gaiasky.util.scene2d.OwnLabel;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Simple interface to display the header and sub-header text elements, set
+ * from the API. See {@link gaiasky.script.v2.impl.UiModule}.
+ */
 public class MessagesInterface extends TableGuiInterface implements IObserver {
     /** Lock object for synchronization **/
     private final Object lock;
@@ -32,7 +36,7 @@ public class MessagesInterface extends TableGuiInterface implements IObserver {
         headline = new OwnLabel("", skin, "headline");
         headline.setColor(1, 1, 0, 1);
         subhead = new OwnLabel("", skin, "subhead");
-        this.add(headline).left();
+        this.add(headline).left().padBottom(20f);
         this.row();
         this.add(subhead).left();
         this.lock = lock;

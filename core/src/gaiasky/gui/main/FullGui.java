@@ -167,7 +167,7 @@ public class FullGui extends AbstractGui {
         messagesInterface = new MessagesInterface(skin, lock);
         messagesInterface.setFillParent(true);
         messagesInterface.left().bottom();
-        messagesInterface.pad(0, Gdx.graphics.getWidth() * 0.2f, Gdx.graphics.getHeight() * 0.2f, 0);
+        messagesInterface.pad(0, 300f, 200f, 0);
         interfaces.add(messagesInterface);
 
         // TOP INFO - TOP CENTER
