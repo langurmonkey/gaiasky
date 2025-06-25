@@ -115,7 +115,7 @@ public class EventManager implements IObserver {
      * @param listener the listener to add
      */
     public void subscribe(IObserver listener, Event msg) {
-        Set<IObserver> listeners = subscriptions.computeIfAbsent(msg.ordinal(), k -> new LinkedHashSet<>());
+        Set<IObserver> listeners = subscriptions.computeIfAbsent(msg.ordinal(), k -> ConcurrentHashMap.newKeySet(3));
         // Associate an empty ordered array with the message code. Sometimes the order matters
         listeners.add(listener);
     }
@@ -355,7 +355,6 @@ public class EventManager implements IObserver {
         if (event == Event.EVENT_TIME_FRAME_CMD) {
             defaultTimeFrame = (TimeFrame) data[0];
         }
-
     }
 
     /** Time frame options **/

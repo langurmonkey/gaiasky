@@ -139,14 +139,13 @@ public class SettingsManager {
             System.setProperty(protocol + ".proxyPassword", proxy.password);
     }
 
-    private static void setSocksProxySettings(ProxyBean proxy,
-                                              String prefix) {
+    private static void setSocksProxySettings(ProxyBean proxy) {
         if (proxy.version != null)
-            System.setProperty(prefix + "ProxyVersion", Integer.toString(proxy.version));
+            System.setProperty("socks" + "ProxyVersion", Integer.toString(proxy.version));
         if (proxy.host != null)
-            System.setProperty(prefix + "ProxyHost", proxy.host);
+            System.setProperty("socks" + "ProxyHost", proxy.host);
         if (proxy.port != null)
-            System.setProperty(prefix + "ProxyPort", Integer.toString(proxy.port));
+            System.setProperty("socks" + "ProxyPort", Integer.toString(proxy.port));
         if (proxy.username != null)
             System.setProperty("java.net.socks.username", proxy.username);
         if (proxy.password != null)
@@ -339,7 +338,7 @@ public class SettingsManager {
                 setProxySettings(settings.proxy.https, "https", "http");
             }
             if (settings.proxy.socks != null) {
-                setSocksProxySettings(settings.proxy.socks, "socks");
+                setSocksProxySettings(settings.proxy.socks);
             }
             if (settings.proxy.ftp != null) {
                 setProxySettings(settings.proxy.ftp, "ftp");

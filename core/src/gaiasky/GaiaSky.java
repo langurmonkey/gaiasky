@@ -1067,12 +1067,13 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             dynamicResolutionLevel = 0;
         }
 
-        // Dispose.
+        // Persist settings and bookmarks.
         if (saveState && !crashed.get()) {
             SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
             if (gaiaSkyAssets != null && gaiaSkyAssets.bookmarksManager != null) gaiaSkyAssets.bookmarksManager.persistBookmarks();
         }
 
+        // Dispose scripting server.
         ScriptingServer.dispose();
 
         // Flush frames.
