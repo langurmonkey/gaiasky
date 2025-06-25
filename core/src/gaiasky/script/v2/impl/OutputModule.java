@@ -12,10 +12,14 @@ import gaiasky.event.EventManager;
 import gaiasky.script.v2.api.OutputAPI;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
+import gaiasky.util.screenshot.ImageRenderer;
 
 /**
  * The output module contains methods and calls that relate to the frame output system, the
  * screenshot system, and other types of output systems.
+ * <p>
+ * Screenshots and frames are saved to a pre-defined location. You can get the default locations
+ * with {@link BaseModule#get_default_frame_output_dir()} and {@link BaseModule#get_default_screenshots_dir()}.
  */
 public class OutputModule extends APIModule implements OutputAPI {
     /**
@@ -33,10 +37,15 @@ public class OutputModule extends APIModule implements OutputAPI {
         if (api.validator.checkNum(width, 1, Integer.MAX_VALUE, "width")
                 && api.validator.checkNum(height, 1, Integer.MAX_VALUE, "height")
                 && api.validator.checkString(directory, "directory")
-                && api.validator.checkDirectoryExists( directory, "directory")
+                && api.validator.checkDirectoryExists(directory, "directory")
                 && api.validator.checkString(namePrefix, "namePrefix")) {
             em.post(Event.SCREENSHOT_CMD, this, width, height, directory);
         }
+    }
+
+    @Override
+    public String get_current_screenshots_dir() {
+        return Settings.settings.screenshot.location;
     }
 
     @Override
@@ -48,9 +57,9 @@ public class OutputModule extends APIModule implements OutputAPI {
         if (api.validator.checkStringEnum(mode, Settings.ScreenshotMode.class, "screenshotMode")) {
             em.post(Event.SCREENSHOT_MODE_CMD, this, mode);
             api.base.post_runnable(() -> em.post(Event.SCREENSHOT_SIZE_UPDATE,
-                                       this,
-                                       Settings.settings.screenshot.resolution[0],
-                                       Settings.settings.screenshot.resolution[1]));
+                                                 this,
+                                                 Settings.settings.screenshot.resolution[0],
+                                                 Settings.settings.screenshot.resolution[1]));
         }
     }
 
@@ -67,11 +76,16 @@ public class OutputModule extends APIModule implements OutputAPI {
     }
 
     @Override
+    public String get_current_frame_output_dir() {
+        return Settings.settings.frame.location;
+    }
+
+    @Override
     public void configure_frame_output(int width, int height, double fps, String directory, String namePrefix) {
         if (api.validator.checkNum(width, 1, Integer.MAX_VALUE, "width")
                 && api.validator.checkNum(height, 1, Integer.MAX_VALUE, "height")
                 && api.validator.checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS")
-                && api.validator.checkString( directory, "directory")
+                && api.validator.checkString(directory, "directory")
                 && api.validator.checkDirectoryExists(directory, "directory")
                 && api.validator.checkString(namePrefix, "namePrefix")) {
             em.post(Event.FRAME_OUTPUT_MODE_CMD, this, Settings.ScreenshotMode.ADVANCED);
@@ -102,6 +116,11 @@ public class OutputModule extends APIModule implements OutputAPI {
     @Override
     public double get_frame_output_fps() {
         return Settings.settings.frame.targetFps;
+    }
+
+    @Override
+    public void reset_frame_output_sequence_number() {
+        ImageRenderer.resetSequenceNumber();
     }
 
 }

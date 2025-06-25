@@ -18,6 +18,23 @@ import gaiasky.script.v2.impl.RefsysModule;
 public interface RefsysAPI {
 
     /**
+     * Returns the column-major matrix representing the given reference system transformation.
+     *
+     * @param name <p>The name of the reference system transformation:</p>
+     *             <ul>
+     *             <li>'equatorialtoecliptic', 'eqtoecl'</li>
+     *             <li>'ecliptictoequatorial', 'ecltoeq'</li>
+     *             <li>'galactictoequatorial', 'galtoeq'</li>
+     *             <li>'equatorialtogalactic', 'eqtogal'</li>
+     *             <li>'ecliptictogalactic', 'ecltogal</li>
+     *             <li>'galactictoecliptic', 'galtoecl</li>
+     *             </ul>
+     *
+     * @return The transformation matrix in column-major order.
+     */
+    double[] get_transform_matrix(String name);
+
+    /**
      * Convert galactic coordinates to the internal cartesian coordinate
      * system.
      *
@@ -26,7 +43,7 @@ public interface RefsysAPI {
      * @param r The distance in Km.
      *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
-     * internal reference system, in internal units.
+     *         internal reference system, in internal units.
      */
     double[] galactic_to_cartesian(double l,
                                    double b,
@@ -41,7 +58,7 @@ public interface RefsysAPI {
      * @param r The distance in Km.
      *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
-     * internal reference system, in internal units.
+     *         internal reference system, in internal units.
      */
     double[] ecliptic_to_cartesian(double l,
                                    double b,
@@ -56,7 +73,7 @@ public interface RefsysAPI {
      * @param r   The distance in Km.
      *
      * @return An array of doubles containing <code>[x, y, z]</code> in the
-     * internal reference system, in internal units.
+     *         internal reference system, in internal units.
      */
     double[] equatorial_to_cartesian(double ra,
                                      double dec,
@@ -71,9 +88,9 @@ public interface RefsysAPI {
      * @param z The z component, in any distance units.
      *
      * @return An array of doubles containing <code>[ra, dec, distance]</code>
-     * with <code>ra</code> and <code>dec</code> in degrees and
-     * <code>distance</code> in the same distance units as the input
-     * position.
+     *         with <code>ra</code> and <code>dec</code> in degrees and
+     *         <code>distance</code> in the same distance units as the input
+     *         position.
      */
     double[] cartesian_to_equatorial(double x,
                                      double y,

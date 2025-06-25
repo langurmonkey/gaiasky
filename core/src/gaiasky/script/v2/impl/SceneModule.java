@@ -9,6 +9,8 @@ package gaiasky.script.v2.impl;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.data.orientation.QuaternionNlerpOrientationServer;
@@ -16,29 +18,32 @@ import gaiasky.data.orientation.QuaternionSlerpOrientationServer;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.beans.OrientationComboBoxBean;
+import gaiasky.gui.beans.PrimitiveComboBoxBean;
+import gaiasky.gui.beans.ShapeComboBoxBean;
+import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
+import gaiasky.render.RenderGroup;
+import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.AttitudeComponent;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
+import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.script.v2.api.SceneAPI;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
-import gaiasky.util.coord.AbstractOrbitCoordinates;
-import gaiasky.util.coord.IBodyCoordinates;
-import gaiasky.util.coord.IPythonCoordinatesProvider;
-import gaiasky.util.coord.PythonBodyCoordinates;
+import gaiasky.util.coord.*;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * The scene module contains methods and calls that modify and query the internal scene in Gaia Sky.
@@ -46,10 +51,12 @@ import java.util.Objects;
 public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     /** Reference to the main {@link Scene} object in Gaia Sky. **/
-    private Scene scene;
+    public Scene scene;
 
     /** Focus view. **/
     private final FocusView focusView;
+    /** Verts view. **/
+    private final VertsView vertsView;
     /** Utilities to deal with trajectories. **/
     private TrajectoryUtils trajectoryUtils;
 
@@ -65,6 +72,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     public SceneModule(EventManager em, APIv2 api, String name) {
         super(em, api, name);
         this.focusView = new FocusView();
+        this.vertsView = new VertsView();
 
         // Subscribe to events.
         em.subscribe(this, Event.SCENE_LOADED);
@@ -649,6 +657,310 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     @Override
     public void set_velocity_vector_max_number(long maxNumber) {
         Settings.settings.scene.star.group.numVelocityVector = (int) maxNumber;
+    }
+
+    @Override
+    public void add_trajectory_line(String name, double[] points, double[] color) {
+        var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
+    }
+
+    public void add_trajectory_line(String name, List<?> points, List<?> color) {
+        var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
+    }
+
+    @Override
+    public void add_trajectory_line(String name, double[] points, double[] color, double trailMap) {
+        var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trailMap, "Orbit");
+    }
+
+    public void add_trajectory_line(String name, List<?> points, List<?> color, double trailMap) {
+        add_trajectory_line(name, api.dArray(points), api.dArray(color), trailMap);
+    }
+
+    @Override
+    public void add_polyline(String name, double[] points, double[] color) {
+        add_polyline(name, points, color, 1f);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color) {
+        add_polyline(name, points, color, 1f);
+    }
+
+    @Override
+    public void add_polyline(String name, double[] points, double[] color, double lineWidth) {
+        add_polyline(name, points, color, lineWidth, false);
+    }
+
+    @Override
+    public void add_polyline(String name, double[] points, double[] color, double lineWidth, boolean arrowCaps) {
+        add_polyline(name, points, color, lineWidth, GL20.GL_LINE_STRIP, arrowCaps);
+    }
+
+    @Override
+    public void add_polyline(String name, double[] points, double[] color, double lineWidth, int primitive) {
+        add_polyline(name, points, color, lineWidth, primitive, false);
+    }
+
+    @Override
+    public void add_polyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
+        addLineObject(name, points, color, lineWidth, primitive, arrowCaps, -1f, "Polyline");
+    }
+
+    Entity addLineObject(String name,
+                         List<?> points,
+                         List<?> color,
+                         double lineWidth,
+                         int primitive,
+                         boolean arrowCaps,
+                         double trailMap,
+                         String archetypeName) {
+        return addLineObject(name, api.dArray(points), api.dArray(color), lineWidth, primitive, arrowCaps, trailMap, archetypeName);
+    }
+
+    Entity addLineObject(String name,
+                         double[] points,
+                         double[] color,
+                         double lineWidth,
+                         int primitive,
+                         boolean arrowCaps,
+                         double trailMap,
+                         String archetypeName) {
+        if (api.validator.checkString(name, "name") && api.validator.checkNum(lineWidth, 0.1f, 50f, "lineWidth") && api.validator.checkNum(primitive,
+                                                                                                                                           1,
+                                                                                                                                           3,
+                                                                                                                                           "primitive")) {
+            var archetype = scene.archetypes().get(archetypeName);
+            var entity = archetype.createEntity();
+
+            var base = Mapper.base.get(entity);
+            base.setName(name);
+            base.setComponentType(ComponentTypes.ComponentType.Orbits);
+
+            var body = Mapper.body.get(entity);
+            body.setColor(color);
+            body.setLabelColor(color);
+            body.setSizePc(100d);
+
+            var line = Mapper.line.get(entity);
+            line.lineWidth = (float) lineWidth;
+
+            var arrow = Mapper.arrow.get(entity);
+            arrow.arrowCap = arrowCaps;
+
+            var verts = Mapper.verts.get(entity);
+            synchronized (vertsView) {
+                vertsView.setEntity(entity);
+                vertsView.setPrimitiveSize((float) lineWidth);
+                vertsView.setPoints(points);
+                vertsView.setRenderGroup(arrowCaps ? RenderGroup.LINE : RenderGroup.LINE_GPU);
+                vertsView.setClosedLoop(false);
+                vertsView.setGlPrimitive(primitive);
+            }
+
+            var trajectory = Mapper.trajectory.get(entity);
+            if (trajectory != null) {
+                if (trailMap < 0) {
+                    // Trail disabled.
+                    trajectory.orbitTrail = false;
+                    trajectory.setTrailMap(trailMap);
+                } else {
+                    trailMap = MathUtilsDouble.clamp(trailMap, 0.0, 1.0);
+                    trajectory.orbitTrail = true;
+                    trajectory.setTrailMap(trailMap);
+                }
+            }
+
+            var graph = Mapper.graph.get(entity);
+            graph.setParent(Scene.ROOT_NAME);
+
+            scene.initializeEntity(entity);
+            scene.setUpEntity(entity);
+
+            em.post(Event.SCENE_ADD_OBJECT_CMD, this, entity, true);
+
+            return entity;
+        }
+        return null;
+    }
+
+    public void add_polyline(String name, double[] points, double[] color, int lineWidth) {
+        add_polyline(name, points, color, (float) lineWidth);
+    }
+
+    public void add_polyline(String name, double[] points, double[] color, int lineWidth, int primitive) {
+        add_polyline(name, points, color, (float) lineWidth, primitive);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth) {
+        add_polyline(name, api.dArray(points), api.dArray(color), lineWidth);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth, boolean arrowCaps) {
+        add_polyline(name, api.dArray(points), api.dArray(color), lineWidth, arrowCaps);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth, int primitive) {
+        add_polyline(name, api.dArray(points), api.dArray(color), lineWidth, primitive);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth, int primitive, boolean arrowCaps) {
+        add_polyline(name, api.dArray(points), api.dArray(color), lineWidth, primitive, arrowCaps);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth) {
+        add_polyline(name, points, color, (float) lineWidth);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth, boolean arrowCaps) {
+        add_polyline(name, points, color, (float) lineWidth, arrowCaps);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth, int primitive) {
+        add_polyline(name, points, color, (float) lineWidth, primitive);
+    }
+
+    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth, int primitive, boolean arrowCaps) {
+        add_polyline(name, points, color, (float) lineWidth, primitive, arrowCaps);
+    }
+
+    @Override
+    public void remove_object(String name) {
+        if (api.validator.checkString(name, "name")) {
+            em.post(Event.SCENE_REMOVE_OBJECT_CMD, this, name, true);
+        }
+    }
+
+    @Override
+    public void add_shape_around_object(String shapeName,
+                                        String shapeType,
+                                        String primitive,
+                                        double size,
+                                        String objectName,
+                                        float r,
+                                        float g,
+                                        float b,
+                                        float a,
+                                        boolean showLabel,
+                                        boolean trackObject) {
+        add_shape_around_object(shapeName,
+                                shapeType,
+                                primitive,
+                                OrientationComboBoxBean.ShapeOrientation.EQUATORIAL.toString(),
+                                size,
+                                objectName,
+                                r,
+                                g,
+                                b,
+                                a,
+                                showLabel,
+                                trackObject);
+    }
+
+    @Override
+    public void add_shape_around_object(String shapeName,
+                                        String shapeType,
+                                        String primitive,
+                                        String orientation,
+                                        double size,
+                                        String objectName,
+                                        float r,
+                                        float g,
+                                        float b,
+                                        float a,
+                                        boolean showLabel,
+                                        boolean trackObject) {
+        if (api.validator.checkString(shapeName, "shapeName")
+                && api.validator.checkStringEnum(shapeType, ShapeComboBoxBean.Shape.class, "shape")
+                && api.validator.checkStringEnum(primitive,
+                                   PrimitiveComboBoxBean.Primitive.class,
+                                   "primitive")
+                && api.validator.checkStringEnum(
+                                    orientation,
+                                    OrientationComboBoxBean.ShapeOrientation.class,
+                                    "orientation")
+                && api.validator.checkNum(size, 0, Double.MAX_VALUE, "size")
+                && api.validator.checkObjectName(objectName)) {
+            final var shapeLc = shapeType.toLowerCase(Locale.ROOT);
+            api.base.post_runnable(() -> {
+                Entity trackingObject = get_focus_entity(objectName);
+                float[] color = new float[]{r, g, b, a};
+                int primitiveInt = PrimitiveComboBoxBean.Primitive.valueOf(primitive.toUpperCase(Locale.ROOT))
+                        .equals(PrimitiveComboBoxBean.Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                // Create shape
+                Archetype at = scene.archetypes().get("ShapeObject");
+                Entity newShape = at.createEntity();
+
+                var base = Mapper.base.get(newShape);
+                base.setName(shapeName.trim());
+                base.ct = new ComponentTypes(ComponentTypes.ComponentType.Others.ordinal());
+
+                var body = Mapper.body.get(newShape);
+                body.setColor(color);
+                body.setLabelColor(new float[]{r, g, b, a});
+                body.size = (float) (size * Constants.KM_TO_U);
+
+                var graph = Mapper.graph.get(newShape);
+                graph.setParent(Scene.ROOT_NAME);
+
+                var focus = Mapper.focus.get(newShape);
+                focus.focusable = false;
+
+                var shape = Mapper.shape.get(newShape);
+                if (trackObject) {
+                    shape.track = new FocusView(trackingObject);
+                } else {
+                    body.setPos(EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3Q()));
+                }
+                shape.trackName = objectName;
+
+                var trf = Mapper.transform.get(newShape);
+                var m = new Matrix4();
+                var orient = OrientationComboBoxBean.ShapeOrientation.valueOf(orientation.toUpperCase(Locale.ROOT));
+                switch (orient) {
+                    case CAMERA -> {
+                        var camera = GaiaSky.instance.cameraManager.getCamera();
+                        m.rotateTowardDirection(camera.direction, camera.up);
+                    }
+                    case EQUATORIAL -> m.idt();
+                    case ECLIPTIC -> m.set(Coordinates.eclipticToEquatorialF());
+                    case GALACTIC -> m.set(Coordinates.galacticToEquatorialF());
+                }
+                trf.setTransformMatrix(m);
+
+                Map<String, Object> params = new HashMap<>();
+                params.put("quality", 25L);
+                params.put("divisions", shapeLc.equalsIgnoreCase(ShapeComboBoxBean.Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 35L);
+                params.put("recursion", 3L);
+                params.put("diameter", 1.0);
+                params.put("width", 1.0);
+                params.put("height", 1.0);
+                params.put("depth", 1.0);
+                params.put("innerradius", 0.6);
+                params.put("outerradius", 1.0);
+                params.put("sphere-in-ring", false);
+                params.put("flip", false);
+
+                var model = Mapper.model.get(newShape);
+                model.model = new ModelComponent();
+                model.model.type = shapeLc;
+                model.model.setPrimitiveType(primitiveInt);
+                model.model.setParams(params);
+                model.model.setStaticLight(true);
+                model.model.setUseColor(true);
+                model.model.setBlendMode(BlendMode.ADDITIVE);
+                model.model.setCulling(false);
+
+                var rt = Mapper.renderType.get(newShape);
+                rt.renderGroup = RenderGroup.MODEL_VERT_ADDITIVE;
+
+                // Initialize shape.
+                scene.initializeEntity(newShape);
+                scene.setUpEntity(newShape);
+
+                // Add to scene.
+                EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, newShape, false);
+            });
+        }
     }
 
 

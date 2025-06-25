@@ -2002,7 +2002,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * Adds a new trajectory object with the given name, points and color. The trajectory
-     * is rendered using the 'line renderer' setting in the preferences dialog.
+     * is rendered using the 'line renderer' setting in the preferences' dialog.
      * This is a very similar call to {@link #addPolyline(String, double[], double[])},
      * but in this case the line can be rendered with higher quality
      * polyline quadstrips.
@@ -2087,7 +2087,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
      * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
-     * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
+     * @param primitive The GL primitive: <code>GL_LINES</code>=1, <code>GL_LINE_LOOP</code>=2, <code>GL_LINE_STRIP</code>=3
      */
     void addPolyline(String name,
                      double[] points,
@@ -2109,7 +2109,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
      * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
-     * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
+     * @param primitive The GL primitive: <code>GL_LINES</code>=1, <code>GL_LINE_LOOP</code>=2, <code>GL_LINE_STRIP</code>=3
      * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
      */
     void addPolyline(String name,
@@ -2120,22 +2120,18 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      boolean arrowCaps);
 
     /**
-     * <p>
      * Removes the model object identified by the given name from the internal
      * scene graph model of Gaia Sky, if it exists.
      * If the object has children, they are removed recursively.
      * Be careful with this function, as it can have unexpected side effects
      * depending on what objects are removed.
      * For example,
-     * </p>
-     *
+     * <p>
      * <code>
      * gs.removeModelObject("Earth")
      * </code>
-     *
      * <p>
      * removes the Earth, the Moon, Gaia and any dependent object from Gaia Sky.
-     * </p>
      *
      * @param name The name of the object to remove.
      */
@@ -3162,13 +3158,6 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     String getDefaultCameraDir();
 
     /**
-     * Gets the absolute path to the location of the music files
-     *
-     * @return Absolute path to the location of the music files
-     */
-    String getDefaultMusicDir();
-
-    /**
      * Gets the absolute path to the location of the inputListener mappings.
      *
      * @return Absolute path to the location of the inputListener mappings.
@@ -3183,14 +3172,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     String getDataDir();
 
     /**
-     * Gets the absolute path to the location of the configuration directory
+     * Get the absolute path to the location of the configuration directory
      *
      * @return Absolute path of config directory.
      */
     String getConfigDir();
 
     /**
-     * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
+     * Get the path to the default data directory. That is <code>~/.gaiasky/</code> in Windows and macOS, and <code>~/.local/share/gaiasky</code>
      * in Linux.
      *
      * @return Absolute path of data directory.

@@ -745,4 +745,219 @@ public interface SceneAPI {
      */
     void set_velocity_vector_max_number(long maxNumber);
 
+    /**
+     * Add a new trajectory object with the given name, points and color. The trajectory
+     * is rendered using the 'line renderer' setting in the preferences dialog.
+     * This is a very similar call to {@link #add_polyline(String, double[], double[])},
+     * but in this case the line can be rendered with higher quality
+     * polyline quadstrips.
+     *
+     * @param name   The name to identify the trajectory, to possibly remove it later.
+     * @param points The points of the trajectory. It is an array containing all the
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
+     * @param color  The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     */
+    void add_trajectory_line(String name,
+                             double[] points,
+                             double[] color);
+
+    /**
+     * Add a new trajectory object with the given name, points and color. The trajectory
+     * is rendered using the 'line renderer' setting in the preferences' dialog.
+     * This is a very similar call to {@link #add_polyline(String, double[], double[])},
+     * but in this case the line can be rendered with higher quality
+     * polyline quadstrips.
+     *
+     * @param name     The name to identify the trajectory, to possibly remove it later.
+     * @param points   The points of the trajectory. It is an array containing all the
+     *                 points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
+     * @param color    The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param trailMap The bottom mapping position for the trail. The orbit trail assigns an opacity value to
+     *                 each point of the orbit, where 1 is the location of the last point in the points list, and 0 is
+     *                 the first one.
+     *                 This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity
+     *                 value of 0. Set to 0 to have a full trail. Set to 0.5 to have a trail that spans half the orbit.
+     *                 Set to 1 to have no orbit at all. Set to negative to disable the trail.
+     */
+    void add_trajectory_line(String name,
+                             double[] points,
+                             double[] color,
+                             double trailMap);
+
+    /**
+     * Add a new polyline with the given name, points and color. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it. The default primitive of GL_LINE_STRIP
+     * is used.
+     *
+     * @param name   The name to identify the polyline, to possibly remove it later.
+     * @param points The points of the polyline. It is an array containing all the
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
+     * @param color  The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     */
+    void add_polyline(String name,
+                      double[] points,
+                      double[] color);
+
+    /**
+     * Add a new polyline with the given name, points, color and line width. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it. The default primitive type of GL_LINE_STRIP
+     * is used.
+     *
+     * @param name      The name to identify the polyline, to possibly remove it later.
+     * @param points    The points of the polyline. It is an array containing all the
+     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     */
+    void add_polyline(String name,
+                      double[] points,
+                      double[] color,
+                      double lineWidth);
+
+    /**
+     * Add a new polyline with the given name, points, color and line width. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it. The default primitive type of GL_LINE_STRIP
+     * is used. This version enables the addition of arrow caps. In the case arrow caps
+     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with
+     * many points.
+     * The arrow cap is added at the first point in the series.
+     *
+     * @param name      The name to identify the polyline, to possibly remove it later.
+     * @param points    The points of the polyline. It is an array containing all the
+     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
+     */
+    void add_polyline(String name,
+                      double[] points,
+                      double[] color,
+                      double lineWidth,
+                      boolean arrowCaps);
+
+    /**
+     * Add a new polyline with the given name, points, color, line width and primitive. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it.
+     *
+     * @param name      The name to identify the polyline, to possibly remove it later.
+     * @param points    The points of the polyline. It is an array containing all the
+     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param primitive The GL primitive: <code>GL_LINES</code>=1, <code>GL_LINE_LOOP</code>=2, <code>GL_LINE_STRIP</code>=3
+     */
+    void add_polyline(String name,
+                      double[] points,
+                      double[] color,
+                      double lineWidth,
+                      int primitive);
+
+    /**
+     * Add a new polyline with the given name, points, color, line width, primitive and arrow caps. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it. This version enables the addition of arrow caps. In the case arrow
+     * caps
+     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with
+     * many points.
+     * The arrow cap is added at the first point in the series.
+     *
+     * @param name      The name to identify the polyline, to possibly remove it later.
+     * @param points    The points of the polyline. It is an array containing all the
+     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param primitive The GL primitive: <code>GL_LINES</code>=1, <code>GL_LINE_LOOP</code>=2, <code>GL_LINE_STRIP</code>=3
+     * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
+     */
+    void add_polyline(String name,
+                      double[] points,
+                      double[] color,
+                      double lineWidth,
+                      int primitive,
+                      boolean arrowCaps);
+
+    /**
+     * Remove the model object identified by the given name from the internal
+     * scene graph model of Gaia Sky, if it exists.
+     * If the object has children, they are removed recursively.
+     * Be careful with this function, as it can have unexpected side effects
+     * depending on what objects are removed.
+     * For example,
+     * <p>
+     * <code>
+     * gs.removeModelObject("Earth")
+     * </code>
+     * <p>
+     * removes the Earth, the Moon, Gaia and any dependent object from Gaia Sky.
+     *
+     * @param name The name of the object to remove.
+     */
+    void remove_object(String name);
+
+    /**
+     * Add a shape object of the given type with the given size around the object with the given name and primitive.
+     *
+     * @param shapeName   The name of the shape object.
+     * @param shape       The shape type, one of
+     *                    <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
+     *                    a wireframe shape, use 'triangles' for a solid shape.
+     * @param size        The size of the object in kilometers.
+     * @param objectName  The name of the object to use as the position.
+     * @param r           The red component of the color in [0,1].
+     * @param g           The green component of the color in [0,1].
+     * @param b           The blue component of the color in [0,1].
+     * @param a           The alpha component of the color in [0,1].
+     * @param showLabel   Whether to show a label with the name of the shape.
+     * @param trackObject Whether to track the object if/when it moves.
+     */
+    void add_shape_around_object(String shapeName,
+                                 String shape,
+                                 String primitive,
+                                 double size,
+                                 String objectName,
+                                 float r,
+                                 float g,
+                                 float b,
+                                 float a,
+                                 boolean showLabel,
+                                 boolean trackObject);
+
+    /**
+     * Add a shape object of the given type with the given size around the object with the given name, primitive and
+     * orientation.
+     *
+     * @param shapeName   The name of the shape object.
+     * @param shape       The shape type, one of
+     *                    <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
+     *                    a wireframe shape, use 'triangles' for a solid shape.
+     * @param orientation The orientation to use, one of
+     *                    <ul><li>camera</li><li>equatorial</li><li>ecliptic</li><li>galactic</li></ul>.
+     * @param size        The size of the object in kilometers.
+     * @param objectName  The name of the object to use as the position.
+     * @param r           The red component of the color in [0,1].
+     * @param g           The green component of the color in [0,1].
+     * @param b           The blue component of the color in [0,1].
+     * @param a           The alpha component of the color in [0,1].
+     * @param showLabel   Whether to show a label with the name of the shape.
+     * @param trackObject Whether to track the object if/when it moves.
+     */
+    void add_shape_around_object(String shapeName,
+                                 String shape,
+                                 String primitive,
+                                 String orientation,
+                                 double size,
+                                 String objectName,
+                                 float r,
+                                 float g,
+                                 float b,
+                                 float a,
+                                 boolean showLabel,
+                                 boolean trackObject);
+
 }

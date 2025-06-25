@@ -7,6 +7,7 @@
 
 package gaiasky.script.v2.api;
 
+import gaiasky.script.v2.impl.BaseModule;
 import gaiasky.script.v2.impl.OutputModule;
 
 /**
@@ -29,6 +30,14 @@ public interface OutputAPI {
                                int height,
                                String directory,
                                String namePrefix);
+
+    /**
+     * Get the current output directory for screenshots as a string. This comes from a setting stored in the
+     * configuration file. To get the default screenshots location, use {@link BaseModule#get_default_screenshots_dir()}.
+     *
+     * @return The absolute path to the current output directory for screenshots.
+     */
+    String get_current_screenshots_dir();
 
     /**
      * Set the screenshot mode. Possible values are <code>simple</code> and <code>advanced</code>.
@@ -65,6 +74,14 @@ public interface OutputAPI {
                                 int fps,
                                 String directory,
                                 String namePrefix);
+
+    /**
+     * Get the current output directory for the frame output system as a string. This comes from a setting stored in the
+     * configuration file. To get the default frame output location, use {@link BaseModule#get_default_frame_output_dir()}.
+     *
+     * @return The absolute path to the current output directory for the frame output system.
+     */
+    String get_current_frame_output_dir();
 
     /**
      * Configure the frame output system, setting the resolution of the images,
@@ -117,4 +134,10 @@ public interface OutputAPI {
      * @return The frame rate setting of the frame output system.
      */
     double get_frame_output_fps();
+
+    /**
+     * Resets to zero the image sequence number used to generate the file names of the
+     * frame output images.
+     */
+    void reset_frame_output_sequence_number();
 }

@@ -7,15 +7,30 @@
 
 package gaiasky.script.v2.impl;
 
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect;
 import gaiasky.script.v2.api.GraphicsAPI;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 
+import java.util.Locale;
+
 /**
  * The graphics module contains methods and calls that modify and query the graphics and rendering system.
+ * <p>
+ * The methods in this API are organized like this:
+ * <ul>
+ *     <li><code>mode_[...]()</code> &mdash; activate or deactivate camera modes</li>
+ *     <li><code>effect_[...]()</code> &mdash; activate or deactivate post-processing effects</li>
+ *     <li><code>set_[...]()</code> &mdash; set properties or settings
+ *     <ul>
+ *     <li><code>set_image_[...]()</code> &mdash; set image levels</li>
+ *     </ul>
+ *     </li>
+ * </ul>
  */
 public class GraphicsModule extends APIModule implements GraphicsAPI {
     /**
@@ -26,6 +41,194 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
      */
     public GraphicsModule(EventManager em, APIv2 api, String name) {
         super(em, api, name);
+    }
+
+    @Override
+    public void set_image_brightness(double level) {
+        if (api.validator.checkNum(level, -1d, 1d, "brightness")) api.base.post_runnable(() -> em.post(Event.BRIGHTNESS_CMD, this, (float) level));
+    }
+
+    public void set_image_brightness(long level) {
+        set_image_brightness((double) level);
+    }
+
+    @Override
+    public void set_image_contrast(double level) {
+        if (api.validator.checkNum(level, 0d, 2d, "contrast")) api.base.post_runnable(() -> em.post(Event.CONTRAST_CMD, this, (float) level));
+    }
+
+    public void set_image_contrast(long level) {
+        set_image_contrast((double) level);
+    }
+
+    @Override
+    public void set_image_hue(double level) {
+        if (api.validator.checkNum(level, 0d, 2d, "hue")) api.base.post_runnable(() -> em.post(Event.HUE_CMD, this, (float) level));
+    }
+
+    public void set_image_hue(long level) {
+        set_image_hue((double) level);
+    }
+
+    @Override
+    public void set_image_saturation(double level) {
+        if (api.validator.checkNum(level, 0d, 2d, "saturation")) api.base.post_runnable(() -> em.post(Event.SATURATION_CMD, this, (float) level));
+    }
+
+    public void set_image_saturation(long level) {
+        set_image_saturation((double) level);
+    }
+
+    @Override
+    public void set_gamma_correction(double level) {
+        if (api.validator.checkNum(level, 0d, 3d, "gamma correction")) api.base.post_runnable(() -> em.post(Event.GAMMA_CMD, this, (float) level));
+    }
+
+    public void set_gamma_correction(long level) {
+        set_gamma_correction((double) level);
+    }
+
+    @Override
+    public void set_hdr_tone_mapping(String type) {
+        if (api.validator.checkString(type, new String[]{"auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE"}, "tone mapping type"))
+            api.base.post_runnable(() -> em.post(Event.TONEMAPPING_TYPE_CMD, this, Settings.ToneMapping.valueOf(type.toUpperCase(Locale.ROOT))));
+    }
+
+    @Override
+    public void set_exposure_tone_mapping(double level) {
+        if (api.validator.checkNum(level, 0d, 20d, "exposure")) api.base.post_runnable(() -> em.post(Event.EXPOSURE_CMD, this, (float) level));
+    }
+
+    public void set_exposure_tone_mapping(long level) {
+        set_exposure_tone_mapping((double) level);
+    }
+
+    @Override
+    public void mode_cubemap(boolean state, String projection) {
+        if (api.validator.checkStringEnum(projection, CubmeapProjectionEffect.CubemapProjection.class, "projection")) {
+            CubmeapProjectionEffect.CubemapProjection newProj = CubmeapProjectionEffect.CubemapProjection.valueOf(projection.toUpperCase(Locale.ROOT));
+            api.base.post_runnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
+        }
+    }
+
+    @Override
+    public void mode_panorama(boolean state) {
+        api.base.post_runnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubmeapProjectionEffect.CubemapProjection.EQUIRECTANGULAR));
+    }
+
+    @Override
+    public void mode_reprojection(String mode) {
+        if (api.validator.checkStringEnum(mode, Settings.ReprojectionMode.class, "re-projection mode")) {
+            Settings.ReprojectionMode newMode = Settings.ReprojectionMode.valueOf(mode.toUpperCase(Locale.ROOT));
+            api.base.post_runnable(() -> em.post(Event.REPROJECTION_CMD, this, newMode != Settings.ReprojectionMode.DISABLED, newMode));
+        }
+    }
+
+    @Override
+    public void set_back_buffer_scale(float scale) {
+        if (api.validator.checkNum(scale, 0.5f, 4f, "back buffer scale")) {
+            api.base.post_runnable(() -> GaiaSky.instance.resetDynamicResolution());
+            api.base.post_runnable(() -> em.post(Event.BACKBUFFER_SCALE_CMD, this, scale));
+        }
+    }
+
+    @Override
+    public void set_index_of_refraction(float ior) {
+        em.post(Event.INDEXOFREFRACTION_CMD, this, ior);
+    }
+
+    @Override
+    public void mode_planetarium(boolean state) {
+        api.base.post_runnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubmeapProjectionEffect.CubemapProjection.AZIMUTHAL_EQUIDISTANT));
+    }
+
+    @Override
+    public void set_cubemap_resolution(int resolution) {
+        if (api.validator.checkNum(resolution, 20, 15000, "resolution")) {
+            api.base.post_runnable(() -> em.post(Event.CUBEMAP_RESOLUTION_CMD, this, resolution));
+        }
+    }
+
+    @Override
+    public void set_cubemap_projection(String projection) {
+        if (api.validator.checkStringEnum(projection, CubmeapProjectionEffect.CubemapProjection.class, "projection")) {
+            CubmeapProjectionEffect.CubemapProjection newProj = CubmeapProjectionEffect.CubemapProjection.valueOf(projection.toUpperCase(Locale.ROOT));
+            em.post(Event.CUBEMAP_PROJECTION_CMD, this, newProj);
+        }
+    }
+
+    @Override
+    public void mode_orthosphere(boolean state) {
+        api.base.post_runnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubmeapProjectionEffect.CubemapProjection.ORTHOSPHERE));
+    }
+
+    @Override
+    public void mode_stereoscopic(boolean state) {
+        api.base.post_runnable(() -> em.post(Event.STEREOSCOPIC_CMD, this, state));
+    }
+
+    @Override
+    public void set_stereo_profile(int index) {
+        api.base.post_runnable(() -> em.post(Event.STEREO_PROFILE_CMD, this, index));
+    }
+
+    @Override
+    public long get_current_frame_number() {
+        return GaiaSky.instance.frames;
+    }
+
+    @Override
+    public void effect_lens_flare(boolean state) {
+        api.base.post_runnable(() -> em.post(Event.LENS_FLARE_CMD, this, state ? 1f : 0f));
+    }
+
+    @Override
+    public void effect_lens_flare(double strength) {
+        if (api.validator.checkNum(strength, Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, "strength")) {
+            api.base.post_runnable(() -> em.post(Event.LENS_FLARE_CMD, this, (float) strength));
+        }
+    }
+
+    @Override
+    public void effect_motion_blur(boolean active) {
+        var strength = active ? 0.8f : 0f;
+        api.base.post_runnable(() -> em.post(Event.MOTION_BLUR_CMD, this, strength));
+    }
+
+    @Override
+    public void effect_motion_blur(double value) {
+        api.base.post_runnable(() -> em.post(Event.MOTION_BLUR_CMD, this, (float) value));
+    }
+
+    @Override
+    public void effect_star_glow(boolean state) {
+        api.base.post_runnable(() -> em.post(Event.LIGHT_GLOW_CMD, this, state));
+    }
+
+    @Override
+    public void effect_bloom(float value) {
+        if (api.validator.checkNum(value, 0f, 1f, "bloom strength")) {
+            api.base.post_runnable(() -> em.post(Event.BLOOM_CMD, this, value));
+        }
+    }
+
+    @Override
+    public void effect_chromatic_aberration(float value) {
+        if (api.validator.checkNum(value,
+                                   Constants.MIN_CHROMATIC_ABERRATION_AMOUNT,
+                                   Constants.MAX_CHROMATIC_ABERRATION_AMOUNT,
+                                   "chromatic aberration amount")) {
+            api.base.post_runnable(() -> em.post(Event.CHROMATIC_ABERRATION_CMD, this, value));
+        }
+    }
+
+    public void effect_bloom(int level) {
+        effect_bloom((float) level);
+    }
+
+    @Override
+    public void set_smooth_lod_transitions(boolean value) {
+        api.base.post_runnable(() -> em.post(Event.OCTREE_PARTICLE_FADE_CMD, this, value));
     }
 
     @Override
@@ -114,7 +317,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
             EventManager.publish(Event.STAR_BASE_LEVEL_CMD, this, opacity);
     }
 
-    public void setStarBaseOpacity(long opacity) {
+    public void set_star_base_opacity(long opacity) {
         set_star_base_opacity((float) opacity);
     }
 

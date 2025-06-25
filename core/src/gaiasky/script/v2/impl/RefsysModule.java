@@ -39,6 +39,18 @@ public class RefsysModule extends APIModule implements RefsysAPI {
         return new double[]{pos.x, pos.y, pos.z};
     }
 
+    @Override
+    public double[] get_transform_matrix(String name) {
+        var mat = Coordinates.getTransformD(name);
+        if (mat != null) {
+            return mat.val;
+        } else {
+            logger.error(name + ": no transformation found with the given name");
+            return null;
+        }
+    }
+
+
     public double[] galactic_to_cartesian(int l, int b, int r) {
         return galactic_to_cartesian((double) l, (double) b, (double) r);
     }

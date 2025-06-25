@@ -339,5 +339,9 @@ public class UiModule extends APIModule implements UiAPI {
         return textures.get(path);
     }
 
+    @Override
+    public void reload() {
+        EventManager.publish(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());
+    }
 
 }

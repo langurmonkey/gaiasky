@@ -244,7 +244,7 @@ public class SettingsManager {
 
         // Data location.
         if (settings.data.location == null || settings.data.location.isBlank()) {
-            settings.data.location = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");
+            settings.data.location = SysUtils.getDefaultDatasetsDir().toAbsolutePath().toString().replaceAll("\\\\", "/");
         }
 
         // Default distance units.

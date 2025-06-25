@@ -403,4 +403,10 @@ public interface UiAPI {
      * @param path The path of the image file to preload as a string.
      */
     void preload_texture(String path);
+
+    /**
+     * Forces a re-initialization of the entire user interface of Gaia Sky. This causes all elements in the UI to
+     * be disposed and re-created.
+     */
+    void reload();
 }

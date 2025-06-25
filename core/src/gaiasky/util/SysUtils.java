@@ -57,7 +57,6 @@ public class SysUtils {
     private static final String CAMERA_DIR_NAME = "camera";
     private static final String SCREENSHOTS_DIR_NAME = "screenshots";
     private static final String FRAMES_DIR_NAME = "frames";
-    private static final String MUSIC_DIR_NAME = "music";
     private static final String MAPPINGS_DIR_NAME = "mappings";
     private static final String BOOKMARKS_DIR_NAME = "bookmarks";
     private static final String MPCDI_DIR_NAME = "mpcdi";
@@ -119,7 +118,6 @@ public class SysUtils {
             Files.createDirectories(getCacheDir());
             // Bottom level.
             Files.createDirectories(getDefaultCameraDir());
-            Files.createDirectories(getDefaultMusicDir());
             Files.createDirectories(getDefaultFramesDir());
             Files.createDirectories(getDefaultScreenshotsDir());
             Files.createDirectories(getDefaultMappingsDir());
@@ -284,15 +282,6 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the music directory.
-     *
-     * @return A pointer to the Gaia Sky music directory.
-     */
-    public static Path getDefaultMusicDir() {
-        return getDataDir().resolve(MUSIC_DIR_NAME);
-    }
-
-    /**
      * Gets a file pointer to the mappings' directory.
      *
      * @return A pointer to the Gaia Sky mappings directory.
@@ -329,11 +318,11 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the local data directory where the data files are downloaded and stored.
+     * Gets a file pointer to the default directory where datasets are downloaded and stored.
      *
-     * @return A pointer to the local data directory where the data files are.
+     * @return A pointer to the default datasets directory.
      */
-    public static Path getLocalDataDir() {
+    public static Path getDefaultDatasetsDir() {
         return getDataDir().resolve(DATA_DIR_NAME);
     }
 

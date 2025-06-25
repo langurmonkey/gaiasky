@@ -70,15 +70,15 @@ public interface TimeAPI {
      * Return the current UTC simulation time in an array.
      *
      * @return The current simulation time in an array with the given indices.
-     * <ul>
-     * <li>0 - The year.</li>
-     * <li>1 - The month, from 1 (January) to 12 (December).</li>
-     * <li>2 - The day-of-month, from 1 to 31.</li>
-     * <li>3 - The hour-of-day, from 0 to 23.</li>
-     * <li>4 - The minute-of-hour, from 0 to 59.</li>
-     * <li>5 - The second-of-minute, from 0 to 59.</li>
-     * <li>6 - The millisecond-of-second, from 0 to 999.</li>
-     * </ul>
+     *         <ul>
+     *         <li>0 - The year.</li>
+     *         <li>1 - The month, from 1 (January) to 12 (December).</li>
+     *         <li>2 - The day-of-month, from 1 to 31.</li>
+     *         <li>3 - The hour-of-day, from 0 to 23.</li>
+     *         <li>4 - The minute-of-hour, from 0 to 59.</li>
+     *         <li>5 - The second-of-minute, from 0 to 59.</li>
+     *         <li>6 - The millisecond-of-second, from 0 to 999.</li>
+     *         </ul>
      */
     int[] get_clock_array();
 
@@ -145,4 +145,49 @@ public interface TimeAPI {
      */
     void remove_target_time();
 
+    /**
+     * Set the maximum simulation time allowed, in years. This sets the maximum time in the future (years)
+     * and in the past (-years). This setting is not saved to the configuration and resets to 5 Myr after
+     * restart.
+     *
+     * @param years The maximum year number to allow.
+     */
+    void set_max_simulation_time(long years);
+
+    /**
+     * Create a time transition from the current time to the given time (year, month, day, hour, minute, second,
+     * millisecond). The time is given in UTC.
+     *
+     * @param year            The year to represent.
+     * @param month           The month-of-year to represent, from 1 (January) to 12
+     *                        (December).
+     * @param day             The day-of-month to represent, from 1 to 31.
+     * @param hour            The hour-of-day to represent, from 0 to 23.
+     * @param min             The minute-of-hour to represent, from 0 to 59.
+     * @param sec             The second-of-minute to represent, from 0 to 59.
+     * @param milliseconds    The millisecond-of-second, from 0 to 999.
+     * @param durationSeconds The duration of the transition, in seconds.
+     * @param smoothType      The function type to use for smoothing. Either "logit", "logisticsigmoid" or "none".
+     *                        <ul>
+     *                        <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                        an effect, otherwise, linear interpolation is used.</li>
+     *                        <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                        0.09 and 0.01.</li>
+     *                        <li>"none": no smoothing is applied.</li>
+     *                        </ul>
+     * @param smoothFactor    Smoothing factor (depends on type, see #smoothType).
+     * @param sync            If true, the call waits for the transition to finish before returning,
+     *                        otherwise it returns immediately.
+     */
+    void transition(int year,
+                    int month,
+                    int day,
+                    int hour,
+                    int min,
+                    int sec,
+                    int milliseconds,
+                    double durationSeconds,
+                    String smoothType,
+                    double smoothFactor,
+                    boolean sync);
 }

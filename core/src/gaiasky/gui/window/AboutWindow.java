@@ -293,11 +293,6 @@ public class AboutWindow extends GenericDialog {
         var frames = new OwnLabel(TextUtils.capString(framesPath, pathLength, true), skin);
         frames.addListener(new OwnTextTooltip(framesPath, skin, 15));
 
-        var musicTitle = new OwnLabel(I18n.msg("gui.help.paths.music"), skin);
-        var musicPath = SysUtils.getDefaultMusicDir().toAbsolutePath().toString();
-        var music = new OwnLabel(TextUtils.capString(musicPath, pathLength, true), skin);
-        music.addListener(new OwnTextTooltip(musicPath, skin, 15));
-
         var mappingsTitle = new OwnLabel(I18n.msg("gui.help.paths.mappings"), skin);
         var mappingsPath = SysUtils.getDefaultMappingsDir().toAbsolutePath().toString();
         var mappings = new OwnLabel(TextUtils.capString(mappingsPath, pathLength, true), skin);
@@ -445,9 +440,6 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
         contentSystem.add(mappingsTitle).left().top().padRight(pad18);
         contentSystem.add(mappings).left();
-        contentSystem.row();
-        contentSystem.add(musicTitle).left().top().padRight(pad18);
-        contentSystem.add(music).left();
         contentSystem.row();
 
         // JAVA

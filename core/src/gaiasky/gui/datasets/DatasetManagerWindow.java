@@ -171,7 +171,7 @@ public class DatasetManagerWindow extends GenericDialog {
         float width = 1800f;
 
         try {
-            Files.createDirectories(SysUtils.getLocalDataDir());
+            Files.createDirectories(SysUtils.getDefaultDatasetsDir());
         } catch (FileAlreadyExistsException e) {
             // Good
         } catch (IOException e) {
