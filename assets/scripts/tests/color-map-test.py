@@ -27,6 +27,8 @@ gs.loadDataset(name, assets + "/scripts/tests/hip-subset.vot")
 cmaps = ["reds", "greens", "blues", "rainbow18", "rainbow", "seismic", "carnation", "hotmetal", "cool"]
 cmapi = 0
 
+gs.sleep(3.0)
+
 gs.setCameraFocus("2548")
 for i in range(8):
     gs.highlightDataset(name, "RA", cmaps[cmapi], 0.0, 15.0, True)
@@ -36,6 +38,8 @@ for i in range(8):
     cmapi = (cmapi + 1) % len(cmaps)
     gs.sleep(1)
 
+
+gs.removeDataset("hip-script")
 lprint("Test finished")
 
 gateway.shutdown()

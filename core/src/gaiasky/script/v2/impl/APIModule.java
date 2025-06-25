@@ -10,6 +10,7 @@ package gaiasky.script.v2.impl;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
+import gaiasky.util.TextUtils;
 
 import java.util.Locale;
 
@@ -39,7 +40,7 @@ public abstract class APIModule {
         this.api = api;
         this.name = name;
 
-        this.logger = getLogger(name.toUpperCase(Locale.ROOT) + "Module");
+        this.logger = getLogger(TextUtils.capitalise(name) + "Module");
 
         this.me = this;
     }

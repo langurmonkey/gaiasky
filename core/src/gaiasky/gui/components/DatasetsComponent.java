@@ -68,7 +68,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         infoMap = new ConcurrentHashMap<>();
         transformsMap = new ConcurrentHashMap<>();
         EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT,
-                Event.CATALOG_POINT_SIZE_SCALING_CMD);
+                                        Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
     @Override
@@ -275,7 +275,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             ColormapPicker cmp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
             cmp.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
             cmp.setNewColorRunnable(() -> ci.setHlColor(cmp.getPickedColor()));
-            cmp.setNewColormapRunnable(() -> ci.setHlColormap(cmp.getPickedCmapIndex(), cmp.getPickedCmapAttribute(), cmp.getPickedCmapMin(), cmp.getPickedCmapMax()));
+            cmp.setNewColormapRunnable(() -> ci.setHlColormap(cmp.getPickedCmapIndex(),
+                                                              cmp.getPickedCmapAttribute(),
+                                                              cmp.getPickedCmapMin(),
+                                                              cmp.getPickedCmapMax()));
             cp = cmp;
         } else {
             ColorPicker clp = new ColorPicker(ci.name, ci.hlColor, stage, skin);
@@ -319,8 +322,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
 
         if (ci.isHighlightable()) {
-            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE,
-                    Constants.SLIDER_STEP_TINY, skin);
+            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"),
+                                                          Constants.MIN_POINT_SIZE_SCALE,
+                                                          Constants.MAX_POINT_SIZE_SCALE,
+                                                          Constants.SLIDER_STEP_TINY,
+                                                          skin);
             sizeScaling.setWidth(350f);
             if (ci.entity != null) {
                 var graph = Mapper.graph.get(ci.entity);
@@ -381,7 +387,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 // Visibility
                                 boolean currentVisibility = ci.isVisible(true);
                                 MenuItem visibility = new MenuItem(I18n.msg(currentVisibility ? "gui.hide" : "gui.show"), skin,
-                                        skin.getDrawable(currentVisibility ? "eye-s-off" : "eye-s-on"));
+                                                                   skin.getDrawable(currentVisibility ? "eye-s-off" : "eye-s-on"));
                                 visibility.addListener(new ChangeListener() {
                                     @Override
                                     public void changed(ChangeEvent event,
@@ -394,7 +400,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                     // Highlight
                                     boolean currentHighlight = ci.highlighted;
                                     MenuItem highlight = new MenuItem(I18n.msg(currentHighlight ? "gui.deemphasize" : "gui.highlight"), skin,
-                                            skin.getDrawable(currentHighlight ? "highlight-s-off" : "highlight-s-on"));
+                                                                      skin.getDrawable(currentHighlight ? "highlight-s-off" : "highlight-s-on"));
                                     highlight.addListener(new ChangeListener() {
                                         @Override
                                         public void changed(ChangeEvent event,
@@ -425,7 +431,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 });
                                 datasetContext.addItem(delete);
                                 datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale,
-                                        stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
+                                                        stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
                             });
                             // Set to processed
                             event.setBubbles(false);
@@ -502,7 +508,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                     } else if (data[0] instanceof Entity entity) {
                         e = entity;
                     }
-                    if(e != null) {
+                    if (e != null) {
                         String datasetName = (String) data[1];
                         boolean checked = (Boolean) data[2];
                         if (Mapper.mesh.has(e)) {
@@ -517,7 +523,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                     CatalogInfo ci = (CatalogInfo) data[0];
                     float[] col = ci.hlColor;
                     if (colorMap.containsKey(ci.name) && col != null) {
-                        colorMap.get(ci.name).setPickedColor(col);
+                        if (ci.plainColor) {
+                            colorMap.get(ci.name).setPickedColor(col);
+                        }
                     }
 
                     if (imageMap.containsKey(ci.name)) {

@@ -7,7 +7,7 @@ gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
 
-gs.setBackBufferScale(2.0)
+gs.setBackBufferScale(0.5)
 
 gs.sleep(5.0)
 

@@ -137,6 +137,7 @@ public class SetUtils {
         label.setLabelPosition(new double[]{0.0, -5.0e7, -4e8});
 
         var set = Mapper.starSet.get(entity);
+        set.setGenerateIndex(true);
         set.setData(data);
         set.setDatafile(file);
         set.setColumnInfoList(columnInfoList);

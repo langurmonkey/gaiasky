@@ -76,7 +76,11 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     @Override
     public void focus_mode(final String focusName, final float waitTimeSeconds) {
         if (api.validator.checkString(focusName, "focusName") && api.validator.checkFocusName(focusName)) {
-            var entity = api.scene.get_entity(focusName);
+            var entity = api.scene.get_focus(focusName);
+            // Make sure that star and particle sets have the correct focus index.
+            focusView.setEntity(entity);
+            focusView.getFocus(focusName);
+            // Execute mode change.
             focus_mode(entity, waitTimeSeconds);
         }
     }

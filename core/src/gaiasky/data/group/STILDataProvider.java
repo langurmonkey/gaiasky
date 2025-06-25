@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.Particle;
 import gaiasky.scene.record.ParticleExt;
@@ -695,7 +697,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         logger.warn(I18n.msg("warn.star.vari.noperiod", noPeriods));
                     }
                 } else {
-                    logger.error(I18n.msg("error.star.noposition"));
+                    var msg = I18n.msg("error.star.noposition");
+                    logger.error(msg);
+                    EventManager.instance.post(Event.POST_POPUP_NOTIFICATION, this, msg);
                 }
             }
         } catch (Exception e) {

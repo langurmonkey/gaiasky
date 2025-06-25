@@ -599,7 +599,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
             logger.info(I18n.msg("notif.catalog.loading", dsName));
 
             // Create star/particle group or star clusters
-            if (api.validator.checkString(dsName, "datasetName") && !api.validator.checkDatasetName(dsName)) {
+            if (api.validator.checkString(dsName, "datasetName") && !api.catalogManager.contains(dsName)) {
                 // Only local files checked.
                 Path path = null;
                 if (ds instanceof FileDataSource) {
@@ -640,10 +640,11 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                                                  false));
 
                             // Catalog info.
-                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
+                            new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, starGroup.get(), true);
                             // Add to catalog manager -> setUp.
+                            scene.initializeEntity(starGroup.get());
                             scene.setUpEntity(starGroup.get());
 
                             String typeStr = datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS ? I18n.msg(
@@ -1015,7 +1016,6 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
             {
                 if (ci.entity != null) {
                     var entity = ci.entity;
-                    final var focusView = this.focusView;
                     synchronized (focusView) {
                         focusView.setEntity(entity);
                         if (focusView.isSet()) {
