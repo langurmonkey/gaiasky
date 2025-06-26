@@ -6,8 +6,6 @@
  */
 
 /**
- * APIv2 and implementation. This package contains the definition and implementation of the new APIv2.
- * <p>
- * For more information, see the {@link gaiasky.script top scripting package}.
+ * Implementation of the APIv2 modules.
  */
-package gaiasky.script.v2;
+package gaiasky.script.v2.impl;
