@@ -6,7 +6,7 @@
  */
 
 /**
- * Since Gaia Sky 3.6.9 we have a new API ({@link gaiasky.script.v2}). We call it <strong>APIv2</strong>.
+ * Since Gaia Sky 3.6.9 we have a new API ({@link gaiasky.script.v2 v2}). We call it <strong>APIv2</strong>.
  * <p>
  * APIv2 is the preferred interface to access Gaia Sky scripting. It has been re-designed from the ground up, but it
  * contains the same functionality as the old {@link gaiasky.script.IScriptingInterface}. Here are some of its properties:
