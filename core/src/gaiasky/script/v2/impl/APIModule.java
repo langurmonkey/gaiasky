@@ -16,6 +16,9 @@ import java.util.Locale;
 
 import static gaiasky.util.Logger.getLogger;
 
+/**
+ * Abstract class which contains attributes and methods common to all API modules.
+ */
 public abstract class APIModule {
     protected final Logger.Log logger;
 
