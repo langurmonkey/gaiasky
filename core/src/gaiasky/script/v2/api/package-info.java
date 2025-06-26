@@ -33,15 +33,11 @@
  *         <li>{@link gaiasky.script.v2.impl.InstancesModule} &mdash; Functions to work with multiple connected instances in the primary-replica model.</li>
  *     </ul>
  *     </li>
- * </ul>
- * The new APIv2 has some advantages over the old one:
- * <ul>
  *     <li>It is well organized.</li>
- *     <li>It is modular.</li>
  *     <li>Uses consistent function naming.</li>
  *     <li>Uses consistent parameter naming.</li>
  * </ul>
- *
+ * <p>
  * From a script, you can access the new APIv2 like this:
  *
  * <pre>{@code
@@ -51,6 +47,8 @@
  * apiv2 = gateway.entry_point.apiv2
  * # Base module
  * base = apiv2.base
+ * # Time module
+ * time = apiv2.time
  * # Camera module
  * camera = apiv2.camera
  * # Interactive camera module

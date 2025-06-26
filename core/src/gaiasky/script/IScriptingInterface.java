@@ -23,7 +23,9 @@ import gaiasky.util.coord.IPythonCoordinatesProvider;
 import java.util.List;
 
 /**
- * <p>Definition of the public API exposed to scripts via Py4j or the REST server.</p>
+ * <p>Definition of the public API (v1), which defines calls and command to interact with Gaia Sky. These calls
+ * can be accessed through Python scripts, via <code>Py4j</code>, using the REST server, or using the in-app console.</p>
+ * <p>See {@link gaiasky.script APIv1} for a high-level description of the APIv1.</p>
  * <p>For more information on Gaia Sky scripting, see
  * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Scripting.html">this page</a>.</p>
  */
