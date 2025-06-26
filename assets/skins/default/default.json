@@ -1179,6 +1179,85 @@
       "font": "ui-22",
       "fontColor": "white",
       "background": null
+    },
+    "msg-15": {
+      "font": "ui-15",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-17": {
+      "font": "ui-17",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-18": {
+      "font": "ui-18",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-19": {
+      "font": "ui-19",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-20": {
+      "font": "ui-20",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-21": {
+      "font": "ui-21",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-22": {
+      "font": "ui-21",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-23": {
+      "font": "ui-23",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-24": {
+      "font": "ui-23",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-25": {
+      "font": "ui-25",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-26": {
+      "font": "ui-25",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-27": {
+      "font": "ui-28",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-28": {
+      "font": "ui-28",
+      "fontColor": "white"
+    },
+    "msg-29": {
+      "font": "ui-28",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-30": {
+      "font": "ui-30",
+      "fontColor": "white",
+      "background": null
+    },
+    "msg-33": {
+      "font": "ui-33",
+      "fontColor": "white",
+      "background": null
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle": {

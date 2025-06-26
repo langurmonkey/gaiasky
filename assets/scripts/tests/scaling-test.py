@@ -46,7 +46,7 @@ gs.setObjectSizeScaling("Pluto", 100000.0)
 
 # Refresh orbit, update positions
 gs.refreshAllOrbits();
-gs.forceSceneUpdate();
+gs.forceUpdateScene();
 
 gs.sleep(3)
 
@@ -89,7 +89,7 @@ gs.setObjectSizeScaling("Pluto", 1.0)
 
 # Refresh orbit, update positions
 gs.refreshAllOrbits();
-gs.forceSceneUpdate();
+gs.forceUpdateScene();
 
 # Orbits and labels off
 gs.setVisibility("element.orbits", False)

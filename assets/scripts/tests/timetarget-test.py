@@ -18,10 +18,10 @@ gs.setSimulationTime(2019, 12, 1, 10, 5, 0, 0)
 
 gs.sleep(2)
 
-# Target time, roughly 48000 years into the future
-gs.setTargetTime(50000, 1, 1, 10, 5, 0, 0)
+# Target time, roughly 4800 years into the future
+gs.setTargetTime(5000, 1, 1, 10, 5, 0, 0)
 # Fast pace
-gs.setSimulationPace(2.7e11)
+gs.setSimulationPace(2.7e10)
 # Start!
 gs.startSimulationTime()
 
@@ -33,10 +33,10 @@ gs.print("%s - Time is:        %i/%i/%i %i:%i:%i.%i" % (datetime.now().time(), t
 gs.print("%s - Time should be: 1/1/50000 10:05:00.000" % datetime.now().time())
 gs.sleep(2)
 
-# Back to 2017
+# Back to 2019
 gs.setTargetTime(2019, 12, 1, 10, 5, 0, 0)
 # Backwards now!
-gs.setSimulationPace(-2.7e11)
+gs.setSimulationPace(-2.7e10)
 # Start!
 gs.startSimulationTime()
 

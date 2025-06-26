@@ -52,7 +52,6 @@ gs.setFrameOutput(False)
 
 pprint("OK")
 
-
 # Count files.
 nfiles = len([name for name in os.listdir(outdir) if os.path.isfile(os.path.join(outdir, name))])
 pprint(f"Produced frames: {nfiles}")

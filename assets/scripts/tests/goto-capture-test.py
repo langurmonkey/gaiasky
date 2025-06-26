@@ -2,41 +2,48 @@
 # Created by Toni Sagrista
 
 from py4j.clientserver import ClientServer, JavaParameters
+import os
 
 gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
-gs.disableInput()
-gs.cameraStop()
+def remove_files_with_prefix(directory, prefix):
+    for filename in os.listdir(directory):
+        if filename.startswith(prefix):
+            filepath = os.path.join(directory, filename)
+            if os.path.isfile(filepath):
+                os.remove(filepath)
+                print(f"Removed: {filepath}")
 
-gs.setRotationCameraSpeed(40)
-gs.setTurningCameraSpeed(30)
-gs.setCameraSpeed(30)
+out = gs.getDefaultFramesDir()
+prefix = "scripting-test"
 
-gs.configureRenderOutput(1280, 720, 60, gs.getDefaultFramesDir(), 'scripting-test')
-gs.setFrameOutput(True)
+print(f"This script will write many image files to '{out}'.")
+print("All images will be deleted at the end.")
+op = input("Are you sure you want to continue? [y/n]: ")
 
-gs.goToObject("Sun", -1, 2.5)
+if op == "y":
+    gs.cameraStop()
 
-gs.setHeadlineMessage("Sun")
-gs.setSubheadMessage("This is the Sun, our star")
+    gs.setRotationCameraSpeed(40)
+    gs.setTurningCameraSpeed(30)
+    gs.setCameraSpeed(30)
 
-gs.sleepFrames(40)
-gs.clearAllMessages()
+    gs.configureRenderOutput(1280, 720, 30, out, prefix)
+    gs.setFrameOutput(True)
 
-gs.goToObject("Earth", -1, 2.5)
+    gs.goToObject("Sun", -1, 2.5)
 
-gs.setHeadlineMessage("Earth")
-gs.setSubheadMessage("This is the Earth, our home")
+    gs.setHeadlineMessage("Sun")
+    gs.setSubheadMessage("This is the Sun, our star")
 
-gs.sleepFrames(40)
-gs.clearAllMessages()
+    gs.sleepFrames(1)
+    gs.clearAllMessages()
 
-gs.setCameraFocus("Sun")
-gs.sleep(4)
+    gs.setFrameOutput(False)
 
-gs.setFrameOutput(False)
-
-gs.enableInput()
+    gs.sleep(2)
+    print("Cleaning up...")
+    remove_files_with_prefix(out, prefix)
 
 gateway.shutdown()

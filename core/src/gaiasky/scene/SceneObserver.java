@@ -64,7 +64,7 @@ public class SceneObserver implements IObserver {
                 final boolean state = (boolean) data[2];
 
                 focusView.setForceLabel(state, name.toLowerCase(Locale.ROOT));
-                logger.info(I18n.msg("notif.object.flag", "forceLabel", focusView.getName(), I18n.msg("gui." + state)));
+                logger.info(I18n.msg("notif.object.flag", "forceLabel", name, I18n.msg("gui." + state)));
             }
         }
         case LABEL_COLOR_CMD -> {

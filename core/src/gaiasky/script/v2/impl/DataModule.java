@@ -236,7 +236,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                      colorNoise,
                                      labelColor,
                                      particleSize,
-                                     new double[]{Math.tan(Math.toRadians(0.1)), FastMath.tan(Math.toRadians(6.0))},
+                                     new double[]{Math.tan(Math.toRadians(0.1)), FastMath.tan(Math.toRadians(3.0))},
                                      ct,
                                      fadeIn,
                                      fadeOut,

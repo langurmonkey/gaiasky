@@ -194,6 +194,9 @@ public class SetUtils {
         base.setName(name.replace("%%PGID%%", Long.toString(base.id)));
         base.setCt(ct);
 
+        var hl = Mapper.highlight.get(entity);
+        hl.pointscaling = (float) particleSize;
+
         var body = Mapper.body.get(entity);
         body.setColor(particleColor);
         body.setLabelColor(labelColor);

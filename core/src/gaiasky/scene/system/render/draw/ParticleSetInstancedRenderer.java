@@ -261,9 +261,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         if (extended) {
                             // PROPER MOTION
                             if (particle.hasProperMotion()) {
-                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = (float) particle.vx();
-                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = (float) particle.vy();
-                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = (float) particle.vz();
+                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = particle.vx();
+                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = particle.vy();
+                                model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = particle.vz();
                             } else {
                                 model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = 0f;
                                 model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = 0f;

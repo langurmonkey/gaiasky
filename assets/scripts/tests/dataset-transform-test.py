@@ -31,7 +31,7 @@ op = input("What operation do you want to perform? (t: transform, c: clear): ")
 
 if op == "t":
     # Rotate 45 degrees
-    mat = gateway.jvm.gaiasky.util.math.Matrix4d()
+    mat = gateway.jvm.gaiasky.util.math.Matrix4D()
     mat.rotate(0.0, 1.0, 0.0, 10.0)
     gs.setDatasetTransformationMatrix(ds_name, mat.getValues())
 elif op == "c":

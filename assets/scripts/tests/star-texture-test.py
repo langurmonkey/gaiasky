@@ -22,7 +22,7 @@ for i in range(ntextures):
 
 gs.setStarTextureIndex(4)
 gs.setStarBrightness(21.0)
-gs.setStarSize(8.2)
+gs.setStarSize(3.0)
 
 
 # close connection
