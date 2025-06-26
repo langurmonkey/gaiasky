@@ -6,10 +6,10 @@
  */
 
 /**
- * This package contains the API definition of the new <strong>Gaia Sky APIv2</strong>.
+ * This package contains the <strong>APIv2</strong> definition.
  * <p>
  * APIv2 is the preferred interface to access Gaia Sky scripting. It has been re-designed from the ground up, but it
- * contains the same functionality as the old {@link gaiasky.script.IScriptingInterface}. Here are some of its properties:
+ * contains the same functionality as the old {@link gaiasky.script.IScriptingInterface APIv1}. Here are some of its properties:
  * <ul>
  *     <li>It is modular. All methods are organized into modules. This creates a nice distinction between similar calls affecting different systems.
  *     The modules are:
@@ -55,8 +55,16 @@
  * camera = apiv2.camera
  * # Interactive camera module
  * icam = camera.interactive
+ *
+ * # We can now use the modules
+ * camera.go_to_object("Mars", 10.0, 5.0)
+ * time.start_clock()
+ *
+ * [...]
+ *
+ * # Remember to shut down the connection before exiting
+ * gateway.shutdown()
  * }
  * </pre>
- * Then, you can access API calls directly from each of the module objects.
  */
 package gaiasky.script.v2.api;
