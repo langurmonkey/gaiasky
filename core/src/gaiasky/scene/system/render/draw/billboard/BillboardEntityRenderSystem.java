@@ -291,9 +291,6 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_th_angle_point", (float) sa.thresholdPoint * fovFactor);
         shader.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
 
-        // Whether light scattering is enabled or not
-        shader.setUniformi("u_lightScattering", (isStar && Settings.settings.postprocess.lightGlow.active) ? 1 : 0);
-
         shader.setUniformf("u_radius", radius);
 
         // Render the mesh

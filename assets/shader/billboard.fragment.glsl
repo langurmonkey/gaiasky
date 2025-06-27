@@ -9,8 +9,6 @@ uniform float u_inner_rad;
 uniform float u_time;
 // Distance in u to the billboard
 uniform float u_distance;
-// Whether light scattering is enabled or not
-uniform int u_lightScattering;
 uniform float u_zfar;
 uniform float u_k;
 uniform mat4 u_matrix;
@@ -109,19 +107,12 @@ vec4 farAway(float dist, float level) {
     // We are far away from the object
     level = u_distance / (u_radius * rays_const);
 
-    if (u_lightScattering == 1) {
-        // Light scattering
-        float core = core(dist, u_inner_rad);
-        return saturate((v_color + core * 5.0) * core * v_color.a);
-    } else {
-        // No light scattering
-        level = min(level, 1.0);
-        float corona = billboardTexture(v_uv);
-        float light = light(dist, light_decay * 2.0);
-        float core = core(dist, u_inner_rad);
+    level = min(level, 1.0);
+    float corona = billboardTexture(v_uv);
+    float light = light(dist, light_decay * 2.0);
+    float core = core(dist, u_inner_rad);
 
-        return saturate((v_color + core) * (corona * (1.0 - level) + light + core) * v_color.a);
-    }
+    return saturate((v_color + core) * (corona * (1.0 - level) + light + core) * v_color.a);
 }
 
 vec4 closeUp(float dist, float level) {
@@ -155,7 +146,7 @@ vec4 closeUp(float dist, float level) {
 
     // We are close to the billboard
     level = min(level, 1.0);
-    float level_corona = float(u_lightScattering) * level;
+    float level_corona = level;
 
     float corona = billboardTexture(v_uv);
     float light = light(dist, light_decay * 2.0);
