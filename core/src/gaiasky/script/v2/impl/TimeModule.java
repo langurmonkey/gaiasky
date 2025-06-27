@@ -144,7 +144,7 @@ public class TimeModule extends APIModule implements TimeAPI {
     }
 
     public void setMaximumSimulationTime(Long years) {
-        set_max_simulation_time(years.longValue());
+        set_max_simulation_time(years);
     }
 
     public void setMaximumSimulationTime(Double years) {

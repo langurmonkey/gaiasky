@@ -237,12 +237,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Create logger
             ConsoleLogger consoleLogger = new ConsoleLogger();
 
-            // REST API server.
-            REST_ENABLED = Settings.settings.program.net.restPort >= 0 && checkRestDependenciesInClasspath();
-            if (REST_ENABLED) {
-                RESTServer.initialize(Settings.settings.program.net.restPort);
-            }
-
             // Slave manager.
             SlaveManager.initialize();
 
@@ -255,7 +249,14 @@ public class GaiaSkyDesktop implements IObserver {
             // Key mappings.
             KeyBindings.initialize();
 
+            // REST API server.
+            REST_ENABLED = Settings.settings.program.net.restPort >= 0;
+            if (REST_ENABLED) {
+                RESTServer.initialize(Settings.settings.program.net.restPort);
+            }
+
             consoleLogger.dispose();
+
 
             gaiaSkyDesktop.init();
 
@@ -354,22 +355,6 @@ public class GaiaSkyDesktop implements IObserver {
         System.setProperty("properties.file", props);
 
         return overwrite || !userConfExists;
-    }
-
-    /**
-     * Checks whether the REST server dependencies are in the classpath.
-     *
-     * @return True if REST dependencies are loaded.
-     */
-    private static boolean checkRestDependenciesInClasspath() {
-        try {
-            Class.forName("spark.Spark");
-            Class.forName("gaiasky.rest.RESTServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            // my class isn't there!
-            return false;
-        }
     }
 
     /**
