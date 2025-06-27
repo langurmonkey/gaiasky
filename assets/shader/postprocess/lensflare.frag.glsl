@@ -112,7 +112,7 @@ float regShape(vec2 p, int N) {
     return f;
 }
 
-vec3 circle(vec2 p, float size, float decay, vec3 color, vec3 color2, float dist, vec2 mouse) {
+vec3 circle(vec2 p, float size, float decay, vec3 color, float dist, vec2 mouse) {
     // l is used for making rings.I get the length and pass it through a sinwave
     // but I also use a pow function. pow function + sin function , from 0 and up, = a pulse, at least
     // if you return the max of that and 0.0.
@@ -138,7 +138,6 @@ vec3 circle(vec2 p, float size, float decay, vec3 color, vec3 color2, float dist
 
 vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     vec3 circColor = u_color;
-    vec3 circColor2 = clamp(u_color + vec3(-0.4, -0.1, 0.4), 0.0, 1.0);
 
     //now to make the sky not black
     vec3 color = vec3(0.0);
@@ -146,18 +145,16 @@ vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     //this calls the function which adds three circle types every time through the loop based on parameters I
     //got by trying things out. rnd i*2000. and rnd i*20 are just to help randomize things more
     for (int i = 0; i < 10; i++){
-        color += circle(uv, pow(rnd(i * 2000.0) * 1.0, 2.0) + 1.41, 0.0, circColor+i, circColor2+i, rnd(i * 20.0) * 3.0 + 0.2 - 0.5, light_pos);
+        color += circle(uv, pow(rnd(i * 2000.0), 2.0) + 1.41, 0.0, circColor+i, rnd(i * 20.0) * 3.0 + 0.2 - 0.5, light_pos);
     }
     //get angle and length of the sun (uv - mouse)
     float a = atan(uv.y - light_pos.y, uv.x - light_pos.x);
     float l = max(1.0 - length(uv - light_pos) - 0.84, 0.0);
 
-    float bright = 0.1;//+0.1/1/3.;//add brightness based on how the sun moves so that it is brightest
-    //when it is lined up with the center
-
     //multiply by the exponential e^x ? of 1.0-length which kind of masks the brightness more so that
     //there is a sharper roll of of the light decay from the sun.
-    color *= exp(1.0 - length(uv - light_pos)) / 5.0;
+    float d = length(uv - light_pos);
+    color *= smoothstep(0.0, 0.4, d);
     color = color * intensity * STRENGTH;
     return vec4(color, 1.0);
 }
