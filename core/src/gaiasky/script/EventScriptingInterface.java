@@ -2751,17 +2751,17 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     @Override
     public void backupSettings() {
-        apiv2.base.backup_settings();
+        apiv2.base.settings_backup();
     }
 
     @Override
     public boolean restoreSettings() {
-        return apiv2.base.restore_settings();
+        return apiv2.base.settings_restore();
     }
 
     @Override
     public void clearSettingsStack() {
-        apiv2.base.clear_settings_stack();
+        apiv2.base.settings_clear_stack();
     }
 
     @Override

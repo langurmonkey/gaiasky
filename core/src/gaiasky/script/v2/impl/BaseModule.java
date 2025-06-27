@@ -173,12 +173,12 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public void backup_settings() {
+    public void settings_backup() {
         settingsStack.push(Settings.settings.clone());
     }
 
     @Override
-    public boolean restore_settings() {
+    public boolean settings_restore() {
         if (settingsStack.isEmpty()) {
             return false;
         }
@@ -196,7 +196,7 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public void clear_settings_stack() {
+    public void settings_clear_stack() {
         settingsStack.clear();
     }
 

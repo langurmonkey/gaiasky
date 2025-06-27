@@ -181,16 +181,16 @@ public interface BaseAPI {
      * <p>Create a backup of the current settings state that can be restored later on.
      * The settings are backed up in a stack, so multiple calls to this method put different copies of the settings
      * on the stack in a LIFO fashion.</p>
-     * <p>This method, together with {@link #restore_settings()}, are useful to back up and restore
+     * <p>This method, together with {@link #settings_restore()}, are useful to back up and restore
      * the
      * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
      * unmodified after your script ends.</p>
      */
-    void backup_settings();
+    void settings_backup();
 
     /**
      * <p>Take the settings object at the top of the settings stack and makes it effective.</p>
-     * <p>This method, together with {@link #backup_settings()}, are useful to back up and restore the
+     * <p>This method, together with {@link #settings_backup()}, are useful to back up and restore the
      * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
      * unmodified after your script ends.</p>
      * <p>WARN: This function applies all settings immediately, and the user interface may be re-initialized.
@@ -198,15 +198,15 @@ public interface BaseAPI {
      *
      * @return True if the stack was not empty and the settings were restored successfully. False otherwise.
      */
-    boolean restore_settings();
+    boolean settings_restore();
 
     /**
      * Clear the stack of settings objects. This will invalidate all previous calls to
-     * {@link #backup_settings()},
-     * effectively making the settings stack empty. Calling {@link #restore_settings()} after this
+     * {@link #settings_backup()},
+     * effectively making the settings stack empty. Calling {@link #settings_restore()} after this
      * method will return false.
      */
-    void clear_settings_stack();
+    void settings_clear_stack();
 
     /**
      * Returns the meter to internal unit conversion factor. Use this factor to multiply

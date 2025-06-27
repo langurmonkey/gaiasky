@@ -62,7 +62,7 @@ public class RefsysModule extends APIModule implements RefsysAPI {
         return new double[]{pos.x, pos.y, pos.z};
     }
 
-    public double[] eclipticToInternalCartesian(int l, int b, int r) {
+    public double[] ecliptic_to_cartesian(int l, int b, int r) {
         return ecliptic_to_cartesian((double) l, (double) b, (double) r);
     }
 

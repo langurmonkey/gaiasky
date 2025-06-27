@@ -12,8 +12,6 @@ import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 
-import java.util.Locale;
-
 import static gaiasky.util.Logger.getLogger;
 
 /**
@@ -23,7 +21,7 @@ public abstract class APIModule {
     protected final Logger.Log logger;
 
     /** Reference to self. **/
-    final APIModule me;
+    protected final APIModule me;
     /** Reference to event manager. **/
     protected final EventManager em;
     /** Reference to API object. **/
