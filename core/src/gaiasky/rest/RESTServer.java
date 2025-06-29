@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import gaiasky.GaiaSky;
+import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.v2.impl.APIModule;
 import gaiasky.script.v2.impl.APIv2;
@@ -45,14 +46,6 @@ public class RESTServer {
      * externally once the GUI is ready.
      */
     private static boolean activated = false;
-    /**
-     * Name to method map for APIv1.
-     */
-    private static final Map<String, Array<Method>> apiv1Methods = new HashMap<>();
-    /**
-     * Top {@link Module} for APIv2.
-     */
-    private static Module apiv2Modules;
 
     /**
      * Prints startup warning and current log level of SimpleLogger.
@@ -215,7 +208,7 @@ public class RESTServer {
      * optionally add a type to the parameters, e.g. "distance_float=0.3f" and split
      * by the underscore.
      */
-    private static String handleAPIv1Call(spark.Request request, spark.Response response) {
+    private static String handleAPIv1Call(spark.Request request, spark.Response response, Map<String, Array<Method>> apiv1Methods) {
 
         // Logging basic request information
         loggerRequestInfo(request);
@@ -644,6 +637,7 @@ public class RESTServer {
             try {
                 logger.debug("Invoking method...");
                 // note: invoke may return null explicitly or because is void type
+                Object moduleInstance = getModuleInstance(module.clazz());
                 Object returnObject = matchMethod.invoke(GaiaSky.instance.scripting(), arguments);
                 if (returnObject == null) {
                     logger.debug("Method returned: '{}', return type is {}", returnObject, matchReturnType);
@@ -672,6 +666,11 @@ public class RESTServer {
             ret.put("text", msg);
             return responseData(request, response, ret, false);
         }
+    }
+
+    private static Object getModuleInstance(Class<?> clazz) {
+       var apiv2 = ((EventScriptingInterface)GaiaSky.instance.scripting()).apiv2;
+       return apiv2.getModuleInstance(clazz);
     }
 
     /**
@@ -709,18 +708,18 @@ public class RESTServer {
             Spark.port(port);
 
             /* Scripting APIv1 mapping */
+            var apiV1Methods = addAPIv1Methods();
             Spark.get("/api", (request, response) -> {
                 response.redirect("/api/help");
                 return response;
             });
-            Spark.get("/api/:cmd", RESTServer::handleAPIv1Call);
-            Spark.post("/api/:cmd", RESTServer::handleAPIv1Call);
-            addAPIv1Methods();
+            Spark.get("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
+            Spark.post("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
 
 
             /* Scripting APIv2 mapping */
-            apiv2Modules = constructAPIv2Modules();
-            apiv2Mappings(apiv2Modules);
+            Module apiV2Modules = constructAPIv2Modules();
+            apiv2Mappings(apiV2Modules);
 
             logger.info("Startup finished.");
 
@@ -729,21 +728,23 @@ public class RESTServer {
         }
     }
 
-    private static void addAPIv1Methods() {
+    private static Map<String, Array<Method>> addAPIv1Methods() {
+        Map<String, Array<Method>> apiv1Methods = new HashMap<>();
         Class<IScriptingInterface> iScriptingInterfaceClass = IScriptingInterface.class;
         Method[] allMethods = iScriptingInterfaceClass.getDeclaredMethods();
 
         for (Method method : allMethods) {
             Array<Method> matches;
-            if (RESTServer.apiv1Methods.containsKey(method.getName())) {
-                matches = RESTServer.apiv1Methods.get(method.getName());
+            if (apiv1Methods.containsKey(method.getName())) {
+                matches = apiv1Methods.get(method.getName());
             } else {
                 matches = new Array<>(false, 1);
             }
             if (!matches.contains(method, true))
                 matches.add(method);
-            RESTServer.apiv1Methods.put(method.getName(), matches);
+            apiv1Methods.put(method.getName(), matches);
         }
+        return apiv1Methods;
     }
 
     private static Module constructAPIv2Modules() {

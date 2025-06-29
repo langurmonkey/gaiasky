@@ -9,6 +9,7 @@ package gaiasky.script.v2.impl;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -69,7 +70,7 @@ public class APIv2 implements IObserver {
     public final InstancesModule instances;
 
     /** List with all the modules. **/
-    final Array<APIModule> modules;
+    final ObjectMap<Class<?>, APIModule> modules;
 
     // Auxiliary vectors
     final Vector3D aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
@@ -88,7 +89,7 @@ public class APIv2 implements IObserver {
         this.em = EventManager.instance;
 
         this.validator = new ParameterValidator(this);
-        this.modules = new Array<>(12);
+        this.modules = new ObjectMap<>(15);
 
         this.base = new BaseModule(em, this, "base");
         this.camera = new CameraModule(em, this, "camera");
@@ -105,7 +106,7 @@ public class APIv2 implements IObserver {
         this.instances = new InstancesModule(em, this, "instances");
 
         // Add all to list.
-        this.modules.addAll(base, camera, time, scene, graphics, data, input, output, ui, camcorder, refsys, instances);
+        this.addModules(base, camera, time, scene, graphics, data, input, output, ui, camcorder, refsys, instances);
 
         // Auxiliary vectors
         aux3d1 = new Vector3D();
@@ -125,6 +126,28 @@ public class APIv2 implements IObserver {
         em.subscribe(this, Event.DISPOSE);
     }
 
+   private void addModules(APIModule... ms) {
+       for (var m : ms) {
+           this.modules.put(m.getClass(), m);
+           var fields = m.getClass().getDeclaredFields();
+           for (var field : fields) {
+               if (APIModule.class.isAssignableFrom(field.getDeclaringClass())) {
+                   // Add this.
+                   try {
+                       var value = (APIModule) field.get(m);
+                       this.modules.put(field.getDeclaringClass(), value);
+                   } catch (IllegalAccessException e) {
+                       throw new RuntimeException(e);
+                   }
+               }
+           }
+       }
+   }
+
+   public APIModule getModuleInstance(Class<?> clazz) {
+        return this.modules.get(clazz);
+   }
+
     @Override
     public void notify(Event event, Object source, Object... data) {
         if (Objects.requireNonNull(event) == Event.DISPOSE) {// Unsubscribe.
@@ -132,7 +155,7 @@ public class APIv2 implements IObserver {
 
             // Dispose modules.
             for (var module : modules) {
-                module.dispose();
+                module.value.dispose();
             }
         }
     }
