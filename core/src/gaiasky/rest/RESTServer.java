@@ -24,6 +24,9 @@ import java.lang.reflect.Parameter;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Implements the REST server, which serves the APIS ({@link gaiasky.script.v2.impl.APIv2} and {@link IScriptingInterface}) over HTTP(s).
+ */
 public class RESTServer {
 
     /**
@@ -201,8 +204,7 @@ public class RESTServer {
      * Handles the API call.
      * <p>
      * This is implemented via Java Reflections and gives access to all methods from
-     * IScriptingInterface
-     * (core/src/gaiasky/script/IScriptingInterface.java).
+     * {@link IScriptingInterface}.
      * Additionally, it provides "special-purpose commands", see commented source
      * block.
      * <p>
