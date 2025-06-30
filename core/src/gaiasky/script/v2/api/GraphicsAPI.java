@@ -220,9 +220,9 @@ public interface GraphicsAPI {
      * <p>
      * Set to 0 to disable the effect.
      *
-     * @param strength The strength or intensity of the lens flare, in [0,1].
+     * @param value The strength or intensity of the lens flare, in [0,1].
      */
-    void effect_lens_flare(double strength);
+    void effect_lens_flare(double value);
 
     /**
      * Enable or disable the camera motion blur effect.
@@ -234,9 +234,9 @@ public interface GraphicsAPI {
     /**
      * Enable or disable the camera motion blur effect.
      *
-     * @param strength The strength of camera the motion blur effect, in [{@link Constants#MOTIONBLUR_MIN}, {@link Constants#MOTIONBLUR_MAX}].
+     * @param value The strength of camera the motion blur effect, in [{@link Constants#MOTIONBLUR_MIN}, {@link Constants#MOTIONBLUR_MAX}].
      */
-    void effect_motion_blur(double strength);
+    void effect_motion_blur(double value);
 
     /**
      * Enable or disable stars' light glowing and spilling over closer objects.
@@ -285,18 +285,18 @@ public interface GraphicsAPI {
     /**
      * Set the star brightness value.
      *
-     * @param brightness The brightness value, between 0 and 100.
+     * @param value The brightness value, between 0 and 100.
      */
-    void set_star_brightness(float brightness);
+    void set_star_brightness(float value);
 
     /**
      * Set the star brightness power profile value in [1.1, 0.9]. Default value is 1.
      * The power is applied to the star solid angle (from camera),
      * before clamping, as sa = pow(sa, r).
      *
-     * @param power The power value in [0, 100].
+     * @param value The power value in [0, 100].
      */
-    void set_star_brightness_power(float power);
+    void set_star_brightness_power(float value);
 
     /**
      * Set the star glow factor level value. This controls the amount of glow light
@@ -304,9 +304,9 @@ public interface GraphicsAPI {
      * {@link Constants#MAX_STAR_GLOW_FACTOR}.
      * Default is 0.06.
      *
-     * @param glowFactor The new glow factor value.
+     * @param value The new glow factor value.
      */
-    void set_star_glow_factor(float glowFactor);
+    void set_star_glow_factor(float value);
 
     /**
      * Get the current point size value in pixels.
@@ -371,22 +371,22 @@ public interface GraphicsAPI {
     /**
      * Set the solid angle below which orbits fade and disappear.
      *
-     * @param angleDeg The threshold angle in degrees.
+     * @param deg The threshold angle in degrees.
      */
-    void set_orbit_solid_angle_threshold(float angleDeg);
+    void set_orbit_solid_angle_threshold(float deg);
 
     /**
      * Limit the frame rate of Gaia Sky to the given value, in frames per second.
      *
-     * @param limitFps The new maximum frame rate as a double-precision floating point number. Set zero or negative to
-     *                 unlimited.
+     * @param fps The new maximum frame rate as a double-precision floating point number. Set zero or negative to
+     *            unlimited.
      */
-    void set_limit_fps(double limitFps);
+    void set_limit_fps(double fps);
 
     /**
      * Limit the frame rate of Gaia Sky to the given value, in frames per second.
      *
-     * @param limitFps The new maximum frame rate as an integer number. Set zero or negative to unlimited.
+     * @param fps The new maximum frame rate as an integer number. Set zero or negative to unlimited.
      */
-    void set_limit_fps(int limitFps);
+    void set_limit_fps(int fps);
 }

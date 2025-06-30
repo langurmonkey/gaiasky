@@ -32,22 +32,22 @@ public interface TimeAPI {
     /**
      * Set the time of the application to the given time, in UTC.
      *
-     * @param year     The year to represent.
-     * @param month    The month-of-year to represent, from 1 (January) to 12
-     *                 (December).
-     * @param day      The day-of-month to represent, from 1 to 31.
-     * @param hour     The hour-of-day to represent, from 0 to 23.
-     * @param min      The minute-of-hour to represent, from 0 to 59.
-     * @param sec      The second-of-minute to represent, from 0 to 59.
-     * @param millisec The millisecond-of-second, from 0 to 999.
+     * @param yr    The year to represent.
+     * @param month The month-of-year to represent, from 1 (January) to 12
+     *              (December).
+     * @param day   The day-of-month to represent, from 1 to 31.
+     * @param hour  The hour-of-day to represent, from 0 to 23.
+     * @param min   The minute-of-hour to represent, from 0 to 59.
+     * @param sec   The second-of-minute to represent, from 0 to 59.
+     * @param ms    The millisecond-of-second, from 0 to 999.
      */
-    void set_clock(int year,
+    void set_clock(int yr,
                    int month,
                    int day,
                    int hour,
                    int min,
                    int sec,
-                   int millisec);
+                   int ms);
 
     /**
      * Return the current simulation time as the number of milliseconds since
@@ -105,10 +105,10 @@ public interface TimeAPI {
      * Set the simulation time warp factor. Positive values make time advance forward, while negative values make time
      * run backwards. A warp factor of 1 sets a real time pace to the simulation time.
      *
-     * @param warpFactor The warp as a factor. A value of 2.0 sets the
-     *                   Gaia Sky time to be twice as fast as real world time.
+     * @param warp The warp as a factor. A value of 2.0 sets the
+     *             Gaia Sky time to be twice as fast as real world time.
      */
-    void set_time_warp(double warpFactor);
+    void set_time_warp(double warp);
 
     /**
      * Set a time bookmark in the global clock that, when reached, the clock
@@ -123,22 +123,22 @@ public interface TimeAPI {
      * Set a time bookmark in the global clock that, when reached, the clock
      * automatically stops.
      *
-     * @param year     The year to represent.
-     * @param month    The month-of-year to represent, from 1 (January) to 12
-     *                 (December).
-     * @param day      The day-of-month to represent, from 1 to 31.
-     * @param hour     The hour-of-day to represent, from 0 to 23.
-     * @param min      The minute-of-hour to represent, from 0 to 59.
-     * @param sec      The second-of-minute to represent, from 0 to 59.
-     * @param milliSec The millisecond-of-second, from 0 to 999.
+     * @param yr    The year to represent.
+     * @param month The month-of-year to represent, from 1 (January) to 12
+     *              (December).
+     * @param day   The day-of-month to represent, from 1 to 31.
+     * @param hour  The hour-of-day to represent, from 0 to 23.
+     * @param min   The minute-of-hour to represent, from 0 to 59.
+     * @param sec   The second-of-minute to represent, from 0 to 59.
+     * @param ms    The millisecond-of-second, from 0 to 999.
      */
-    void set_target_time(int year,
+    void set_target_time(int yr,
                          int month,
                          int day,
                          int hour,
                          int min,
                          int sec,
-                         int milliSec);
+                         int ms);
 
     /**
      * Unset the target time bookmark from the global clock, if any.
@@ -150,44 +150,44 @@ public interface TimeAPI {
      * and in the past (-years). This setting is not saved to the configuration and resets to 5 Myr after
      * restart.
      *
-     * @param years The maximum year number to allow.
+     * @param yr The maximum year number to allow.
      */
-    void set_max_simulation_time(long years);
+    void set_max_simulation_time(long yr);
 
     /**
      * Create a time transition from the current time to the given time (year, month, day, hour, minute, second,
      * millisecond). The time is given in UTC.
      *
-     * @param year            The year to represent.
-     * @param month           The month-of-year to represent, from 1 (January) to 12
-     *                        (December).
-     * @param day             The day-of-month to represent, from 1 to 31.
-     * @param hour            The hour-of-day to represent, from 0 to 23.
-     * @param min             The minute-of-hour to represent, from 0 to 59.
-     * @param sec             The second-of-minute to represent, from 0 to 59.
-     * @param milliseconds    The millisecond-of-second, from 0 to 999.
-     * @param durationSeconds The duration of the transition, in seconds.
-     * @param smoothType      The function type to use for smoothing. Either "logit", "logisticsigmoid" or "none".
-     *                        <ul>
-     *                        <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
-     *                        an effect, otherwise, linear interpolation is used.</li>
-     *                        <li>"logit": starts fast and ends fast. The smooth factor must be between
-     *                        0.09 and 0.01.</li>
-     *                        <li>"none": no smoothing is applied.</li>
-     *                        </ul>
-     * @param smoothFactor    Smoothing factor (depends on type, see #smoothType).
-     * @param sync            If true, the call waits for the transition to finish before returning,
-     *                        otherwise it returns immediately.
+     * @param yr            The year to represent.
+     * @param month         The month-of-year to represent, from 1 (January) to 12
+     *                      (December).
+     * @param day           The day-of-month to represent, from 1 to 31.
+     * @param hour          The hour-of-day to represent, from 0 to 23.
+     * @param min           The minute-of-hour to represent, from 0 to 59.
+     * @param sec           The second-of-minute to represent, from 0 to 59.
+     * @param ms            The millisecond-of-second, from 0 to 999.
+     * @param duration      The duration of the transition, in seconds.
+     * @param smooth_type   The function type to use for smoothing. Either "logit", "logisticsigmoid" or "none".
+     *                      <ul>
+     *                      <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                      an effect, otherwise, linear interpolation is used.</li>
+     *                      <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                      0.09 and 0.01.</li>
+     *                      <li>"none": no smoothing is applied.</li>
+     *                      </ul>
+     * @param smooth_factor Smoothing factor (depends on type, see #smoothType).
+     * @param sync          If true, the call waits for the transition to finish before returning,
+     *                      otherwise it returns immediately.
      */
-    void transition(int year,
+    void transition(int yr,
                     int month,
                     int day,
                     int hour,
                     int min,
                     int sec,
-                    int milliseconds,
-                    double durationSeconds,
-                    String smoothType,
-                    double smoothFactor,
+                    int ms,
+                    double duration,
+                    String smooth_type,
+                    double smooth_factor,
                     boolean sync);
 }

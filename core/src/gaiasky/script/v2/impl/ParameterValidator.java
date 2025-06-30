@@ -97,6 +97,14 @@ public class ParameterValidator {
         return true;
     }
 
+    boolean checkLength(float[] array, int length, String name) {
+        if (array.length != length) {
+            logger.error(name + " must have a length of " + length + ". Current length is " + array.length);
+            return false;
+        }
+        return true;
+    }
+
     boolean checkString(String value, String name) {
         if (value == null || value.isEmpty()) {
             logger.error(name + " can't be null nor empty");

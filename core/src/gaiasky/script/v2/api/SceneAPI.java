@@ -41,15 +41,15 @@ public interface SceneAPI {
      * Get an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
      * until the object is available, with a timeout.
      *
-     * @param name           The name or id (HIP, TYC, Gaia SourceId) of the object.
-     * @param timeoutSeconds The timeout in seconds to wait until returning.
-     *                       If negative, it waits indefinitely.
+     * @param name    The name or id (HIP, TYC, Gaia SourceId) of the object.
+     * @param timeout The timeout in seconds to wait until returning.
+     *                If negative, it waits indefinitely.
      *
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      *         the timeout has passed.
      */
     FocusView get_object(String name,
-                         double timeoutSeconds);
+                         double timeout);
 
     /**
      * Get the line object identified by the given <code>name</code>. The returned line object is of type {@link Verts}.
@@ -72,15 +72,15 @@ public interface SceneAPI {
      * the object to become available. If the object becomes available before the timeout has passed, ti is returned. Otherwise,
      * this call returns null.
      *
-     * @param name           The name of the line object.
-     * @param timeoutSeconds The timeout, in seconds, to wait for the object to be ready.
-     *                       If negative, it waits indefinitely.
+     * @param name    The name of the line object.
+     * @param timeout The timeout, in seconds, to wait for the object to be ready.
+     *                If negative, it waits indefinitely.
      *
      * @return The line object as a {@link VertsView}, or null
      *         if it does not exist.
      */
     VertsView get_line_object(String name,
-                              double timeoutSeconds);
+                              double timeout);
 
     /**
      * Get the reference to an entity given its name.
@@ -94,10 +94,10 @@ public interface SceneAPI {
      * If the entity is not in the scene after the timeout has passed, ths method
      * returns null.
      *
-     * @param name           Entity name.
-     * @param timeOutSeconds Timeout time, in seconds.
+     * @param name    Entity name.
+     * @param timeout Timeout time, in seconds.
      **/
-    Entity get_entity(String name, double timeOutSeconds);
+    Entity get_entity(String name, double timeout);
 
     /**
      * Get a focus object from the scene given its name.
@@ -112,13 +112,13 @@ public interface SceneAPI {
      * Return the star parameters given its identifier or name, if the star exists
      * and it is loaded.
      *
-     * @param starId The star identifier or name.
+     * @param name The star identifier or name.
      *
      * @return An array with (ra [deg], dec [deg], parallax [mas], pmra [mas/yr], pmdec [mas/yr], radvel [km/s], appmag
      *         [mag], red [0,1], green [0,1], blue [0,1]) if the
      *         star exists and is loaded, null otherwise.
      */
-    double[] get_star_parameters(String starId);
+    double[] get_star_parameters(String name);
 
     /**
      * Get the current position of the object identified by <code>name</code> in
@@ -179,23 +179,23 @@ public interface SceneAPI {
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param name     The name of the object.
-     * @param position The position in the internal reference system and internal units.
+     * @param name The name of the object.
+     * @param pos  The position in the internal reference system and internal units.
      */
     void set_object_posiiton(String name,
-                             double[] position);
+                             double[] pos);
 
     /**
      * Set the internal position of the object identified by <code>name</code>. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param name     The name of the object.
-     * @param position The position in the internal reference system and the given units.
-     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param name  The name of the object.
+     * @param pos   The position in the internal reference system and the given units.
+     * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      */
     void set_object_posiiton(String name,
-                             double[] position,
+                             double[] pos,
                              String units);
 
     /**
@@ -203,23 +203,23 @@ public interface SceneAPI {
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param object   The object in a focus view wrapper.
-     * @param position The position in the internal reference system and internal units.
+     * @param object The object in a focus view wrapper.
+     * @param pos    The position in the internal reference system and internal units.
      */
     void set_object_posiiton(FocusView object,
-                             double[] position);
+                             double[] pos);
 
     /**
      * Set the internal position of the given entity object. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param object   The object in a focus view wrapper.
-     * @param position The position in the internal reference system and the given units.
-     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param object The object in a focus view wrapper.
+     * @param pos    The position in the internal reference system and the given units.
+     * @param units  The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      */
     void set_object_posiiton(FocusView object,
-                             double[] position,
+                             double[] pos,
                              String units);
 
     /**
@@ -227,23 +227,23 @@ public interface SceneAPI {
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param object   The object entity.
-     * @param position The position in the internal reference system and internal units.
+     * @param object The object entity.
+     * @param pos    The position in the internal reference system and internal units.
      */
     void set_object_posiiton(Entity object,
-                             double[] position);
+                             double[] pos);
 
     /**
      * Set the internal position of the given entity object. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param object   The object entity.
-     * @param position The position in the internal reference system and the given units.
-     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param object The object entity.
+     * @param pos    The position in the internal reference system and the given units.
+     * @param units  The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      */
     void set_object_posiiton(Entity object,
-                             double[] position,
+                             double[] pos,
                              String units);
 
     /**
@@ -538,11 +538,11 @@ public interface SceneAPI {
      * back to 1.0 at the end of your script.
      * </p>
      *
-     * @param name          The name or id of the object.
-     * @param scalingFactor The scaling factor to scale the size of that object.
+     * @param name   The name or id of the object.
+     * @param factor The scaling factor to scale the size of that object.
      */
     void set_object_size_scaling(String name,
-                                 double scalingFactor);
+                                 double factor);
 
     /**
      * Set the given orbit coordinates scaling factor to the orbit object identified by
@@ -558,17 +558,17 @@ public interface SceneAPI {
      * this call in order to immediately refresh the scaled orbits.
      * </p>
      *
-     * @param name          The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87,
-     *                      UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates,
-     *                      HeliotropicOrbitCoordinates, MoonAACoordinates).
-     *                      Optionally, you can append ':objectName' to select a single object. For instance, both Gaia
-     *                      and JWST have
-     *                      heliotropic orbit coordinates. To only select the Gaia orbit provider, use
-     *                      "HeliotropicOrbitCoordinates:Gaia".
-     * @param scalingFactor The scaling factor.
+     * @param name   The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87,
+     *               UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates,
+     *               HeliotropicOrbitCoordinates, MoonAACoordinates).
+     *               Optionally, you can append ':objectName' to select a single object. For instance, both Gaia
+     *               and JWST have
+     *               heliotropic orbit coordinates. To only select the Gaia orbit provider, use
+     *               "HeliotropicOrbitCoordinates:Gaia".
+     * @param factor The scaling factor.
      */
     void set_orbit_coordinates_scaling(String name,
-                                       double scalingFactor);
+                                       double factor);
 
     /**
      * Force the refresh of the orbit of the object identified by
@@ -614,14 +614,14 @@ public interface SceneAPI {
      * The interpolation between quaternions is done using <b>slerp</b> (spherical linear interpolation).
      *
      * @param name The name of the object. The object must already have an <code>Orientation</code> component.
-     * @param file The file path. The file is a CSV where each line has the time (ISO-8601) and the
+     * @param path The file path. The file is a CSV where each line has the time (ISO-8601) and the
      *             x, y, z and w components of the quaternion for that time. For instance, a valid line would
      *             be "<code>2018-04-01T15:20:15Z,0.9237,0.3728,0.0358,0.0795</code>".
      *
      * @return True if the object was found and could be updated.
      */
     boolean set_object_quaternion_slerp_orientation(String name,
-                                                    String file);
+                                                    String path);
 
 
     /**
@@ -632,14 +632,14 @@ public interface SceneAPI {
      * The interpolation between quaternions is done using <b>nlerp</b> (normalized linear interpolation).
      *
      * @param name The name of the object. The object must already have an <code>Orientation</code> component.
-     * @param file The file path. The file is a CSV where each line has the time (ISO-8601) and the
+     * @param path The file path. The file is a CSV where each line has the time (ISO-8601) and the
      *             x, y, z and w components of the quaternion for that time. For instance, a valid line would
      *             be "<code>2018-04-01T15:20:15Z,0.9237,0.3728,0.0358,0.0795</code>".
      *
      * @return True if the object was found and could be updated.
      */
     boolean set_object_quaternion_nlerp_orientation(String name,
-                                                    String file);
+                                                    String path);
 
     /**
      * Set the global label size factor. This is a multiplier that applies to all object labels.
@@ -657,11 +657,11 @@ public interface SceneAPI {
      * <p>
      * This setting is temporary and will not persist after a restart.
      *
-     * @param name       The object name.
-     * @param forceLabel Whether to force the label to render for this object or not.
+     * @param name  The object name.
+     * @param force Whether to force the label to render for this object or not.
      */
     void set_force_display_label(String name,
-                                 boolean forceLabel);
+                                 boolean force);
 
     /**
      * Set the label color of the object identified by the given <code>name</code>.
@@ -726,9 +726,9 @@ public interface SceneAPI {
     /**
      * Specify whether arrowheads should be displayed on velocity vectors.
      *
-     * @param arrowheadsEnabled Whether to show the velocity vectors with arrowheads.
+     * @param enabled Whether to show the velocity vectors with arrowheads.
      */
-    void set_velocity_vectors_arrowheads(boolean arrowheadsEnabled);
+    void set_velocity_vectors_arrowheads(boolean enabled);
 
     /**
      * Return the current maximum number of velocity vectors per star group. This is a global setting stored in the configuration file.
@@ -741,9 +741,9 @@ public interface SceneAPI {
      * Set the maximum number of proper motion vectors to add per star group. This modifies the global setting stored in the
      * configuration file, and will be persisted when the application exits.
      *
-     * @param maxNumber The maximum number of proper motion vectors per star group.
+     * @param num The maximum number of proper motion vectors per star group.
      */
-    void set_velocity_vector_max_number(long maxNumber);
+    void set_velocity_vector_max_number(long num);
 
     /**
      * Add a new trajectory object with the given name, points and color. The trajectory
@@ -768,21 +768,21 @@ public interface SceneAPI {
      * but in this case the line can be rendered with higher quality
      * polyline quadstrips.
      *
-     * @param name     The name to identify the trajectory, to possibly remove it later.
-     * @param points   The points of the trajectory. It is an array containing all the
-     *                 points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
-     * @param color    The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param trailMap The bottom mapping position for the trail. The orbit trail assigns an opacity value to
-     *                 each point of the orbit, where 1 is the location of the last point in the points list, and 0 is
-     *                 the first one.
-     *                 This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity
-     *                 value of 0. Set to 0 to have a full trail. Set to 0.5 to have a trail that spans half the orbit.
-     *                 Set to 1 to have no orbit at all. Set to negative to disable the trail.
+     * @param name   The name to identify the trajectory, to possibly remove it later.
+     * @param points The points of the trajectory. It is an array containing all the
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
+     * @param color  The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param trail  The bottom mapping position for the trail. The orbit trail assigns an opacity value to
+     *               each point of the orbit, where 1 is the location of the last point in the points list, and 0 is
+     *               the first one.
+     *               This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity
+     *               value of 0. Set to 0 to have a full trail. Set to 0.5 to have a trail that spans half the orbit.
+     *               Set to 1 to have no orbit at all. Set to negative to disable the trail.
      */
     void add_trajectory_line(String name,
                              double[] points,
                              double[] color,
-                             double trailMap);
+                             double trail);
 
     /**
      * Add a new polyline with the given name, points and color. The polyline will
@@ -805,16 +805,16 @@ public interface SceneAPI {
      * visibility of 'Others' in order to see it. The default primitive type of GL_LINE_STRIP
      * is used.
      *
-     * @param name      The name to identify the polyline, to possibly remove it later.
-     * @param points    The points of the polyline. It is an array containing all the
-     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param name   The name to identify the polyline, to possibly remove it later.
+     * @param points The points of the polyline. It is an array containing all the
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color  The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param width  The line width. Usually a value between 1 (default) and 10.
      */
     void add_polyline(String name,
                       double[] points,
                       double[] color,
-                      double lineWidth);
+                      double width);
 
     /**
      * Add a new polyline with the given name, points, color and line width. The polyline will
@@ -825,18 +825,18 @@ public interface SceneAPI {
      * many points.
      * The arrow cap is added at the first point in the series.
      *
-     * @param name      The name to identify the polyline, to possibly remove it later.
-     * @param points    The points of the polyline. It is an array containing all the
-     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
-     * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
+     * @param name   The name to identify the polyline, to possibly remove it later.
+     * @param points The points of the polyline. It is an array containing all the
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color  The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param width  The line width. Usually a value between 1 (default) and 10.
+     * @param caps   Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
      */
     void add_polyline(String name,
                       double[] points,
                       double[] color,
-                      double lineWidth,
-                      boolean arrowCaps);
+                      double width,
+                      boolean caps);
 
     /**
      * Add a new polyline with the given name, points, color, line width and primitive. The polyline will
@@ -847,13 +847,13 @@ public interface SceneAPI {
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
      * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param width     The line width. Usually a value between 1 (default) and 10.
      * @param primitive The GL primitive: <code>GL_LINES</code>=1, <code>GL_LINE_LOOP</code>=2, <code>GL_LINE_STRIP</code>=3
      */
     void add_polyline(String name,
                       double[] points,
                       double[] color,
-                      double lineWidth,
+                      double width,
                       int primitive);
 
     /**
@@ -869,16 +869,16 @@ public interface SceneAPI {
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
      * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param width     The line width. Usually a value between 1 (default) and 10.
      * @param primitive The GL primitive: <code>GL_LINES</code>=1, <code>GL_LINE_LOOP</code>=2, <code>GL_LINE_STRIP</code>=3
-     * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
+     * @param caps      Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
      */
     void add_polyline(String name,
                       double[] points,
                       double[] color,
-                      double lineWidth,
+                      double width,
                       int primitive,
-                      boolean arrowCaps);
+                      boolean caps);
 
     /**
      * Remove the model object identified by the given name from the internal
@@ -901,63 +901,63 @@ public interface SceneAPI {
     /**
      * Add a shape object of the given type with the given size around the object with the given name and primitive.
      *
-     * @param shapeName   The name of the shape object.
-     * @param shape       The shape type, one of
-     *                    <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
-     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
-     *                    a wireframe shape, use 'triangles' for a solid shape.
-     * @param size        The size of the object in kilometers.
-     * @param objectName  The name of the object to use as the position.
-     * @param r           The red component of the color in [0,1].
-     * @param g           The green component of the color in [0,1].
-     * @param b           The blue component of the color in [0,1].
-     * @param a           The alpha component of the color in [0,1].
-     * @param showLabel   Whether to show a label with the name of the shape.
-     * @param trackObject Whether to track the object if/when it moves.
+     * @param name      The name of the shape object.
+     * @param shape     The shape type, one of
+     *                  <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
+     *                  a wireframe shape, use 'triangles' for a solid shape.
+     * @param size      The size of the object in kilometers.
+     * @param obj_name  The name of the object to use as the position.
+     * @param r         The red component of the color in [0,1].
+     * @param g         The green component of the color in [0,1].
+     * @param b         The blue component of the color in [0,1].
+     * @param a         The alpha component of the color in [0,1].
+     * @param label     Whether to show a label with the name of the shape.
+     * @param track     Whether to track the object if/when it moves.
      */
-    void add_shape_around_object(String shapeName,
+    void add_shape_around_object(String name,
                                  String shape,
                                  String primitive,
                                  double size,
-                                 String objectName,
+                                 String obj_name,
                                  float r,
                                  float g,
                                  float b,
                                  float a,
-                                 boolean showLabel,
-                                 boolean trackObject);
+                                 boolean label,
+                                 boolean track);
 
     /**
      * Add a shape object of the given type with the given size around the object with the given name, primitive and
      * orientation.
      *
-     * @param shapeName   The name of the shape object.
-     * @param shape       The shape type, one of
-     *                    <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
-     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
-     *                    a wireframe shape, use 'triangles' for a solid shape.
-     * @param orientation The orientation to use, one of
-     *                    <ul><li>camera</li><li>equatorial</li><li>ecliptic</li><li>galactic</li></ul>.
-     * @param size        The size of the object in kilometers.
-     * @param objectName  The name of the object to use as the position.
-     * @param r           The red component of the color in [0,1].
-     * @param g           The green component of the color in [0,1].
-     * @param b           The blue component of the color in [0,1].
-     * @param a           The alpha component of the color in [0,1].
-     * @param showLabel   Whether to show a label with the name of the shape.
-     * @param trackObject Whether to track the object if/when it moves.
+     * @param name      The name of the shape object.
+     * @param shape     The shape type, one of
+     *                  <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create
+     *                  a wireframe shape, use 'triangles' for a solid shape.
+     * @param ori       The orientation to use, one of
+     *                  <ul><li>camera</li><li>equatorial</li><li>ecliptic</li><li>galactic</li></ul>.
+     * @param size      The size of the object in kilometers.
+     * @param obj_name  The name of the object to use as the position.
+     * @param r         The red component of the color in [0,1].
+     * @param g         The green component of the color in [0,1].
+     * @param b         The blue component of the color in [0,1].
+     * @param a         The alpha component of the color in [0,1].
+     * @param label     Whether to show a label with the name of the shape.
+     * @param track     Whether to track the object if/when it moves.
      */
-    void add_shape_around_object(String shapeName,
+    void add_shape_around_object(String name,
                                  String shape,
                                  String primitive,
-                                 String orientation,
+                                 String ori,
                                  double size,
-                                 String objectName,
+                                 String obj_name,
                                  float r,
                                  float g,
                                  float b,
                                  float a,
-                                 boolean showLabel,
-                                 boolean trackObject);
+                                 boolean label,
+                                 boolean track);
 
 }

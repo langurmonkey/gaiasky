@@ -33,9 +33,9 @@ public class CamcorderModule extends APIModule implements CamcorderAPI {
     }
 
     @Override
-    public void set_fps(double targetFps) {
-        if (api.validator.checkNum(targetFps, Constants.MIN_FPS, Constants.MAX_FPS, "targetFps")) {
-            em.post(Event.CAMRECORDER_FPS_CMD, this, targetFps);
+    public void set_fps(double fps) {
+        if (api.validator.checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "targetFps")) {
+            em.post(Event.CAMRECORDER_FPS_CMD, this, fps);
         }
     }
 
@@ -50,8 +50,8 @@ public class CamcorderModule extends APIModule implements CamcorderAPI {
     }
 
     @Override
-    public void start(String fileName) {
-        em.post(Event.RECORD_CAMERA_CMD, this, true, Path.of(fileName).getFileName().toString());
+    public void start(String path) {
+        em.post(Event.RECORD_CAMERA_CMD, this, true, Path.of(path).getFileName().toString());
     }
 
     @Override
@@ -60,8 +60,8 @@ public class CamcorderModule extends APIModule implements CamcorderAPI {
     }
 
     @Override
-    public void play(String file, boolean sync) {
-        em.post(Event.PLAY_CAMERA_CMD, this, true, file);
+    public void play(String path, boolean sync) {
+        em.post(Event.PLAY_CAMERA_CMD, this, true, path);
 
         // Wait if needed
         if (sync) {
@@ -89,8 +89,8 @@ public class CamcorderModule extends APIModule implements CamcorderAPI {
     }
 
     @Override
-    public void play(String file) {
-        play(file, false);
+    public void play(String path) {
+        play(path, false);
     }
 
 }

@@ -183,9 +183,9 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
     }
 
     @Override
-    public void effect_lens_flare(double strength) {
-        if (api.validator.checkNum(strength, Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, "strength")) {
-            api.base.post_runnable(() -> em.post(Event.LENS_FLARE_CMD, this, (float) strength));
+    public void effect_lens_flare(double value) {
+        if (api.validator.checkNum(value, Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, "strength")) {
+            api.base.post_runnable(() -> em.post(Event.LENS_FLARE_CMD, this, (float) value));
         }
     }
 
@@ -242,20 +242,20 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
     }
 
     @Override
-    public void set_star_brightness_power(float power) {
-        if (api.validator.checkFinite(power, "brightness-pow")) {
+    public void set_star_brightness_power(float value) {
+        if (api.validator.checkFinite(value, "brightness-pow")) {
             // Default to 1 in case of overflow to maintain compatibility.
-            if (power < Constants.MIN_STAR_BRIGHTNESS_POW || power > Constants.MAX_STAR_BRIGHTNESS_POW) {
-                power = 1.0f;
+            if (value < Constants.MIN_STAR_BRIGHTNESS_POW || value > Constants.MAX_STAR_BRIGHTNESS_POW) {
+                value = 1.0f;
             }
-            em.post(Event.STAR_BRIGHTNESS_POW_CMD, this, power);
+            em.post(Event.STAR_BRIGHTNESS_POW_CMD, this, value);
         }
     }
 
     @Override
-    public void set_star_glow_factor(float glowFactor) {
-        if (api.validator.checkNum(glowFactor, 0.001, 5, "glow-factor")) {
-            em.post(Event.STAR_GLOW_FACTOR_CMD, this, glowFactor);
+    public void set_star_glow_factor(float value) {
+        if (api.validator.checkNum(value, 0.001, 5, "glow-factor")) {
+            em.post(Event.STAR_GLOW_FACTOR_CMD, this, value);
         }
     }
 
@@ -269,14 +269,14 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
     }
 
     @Override
-    public void set_star_brightness(final float brightness) {
-        if (api.validator.checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness")) em.post(Event.STAR_BRIGHTNESS_CMD,
-                                                                                                                  this,
-                                                                                                                  MathUtilsDouble.lint(brightness,
-                                                                                                                                       Constants.MIN_SLIDER,
-                                                                                                                                       Constants.MAX_SLIDER,
-                                                                                                                                       Constants.MIN_STAR_BRIGHTNESS,
-                                                                                                                                       Constants.MAX_STAR_BRIGHTNESS));
+    public void set_star_brightness(final float value) {
+        if (api.validator.checkNum(value, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness")) em.post(Event.STAR_BRIGHTNESS_CMD,
+                                                                                                             this,
+                                                                                                             MathUtilsDouble.lint(value,
+                                                                                                                                  Constants.MIN_SLIDER,
+                                                                                                                                  Constants.MAX_SLIDER,
+                                                                                                                                  Constants.MIN_STAR_BRIGHTNESS,
+                                                                                                                                  Constants.MAX_STAR_BRIGHTNESS));
     }
 
     public void set_star_brightness(final int brightness) {
@@ -341,22 +341,22 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
     }
 
     @Override
-    public void set_orbit_solid_angle_threshold(float angleDeg) {
-        if (api.validator.checkNum(angleDeg, 0.0f, 180f, "solid-angle")) {
-            api.base.post_runnable(() -> EventManager.publish(Event.ORBIT_SOLID_ANGLE_TH_CMD, this, (double) angleDeg));
+    public void set_orbit_solid_angle_threshold(float deg) {
+        if (api.validator.checkNum(deg, 0.0f, 180f, "solid-angle")) {
+            api.base.post_runnable(() -> EventManager.publish(Event.ORBIT_SOLID_ANGLE_TH_CMD, this, (double) deg));
         }
     }
 
     @Override
-    public void set_limit_fps(double limitFps) {
-        if (api.validator.checkNum(limitFps, -Double.MAX_VALUE, Constants.MAX_FPS, "limitFps")) {
-            em.post(Event.LIMIT_FPS_CMD, this, limitFps);
+    public void set_limit_fps(double fps) {
+        if (api.validator.checkNum(fps, -Double.MAX_VALUE, Constants.MAX_FPS, "limitFps")) {
+            em.post(Event.LIMIT_FPS_CMD, this, fps);
         }
     }
 
     @Override
-    public void set_limit_fps(int limitFps) {
-        set_limit_fps((double) limitFps);
+    public void set_limit_fps(int fps) {
+        set_limit_fps((double) fps);
     }
 
 }

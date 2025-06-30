@@ -22,9 +22,9 @@ public interface CamcorderAPI {
      * Sky to this value while the camera is recording and playing. Make sure to use the right FPS setting during
      * playback.
      *
-     * @param targetFps The target frame rate for the camcorder.
+     * @param fps The target frame rate for the camcorder.
      */
-    void set_fps(double targetFps);
+    void set_fps(double fps);
 
     /**
      * Get the current frame rate setting of the camcorder.
@@ -48,8 +48,10 @@ public interface CamcorderAPI {
      * <code>{@link BaseModule#get_camcorder_dir()} + "/" + filename + ".gsc"</code>
      * <p>
      * This command has no effect if the camera is already being recorded.
+     *
+     * @param path Path to the camera file to play.
      */
-    void start(String fileName);
+    void start(String path);
 
     /**
      * Stop the current camera recording. This command has no effect if the
@@ -61,20 +63,20 @@ public interface CamcorderAPI {
      * Play a <code>.gsc</code> camera path file and returns immediately. This
      * method does not wait for the camera path file to finish playing.
      *
-     * @param file The path to the camera file. Path is relative to the application's root directory or absolute.
+     * @param path The path to the camera file. Path is relative to the application's root directory or absolute.
      */
-    void play(String file);
+    void play(String path);
 
     /**
      * Runs a .gsc camera path file and returns immediately. This
      * function accepts a boolean indicating whether to wait for the
      * camera path file to finish or not.
      *
-     * @param file The path to the camera file. Path is relative to the application's root directory or absolute.
+     * @param path The path to the camera file. Path is relative to the application's root directory or absolute.
      * @param sync If true, the call is synchronous and waits for the camera
      *             file to finish. Otherwise, it returns immediately.
      */
-    void play(String file,
+    void play(String path,
               boolean sync);
 
 }

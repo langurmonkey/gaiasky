@@ -164,7 +164,7 @@ public class RESTServer {
      * @param methodName The name of the method.
      * @param module     The module.
      *
-     * @return List of all matching methods.
+     * @return A list of all matching methods.
      */
     private static String[] getMethodDeclarationStrings(String methodName, Module module) {
         Method[] allMethods = module.clazz().getDeclaredMethods();

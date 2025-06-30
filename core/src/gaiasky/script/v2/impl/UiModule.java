@@ -51,28 +51,28 @@ public class UiModule extends APIModule implements UiAPI {
 
     @Override
     public void display_message(final int id,
-                                final String message,
+                                final String msg,
                                 final float x,
                                 final float y,
                                 final float r,
                                 final float g,
                                 final float b,
                                 final float a,
-                                final float fontSize) {
-        api.base.post_runnable(() -> em.post(Event.ADD_CUSTOM_MESSAGE, this, id, message, x, y, r, g, b, a, fontSize));
+                                final float size) {
+        api.base.post_runnable(() -> em.post(Event.ADD_CUSTOM_MESSAGE, this, id, msg, x, y, r, g, b, a, size));
     }
 
     @Override
     public void display_message(final int id,
-                                final String message,
+                                final String msg,
                                 final double x,
                                 final double y,
                                 final double[] color,
-                                final double fontSize) {
+                                final double size) {
         if (api.validator.checkNotNull(color, "color")
                 && api.validator.checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
-            display_message(id, message, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a, (float) fontSize);
+            display_message(id, msg, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a, (float) size);
         }
     }
 
@@ -94,17 +94,17 @@ public class UiModule extends APIModule implements UiAPI {
 
     @Override
     public void display_text(final int id,
-                             final String text,
+                             final String msg,
                              final float x,
                              final float y,
-                             final float maxWidth,
-                             final float maxHeight,
+                             final float max_w,
+                             final float max_h,
                              final float r,
                              final float g,
                              final float b,
                              final float a,
-                             final float fontSize) {
-        api.base.post_runnable(() -> em.post(Event.ADD_CUSTOM_TEXT, this, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize));
+                             final float size) {
+        api.base.post_runnable(() -> em.post(Event.ADD_CUSTOM_TEXT, this, id, msg, x, y, max_w, max_h, r, g, b, a, size));
     }
 
     public void display_text(final int id,
@@ -223,34 +223,34 @@ public class UiModule extends APIModule implements UiAPI {
     }
 
     @Override
-    public void expand_pane(String paneName) {
-        if (api.validator.checkString(paneName,
+    public void expand_pane(String name) {
+        if (api.validator.checkString(name,
                                       new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
                                       "panelName")) {
-            api.base.post_runnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, paneName + "Component", true));
+            api.base.post_runnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, name + "Component", true));
         }
     }
 
     @Override
-    public void collapse_pane(String paneName) {
-        if (api.validator.checkString(paneName,
+    public void collapse_pane(String name) {
+        if (api.validator.checkString(name,
                                       new String[]{"Time", "Camera", "Visibility", "VisualSettings", "Datasets", "LocationLog", "Bookmarks"},
                                       "panelName")) {
-            api.base.post_runnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, paneName + "Component", false));
+            api.base.post_runnable(() -> em.post(Event.EXPAND_COLLAPSE_PANE_CMD, this, name + "Component", false));
         }
     }
 
     @Override
-    public void display_popup_notification(String message) {
-        if (api.validator.checkString(message, "message")) {
-            em.post(Event.POST_POPUP_NOTIFICATION, this, message);
+    public void display_popup_notification(String msg) {
+        if (api.validator.checkString(msg, "message")) {
+            em.post(Event.POST_POPUP_NOTIFICATION, this, msg);
         }
     }
 
     @Override
-    public void display_popup_notification(String message, float duration) {
-        if (api.validator.checkString(message, "message")) {
-            em.post(Event.POST_POPUP_NOTIFICATION, this, message, duration);
+    public void display_popup_notification(String msg, float duration) {
+        if (api.validator.checkString(msg, "message")) {
+            em.post(Event.POST_POPUP_NOTIFICATION, this, msg, duration);
         }
     }
 
@@ -262,13 +262,13 @@ public class UiModule extends APIModule implements UiAPI {
     }
 
     @Override
-    public void set_headline_message(final String headline) {
-        api.base.post_runnable(() -> em.post(Event.POST_HEADLINE_MESSAGE, this, headline));
+    public void set_headline_message(final String msg) {
+        api.base.post_runnable(() -> em.post(Event.POST_HEADLINE_MESSAGE, this, msg));
     }
 
     @Override
-    public void set_subhead_message(final String subhead) {
-        api.base.post_runnable(() -> em.post(Event.POST_SUBHEAD_MESSAGE, this, subhead));
+    public void set_subhead_message(final String msg) {
+        api.base.post_runnable(() -> em.post(Event.POST_SUBHEAD_MESSAGE, this, msg));
     }
 
     @Override

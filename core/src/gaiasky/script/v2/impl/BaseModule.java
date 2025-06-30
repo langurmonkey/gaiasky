@@ -99,17 +99,17 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public void sleep(float seconds) {
-        if (api.validator.checkNum(seconds, 0f, Float.MAX_VALUE, "seconds")) {
-            if (seconds == 0f) return;
+    public void sleep(float value) {
+        if (api.validator.checkNum(value, 0f, Float.MAX_VALUE, "seconds")) {
+            if (value == 0f) return;
 
             if (api.output.is_frame_output_active()) {
-                sleep_frames(Math.max(1, FastMath.round(api.output.get_frame_output_fps() * seconds)));
+                sleep_frames(Math.max(1, FastMath.round(api.output.get_frame_output_fps() * value)));
             } else if (Camcorder.instance.isRecording()) {
-                sleep_frames(Math.max(1, FastMath.round(api.camcorder.get_fps() * seconds)));
+                sleep_frames(Math.max(1, FastMath.round(api.camcorder.get_fps() * value)));
             } else {
                 try {
-                    Thread.sleep(Math.round(seconds * 1000f));
+                    Thread.sleep(Math.round(value * 1000f));
                 } catch (InterruptedException e) {
                     logger.error(e);
                 }
@@ -141,15 +141,15 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public void post_runnable(Runnable runnable) {
-        GaiaSky.postRunnable(runnable);
+    public void post_runnable(Runnable r) {
+        GaiaSky.postRunnable(r);
     }
 
 
     @Override
-    public void park_scene_runnable(String id, Runnable runnable) {
+    public void park_scene_runnable(String id, Runnable r) {
         if (api.validator.checkString(id, "id")) {
-            em.post(Event.PARK_RUNNABLE, this, id, runnable);
+            em.post(Event.PARK_RUNNABLE, this, id, r);
         }
     }
 
@@ -161,9 +161,9 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public void park_camera_runnable(String id, Runnable runnable) {
+    public void park_camera_runnable(String id, Runnable r) {
         if (api.validator.checkString(id, "id")) {
-            em.post(Event.PARK_CAMERA_RUNNABLE, this, id, runnable);
+            em.post(Event.PARK_CAMERA_RUNNABLE, this, id, r);
         }
     }
 
@@ -211,34 +211,34 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public double internal_to_m(double internalUnits) {
-        return internalUnits * Constants.U_TO_M;
+    public double internal_to_m(double iu) {
+        return iu * Constants.U_TO_M;
     }
 
     @Override
-    public double internal_to_km(double internalUnits) {
-        return internalUnits * Constants.U_TO_KM;
+    public double internal_to_km(double iu) {
+        return iu * Constants.U_TO_KM;
     }
 
     @Override
-    public double[] internal_to_km(double[] internalUnits) {
-        double[] result = new double[internalUnits.length];
-        for (int i = 0; i < internalUnits.length; i++) {
-            result[i] = internal_to_km(internalUnits[i]);
+    public double[] internal_to_km(double[] iu) {
+        double[] result = new double[iu.length];
+        for (int i = 0; i < iu.length; i++) {
+            result[i] = internal_to_km(iu[i]);
         }
         return result;
     }
 
     @Override
-    public double internal_to_pc(double internalUnits) {
-        return internalUnits * Constants.U_TO_PC;
+    public double internal_to_pc(double iu) {
+        return iu * Constants.U_TO_PC;
     }
 
     @Override
-    public double[] internal_to_pc(double[] internalUnits) {
-        double[] result = new double[internalUnits.length];
-        for (int i = 0; i < internalUnits.length; i++) {
-            result[i] = internal_to_pc(internalUnits[i]);
+    public double[] internal_to_pc(double[] iu) {
+        double[] result = new double[iu.length];
+        for (int i = 0; i < iu.length; i++) {
+            result[i] = internal_to_pc(iu[i]);
         }
         return result;
     }
@@ -252,18 +252,18 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public double m_to_internal(double metres) {
-        return metres * Constants.M_TO_U;
+    public double m_to_internal(double m) {
+        return m * Constants.M_TO_U;
     }
 
     @Override
-    public double km_to_internal(double kilometres) {
-        return kilometres * Constants.KM_TO_U;
+    public double km_to_internal(double km) {
+        return km * Constants.KM_TO_U;
     }
 
     @Override
-    public double pc_to_internal(double parsecs) {
-        return parsecs * Constants.PC_TO_U;
+    public double pc_to_internal(double pc) {
+        return pc * Constants.PC_TO_U;
     }
 
     public double kilometersToInternalUnits(double kilometres) {
@@ -271,18 +271,18 @@ public class BaseModule extends APIModule implements BaseAPI {
     }
 
     @Override
-    public void print(String message) {
-        logger.info(message);
+    public void print(String msg) {
+        logger.info(msg);
     }
 
     @Override
-    public void log(String message) {
-        logger.info(message);
+    public void log(String msg) {
+        logger.info(msg);
     }
 
     @Override
-    public void error(String message) {
-        logger.error(message);
+    public void error(String msg) {
+        logger.error(msg);
     }
 
     @Override

@@ -111,9 +111,9 @@ public interface BaseAPI {
      * if we are capturing frames and the frame rate is set to 30 FPS, the
      * command sleep(1) will put the script to sleep for 30 frames.
      *
-     * @param seconds The number of seconds to wait.
+     * @param secs The number of seconds to wait.
      */
-    void sleep(float seconds);
+    void sleep(float secs);
 
     /**
      * Sleep for a number of frames. The frame monitor is notified at the beginning
@@ -129,9 +129,9 @@ public interface BaseAPI {
      * Post a {@link Runnable} to the main loop thread. This {@link Runnable} runs <strong>once</strong> after the update-scene stage, and
      * before the render stage.
      *
-     * @param runnable The runnable to run.
+     * @param r The runnable to run.
      */
-    void post_runnable(Runnable runnable);
+    void post_runnable(Runnable r);
 
     /**
      * <p>
@@ -146,10 +146,10 @@ public interface BaseAPI {
      * remove them with {@link #remove_runnable(String)} if needed.
      * </p>
      *
-     * @param id       The string id to identify the runnable.
-     * @param runnable The scene update runnable to park.
+     * @param id The string id to identify the runnable.
+     * @param r  The scene update runnable to park.
      */
-    void park_scene_runnable(String id, Runnable runnable);
+    void park_scene_runnable(String id, Runnable r);
 
     /**
      * <p>
@@ -164,10 +164,10 @@ public interface BaseAPI {
      * remove them with {@link #remove_runnable(String)} if needed.
      * </p>
      *
-     * @param id       The string id to identify the runnable.
-     * @param runnable The camera update runnable to park.
+     * @param id The string id to identify the runnable.
+     * @param r  The camera update runnable to park.
      */
-    void park_camera_runnable(String id, Runnable runnable);
+    void park_camera_runnable(String id, Runnable r);
 
     /**
      * Remove the runnable with the given id, if any. Use this method to remove previously parked scene and camera
@@ -227,95 +227,95 @@ public interface BaseAPI {
     /**
      * Converts the value in internal units to metres.
      *
-     * @param internalUnits The value in internal units.
+     * @param iu The value in internal units.
      *
      * @return The value in metres.
      */
-    double internal_to_m(double internalUnits);
+    double internal_to_m(double iu);
 
     /**
      * Converts the value in internal units to Kilometers.
      *
-     * @param internalUnits The value in internal units.
+     * @param iu The value in internal units.
      *
      * @return The value in Kilometers.
      */
-    double internal_to_km(double internalUnits);
+    double internal_to_km(double iu);
 
     /**
      * Converts the array in internal units to Kilometers.
      *
-     * @param internalUnits The array in internal units.
+     * @param iu The array in internal units.
      *
      * @return The array in Kilometers.
      */
-    double[] internal_to_km(double[] internalUnits);
+    double[] internal_to_km(double[] iu);
 
     /**
      * Converts the value in internal units to parsecs.
      *
-     * @param internalUnits The value in internal units.
+     * @param iu The value in internal units.
      *
      * @return The value in parsecs.
      */
-    double internal_to_pc(double internalUnits);
+    double internal_to_pc(double iu);
 
     /**
      * Converts the array in internal units to parsecs.
      *
-     * @param internalUnits The array in internal units.
+     * @param iu The array in internal units.
      *
      * @return The array in parsecs.
      */
-    double[] internal_to_pc(double[] internalUnits);
+    double[] internal_to_pc(double[] iu);
 
     /**
      * Converts the metres to internal units.
      *
-     * @param metres The value in metres.
+     * @param m The value in metres.
      *
      * @return The value in internal units.
      */
-    double m_to_internal(double metres);
+    double m_to_internal(double m);
 
     /**
      * Converts the kilometres to internal units.
      *
-     * @param kilometres The value in kilometers.
+     * @param km The value in kilometers.
      *
      * @return The value in internal units.
      */
-    double km_to_internal(double kilometres);
+    double km_to_internal(double km);
 
     /**
      * Converts the parsecs to internal units.
      *
-     * @param parsecs The value in parsecs.
+     * @param pc The value in parsecs.
      *
      * @return The value in internal units.
      */
-    double pc_to_internal(double parsecs);
+    double pc_to_internal(double pc);
 
     /**
      * Print text using the internal logging system.
      *
-     * @param message The message.
+     * @param msg The message.
      */
-    void print(String message);
+    void print(String msg);
 
     /**
      * Print text using the internal logging system.
      *
-     * @param message The message.
+     * @param msg The message.
      */
-    void log(String message);
+    void log(String msg);
 
     /**
      * Log an error using the internal logging system.
      *
-     * @param message The error message.
+     * @param msg The error message.
      */
-    void error(String message);
+    void error(String msg);
 
     /**
      * Initiate the quit action to terminate the program. This call causes Gaia Sky to exit.

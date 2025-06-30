@@ -45,9 +45,7 @@ public interface RefsysAPI {
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      *         internal reference system, in internal units.
      */
-    double[] galactic_to_cartesian(double l,
-                                   double b,
-                                   double r);
+    double[] galactic_to_cartesian(double l, double b, double r);
 
     /**
      * Convert ecliptic coordinates to the internal cartesian coordinate
@@ -60,9 +58,7 @@ public interface RefsysAPI {
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      *         internal reference system, in internal units.
      */
-    double[] ecliptic_to_cartesian(double l,
-                                   double b,
-                                   double r);
+    double[] ecliptic_to_cartesian(double l, double b, double r);
 
     /**
      * Convert equatorial coordinates to the internal cartesian coordinate
@@ -75,9 +71,7 @@ public interface RefsysAPI {
      * @return An array of doubles containing <code>[x, y, z]</code> in the
      *         internal reference system, in internal units.
      */
-    double[] equatorial_to_cartesian(double ra,
-                                     double dec,
-                                     double r);
+    double[] equatorial_to_cartesian(double ra, double dec, double r);
 
     /**
      * Convert internal cartesian coordinates to equatorial
@@ -92,31 +86,28 @@ public interface RefsysAPI {
      *         <code>distance</code> in the same distance units as the input
      *         position.
      */
-    double[] cartesian_to_equatorial(double x,
-                                     double y,
-                                     double z);
+    double[] cartesian_to_equatorial(double x, double y, double z);
 
     /**
-     * Convert regular cartesian coordinates, where XY is the equatorial plane, with X pointing to
+     * Convert regular Cartesian coordinates, where XY is the equatorial plane, with X pointing to
      * the vernal equinox (ra=0) and Y points to ra=90, and Z pointing to the celestial North Pole (dec=90)
-     * to internal cartesian coordinates with internal units.
+     * to internal Cartesian coordinates in internal units.
      *
-     * @param eq       Equatorial cartesian coordinates (X->[ra=0,dec=0], Y->[ra=90,dec=0], Z->[ra=0,dec=90])
-     * @param kmFactor Factor used to bring the input coordinate units to Kilometers, so that <code>eq * factor =
-     *                 Km</code>
+     * @param eq     Equatorial cartesian coordinates (X->[ra=0,dec=0], Y->[ra=90,dec=0], Z->[ra=0,dec=90]).
+     * @param factor Factor used to bring the input coordinate units to Kilometers, so that <code>eq * factor =
+     *               Km</code>.
      *
-     * @return Internal coordinates ready to be fed in other scripting functions
+     * @return Internal coordinates ready to be fed in other scripting functions.
      */
-    double[] equatorial_cartesian_to_internal(double[] eq,
-                                              double kmFactor);
+    double[] equatorial_cartesian_to_internal(double[] eq, double factor);
 
     /**
      * Convert equatorial cartesian coordinates (in the internal reference system)
      * to galactic cartesian coordinates.
      *
-     * @param eq Vector with [x, y, z] equatorial cartesian coordinates
+     * @param eq Vector with [x, y, z] equatorial cartesian coordinates.
      *
-     * @return Vector with [x, y, z] galactic cartesian coordinates
+     * @return Vector with [x, y, z] galactic cartesian coordinates.
      */
     double[] equatorial_to_galactic(double[] eq);
 
@@ -124,29 +115,29 @@ public interface RefsysAPI {
      * Convert equatorial cartesian coordinates (in the internal reference system)
      * to ecliptic cartesian coordinates.
      *
-     * @param eqInternal Vector with [x, y, z] equatorial cartesian coordinates
+     * @param eq Vector with [x, y, z] equatorial cartesian coordinates.
      *
-     * @return Vector with [x, y, z] ecliptic cartesian coordinates
+     * @return Vector with [x, y, z] ecliptic cartesian coordinates.
      */
-    double[] equatorial_to_ecliptic(double[] eqInternal);
+    double[] equatorial_to_ecliptic(double[] eq);
 
     /**
      * Convert galactic cartesian coordinates (in the internal reference system)
      * to equatorial cartesian coordinates.
      *
-     * @param galInternal Vector with [x, y, z] galactic cartesian coordinates
+     * @param gal Vector with [x, y, z] galactic cartesian coordinates.
      *
-     * @return Vector with [x, y, z] equatorial cartesian coordinates
+     * @return Vector with [x, y, z] equatorial cartesian coordinates.
      */
-    double[] galactic_to_equatorial(double[] galInternal);
+    double[] galactic_to_equatorial(double[] gal);
 
     /**
      * Convert ecliptic cartesian coordinates (in the internal reference system)
      * to equatorial cartesian coordinates.
      *
-     * @param eclInternal Vector with [x, y, z] ecliptic cartesian coordinates
+     * @param ecl Vector with [x, y, z] ecliptic cartesian coordinates.
      *
-     * @return Vector with [x, y, z] equatorial cartesian coordinates
+     * @return Vector with [x, y, z] equatorial cartesian coordinates.
      */
-    double[] ecliptic_to_equatorial(double[] eclInternal);
+    double[] ecliptic_to_equatorial(double[] ecl);
 }

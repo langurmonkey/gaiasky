@@ -33,13 +33,13 @@ public class OutputModule extends APIModule implements OutputAPI {
     }
 
     @Override
-    public void configure_screenshots(int width, int height, String directory, String namePrefix) {
-        if (api.validator.checkNum(width, 1, Integer.MAX_VALUE, "width")
-                && api.validator.checkNum(height, 1, Integer.MAX_VALUE, "height")
-                && api.validator.checkString(directory, "directory")
-                && api.validator.checkDirectoryExists(directory, "directory")
-                && api.validator.checkString(namePrefix, "namePrefix")) {
-            em.post(Event.SCREENSHOT_CMD, this, width, height, directory);
+    public void configure_screenshots(int w, int h, String path, String prefix) {
+        if (api.validator.checkNum(w, 1, Integer.MAX_VALUE, "width")
+                && api.validator.checkNum(h, 1, Integer.MAX_VALUE, "height")
+                && api.validator.checkString(path, "directory")
+                && api.validator.checkDirectoryExists(path, "directory")
+                && api.validator.checkString(prefix, "namePrefix")) {
+            em.post(Event.SCREENSHOT_CMD, this, w, h, path);
         }
     }
 
@@ -71,8 +71,8 @@ public class OutputModule extends APIModule implements OutputAPI {
 
 
     @Override
-    public void configure_frame_output(int width, int height, int fps, String directory, String namePrefix) {
-        configure_frame_output(width, height, (double) fps, directory, namePrefix);
+    public void configure_frame_output(int w, int h, int fps, String path, String prefix) {
+        configure_frame_output(w, h, (double) fps, path, prefix);
     }
 
     @Override
@@ -81,15 +81,15 @@ public class OutputModule extends APIModule implements OutputAPI {
     }
 
     @Override
-    public void configure_frame_output(int width, int height, double fps, String directory, String namePrefix) {
-        if (api.validator.checkNum(width, 1, Integer.MAX_VALUE, "width")
-                && api.validator.checkNum(height, 1, Integer.MAX_VALUE, "height")
+    public void configure_frame_output(int w, int h, double fps, String path, String prefix) {
+        if (api.validator.checkNum(w, 1, Integer.MAX_VALUE, "width")
+                && api.validator.checkNum(h, 1, Integer.MAX_VALUE, "height")
                 && api.validator.checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS")
-                && api.validator.checkString(directory, "directory")
-                && api.validator.checkDirectoryExists(directory, "directory")
-                && api.validator.checkString(namePrefix, "namePrefix")) {
+                && api.validator.checkString(path, "directory")
+                && api.validator.checkDirectoryExists(path, "directory")
+                && api.validator.checkString(prefix, "namePrefix")) {
             em.post(Event.FRAME_OUTPUT_MODE_CMD, this, Settings.ScreenshotMode.ADVANCED);
-            em.post(Event.CONFIG_FRAME_OUTPUT_CMD, this, width, height, fps, directory, namePrefix);
+            em.post(Event.CONFIG_FRAME_OUTPUT_CMD, this, w, h, fps, path, prefix);
         }
     }
 

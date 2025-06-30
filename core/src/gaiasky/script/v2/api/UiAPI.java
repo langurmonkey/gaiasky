@@ -23,58 +23,58 @@ public interface UiAPI {
      * will not appear in the screenshots/frames in advanced mode. This is
      * intended for running interactively only.</strong>
      *
-     * @param id       A unique identifier, used to identify this message when you
-     *                 want to remove it.
-     * @param message  The string message, to be displayed in one line. But explicit
-     *                 newline breaks the line.
-     * @param x        The x coordinate of the bottom-left corner, in [0,1] from
-     *                 left to right. This is not resolution-dependant.
-     * @param y        The y coordinate of the bottom-left corner, in [0,1] from
-     *                 bottom to top. This is not resolution-dependant.
-     * @param r        The red component of the color in [0,1].
-     * @param g        The green component of the color in [0,1].
-     * @param b        The blue component of the color in [0,1].
-     * @param a        The alpha component of the color in [0,1].
-     * @param fontSize The size of the font. The system will use the existing font
-     *                 closest to the chosen size and scale it up or down to match
-     *                 the desired size. Scaling can cause artifacts, so to ensure
-     *                 the best font quality, stick to the existing sizes.
+     * @param id   A unique identifier, used to identify this message when you
+     *             want to remove it.
+     * @param msg  The string message, to be displayed in one line. But explicit
+     *             newline breaks the line.
+     * @param x    The x coordinate of the bottom-left corner, in [0,1] from
+     *             left to right. This is not resolution-dependant.
+     * @param y    The y coordinate of the bottom-left corner, in [0,1] from
+     *             bottom to top. This is not resolution-dependant.
+     * @param r    The red component of the color in [0,1].
+     * @param g    The green component of the color in [0,1].
+     * @param b    The blue component of the color in [0,1].
+     * @param a    The alpha component of the color in [0,1].
+     * @param size The size of the font. The system will use the existing font
+     *             closest to the chosen size and scale it up or down to match
+     *             the desired size. Scaling can cause artifacts, so to ensure
+     *             the best font quality, stick to the existing sizes.
      */
     void display_message(int id,
-                         String message,
+                         String msg,
                          float x,
                          float y,
                          float r,
                          float g,
                          float b,
                          float a,
-                         float fontSize);
+                         float size);
 
     /**
      * Same as {@link #display_image(int, String, float, float, float, float, float, float)} but
      * using an array for the color
      * instead of giving each component separately.
      *
-     * @param id       A unique identifier, used to identify this message when you
-     *                 want to remove it.
-     * @param message  The string message, to be displayed in one line. But explicit
-     *                 newline breaks the line.
-     * @param x        The x coordinate of the bottom-left corner, in [0,1] from
-     *                 left to right. This is not resolution-dependant.
-     * @param y        The y coordinate of the bottom-left corner, in [0,1] from
-     *                 bottom to top. This is not resolution-dependant.
-     * @param color    The color as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fontSize The size of the font. The system will use the existing font
-     *                 closest to the chosen size and scale it up or down to match
-     *                 the desired size. Scaling can cause artifacts, so to ensure
-     *                 the best font quality, stick to the existing sizes.
+     * @param id    A unique identifier, used to identify this message when you
+     *              want to remove it.
+     * @param msg   The string message, to be displayed in one line. But explicit
+     *              newline breaks the line.
+     * @param x     The x coordinate of the bottom-left corner, in [0,1] from
+     *              left to right. This is not resolution-dependant.
+     * @param y     The y coordinate of the bottom-left corner, in [0,1] from
+     *              bottom to top. This is not resolution-dependant.
+     * @param color The color as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param size  The size of the font. The system will use the existing font
+     *              closest to the chosen size and scale it up or down to match
+     *              the desired size. Scaling can cause artifacts, so to ensure
+     *              the best font quality, stick to the existing sizes.
      */
     void display_message(int id,
-                         String message,
+                         String msg,
                          double x,
                          double y,
                          double[] color,
-                         double fontSize);
+                         double size);
 
     /**
      * Add a new multi-line text in the screen with the given id, coordinates
@@ -84,37 +84,37 @@ public interface UiAPI {
      * the screenshots/frames in advanced mode. This is intended for running
      * interactively only.</strong>
      *
-     * @param id        A unique identifier, used to identify this message when you
-     *                  want to remove it.
-     * @param text      The string message, to be displayed line-wrapped in the box
-     *                  defined by maxWidth and maxHeight. Explicit newline still
-     *                  breaks the line.
-     * @param x         The x coordinate of the bottom-left corner, in [0,1] from
-     *                  left to right. This is not resolution-dependant.
-     * @param y         The y coordinate of the bottom-left corner, in [0,1] from
-     *                  bottom to top. This is not resolution-dependant.
-     * @param maxWidth  The maximum width in screen percentage [0,1]. Set to 0 to let
-     *                  the system decide.
-     * @param maxHeight The maximum height in screen percentage [0,1]. Set to 0 to
-     *                  let the system decide.
-     * @param r         The red component of the color in [0,1].
-     * @param g         The green component of the color in [0,1].
-     * @param b         The blue component of the color in [0,1].
-     * @param a         The alpha component of the color in [0,1].
-     * @param fontSize  The size of the font. The system will use the existing font
-     *                  closest to the chosen size.
+     * @param id    A unique identifier, used to identify this message when you
+     *              want to remove it.
+     * @param msg   The string message, to be displayed line-wrapped in the box
+     *              defined by maxWidth and maxHeight. Explicit newline still
+     *              breaks the line.
+     * @param x     The x coordinate of the bottom-left corner, in [0,1] from
+     *              left to right. This is not resolution-dependant.
+     * @param y     The y coordinate of the bottom-left corner, in [0,1] from
+     *              bottom to top. This is not resolution-dependant.
+     * @param max_w The maximum width in screen percentage [0,1]. Set to 0 to let
+     *              the system decide.
+     * @param max_h The maximum height in screen percentage [0,1]. Set to 0 to
+     *              let the system decide.
+     * @param r     The red component of the color in [0,1].
+     * @param g     The green component of the color in [0,1].
+     * @param b     The blue component of the color in [0,1].
+     * @param a     The alpha component of the color in [0,1].
+     * @param size  The size of the font. The system will use the existing font
+     *              closest to the chosen size.
      */
     void display_text(int id,
-                      String text,
+                      String msg,
                       float x,
                       float y,
-                      float maxWidth,
-                      float maxHeight,
+                      float max_w,
+                      float max_h,
                       float r,
                       float g,
                       float b,
                       float a,
-                      float fontSize);
+                      float size);
 
     /**
      * Add a new image object at the given coordinates. If an object already
@@ -285,7 +285,7 @@ public interface UiAPI {
      * <p>
      * Please, mind the case!
      */
-    void expand_pane(String panelName);
+    void expand_pane(String name);
 
     /**
      * Collapse the UI pane with the given name. Possible names are:
@@ -302,40 +302,40 @@ public interface UiAPI {
      * <p>
      * Please, mind the case!
      */
-    void collapse_pane(String panelName);
+    void collapse_pane(String name);
 
     /**
      * Display a popup notification on the screen with the given contents for the default duration of 8 seconds.
      * The notification appears at the top-right of the screen and stays there until the duration time elapses, then it disappears.
      *
-     * @param message The notification text.
+     * @param msg The notification text.
      */
-    void display_popup_notification(String message);
+    void display_popup_notification(String msg);
 
     /**
      * Display a popup notification on the screen for the given duration.
      * The notification appears at the top-right of the screen and stays there until the duration time elapses, then it disappears.
      *
-     * @param message  The notification text.
+     * @param msg      The notification text.
      * @param duration The duration, in seconds, until the notification automatically disappears. Set this to a negative number so that the
      *                 notification never expires. If this is the case, the notification must be manually closed by the user.
      */
-    void display_popup_notification(String message, float duration);
+    void display_popup_notification(String msg, float duration);
 
     /**
      * Set the contents of the headline message. The headline message appears in the middle of the screen with a big font.
      *
-     * @param headline The headline text.
+     * @param msg The headline text.
      */
-    void set_headline_message(final String headline);
+    void set_headline_message(final String msg);
 
     /**
      * Set the contents of the sub-header message. The sub-header message appears just below the headline message, in the middle of the screen,
      * with a somewhat smaller font.
      *
-     * @param subhead The sub-header text.
+     * @param msg The sub-header text.
      */
-    void set_subhead_message(final String subhead);
+    void set_subhead_message(final String msg);
 
     /**
      * Clear the content of the headline message. After this method is called, the headline message disappears from screen.

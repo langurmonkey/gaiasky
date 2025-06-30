@@ -68,12 +68,12 @@ public interface InteractiveCameraAPI {
      * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
      * look into the {@link BaseModule#park_runnable(String, Runnable)} family of calls.</p>
      *
-     * @param name       The name or id (HIP, TYC, sourceId) of the object.
-     * @param solidAngle The target solid angle of the object, in degrees. The angle
-     *                   gets larger and larger as we approach the object.
+     * @param name The name or id (HIP, TYC, sourceId) of the object.
+     * @param sa   The target solid angle of the object, in degrees. The angle
+     *             gets larger and larger as we approach the object.
      */
     void go_to_object(String name,
-                      double solidAngle);
+                      double sa);
 
     /**
      * Run a seamless trip to the object with the name <code>focusName</code>
@@ -89,16 +89,16 @@ public interface InteractiveCameraAPI {
      * to the main thread, running in a separate thread. If you need total synchronization and reproducibility,
      * look into the {@link BaseModule#park_runnable(String, Runnable)} family of calls.</p>
      *
-     * @param name            The name or id (HIP, TYC, sourceId) of the object.
-     * @param solidAngle      The target solid angle of the object, in degrees. The angle
-     *                        gets larger and larger as we approach the object.
-     * @param waitTimeSeconds The seconds to wait for the camera direction vector and the
-     *                        vector from the camera position to the target object to be
-     *                        aligned.
+     * @param name The name or id (HIP, TYC, sourceId) of the object.
+     * @param sa   The target solid angle of the object, in degrees. The angle
+     *             gets larger and larger as we approach the object.
+     * @param wait The seconds to wait for the camera direction vector and the
+     *             vector from the camera position to the target object to be
+     *             aligned.
      */
     void go_to_object(String name,
-                      double solidAngle,
-                      float waitTimeSeconds);
+                      double sa,
+                      float wait);
 
     /**
      * Get the current physical speed of the camera in km/h.
@@ -153,13 +153,13 @@ public interface InteractiveCameraAPI {
      * This method gets two unitless parameters in [0, 1], <code>deltaX</code> and <code>deltaY</code>, which
      * mimic the delta, in pixels, of the mouse cursor being dragged.
      *
-     * @param deltaX The x component, between 0 and 1. Positive is right and
-     *               negative is left.
-     * @param deltaY The y component, between 0 and 1. Positive is up and negative
-     *               is down.
+     * @param dx The x component, between 0 and 1. Positive is right and
+     *           negative is left.
+     * @param dy The y component, between 0 and 1. Positive is up and negative
+     *           is down.
      */
-    void add_rotation(double deltaX,
-                      double deltaY);
+    void add_rotation(double dx,
+                      double dy);
 
     /**
      * Add a roll force to the camera.
@@ -177,13 +177,13 @@ public interface InteractiveCameraAPI {
      * the turn will not be permanent. Use the cinematic behaviour to have the turn
      * persist in time.
      *
-     * @param deltaX The x component, between 0 and 1. Positive is right and
-     *               negative is left.
-     * @param deltaY The y component, between 0 and 1. Positive is up and negative
-     *               is down.
+     * @param dx The x component, between 0 and 1. Positive is right and
+     *           negative is left.
+     * @param dy The y component, between 0 and 1. Positive is up and negative
+     *           is down.
      */
-    void add_turn(double deltaX,
-                  double deltaY);
+    void add_turn(double dx,
+                  double dy);
 
     /**
      * Add a yaw to the camera. Same as {@link #add_turn(double, double)} with
@@ -215,11 +215,11 @@ public interface InteractiveCameraAPI {
      * a planet or moon, at the
      * location with the given name, if it exists.
      *
-     * @param name         The proper name of the object.
-     * @param locationName The name of the location to land on
+     * @param name     The proper name of the object.
+     * @param location The name of the location to land on
      */
     void land_at_location(String name,
-                          String locationName);
+                          String location);
 
     /**
      * Land on the object with the given <code>name</code>, if it is a

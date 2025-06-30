@@ -88,13 +88,13 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void go_to_object(String name, double angle) {
-        go_to_object(name, angle, -1);
+    public void go_to_object(String name, double sa) {
+        go_to_object(name, sa, -1);
     }
 
     @Override
-    public void go_to_object(String name, double solidAngle, float waitTimeSeconds) {
-        go_to_object(name, solidAngle, waitTimeSeconds, null);
+    public void go_to_object(String name, double sa, float wait) {
+        go_to_object(name, sa, wait, null);
     }
 
     /**
@@ -224,10 +224,10 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void add_rotation(final double deltaX, final double deltaY) {
-        if (api.validator.checkNum(deltaX, -100d, 100d, "deltaX")
-                && api.validator.checkNum(deltaY, -100d, 100d, "deltaY"))
-            api.base.post_runnable(() -> em.post(Event.CAMERA_ROTATE, this, deltaX, deltaY));
+    public void add_rotation(final double dx, final double dy) {
+        if (api.validator.checkNum(dx, -100d, 100d, "deltaX")
+                && api.validator.checkNum(dy, -100d, 100d, "deltaY"))
+            api.base.post_runnable(() -> em.post(Event.CAMERA_ROTATE, this, dx, dy));
     }
 
     public void add_rotation(final double deltaX, final long deltaY) {
@@ -248,10 +248,10 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void add_turn(final double deltaX, final double deltaY) {
-        if (api.validator.checkNum(deltaX, -100d, 100d, "deltaX")
-                && api.validator.checkNum(deltaY, -100d, 100d, "deltaY")) {
-            api.base.post_runnable(() -> em.post(Event.CAMERA_TURN, this, deltaX, deltaY));
+    public void add_turn(final double dx, final double dy) {
+        if (api.validator.checkNum(dx, -100d, 100d, "deltaX")
+                && api.validator.checkNum(dy, -100d, 100d, "deltaY")) {
+            api.base.post_runnable(() -> em.post(Event.CAMERA_TURN, this, dx, dy));
         }
     }
 
@@ -499,8 +499,8 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void land_at_location(String name, String locationName) {
-        land_at_location(name, locationName, null);
+    public void land_at_location(String name, String location) {
+        land_at_location(name, location, null);
     }
 
     public void land_at_location(String name, String locationName, AtomicBoolean stop) {

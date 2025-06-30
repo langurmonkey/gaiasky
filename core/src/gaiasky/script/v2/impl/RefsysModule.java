@@ -88,8 +88,8 @@ public class RefsysModule extends APIModule implements RefsysAPI {
     }
 
     @Override
-    public double[] equatorial_cartesian_to_internal(double[] eq, double kmFactor) {
-        var v = api.aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
+    public double[] equatorial_cartesian_to_internal(double[] eq, double factor) {
+        var v = api.aux3d1.set(eq).scl(factor).scl(Constants.KM_TO_U);
         return new double[]{v.y, v.z, v.x};
     }
 

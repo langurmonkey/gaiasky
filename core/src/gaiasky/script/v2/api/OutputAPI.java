@@ -21,15 +21,15 @@ public interface OutputAPI {
      * Configures the screenshot system, setting the resolution of the images,
      * the output directory and the image name prefix.
      *
-     * @param width      Width of images.
-     * @param height     Height of images.
-     * @param directory  The output directory path.
-     * @param namePrefix The file name prefix.
+     * @param w      Width of images.
+     * @param h      Height of images.
+     * @param path   The output directory path.
+     * @param prefix The file name prefix.
      */
-    void configure_screenshots(int width,
-                               int height,
-                               String directory,
-                               String namePrefix);
+    void configure_screenshots(int w,
+                               int h,
+                               String path,
+                               String prefix);
 
     /**
      * Get the current output directory for screenshots as a string. This comes from a setting stored in the
@@ -48,9 +48,9 @@ public interface OutputAPI {
      * {@link #configure_screenshots(int, int, String, String)} and
      * it does not draw the UI.
      *
-     * @param screenshotMode The screenshot mode. <code>simple</code> or <code>advanced</code>.
+     * @param mode The screenshot mode. <code>simple</code> or <code>advanced</code>.
      */
-    void screenshot_mode(String screenshotMode);
+    void screenshot_mode(String mode);
 
     /**
      * Take a screenshot of the current frame and saves it to the configured
@@ -63,17 +63,17 @@ public interface OutputAPI {
      * the target frames per second, the output directory and the image name
      * prefix. This function sets the frame output mode to 'advanced'.
      *
-     * @param width      Width of images.
-     * @param height     Height of images.
-     * @param fps        Target frames per second (number of images per second).
-     * @param directory  The output directory path.
-     * @param namePrefix The file name prefix.
+     * @param w      Width of images.
+     * @param h      Height of images.
+     * @param fps    Target frames per second (number of images per second).
+     * @param path   The output directory path.
+     * @param prefix The file name prefix.
      */
-    void configure_frame_output(int width,
-                                int height,
+    void configure_frame_output(int w,
+                                int h,
                                 int fps,
-                                String directory,
-                                String namePrefix);
+                                String path,
+                                String prefix);
 
     /**
      * Get the current output directory for the frame output system as a string. This comes from a setting stored in the
@@ -88,17 +88,17 @@ public interface OutputAPI {
      * the target frames per second, the output directory and the image name
      * prefix. This function sets the frame output mode to 'advanced'.
      *
-     * @param width      Width of images.
-     * @param height     Height of images.
-     * @param fps        Target frames per second (number of images per second).
-     * @param directory  The output directory path.
-     * @param namePrefix The file name prefix.
+     * @param w      Width of images.
+     * @param h      Height of images.
+     * @param fps    Target frames per second (number of images per second).
+     * @param path   The output directory path.
+     * @param prefix The file name prefix.
      */
-    void configure_frame_output(int width,
-                                int height,
+    void configure_frame_output(int w,
+                                int h,
                                 double fps,
-                                String directory,
-                                String namePrefix);
+                                String path,
+                                String prefix);
 
     /**
      * Set the frame output mode. Possible values are <code>simple</code> and <code>advanced</code>.
@@ -109,9 +109,9 @@ public interface OutputAPI {
      * {@link #configure_frame_output(int, int, int, String, String)} and
      * it does not draw the UI.
      *
-     * @param screenshotMode The screenshot mode. <code>simple</code> or <code>advanced</code>.
+     * @param mode The screenshot mode. <code>simple</code> or <code>advanced</code>.
      */
-    void frame_output_mode(String screenshotMode);
+    void frame_output_mode(String mode);
 
     /**
      * Activate or deactivate the frame output system. If called with true,

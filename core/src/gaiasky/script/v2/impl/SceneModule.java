@@ -84,9 +84,9 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public FocusView get_object(String name, double timeOutSeconds) {
-        if (api.validator.checkObjectName(name, timeOutSeconds)) {
-            Entity object = get_entity(name, timeOutSeconds);
+    public FocusView get_object(String name, double timeout) {
+        if (api.validator.checkObjectName(name, timeout)) {
+            Entity object = get_entity(name, timeout);
             return new FocusView(object);
         }
         return null;
@@ -98,9 +98,9 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public VertsView get_line_object(String name, double timeOutSeconds) {
-        if (api.validator.checkObjectName(name, timeOutSeconds)) {
-            Entity object = get_entity(name, timeOutSeconds);
+    public VertsView get_line_object(String name, double timeout) {
+        if (api.validator.checkObjectName(name, timeout)) {
+            Entity object = get_entity(name, timeout);
             if (Mapper.verts.has(object)) {
                 return new VertsView(object);
             } else {
@@ -117,7 +117,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public Entity get_entity(String name, double timeOutSeconds) {
+    public Entity get_entity(String name, double timeout) {
         Entity obj = scene.getEntity(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -129,11 +129,11 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         }
 
         // If negative, no limit in waiting
-        if (timeOutSeconds < 0) timeOutSeconds = Double.MAX_VALUE;
+        if (timeout < 0) timeout = Double.MAX_VALUE;
 
         double startMs = System.currentTimeMillis();
         double elapsedSeconds = 0;
-        while (obj == null && elapsedSeconds < timeOutSeconds) {
+        while (obj == null && elapsedSeconds < timeout) {
             api.base.sleep_frames(1);
             obj = scene.getEntity(name);
             elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
@@ -154,9 +154,9 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public double[] get_star_parameters(String id) {
-        if (api.validator.checkObjectName(id)) {
-            Entity entity = get_entity(id);
+    public double[] get_star_parameters(String name) {
+        if (api.validator.checkObjectName(name)) {
+            Entity entity = get_entity(name);
             if (Mapper.starSet.has(entity)) {
                 var set = Mapper.starSet.get(entity);
                 // This star group contains the star
@@ -207,14 +207,14 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_object_posiiton(String name, double[] position) {
-        set_object_posiiton(name, position, "internal");
+    public void set_object_posiiton(String name, double[] pos) {
+        set_object_posiiton(name, pos, "internal");
     }
 
     @Override
-    public void set_object_posiiton(String name, double[] position, String units) {
+    public void set_object_posiiton(String name, double[] pos, String units) {
         if (api.validator.checkObjectName(name)) {
-            set_object_posiiton(get_object(name), position, units);
+            set_object_posiiton(get_object(name), pos, units);
         }
 
     }
@@ -228,13 +228,13 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_object_posiiton(FocusView object, double[] position) {
-        set_object_posiiton(object, position, "internal");
+    public void set_object_posiiton(FocusView object, double[] pos) {
+        set_object_posiiton(object, pos, "internal");
     }
 
     @Override
-    public void set_object_posiiton(FocusView object, double[] position, String units) {
-        set_object_posiiton(object.getEntity(), position, units);
+    public void set_object_posiiton(FocusView object, double[] pos, String units) {
+        set_object_posiiton(object.getEntity(), pos, units);
     }
 
     public void set_object_posiiton(FocusView object, List<?> position) {
@@ -246,18 +246,18 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_object_posiiton(Entity object, double[] position) {
-        set_object_posiiton(object, position, "internal");
+    public void set_object_posiiton(Entity object, double[] pos) {
+        set_object_posiiton(object, pos, "internal");
     }
 
     @Override
-    public void set_object_posiiton(Entity object, double[] position, String units) {
+    public void set_object_posiiton(Entity object, double[] pos, String units) {
         if (api.validator.checkNotNull(object, "object")
-                && api.validator.checkLength(position, 3, "position")
+                && api.validator.checkLength(pos, 3, "position")
                 && api.validator.checkDistanceUnits(units)) {
 
             Settings.DistanceUnits u = Settings.DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
-            double[] posUnits = new double[]{u.toInternalUnits(position[0]), u.toInternalUnits(position[1]), u.toInternalUnits(position[2])};
+            double[] posUnits = new double[]{u.toInternalUnits(pos[0]), u.toInternalUnits(pos[1]), u.toInternalUnits(pos[2])};
 
             var body = Mapper.body.get(object);
             body.pos.set(posUnits);
@@ -382,10 +382,10 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_object_size_scaling(String name, double scalingFactor) {
+    public void set_object_size_scaling(String name, double factor) {
         if (api.validator.checkObjectName(name)) {
             Entity object = get_entity(name);
-            set_object_size_scaling(object, scalingFactor);
+            set_object_size_scaling(object, factor);
         }
     }
 
@@ -412,7 +412,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_orbit_coordinates_scaling(String name, double scalingFactor) {
+    public void set_orbit_coordinates_scaling(String name, double factor) {
         int modified = 0;
         String className, objectName;
         if (name.contains(":")) {
@@ -429,11 +429,11 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
             if (aoc.getClass().getSimpleName().equalsIgnoreCase(className)) {
                 if (objectName != null) {
                     if (aoc.getOrbitName() != null && aoc.getOrbitName().contains(objectName)) {
-                        aoc.setScaling(scalingFactor);
+                        aoc.setScaling(factor);
                         modified++;
                     }
                 } else {
-                    aoc.setScaling(scalingFactor);
+                    aoc.setScaling(factor);
                     modified++;
                 }
             }
@@ -528,13 +528,13 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public boolean set_object_quaternion_slerp_orientation(String name, String file) {
-        return setObjectQuaternionOrientation(name, file, true);
+    public boolean set_object_quaternion_slerp_orientation(String name, String path) {
+        return setObjectQuaternionOrientation(name, path, true);
     }
 
     @Override
-    public boolean set_object_quaternion_nlerp_orientation(String name, String file) {
-        return setObjectQuaternionOrientation(name, file, false);
+    public boolean set_object_quaternion_nlerp_orientation(String name, String path) {
+        return setObjectQuaternionOrientation(name, path, false);
     }
 
     @Override
@@ -549,10 +549,10 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_force_display_label(String name, boolean forceLabel) {
+    public void set_force_display_label(String name, boolean force) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
-            em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, name, forceLabel);
+            em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, name, force);
         }
     }
 
@@ -633,8 +633,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_velocity_vectors_arrowheads(boolean arrowheadsEnabled) {
-        api.base.post_runnable(() -> EventManager.publish(Event.PM_ARROWHEADS_CMD, this, arrowheadsEnabled));
+    public void set_velocity_vectors_arrowheads(boolean enabled) {
+        api.base.post_runnable(() -> EventManager.publish(Event.PM_ARROWHEADS_CMD, this, enabled));
     }
 
     @Override
@@ -655,8 +655,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_velocity_vector_max_number(long maxNumber) {
-        Settings.settings.scene.star.group.numVelocityVector = (int) maxNumber;
+    public void set_velocity_vector_max_number(long num) {
+        Settings.settings.scene.star.group.numVelocityVector = (int) num;
     }
 
     @Override
@@ -669,8 +669,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void add_trajectory_line(String name, double[] points, double[] color, double trailMap) {
-        var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trailMap, "Orbit");
+    public void add_trajectory_line(String name, double[] points, double[] color, double trail) {
+        var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trail, "Orbit");
     }
 
     public void add_trajectory_line(String name, List<?> points, List<?> color, double trailMap) {
@@ -687,23 +687,23 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double lineWidth) {
-        add_polyline(name, points, color, lineWidth, false);
+    public void add_polyline(String name, double[] points, double[] color, double width) {
+        add_polyline(name, points, color, width, false);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double lineWidth, boolean arrowCaps) {
-        add_polyline(name, points, color, lineWidth, GL20.GL_LINE_STRIP, arrowCaps);
+    public void add_polyline(String name, double[] points, double[] color, double width, boolean caps) {
+        add_polyline(name, points, color, width, GL20.GL_LINE_STRIP, caps);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double lineWidth, int primitive) {
-        add_polyline(name, points, color, lineWidth, primitive, false);
+    public void add_polyline(String name, double[] points, double[] color, double width, int primitive) {
+        add_polyline(name, points, color, width, primitive, false);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
-        addLineObject(name, points, color, lineWidth, primitive, arrowCaps, -1f, "Polyline");
+    public void add_polyline(String name, double[] points, double[] color, double width, int primitive, boolean caps) {
+        addLineObject(name, points, color, width, primitive, caps, -1f, "Polyline");
     }
 
     Entity addLineObject(String name,
@@ -831,58 +831,58 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void add_shape_around_object(String shapeName,
+    public void add_shape_around_object(String name,
                                         String shapeType,
                                         String primitive,
                                         double size,
-                                        String objectName,
+                                        String obj_name,
                                         float r,
                                         float g,
                                         float b,
                                         float a,
-                                        boolean showLabel,
-                                        boolean trackObject) {
-        add_shape_around_object(shapeName,
+                                        boolean label,
+                                        boolean track) {
+        add_shape_around_object(name,
                                 shapeType,
                                 primitive,
                                 OrientationComboBoxBean.ShapeOrientation.EQUATORIAL.toString(),
                                 size,
-                                objectName,
+                                obj_name,
                                 r,
                                 g,
                                 b,
                                 a,
-                                showLabel,
-                                trackObject);
+                                label,
+                                track);
     }
 
     @Override
-    public void add_shape_around_object(String shapeName,
+    public void add_shape_around_object(String name,
                                         String shapeType,
                                         String primitive,
-                                        String orientation,
+                                        String ori,
                                         double size,
-                                        String objectName,
+                                        String obj_name,
                                         float r,
                                         float g,
                                         float b,
                                         float a,
-                                        boolean showLabel,
-                                        boolean trackObject) {
-        if (api.validator.checkString(shapeName, "shapeName")
+                                        boolean label,
+                                        boolean track) {
+        if (api.validator.checkString(name, "shapeName")
                 && api.validator.checkStringEnum(shapeType, ShapeComboBoxBean.Shape.class, "shape")
                 && api.validator.checkStringEnum(primitive,
                                    PrimitiveComboBoxBean.Primitive.class,
                                    "primitive")
                 && api.validator.checkStringEnum(
-                                    orientation,
+                ori,
                                     OrientationComboBoxBean.ShapeOrientation.class,
                                     "orientation")
                 && api.validator.checkNum(size, 0, Double.MAX_VALUE, "size")
-                && api.validator.checkObjectName(objectName)) {
+                && api.validator.checkObjectName(obj_name)) {
             final var shapeLc = shapeType.toLowerCase(Locale.ROOT);
             api.base.post_runnable(() -> {
-                Entity trackingObject = get_focus_entity(objectName);
+                Entity trackingObject = get_focus_entity(obj_name);
                 float[] color = new float[]{r, g, b, a};
                 int primitiveInt = PrimitiveComboBoxBean.Primitive.valueOf(primitive.toUpperCase(Locale.ROOT))
                         .equals(PrimitiveComboBoxBean.Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
@@ -891,7 +891,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                 Entity newShape = at.createEntity();
 
                 var base = Mapper.base.get(newShape);
-                base.setName(shapeName.trim());
+                base.setName(name.trim());
                 base.ct = new ComponentTypes(ComponentTypes.ComponentType.Others.ordinal());
 
                 var body = Mapper.body.get(newShape);
@@ -906,16 +906,16 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                 focus.focusable = false;
 
                 var shape = Mapper.shape.get(newShape);
-                if (trackObject) {
+                if (track) {
                     shape.track = new FocusView(trackingObject);
                 } else {
-                    body.setPos(EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3Q()));
+                    body.setPos(EntityUtils.getAbsolutePosition(trackingObject, obj_name, new Vector3Q()));
                 }
-                shape.trackName = objectName;
+                shape.trackName = obj_name;
 
                 var trf = Mapper.transform.get(newShape);
                 var m = new Matrix4();
-                var orient = OrientationComboBoxBean.ShapeOrientation.valueOf(orientation.toUpperCase(Locale.ROOT));
+                var orient = OrientationComboBoxBean.ShapeOrientation.valueOf(ori.toUpperCase(Locale.ROOT));
                 switch (orient) {
                     case CAMERA -> {
                         var camera = GaiaSky.instance.cameraManager.getCamera();

@@ -64,8 +64,8 @@ public class InputModule extends APIModule implements IObserver, InputAPI {
     }
 
     @Override
-    public void wait_input(int keyCode) {
-        while (inputCode != keyCode) {
+    public void wait_input(int code) {
+        while (inputCode != code) {
             api.base.sleep_frames(1);
         }
         // Consume

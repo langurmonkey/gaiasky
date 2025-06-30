@@ -53,9 +53,9 @@ public class TimeModule extends APIModule implements TimeAPI {
     }
 
     @Override
-    public void set_clock(int year, int month, int day, int hour, int min, int sec, int millisec) {
-        if (api.validator.checkDateTime(year, month, day, hour, min, sec, millisec)) {
-            LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
+    public void set_clock(int yr, int month, int day, int hour, int min, int sec, int ms) {
+        if (api.validator.checkDateTime(yr, month, day, hour, min, sec, ms)) {
+            LocalDateTime date = LocalDateTime.of(yr, month, day, hour, min, sec, ms);
             em.post(Event.TIME_CHANGE_CMD, this, date.toInstant(ZoneOffset.UTC));
         }
     }
@@ -103,8 +103,8 @@ public class TimeModule extends APIModule implements TimeAPI {
     }
 
     @Override
-    public void set_time_warp(final double warpFactor) {
-        em.post(Event.TIME_WARP_CMD, this, warpFactor);
+    public void set_time_warp(final double warp) {
+        em.post(Event.TIME_WARP_CMD, this, warp);
     }
 
     /**
@@ -121,9 +121,9 @@ public class TimeModule extends APIModule implements TimeAPI {
     }
 
     @Override
-    public void set_target_time(int year, int month, int day, int hour, int min, int sec, int millisec) {
-        if (api.validator.checkDateTime(year, month, day, hour, min, sec, millisec)) {
-            em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
+    public void set_target_time(int yr, int month, int day, int hour, int min, int sec, int ms) {
+        if (api.validator.checkDateTime(yr, month, day, hour, min, sec, ms)) {
+            em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(yr, month, day, hour, min, sec, ms).toInstant(ZoneOffset.UTC));
         }
     }
 
@@ -133,9 +133,9 @@ public class TimeModule extends APIModule implements TimeAPI {
     }
 
     @Override
-    public void set_max_simulation_time(long years) {
-        if (api.validator.checkFinite(years, "years")) {
-            Settings.settings.runtime.setMaxTime(Math.abs(years));
+    public void set_max_simulation_time(long yr) {
+        if (api.validator.checkFinite(yr, "years")) {
+            Settings.settings.runtime.setMaxTime(Math.abs(yr));
         }
     }
 
@@ -157,18 +157,18 @@ public class TimeModule extends APIModule implements TimeAPI {
 
 
     @Override
-    public void transition(int year,
+    public void transition(int yr,
                            int month,
                            int day,
                            int hour,
                            int min,
                            int sec,
-                           int milliseconds,
-                           double durationSeconds,
-                           String smoothType,
-                           double smoothFactor,
+                           int ms,
+                           double duration,
+                           String smooth_type,
+                           double smooth_factor,
                            boolean sync) {
-        transition(year, month, day, hour, min, sec, milliseconds, durationSeconds, smoothType, smoothFactor, sync, null);
+        transition(yr, month, day, hour, min, sec, ms, duration, smooth_type, smooth_factor, sync, null);
     }
 
     public void transition(int year,

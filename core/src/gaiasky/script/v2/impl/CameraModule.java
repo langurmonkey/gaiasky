@@ -66,19 +66,19 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void focus_mode(final String focusName) {
-        focus_mode(focusName, 0.0f);
+    public void focus_mode(final String name) {
+        focus_mode(name, 0.0f);
     }
 
     @Override
-    public void focus_mode(final String focusName, final float waitTimeSeconds) {
-        if (api.validator.checkString(focusName, "focusName") && api.validator.checkFocusName(focusName)) {
-            var entity = api.scene.get_focus(focusName);
+    public void focus_mode(final String name, final float wait) {
+        if (api.validator.checkString(name, "focusName") && api.validator.checkFocusName(name)) {
+            var entity = api.scene.get_focus(name);
             // Make sure that star and particle sets have the correct focus index.
             focusView.setEntity(entity);
-            focusView.getFocus(focusName);
+            focusView.getFocus(name);
             // Execute mode change.
-            focus_mode(entity, waitTimeSeconds);
+            focus_mode(entity, wait);
         }
     }
 
@@ -115,13 +115,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void focus_mode_instant(final String focusName) {
-        if (api.validator.checkString(focusName, "focusName")) {
-            Entity entity = api.scene.get_entity(focusName);
+    public void focus_mode_instant(final String name) {
+        if (api.validator.checkString(name, "focusName")) {
+            Entity entity = api.scene.get_entity(name);
             if (Mapper.focus.has(entity)) {
                 synchronized (focusView) {
                     focusView.setEntity(entity);
-                    focusView.getFocus(focusName);
+                    focusView.getFocus(name);
                     em.post(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
                     em.post(Event.FOCUS_CHANGE_CMD, this, focusView.getEntity());
                 }
@@ -139,14 +139,14 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
                 // Make sure the last action is flushed
                 api.base.sleep_frames(2);
             } else {
-                logger.error("FOCUS_MODE object does not exist: " + focusName);
+                logger.error("FOCUS_MODE object does not exist: " + name);
             }
         }
     }
 
     @Override
-    public void focus_mode_instant_go(final String focusName) {
-        focus_mode_instant_go(focusName, true);
+    public void focus_mode_instant_go(final String name) {
+        focus_mode_instant_go(name, true);
     }
 
     /**
@@ -207,13 +207,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public boolean wait_focus(String name, long timeoutMs) {
+    public boolean wait_focus(String name, long timeout) {
         long iniTime = TimeUtils.millis();
         NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
         while (cam.focus == null || !cam.focus.getName().equalsIgnoreCase(name)) {
             api.base.sleep_frames(1);
             long spent = TimeUtils.millis() - iniTime;
-            if (timeoutMs > 0 && spent > timeoutMs) {
+            if (timeout > 0 && spent > timeout) {
                 // Timeout!
                 return true;
             }
@@ -228,8 +228,8 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void center_focus(boolean centerFocus) {
-        api.base.post_runnable(() -> em.post(Event.CAMERA_CENTER_FOCUS_CMD, this, centerFocus));
+    public void center_focus(boolean center) {
+        api.base.post_runnable(() -> em.post(Event.CAMERA_CENTER_FOCUS_CMD, this, center));
     }
 
 
@@ -250,8 +250,8 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_position(final double[] vec) {
-        this.set_position(vec, "km");
+    public void set_position(final double[] pos) {
+        this.set_position(pos, "km");
     }
 
     @Override
@@ -282,19 +282,19 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_position(double[] position, boolean immediate) {
-        set_position(position, "km", immediate);
+    public void set_position(double[] pos, boolean immediate) {
+        set_position(pos, "km", immediate);
     }
 
     @Override
-    public void set_position(double[] position, String units, boolean immediate) {
-        if (api.validator.checkLength(position, 3, "position")
+    public void set_position(double[] pos, String units, boolean immediate) {
+        if (api.validator.checkLength(pos, 3, "position")
                 && api.validator.checkDistanceUnits(units)) {
             Settings.DistanceUnits u = Settings.DistanceUnits.valueOf(units.toUpperCase(Locale.ROOT));
             if (immediate) {
-                sendPositionEvent(position, u);
+                sendPositionEvent(pos, u);
             } else {
-                api.base.post_runnable(() -> sendPositionEvent(position, u));
+                api.base.post_runnable(() -> sendPositionEvent(pos, u));
             }
         }
 
@@ -332,8 +332,8 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_position(double[] position, String units) {
-        set_position(position, units, false);
+    public void set_position(double[] dir, String units) {
+        set_position(dir, units, false);
     }
 
     /**
@@ -355,12 +355,12 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_direction(double[] direction, boolean immediate) {
-        if (api.validator.checkLength(direction, 3, "direction")) {
+    public void set_direction(double[] dir, boolean immediate) {
+        if (api.validator.checkLength(dir, 3, "direction")) {
             if (immediate) {
-                sendDirectionEvent(direction);
+                sendDirectionEvent(dir);
             } else {
-                api.base.post_runnable(() -> sendDirectionEvent(direction));
+                api.base.post_runnable(() -> sendDirectionEvent(dir));
             }
         }
     }
@@ -386,13 +386,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_direction_equatorial(double alpha, double delta) {
-        if (api.validator.checkNum(delta, -90.0, 90.0, "declination")) {
+    public void set_direction_equatorial(double ra, double dec) {
+        if (api.validator.checkNum(dec, -90.0, 90.0, "declination")) {
             // Camera free.
             free_mode();
 
             // Direction.
-            api.aux3d1.set(FastMath.toRadians(alpha), FastMath.toRadians(delta), Constants.PC_TO_U);
+            api.aux3d1.set(FastMath.toRadians(ra), FastMath.toRadians(dec), Constants.PC_TO_U);
             var targetPoint = Coordinates.sphericalToCartesian(api.aux3d1, api.aux3d2);
             var dir = targetPoint.sub(GaiaSky.instance.cameraManager.getPos()).nor();
 
@@ -505,23 +505,23 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_position_and_focus(String focus, String other, double rotation, double solidAngle) {
+    public void set_position_and_focus(String name, String other, double rot, double solidAngle) {
         if (api.validator.checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle")
-                && api.validator.checkNotNull(focus, "focus")
+                && api.validator.checkNotNull(name, "focus")
                 && api.validator.checkNotNull(other, "other")) {
 
-            if (scene.index().containsEntity(focus) && scene.index().containsEntity(other)) {
+            if (scene.index().containsEntity(name) && scene.index().containsEntity(other)) {
                 Entity focusObj, otherObj;
                 synchronized (focusView) {
-                    focusObj = scene.findFocus(focus);
+                    focusObj = scene.findFocus(name);
                     focusView.setEntity(focusObj);
-                    focusView.getFocus(focus);
+                    focusView.getFocus(name);
 
                     otherObj = scene.findFocus(other);
                     focusView.setEntity(otherObj);
                     focusView.getFocus(other);
                 }
-                set_position_and_focus(focusObj, otherObj, rotation, solidAngle);
+                set_position_and_focus(focusObj, otherObj, rot, solidAngle);
             }
         }
     }
@@ -590,25 +590,25 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void go_to_object(String name, double positionDurationSeconds, double orientationDurationSeconds) {
-        go_to_object(name, positionDurationSeconds, orientationDurationSeconds, true);
+    public void go_to_object(String name, double positionDurationSeconds, double ori_duration) {
+        go_to_object(name, positionDurationSeconds, ori_duration, true);
     }
 
     @Override
-    public void go_to_object(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds) {
-        go_to_object(name, solidAngle, positionDurationSeconds, orientationDurationSeconds, true);
+    public void go_to_object(String name, double sa, double pos_duration, double ori_duration) {
+        go_to_object(name, sa, pos_duration, ori_duration, true);
     }
 
     @Override
-    public void go_to_object(String name, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
-        go_to_object(name, -1.0, positionDurationSeconds, orientationDurationSeconds, true);
+    public void go_to_object(String name, double positionDurationSeconds, double ori_duration, boolean sync) {
+        go_to_object(name, -1.0, positionDurationSeconds, ori_duration, true);
     }
 
     @Override
-    public void go_to_object(String name, double solidAngle, double positionDurationSeconds, double orientationDurationSeconds, boolean sync) {
+    public void go_to_object(String name, double sa, double pos_duration, double ori_duration, boolean sync) {
         if (api.validator.checkString(name, "name") && api.validator.checkObjectName(name)) {
             Entity focus = scene.findFocus(name);
-            go_to_object(focus, solidAngle, positionDurationSeconds, orientationDurationSeconds, sync);
+            go_to_object(focus, sa, pos_duration, ori_duration, sync);
         } else {
             logger.error("Could not find position of " + name);
         }
@@ -715,13 +715,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_tracking_object(String objectName) {
-        if (objectName == null) {
+    public void set_tracking_object(String name) {
+        if (name == null) {
             remove_tracking_object();
-        } else if (api.validator.checkFocusName(objectName)) {
+        } else if (api.validator.checkFocusName(name)) {
             synchronized (focusView) {
-                Entity trackingObject = api.scene.get_focus(objectName);
-                em.post(Event.CAMERA_TRACKING_OBJECT_CMD, this, trackingObject, objectName);
+                Entity trackingObject = api.scene.get_focus(name);
+                em.post(Event.CAMERA_TRACKING_OBJECT_CMD, this, trackingObject, name);
             }
         } else {
             remove_tracking_object();
@@ -744,10 +744,10 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_fov(final float newFov) {
+    public void set_fov(final float fov) {
         if (!SlaveManager.projectionActive()) {
-            if (api.validator.checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
-                api.base.post_runnable(() -> em.post(Event.FOV_CHANGED_CMD, this, newFov));
+            if (api.validator.checkNum(fov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
+                api.base.post_runnable(() -> em.post(Event.FOV_CHANGED_CMD, this, fov));
         }
     }
 
@@ -756,8 +756,8 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void transition_km(double[] camPos, double[] camDir, double[] camUp, double seconds) {
-        transition(camPos, "km", camDir, camUp, seconds, true);
+    public void transition_km(double[] pos, double[] dir, double[] up, double duration) {
+        transition(pos, "km", dir, up, duration, true);
     }
 
     public void transition_km(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
@@ -769,13 +769,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void transition(double[] camPos, double[] camDir, double[] camUp, double seconds) {
-        transition(camPos, "internal", camDir, camUp, seconds);
+    public void transition(double[] pos, double[] dir, double[] up, double duration) {
+        transition(pos, "internal", dir, up, duration);
     }
 
     @Override
-    public void transition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds) {
-        transition(camPos, units, camDir, camUp, seconds, true);
+    public void transition(double[] pos, String units, double[] dir, double[] up, double duration) {
+        transition(pos, units, dir, up, duration, true);
     }
 
     public void transition(double[] camPos, double[] camDir, double[] camUp, long seconds) {
@@ -803,13 +803,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void transition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
-        transition(camPos, "internal", camDir, camUp, seconds, sync);
+    public void transition(double[] pos, double[] dir, double[] camUp, double duration, boolean sync) {
+        transition(pos, "internal", dir, camUp, duration, sync);
     }
 
     @Override
-    public void transition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds, boolean sync) {
-        transition(camPos, units, camDir, camUp, seconds, "none", 0, seconds, "none", 0, sync);
+    public void transition(double[] pos, String units, double[] dir, double[] up, double duration, boolean sync) {
+        transition(pos, units, dir, up, duration, "none", 0, duration, "none", 0, sync);
     }
 
     public void transition(List<?> camPos,
@@ -834,25 +834,25 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void transition(double[] camPos,
-                           double[] camDir,
-                           double[] camUp,
-                           double positionDurationSeconds,
-                           String positionSmoothType,
-                           double positionSmoothFactor,
-                           double orientationDurationSeconds,
-                           String orientationSmoothType,
-                           double orientationSmoothFactor) {
-        transition(camPos,
+    public void transition(double[] pos,
+                           double[] dir,
+                           double[] up,
+                           double pos_duration,
+                           String pos_smooth_type,
+                           double pos_smooth_factor,
+                           double ori_duration,
+                           String ori_smooth_type,
+                           double ori_smooth_factor) {
+        transition(pos,
                    "internal",
-                   camDir,
-                   camUp,
-                   positionDurationSeconds,
-                   positionSmoothType,
-                   positionSmoothFactor,
-                   orientationDurationSeconds,
-                   orientationSmoothType,
-                   orientationSmoothFactor,
+                   dir,
+                   up,
+                   pos_duration,
+                   pos_smooth_type,
+                   pos_smooth_factor,
+                   ori_duration,
+                   ori_smooth_type,
+                   ori_smooth_factor,
                    true);
     }
 
@@ -881,27 +881,27 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void transition(double[] camPos,
+    public void transition(double[] pos,
                            String units,
-                           double[] camDir,
-                           double[] camUp,
-                           double positionDurationSeconds,
-                           String positionSmoothType,
-                           double positionSmoothFactor,
-                           double orientationDurationSeconds,
-                           String orientationSmoothType,
-                           double orientationSmoothFactor,
+                           double[] dir,
+                           double[] up,
+                           double pos_duration,
+                           String pos_smooth_type,
+                           double pos_smooth_factor,
+                           double ori_duration,
+                           String ori_smooth_type,
+                           double ori_smooth_factor,
                            boolean sync) {
-        transition(camPos,
+        transition(pos,
                    units,
-                   camDir,
-                   camUp,
-                   positionDurationSeconds,
-                   positionSmoothType,
-                   positionSmoothFactor,
-                   orientationDurationSeconds,
-                   orientationSmoothType,
-                   orientationSmoothFactor,
+                   dir,
+                   up,
+                   pos_duration,
+                   pos_smooth_type,
+                   pos_smooth_factor,
+                   ori_duration,
+                   ori_smooth_type,
+                   ori_smooth_factor,
                    sync,
                    null);
     }
@@ -966,13 +966,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void transition_position(double[] camPos,
+    public void transition_position(double[] pos,
                                     String units,
-                                    double durationSeconds,
+                                    double duration,
                                     String smoothType,
-                                    double smoothFactor,
+                                    double smooth_factor,
                                     boolean sync) {
-        transition_position(camPos, units, durationSeconds, smoothType, smoothFactor, sync, null);
+        transition_position(pos, units, duration, smoothType, smooth_factor, sync, null);
     }
 
     public void transition_position(double[] camPos,
@@ -1024,13 +1024,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void transition_orientation(double[] camDir,
-                                       double[] camUp,
-                                       double durationSeconds,
-                                       String smoothType,
-                                       double smoothFactor,
+    public void transition_orientation(double[] dir,
+                                       double[] up,
+                                       double duration,
+                                       String smooth_type,
+                                       double smooth_factor,
                                        boolean sync) {
-        transition_orientation(camDir, camUp, durationSeconds, smoothType, smoothFactor, sync, null);
+        transition_orientation(dir, up, duration, smooth_type, smooth_factor, sync, null);
     }
 
     public void transition_orientation(double[] camDir,

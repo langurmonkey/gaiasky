@@ -40,10 +40,10 @@ public interface InputAPI {
     /**
      * Block the execution until the given key or button is pressed.
      *
-     * @param keyCode The key or button code. Please see
-     *                {@link Input.Keys} and {@link GSKeys}.
+     * @param code The key or button code. Please see
+     *             {@link Input.Keys} and {@link GSKeys}.
      */
-    void wait_input(int keyCode);
+    void wait_input(int code);
 
     /**
      * Block the execution until the Enter key is pressed.

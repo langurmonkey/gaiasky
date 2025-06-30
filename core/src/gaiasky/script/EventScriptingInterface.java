@@ -2695,7 +2695,8 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     @Override
     public boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight) {
-        return apiv2.data.highlight_dataset(dsName, r, g, b, a, highlight);
+        float[] color = new float[]{r, g, b, a};
+        return apiv2.data.highlight_dataset(dsName, color, highlight);
     }
 
     @Override
