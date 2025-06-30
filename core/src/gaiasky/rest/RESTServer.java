@@ -160,6 +160,11 @@ public class RESTServer {
     /**
      * Returns a list of all matching method declaration strings. To get a list of
      * all method declarations, use empty string for <code>methodName</code>.
+     *
+     * @param methodName The name of the method.
+     * @param module     The module.
+     *
+     * @return List of all matching methods.
      */
     private static String[] getMethodDeclarationStrings(String methodName, Module module) {
         Method[] allMethods = module.clazz().getDeclaredMethods();
@@ -167,12 +172,31 @@ public class RESTServer {
         List<String> matchMethodsDeclarations = new ArrayList<>();
         for (Method allMethod : allMethods) {
             if (methodName.isEmpty() || methodName.equals(allMethod.getName())) {
-                String declaration = methodDeclarationString(allMethod);
-                matchMethodsDeclarations.add(declaration);
+                // Only public methods
+                if (Modifier.isPublic(allMethod.getModifiers())) {
+                    String declaration = methodDeclarationString(allMethod);
+                    matchMethodsDeclarations.add(declaration);
+                }
             }
         }
         Collections.sort(matchMethodsDeclarations);
         return matchMethodsDeclarations.toArray(new String[0]);
+    }
+
+    /**
+     * Returns a list of all modules within the given module.
+     *
+     * @param module The module.
+     *
+     * @return The list of all modules.
+     */
+    private static String[] getModuleDeclarations(Module module) {
+        List<String> result = new ArrayList<>();
+        for (var m : module.modules()) {
+            result.add(m.name());
+        }
+        Collections.sort(result);
+        return result.toArray(new String[0]);
     }
 
     /**
@@ -462,8 +486,13 @@ public class RESTServer {
         /* Special-treatment commands */
         if ("help".equals(cmd)) {
             logger.debug("Help command received");
-            ret.put("text", "Help: see 'cmd_syntax' for command reference. " + "Vectors are comma-separated.");
-            ret.put("cmd_syntax", getMethodDeclarationStrings("", module));
+            if (module.path().getParent() == null) {
+                ret.put("text", "Help: see 'modules' for information on the available modules. Use each module as a path to access its methods.");
+                ret.put("modules", getModuleDeclarations(module));
+            } else {
+                ret.put("text", "Help: see 'cmd_syntax' for command reference. " + "Vectors are comma-separated.");
+                ret.put("cmd_syntax", getMethodDeclarationStrings("", module));
+            }
             return responseData(request, response, ret, true);
         } else if ("debugCall".equals(cmd)) {
             logger.debug("debugCall received. What to do now?");
@@ -477,6 +506,16 @@ public class RESTServer {
         boolean methodNameMatches = false;
 
         if (module.methodMap() == null || !module.methodMap().containsKey(cmd)) {
+            // Check if it is a module path, and serve help.
+            var innerModules = module.modules();
+            for (var im : innerModules) {
+                if (cmd.equals(im.name())) {
+                    // Hit!
+                    response.redirect(im.name() + "/help");
+                    return null;
+                }
+            }
+
             /* No match: could not find matching method */
             logger.debug("No suitable method found.");
 
@@ -669,8 +708,8 @@ public class RESTServer {
     }
 
     private static Object getModuleInstance(Class<?> clazz) {
-       var apiv2 = ((EventScriptingInterface)GaiaSky.instance.scripting()).apiv2;
-       return apiv2.getModuleInstance(clazz);
+        var apiv2 = ((EventScriptingInterface) GaiaSky.instance.scripting()).apiv2;
+        return apiv2.getModuleInstance(clazz);
     }
 
     /**
@@ -753,16 +792,14 @@ public class RESTServer {
 
     private static void apiv2Mappings(Module module) {
         var path = module.path();
-        Spark.get("/" + path.toString(), (request, response) -> {
+        Spark.get("/" + path, (request, response) -> {
             response.redirect("/" + path + "/help");
             return response;
         });
 
         // Handle methods in current module.
-        if (module.methodMap() != null && !module.methodMap().isEmpty()) {
-            Spark.get("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
-            Spark.post("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
-        }
+        Spark.get("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
+        Spark.post("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
 
         // Recursively add modules.
         if (module.modules() != null && !module.modules().isEmpty()) {
@@ -804,12 +841,12 @@ public class RESTServer {
  * @param methodMap The method map.
  * @param modules   References to the inner modules.
  */
-record Module(Path path, Class<?> clazz, Map<String, Array<Method>> methodMap, Array<Module> modules) {
+record Module(String name, Path path, Class<?> clazz, Map<String, Array<Method>> methodMap, Array<Module> modules) {
 
     public static Module of(Path path, Class<?> clazz) {
         if (!APIModule.class.isAssignableFrom(clazz)) {
             // Current class is not an APIModule itself.
-            return new Module(path, clazz, null, getModules(clazz, path));
+            return new Module("root", path, clazz, null, getModules(clazz, path));
         } else {
             // We are an APIModule, gather methods.
             // Add methods.
@@ -832,7 +869,9 @@ record Module(Path path, Class<?> clazz, Map<String, Array<Method>> methodMap, A
                     matches.add(method);
                 map.put(key, matches);
             }
-            return new Module(path, clazz, map, getModules(clazz, path));
+            // Extract name from module class name.
+            var name = clazz.getSimpleName().substring(0, clazz.getSimpleName().indexOf("Module")).toLowerCase();
+            return new Module(name, path, clazz, map, getModules(clazz, path));
         }
     }
 

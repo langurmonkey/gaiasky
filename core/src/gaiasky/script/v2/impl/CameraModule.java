@@ -41,8 +41,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     private Scene scene;
     /** Focus view. **/
     private final FocusView focusView;
-    /** Currently active stop instances. **/
-    private final Set<AtomicBoolean> stops;
     /** Internal camera transition sequence number. **/
     private int cTransSeq = 0;
 
@@ -62,7 +60,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     public CameraModule(EventManager em, APIv2 api, String name) {
         super(em, api, name);
         this.focusView = new FocusView();
-        this.stops = new HashSet<>();
         this.interactive = new InteractiveCameraModule(em, api, "interactive");
 
         em.subscribe(this, Event.SCENE_LOADED);
@@ -1368,11 +1365,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
 
     @Override
     public void dispose() {
-        // Stop all ongoing processes.
-        for (var stop : stops) {
-            if (stop != null) stop.set(true);
-        }
-
         interactive.dispose();
 
         super.dispose();
