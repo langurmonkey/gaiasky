@@ -638,7 +638,7 @@ public class RESTServer {
                 logger.debug("Invoking method...");
                 // note: invoke may return null explicitly or because is void type
                 Object moduleInstance = getModuleInstance(module.clazz());
-                Object returnObject = matchMethod.invoke(GaiaSky.instance.scripting(), arguments);
+                Object returnObject = matchMethod.invoke(moduleInstance, arguments);
                 if (returnObject == null) {
                     logger.debug("Method returned: '{}', return type is {}", returnObject, matchReturnType);
                 } else {

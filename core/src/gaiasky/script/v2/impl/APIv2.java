@@ -18,6 +18,7 @@ import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Objects;
 
@@ -131,11 +132,11 @@ public class APIv2 implements IObserver {
            this.modules.put(m.getClass(), m);
            var fields = m.getClass().getDeclaredFields();
            for (var field : fields) {
-               if (APIModule.class.isAssignableFrom(field.getDeclaringClass())) {
+               if (Modifier.isPublic(field.getModifiers()) && APIModule.class.isAssignableFrom(field.getType())) {
                    // Add this.
                    try {
                        var value = (APIModule) field.get(m);
-                       this.modules.put(field.getDeclaringClass(), value);
+                       this.modules.put(field.getType(), value);
                    } catch (IllegalAccessException e) {
                        throw new RuntimeException(e);
                    }
