@@ -13,8 +13,8 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import gaiasky.GaiaSky;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
-import gaiasky.script.v2.impl.APIModule;
 import gaiasky.script.v2.impl.APIv2;
+import gaiasky.script.v2.meta.ModuleDesc;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import spark.Spark;
@@ -166,7 +166,7 @@ public class RESTServer {
      *
      * @return A list of all matching methods.
      */
-    private static String[] getMethodDeclarationStrings(String methodName, Module module) {
+    private static String[] getMethodDeclarationStrings(String methodName, ModuleDesc module) {
         Method[] allMethods = module.clazz().getDeclaredMethods();
 
         List<String> matchMethodsDeclarations = new ArrayList<>();
@@ -190,7 +190,7 @@ public class RESTServer {
      *
      * @return The list of all modules.
      */
-    private static String[] getModuleDeclarations(Module module) {
+    private static String[] getModuleDeclarations(ModuleDesc module) {
         List<String> result = new ArrayList<>();
         for (var m : module.modules()) {
             result.add(m.name());
@@ -462,7 +462,7 @@ public class RESTServer {
         }
     }
 
-    private static String handleAPIv2Call(spark.Request request, spark.Response response, Module module) {
+    private static String handleAPIv2Call(spark.Request request, spark.Response response, ModuleDesc module) {
         // Logging basic request information
         loggerRequestInfo(request);
 
@@ -757,7 +757,7 @@ public class RESTServer {
 
 
             /* Scripting APIv2 mapping */
-            Module apiV2Modules = constructAPIv2Modules();
+            ModuleDesc apiV2Modules = constructAPIv2Modules();
             apiv2Mappings(apiV2Modules);
 
             logger.info("Startup finished.");
@@ -786,11 +786,11 @@ public class RESTServer {
         return apiv1Methods;
     }
 
-    private static Module constructAPIv2Modules() {
-        return Module.of(Path.of("apiv2"), APIv2.class);
+    private static ModuleDesc constructAPIv2Modules() {
+        return ModuleDesc.of(Path.of("apiv2"), APIv2.class);
     }
 
-    private static void apiv2Mappings(Module module) {
+    private static void apiv2Mappings(ModuleDesc module) {
         var path = module.path();
         Spark.get("/" + path, (request, response) -> {
             response.redirect("/" + path + "/help");
@@ -831,59 +831,5 @@ public class RESTServer {
             logger.error(e);
         }
 
-    }
-}
-
-/**
- * Represents an APIv2 module.
- *
- * @param path      The module path.
- * @param methodMap The method map.
- * @param modules   References to the inner modules.
- */
-record Module(String name, Path path, Class<?> clazz, Map<String, Array<Method>> methodMap, Array<Module> modules) {
-
-    public static Module of(Path path, Class<?> clazz) {
-        if (!APIModule.class.isAssignableFrom(clazz)) {
-            // Current class is not an APIModule itself.
-            return new Module("root", path, clazz, null, getModules(clazz, path));
-        } else {
-            // We are an APIModule, gather methods.
-            // Add methods.
-            Method[] allMethods = clazz.getDeclaredMethods();
-            var map = new HashMap<String, Array<Method>>();
-
-            for (Method method : allMethods) {
-                // Only use public methods
-                if (!Modifier.isPublic(method.getModifiers())) {
-                    continue;
-                }
-                var key = method.getName();
-                Array<Method> matches;
-                if (map.containsKey(key)) {
-                    matches = map.get(key);
-                } else {
-                    matches = new Array<>(false, 1);
-                }
-                if (!matches.contains(method, true))
-                    matches.add(method);
-                map.put(key, matches);
-            }
-            // Extract name from module class name.
-            var name = clazz.getSimpleName().substring(0, clazz.getSimpleName().indexOf("Module")).toLowerCase();
-            return new Module(name, path, clazz, map, getModules(clazz, path));
-        }
-    }
-
-    private static Array<Module> getModules(Class<?> clazz, Path parentPath) {
-        var l = new Array<Module>();
-        for (var field : clazz.getDeclaredFields()) {
-            var fieldClass = field.getType();
-            if (APIModule.class.isAssignableFrom(fieldClass)) {
-                l.add(Module.of(parentPath.resolve(field.getName()), fieldClass));
-            }
-        }
-
-        return l.isEmpty() ? null : l;
     }
 }

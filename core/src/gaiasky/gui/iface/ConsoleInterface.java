@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -39,6 +40,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The graphical user interface that displays and manages the console window at the bottom of the main window.
@@ -214,16 +216,13 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     public void showConsole() {
         rebuildMainTable();
         input.getStage().setKeyboardFocus(input);
-        this.addAction(Actions.sequence(
-                Actions.alpha(0f),
-                Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())));
+        this.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())));
     }
 
     public void closeConsole() {
-        this.addAction(Actions.sequence(
-                Actions.alpha(1f),
-                Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
-                Actions.run(this::remove)));
+        this.addAction(Actions.sequence(Actions.alpha(1f),
+                                        Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                                        Actions.run(this::remove)));
     }
 
     public boolean remove() {
@@ -258,7 +257,9 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
 
     private void addOutput(String messageText, final MsgType type) {
         if (messageText != null) {
-            ConsoleManager.Message msg = new ConsoleManager.Message(messageText, type, Instant.now());
+            final int maxLen = (int) (outputScroll.getWidth() * 0.045);
+            var text = TextUtils.breakCharacters(messageText, maxLen);
+            ConsoleManager.Message msg = new ConsoleManager.Message(text, type, Instant.now());
             addMessageWidget(msg);
             manager.messages().add(msg);
             if (initialized) {
@@ -298,7 +299,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         int segments = 0;
         final int maxLen = (int) (outputScroll.getWidth() * 0.055);
 
-        // Initial vertical and horizontal groups layout.
+        // Initial vertical and horizontal groups' layout.
         Table vg = new Table(getSkin());
         HorizontalGroup hg = new HorizontalGroup();
         hg.align(Align.topLeft);
@@ -384,25 +385,28 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         return hg;
     }
 
-    private String processMethod(Method m) {
-        StringBuilder sb = new StringBuilder("  " + green + m.getName() + reset);
+    private String processMethod(String key, Method m) {
+        var prefix = getPrefix(key, "");
+        StringBuilder sb = new StringBuilder("  " + green + prefix + m.getName() + reset);
         var params = m.getParameters();
         for (var p : params) {
             var c = p.getType();
-            if (!c.isPrimitive()
-                    && !c.isArray()
-                    && !c.equals(String.class)) {
+            if (!c.isPrimitive() && !c.isArray() && !c.equals(String.class)) {
                 // Unsupported parameter type (not a primitive, array or string).
                 return null;
             }
-            sb.append(" ")
-                    .append(p.getName())
-                    .append(":")
-                    .append(yellow)
-                    .append(c.getSimpleName())
-                    .append(reset);
+            sb.append(" ").append(p.getName()).append(":").append(yellow).append(c.getSimpleName()).append(reset);
         }
         return sb.toString();
+    }
+
+    private String getPrefix(String method, String defaultValue) {
+        String prefix = defaultValue;
+        var idx = method.lastIndexOf(".");
+        if (idx > 0) {
+            prefix = method.substring(0, idx + 1);
+        }
+        return prefix;
     }
 
     /**
@@ -475,45 +479,34 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         // Process command.
         if ("help".equals(command)) {
             if (numParams == 0) {
+                // APIs and shortcuts.
                 addOutputOk(command);
-                addOutputInfo(blue + I18n.msg("gui.console.api") + reset + ":");
-                manager.methodMap()
-                        .keySet()
-                        .stream()
-                        .sorted()
-                        .forEach(a -> {
-                            var b = manager.methodMap().get(a);
-                            b.forEach(m -> addOutputInfo(processMethod(m)));
-                        });
-
+                printMethods(manager.methodMap(), "");
                 addOutputInfo("");
-
-                addOutputInfo(blue + I18n.msg("gui.console.shortcuts") + reset + ":");
-                manager.shortcutMap().keySet().stream().sorted().forEach(a -> {
-                    var b = manager.shortcutMap().get(a);
-                    addOutputInfo("  " + a + yellow + " :=: " + green + b);
-                });
+                printShortcuts(manager.shortcutMap());
             } else if (numParams == 1) {
-                if ("api".equals(parameters[0])) {
-                    addOutputOk(command);
-                    addOutputInfo(blue + I18n.msg("gui.console.api") + reset + ":");
-                    manager.methodMap()
-                            .keySet()
-                            .stream()
-                            .sorted()
-                            .forEach(a -> {
-                                var b = manager.methodMap().get(a);
-                                b.forEach(m -> addOutputInfo(processMethod(m)));
-                            });
-                } else if ("shortcuts".equals(parameters[0])) {
-                    addOutputOk(command);
-                    addOutputInfo(blue + I18n.msg("gui.console.shortcuts") + reset + ":");
-                    manager.shortcutMap().keySet().stream().sorted().forEach(a -> {
-                        var b = manager.shortcutMap().get(a);
-                        addOutputInfo("  " + a + yellow + " :=: " + green + b + reset);
-                    });
-                } else {
-                    addOutputError(I18n.msg("gui.console.cmd.parameters", cmd));
+                switch (parameters[0]) {
+                    case "api" -> {
+                        // Only APIs.
+                        addOutputOk(command);
+                        printMethods(manager.methodMap(), "");
+                    }
+                    case "apiv1" -> {
+                        // Only APIv1.
+                        addOutputOk(command);
+                        printMethods(manager.methodMapAPIv1(), "v1");
+                    }
+                    case "apiv2" -> {
+                        // Only APIv2.
+                        addOutputOk(command);
+                        printMethods(manager.methodMapAPIv2(), "v2");
+                    }
+                    case "shortcuts" -> {
+                        // Only shortcuts.
+                        addOutputOk(command);
+                        printShortcuts(manager.shortcutMap());
+                    }
+                    case null, default -> addOutputError(I18n.msg("gui.console.cmd.parameters", cmd));
                 }
             } else {
                 addOutputError(I18n.msg("gui.console.cmd.parameters", cmd));
@@ -602,11 +595,14 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                     }
 
                     if (ok) {
+
                         /* Invoke method. */
                         try {
+                            var prefix = getPrefix(cmd, ".");
+                            var instance = manager.getInstance(prefix);
                             // note: invoke may return null explicitly or because is void type
                             startNotificationCapture();
-                            Object returnObject = method.invoke(GaiaSky.instance.scripting(), arguments);
+                            Object returnObject = method.invoke(instance, arguments);
                             stopNotificationCapture();
 
                             if (notificationAvailable() && level == Logger.LoggerLevel.ERROR) {
@@ -664,7 +660,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                     addOutputInfo("Possible candidates:");
                     candidates.forEach(c -> {
                         var l = manager.methodMap().get(c);
-                        l.forEach(m -> addOutputInfo(processMethod(m)));
+                        l.forEach(m -> addOutputInfo(processMethod(c, m)));
                     });
                     addOutputInfo("");
                 }
@@ -674,6 +670,22 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         } else {
             addOutputError(I18n.msg("gui.console.cmd.notfound", cmd));
         }
+    }
+
+    private void printMethods(Map<String, Array<Method>> methods, String version) {
+        addOutputInfo(blue + I18n.msg("gui.console.api", version) + reset + ":");
+        methods.keySet().stream().sorted().forEach(a -> {
+            var b = manager.methodMap().get(a);
+            b.forEach(m -> addOutputInfo(processMethod(a, m)));
+        });
+    }
+
+    private void printShortcuts(Map<String, String> shortcuts) {
+        addOutputInfo(blue + I18n.msg("gui.console.shortcuts") + reset + ":");
+        shortcuts.keySet().stream().sorted().forEach(a -> {
+            var b = shortcuts.get(a);
+            addOutputInfo("  " + a + yellow + " :=: " + green + b);
+        });
     }
 
     /**

@@ -86,7 +86,7 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
             assets.postProcessor.initialize(manager);
 
             // Console manager.
-            assets.consoleManager = new ConsoleManager();
+            assets.consoleManager = new ConsoleManager(assets.scriptingInterface);
         }
     }
 
