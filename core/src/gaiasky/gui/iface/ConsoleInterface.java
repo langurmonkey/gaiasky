@@ -484,7 +484,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                 printMethods(manager.methodMap(), "");
                 addOutputInfo("");
                 printShortcuts(manager.shortcutMap());
-            } else if (numParams == 1) {
+            } else if (numParams >= 1) {
                 switch (parameters[0]) {
                     case "api" -> {
                         // Only APIs.
@@ -498,8 +498,21 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
                     }
                     case "apiv2" -> {
                         // Only APIv2.
-                        addOutputOk(command);
-                        printMethods(manager.methodMapAPIv2(), "v2");
+                        if (numParams == 2) {
+                            // Module name.
+                            var moduleName = parameters[1];
+                            var methods = manager.methodMapAPIv2(moduleName);
+                            if (methods.isEmpty()) {
+                                addOutputError(I18n.msg("gui.console.module.methods.error", moduleName));
+                            } else {
+                                addOutputOk(command);
+                                printMethods(methods, "v2", moduleName);
+                            }
+                        } else {
+                            // All modules.
+                            addOutputOk(command);
+                            printMethods(manager.methodMapAPIv2(), "v2");
+                        }
                     }
                     case "shortcuts" -> {
                         // Only shortcuts.
@@ -673,7 +686,12 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     }
 
     private void printMethods(Map<String, Array<Method>> methods, String version) {
-        addOutputInfo(blue + I18n.msg("gui.console.api", version) + reset + ":");
+        printMethods(methods, version, null);
+    }
+
+    private void printMethods(Map<String, Array<Method>> methods, String version, String module) {
+        var mod = module != null ? " (" + module + ")" : "";
+        addOutputInfo(blue + I18n.msg("gui.console.api", version) + mod + reset + ":");
         methods.keySet().stream().sorted().forEach(a -> {
             var b = manager.methodMap().get(a);
             b.forEach(m -> addOutputInfo(processMethod(a, m)));

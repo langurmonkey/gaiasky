@@ -9,7 +9,6 @@ package gaiasky.script;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
 import gaiasky.gui.iface.ConsoleInterface;
 import gaiasky.script.v2.impl.APIModule;
 import gaiasky.script.v2.impl.APIv2;
@@ -18,7 +17,6 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
@@ -26,6 +24,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Manages the Gaia Sky console/terminal, keeps its history and more. The console accepts all calls defined in {@link IScriptingInterface}. Aliases to
@@ -49,7 +48,7 @@ public class ConsoleManager {
     /** Module instances by path. **/
     private Map<String, Object> instances;
     /** Scripting interface reference. **/
-    private IScriptingInterface script;
+    private final IScriptingInterface script;
 
     /**
      * A single console message. Typically, this is represented visually by a single line.
@@ -150,6 +149,14 @@ public class ConsoleManager {
 
     public Map<String, Array<Method>> methodMapAPIv2() {
         return apiV2Methods;
+    }
+
+    public Map<String, Array<Method>> methodMapAPIv2(String module) {
+        var result = apiV2Methods.entrySet().stream()
+                .filter((entry) -> entry.getKey().startsWith(module))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return result;
     }
 
     public Map<String, String> shortcutMap() {
