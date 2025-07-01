@@ -39,52 +39,36 @@
 
   <releases>
 
-    <release version="3.6.8" date="2025-03-19" urgency="high">
-      <url>https://gaiasky.space/news/2025/gaiasky_3.6.8</url>
+    <release version="3.6.9" date="2025-07-01" urgency="high">
+      <url>https://gaiasky.space/news/2025/gaiasky_3.6.9</url>
       <description>
         <p>Features</p>
         <ul>
-          <li>Major UI overhaul: consolidated fonts, updated themes, removed deprecated components.</li>
-          <li>Improved visual quality: increased padding and higher image resolution in UI.</li>
-          <li>Switched to Inter as the default label font.</li>
-          <li>Panels in the main UI now expand when the mouse hovers over the buttons.</li>
-          <li>Displays the list of enabled datasets.</li>
-          <li>New “Recommended Datasets” option for one-click download and launch.</li>
-          <li>Updated background image.</li>
-          <li>Julian date tab added to date/time dialog.</li>
-          <li>Time zone support improved; system-default time zone now used.</li>
-          <li>Dialogs remember the last opened tab (e.g. Preferences, About).</li>
-          <li>New star texture selector added to Preferences.</li>
-          <li>New object debug tool available via the debug panel—inspect and edit component fields.</li>
-          <li>Pointer coordinates display disabled by default (can be re-enabled in Preferences).</li>
-          <li>Bookmark improvements.</li>
+          <li>Add motion trail effect.</li>
+          <li>Add Turkish translation, contributed by Erdem Uygun.</li>
+          <li>Migrate go-to-object operation in the camera info pane to use the
+            smooth transitions API.</li>
+          <li>Add a new APIv2.</li>
+          <li>Adapt REST server and console to accept APIv2 calls.</li>
+          <li>Add new setting to enable and disable notification messages.</li>
+          <li>Left and right trigger buttons (LT, RT) to control slider values in gamepad GUI.</li>
         </ul>
         <p>Bug fixes</p>
           <ul>
-            <li>Fixed incorrect formatting of uptime duration.</li>
-            <li>Julian vs Gregorian calendar automatically selected based on date.</li>
-            <li>Fixed layout issues in Preferences and other dialogs.</li>
-            <li>UI fixes.</li>
-            <li>Fixed crash when setting data directory to a root drive in Windows.</li>
-            <li>Fixed crash due to early resolution of <code>attitudeindicator.png</code>.</li>
-            <li>Improved orbit rendering.</li>
-            <li>Reused GZipped file streams no longer break on non-gzipped JSON files.</li>
-            <li>Context menu in bookmarks pane now positioned correctly.</li>
-            <li>Error window layout made consistent.</li>
-            <li>Visibility dialog now properly handles ‘Invisible’ object types.</li>
+            <li>Fix issues with upper- and lower-case conversions not using the correct locale.</li>
+            <li>Starg glow effect flickering.</li>
+            <li>Big bugfix campaign in test and showcase scripts.</li>
+            <li>Dataset highlight API call not working properly.</li>
+            <li>Use concurrent set as collections in event manager to avoid concurrent modification exceptions.</li>
+            <li>Proper motions produce index out of bounds due to incorrect computation of maximum number of arrows.</li>
+            <li>Fix locale in upper- and lower-case transformations.</li>
+            <li>Properly scale camera mouse scroll and drag operations with the current frame rate.</li>
+            <li>Disable OpenAL system.</li>
           </ul>
         <p>Performance improvements</p>
           <ul>
-            <li>Replaced <code>Apfloat</code> with <code>Quadruple</code></li>
-            <li>Reduced short-lived object allocations in many systems.</li>
-            <li>Major speed-up in label rendering via task refactoring.</li>
-            <li>Star size factors now cached instead of recalculated per frame.</li>
-            <li>Internal maps replaced with faster, boxing-free versions.</li>
-            <li>Half-precision (16-bit) floats now used for non-critical
-              star/particle magnitudes.</li>
-            <li>Particle updates split over multiple frames to reduce frame drops.</li>
-            <li>Old particle and variable record types unified into a compact, immutable <code>Particle</code> record.</li>
-            <li><code>PointCloudData</code> reimplemented using records with a more compact memory footprint.</li>
+            <li>Use <code>GL_RGB16F</code> instead of <code>GL_RGBA16F</code> format for internal post-processing effects.</li>
+            <li>Set a default value of 0.4 scale for the lens flare effect.</li>
           </ul>
       </description>
       </release>

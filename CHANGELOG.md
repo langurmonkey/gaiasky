@@ -1,3 +1,44 @@
+<a name="3.6.9"></a>
+## [3.6.9](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.9) (2025-07-01)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.8...3.6.9)
+
+### Bug Fixes
+- Star glow effect flickers due to using a different method to render the billboard depending on whether the effect is active or not. 
+- Big bugfix campaign in scripting. Went over all scripting tests and fixed all bugs so that all of them run fine. 
+- Add missing `"` character to fonts, fix custom and messages interfaces' computation of position coordinates. 
+- Dataset highlight API call not working properly. 
+- Use concurrent set as collections in event manager to avoid concurrent modification exceptions. 
+- Proper motions produce index out of bounds due to incorrect computation of maximum number of arrows. 
+- Correct many instances where the wrong locale is used to convert strings to upper and/or lower case. Enable star name localization for the index and labels. 
+- Properly scale camera mouse scroll and drag operations with the current frame rate. 
+- Disable OpenAL and audio altogether in Gaia Sky. 
+- Use `RGBA16F` float format for the lens flare ping-pong buffer, otherwise AMD APUs show banding artifacts. Fixes [#846](https://codeberg.org/gaiasky/gaiasky/issues/846). 
+
+### Features
+- Add motion trail effect, which stretches stars and particles in the velocity direction. Can be toggled off in the settings. 
+- Add a new API v2, which re-names and re-organizes the single access point we had in the previous API into several modules grouped by function. It also improves documentation and standardizes function and parameter names when possible. 
+- Adapt REST server and console to respond to APIv2 calls.
+- Add Turkish translation, contributed by Erdem Uygun. 
+- Add new setting to enable and disable notification messages, and add checkbox to preferences window. Notifications are off by default. Fixes [#847](https://codeberg.org/gaiasky/gaiasky/issues/847). 
+- Migrate go-to-object operation in the camera info pane to use the smooth transitions API, which creates seamless, bumpy-free rides between two camera states. 
+- Update monospace fonts to include all supported characters, now using Liberation Mono. Fix issues with upper- and lower-case conversions not using the correct locale. 
+- Add missing characters to font files to ready them for the Turkish translation. 
+- Left and right trigger buttons (LT, RT) in gamepads to control slider values in gamepad GUI. 
+- Add `generateIndex` attribute to particle sets, so that the index can be omitted for sets that do not need it (which is most of them). 
+
+### Performance Improvements
+- Use `GL_RGB16F` instead of `GL_RGBA16F` format (omitting the alpha channel) for internal post-processing effects buffers (lens flare, bloom, etc.). This saves some VRAM, especially useful in integrated graphics. 
+- Set a default value of 0.4 scale for the lens flare effect to minimize fill rate and make the ping-pong pass much faster. 
+
+### Build System
+- Add `--sun-misc-unsafe-memory-access=allow` to launch VM options to prevent logging unsafe operation access in LWJGL3. 
+
+### Code Refactoring
+- Harmonize and consolidate star and particle set creation methods under the same class. 
+
+### Documentation
+- Add new APIv2 package-level documentation. 
+
 <a name="3.6.8"></a>
 ## [3.6.8](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.8) (2025-06-02)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.7...3.6.8)
