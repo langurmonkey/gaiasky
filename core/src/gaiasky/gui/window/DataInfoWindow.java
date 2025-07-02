@@ -51,6 +51,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -61,6 +63,8 @@ public class DataInfoWindow extends GenericDialog {
     private static final String URL_WIKI_API_SUMMARY = "https://$LANG.wikipedia.org/api/rest_v1/page/summary/";
     private static final String URL_WIKI_REDIRECT = "https://en.wikipedia.org/w/api.php?action=query&titles=$NAME&redirects&format=json";
     private static final String URL_WIKI_LANGLINKS = "https://en.wikipedia.org/w/api.php?action=query&prop=langlinks&titles=$NAME&lllimit=500&format=json";
+    private static final String USER_AGENT = "GaiaSky/" + Settings.settings.version.version + " (https://gaiasky.space)";
+    private static final int TIMEOUT_MS = 15000;
 
     static String getWikipediaBaseURL(String languageCode) {
         return URL_WIKIPEDIA.replace("$LANG", languageCode);
@@ -83,7 +87,10 @@ public class DataInfoWindow extends GenericDialog {
         return URLEncoder.encode(title, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
-    private static final int TIMEOUT_MS = 5000;
+    static void setUserAgent(Net.HttpRequest request) {
+        request.setHeader("User-Agent", USER_AGENT);
+    }
+
     private final String[] prefixes = {"NGC", "IC"};
     private final String[] suffixes = {"_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", ""};
     private final String[] suffixes_model = {"_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "_Galaxy", "_Dwarf", ""};
@@ -97,15 +104,75 @@ public class DataInfoWindow extends GenericDialog {
     private Cell<?> linkCell;
 
     private final float pad;
-    private boolean updating = false;
 
     private final DecimalFormat nf;
     private final Vector3D pos;
-    private final Vector3Q posb;
+    private final Vector3Q posQ;
     private final float padBottom = 10f;
 
     final String colNameStyle = "header-blue";
     final String contentStyle = "big";
+
+    /**
+     * Structure to keep track of current HTTP requests.
+     */
+    private static class TrackedRequest {
+        Net.HttpRequest request;
+        String tag;
+        long startTime;
+        boolean isCompleted;
+        boolean isCancelled;
+    }
+
+    /** Current requests. **/
+    java.util.List<TrackedRequest> inFlightRequests = Collections.synchronizedList(new ArrayList<>());
+
+    /** Sends a tracked HTTP request. **/
+    private void sendTrackedRequest(String url, String tag, Net.HttpResponseListener listener) {
+        var request = new Net.HttpRequest(HttpMethods.GET);
+        request.setUrl(url);
+        request.setTimeOut(TIMEOUT_MS);
+        setUserAgent(request);
+
+        TrackedRequest tracked = new TrackedRequest();
+        tracked.request = request;
+        tracked.tag = tag;
+        tracked.startTime = System.currentTimeMillis();
+        inFlightRequests.add(tracked);
+
+        Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                listener.handleHttpResponse(httpResponse);
+                inFlightRequests.remove(tracked);
+                tracked.isCompleted = true;
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                listener.failed(t);
+                inFlightRequests.remove(tracked);
+                tracked.isCompleted = true;
+            }
+
+            @Override
+            public void cancelled() {
+                listener.cancelled();
+                inFlightRequests.remove(tracked);
+                tracked.isCancelled = true;
+            }
+        });
+    }
+
+    /** Cancels all current HTTP requests that have not yet finished. **/
+    private void cancelCurrentRequests() {
+        for (var req : inFlightRequests) {
+            if (!req.isCancelled || !req.isCompleted) {
+               Gdx.net.cancelHttpRequest(req.request);
+            }
+        }
+
+    }
 
     public DataInfoWindow(Stage stg, Skin skin) {
         super(I18n.msg("gui.wiki.title", "?"), skin, stg);
@@ -114,7 +181,7 @@ public class DataInfoWindow extends GenericDialog {
         this.pad = 8f;
         this.nf = new DecimalFormat("##0.##");
         this.pos = new Vector3D();
-        this.posb = new Vector3Q();
+        this.posQ = new Vector3Q();
 
         setCancelText(I18n.msg("gui.close"));
         setModal(false);
@@ -123,11 +190,10 @@ public class DataInfoWindow extends GenericDialog {
         buildSuper();
     }
 
-    public boolean isUpdating() {
-        return updating;
-    }
 
     public void update(FocusView object) {
+        // Cancel current requests, if any.
+
         String name = object.getLocalizedName();
         this.getTitleLabel().setText(I18n.msg("gui.wiki.title", name));
 
@@ -153,7 +219,6 @@ public class DataInfoWindow extends GenericDialog {
                     wikiTable.clear();
                     linkCell.clearActor();
                     if (!actualWikiName.isEmpty()) {
-                        updating = true;
                         fetchWikipediaData(actualWikiName, languageCode, new WikiDataListener(actualWikiName));
                     }
                 } catch (Exception ignored) {
@@ -299,11 +364,8 @@ public class DataInfoWindow extends GenericDialog {
         if (index.get() < suffixes.length) {
             final var fullName = name + suffixes[index.get()];
             final var url = base + encodeWikipediaTitle(fullName);
-            Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
-            request.setUrl(url);
-            request.setTimeOut(TIMEOUT_MS);
 
-            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+            sendTrackedRequest(url, "base", new HttpResponseListener() {
                 @Override
                 public void handleHttpResponse(Net.HttpResponse httpResponse) {
                     if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
@@ -351,11 +413,7 @@ public class DataInfoWindow extends GenericDialog {
 
     private void redirectStep(final String name, RedirectListener listener) {
         var url = getWikipediaRedirectURL(name);
-        Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
-        request.setUrl(url);
-        request.setTimeOut(TIMEOUT_MS);
-
-        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+        sendTrackedRequest(url, "redirect", new HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
                 if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
@@ -370,7 +428,7 @@ public class DataInfoWindow extends GenericDialog {
                         // Fetch redirect name.
                         var newName = redirects.getString("to");
                         if (newName != null && !newName.isEmpty()) {
-                            listener.ok(newName);
+                            listener.ok(encodeWikipediaTitle(newName));
                         } else {
                             logger.warn("We found a redirect, but could not get target: " + redirects.toString());
                             logger.warn("We proceed with the default name: " + name);
@@ -402,11 +460,7 @@ public class DataInfoWindow extends GenericDialog {
     }
 
     private void langlinksStep(final String langlinksUrl, final String urlEnglish, LinkListener listener) {
-        Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
-        request.setUrl(langlinksUrl);
-        request.setTimeOut(TIMEOUT_MS);
-
-        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+        sendTrackedRequest(langlinksUrl, "langlinks", new HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
                 if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
@@ -602,7 +656,7 @@ public class DataInfoWindow extends GenericDialog {
             focusRA.setText(nf.format(posSph.x) + deg);
             focusDEC.setText(nf.format(posSph.y) + deg);
         } else {
-            Coordinates.cartesianToSpherical(object.getAbsolutePosition(posb), pos);
+            Coordinates.cartesianToSpherical(object.getAbsolutePosition(posQ), pos);
 
             focusRA.setText(nf.format(MathUtilsDouble.radDeg * pos.x % 360) + deg);
             focusDEC.setText(nf.format(MathUtilsDouble.radDeg * pos.y % 360) + deg);
@@ -722,14 +776,11 @@ public class DataInfoWindow extends GenericDialog {
      * @param listener The callback listener.
      */
     private void getJSONData(String url, final WikiDataListener listener) {
-        Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
-        request.setUrl(url);
-        request.setTimeOut(5000);
 
         if (Settings.settings.program.offlineMode) {
             listener.ko(I18n.msg("gui.system.offlinemode.tooltip"));
         } else {
-            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+            sendTrackedRequest(url, "json", new HttpResponseListener() {
                 @Override
                 public void handleHttpResponse(Net.HttpResponse httpResponse) {
                     if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
@@ -814,12 +865,8 @@ public class DataInfoWindow extends GenericDialog {
 
                         if (!Files.exists(imageFile) || !Files.isRegularFile(imageFile) || !Files.isReadable(imageFile)) {
                             // Download image file!
-                            Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
-                            request.setUrl(thumbUrl);
-                            request.setTimeOut(5000);
-
                             logger.info(I18n.msg("gui.download.starting", thumbUrl));
-                            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+                            sendTrackedRequest(thumbUrl, "thumbnail", new HttpResponseListener() {
                                 @Override
                                 public void handleHttpResponse(Net.HttpResponse httpResponse) {
                                     if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
@@ -903,7 +950,6 @@ public class DataInfoWindow extends GenericDialog {
             wikiTable.add(textLabel).left().padBottom(pad * 5f).padLeft(pad * 3f).row();
             wikiTable.pack();
             recalculateWindowSize();
-            updating = false;
         }
 
         public void ko() {
@@ -916,7 +962,6 @@ public class DataInfoWindow extends GenericDialog {
                     linkCell.clearActor();
                 }
                 recalculateWindowSize();
-                updating = false;
             });
         }
 
@@ -926,7 +971,6 @@ public class DataInfoWindow extends GenericDialog {
                 wikiTable.add(new OwnLabel(error, skin, "big"));
                 wikiTable.pack();
                 recalculateWindowSize();
-                updating = false;
             });
         }
 

@@ -8,7 +8,6 @@
 package gaiasky.gui.main;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -119,10 +118,10 @@ public class FullGui extends AbstractGui {
 
         // We must subscribe to the desired events
         EventManager.instance.subscribe(this, FOV_CHANGED_CMD, UPDATE_DATA_INFO_CMD, SHOW_DATA_INFO_CMD,
-                SHOW_ARCHIVE_VIEW_CMD, UPDATE_ARCHIVE_VIEW_CMD, SHOW_PLAYCAMERA_CMD, REMOVE_KEYBOARD_FOCUS_CMD,
-                REMOVE_GUI_COMPONENT_CMD, ADD_GUI_COMPONENT_CMD, SHOW_LOG_CMD, RA_DEC_UPDATED, LON_LAT_UPDATED,
-                CONTEXT_MENU_CMD, SHOW_LAND_AT_LOCATION_CMD, DISPLAY_POINTER_COORDS_CMD, MINIMAP_TOGGLE_CMD,
-                MINIMAP_DISPLAY_CMD, SHOW_PROCEDURAL_GEN_CMD, CONSOLE_CMD);
+                                        SHOW_ARCHIVE_VIEW_CMD, UPDATE_ARCHIVE_VIEW_CMD, SHOW_PLAYCAMERA_CMD, REMOVE_KEYBOARD_FOCUS_CMD,
+                                        REMOVE_GUI_COMPONENT_CMD, ADD_GUI_COMPONENT_CMD, SHOW_LOG_CMD, RA_DEC_UPDATED, LON_LAT_UPDATED,
+                                        CONTEXT_MENU_CMD, SHOW_LAND_AT_LOCATION_CMD, DISPLAY_POINTER_COORDS_CMD, MINIMAP_TOGGLE_CMD,
+                                        MINIMAP_DISPLAY_CMD, SHOW_PROCEDURAL_GEN_CMD, CONSOLE_CMD);
     }
 
     protected void buildGui() {
@@ -407,11 +406,17 @@ public class FullGui extends AbstractGui {
                 landAtLocation.show(stage);
             }
             case SHOW_PLAYCAMERA_CMD -> {
-                var fc = new FileChooser(I18n.msg("gui.camera.title"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+                var fc = new FileChooser(I18n.msg("gui.camera.title"),
+                                         skin,
+                                         stage,
+                                         SysUtils.getDefaultCameraDir(),
+                                         FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.camera.run"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName()
+                        .toString()
+                        .endsWith(".gsc"));
                 fc.setAcceptedFiles("*.dat, *.gsc");
                 fc.setResultListener((success, result) -> {
                     if (success) {
@@ -435,7 +440,7 @@ public class FullGui extends AbstractGui {
                     logWindow.show(stage);
             }
             case UPDATE_DATA_INFO_CMD -> {
-                if (dataInfoWindow != null && dataInfoWindow.isVisible() && dataInfoWindow.hasParent() && !dataInfoWindow.isUpdating()) {
+                if (dataInfoWindow != null && dataInfoWindow.isVisible() && dataInfoWindow.hasParent()) {
                     var object = (FocusView) data[0];
                     dataInfoWindow.update(object);
                 }
@@ -445,11 +450,9 @@ public class FullGui extends AbstractGui {
                 if (dataInfoWindow == null) {
                     dataInfoWindow = new DataInfoWindow(stage, skin);
                 }
-                if (!dataInfoWindow.isUpdating()) {
-                    dataInfoWindow.update(object);
-                    if (!dataInfoWindow.isVisible() || !dataInfoWindow.hasParent())
-                        dataInfoWindow.show(stage);
-                }
+                dataInfoWindow.update(object);
+                if (!dataInfoWindow.isVisible() || !dataInfoWindow.hasParent())
+                    dataInfoWindow.show(stage);
             }
             case UPDATE_ARCHIVE_VIEW_CMD -> {
                 if (archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()) {
