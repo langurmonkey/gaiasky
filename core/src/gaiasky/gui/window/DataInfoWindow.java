@@ -59,24 +59,29 @@ public class DataInfoWindow extends GenericDialog {
 
     private static final String URL_WIKIPEDIA = "https://$LANG.wikipedia.org/wiki/";
     private static final String URL_WIKI_API_SUMMARY = "https://$LANG.wikipedia.org/api/rest_v1/page/summary/";
+    private static final String URL_WIKI_REDIRECT = "https://en.wikipedia.org/w/api.php?action=query&titles=$NAME&redirects&format=json";
     private static final String URL_WIKI_LANGLINKS = "https://en.wikipedia.org/w/api.php?action=query&prop=langlinks&titles=$NAME&lllimit=500&format=json";
 
-    static String getWikipediaBase(String languageCode) {
+    static String getWikipediaBaseURL(String languageCode) {
         return URL_WIKIPEDIA.replace("$LANG", languageCode);
     }
 
-    static String getWikipediaAPISummary(String languageCode) {
+    static String getWikipediaAPISummaryURL(String languageCode) {
         return URL_WIKI_API_SUMMARY.replace("$LANG", languageCode);
     }
 
-    static String getWikipediaLanglinks(String name) {
+    static String getWikipediaLanglinksURL(String name) {
         return URL_WIKI_LANGLINKS.replace("$NAME", name);
     }
 
-     static String encodeWikipediaTitle(String title) {
-         // URLEncoder.encode encodes spaces as '+', so we fix that
-         return URLEncoder.encode(title, StandardCharsets.UTF_8).replace("+", "%20");
-     }
+    static String getWikipediaRedirectURL(String name) {
+        return URL_WIKI_REDIRECT.replace("$NAME", name);
+    }
+
+    static String encodeWikipediaTitle(String title) {
+        // URLEncoder.encode encodes spaces as '+', so we fix that
+        return URLEncoder.encode(title, StandardCharsets.UTF_8).replace("+", "%20");
+    }
 
     private static final int TIMEOUT_MS = 5000;
     private final String[] prefixes = {"NGC", "IC"};
@@ -143,7 +148,7 @@ public class DataInfoWindow extends GenericDialog {
                     return;
                 }
                 try {
-                    String urlWiki = getWikipediaBase(languageCode);
+                    String urlWiki = getWikipediaBaseURL(languageCode);
                     String actualWikiName = link.substring(urlWiki.length());
                     wikiTable.clear();
                     linkCell.clearActor();
@@ -157,6 +162,7 @@ public class DataInfoWindow extends GenericDialog {
 
             @Override
             public void ko(String link) {
+
             }
         });
     }
@@ -213,26 +219,26 @@ public class DataInfoWindow extends GenericDialog {
 
     private void fillWikipediaTable(IFocus focus, LinkListener listener) {
         try {
-            String url = getWikipediaBase("en");
+            String url = getWikipediaBaseURL("en");
             String wikiName = focus.getName().replace(' ', '_');
             var view = (FocusView) focus;
             if (Mapper.hip.has(view.getEntity())) {
-                urlCheckAndLocalization(url, wikiName, suffixes_star, listener);
+                urlCheckRedirectLocalization(url, wikiName, suffixes_star, listener);
             } else if (view.isParticle()) {
-                urlCheckAndLocalization(url, wikiName, suffixes_gal, listener);
+                urlCheckRedirectLocalization(url, wikiName, suffixes_gal, listener);
             } else if (Mapper.tagBillboardGalaxy.has(view.getEntity())) {
-                urlCheckAndLocalization(url, wikiName, suffixes_gal, listener);
+                urlCheckRedirectLocalization(url, wikiName, suffixes_gal, listener);
             } else if (Mapper.celestial.has(view.getEntity())) {
                 var celestial = Mapper.celestial.get(view.getEntity());
                 if (celestial.wikiName != null) {
-                    urlCheckAndLocalization(url, celestial.wikiName.replace(' ', '_'), new String[]{""}, listener);
+                    urlCheckRedirectLocalization(url, celestial.wikiName.replace(' ', '_'), new String[]{""}, listener);
                 } else {
-                    urlCheckAndLocalization(url, wikiName, suffixes_model, listener);
+                    urlCheckRedirectLocalization(url, wikiName, suffixes_model, listener);
                 }
             } else if (view.isCluster()) {
-                urlCheckAndLocalization(url, wikiName, suffixes_cluster, listener);
+                urlCheckRedirectLocalization(url, wikiName, suffixes_cluster, listener);
             } else if (Mapper.starSet.has(view.getEntity())) {
-                urlCheckAndLocalization(url, wikiName, suffixes_star, listener);
+                urlCheckRedirectLocalization(url, wikiName, suffixes_star, listener);
             } else if (wikiName.startsWith("NGC") || wikiName.startsWith("ngc")) {
                 var third = wikiName.charAt(3);
                 if (third != '_') {
@@ -240,12 +246,12 @@ public class DataInfoWindow extends GenericDialog {
                     try {
                         var num = Parser.parseIntException(numStr);
                         wikiName = "NGC_" + num;
-                        urlCheckAndLocalization(url, wikiName, suffixes, listener);
+                        urlCheckRedirectLocalization(url, wikiName, suffixes, listener);
                     } catch (Exception e) {
-                        urlCheckAndLocalization(url, wikiName, suffixes, listener);
+                        urlCheckRedirectLocalization(url, wikiName, suffixes, listener);
                     }
                 } else {
-                    urlCheckAndLocalization(url, wikiName, suffixes, listener);
+                    urlCheckRedirectLocalization(url, wikiName, suffixes, listener);
                 }
             } else {
                 // Check prefixes
@@ -261,7 +267,7 @@ public class DataInfoWindow extends GenericDialog {
                             try {
                                 var num = Parser.parseIntException(numStr);
                                 wikiName = prefix.toUpperCase() + "_" + num;
-                                urlCheckAndLocalization(url, wikiName, suffixes, listener);
+                                urlCheckRedirectLocalization(url, wikiName, suffixes, listener);
                                 hit = true;
                                 break;
                             } catch (Exception ignored) {
@@ -270,7 +276,7 @@ public class DataInfoWindow extends GenericDialog {
                     }
                 }
                 if (!hit) {
-                    urlCheckAndLocalization(url, wikiName, suffixes, listener);
+                    urlCheckRedirectLocalization(url, wikiName, suffixes, listener);
                 }
             }
 
@@ -280,12 +286,16 @@ public class DataInfoWindow extends GenericDialog {
         }
     }
 
-    private void urlCheckAndLocalization(final String base, final String name, final String[] suffixes, LinkListener listener) {
+    private void urlCheckRedirectLocalization(final String base, final String name, final String[] suffixes, LinkListener listener) {
         final AtomicInteger index = new AtomicInteger(0);
-        createRequest(base, name, suffixes, index, listener);
+        urlCheckRedirectLocalization(base, name, suffixes, index, listener);
     }
 
-    private void createRequest(final String base, final String name, final String[] suffixes, final AtomicInteger index, LinkListener listener) {
+    private void urlCheckRedirectLocalization(final String base,
+                                              final String name,
+                                              final String[] suffixes,
+                                              final AtomicInteger index,
+                                              LinkListener listener) {
         if (index.get() < suffixes.length) {
             final var fullName = name + suffixes[index.get()];
             final var url = base + encodeWikipediaTitle(fullName);
@@ -300,17 +310,22 @@ public class DataInfoWindow extends GenericDialog {
                         // Hit existing endpoint!
                         var languageCode = I18n.locale.getLanguage();
                         if (languageCode.equals("en")) {
-                            // We're using English, proceed.
-                            listener.ok(url, languageCode);
+                            redirectStep(name, goodName -> {
+                                // We're using English, proceed.
+                                listener.ok(base + goodName, languageCode);
+                            });
                         } else {
                             // Check for available languages, or try next.
-                            var langlinksUrl = getWikipediaLanglinks(fullName);
-                            langlinksStep(langlinksUrl, url, listener);
+                            redirectStep(name, goodName -> {
+                                var langlinksUrl = getWikipediaLanglinksURL(goodName);
+                                var url1 = base + goodName;
+                                langlinksStep(langlinksUrl, url1, listener);
+                            });
                         }
                     } else {
                         // Next
                         index.incrementAndGet();
-                        createRequest(base, name, suffixes, index, listener);
+                        urlCheckRedirectLocalization(base, name, suffixes, index, listener);
                     }
                 }
 
@@ -318,20 +333,72 @@ public class DataInfoWindow extends GenericDialog {
                 public void failed(Throwable t) {
                     // Next
                     index.incrementAndGet();
-                    createRequest(base, name, suffixes, index, listener);
+                    urlCheckRedirectLocalization(base, name, suffixes, index, listener);
                 }
 
                 @Override
                 public void cancelled() {
                     // Next
                     index.incrementAndGet();
-                    createRequest(base, name, suffixes, index, listener);
+                    urlCheckRedirectLocalization(base, name, suffixes, index, listener);
                 }
             });
         } else {
             // Ran out of suffixes!
             listener.ok(null, null);
         }
+    }
+
+    private void redirectStep(final String name, RedirectListener listener) {
+        var url = getWikipediaRedirectURL(name);
+        Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
+        request.setUrl(url);
+        request.setTimeOut(TIMEOUT_MS);
+
+        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+                    var jsonString = httpResponse.getResultAsString();
+                    var parser = new JsonReader();
+                    var json = parser.parse(jsonString);
+                    var redirects = json.get("query").get("redirects");
+                    if (redirects == null) {
+                        // No redirects, use current name.
+                        listener.ok(name);
+                    } else {
+                        // Fetch redirect name.
+                        var newName = redirects.getString("to");
+                        if (newName != null && !newName.isEmpty()) {
+                            listener.ok(newName);
+                        } else {
+                            logger.warn("We found a redirect, but could not get target: " + redirects.toString());
+                            logger.warn("We proceed with the default name: " + name);
+                            listener.ok(name);
+                        }
+                    }
+                } else {
+                    // Default.
+                    logger.warn("Redirect step returned HTTP error code: " + httpResponse.getStatus().getStatusCode());
+                    logger.warn("We proceed with the default name without resolving redirects: " + name);
+                    listener.ok(name);
+                }
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                // Use incoming name.
+                logger.warn("Redirect step failed.");
+                logger.warn("We proceed with the default name without resolving redirects: " + name);
+                listener.ok(name);
+            }
+
+            @Override
+            public void cancelled() {
+                // Use incoming name.
+                logger.warn("Redirect step cancelled.");
+            }
+        });
     }
 
     private void langlinksStep(final String langlinksUrl, final String urlEnglish, LinkListener listener) {
@@ -356,7 +423,7 @@ public class DataInfoWindow extends GenericDialog {
                             var name = current.getString("*");
                             if (name != null && !name.isEmpty()) {
                                 // Build URL and send ok.
-                                var link = getWikipediaBase(l) + encodeWikipediaTitle(name);
+                                var link = getWikipediaBaseURL(l) + encodeWikipediaTitle(name);
                                 listener.ok(link, l);
                                 return;
                             } else {
@@ -369,6 +436,8 @@ public class DataInfoWindow extends GenericDialog {
 
                 } else {
                     // Use English.
+                    logger.warn("Langlinks step returned HTTP error code: " + httpResponse.getStatus().getStatusCode());
+                    logger.warn("We proceed with the English version.");
                     listener.ok(urlEnglish, "en");
                 }
 
@@ -377,13 +446,15 @@ public class DataInfoWindow extends GenericDialog {
             @Override
             public void failed(Throwable t) {
                 // Use English.
+                logger.warn("Langlinks step failed.");
+                logger.warn("We proceed with the English version.");
                 listener.ok(urlEnglish, "en");
             }
 
             @Override
             public void cancelled() {
                 // Use English.
-                listener.ok(urlEnglish, "en");
+                logger.warn("Langlinks step cancelled.");
             }
         });
     }
@@ -641,7 +712,7 @@ public class DataInfoWindow extends GenericDialog {
      * @param listener The listener, for callbacks.
      */
     private void fetchWikipediaData(final String wikiName, final String languageCode, final WikiDataListener listener) {
-        getJSONData(getWikipediaAPISummary(languageCode) + encodeWikipediaTitle(wikiName), listener);
+        getJSONData(getWikipediaAPISummaryURL(languageCode) + encodeWikipediaTitle(wikiName), listener);
     }
 
     /**
@@ -667,7 +738,8 @@ public class DataInfoWindow extends GenericDialog {
                         listener.ok(root);
                     } else {
                         // Ko with code
-                        listener.ko(httpResponse.getStatus().toString());
+                        var err = I18n.msg("gui.download.error.httpstatus", httpResponse.getStatus().getStatusCode());
+                        listener.ko(err);
                     }
 
                 }
@@ -869,4 +941,8 @@ public class DataInfoWindow extends GenericDialog {
     }
 
 
+}
+
+interface RedirectListener {
+    void ok(String goodName);
 }
