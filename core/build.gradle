@@ -39,6 +39,7 @@ tasks.register('versionFile') {
 
     doLast {
         File versionFile = file('build/classes/java/main/version')
+        versionFile.delete() // Remove existing
         versionFile.parentFile.mkdirs() // Ensure directory exists
 
         versionFile.withWriter('UTF-8') { writer ->
@@ -213,7 +214,7 @@ tasks.register('copyToLib') {
 }
 
 tasks.register('gaiaskyJar') {
-    dependsOn compileJava, jar, copyToLib
+    dependsOn versionFile, compileJava, jar, copyToLib
     description = 'Creates the Gaia Sky jar file, gaiasky-core.jar.'
     doLast {
         copy {
@@ -627,7 +628,7 @@ tasks.register('genGPGSignatures', Exec) {
 }
 
 tasks.register('pack') {
-    dependsOn 'genGPGSignatures', 'createAppImage', 'createArch', 'createDebian'
+    dependsOn genGPGSignatures, createAppImage, createArch, createDebian
     description = 'Generate a full release of Gaia Sky, with all the media files for Linux, Windows and macOS.'
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz and gaiasky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
