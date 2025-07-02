@@ -32,6 +32,7 @@
 
 ### Build System
 - Add `--sun-misc-unsafe-memory-access=allow` to launch VM options to prevent logging unsafe operation access in LWJGL3. 
+- Disable OptFlowCam export option for keyframes in Flatpak in order to avoid Python dependencies.
 
 ### Code Refactoring
 - Harmonize and consolidate star and particle set creation methods under the same class. 

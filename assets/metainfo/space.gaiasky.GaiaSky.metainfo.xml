@@ -53,6 +53,7 @@
           <li>Add new setting to enable and disable notification messages.</li>
           <li>Left and right trigger buttons (LT, RT) to control slider values in gamepad GUI.</li>
           <li>Update default lens flare shader.</li>
+          <li>Disable OptFlowCam export option for keyframes in Flatpak in order to avoid Python dependencies.</li>
         </ul>
         <p>Bug fixes</p>
           <ul>

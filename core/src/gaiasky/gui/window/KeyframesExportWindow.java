@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnTextArea;
@@ -29,9 +30,13 @@ public class KeyframesExportWindow extends FileNameWindow {
 
         content.row();
 
+        var optFlowCamEnabled = !SysUtils.isFlatpak();
+
         // Add checkbox.
         useOptFlowCam = new OwnCheckBox("Use OptFlowCam method to compute camera path", skin, 20f);
         useOptFlowCam.setChecked(false);
+        useOptFlowCam.setDisabled(!optFlowCamEnabled);
+
         // Info pane.
         String plInfoStr = I18n.msg("gui.keyframes.export.optflowcam");
         var ssLines = GlobalResources.countOccurrences(plInfoStr, '\n');
@@ -41,7 +46,9 @@ public class KeyframesExportWindow extends FileNameWindow {
         plInfo.setWidth(600f);
         plInfo.clearListeners();
 
-        content.add(useOptFlowCam).colspan(2).left().padTop(20f).row();
-        content.add(plInfo).colspan(2).right().padTop(20f);
+        if (optFlowCamEnabled) {
+            content.add(useOptFlowCam).colspan(2).left().padTop(20f).row();
+            content.add(plInfo).colspan(2).right().padTop(20f);
+        }
     }
 }
