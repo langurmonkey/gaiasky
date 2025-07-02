@@ -8,7 +8,7 @@
 package gaiasky.gui.api;
 
 public interface LinkListener {
-    void ok(String link);
+    void ok(String link, String languageCode);
 
     void ko(String link);
 }

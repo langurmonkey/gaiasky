@@ -228,9 +228,7 @@ public class Constants {
     public static final String URL_HIP_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+extcat.hipparcos+WHERE+hip=";
     public static final String URL_GAIA_WEB_SOURCE = "https://gaia.ari.uni-heidelberg.de/singlesource.html#id=";
     public static final String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
-    // TODO Use Wikipedia API to get localized content to the current language
-    public static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
-    public static final String URL_WIKI_API_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+
     /** Number of directional lights. **/
     public static final int N_DIR_LIGHTS = 3;
     /** Number of point lights. **/

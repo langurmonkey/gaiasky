@@ -35,8 +35,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
-import java.util.Locale;
-
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     private final Vector3D D31 = new Vector3D();
@@ -475,6 +473,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * when time is on
      *
      * @param time The current time
+     *
      * @return True if position should be recomputed for this entity
      */
     protected boolean mustUpdatePosition(ITimeFrameProvider time) {

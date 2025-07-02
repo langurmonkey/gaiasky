@@ -33,7 +33,6 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 public class ExternalInformationUpdater {
     private static final Log logger = Logger.getLogger(ExternalInformationUpdater.class);
 
-    private static final int TIMEOUT_MS = 5000;
     private Skin skin;
     private LabelStyle linkStyle;
     private Cell<Link> dataCell, gaiaCell, simbadCell;
@@ -97,7 +96,7 @@ public class ExternalInformationUpdater {
                 // Simbad link.
                 setSimbadLink(focus, new LinkListener() {
                     @Override
-                    public void ok(String link) {
+                    public void ok(String link, String languageCode) {
                         if (simbadCell != null) {
                             try {
                                 if (simbadLink != null) {
@@ -126,7 +125,7 @@ public class ExternalInformationUpdater {
         if (focus.isStar()) {
             String url = Constants.URL_SIMBAD;
             if (focus.getHip() > 0) {
-                listener.ok(url + "HIP+" + focus.getHip());
+                listener.ok(url + "HIP+" + focus.getHip(), "en");
             } else {
                 listener.ko(null);
             }

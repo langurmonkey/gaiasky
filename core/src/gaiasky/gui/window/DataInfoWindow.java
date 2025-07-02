@@ -32,8 +32,8 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
@@ -46,10 +46,8 @@ import uk.ac.starlink.table.ColumnInfo;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
@@ -58,6 +56,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DataInfoWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DataInfoWindow.class);
+
+    private static final String URL_WIKIPEDIA = "https://$LANG.wikipedia.org/wiki/";
+    private static final String URL_WIKI_API_SUMMARY = "https://$LANG.wikipedia.org/api/rest_v1/page/summary/";
+    private static final String URL_WIKI_LANGLINKS = "https://en.wikipedia.org/w/api.php?action=query&prop=langlinks&titles=$NAME&lllimit=500&format=json";
+
+    static String getWikipediaBase(String languageCode) {
+        return URL_WIKIPEDIA.replace("$LANG", languageCode);
+    }
+
+    static String getWikipediaAPISummary(String languageCode) {
+        return URL_WIKI_API_SUMMARY.replace("$LANG", languageCode);
+    }
+
+    static String getWikipediaLanglinks(String name) {
+        return URL_WIKI_LANGLINKS.replace("$NAME", name);
+    }
+
+     static String encodeWikipediaTitle(String title) {
+         // URLEncoder.encode encodes spaces as '+', so we fix that
+         return URLEncoder.encode(title, StandardCharsets.UTF_8).replace("+", "%20");
+     }
+
     private static final int TIMEOUT_MS = 5000;
     private final String[] prefixes = {"NGC", "IC"};
     private final String[] suffixes = {"_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", ""};
@@ -118,14 +138,18 @@ public class DataInfoWindow extends GenericDialog {
         linkCell.clearActor();
         fillWikipediaTable(object, new LinkListener() {
             @Override
-            public void ok(String link) {
+            public void ok(String link, String languageCode) {
+                if (link == null || languageCode == null) {
+                    return;
+                }
                 try {
-                    String actualWikiName = link.substring(Constants.URL_WIKIPEDIA.length());
+                    String urlWiki = getWikipediaBase(languageCode);
+                    String actualWikiName = link.substring(urlWiki.length());
                     wikiTable.clear();
                     linkCell.clearActor();
                     if (!actualWikiName.isEmpty()) {
                         updating = true;
-                        fetchWikipediaData(actualWikiName, new WikiDataListener(actualWikiName));
+                        fetchWikipediaData(actualWikiName, languageCode, new WikiDataListener(actualWikiName));
                     }
                 } catch (Exception ignored) {
                 }
@@ -189,26 +213,26 @@ public class DataInfoWindow extends GenericDialog {
 
     private void fillWikipediaTable(IFocus focus, LinkListener listener) {
         try {
-            String url = Constants.URL_WIKIPEDIA;
+            String url = getWikipediaBase("en");
             String wikiName = focus.getName().replace(' ', '_');
             var view = (FocusView) focus;
             if (Mapper.hip.has(view.getEntity())) {
-                urlCheck(url, wikiName, suffixes_star, listener);
+                urlCheckAndLocalization(url, wikiName, suffixes_star, listener);
             } else if (view.isParticle()) {
-                urlCheck(url, wikiName, suffixes_gal, listener);
+                urlCheckAndLocalization(url, wikiName, suffixes_gal, listener);
             } else if (Mapper.tagBillboardGalaxy.has(view.getEntity())) {
-                urlCheck(url, wikiName, suffixes_gal, listener);
+                urlCheckAndLocalization(url, wikiName, suffixes_gal, listener);
             } else if (Mapper.celestial.has(view.getEntity())) {
                 var celestial = Mapper.celestial.get(view.getEntity());
                 if (celestial.wikiName != null) {
-                    listener.ok(url + celestial.wikiName.replace(' ', '_'));
+                    urlCheckAndLocalization(url, celestial.wikiName.replace(' ', '_'), new String[]{""}, listener);
                 } else {
-                    urlCheck(url, wikiName, suffixes_model, listener);
+                    urlCheckAndLocalization(url, wikiName, suffixes_model, listener);
                 }
             } else if (view.isCluster()) {
-                urlCheck(url, wikiName, suffixes_cluster, listener);
+                urlCheckAndLocalization(url, wikiName, suffixes_cluster, listener);
             } else if (Mapper.starSet.has(view.getEntity())) {
-                urlCheck(url, wikiName, suffixes_star, listener);
+                urlCheckAndLocalization(url, wikiName, suffixes_star, listener);
             } else if (wikiName.startsWith("NGC") || wikiName.startsWith("ngc")) {
                 var third = wikiName.charAt(3);
                 if (third != '_') {
@@ -216,12 +240,12 @@ public class DataInfoWindow extends GenericDialog {
                     try {
                         var num = Parser.parseIntException(numStr);
                         wikiName = "NGC_" + num;
-                        urlCheck(url, wikiName, suffixes, listener);
+                        urlCheckAndLocalization(url, wikiName, suffixes, listener);
                     } catch (Exception e) {
-                        urlCheck(url, wikiName, suffixes, listener);
+                        urlCheckAndLocalization(url, wikiName, suffixes, listener);
                     }
                 } else {
-                    urlCheck(url, wikiName, suffixes, listener);
+                    urlCheckAndLocalization(url, wikiName, suffixes, listener);
                 }
             } else {
                 // Check prefixes
@@ -237,7 +261,7 @@ public class DataInfoWindow extends GenericDialog {
                             try {
                                 var num = Parser.parseIntException(numStr);
                                 wikiName = prefix.toUpperCase() + "_" + num;
-                                urlCheck(url, wikiName, suffixes, listener);
+                                urlCheckAndLocalization(url, wikiName, suffixes, listener);
                                 hit = true;
                                 break;
                             } catch (Exception ignored) {
@@ -246,24 +270,25 @@ public class DataInfoWindow extends GenericDialog {
                     }
                 }
                 if (!hit) {
-                    urlCheck(url, wikiName, suffixes, listener);
+                    urlCheckAndLocalization(url, wikiName, suffixes, listener);
                 }
             }
 
         } catch (Exception e) {
             logger.error(e);
-            listener.ok(null);
+            listener.ok(null, null);
         }
     }
 
-    private void urlCheck(final String base, final String name, final String[] suffixes, LinkListener listener) {
+    private void urlCheckAndLocalization(final String base, final String name, final String[] suffixes, LinkListener listener) {
         final AtomicInteger index = new AtomicInteger(0);
         createRequest(base, name, suffixes, index, listener);
     }
 
     private void createRequest(final String base, final String name, final String[] suffixes, final AtomicInteger index, LinkListener listener) {
         if (index.get() < suffixes.length) {
-            final String url = base + name + suffixes[index.get()];
+            final var fullName = name + suffixes[index.get()];
+            final var url = base + encodeWikipediaTitle(fullName);
             Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
             request.setUrl(url);
             request.setTimeOut(TIMEOUT_MS);
@@ -272,7 +297,16 @@ public class DataInfoWindow extends GenericDialog {
                 @Override
                 public void handleHttpResponse(Net.HttpResponse httpResponse) {
                     if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
-                        listener.ok(url);
+                        // Hit existing endpoint!
+                        var languageCode = I18n.locale.getLanguage();
+                        if (languageCode.equals("en")) {
+                            // We're using English, proceed.
+                            listener.ok(url, languageCode);
+                        } else {
+                            // Check for available languages, or try next.
+                            var langlinksUrl = getWikipediaLanglinks(fullName);
+                            langlinksStep(langlinksUrl, url, listener);
+                        }
                     } else {
                         // Next
                         index.incrementAndGet();
@@ -296,8 +330,62 @@ public class DataInfoWindow extends GenericDialog {
             });
         } else {
             // Ran out of suffixes!
-            listener.ok(null);
+            listener.ok(null, null);
         }
+    }
+
+    private void langlinksStep(final String langlinksUrl, final String urlEnglish, LinkListener listener) {
+        Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
+        request.setUrl(langlinksUrl);
+        request.setTimeOut(TIMEOUT_MS);
+
+        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+                    var lang = I18n.locale.getLanguage();
+                    var jsonString = httpResponse.getResultAsString();
+                    JsonReader reader = new JsonReader();
+                    var root = reader.parse(jsonString);
+                    var langlinks = root.get("query").get("pages").get(0).get("langlinks");
+                    var current = langlinks.child;
+                    while (current != null) {
+                        var l = current.getString("lang");
+                        if (l != null && l.equals(lang)) {
+                            // Current language found!
+                            var name = current.getString("*");
+                            if (name != null && !name.isEmpty()) {
+                                // Build URL and send ok.
+                                var link = getWikipediaBase(l) + encodeWikipediaTitle(name);
+                                listener.ok(link, l);
+                                return;
+                            } else {
+                                // Use English.
+                                listener.ok(urlEnglish, "en");
+                            }
+                        }
+                        current = current.next();
+                    }
+
+                } else {
+                    // Use English.
+                    listener.ok(urlEnglish, "en");
+                }
+
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                // Use English.
+                listener.ok(urlEnglish, "en");
+            }
+
+            @Override
+            public void cancelled() {
+                // Use English.
+                listener.ok(urlEnglish, "en");
+            }
+        });
     }
 
 
@@ -354,7 +442,8 @@ public class DataInfoWindow extends GenericDialog {
         try {
             objectType.setText(TextUtils.capitalise(
                     I18n.msg("element." +
-                            ComponentTypes.ComponentType.values()[object.getCt().getFirstOrdinal()].toString().toLowerCase(Locale.ROOT) + ".singular")));
+                                     ComponentTypes.ComponentType.values()[object.getCt().getFirstOrdinal()].toString()
+                                             .toLowerCase(Locale.ROOT) + ".singular")));
         } catch (Exception e) {
             objectType.setText("");
         }
@@ -551,8 +640,8 @@ public class DataInfoWindow extends GenericDialog {
      * @param wikiName The Wikipedia name of the object.
      * @param listener The listener, for callbacks.
      */
-    private void fetchWikipediaData(final String wikiName, final WikiDataListener listener) {
-        getJSONData(Constants.URL_WIKI_API_SUMMARY + wikiName, listener);
+    private void fetchWikipediaData(final String wikiName, final String languageCode, final WikiDataListener listener) {
+        getJSONData(getWikipediaAPISummary(languageCode) + encodeWikipediaTitle(wikiName), listener);
     }
 
     /**
@@ -778,5 +867,6 @@ public class DataInfoWindow extends GenericDialog {
         scroll.setPosition(0, 0);
         pack();
     }
+
 
 }

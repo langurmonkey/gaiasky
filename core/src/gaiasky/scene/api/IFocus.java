@@ -77,6 +77,7 @@ public interface IFocus {
      * Checks whether the focus has the given name.
      *
      * @param name The name.
+     *
      * @return True if there is a match.
      */
     boolean hasName(String name);
@@ -86,6 +87,7 @@ public interface IFocus {
      *
      * @param name      The name.
      * @param matchCase Whether to match the case when comparing.
+     *
      * @return True if there is a match.
      */
     boolean hasName(String name, boolean matchCase);
@@ -99,6 +101,7 @@ public interface IFocus {
 
     /**
      * Gets the name of the closest object, localized.
+     *
      * @return The localized name.
      */
     String getClosestLocalizedName();
@@ -147,6 +150,7 @@ public interface IFocus {
      * (equatorial system).
      *
      * @param out The out vector.
+     *
      * @return The absolute position, same as aux.
      */
     Vector3Q getAbsolutePosition(Vector3Q out);
@@ -157,6 +161,7 @@ public interface IFocus {
      *
      * @param name The name (lowercase) of the entity to get the position from (useful in case of star groups).
      * @param out  Vector3d to put the return value.
+     *
      * @return The absolute position of the entity if it exists, null otherwise.
      */
     Vector3Q getAbsolutePosition(String name, Vector3Q out);
@@ -165,6 +170,7 @@ public interface IFocus {
      * Same as {@link IFocus#getAbsolutePosition(Vector3Q)}.
      *
      * @param out Vector3d where to put the return value.
+     *
      * @return The absolute position, same as aux.
      */
     Vector3Q getClosestAbsolutePos(Vector3Q out);
@@ -185,6 +191,7 @@ public interface IFocus {
      * @param time   The time frame provider.
      * @param camera The camera.
      * @param force  Whether to force the computation if time is off.
+     *
      * @return The aux vector for chaining.
      */
     Vector3Q getPredictedPosition(Vector3Q aux, ITimeFrameProvider time, ICamera camera, boolean force);
@@ -195,6 +202,7 @@ public interface IFocus {
      *
      * @param aux       The out vector where the result will be stored.
      * @param deltaTime Delta time in seconds.
+     *
      * @return The aux vector for chaining.
      */
     Vector3Q getPredictedPosition(Vector3Q aux, double deltaTime);
@@ -266,6 +274,7 @@ public interface IFocus {
 
     /**
      * Return the effective temperature.
+     *
      * @return The effective temperature of the object, in Kelvins.
      */
     double getTEff();
@@ -276,6 +285,7 @@ public interface IFocus {
      * in the height texture (if exists).
      *
      * @param camPos The camera position.
+     *
      * @return The height of the projected position of the current camera.
      */
     double getElevationAt(Vector3Q camPos);
@@ -286,6 +296,7 @@ public interface IFocus {
      *
      * @param camPos            The camera position.
      * @param useFuturePosition Whether to use the future position or the current one.
+     *
      * @return The height of the projected position of the current camera on the surface.
      */
     double getElevationAt(Vector3Q camPos, boolean useFuturePosition);
@@ -296,6 +307,7 @@ public interface IFocus {
      *
      * @param camPos  The camera position.
      * @param nextPos The future position of this body to use.
+     *
      * @return The height of the projected position of the current camera on the surface.
      */
     double getElevationAt(Vector3Q camPos, Vector3Q nextPos);
@@ -414,12 +426,14 @@ public interface IFocus {
 
     /**
      * Check whether this focus is actually focusable. This checks the attribute 'focusable' of the Focus component.
+     *
      * @return Whether the focus is focusable.
      */
     boolean isFocusable();
 
     /**
      * Check whether this focus has camera collisions enabled.
+     *
      * @return Whether the focus has camera collisions enabled.
      */
     boolean isCameraCollision();
