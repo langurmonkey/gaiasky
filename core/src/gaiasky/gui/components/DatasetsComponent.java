@@ -288,7 +288,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
         colorMap.put(ci.name, cp);
 
-        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 26), skin, "hud-subheader");
+        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 23), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
 
         float pad = 4.8f;
@@ -317,7 +317,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.row();
             OwnLabel nObjects = new OwnLabel(I18n.msg("gui.objects") + ": " + ci.nParticles, skin, "default-blue");
             String bytes = ci.sizeBytes > 0 ? I18n.msg("gui.size") + ": " + GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "";
-            nObjects.addListener(new OwnTextTooltip(nObjects.getText() + ", " + bytes, skin));
+            nObjects.addListener(new OwnTextTooltip(nObjects.getText() + (bytes.isEmpty() ? "" : ", " + bytes), skin));
             t.add(nObjects).left();
         }
 
