@@ -27,8 +27,7 @@ interface Injected {
 
 def coreProject = project(':core')
 
-tasks.register('versionFile') {
-    dependsOn compileTestJava, test
+tasks.register('genVersionFile') {
     // Capture values at configuration time
     def buildtime = coreProject.buildtime
     def rev = coreProject.rev
@@ -53,6 +52,11 @@ tasks.register('versionFile') {
     }
 }
 
+// Make compileJava depend on genVersionFile to make sure the version file
+// is generated early enough
+tasks.named('compileJava') {
+    dependsOn genVersionFile
+}
 
 sourceSets {
     main {
@@ -72,7 +76,7 @@ sourceSets {
 
 
 jar {
-    dependsOn versionFile
+    dependsOn genVersionFile
     exclude('**/*.hiero')
     exclude('**/*.svg')
     exclude('**/*.xcf')
@@ -215,7 +219,7 @@ tasks.register('copyToLib') {
 }
 
 tasks.register('gaiaskyJar') {
-    dependsOn versionFile, jar, copyToLib
+    dependsOn genVersionFile, jar, copyToLib
     description = 'Creates the Gaia Sky jar file, gaiasky-core.jar.'
     doLast {
         copy {
