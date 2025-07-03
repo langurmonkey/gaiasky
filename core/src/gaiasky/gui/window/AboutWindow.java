@@ -63,13 +63,16 @@ public class AboutWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        final float contentWidth = 940f;
+        final float contentWidth = 1140f;
         final float titleWidth = 250f;
-        final float taWidth = 650f;
+        final float taWidth = 850f;
         final float taWidth2 = 1280f;
         final float taHeight = 160f;
         final float tabWidth = 240f;
         final float buttonHeight = 40f;
+
+        padLeft(pad18);
+        padRight(pad18);
 
         // Only show update tab if not launched via install4j.
         boolean showUpdateTab = !SysUtils.launchedViaInstall4j();
