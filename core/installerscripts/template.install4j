@@ -41,7 +41,7 @@
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" dpiAware="false">
         <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC --sun-misc-unsafe-memory-access=allow -Dpython.console.encoding=UTF-8 -Dassets.location=./">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC -XX:+ZGenerational -Dpython.console.encoding=UTF-8 -Dassets.location=./">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -54,7 +54,7 @@
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
         <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC --sun-misc-unsafe-memory-access=allow -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC -XX:+ZGenerational -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -67,7 +67,7 @@
       <executable name="${compiler:sys.shortName}vr" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gsvr_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
         <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC --sun-misc-unsafe-memory-access=allow -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC -XX:+ZGenerational -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -1306,7 +1306,7 @@ return true;</property>
         <entry filesetId="970" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="24/jdk-24.0.1+9" usePack200="false" overrideJdkRelease="true" />
     </windows>
     <macosArchive name="macOS Archive" id="966" includeAllDownloadableComponents="false" architecture="universal" launcherId="573">
       <exclude>
@@ -1319,7 +1319,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="24/jdk-24.0.1+9" overrideJdkRelease="true" />
     </macosArchive>
     <unixInstaller name="Unix Installer" id="28" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1351,7 +1351,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="24/jdk-24.0.1+9" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxDeb>
@@ -1369,7 +1369,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="24/jdk-24.0.1+9" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
@@ -1389,7 +1389,7 @@ return true;</property>
         <entry filesetId="970" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="24/jdk-24.0.1+9" overrideJdkRelease="true" />
     </windowsArchive>
     <unixArchive name="Unix Archive" id="952" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1403,7 +1403,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="21/jdk-21+35" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="24/jdk-24.0.1+9" overrideJdkRelease="true" />
     </unixArchive>
   </mediaSets>
   <buildIds>

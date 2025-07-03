@@ -19,8 +19,6 @@ SET OPTS=%OPTS% -XX:+UseZGC -XX:+ZGenerational
 SET OPTS=%OPTS% -Dassets.location=.
 :: SimpleLogger defaults
 SET OPTS=%OPTS% -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.showThreadName=false
-:: Unsafe access
-SET OPTS=%OPTS% --sun-misc-unsafe-memory-access=allow
 
 IF EXIST ".\jre\bin\java.exe" (
     :: Use bundled java

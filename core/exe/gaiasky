@@ -95,9 +95,6 @@ OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
 # SimpleLogger defaults 
 OPTS="$OPTS -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.showThreadName=false"
 
-# Unsafe access
-OPTS="$OPTS --sun-misc-unsafe-memory-access=allow"
-
 # Process name
 OPTS="$OPTS -Dname=gaiasky"
 
