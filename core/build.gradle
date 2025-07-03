@@ -28,6 +28,7 @@ interface Injected {
 def coreProject = project(':core')
 
 tasks.register('versionFile') {
+    dependsOn compileTestJava, test
     // Capture values at configuration time
     def buildtime = coreProject.buildtime
     def rev = coreProject.rev
@@ -214,7 +215,7 @@ tasks.register('copyToLib') {
 }
 
 tasks.register('gaiaskyJar') {
-    dependsOn versionFile, compileJava, jar, copyToLib
+    dependsOn versionFile, jar, copyToLib
     description = 'Creates the Gaia Sky jar file, gaiasky-core.jar.'
     doLast {
         copy {
