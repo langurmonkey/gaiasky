@@ -64,7 +64,10 @@ public class DataInfoWindow extends GenericDialog {
     private static final String URL_WIKI_REDIRECT = "https://en.wikipedia.org/w/api.php?action=query&titles=$NAME&redirects&format=json";
     private static final String URL_WIKI_LANGLINKS = "https://en.wikipedia.org/w/api.php?action=query&prop=langlinks&titles=$NAME&lllimit=500&format=json";
     private static final String USER_AGENT = "GaiaSky/" + Settings.settings.version.version + " (https://gaiasky.space)";
-    private static final int TIMEOUT_MS = 15000;
+    /** Timeout for HTTP requests. **/
+    private static final int REQUEST_TIMEOUT_MS = 15000;
+    /** Minimum wait time between requests. **/
+    private static final int REQUEST_WAIT_MS = 1000;
 
     static String getWikipediaBaseURL(String languageCode) {
         return URL_WIKIPEDIA.replace("$LANG", languageCode);
@@ -87,16 +90,15 @@ public class DataInfoWindow extends GenericDialog {
         return URLEncoder.encode(title, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
-    static void setUserAgent(Net.HttpRequest request) {
-        request.setHeader("User-Agent", USER_AGENT);
-    }
-
     private final String[] prefixes = {"NGC", "IC"};
     private final String[] suffixes = {"_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", ""};
     private final String[] suffixes_model = {"_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "_Galaxy", "_Dwarf", ""};
     private final String[] suffixes_gal = {"_(dwarf_galaxy)", "_(galaxy)", "_Galaxy", "_Dwarf", "_Cluster", ""};
     private final String[] suffixes_cluster = {"_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", ""};
     private final String[] suffixes_star = {"_(star)", ""};
+
+    /** Use langlinks from Wikipedia API to try and resolve localized articles. **/
+    private final boolean useLanglinks = false;
 
     private Table mainTable, wikiTable, dataTable;
     private OwnScrollPane scroll;
@@ -119,56 +121,79 @@ public class DataInfoWindow extends GenericDialog {
     private static class TrackedRequest {
         Net.HttpRequest request;
         String tag;
-        long startTime;
-        boolean isCompleted;
-        boolean isCancelled;
+        long incomeTime = -1L;
+        long startTime = -1L;
+        boolean isCompleted = false;
+        boolean isCancelled = false;
     }
 
     /** Current requests. **/
     java.util.List<TrackedRequest> inFlightRequests = Collections.synchronizedList(new ArrayList<>());
+    private long lastTrackedRequest = -1;
 
     /** Sends a tracked HTTP request. **/
     private void sendTrackedRequest(String url, String tag, Net.HttpResponseListener listener) {
         var request = new Net.HttpRequest(HttpMethods.GET);
         request.setUrl(url);
-        request.setTimeOut(TIMEOUT_MS);
-        setUserAgent(request);
+        request.setTimeOut(REQUEST_TIMEOUT_MS);
+        request.setHeader("User-Agent", USER_AGENT);
 
         TrackedRequest tracked = new TrackedRequest();
         tracked.request = request;
         tracked.tag = tag;
-        tracked.startTime = System.currentTimeMillis();
+        tracked.incomeTime = System.currentTimeMillis();
         inFlightRequests.add(tracked);
 
-        Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
-            @Override
-            public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                listener.handleHttpResponse(httpResponse);
-                inFlightRequests.remove(tracked);
-                tracked.isCompleted = true;
+        // Avoid Wikipedia rate limit by spacing requests by at least 1 second.
+        var now = System.currentTimeMillis();
+        if (now - lastTrackedRequest < REQUEST_WAIT_MS) {
+            try {
+                Thread.sleep(now - lastTrackedRequest);
+            } catch (InterruptedException e) {
+                logger.error("Error waiting to do next HTTP request", e);
             }
+        }
 
-            @Override
-            public void failed(Throwable t) {
-                listener.failed(t);
-                inFlightRequests.remove(tracked);
-                tracked.isCompleted = true;
-            }
+        // Make sure the request has not been cancelled during the wait.
+        if (!tracked.isCancelled) {
+            tracked.startTime = System.currentTimeMillis();
+            lastTrackedRequest = tracked.startTime;
+            Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
+                @Override
+                public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                    listener.handleHttpResponse(httpResponse);
+                    inFlightRequests.remove(tracked);
+                    tracked.isCompleted = true;
+                }
 
-            @Override
-            public void cancelled() {
-                listener.cancelled();
-                inFlightRequests.remove(tracked);
-                tracked.isCancelled = true;
-            }
-        });
+                @Override
+                public void failed(Throwable t) {
+                    listener.failed(t);
+                    inFlightRequests.remove(tracked);
+                    tracked.isCompleted = true;
+                }
+
+                @Override
+                public void cancelled() {
+                    listener.cancelled();
+                    inFlightRequests.remove(tracked);
+                    tracked.isCancelled = true;
+                }
+            });
+        }
     }
 
     /** Cancels all current HTTP requests that have not yet finished. **/
     private void cancelCurrentRequests() {
         for (var req : inFlightRequests) {
             if (!req.isCancelled || !req.isCompleted) {
-               Gdx.net.cancelHttpRequest(req.request);
+                if (req.startTime <= 0) {
+                    // Request has not been sent yet.
+                    req.isCancelled = true;
+                } else {
+                    // Request has been sent, just cancel it.
+                    Gdx.net.cancelHttpRequest(req.request);
+                }
             }
         }
 
@@ -193,7 +218,9 @@ public class DataInfoWindow extends GenericDialog {
 
     public void update(FocusView object) {
         // Cancel current requests, if any.
+        cancelCurrentRequests();
 
+        // Update.
         String name = object.getLocalizedName();
         this.getTitleLabel().setText(I18n.msg("gui.wiki.title", name));
 
@@ -379,9 +406,13 @@ public class DataInfoWindow extends GenericDialog {
                         } else {
                             // Check for available languages, or try next.
                             redirectStep(name, goodName -> {
-                                var langlinksUrl = getWikipediaLanglinksURL(goodName);
-                                var url1 = base + goodName;
-                                langlinksStep(langlinksUrl, url1, listener);
+                                var urlEnglish = base + goodName;
+                                if (useLanglinks) {
+                                    var langlinksUrl = getWikipediaLanglinksURL(goodName);
+                                    langlinksStep(langlinksUrl, urlEnglish, listener);
+                                } else {
+                                    listener.ok(urlEnglish, "en");
+                                }
                             });
                         }
                     } else {
