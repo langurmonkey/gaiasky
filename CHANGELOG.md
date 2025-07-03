@@ -1,3 +1,18 @@
+
+<a name="3.6.9-2"></a>
+## [3.6.9-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.9-2) (2025-07-03)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.9...3.6.9-2)
+
+### Bug Fixes
+- Roll back JVM argument `--sun-misc-unsafe-memory-access=allow`, add `-XX:+UseZGenerational`. Use Java 24 by default. 
+- Make sure 'versionFile' task is executed when packing the app by setting right dependencies. 
+- Resolve redirects for Wikipedia titles before hitting the API, as the API does not resolve redirects automatically, leading to 403 errors. 
+- Adjust layout and width of about window to avoid UI overflow. 
+
+### Build System
+- Upgrade to Gradle 8.14.2 (supports Java 24), update minimum Java version in install4j template from 17 to 21. 
+
+
 <a name="3.6.9"></a>
 ## [3.6.9](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.9) (2025-07-01)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.8...3.6.9)

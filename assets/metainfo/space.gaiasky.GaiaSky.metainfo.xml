@@ -39,15 +39,14 @@
 
   <releases>
 
-    <release version="3.6.9" date="2025-07-01" urgency="high">
+    <release version="3.6.9-2" date="2025-07-03" urgency="high">
       <url>https://gaiasky.space/news/2025/gaiasky_3.6.9</url>
       <description>
         <p>Features</p>
         <ul>
           <li>Add motion trail effect.</li>
           <li>Add Turkish translation, contributed by Erdem Uygun.</li>
-          <li>Migrate go-to-object operation in the camera info pane to use the
-            smooth transitions API.</li>
+          <li>Migrate go-to-object operation in the camera info pane to use the smooth transitions API.</li>
           <li>Add a new APIv2.</li>
           <li>Adapt REST server and console to accept APIv2 calls.</li>
           <li>Add new setting to enable and disable notification messages.</li>
@@ -66,6 +65,9 @@
             <li>Fix locale in upper- and lower-case transformations.</li>
             <li>Properly scale camera mouse scroll and drag operations with the current frame rate.</li>
             <li>Disable OpenAL system.</li>
+            <li>Resolve redirects for Wikipedia titles, as the API does not resolve redirects automatically.</li>
+            <li>Make sure `versionFile` task is executed when packing the app by setting the right dependencies.</li>
+            <li>Adjust layout and width of about window to avoid UI overflow.</li>
           </ul>
         <p>Performance improvements</p>
           <ul>
