@@ -46,8 +46,10 @@ import uk.ac.starlink.table.ColumnInfo;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
@@ -87,7 +89,7 @@ public class DataInfoWindow extends GenericDialog {
 
     static String encodeWikipediaTitle(String title) {
         // URLEncoder.encode encodes spaces as '+', so we fix that
-        return URLEncoder.encode(title, StandardCharsets.UTF_8).replace("+", "%20");
+        return title.replace(" ", "_");
     }
 
     private final String[] prefixes = {"NGC", "IC"};
@@ -98,7 +100,7 @@ public class DataInfoWindow extends GenericDialog {
     private final String[] suffixes_star = {"_(star)", ""};
 
     /** Use langlinks from Wikipedia API to try and resolve localized articles. **/
-    private final boolean useLanglinks = false;
+    private final boolean useLanglinks = true;
 
     private Table mainTable, wikiTable, dataTable;
     private OwnScrollPane scroll;
