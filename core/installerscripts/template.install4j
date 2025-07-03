@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="11.0.2" transformSequenceNumber="11">
   <directoryPresets config="@gs-git-folder@/assets/cert/cert.pfx" />
-  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="17" allowBetaVM="true">
+  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="21" allowBetaVM="true">
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
