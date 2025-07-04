@@ -58,6 +58,10 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Pulls object local and remote information from the Wikipedia API and presents it to the
+ * user in this window.
+ */
 public class DataInfoWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DataInfoWindow.class);
 
