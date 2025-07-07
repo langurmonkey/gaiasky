@@ -120,7 +120,7 @@
         ]
       },
       "orientationSource": {
-        "description": "Location of the data file(s), necessary to initialize the quaternion orientation provider.",
+        "description": "Location of the data file(s), necessary to initialize the quaternion orientation provider. In the LVLH orientation server, this must contain the name of the entity this server is attached to.",
         "unit": "String",
         "aliases": [
           "attitudeLocation"

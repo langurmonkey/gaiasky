@@ -11,10 +11,9 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
 import gaiasky.data.api.OrientationServer;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.view.FocusView;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
 import java.util.Date;
@@ -28,7 +27,6 @@ public class LVLHOrientationServer implements OrientationServer {
     protected final String objectName;
     protected Entity object;
     protected Entity parent;
-    protected FocusView view;
     protected final Vector3Q a, b, c, lastPos;
     protected final Vector3D up, dir, side, lastDir;
     protected boolean initialized = false;
@@ -37,7 +35,6 @@ public class LVLHOrientationServer implements OrientationServer {
         super();
         lastOrientation = new QuaternionDouble();
         this.objectName = objectName.substring(objectName.lastIndexOf("/") + 1);
-        this.view = new FocusView();
         a = new Vector3Q();
         b = new Vector3Q();
         c = new Vector3Q();
@@ -53,10 +50,13 @@ public class LVLHOrientationServer implements OrientationServer {
             var scene = GaiaSky.instance.scene;
             object = scene.getEntity(objectName);
             if (object != null) {
-                view.setEntity(object);
-                view.setScene(scene);
-                var graph = Mapper.graph.get(object);
-                parent = graph.parent;
+                // Find nearest celestial parent up the hierarchy.
+                var obj = object;
+                do {
+                    var graph = Mapper.graph.get(obj);
+                    obj = graph.parent;
+                } while(!Mapper.celestial.has(obj));
+                parent = obj;
             }
             initialized = true;
         }
@@ -70,11 +70,11 @@ public class LVLHOrientationServer implements OrientationServer {
     @Override
     public QuaternionDouble updateOrientation(Instant instant) {
         lazyInitialize();
-        if(object != null && parent != null) {
+        if (object != null && parent != null) {
             // Position of object in local reference system.
             a.set(Mapper.body.get(object).pos);
 
-            if(!lastPos.equals(a)) {
+            if (!lastPos.equals(a)) {
                 // Compute direction using lastPos.
                 lastPos.sub(a).nor().put(dir).scl(-1);
                 lastDir.set(dir);
