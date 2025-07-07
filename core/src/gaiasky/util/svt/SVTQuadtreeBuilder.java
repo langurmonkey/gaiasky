@@ -41,8 +41,11 @@ public class SVTQuadtreeBuilder {
 
         var level0 = location.resolve("level0");
         if (!Files.exists(level0)) {
-            logger.error("Can't initialize SVT without 'level0' directory: " + location);
-            return null;
+            level0 = location.resolve("level00");
+            if (!Files.exists(level0)) {
+                logger.error("Can't initialize SVT without 'level0' or 'level00' directory: " + location);
+                return null;
+            }
         }
         logger.info(I18n.msg("notif.loading", "SVT quadtree: " + location));
         try (Stream<Path> stream = Files.list(location)) {
