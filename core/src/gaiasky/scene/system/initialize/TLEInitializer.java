@@ -57,7 +57,7 @@ public class TLEInitializer extends AbstractInitSystem {
                 final var tle = Mapper.tle.get(entity);
                 final var fileName = TextUtils.sanitizeFilename(tle.nameTLE + "-TLE.json");
                 final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
-                cacheDir.toFile().mkdirs();
+                var ignored = cacheDir.toFile().mkdirs();
                 final var filePath = cacheDir.resolve(fileName);
                 var mustUpdate = false;
                 if (Files.exists(filePath)) {

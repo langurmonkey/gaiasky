@@ -7,18 +7,27 @@
 
 package gaiasky.util.coord;
 
+import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A utility to fetch and parse TLE (Two-Line Element) orbital data for a given spacecraft
  * from a remote URL and extract its orbital elements and epoch.
  */
 public class TLEParser {
+
+    /** Timeout of 1 hour. **/
+    private static final long CACHE_TIMEOUT_MS = 3_600_000;
 
     /**
      * Holds parsed orbital elements for a spacecraft.
@@ -67,8 +76,27 @@ public class TLEParser {
         return extractOrbitalElements(lines, targetName);
     }
 
+    private String getGroupFromURL(URL url) throws RuntimeException {
+        String query = url.getQuery(); // returns "GROUP=gps-ops&FORMAT=tle"
+
+        Map<String, String> queryPairs = new HashMap<>();
+        for (String pair : query.split("&")) {
+            int idx = pair.indexOf('=');
+            String key = URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8);
+            queryPairs.put(key, value);
+        }
+        return queryPairs.get("GROUP");
+    }
+
     /**
      * Downloads TLE data from the given URL.
+     * <p>
+     * This method implements file-level caching, where TLE data files are cached per
+     * group. If a file for the given group (retrieved as a URL parameter) exists,
+     * the method checks whether the file modification date is older than the
+     * cache timeout ({@link #CACHE_TIMEOUT_MS}). If it is, the file is pulled
+     * again from the remote server. Otherwise, the local file is used.
      *
      * @param urlString The URL to fetch TLE data from.
      *
@@ -78,13 +106,38 @@ public class TLEParser {
      */
     public List<String> fetchTLEData(String urlString) throws IOException {
         URL url = java.net.URI.create(urlString).toURL();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String group = getGroupFromURL(url);
+        final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
+        var file = cacheDir.resolve("TLE-" + group);
+        boolean download = true;
+        if (Files.exists(file) && Files.isRegularFile(file)) {
+            var now = System.currentTimeMillis();
+            var t = Files.getLastModifiedTime(file);
+            var modified = t.to(TimeUnit.MILLISECONDS);
+            if (now - modified < CACHE_TIMEOUT_MS) {
+                download = false;
+            }
+        }
+        BufferedReader reader;
+        if (download) {
+            // Download TLE data.
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        } else {
+            // Use cached file.
+            reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file)));
+        }
         List<String> lines = new ArrayList<>();
         String line;
         while ((line = reader.readLine()) != null) {
             if (!line.trim().isEmpty()) lines.add(line);
         }
         reader.close();
+
+        // We have just downloaded a new version, cache result!
+        if (download) {
+            Files.write(file, lines);
+        }
+
         return lines;
     }
 
