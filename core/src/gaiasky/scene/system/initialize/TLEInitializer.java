@@ -90,8 +90,7 @@ public class TLEInitializer extends AbstractInitSystem {
                         if (Files.exists(filePath)) {
                             try {
                                 Files.delete(filePath);
-                            } catch (IOException ex) {
-                                logger.error(ex);
+                            } catch (IOException ignored1) {
                             }
                         }
 
