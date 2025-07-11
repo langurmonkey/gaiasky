@@ -110,7 +110,8 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             Vector3D aux = D31;
             graph.translation.put(aux).sub(body.pos).scl(-1);
             // Make sure we don't render locations if the normal at the point points away from the camera.
-            return aux.add(loc.location3d).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor()) < -0.3;
+            var fov = (GaiaSky.instance.cameraManager.getCamera().fieldOfView - 1.0) * 0.5 / 149.0;
+            return aux.add(loc.location3d).scl(-1.0).nor().dot(GaiaSky.instance.cameraManager.getDirection()) > 0.5 + fov;
         } else {
             return false;
         }

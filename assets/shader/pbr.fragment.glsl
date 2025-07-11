@@ -400,7 +400,7 @@ void main() {
     vec3 ambient = v_data.ambientLight;
 
     #if defined(atmosphereGround) || defined(atmosphereObject)
-        vec3 night = emissive.rgb;
+        vec3 night = max(vec3(0.0, 0.0, 0.0), emissive.rgb - ambient.rgb);
         emissive = vec4(0.0);
     #else
         vec3 night = vec3(0.0);

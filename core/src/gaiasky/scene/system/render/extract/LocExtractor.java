@@ -11,15 +11,23 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.view.LabelView;
 
 public class LocExtractor extends AbstractExtractSystem {
 
+    private final LabelView view;
+
     public LocExtractor(Family family, int priority) {
         super(family, priority);
+        this.view = new LabelView();
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        view.setEntity(entity);
+        if (!view.renderTextLocation()) {
+            return;
+        }
         var base = Mapper.base.get(entity);
         if (mustRender(base)) {
             var loc = Mapper.loc.get(entity);

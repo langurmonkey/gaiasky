@@ -119,6 +119,8 @@ public class GlobalResources {
         manager.load("img/markers/loc-marker-default.png", Texture.class, params);
         manager.load("img/markers/loc-marker-flag.png", Texture.class, params);
         manager.load("img/markers/loc-marker-city.png", Texture.class, params);
+        manager.load("img/markers/loc-marker-town.png", Texture.class, params);
+        manager.load("img/markers/loc-marker-landmark.png", Texture.class, params);
         manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class, params);
     }
 
@@ -136,6 +138,8 @@ public class GlobalResources {
         textures.put("loc-marker-default", manager.get("img/markers/loc-marker-default.png"));
         textures.put("loc-marker-flag", manager.get("img/markers/loc-marker-flag.png"));
         textures.put("loc-marker-city", manager.get("img/markers/loc-marker-city.png"));
+        textures.put("loc-marker-town", manager.get("img/markers/loc-marker-town.png"));
+        textures.put("loc-marker-landmark", manager.get("img/markers/loc-marker-landmark.png"));
         textures.put("attitude-indicator", manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class));
 
     }

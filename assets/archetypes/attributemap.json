@@ -639,7 +639,7 @@
         "unit": "Boolean"
       },
       "locationMarkerTexture": {
-        "description": "Location marker texture (image). Set to ``none`` to disable maker. |brsp| **Possible values are:** |ul| |li| ``none`` -- disable marker. |eli| |li| ``default`` -- use the default marker, a cross. |eli| |li| ``flag`` -- use an icon of a flag as marker. |eli| |li| ``city`` -- use an icon of a city as marker. |eli| |li| Path to a PNG image. If the path directs to a data package, the format is ``$data/[package-name]/path/to/file.png``. |eli| |eul|",
+        "description": "Location marker texture (image). Set to ``none`` to disable maker. |brsp| **Possible values are:** |ul| |li| ``none`` -- disable marker. |eli| |li| ``default`` -- use the default marker, a cross. |eli| |li| ``flag`` -- use an icon of a flag as marker. |eli| |li| ``city`` -- use an icon of a city as marker. |eli| |li| ``town`` -- use an icon of a town as marker. |eli| |li| ``landmark`` -- use landmark icon as a marker. |eli| |li| Path to a PNG image. If the path directs to a data package, the format is ``$data/[package-name]/path/to/file.png``. |eli| |eul|",
         "unit": "String",
         "aliases": [
           "markerTexture"

@@ -40,7 +40,7 @@ public class LocationMark implements Component {
 
     /**
      * Location marker texture. Set to 'none' to disable maker.
-     * Possible values are 'none', 'default', 'flag', 'city', or a path to a PNG image.
+     * Possible values are 'none', 'default', 'flag', 'city', 'town', 'landmark', or a path to a PNG image.
      */
     public String locationMarkerTexture = "default";
 
