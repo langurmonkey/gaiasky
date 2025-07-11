@@ -49,7 +49,8 @@ public class PerimeterUpdater extends AbstractUpdateSystem {
         float angleLow = (float) parentSa.thresholdQuad * camera.getFovFactor() * 30f;
         float angleHigh = angleLow * 3f;
 
-        if (GaiaSky.instance.isOn(base.ct) && parentBody.solidAngleApparent > angleLow) {
+        if (GaiaSky.instance.isOn(base.ct) && parentBody.solidAngleApparent > angleLow
+                && parentBody.solidAngle < 1.09) {
             graph.localTransform.idt();
             toCartesian(perimeter.loc2d[0][0][0], perimeter.loc2d[0][0][1], perimeter.cart0, graph.localTransform);
 
