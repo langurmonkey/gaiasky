@@ -919,7 +919,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 creditsTitle = new OwnLabel(I18n.msg("gui.download.credits"), skin, "grey-large");
                 for (var c : credits) {
                     if (c != null && !c.isEmpty()) {
-                        creditsContent.add("-").left().padRight(pad10);
+                        creditsContent.add("-").left().top().padRight(pad10);
                         creditsContent.add(new OwnLabel(TextUtils.breakCharacters(c, 70), skin)).left().row();
                     }
                 }

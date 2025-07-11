@@ -133,12 +133,23 @@ public class DatasetDesc {
         }
 
         // Links
+        JsonValue links = null;
         if (source.has("links"))
-            this.links = source.get("links").asStringArray();
+            links = source.get("links");
         else if (source.has("link"))
-            this.links = new String[]{source.getString("link")};
-        else
+            links = source.get("link");
+        if (links != null) {
+            if (links.isArray()) {
+                this.links = links.asStringArray();
+            } else if (links.isString()) {
+                this.links = new String[]{links.asString()};
+            } else {
+                logger.warn("Attribute credits must be a String or String[].");
+            }
+        } else {
             this.links = null;
+        }
+
 
         // Creator
         if (source.has("creator"))
@@ -147,9 +158,16 @@ public class DatasetDesc {
             this.creator = null;
 
         // Credits
-        if (source.has("credits"))
-            this.credits = source.get("credits").asStringArray();
-        else
+        if (source.has("credits")) {
+            var c = source.get("credits");
+            if (c.isArray()) {
+                this.credits = c.asStringArray();
+            } else if (c.isString()) {
+                this.credits = new String[]{c.asString()};
+            } else {
+                logger.warn("Attribute credits must be a String or String[].");
+            }
+        } else
             this.credits = null;
 
         // Type
