@@ -399,7 +399,7 @@ void main() {
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = v_data.ambientLight;
 
-    #ifdef atmosphereGround
+    #if defined(atmosphereGround) || defined(atmosphereObject)
         vec3 night = emissive.rgb;
         emissive = vec4(0.0);
     #else

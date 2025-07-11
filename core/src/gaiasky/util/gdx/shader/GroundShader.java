@@ -82,6 +82,8 @@ public class GroundShader extends RelativisticShader {
         // Atmosphere ground only if camera height is set
         if (mask.has(AtmosphereAttribute.CameraHeight))
             prefix += "#define atmosphereGround\n";
+        if (mask.has(AtmosphereAttribute.KrESun))
+            prefix += "#define atmosphereObject\n";
         return prefix;
     }
 
