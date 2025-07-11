@@ -83,8 +83,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 initMtc.emissiveCubemap == null;
 
         EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO,
-                Event.PROCEDURAL_GENERATION_SURFACE_INFO,
-                Event.FOCUS_CHANGED);
+                                        Event.PROCEDURAL_GENERATION_SURFACE_INFO,
+                                        Event.FOCUS_CHANGED);
 
         setAcceptText(I18n.msg("gui.close"));
 
@@ -118,10 +118,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     @Override
     protected void build() {
-        this.textWidth = 195f;
+        this.textWidth = 220f;
         this.fieldWidth = 500f;
         this.fieldWidthAll = 750f;
-        this.fieldWidthTotal = 850f;
+        this.fieldWidthTotal = 950f;
         float tabContentWidth = 400f;
         float tabWidth = 240f;
 
@@ -227,9 +227,13 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(randomize).center().padBottom(pad34).row();
 
         // Resolution
-        OwnSliderPlus pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"), Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
+        OwnSliderPlus pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"),
+                                                       Constants.PG_RESOLUTION_MIN,
+                                                       Constants.PG_RESOLUTION_MAX,
+                                                       1,
+                                                       skin);
         pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
-        pgResolution.setWidth(fieldWidthTotal);
+        pgResolution.setWidth(fieldWidthTotal + 50f);
         pgResolution.setValue(Settings.settings.graphics.proceduralGenerationResolution[1]);
         pgResolution.addListener(new ChangeListener() {
             @Override
@@ -240,7 +244,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 EventManager.publish(Event.PROCEDURAL_GENERATION_RESOLUTION_CMD, this, pgWidth, pgHeight);
             }
         });
-        content.add(pgResolution).left().padBottom(pad18).row();
+        content.add(pgResolution).right().padBottom(pad18).row();
 
         // Save textures
         OwnCheckBox saveTextures = new OwnCheckBox(I18n.msg("gui.procedural.savetextures"), skin, pad10);
@@ -253,7 +257,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             }
         });
         OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
-        saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()), skin));
+        saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()),
+                                                           skin));
         HorizontalGroup saveTexturesGroup = new HorizontalGroup();
         saveTexturesGroup.space(pad10);
         saveTexturesGroup.addActor(saveTextures);
@@ -262,39 +267,13 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     }
 
-    private OwnTextButton addLocalButton(Table content,
-                                         String key,
-                                         Function<Boolean, Boolean> generateFunc
-    ) {
-        String name = I18n.msg(key);
-
-        // Generate button
-        OwnTextButton generate = new OwnTextButton(I18n.msg("gui.procedural.generate", name), skin);
-        generate.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                generateFunc.apply(true);
-            }
-        });
-        generate.pad(pad10, pad20, pad10, pad20);
-        generate.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.button.generate", name), skin));
-
-        content.add(generate).center().colspan(2).padBottom(pad34).row();
-        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
-
-        return generate;
-    }
-
     private void addLocalButtons(Table content,
-                                 String key,
                                  Function<Boolean, Boolean> gasGiantFunc,
                                  Function<Boolean, Boolean> earthLikeFunc,
                                  Function<Boolean, Boolean> coldPlanetFunc,
                                  Function<Boolean, Boolean> rockyPlanetFunc
     ) {
-        String name = I18n.msg(key);
-        float w = 250f;
+        float w = 220f;
 
         // Gas giant
         OwnTextButton gasGiant = new OwnTextButton(I18n.msg("gui.procedural.button.gasgiant"), skin);
@@ -354,7 +333,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         Table bt = new Table(skin);
         bt.add(earthLike).pad(5f);
-        bt.add(snowWorld).pad(5f).row();
+        bt.add(snowWorld).pad(5f);
         bt.add(rockyPlanet).pad(5f);
         bt.add(gasGiant).pad(5f);
 
@@ -408,9 +387,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     }
 
     private void addNoiseGroup(Table content,
-                               NoiseComponent nc,
-                               String key,
-                               boolean expanded) {
+                               NoiseComponent nc) {
+
+        var fieldWidthNoise = fieldWidthAll + 250f;
 
         // Noise group table.
         Table noiseTable = new Table(skin);
@@ -418,7 +397,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         // Seed.
         FloatValidator lv = new FloatValidator(-10000f, 10000f);
         OwnTextField seedField = new OwnTextField(Float.toString(nc.seed), skin);
-        seedField.setWidth(fieldWidth);
+        seedField.setWidth(fieldWidth + 110f);
         seedField.setValidator(lv);
         seedField.addListener(new ChangeListener() {
             @Override
@@ -439,7 +418,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         // Noise type.
         OwnSelectBox<NoiseType> type = new OwnSelectBox<>(skin);
         type.setItems(NoiseType.values());
-        type.setWidth(fieldWidth);
+        type.setWidth(fieldWidth + 110f);
         type.setSelected(nc.type);
         type.addListener(new ChangeListener() {
             @Override
@@ -458,7 +437,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Scale.
         OwnSliderPlus scaleX = new OwnSliderPlus(I18n.msg("gui.procedural.scale", "[x]"), 0.01f, 14.0f, 0.01f, skin);
-        scaleX.setWidth(fieldWidthAll / 3f - pad10 * 1.3f);
+        scaleX.setWidth(fieldWidthNoise / 3f - pad10 * 1.3f);
         scaleX.setValue((float) nc.scale[0]);
         scaleX.addListener(new ChangeListener() {
             @Override
@@ -468,7 +447,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             }
         });
         OwnSliderPlus scaleY = new OwnSliderPlus(I18n.msg("gui.procedural.scale", "[y]"), 0.01f, 14.0f, 0.01f, skin);
-        scaleY.setWidth(fieldWidthAll / 3f - pad10 * 1.3f);
+        scaleY.setWidth(fieldWidthNoise / 3f - pad10 * 1.3f);
         scaleY.setValue((float) nc.scale[1]);
         scaleY.addListener(new ChangeListener() {
             @Override
@@ -478,7 +457,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             }
         });
         OwnSliderPlus scaleZ = new OwnSliderPlus(I18n.msg("gui.procedural.scale", "[z]"), 0.01f, 14.0f, 0.01f, skin);
-        scaleZ.setWidth(fieldWidthAll / 3f - pad10 * 1.3f);
+        scaleZ.setWidth(fieldWidthNoise / 3f - pad10 * 1.3f);
         scaleZ.setValue((float) nc.scale[2]);
         scaleZ.addListener(new ChangeListener() {
             @Override
@@ -500,7 +479,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Amplitude.
         OwnSliderPlus amplitude = new OwnSliderPlus(I18n.msg("gui.procedural.amplitude"), 0.1f, 3.0f, 0.01f, skin);
-        amplitude.setWidth(fieldWidthAll);
+        amplitude.setWidth(fieldWidthNoise);
         amplitude.setValue((float) nc.amplitude);
         amplitude.addListener(new ChangeListener() {
             @Override
@@ -516,7 +495,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Persistence.
         OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
-        persistence.setWidth(fieldWidthAll);
+        persistence.setWidth(fieldWidthNoise);
         persistence.setValue((float) nc.persistence);
         persistence.addListener(new ChangeListener() {
             @Override
@@ -532,7 +511,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Frequency.
         OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency"), 0.01f, 3.0f, 0.01f, skin);
-        frequency.setWidth(fieldWidthAll);
+        frequency.setWidth(fieldWidthNoise);
         frequency.setValue((float) nc.frequency);
         frequency.addListener(new ChangeListener() {
             @Override
@@ -548,7 +527,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Lacunarity.
         OwnSliderPlus lacunarity = new OwnSliderPlus(I18n.msg("gui.procedural.lacunarity"), 0.1f, 5.0f, 0.1f, skin);
-        lacunarity.setWidth(fieldWidthAll);
+        lacunarity.setWidth(fieldWidthNoise);
         lacunarity.setValue((float) nc.lacunarity);
         lacunarity.addListener(new ChangeListener() {
             @Override
@@ -564,7 +543,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Octaves.
         OwnSliderPlus octaves = new OwnSliderPlus(I18n.msg("gui.procedural.octaves"), 1, 8, 1, skin);
-        octaves.setWidth(fieldWidthAll);
+        octaves.setWidth(fieldWidthNoise);
         octaves.setValue(nc.octaves);
         octaves.addListener(new ChangeListener() {
             @Override
@@ -580,7 +559,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Terraces.
         OwnSliderPlus terraces = new OwnSliderPlus(I18n.msg("gui.procedural.terraces"), 0, 8, 1, skin);
-        terraces.setWidth(fieldWidthAll);
+        terraces.setWidth(fieldWidthNoise);
         terraces.setValue(nc.numTerraces);
         terraces.addListener(new ChangeListener() {
             @Override
@@ -596,7 +575,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Terraces exponent.
         OwnSliderPlus terracesExp = new OwnSliderPlus(I18n.msg("gui.procedural.terraces.exp"), 1, 13, 1, skin);
-        terracesExp.setWidth(fieldWidthAll);
+        terracesExp.setWidth(fieldWidthNoise);
         terracesExp.setValue(nc.terracesExp);
         terracesExp.setValueLabelTransform((value) -> String.valueOf(value * 2.0 - 1.0));
         terracesExp.addListener(new ChangeListener() {
@@ -613,7 +592,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Range.
         OwnSliderPlus rangeMin = new OwnSliderPlus(I18n.msg("gui.procedural.range", "[min]"), -2f, 0.0f, 0.1f, skin);
-        rangeMin.setWidth(fieldWidthAll / 2f - pad10);
+        rangeMin.setWidth(fieldWidthNoise / 2f - pad10);
         rangeMin.setValue((float) nc.range[0]);
         rangeMin.addListener(new ChangeListener() {
             @Override
@@ -623,7 +602,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             }
         });
         OwnSliderPlus rangeMax = new OwnSliderPlus(I18n.msg("gui.procedural.range", "[max]"), 0.5f, 2.0f, 0.1f, skin);
-        rangeMax.setWidth(fieldWidthAll / 2f - pad10);
+        rangeMax.setWidth(fieldWidthNoise / 2f - pad10);
         rangeMax.setValue((float) nc.range[1]);
         rangeMax.addListener(new ChangeListener() {
             @Override
@@ -644,7 +623,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Power.
         OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.1f, 8f, 0.1f, skin);
-        power.setWidth(fieldWidthAll);
+        power.setWidth(fieldWidthNoise);
         power.setValue((float) nc.power);
         power.addListener(new ChangeListener() {
             @Override
@@ -708,11 +687,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         noiseTable.add(ridge).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(ridgeTooltip).left().padBottom(pad18).row();
 
-        CollapsiblePane groupPane = new CollapsiblePane(stage, null, I18n.msg(key),
-                noiseTable, fieldWidthAll * 1.2f, skin, "hud-header", "expand-collapse",
-                null, expanded, () -> me.pack(), null, (Actor) null);
 
-        content.add(groupPane).colspan(3).center().padBottom(pad34).row();
+        content.add(new OwnLabel(I18n.msg("gui.procedural.noise.params"), skin, "hud-header")).left().padBottom(pad34).row();
+        content.add(noiseTable).colspan(3).center().padBottom(pad34).row();
     }
 
     private void updateLutImage(Array<String> luts) {
@@ -767,11 +744,11 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             content.add(new OwnLabel(I18n.msg("gui.procedural.param.surface"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
 
             // Add button group with presets.
-            addLocalButtons(content, "gui.procedural.surface",
-                    this::randomizeSurfaceGasGiant,
-                    this::randomizeSurfaceEarthLike,
-                    this::randomizeSurfaceColdPlanet,
-                    this::randomizeSurfaceRockyPlanet);
+            addLocalButtons(content,
+                            this::randomizeSurfaceGasGiant,
+                            this::randomizeSurfaceEarthLike,
+                            this::randomizeSurfaceColdPlanet,
+                            this::randomizeSurfaceRockyPlanet);
 
             // Add generate and randomize buttons
             genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
@@ -797,7 +774,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             }
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);
-            lookUpTablesBox.setWidth(fieldWidth + 120f);
+            lookUpTablesBox.setWidth(fieldWidth + 80f);
             lookUpTablesBox.setSelected(mtc.biomeLUT);
             lookUpTablesBox.addListener(new ChangeListener() {
                 @Override
@@ -820,7 +797,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
             // Hue shift
             hueShift = new OwnSliderPlus(I18n.msg("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, skin);
-            hueShift.setWidth(fieldWidthTotal);
+            hueShift.setWidth(fieldWidthTotal - 100f);
             hueShift.setValueSuffix("°");
             hueShift.setValue(mtc.biomeHueShift);
             hueShift.addListener(new ChangeListener() {
@@ -841,7 +818,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
             // Height scale
             OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 80.0f, 0.1f, skin);
-            heightScale.setWidth(fieldWidthTotal);
+            heightScale.setWidth(fieldWidthTotal - 100f);
             heightScale.setValueSuffix(" km");
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
             heightScale.addListener(new ChangeListener() {
@@ -872,20 +849,11 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             scrollContent.add(emissionTooltip).left().padBottom(pad34).row();
 
             // Noise
-            addNoiseGroup(scrollContent, mtc.nc, "gui.procedural.noise.params", true);
+            addNoiseGroup(scrollContent, mtc.nc);
 
-            scrollContent.pad(pad10 * 2.5f);
-            scrollContent.top();
-            OwnScrollPane scroll = new OwnScrollPane(scrollContent, skin, "default-nobg");
+            var scrollPane = scrollPane(scrollContent, 600f);
 
-            scroll.setFadeScrollBars(false);
-            scroll.setScrollbarsVisible(true);
-            scroll.setScrollingDisabled(true, false);
-            scroll.setOverscroll(false, false);
-            scroll.setSmoothScrolling(false);
-            scroll.setHeight(700f);
-
-            content.add(scroll).colspan(2).center().top().row();
+            content.add(scrollPane).colspan(2).center().top().row();
             content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad10).row();
 
         } else {
@@ -913,7 +881,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad18).row();
 
-        // Fog color
+        Table scrollContent = new Table(skin);
+
+        // Cloud color
         ColorPicker cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
         cloudColor.setSize(128f, 128f);
         cloudColor.setNewColorRunnable(() -> {
@@ -932,12 +902,15 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         cloudGroup.space(pad20);
         cloudGroup.addActor(cloudColor);
         cloudGroup.addActor(cloudColorTooltip);
-        content.add(cloudColorLabel).left().padRight(pad18).padBottom(pad18);
-        content.add(cloudGroup).left().expandX().padBottom(pad18).padRight(pad10).row();
+        scrollContent.add(cloudColorLabel).left().padRight(pad18).padBottom(pad18);
+        scrollContent.add(cloudGroup).left().expandX().padBottom(pad18).padRight(pad10).row();
 
         // Noise
-        addNoiseGroup(content, clc.nc, "gui.procedural.noise.params", true);
+        addNoiseGroup(scrollContent, clc.nc);
 
+        var scrollPane = scrollPane(scrollContent, 600f);
+
+        content.add(scrollPane).colspan(2).center().top().row();
         content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
     }
 
@@ -1053,9 +1026,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Fog density
         OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
-                Constants.MIN_ATM_FOG_DENSITY,
-                Constants.MAX_ATM_FOG_DENSITY,
-                Constants.SLIDER_STEP_TINY, skin);
+                                                     Constants.MIN_ATM_FOG_DENSITY,
+                                                     Constants.MAX_ATM_FOG_DENSITY,
+                                                     Constants.SLIDER_STEP_TINY, skin);
         fogDensity.setWidth(fieldWidthTotal);
         fogDensity.setValue(ac.fogDensity);
         fogDensity.addListener(new ChangeListener() {
@@ -1319,6 +1292,18 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     private void updateButtonStatus() {
         genCloudsButton.setDisabled(genCloudNum > 0);
         genSurfaceButton.setDisabled(genSurfaceNum > 0);
+    }
+
+    private ScrollPane scrollPane(Actor actor, float height) {
+        ScrollPane scroll = new OwnScrollPane(actor, skin, "minimalist-nobg");
+        scroll.setWidth(fieldWidthTotal + 100f);
+        scroll.setHeight(height);
+        scroll.setOverscroll(false, false);
+        scroll.setSmoothScrolling(false);
+        scroll.setScrollingDisabled(true, false);
+        scroll.setFadeScrollBars(false);
+        scroll.setScrollbarsVisible(true);
+        return scroll;
     }
 
     @Override
