@@ -50,7 +50,7 @@ public class SVTQuadtreeBuilder {
         logger.info(I18n.msg("notif.loading", "SVT quadtree: " + location));
         try (Stream<Path> stream = Files.list(location)) {
             final AtomicInteger depth = new AtomicInteger(0);
-            stream.sorted(comp).forEach(directory -> {
+            stream.filter(Files::isDirectory).sorted(comp).forEach(directory -> {
                 var dirName = directory.getFileName().toString();
                 if (dirName.matches("level\\d+")) {
                     var level = Integer.parseInt(dirName.substring(5));
@@ -58,7 +58,7 @@ public class SVTQuadtreeBuilder {
                     try (Stream<Path> files = Files.list(directory)) {
                         files.sorted(comp).forEach(file -> {
                             var fileName = file.getFileName().toString();
-                            // Accepted file names: tx[_|-| ]COLNUM[_|-| ]ROWNUM.ext
+                            // Accepted file names: tx[_|-| ]COL_NUM[_|-| ]ROW_NUM.ext
                             if (fileName.matches("tx[_\\-\\s.]\\d+[_\\-\\s.]\\d+\\.\\w+")) {
                                 String[] tokens = fileName.split("[_\\-\\s.]");
                                 int col = Integer.parseInt(tokens[1].trim());
