@@ -27,7 +27,9 @@ public class DatasetDesc {
     public String key;
     public String name;
     public String description;
-    public String link;
+    public String[] links;
+    public String[] credits;
+    public String creator;
     public String type;
     public String file;
     public DatasetType datasetType;
@@ -62,7 +64,7 @@ public class DatasetDesc {
         this.reader = reader;
         this.source = source;
 
-        // Check if we have it
+        // Check if we have it.
         if (source.has("check")) {
             this.checkStr = source.getString("check");
             if (!this.checkStr.startsWith(Constants.DATA_LOCATION_TOKEN)) {
@@ -95,10 +97,12 @@ public class DatasetDesc {
         if (source.has("name")) {
             this.name = source.getString("name");
         }
-        if (this.key == null) {
+        // Fill key with name
+        if (this.key == null && this.name != null) {
             this.key = this.name.replaceAll("\\s+", "-");
         }
-        this.baseData = key.equals(Constants.DEFAULT_DATASET_KEY);
+        if (this.key != null)
+            this.baseData = key.equals(Constants.DEFAULT_DATASET_KEY);
 
         if (source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
@@ -128,11 +132,25 @@ public class DatasetDesc {
             this.releaseNotes = null;
         }
 
-        // Link
-        if (source.has("link"))
-            this.link = source.getString("link");
+        // Links
+        if (source.has("links"))
+            this.links = source.get("links").asStringArray();
+        else if (source.has("link"))
+            this.links = new String[]{source.getString("link")};
         else
-            this.link = null;
+            this.links = null;
+
+        // Creator
+        if (source.has("creator"))
+            this.creator = source.getString("creator");
+        else
+            this.creator = null;
+
+        // Credits
+        if (source.has("credits"))
+            this.credits = source.get("credits").asStringArray();
+        else
+            this.credits = null;
 
         // Type
         if (source.has("type")) {
@@ -255,7 +273,9 @@ public class DatasetDesc {
         copy.key = this.key;
         copy.name = this.name;
         copy.description = this.description;
-        copy.link = this.link;
+        copy.links = this.links;
+        copy.creator = this.creator;
+        copy.credits = this.credits;
         copy.type = this.type;
         copy.file = this.file;
         copy.datasetType = this.datasetType;

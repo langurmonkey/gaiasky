@@ -171,6 +171,8 @@ public class TextUtils {
     public static String capString(String in,
                                    int targetLength,
                                    boolean fromStart) {
+        if (in == null)
+            return null;
         if (in.length() <= targetLength) {
             return in;
         } else {

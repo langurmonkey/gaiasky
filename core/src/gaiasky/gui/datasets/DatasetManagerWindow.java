@@ -108,7 +108,10 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
-        super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates", serverDd.numUpdates) : ""), skin, stage);
+        super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates",
+                                                                                                                 serverDd.numUpdates) : ""),
+              skin,
+              stage);
         this.nf = new DecimalFormat("##0.0");
         this.serverDd = serverDd;
         this.highlight = ColorUtils.gYellowC;
@@ -298,7 +301,11 @@ public class DatasetManagerWindow extends GenericDialog {
 
         dataLocationButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"), skin, stage, Path.of(Settings.settings.data.location), FileChooser.FileChooserTarget.DIRECTORIES);
+                FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"),
+                                                 skin,
+                                                 stage,
+                                                 Path.of(Settings.settings.data.location),
+                                                 FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -349,7 +356,10 @@ public class DatasetManagerWindow extends GenericDialog {
             if (mode == DatasetMode.AVAILABLE) {
                 content.add(new OwnLabel(I18n.msg("gui.download.noconnection.title"), skin)).center().padTop(pad34 * 2f).padBottom(pad18).row();
             }
-            content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad34 * 2f).row();
+            content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin))
+                    .center()
+                    .padTop(mode == DatasetMode.AVAILABLE ? 0 : pad34 * 2f)
+                    .row();
         } else {
             var left = content.add().top().left().padRight(pad34);
             right = content.add().top().left();
@@ -359,7 +369,10 @@ public class DatasetManagerWindow extends GenericDialog {
                 reloadRightPane(right, selectedDataset[mode.ordinal()], mode);
             } else {
                 content.clear();
-                content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad34 * 2f).row();
+                content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin))
+                        .center()
+                        .padTop(mode == DatasetMode.AVAILABLE ? 0 : pad34 * 2f)
+                        .row();
             }
 
         }
@@ -417,19 +430,32 @@ public class DatasetManagerWindow extends GenericDialog {
         return added;
     }
 
-    private int populateLeftTable(Table leftTable, DatasetMode mode, DataDescriptor dataDescriptor, List<String> currentSetting, float width, String filter) {
+    private int populateLeftTable(Table leftTable,
+                                  DatasetMode mode,
+                                  DataDescriptor dataDescriptor,
+                                  List<String> currentSetting,
+                                  float width,
+                                  String filter) {
         leftTable.clear();
         int added = 0;
         for (DatasetType type : dataDescriptor.types) {
             List<DatasetDesc> datasets = type.datasets;
-            List<DatasetDesc> filtered = datasets.stream().filter(d -> d.filter(filter) && (mode != DatasetMode.AVAILABLE || !d.exists)).collect(Collectors.toList());
+            List<DatasetDesc> filtered = datasets.stream()
+                    .filter(d -> d.filter(filter) && (mode != DatasetMode.AVAILABLE || !d.exists))
+                    .collect(Collectors.toList());
             added += addDatasetTypeGroup(leftTable, mode, currentSetting, type, filtered, width, filter);
         }
         leftTable.pack();
         return added;
     }
 
-    private int addDatasetTypeGroup(Table leftTable, DatasetMode mode, List<String> currentSetting, DatasetType type, List<DatasetDesc> filtered, float width, String filter) {
+    private int addDatasetTypeGroup(Table leftTable,
+                                    DatasetMode mode,
+                                    List<String> currentSetting,
+                                    DatasetType type,
+                                    List<DatasetDesc> filtered,
+                                    float width,
+                                    String filter) {
         int added = 0;
         if (!filtered.isEmpty()) {
             final Array<CheckBox> groupCheckBoxes = new Array<>();
@@ -484,8 +510,8 @@ public class DatasetManagerWindow extends GenericDialog {
                 typeString = TextUtils.trueCapitalise(type.typeStr);
             }
             CollapsiblePane groupPane = new CollapsiblePane(stage, paneImage, typeString,
-                    contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
-                    null, filter != null && !filter.isBlank(), null, buttons);
+                                                            contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
+                                                            null, filter != null && !filter.isBlank(), null, buttons);
             leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
             selectionOrder.add(new Pair<>(null, groupPane.getExpandCollapseActor()));
 
@@ -548,14 +574,19 @@ public class DatasetManagerWindow extends GenericDialog {
                         select.setChecked(false);
                         select.setDisabled(true);
                         title.setColor(ColorUtils.gRedC);
-                        tooltipText = I18n.msg("gui.download.version.gs.mismatch", Integer.toString(Settings.SOURCE_VERSION), Integer.toString(dataset.minGsVersion));
+                        tooltipText = I18n.msg("gui.download.version.gs.mismatch",
+                                               Integer.toString(Settings.SOURCE_VERSION),
+                                               Integer.toString(dataset.minGsVersion));
                         select.getStyle().disabledFontColor = ColorUtils.gRedC;
 
                         // Remove from selected, if it is.
                         String filePath = dataset.catalogFile.path();
                         if (Settings.settings.data.dataFiles.contains(filePath)) {
                             Settings.settings.data.dataFiles.remove(filePath);
-                            logger.info(I18n.msg("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(Settings.SOURCE_VERSION)));
+                            logger.info(I18n.msg("gui.download.disabled.version",
+                                                 dataset.name,
+                                                 Integer.toString(dataset.minGsVersion),
+                                                 Integer.toString(Settings.SOURCE_VERSION)));
                         }
                     } else {
                         select.setChecked(DatasetDownloadUtils.isPathIn(Settings.settings.data.dataFile(dataset.checkStr), currentSetting));
@@ -588,7 +619,9 @@ public class DatasetManagerWindow extends GenericDialog {
                     version = new OwnLabel(I18n.msg("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
                 } else if (mode == DatasetMode.INSTALLED) {
                     if (dataset.outdated) {
-                        version = new OwnLabel(I18n.msg("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
+                        version = new OwnLabel(I18n.msg("gui.download.version.new",
+                                                        Integer.toString(dataset.serverVersion),
+                                                        Integer.toString(dataset.myVersion)), skin, "grey-large");
                         version.setColor(highlight);
                     } else {
                         version = new OwnLabel(I18n.msg("gui.download.version.local", dataset.myVersion), skin, "grey-large");
@@ -634,7 +667,9 @@ public class DatasetManagerWindow extends GenericDialog {
                                         if (mode == DatasetMode.INSTALLED) {
                                             if (dataset.outdated) {
                                                 // Update.
-                                                var update = new MenuItem(I18n.msg("gui.download.update"), skin, skin.getDrawable("iconic-arrow-circle-bottom"));
+                                                var update = new MenuItem(I18n.msg("gui.download.update"),
+                                                                          skin,
+                                                                          skin.getDrawable("iconic-arrow-circle-bottom"));
                                                 update.addListener(new ChangeListener() {
                                                     @Override
                                                     public void changed(ChangeEvent event, Actor actor) {
@@ -647,7 +682,9 @@ public class DatasetManagerWindow extends GenericDialog {
                                                 boolean enabled = DatasetDownloadUtils.isPathIn(dataset.catalogFile.path(), currentSetting);
                                                 if (enabled) {
                                                     // Disable.
-                                                    var disable = new MenuItem(I18n.msg("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
+                                                    var disable = new MenuItem(I18n.msg("gui.download.disable"),
+                                                                               skin,
+                                                                               skin.getDrawable("check-off-disabled"));
                                                     disable.addListener(new ChangeListener() {
                                                         @Override
                                                         public void changed(ChangeEvent event, Actor actor) {
@@ -692,7 +729,9 @@ public class DatasetManagerWindow extends GenericDialog {
                                             datasetContext.addItem(delete);
                                         } else if (mode == DatasetMode.AVAILABLE) {
                                             // Install.
-                                            var install = new MenuItem(I18n.msg("gui.download.install"), skin, skin.getDrawable("iconic-cloud-download"));
+                                            var install = new MenuItem(I18n.msg("gui.download.install"),
+                                                                       skin,
+                                                                       skin.getDrawable("iconic-cloud-download"));
                                             install.addListener(new ChangeListener() {
                                                 @Override
                                                 public void changed(ChangeEvent event, Actor actor) {
@@ -725,7 +764,11 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
 
                 // Create watcher.
-                watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null, null));
+                watchers.add(new DatasetWatcher(dataset,
+                                                progress,
+                                                installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null,
+                                                null,
+                                                null));
                 added++;
             }
             if (anySelected) {
@@ -779,7 +822,9 @@ public class DatasetManagerWindow extends GenericDialog {
                     status = new OwnLabel(I18n.msg("gui.download.enabled"), skin, "mono");
                 } else if (dataset.minGsVersion > Settings.SOURCE_VERSION) {
                     // Notify version mismatch.
-                    status = new OwnLabel(I18n.msg("gui.download.version.gs.mismatch.short", Integer.toString(Settings.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
+                    status = new OwnLabel(I18n.msg("gui.download.version.gs.mismatch.short",
+                                                   Integer.toString(Settings.SOURCE_VERSION),
+                                                   Integer.toString(dataset.minGsVersion)), skin, "mono");
                     status.setColor(ColorUtils.gRedC);
                 } else {
                     // Notify status.
@@ -805,7 +850,9 @@ public class DatasetManagerWindow extends GenericDialog {
                 version = new OwnLabel(I18n.msg("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
             } else if (mode == DatasetMode.INSTALLED) {
                 if (dataset.outdated) {
-                    version = new OwnLabel(I18n.msg("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
+                    version = new OwnLabel(I18n.msg("gui.download.version.new",
+                                                    Integer.toString(dataset.serverVersion),
+                                                    Integer.toString(dataset.myVersion)), skin, "grey-large");
                     version.setColor(highlight);
                 } else {
                     version = new OwnLabel(I18n.msg("gui.download.version.local", dataset.myVersion), skin, "grey-large");
@@ -814,6 +861,9 @@ public class DatasetManagerWindow extends GenericDialog {
 
             // Key.
             var key = new OwnLabel(I18n.msg("gui.download.name", dataset.key), skin, "grey-large");
+
+            // Creator
+            var creator = new OwnLabel(I18n.msg("gui.download.creator", TextUtils.capString(dataset.creator, 70)), skin, "grey-large");
 
             // Size.
             var size = new OwnLabel(I18n.msg("gui.download.size", dataset.size), skin, "grey-large");
@@ -824,11 +874,22 @@ public class DatasetManagerWindow extends GenericDialog {
             var nObjects = new OwnLabel(nObjStr, skin, "grey-large");
             nObjects.addListener(new OwnTextTooltip(I18n.msg("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
 
-            // Link.
-            Link link = null;
-            if (dataset.link != null && !dataset.link.isBlank()) {
-                String linkStr = dataset.link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
-                link = new Link(TextUtils.breakCharacters(linkStr, 80, true), skin, dataset.link);
+            // Links.
+            Table linksGroup = null;
+            if (dataset.links != null) {
+                linksGroup = new Table(skin);
+
+                int i = 0;
+                for (var link : dataset.links) {
+                    if (!link.isBlank()) {
+                        String linkStr = link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
+                        var linkActor = new Link(TextUtils.breakCharacters(linkStr, 70, true), skin, link);
+                        if (i > 0)
+                            linksGroup.row();
+                        linksGroup.add(linkActor).left();
+                        i++;
+                    }
+                }
             }
 
             Table infoTable = new Table(skin);
@@ -836,7 +897,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
             // Description.
             var descriptionString = dataset.description;
-            var desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
+            var desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 70), skin);
             desc.setWidth(1000f);
 
             // Release notes.
@@ -844,10 +905,25 @@ public class DatasetManagerWindow extends GenericDialog {
             if (releaseNotesString == null || releaseNotesString.isBlank()) {
                 releaseNotesString = "-";
             }
-            releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
+            releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 70);
             var releaseNotesTitle = new OwnLabel(I18n.msg("gui.download.releasenotes"), skin, "grey-large");
             var releaseNotes = new OwnLabel(releaseNotesString, skin);
             releaseNotes.setWidth(1000f);
+
+            // Credits
+            var credits = dataset.credits;
+            Table creditsContent = null;
+            Label creditsTitle = null;
+            if (credits != null && credits.length > 0) {
+                creditsContent = new Table(skin);
+                creditsTitle = new OwnLabel(I18n.msg("gui.download.credits"), skin, "grey-large");
+                for (var c : credits) {
+                    if (c != null && !c.isEmpty()) {
+                        creditsContent.add("-").left().padRight(pad10);
+                        creditsContent.add(new OwnLabel(TextUtils.breakCharacters(c, 70), skin)).left().row();
+                    }
+                }
+            }
 
             // Files.
             var filesTitle = new OwnLabel(I18n.msg("gui.download.files"), skin, "grey-large");
@@ -873,6 +949,10 @@ public class DatasetManagerWindow extends GenericDialog {
             infoTable.add(desc).top().left().padBottom(pad34).row();
             infoTable.add(releaseNotesTitle).top().left().padBottom(pad18).row();
             infoTable.add(releaseNotes).top().left().padBottom(pad34).row();
+            if (creditsContent != null) {
+                infoTable.add(creditsTitle).top().left().padBottom(pad18).row();
+                infoTable.add(creditsContent).top().left().padBottom(pad34).row();
+            }
             infoTable.add(filesTitle).top().left().padBottom(pad18).row();
             infoTable.add(files).top().left().padBottom(pad34).row();
             infoTable.add(dataLocationNote).top().left();
@@ -907,9 +987,11 @@ public class DatasetManagerWindow extends GenericDialog {
             rightTable.add(type).top().left().padBottom(pad10).row();
             rightTable.add(version).top().left().padBottom(pad10).row();
             rightTable.add(key).top().left().padBottom(pad10).row();
+            if (dataset.creator != null)
+                rightTable.add(creator).top().left().padBottom(pad10).row();
             rightTable.add(size).top().left().padBottom(pad10).row();
             rightTable.add(nObjects).top().left().padBottom(pad18).row();
-            rightTable.add(link).top().left().padBottom(pad34 * 2f).row();
+            rightTable.add(linksGroup).top().left().padBottom(pad34 * 2f).row();
             rightTable.add(infoScroll).top().left().padBottom(pad34).row();
             rightTable.add(cancelDownloadButton).padTop(pad34).center();
 
@@ -975,7 +1057,12 @@ public class DatasetManagerWindow extends GenericDialog {
                 double mbPerSecond = speed / 1000d;
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
                 // Since we are downloading on a background thread, post a runnable to touch UI.
-                GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString));
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO,
+                                                                this,
+                                                                dataset.key,
+                                                                (float) progress,
+                                                                progressString,
+                                                                speedString));
             } catch (Exception e) {
                 logger.warn(I18n.msg("gui.download.error.progress"));
             }
@@ -987,7 +1074,12 @@ public class DatasetManagerWindow extends GenericDialog {
             double mbPerSecond = speed / 1000d;
             final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI.
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString));
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO,
+                                                            this,
+                                                            dataset.key,
+                                                            (float) progress,
+                                                            progressString,
+                                                            speedString));
         };
 
         Consumer<String> finish = (digest) -> {
@@ -1104,7 +1196,14 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         // Download.
-        final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, Settings.settings.program.offlineMode, progressDownload, progressHashResume, finish, fail, cancel);
+        final Net.HttpRequest request = DownloadHelper.downloadFile(url,
+                                                                    tempDownload,
+                                                                    Settings.settings.program.offlineMode,
+                                                                    progressDownload,
+                                                                    progressHashResume,
+                                                                    finish,
+                                                                    fail,
+                                                                    cancel);
         GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_START_INFO, this, dataset.key, request));
         currentDownloads.put(dataset.key, new Pair<>(dataset, request));
 
@@ -1263,12 +1362,13 @@ public class DatasetManagerWindow extends GenericDialog {
 
     /**
      * Enables a given dataset, so that it is loaded when Gaia Sky starts.
+     *
      * @param dataset The dataset to enable.
      */
     private void actionEnableDataset(DatasetDesc dataset, OwnCheckBox cb) {
         // Texture packs can't be enabled here.
         if (dataset.type.equals("texture-pack"))
-            return ;
+            return;
 
         String filePath = null;
         if (dataset.checkStr != null) {
@@ -1297,7 +1397,11 @@ public class DatasetManagerWindow extends GenericDialog {
                             warning.setColor(ColorUtils.gYellowC);
                             content.add(warning).left().padRight(pad20).padBottom(pad34);
                             content.add(new OwnLabel(TextUtils.breakCharacters(opt.get(), 60), skin)).left().padBottom(pad34).row();
-                            content.add(new OwnLabel(I18n.msg("gui.download.incompatibility.proceed"), skin)).left().colspan(2).padBottom(pad18).row();
+                            content.add(new OwnLabel(I18n.msg("gui.download.incompatibility.proceed"), skin))
+                                    .left()
+                                    .colspan(2)
+                                    .padBottom(pad18)
+                                    .row();
                         }
 
                         @Override
@@ -1334,7 +1438,9 @@ public class DatasetManagerWindow extends GenericDialog {
 
     /**
      * Checks whether the given dataset has incompatibilities with the currently enabled datasets.
+     *
      * @param dataset The dataset to check.
+     *
      * @return Whether there are incompatibilities with the given dataset and the enabled datasets.
      */
     private Optional<String> checkDatasetIncompatibilities(DatasetDesc dataset) {
@@ -1370,6 +1476,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
     /**
      * Disable a given dataset, so that it is not loaded during startup.
+     *
      * @param dataset The dataset to disable.
      */
     private void actionDisableDataset(DatasetDesc dataset) {
@@ -1424,7 +1531,9 @@ public class DatasetManagerWindow extends GenericDialog {
                             }
                             File directory = dataPath.toRealPath().toFile();
                             // Expand possible wildcards.
-                            Collection<File> files = FileUtils.listFilesAndDirs(directory, WildcardFileFilter.builder().setWildcards(baseName).get(), WildcardFileFilter.builder().setWildcards(baseName).get());
+                            Collection<File> files = FileUtils.listFilesAndDirs(directory,
+                                                                                WildcardFileFilter.builder().setWildcards(baseName).get(),
+                                                                                WildcardFileFilter.builder().setWildcards(baseName).get());
                             for (File file : files) {
                                 if (!file.equals(directory) && file.exists()) {
                                     FileUtils.forceDelete(file);
