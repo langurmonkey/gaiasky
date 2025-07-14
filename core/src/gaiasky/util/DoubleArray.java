@@ -14,6 +14,9 @@ import net.jafama.FastMath;
 
 import java.util.Arrays;
 
+/**
+ * A wrapper around a double array to make it resizable and optionally ordered.
+ */
 public class DoubleArray {
     public double[] items;
     public int size;
@@ -249,17 +252,15 @@ public class DoubleArray {
     }
 
     /** Removes and returns the item at the specified index. */
-    public double removeIndex(int index) {
+    public void removeIndex(int index) {
         if (index >= size)
             throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
         double[] items = this.items;
-        double value = items[index];
         size--;
         if (ordered)
             System.arraycopy(items, index + 1, items, index, size - index);
         else
             items[index] = items[size];
-        return value;
     }
 
     /** Removes the items between the specified indices, inclusive. */
@@ -280,7 +281,7 @@ public class DoubleArray {
     }
 
     /**
-     * Removes from this array all of elements contained in the specified array.
+     * Removes from this array all the elements contained in the specified array.
      *
      * @return true if this array was modified.
      */
@@ -443,9 +444,8 @@ public class DoubleArray {
             return true;
         if (!ordered)
             return false;
-        if (!(object instanceof DoubleArray))
+        if (!(object instanceof DoubleArray array))
             return false;
-        DoubleArray array = (DoubleArray) object;
         if (!array.ordered)
             return false;
         int n = size;
@@ -462,9 +462,8 @@ public class DoubleArray {
     public boolean equals(Object object, double epsilon) {
         if (object == this)
             return true;
-        if (!(object instanceof DoubleArray))
+        if (!(object instanceof DoubleArray array))
             return false;
-        DoubleArray array = (DoubleArray) object;
         int n = size;
         if (n != array.size)
             return false;

@@ -83,7 +83,7 @@ public class CascadedShadowMapRenderPass extends RenderPass {
         IFocus l = camera.getCloseLightSource(0);
         l.getAbsolutePosition(aux1b);
         if(!models.isEmpty()) {
-            var firstModel = ((Render)models.get(0)).getEntity();
+            var firstModel = ((Render)models.getFirst()).getEntity();
             EntityUtils.getAbsolutePosition(firstModel, aux2b);
             aux1b.sub(aux2b).nor().put(aux).scl(-1);
             var cameraLight = baseLight.getCamera();

@@ -20,6 +20,9 @@ import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
+/**
+ * Manager for cascaded shadow maps.
+ */
 public class CascadeShadowMap implements Disposable {
 
     public final Array<DirectionalShadowLight> lights;
