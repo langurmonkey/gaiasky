@@ -39,21 +39,26 @@ public class SVTQuadtreeBuilder {
         var comp = new FilenameComparator();
         var tree = new SVTQuadtree<Path>(name, tileSize, 2);
 
-        var level0 = location.resolve("level0");
-        if (!Files.exists(level0)) {
-            level0 = location.resolve("level00");
-            if (!Files.exists(level0)) {
-                logger.error("Can't initialize SVT without 'level0' or 'level00' directory: " + location);
-                return null;
-            }
+        var levels = 0L;
+        try (Stream<Path> stream = Files.list(location)) {
+            levels = stream.filter(element -> element.getFileName().toString().matches("^(level)?0{1,2}$")).count();
+        } catch (IOException e) {
+            logger.error(e, "Error reading SVT level directories: " + location);
         }
+
+        if (levels != 1) {
+            logger.error("Can't initialize SVT without a level 0 directory: " + location);
+            return null;
+        }
+
         logger.info(I18n.msg("notif.loading", "SVT quadtree: " + location));
         try (Stream<Path> stream = Files.list(location)) {
             final AtomicInteger depth = new AtomicInteger(0);
             stream.filter(Files::isDirectory).sorted(comp).forEach(directory -> {
                 var dirName = directory.getFileName().toString();
-                if (dirName.matches("level\\d+")) {
-                    var level = Integer.parseInt(dirName.substring(5));
+                if (dirName.matches("^(level)?\\d{1,2}$")) {
+                    var beginIndex = dirName.startsWith("level") ? 5 : 0;
+                    var level = Integer.parseInt(dirName.substring(beginIndex));
                     logger.debug("visit: " + dirName + " (l" + level + ")");
                     try (Stream<Path> files = Files.list(directory)) {
                         files.sorted(comp).forEach(file -> {
