@@ -303,7 +303,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_diffuseCubemap = register(Inputs.diffuseCubemap, Setters.diffuseCubemap);
         u_normalCubemap = register(Inputs.normalCubemap, Setters.normalCubemap);
         u_specularCubemap = register(Inputs.specularCubemap, Setters.specularCubemap);
-        u_emissiveCubemap = register(Inputs.emissionCubemap, Setters.emissiveCubemap);
+        u_emissiveCubemap = register(Inputs.emissiveCubemap, Setters.emissiveCubemap);
         u_heightCubemap = register(Inputs.heightCubemap, Setters.heightCubemap);
         u_roughnessCubemap = register(Inputs.roughnessCubemap, Setters.roughnessCubemap);
         u_metallicCubemap = register(Inputs.metallicCubemap, Setters.metallicCubemap);
@@ -1000,7 +1000,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform diffuseCubemap = new Uniform("u_diffuseCubemap");
         public final static Uniform normalCubemap = new Uniform("u_normalCubemap");
         public final static Uniform specularCubemap = new Uniform("u_specularCubemap");
-        public final static Uniform emissionCubemap = new Uniform("u_emissionCubemap");
+        public final static Uniform emissiveCubemap = new Uniform("u_emissiveCubemap");
         public final static Uniform heightCubemap = new Uniform("u_heightCubemap");
         public final static Uniform metallicCubemap = new Uniform("u_metallicCubemap");
         public final static Uniform aoCubemap = new Uniform("u_aoCubemap");
