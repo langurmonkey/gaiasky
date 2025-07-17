@@ -18,6 +18,9 @@ import gaiasky.data.api.OrientationServer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
+/**
+ * Loads instances of {@link OrientationServer}.
+ */
 public class OrientationServerLoader extends AsynchronousAssetLoader<OrientationServer, OrientationServerLoader.OrientationServerParameters> {
     private static final Log logger = Logger.getLogger(OrientationServerLoader.class);
 
@@ -35,7 +38,6 @@ public class OrientationServerLoader extends AsynchronousAssetLoader<Orientation
                 logger.error("Orientation server loader class name is null or blank");
                 throw new RuntimeException("Orientation server loader class name is null or blank");
             }
-            @SuppressWarnings("unchecked")
             Class<? extends OrientationServer> c = (Class<? extends OrientationServer>) Class.forName(className);
             server = c.getDeclaredConstructor(String.class).newInstance(fileName);
         } catch (Exception e) {
