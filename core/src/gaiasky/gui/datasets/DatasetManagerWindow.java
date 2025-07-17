@@ -785,7 +785,6 @@ public class DatasetManagerWindow extends GenericDialog {
             watchers.remove(rightPaneWatcher);
             rightPaneWatcher = null;
         }
-        cell.clearActor();
         var rightTable = new Table(skin);
 
         if (dataset == null) {
@@ -994,6 +993,7 @@ public class DatasetManagerWindow extends GenericDialog {
             rightTable.add(linksGroup).top().left().padBottom(pad34 * 2f).row();
             rightTable.add(infoScroll).top().left().padBottom(pad34).row();
             rightTable.add(cancelDownloadButton).padTop(pad34).center();
+            rightTable.pack();
 
             // Scroll.
             final var maxScrollHeight = stage.getHeight() * 0.65f;
@@ -1004,9 +1004,8 @@ public class DatasetManagerWindow extends GenericDialog {
             scrollPane.setWidth(1050f);
             scrollPane.setHeight(Math.min(maxScrollHeight, rightTable.getHeight()));
 
-            cell.setActor(rightTable);
+            cell.setActor(scrollPane);
             cell.top().left();
-            cell.getTable().pack();
 
             // Create watcher.
             rightPaneWatcher = new DatasetWatcher(dataset, null, null, status, rightTable);
