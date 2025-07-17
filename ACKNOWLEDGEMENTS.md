@@ -65,4 +65,3 @@
 
 -  [Install4j (multi-platform installer builder)](https://www.ej-technologies.com/products/install4j/overview.html), for providing an open source license.
 -  [JProfiler (Java profiler)](https://www.ej-technologies.com/products/jprofiler/overview.html), for providing an open source license.
--  Bitrock's [InstallBuilder](https://installbuilder.bitrock.com/) for providing a free open source license.

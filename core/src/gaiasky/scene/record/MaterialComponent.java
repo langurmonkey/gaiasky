@@ -798,18 +798,25 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         this.specular = Settings.settings.data.dataFile(specular);
     }
 
-    public void setSpecular(Double specular) {
+    public void setSpecularValue(Double specular) {
         float r = specular.floatValue();
         this.specularColor = new float[]{r, r, r};
     }
+    public void setSpecular(Double specular) {
+        this.setSpecularValue(specular);
+    }
 
-    public void setSpecular(double[] specular) {
+    public void setSpecularValues(double[] specular) {
         if (specular.length > 1) {
             this.specularColor = new float[]{(float) specular[0], (float) specular[1], (float) specular[2]};
         } else {
             float r = (float) specular[0];
             this.specularColor = new float[]{r, r, r};
         }
+    }
+
+    public void setSpecular(double[] specular) {
+       this.setSpecularValues(specular);
     }
 
     public void setNormal(String normal) {
@@ -1001,9 +1008,13 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         this.specularCubemap.setLocation(cubemap);
     }
 
-    public void setEmissiveColormap(String cubemap) {
+    public void setEmissiveCubemap(String cubemap) {
         this.emissiveCubemap = new CubemapComponent();
         this.emissiveCubemap.setLocation(cubemap);
+    }
+
+    public void setNightCubemap(String cubemap) {
+        this.setEmissiveCubemap(cubemap);
     }
 
     public void setHeightCubemap(String cubemap) {
