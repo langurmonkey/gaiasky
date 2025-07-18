@@ -1,3 +1,27 @@
+<a name="3.6.10"></a>
+## [3.6.10](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.10) (2025-07-18)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.9-2...3.6.10)
+
+## Features
+- Localize Wikipedia API queries for object information.
+- Add file-level cache to TLE subsystem. TLE files are also cached per-group to avoid unnecessary sequential calls to fetch the same file. By default, the TTL for TLE files is 1 hour.
+- Directory structure of virtual texture tiles now accepts more formats (`levelx`, `levelxx`, `x`, `xx`).
+- Set default virtual texture cache size to 10. Add information tooltip to cache size in preferences window.
+- Add markers for towns and landmarks. Night lights go out with ambient light in PBR shader.
+- Country perimeter lines disappear when the camera gets close to the surface of the Planet.
+- Add new attributes to dataset definition format: `links` (now accepts multiple sources as links), `creator` (the creator or curator of the dataset), `credits` (specific attribute for credits instead of adding them to the description; multiple strings accepted).
+
+## Bug Fixes
+- Typo in default shader class (`u_emissionCubemap` -> `u_emissiveCubemap`) prevented emissive/night cubemaps from working.
+- Add `nightCubemap` as alias to `emissiveCubemap` in material component.
+- Add `specularValue` and `specularValues` as aliases to `specular` in material component, with floating point number parameters.
+- Properly filtre directories when building the SVT quadtree structure to avoid incorrect 'Worng directory name format' warnings.
+- Deactivating atmospheres causes night texture to apply uniformly to all planet as if it were a regular emissive texture.
+- Procedural generation window does not fit in the window with the new UI theme. Fix layout by introducing scroll panes and resizing elements.
+- Layout issue in right pane of dataset manager window prevented it from using scroll, causing the window to be too large in some cases.
+- Layout issue and tooltip text in datasets component.
+- Move `genVersionFile` task to the top of the dependency list (before `compileJava`) so that we always have the correct file available.
+- Mend wording in new data pack notification window.
 
 <a name="3.6.9-2"></a>
 ## [3.6.9-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.9-2) (2025-07-03)

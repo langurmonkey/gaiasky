@@ -22,7 +22,7 @@ public class MappingFileComboBoxBean extends FileComboBoxBean {
             String suffix = file.toRealPath().startsWith(assets.toRealPath()) ? " [" + I18n.msgOr("gui.internal", "internal") + "]" : " [" + I18n.msgOr("gui.user", "user") + "]";
             this.name += suffix;
         } catch (IOException e) {
-            Logger.getLogger(MappingFileComboBoxBean.class.getSimpleName()).error(e);
+            Logger.getLogger(MappingFileComboBoxBean.class).error(e);
         }
     }
 }

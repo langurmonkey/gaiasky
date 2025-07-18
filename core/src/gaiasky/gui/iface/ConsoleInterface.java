@@ -46,7 +46,7 @@ import java.util.Map;
  * The graphical user interface that displays and manages the console window at the bottom of the main window.
  */
 public class ConsoleInterface extends TableGuiInterface implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(ConsoleInterface.class.getSimpleName());
+    private static final Logger.Log logger = Logger.getLogger(ConsoleInterface.class);
 
     /**
      * The console manager keeps track of the console data.

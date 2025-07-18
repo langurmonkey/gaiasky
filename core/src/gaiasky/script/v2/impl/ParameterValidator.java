@@ -24,7 +24,7 @@ import static gaiasky.util.Logger.getLogger;
  * This class contains utility methods to check the validity of different parameter types.
  */
 public class ParameterValidator {
-    protected final static Logger.Log logger = getLogger(ParameterValidator.class.getSimpleName());
+    protected final static Logger.Log logger = getLogger(ParameterValidator.class);
 
     /** Reference to API object. **/
     private final APIv2 api;

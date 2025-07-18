@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class OrbitDataWriter {
-    private static final Logger.Log logger = Logger.getLogger(OrbitDataWriter.class.getSimpleName());
+    private static final Logger.Log logger = Logger.getLogger(OrbitDataWriter.class);
 
     /**
      * Dumps the current orbit data to the given file

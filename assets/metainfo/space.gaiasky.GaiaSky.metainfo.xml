@@ -39,40 +39,31 @@
 
   <releases>
 
-    <release version="3.6.9-2" date="2025-07-03" urgency="high">
-      <url>https://gaiasky.space/news/2025/gaiasky_3.6.9</url>
+    <release version="3.6.10" date="2025-07-21" urgency="high">
+      <url>https://gaiasky.space/news/2025/gaiasky_3.6.10</url>
       <description>
         <p>Features</p>
         <ul>
-          <li>Add motion trail effect.</li>
-          <li>Add Turkish translation, contributed by Erdem Uygun.</li>
-          <li>Migrate go-to-object operation in the camera info pane to use the smooth transitions API.</li>
-          <li>Add a new APIv2.</li>
-          <li>Adapt REST server and console to accept APIv2 calls.</li>
-          <li>Add new setting to enable and disable notification messages.</li>
-          <li>Left and right trigger buttons (LT, RT) to control slider values in gamepad GUI.</li>
-          <li>Update default lens flare shader.</li>
-          <li>Disable OptFlowCam export option for keyframes in Flatpak in order to avoid Python dependencies.</li>
+          <li>Localize Wikipedia API queries for object information.</li>
+          <li>Add file-level cache to TLE subsystem. TLE files are also cached per-group to avoid unnecessary sequential calls to fetch the same file. By default, the TTL for TLE files is 1 hour.</li>
+          <li>Directory structure of virtual texture tiles now accepts more formats (<code>levelx</code>, <code>levelxx</code>, <code>x</code>, <code>xx</code>). </li>
+          <li>Set default virtual texture cache size to 10. Add information tooltip to cache size in preferences window.</li>
+          <li>Add markers for towns and landmarks. Night lights go out with ambient light in PBR shader.</li>
+          <li>Country perimeter lines disappear when the camera gets close to the surface of the Planet.</li>
+          <li>Add new attributes to dataset definition format: <code>links</code> (now accepts multiple sources as links), <code>creator</code> (the creator or curator of the dataset), <code>credits</code> (specific attribute for credits instead of adding them to the description; multiple strings accepted).</li>
         </ul>
         <p>Bug fixes</p>
           <ul>
-            <li>Fix issues with upper- and lower-case conversions not using the correct locale.</li>
-            <li>Starg glow effect flickering.</li>
-            <li>Big bugfix campaign in test and showcase scripts.</li>
-            <li>Dataset highlight API call not working properly.</li>
-            <li>Use concurrent set as collections in event manager to avoid concurrent modification exceptions.</li>
-            <li>Proper motions produce index out of bounds due to incorrect computation of maximum number of arrows.</li>
-            <li>Fix locale in upper- and lower-case transformations.</li>
-            <li>Properly scale camera mouse scroll and drag operations with the current frame rate.</li>
-            <li>Disable OpenAL system.</li>
-            <li>Resolve redirects for Wikipedia titles, as the API does not resolve redirects automatically.</li>
-            <li>Make sure `versionFile` task is executed when packing the app by setting the right dependencies.</li>
-            <li>Adjust layout and width of about window to avoid UI overflow.</li>
-          </ul>
-        <p>Performance improvements</p>
-          <ul>
-            <li>Use <code>GL_RGB16F</code> instead of <code>GL_RGBA16F</code> format for internal post-processing effects.</li>
-            <li>Set a default value of 0.4 scale for the lens flare effect.</li>
+            <li>Typo in default shader class (<code>u_emissionCubemap</code> -&gt; <code>u_emissiveCubemap</code>) prevented emissive/night cubemaps from working.</li>
+            <li>Add <code>nightCubemap</code> as alias to <code>emissiveCubemap</code> in material component. </li>
+            <li>Add <code>specularValue</code> and <code>specularValues</code> as aliases to <code>specular</code> in material component, with floating point number parameters.</li>
+            <li>Properly filtre directories when building the SVT quadtree structure to avoid incorrect ‘Worng directory name format’ warnings.</li>
+            <li>Deactivating atmospheres causes night texture to apply uniformly to all planet as if it were a regular emissive texture.</li>
+            <li>Procedural generation window does not fit in the window with the new UI theme. Fix layout by introducing scroll panes and resizing elements.</li>
+            <li>Layout issue in right pane of dataset manager window prevented it from using scroll, causing the window to be too large in some cases.</li>
+            <li>Layout issue and tooltip text in datasets component.</li>
+            <li>Move <code>genVersionFile</code> task to the top of the dependency list (before <code>compileJava</code>) so that we always have the correct file available.</li>
+            <li>Mend wording in new data pack notification window.</li>
           </ul>
       </description>
       </release>

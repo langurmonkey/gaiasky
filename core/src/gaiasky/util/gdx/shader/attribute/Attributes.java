@@ -160,7 +160,7 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>, C
             if (candidate != null) {
                 attributes.removeValue(candidate, true);
             } else {
-                Logger.getLogger(Attributes.class.getSimpleName()).warn("Attribute not found: " + index);
+                Logger.getLogger(Attributes.class).warn("Attribute not found: " + index);
             }
             Bits type = Bits.empty();
             type.set(index);

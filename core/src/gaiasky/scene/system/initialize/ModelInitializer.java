@@ -46,7 +46,7 @@ import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
 public class ModelInitializer extends AbstractInitSystem {
-    private static final Logger.Log logger = Logger.getLogger(ModelInitializer.class.getSimpleName());
+    private static final Logger.Log logger = Logger.getLogger(ModelInitializer.class);
 
     /**
      * Reference to the spacecraft radio.

@@ -143,6 +143,9 @@ project(":core") {
         // Tar
         implementation group: "org.kamranzafar", name: "jtar", version: "$jtarVersion"
 
+        // JPEGXL
+        // implementation group: "com.github.umjammer", name: "vavi-image-jpegxl", version: "0.0.7"
+
         // Scripting
         implementation group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         // System information
