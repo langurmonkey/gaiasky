@@ -85,7 +85,11 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, TexturePa
         if (texture != null) {
             texture.load(info.data);
         } else {
-            texture = new Texture(info.data);
+            try {
+                texture = new Texture(info.data);
+            } catch (Exception e) {
+                return null;
+            }
         }
         if (parameter != null) {
             texture.setFilter(parameter.minFilter, parameter.magFilter);

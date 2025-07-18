@@ -274,6 +274,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Create the tab content. Just using images here for simplicity.
         tabStack = new Stack();
 
+        final IValidator widthValidator = new IntValidator(100, 10000);
+        final IValidator heightValidator = new IntValidator(100, 10000);
+
         /*
          * ==== GRAPHICS ====
          */
@@ -285,243 +288,245 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentGraphicsTable.align(Align.top | Align.left);
 
         // PRESETS
-        Label titlePresets = new OwnLabel(I18n.msg("gui.presets"), skin, "header");
-        Table presets = new Table();
+        {
+            Label titlePresets = new OwnLabel(I18n.msg("gui.presets"), skin, "header");
+            Table presets = new Table();
 
-        float buttonWidth = 200f;
-        // Low
-        OwnTextButton low = new OwnTextButton(I18n.msg("gui.presets.low"), skin);
-        low.setWidth(buttonWidth);
-        low.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                /* PRESET LOW */
+            float buttonWidth = 200f;
+            // Low
+            OwnTextButton low = new OwnTextButton(I18n.msg("gui.presets.low"), skin);
+            low.setWidth(buttonWidth);
+            low.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    /* PRESET LOW */
 
-                // Low graphics quality.
-                graphicsQuality.setSelectedIndex(GraphicsQuality.LOW.ordinal());
-                // No anti-aliasing.
-                antiAlias.setSelectedIndex(idxAa(AntialiasType.NONE));
-                FXAAQuality = 0;
-                // Legacy point style.
-                pointCloudRenderer.setSelectedIndex(PointCloudMode.POINTS.ordinal());
-                // Legacy line style.
-                lineRenderer.setSelectedIndex(LineMode.GL_LINES.ordinal());
-                // Lens flare.
-                lensFlare.setValue(0f);
-                Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
-                // No bloom.
-                bloomEffect.setValue(0f);
-                // No unsharp mask.
-                unsharpMask.setValue(0f);
-                // No chromatic aberration.
-                chromaticAberration.setValue(0f);
-                // No film grain.
-                filmGrain.setValue(0f);
-                // No elevation representation.
-                elevationSb.setSelectedIndex(ElevationType.NONE.ordinal());
-                // No shadows.
-                shadowsCb.setChecked(false);
-                // No motion blur.
-                motionBlur.setValue(0f);
-                // No HDR tone mapping.
-                toneMappingSelect.setSelectedIndex(ToneMapping.NONE.ordinal());
-            }
-        });
-        low.pad(pad10, pad20, pad10, pad20);
-        low.addListener(new OwnTextTooltip(I18n.msg("gui.presets.low.info"), skin));
-        // Medium
-        OwnTextButton medium = new OwnTextButton(I18n.msg("gui.presets.med"), skin);
-        medium.setWidth(buttonWidth);
-        medium.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                /* PRESET MEDIUM */
-
-                // Normal graphics quality.
-                graphicsQuality.setSelectedIndex(GraphicsQuality.NORMAL.ordinal());
-                // FXAA anti-aliasing.
-                antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
-                FXAAQuality = 1;
-                // Triangles as point style.
-                pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
-                // Polyline quadstrip line style.
-                lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
-                // Simple lens flare.
-                lensFlare.setValue(1f);
-                Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
-                // Vertex displacement elevation representation.
-                elevationSb.setSelectedIndex(ElevationType.REGULAR.ordinal());
-                // 5 shadows, 1024.
-                shadowsCb.setChecked(true);
-                nShadows.setSelectedIndex(4);
-                if (smResolution.getDoubleValue(0) < 1024) {
-                    smResolution.setText("1024");
+                    // Low graphics quality.
+                    graphicsQuality.setSelectedIndex(GraphicsQuality.LOW.ordinal());
+                    // No anti-aliasing.
+                    antiAlias.setSelectedIndex(idxAa(AntialiasType.NONE));
+                    FXAAQuality = 0;
+                    // Legacy point style.
+                    pointCloudRenderer.setSelectedIndex(PointCloudMode.POINTS.ordinal());
+                    // Legacy line style.
+                    lineRenderer.setSelectedIndex(LineMode.GL_LINES.ordinal());
+                    // Lens flare.
+                    lensFlare.setValue(0f);
+                    Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
+                    // No bloom.
+                    bloomEffect.setValue(0f);
+                    // No unsharp mask.
+                    unsharpMask.setValue(0f);
+                    // No chromatic aberration.
+                    chromaticAberration.setValue(0f);
+                    // No film grain.
+                    filmGrain.setValue(0f);
+                    // No elevation representation.
+                    elevationSb.setSelectedIndex(ElevationType.NONE.ordinal());
+                    // No shadows.
+                    shadowsCb.setChecked(false);
+                    // No motion blur.
+                    motionBlur.setValue(0f);
+                    // No HDR tone mapping.
+                    toneMappingSelect.setSelectedIndex(ToneMapping.NONE.ordinal());
                 }
-            }
-        });
-        medium.pad(pad10, pad20, pad10, pad20);
-        medium.addListener(new OwnTextTooltip(I18n.msg("gui.presets.med.info"), skin));
-        // High
-        OwnTextButton high = new OwnTextButton(I18n.msg("gui.presets.high"), skin);
-        high.setWidth(buttonWidth);
-        high.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                /* PRESET HIGH */
+            });
+            low.pad(pad10, pad20, pad10, pad20);
+            low.addListener(new OwnTextTooltip(I18n.msg("gui.presets.low.info"), skin));
+            // Medium
+            OwnTextButton medium = new OwnTextButton(I18n.msg("gui.presets.med"), skin);
+            medium.setWidth(buttonWidth);
+            medium.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    /* PRESET MEDIUM */
 
-                // Normal graphics quality.
-                graphicsQuality.setSelectedIndex(GraphicsQuality.HIGH.ordinal());
-                // FXAA anti-aliasing.
-                antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
-                FXAAQuality = 2;
-                // Triangles as point style.
-                pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
-                // Polyline quadstrip line style.
-                lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
-                // Complex lens flare.
-                lensFlare.setValue(1f);
-                Settings.settings.postprocess.lensFlare.type = LensFlareType.COMPLEX;
-                // Tessellation elevation representation.
-                elevationSb.setSelectedIndex(ElevationType.TESSELLATION.ordinal());
-                // 6 shadows, 2048.
-                shadowsCb.setChecked(true);
-                nShadows.setSelectedIndex(5);
-                if (smResolution.getDoubleValue(0) < 2048) {
-                    smResolution.setText("2048");
+                    // Normal graphics quality.
+                    graphicsQuality.setSelectedIndex(GraphicsQuality.NORMAL.ordinal());
+                    // FXAA anti-aliasing.
+                    antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                    FXAAQuality = 1;
+                    // Triangles as point style.
+                    pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
+                    // Polyline quadstrip line style.
+                    lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
+                    // Simple lens flare.
+                    lensFlare.setValue(1f);
+                    Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
+                    // Vertex displacement elevation representation.
+                    elevationSb.setSelectedIndex(ElevationType.REGULAR.ordinal());
+                    // 5 shadows, 1024.
+                    shadowsCb.setChecked(true);
+                    nShadows.setSelectedIndex(4);
+                    if (smResolution.getDoubleValue(0) < 1024) {
+                        smResolution.setText("1024");
+                    }
                 }
-            }
-        });
-        high.pad(pad10, pad20, pad10, pad20);
-        high.addListener(new OwnTextTooltip(I18n.msg("gui.presets.high.info"), skin));
+            });
+            medium.pad(pad10, pad20, pad10, pad20);
+            medium.addListener(new OwnTextTooltip(I18n.msg("gui.presets.med.info"), skin));
+            // High
+            OwnTextButton high = new OwnTextButton(I18n.msg("gui.presets.high"), skin);
+            high.setWidth(buttonWidth);
+            high.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    /* PRESET HIGH */
 
-        presets.add(low).left().padRight(pad34).padBottom(pad10);
-        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.low.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
-        presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
-        presets.add(medium).center().padRight(pad34).padBottom(pad10);
-        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.med.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
-        presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
-        presets.add(high).center().padRight(pad34).padBottom(pad10);
-        presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.high.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
-        presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+                    // Normal graphics quality.
+                    graphicsQuality.setSelectedIndex(GraphicsQuality.HIGH.ordinal());
+                    // FXAA anti-aliasing.
+                    antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
+                    FXAAQuality = 2;
+                    // Triangles as point style.
+                    pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
+                    // Polyline quadstrip line style.
+                    lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
+                    // Complex lens flare.
+                    lensFlare.setValue(1f);
+                    Settings.settings.postprocess.lensFlare.type = LensFlareType.COMPLEX;
+                    // Tessellation elevation representation.
+                    elevationSb.setSelectedIndex(ElevationType.TESSELLATION.ordinal());
+                    // 6 shadows, 2048.
+                    shadowsCb.setChecked(true);
+                    nShadows.setSelectedIndex(5);
+                    if (smResolution.getDoubleValue(0) < 2048) {
+                        smResolution.setText("2048");
+                    }
+                }
+            });
+            high.pad(pad10, pad20, pad10, pad20);
+            high.addListener(new OwnTextTooltip(I18n.msg("gui.presets.high.info"), skin));
 
-        // Add to content
-        addContentGroup(contentGraphicsTable, titlePresets, presets, 0f);
+            presets.add(low).left().padRight(pad34).padBottom(pad10);
+            presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.low.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
+            presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+            presets.add(medium).center().padRight(pad34).padBottom(pad10);
+            presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.med.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
+            presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+            presets.add(high).center().padRight(pad34).padBottom(pad10);
+            presets.add(new OwnLabel(TextUtils.breakCharacters(I18n.msg("gui.presets.high.info"), 80), skin)).left().padBottom(pad10).padRight(pad34);
+            presets.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+
+            // Add to content
+            addContentGroup(contentGraphicsTable, titlePresets, presets, 0f);
+        }
 
         // RESOLUTION/MODE
-        Label titleResolution = new OwnLabel(I18n.msg("gui.resolutionmode"), skin, "header");
-        Table mode = new Table();
+        {
+            Label titleResolution = new OwnLabel(I18n.msg("gui.resolutionmode"), skin, "header");
+            Table mode = new Table();
 
-        // Full screen mode resolutions
-        Array<DisplayMode> modes = new Array<>(Gdx.graphics.getDisplayModes());
-        modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
-        fullScreenResolutions = new OwnSelectBox<>(skin);
-        fullScreenResolutions.setWidth(selectWidth);
-        fullScreenResolutions.setItems(modes);
+            // Full screen mode resolutions
+            Array<DisplayMode> modes = new Array<>(Gdx.graphics.getDisplayModes());
+            modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
+            fullScreenResolutions = new OwnSelectBox<>(skin);
+            fullScreenResolutions.setWidth(selectWidth);
+            fullScreenResolutions.setItems(modes);
 
-        DisplayMode selectedMode = null;
-        for (DisplayMode dm : modes) {
-            if (dm.width == settings.graphics.fullScreen.resolution[0] && dm.height == settings.graphics.fullScreen.resolution[1]
-                    && dm.bitsPerPixel == settings.graphics.fullScreen.bitDepth && dm.refreshRate == settings.graphics.fullScreen.refreshRate) {
-                selectedMode = dm;
-                break;
+            DisplayMode selectedMode = null;
+            for (DisplayMode dm : modes) {
+                if (dm.width == settings.graphics.fullScreen.resolution[0] && dm.height == settings.graphics.fullScreen.resolution[1]
+                        && dm.bitsPerPixel == settings.graphics.fullScreen.bitDepth && dm.refreshRate == settings.graphics.fullScreen.refreshRate) {
+                    selectedMode = dm;
+                    break;
+                }
             }
+            if (selectedMode != null) {
+                fullScreenResolutions.setSelected(selectedMode);
+            }
+
+            // Get current resolution
+            Table windowedResolutions = new Table(skin);
+            widthField = new OwnTextField("", skin, widthValidator);
+            widthField.setWidth(inputSmallWidth);
+            heightField = new OwnTextField("", skin, heightValidator);
+            heightField.setWidth(inputSmallWidth);
+            final OwnLabel xLabel = new OwnLabel("x", skin);
+            populateWidthHeight(false);
+
+            windowedResolutions.add(widthField).left().padRight(pad10);
+            windowedResolutions.add(xLabel).left().padRight(pad10);
+            windowedResolutions.add(heightField).left().row();
+
+            // Radio buttons
+            fullScreen = new OwnCheckBox(I18n.msg("gui.fullscreen"), skin, "radio", pad10);
+            fullScreen.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    selectFullscreen(fullScreen.isChecked(), widthField, heightField, fullScreenResolutions, xLabel);
+                    return true;
+                }
+                return false;
+            });
+            fullScreen.setChecked(settings.graphics.fullScreen.active);
+
+            windowed = new OwnCheckBox(I18n.msg("gui.windowed"), skin, "radio", pad10);
+            windowed.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    selectFullscreen(!windowed.isChecked(), widthField, heightField, fullScreenResolutions, xLabel);
+                    return true;
+                }
+                return false;
+            });
+            windowed.setChecked(!settings.graphics.fullScreen.active);
+            selectFullscreen(settings.graphics.fullScreen.active, widthField, heightField, fullScreenResolutions, xLabel);
+
+            new ButtonGroup<>(fullScreen, windowed);
+
+            // VSYNC
+            OwnLabel vsyncLabel = new OwnLabel(I18n.msg("gui.vsync"), skin);
+            OwnCheckBox vSync = new OwnCheckBox("", skin);
+            vSync.setName("V-sync");
+            vSync.setChecked(settings.graphics.vsync);
+            vsyncValue = new AtomicBoolean(settings.graphics.vsync);
+            vSync.addListener(e -> {
+                if (e instanceof ChangeEvent ce) {
+                    vsyncValue.set(((OwnCheckBox) ce.getTarget()).isChecked());
+                    return true;
+                }
+                return false;
+            });
+
+            // LIMIT FPS
+            IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
+            double limitFps = settings.graphics.fpsLimit <= 0 ? 60 : settings.graphics.fpsLimit;
+            this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsDouble.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)),
+                                                skin,
+                                                limitFpsValidator);
+            this.maxFpsInput.setDisabled(settings.graphics.fpsLimit <= 0);
+
+            OwnLabel maxFpsLabel = new OwnLabel(I18n.msg("gui.limitfps"), skin);
+            maxFps = new OwnCheckBox("", skin);
+            maxFps.setChecked(settings.graphics.fpsLimit > 0);
+            maxFps.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    enableComponents(maxFps.isChecked(), this.maxFpsInput);
+                    return true;
+                }
+                return false;
+            });
+            HorizontalGroup maxFpsGroup = new HorizontalGroup();
+            maxFpsGroup.space(pad18);
+            maxFpsGroup.addActor(maxFps);
+            maxFpsGroup.addActor(this.maxFpsInput);
+
+            labels.addAll(vsyncLabel, maxFpsLabel);
+
+            mode.add(fullScreen).left().padRight(pad18);
+            mode.add(fullScreenResolutions).left().row();
+            mode.add(windowed).left().padRight(pad18).padTop(pad18).padBottom(pad18);
+            mode.add(windowedResolutions).left().padTop(pad18).padBottom(pad18).row();
+            mode.add(vsyncLabel).left().padRight(pad34).padBottom(pad10);
+            mode.add(vSync).left().padBottom(pad10).row();
+            mode.add(maxFpsLabel).left().padRight(pad34).padBottom(pad10);
+            mode.add(maxFpsGroup).left().padBottom(pad10).row();
+
+            // Add to content
+            addContentGroup(contentGraphicsTable, titleResolution, mode);
         }
-        if (selectedMode != null) {
-            fullScreenResolutions.setSelected(selectedMode);
-        }
-
-        // Get current resolution
-        Table windowedResolutions = new Table(skin);
-        IValidator widthValidator = new IntValidator(100, 10000);
-        widthField = new OwnTextField("", skin, widthValidator);
-        widthField.setWidth(inputSmallWidth);
-        IValidator heightValidator = new IntValidator(100, 10000);
-        heightField = new OwnTextField("", skin, heightValidator);
-        heightField.setWidth(inputSmallWidth);
-        final OwnLabel xLabel = new OwnLabel("x", skin);
-        populateWidthHeight(false);
-
-        windowedResolutions.add(widthField).left().padRight(pad10);
-        windowedResolutions.add(xLabel).left().padRight(pad10);
-        windowedResolutions.add(heightField).left().row();
-
-        // Radio buttons
-        fullScreen = new OwnCheckBox(I18n.msg("gui.fullscreen"), skin, "radio", pad10);
-        fullScreen.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                selectFullscreen(fullScreen.isChecked(), widthField, heightField, fullScreenResolutions, xLabel);
-                return true;
-            }
-            return false;
-        });
-        fullScreen.setChecked(settings.graphics.fullScreen.active);
-
-        windowed = new OwnCheckBox(I18n.msg("gui.windowed"), skin, "radio", pad10);
-        windowed.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                selectFullscreen(!windowed.isChecked(), widthField, heightField, fullScreenResolutions, xLabel);
-                return true;
-            }
-            return false;
-        });
-        windowed.setChecked(!settings.graphics.fullScreen.active);
-        selectFullscreen(settings.graphics.fullScreen.active, widthField, heightField, fullScreenResolutions, xLabel);
-
-        new ButtonGroup<>(fullScreen, windowed);
-
-        // VSYNC
-        OwnLabel vsyncLabel = new OwnLabel(I18n.msg("gui.vsync"), skin);
-        OwnCheckBox vSync = new OwnCheckBox("", skin);
-        vSync.setName("V-sync");
-        vSync.setChecked(settings.graphics.vsync);
-        vsyncValue = new AtomicBoolean(settings.graphics.vsync);
-        vSync.addListener(e -> {
-            if (e instanceof ChangeEvent ce) {
-                vsyncValue.set(((OwnCheckBox) ce.getTarget()).isChecked());
-                return true;
-            }
-            return false;
-        });
-
-        // LIMIT FPS
-        IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
-        double limitFps = settings.graphics.fpsLimit <= 0 ? 60 : settings.graphics.fpsLimit;
-        this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsDouble.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)),
-                                            skin,
-                                            limitFpsValidator);
-        this.maxFpsInput.setDisabled(settings.graphics.fpsLimit <= 0);
-
-        OwnLabel maxFpsLabel = new OwnLabel(I18n.msg("gui.limitfps"), skin);
-        maxFps = new OwnCheckBox("", skin);
-        maxFps.setChecked(settings.graphics.fpsLimit > 0);
-        maxFps.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                enableComponents(maxFps.isChecked(), this.maxFpsInput);
-                return true;
-            }
-            return false;
-        });
-        HorizontalGroup maxFpsGroup = new HorizontalGroup();
-        maxFpsGroup.space(pad18);
-        maxFpsGroup.addActor(maxFps);
-        maxFpsGroup.addActor(this.maxFpsInput);
-
-        labels.addAll(vsyncLabel, maxFpsLabel);
-
-        mode.add(fullScreen).left().padRight(pad18);
-        mode.add(fullScreenResolutions).left().row();
-        mode.add(windowed).left().padRight(pad18).padTop(pad18).padBottom(pad18);
-        mode.add(windowedResolutions).left().padTop(pad18).padBottom(pad18).row();
-        mode.add(vsyncLabel).left().padRight(pad34).padBottom(pad10);
-        mode.add(vSync).left().padBottom(pad10).row();
-        mode.add(maxFpsLabel).left().padRight(pad34).padBottom(pad10);
-        mode.add(maxFpsGroup).left().padBottom(pad10).row();
-
-        // Add to content
-        addContentGroup(contentGraphicsTable, titleResolution, mode);
 
         // EXTERNAL VIEW SETTINGS
         if (GaiaSky.instance.isExternalView()) {
@@ -567,635 +572,666 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // GRAPHICS SETTINGS
-        var titleGraphics = new OwnLabel(I18n.msg("gui.graphicssettings"), skin, "header");
-        var graphics = new Table();
+        {
+            var titleGraphics = new OwnLabel(I18n.msg("gui.graphicssettings"), skin, "header");
+            var graphics = new Table();
 
-        var graphicsQualityLabel = new OwnLabel(I18n.msg("gui.gquality"), skin);
-        graphicsQualityLabel.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
+            var graphicsQualityLabel = new OwnLabel(I18n.msg("gui.gquality"), skin);
+            graphicsQualityLabel.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
 
-        ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
-        int i = 0;
-        for (GraphicsQuality q : GraphicsQuality.values()) {
-            gqs[i] = new ComboBoxBean(I18n.msg(q.key), q.ordinal());
-            i++;
-        }
-        graphicsQuality = new OwnSelectBox<>(skin);
-        graphicsQuality.setItems(gqs);
-        graphicsQuality.setWidth(selectWidth);
-        graphicsQuality.setSelected(gqs[settings.graphics.quality.ordinal()]);
-        graphicsQuality.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                ComboBoxBean s = graphicsQuality.getSelected();
-                GraphicsQuality gq = GraphicsQuality.values()[s.value];
-                if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent(Constants.HI_RES_TEXTURES_DATASET_KEY)) && (gq.isHigh()
-                        || gq.isUltra())) {
-                    // Show notice
-                    // Hi resolution textures notice
-                    if (noticeHiResCell != null && noticeHiResCell.getActor() == null) {
-                        String infoString = I18n.msg("gui.gquality.hires.info") + "\n";
-                        int lines1 = GlobalResources.countOccurrences(infoString, '\n');
-                        OwnTextArea noticeHiRes = new OwnTextArea(infoString, skin, "info");
-                        noticeHiRes.setDisabled(true);
-                        noticeHiRes.setPrefRows(lines1 + 1);
-                        noticeHiRes.setWidth(1200f);
-                        noticeHiRes.clearListeners();
-                        noticeHiResCell.setActor(noticeHiRes);
+            ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
+            int i = 0;
+            for (GraphicsQuality q : GraphicsQuality.values()) {
+                gqs[i] = new ComboBoxBean(I18n.msg(q.key), q.ordinal());
+                i++;
+            }
+            graphicsQuality = new OwnSelectBox<>(skin);
+            graphicsQuality.setItems(gqs);
+            graphicsQuality.setWidth(selectWidth);
+            graphicsQuality.setSelected(gqs[settings.graphics.quality.ordinal()]);
+            graphicsQuality.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    ComboBoxBean s = graphicsQuality.getSelected();
+                    GraphicsQuality gq = GraphicsQuality.values()[s.value];
+                    if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent(Constants.HI_RES_TEXTURES_DATASET_KEY)) && (gq.isHigh()
+                            || gq.isUltra())) {
+                        // Show notice
+                        // Hi resolution textures notice
+                        if (noticeHiResCell != null && noticeHiResCell.getActor() == null) {
+                            String infoString = I18n.msg("gui.gquality.hires.info") + "\n";
+                            int lines1 = GlobalResources.countOccurrences(infoString, '\n');
+                            OwnTextArea noticeHiRes = new OwnTextArea(infoString, skin, "info");
+                            noticeHiRes.setDisabled(true);
+                            noticeHiRes.setPrefRows(lines1 + 1);
+                            noticeHiRes.setWidth(1200f);
+                            noticeHiRes.clearListeners();
+                            noticeHiResCell.setActor(noticeHiRes);
+                        }
+                    } else {
+                        // Hide notice
+                        if (noticeHiResCell != null) {
+                            noticeHiResCell.setActor(null);
+                        }
+
                     }
-                } else {
-                    // Hide notice
-                    if (noticeHiResCell != null) {
-                        noticeHiResCell.setActor(null);
-                    }
-
                 }
-            }
-            return false;
-        });
+                return false;
+            });
 
-        OwnImageButton gQualityTooltip = new OwnImageButton(skin, "tooltip");
-        gQualityTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
+            OwnImageButton gQualityTooltip = new OwnImageButton(skin, "tooltip");
+            gQualityTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
 
-        // AA
-        OwnLabel aaLabel = new OwnLabel(I18n.msg("gui.aa"), skin);
-        aaLabel.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
+            // AA
+            OwnLabel aaLabel = new OwnLabel(I18n.msg("gui.aa"), skin);
+            aaLabel.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
-        ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.aa.no"), 0), new ComboBoxBean(I18n.msg("gui.aa.fxaa"), -1),
-                new ComboBoxBean(I18n.msg("gui.aa.nfaa"), -2)};
-        antiAlias = new OwnSelectBox<>(skin);
-        antiAlias.setItems(aas);
-        antiAlias.setWidth(selectWidth);
-        antiAlias.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
-        FXAAQuality = settings.postprocess.antialiasing.quality;
+            ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.aa.no"), 0), new ComboBoxBean(I18n.msg("gui.aa.fxaa"), -1),
+                    new ComboBoxBean(I18n.msg("gui.aa.nfaa"), -2)};
+            antiAlias = new OwnSelectBox<>(skin);
+            antiAlias.setItems(aas);
+            antiAlias.setWidth(selectWidth);
+            antiAlias.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
+            FXAAQuality = settings.postprocess.antialiasing.quality;
 
-        OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
-        aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
+            OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
+            aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
-        // Only if not VR, the triangles break in VR
-        // POINT CLOUD
-        ComboBoxBean[] pointCloudItems = new ComboBoxBean[]{
-                new ComboBoxBean(I18n.msg("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()),
-                new ComboBoxBean(I18n.msg("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal())};
-        pointCloudRenderer = new OwnSelectBox<>(skin);
-        pointCloudRenderer.setItems(pointCloudItems);
-        pointCloudRenderer.setWidth(selectWidth);
-        pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
+            // Only if not VR, the triangles break in VR
+            // POINT CLOUD
+            ComboBoxBean[] pointCloudItems = new ComboBoxBean[]{
+                    new ComboBoxBean(I18n.msg("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()),
+                    new ComboBoxBean(I18n.msg("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal())};
+            pointCloudRenderer = new OwnSelectBox<>(skin);
+            pointCloudRenderer.setItems(pointCloudItems);
+            pointCloudRenderer.setWidth(selectWidth);
+            pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
 
-        // LINE RENDERER
-        OwnLabel lrLabel = new OwnLabel(I18n.msg("gui.linerenderer"), skin);
-        ComboBoxBean[] lineRenderers = new ComboBoxBean[]{
-                new ComboBoxBean(I18n.msg("gui.linerenderer.quads"), LineMode.POLYLINE_QUADSTRIP.ordinal()),
-                new ComboBoxBean(I18n.msg("gui.linerenderer.lines"), LineMode.GL_LINES.ordinal())};
-        lineRenderer = new OwnSelectBox<>(skin);
-        lineRenderer.setItems(lineRenderers);
-        lineRenderer.setWidth(selectWidth);
-        lineRenderer.setSelected(lineRenderers[settings.scene.renderer.line.mode.ordinal()]);
-        // Disable in safe mode
-        lrLabel.setDisabled(safeMode);
-        lineRenderer.setDisabled(safeMode);
+            // LINE RENDERER
+            OwnLabel lrLabel = new OwnLabel(I18n.msg("gui.linerenderer"), skin);
+            ComboBoxBean[] lineRenderers = new ComboBoxBean[]{
+                    new ComboBoxBean(I18n.msg("gui.linerenderer.quads"), LineMode.POLYLINE_QUADSTRIP.ordinal()),
+                    new ComboBoxBean(I18n.msg("gui.linerenderer.lines"), LineMode.GL_LINES.ordinal())};
+            lineRenderer = new OwnSelectBox<>(skin);
+            lineRenderer.setItems(lineRenderers);
+            lineRenderer.setWidth(selectWidth);
+            lineRenderer.setSelected(lineRenderers[settings.scene.renderer.line.mode.ordinal()]);
+            // Disable in safe mode
+            lrLabel.setDisabled(safeMode);
+            lineRenderer.setDisabled(safeMode);
 
-        // BLOOM
-        OwnLabel bloomLabel = new OwnLabel(I18n.msg("gui.bloom"), skin, "default");
-        bloomEffect = new OwnSliderPlus("", Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
-        bloomEffect.setName("bloom effect");
-        bloomEffect.setWidth(sliderWidth);
-        bloomEffect.setValue(settings.postprocess.bloom.intensity);
-        bloomEffect.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.BLOOM_CMD, bloomEffect, bloomEffect.getValue());
-                return true;
-            }
-            return false;
-        });
+            // BLOOM
+            OwnLabel bloomLabel = new OwnLabel(I18n.msg("gui.bloom"), skin, "default");
+            bloomEffect = new OwnSliderPlus("", Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
+            bloomEffect.setName("bloom effect");
+            bloomEffect.setWidth(sliderWidth);
+            bloomEffect.setValue(settings.postprocess.bloom.intensity);
+            bloomEffect.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.BLOOM_CMD, bloomEffect, bloomEffect.getValue());
+                    return true;
+                }
+                return false;
+            });
 
-        // UNSHARP MASK
-        OwnLabel unsharpMaskLabel = new OwnLabel(I18n.msg("gui.unsharpmask"), skin, "default");
-        unsharpMask = new OwnSliderPlus("", Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
-        unsharpMask.setName("unsharp mask factor");
-        unsharpMask.setWidth(sliderWidth);
-        unsharpMask.setValue(settings.postprocess.unsharpMask.factor);
-        unsharpMask.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.UNSHARP_MASK_CMD, unsharpMask, unsharpMask.getValue());
-                return true;
-            }
-            return false;
-        });
+            // UNSHARP MASK
+            OwnLabel unsharpMaskLabel = new OwnLabel(I18n.msg("gui.unsharpmask"), skin, "default");
+            unsharpMask = new OwnSliderPlus("",
+                                            Constants.MIN_UNSHARP_MASK_FACTOR,
+                                            Constants.MAX_UNSHARP_MASK_FACTOR,
+                                            Constants.SLIDER_STEP_TINY,
+                                            skin);
+            unsharpMask.setName("unsharp mask factor");
+            unsharpMask.setWidth(sliderWidth);
+            unsharpMask.setValue(settings.postprocess.unsharpMask.factor);
+            unsharpMask.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.UNSHARP_MASK_CMD, unsharpMask, unsharpMask.getValue());
+                    return true;
+                }
+                return false;
+            });
 
-        // CHROMATIC ABERRATION
-        OwnLabel chromaticAberrationLabel = new OwnLabel(I18n.msg("gui.chromaticaberration"), skin, "default");
-        chromaticAberration = new OwnSliderPlus("", Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT,
-                                                Constants.SLIDER_STEP_TINY * 0.1f, skin);
-        chromaticAberration.setName("chromatic aberration amount");
-        chromaticAberration.setWidth(sliderWidth);
-        chromaticAberration.setValue(settings.postprocess.chromaticAberration.amount);
-        chromaticAberration.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, chromaticAberration, chromaticAberration.getValue());
-                return true;
-            }
-            return false;
-        });
+            // CHROMATIC ABERRATION
+            OwnLabel chromaticAberrationLabel = new OwnLabel(I18n.msg("gui.chromaticaberration"), skin, "default");
+            chromaticAberration = new OwnSliderPlus("", Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT,
+                                                    Constants.SLIDER_STEP_TINY * 0.1f, skin);
+            chromaticAberration.setName("chromatic aberration amount");
+            chromaticAberration.setWidth(sliderWidth);
+            chromaticAberration.setValue(settings.postprocess.chromaticAberration.amount);
+            chromaticAberration.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, chromaticAberration, chromaticAberration.getValue());
+                    return true;
+                }
+                return false;
+            });
 
-        // FILM GRAIN
-        OwnLabel filmGrainLabel = new OwnLabel(I18n.msg("gui.filmgrain"), skin, "default");
-        filmGrain = new OwnSliderPlus("", Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY,
-                                      Constants.SLIDER_STEP_TINY * 0.1f, skin);
-        filmGrain.setName("film grain intensity");
-        filmGrain.setWidth(sliderWidth);
-        filmGrain.setValue(settings.postprocess.filmGrain.intensity);
-        filmGrain.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.FILM_GRAIN_CMD, filmGrain, filmGrain.getValue());
-                return true;
-            }
-            return false;
-        });
+            // FILM GRAIN
+            OwnLabel filmGrainLabel = new OwnLabel(I18n.msg("gui.filmgrain"), skin, "default");
+            filmGrain = new OwnSliderPlus("", Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY,
+                                          Constants.SLIDER_STEP_TINY * 0.1f, skin);
+            filmGrain.setName("film grain intensity");
+            filmGrain.setWidth(sliderWidth);
+            filmGrain.setValue(settings.postprocess.filmGrain.intensity);
+            filmGrain.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.FILM_GRAIN_CMD, filmGrain, filmGrain.getValue());
+                    return true;
+                }
+                return false;
+            });
 
-        // LABELS
-        labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel, chromaticAberrationLabel, filmGrainLabel);
+            // LABELS
+            labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel, chromaticAberrationLabel, filmGrainLabel);
 
-        // LENS FLARE
-        OwnLabel lensFlareLabel = new OwnLabel(I18n.msg("gui.lensflare"), skin);
-        lensFlare = new OwnSliderPlus("", Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, Constants.SLIDER_STEP_TINY, skin);
-        lensFlare.setName("lens flare strength");
-        lensFlare.setWidth(sliderWidth);
-        lensFlare.setValue(settings.postprocess.lensFlare.strength);
-        lensFlare.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.getValue());
-                return true;
-            }
-            return false;
-        });
+            // LENS FLARE
+            OwnLabel lensFlareLabel = new OwnLabel(I18n.msg("gui.lensflare"), skin);
+            lensFlare = new OwnSliderPlus("", Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, Constants.SLIDER_STEP_TINY, skin);
+            lensFlare.setName("lens flare strength");
+            lensFlare.setWidth(sliderWidth);
+            lensFlare.setValue(settings.postprocess.lensFlare.strength);
+            lensFlare.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.getValue());
+                    return true;
+                }
+                return false;
+            });
 
-        // FADE TIME
-        OwnLabel fadeTimeLabel = new OwnLabel(I18n.msg("gui.fadetime"), skin, "default");
-        IValidator fadeTimeValidator = new LongValidator(Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
-        fadeTimeField = new OwnTextField(Long.toString(settings.scene.fadeMs), skin, fadeTimeValidator);
-        fadeTimeField.setWidth(inputWidth);
-        OwnImageButton fadeTimeTooltip = new OwnImageButton(skin, "tooltip");
-        fadeTimeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.fadetime.info"), skin));
+            // FADE TIME
+            OwnLabel fadeTimeLabel = new OwnLabel(I18n.msg("gui.fadetime"), skin, "default");
+            IValidator fadeTimeValidator = new LongValidator(Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
+            fadeTimeField = new OwnTextField(Long.toString(settings.scene.fadeMs), skin, fadeTimeValidator);
+            fadeTimeField.setWidth(inputWidth);
+            OwnImageButton fadeTimeTooltip = new OwnImageButton(skin, "tooltip");
+            fadeTimeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.fadetime.info"), skin));
 
-        graphics.add(graphicsQualityLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(graphicsQuality).left().padRight(pad18).padBottom(pad10);
-        graphics.add(gQualityTooltip).left().padBottom(pad10).padRight(pad10);
-        graphics.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
-        noticeHiResCell = graphics.add();
-        noticeHiResCell.colspan(4).left().row();
-        graphics.add(aaLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(antiAlias).left().padRight(pad18).padBottom(pad10);
-        graphics.add(aaTooltip).colspan(2).left().padBottom(pad10).row();
-        OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
-        OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
-        pointCloudTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.pointcloud.info"), skin));
-        graphics.add(pointCloudLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(pointCloudRenderer).left().padBottom(pad10);
-        graphics.add(pointCloudTooltip).left().padRight(pad10).padBottom(pad10);
-        graphics.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
-        OwnImageButton lineTooltip = new OwnImageButton(skin, "tooltip");
-        lineTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.linerenderer.info"), skin));
-        graphics.add(lrLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(lineRenderer).left().padBottom(pad10);
-        graphics.add(lineTooltip).colspan(2).left().padRight(pad10).padBottom(pad10).row();
-        graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(lensFlare).colspan(3).left().padBottom(pad10).row();
-        graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(bloomEffect).colspan(3).left().padBottom(pad10).row();
-        graphics.add(unsharpMaskLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(unsharpMask).colspan(3).left().padBottom(pad10).row();
-        graphics.add(chromaticAberrationLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(chromaticAberration).colspan(3).left().padBottom(pad10).row();
-        graphics.add(filmGrainLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(filmGrain).colspan(3).left().padBottom(pad10).row();
-        graphics.add(fadeTimeLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(fadeTimeField).left().padRight(pad18).padBottom(pad10);
-        graphics.add(fadeTimeTooltip).colspan(2).left().padRight(pad34).padBottom(pad10).row();
+            graphics.add(graphicsQualityLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(graphicsQuality).left().padRight(pad18).padBottom(pad10);
+            graphics.add(gQualityTooltip).left().padBottom(pad10).padRight(pad10);
+            graphics.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+            noticeHiResCell = graphics.add();
+            noticeHiResCell.colspan(4).left().row();
+            graphics.add(aaLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(antiAlias).left().padRight(pad18).padBottom(pad10);
+            graphics.add(aaTooltip).colspan(2).left().padBottom(pad10).row();
+            OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
+            OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
+            pointCloudTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.pointcloud.info"), skin));
+            graphics.add(pointCloudLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(pointCloudRenderer).left().padBottom(pad10);
+            graphics.add(pointCloudTooltip).left().padRight(pad10).padBottom(pad10);
+            graphics.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+            OwnImageButton lineTooltip = new OwnImageButton(skin, "tooltip");
+            lineTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.linerenderer.info"), skin));
+            graphics.add(lrLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(lineRenderer).left().padBottom(pad10);
+            graphics.add(lineTooltip).colspan(2).left().padRight(pad10).padBottom(pad10).row();
+            graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(lensFlare).colspan(3).left().padBottom(pad10).row();
+            graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(bloomEffect).colspan(3).left().padBottom(pad10).row();
+            graphics.add(unsharpMaskLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(unsharpMask).colspan(3).left().padBottom(pad10).row();
+            graphics.add(chromaticAberrationLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(chromaticAberration).colspan(3).left().padBottom(pad10).row();
+            graphics.add(filmGrainLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(filmGrain).colspan(3).left().padBottom(pad10).row();
+            graphics.add(fadeTimeLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(fadeTimeField).left().padRight(pad18).padBottom(pad10);
+            graphics.add(fadeTimeTooltip).colspan(2).left().padRight(pad34).padBottom(pad10).row();
 
-        // Add to content
-        addContentGroup(contentGraphicsTable, titleGraphics, graphics);
+            // Add to content
+            addContentGroup(contentGraphicsTable, titleGraphics, graphics);
+        }
 
         // ELEVATION
-        Label titleElevation = new OwnLabel(I18n.msg("gui.elevation.title"), skin, "header");
-        Table elevation = new Table();
+        {
+            Label titleElevation = new OwnLabel(I18n.msg("gui.elevation.title"), skin, "header");
+            Table elevation = new Table();
 
-        // ELEVATION TYPE
-        OwnLabel elevationTypeLabel = new OwnLabel(I18n.msg("gui.elevation.type"), skin);
-        ElevationComboBoxBean[] ecbb = new ElevationComboBoxBean[ElevationType.values().length];
-        i = 0;
-        for (ElevationType et : ElevationType.values()) {
-            ecbb[i] = new ElevationComboBoxBean(I18n.msg("gui.elevation.type." + et.toString().toLowerCase(Locale.ROOT)), et);
-            i++;
-        }
-        elevationSb = new OwnSelectBox<>(skin);
-        elevationSb.setItems(ecbb);
-        elevationSb.setWidth(selectWidth);
-        elevationSb.setSelectedIndex(Settings.settings.scene.renderer.elevation.type.ordinal());
-        elevationSb.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                enableComponents(elevationSb.getSelected().type.isTessellation(), tessQuality, tessQualityLabel);
+            // ELEVATION TYPE
+            OwnLabel elevationTypeLabel = new OwnLabel(I18n.msg("gui.elevation.type"), skin);
+            ElevationComboBoxBean[] ecbb = new ElevationComboBoxBean[ElevationType.values().length];
+            int i = 0;
+            for (ElevationType et : ElevationType.values()) {
+                ecbb[i] = new ElevationComboBoxBean(I18n.msg("gui.elevation.type." + et.toString().toLowerCase(Locale.ROOT)), et);
+                i++;
             }
-            return false;
-        });
-        // Disable in safe mode.
-        elevationTypeLabel.setDisabled(safeMode);
-        elevationSb.setDisabled(safeMode);
+            elevationSb = new OwnSelectBox<>(skin);
+            elevationSb.setItems(ecbb);
+            elevationSb.setWidth(selectWidth);
+            elevationSb.setSelectedIndex(Settings.settings.scene.renderer.elevation.type.ordinal());
+            elevationSb.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    enableComponents(elevationSb.getSelected().type.isTessellation(), tessQuality, tessQualityLabel);
+                }
+                return false;
+            });
+            // Disable in safe mode.
+            elevationTypeLabel.setDisabled(safeMode);
+            elevationSb.setDisabled(safeMode);
 
-        // TESSELLATION QUALITY
-        tessQualityLabel = new OwnLabel(I18n.msg("gui.elevation.tessellation.quality"), skin);
-        tessQualityLabel.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
+            // TESSELLATION QUALITY
+            tessQualityLabel = new OwnLabel(I18n.msg("gui.elevation.tessellation.quality"), skin);
+            tessQualityLabel.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
 
-        tessQuality = new OwnSliderPlus("", Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, skin);
-        tessQuality.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
-        tessQuality.setWidth(sliderWidth);
-        tessQuality.setValue((float) settings.scene.renderer.elevation.quality);
+            tessQuality = new OwnSliderPlus("", Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, skin);
+            tessQuality.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
+            tessQuality.setWidth(sliderWidth);
+            tessQuality.setValue((float) settings.scene.renderer.elevation.quality);
 
-        // LABELS
-        labels.add(elevationTypeLabel, tessQualityLabel);
+            // LABELS
+            labels.add(elevationTypeLabel, tessQualityLabel);
 
-        elevation.add(elevationTypeLabel).left().padRight(pad34).padBottom(pad10);
-        elevation.add(elevationSb).left().padRight(pad18).padBottom(pad10);
-        elevation.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
-        elevation.add(tessQualityLabel).left().padRight(pad34).padBottom(pad10);
-        elevation.add(tessQuality).left().padRight(pad18).padBottom(pad10);
+            elevation.add(elevationTypeLabel).left().padRight(pad34).padBottom(pad10);
+            elevation.add(elevationSb).left().padRight(pad18).padBottom(pad10);
+            elevation.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+            elevation.add(tessQualityLabel).left().padRight(pad34).padBottom(pad10);
+            elevation.add(tessQuality).left().padRight(pad18).padBottom(pad10);
 
-        // Add to content
-        addContentGroup(contentGraphicsTable, titleElevation, elevation);
+            // Add to content
+            addContentGroup(contentGraphicsTable, titleElevation, elevation);
+        }
 
         // SHADOWS
-        Label titleShadows = new OwnLabel(I18n.msg("gui.graphics.shadows"), skin, "header");
-        Table shadows = new Table();
+        {
+            Label titleShadows = new OwnLabel(I18n.msg("gui.graphics.shadows"), skin, "header");
+            Table shadows = new Table();
 
-        // SHADOW MAP RESOLUTION
-        OwnLabel smResolutionLabel = new OwnLabel(I18n.msg("gui.graphics.shadows.resolution"), skin);
-        smResolutionLabel.setDisabled(!settings.scene.renderer.shadow.active);
-        IntValidator smResValidator = new IntValidator(128, GaiaSky.instance.maxTextureSize);
-        smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(settings.scene.renderer.shadow.resolution,
-                                                                         128,
-                                                                         GaiaSky.instance.maxTextureSize)), skin, smResValidator);
-        smResolution.setWidth(inputWidth);
-        smResolution.setDisabled(!settings.scene.renderer.shadow.active);
+            // SHADOW MAP RESOLUTION
+            OwnLabel smResolutionLabel = new OwnLabel(I18n.msg("gui.graphics.shadows.resolution"), skin);
+            smResolutionLabel.setDisabled(!settings.scene.renderer.shadow.active);
+            IntValidator smResValidator = new IntValidator(128, GaiaSky.instance.maxTextureSize);
+            smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(settings.scene.renderer.shadow.resolution,
+                                                                             128,
+                                                                             GaiaSky.instance.maxTextureSize)), skin, smResValidator);
+            smResolution.setWidth(inputWidth);
+            smResolution.setDisabled(!settings.scene.renderer.shadow.active);
 
-        // N SHADOWS
-        OwnLabel nShadowsLabel = new OwnLabel("#" + I18n.msg("gui.graphics.shadows"), skin);
-        nShadowsLabel.setDisabled(!settings.scene.renderer.shadow.active);
+            // N SHADOWS
+            OwnLabel nShadowsLabel = new OwnLabel("#" + I18n.msg("gui.graphics.shadows"), skin);
+            nShadowsLabel.setDisabled(!settings.scene.renderer.shadow.active);
 
-        int nSh = 10;
-        ComboBoxBean[] nsh = new ComboBoxBean[nSh];
-        IntStream.rangeClosed(1, nSh).forEach(s -> nsh[s - 1] = new ComboBoxBean(String.valueOf(s), s));
+            int nSh = 10;
+            ComboBoxBean[] nsh = new ComboBoxBean[nSh];
+            IntStream.rangeClosed(1, nSh).forEach(s -> nsh[s - 1] = new ComboBoxBean(String.valueOf(s), s));
 
-        nShadows = new OwnSelectBox<>(skin);
-        nShadows.setItems(nsh);
-        nShadows.setWidth(selectWidth);
-        nShadows.setSelected(nsh[settings.scene.renderer.shadow.number - 1]);
-        nShadows.setDisabled(!settings.scene.renderer.shadow.active);
+            nShadows = new OwnSelectBox<>(skin);
+            nShadows.setItems(nsh);
+            nShadows.setWidth(selectWidth);
+            nShadows.setSelected(nsh[settings.scene.renderer.shadow.number - 1]);
+            nShadows.setDisabled(!settings.scene.renderer.shadow.active);
 
-        // ENABLE SHADOWS
-        OwnLabel shadowsLabel = new OwnLabel(I18n.msg("gui.graphics.shadows.enable"), skin);
-        shadowsCb = new OwnCheckBox("", skin);
-        shadowsCb.setChecked(settings.scene.renderer.shadow.active);
-        shadowsCb.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                // Enable or disable resolution
-                enableComponents(shadowsCb.isChecked(), smResolution, smResolutionLabel, nShadows, nShadowsLabel);
-                return true;
-            }
-            return false;
-        });
+            // ENABLE SHADOWS
+            OwnLabel shadowsLabel = new OwnLabel(I18n.msg("gui.graphics.shadows.enable"), skin);
+            shadowsCb = new OwnCheckBox("", skin);
+            shadowsCb.setChecked(settings.scene.renderer.shadow.active);
+            shadowsCb.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    // Enable or disable resolution
+                    enableComponents(shadowsCb.isChecked(), smResolution, smResolutionLabel, nShadows, nShadowsLabel);
+                    return true;
+                }
+                return false;
+            });
 
-        // LABELS
-        labels.add(smResolutionLabel);
+            // LABELS
+            labels.add(smResolutionLabel);
 
-        shadows.add(shadowsLabel).left().padRight(pad34).padBottom(pad10);
-        shadows.add(shadowsCb).left().padRight(pad18).padBottom(pad10).row();
-        shadows.add(smResolutionLabel).left().padRight(pad34).padBottom(pad10);
-        shadows.add(smResolution).left().padRight(pad18).padBottom(pad10).row();
-        shadows.add(nShadowsLabel).left().padRight(pad34).padBottom(pad10);
-        shadows.add(nShadows).left().padRight(pad18).padBottom(pad10);
+            shadows.add(shadowsLabel).left().padRight(pad34).padBottom(pad10);
+            shadows.add(shadowsCb).left().padRight(pad18).padBottom(pad10).row();
+            shadows.add(smResolutionLabel).left().padRight(pad34).padBottom(pad10);
+            shadows.add(smResolution).left().padRight(pad18).padBottom(pad10).row();
+            shadows.add(nShadowsLabel).left().padRight(pad34).padBottom(pad10);
+            shadows.add(nShadows).left().padRight(pad18).padBottom(pad10);
 
-        // Add to content
-        addContentGroup(contentGraphicsTable, titleShadows, shadows);
-
-        // IMAGE LEVELS
-        Label titleDisplay = new OwnLabel(I18n.msg("gui.graphics.imglevels"), skin, "header");
-        Table imageLevels = new Table();
-
-
-        /* Brightness */
-        OwnLabel brightnessLabel = new OwnLabel(I18n.msg("gui.brightness"), skin, "default");
-        Slider brightness = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
-        brightness.setName("brightness");
-        brightness.setWidth(sliderWidth);
-        brightness.setValue(MathUtilsDouble.lint(settings.postprocess.levels.brightness,
-                                                 Constants.MIN_BRIGHTNESS,
-                                                 Constants.MAX_BRIGHTNESS,
-                                                 Constants.MIN_SLIDER,
-                                                 Constants.MAX_SLIDER));
-        brightness.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.BRIGHTNESS_CMD, brightness,
-                                     MathUtilsDouble.lint(brightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_BRIGHTNESS,
-                                                          Constants.MAX_BRIGHTNESS), true);
-                return true;
-            }
-            return false;
-        });
-
-        imageLevels.add(brightnessLabel).left().padRight(pad34).padBottom(pad10);
-        imageLevels.add(brightness).left().padRight(pad18).padBottom(pad10).row();
-
-        /* Contrast */
-        OwnLabel contrastLabel = new OwnLabel(I18n.msg("gui.contrast"), skin, "default");
-        Slider contrast = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
-        contrast.setName("contrast");
-        contrast.setWidth(sliderWidth);
-        contrast.setValue(
-                MathUtilsDouble.lint(settings.postprocess.levels.contrast,
-                                     Constants.MIN_CONTRAST,
-                                     Constants.MAX_CONTRAST,
-                                     Constants.MIN_SLIDER,
-                                     Constants.MAX_SLIDER));
-        contrast.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.CONTRAST_CMD, contrast,
-                                     MathUtilsDouble.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST,
-                                                          Constants.MAX_CONTRAST), true);
-                return true;
-            }
-            return false;
-        });
-
-        imageLevels.add(contrastLabel).left().padRight(pad34).padBottom(pad10);
-        imageLevels.add(contrast).left().padRight(pad18).padBottom(pad10).row();
-
-        /* Hue */
-        OwnLabel hueLabel = new OwnLabel(I18n.msg("gui.hue"), skin, "default");
-        Slider hue = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
-        hue.setName("hue");
-        hue.setWidth(sliderWidth);
-        hue.setValue(MathUtilsDouble.lint(settings.postprocess.levels.hue,
-                                          Constants.MIN_HUE,
-                                          Constants.MAX_HUE,
-                                          Constants.MIN_SLIDER,
-                                          Constants.MAX_SLIDER));
-        hue.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.HUE_CMD, hue,
-                                     MathUtilsDouble.lint(hue.getValue(),
-                                                          Constants.MIN_SLIDER,
-                                                          Constants.MAX_SLIDER,
-                                                          Constants.MIN_HUE,
-                                                          Constants.MAX_HUE), true);
-                return true;
-            }
-            return false;
-        });
-
-        imageLevels.add(hueLabel).left().padRight(pad34).padBottom(pad10);
-        imageLevels.add(hue).left().padRight(pad18).padBottom(pad10).row();
-
-        /* Saturation */
-        OwnLabel saturationLabel = new OwnLabel(I18n.msg("gui.saturation"), skin, "default");
-        Slider saturation = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
-        saturation.setName("saturation");
-        saturation.setWidth(sliderWidth);
-        saturation.setValue(MathUtilsDouble.lint(settings.postprocess.levels.saturation,
-                                                 Constants.MIN_SATURATION,
-                                                 Constants.MAX_SATURATION,
-                                                 Constants.MIN_SLIDER,
-                                                 Constants.MAX_SLIDER));
-        saturation.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SATURATION_CMD, saturation,
-                                     MathUtilsDouble.lint(saturation.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SATURATION,
-                                                          Constants.MAX_SATURATION), true);
-                return true;
-            }
-            return false;
-        });
-
-        imageLevels.add(saturationLabel).left().padRight(pad34).padBottom(pad10);
-        imageLevels.add(saturation).left().padRight(pad18).padBottom(pad10).row();
-
-        /* Gamma */
-        OwnLabel gammaLabel = new OwnLabel(I18n.msg("gui.gamma"), skin, "default");
-        Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, Constants.SLIDER_STEP_TINY, false, skin);
-        gamma.setName("gamma");
-        gamma.setWidth(sliderWidth);
-        gamma.setValue(settings.postprocess.levels.gamma);
-        gamma.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.GAMMA_CMD, gamma, gamma.getValue(), true);
-                return true;
-            }
-            return false;
-        });
-
-        imageLevels.add(gammaLabel).left().padRight(pad34).padBottom(pad10);
-        imageLevels.add(gamma).left().padRight(pad18).padBottom(pad10).row();
-
-        /* Tone Mapping */
-        OwnLabel toneMappingLabel = new OwnLabel(I18n.msg("gui.tonemapping.type"), skin, "default");
-        int nToneMapping = ToneMapping.values().length;
-        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[nToneMapping];
-        for (int itm = 0; itm < nToneMapping; itm++) {
-            ToneMapping tm = ToneMapping.values()[itm];
-            toneMappingTypes[itm] = new ComboBoxBean(I18n.msg("gui.tonemapping." + tm.name().toLowerCase(Locale.ROOT)), tm.ordinal());
+            // Add to content
+            addContentGroup(contentGraphicsTable, titleShadows, shadows);
         }
 
-        toneMappingSelect = new OwnSelectBox<>(skin);
-        toneMappingSelect.setItems(toneMappingTypes);
-        toneMappingSelect.setWidth(selectWidth);
-        toneMappingSelect.setSelectedIndex(settings.postprocess.toneMapping.type.ordinal());
-        imageLevels.add(toneMappingLabel).left().padRight(pad34).padBottom(pad10);
-        imageLevels.add(toneMappingSelect).left().padBottom(pad10).row();
+        // IMAGE LEVELS
+        {
+            Label titleDisplay = new OwnLabel(I18n.msg("gui.graphics.imglevels"), skin, "header");
+            Table imageLevels = new Table();
 
-        /* Exposure */
-        OwnLabel exposureLabel = new OwnLabel(I18n.msg("gui.exposure"), skin, "default");
-        exposureLabel.setDisabled(settings.postprocess.toneMapping.type != ToneMapping.EXPOSURE);
-        Slider exposure = new OwnSliderPlus("", Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
-        exposure.setName("exposure");
-        exposure.setWidth(sliderWidth);
-        exposure.setValue(settings.postprocess.toneMapping.exposure);
-        exposure.setDisabled(settings.postprocess.toneMapping.type != ToneMapping.EXPOSURE);
-        exposure.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.EXPOSURE_CMD, exposure, exposure.getValue());
-                return true;
+
+            /* Brightness */
+            OwnLabel brightnessLabel = new OwnLabel(I18n.msg("gui.brightness"), skin, "default");
+            Slider brightness = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            brightness.setName("brightness");
+            brightness.setWidth(sliderWidth);
+            brightness.setValue(MathUtilsDouble.lint(settings.postprocess.levels.brightness,
+                                                     Constants.MIN_BRIGHTNESS,
+                                                     Constants.MAX_BRIGHTNESS,
+                                                     Constants.MIN_SLIDER,
+                                                     Constants.MAX_SLIDER));
+            brightness.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.BRIGHTNESS_CMD, brightness,
+                                         MathUtilsDouble.lint(brightness.getValue(),
+                                                              Constants.MIN_SLIDER,
+                                                              Constants.MAX_SLIDER,
+                                                              Constants.MIN_BRIGHTNESS,
+                                                              Constants.MAX_BRIGHTNESS), true);
+                    return true;
+                }
+                return false;
+            });
+
+            imageLevels.add(brightnessLabel).left().padRight(pad34).padBottom(pad10);
+            imageLevels.add(brightness).left().padRight(pad18).padBottom(pad10).row();
+
+            /* Contrast */
+            OwnLabel contrastLabel = new OwnLabel(I18n.msg("gui.contrast"), skin, "default");
+            Slider contrast = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            contrast.setName("contrast");
+            contrast.setWidth(sliderWidth);
+            contrast.setValue(
+                    MathUtilsDouble.lint(settings.postprocess.levels.contrast,
+                                         Constants.MIN_CONTRAST,
+                                         Constants.MAX_CONTRAST,
+                                         Constants.MIN_SLIDER,
+                                         Constants.MAX_SLIDER));
+            contrast.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.CONTRAST_CMD, contrast,
+                                         MathUtilsDouble.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST,
+                                                              Constants.MAX_CONTRAST), true);
+                    return true;
+                }
+                return false;
+            });
+
+            imageLevels.add(contrastLabel).left().padRight(pad34).padBottom(pad10);
+            imageLevels.add(contrast).left().padRight(pad18).padBottom(pad10).row();
+
+            /* Hue */
+            OwnLabel hueLabel = new OwnLabel(I18n.msg("gui.hue"), skin, "default");
+            Slider hue = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            hue.setName("hue");
+            hue.setWidth(sliderWidth);
+            hue.setValue(MathUtilsDouble.lint(settings.postprocess.levels.hue,
+                                              Constants.MIN_HUE,
+                                              Constants.MAX_HUE,
+                                              Constants.MIN_SLIDER,
+                                              Constants.MAX_SLIDER));
+            hue.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.HUE_CMD, hue,
+                                         MathUtilsDouble.lint(hue.getValue(),
+                                                              Constants.MIN_SLIDER,
+                                                              Constants.MAX_SLIDER,
+                                                              Constants.MIN_HUE,
+                                                              Constants.MAX_HUE), true);
+                    return true;
+                }
+                return false;
+            });
+
+            imageLevels.add(hueLabel).left().padRight(pad34).padBottom(pad10);
+            imageLevels.add(hue).left().padRight(pad18).padBottom(pad10).row();
+
+            /* Saturation */
+            OwnLabel saturationLabel = new OwnLabel(I18n.msg("gui.saturation"), skin, "default");
+            Slider saturation = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            saturation.setName("saturation");
+            saturation.setWidth(sliderWidth);
+            saturation.setValue(MathUtilsDouble.lint(settings.postprocess.levels.saturation,
+                                                     Constants.MIN_SATURATION,
+                                                     Constants.MAX_SATURATION,
+                                                     Constants.MIN_SLIDER,
+                                                     Constants.MAX_SLIDER));
+            saturation.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SATURATION_CMD, saturation,
+                                         MathUtilsDouble.lint(saturation.getValue(),
+                                                              Constants.MIN_SLIDER,
+                                                              Constants.MAX_SLIDER,
+                                                              Constants.MIN_SATURATION,
+                                                              Constants.MAX_SATURATION), true);
+                    return true;
+                }
+                return false;
+            });
+
+            imageLevels.add(saturationLabel).left().padRight(pad34).padBottom(pad10);
+            imageLevels.add(saturation).left().padRight(pad18).padBottom(pad10).row();
+
+            /* Gamma */
+            OwnLabel gammaLabel = new OwnLabel(I18n.msg("gui.gamma"), skin, "default");
+            Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, Constants.SLIDER_STEP_TINY, false, skin);
+            gamma.setName("gamma");
+            gamma.setWidth(sliderWidth);
+            gamma.setValue(settings.postprocess.levels.gamma);
+            gamma.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.GAMMA_CMD, gamma, gamma.getValue(), true);
+                    return true;
+                }
+                return false;
+            });
+
+            imageLevels.add(gammaLabel).left().padRight(pad34).padBottom(pad10);
+            imageLevels.add(gamma).left().padRight(pad18).padBottom(pad10).row();
+
+            /* Tone Mapping */
+            OwnLabel toneMappingLabel = new OwnLabel(I18n.msg("gui.tonemapping.type"), skin, "default");
+            int nToneMapping = ToneMapping.values().length;
+            ComboBoxBean[] toneMappingTypes = new ComboBoxBean[nToneMapping];
+            for (int itm = 0; itm < nToneMapping; itm++) {
+                ToneMapping tm = ToneMapping.values()[itm];
+                toneMappingTypes[itm] = new ComboBoxBean(I18n.msg("gui.tonemapping." + tm.name().toLowerCase(Locale.ROOT)), tm.ordinal());
             }
-            return false;
-        });
-        toneMappingSelect.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                ToneMapping newTM = ToneMapping.values()[toneMappingSelect.getSelectedIndex()];
-                EventManager.publish(Event.TONEMAPPING_TYPE_CMD, toneMappingSelect, newTM);
-                boolean disabled = newTM != ToneMapping.EXPOSURE;
-                exposureLabel.setDisabled(disabled);
-                exposure.setDisabled(disabled);
-                return true;
-            }
-            return false;
-        });
 
-        imageLevels.add(exposureLabel).left().padRight(pad34).padBottom(pad10);
-        imageLevels.add(exposure).left().padRight(pad18).padBottom(pad10).row();
+            toneMappingSelect = new OwnSelectBox<>(skin);
+            toneMappingSelect.setItems(toneMappingTypes);
+            toneMappingSelect.setWidth(selectWidth);
+            toneMappingSelect.setSelectedIndex(settings.postprocess.toneMapping.type.ordinal());
+            imageLevels.add(toneMappingLabel).left().padRight(pad34).padBottom(pad10);
+            imageLevels.add(toneMappingSelect).left().padBottom(pad10).row();
 
-        // LABELS
-        labels.addAll(brightnessLabel, contrastLabel, hueLabel, saturationLabel, gammaLabel);
+            /* Exposure */
+            OwnLabel exposureLabel = new OwnLabel(I18n.msg("gui.exposure"), skin, "default");
+            exposureLabel.setDisabled(settings.postprocess.toneMapping.type != ToneMapping.EXPOSURE);
+            Slider exposure = new OwnSliderPlus("", Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
+            exposure.setName("exposure");
+            exposure.setWidth(sliderWidth);
+            exposure.setValue(settings.postprocess.toneMapping.exposure);
+            exposure.setDisabled(settings.postprocess.toneMapping.type != ToneMapping.EXPOSURE);
+            exposure.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.EXPOSURE_CMD, exposure, exposure.getValue());
+                    return true;
+                }
+                return false;
+            });
+            toneMappingSelect.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    ToneMapping newTM = ToneMapping.values()[toneMappingSelect.getSelectedIndex()];
+                    EventManager.publish(Event.TONEMAPPING_TYPE_CMD, toneMappingSelect, newTM);
+                    boolean disabled = newTM != ToneMapping.EXPOSURE;
+                    exposureLabel.setDisabled(disabled);
+                    exposure.setDisabled(disabled);
+                    return true;
+                }
+                return false;
+            });
 
-        // Add to content
-        addContentGroup(contentGraphicsTable, titleDisplay, imageLevels);
+            imageLevels.add(exposureLabel).left().padRight(pad34).padBottom(pad10);
+            imageLevels.add(exposure).left().padRight(pad18).padBottom(pad10).row();
+
+            // LABELS
+            labels.addAll(brightnessLabel, contrastLabel, hueLabel, saturationLabel, gammaLabel);
+
+            // Add to content
+            addContentGroup(contentGraphicsTable, titleDisplay, imageLevels);
+        }
 
         if (!vr) {
             // VIRTUAL TEXTURES
-            Label titleSVT = new OwnLabel(I18n.msg("gui.svt"), skin, "header");
-            Table svtTable = new Table();
+            {
+                Label titleSVT = new OwnLabel(I18n.msg("gui.svt"), skin, "header");
+                Table svtTable = new Table();
 
-            /* Cache size */
-            OwnLabel svtCacheSizeLabel = new OwnLabel(I18n.msg("gui.svt.cachesize"), skin, "default");
-            svtCacheSize = new OwnSliderPlus("", Constants.MIN_TILE_CACHE, Constants.MAX_TILE_CACHE, 1, skin);
-            svtCacheSize.setValueLabelTransform((val) -> Integer.toString((int) (val * val)));
-            svtCacheSize.setName("cacheSize");
-            svtCacheSize.setWidth(sliderWidth);
-            svtCacheSize.setValue(settings.scene.renderer.virtualTextures.cacheSize);
+                /* Cache size */
+                OwnLabel svtCacheSizeLabel = new OwnLabel(I18n.msg("gui.svt.cachesize"), skin, "default");
+                svtCacheSize = new OwnSliderPlus("", Constants.MIN_TILE_CACHE, Constants.MAX_TILE_CACHE, 1, skin);
+                svtCacheSize.setValueLabelTransform((val) -> {
+                    var valInt = val.intValue();
+                    var value = Integer.toString(valInt * valInt);
+                    return value.toString() + " (" + valInt + "x" + valInt + ")";
+                });
+                svtCacheSize.setName("cacheSize");
+                svtCacheSize.setWidth(sliderWidth);
+                svtCacheSize.setValue(settings.scene.renderer.virtualTextures.cacheSize);
 
-            svtTable.add(svtCacheSizeLabel).left().padRight(pad34).padBottom(pad10);
-            svtTable.add(svtCacheSize).left().padRight(pad18).padBottom(pad10);
-            svtTable.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+                OwnImageButton cacheSizeTooltip = new OwnImageButton(skin, "tooltip");
+                cacheSizeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.svt.cachesize.info"), skin));
 
-            labels.addAll(svtCacheSizeLabel);
+                svtTable.add(svtCacheSizeLabel).left().padRight(pad34).padBottom(pad10);
+                svtTable.add(svtCacheSize).left().padRight(pad18).padBottom(pad10);
+                svtTable.add(cacheSizeTooltip).left().padRight(pad18).padBottom(pad10);
+                svtTable.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
 
-            // Add to content
-            addContentGroup(contentGraphicsTable, titleSVT, svtTable);
+                labels.addAll(svtCacheSizeLabel);
+
+                // Add to content
+                addContentGroup(contentGraphicsTable, titleSVT, svtTable);
+            }
 
             // EXPERIMENTAL
-            Label titleExperimental = new OwnLabel(I18n.msg("gui.experimental"), skin, "header");
-            Table experimental = new Table();
+            {
+                Label titleExperimental = new OwnLabel(I18n.msg("gui.experimental"), skin, "header");
+                Table experimental = new Table();
 
-            // Re-projection
-            OwnLabel reprojectionLabel = new OwnLabel(I18n.msg("gui.reproj"), skin);
-            ReprojectionMode[] reprojectionModes = ReprojectionMode.values();
-            reprojectionMode = new OwnSelectBox<>(skin);
-            reprojectionMode.setItems(reprojectionModes);
-            reprojectionMode.setWidth(selectWidth);
-            if (!settings.postprocess.reprojection.active) {
-                reprojectionMode.setSelected(reprojectionModes[ReprojectionMode.DISABLED.ordinal()]);
-            } else {
-                reprojectionMode.setSelected(reprojectionModes[settings.postprocess.reprojection.mode.ordinal()]);
+                // Re-projection
+                OwnLabel reprojectionLabel = new OwnLabel(I18n.msg("gui.reproj"), skin);
+                ReprojectionMode[] reprojectionModes = ReprojectionMode.values();
+                reprojectionMode = new OwnSelectBox<>(skin);
+                reprojectionMode.setItems(reprojectionModes);
+                reprojectionMode.setWidth(selectWidth);
+                if (!settings.postprocess.reprojection.active) {
+                    reprojectionMode.setSelected(reprojectionModes[ReprojectionMode.DISABLED.ordinal()]);
+                } else {
+                    reprojectionMode.setSelected(reprojectionModes[settings.postprocess.reprojection.mode.ordinal()]);
+                }
+                reprojectionMode.addListener((event) -> {
+                    if (event instanceof ChangeEvent) {
+                        var newMode = reprojectionMode.getSelected();
+                        EventManager.publish(Event.REPROJECTION_CMD, this, newMode != ReprojectionMode.DISABLED, newMode);
+                        return true;
+                    }
+                    return false;
+                });
+
+                experimental.add(reprojectionLabel).left().padRight(pad34).padBottom(pad10);
+                experimental.add(reprojectionMode).left().padRight(pad18).padBottom(pad10).row();
+
+                // Dynamic resolution
+                OwnLabel dynamicResolutionLabel = new OwnLabel(I18n.msg("gui.dynamicresolution"), skin);
+                dynamicResolution = new OwnCheckBox("", skin);
+                dynamicResolution.setChecked(settings.graphics.dynamicResolution);
+                OwnImageButton dynamicResolutionTooltip = new OwnImageButton(skin, "tooltip");
+                dynamicResolutionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.dynamicresolution.info"), skin));
+
+                experimental.add(dynamicResolutionLabel).left().padRight(pad34).padBottom(pad10);
+                experimental.add(dynamicResolution).left().padRight(pad18).padBottom(pad10);
+                experimental.add(dynamicResolutionTooltip).left().padBottom(pad10).row();
+
+                // Back-buffer scale
+                OwnLabel backBufferScaleLabel = new OwnLabel(I18n.msg("gui.backbuffer.scale"), skin);
+                backBufferScaleLabel.setDisabled(settings.graphics.dynamicResolution);
+                backBufferScale = new OwnSliderPlus("",
+                                                    Constants.BACKBUFFER_SCALE_MIN,
+                                                    Constants.BACKBUFFER_SCALE_MAX,
+                                                    Constants.BACKBUFFER_SCALE_STEP,
+                                                    skin);
+                backBufferScale.setWidth(sliderWidth);
+                backBufferScale.setMappedValue(settings.graphics.backBufferScale);
+                backBufferScale.setDisabled(settings.graphics.dynamicResolution);
+                OwnImageButton backBufferTooltip = new OwnImageButton(skin, "tooltip");
+                backBufferTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.backbuffer.scale.info"), skin));
+                dynamicResolution.addListener((event) -> {
+                    if (event instanceof ChangeEvent) {
+                        backBufferScale.setDisabled(dynamicResolution.isChecked());
+                        backBufferScaleLabel.setDisabled(dynamicResolution.isChecked());
+                        return true;
+                    }
+                    return false;
+                });
+
+                experimental.add(backBufferScaleLabel).left().padRight(pad34).padBottom(pad10);
+                experimental.add(backBufferScale).left().padRight(pad18).padBottom(pad10);
+                experimental.add(backBufferTooltip).left().padBottom(pad10).row();
+
+                // Upscale filter
+                OwnLabel upscaleFilterLabel = new OwnLabel(I18n.msg("gui.upscale.filter"), skin);
+                UpscaleFilter[] upscaleFilterValues = UpscaleFilter.values();
+                upscaleFilter = new OwnSelectBox<>(skin);
+                upscaleFilter.setItems(upscaleFilterValues);
+                upscaleFilter.setWidth(selectWidth);
+                upscaleFilter.setSelected(upscaleFilterValues[settings.postprocess.upscaleFilter.ordinal()]);
+                upscaleFilter.addListener(new OwnTextTooltip(I18n.msg("gui.upscale.filter.info"), skin));
+                upscaleFilter.addListener((event) -> {
+                    if (event instanceof ChangeEvent) {
+                        var newMode = upscaleFilter.getSelected();
+                        EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilter.getSelected());
+                        return true;
+                    }
+                    return false;
+                });
+
+                experimental.add(upscaleFilterLabel).left().padRight(pad34).padBottom(pad10);
+                experimental.add(upscaleFilter).left().padRight(pad18).padBottom(pad10).row();
+
+                // Index of refraction of celestial sphere
+                OwnLabel celestialSphereIndexOfRefractionLabel = new OwnLabel(I18n.msg("gui.indexofrefraction"), skin);
+                celestialSphereIndexOfRefraction = new OwnSliderPlus("", 1.f, 2.5f, 0.05f, skin);
+                celestialSphereIndexOfRefraction.setWidth(sliderWidth);
+                celestialSphereIndexOfRefraction.setMappedValue(settings.program.modeCubemap.celestialSphereIndexOfRefraction);
+                OwnImageButton celestialSphereIndexOfRefractionTooltip = new OwnImageButton(skin, "tooltip");
+                celestialSphereIndexOfRefractionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.indexofrefraction.info"), skin));
+
+                experimental.add(celestialSphereIndexOfRefractionLabel).left().padRight(pad34).padBottom(pad10);
+                experimental.add(celestialSphereIndexOfRefraction).left().padRight(pad18).padBottom(pad10);
+                experimental.add(celestialSphereIndexOfRefractionTooltip).left().padBottom(pad10).row();
+
+                // SSR
+                OwnLabel ssrLabel = new OwnLabel(I18n.msg("gui.ssr"), skin);
+                ssr = new OwnCheckBox("", skin);
+                ssr.setChecked(!safeMode && settings.postprocess.ssr.active);
+                ssr.setDisabled(safeMode);
+                OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
+                ssrTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.ssr.info"), skin));
+
+                experimental.add(ssrLabel).left().padRight(pad34).padBottom(pad10);
+                experimental.add(ssr).left().padRight(pad18).padBottom(pad10);
+                experimental.add(ssrTooltip).left().padBottom(pad10).row();
+
+                // MOTION BLUR
+                OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
+                motionBlur = new OwnSliderPlus("", Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY, skin);
+                motionBlur.setWidth(sliderWidth);
+                motionBlur.setMappedValue(settings.postprocess.motionBlur.strength);
+                motionBlur.addListener(event -> {
+                    if (event instanceof ChangeEvent ce) {
+                        EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.getMappedValue());
+                    }
+                    return false;
+                });
+
+                experimental.add(motionBlurLabel).left().padRight(pad34).padBottom(pad10);
+                experimental.add(motionBlur).left().padRight(pad18).padBottom(pad10);
+
+
+                // LABELS
+                labels.addAll(dynamicResolutionLabel);
+                labels.addAll(ssrLabel);
+
+                // Add to content
+                addContentGroup(contentGraphicsTable, titleExperimental, experimental);
             }
-            reprojectionMode.addListener((event) -> {
-                if (event instanceof ChangeEvent) {
-                    var newMode = reprojectionMode.getSelected();
-                    EventManager.publish(Event.REPROJECTION_CMD, this, newMode != ReprojectionMode.DISABLED, newMode);
-                    return true;
-                }
-                return false;
-            });
-
-            experimental.add(reprojectionLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(reprojectionMode).left().padRight(pad18).padBottom(pad10).row();
-
-            // Dynamic resolution
-            OwnLabel dynamicResolutionLabel = new OwnLabel(I18n.msg("gui.dynamicresolution"), skin);
-            dynamicResolution = new OwnCheckBox("", skin);
-            dynamicResolution.setChecked(settings.graphics.dynamicResolution);
-            OwnImageButton dynamicResolutionTooltip = new OwnImageButton(skin, "tooltip");
-            dynamicResolutionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.dynamicresolution.info"), skin));
-
-            experimental.add(dynamicResolutionLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(dynamicResolution).left().padRight(pad18).padBottom(pad10);
-            experimental.add(dynamicResolutionTooltip).left().padBottom(pad10).row();
-
-            // Back-buffer scale
-            OwnLabel backBufferScaleLabel = new OwnLabel(I18n.msg("gui.backbuffer.scale"), skin);
-            backBufferScaleLabel.setDisabled(settings.graphics.dynamicResolution);
-            backBufferScale = new OwnSliderPlus("",
-                                                Constants.BACKBUFFER_SCALE_MIN,
-                                                Constants.BACKBUFFER_SCALE_MAX,
-                                                Constants.BACKBUFFER_SCALE_STEP,
-                                                skin);
-            backBufferScale.setWidth(sliderWidth);
-            backBufferScale.setMappedValue(settings.graphics.backBufferScale);
-            backBufferScale.setDisabled(settings.graphics.dynamicResolution);
-            OwnImageButton backBufferTooltip = new OwnImageButton(skin, "tooltip");
-            backBufferTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.backbuffer.scale.info"), skin));
-            dynamicResolution.addListener((event) -> {
-                if (event instanceof ChangeEvent) {
-                    backBufferScale.setDisabled(dynamicResolution.isChecked());
-                    backBufferScaleLabel.setDisabled(dynamicResolution.isChecked());
-                    return true;
-                }
-                return false;
-            });
-
-            experimental.add(backBufferScaleLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(backBufferScale).left().padRight(pad18).padBottom(pad10);
-            experimental.add(backBufferTooltip).left().padBottom(pad10).row();
-
-            // Upscale filter
-            OwnLabel upscaleFilterLabel = new OwnLabel(I18n.msg("gui.upscale.filter"), skin);
-            UpscaleFilter[] upscaleFilterValues = UpscaleFilter.values();
-            upscaleFilter = new OwnSelectBox<>(skin);
-            upscaleFilter.setItems(upscaleFilterValues);
-            upscaleFilter.setWidth(selectWidth);
-            upscaleFilter.setSelected(upscaleFilterValues[settings.postprocess.upscaleFilter.ordinal()]);
-            upscaleFilter.addListener(new OwnTextTooltip(I18n.msg("gui.upscale.filter.info"), skin));
-            upscaleFilter.addListener((event) -> {
-                if (event instanceof ChangeEvent) {
-                    var newMode = upscaleFilter.getSelected();
-                    EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilter.getSelected());
-                    return true;
-                }
-                return false;
-            });
-
-            experimental.add(upscaleFilterLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(upscaleFilter).left().padRight(pad18).padBottom(pad10).row();
-
-            // Index of refraction of celestial sphere
-            OwnLabel celestialSphereIndexOfRefractionLabel = new OwnLabel(I18n.msg("gui.indexofrefraction"), skin);
-            celestialSphereIndexOfRefraction = new OwnSliderPlus("", 1.f, 2.5f, 0.05f, skin);
-            celestialSphereIndexOfRefraction.setWidth(sliderWidth);
-            celestialSphereIndexOfRefraction.setMappedValue(settings.program.modeCubemap.celestialSphereIndexOfRefraction);
-            OwnImageButton celestialSphereIndexOfRefractionTooltip = new OwnImageButton(skin, "tooltip");
-            celestialSphereIndexOfRefractionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.indexofrefraction.info"), skin));
-
-            experimental.add(celestialSphereIndexOfRefractionLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(celestialSphereIndexOfRefraction).left().padRight(pad18).padBottom(pad10);
-            experimental.add(celestialSphereIndexOfRefractionTooltip).left().padBottom(pad10).row();
-
-            // SSR
-            OwnLabel ssrLabel = new OwnLabel(I18n.msg("gui.ssr"), skin);
-            ssr = new OwnCheckBox("", skin);
-            ssr.setChecked(!safeMode && settings.postprocess.ssr.active);
-            ssr.setDisabled(safeMode);
-            OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
-            ssrTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.ssr.info"), skin));
-
-            experimental.add(ssrLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(ssr).left().padRight(pad18).padBottom(pad10);
-            experimental.add(ssrTooltip).left().padBottom(pad10).row();
-
-            // MOTION BLUR
-            OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
-            motionBlur = new OwnSliderPlus("", Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY, skin);
-            motionBlur.setWidth(sliderWidth);
-            motionBlur.setMappedValue(settings.postprocess.motionBlur.strength);
-            motionBlur.addListener(event -> {
-                if (event instanceof ChangeEvent ce) {
-                    EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.getMappedValue());
-                }
-                return false;
-            });
-
-            experimental.add(motionBlurLabel).left().padRight(pad34).padBottom(pad10);
-            experimental.add(motionBlur).left().padRight(pad18).padBottom(pad10);
-
-            // LABELS
-            labels.addAll(dynamicResolutionLabel);
-            labels.addAll(ssrLabel);
-
-            // Add to content
-            addContentGroup(contentGraphicsTable, titleExperimental, experimental);
         }
 
         /*
@@ -1208,187 +1244,193 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentScene.setFadeScrollBars(false);
         contentSceneTable.align(Align.top | Align.left);
 
+        // STARS
+        {
+            OwnLabel titleStars = new OwnLabel(I18n.msg("gui.ui.scene.stars"), skin, "header");
+            Table starsTable = new Table();
+
+            // Texture index
+            OwnLabel textureIndexLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.texture"), skin);
+            var indexList = settings.scene.star.getStarTextureIndices();
+            var indices = new Array<ComboBoxBean>(indexList.size);
+            ComboBoxBean selected = null;
+            for (int y = 0; y < indexList.size; y++) {
+                var idx = indexList.get(y);
+                var cbb = new ComboBoxBean(Integer.toString(idx), idx);
+                indices.add(cbb);
+                if (idx == settings.scene.star.textureIndex) {
+                    selected = cbb;
+                }
+            }
+            // Do not show texture index if we did not find any texture (i.e. the base data package is not downloaded yet).
+            if (!indexList.isEmpty()) {
+                textureIndex = new OwnSelectBox<>(skin);
+                textureIndex.setItems(indices);
+                if (selected != null)
+                    textureIndex.setSelected(selected);
+            }
+
+            // Render stars as spheres
+            OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.spheres"), skin);
+            starSpheres = new OwnCheckBox("", skin);
+            starSpheres.setChecked(settings.scene.star.renderStarSpheres);
+
+
+            // Star glow over objects
+            OwnLabel glowOverObjectsLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
+            CheckBox glowOverObjects = new OwnCheckBox("", skin);
+            glowOverObjects.setName("light scattering");
+            glowOverObjects.setChecked(settings.postprocess.lightGlow.active);
+            glowOverObjects.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.LIGHT_GLOW_CMD, glowOverObjects, glowOverObjects.isChecked());
+                    return true;
+                }
+                return false;
+            });
+
+            // Motion trails
+            OwnLabel motionTrailsLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.trails"), skin);
+            motionTrails = new OwnCheckBox("", skin);
+            motionTrails.setChecked(settings.scene.particleGroups.motionTrails);
+
+            // Star distance to compute camera speed scaling
+            OwnLabel starDistanceScalingLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.distance.scaling"), skin);
+            starDistanceScaling = new OwnCheckBox("", skin);
+            starDistanceScaling.setChecked(settings.scene.camera.starDistanceScaling);
+
+            // Add labels
+            labels.add(textureIndexLabel, starSpheresLabel, starDistanceScalingLabel, glowOverObjectsLabel);
+
+            // Add to table
+            starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
+            starsTable.add(glowOverObjects).left().padRight(pad18).padBottom(pad10).row();
+            starsTable.add(motionTrailsLabel).left().padRight(pad34).padBottom(pad10);
+            starsTable.add(motionTrails).left().padRight(pad18).padBottom(pad10).row();
+            if (textureIndex != null) {
+                starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
+                starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
+            }
+            starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
+            starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
+            starsTable.add(starDistanceScalingLabel).left().padRight(pad34).padBottom(pad10);
+            starsTable.add(starDistanceScaling).left().padRight(pad18).padBottom(pad10).row();
+
+            // Add to content
+            addContentGroup(contentSceneTable, titleStars, starsTable, 0f);
+        }
+
         // RECURSIVE GRID
-        OwnLabel titleRecgrid = new OwnLabel(I18n.msg("gui.ui.recursivegrid"), skin, "header");
-        Table rg = new Table();
+        {
+            OwnLabel titleRecgrid = new OwnLabel(I18n.msg("gui.ui.recursivegrid"), skin, "header");
+            Table rg = new Table();
 
-        // ORIGIN
-        OwnLabel originLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.origin"), skin);
-        String[] origins = new String[]{I18n.msg("gui.ui.recursivegrid.origin.refsys"), I18n.msg("gui.ui.recursivegrid.origin.focus")};
-        recGridOrigin = new OwnSelectBox<>(skin);
-        recGridOrigin.setWidth(selectWidth);
-        recGridOrigin.setItems(origins);
-        recGridOrigin.setSelectedIndex(settings.program.recursiveGrid.origin.ordinal());
+            // Origin
+            OwnLabel originLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.origin"), skin);
+            String[] origins = new String[]{I18n.msg("gui.ui.recursivegrid.origin.refsys"), I18n.msg("gui.ui.recursivegrid.origin.focus")};
+            recGridOrigin = new OwnSelectBox<>(skin);
+            recGridOrigin.setWidth(selectWidth);
+            recGridOrigin.setItems(origins);
+            recGridOrigin.setSelectedIndex(settings.program.recursiveGrid.origin.ordinal());
 
-        // STYLE
-        OwnLabel styleLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.style"), skin);
-        String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.circular"), I18n.msg("gui.ui.recursivegrid.style.square")};
-        recGridStyle = new OwnSelectBox<>(skin);
-        recGridStyle.setWidth(selectWidth);
-        recGridStyle.setItems(styles);
-        recGridStyle.setSelectedIndex(settings.program.recursiveGrid.style.ordinal());
+            // Style
+            OwnLabel styleLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.style"), skin);
+            String[] styles = new String[]{I18n.msg("gui.ui.recursivegrid.style.circular"), I18n.msg("gui.ui.recursivegrid.style.square")};
+            recGridStyle = new OwnSelectBox<>(skin);
+            recGridStyle.setWidth(selectWidth);
+            recGridStyle.setItems(styles);
+            recGridStyle.setSelectedIndex(settings.program.recursiveGrid.style.ordinal());
 
-        // PROJECTION LINES
-        OwnLabel recGridProjectionLinesLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.projlines"), skin);
-        recGridProjectionLines = new OwnCheckBox("", skin);
-        recGridProjectionLines.setName("origin projection lines cb");
-        recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
+            // Projection lines
+            OwnLabel recGridProjectionLinesLabel = new OwnLabel(I18n.msg("gui.ui.recursivegrid.projlines"), skin);
+            recGridProjectionLines = new OwnCheckBox("", skin);
+            recGridProjectionLines.setName("origin projection lines cb");
+            recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
 
-        labels.add(originLabel, styleLabel, recGridProjectionLinesLabel);
+            labels.add(originLabel, styleLabel, recGridProjectionLinesLabel);
 
-        // Add to table.
-        rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(recGridOrigin).left().padBottom(pad10).row();
-        rg.add(styleLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(recGridStyle).left().padBottom(pad10).row();
-        rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
-        rg.add(recGridProjectionLines).left().padBottom(pad10).row();
+            // Add to table.
+            rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
+            rg.add(recGridOrigin).left().padBottom(pad10).row();
+            rg.add(styleLabel).left().padBottom(pad10).padRight(pad34);
+            rg.add(recGridStyle).left().padBottom(pad10).row();
+            rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
+            rg.add(recGridProjectionLines).left().padBottom(pad10).row();
 
-        // Add to content.
-        addContentGroup(contentSceneTable, titleRecgrid, rg, 0f);
+            // Add to content.
+            addContentGroup(contentSceneTable, titleRecgrid, rg);
+        }
 
         // ECLIPSES
-        Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
-        Table eclipsesTable = new Table();
-        // Enable eclipses.
-        OwnLabel eclipsesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.enable"), skin);
-        eclipses = new OwnCheckBox("", skin);
-        eclipses.setChecked(settings.scene.renderer.eclipses.active);
-        eclipses.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                // Enable or disable resolution
-                enableComponents(eclipses.isChecked(), eclipseOutlines);
-                return true;
-            }
-            return false;
-        });
-        // Eclipse outlines
-        OwnLabel eclipsesOutlinesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.outlines"), skin);
-        eclipseOutlines = new OwnCheckBox("", skin);
-        eclipseOutlines.setChecked(settings.scene.renderer.eclipses.outlines);
+        {
+            Label titleEclipses = new OwnLabel(I18n.msg("gui.graphics.eclipses"), skin, "header");
+            Table eclipsesTable = new Table();
+            // Enable eclipses.
+            OwnLabel eclipsesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.enable"), skin);
+            eclipses = new OwnCheckBox("", skin);
+            eclipses.setChecked(settings.scene.renderer.eclipses.active);
+            eclipses.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    // Enable or disable resolution
+                    enableComponents(eclipses.isChecked(), eclipseOutlines);
+                    return true;
+                }
+                return false;
+            });
+            // Eclipse outlines
+            OwnLabel eclipsesOutlinesLabel = new OwnLabel(I18n.msg("gui.graphics.eclipses.outlines"), skin);
+            eclipseOutlines = new OwnCheckBox("", skin);
+            eclipseOutlines.setChecked(settings.scene.renderer.eclipses.outlines);
 
-        labels.add(eclipsesLabel, eclipsesOutlinesLabel);
+            labels.add(eclipsesLabel, eclipsesOutlinesLabel);
 
-        eclipsesTable.add(eclipsesLabel).left().padRight(pad34).padBottom(pad10);
-        eclipsesTable.add(eclipses).left().padRight(pad18).padBottom(pad10).row();
-        eclipsesTable.add(eclipsesOutlinesLabel).left().padRight(pad34).padBottom(pad10);
-        eclipsesTable.add(eclipseOutlines).left().padRight(pad18).padBottom(pad10);
+            eclipsesTable.add(eclipsesLabel).left().padRight(pad34).padBottom(pad10);
+            eclipsesTable.add(eclipses).left().padRight(pad18).padBottom(pad10).row();
+            eclipsesTable.add(eclipsesOutlinesLabel).left().padRight(pad34).padBottom(pad10);
+            eclipsesTable.add(eclipseOutlines).left().padRight(pad18).padBottom(pad10);
 
-        // Add to content
-        addContentGroup(contentSceneTable, titleEclipses, eclipsesTable);
-
-        // STARS
-        OwnLabel titleStars = new OwnLabel(I18n.msg("gui.ui.scene.stars"), skin, "header");
-        Table starsTable = new Table();
-
-        // Texture index
-        OwnLabel textureIndexLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.texture"), skin);
-        var indexList = settings.scene.star.getStarTextureIndices();
-        var indices = new Array<ComboBoxBean>(indexList.size);
-        ComboBoxBean selected = null;
-        for (int y = 0; y < indexList.size; y++) {
-            var idx = indexList.get(y);
-            var cbb = new ComboBoxBean(Integer.toString(idx), idx);
-            indices.add(cbb);
-            if (idx == settings.scene.star.textureIndex) {
-                selected = cbb;
-            }
+            // Add to content
+            addContentGroup(contentSceneTable, titleEclipses, eclipsesTable);
         }
-        // Do not show texture index if we did not find any texture (i.e. the base data package is not downloaded yet).
-        if (!indexList.isEmpty()) {
-            textureIndex = new OwnSelectBox<>(skin);
-            textureIndex.setItems(indices);
-            if (selected != null)
-                textureIndex.setSelected(selected);
-        }
-
-        // Render stars as spheres
-        OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.spheres"), skin);
-        starSpheres = new OwnCheckBox("", skin);
-        starSpheres.setChecked(settings.scene.star.renderStarSpheres);
-
-
-        // Star glow over objects
-        OwnLabel glowOverObjectsLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
-        CheckBox glowOverObjects = new OwnCheckBox("", skin);
-        glowOverObjects.setName("light scattering");
-        glowOverObjects.setChecked(settings.postprocess.lightGlow.active);
-        glowOverObjects.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LIGHT_GLOW_CMD, glowOverObjects, glowOverObjects.isChecked());
-                return true;
-            }
-            return false;
-        });
-
-        // Motion trails
-        OwnLabel motionTrailsLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.trails"), skin);
-        motionTrails = new OwnCheckBox("", skin);
-        motionTrails.setChecked(settings.scene.particleGroups.motionTrails);
-
-        // Star distance to compute camera speed scaling
-        OwnLabel starDistanceScalingLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.distance.scaling"), skin);
-        starDistanceScaling = new OwnCheckBox("", skin);
-        starDistanceScaling.setChecked(settings.scene.camera.starDistanceScaling);
-
-        // Add labels
-        labels.add(textureIndexLabel, starSpheresLabel, starDistanceScalingLabel, glowOverObjectsLabel);
-
-        // Add to table
-        starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(glowOverObjects).left().padRight(pad18).padBottom(pad10).row();
-        starsTable.add(motionTrailsLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(motionTrails).left().padRight(pad18).padBottom(pad10).row();
-        if (textureIndex != null) {
-            starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
-            starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
-        }
-        starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
-        starsTable.add(starDistanceScalingLabel).left().padRight(pad34).padBottom(pad10);
-        starsTable.add(starDistanceScaling).left().padRight(pad18).padBottom(pad10).row();
-
-        // Add to content
-        addContentGroup(contentSceneTable, titleStars, starsTable);
 
         // PROCEDURAL GENERATION
-        OwnLabel titleProcedural = new OwnLabel(I18n.msg("gui.ui.procedural"), skin, "header");
-        Table pgen = new Table();
+        {
+            OwnLabel titleProcedural = new OwnLabel(I18n.msg("gui.ui.procedural"), skin, "header");
+            Table procGenTable = new Table();
 
-        // RESOLUTION
-        OwnLabel pgResolutionLabel = new OwnLabel(I18n.msg("gui.ui.procedural.resolution"), skin);
-        pgResolution = new OwnSliderPlus("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
-        pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
-        pgResolution.setWidth(sliderWidth);
-        pgResolution.setValue(settings.graphics.proceduralGenerationResolution[1]);
+            // Resolution
+            OwnLabel pgResolutionLabel = new OwnLabel(I18n.msg("gui.ui.procedural.resolution"), skin);
+            pgResolution = new OwnSliderPlus("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
+            pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
+            pgResolution.setWidth(sliderWidth);
+            pgResolution.setValue(settings.graphics.proceduralGenerationResolution[1]);
 
-        labels.add(pgResolutionLabel);
+            labels.add(pgResolutionLabel);
 
-        // Add to table.
-        pgen.add(pgResolutionLabel).left().padBottom(pad10).padRight(pad34);
-        pgen.add(pgResolution).left().padBottom(pad10).row();
+            // Add to table.
+            procGenTable.add(pgResolutionLabel).left().padBottom(pad10).padRight(pad34);
+            procGenTable.add(pgResolution).left().padBottom(pad10).row();
 
-        // SAVE TO DISK
+            // Save textures to disk
+            OwnLabel saveTexturesLabel = new OwnLabel(I18n.msg("gui.procedural.savetextures"), skin);
+            saveTextures = new OwnCheckBox("", skin, pad10);
+            saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
+            OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
+            saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures",
+                                                                        SysUtils.getProceduralPixmapDir().toString()),
+                                                               skin));
+            HorizontalGroup saveTexturesGroup = new HorizontalGroup();
+            saveTexturesGroup.space(pad10);
+            saveTexturesGroup.addActor(saveTextures);
+            saveTexturesGroup.addActor(saveTexturesTooltip);
 
-        // Save textures
-        OwnLabel saveTexturesLabel = new OwnLabel(I18n.msg("gui.procedural.savetextures"), skin);
-        vSync = new OwnCheckBox("", skin);
-        saveTextures = new OwnCheckBox("", skin, pad10);
-        saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
-        OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
-        saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()),
-                                                           skin));
-        HorizontalGroup saveTexturesGroup = new HorizontalGroup();
-        saveTexturesGroup.space(pad10);
-        saveTexturesGroup.addActor(saveTextures);
-        saveTexturesGroup.addActor(saveTexturesTooltip);
+            // Add to table.
+            procGenTable.add(saveTexturesLabel).left().padBottom(pad10).padRight(pad34);
+            procGenTable.add(saveTexturesGroup).left().padBottom(pad10).padRight(pad34);
 
-        // Add to table.
-        pgen.add(saveTexturesLabel).left().padBottom(pad10).padRight(pad34);
-        pgen.add(saveTexturesGroup).left().padBottom(pad10).padRight(pad34);
-
-        // Add to content.
-        addContentGroup(contentSceneTable, titleProcedural, pgen);
+            // Add to content.
+            addContentGroup(contentSceneTable, titleProcedural, procGenTable);
+        }
 
 
         /*
@@ -1413,7 +1455,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         String[] files = i18nDir.list();
         assert files != null;
         Array<LangComboBoxBean> langs = new Array<>();
-        i = 0;
+        int i = 0;
         for (String file : files) {
             if (file.startsWith(i18nName) && file.endsWith(".properties")) {
                 String locale = file.substring(i18nName.length(), file.length() - ".properties".length());

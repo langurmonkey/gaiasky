@@ -51,8 +51,12 @@ public class BufferedImageTextureData implements TextureData {
         // Prepare
         try {
             image = ImageIO.read(file.read());
-            width = image.getWidth();
-            height = image.getHeight();
+            if (image != null) {
+                width = image.getWidth();
+                height = image.getHeight();
+            } else {
+                logger.error("Error loading image file: " + file.file().getAbsolutePath());
+            }
         } catch (Exception e) {
             logger.error(e, "Error loading image file: " + file.file().getAbsolutePath());
         }

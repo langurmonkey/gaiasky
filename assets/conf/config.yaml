@@ -272,7 +272,7 @@ scene:
     # Sparse Virtual Texture global settings.
     virtualTextures:
       # Cache size, in tiles per side.
-      cacheSize: 8
+      cacheSize: 10
       # The detection buffer reduction factor.
       detectionBufferFactor: 8.0
       # Maximum number of tiles to load per frame.
