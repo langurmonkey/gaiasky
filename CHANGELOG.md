@@ -22,6 +22,7 @@
 - Layout issue and tooltip text in datasets component.
 - Move `genVersionFile` task to the top of the dependency list (before `compileJava`) so that we always have the correct file available.
 - Mend wording in new data pack notification window.
+- Remove unused titles from `objects` I18n files. Fix typo Korou -> Kourou.
 
 <a name="3.6.9-2"></a>
 ## [3.6.9-2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.9-2) (2025-07-03)
