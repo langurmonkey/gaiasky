@@ -3,6 +3,7 @@
   "releasecommands": [
     "git tag -a &tag& -m &tag_annotation&",
     "git remote | xargs -L1 git push --all",
+    "./gradlew clean",
     "./gradlew core:pack -PwinKeystorePassword=&keystore_pwd&"
   ]
 }

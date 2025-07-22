@@ -8,7 +8,6 @@
 in vec4 v_position;
 #define pullPosition() { return v_position; }
 
-
 in vec2 v_texCoord0;
 
 // Uniforms which are always available
@@ -68,7 +67,6 @@ uniform vec3 u_eclipsingBodyPos;
 #include <shader/lib/math.glsl>
 #endif // eclipsingBodyFlag
 
-
 //////////////////////////////////////////////////////
 ////// DIRECTIONAL LIGHTS
 //////////////////////////////////////////////////////
@@ -102,8 +100,8 @@ in vec3 v_viewDir;
 in vec3 v_fragPosWorld;
 in mat3 v_tbn;
 
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 layerBuffer;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
@@ -132,19 +130,20 @@ void main() {
     }
     #endif // eclipsingBodyFlag
 
-    vec3 cloudColor = vec3(0.0, 0.0, 0.0);
+    // Stores lighting contribution.
+    vec3 litColor = vec3(0.0, 0.0, 0.0);
 
     // DIRECTIONAL LIGHTS
     #ifdef directionalLightsFlag
     // Loop for directional light contributions.
     for (int i = 0; i < numDirectionalLights; i++) {
         // Normal in pixel space.
-        vec3 col = u_dirLights[i].color;
+        vec3 lightCol = u_dirLights[i].color;
         vec3 N = vec3(0.0, 0.0, 1.0);
         vec3 L = normalize(u_dirLights[i].direction * v_tbn);
         float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
 
-        cloudColor = saturate(cloudColor + col * NL + ambient * (1.0 - NL));
+        litColor += lightCol * NL;
     }
     #endif // directionalLightsFlag
 
@@ -153,17 +152,19 @@ void main() {
     // Loop for point light contributions.
     for (int i = 0; i < numPointLights; i++) {
         // Normal in pixel space.
-        vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
+        vec3 lightCol = u_pointLights[i].color * u_pointLights[i].intensity;
         vec3 N = vec3(0.0, 0.0, 1.0);
         vec3 L = normalize((u_pointLights[i].position - v_fragPosWorld) * v_tbn);
         float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
 
-        cloudColor = saturate(cloudColor + col * NL + ambient * (1.0 - NL));
+        litColor += lightCol * NL;
     }
     #endif // pointLightsFlag
 
-    cloudColor *= cloud.rgb;
-    fragColor = vec4(cloudColor * shdw, cloud.a) * v_opacity;
+    float brightness = clamp(length(litColor + ambient), 0.1, 1.0);
+    vec3 cloudColor = cloud.rgb * brightness;
+
+    fragColor = vec4(cloudColor * shdw, 1.0) * v_opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
@@ -171,5 +172,4 @@ void main() {
     #ifdef ssrFlag
     ssrBuffers();
     #endif // ssrFlag
-
 }
