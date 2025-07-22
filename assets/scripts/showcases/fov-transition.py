@@ -5,13 +5,13 @@
 # Created by Toni Sagrista
 
 from py4j.clientserver import ClientServer, JavaParameters
-import time
 
 gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
 
 def fov_transition(fov0, fov1, duration):
+    import time
     class FovTransition(object):
         def __init__(self, fov0, fov1, duration):
             self.duration = duration
