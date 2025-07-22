@@ -505,6 +505,11 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.camera.set_fov(newFov);
     }
 
+    @Override
+    public double getFov() {
+        return apiv2.camera.get_fov();
+    }
+
     public void setFov(final int newFov) {
         apiv2.camera.set_fov(newFov);
     }

@@ -819,6 +819,13 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setFov(float newFov);
 
     /**
+     * Return the current camera field of view angle, in degrees.
+     *
+     * @return The current camera field of view angle, in degrees.
+     */
+    double getFov();
+
+    /**
      * Sets the camera state (position, direction and up vector).
      *
      * @param pos The position of the camera in internal units, not Km.

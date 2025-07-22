@@ -493,6 +493,13 @@ public interface CameraAPI {
     void set_fov(float fov);
 
     /**
+     * Return the current camera field of view angle, in degrees.
+     *
+     * @return The current camera field of view angle, in degrees.
+     */
+    double get_fov();
+
+    /**
      * Set the camera state (position, direction and up vector).
      *
      * @param pos The position of the camera in internal units, not Km.

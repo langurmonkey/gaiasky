@@ -751,6 +751,11 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         }
     }
 
+    @Override
+    public double get_fov() {
+        return GaiaSky.instance.cameraManager.getCamera().fieldOfView;
+    }
+
     public void set_fov(final int newFov) {
         set_fov((float) newFov);
     }
