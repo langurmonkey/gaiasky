@@ -9,7 +9,9 @@ from py4j.clientserver import ClientServer, JavaParameters
 gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
-
+"""
+      Transiton between fov0 and fov1.
+"""
 def fov_transition(fov0, fov1, duration):
     import time
     class FovTransition(object):
@@ -50,7 +52,13 @@ def fov_transition(fov0, fov1, duration):
         time.sleep(0.05)
     
 
-fov0 = float(input("Enter the initial FoV in degrees:  "))
+f0 = input("Enter the initial FoV in degrees (leave empty to use current fov):  ")
+if f0 == "" or f0 is None:
+    gs_object = gateway.jvm.gaiasky.GaiaSky.instance
+    camera = gs_object.getCameraManager().getCamera()
+    fov0 = camera.getClass().getField("fieldOfView").get(camera)
+else:
+    fov0 = float(f0)
 fov1 = float(input("Enter the final FoV in degrees:    "))
 duration = float(input("Enter the duration in seconds: "))
 
