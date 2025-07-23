@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
@@ -29,6 +30,8 @@ public class SceneObserver implements IObserver {
                                         Event.PER_OBJECT_VISIBILITY_CMD,
                                         Event.FORCE_OBJECT_LABEL_CMD,
                                         Event.MUTE_OBJECT_LABEL_CMD,
+                                        Event.LABEL_EXCLUDE_REGEX_CMD,
+                                        Event.LABEL_INCLUDE_REGEX_CMD,
                                         Event.LABEL_COLOR_CMD);
     }
 
@@ -86,6 +89,14 @@ public class SceneObserver implements IObserver {
                     focusView.setRenderLabel(!state, name.toLowerCase(Locale.ROOT));
                     logger.info(I18n.msg("notif.object.flag", "muteLabel", name, I18n.msg("gui." + state)));
                 }
+            }
+            case LABEL_EXCLUDE_REGEX_CMD -> {
+                String regex = (String) data[0];
+                LabelEntityRenderSystem.setExcludeRegex(regex);
+            }
+            case LABEL_INCLUDE_REGEX_CMD -> {
+                String regex = (String) data[0];
+                LabelEntityRenderSystem.setIncludeRegex(regex);
             }
             case LABEL_COLOR_CMD -> {
                 final Entity entity = (Entity) data[0];

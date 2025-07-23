@@ -37,8 +37,80 @@ import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
+/**
+ * Renders labels for all objects and entities.
+ */
 public class LabelEntityRenderSystem {
+    private static final Logger.Log logger = Logger.getLogger(LabelEntityRenderSystem.class);
+
+    /**
+     * If set, all labels matching this regular expression are not rendered.
+     * <p>
+     * Only either {@link #includeRegex} or this can be set at a given time.
+     **/
+    private static String excludeRegex = null;
+    /**
+     * If set, only labels matching this regular expression are rendered.
+     * <p>
+     * Only either {@link #excludeRegex} or this can be set at a given time.
+     **/
+    private static String includeRegex = null;
+
+    /**
+     * Set the exclude regex. If the include regex is set, it is removed.
+     *
+     * @param regex The exclude regular expression.
+     */
+    public static synchronized void setExcludeRegex(String regex) {
+        try {
+            // Make sure it is a correct regular expression.
+            Pattern.compile(regex);
+            excludeRegex = regex;
+            if (includeRegex != null) {
+                includeRegex = null;
+            }
+        } catch (PatternSyntaxException e) {
+            logger.error("Could not compile regular expression: " + regex, e);
+        }
+    }
+
+    /**
+     * Set the include regex. If the exclude regex is set, it is removed.
+     *
+     * @param regex The include regular expression.
+     */
+    public static synchronized void setIncludeRegex(String regex) {
+        try {
+            // Make sure it is a correct regular expression.
+            Pattern.compile(regex);
+            includeRegex = regex;
+            if (excludeRegex != null) {
+                excludeRegex = null;
+            }
+        } catch (PatternSyntaxException e) {
+            logger.error("Could not compile regular expression: " + regex, e);
+        }
+    }
+
+    /**
+     * Checks if the given text passes the include/exclude regular expression condition.
+     *
+     * @param text The text to test.
+     *
+     * @return True if the text passes the conditions, false otherwise.
+     */
+    private synchronized boolean checkRegex(String text) {
+        if (includeRegex == null && excludeRegex == null) {
+            return true;
+        } else if (includeRegex != null) {
+            return text.matches(includeRegex);
+        } else {
+            return !text.matches(excludeRegex);
+        }
+    }
 
     private final Vector3D D31 = new Vector3D();
     private final Vector3D D32 = new Vector3D();
@@ -675,10 +747,21 @@ public class LabelEntityRenderSystem {
                 .gravitationalWavePos(out);
     }
 
-    protected void render2DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, RenderingContext rc, BitmapFont font, String label, float x, float y,
-                                 float scale, int align) {
+    protected void render2DLabel(ExtSpriteBatch batch,
+                                 ExtShaderProgram shader,
+                                 RenderingContext rc,
+                                 BitmapFont font,
+                                 String labelText,
+                                 float x,
+                                 float y,
+                                 float scale,
+                                 int align) {
+        if (!checkRegex(labelText)) {
+            return;
+        }
+
         shader.setUniformf("u_scale", scale);
-        DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
+        DecalUtils.drawFont2D(font, batch, rc, labelText, x, y, scale, align);
     }
 
     protected void render3DLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera,
@@ -690,6 +773,10 @@ public class LabelEntityRenderSystem {
     protected void render3DLabel(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera,
                                  RenderingContext rc, String labelText, Vector3D labelPosition, double distToCamera, float scale, double size,
                                  double radius, float minSizeDegrees, float maxSizeDegrees, boolean forceLabel) {
+        if (!checkRegex(labelText)) {
+            return;
+        }
+
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", Settings.settings.scene.label.size * scale / camera.getFovFactor());
 

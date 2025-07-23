@@ -12,8 +12,8 @@ import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProject
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 import static gaiasky.util.Settings.*;
 
@@ -120,7 +120,7 @@ public enum Event {
      *     <li>name ({@link String}) -- name of the bookmark</li>
      *     <li>folder ({@link Boolean}) -- whether it is a folder node (false for actual bookmarks)</li>
      * </ol>
-     *  **/
+     **/
     BOOKMARKS_ADD,
     /** Remove bookmark. Contains the path to remove. **/
     BOOKMARKS_REMOVE,
@@ -178,7 +178,10 @@ public enum Event {
      * Contains a boolean with the cinematic mode state (on/off).
      **/
     CAMERA_CINEMATIC_CMD,
-    /** Broadcasts the overall closest (in [0]), the closest non-star body (in [1]) and the closest particle (in [2]) to this camera. Happens every frame. **/
+    /**
+     * Broadcasts the overall closest (in [0]), the closest non-star body (in [1]) and the closest particle (in [2]) to this camera. Happens every
+     * frame.
+     **/
     CAMERA_CLOSEST_INFO,
     /**
      * This event is broadcast whenever the closest object to the camera
@@ -434,7 +437,8 @@ public enum Event {
     GPU_DISPOSE_ORBITAL_ELEMENTS,
 
     /**
-     * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT}, {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}].
+     * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT},
+     * {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}].
      */
     ELEVATION_MULTIPLIER_CMD,
 
@@ -871,7 +875,7 @@ public enum Event {
     REBUILD_SHADOW_MAP_DATA_CMD,
     /**
      * Eclipses have been toggled. Contains a boolean with the new state.
-      */
+     */
     ECLIPSES_CMD,
 
     /**
@@ -1154,6 +1158,17 @@ public enum Event {
     MUTE_OBJECT_LABEL_CMD,
 
     /**
+     * Set include regular expression. Only labels matching this regex are rendered.
+     * The exclude regular expression is disabled. Contains the string regular expression and the source object.
+     */
+    LABEL_INCLUDE_REGEX_CMD,
+    /**
+     * Set exclude regular expression. Labels matching this regex are not rendered.
+     * The include regular expression is disabled. Contains the string regular expression and the source object.
+     */
+    LABEL_EXCLUDE_REGEX_CMD,
+
+    /**
      * Sets the label color for a given object.
      * Contains the entity, the name of the object, the new color
      * as a float array (RGBA) in [0,1], and the source object.
@@ -1350,7 +1365,8 @@ public enum Event {
     TARGET_TIME_CMD,
 
     /**
-     * Sets the tessellation quality. Contains the new quality in [{@link gaiasky.util.Constants#MIN_TESS_QUALITY}, {@link gaiasky.util.Constants#MAX_TESS_QUALITY}]
+     * Sets the tessellation quality. Contains the new quality in [{@link gaiasky.util.Constants#MIN_TESS_QUALITY},
+     * {@link gaiasky.util.Constants#MAX_TESS_QUALITY}]
      */
     TESSELLATION_QUALITY_CMD,
 

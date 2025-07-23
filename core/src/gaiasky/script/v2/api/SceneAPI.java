@@ -20,6 +20,8 @@ import gaiasky.util.Constants;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.IPythonCoordinatesProvider;
 
+import java.util.regex.Pattern;
+
 /**
  * API definition for the scene module, {@link SceneModule}.
  * <p>
@@ -664,6 +666,24 @@ public interface SceneAPI {
      */
     void set_force_display_label(String name,
                                  boolean force);
+
+    /**
+     * Set the global label include regular expression. Only labels that match this regular expression are
+     * rendered after this call. This call disables the global exclude regular expression (set with {@link #set_label_exclude_regexp(String)}), if
+     * it is set.
+     *
+     * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
+     */
+    void set_label_include_regexp(String regexp);
+
+    /**
+     * Set the global label exclude regular expression. Labels that match this regular expression are
+     * not rendered after this call. This call disables the global include regular expression (set with {@link #set_label_include_regexp(String)}), if
+     * it is set.
+     *
+     * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
+     */
+    void set_label_exclude_regexp(String regexp);
 
     /**
      * Mute the label of the object identified by <code>name</code>, ignoring the usual solid angle-based

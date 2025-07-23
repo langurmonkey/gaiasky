@@ -569,6 +569,16 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
+    public void setLabelIncludeRegexp(String regexp) {
+        apiv2.scene.set_label_include_regexp(regexp);
+    }
+
+    @Override
+    public void setLabelExcludeRegexp(String regexp) {
+        apiv2.scene.set_label_exclude_regexp(regexp);
+    }
+
+    @Override
     public void setMuteLabel(String name, boolean muteLabel) {
         apiv2.scene.set_mute_label(name, muteLabel);
     }

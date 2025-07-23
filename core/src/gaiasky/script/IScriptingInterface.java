@@ -21,6 +21,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.coord.IPythonCoordinatesProvider;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * <p>Definition of the public API (v1), which defines calls and command to interact with Gaia Sky. These calls
@@ -986,6 +987,23 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setForceDisplayLabel(String name,
                               boolean forceLabel);
 
+    /**
+     * Set the global label include regular expression. Only labels that match this regular expression are
+     * rendered after this call. This call disables the global exclude regular expression (set with {@link #setLabelExcludeRegexp(String)}), if
+     * it is set.
+     *
+     * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
+     */
+    void setLabelIncludeRegexp(String regexp);
+
+    /**
+     * Set the global label exclude regular expression. Labels that match this regular expression are
+     * not rendered after this call. This call disables the global include regular expression (set with {@link #setLabelIncludeRegexp(String)}), if
+     * it is set.
+     *
+     * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
+     */
+    void setLabelExcludeRegexp(String regexp);
     /**
      * Mute the label of the object identified by <code>name</code>, ignoring the usual solid angle-based
      * visibility rules. If called with <code>mute = true</code>, the label for the given object is

@@ -557,6 +557,20 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
+    public void set_label_include_regexp(String regexp) {
+        if (api.validator.checkRegexp(regexp)) {
+            em.post(Event.LABEL_INCLUDE_REGEX_CMD, this, regexp);
+        }
+    }
+
+    @Override
+    public void set_label_exclude_regexp(String regexp) {
+        if (api.validator.checkRegexp(regexp)) {
+            em.post(Event.LABEL_EXCLUDE_REGEX_CMD, this, regexp);
+        }
+    }
+
+    @Override
     public void set_mute_label(String name, boolean mute) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
@@ -880,12 +894,12 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         if (api.validator.checkString(name, "shapeName")
                 && api.validator.checkStringEnum(shapeType, ShapeComboBoxBean.Shape.class, "shape")
                 && api.validator.checkStringEnum(primitive,
-                                   PrimitiveComboBoxBean.Primitive.class,
-                                   "primitive")
+                                                 PrimitiveComboBoxBean.Primitive.class,
+                                                 "primitive")
                 && api.validator.checkStringEnum(
                 ori,
-                                    OrientationComboBoxBean.ShapeOrientation.class,
-                                    "orientation")
+                OrientationComboBoxBean.ShapeOrientation.class,
+                "orientation")
                 && api.validator.checkNum(size, 0, Double.MAX_VALUE, "size")
                 && api.validator.checkObjectName(obj_name)) {
             final var shapeLc = shapeType.toLowerCase(Locale.ROOT);

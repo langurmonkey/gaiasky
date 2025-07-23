@@ -10,6 +10,7 @@ package gaiasky.script.v2.impl;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.validator.RegexpValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,8 @@ import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.Locale;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import static gaiasky.util.Logger.getLogger;
 
@@ -226,6 +229,16 @@ public class ParameterValidator {
 
     boolean checkSmoothType(String type, String name) {
         return type.equalsIgnoreCase("logit") || type.equalsIgnoreCase("logisticsigmoid") || type.equalsIgnoreCase("none");
+    }
+
+    boolean checkRegexp(String regexp) {
+        try {
+            Pattern.compile(regexp);
+            return true;
+        } catch (PatternSyntaxException e) {
+            logger.error("Invalid regular expression: " + regexp);
+            return false;
+        }
     }
 
     private void logPossibleValues(String value, String[] possibleValues, String name) {
