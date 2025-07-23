@@ -557,6 +557,14 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
+    public void set_mute_label(String name, boolean mute) {
+        if (api.validator.checkObjectName(name)) {
+            Entity obj = get_entity(name);
+            em.post(Event.MUTE_OBJECT_LABEL_CMD, this, obj, name, mute);
+        }
+    }
+
+    @Override
     public void set_label_color(String name, double[] color) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);

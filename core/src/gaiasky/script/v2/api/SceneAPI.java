@@ -649,11 +649,13 @@ public interface SceneAPI {
     void set_label_size_factor(float factor);
 
     /**
-     * Force the label of the given object to be displayed, ignoring the usual
-     * solid angle-based visibility rules. The object is identified by the given <code>name</code>.
+     * Force the label of the object identified by <code>name</code> to be displayed, ignoring the usual
+     * solid angle-based visibility rules. If called with <code>force = true</code>, the label for the
+     * given object is always rendered. Calling this method with <code>false</code> does not cause the label
+     * to be muted. If you want to mute the label, use {@link #set_mute_label(String, boolean)} instead.
      * <p>
      * Note: This does not override the visibility of the object itself, nor the
-     * visibility settings of the label component.
+     * visibility settings of the <code>labels</code> component type.
      * <p>
      * This setting is temporary and will not persist after a restart.
      *
@@ -662,6 +664,22 @@ public interface SceneAPI {
      */
     void set_force_display_label(String name,
                                  boolean force);
+
+    /**
+     * Mute the label of the object identified by <code>name</code>, ignoring the usual solid angle-based
+     * visibility rules. If called with <code>mute = true</code>, the label for the given object is
+     * never rendered. Calling this method with <code>false</code> does not cause the label to always
+     * display. If you want to force-display the label, use {@link #set_force_display_label(String, boolean)} instead.
+     * <p>
+     * Note: This does not override the visibility of the object itself, nor the
+     * visibility settings of the <code>labels</code> component type.
+     * <p>
+     * This setting is temporary and will not persist after a restart.
+     *
+     * @param name The object name.
+     * @param mute Whether to mute the label for the object or not.
+     */
+    void set_mute_label(String name, boolean mute);
 
     /**
      * Set the label color of the object identified by the given <code>name</code>.

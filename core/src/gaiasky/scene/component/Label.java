@@ -19,21 +19,28 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3Q;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/** Component with attributes concerning labels. **/
 public class Label implements Component {
 
+    /** Enum with states for the label display property. **/
+    public enum LabelDisplay {
+        /** Always display the label for this object. **/
+        ALWAYS,
+        /** Never display the label for this object. **/
+        NEVER,
+        /** Display the label for this object based on the automatic labelling algorithm. **/
+        AUTO;
+    }
 
     /**
-     * Force to render the label of this entity,
-     * bypassing the solid angle check
+     * Display state for the label of this object.
      */
-    public boolean forceLabel = false;
-    /**
-     * This flag disables the rendering of the label.
-     */
-    public boolean renderLabel = true;
+    public LabelDisplay display = LabelDisplay.AUTO;
+
     /** Factor to apply to the size of the label. **/
     public float labelFactor = 0;
     /** Internal rendering factor **/
@@ -64,13 +71,40 @@ public class Label implements Component {
     /** The label rendering code. **/
     public Consumer7<LabelEntityRenderSystem, LabelView, ExtSpriteBatch, ExtShaderProgram, TextRenderer, RenderingContext, ICamera> renderConsumer;
 
+    public boolean isDisplayAuto() {
+        return display == LabelDisplay.AUTO;
+    }
+
+    public boolean isDisplayAlways() {
+        return display == LabelDisplay.ALWAYS;
+    }
+
+    public boolean isDisplayNever() {
+        return display == LabelDisplay.NEVER;
+    }
+
+    public boolean renderLabel() {
+        return !isDisplayNever();
+    }
+
+    public boolean forceLabel() {
+        return isDisplayAlways();
+    }
+
+    public void setLabelDisplay(String value) {
+        try {
+            var d = LabelDisplay.valueOf(value.toUpperCase(Locale.ROOT));
+            this.display = d;
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
 
     public void setForceLabel(Boolean force) {
-        this.forceLabel = force;
+        this.display = force ? LabelDisplay.ALWAYS : LabelDisplay.AUTO;
     }
 
     public void setRenderLabel(Boolean render) {
-        this.renderLabel = render;
+        this.display = render ? LabelDisplay.AUTO : LabelDisplay.NEVER;
     }
 
     /**
@@ -81,13 +115,17 @@ public class Label implements Component {
      */
     public void setLabelPositionPc(double[] labelPositionPc) {
         if (labelPositionPc != null) {
-            this.labelPosition = new Vector3Q(labelPositionPc[0] * Constants.PC_TO_U, labelPositionPc[1] * Constants.PC_TO_U, labelPositionPc[2] * Constants.PC_TO_U);
+            this.labelPosition = new Vector3Q(labelPositionPc[0] * Constants.PC_TO_U,
+                                              labelPositionPc[1] * Constants.PC_TO_U,
+                                              labelPositionPc[2] * Constants.PC_TO_U);
         }
     }
 
     public void setLabelPositionKm(double[] labelPositionKm) {
         if (labelPosition != null) {
-            this.labelPosition = new Vector3Q(labelPositionKm[0] * Constants.KM_TO_U, labelPositionKm[1] * Constants.KM_TO_U, labelPositionKm[2] * Constants.KM_TO_U);
+            this.labelPosition = new Vector3Q(labelPositionKm[0] * Constants.KM_TO_U,
+                                              labelPositionKm[1] * Constants.KM_TO_U,
+                                              labelPositionKm[2] * Constants.KM_TO_U);
         }
     }
 

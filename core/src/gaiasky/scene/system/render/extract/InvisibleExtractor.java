@@ -43,8 +43,8 @@ public class InvisibleExtractor extends AbstractExtractSystem {
         return base.names != null
                 // Label objects.
                 && label.label
-                && label.renderLabel
+                && label.renderLabel()
                 && mustRender(base)
-                && (label.forceLabel || body.solidAngleApparent >= sa.thresholdLabel / label.labelBias);
+                && (label.forceLabel() || body.solidAngleApparent >= sa.thresholdLabel / label.labelBias);
     }
 }

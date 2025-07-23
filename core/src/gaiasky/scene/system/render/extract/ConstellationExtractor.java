@@ -28,7 +28,7 @@ public class ConstellationExtractor extends AbstractExtractSystem {
             var label = Mapper.label.get(entity);
 
             addToRender(render, RenderGroup.LINE);
-            if (constel.allLoaded && label.renderLabel) {
+            if (constel.allLoaded && label.renderLabel()) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
         }

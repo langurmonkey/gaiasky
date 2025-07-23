@@ -19,6 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.FilterView;
 import gaiasky.util.*;
@@ -229,9 +230,13 @@ public class ParticleSet implements Component, IDisposable {
     public float[] ccMin = null, ccMax = null;
 
     /**
-     * Particles for which forceLabel is enabled.
+     * Indices of particles for which <code>labelDisplay</code> is set to {@link LabelDisplay#ALWAYS}.
      **/
-    public IntSet forceLabel;
+    public IntSet labelDisplayAlways;
+    /**
+     * Indices of particles for which <code>labelDisplay</code> is set to {@link LabelDisplay#NEVER}.
+     */
+    public IntSet labelDisplayNever;
 
     /**
      * Particles with special label colors.
@@ -1164,14 +1169,12 @@ public class ParticleSet implements Component, IDisposable {
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
-                if (this.forceLabel.contains(idx)) {
+                if (this.labelDisplayAlways.contains(idx)) {
                     if (!forceLabel) {
-                        // Remove from forceLabelStars
-                        this.forceLabel.remove(idx);
+                        this.labelDisplayAlways.remove(idx);
                     }
                 } else if (forceLabel) {
-                    // Add to forceLabelStars
-                    this.forceLabel.add(idx);
+                    this.labelDisplayAlways.add(idx);
                 }
             }
         }
@@ -1183,10 +1186,44 @@ public class ParticleSet implements Component, IDisposable {
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
-                return forceLabel.contains(idx);
+                return labelDisplayAlways.contains(idx);
             }
         }
         return false;
+    }
+
+    public void setRenderLabel(Boolean renderLabel,
+                               String name) {
+        name = name.toLowerCase(Locale.ROOT)
+                .trim();
+        synchronized (indexSync) {
+            if (index != null && index.containsKey(name)) {
+                int idx = index.get(name);
+                if (!this.labelDisplayNever.contains(idx)) {
+                    if (!renderLabel) {
+                        this.labelDisplayNever.add(idx);
+                    }
+                } else if (renderLabel) {
+                    this.labelDisplayNever.remove(idx);
+                }
+            }
+        }
+    }
+
+    public boolean isRenderLabel(String name) {
+        name = name.toLowerCase(Locale.ROOT)
+                .trim();
+        synchronized (indexSync) {
+            if (index != null && index.containsKey(name)) {
+                int idx = index.get(name);
+                return isRenderLabel(idx);
+            }
+        }
+        return false;
+    }
+
+    public boolean isRenderLabel(int idx) {
+        return !labelDisplayNever.contains(idx);
     }
 
     public void setLabelColor(float[] color,

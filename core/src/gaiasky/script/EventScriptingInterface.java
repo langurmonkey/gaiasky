@@ -569,6 +569,11 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
+    public void setMuteLabel(String name, boolean muteLabel) {
+        apiv2.scene.set_mute_label(name, muteLabel);
+    }
+
+    @Override
     public void setLabelColor(String name, double[] color) {
         apiv2.scene.set_label_color(name, color);
     }

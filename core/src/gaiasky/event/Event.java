@@ -1147,6 +1147,13 @@ public enum Event {
     FORCE_OBJECT_LABEL_CMD,
 
     /**
+     * Sets the mute label flag on the given object which causes the label to never be rendered.
+     * Contains the entity, the name of the object, a boolean with the new mute label state, and the
+     * source object.
+     */
+    MUTE_OBJECT_LABEL_CMD,
+
+    /**
      * Sets the label color for a given object.
      * Contains the entity, the name of the object, the new color
      * as a float array (RGBA) in [0,1], and the source object.

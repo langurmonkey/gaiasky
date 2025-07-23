@@ -160,7 +160,7 @@ public interface IFocus {
      * name within this entity in the native reference system.
      *
      * @param name The name (lowercase) of the entity to get the position from (useful in case of star groups).
-     * @param out  Vector3d to put the return value.
+     * @param out  Vector3D to put the return value.
      *
      * @return The absolute position of the entity if it exists, null otherwise.
      */
@@ -169,7 +169,7 @@ public interface IFocus {
     /**
      * Same as {@link IFocus#getAbsolutePosition(Vector3Q)}.
      *
-     * @param out Vector3d where to put the return value.
+     * @param out Vector3D where to put the return value.
      *
      * @return The absolute position, same as aux.
      */
@@ -445,8 +445,22 @@ public interface IFocus {
      */
     float[] getColor();
 
+    /**
+     * Is the label of the entity forced to display?
+     *
+     * @return The force label property.
+     */
     boolean isForceLabel();
 
     boolean isForceLabel(String name);
+
+    /**
+     * Is the label of the entity rendered?
+     *
+     * @return The render label property.
+     */
+    boolean isRenderLabel();
+
+    boolean isRenderLabel(String name);
 
 }

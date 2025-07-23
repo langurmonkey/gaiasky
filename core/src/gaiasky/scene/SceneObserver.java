@@ -25,7 +25,11 @@ public class SceneObserver implements IObserver {
     public SceneObserver() {
         this.view = new FocusView();
 
-        EventManager.instance.subscribe(this, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.PER_OBJECT_VISIBILITY_CMD,
+                                        Event.FORCE_OBJECT_LABEL_CMD,
+                                        Event.MUTE_OBJECT_LABEL_CMD,
+                                        Event.LABEL_COLOR_CMD);
     }
 
     @Override
@@ -33,50 +37,66 @@ public class SceneObserver implements IObserver {
                        Object source,
                        Object... data) {
         switch (event) {
-        case PER_OBJECT_VISIBILITY_CMD -> {
-            if (data[0] instanceof FocusView focusView) {
-                final String name = (String) data[1];
-                final boolean state = (boolean) data[2];
+            case PER_OBJECT_VISIBILITY_CMD -> {
+                if (data[0] instanceof FocusView focusView) {
+                    final String name = (String) data[1];
+                    final boolean state = (boolean) data[2];
 
-                focusView.setVisible(state, name.toLowerCase(Locale.ROOT).strip());
-                logger.info(I18n.msg("notif.visibility.object.set", focusView.getName(), I18n.msg("gui." + state)));
-            } else if (data[0] instanceof Entity entity) {
-                view.setEntity(entity);
-                final String name = (String) data[1];
-                final boolean state = (boolean) data[2];
+                    focusView.setVisible(state, name.toLowerCase(Locale.ROOT).strip());
+                    logger.info(I18n.msg("notif.visibility.object.set", focusView.getName(), I18n.msg("gui." + state)));
+                } else if (data[0] instanceof Entity entity) {
+                    view.setEntity(entity);
+                    final String name = (String) data[1];
+                    final boolean state = (boolean) data[2];
 
-                view.setVisible(state, name.toLowerCase(Locale.ROOT).strip());
-                logger.info(I18n.msg("notif.visibility.object.set", view.getName(), I18n.msg("gui." + state)));
-            } else {
-                logger.warn("PER_OBJECT_VISIBILITY_CMD needs a FocusView or an Entity, got " + data[0].getClass().getSimpleName());
+                    view.setVisible(state, name.toLowerCase(Locale.ROOT).strip());
+                    logger.info(I18n.msg("notif.visibility.object.set", view.getName(), I18n.msg("gui." + state)));
+                } else {
+                    logger.warn("PER_OBJECT_VISIBILITY_CMD needs a FocusView or an Entity, got " + data[0].getClass().getSimpleName());
+                }
             }
-        }
-        case FORCE_OBJECT_LABEL_CMD -> {
-            FocusView focusView = null;
-            if (data[0] instanceof Entity entity) {
-                view.setEntity(entity);
-                focusView = view;
-            } else if (data[0] instanceof FocusView fv) {
-                focusView = fv;
-            }
-            if (focusView != null) {
-                final String name = (String) data[1];
-                final boolean state = (boolean) data[2];
+            case FORCE_OBJECT_LABEL_CMD -> {
+                FocusView focusView = null;
+                if (data[0] instanceof Entity entity) {
+                    view.setEntity(entity);
+                    focusView = view;
+                } else if (data[0] instanceof FocusView fv) {
+                    focusView = fv;
+                }
+                if (focusView != null) {
+                    final String name = (String) data[1];
+                    final boolean state = (boolean) data[2];
 
-                focusView.setForceLabel(state, name.toLowerCase(Locale.ROOT));
-                logger.info(I18n.msg("notif.object.flag", "forceLabel", name, I18n.msg("gui." + state)));
+                    focusView.setForceLabel(state, name.toLowerCase(Locale.ROOT));
+                    logger.info(I18n.msg("notif.object.flag", "forceLabel", name, I18n.msg("gui." + state)));
+                }
             }
-        }
-        case LABEL_COLOR_CMD -> {
-            final Entity entity = (Entity) data[0];
-            String name = (String) data[1];
-            float[] labelColor = (float[]) data[2];
+            case MUTE_OBJECT_LABEL_CMD -> {
+                FocusView focusView = null;
+                if (data[0] instanceof Entity entity) {
+                    view.setEntity(entity);
+                    focusView = view;
+                } else if (data[0] instanceof FocusView fv) {
+                    focusView = fv;
+                }
+                if (focusView != null) {
+                    final String name = (String) data[1];
+                    final boolean state = (boolean) data[2];
 
-            synchronized (view) {
-                view.setEntity(entity);
-                view.setLabelColor(labelColor, name);
+                    focusView.setRenderLabel(!state, name.toLowerCase(Locale.ROOT));
+                    logger.info(I18n.msg("notif.object.flag", "muteLabel", name, I18n.msg("gui." + state)));
+                }
             }
-        }
+            case LABEL_COLOR_CMD -> {
+                final Entity entity = (Entity) data[0];
+                String name = (String) data[1];
+                float[] labelColor = (float[]) data[2];
+
+                synchronized (view) {
+                    view.setEntity(entity);
+                    view.setLabelColor(labelColor, name);
+                }
+            }
         }
 
     }

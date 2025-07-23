@@ -901,6 +901,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         }
     }
 
+    @Override
     public boolean isForceLabel(String name) {
         if (isValid() && isSet()) {
             return getSet().isForceLabel(name);
@@ -910,20 +911,46 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
+    public boolean isForceLabel() {
+        if (isValid() && Mapper.label.has(entity)) {
+            return Mapper.label.get(entity).forceLabel();
+        }
+        return false;
+    }
+
+    public void setRenderLabel(Boolean renderLabel,
+                              String name) {
+        if (isSet()) {
+            getSet().setRenderLabel(renderLabel, name);
+        } else if (Mapper.label.has(entity)) {
+            Mapper.label.get(entity).setRenderLabel(renderLabel);
+        }
+    }
+
+    @Override
+    public boolean isRenderLabel(String name) {
+        if (isValid() && isSet()) {
+            return getSet().isRenderLabel(name);
+        } else {
+            return isRenderLabel();
+        }
+    }
+
+    @Override
+    public boolean isRenderLabel() {
+        if (isValid() && Mapper.label.has(entity)) {
+            return Mapper.label.get(entity).renderLabel();
+        }
+        return false;
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other instanceof FocusView) {
             return this.entity == ((FocusView) other).getEntity();
         }
         return false;
 
-    }
-
-    @Override
-    public boolean isForceLabel() {
-        if (isValid() && Mapper.label.has(entity)) {
-            return Mapper.label.get(entity).forceLabel;
-        }
-        return false;
     }
 
     /**

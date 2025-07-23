@@ -30,7 +30,7 @@ public class ShapeExtractor extends AbstractExtractSystem {
                 addToRender(render, renderType.renderGroup != null ? renderType.renderGroup : RenderGroup.MODEL_VERT_ADDITIVE);
             }
         }
-        if (mustRender && label.renderLabel || label.forceLabel) {
+        if (mustRender && label.renderLabel() || label.forceLabel()) {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }

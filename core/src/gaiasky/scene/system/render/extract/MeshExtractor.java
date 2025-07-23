@@ -32,7 +32,7 @@ public class MeshExtractor extends AbstractExtractSystem {
                 case DUST -> addToRender(render, RenderGroup.MODEL_PIX_DUST);
             }
 
-            if (Mapper.label.get(entity).renderLabel)
+            if (Mapper.label.get(entity).renderLabel())
                 addToRender(render, RenderGroup.FONT_LABEL);
         }
     }

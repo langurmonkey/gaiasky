@@ -166,7 +166,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         }
 
         // Maps.
-        set.forceLabel = new IntSet();
+        set.labelDisplayAlways = new IntSet();
+        set.labelDisplayNever = new IntSet();
         set.labelColors = new IntMap<>();
 
         // Labels.

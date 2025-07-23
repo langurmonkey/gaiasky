@@ -80,7 +80,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                 // Simple billboards.
                 if (body.solidAngleApparent >= sa.thresholdNone) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
-                    if (label.renderLabel) {
+                    if (label.renderLabel()) {
                         addToRender(render, RenderGroup.FONT_LABEL);
                     }
                 }
@@ -113,7 +113,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                         addToRender(render, RenderGroup.FONT_LABEL);
                     }
                 }
-                if (!isInRender(render, RenderGroup.FONT_LABEL) && label.forceLabel) {
+                if (!isInRender(render, RenderGroup.FONT_LABEL) && label.forceLabel()) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
 
@@ -157,9 +157,9 @@ public class ModelExtractor extends AbstractExtractSystem {
                                SolidAngle sa,
                                Label label) {
         return base.names != null
-                && label.renderLabel
+                && label.renderLabel()
                 && renderer.isOn(ComponentTypes.ComponentType.Labels)
-                && (label.forceLabel || body.solidAngleApparent >= sa.thresholdLabel / label.labelBias);
+                && (label.forceLabel() || body.solidAngleApparent >= sa.thresholdLabel / label.labelBias);
     }
 
     private boolean isValidPosition(Coordinates coord) {

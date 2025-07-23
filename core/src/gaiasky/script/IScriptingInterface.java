@@ -970,18 +970,38 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setLabelSizeFactor(float factor);
 
     /**
-     * Forces the label to display for the given object, bypassing the solid angle
-     * requirements that are usually in place and determine label visibility.
-     * This setting does not override the visibility of the object itself, or of
-     * the label visibility component element.
-     * Changes to the force display label flag are not persisted on restart.
-     * /*
+     * Force the label of the object identified by <code>name</code> to be displayed, ignoring the usual
+     * solid angle-based visibility rules. If called with <code>force = true</code>, the label for the
+     * given object is always rendered. Calling this method with <code>false</code> does not cause the label
+     * to be muted. If you want to mute the label, use {@link #setMuteLabel(String, boolean)} instead.
+     * <p>
+     * Note: This does not override the visibility of the object itself, nor the
+     * visibility settings of the <code>labels</code> component type.
+     * <p>
+     * This setting is temporary and will not persist after a restart.
      *
      * @param name       The object name.
      * @param forceLabel Whether to force the label to render for this object or not.
      */
     void setForceDisplayLabel(String name,
                               boolean forceLabel);
+
+    /**
+     * Mute the label of the object identified by <code>name</code>, ignoring the usual solid angle-based
+     * visibility rules. If called with <code>mute = true</code>, the label for the given object is
+     * never rendered. Calling this method with <code>false</code> does not cause the label to always
+     * display. If you want to force-display the label, use {@link #setForceDisplayLabel(String, boolean)} instead.
+     * <p>
+     * Note: This does not override the visibility of the object itself, nor the
+     * visibility settings of the <code>labels</code> component type.
+     * <p>
+     * This setting is temporary and will not persist after a restart.
+     *
+     * @param name      The object name.
+     * @param muteLabel Whether to mute the label for the object or not.
+     */
+    void setMuteLabel(String name,
+                      boolean muteLabel);
 
     /**
      * Sets the label color of the object identified by the given name.

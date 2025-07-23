@@ -561,5 +561,15 @@ public class Proximity {
         public boolean isForceLabel(String name) {
             return false;
         }
+
+        @Override
+        public boolean isRenderLabel() {
+            return false;
+        }
+
+        @Override
+        public boolean isRenderLabel(String name) {
+            return false;
+        }
     }
 }

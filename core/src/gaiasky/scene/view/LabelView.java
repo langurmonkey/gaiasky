@@ -91,7 +91,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     public boolean renderTextCelestial() {
         return base.names != null
                 && renderTextBase()
-                && (label.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel / label.labelBias);
+                && (label.forceLabel() || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel / label.labelBias);
     }
 
     public boolean renderTextParticle() {
@@ -105,7 +105,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
                 && (
                         (body.solidAngle >= LocationMark.LOWER_LIMIT
                             && (body.solidAngle <= LocationMark.UPPER_LIMIT || loc.ignoreSolidAngleLimit))
-                        || label.forceLabel)
+                        || label.forceLabel())
                 ){
             Vector3D aux = D31;
             graph.translation.put(aux).sub(body.pos).scl(-1);
@@ -135,7 +135,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextTrajectory() {
-        return renderTextBase() && label.forceLabel;
+        return renderTextBase() && label.forceLabel();
     }
 
     public boolean renderTextGridRec() {

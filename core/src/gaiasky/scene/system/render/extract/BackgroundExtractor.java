@@ -40,7 +40,7 @@ public class BackgroundExtractor extends AbstractExtractSystem {
                 var renderType = Mapper.renderType.get(entity);
 
                 addToRender(render, renderType.renderGroup);
-                if (label.label && label.renderLabel) {
+                if (label.label && label.renderLabel()) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
             }
