@@ -34,12 +34,12 @@ import java.util.regex.Pattern;
 public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
-     * Gets the location of the assets folder.
+     * Get the location of the assets folder.
      */
     String getAssetsLocation();
 
     /**
-     * Pre-loads the given images as textures for later use. They will be cached
+     * Pre-load the given images as textures for later use. They will be cached
      * for the subsequent uses.
      *
      * @param paths The texture paths.
@@ -47,7 +47,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void preloadTextures(String[] paths);
 
     /**
-     * Pre-loads the given image as a texture for later use. The texture will
+     * Pre-load the given image as a texture for later use. The texture will
      * be cached for later use.
      *
      * @param path The path of the image file to preload.
@@ -55,28 +55,28 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void preloadTexture(String path);
 
     /**
-     * Sets the current time frame to <b>real time</b>. All the commands
+     * Set the current time frame to <b>real time</b>. All the commands
      * executed after this command becomes active will be in the <b>real
      * time</b> frame (clock ticks).
      */
     void activateRealTimeFrame();
 
     /**
-     * Sets the current time frame to <b>simulation time</b>. All the commands
+     * Set the current time frame to <b>simulation time</b>. All the commands
      * executed after this command becomes active will be in the <b>simulation
      * time</b> frame (simulation clock in the app).
      */
     void activateSimulationTimeFrame();
 
     /**
-     * Displays a popup notification on the screen for the default duration.
+     * Display a popup notification on the screen for the default duration.
      *
      * @param message The message text.
      */
     void displayPopupNotification(String message);
 
     /**
-     * Displays a popup notification on the screen for the given duration.
+     * Display a popup notification on the screen for the given duration.
      *
      * @param message  The message text.
      * @param duration The duration in seconds until the notification is removed.
@@ -85,14 +85,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                   float duration);
 
     /**
-     * Sets a headline message that will appear in a big font in the screen.
+     * Set a headline message that will appear in a big font in the screen.
      *
      * @param headline The headline text.
      */
     void setHeadlineMessage(String headline);
 
     /**
-     * Sets a subhead message that will appear in a small font below the
+     * Set a subhead message that will appear in a small font below the
      * headline.
      *
      * @param subhead The subhead text.
@@ -100,22 +100,22 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setSubheadMessage(String subhead);
 
     /**
-     * Clears the headline message.
+     * Clear the headline message.
      */
     void clearHeadlineMessage();
 
     /**
-     * Clears the subhead message.
+     * Clear the subhead message.
      */
     void clearSubheadMessage();
 
     /**
-     * Clears both the subhead and the headline messages.
+     * Clear both the subhead and the headline messages.
      */
     void clearAllMessages();
 
     /**
-     * Adds a new one-line message in the screen with the given id and the given
+     * Add a new one-line message in the screen with the given id and the given
      * coordinates. If an object already exists with the given id, it is
      * removed. However, if a message object already exists with the same id,
      * its properties are updated. <strong>The messages placed with this method
@@ -176,7 +176,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               double fontSize);
 
     /**
-     * Adds a new multi-line text in the screen with the given id, coordinates
+     * Add a new multi-line text in the screen with the given id, coordinates
      * and size. If an object already exists with the given id, it is removed.
      * However, if a text object already exists with the same id, its properties
      * are updated. <strong>The texts placed with this method will not appear in
@@ -216,7 +216,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            float fontSize);
 
     /**
-     * Adds a new image object at the given coordinates. If an object already
+     * Add a new image object at the given coordinates. If an object already
      * exists with the given id, it is removed. However, if an image object
      * already exists with the same id, its properties are updated.<br>
      * <strong>The messages placed with this method will not appear in the
@@ -238,7 +238,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             float y);
 
     /**
-     * Adds a new image object at the given coordinates. If an object already
+     * Add a new image object at the given coordinates. If an object already
      * exists with the given id, it is removed. However, if an image object
      * already exists with the same id, its properties are updated.<br>
      * <strong>Warning: This method will only work in the asynchronous mode. Run
@@ -288,19 +288,19 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             double[] color);
 
     /**
-     * Removes all objects.
+     * Remove all objects.
      */
     void removeAllObjects();
 
     /**
-     * Removes the item with the given id.
+     * Remove the item with the given id.
      *
      * @param id Integer with the integer id of the object to remove.
      */
     void removeObject(int id);
 
     /**
-     * Removes the items with the given ids. They can either be messages, images or
+     * Remove the items with the given ids. They can either be messages, images or
      * whatever else.
      *
      * @param ids Vector with the integer ids of the objects to remove
@@ -308,24 +308,24 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void removeObjects(int[] ids);
 
     /**
-     * Disables all input events from mouse, keyboard, touchscreen, etc.
+     * Disable all input events from mouse, keyboard, touchscreen, etc.
      */
     void disableInput();
 
     /**
-     * Enables all input events.
+     * Enable all input events.
      */
     void enableInput();
 
     /**
-     * Enables or disables the cinematic camera mode.
+     * Enable or disable the cinematic camera mode.
      *
      * @param cinematic Whether to enable or disable the cinematic mode.
      */
     void setCinematicCamera(boolean cinematic);
 
     /**
-     * Sets the camera in focus mode with the focus object that bears the given
+     * Set the camera in focus mode with the focus object that bears the given
      * <code>focusName</code>. It returns immediately, so it does not wait for
      * the camera direction to point to the focus.
      *
@@ -334,7 +334,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraFocus(String focusName);
 
     /**
-     * Sets the camera in focus mode with the focus object that bears the given
+     * Set the camera in focus mode with the focus object that bears the given
      * <code>focusName</code>. The amount of time to block and wait for the
      * camera to face the focus can also be specified in
      * <code>waitTimeSeconds</code>.
@@ -347,7 +347,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         float waitTimeSeconds);
 
     /**
-     * Sets the camera in focus mode with the given focus object. It also
+     * Set the camera in focus mode with the given focus object. It also
      * instantly sets the camera direction vector to point towards the focus.
      *
      * @param focusName The name of the new focus object.
@@ -355,7 +355,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraFocusInstant(final String focusName);
 
     /**
-     * Sets the camera in focus mode with the given focus object and instantly moves
+     * Set the camera in focus mode with the given focus object and instantly moves
      * the camera next to the focus object.
      *
      * @param focusName The name of the new focus object.
@@ -388,12 +388,12 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraOrientationLock(boolean lock);
 
     /**
-     * Sets the camera in free mode.
+     * Set the camera in free mode.
      */
     void setCameraFree();
 
     /**
-     * Sets the camera position to the given coordinates, in Km, equatorial
+     * Set the camera position to the given coordinates, in Km, equatorial
      * system.
      *
      * @param vec Vector of three components in internal coordinates and Km.
@@ -404,7 +404,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraPostion(double[] vec);
 
     /**
-     * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
+     * Set the camera position to the given coordinates, in the internal reference system and kilometres.
      * The <code>immediate</code> parameter enables setting the camera state
      * immediately without waiting for the possible current update
      * operation to finish. Set this to true if you run this function
@@ -417,7 +417,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            boolean immediate);
 
     /**
-     * Sets the camera position to the given coordinates, in the internal reference system and in the requested units.
+     * Set the camera position to the given coordinates, in the internal reference system and in the requested units.
      * The <code>immediate</code> parameter enables setting the camera state
      * immediately without waiting for the possible current update
      * operation to finish. Set this to true if you run this function
@@ -464,7 +464,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            boolean immediate);
 
     /**
-     * Gets the current camera position, in km.
+     * Get the current camera position, in km.
      *
      * @return The camera position coordinates in the internal reference system,
      *         in km.
@@ -472,7 +472,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] getCameraPosition();
 
     /**
-     * Gets the current camera position, in the requested units.
+     * Get the current camera position, in the requested units.
      *
      * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
      *
@@ -481,7 +481,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] getCameraPosition(String units);
 
     /**
-     * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
+     * Set the camera position to the given coordinates, in the internal reference system and kilometres.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
      * within a parked runnable, use {@link #setCameraPosition(double[], boolean)},
@@ -492,7 +492,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraPosition(double[] position);
 
     /**
-     * Sets the camera position to the given coordinates, in the internal reference system and the given units.
+     * Set the camera position to the given coordinates, in the internal reference system and the given units.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
      * within a parked runnable, use {@link #setCameraPosition(double[], boolean)},
@@ -505,7 +505,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            String units);
 
     /**
-     * Sets the camera direction vector to the given vector, in the internal reference system.
+     * Set the camera direction vector to the given vector, in the internal reference system.
      * The <code>immediate</code> parameter enables setting the camera state
      * immediately without waiting for the possible current update
      * operation to finish. Set this to true if you run this function
@@ -518,14 +518,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             boolean immediate);
 
     /**
-     * Gets the current camera direction vector.
+     * Get the current camera direction vector.
      *
      * @return The camera direction vector in the internal reference system.
      */
     double[] getCameraDirection();
 
     /**
-     * Sets the camera direction vector to the given vector, in the internal reference system.
+     * Set the camera direction vector to the given vector, in the internal reference system.
      * You can convert from spherical coordinates using
      * {@link #equatorialCartesianToInternalCartesian(double[], double)},
      * {@link #galacticToInternalCartesian(double, double, double)} and
@@ -540,7 +540,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraDirection(double[] dir);
 
     /**
-     * Creates a smooth camera orientation transition from the current camera orientation
+     * Create a smooth camera orientation transition from the current camera orientation
      * to the given sky coordinates, in equatorial coordinates.
      * This method sets the camera in free mode.
      *
@@ -550,7 +550,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraDirectionEquatorial(double alpha, double delta);
 
     /**
-     * Creates a smooth camera orientation transition from the current camera orientation
+     * Create a smooth camera orientation transition from the current camera orientation
      * to the given sky coordinates, in galactic coordinates.
      * This method sets the camera in free mode.
      *
@@ -560,7 +560,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraDirectionGalactic(double l, double b);
 
     /**
-     * Sets the camera up vector to the given vector, in the internal reference system.
+     * Set the camera up vector to the given vector, in the internal reference system.
      * The <code>immediate</code> parameter enables setting the camera state
      * immediately without waiting for the possible current update
      * operation to finish. Set this to true if you run this function
@@ -573,14 +573,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      boolean immediate);
 
     /**
-     * Gets the current camera up vector.
+     * Get the current camera up vector.
      *
      * @return The camera up vector in the internal reference system.
      */
     double[] getCameraUp();
 
     /**
-     * Sets the camera up vector to the given vector, in the internal reference system.
+     * Set the camera up vector to the given vector, in the internal reference system.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
      * within a parked runnable, use {@link #setCameraUp(double[], boolean)},
@@ -591,21 +591,21 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraUp(double[] up);
 
     /**
-     * Sets the camera orientation to the given quaternion, given as an array of [x, y, z, w].
+     * Set the camera orientation to the given quaternion, given as an array of [x, y, z, w].
      *
      * @param quaternion The 4-component quaternion.
      */
     void setCameraOrientationQuaternion(double[] quaternion);
 
     /**
-     * Gets the current camera orientation quaternion.
+     * Get the current camera orientation quaternion.
      *
      * @return The current camera orientation quaternion, as an array of [x, y, z, w].
      */
     double[] getCameraOrientationQuaternion();
 
     /**
-     * Sets the focus and instantly moves the camera to a point in the line
+     * Set the focus and instantly moves the camera to a point in the line
      * defined by <code>focus</code>-<code>other</code> and rotated
      * <code>rotation</code> degrees around <code>focus</code> using the camera
      * up vector as a rotation axis.
@@ -622,7 +622,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                    double solidAngle);
 
     /**
-     * Sets the camera in free mode and points it to the given coordinates in equatorial system.
+     * Set the camera in free mode and points it to the given coordinates in equatorial system.
      *
      * @param ra  Right ascension in degrees.
      * @param dec Declination in degrees.
@@ -631,28 +631,28 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               double dec);
 
     /**
-     * Gets the current physical speed of the camera in km/h.
+     * Get the current physical speed of the camera in km/h.
      *
      * @return The current speed of the camera in km/h.
      */
     double getCameraSpeed();
 
     /**
-     * Changes the speed multiplier of the camera and its acceleration.
+     * Change the speed multiplier of the camera and its acceleration.
      *
      * @param speed The new speed, from 0 to 100.
      */
     void setCameraSpeed(float speed);
 
     /**
-     * Changes the speed of the camera when it rotates around a focus.
+     * Change the speed of the camera when it rotates around a focus.
      *
      * @param speed The new rotation speed in [0,100]
      */
     void setCameraRotationSpeed(float speed);
 
     /**
-     * Changes the speed of the camera when it rotates around a focus.
+     * Change the speed of the camera when it rotates around a focus.
      *
      * @param speed The new rotation speed in [0,100]
      *
@@ -662,14 +662,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setRotationCameraSpeed(float speed);
 
     /**
-     * Changes the turning speed of the camera.
+     * Change the turning speed of the camera.
      *
      * @param speed The new turning speed, from 1 to 100.
      */
     void setCameraTurningSpeed(float speed);
 
     /**
-     * Changes the turning speed of the camera.
+     * Change the turning speed of the camera.
      *
      * @param speed The new turning speed, from 1 to 100.
      *
@@ -717,7 +717,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraSpeedLimit(int index);
 
     /**
-     * Sets the camera to track the object with the given name. In this mode,
+     * Set the camera to track the object with the given name. In this mode,
      * the position of the camera is still dependent on the focus object (if any), but
      * its direction points to the tracking object.
      *
@@ -726,12 +726,12 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraTrackingObject(String objectName);
 
     /**
-     * Removes the tracking object from the camera, if any.
+     * Remove the tracking object from the camera, if any.
      */
     void removeCameraTrackingObject();
 
     /**
-     * Adds a forward movement to the camera with the given value. If value is
+     * Add a forward movement to the camera with the given value. If value is
      * negative the movement is backwards.
      *
      * @param value The magnitude of the movement, between -1 and 1.
@@ -739,7 +739,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void cameraForward(double value);
 
     /**
-     * Adds a rotation movement to the camera around the current focus, or a pitch/yaw if in free mode.
+     * Add a rotation movement to the camera around the current focus, or a pitch/yaw if in free mode.
      * <p>
      * If the camera is not using the cinematic behaviour ({@link #setCinematicCamera(boolean)},
      * the rotation movement will not be permanent. Use the cinematic behaviour to have the camera
@@ -754,14 +754,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                       double deltaY);
 
     /**
-     * Adds a roll force to the camera.
+     * Add a roll force to the camera.
      *
      * @param roll The intensity of the roll.
      */
     void cameraRoll(double roll);
 
     /**
-     * Adds a turn force to the camera (yaw and/or pitch). If the camera is in focus mode, it
+     * Add a turn force to the camera (yaw and/or pitch). If the camera is in focus mode, it
      * permanently deviates the line of sight from the focus until centered
      * again.
      * If the camera is not using the cinematic behaviour ({@link #setCinematicCamera(boolean)},
@@ -777,7 +777,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                     double deltaY);
 
     /**
-     * Adds a yaw to the camera. Same as {@link #cameraTurn(double, double)} with
+     * Add a yaw to the camera. Same as {@link #cameraTurn(double, double)} with
      * deltaY set to zero.
      *
      * @param amount The amount.
@@ -785,7 +785,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void cameraYaw(double amount);
 
     /**
-     * Adds a pitch to the camera. Same as {@link #cameraTurn(double, double)} with
+     * Add a pitch to the camera. Same as {@link #cameraTurn(double, double)} with
      * deltaX set to zero.
      *
      * @param amount The amount.
@@ -804,7 +804,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void cameraCenter();
 
     /**
-     * Returns the closest object to the camera in this instant as a
+     * Return the closest object to the camera in this instant as a
      * {@link IFocus}.
      *
      * @return The closest object to the camera.
@@ -812,7 +812,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     IFocus getClosestObjectToCamera();
 
     /**
-     * Changes the field of view of the camera.
+     * Change the field of view of the camera.
      *
      * @param newFov The new field of view value in degrees, between {@link gaiasky.util.Constants#MIN_FOV} and
      *               {@link gaiasky.util.Constants#MAX_FOV}.
@@ -827,7 +827,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double getFov();
 
     /**
-     * Sets the camera state (position, direction and up vector).
+     * Set the camera state (position, direction and up vector).
      *
      * @param pos The position of the camera in internal units, not Km.
      * @param dir The direction of the camera.
@@ -838,7 +838,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         double[] up);
 
     /**
-     * Sets the camera state (position, direction and up vector) plus the current time.
+     * Set the camera state (position, direction and up vector) plus the current time.
      *
      * @param pos  The position of the camera in internal units, not Km.
      * @param dir  The direction of the camera.
@@ -861,7 +861,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                        boolean visible);
 
     /**
-     * Sets the component described by the given name visible or invisible.
+     * Set the component described by the given name visible or invisible.
      *
      * @param key     The key of the component: "element.stars", "element.planets",
      *                "element.moons", etc. See
@@ -872,7 +872,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                     boolean visible);
 
     /**
-     * Gets the visibility of the component type described by the key. Examples of keys are
+     * Get the visibility of the component type described by the key. Examples of keys are
      * "element.stars", "element.planets" or "element.moons". See {@link gaiasky.render.ComponentTypes.ComponentType}.
      *
      * @param key The key of the component type to query.
@@ -902,8 +902,8 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] getObjectScreenCoordinates(String name);
 
     /**
-     * Sets the visibility of a particular object. Use this method to hide individual objects.
-     * Changes to the individual object visibility are not persisted on restart.
+     * Set the visibility of a particular object. Use this method to hide individual objects.
+     * Change to the individual object visibility are not persisted on restart.
      *
      * @param name    The name of the object. Must be an instance of {@link IVisibilitySwitch}.
      * @param visible The visible status to set. Set to false in order to hide the object. True to make it visible.
@@ -914,7 +914,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                 boolean visible);
 
     /**
-     * Gets the visibility of a particular object.
+     * Get the visibility of a particular object.
      *
      * @param name The name of the object. Must be an instance of {@link IVisibilitySwitch}.
      *
@@ -924,7 +924,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Sets the given quaternions file (CSV with times and quaternions) as the orientation provider
+     * Set the given quaternions file (CSV with times and quaternions) as the orientation provider
      * for this object. This call removes the previous orientation model from the object (either
      * {@link RigidRotation} or {@link AttitudeComponent}.
      * </p>
@@ -945,7 +945,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Sets the given quaternions file (CSV with times and quaternions) as the orientation provider
+     * Set the given quaternions file (CSV with times and quaternions) as the orientation provider
      * for this object. This call removes the previous orientation model from the object (either
      * {@link RigidRotation} or {@link AttitudeComponent}.
      * </p>
@@ -964,7 +964,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                                 String file);
 
     /**
-     * Sets the label size factor. The label size will be multiplied by this.
+     * Set the label size factor. The label size will be multiplied by this.
      *
      * @param factor Factor in {@link Constants#MIN_LABEL_SIZE} and {@link Constants#MAX_LABEL_SIZE}.
      */
@@ -1022,7 +1022,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                       boolean muteLabel);
 
     /**
-     * Sets the label color of the object identified by the given name.
+     * Set the label color of the object identified by the given name.
      * The label color must be an array of RGBA values in [0,1].
      *
      * @param name  The object name.
@@ -1032,7 +1032,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                        double[] color);
 
     /**
-     * Gets the value of the force display label flag for the object identified with the
+     * Get the value of the force display label flag for the object identified with the
      * given name.
      *
      * @param name The name of the object.
@@ -1042,28 +1042,28 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean getForceDisplayLabel(String name);
 
     /**
-     * Sets the line width factor. The line width will be multiplied by this.
+     * Set the line width factor. The line width will be multiplied by this.
      *
      * @param factor Factor in {@link Constants#MIN_LINE_WIDTH} and {@link Constants#MAX_LINE_WIDTH}.
      */
     void setLineWidthFactor(float factor);
 
     /**
-     * Sets the number factor of proper motion vectors that are visible. In [1,100].
+     * Set the number factor of proper motion vectors that are visible. In [1,100].
      *
      * @param factor Factor in [1,100].
      */
     void setProperMotionsNumberFactor(float factor);
 
     /**
-     * Sets the length of the proper motion vectors, in [500,30000].
+     * Set the length of the proper motion vectors, in [500,30000].
      *
      * @param factor Factor in [500,30000].
      */
     void setProperMotionsLengthFactor(float factor);
 
     /**
-     * Sets the color mode of proper motion vectors.
+     * Set the color mode of proper motion vectors.
      *
      * @param mode The color mode:
      *             <ul>
@@ -1078,49 +1078,49 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setProperMotionsColorMode(int mode);
 
     /**
-     * Sets whether to show arrowheads or not for the velocity vectors.
+     * Set whether to show arrowheads or not for the velocity vectors.
      *
      * @param arrowheadsEnabled Whether to show the velocity vectors with arrowheads.
      */
     void setProperMotionsArrowheads(boolean arrowheadsEnabled);
 
     /**
-     * Returns the current maximum number of velocity vectors per star group.
+     * Return the current maximum number of velocity vectors per star group.
      *
      * @return Max number of velocity vectors per star group.
      */
     long getProperMotionsMaxNumber();
 
     /**
-     * Sets the maximum number of proper motion vectors to add per star group.
+     * Set the maximum number of proper motion vectors to add per star group.
      *
      * @param maxNumber The maximum number of proper motion vectors per star group.
      */
     void setProperMotionsMaxNumber(long maxNumber);
 
     /**
-     * Sets the visibility of all cross-hairs.
+     * Set the visibility of all cross-hairs.
      *
      * @param visible The visibility state, which applies to all cross-hairs.
      */
     void setCrosshairVisibility(boolean visible);
 
     /**
-     * Sets the visibility of the focus object crosshair.
+     * Set the visibility of the focus object crosshair.
      *
      * @param visible The visibility state.
      */
     void setFocusCrosshairVisibility(boolean visible);
 
     /**
-     * Sets the visibility of the closest object crosshair.
+     * Set the visibility of the closest object crosshair.
      *
      * @param visible The visibility state.
      */
     void setClosestCrosshairVisibility(boolean visible);
 
     /**
-     * Sets the visibility of the home object crosshair.
+     * Set the visibility of the home object crosshair.
      *
      * @param visible The visibility state.
      */
@@ -1134,14 +1134,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setMinimapVisibility(boolean visible);
 
     /**
-     * Sets the ambient light to a certain value.
+     * Set the ambient light to a certain value.
      *
      * @param value The value of the ambient light in [0,1].
      */
     void setAmbientLight(float value);
 
     /**
-     * Sets the time of the application to the given time, in UTC.
+     * Set the time of the application to the given time, in UTC.
      *
      * @param year     The year to represent.
      * @param month    The month-of-year to represent, from 1 (January) to 12
@@ -1161,7 +1161,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            int millisec);
 
     /**
-     * Returns the current simulation time as the number of milliseconds since
+     * Return the current simulation time as the number of milliseconds since
      * 1970-01-01T00:00:00Z (UTC).
      *
      * @return Number of milliseconds since the epoch (Jan 1, 1970 00:00:00 UTC).
@@ -1169,7 +1169,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     long getSimulationTime();
 
     /**
-     * Sets the time of the application. The long value represents specified
+     * Set the time of the application. The long value represents specified
      * number of milliseconds since the standard base time known as "the epoch",
      * namely January 1, 1970, 00:00:00 GMT.
      *
@@ -1178,7 +1178,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setSimulationTime(long time);
 
     /**
-     * Returns the current UTC simulation time in an array.
+     * Return the current UTC simulation time in an array.
      *
      * @return The current simulation time in an array with the given indices.
      *         <ul>
@@ -1194,7 +1194,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     int[] getSimulationTimeArr();
 
     /**
-     * Starts the simulation.
+     * Start the simulation.
      */
     void startSimulationTime();
 
@@ -1217,7 +1217,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setSimulationPace(double pace);
 
     /**
-     * Sets the simulation time warp factor. Positive values make time advance forward, while negative values make time
+     * Set the simulation time warp factor. Positive values make time advance forward, while negative values make time
      * run backwards. A warp factor of 1 sets a real time pace to the simulation time.
      *
      * @param warp The warp as a factor. A value of 2.0 sets the
@@ -1226,7 +1226,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setTimeWarp(double warp);
 
     /**
-     * Sets a time bookmark in the global clock that, when reached, the clock
+     * Set a time bookmark in the global clock that, when reached, the clock
      * automatically stops.
      *
      * @param ms The time as the number of milliseconds since the epoch (Jan 1,
@@ -1235,7 +1235,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setTargetTime(long ms);
 
     /**
-     * Sets a time bookmark in the global clock that, when reached, the clock
+     * Set a time bookmark in the global clock that, when reached, the clock
      * automatically stops.
      *
      * @param year     The year to represent.
@@ -1261,21 +1261,21 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void unsetTargetTime();
 
     /**
-     * Gets the star brightness value.
+     * Get the star brightness value.
      *
      * @return The brightness value, between 0 and 100.
      */
     float getStarBrightness();
 
     /**
-     * Sets the star brightness value.
+     * Set the star brightness value.
      *
      * @param brightness The brightness value, between 0 and 100.
      */
     void setStarBrightness(float brightness);
 
     /**
-     * Sets the star brightness power profile value in [1.1, 0.9]. Default value is 1.
+     * Set the star brightness power profile value in [1.1, 0.9]. Default value is 1.
      * The power is applied to the star solid angle (from camera),
      * before clamping, as sa = pow(sa, r).
      *
@@ -1284,7 +1284,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarBrightnessPower(float power);
 
     /**
-     * Sets the star glow factor level value. This controls the amount of glow light
+     * Set the star glow factor level value. This controls the amount of glow light
      * when the camera is close to stars. Must be between {@link Constants#MIN_STAR_GLOW_FACTOR} and
      * {@link Constants#MAX_STAR_GLOW_FACTOR}.
      * Default is 0.06.
@@ -1294,14 +1294,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarGlowFactor(float glowFactor);
 
     /**
-     * Gets the current point size value in pixels.
+     * Get the current point size value in pixels.
      *
      * @return The size value, in pixels.
      */
     float getPointSize();
 
     /**
-     * Gets the current star size value in pixels.
+     * Get the current star size value in pixels.
      *
      * @return The size value, in pixels.
      *
@@ -1311,7 +1311,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     float getStarSize();
 
     /**
-     * Sets the base point size.
+     * Set the base point size.
      *
      * @param size The size value, between {@link Constants#MIN_STAR_POINT_SIZE} and
      *             {@link Constants#MAX_STAR_POINT_SIZE}.
@@ -1319,7 +1319,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setPointSize(float size);
 
     /**
-     * Sets the size of the rasterized stars, in pixels.
+     * Set the size of the rasterized stars, in pixels.
      *
      * @param size The size value in pixels, between {@link Constants#MIN_STAR_POINT_SIZE} and
      *             {@link Constants#MAX_STAR_POINT_SIZE}.
@@ -1330,14 +1330,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarSize(float size);
 
     /**
-     * Gets the base star opacity.
+     * Get the base star opacity.
      *
      * @return The base opacity value.
      */
     float getStarBaseOpacity();
 
     /**
-     * Gets the minimum star opacity.
+     * Get the minimum star opacity.
      *
      * @return The minimum opacity value.
      *
@@ -1347,7 +1347,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     float getStarMinOpacity();
 
     /**
-     * Sets the base star opacity.
+     * Set the base star opacity.
      *
      * @param opacity The base opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and
      *                {@link Constants#MAX_STAR_MIN_OPACITY}.
@@ -1355,7 +1355,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarBaseOpacity(float opacity);
 
     /**
-     * Sets the minimum star opacity.
+     * Set the minimum star opacity.
      *
      * @param opacity The minimum opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and
      *                {@link Constants#MAX_STAR_MIN_OPACITY}.
@@ -1366,7 +1366,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarMinOpacity(float opacity);
 
     /**
-     * Sets the star texture index, in [1, 4]
+     * Set the star texture index, in [1, 4]
      * <p>
      * 1 - horizontal spike
      * 2 - god rays
@@ -1378,7 +1378,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarTextureIndex(int index);
 
     /**
-     * Sets the number of nearest stars to be processed for each
+     * Set the number of nearest stars to be processed for each
      * star group. This will limit the number of stars that are
      * rendered with billboards, labels and velocity vectors.
      *
@@ -1394,14 +1394,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarGroupBillboard(boolean flag);
 
     /**
-     * Sets the solid angle below which orbits fade and disappear.
+     * Set the solid angle below which orbits fade and disappear.
      *
      * @param angleDeg The threshold angle in degrees
      */
     void setOrbitSolidAngleThreshold(float angleDeg);
 
     /**
-     * Sets the projection yaw angle (if this is a replica instance), in degrees.
+     * Set the projection yaw angle (if this is a replica instance), in degrees.
      * The yaw angle turns the camera to the right.
      * This function is intended for multi-projector setups, to configure
      * replicas without restarting Gaia Sky.
@@ -1411,7 +1411,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setProjectionYaw(float yaw);
 
     /**
-     * Sets the projection pitch angle (if this is a replica instance), in degrees.
+     * Set the projection pitch angle (if this is a replica instance), in degrees.
      * The pitch angle turns the camera up.
      * This function is intended for multi-projector setups, to configure
      * replicas without restarting Gaia Sky.
@@ -1421,7 +1421,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setProjectionPitch(float pitch);
 
     /**
-     * Sets the projection roll angle (if this is a replica instance), in degrees.
+     * Set the projection roll angle (if this is a replica instance), in degrees.
      * The roll angle rolls the camera clockwise.
      * This function is intended for multi-projector setups, to configure
      * replicas without restarting Gaia Sky.
@@ -1469,7 +1469,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               String namePrefix);
 
     /**
-     * Sets the screenshot mode. Possible values are 'simple' and 'advanced'.
+     * Set the screenshot mode. Possible values are 'simple' and 'advanced'.
      * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
      * resolution and containing the UI elements.
      * The <b>advanced</b> mode redraws the last frame using the resolution configured using
@@ -1546,7 +1546,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               String namePrefix);
 
     /**
-     * Sets the frame output mode. Possible values are 'simple' and 'advanced'.
+     * Set the frame output mode. Possible values are 'simple' and 'advanced'.
      * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
      * resolution and containing the UI elements.
      * The <b>advanced</b> mode redraws the last frame using the resolution configured using
@@ -1575,7 +1575,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean isFrameOutputActive();
 
     /**
-     * Gets the current FPS setting in the frame output system.
+     * Get the current FPS setting in the frame output system.
      *
      * @return The FPS setting.
      *
@@ -1585,7 +1585,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double getRenderOutputFps();
 
     /**
-     * Gets the current FPS setting in the frame output system.
+     * Get the current FPS setting in the frame output system.
      *
      * @return The FPS setting.
      */
@@ -1600,7 +1600,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setFrameOutput(boolean active);
 
     /**
-     * Gets an object from the scene graph by <code>name</code> or id (HIP, TYC, Gaia SourceId).
+     * Get an object from the scene graph by <code>name</code> or id (HIP, TYC, Gaia SourceId).
      *
      * @param name The name or id (HIP, TYC, Gaia SourceId) of the object.
      *
@@ -1610,7 +1610,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     FocusView getObject(String name);
 
     /**
-     * Gets an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
+     * Get an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
      * until the object is available, with a timeout.
      *
      * @param name           The name or id (HIP, TYC, Gaia SourceId) of the object.
@@ -1624,7 +1624,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         double timeoutSeconds);
 
     /**
-     * Gets a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
+     * Get a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
      *
      * @param name The name of the line object.
      *
@@ -1634,7 +1634,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     VertsView getLineObject(String name);
 
     /**
-     * Gets a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
+     * Get a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
      *
      * @param name           The name of the line object.
      * @param timeoutSeconds The timeout in seconds to wait until returning.
@@ -1647,7 +1647,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             double timeoutSeconds);
 
     /**
-     * Sets the given size scaling factor to the object identified by
+     * Set the given size scaling factor to the object identified by
      * <code>name</code>. This method will only work with model objects such as
      * planets, asteroids, satellites, etc. It will not work with orbits, stars
      * or any other types.
@@ -1664,7 +1664,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               double scalingFactor);
 
     /**
-     * Sets the given orbit coordinates scaling factor to the AbstractOrbitCoordinates identified by
+     * Set the given orbit coordinates scaling factor to the AbstractOrbitCoordinates identified by
      * <code>name</code>. See {@link gaiasky.util.coord.AbstractOrbitCoordinates} and its subclasses.
      * <p>
      * Also, <strong>use this with caution</strong>, as scaling coordinates
@@ -1706,7 +1706,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void forceUpdateScene();
 
     /**
-     * Gets the size of the object identified by <code>name</code>, in kilometres.
+     * Get the size of the object identified by <code>name</code>, in kilometres.
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      *
@@ -1771,7 +1771,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                     float waitTimeSeconds);
 
     /**
-     * Sets the camera in focus mode with the given focus object and instantly moves
+     * Set the camera in focus mode with the given focus object and instantly moves
      * the camera next to the focus object.
      *
      * @param name The name of the new focus object.
@@ -1862,7 +1862,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               double latitude);
 
     /**
-     * Returns the distance to the surface of the object identified with the
+     * Return the distance to the surface of the object identified with the
      * given <code>name</code>. If the object is an abstract node or does not
      * exist, it returns a negative distance.
      *
@@ -1874,7 +1874,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double getDistanceTo(String name);
 
     /**
-     * Returns the star parameters given its identifier or name, if the star exists
+     * Return the star parameters given its identifier or name, if the star exists
      * and it is loaded.
      *
      * @param starId The star identifier or name.
@@ -1886,7 +1886,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] getStarParameters(String starId);
 
     /**
-     * Gets the current position of the object identified by <code>name</code> in
+     * Get the current position of the object identified by <code>name</code> in
      * the internal coordinate system and internal units. If the object does not exist,
      * it returns null.
      *
@@ -1897,7 +1897,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] getObjectPosition(String name);
 
     /**
-     * Gets the current position of the object identified by <code>name</code> in
+     * Get the current position of the object identified by <code>name</code> in
      * the internal coordinate system and the requested distance units. If the object does not exist,
      * it returns null.
      *
@@ -1910,7 +1910,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                String units);
 
     /**
-     * Gets the predicted position of the object identified by <code>name</code> in
+     * Get the predicted position of the object identified by <code>name</code> in
      * the internal coordinate system and internal units. If the object does not exist,
      * it returns null.
      * The predicted position is the position of the object in the next update cycle, and
@@ -1923,7 +1923,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] getObjectPredictedPosition(String name);
 
     /**
-     * Gets the predicted position of the object identified by <code>name</code> in
+     * Get the predicted position of the object identified by <code>name</code> in
      * the internal coordinate system and the requested distance units. If the object does not exist,
      * it returns null.
      * The predicted position is the position of the object in the next update cycle, and
@@ -1938,7 +1938,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                         String units);
 
     /**
-     * Sets the internal position of the object identified by <code>name</code>. Note that
+     * Set the internal position of the object identified by <code>name</code>. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
@@ -1949,7 +1949,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            double[] position);
 
     /**
-     * Sets the internal position of the object identified by <code>name</code>. Note that
+     * Set the internal position of the object identified by <code>name</code>. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
@@ -1962,7 +1962,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            String units);
 
     /**
-     * Sets the internal position of the given entity object. Note that
+     * Set the internal position of the given entity object. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
@@ -1973,7 +1973,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            double[] position);
 
     /**
-     * Sets the internal position of the given entity object. Note that
+     * Set the internal position of the given entity object. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
@@ -1986,7 +1986,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            String units);
 
     /**
-     * Sets the internal position of the given entity object. Note that
+     * Set the internal position of the given entity object. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
@@ -1997,7 +1997,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            double[] position);
 
     /**
-     * Sets the internal position of the given entity object. Note that
+     * Set the internal position of the given entity object. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
@@ -2010,7 +2010,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            String units);
 
     /**
-     * Sets the coordinates provider for the object identified with the given name, if possible.
+     * Set the coordinates provider for the object identified with the given name, if possible.
      * The provider object must implement {@link IPythonCoordinatesProvider}, and in particular
      * the method {@link IPythonCoordinatesProvider#getEquatorialCartesianCoordinates(Object, Object)}, which
      * takes in a julian date and outputs the object coordinates in the internal cartesian system.
@@ -2022,7 +2022,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                       IPythonCoordinatesProvider provider);
 
     /**
-     * Removes the current coordinates provider from the object with the given name. This method must
+     * Remove the current coordinates provider from the object with the given name. This method must
      * be called before shutting down the gateway if the coordinates provider has been previously set
      * for the given object from Python with {@link #setObjectCoordinatesProvider(String, IPythonCoordinatesProvider)}.
      * Otherwise, Gaia Sky will crash due to the missing connection to Python.
@@ -2032,7 +2032,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void removeObjectCoordinatesProvider(String name);
 
     /**
-     * Adds a new trajectory object with the given name, points and color. The trajectory
+     * Add a new trajectory object with the given name, points and color. The trajectory
      * is rendered using the 'line renderer' setting in the preferences dialog.
      * This is a very similar call to {@link #addPolyline(String, double[], double[])},
      * but in this case the line can be rendered with higher quality
@@ -2048,7 +2048,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            double[] color);
 
     /**
-     * Adds a new trajectory object with the given name, points and color. The trajectory
+     * Add a new trajectory object with the given name, points and color. The trajectory
      * is rendered using the 'line renderer' setting in the preferences' dialog.
      * This is a very similar call to {@link #addPolyline(String, double[], double[])},
      * but in this case the line can be rendered with higher quality
@@ -2071,7 +2071,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                            double trailMap);
 
     /**
-     * Adds a new polyline with the given name, points and color. The polyline will
+     * Add a new polyline with the given name, points and color. The polyline will
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it. The default primitive of GL_LINE_STRIP
      * is used.
@@ -2086,7 +2086,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      double[] color);
 
     /**
-     * Adds a new polyline with the given name, points, color and line width. The polyline will
+     * Add a new polyline with the given name, points, color and line width. The polyline will
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it. The default primitive type of GL_LINE_STRIP
      * is used.
@@ -2103,7 +2103,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      double lineWidth);
 
     /**
-     * Adds a new polyline with the given name, points, color and line width. The polyline will
+     * Add a new polyline with the given name, points, color and line width. The polyline will
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it. The default primitive type of GL_LINE_STRIP
      * is used. This version enables the addition of arrow caps. In the case arrow caps
@@ -2125,7 +2125,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      boolean arrowCaps);
 
     /**
-     * Adds a new polyline with the given name, points, color, line width and primitive. The polyline will
+     * Add a new polyline with the given name, points, color, line width and primitive. The polyline will
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it.
      *
@@ -2143,7 +2143,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      int primitive);
 
     /**
-     * Adds a new polyline with the given name, points, color, line width, primitive and arrow caps. The polyline will
+     * Add a new polyline with the given name, points, color, line width, primitive and arrow caps. The polyline will
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it. This version enables the addition of arrow caps. In the case arrow
      * caps
@@ -2167,7 +2167,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      boolean arrowCaps);
 
     /**
-     * Removes the model object identified by the given name from the internal
+     * Remove the model object identified by the given name from the internal
      * scene graph model of Gaia Sky, if it exists.
      * If the object has children, they are removed recursively.
      * Be careful with this function, as it can have unexpected side effects
@@ -2185,14 +2185,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void removeModelObject(String name);
 
     /**
-     * Sets the vertical scroll position in the GUI.
+     * Set the vertical scroll position in the GUI.
      *
      * @param pixelY The pixel to set the scroll position to.
      */
     void setGuiScrollPosition(float pixelY);
 
     /**
-     * Enables the GUI rendering. This makes the user interface
+     * Enable the GUI rendering. This makes the user interface
      * to be rendered and updated again if it was previously disabled. Otherwise, it has
      * no effect.
      */
@@ -2205,7 +2205,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void disableGui();
 
     /**
-     * Gets the current scale factor applied to the UI.
+     * Get the current scale factor applied to the UI.
      *
      * @return The scale factor.
      */
@@ -2307,21 +2307,21 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void waitForInput(int code);
 
     /**
-     * Returns the screen width in pixels.
+     * Return the screen width in pixels.
      *
      * @return The screen width in pixels.
      */
     int getScreenWidth();
 
     /**
-     * Returns the screen height in pixels.
+     * Return the screen height in pixels.
      *
      * @return The screen height in pixels.
      */
     int getScreenHeight();
 
     /**
-     * Returns the size and position of the GUI element that goes by the given
+     * Return the size and position of the GUI element that goes by the given
      * name or null if such element does not exist. <strong>Warning> This will
      * only work in asynchronous mode.</strong>
      *
@@ -2334,21 +2334,21 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     float[] getPositionAndSizeGui(String name);
 
     /**
-     * Returns a string with the version number, build string, system, builder and build time.
+     * Return a string with the version number, build string, system, builder and build time.
      *
      * @return A string with the full version information.
      */
     String getVersion();
 
     /**
-     * Returns the version number string.
+     * Return the version number string.
      *
      * @return The version number string.
      */
     String getVersionNumber();
 
     /**
-     * Returns the build string.
+     * Return the build string.
      *
      * @return The build string.
      */
@@ -2367,7 +2367,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                       long timeoutMs);
 
     /**
-     * Sets the target frame rate of the camcorder. This artificially sets the frame rate (the frame time) of Gaia
+     * Set the target frame rate of the camcorder. This artificially sets the frame rate (the frame time) of Gaia
      * Sky to this value while the camera is recording and playing. Make sure to use the right FPS setting during
      * playback!
      *
@@ -2382,21 +2382,21 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCameraRecorderFps(double targetFps);
 
     /**
-     * Gets the current frame rate setting of the camcorder.
+     * Get the current frame rate setting of the camcorder.
      *
      * @return The FPS setting of the camcorder.
      */
     double getCamcorderFps();
 
     /**
-     * Starts recording the camera path to an auto-generated file in the default
+     * Start recording the camera path to an auto-generated file in the default
      * camera directory. This command has no
      * effect if the camera is already being recorded.
      */
     void startRecordingCameraPath();
 
     /**
-     * Starts recording a camera path with the given filename. The filename
+     * Start recording a camera path with the given filename. The filename
      * is without extension or path. The final path with the camera file, after
      * invoking {@link #stopRecordingCameraPath()}, is:
      * <br /><br />
@@ -2407,13 +2407,13 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void startRecordingCameraPath(String fileName);
 
     /**
-     * Stops the current camera recording. This command has no effect if the
+     * Stop the current camera recording. This command has no effect if the
      * camera was not being recorded.
      */
     void stopRecordingCameraPath();
 
     /**
-     * Runs the camera recording file with the given path. Does not
+     * Run the camera recording file with the given path. Does not
      * wait for the camera file to finish playing.
      *
      * @param file The path of the camera file. Path is relative to the application's root directory or absolute.
@@ -2421,7 +2421,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void runCameraRecording(String file);
 
     /**
-     * Runs a .gsc camera path file and returns immediately. This
+     * Run a <code>.gsc</code> camera path file and returns immediately. This
      * function does not wait for the camera file to finish playing.
      *
      * @param file The path to the camera file. Path is relative to the application's root directory or absolute.
@@ -2434,7 +2434,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void playCameraPath(String file);
 
     /**
-     * Runs a .gsc camera path file and returns immediately. This
+     * Run a <code>.gsc</code> camera path file and returns immediately. This
      * function accepts a boolean indicating whether to wait for the
      * camera path file to finish or not.
      *
@@ -2453,7 +2453,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. This function waits for the transition to finish and then returns control
      * to the script.
      * </p>
@@ -2474,7 +2474,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. This function waits for the transition to finish and then returns control
      * to the script.
      * <p>
@@ -2511,7 +2511,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
      * </p>
@@ -2535,7 +2535,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
      * </p>
@@ -2561,7 +2561,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds.
      * </p>
      * <p>
@@ -2611,7 +2611,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds.
      * </p>
      * <p>
@@ -2669,7 +2669,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera position to the given camera position in
+     * Create a smooth transition from the current camera position to the given camera position in
      * the given number of seconds.
      * </p>
      * <p>
@@ -2709,7 +2709,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
 
     /**
      * <p>
-     * Creates a smooth transition from the current camera orientation to the given camera orientation {camDir, camUp}
+     * Create a smooth transition from the current camera orientation to the given camera orientation {camDir, camUp}
      * in
      * the given number of seconds.
      * </p>
@@ -2748,7 +2748,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                      boolean sync);
 
     /**
-     * Creates a time transition from the current time to the given time (year, month, day, hour, minute, second,
+     * Create a time transition from the current time to the given time (year, month, day, hour, minute, second,
      * millisecond). The time is given in UTC.
      *
      * @param year            The year to represent.
@@ -2803,7 +2803,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void sleepFrames(long frames);
 
     /**
-     * Converts galactic coordinates to the internal cartesian coordinate
+     * Convert galactic coordinates to the internal cartesian coordinate
      * system.
      *
      * @param l The galactic longitude in degrees.
@@ -2818,7 +2818,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                          double r);
 
     /**
-     * Converts ecliptic coordinates to the internal cartesian coordinate
+     * Convert ecliptic coordinates to the internal cartesian coordinate
      * system.
      *
      * @param l The ecliptic longitude in degrees.
@@ -2833,7 +2833,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                          double r);
 
     /**
-     * Converts equatorial coordinates to the internal cartesian coordinate
+     * Convert equatorial coordinates to the internal cartesian coordinate
      * system.
      *
      * @param ra  The right ascension in degrees.
@@ -2848,7 +2848,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                            double r);
 
     /**
-     * Converts internal cartesian coordinates to equatorial
+     * Convert internal cartesian coordinates to equatorial
      * <code>[ra, dec, distance]</code> coordinates.
      *
      * @param x The x component, in any distance units.
@@ -2865,7 +2865,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                            double z);
 
     /**
-     * Converts regular cartesian coordinates, where XY is the equatorial plane, with X pointing to
+     * Convert regular cartesian coordinates, where XY is the equatorial plane, with X pointing to
      * the vernal equinox (ra=0) and Y points to ra=90, and Z pointing to the celestial north pole (dec=90)
      * to internal cartesian coordinates with internal units.
      *
@@ -2879,7 +2879,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                                     double kmFactor);
 
     /**
-     * Converts equatorial cartesian coordinates (in the internal reference system)
+     * Convert equatorial cartesian coordinates (in the internal reference system)
      * to galactic cartesian coordinates.
      *
      * @param eq Vector with [x, y, z] equatorial cartesian coordinates
@@ -2889,7 +2889,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] equatorialToGalactic(double[] eq);
 
     /**
-     * Converts equatorial cartesian coordinates (in the internal reference system)
+     * Convert equatorial cartesian coordinates (in the internal reference system)
      * to ecliptic cartesian coordinates.
      *
      * @param eqInternal Vector with [x, y, z] equatorial cartesian coordinates
@@ -2899,7 +2899,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] equatorialToEcliptic(double[] eqInternal);
 
     /**
-     * Converts galactic cartesian coordinates (in the internal reference system)
+     * Convert galactic cartesian coordinates (in the internal reference system)
      * to equatorial cartesian coordinates.
      *
      * @param galInternal Vector with [x, y, z] galactic cartesian coordinates
@@ -2909,7 +2909,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] galacticToEquatorial(double[] galInternal);
 
     /**
-     * Converts ecliptic cartesian coordinates (in the internal reference system)
+     * Convert ecliptic cartesian coordinates (in the internal reference system)
      * to equatorial cartesian coordinates.
      *
      * @param eclInternal Vector with [x, y, z] ecliptic cartesian coordinates
@@ -2919,7 +2919,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] eclipticToEquatorial(double[] eclInternal);
 
     /**
-     * Sets the brightness level of the render system.
+     * Set the brightness level of the render system.
      *
      * @param level The brightness level as a double precision floating point
      *              number in [-1,1]. The neutral value is 0.0.
@@ -2927,7 +2927,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setBrightnessLevel(double level);
 
     /**
-     * Sets the contrast level of the render system.
+     * Set the contrast level of the render system.
      *
      * @param level The contrast level as a double precision floating point number
      *              in [0,2]. The neutral value is 1.0.
@@ -2935,7 +2935,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setContrastLevel(double level);
 
     /**
-     * Sets the hue level of the render system.
+     * Set the hue level of the render system.
      *
      * @param level The hue level as a double precision floating point number
      *              in [0,2]. The neutral value is 1.0.
@@ -2943,7 +2943,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setHueLevel(double level);
 
     /**
-     * Sets the saturation level of the render system.
+     * Set the saturation level of the render system.
      *
      * @param level The saturation level as a double precision floating point number
      *              in [0,2]. The neutral value is 1.0.
@@ -2951,7 +2951,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setSaturationLevel(double level);
 
     /**
-     * Sets the gamma correction level.
+     * Set the gamma correction level.
      *
      * @param level The gamma correction level in [0,3] as a floating point number.
      *              The neutral value is 1.2.
@@ -2959,7 +2959,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setGammaCorrectionLevel(double level);
 
     /**
-     * Sets the high dynamic range tone mapping algorithm type. The types can be:
+     * Set the high dynamic range tone mapping algorithm type. The types can be:
      * <ul>
      *     <li>"auto" - performs an automatic HDR tone mapping based on the current luminosity of the scene</li>
      *     <li>"exposure" - performs an exposure-based HDR tone mapping. The exposure value must be set with {@link #setExposureToneMappingLevel(double)}</li>
@@ -2974,21 +2974,21 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setHDRToneMappingType(String type);
 
     /**
-     * Sets the exposure level.
+     * Set the exposure level.
      *
      * @param level The exposure level in [0,n]. Set to 0 to disable exposure tone mapping.
      */
     void setExposureToneMappingLevel(double level);
 
     /**
-     * Enables or disables the planetarium mode.
+     * Enable or disable the planetarium mode.
      *
      * @param state The boolean state. True to activate, false to deactivate.
      */
     void setPlanetariumMode(boolean state);
 
     /**
-     * Enables and disables the cubemap mode.
+     * Enable and disables the cubemap mode.
      *
      * @param state      The boolean state. True to activate, false to deactivate.
      * @param projection The projection as a string.
@@ -2997,14 +2997,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         String projection);
 
     /**
-     * Enables or disables the panorama mode.
+     * Enable or disable the panorama mode.
      *
      * @param state The boolean state. True to activate, false to deactivate.
      */
     void setPanoramaMode(boolean state);
 
     /**
-     * Sets the resolution (width and height are the same) of each side of the
+     * Set the resolution (width and height are the same) of each side of the
      * frame buffers used to capture each of the 6 directions that go into the
      * cubemap to construct the equirectangular image for the 360 mode. This
      * should roughly be 1/3 of the output resolution at which the 360 mode are
@@ -3016,7 +3016,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCubemapResolution(int resolution);
 
     /**
-     * Sets the cubemap projection to use.
+     * Set the cubemap projection to use.
      * Accepted values are:
      * <ul>
      *     <li>"equirectangular" - spherical projection.</li>
@@ -3036,28 +3036,28 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setCubemapProjection(String projection);
 
     /**
-     * Enables or disables the orthosphere view mode.
+     * Enable or disable the orthosphere view mode.
      *
      * @param state The state, true to activate and false to deactivate.
      */
     void setOrthosphereViewMode(boolean state);
 
     /**
-     * Sets index of refraction of celestial sphere in orthosphere view mode.
+     * Set index of refraction of celestial sphere in orthosphere view mode.
      *
      * @param ior The index of refraction.
      */
     void setIndexOfRefraction(float ior);
 
     /**
-     * Enables and disables the stereoscopic mode.
+     * Enable and disables the stereoscopic mode.
      *
      * @param state The boolean state. True to activate, false to deactivate.
      */
     void setStereoscopicMode(boolean state);
 
     /**
-     * Changes the stereoscopic profile.
+     * Change the stereoscopic profile.
      *
      * @param index The index of the new profile:
      *              <ul>
@@ -3071,7 +3071,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStereoscopicProfile(int index);
 
     /**
-     * Sets the re-projection mode. Possible modes are:
+     * Set the re-projection mode. Possible modes are:
      * <ul>
      *     <li>"disabled"</li>
      *     <li>"default"</li>
@@ -3095,28 +3095,28 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setReprojectionMode(String mode);
 
     /**
-     * Sets the scaling factor for the back-buffer.
+     * Set the scaling factor for the back-buffer.
      *
      * @param scale The back-buffer scaling factor.
      */
     void setBackBufferScale(float scale);
 
     /**
-     * Gets the current frame number. Useful for timing actions in scripts.
+     * Get the current frame number. Useful for timing actions in scripts.
      *
      * @return The current frame number.
      */
     long getCurrentFrameNumber();
 
     /**
-     * Enables or disables the lens flare effect.
+     * Enable or disable the lens flare effect.
      *
      * @param state Activate (true) or deactivate (false).
      */
     void setLensFlare(boolean state);
 
     /**
-     * Sets the strength of the lens flare effect, in [0,1].
+     * Set the strength of the lens flare effect, in [0,1].
      * Set to 0 to disable the effect.
      *
      * @param strength The strength or intensity of the lens flare, in [0,1].
@@ -3124,21 +3124,21 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setLensFlare(double strength);
 
     /**
-     * Enables or disables the camera motion blur effect.
+     * Enable or disable the camera motion blur effect.
      *
      * @param state Activate (true) or deactivate (false).
      */
     void setMotionBlur(boolean state);
 
     /**
-     * Enables or disables the camera motion blur effect.
+     * Enable or disable the camera motion blur effect.
      *
      * @param strength The strength of camera the motion blur effect, in [{@link Constants#MOTIONBLUR_MIN}, {@link Constants#MOTIONBLUR_MAX}].
      */
     void setMotionBlur(double strength);
 
     /**
-     * Enables or disables the stars glowing over objects.
+     * Enable or disable the stars glowing over objects.
      *
      * @param state Activate (true) or deactivate (false).
      *
@@ -3148,14 +3148,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setStarGlow(boolean state);
 
     /**
-     * Enables or disables stars' light glowing and spilling over closer objects.
+     * Enable or disable stars' light glowing and spilling over closer objects.
      *
      * @param state Enable (true) or disable (false).
      */
     void setStarGlowOverObjects(boolean state);
 
     /**
-     * Sets the strength value for the bloom effect.
+     * Set the strength value for the bloom effect.
      *
      * @param value Bloom strength between 0 and 100. Set to 0 to deactivate the
      *              bloom.
@@ -3163,14 +3163,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setBloom(float value);
 
     /**
-     * Sets the amount of chromatic aberration. Set to 0 to disable the effect.
+     * Set the amount of chromatic aberration. Set to 0 to disable the effect.
      *
      * @param value Chromatic aberration amount in [0,0.05].
      */
     void setChromaticAberration(float value);
 
     /**
-     * Sets the value of smooth lod transitions, allowing or disallowing octant fade-ins of
+     * Set the value of smooth lod transitions, allowing or disallowing octant fade-ins of
      * as they come into view.
      *
      * @param value Activate (true) or deactivate (false).
@@ -3184,35 +3184,35 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void resetImageSequenceNumber();
 
     /**
-     * Gets the absolute path of the default directory where the still frames are saved.
+     * Get the absolute path of the default directory where the still frames are saved.
      *
      * @return Absolute path of directory where still frames are saved.
      */
     String getDefaultFramesDir();
 
     /**
-     * Gets the absolute path of the default directory where the screenshots are saved.
+     * Get the absolute path of the default directory where the screenshots are saved.
      *
      * @return Absolute path of directory where screenshots are saved.
      */
     String getDefaultScreenshotsDir();
 
     /**
-     * Gets the absolute path of the default directory where the camera files are saved.
+     * Get the absolute path of the default directory where the camera files are saved.
      *
      * @return Absolute path of directory where camera files are saved.
      */
     String getDefaultCameraDir();
 
     /**
-     * Gets the absolute path to the location of the inputListener mappings.
+     * Get the absolute path to the location of the inputListener mappings.
      *
      * @return Absolute path to the location of the inputListener mappings.
      */
     String getDefaultMappingsDir();
 
     /**
-     * Gets the absolute path of the local data directory, configured in your <code>config.yaml</code> file.
+     * Get the absolute path of the local data directory, configured in your <code>config.yaml</code> file.
      *
      * @return Absolute path to the location of the data files.
      */
@@ -3286,7 +3286,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             Runnable runnable);
 
     /**
-     * Removes the runnable with the given id, if any. Use this method to remove previously parked scene and camera
+     * Remove the runnable with the given id, if any. Use this method to remove previously parked scene and camera
      * runnables.
      *
      * @param id The id of the runnable to remove.
@@ -3294,7 +3294,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void removeRunnable(String id);
 
     /**
-     * Removes the runnable with the given id, if any.
+     * Remove the runnable with the given id, if any.
      *
      * @param id The id of the runnable to remove.
      *
@@ -3304,7 +3304,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void unparkRunnable(String id);
 
     /**
-     * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
+     * Load a VOTable, FITS, CSV or JSON dataset file with the given name.
      * In this version, the loading happens synchronously, so the catalog is available to Gaia Sky immediately after
      * this call returns.
      * The actual loading process is carried out
@@ -3322,7 +3322,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         String path);
 
     /**
-     * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
+     * Load a VOTable, FITS, CSV or JSON dataset file with the given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
      * {@link #loadDataset(String, String)}.<br/>
@@ -3347,7 +3347,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         final boolean sync);
 
     /**
-     * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
+     * Load a VOTable, FITS, CSV or JSON dataset file with the given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
      * {@link #loadDataset(String, String, boolean)}.<br/>
@@ -3377,7 +3377,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         final boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable, a CSV or a FITS file.
+     * Load a star dataset from a VOTable, a CSV or a FITS file.
      * The dataset does not have a label.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -3397,7 +3397,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable, a CSV or a FITS file.
+     * Load a star dataset from a VOTable, a CSV or a FITS file.
      * The dataset does not have a label.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -3420,7 +3420,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable, a CSV or a FITS file.
+     * Load a star dataset from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
@@ -3444,7 +3444,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable, a CSV or a FITS file.
+     * Load a star dataset from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
@@ -3474,7 +3474,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             boolean sync);
 
     /**
-     * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
+     * Load a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
@@ -3508,7 +3508,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                 boolean sync);
 
     /**
-     * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
+     * Load a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
@@ -3548,7 +3548,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                 boolean sync);
 
     /**
-     * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
+     * Load a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
@@ -3590,7 +3590,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                 boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
+     * Load a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel. Uses the same color for
      * clusters and labels.
      * The call can be made synchronous or asynchronous.
@@ -3620,7 +3620,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                    boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
+     * Load a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
      * The call can be made synchronous or asynchronous.
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -3651,7 +3651,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                    boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
+     * Load a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel. Uses the same color
      * for clusters and labels.
      * The call can be made synchronous or asynchronous.
@@ -3684,7 +3684,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                    boolean sync);
 
     /**
-     * Loads a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
+     * Load a star cluster dataset from a CSV, VOTable or FITS file. The file needs the columns with the
      * following names: name, ra, dec, dist, pmra, pmdec, radius, radvel.
      * The call can be made synchronous or asynchronous.
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -3718,7 +3718,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                    boolean sync);
 
     /**
-     * Loads a variable star dataset from a VOTable, CSV or FITS file.
+     * Load a variable star dataset from a VOTable, CSV or FITS file.
      * The variable star table must have the following columns representing the light curve:
      * <ul>
      *     <li><code>g_transit_time</code>: list of times as Julian days since J2010 for each of the magnitudes</li>
@@ -3754,7 +3754,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                     boolean sync);
 
     /**
-     * Loads a Gaia Sky JSON dataset file asynchronously. The call returns immediately, and the
+     * Load a Gaia Sky JSON dataset file asynchronously. The call returns immediately, and the
      * dataset becomes available when it finished loading.
      * The Gaia Sky JSON data format is described
      * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
@@ -3768,7 +3768,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             String path);
 
     /**
-     * Loads a JSON Gaia Sky dataset file asynchronously. The call returns immediately, and the
+     * Load a JSON Gaia Sky dataset file asynchronously. The call returns immediately, and the
      * dataset becomes available when it finished loading.
      * The Gaia Sky JSON data format is described
      * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
@@ -3782,7 +3782,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             String path);
 
     /**
-     * Loads a Gaia Sky JSON dataset file in a synchronous or asynchronous manner.
+     * Load a Gaia Sky JSON dataset file in a synchronous or asynchronous manner.
      * The Gaia Sky JSON data format is described
      * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
      *
@@ -3797,7 +3797,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             boolean sync);
 
     /**
-     * Loads a Gaia Sky JSON dataset file in a synchronous or asynchronous manner.
+     * Load a Gaia Sky JSON dataset file in a synchronous or asynchronous manner.
      * The Gaia Sky JSON data format is described
      * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
      *
@@ -3814,7 +3814,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                             boolean sync);
 
     /**
-     * Removes the dataset identified by the given name, if it exists.
+     * Remove the dataset identified by the given name, if it exists.
      *
      * @param dsName The name of the dataset to remove.
      *
@@ -3823,7 +3823,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean removeDataset(String dsName);
 
     /**
-     * Hides the dataset identified by the given name, if it exists and is not hidden.
+     * Hide the dataset identified by the given name, if it exists and is not hidden.
      *
      * @param dsName The name of the dataset to hide.
      *
@@ -3832,14 +3832,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean hideDataset(String dsName);
 
     /**
-     * Returns the names of all datasets currently loaded.
+     * Return the names of all datasets currently loaded.
      *
      * @return A list with all the names of the loaded datasets.
      */
     List<String> listDatasets();
 
     /**
-     * Checks whether the dataset identified by the given name is loaded
+     * Check whether the dataset identified by the given name is loaded
      *
      * @param dsName The name of the dataset to query.
      *
@@ -3848,7 +3848,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean hasDataset(String dsName);
 
     /**
-     * Shows (un-hides) the dataset identified by the given name, if it exists and is hidden
+     * Show (un-hide) the dataset identified by the given name, if it exists and is hidden
      *
      * @param dsName The name of the dataset to show.
      *
@@ -3857,7 +3857,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean showDataset(String dsName);
 
     /**
-     * Sets the given 4x4 matrix (in column-major order) as the transformation matrix to apply
+     * Set the given 4x4 matrix (in column-major order) as the transformation matrix to apply
      * to all the data points in the dataset identified by the given name.
      *
      * @param dsName The name of the dataset.
@@ -3869,7 +3869,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                            double[] matrix);
 
     /**
-     * Clears the transformation matrix (if any) in the dataset identified by the given name.
+     * Clear the transformation matrix (if any) in the dataset identified by the given name.
      *
      * @param dsName The name of the dataset.
      *
@@ -3878,7 +3878,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean clearDatasetTransformationMatrix(String dsName);
 
     /**
-     * Enables or disables the dataset highlight, using a plain color given by the color index:
+     * Enable or disable the dataset highlight, using a plain color given by the color index:
      * <ul>
      *     <li>0 - blue</li>
      *     <li>1 - red</li>
@@ -3902,7 +3902,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                              boolean highlight);
 
     /**
-     * Enables or disables the dataset highlight using a plain color chosen by the system.
+     * Enable or disable the dataset highlight using a plain color chosen by the system.
      *
      * @param dsName    The dataset name.
      * @param highlight State.
@@ -3913,7 +3913,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                              boolean highlight);
 
     /**
-     * Enables or disables the dataset highlight, using a given plain color.
+     * Enable or disable the dataset highlight, using a given plain color.
      *
      * @param dsName    The dataset name.
      * @param r         Red component.
@@ -3929,7 +3929,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                              boolean highlight);
 
     /**
-     * Enables or disables the dataset highlight, using the given color map on the given attribute with the given
+     * Enable or disable the dataset highlight, using the given color map on the given attribute with the given
      * maximum and minimum mapping values.
      *
      * @param dsName        The dataset name.
@@ -3954,7 +3954,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                              boolean highlight);
 
     /**
-     * Sets the size increase factor of this dataset when highlighted.
+     * Set the size increase factor of this dataset when highlighted.
      *
      * @param dsName     The dataset name.
      * @param sizeFactor The size factor to apply to the particles when highlighted, must be in
@@ -3967,7 +3967,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                           float sizeFactor);
 
     /**
-     * Sets the 'all visible' property of datasets when highlighted. If set to true, all stars in the dataset have an
+     * Set the 'all visible' property of datasets when highlighted. If set to true, all stars in the dataset have an
      * increased minimum
      * opacity when highlighted, so that they are all visible. Otherwise, stars retain their minimum opacity and base
      * brightness.
@@ -3981,7 +3981,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                           boolean allVisible);
 
     /**
-     * Sets the dataset point size multiplier.
+     * Set the dataset point size multiplier.
      *
      * @param dsName     The dataset name.
      * @param multiplier The multiplier, as a positive floating point number.
@@ -3990,7 +3990,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                                        double multiplier);
 
     /**
-     * Creates a shape object of the given type with the given size around the object with the given name and primitive.
+     * Create a shape object of the given type with the given size around the object with the given name and primitive.
      *
      * @param shapeName   The name of the shape object.
      * @param shape       The shape type, one of
@@ -4019,7 +4019,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               boolean trackObject);
 
     /**
-     * Creates a shape object of the given type with the given size around the object with the given name, primitive and
+     * Create a shape object of the given type with the given size around the object with the given name, primitive and
      * orientation.
      *
      * @param shapeName   The name of the shape object.
@@ -4052,7 +4052,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               boolean trackObject);
 
     /**
-     * <p>Creates a backup of the current settings state that can be restored later on.
+     * <p>Create a backup of the current settings state that can be restored later on.
      * The settings are backed up in a stack, so multiple calls to this method put different copies of the settings
      * on the stack in a LIFO fashion.</p>
      * <p>This method, together with {@link #restoreSettings()}, are useful to back up and restore
@@ -4063,7 +4063,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void backupSettings();
 
     /**
-     * <p>Takes the settings object at the top of the settings stack and makes it effective.</p>
+     * <p>Take the settings object at the top of the settings stack and makes it effective.</p>
      * <p>This method, together with {@link #backupSettings()}, are useful to back up and restore the
      * settings at the beginning and end of your scripts, respectively, and ensure that the user settings are left
      * unmodified after your script ends.</p>
@@ -4075,7 +4075,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     boolean restoreSettings();
 
     /**
-     * Clears the stack of settings objects. This will invalidate all previous calls to
+     * Clear the stack of settings objects. This will invalidate all previous calls to
      * {@link #backupSettings()},
      * effectively making the settings stack empty. Calling {@link #restoreSettings()} after this
      * method will return false.
@@ -4083,12 +4083,12 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void clearSettingsStack();
 
     /**
-     * Forces a re-initialization of the entire user interface of Gaia Sky on the fly.
+     * Force a re-initialization of the entire user interface of Gaia Sky on the fly.
      */
     void resetUserInterface();
 
     /**
-     * Sets the maximum simulation time allowed, in years. This sets the maximum time in the future (years)
+     * Set the maximum simulation time allowed, in years. This sets the maximum time in the future (years)
      * and in the past (-years). This setting is not saved to the configuration and resets to 5 Myr after
      * restart.
      *
@@ -4097,7 +4097,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void setMaximumSimulationTime(long years);
 
     /**
-     * Returns the column-major matrix representing the given reference system transformation.
+     * Return the column-major matrix representing the given reference system transformation.
      *
      * @param name <p>The name of the reference system transformation:</p>
      *             <ul>
@@ -4114,7 +4114,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] getRefSysTransform(String name);
 
     /**
-     * Returns the meter to internal unit conversion factor. Use this factor to multiply
+     * Return the meter to internal unit conversion factor. Use this factor to multiply
      * your coordinates in meters to get them in internal units.
      *
      * @return The factor M_TO_U.
@@ -4122,7 +4122,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double getMeterToInternalUnitConversion();
 
     /**
-     * Returns the internal unit to meter conversion factor. Use this factor to multiply
+     * Return the internal unit to meter conversion factor. Use this factor to multiply
      * your coordinates in internal units to get them in meters.
      *
      * @return The factor U_TO_M.
@@ -4130,7 +4130,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double getInternalUnitToMeterConversion();
 
     /**
-     * Converts the value in internal units to metres.
+     * Convert the value in internal units to metres.
      *
      * @param internalUnits The value in internal units.
      *
@@ -4139,7 +4139,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double internalUnitsToMetres(double internalUnits);
 
     /**
-     * Converts the value in internal units to Kilometers.
+     * Convert the value in internal units to Kilometers.
      *
      * @param internalUnits The value in internal units.
      *
@@ -4148,7 +4148,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double internalUnitsToKilometres(double internalUnits);
 
     /**
-     * Converts the array in internal units to Kilometers.
+     * Convert the array in internal units to Kilometers.
      *
      * @param internalUnits The array in internal units.
      *
@@ -4157,7 +4157,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] internalUnitsToKilometres(double[] internalUnits);
 
     /**
-     * Converts the value in internal units to parsecs.
+     * Convert the value in internal units to parsecs.
      *
      * @param internalUnits The value in internal units.
      *
@@ -4166,7 +4166,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double internalUnitsToParsecs(double internalUnits);
 
     /**
-     * Converts the array in internal units to parsecs.
+     * Convert the array in internal units to parsecs.
      *
      * @param internalUnits The array in internal units.
      *
@@ -4175,7 +4175,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double[] internalUnitsToParsecs(double[] internalUnits);
 
     /**
-     * Converts the metres to internal units.
+     * Convert the metres to internal units.
      *
      * @param metres The value in metres.
      *
@@ -4184,7 +4184,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double metresToInternalUnits(double metres);
 
     /**
-     * Converts the kilometres to internal units.
+     * Convert the kilometres to internal units.
      *
      * @param kilometres The value in kilometers.
      *
@@ -4193,7 +4193,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double kilometresToInternalUnits(double kilometres);
 
     /**
-     * Converts the parsecs to internal units.
+     * Convert the parsecs to internal units.
      *
      * @param parsecs The value in parsecs.
      *
@@ -4202,7 +4202,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     double parsecsToInternalUnits(double parsecs);
 
     /**
-     * Gets the current frame number. The number begins at 0 for the first frame produced
+     * Get the current frame number. The number begins at 0 for the first frame produced
      * when Gaia Sky is started and increases continuously.
      *
      * @return The current frame number.
@@ -4210,7 +4210,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     long getFrameNumber();
 
     /**
-     * Rotates a 3D vector around the given axis by the specified angle in degrees.
+     * Rotate a 3D vector around the given axis by the specified angle in degrees.
      * Vectors are arrays with 3 components. If more components are there, they are ignored.
      *
      * @param vector Vector to rotate, with at least 3 components.
@@ -4224,8 +4224,8 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      double angle);
 
     /**
-     * Rotates a 2D vector by the specified angle in degrees, counter-clockwise assuming that
-     * the y axis points up.
+     * Rotate a 2D vector by the specified angle in degrees, counter-clockwise assuming that
+     * the Y axis points up.
      *
      * @param vector Vector to rotate, with at least 2 components.
      *
@@ -4235,7 +4235,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                      double angle);
 
     /**
-     * Computes the cross product between the two 3D vectors.
+     * Compute the cross product between the two 3D vectors.
      *
      * @param vec1 First 3D vector.
      * @param vec2 Second 3D vector.
@@ -4246,7 +4246,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                     double[] vec2);
 
     /**
-     * Computes the dot product between the two 3D vectors.
+     * Compute the dot product between the two 3D vectors.
      *
      * @param vec1 First 3D vector.
      * @param vec2 Second 3D vector.
@@ -4278,7 +4278,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void error(String message);
 
     /**
-     * Initiates the quit action to terminate the program.
+     * Initiate the quit action to terminate the program.
      */
     void quit();
 

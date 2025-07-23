@@ -459,9 +459,9 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
     }
 
     /**
-     * Creates a new {@link QuadrupleImmutable} instance with the given {@link double} value.
+     * Creates a new {@link QuadrupleImmutable} instance with the given double value.
      *
-     * @param value the {@link double} value to be assigned.
+     * @param value the double value to be assigned.
      */
     public static QuadrupleImmutable from(double value) {
         boolean negative;
@@ -503,9 +503,9 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
     }
 
     /**
-     * Creates a new {@link QuadrupleImmutable} instance with the given {@link long} value.
+     * Creates a new {@link QuadrupleImmutable} instance with the given long value.
      *
-     * @param value the {@link long} value to be assigned.
+     * @param value the long value to be assigned.
      */
     public static QuadrupleImmutable from(long value) {
         if (value == 0)
