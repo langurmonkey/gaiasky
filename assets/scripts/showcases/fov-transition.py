@@ -16,6 +16,6 @@ duration = float(input("Enter the duration in seconds: "))
 
 print(f"Creating {duration}s transition to {target_fov}")
 
-camera.transition_fov(target_fov, duration)
+camera.transition_fov(target_fov, duration, "logisticsigmoid", 12.0)
 
 gateway.shutdown()

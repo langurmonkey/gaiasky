@@ -1120,7 +1120,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
 
     @Override
     public void transition_fov(double target_fov, double duration) {
-        transition_fov(target_fov, duration, "logisticsigmoid", 14);
+        transition_fov(target_fov, duration, "logisticsigmoid", 12);
     }
 
     @Override
@@ -1474,15 +1474,17 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             this.fovMapper = getMapper(smoothType, smoothFactor);
         }
 
+        float lastFov = 0;
         @Override
         public void run() {
             // Update elapsed time
             elapsed = GaiaSky.instance.getT() - start;
 
             // Interpolation variable.
-            double alpha = MathUtilsDouble.clamp(elapsed / duration, 0.0, 0.999999999999999999);
+            double alpha = fovMapper.apply(MathUtilsDouble.clamp(elapsed / duration, 0.0, 0.999999999999999999));
             // Compute new FOV.
             float newFov = (float) (fov0 + dFov * alpha);
+            System.out.println(alpha);
             // Post it.
             me.api.base.post_runnable(() -> me.em.post(Event.FOV_CMD, this, newFov));
 

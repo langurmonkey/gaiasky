@@ -2836,7 +2836,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param smoothType   The function type to use for the smoothing. Either "logit",
      *                     "logisticsigmoid" or "none".
      *                     <ul>
-     *                     <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                     <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 7 to produce
      *                     an effect, otherwise, linear interpolation is used.</li>
      *                     <li>"logit": starts fast and ends fast. The smooth factor must be between
      *                     0.09 and 0.01.</li>
