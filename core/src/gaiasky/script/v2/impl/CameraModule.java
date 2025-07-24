@@ -1484,7 +1484,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             double alpha = fovMapper.apply(MathUtilsDouble.clamp(elapsed / duration, 0.0, 0.999999999999999999));
             // Compute new FOV.
             float newFov = (float) (fov0 + dFov * alpha);
-            System.out.println(alpha);
             // Post it.
             me.api.base.post_runnable(() -> me.em.post(Event.FOV_CMD, this, newFov));
 
