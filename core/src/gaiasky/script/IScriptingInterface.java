@@ -39,7 +39,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     String getAssetsLocation();
 
     /**
-     * Pre-load the given images as textures for later use. They will be cached
+     * Preload the given images as textures for later use. They will be cached
      * for the subsequent uses.
      *
      * @param paths The texture paths.
@@ -47,7 +47,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
     void preloadTextures(String[] paths);
 
     /**
-     * Pre-load the given image as a texture for later use. The texture will
+     * Preload the given image as a texture for later use. The texture will
      * be cached for later use.
      *
      * @param path The path of the image file to preload.
