@@ -126,7 +126,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE,
                 Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD,
                 Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
-                Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CHANGED_CMD,
+                Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CMD,
                 Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE,
                 Event.CAMERA_ORIENTATION_UPDATE, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
                 Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
@@ -622,7 +622,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            case FOV_CHANGED_CMD -> {
+            case FOV_CMD -> {
                 var newFov = (Float) data[0];
                 GaiaSky.postRunnable(() -> {
                     for (int i = 0; i < RenderType.values().length; i++) {

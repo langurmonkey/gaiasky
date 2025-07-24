@@ -28,7 +28,9 @@ import gaiasky.util.math.*;
 import net.jafama.FastMath;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
@@ -746,8 +748,8 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     @Override
     public void set_fov(final float fov) {
         if (!SlaveManager.projectionActive()) {
-            if (api.validator.checkNum(fov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
-                api.base.post_runnable(() -> em.post(Event.FOV_CHANGED_CMD, this, fov));
+            if (api.validator.checkNum(fov, Constants.MIN_FOV, Constants.MAX_FOV, "fov"))
+                api.base.post_runnable(() -> em.post(Event.FOV_CMD, this, fov));
         }
     }
 
@@ -982,12 +984,14 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
 
     public void transition_position(double[] camPos,
                                     String units,
-                                    double durationSeconds,
-                                    String smoothType,
-                                    double smoothFactor,
+                                    double duration,
+                                    String smooth_type,
+                                    double smooth_factor,
                                     boolean sync,
                                     AtomicBoolean stop) {
-        if (api.validator.checkDistanceUnits(units) && api.validator.checkSmoothType(smoothType, "smoothType")) {
+        if (api.validator.checkDistanceUnits(units)
+                && api.validator.checkNum(duration, 0.0000001, 500.0, "duration")
+                && api.validator.checkSmoothType(smooth_type, "smooth_type")) {
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
             // Put camera in free mode.
@@ -1004,9 +1008,9 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             // Create and park position transition runnable
             CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
                                                                       posUnits,
-                                                                      durationSeconds,
-                                                                      smoothType,
-                                                                      smoothFactor,
+                                                                      duration,
+                                                                      smooth_type,
+                                                                      smooth_factor,
                                                                       end,
                                                                       stop);
             api.base.park_runnable(name, r);
@@ -1040,12 +1044,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
 
     public void transition_orientation(double[] camDir,
                                        double[] camUp,
-                                       double durationSeconds,
-                                       String smoothType,
-                                       double smoothFactor,
+                                       double duration,
+                                       String smooth_type,
+                                       double smooth_factor,
                                        boolean sync,
                                        AtomicBoolean stop) {
-        if (api.validator.checkSmoothType(smoothType, "smoothType")) {
+        if (api.validator.checkSmoothType(smooth_type, "smooth_type")
+                && api.validator.checkNum(duration, 0.0000001, 500.0, "duration")) {
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
             // Put camera in free mode.
@@ -1056,13 +1061,13 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             Runnable end = null;
             if (!sync) end = () -> api.base.remove_runnable(name);
 
-            // Create and park orientation transition runnable
+            // Create and park transition runnable
             CameraTransitionRunnable r = new CameraTransitionRunnable(cam,
                                                                       camDir,
                                                                       camUp,
-                                                                      durationSeconds,
-                                                                      smoothType,
-                                                                      smoothFactor,
+                                                                      duration,
+                                                                      smooth_type,
+                                                                      smooth_factor,
                                                                       end,
                                                                       stop);
             api.base.park_runnable(name, r);
@@ -1113,6 +1118,58 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         transition_position(api.dArray(camPos), units, durationSeconds, smoothType, smoothFactor, sync);
     }
 
+    @Override
+    public void transition_fov(double target_fov, double duration) {
+        transition_fov(target_fov, duration, "logisticsigmoid", 14);
+    }
+
+    @Override
+    public void transition_fov(double target_fov, double duration, String smooth_type, double smooth_factor) {
+        transition_fov(target_fov, duration, smooth_type, smooth_factor, true);
+    }
+
+    @Override
+    public void transition_fov(double target_fov, double duration, String smooth_type, double smooth_factor, boolean sync) {
+        if (api.validator.checkNum(target_fov, Constants.MIN_FOV, Constants.MAX_FOV, "target_fov")
+                && api.validator.checkNum(duration, 0.0000001, 500.0, "duration")
+                && api.validator.checkSmoothType(smooth_type, "smooth_type")) {
+
+            NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
+
+            // Set up final actions
+            String name = "fovTransition" + (cTransSeq++);
+            Runnable end = null;
+            if (!sync) end = () -> api.base.remove_runnable(name);
+
+            // Create and park transition runnable
+            FovTransitionRunnable r = new FovTransitionRunnable(this,
+                                                                cam,
+                                                                target_fov,
+                                                                duration,
+                                                                smooth_type,
+                                                                smooth_factor,
+                                                                end,
+                                                                null);
+            api.base.park_runnable(name, r);
+
+            if (sync) {
+                // Wait on lock.
+                synchronized (r.lock) {
+                    try {
+                        r.lock.wait();
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                }
+
+                // Remove and return
+                api.base.remove_runnable(name);
+            }
+        }
+    }
+
+    // ===============================================================================================================================================
+
     enum TransitionType {
         POSITION, ORIENTATION, ALL;
 
@@ -1129,21 +1186,75 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         }
     }
 
-    static class CameraTransitionRunnable implements Runnable {
-        final Object lock;
+    /**
+     * Generic transition runnable with some nice utilities.
+     */
+    static abstract class TransitionRunnable implements Runnable {
+        public final Object lock;
+        protected final AtomicBoolean stop;
+        protected double elapsed, start;
+        protected NaturalCamera cam;
+        protected final Runnable end;
+
+        protected TransitionRunnable(NaturalCamera cam, Runnable end, AtomicBoolean stop) {
+            this.lock = new Object();
+            this.stop = stop;
+            this.start = GaiaSky.instance.getT();
+            this.elapsed = 0;
+            this.cam = cam;
+            this.end = end;
+        }
+
+        /**
+         * Get mapper with the given smoothing type and factor.
+         *
+         * @param smoothingType   The smoothing type. Can be "logisticsigmoid" or "logit".
+         * @param smoothingFactor The smoothing factor.
+         *
+         * @return The mapper.
+         */
+        protected Function<Double, Double> getMapper(String smoothingType, double smoothingFactor) {
+            Function<Double, Double> mapper;
+            if (Objects.equals(smoothingType.toLowerCase(Locale.ROOT), "logisticsigmoid")) {
+                final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
+                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logisticSigmoid(x, fac), 0.0, 1.0);
+            } else if (Objects.equals(smoothingType, "logit")) {
+                final double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
+                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logit(x) * fac + 0.5, 0.0, 1.0);
+            } else {
+                mapper = (x) -> x;
+            }
+            return mapper;
+        }
+
+        /**
+         * Gets a path from p0 to p1.
+         *
+         * @param p0 The initial position.
+         * @param p1 The final position.
+         *
+         * @return The linear interpolation path.
+         */
+        protected PathDouble<Vector3D> getPath(Vector3D p0, double[] p1) {
+            Vector3D[] points = new Vector3D[]{new Vector3D(p0), new Vector3D(p1)};
+            return new LinearDouble<>(points);
+        }
+
+    }
+
+    /**
+     * The camera transition runnable manages transitions in both camera position and orientation.
+     */
+    static class CameraTransitionRunnable extends TransitionRunnable {
         final Vector3D v3d1, v3d2, v3d3;
         final Vector3D aux3d3 = new Vector3D();
-        final AtomicBoolean stop;
-        NaturalCamera cam;
         /** Duration of the position interpolation, in seconds. **/
         double posDuration;
         /** Duration of the orientation interpolation, in seconds. **/
         double orientationDuration;
-        double elapsed, start;
         Vector3D targetDir, targetUp;
         PathDouble<Vector3D> posInterpolator;
         QuaternionDouble startOrientation, endOrientation, qd;
-        Runnable end;
         /** Maps input x to output x for positions. **/
         Function<Double, Double> positionMapper;
         /** Maps input x to output x for orientations. **/
@@ -1254,6 +1365,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
                                         double orientationSmoothFactor,
                                         Runnable end,
                                         AtomicBoolean stop) {
+            super(cam, end, stop);
             if (pos == null) {
                 type = TransitionType.ORIENTATION;
             } else if (dir == null || up == null) {
@@ -1261,7 +1373,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             } else {
                 type = TransitionType.ALL;
             }
-            this.cam = cam;
             if (type.isPosition() && pos != null) {
                 this.posDuration = positionDurationSeconds;
             }
@@ -1270,11 +1381,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
                 this.targetUp = new Vector3D(up).nor();
                 this.orientationDuration = orientationDurationSeconds;
             }
-            this.start = GaiaSky.instance.getT();
-            this.elapsed = 0;
-            this.end = end;
-            this.lock = new Object();
-            this.stop = stop;
 
             if (type.isPosition()) {
                 // Mappers.
@@ -1303,33 +1409,6 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             qd = new QuaternionDouble();
         }
 
-        private Function<Double, Double> getMapper(String smoothingType, double smoothingFactor) {
-            Function<Double, Double> mapper;
-            if (Objects.equals(smoothingType, "logisticsigmoid")) {
-                final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
-                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logisticSigmoid(x, fac), 0.0, 1.0);
-            } else if (Objects.equals(smoothingType, "logit")) {
-                final double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
-                mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logit(x) * fac + 0.5, 0.0, 1.0);
-            } else {
-                mapper = (x) -> x;
-            }
-            return mapper;
-        }
-
-        /**
-         * Gets a path from p0 to p1.
-         *
-         * @param p0 The initial position.
-         * @param p1 The final position.
-         *
-         * @return The linear interpolation path.
-         */
-        private PathDouble<Vector3D> getPath(Vector3D p0, double[] p1) {
-            Vector3D[] points = new Vector3D[]{new Vector3D(p0), new Vector3D(p1)};
-            return new LinearDouble<>(points);
-        }
-
         @Override
         public void run() {
             // Update elapsed time
@@ -1356,6 +1435,59 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
 
             // Finish if needed.
             if ((stop != null && stop.get()) || (elapsed >= posDuration && elapsed >= orientationDuration)) {
+                // On end, run runnable if present, otherwise notify lock
+                if (end != null) {
+                    end.run();
+                } else {
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Manages smooth transitions in camera field of view angle.
+     */
+    static class FovTransitionRunnable extends TransitionRunnable {
+        private final CameraModule me;
+        private final double fov0;
+        private final double dFov;
+        private final double duration;
+        /** Maps input x to output x for positions. **/
+        Function<Double, Double> fovMapper;
+
+        public FovTransitionRunnable(CameraModule me,
+                                     NaturalCamera cam,
+                                     double targetFov,
+                                     double duration,
+                                     String smoothType,
+                                     double smoothFactor,
+                                     Runnable end,
+                                     AtomicBoolean stop) {
+            super(cam, end, stop);
+            this.me = me;
+            this.fov0 = cam.camera.fieldOfView;
+            this.dFov = targetFov - fov0;
+            this.duration = duration;
+            this.fovMapper = getMapper(smoothType, smoothFactor);
+        }
+
+        @Override
+        public void run() {
+            // Update elapsed time
+            elapsed = GaiaSky.instance.getT() - start;
+
+            // Interpolation variable.
+            double alpha = MathUtilsDouble.clamp(elapsed / duration, 0.0, 0.999999999999999999);
+            // Compute new FOV.
+            float newFov = (float) (fov0 + dFov * alpha);
+            // Post it.
+            me.api.base.post_runnable(() -> me.em.post(Event.FOV_CMD, this, newFov));
+
+            // Finish if needed.
+            if ((stop != null && stop.get()) || elapsed >= duration) {
                 // On end, run runnable if present, otherwise notify lock
                 if (end != null) {
                     end.run();

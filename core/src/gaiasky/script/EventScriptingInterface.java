@@ -1798,6 +1798,21 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.time.transition(year, month, day, hour, min, sec, milliseconds, durationSeconds, smoothType, smoothFactor, sync);
     }
 
+    @Override
+    public void fovTransition(double targetFov, double duration) {
+        apiv2.camera.transition_fov(targetFov, duration);
+    }
+
+    @Override
+    public void fovTransition(double targetFov, double duration, String smoothType, double smoothFactor) {
+        apiv2.camera.transition_fov(targetFov, duration, smoothType, smoothFactor);
+    }
+
+    @Override
+    public void fovTransition(double targetFov, double duration, String smoothType, double smoothFactor, boolean sync) {
+        apiv2.camera.transition_fov(targetFov, duration, smoothType, smoothFactor, sync);
+    }
+
     public void timeTransition(int year,
                                int month,
                                int day,

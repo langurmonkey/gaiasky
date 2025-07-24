@@ -525,8 +525,8 @@ public interface CameraAPI {
                             long time);
 
     /**
-     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
-     * the given number of seconds. This function waits for the transition to finish and then returns control
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} with
+     * the given duration, in seconds. This function waits for the transition to finish and then returns control
      * to the script.
      * <p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
@@ -543,8 +543,8 @@ public interface CameraAPI {
                     double duration);
 
     /**
-     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
-     * the given number of seconds. This function waits for the transition to finish and then returns control
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} with
+     * the given duration, in seconds. This function waits for the transition to finish and then returns control
      * to the script.
      * <p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
@@ -577,8 +577,8 @@ public interface CameraAPI {
                        double duration);
 
     /**
-     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
-     * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} with
+     * the given duration, in seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
      * <p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
@@ -598,8 +598,8 @@ public interface CameraAPI {
                     boolean sync);
 
     /**
-     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
-     * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} with
+     * the given duration, in seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
      * <p>
      * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
@@ -621,8 +621,8 @@ public interface CameraAPI {
                     boolean sync);
 
     /**
-     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
-     * the given number of seconds.
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp},
+     * with the given duration, in seconds.
      * <p>
      * This function accepts smoothing types and factors for the position and orientation.
      * <p>
@@ -667,8 +667,8 @@ public interface CameraAPI {
                     double ori_smooth_factor);
 
     /**
-     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
-     * the given number of seconds.
+     * Create a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp},
+     * with the given duration, in seconds.
      * <p>
      * This function accepts smoothing types and factors for the position and orientation.
      * <p>
@@ -720,8 +720,8 @@ public interface CameraAPI {
                     boolean sync);
 
     /**
-     * Create a smooth transition from the current camera position to the given camera position in
-     * the given number of seconds.
+     * Create a smooth transition from the current camera position to the given camera position,
+     * with the given duration, in seconds.
      * <p>
      * This function accepts smoothing type and factor.
      * <p>
@@ -755,8 +755,8 @@ public interface CameraAPI {
                              boolean sync);
 
     /**
-     * Create a smooth transition from the current camera orientation to the given camera orientation {camDir, camUp}
-     * in the given number of seconds.
+     * Create a smooth transition from the current camera orientation to the given camera orientation {camDir, camUp},
+     * with the given duration, in seconds.
      * <p>
      * This function accepts smoothing type and factor.
      * <p>
@@ -787,4 +787,71 @@ public interface CameraAPI {
                                 String smooth_type,
                                 double smooth_factor,
                                 boolean sync);
+
+    /**
+     * Create a smooth transition from the current camera field of view angle (FOV) to the given target FOV,
+     * with the given duration, in seconds.
+     * <p>
+     * This call is synchronous, i.e., returns only after the transition has finished.
+     *
+     * @param target_fov The target FOV angle.
+     * @param duration   The duration of the transition, in seconds.
+     */
+    void transition_fov(double target_fov,
+                        double duration);
+
+    /**
+     * Create a smooth transition from the current camera field of view angle (FOV) to the given target FOV,
+     * with the given duration, in seconds.
+     * <p>
+     * This function accepts smoothing type and factor.
+     * <p>
+     * This call is synchronous, i.e., returns only after the transition has finished.
+     *
+     * @param target_fov    The target FOV angle.
+     * @param duration      The duration of the transition, in seconds.
+     * @param smooth_type   The function type to use for the smoothing. Either "logit",
+     *                      "logisticsigmoid" or "none".
+     *                      <ul>
+     *                      <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                      an effect, otherwise, linear interpolation is used.</li>
+     *                      <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                      0.09 and 0.01.</li>
+     *                      <li>"none": no smoothing is applied.</li>
+     *                      </ul>
+     * @param smooth_factor Smoothing factor (depends on type).
+     */
+    void transition_fov(double target_fov,
+                        double duration,
+                        String smooth_type,
+                        double smooth_factor);
+
+    /**
+     * Create a smooth transition from the current camera field of view angle (FOV) to the given target FOV,
+     * with the given duration, in seconds.
+     * <p>
+     * This function accepts smoothing type and factor.
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     *
+     * @param target_fov    The target FOV angle.
+     * @param duration      The duration of the transition, in seconds.
+     * @param smooth_type   The function type to use for the smoothing. Either "logit",
+     *                      "logisticsigmoid" or "none".
+     *                      <ul>
+     *                      <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                      an effect, otherwise, linear interpolation is used.</li>
+     *                      <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                      0.09 and 0.01.</li>
+     *                      <li>"none": no smoothing is applied.</li>
+     *                      </ul>
+     * @param smooth_factor Smoothing factor (depends on type).
+     * @param sync          If true, the call waits for the transition to finish before returning,
+     *                      otherwise it returns immediately.
+     */
+    void transition_fov(double target_fov,
+                        double duration,
+                        String smooth_type,
+                        double smooth_factor,
+                        boolean sync);
 }

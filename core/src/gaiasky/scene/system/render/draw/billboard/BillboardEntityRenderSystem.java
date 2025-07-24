@@ -44,7 +44,7 @@ public class BillboardEntityRenderSystem implements IObserver {
 
     public BillboardEntityRenderSystem() {
         utils = new ParticleUtils();
-        EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD);
+        EventManager.instance.subscribe(this, Event.FOV_CMD);
         initRenderAttributes();
     }
 
@@ -330,7 +330,7 @@ public class BillboardEntityRenderSystem implements IObserver {
     public void notify(Event event,
                        Object source,
                        Object... data) {
-        if (event == Event.FOV_CHANGED_CMD) {
+        if (event == Event.FOV_CMD) {
             fovFactor = (Float) data[0] / 40f;
             solidAngleThresholdTopOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP / fovFactor;
             solidAngleThresholdBottomOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor;

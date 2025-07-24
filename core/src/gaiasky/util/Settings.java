@@ -1357,7 +1357,7 @@ public class Settings extends SettingsObject {
                     switch (event) {
                         case FOCUS_LOCK_CMD -> focusLock.position = (boolean) data[0];
                         case ORIENTATION_LOCK_CMD -> focusLock.orientation = (boolean) data[0];
-                        case FOV_CHANGED_CMD -> {
+                        case FOV_CMD -> {
                             if (!SlaveManager.projectionActive()) {
                                 boolean checkMax = source instanceof Actor;
                                 fov = MathUtilsDouble.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
@@ -1452,7 +1452,7 @@ public class Settings extends SettingsObject {
                                                 Event.CAMERA_CINEMATIC_CMD,
                                                 Event.FOCUS_LOCK_CMD,
                                                 Event.ORIENTATION_LOCK_CMD,
-                                                Event.FOV_CHANGED_CMD,
+                                                Event.FOV_CMD,
                                                 Event.CAMERA_SPEED_CMD,
                                                 Event.ROTATION_SPEED_CMD,
                                                 Event.TURNING_SPEED_CMD,
@@ -1471,7 +1471,7 @@ public class Settings extends SettingsObject {
             public void apply() {
                 EventManager.publish(Event.FOCUS_LOCK_CMD, this, focusLock.position);
                 EventManager.publish(Event.ORIENTATION_LOCK_CMD, this, focusLock.orientation);
-                EventManager.publish(Event.FOV_CHANGED_CMD, this, fov);
+                EventManager.publish(Event.FOV_CMD, this, fov);
                 EventManager.publish(Event.CAMERA_SPEED_CMD, this, (float) speed);
                 EventManager.publish(Event.ROTATION_SPEED_CMD, this, (float) rotate);
                 EventManager.publish(Event.TURNING_SPEED_CMD, this, (float) turn);
@@ -2461,7 +2461,7 @@ public class Settings extends SettingsObject {
                             EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 10f);
                         } else {
                             EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
-                            EventManager.publish(Event.FOV_CHANGED_CMD, this, GaiaSky.instance.cameraManager.getCamera().fieldOfView);
+                            EventManager.publish(Event.FOV_CMD, this, GaiaSky.instance.cameraManager.getCamera().fieldOfView);
                         }
                     }
                     case CUBEMAP_PROJECTION_CMD -> {

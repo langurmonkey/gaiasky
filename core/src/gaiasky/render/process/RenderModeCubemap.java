@@ -91,7 +91,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             upEffective.rotate(dirUpCrs, -angleFromZenith);
         }
 
-        EventManager.publish(Event.FOV_CHANGED_CMD, this, 90f);
+        EventManager.publish(Event.FOV_CMD, this, 90f);
 
         // The sides of the cubemap must be square. We use the max of our resolution
         int wh = Settings.settings.program.modeCubemap.faceResolution;
@@ -189,7 +189,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
         // Restore fov
-        EventManager.publish(Event.FOV_CHANGED_CMD, this, fovBackup);
+        EventManager.publish(Event.FOV_CMD, this, fovBackup);
     }
 
     protected void renderFace(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
@@ -218,7 +218,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         float fov = 45f;
         float fov2 = fov / 2f;
 
-        EventManager.publish(Event.FOV_CHANGED_CMD, this, fov);
+        EventManager.publish(Event.FOV_CMD, this, fov);
 
         PerspectiveCamera cam = camera.getCamera();
 

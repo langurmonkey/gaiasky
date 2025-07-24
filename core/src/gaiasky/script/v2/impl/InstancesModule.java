@@ -64,7 +64,7 @@ public class InstancesModule extends APIModule implements InstancesAPI {
         if (api.validator.checkNum(fov, Constants.MIN_FOV, 170f, "newFov"))
             api.base.post_runnable(() -> {
                 SlaveManager.instance.cameraFov = fov;
-                em.post(Event.FOV_CHANGED_CMD, this, fov);
+                em.post(Event.FOV_CMD, this, fov);
             });
     }
 }

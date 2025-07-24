@@ -127,7 +127,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         gamepadListener = new SpacecraftGamepadListener(this, Settings.settings.controls.gamepad.mappingsFile);
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.SPACECRAFT_LOADED, Event.SPACECRAFT_MACHINE_SELECTION_INFO);
+        EventManager.instance.subscribe(this, Event.FOV_CMD, Event.SPACECRAFT_LOADED, Event.SPACECRAFT_MACHINE_SELECTION_INFO);
     }
 
     @Override

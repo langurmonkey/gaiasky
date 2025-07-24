@@ -511,7 +511,7 @@ public enum Event {
     /**
      * Contains the float with the new FOV value and an optional boolean to indicate whether to cap the value to 95 degrees or not.
      **/
-    FOV_CHANGED_CMD,
+    FOV_CMD,
 
     /**
      * Frames per second info.

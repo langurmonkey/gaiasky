@@ -1004,6 +1004,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
      */
     void setLabelExcludeRegexp(String regexp);
+
     /**
      * Mute the label of the object identified by <code>name</code>, ignoring the usual solid angle-based
      * visibility rules. If called with <code>mute = true</code>, the label for the given object is
@@ -2783,6 +2784,73 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                         String smoothType,
                         double smoothFactor,
                         boolean sync);
+
+    /**
+     * Create a smooth transition from the current camera field of view angle (FOV) to the given target FOV,
+     * with the given duration, in seconds.
+     * <p>
+     * This call is synchronous, i.e., returns only after the transition has finished.
+     *
+     * @param targetFov The target FOV angle.
+     * @param duration  The duration of the transition, in seconds.
+     */
+    void fovTransition(double targetFov,
+                       double duration);
+
+    /**
+     * Create a smooth transition from the current camera field of view angle (FOV) to the given target FOV,
+     * with the given duration, in seconds.
+     * <p>
+     * This function accepts smoothing type and factor.
+     * <p>
+     * This call is synchronous, i.e., returns only after the transition has finished.
+     *
+     * @param targetFov    The target FOV angle.
+     * @param duration     The duration of the transition, in seconds.
+     * @param smoothType   The function type to use for the smoothing. Either "logit",
+     *                     "logisticsigmoid" or "none".
+     *                     <ul>
+     *                     <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                     an effect, otherwise, linear interpolation is used.</li>
+     *                     <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                     0.09 and 0.01.</li>
+     *                     <li>"none": no smoothing is applied.</li>
+     *                     </ul>
+     * @param smoothFactor Smoothing factor (depends on type).
+     */
+    void fovTransition(double targetFov,
+                       double duration,
+                       String smoothType,
+                       double smoothFactor);
+
+    /**
+     * Create a smooth transition from the current camera field of view angle (FOV) to the given target FOV,
+     * with the given duration, in seconds.
+     * <p>
+     * This function accepts smoothing type and factor.
+     * <p>
+     * Optionally, this call may return immediately (async) or it may wait for the transition to finish (sync).
+     *
+     * @param targetFov    The target FOV angle.
+     * @param duration     The duration of the transition, in seconds.
+     * @param smoothType   The function type to use for the smoothing. Either "logit",
+     *                     "logisticsigmoid" or "none".
+     *                     <ul>
+     *                     <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                     an effect, otherwise, linear interpolation is used.</li>
+     *                     <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                     0.09 and 0.01.</li>
+     *                     <li>"none": no smoothing is applied.</li>
+     *                     </ul>
+     * @param smoothFactor Smoothing factor (depends on type).
+     * @param sync         If true, the call waits for the transition to finish before returning,
+     *                     otherwise it returns immediately.
+     */
+    void fovTransition(double targetFov,
+                       double duration,
+                       String smoothType,
+                       double smoothFactor,
+                       boolean sync);
 
     /**
      * Sleeps for the given number of seconds in the application time (FPS), so

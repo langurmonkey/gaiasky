@@ -356,10 +356,10 @@ public class KeyBindings {
         }));
 
         // Increase field of view
-        addAction(new ProgramAction("action.incfov", () -> EventManager.publish(Event.FOV_CHANGED_CMD, this, Settings.settings.scene.camera.fov + 1f), noSlaveProj));
+        addAction(new ProgramAction("action.incfov", () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov + 1f), noSlaveProj));
 
         // Decrease field of view
-        addAction(new ProgramAction("action.decfov", () -> EventManager.publish(Event.FOV_CHANGED_CMD, this, Settings.settings.scene.camera.fov - 1f), noSlaveProj));
+        addAction(new ProgramAction("action.decfov", () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov - 1f), noSlaveProj));
 
         // Fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {

@@ -459,7 +459,7 @@ public class GamepadGui extends AbstractGui {
             fovSlider.addListener(event -> {
                 if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
                     float value = fovSlider.getMappedValue();
-                    EventManager.publish(Event.FOV_CHANGED_CMD, fovSlider, value);
+                    EventManager.publish(Event.FOV_CMD, fovSlider, value);
                     return true;
                 }
                 return false;

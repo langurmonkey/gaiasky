@@ -278,7 +278,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView.addListener(event -> {
             if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
                 final float value = fieldOfView.getMappedValue();
-                EventManager.publish(Event.FOV_CHANGED_CMD, fieldOfView, value);
+                EventManager.publish(Event.FOV_CMD, fieldOfView, value);
                 return true;
             }
             return false;
@@ -429,7 +429,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraGroup.pack();
         EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.ROTATION_SPEED_CMD,
-                                        Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CHANGED_CMD,
+                                        Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CMD,
                                         Event.CUBEMAP_CMD, Event.CAMERA_CINEMATIC_CMD, Event.ORIENTATION_LOCK_CMD,
                                         Event.RECORD_CAMERA_CMD);
     }
@@ -506,7 +506,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 orientationLock.setProgrammaticChangeEvents(true);
             }
         }
-        case FOV_CHANGED_CMD -> {
+        case FOV_CMD -> {
             if (source != fieldOfView) {
                 fovFlag = false;
                 fieldOfView.setValue((Float) data[0]);

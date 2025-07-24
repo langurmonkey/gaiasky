@@ -365,7 +365,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch = new SpriteBatch(50, spriteShader);
 
         // FOCUS_MODE is changed from GUI.
-        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD,
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CMD,
                                         Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD,
                                         Event.CAMERA_PROJECTION_CMD,
                                         Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL,
@@ -1471,7 +1471,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 setFocus(focusName, newFocus);
                 checkFocus();
             }
-            case FOV_CHANGED_CMD -> {
+            case FOV_CMD -> {
                 boolean checkMax = source instanceof Actor;
                 float fov = MathUtilsDouble.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
                 for (PerspectiveCamera cam : cameras) {

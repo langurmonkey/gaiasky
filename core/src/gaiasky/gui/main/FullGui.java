@@ -117,7 +117,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, FOV_CHANGED_CMD, UPDATE_DATA_INFO_CMD, SHOW_DATA_INFO_CMD,
+        EventManager.instance.subscribe(this, FOV_CMD, UPDATE_DATA_INFO_CMD, SHOW_DATA_INFO_CMD,
                                         SHOW_ARCHIVE_VIEW_CMD, UPDATE_ARCHIVE_VIEW_CMD, SHOW_PLAYCAMERA_CMD, REMOVE_KEYBOARD_FOCUS_CMD,
                                         REMOVE_GUI_COMPONENT_CMD, ADD_GUI_COMPONENT_CMD, SHOW_LOG_CMD, RA_DEC_UPDATED, LON_LAT_UPDATED,
                                         CONTEXT_MENU_CMD, SHOW_LAND_AT_LOCATION_CMD, DISPLAY_POINTER_COORDS_CMD, MINIMAP_TOGGLE_CMD,
