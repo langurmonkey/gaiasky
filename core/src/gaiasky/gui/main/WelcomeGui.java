@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -50,6 +51,7 @@ import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.vr.openxr.XrLoadStatus;
+import net.jafama.FastMath;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,7 +87,7 @@ public class WelcomeGui extends AbstractGui {
     private WelcomeGuiKbdListener kbdListener;
     private Table datasetsContainer;
     private boolean preventRecommended = false;
-
+    private float dsScrollY;
 
     /**
      * Creates an initial GUI.
@@ -273,6 +275,9 @@ public class WelcomeGui extends AbstractGui {
         float buttonWidth = 460f;
         float buttonHeight = 110f;
 
+        EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_RECOMPUTE_CMD);
+        EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
+
         // CENTRAL TABLE
         // Contains the logo and the start/dataset/exit buttons.
         Table center = new Table(skin);
@@ -342,7 +347,7 @@ public class WelcomeGui extends AbstractGui {
         final boolean regularStart = numLocalDatasets > 0 || preventRecommended;
 
         if (regularStart) {
-            // Regular Welcome screen options: Start Gaia Sky, Dataset Manager, Exit
+            // Regular Welcome screen options: Start Gaia Sky, Dataset Manager, Dataset List
             // Start Gaia Sky button
             OwnTextIconButton startButton = new OwnTextIconButton(I18n.msg("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
             startButton.setSpace(pad18);
@@ -606,24 +611,40 @@ public class WelcomeGui extends AbstractGui {
         datasetsContainer = new Table(skin);
         datasetsContainer.setFillParent(true);
 
+        Table datasetsTable = new Table(skin);
+        datasetsTable.setBackground("bg-pane");
+        datasetsTable.right()
+                .pad(pad16);
         Table datasets = new Table(skin);
-        datasets.setBackground("bg-pane");
-        datasets.right()
-                .pad(pad32);
+        datasets.right();
 
         var enabledDatasets = getEnabledDatasets();
         int count = enabledDatasets != null ? enabledDatasets.size() : 0;
 
-        datasets.add(new OwnLabel(I18n.msg("gui.welcome.datasets.enabled", count), skin, "header"))
+        datasetsTable.add(new OwnLabel(I18n.msg("gui.welcome.datasets.enabled", count), skin, "header"))
                 .left()
-                .padBottom(pad28)
+                .padLeft(pad16 * 0.5f)
+                .padBottom(pad16)
                 .row();
 
         if (enabledDatasets != null && !enabledDatasets.isEmpty()) {
-            enabledDatasets.forEach(ds -> {
+            enabledDatasets.stream().sorted().forEach(ds -> {
                 var typeIcon = new OwnImage(skin.getDrawable(DatasetManagerWindow.getIcon(ds.type)));
                 typeIcon.setSize(30f, 30f);
-                var g = hg(typeIcon, new OwnLabel(TextUtils.capString(ds.name, 32), skin));
+                var disable = new OwnTextIconButton("", skin, "select-none");
+                disable.setSize(40f, 35f);
+                disable.addListener(new OwnTextTooltip(I18n.msg("gui.download.disable") + " " + ds.name, skin, 40));
+                disable.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        disableDataset(ds);
+                        reloadView();
+                    }
+                });
+                var dsName = new OwnLabel(TextUtils.capString(ds.name, 32), skin);
+                dsName.setWidth(410f);
+                var g = hg(typeIcon, dsName);
+                datasets.add(disable).center().padRight(pad16 / 2f).left().padBottom(pad16);
                 datasets.add(g)
                         .left()
                         .padBottom(pad16)
@@ -634,9 +655,29 @@ public class WelcomeGui extends AbstractGui {
             datasets.add(noDatasets)
                     .left();
         }
+        datasets.pack();
 
+        ScrollPane datasetsScroll = new OwnScrollPane(datasets, skin, "minimalist-nobg");
+        datasetsScroll.setScrollbarsVisible(true);
+        datasetsScroll.setForceScroll(false, true);
+        datasetsScroll.setScrollingDisabled(true, false);
+        datasetsScroll.setOverscroll(false, false);
+        datasetsScroll.setSmoothScrolling(true);
+        datasetsScroll.setHeight(FastMath.min(Gdx.graphics.getHeight() * getUnitsPerPixel() * 0.8f, datasets.getHeight()));
+        datasetsScroll.setWidth(520f);
+        datasetsScroll.pack();
 
-        datasetsContainer.add(datasets)
+        datasetsScroll.addListener(event -> {
+            if (event instanceof InputEvent) {
+                dsScrollY = datasetsScroll.getScrollY();
+            }
+            return false;
+        });
+
+        datasetsScroll.setScrollY(dsScrollY);
+        datasetsTable.add(datasetsScroll).top().left();
+
+        datasetsContainer.add(datasetsTable)
                 .right()
                 .expandX()
                 .padRight(pad32);
@@ -787,8 +828,6 @@ public class WelcomeGui extends AbstractGui {
             }
         }
         updateFocused();
-        EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_RECOMPUTE_CMD);
-        EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
     }
 
     private void ensureBaseDataEnabled(DataDescriptor dd) {
@@ -954,6 +993,19 @@ public class WelcomeGui extends AbstractGui {
         newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY));
         newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY)
                              .resolve("dataset.json"));
+    }
+
+    private void disableDataset(DatasetDesc dataset) {
+        // Base data can't be disabled
+        if (!dataset.baseData) {
+            String filePath = null;
+            if (dataset.checkStr != null) {
+                filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
+            }
+            if (filePath != null && !filePath.isBlank()) {
+                Settings.settings.data.dataFiles.remove(filePath);
+            }
+        }
     }
 
     @Override
@@ -1268,7 +1320,7 @@ public class WelcomeGui extends AbstractGui {
         // Hide/show datasets container depending on aspect ratio.
         // Must ensure enough space is left on the right side.
         if (datasetsContainer != null) {
-            datasetsContainer.setVisible(!((float) width / (float) height < 1.6));
+            datasetsContainer.setVisible(!((float) width / (float) height < 1.7));
         }
         super.resize(width, height);
     }

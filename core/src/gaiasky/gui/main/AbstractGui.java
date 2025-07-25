@@ -58,7 +58,7 @@ public abstract class AbstractGui implements IObserver, IGui {
      * Units per pixel, 1/uiScale.
      * This only works with a screen viewport.
      */
-    protected float unitsPerPixel = 1;
+    protected float unitsPerPixel;
 
     /** Lock for sync. **/
     protected final Object lock;

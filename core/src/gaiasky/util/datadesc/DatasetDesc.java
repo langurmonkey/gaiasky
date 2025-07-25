@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 
-public class DatasetDesc {
+public class DatasetDesc implements Comparable<DatasetDesc> {
     private final Log logger = Logger.getLogger(DatasetDesc.class);
     public JsonValue source;
     public String key;
@@ -316,6 +316,11 @@ public class DatasetDesc {
         copy.files = this.files;
         copy.server = this.server;
         return copy;
+    }
+
+    @Override
+    public int compareTo(DatasetDesc other) {
+        return this.name.compareTo(other.name);
     }
 
     public enum DatasetStatus {
