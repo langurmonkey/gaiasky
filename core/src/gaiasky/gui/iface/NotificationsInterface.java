@@ -9,6 +9,7 @@ package gaiasky.gui.iface;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -153,6 +154,12 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                                         Event.CAMERA_CINEMATIC_CMD);
     }
 
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        if (ignoreDisplaySetting || Settings.settings.program.ui.notifications)
+            super.draw(batch, parentAlpha);
+    }
+
     public void setIgnoreDisplaySetting(boolean value) {
         ignoreDisplaySetting = value;
     }
@@ -168,6 +175,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     private void addMessage(String msg) {
         addMessage(msg, false, LoggerLevel.INFO);
     }
+
 
     private void addMessage(String msg, boolean permanent, LoggerLevel level) {
         if (ignoreDisplaySetting || Settings.settings.program.ui.notifications)
@@ -330,9 +338,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                             addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
                     }
                 }
-                case ORBIT_DATA_LOADED ->
-                        addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false,
-                                   LoggerLevel.DEBUG);
+                case ORBIT_DATA_LOADED -> addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false,
+                                                     LoggerLevel.DEBUG);
                 case SCREENSHOT_INFO -> addMessage(I18n.msg("notif.screenshot", data[0]));
                 case STEREOSCOPIC_CMD -> {
                     if (!Settings.settings.runtime.openXr)
@@ -342,8 +349,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                     boolean displayGui = (Boolean) data[0];
                     addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
                 }
-                case STEREO_PROFILE_CMD ->
-                        addMessage(I18n.msg("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
+                case STEREO_PROFILE_CMD -> addMessage(I18n.msg("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
                 case FRAME_OUTPUT_CMD -> {
                     boolean activated = (Boolean) data[0];
                     if (activated) {
