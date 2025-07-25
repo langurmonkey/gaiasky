@@ -33,6 +33,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.KeyframesManager;
+import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
@@ -916,30 +917,48 @@ public class Settings extends SettingsObject {
         }
 
         /**
-         * Adds the given catalog descriptor file to the list of JSON selected files.
+         * Adds the given dataset descriptor file to the list of enabled JSON files.
          *
-         * @param catalog The catalog descriptor file pointer.
+         * @param dataset The dataset descriptor file pointer.
          *
          * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not
-         * readable, or it is already in the list.
+         *         readable, or it is already in the list.
          */
-        public boolean addSelectedCatalog(Path catalog) {
+        public boolean enableDataset(Path dataset) {
             // Look for catalog already existing
-            if (!Files.exists(catalog) || !Files.isReadable(catalog) || !Files.isRegularFile(catalog)) {
+            if (!Files.exists(dataset) || !Files.isReadable(dataset) || !Files.isRegularFile(dataset)) {
                 return false;
             }
             for (String pathStr : dataFiles) {
                 Path path = Path.of(pathStr);
                 try {
-                    if (Files.isSameFile(path, catalog)) {
+                    if (Files.isSameFile(path, dataset)) {
                         return false;
                     }
                 } catch (IOException e) {
                     logger.error(e);
                 }
             }
-            dataFiles.add(catalog.toString());
+            dataFiles.add(dataset.toString());
             return true;
+        }
+
+        /**
+         * Disables the given {@link DatasetDesc} by removing it from the {@link #dataFiles} list of enabled datasets.
+         *
+         * @param dataset The dataset.
+         */
+        public void disableDataset(DatasetDesc dataset) {
+            // Base data can't be disabled
+            if (!dataset.baseData) {
+                String filePath = null;
+                if (dataset.checkStr != null) {
+                    filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
+                }
+                if (filePath != null && !filePath.isBlank()) {
+                    dataFiles.remove(filePath);
+                }
+            }
         }
 
         @Override

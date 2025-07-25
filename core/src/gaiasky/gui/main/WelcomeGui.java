@@ -616,14 +616,13 @@ public class WelcomeGui extends AbstractGui {
         datasetsTable.right()
                 .pad(pad16);
         Table datasets = new Table(skin);
-        datasets.right();
+        datasets.left();
 
         var enabledDatasets = getEnabledDatasets();
         int count = enabledDatasets != null ? enabledDatasets.size() : 0;
 
         datasetsTable.add(new OwnLabel(I18n.msg("gui.welcome.datasets.enabled", count), skin, "header"))
                 .left()
-                .padLeft(pad16 * 0.5f)
                 .padBottom(pad16)
                 .row();
 
@@ -637,7 +636,7 @@ public class WelcomeGui extends AbstractGui {
                 disable.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
-                        disableDataset(ds);
+                        Settings.settings.data.disableDataset(ds);
                         reloadView();
                     }
                 });
@@ -652,12 +651,14 @@ public class WelcomeGui extends AbstractGui {
             });
         } else {
             var noDatasets = new OwnLabel(I18n.msg("gui.welcome.datasets.enabled.no"), skin);
+            noDatasets.setWidth(410f);
             datasets.add(noDatasets)
+                    .padLeft(5f)
                     .left();
         }
         datasets.pack();
 
-        ScrollPane datasetsScroll = new OwnScrollPane(datasets, skin, "minimalist-nobg");
+        var datasetsScroll = new OwnScrollPane(datasets, skin, "minimalist-nobg");
         datasetsScroll.setScrollbarsVisible(true);
         datasetsScroll.setForceScroll(false, true);
         datasetsScroll.setScrollingDisabled(true, false);
@@ -993,19 +994,6 @@ public class WelcomeGui extends AbstractGui {
         newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY));
         newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY)
                              .resolve("dataset.json"));
-    }
-
-    private void disableDataset(DatasetDesc dataset) {
-        // Base data can't be disabled
-        if (!dataset.baseData) {
-            String filePath = null;
-            if (dataset.checkStr != null) {
-                filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
-            }
-            if (filePath != null && !filePath.isBlank()) {
-                Settings.settings.data.dataFiles.remove(filePath);
-            }
-        }
     }
 
     @Override

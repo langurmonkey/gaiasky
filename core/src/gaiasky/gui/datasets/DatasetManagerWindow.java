@@ -1479,16 +1479,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * @param dataset The dataset to disable.
      */
     private void actionDisableDataset(DatasetDesc dataset) {
-        // Base data can't be disabled
-        if (!dataset.baseData) {
-            String filePath = null;
-            if (dataset.checkStr != null) {
-                filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
-            }
-            if (filePath != null && !filePath.isBlank()) {
-                Settings.settings.data.dataFiles.remove(filePath);
-            }
-        }
+        Settings.settings.data.disableDataset(dataset);
     }
 
     private void actionDeleteDataset(DatasetDesc dataset) {
