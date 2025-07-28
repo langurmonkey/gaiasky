@@ -1,3 +1,19 @@
+<a name="3.6.11"></a>
+## [3.6.11](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.11) (2025-07-28)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.10...3.6.11)
+
+## Features
+- Add `transition_fov()` (APIv2) and `fovTransition()` (APIv1) calls to create smooth transitions in camera field of view angle.
+- Add `set_label_[in|ex]clude_regexp` calls to filter allowed and/or required label formats. If the include regexp is set, only labels that match it are allowed. If the exclude regexp is set, labels that match it are not allowed.
+- Add `set_mute_label()` APIv2 call (`setMuteLabel()` APIv1) to disable the label of individual objects.
+- Add `get_fov()` API call to APIv2, and `getFov()` to APIv1 to get the current camera field of view angle.
+
+## Bug Fixes
+- Disable render stage of notifications interface when notifications are off instead of just preventing the creation of messages; This is so that the empty table background is not seen when notifications are off.
+- Add scroll pane to layout of enabled datasets in welcome window. Add 'disable dataset' shortcut to each dataset.
+- Fix overall visual consistency and usability of enbaled datasets in welcome window.
+- Keep clouds on the dark side of planets marginally visible instead of making them totatlly disappear during the night.
+
 <a name="3.6.10"></a>
 ## [3.6.10](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.10) (2025-07-18)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.9-2...3.6.10)

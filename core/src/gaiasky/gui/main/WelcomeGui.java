@@ -658,24 +658,7 @@ public class WelcomeGui extends AbstractGui {
         }
         datasets.pack();
 
-        var datasetsScroll = new OwnScrollPane(datasets, skin, "minimalist-nobg");
-        datasetsScroll.setScrollbarsVisible(true);
-        datasetsScroll.setForceScroll(false, true);
-        datasetsScroll.setScrollingDisabled(true, false);
-        datasetsScroll.setOverscroll(false, false);
-        datasetsScroll.setSmoothScrolling(true);
-        datasetsScroll.setHeight(FastMath.min(Gdx.graphics.getHeight() * getUnitsPerPixel() * 0.8f, datasets.getHeight()));
-        datasetsScroll.setWidth(520f);
-        datasetsScroll.pack();
-
-        datasetsScroll.addListener(event -> {
-            if (event instanceof InputEvent) {
-                dsScrollY = datasetsScroll.getScrollY();
-            }
-            return false;
-        });
-
-        datasetsScroll.setScrollY(dsScrollY);
+        final var datasetsScroll = getOwnScrollPane(datasets);
         datasetsTable.add(datasetsScroll).top().left();
 
         datasetsContainer.add(datasetsTable)
@@ -829,6 +812,28 @@ public class WelcomeGui extends AbstractGui {
             }
         }
         updateFocused();
+    }
+
+    private OwnScrollPane getOwnScrollPane(Table datasets) {
+        var datasetsScroll = new OwnScrollPane(datasets, skin, "minimalist-nobg");
+        datasetsScroll.setScrollbarsVisible(true);
+        datasetsScroll.setForceScroll(false, true);
+        datasetsScroll.setScrollingDisabled(true, false);
+        datasetsScroll.setOverscroll(false, false);
+        datasetsScroll.setSmoothScrolling(true);
+        datasetsScroll.setHeight(FastMath.min(Gdx.graphics.getHeight() * getUnitsPerPixel() * 0.8f, datasets.getHeight()));
+        datasetsScroll.setWidth(520f);
+        datasetsScroll.pack();
+
+        datasetsScroll.addListener(event -> {
+            if (event instanceof InputEvent) {
+                dsScrollY = datasetsScroll.getScrollY();
+            }
+            return false;
+        });
+
+        datasetsScroll.setScrollY(dsScrollY);
+        return datasetsScroll;
     }
 
     private void ensureBaseDataEnabled(DataDescriptor dd) {

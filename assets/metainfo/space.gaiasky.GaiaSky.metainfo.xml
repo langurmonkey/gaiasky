@@ -39,23 +39,23 @@
 
   <releases>
 
-    <release version="3.6.10" date="2025-07-21" urgency="high">
-      <url>https://gaiasky.space/news/2025/gaiasky_3.6.10</url>
+    <release version="3.6.11" date="2025-07-28" urgency="high">
+      <url>https://gaiasky.space/news/2025/gaiasky_3.6.11</url>
       <description>
         <p>Features</p>
         <ul>
           <li>Localize Wikipedia API queries for object information.</li>
-          <li>Add file-level cache to TLE subsystem. TLE files are also cached per-group to avoid unnecessary sequential calls to fetch the same file. By default, the TTL for TLE files is 1 hour.</li>
-          <li>Directory structure of virtual texture tiles now accepts more formats (<code>levelx</code>, <code>levelxx</code>, <code>x</code>, <code>xx</code>). </li>
+          <li>Add file-level cache to TLE subsystem. TLE files are also cached per-group to avoid unnecessary sequential calls to fetch the same file.</li>
+          <li>Directory structure of virtual texture tiles now accepts more formats (<code>levelx</code>, <code>levelxx</code>, <code>x</code>, <code>xx</code>).</li>
           <li>Set default virtual texture cache size to 10. Add information tooltip to cache size in preferences window.</li>
           <li>Add markers for towns and landmarks. Night lights go out with ambient light in PBR shader.</li>
           <li>Country perimeter lines disappear when the camera gets close to the surface of the Planet.</li>
-          <li>Add new attributes to dataset definition format: <code>links</code> (now accepts multiple sources as links), <code>creator</code> (the creator or curator of the dataset), <code>credits</code> (specific attribute for credits instead of adding them to the description; multiple strings accepted).</li>
+          <li>Add new attributes to dataset definition format: <code>links</code> (array), <code>creator</code>, <code>credits</code> (acknowledgements).</li>
         </ul>
         <p>Bug fixes</p>
           <ul>
             <li>Typo in default shader class (<code>u_emissionCubemap</code> -&gt; <code>u_emissiveCubemap</code>) prevented emissive/night cubemaps from working.</li>
-            <li>Add <code>nightCubemap</code> as alias to <code>emissiveCubemap</code> in material component. </li>
+            <li>Add <code>nightCubemap</code> as alias to <code>emissiveCubemap</code> in material component.</li>
             <li>Add <code>specularValue</code> and <code>specularValues</code> as aliases to <code>specular</code> in material component, with floating point number parameters.</li>
             <li>Properly filtre directories when building the SVT quadtree structure to avoid incorrect ‘Worng directory name format’ warnings.</li>
             <li>Deactivating atmospheres causes night texture to apply uniformly to all planet as if it were a regular emissive texture.</li>
