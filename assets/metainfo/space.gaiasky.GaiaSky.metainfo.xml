@@ -44,26 +44,17 @@
       <description>
         <p>Features</p>
         <ul>
-          <li>Localize Wikipedia API queries for object information.</li>
-          <li>Add file-level cache to TLE subsystem. TLE files are also cached per-group to avoid unnecessary sequential calls to fetch the same file.</li>
-          <li>Directory structure of virtual texture tiles now accepts more formats (<code>levelx</code>, <code>levelxx</code>, <code>x</code>, <code>xx</code>).</li>
-          <li>Set default virtual texture cache size to 10. Add information tooltip to cache size in preferences window.</li>
-          <li>Add markers for towns and landmarks. Night lights go out with ambient light in PBR shader.</li>
-          <li>Country perimeter lines disappear when the camera gets close to the surface of the Planet.</li>
-          <li>Add new attributes to dataset definition format: <code>links</code> (array), <code>creator</code>, <code>credits</code> (acknowledgements).</li>
+          <li>Add <code>transition_fov()</code> (APIv2) and <code>fovTransition()</code> (APIv1) calls to create smooth transitions in camera field of view angle.</li>
+          <li>Add <code>set_label_[in|ex]clude_regexp</code> calls to filter allowed and/or required label formats. If the include regexp is set, only labels that match it are allowed. If the exclude regexp is set, labels that match it are not allowed.</li>
+          <li>Add <code>set_mute_label()</code> APIv2 call (<code>setMuteLabel()</code> APIv1) to disable the label of individual objects.</li>
+          <li>Add <code>get_fov()</code> API call to APIv2, and <code>getFov()</code> to APIv1 to get the current camera field of view angle. </li>
         </ul>
         <p>Bug fixes</p>
           <ul>
-            <li>Typo in default shader class (<code>u_emissionCubemap</code> -&gt; <code>u_emissiveCubemap</code>) prevented emissive/night cubemaps from working.</li>
-            <li>Add <code>nightCubemap</code> as alias to <code>emissiveCubemap</code> in material component.</li>
-            <li>Add <code>specularValue</code> and <code>specularValues</code> as aliases to <code>specular</code> in material component, with floating point number parameters.</li>
-            <li>Properly filtre directories when building the SVT quadtree structure to avoid incorrect ‘Worng directory name format’ warnings.</li>
-            <li>Deactivating atmospheres causes night texture to apply uniformly to all planet as if it were a regular emissive texture.</li>
-            <li>Procedural generation window does not fit in the window with the new UI theme. Fix layout by introducing scroll panes and resizing elements.</li>
-            <li>Layout issue in right pane of dataset manager window prevented it from using scroll, causing the window to be too large in some cases.</li>
-            <li>Layout issue and tooltip text in datasets component.</li>
-            <li>Move <code>genVersionFile</code> task to the top of the dependency list (before <code>compileJava</code>) so that we always have the correct file available.</li>
-            <li>Mend wording in new data pack notification window.</li>
+            <li>Disable render stage of notifications interface when notifications are off instead of just preventing the creation of messages; This is so that the empty table background is not seen when notifications are off.</li>
+            <li>Add scroll pane to layout of enabled datasets in welcome window. Add ‘disable dataset’ shortcut to each dataset.</li>
+            <li>Fix overall visual consistency and usability of enabled datasets in welcome window.</li>
+            <li>Keep clouds on the dark side of planets marginally visible instead of making them totally disappear during the night.</li>
           </ul>
       </description>
       </release>

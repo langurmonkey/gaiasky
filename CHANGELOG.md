@@ -11,8 +11,8 @@
 ## Bug Fixes
 - Disable render stage of notifications interface when notifications are off instead of just preventing the creation of messages; This is so that the empty table background is not seen when notifications are off.
 - Add scroll pane to layout of enabled datasets in welcome window. Add 'disable dataset' shortcut to each dataset.
-- Fix overall visual consistency and usability of enbaled datasets in welcome window.
-- Keep clouds on the dark side of planets marginally visible instead of making them totatlly disappear during the night.
+- Fix overall visual consistency and usability of enabled datasets in welcome window.
+- Keep clouds on the dark side of planets marginally visible instead of making them totally disappear during the night.
 
 <a name="3.6.10"></a>
 ## [3.6.10](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.10) (2025-07-18)
@@ -31,7 +31,7 @@
 - Typo in default shader class (`u_emissionCubemap` -> `u_emissiveCubemap`) prevented emissive/night cubemaps from working.
 - Add `nightCubemap` as alias to `emissiveCubemap` in material component.
 - Add `specularValue` and `specularValues` as aliases to `specular` in material component, with floating point number parameters.
-- Properly filtre directories when building the SVT quadtree structure to avoid incorrect 'Worng directory name format' warnings.
+- Properly filtre directories when building the SVT quadtree structure to avoid incorrect 'Wrong directory name format' warnings.
 - Deactivating atmospheres causes night texture to apply uniformly to all planet as if it were a regular emissive texture.
 - Procedural generation window does not fit in the window with the new UI theme. Fix layout by introducing scroll panes and resizing elements.
 - Layout issue in right pane of dataset manager window prevented it from using scroll, causing the window to be too large in some cases.
@@ -162,7 +162,7 @@
 - add `setCameraDirectionEquatorial()` and `setCameraDirectionGalactic()` API calls to transition the camera direction to specific coordinates given in the equatorial and galactic spherical systems. 
 - add enabled dataset list directly in welcome window. 
 - add Julian date tab to date/time dialog so that the time can also be set in Julian days. Fix issues with time zones, making it possible now to use the system default time zone. 
-- further optimize `PointCloudData` and `PointSample` to directly include the long seconds and int nanos in the recrod instead of the `Instant` instance. 
+- further optimize `PointCloudData` and `PointSample` to directly include the long seconds and int nanos in the record instead of the `Instant` instance. 
 - add shading style to star and particle sets, with possible values `default` and `twinkle`. 
 - improve visual quality of UI theme by increasing the padding and upping the image quality setting. 
 - big update to improve and refactor the user interface. Update and consolidate fonts, update skin system to be able to auto-generate themes from colors, remove old UI themes, remove Title component types, which were broken. 
@@ -224,7 +224,7 @@
 - focus orientation lock does not work consistently. 
 - trajectory scaling. 
 - missing translation keys for invisible component type. 
-- resotre motion blur settings crashes the app. 
+- Restore motion blur settings crashes the app. 
 - changelog template contains wrong URL paths. 
 
 ### Build System
@@ -282,7 +282,7 @@
 - update Gaia Sky icon. 
 
 ### Build System
-- update configuration file version number. This implies that your old configuration file gets overriden with the new version during the first startup of the new Gaia Sky version.
+- update configuration file version number. This implies that your old configuration file gets overridden with the new version during the first startup of the new Gaia Sky version.
 - update to Libgdx 1.13.1.
 
 ### Features
