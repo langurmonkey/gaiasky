@@ -2842,7 +2842,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *                     0.09 and 0.01.</li>
      *                     <li><code>"none"</code>: no smoothing is applied.</li>
      *                     </ul>
-     * @param smoothFactor Smoothing factor (depends on type). This is ignored if <code>smooth_type</code> is <code>"none"</code>.
+     * @param smoothFactor Smoothing factor (depends on type). This is ignored if <code>smoothType</code> is <code>"none"</code>.
      */
     void fovTransition(double targetFov,
                        double duration,
@@ -2868,7 +2868,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *                     0.09 and 0.01.</li>
      *                     <li><code>"none"</code>: no smoothing is applied.</li>
      *                     </ul>
-     * @param smoothFactor Smoothing factor (depends on type). This is ignored if <code>smooth_type</code> is <code>"none"</code>.
+     * @param smoothFactor Smoothing factor (depends on type). This is ignored if <code>smoothType</code> is <code>"none"</code>.
      * @param sync         If true, the call waits for the transition to finish before returning,
      *                     otherwise it returns immediately.
      */
