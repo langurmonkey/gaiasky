@@ -485,7 +485,7 @@ public interface CameraAPI {
     IFocus get_closest_object();
 
     /**
-     * Set the field of view of the perspective matrix of the camera, in degrees.
+     * Set the (vertical) field of view of the perspective matrix of the camera, in degrees.
      *
      * @param fov The new field of view value in degrees, between {@link gaiasky.util.Constants#MIN_FOV} and
      *            {@link gaiasky.util.Constants#MAX_FOV}.
@@ -493,7 +493,7 @@ public interface CameraAPI {
     void set_fov(float fov);
 
     /**
-     * Return the current camera field of view angle, in degrees.
+     * Return the (vertical) current camera field of view angle, in degrees.
      *
      * @return The current camera field of view angle, in degrees.
      */

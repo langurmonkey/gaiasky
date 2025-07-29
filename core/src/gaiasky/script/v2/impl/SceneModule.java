@@ -571,6 +571,11 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
+    public void clear_label_filter_regexps() {
+        em.post(Event.LABEL_CLEAR_FILTER_REGEX_CMD, this);
+    }
+
+    @Override
     public void set_mute_label(String name, boolean mute) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
@@ -591,7 +596,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public boolean get_force_dispaly_label(String name) {
+    public boolean get_force_display_label(String name) {
         if (api.validator.checkFocusName(name)) {
             Entity obj = get_entity(name);
 

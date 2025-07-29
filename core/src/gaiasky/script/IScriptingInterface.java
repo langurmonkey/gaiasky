@@ -988,22 +988,47 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
                               boolean forceLabel);
 
     /**
-     * Set the global label include regular expression. Only labels that match this regular expression are
+     * Set the global include regular expression for filtering labels. Only labels that match this regular expression are
      * rendered after this call. This call disables the global exclude regular expression (set with {@link #setLabelExcludeRegexp(String)}), if
      * it is set.
+     * <p>
+     * Java (like many other c-style languages) interprets backslashes '\\' as escape characters. If you are calling the API programmatically (i.e.
+     * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
+     * <p>
+     * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clearLabelFilterRegexps()}.
+     * <p>
+     * The include regular expression is not persisted to the settings file, and never lives longer than the current Gaia Sky instance.
+     * It is cleared after a restart.
+     *
      *
      * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
      */
     void setLabelIncludeRegexp(String regexp);
 
     /**
-     * Set the global label exclude regular expression. Labels that match this regular expression are
+     * Set the global exclude regular expression for filtering labels. Labels that match this regular expression are
      * not rendered after this call. This call disables the global include regular expression (set with {@link #setLabelIncludeRegexp(String)}), if
      * it is set.
+     * <p>
+     * Java (like many other c-style languages) interprets backslashes '\\' as escape characters. If you are calling the API programmatically (i.e.
+     * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
+     * <p>
+     * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clearLabelFilterRegexps()}.
+     * <p>
+     * The exclude regular expression is not persisted to the settings file, and never lives longer than the current Gaia Sky instance.
+     * It is cleared after a restart.
      *
      * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
      */
     void setLabelExcludeRegexp(String regexp);
+
+    /**
+     * Clears all label-filtering regular expressions currently in use, set with {@link #setLabelExcludeRegexp(String)} or
+     * {@link #setLabelIncludeRegexp(String)}, if any.
+     * <p>
+     * After this call, the label include and exclude regular expressions, used to filter labels in and out, are cleared.
+     */
+    void clearLabelFilterRegexps();
 
     /**
      * Mute the label of the object identified by <code>name</code>, ignoring the usual solid angle-based

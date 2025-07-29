@@ -1169,6 +1169,12 @@ public enum Event {
     LABEL_EXCLUDE_REGEX_CMD,
 
     /**
+     * Command to clear all filter regular expressions for labels (set with {@link #LABEL_EXCLUDE_REGEX_CMD} and
+     * {@link #LABEL_INCLUDE_REGEX_CMD}). Contains the source object.
+     */
+    LABEL_CLEAR_FILTER_REGEX_CMD,
+
+    /**
      * Sets the label color for a given object.
      * Contains the entity, the name of the object, the new color
      * as a float array (RGBA) in [0,1], and the source object.

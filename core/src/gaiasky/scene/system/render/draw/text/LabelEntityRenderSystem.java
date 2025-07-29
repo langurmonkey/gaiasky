@@ -65,16 +65,24 @@ public class LabelEntityRenderSystem {
      * @param regex The exclude regular expression.
      */
     public static synchronized void setExcludeRegex(String regex) {
-        try {
-            // Make sure it is a correct regular expression.
-            Pattern.compile(regex);
-            excludeRegex = regex;
-            if (includeRegex != null) {
-                includeRegex = null;
+        if (regex == null || regex.isEmpty()) {
+            removeExcludeRegex();
+        } else {
+            try {
+                // Make sure it is a correct regular expression.
+                Pattern.compile(regex);
+                excludeRegex = regex;
+                if (includeRegex != null) {
+                    includeRegex = null;
+                }
+            } catch (PatternSyntaxException e) {
+                logger.error("Could not compile regular expression: " + regex, e);
             }
-        } catch (PatternSyntaxException e) {
-            logger.error("Could not compile regular expression: " + regex, e);
         }
+    }
+
+    public static void removeExcludeRegex() {
+        excludeRegex = null;
     }
 
     /**
@@ -83,16 +91,24 @@ public class LabelEntityRenderSystem {
      * @param regex The include regular expression.
      */
     public static synchronized void setIncludeRegex(String regex) {
-        try {
-            // Make sure it is a correct regular expression.
-            Pattern.compile(regex);
-            includeRegex = regex;
-            if (excludeRegex != null) {
-                excludeRegex = null;
+        if (regex == null || regex.isEmpty()) {
+            removeIncludeRegex();
+        } else {
+            try {
+                // Make sure it is a correct regular expression.
+                Pattern.compile(regex);
+                includeRegex = regex;
+                if (excludeRegex != null) {
+                    excludeRegex = null;
+                }
+            } catch (PatternSyntaxException e) {
+                logger.error("Could not compile regular expression: " + regex, e);
             }
-        } catch (PatternSyntaxException e) {
-            logger.error("Could not compile regular expression: " + regex, e);
         }
+    }
+
+    public static void removeIncludeRegex() {
+        includeRegex = null;
     }
 
     /**

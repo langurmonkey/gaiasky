@@ -98,6 +98,10 @@ public class SceneObserver implements IObserver {
                 String regex = (String) data[0];
                 LabelEntityRenderSystem.setIncludeRegex(regex);
             }
+            case LABEL_CLEAR_FILTER_REGEX_CMD -> {
+                LabelEntityRenderSystem.removeExcludeRegex();
+                LabelEntityRenderSystem.removeIncludeRegex();
+            }
             case LABEL_COLOR_CMD -> {
                 final Entity entity = (Entity) data[0];
                 String name = (String) data[1];
