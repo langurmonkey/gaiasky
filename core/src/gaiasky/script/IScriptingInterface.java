@@ -992,14 +992,14 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * rendered after this call. This call disables the global exclude regular expression (set with {@link #setLabelExcludeRegexp(String)}), if
      * it is set.
      * <p>
-     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API programmatically (i.e.
+     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API
+     * programmatically (i.e.
      * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
      * <p>
      * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clearLabelFilterRegexps()}.
      * <p>
      * The include regular expression is not persisted to the settings file, and never lives longer than the current Gaia Sky instance.
      * It is cleared after a restart.
-     *
      *
      * @param regexp The regular expression string, in Java format. See {@link Pattern} for more information.
      */
@@ -1010,7 +1010,8 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * not rendered after this call. This call disables the global include regular expression (set with {@link #setLabelIncludeRegexp(String)}), if
      * it is set.
      * <p>
-     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API programmatically (i.e.
+     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API
+     * programmatically (i.e.
      * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
      * <p>
      * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clearLabelFilterRegexps()}.
@@ -2832,16 +2833,16 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *
      * @param targetFov    The target FOV angle.
      * @param duration     The duration of the transition, in seconds.
-     * @param smoothType   The function type to use for the smoothing. Either "logit",
-     *                     "logisticsigmoid" or "none".
+     * @param smoothType   The function type to use for the smoothing. Either <code>"logit"</code>,
+     *                     <code>"logisticsigmoid"</code> or <code>"none"</code>.
      *                     <ul>
-     *                     <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                     <li><code>"logisticsigmoid"</code>: starts slow and ends slow. The smooth factor must be over 12 to produce
      *                     an effect, otherwise, linear interpolation is used.</li>
-     *                     <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                     <li><code>"logit"</code>: starts fast and ends fast. The smooth factor must be between
      *                     0.09 and 0.01.</li>
-     *                     <li>"none": no smoothing is applied.</li>
+     *                     <li><code>"none"</code>: no smoothing is applied.</li>
      *                     </ul>
-     * @param smoothFactor Smoothing factor (depends on type).
+     * @param smoothFactor Smoothing factor (depends on type). This is ignored if <code>smooth_type</code> is <code>"none"</code>.
      */
     void fovTransition(double targetFov,
                        double duration,
@@ -2858,16 +2859,16 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *
      * @param targetFov    The target FOV angle.
      * @param duration     The duration of the transition, in seconds.
-     * @param smoothType   The function type to use for the smoothing. Either "logit",
-     *                     "logisticsigmoid" or "none".
+     * @param smoothType   The function type to use for the smoothing. Either <code>"logit"</code>,
+     *                     <code>"logisticsigmoid"</code> or <code>"none"</code>.
      *                     <ul>
-     *                     <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 7 to produce
+     *                     <li><code>"logisticsigmoid"</code>: starts slow and ends slow. The smooth factor must be over 12 to produce
      *                     an effect, otherwise, linear interpolation is used.</li>
-     *                     <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                     <li><code>"logit"</code>: starts fast and ends fast. The smooth factor must be between
      *                     0.09 and 0.01.</li>
-     *                     <li>"none": no smoothing is applied.</li>
+     *                     <li><code>"none"</code>: no smoothing is applied.</li>
      *                     </ul>
-     * @param smoothFactor Smoothing factor (depends on type).
+     * @param smoothFactor Smoothing factor (depends on type). This is ignored if <code>smooth_type</code> is <code>"none"</code>.
      * @param sync         If true, the call waits for the transition to finish before returning,
      *                     otherwise it returns immediately.
      */

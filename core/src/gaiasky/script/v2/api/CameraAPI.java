@@ -810,16 +810,16 @@ public interface CameraAPI {
      *
      * @param target_fov    The target FOV angle.
      * @param duration      The duration of the transition, in seconds.
-     * @param smooth_type   The function type to use for the smoothing. Either "logit",
-     *                      "logisticsigmoid" or "none".
+     * @param smooth_type   The function type to use for the smoothing. Either <code>"logit"</code>,
+     *                      <code>"logisticsigmoid"</code> or <code>"none"</code>.
      *                      <ul>
-     *                      <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                      <li><code>"logisticsigmoid"</code>: starts slow and ends slow. The smooth factor must be over 12 to produce
      *                      an effect, otherwise, linear interpolation is used.</li>
-     *                      <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                      <li><code>"logit"</code>: starts fast and ends fast. The smooth factor must be between
      *                      0.09 and 0.01.</li>
-     *                      <li>"none": no smoothing is applied.</li>
+     *                      <li><code>"none"</code>: no smoothing is applied.</li>
      *                      </ul>
-     * @param smooth_factor Smoothing factor (depends on type).
+     * @param smooth_factor Smoothing factor (depends on type). This is ignored if <code>smooth_type</code> is <code>"none"</code>.
      */
     void transition_fov(double target_fov,
                         double duration,
@@ -836,16 +836,16 @@ public interface CameraAPI {
      *
      * @param target_fov    The target FOV angle.
      * @param duration      The duration of the transition, in seconds.
-     * @param smooth_type   The function type to use for the smoothing. Either "logit",
-     *                      "logisticsigmoid" or "none".
+     * @param smooth_type   The function type to use for the smoothing. Either <code>"logit"</code>,
+     *                      <code>"logisticsigmoid"</code> or <code>"none"</code>.
      *                      <ul>
-     *                      <li>"logisticsigmoid": starts slow and ends slow. The smooth factor must be over 12 to produce
+     *                      <li><code>"logisticsigmoid"</code>: starts slow and ends slow. The smooth factor must be over 12 to produce
      *                      an effect, otherwise, linear interpolation is used.</li>
-     *                      <li>"logit": starts fast and ends fast. The smooth factor must be between
+     *                      <li><code>"logit"</code>: starts fast and ends fast. The smooth factor must be between
      *                      0.09 and 0.01.</li>
-     *                      <li>"none": no smoothing is applied.</li>
+     *                      <li><code>"none"</code>: no smoothing is applied.</li>
      *                      </ul>
-     * @param smooth_factor Smoothing factor (depends on type).
+     * @param smooth_factor Smoothing factor (depends on type). This is ignored if <code>smooth_type</code> is <code>"none"</code>.
      * @param sync          If true, the call waits for the transition to finish before returning,
      *                      otherwise it returns immediately.
      */
