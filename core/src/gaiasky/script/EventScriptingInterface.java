@@ -599,7 +599,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     @Override
     public boolean getForceDisplayLabel(String name) {
-        return apiv2.scene.get_force_dispaly_label(name);
+        return apiv2.scene.get_force_display_label(name);
     }
 
     @Override
