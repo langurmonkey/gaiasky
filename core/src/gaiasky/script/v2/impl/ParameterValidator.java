@@ -8,9 +8,9 @@
 package gaiasky.script.v2.impl;
 
 import com.badlogic.ashley.core.Entity;
+import gaiasky.render.ComponentTypes;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
-import gaiasky.util.validator.RegexpValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -241,10 +241,16 @@ public class ParameterValidator {
         }
     }
 
+    boolean checkCtKeyNull(String key) {
+        ComponentTypes.ComponentType ct = ComponentTypes.ComponentType.getFromKey(key);
+        return ct == null;
+    }
+
     private void logPossibleValues(String value, String[] possibleValues, String name) {
         logger.error(name + " value not valid: " + value + ". Possible values are:");
         for (String v : possibleValues)
             logger.error(v);
     }
+
 
 }

@@ -304,7 +304,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     @Override
     public void set_component_type_visibility(String key, boolean visible) {
-        if (checkCtKeyNull(key)) {
+        if (api.validator.checkCtKeyNull(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
             for (ComponentTypes.ComponentType ct : cts)
@@ -316,7 +316,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     @Override
     public boolean get_component_type_visibility(String key) {
-        if (checkCtKeyNull(key)) {
+        if (api.validator.checkCtKeyNull(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
             for (ComponentTypes.ComponentType ct : cts)
@@ -345,7 +345,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                 if (camera.getCamera().direction.dot(posFloat) > 0) {
                     camera.getCamera().project(posFloat);
                     if (posFloat.x < 0 || posFloat.x > Gdx.graphics.getWidth() || posFloat.y < 0 || posFloat.y > Gdx.graphics.getHeight()) {
-                        // Off screen.
+                        // Off-screen.
                         return null;
                     }
                     return new double[]{posFloat.x, posFloat.y};
@@ -619,11 +619,6 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     public void set_line_width_factor(int factor) {
         set_line_width_factor((float) factor);
-    }
-
-    private boolean checkCtKeyNull(String key) {
-        ComponentTypes.ComponentType ct = ComponentTypes.ComponentType.getFromKey(key);
-        return ct == null;
     }
 
     @Override
