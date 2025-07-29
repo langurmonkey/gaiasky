@@ -672,7 +672,7 @@ public interface SceneAPI {
      * rendered after this call. This call disables the global exclude regular expression (set with {@link #set_label_exclude_regexp(String)}), if
      * it is set.
      * <p>
-     * Java (like many other c-style languages) interprets backslashes '\\' as escape characters. If you are calling the API programmatically (i.e.
+     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API programmatically (i.e.
      * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
      * <p>
      * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clear_label_filter_regexps()}.
@@ -689,7 +689,7 @@ public interface SceneAPI {
      * not rendered after this call. This call disables the global include regular expression (set with {@link #set_label_include_regexp(String)}), if
      * it is set.
      * <p>
-     * Java (like many other c-style languages) interprets backslashes '\\' as escape characters. If you are calling the API programmatically (i.e.
+     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API programmatically (i.e.
      * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
      * <p>
      * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clear_label_filter_regexps()}.
