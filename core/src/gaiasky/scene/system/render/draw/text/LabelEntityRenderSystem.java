@@ -375,7 +375,7 @@ public class LabelEntityRenderSystem {
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i) && set.isRenderLabel(i)) {
                     IParticleRecord pb = pointData.get(idx);
                     if (pb.names() != null) {
-                        Vector3Q particlePosition = view.particleSet.fetchPosition(pb, view.particleSet.cPosD, B31, view.particleSet.currDeltaYears);
+                        Vector3Q particlePosition = view.particleSet.fetchPosition(pb, camera.getPos(), B31, view.particleSet.currDeltaYears);
                         float distToCamera = (float) particlePosition.lenDouble();
                         float solidAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
 
@@ -441,19 +441,18 @@ public class LabelEntityRenderSystem {
 
             var active = set.indices;
 
-            Vector3Q starPosition = B31;
             int n = FastMath.min(active.length, set.numLabels);
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
                 if (idx >= 0 && set.metadata[i] < Double.MAX_VALUE && set.isVisible(idx) && set.isRenderLabel(idx)) {
-                    renderStarLabel(view, set, idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+                    renderStarLabel(view, set, idx, thresholdLabel, batch, shader, sys, rc, camera);
                 }
             }
             var it = set.labelDisplayAlways.iterator();
             while (it.hasNext) {
                 var i = it.next();
                 if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
-                    renderStarLabel(view, set, i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+                    renderStarLabel(view, set, i, thresholdLabel, batch, shader, sys, rc, camera);
                 }
             }
         }
@@ -462,11 +461,12 @@ public class LabelEntityRenderSystem {
     /**
      * Renders the label for a single star in a star group.
      */
-    private void renderStarLabel(LabelView view, StarSet set, int idx, Vector3Q starPosition, float thresholdLabel, ExtSpriteBatch batch,
+    private void renderStarLabel(LabelView view, StarSet set, int idx, float thresholdLabel, ExtSpriteBatch batch,
                                  ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         boolean forceLabel = set.labelDisplayAlways.contains(idx);
         IParticleRecord star = set.pointData.get(idx);
-        starPosition = set.fetchPosition(star, set.cPosD, starPosition, set.currDeltaYears);
+        var starPosition = B31;
+        starPosition = set.fetchPosition(star, camera.getPos(), starPosition, set.currDeltaYears);
 
         double distToCamera = starPosition.lenDouble();
         float radius = (float) set.getRadius(idx);

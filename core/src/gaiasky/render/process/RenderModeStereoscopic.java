@@ -128,10 +128,10 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             // Let's calculate the separation
             separation = FastMath.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
             // Let's cap it.
-            separationCapped = FastMath.min(separation, 10.0 * Constants.M_TO_U);
+            separationCapped = FastMath.min(separation, 1.0E8 * Constants.KM_TO_U);
             dirAngleDeg = EYE_ANGLE_DEG;
         } else {
-            separationCapped = FastMath.min(separation, 10.0 * Constants.M_TO_U);
+            separationCapped = FastMath.min(separation, 1.0E8 * Constants.KM_TO_U);
         }
 
         // Aux5d contains the direction to the side of the camera, normalized.
