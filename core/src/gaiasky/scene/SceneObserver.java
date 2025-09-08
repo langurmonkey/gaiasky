@@ -32,6 +32,7 @@ public class SceneObserver implements IObserver {
                                         Event.MUTE_OBJECT_LABEL_CMD,
                                         Event.LABEL_EXCLUDE_REGEX_CMD,
                                         Event.LABEL_INCLUDE_REGEX_CMD,
+                                        Event.LABEL_CLEAR_FILTER_REGEX_CMD,
                                         Event.LABEL_COLOR_CMD);
     }
 
