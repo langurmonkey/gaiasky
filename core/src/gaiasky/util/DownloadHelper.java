@@ -109,7 +109,7 @@ public class DownloadHelper {
                 // Determine how much we have to download
                 int status = httpResponse.getStatus().getStatusCode();
                 if (status == 416) {
-                    // Range not satisfiable, clean and try again
+                    // Range not satisfiable, clean and try again.
                     if (resume) {
                         try {
                             Files.delete(to.file().toPath());
@@ -124,7 +124,7 @@ public class DownloadHelper {
                 long length = Long.parseLong(httpResponse.getHeader("Content-Length"));
 
                 if (status < 400) {
-                    // We're going to download the file, create the streams
+                    // We're going to download the file, create the streams.
                     try {
                         InputStream is = httpResponse.getResultAsStream();
                         OutputStream os = to.write(resume);
@@ -145,12 +145,12 @@ public class DownloadHelper {
                             os.write(bytes, 0, count);
                             read += count;
 
-                            // Compute progress value
+                            // Compute progress value.
                             final double progressValue = ((double) (startSize + read) / (double) totalLength) * 100;
 
-                            // Compute speed
+                            // Compute speed.
                             long currentTimeMs = System.currentTimeMillis();
-                            // Update each second
+                            // Update each second.
                             boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
                             if (updateSpeed) {
                                 long elapsedMs = currentTimeMs - lastTimeMs;
@@ -158,11 +158,11 @@ public class DownloadHelper {
                                 bytesPerMs = (double) readInterval / elapsedMs;
                             }
 
-                            // Run progress runnable
+                            // Run progress runnable.
                             if (progressDownload != null)
                                 progressDownload.run(startSize + read, totalLength, progressValue, bytesPerMs);
 
-                            // Reset
+                            // Reset.
                             if (updateSpeed) {
                                 lastTimeMs = currentTimeMs;
                                 lastRead = read;
@@ -172,27 +172,26 @@ public class DownloadHelper {
                         os.close();
                         logger.info(I18n.msg("gui.download.finished", to.file().toPath()));
 
-                        // Get digest and run finish runnable
+                        // Get digest and run finish runnable.
                         if (finish != null && !cancelled) {
                             if (resume) {
-                                // We have only read part of the file, the digest in dis is not valid!
+                                // We have only read part of the file, the digest is not valid!
                                 // Compute digest
-                                try {
+                                try (var fis = to.read()) {
                                     logger.info("Recomputing sha156 checksum due to being a resumed download: " + to.file().toPath());
                                     md.reset();
-                                    InputStream fis = to.read();
                                     length = to.length();
                                     read = 0;
                                     while ((count = fis.read(bytes, 0, bytes.length)) != -1) {
                                         md.update(bytes, 0, count);
                                         read += count;
 
-                                        // Compute progress value
+                                        // Compute progress value.
                                         final double progressValue = ((double) read / (double) length) * 100;
 
-                                        // Compute speed
+                                        // Compute speed.
                                         long currentTimeMs = System.currentTimeMillis();
-                                        // Update each second
+                                        // Update each second.
                                         boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
                                         if (updateSpeed) {
                                             long elapsedMs = currentTimeMs - lastTimeMs;
@@ -200,7 +199,7 @@ public class DownloadHelper {
                                             bytesPerMs = (double) readInterval / elapsedMs;
                                         }
 
-                                        // Run progress runnable
+                                        // Run progress runnable.
                                         if (progressHashResume != null)
                                             progressHashResume.run(read, length, progressValue, bytesPerMs);
                                     }

@@ -14,6 +14,9 @@ import net.jafama.FastMath;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -220,7 +223,7 @@ public class TextUtils {
      * @param line The input string
      *
      * @return The string with its first letter capitalised and the others in
-     * lower case
+     *         lower case
      */
     public static String trueCapitalise(String line) {
         return Character.toUpperCase(line.charAt(0)) + line.substring(1).toLowerCase();
@@ -846,7 +849,7 @@ public class TextUtils {
      * @param padChar The padding character to use.
      *
      * @return The padded string, or the original string if its length was greater than
-     * the given target length.
+     *         the given target length.
      */
     public static String padString(String str,
                                    int length,
@@ -855,6 +858,24 @@ public class TextUtils {
             return str;
         } else {
             return String.format("%1$" + length + "s", str).replace(' ', padChar);
+        }
+    }
+
+    /**
+     * Check if a string is a valid URL.
+     *
+     * @param url The string to check.
+     *
+     * @return True if the string is a valid URL.
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static boolean isValidURL(String url) {
+        if (url == null) return false;
+        try {
+            new URI(url).toURL();
+            return true;
+        } catch (MalformedURLException | URISyntaxException e) {
+            return false;
         }
     }
 

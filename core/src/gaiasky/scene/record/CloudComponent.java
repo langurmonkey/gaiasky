@@ -8,6 +8,7 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -34,11 +35,14 @@ import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.svt.SVTManager;
 import net.jafama.FastMath;
+import org.apache.commons.io.FilenameUtils;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -71,6 +75,22 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
      **/
     public float[] color = new float[]{1f, 1f, 1f, 0.7f};
     public String diffuse, diffuseUnpacked;
+
+    /** URL To pull cloud texture from. Only regular diffuse texture supported (no cubemap, no SVT). **/
+    public String url;
+    /** URL representation of the string. **/
+    private URL urlObject;
+    /** The URL is valid. **/
+    public boolean urlValid = false;
+    /** Path to the downloaded file. **/
+    public String urlUnpacked;
+    /** The download has been triggered. **/
+    public boolean downloadTriggered = false;
+    /** The download has been finished. **/
+    public boolean downloadFinished = false;
+    /** Location of the file pointed at by the URL on disk. **/
+    public String urlLocation;
+
     /**
      * The material component associated to the same model.
      **/
@@ -106,6 +126,20 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     private void initialize(boolean force) {
         if (!Settings.settings.scene.initialization.lazyTexture || force) {
+            this.generated.set(false);
+            if (url != null && TextUtils.isValidURL(url)) {
+                try {
+                    urlObject = new URI(url).toURL();
+                    // Pull from URL, later.
+                    urlValid = true;
+                } catch (Exception ignored) {
+                }
+                // Mute diffuse and diffuse cubemap channels.
+                diffuse = null;
+                diffuseCubemap = null;
+                diffuseSvt = null;
+                return;
+            }
             if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD)) {
                 // Add textures to load
                 diffuseUnpacked = addToLoad(diffuse);
@@ -117,7 +151,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             if (diffuseSvt != null)
                 diffuseSvt.initialize("diffuseSvt", this, TextureAttribute.SvtIndirectionDiffuse);
         }
-        this.generated.set(false);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -138,7 +171,14 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indices(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere",
+                                                                               params,
+                                                                               Bits.indices(Usage.Position,
+                                                                                            Usage.Normal,
+                                                                                            Usage.Tangent,
+                                                                                            Usage.BiNormal,
+                                                                                            Usage.TextureCoordinates),
+                                                                               GL20.GL_TRIANGLES);
         IntModel cloudModel = pair.getFirst();
         Material material = pair.getSecond().get("base");
         material.clear();
@@ -163,6 +203,38 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                 initialize(true);
                 // Set to loading
                 texLoading = true;
+            } else if (urlValid && !downloadTriggered) {
+                // Send request.
+                var fileName = FilenameUtils.getName(urlObject.getPath());
+                fileName = TextUtils.sanitizeFilename(name + "-" + fileName);
+                final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
+                var ignored = cacheDir.toFile().mkdirs();
+                final var filePath = cacheDir.resolve(fileName);
+                var f = new FileHandle(filePath.toFile());
+
+                DownloadHelper.downloadFile(url,
+                                            f,
+                                            Settings.settings.program.offlineMode,
+                                            null,
+                                            null,
+                                            (digest) -> {
+                                                // Download successful.
+                                                diffuse = f.path();
+                                                diffuseUnpacked = f.path();
+                                                urlUnpacked = f.path();
+                                                addToLoad(diffuse);
+                                                downloadFinished = true;
+                                            },
+                                            () -> {
+                                                // Fail, revert to local file.
+                                                downloadFinished = true;
+                                            },
+                                            null);
+                downloadTriggered = true;
+
+            } else //noinspection StatementWithEmptyBody
+                if (urlValid && !downloadFinished) {
+                // Wait, do nothing now.
             } else if (isFinishedLoading(manager)) {
                 GaiaSky.postRunnable(() -> this.initMaterial(model));
 
@@ -202,6 +274,18 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             if (!diffuse.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(diffuseUnpacked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+
+                // Add occlusion clouds attributes if we pulled the texture from URL.
+                if (urlValid && downloadFinished) {
+                    var mat = model.model.mtc.getMaterial();
+                    mat.remove(OcclusionCloudsAttribute.Type);
+                    mat.remove(TextureAttribute.AO);
+                    mat.remove(CubemapAttribute.AmbientOcclusionCubemap);
+                    model.model.mtc.aoTexture = tex;
+                    mat.set(new TextureAttribute(TextureAttribute.AO, model.model.mtc.aoTexture));
+                    mat.set(new OcclusionCloudsAttribute(true));
+                    model.model.mtc.setOcclusionClouds(true);
+                }
             } else {
                 initializeGenCloudData(model);
             }
@@ -229,6 +313,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         material.set(new BlendingAttribute(1.0f));
         // Do not cull, only when below the clouds!
         material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_BACK));
+
     }
 
     private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
@@ -237,11 +322,13 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         svt.id = id;
         // Set attributes.
         double svtResolution = svt.tileSize * FastMath.pow(2.0, svt.tree.depth);
-        material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
+        material.set(new Vector2Attribute(Vector2Attribute.SvtResolution,
+                                          new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
         material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
         material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
         material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
-        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor, (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
+        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor,
+                                        (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
     }
 
     public void setGenerated(boolean generated) {
@@ -267,7 +354,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                 // Write to disk if necessary.
                 if (Settings.settings.program.saveProceduralTextures) {
                     SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud",
-                            Settings.ImageFormat.JPG);
+                                                     Settings.ImageFormat.JPG);
                 }
                 if (cloudFb != null) {
                     cloudTex = cloudFb.getColorBufferTexture();
@@ -374,6 +461,10 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     public void setDiffuse(String diffuse) {
         this.diffuse = Settings.settings.data.dataFile(diffuse);
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public void setNoise(NoiseComponent noise) {

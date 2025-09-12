@@ -589,11 +589,11 @@ void main() {
         diffuseColor = saturate(diffuse.rgb * ambient);
     } else {
         #ifdef occlusionCloudsFlag
-        // Ambient occlusion contains clouds, take into account light direction and normal.
-        float ambientOcclusion = fetchColorAmbientOcclusion(texCoords + L0.xy  * 0.0015);
-        ambientOcclusion = clamp(1.0 - 1.7 * ambientOcclusion, 0.0, 1.0);
-        diffuseColor *= ambientOcclusion;
-        specularColor *= ambientOcclusion;
+            // Ambient occlusion contains clouds, take into account light direction and normal.
+            float ambientOcclusion = clamp(fetchColorAmbientOcclusion(texCoords + L0.xy  * 0.0015), 0.0, 1.0);
+            ambientOcclusion = pow(1.0 - ambientOcclusion, 0.7);
+            diffuseColor *= ambientOcclusion;
+            specularColor *= ambientOcclusion;
         #endif // occlusionCloudsFlag
 
         // Regular shading.

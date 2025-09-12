@@ -33,10 +33,7 @@ import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.Constants;
-import gaiasky.util.Logger;
-import gaiasky.util.Pair;
-import gaiasky.util.Settings;
+import gaiasky.util.*;
 import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
@@ -321,20 +318,23 @@ public class ModelInitializer extends AbstractInitSystem {
         if (Mapper.cloud.has(entity)) {
             var cloud = Mapper.cloud.get(entity);
             if (model.model != null && model.model.mtc != null && cloud.cloud != null) {
-                if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
-                    // Cloud shadows unsupported with SVT.
-                    // This is because we can't ensure that the cloud SVT is exactly the same (levels, size, etc.) as the
-                    // main diffuse SVT, and the visibility determination happens only once per layer.
-                    cloud.cloud.diffuse = null;
-                    cloud.cloud.diffuseCubemap = null;
-                    //model.model.mtc.setAoSVT(cloud.cloud.svtParams);
-                    //model.model.mtc.setOcclusionClouds(true);
-                } else if (cloud.cloud.diffuse != null && !cloud.cloud.diffuse.endsWith(Constants.GEN_KEYWORD)) {
-                    model.model.mtc.ao = cloud.cloud.diffuse;
-                    model.model.mtc.setOcclusionClouds(true);
-                } else if (cloud.cloud.diffuseCubemap != null) {
-                    model.model.mtc.setAmbientOcclusionCubemap(cloud.cloud.diffuseCubemap.location);
-                    model.model.mtc.setOcclusionClouds(true);
+                // Do not add cloud occlusion with current configuration if clouds are pulled from URL.
+                if (!TextUtils.isValidURL(cloud.cloud.url)) {
+                    if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
+                        // Cloud shadows unsupported with SVT.
+                        // This is because we can't ensure that the cloud SVT is exactly the same (levels, size, etc.) as the
+                        // main diffuse SVT, and the visibility determination happens only once per layer.
+                        cloud.cloud.diffuse = null;
+                        cloud.cloud.diffuseCubemap = null;
+                        //model.model.mtc.setAoSVT(cloud.cloud.svtParams);
+                        //model.model.mtc.setOcclusionClouds(true);
+                    } else if (cloud.cloud.diffuse != null && !cloud.cloud.diffuse.endsWith(Constants.GEN_KEYWORD)) {
+                        model.model.mtc.ao = cloud.cloud.diffuse;
+                        model.model.mtc.setOcclusionClouds(true);
+                    } else if (cloud.cloud.diffuseCubemap != null) {
+                        model.model.mtc.setAmbientOcclusionCubemap(cloud.cloud.diffuseCubemap.location);
+                        model.model.mtc.setOcclusionClouds(true);
+                    }
                 }
             }
         }
