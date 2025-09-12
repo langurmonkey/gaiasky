@@ -277,14 +277,17 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
                 // Add occlusion clouds attributes if we pulled the texture from URL.
                 if (urlValid && downloadFinished) {
-                    var mat = model.model.mtc.getMaterial();
-                    mat.remove(OcclusionCloudsAttribute.Type);
-                    mat.remove(TextureAttribute.AO);
-                    mat.remove(CubemapAttribute.AmbientOcclusionCubemap);
-                    model.model.mtc.aoTexture = tex;
-                    mat.set(new TextureAttribute(TextureAttribute.AO, model.model.mtc.aoTexture));
-                    mat.set(new OcclusionCloudsAttribute(true));
-                    model.model.mtc.setOcclusionClouds(true);
+                    if (model != null && model.model != null && model.model.mtc != null &&
+                            GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+                        var mat = model.model.mtc.getMaterial();
+                        mat.remove(OcclusionCloudsAttribute.Type);
+                        mat.remove(TextureAttribute.AO);
+                        mat.remove(CubemapAttribute.AmbientOcclusionCubemap);
+                        model.model.mtc.aoTexture = tex;
+                        mat.set(new TextureAttribute(TextureAttribute.AO, model.model.mtc.aoTexture));
+                        mat.set(new OcclusionCloudsAttribute(true));
+                        model.model.mtc.setOcclusionClouds(true);
+                    }
                 }
             } else {
                 initializeGenCloudData(model);
