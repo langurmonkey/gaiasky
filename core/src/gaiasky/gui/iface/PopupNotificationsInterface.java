@@ -134,11 +134,13 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
         if (event == Event.POST_POPUP_NOTIFICATION) {
             String message = (String) data[0];
             float seconds = defaultSeconds;
-            if (data.length > 1) {
+            var len = data.length;
+            if (len > 1) {
+                // Timeout.
                 try {
-                    seconds = ((Number) data[1]).floatValue();
+                    seconds = ((Number) data[len - 1]).floatValue();
                 } catch (ClassCastException ignored) {
-                    // Item [1] should always be a number!
+                    // Item [n-1] should always be a number!
                 }
             }
             addNotification(message, seconds);

@@ -188,13 +188,20 @@ public class WelcomeGui extends AbstractGui {
                                             // Fail?
                                             downloadError = true;
                                             if (Settings.settings.program.offlineMode) {
-                                                logger.error(I18n.msg("gui.welcome.error.offlinemode"));
+                                                logger.warn(I18n.msg("gui.welcome.error.offlinemode"));
                                             } else {
                                                 logger.error(I18n.msg("gui.welcome.error.nointernet"));
                                             }
                                             if (baseDataPresent()) {
-                                                // Go on all in
-                                                GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, stage, this::buildWelcomeUI));
+                                                // Just post a tooltip.
+                                                GaiaSky.postRunnable(() -> {
+                                                    var title = I18n.msg("gui.download.noconnection.continue");
+                                                    if (Settings.settings.program.offlineMode) {
+                                                        title = I18n.msg("gui.system.offlinemode.tooltip");
+                                                    }
+                                                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, title, 10f);
+                                                    buildWelcomeUI();
+                                                });
                                             } else {
                                                 // Error and exit
                                                 logger.error(I18n.msg("gui.welcome.error.nobasedata"));

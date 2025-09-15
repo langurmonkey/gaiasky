@@ -256,8 +256,14 @@ public class DatasetManagerWindow extends GenericDialog {
         tabs.add(tabAvail);
         tabs.add(tabInstalled);
 
-        // Check
-        if (serverDd != null && serverDd.updatesAvailable)
+        // Select installed tab if:
+        // - There are updates to installed datasets.
+        // - We can't contact the server.
+        // - We have local datasets other than the base data.
+        var localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
+        if ((serverDd != null && serverDd.updatesAvailable)
+        || (serverDd == null || serverDd.datasets.isEmpty())
+        || (localDd != null && localDd.datasets.size() > 1))
             selectedTab = 1;
         tabs.setChecked(selectedTab == 0 ? tabAvail.getText().toString() : tabInstalled.getText().toString());
 
