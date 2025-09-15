@@ -272,7 +272,7 @@ public class DatasetManagerWindow extends GenericDialog {
             addDataLocation(content);
 
         // Add manual download
-        Link manualDownload = new Link(I18n.msg("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
+        Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.dataMirror);
         content.add(manualDownload).center();
 
         initialized.set(true);

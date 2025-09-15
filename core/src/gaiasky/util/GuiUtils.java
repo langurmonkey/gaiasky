@@ -84,7 +84,7 @@ public class GuiUtils {
                 } else {
                     OwnLabel info = new OwnLabel(I18n.msg("gui.download.noconnection.continue"), skin);
                     content.add(info).pad(pad18).row();
-                    Link manualDownload = new Link(I18n.msg("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
+                    Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.dataMirror);
                     content.add(manualDownload).pad(pad18);
                 }
 
