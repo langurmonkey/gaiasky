@@ -18,10 +18,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.Link;
-import gaiasky.util.scene2d.OwnImageButton;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;
 
 /**
@@ -129,11 +126,52 @@ public class GuiUtils {
                     text = I18n.msg("gui.download.noconnection");
                 }
                 OwnLabel info = new OwnLabel(text, skin);
-                OwnLabel gsExit = new OwnLabel(I18n.msg("notif.gaiasky.exit"), skin);
-                Link manualDownload = new Link(I18n.msg("gui.download.manual"), skin, "link", "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
-                content.add(info).left().pad(10).row();
-                content.add(gsExit).left().pad(10).row();
-                content.add(manualDownload).pad(10);
+                content.add(info).left().pad(pad10).padBottom(pad34).row();
+
+                Table status = new Table(skin);
+                // Data server status.
+                var dataServer = new OwnLabel(I18n.msg("gui.connection.dataserver"), skin);
+                status.add(dataServer).left().padRight(pad34 * 3f).padBottom(pad18);
+                status.add(getKoImage()).left().padBottom(pad18).row();
+
+                // Internet connection status.
+                var internet = new OwnLabel(I18n.msg("gui.connection.internet"), skin);
+                status.add(internet).left().padRight(pad34 * 3f).padBottom(pad18);
+                var cell = status.add();
+                cell.left().padBottom(pad18).row();
+                cell.setActor(new OwnLabel("...", skin));
+
+                DownloadHelper.checkInternetConnection(
+                        () -> {
+                            GaiaSky.postRunnable(() -> cell.setActor(getOkImage()));
+                        },
+                        () -> {
+                            GaiaSky.postRunnable(() -> cell.setActor(getKoImage()));
+                        }
+                );
+
+                content.add(status).center().pad(pad10).padBottom(pad34).row();
+
+                content.add(new OwnLabel("To fix the issue, you can try:", skin)).left().pad(pad10).row();
+                content.add(new Link(I18n.msg("gui.connection.fix.manual"),
+                                     skin,
+                                     "link",
+                                     Settings.settings.program.url.dataMirror)).pad(pad10).row();
+                content.add(new Link(I18n.msg("gui.connection.fix.report"), skin, "link", Settings.REPO_ISSUES)).pad(pad10);
+            }
+
+            private OwnImage getKoImage() {
+                var ko = skin.getDrawable("iconic-circle-x");
+                var koImage = new OwnImage(ko);
+                koImage.setColor(skin.getColor("red"));
+                return koImage;
+            }
+
+            private OwnImage getOkImage() {
+                var ok = skin.getDrawable("iconic-circle-check");
+                var okImage = new OwnImage(ok);
+                okImage.setColor(skin.getColor("green"));
+                return okImage;
             }
 
             @Override
@@ -278,6 +316,7 @@ public class GuiUtils {
      * traversing it recursively, if it exists.
      *
      * @param actor The container actor.
+     *
      * @return The first scroll pane found, or null if none is found.
      */
     public static ScrollPane getScrollPaneIn(Actor actor) {
@@ -297,7 +336,9 @@ public class GuiUtils {
 
     /**
      * Gets the first scroll pane ancestor of the given actor, if any.
+     *
      * @param actor The actor.
+     *
      * @return The first scroll pane ancestor. Null if it does not exist.
      */
     public static ScrollPane getScrollPaneAncestor(Actor actor) {
@@ -338,6 +379,7 @@ public class GuiUtils {
      *
      * @param actors The list of actors.
      * @param list   The output list.
+     *
      * @return The output list with all the input widgets.
      */
     public static Array<Actor> getInputWidgets(Array<? extends Actor> actors, Array<Actor> list) {
@@ -353,6 +395,7 @@ public class GuiUtils {
      *
      * @param actor The actor.
      * @param list  The list with all the input widgets in the actor.
+     *
      * @return The input list.
      */
     public static Array<Actor> getInputWidgets(Actor actor, Array<Actor> list) {
@@ -377,6 +420,7 @@ public class GuiUtils {
      * Check if the given actor is an input widget.
      *
      * @param actor The actor.
+     *
      * @return True if the actor is an input widget.
      */
     public static boolean isInputWidget(Actor actor) {
@@ -390,6 +434,7 @@ public class GuiUtils {
      * Check if the given actor is a tooltip widget.
      *
      * @param actor The actor.
+     *
      * @return True if the actor is a tooltip widget.
      */
     public static boolean isTooltipWidget(Actor actor) {
@@ -400,6 +445,7 @@ public class GuiUtils {
      * Check if the actor is not disabled.
      *
      * @param actor The actor.
+     *
      * @return True if the actor is not disabled.
      */
     public static boolean isNotDisabled(Actor actor) {

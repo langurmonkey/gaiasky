@@ -193,7 +193,7 @@ public class WelcomeGui extends AbstractGui {
                                                 logger.error(I18n.msg("gui.welcome.error.nointernet"));
                                             }
                                             if (baseDataPresent()) {
-                                                // Just post a tooltip.
+                                                // Just post a tooltip and go on.
                                                 GaiaSky.postRunnable(() -> {
                                                     var title = I18n.msg("gui.download.noconnection.continue");
                                                     if (Settings.settings.program.offlineMode) {
@@ -203,7 +203,7 @@ public class WelcomeGui extends AbstractGui {
                                                     buildWelcomeUI();
                                                 });
                                             } else {
-                                                // Error and exit
+                                                // Error and exit.
                                                 logger.error(I18n.msg("gui.welcome.error.nobasedata"));
                                                 GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, stage));
                                             }
@@ -771,7 +771,7 @@ public class WelcomeGui extends AbstractGui {
             if (serverDatasets != null && serverDatasets.updatesAvailable) {
                 DatasetDesc baseData = serverDatasets.findDatasetByKey(Constants.DEFAULT_DATASET_KEY);
                 if (baseData != null && baseData.myVersion < baseData.serverVersion) {
-                    // We have a base data update, show notice
+                    // We have a base data update, show notice.
                     GenericDialog baseDataNotice = new GenericDialog(I18n.msg("gui.basedata.title"), skin, stage) {
 
                         @Override

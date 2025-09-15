@@ -91,7 +91,10 @@ public class Settings extends SettingsObject {
     public static final String AUTHOR_AFFILIATION_PLAIN = "Universitaet Heidelberg, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
     public static final String AUTHOR_WEBSITE_TEXT = "tonisagrista.com";
     public static final String AUTHOR_WEBSITE_FULL = "https://tonisagrista.com";
+    /** License file. **/
     public static final String LICENSE_URL = "https://opensource.org/licenses/MPL-2.0";
+    /** URL used to check for internet connection. **/
+    public static final String INTERNET_CHECK_URL = "http://fedoraproject.org/static/hotspot.txt";
     private static final Log logger = Logger.getLogger(Settings.class);
     // Static settings
     public static String APPLICATION_NAME = "Gaia Sky";

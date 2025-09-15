@@ -13,6 +13,7 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
@@ -31,12 +32,59 @@ import java.util.function.Consumer;
 public class DownloadHelper {
     private static final Log logger = Logger.getLogger(DownloadHelper.class);
 
-    /*
+    /**
+     * Checks for an internet connection and runs the appropriate runnable depending on the outcome.
+     *
+     * @param success Success runnable.
+     * @param fail    Failure runnable.
+     */
+    public static void checkInternetConnection(Runnable success, Runnable fail) {
+        HttpRequest request = new HttpRequest(HttpMethods.GET);
+        request.setFollowRedirects(true);
+        request.setTimeOut(6500);
+        request.setUrl("http://fedoraproject.org/static/hotspot.txt");
+        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+
+            @Override
+            public void handleHttpResponse(HttpResponse httpResponse) {
+                var status = httpResponse.getStatus();
+                if (status.getStatusCode() < HttpStatus.SC_BAD_REQUEST) {
+                    // OK.
+                    success.run();
+                } else if (status.getStatusCode() < HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+                    // Client error.
+                    fail.run();
+                } else {
+                    // Server error.
+                    fail.run();
+                }
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                fail.run();
+            }
+
+            @Override
+            public void cancelled() {
+                fail.run();
+            }
+        });
+    }
+
+    /**
      * Spawns a new thread which downloads the file from the given location, running the
      * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
      * when finished.
      */
-    public static HttpRequest downloadFile(String url, FileHandle to, boolean offlineMode, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, Consumer<String> finish, Runnable fail, Runnable cancel) {
+    public static HttpRequest downloadFile(String url,
+                                           FileHandle to,
+                                           boolean offlineMode,
+                                           ProgressRunnable progressDownload,
+                                           ProgressRunnable progressHashResume,
+                                           Consumer<String> finish,
+                                           Runnable fail,
+                                           Runnable cancel) {
 
         if (url.startsWith("file://")) {
             // Local file!
@@ -67,7 +115,7 @@ public class DownloadHelper {
             // Make a 'GET' request to get data descriptor.
             HttpRequest request = new HttpRequest(HttpMethods.GET);
             request.setFollowRedirects(true);
-            request.setTimeOut(2500);
+            request.setTimeOut(6500);
             request.setUrl(url);
 
             // Resume download if target file (?.tar.gz.part) exists.
@@ -99,7 +147,30 @@ public class DownloadHelper {
         }
     }
 
-    public static void sendRequest(HttpRequest request, String url, boolean resume, FileHandle to, long startSize, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, Consumer<String> finish, Runnable fail, Runnable cancel) {
+    /**
+     * Send the given {@link HttpRequest} with the given parameters.
+     *
+     * @param request            The request.
+     * @param url                The URL.
+     * @param resume             Whether to resume past downloads.
+     * @param to                 File to save the response.
+     * @param startSize          Partial start size.
+     * @param progressDownload   Runnable to run during download progress.
+     * @param progressHashResume Runnable to run during hashing progress.
+     * @param finish             Runnable to run if the download finished successfully.
+     * @param fail               Runnable to run if the download failed.
+     * @param cancel             Runnable to run if the download was cancelled.
+     */
+    public static void sendRequest(HttpRequest request,
+                                   String url,
+                                   boolean resume,
+                                   FileHandle to,
+                                   long startSize,
+                                   ProgressRunnable progressDownload,
+                                   ProgressRunnable progressHashResume,
+                                   Consumer<String> finish,
+                                   Runnable fail,
+                                   Runnable cancel) {
         // Send the request, listen for the response
         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
             private boolean cancelled = false;
