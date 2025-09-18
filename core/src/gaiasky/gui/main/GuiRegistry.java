@@ -51,7 +51,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * Keeps track of and manages the active user interfaces ({@link IGui} instances).
+ * Keeps track of and manages the active user interfaces ({@link IGui} instances). It also serves and implements
+ * most of the GUI-related action events.
  */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
@@ -416,7 +417,7 @@ public class GuiRegistry implements IObserver {
                     }
                 }
                 case SHOW_PREFERENCES_ACTION -> {
-                    Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
+                    Array<Actor> prefs = getPreferencesWindows();
                     if (prefs.isEmpty()) {
                         if (preferencesWindow != null) {
                             preferencesWindow.dispose();
@@ -828,13 +829,13 @@ public class GuiRegistry implements IObserver {
         }
     }
 
-    private Array<Actor> getElementsOfType(Class<? extends Actor> clazz) {
+    private Array<Actor> getPreferencesWindows() {
         Array<Actor> result = new Array<>();
         if (current != null) {
             Stage ui = current.getGuiStage();
             Array<Actor> actors = ui.getActors();
             for (Actor actor : actors) {
-                if (clazz.isAssignableFrom(actor.getClass())) {
+                if (PreferencesWindow.class.isAssignableFrom(actor.getClass())) {
                     result.add(actor);
                 }
             }

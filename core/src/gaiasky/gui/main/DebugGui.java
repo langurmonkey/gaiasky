@@ -25,6 +25,13 @@ public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container<Actor> di;
 
+    /**
+     * Creates a new instance of this GUI.
+     *
+     * @param skin          The skin to use.
+     * @param graphics      The graphics instance.
+     * @param unitsPerPixel The units per pixel value.
+     */
     public DebugGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;

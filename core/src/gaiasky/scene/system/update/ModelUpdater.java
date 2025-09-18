@@ -65,7 +65,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         var engine = Mapper.engine.get(entity);
 
         // Update light with global position.
-        LightingUtils.updateLights(model, body, graph, camera);
+        LightingUtils.updateLights(model, body, camera);
         updateLocalTransform(entity, body, graph, scaffolding);
 
         // Atmosphere and cloud.

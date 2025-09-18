@@ -981,7 +981,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
         globalResources.initialize(assetManager);
 
-        mainGui = new FullGui(globalResources.getSkin(), graphics, unitsPerPixel, globalResources);
+        mainGui = new MainGui(globalResources.getSkin(), graphics, unitsPerPixel, globalResources);
         mainGui.initialize(assetManager, globalResources.getSpriteBatch());
 
         debugGui = new DebugGui(globalResources.getSkin(), graphics, unitsPerPixel);
@@ -1024,7 +1024,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         guiRegistry.unregisterAll();
 
         // Set scene to main gui.
-        ((FullGui) mainGui).setScene(scene);
+        ((MainGui) mainGui).setScene(scene);
         mainGui.setVisibilityToggles(ComponentType.values(), sceneRenderer.visible);
 
         for (IGui gui : guis)

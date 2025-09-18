@@ -236,7 +236,7 @@ public class KeyBindings {
          */
 
         // Condition which checks the current GUI is the FullGui
-        BooleanRunnable fullGuiCondition = () -> GaiaSky.instance.getGuiRegistry().current instanceof FullGui;
+        BooleanRunnable fullGuiCondition = () -> GaiaSky.instance.getGuiRegistry().current instanceof MainGui;
         // Condition that checks the current camera is not Game
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
         // Condition that checks the GUI is visible (no clean mode)

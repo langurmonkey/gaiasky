@@ -55,10 +55,10 @@ import java.time.Instant;
 import static gaiasky.event.Event.*;
 
 /**
- * Aggregates and manages all the panels and separate user interfaces in Gaia Sky.
+ * Aggregates and manages the main user interface mode, with all its sub-interfaces.
  */
-public class FullGui extends AbstractGui {
-    private static final Log logger = Logger.getLogger(FullGui.class);
+public class MainGui extends AbstractGui {
+    private static final Log logger = Logger.getLogger(MainGui.class);
     private final GlobalResources globalResources;
     private final FocusView view;
     private CatalogManager catalogManager;
@@ -89,7 +89,15 @@ public class FullGui extends AbstractGui {
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
 
-    public FullGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources) {
+    /**
+     * Creates a {@link MainGui} with the given skin, graphics instance, units per pixel, and global resources.
+     *
+     * @param skin            The {@link Skin} to use.
+     * @param graphics        The {@link Graphics} instance.
+     * @param unitsPerPixel   The units per pixel to use, as a floating point number.
+     * @param globalResources Reference to the {@link GlobalResources} object.
+     */
+    public MainGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.globalResources = globalResources;

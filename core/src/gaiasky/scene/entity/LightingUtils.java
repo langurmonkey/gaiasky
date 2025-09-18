@@ -23,14 +23,14 @@ import net.jafama.FastMath;
  */
 public class LightingUtils {
 
-    // At what distance the light has the maximum intensity.
+    /** Distance at which the light reaches maximum intensity. **/
     private static final double LIGHT_X0 = 0.1 * Constants.AU_TO_U;
-    // At what distance the light is 0.
+    /** Distance at which the light is nil. **/
     private static final double LIGHT_X1 = 500.0 * Constants.AU_TO_U;
 
     private static final TLV3 F31 = new TLV3();
 
-    public static void updateLights(Model model, Body body, GraphNode graph, ICamera camera) {
+    public static void updateLights(Model model, Body body, ICamera camera) {
         if (model.model != null && !model.model.isStaticLight() && body.distToCamera <= LIGHT_X1) {
             // We use point lights for stars.
             for (int i = 0; i < Constants.N_POINT_LIGHTS; i++) {

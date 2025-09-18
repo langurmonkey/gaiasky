@@ -37,7 +37,7 @@ public class ShapeUpdater extends AbstractUpdateSystem {
 
         if (model.model != null && !model.model.isStaticLight()) {
             // Update light with global position
-            LightingUtils.updateLights(model, body, graph, GaiaSky.instance.cameraManager);
+            LightingUtils.updateLights(model, body, GaiaSky.instance.cameraManager);
         }
 
         // Compute local transform.
