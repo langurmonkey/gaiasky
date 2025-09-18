@@ -192,7 +192,7 @@ public class FileChooser extends GenericDialog {
 
         // Text input with current location
         location = new OwnTextField("", skin);
-        location.setWidth(745f);
+        location.setWidth(710f);
         location.setAlignment(Align.left);
         location.addListener(event -> {
             if (event instanceof ChangeEvent) {
