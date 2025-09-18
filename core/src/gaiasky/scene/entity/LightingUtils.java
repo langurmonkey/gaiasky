@@ -7,8 +7,6 @@
 
 package gaiasky.scene.entity;
 
-import com.badlogic.gdx.math.Vector3;
-import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
@@ -30,25 +28,25 @@ public class LightingUtils {
     // At what distance the light is 0.
     private static final double LIGHT_X1 = 500.0 * Constants.AU_TO_U;
 
-    private static final ThreadLocal<Vector3> F31 = new TLV3();
+    private static final TLV3 F31 = new TLV3();
 
     public static void updateLights(Model model, Body body, GraphNode graph, ICamera camera) {
         if (model.model != null && !model.model.isStaticLight() && body.distToCamera <= LIGHT_X1) {
             // We use point lights for stars.
             for (int i = 0; i < Constants.N_POINT_LIGHTS; i++) {
-                IFocus lightSource = camera.getCloseLightSource(i);
+                var lightSource = camera.getCloseLightSource(i);
                 if (lightSource != null) {
                     if (lightSource instanceof Proximity.NearbyRecord nr) {
                         var pointLight = model.model.pointLight(i);
                         if (pointLight != null) {
                             if (nr.isStar() || nr.isStarGroup()) {
                                 // Only stars illuminate.
-                                float[] col = nr.getColor();
-                                double closestDist = nr.getClosestDistToCamera();
+                                var color = nr.getColor();
+                                var closestDistance = nr.getClosestDistToCamera();
                                 // Dim light with distance.
-                                float colFactor = (float) FastMath.pow(MathUtilsDouble.flint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
+                                var colorFactor = (float) FastMath.pow(MathUtilsDouble.flint(closestDistance, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
                                 pointLight.position.set(nr.pos.put(F31.get()));
-                                pointLight.color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
+                                pointLight.color.set(color[0] * colorFactor, color[1] * colorFactor, color[2] * colorFactor, colorFactor);
                                 pointLight.intensity = 1;
                             } else {
                                 Vector3Q campos = camera.getPos();
