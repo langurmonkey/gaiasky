@@ -62,9 +62,17 @@ public class MainGamepadListener extends AbstractGamepadListener {
                     // Set focus
                     em.post(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
                 }
+            } else if (buttonCode == mappings.getButtonRB()) {
+                if (cam.getMode().isFree()) {
+                    cam.setVertical(0.1);
+                }
+            } else if (buttonCode == mappings.getButtonLB()) {
+                if (cam.getMode().isFree()) {
+                    cam.setVertical(-0.1);
+                }
             }
-            cam.setGamepadInput(true);
 
+            cam.setGamepadInput(true);
             return true;
         }
         return false;
@@ -75,7 +83,19 @@ public class MainGamepadListener extends AbstractGamepadListener {
         if (active.get()) {
             super.buttonUp(controller, buttonCode);
             logger.debug("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
+
+            if (buttonCode == mappings.getButtonRB()) {
+                if (cam.getMode().isFree()) {
+                    cam.setVertical(0.0);
+                }
+            } else if (buttonCode == mappings.getButtonLB()) {
+                if (cam.getMode().isFree()) {
+                    cam.setVertical(0.0);
+                }
+            }
+
             cam.setGamepadInput(true);
+            return true;
         }
         return false;
     }
