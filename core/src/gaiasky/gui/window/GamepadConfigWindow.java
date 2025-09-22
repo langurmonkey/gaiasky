@@ -38,6 +38,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * The window to configure gamepad mappings.
+ */
 public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GamepadConfigWindow.class);
     private static final int TYPE_BUTTON = 0;
@@ -62,7 +65,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private Cell<Image> elementCell;
 
     public GamepadConfigWindow(String controllerName, GamepadMappings mappings, Stage stage, Skin skin) {
-        super("Configure controller: " + controllerName, skin, stage);
+        super(I18n.msg("gui.controller.configure.title", controllerName), skin, stage);
         this.controllerName = controllerName;
         this.mappings = mappings;
         if (this.mappings == null) {
@@ -199,8 +202,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
         // Table with inputs and mappings
         Table inputTable = new Table(skin);
-        GamepadInput[] gpds = GamepadInput.values();
-        for (GamepadInput gpd : gpds) {
+        GamepadInput[] gamepads = GamepadInput.values();
+        for (GamepadInput gpd : gamepads) {
             Trio<Texture, float[], String> t = inputInfo.get(gpd);
             inputTable.add(new OwnLabel(t.getThird() + ": ", skin, lw)).left().padBottom(pad10).padRight(pad18);
 
@@ -209,9 +212,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
             Color origCol = inputField.getColor().cpy();
             inputFields.put(gpd, inputField);
             inputField.addListener(event -> {
-                if (event instanceof FocusListener.FocusEvent) {
-                    FocusListener.FocusEvent fe = (FocusListener.FocusEvent) event;
-                    if (fe.isFocused()) {
+                if (event instanceof FocusListener.FocusEvent focusEvent) {
+                    if (focusEvent.isFocused()) {
                         inputField.setColor(0.4f, 0.4f, 1f, 1f);
                         displayElement(gpd);
                         makeCurrent(gpd, inputField);
@@ -228,25 +230,25 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         }
 
         // Sensitivity
-        lsx = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        lsx = new OwnSlider(0.1f, 2f, 0.1f, skin);
         lsx.setValue((float) this.mappings.AXIS_LSTICK_H_SENS);
         lsx.setWidth(iw);
-        lsy = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        lsy = new OwnSlider(0.1f, 2f, 0.1f, skin);
         lsy.setValue((float) this.mappings.AXIS_LSTICK_V_SENS);
         lsy.setWidth(iw);
-        rsx = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        rsx = new OwnSlider(0.1f, 2f, 0.1f, skin);
         rsx.setValue((float) this.mappings.AXIS_RSTICK_H_SENS);
         rsx.setWidth(iw);
-        rsy = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        rsy = new OwnSlider(0.1f, 2f, 0.1f, skin);
         rsy.setValue((float) this.mappings.AXIS_RSTICK_V_SENS);
         rsy.setWidth(iw);
-        lts = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        lts = new OwnSlider(0.1f, 2f, 0.1f, skin);
         lts.setValue((float) this.mappings.AXIS_LT_SENS);
         lts.setWidth(iw);
-        rts = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        rts = new OwnSlider(0.1f, 2f, 0.1f, skin);
         rts.setValue((float) this.mappings.AXIS_RT_SENS);
         rts.setWidth(iw);
-        axisPower = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        axisPower = new OwnSlider(0.1f, 8f, 0.1f, skin);
         axisPower.setColor(1f, 0.5f, 0.5f, 1f);
         axisPower.setValue((float) this.mappings.AXIS_VALUE_POW);
         axisPower.setWidth(iw);
@@ -286,7 +288,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         content.add(filenameGroup).colspan(2).padTop(pad34);
 
         // Select first
-        GaiaSky.postRunnable(() -> stage.setKeyboardFocus(inputFields.get(gpds[0])));
+        GaiaSky.postRunnable(() -> stage.setKeyboardFocus(inputFields.get(gamepads[0])));
 
         content.pack();
     }
