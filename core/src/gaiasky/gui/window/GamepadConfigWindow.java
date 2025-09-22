@@ -38,21 +38,24 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The window to configure gamepad mappings.
+ * Create and control the GUI window used to configure gamepad mappings live.
  */
 public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GamepadConfigWindow.class);
+
     private static final int TYPE_BUTTON = 0;
     private static final int TYPE_AXIS = 1;
     private static final int TYPE_EITHER = 2;
+
     private final String none;
     private final String button;
     private final String axis;
     private final String controllerName;
-    // Saved file, at the end, if any
+
+    /** Saved file, at the end, if any. **/
     public Path savedFile = null;
     private Texture controller;
-    // For each button/axis we have the texture, the location in pixels and the name
+    /** For each button/axis we have the texture, the location in pixels and the name. **/
     private Map<GamepadInput, Trio<Texture, float[], String>> inputInfo;
     private Map<GamepadInput, OwnTextField> inputFields;
     private GamepadMappings mappings;
@@ -60,7 +63,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private OwnTextField currTextField, filename;
     private OwnLabel currentInput;
     private OwnSlider lsx, lsy, rsx, rsy, lts, rts, axisPower;
-    // The cell with the active element
+    /** The cell with the active element. **/
     private Cell<Image> elementCell;
 
     public GamepadConfigWindow(String controllerName, GamepadMappings mappings, Stage stage, Skin skin) {
