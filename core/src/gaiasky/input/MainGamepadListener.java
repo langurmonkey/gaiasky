@@ -64,11 +64,11 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 }
             } else if (buttonCode == mappings.getButtonRB()) {
                 if (cam.getMode().isFree()) {
-                    cam.setVertical(0.1);
+                    cam.setVertical(1.0);
                 }
             } else if (buttonCode == mappings.getButtonLB()) {
                 if (cam.getMode().isFree()) {
-                    cam.setVertical(-0.1);
+                    cam.setVertical(-1.0);
                 }
             }
 

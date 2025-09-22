@@ -9,7 +9,6 @@ package gaiasky.gui.window;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -123,32 +122,32 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         inputFields = new HashMap<>();
         inputInfo = new HashMap<>();
         // Buttons
-        inputInfo.put(GamepadInput.A, new Trio<>(a, new float[] { 310, -50 }, I18n.msg("gui.controller.action.primary")));
-        inputInfo.put(GamepadInput.B, new Trio<>(b, new float[] { 397, -120 }, I18n.msg("gui.controller.action.back")));
-        inputInfo.put(GamepadInput.X, new Trio<>(x, new float[] { 227, -120 }, I18n.msg("gui.controller.action.secondary")));
-        inputInfo.put(GamepadInput.Y, new Trio<>(y, new float[] { 310, -190 }, I18n.msg("gui.controller.action.tertiary")));
+        inputInfo.put(GamepadInput.A, new Trio<>(a, new float[]{310, -50}, I18n.msg("gui.controller.action.primary")));
+        inputInfo.put(GamepadInput.B, new Trio<>(b, new float[]{397, -120}, I18n.msg("gui.controller.action.back")));
+        inputInfo.put(GamepadInput.X, new Trio<>(x, new float[]{227, -120}, I18n.msg("gui.controller.action.secondary")));
+        inputInfo.put(GamepadInput.Y, new Trio<>(y, new float[]{310, -190}, I18n.msg("gui.controller.action.tertiary")));
         // Left stick
-        inputInfo.put(GamepadInput.LSTICK, new Trio<>(stick, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.click")));
-        inputInfo.put(GamepadInput.LSTICK_H, new Trio<>(stickH, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.horizontal")));
-        inputInfo.put(GamepadInput.LSTICK_V, new Trio<>(stickV, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.vertical")));
+        inputInfo.put(GamepadInput.LSTICK, new Trio<>(stick, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.click")));
+        inputInfo.put(GamepadInput.LSTICK_H, new Trio<>(stickH, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.horizontal")));
+        inputInfo.put(GamepadInput.LSTICK_V, new Trio<>(stickV, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.vertical")));
         // Right stick
-        inputInfo.put(GamepadInput.RSTICK, new Trio<>(stick, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.click")));
-        inputInfo.put(GamepadInput.RSTICK_H, new Trio<>(stickH, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.horizontal")));
-        inputInfo.put(GamepadInput.RSTICK_V, new Trio<>(stickV, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.vertical")));
+        inputInfo.put(GamepadInput.RSTICK, new Trio<>(stick, new float[]{160, 50}, I18n.msg("gui.controller.rstick.click")));
+        inputInfo.put(GamepadInput.RSTICK_H, new Trio<>(stickH, new float[]{160, 50}, I18n.msg("gui.controller.rstick.horizontal")));
+        inputInfo.put(GamepadInput.RSTICK_V, new Trio<>(stickV, new float[]{160, 50}, I18n.msg("gui.controller.rstick.vertical")));
         // Dpad
-        inputInfo.put(GamepadInput.DPAD_UP, new Trio<>(dPadU, new float[] { -155, 10 }, I18n.msg("gui.controller.dpad.up")));
-        inputInfo.put(GamepadInput.DPAD_DOWN, new Trio<>(dPadD, new float[] { -155, 85 }, I18n.msg("gui.controller.dpad.down")));
-        inputInfo.put(GamepadInput.DPAD_LEFT, new Trio<>(dPadL, new float[] { -194, 49 }, I18n.msg("gui.controller.dpad.left")));
-        inputInfo.put(GamepadInput.DPAD_RIGHT, new Trio<>(dPadR, new float[] { -120, 49 }, I18n.msg("gui.controller.dpad.right")));
+        inputInfo.put(GamepadInput.DPAD_UP, new Trio<>(dPadU, new float[]{-155, 10}, I18n.msg("gui.controller.dpad.up")));
+        inputInfo.put(GamepadInput.DPAD_DOWN, new Trio<>(dPadD, new float[]{-155, 85}, I18n.msg("gui.controller.dpad.down")));
+        inputInfo.put(GamepadInput.DPAD_LEFT, new Trio<>(dPadL, new float[]{-194, 49}, I18n.msg("gui.controller.dpad.left")));
+        inputInfo.put(GamepadInput.DPAD_RIGHT, new Trio<>(dPadR, new float[]{-120, 49}, I18n.msg("gui.controller.dpad.right")));
         // Start/select
-        inputInfo.put(GamepadInput.START, new Trio<>(startSelect, new float[] { 75, -170 }, I18n.msg("gui.controller.start")));
-        inputInfo.put(GamepadInput.SELECT, new Trio<>(startSelect, new float[] { -75, -170 }, I18n.msg("gui.controller.select")));
+        inputInfo.put(GamepadInput.START, new Trio<>(startSelect, new float[]{75, -170}, I18n.msg("gui.controller.start")));
+        inputInfo.put(GamepadInput.SELECT, new Trio<>(startSelect, new float[]{-75, -170}, I18n.msg("gui.controller.select")));
         // Bumpers
-        inputInfo.put(GamepadInput.LB, new Trio<>(lb, new float[] { -322, -282 }, I18n.msg("gui.controller.lb")));
-        inputInfo.put(GamepadInput.RB, new Trio<>(rb, new float[] { 322, -282 }, I18n.msg("gui.controller.rb")));
+        inputInfo.put(GamepadInput.LB, new Trio<>(lb, new float[]{-322, -282}, I18n.msg("gui.controller.lb")));
+        inputInfo.put(GamepadInput.RB, new Trio<>(rb, new float[]{322, -282}, I18n.msg("gui.controller.rb")));
         // Triggers
-        inputInfo.put(GamepadInput.LT, new Trio<>(lt, new float[] { -354, -265 }, I18n.msg("gui.controller.lt")));
-        inputInfo.put(GamepadInput.RT, new Trio<>(rt, new float[] { 354, -265 }, I18n.msg("gui.controller.rt")));
+        inputInfo.put(GamepadInput.LT, new Trio<>(lt, new float[]{-354, -265}, I18n.msg("gui.controller.lt")));
+        inputInfo.put(GamepadInput.RT, new Trio<>(rt, new float[]{354, -265}, I18n.msg("gui.controller.rt")));
 
         // Park our own listener.
         defaultGamepadListener = false;
@@ -165,56 +164,60 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         float iw = 176f;
 
         // Main tips
-        OwnLabel tip = new OwnLabel(I18n.msg("gui.controller.tip.config"), skin);
+        var tip = new OwnLabel(I18n.msg("gui.controller.tip.config"), skin);
         content.add(tip).colspan(2).padBottom(pad18 * 2f).row();
 
         // Controller
         Cell<?> controllerCell = content.add().padRight(pad18 * 2);
 
-        Table controllerTable = new Table(skin);
+        var controllerTable = new Table(skin);
         controllerTable.setBackground(new SpriteDrawable(new Sprite(controller)));
         controllerTable.setSize(controller.getWidth(), controller.getHeight());
-        controllerCell.setActor(controllerTable);
+        controllerCell.setActor(controllerTable).width(controller.getWidth()).height(controller.getHeight());
         elementCell = controllerTable.add((Image) null);
 
         // Last input
-        OwnLabel currentInputLabel = new OwnLabel(I18n.msg("gui.controller.lastinput") + ":", skin, "header");
+        var currentInputLabel = new OwnLabel(I18n.msg("gui.controller.lastinput") + ":", skin, "header");
         currentInput = new OwnLabel(none, skin, "default-blue");
 
-        HorizontalGroup lastInputGroup = new HorizontalGroup();
+        var lastInputGroup = new HorizontalGroup();
         lastInputGroup.space(pad18);
         lastInputGroup.addActor(currentInputLabel);
         lastInputGroup.addActor(currentInput);
 
         // File name
-        OwnLabel fileLabel = new OwnLabel(I18n.msg("gui.controller.filename") + ":", skin, "header");
-        LengthValidator lv = new LengthValidator(3, 100);
+        var fileLabel = new OwnLabel(I18n.msg("gui.controller.filename") + ":", skin, "header");
+        var lv = new LengthValidator(3, 100);
         filename = new OwnTextField(this.controllerName.replaceAll("\\s+", "_"), skin, lv);
         filename.setWidth(384f);
-        OwnImageButton filenameTooltip = new OwnImageButton(skin, "tooltip");
-        filenameTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.controller.filename.tooltip", SysUtils.getDefaultMappingsDir().toAbsolutePath()), skin));
+        var filenameTooltip = new OwnImageButton(skin, "tooltip");
+        filenameTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.controller.filename.tooltip", SysUtils.getDefaultMappingsDir().toAbsolutePath()),
+                                                       skin));
 
-        HorizontalGroup filenameGroup = new HorizontalGroup();
+        var filenameGroup = new HorizontalGroup();
         filenameGroup.space(pad34);
         filenameGroup.addActor(fileLabel);
         filenameGroup.addActor(filename);
         filenameGroup.addActor(filenameTooltip);
 
         // Table with inputs and mappings
-        Table inputTable = new Table(skin);
+        var inputTableLeft = new Table(skin);
+        var inputTableRight = new Table(skin);
+        Table inputTable = inputTableLeft;
+        int gp = 0;
         GamepadInput[] gamepads = GamepadInput.values();
         for (GamepadInput gpd : gamepads) {
-            Trio<Texture, float[], String> t = inputInfo.get(gpd);
+            var t = inputInfo.get(gpd);
             inputTable.add(new OwnLabel(t.getThird() + ": ", skin, lw)).left().padBottom(pad10).padRight(pad18);
 
             OwnTextField inputField = new OwnTextField(getMappingsValue(gpd, mappings), skin);
             inputField.setWidth(iw);
-            Color origCol = inputField.getColor().cpy();
+            var origCol = inputField.getColor().cpy();
             inputFields.put(gpd, inputField);
             inputField.addListener(event -> {
                 if (event instanceof FocusListener.FocusEvent focusEvent) {
                     if (focusEvent.isFocused()) {
-                        inputField.setColor(0.4f, 0.4f, 1f, 1f);
+                        inputField.setColor(1.0f, 0.8f, 0.3f, 1f);
                         displayElement(gpd);
                         makeCurrent(gpd, inputField);
                     } else {
@@ -227,6 +230,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 return false;
             });
             inputTable.add(inputField).left().padBottom(pad10).row();
+            gp++;
+            inputTable = (inputTable == inputTableLeft ? inputTableRight : inputTableLeft);
         }
 
         // Sensitivity
@@ -248,15 +253,15 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         rts = new OwnSlider(0.1f, 2f, 0.1f, skin);
         rts.setValue((float) this.mappings.AXIS_RT_SENS);
         rts.setWidth(iw);
-        axisPower = new OwnSlider(0.1f, 8f, 0.1f, skin);
+        axisPower = new OwnSlider(0.1f, 15f, 0.1f, skin);
         axisPower.setColor(1f, 0.5f, 0.5f, 1f);
         axisPower.setValue((float) this.mappings.AXIS_VALUE_POW);
         axisPower.setWidth(iw);
 
-        Table sensitivityTable01 = new Table(skin);
-        Table sensitivityTable02 = new Table(skin);
+        var sensitivityTable01 = new Table(skin);
+        var sensitivityTable02 = new Table(skin);
 
-        OwnLabel titleSensitivity = new OwnLabel(I18n.msg("gui.controller.sensitivity"), skin, "header-s");
+        var titleSensitivity = new OwnLabel(I18n.msg("gui.controller.sensitivity"), skin, "header-s");
 
         sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.lstick") + " X:", skin, lw)).left().padRight(pad18).padBottom(pad10);
         sensitivityTable01.add(lsx).left().padBottom(pad10).row();
@@ -275,7 +280,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         sensitivityTable02.add(axisPower).left();
 
         // Add inputs and the rest
-        content.add(inputTable).left();
+        content.add(inputTableLeft).left().padRight(pad34);
+        content.add(inputTableRight).left();
         content.row();
         content.add(lastInputGroup).padBottom(pad18);
         content.row();
@@ -297,97 +303,97 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         if (m == null)
             return none;
 
-        String b = button + " ";
-        String a = axis + " ";
+        var b = button + " ";
+        var a = axis + " ";
         String out;
         switch (gpd) {
-        case A -> out = m.BUTTON_A >= 0 ? b + m.BUTTON_A : none;
-        case B -> out = m.BUTTON_B >= 0 ? b + m.BUTTON_B : none;
-        case X -> out = m.BUTTON_X >= 0 ? b + m.BUTTON_X : none;
-        case Y -> out = m.BUTTON_Y >= 0 ? b + m.BUTTON_Y : none;
-        case START -> out = m.BUTTON_START >= 0 ? b + m.BUTTON_START : none;
-        case SELECT -> out = m.BUTTON_SELECT >= 0 ? b + m.BUTTON_SELECT : none;
-        case DPAD_UP -> {
-            if (m.BUTTON_DPAD_UP >= 0) {
-                // Button
-                out = b + m.BUTTON_DPAD_UP;
-            } else if (m.AXIS_DPAD_V >= 0) {
-                // Axis
-                out = a + m.AXIS_DPAD_V;
-            } else {
-                // None
-                out = none;
+            case A -> out = m.BUTTON_A >= 0 ? b + m.BUTTON_A : none;
+            case B -> out = m.BUTTON_B >= 0 ? b + m.BUTTON_B : none;
+            case X -> out = m.BUTTON_X >= 0 ? b + m.BUTTON_X : none;
+            case Y -> out = m.BUTTON_Y >= 0 ? b + m.BUTTON_Y : none;
+            case START -> out = m.BUTTON_START >= 0 ? b + m.BUTTON_START : none;
+            case SELECT -> out = m.BUTTON_SELECT >= 0 ? b + m.BUTTON_SELECT : none;
+            case DPAD_UP -> {
+                if (m.BUTTON_DPAD_UP >= 0) {
+                    // Button
+                    out = b + m.BUTTON_DPAD_UP;
+                } else if (m.AXIS_DPAD_V >= 0) {
+                    // Axis
+                    out = a + m.AXIS_DPAD_V;
+                } else {
+                    // None
+                    out = none;
+                }
             }
-        }
-        case DPAD_DOWN -> {
-            if (m.BUTTON_DPAD_DOWN >= 0) {
-                // Button
-                out = b + m.BUTTON_DPAD_DOWN;
-            } else if (m.AXIS_DPAD_V >= 0) {
-                // Axis
-                out = a + m.AXIS_DPAD_V;
-            } else {
-                // None
-                out = none;
+            case DPAD_DOWN -> {
+                if (m.BUTTON_DPAD_DOWN >= 0) {
+                    // Button
+                    out = b + m.BUTTON_DPAD_DOWN;
+                } else if (m.AXIS_DPAD_V >= 0) {
+                    // Axis
+                    out = a + m.AXIS_DPAD_V;
+                } else {
+                    // None
+                    out = none;
+                }
             }
-        }
-        case DPAD_LEFT -> {
-            if (m.BUTTON_DPAD_LEFT >= 0) {
-                // Button
-                out = b + m.BUTTON_DPAD_LEFT;
-            } else if (m.AXIS_DPAD_H >= 0) {
-                // Axis
-                out = a + m.AXIS_DPAD_H;
-            } else {
-                // None
-                out = none;
+            case DPAD_LEFT -> {
+                if (m.BUTTON_DPAD_LEFT >= 0) {
+                    // Button
+                    out = b + m.BUTTON_DPAD_LEFT;
+                } else if (m.AXIS_DPAD_H >= 0) {
+                    // Axis
+                    out = a + m.AXIS_DPAD_H;
+                } else {
+                    // None
+                    out = none;
+                }
             }
-        }
-        case DPAD_RIGHT -> {
-            if (m.BUTTON_DPAD_RIGHT >= 0) {
-                // Button
-                out = b + m.BUTTON_DPAD_RIGHT;
-            } else if (m.AXIS_DPAD_H >= 0) {
-                // Axis
-                out = a + m.AXIS_DPAD_H;
-            } else {
-                // None
-                out = none;
+            case DPAD_RIGHT -> {
+                if (m.BUTTON_DPAD_RIGHT >= 0) {
+                    // Button
+                    out = b + m.BUTTON_DPAD_RIGHT;
+                } else if (m.AXIS_DPAD_H >= 0) {
+                    // Axis
+                    out = a + m.AXIS_DPAD_H;
+                } else {
+                    // None
+                    out = none;
+                }
             }
-        }
-        case RB -> out = m.BUTTON_RB >= 0 ? b + m.BUTTON_RB : none;
-        case RT -> {
-            if (m.BUTTON_RT >= 0) {
-                // Button
-                out = b + m.BUTTON_RT;
-            } else if (m.AXIS_RT >= 0) {
-                // Axis
-                out = a + m.AXIS_RT;
-            } else {
-                // None
-                out = none;
+            case RB -> out = m.BUTTON_RB >= 0 ? b + m.BUTTON_RB : none;
+            case RT -> {
+                if (m.BUTTON_RT >= 0) {
+                    // Button
+                    out = b + m.BUTTON_RT;
+                } else if (m.AXIS_RT >= 0) {
+                    // Axis
+                    out = a + m.AXIS_RT;
+                } else {
+                    // None
+                    out = none;
+                }
             }
-        }
-        case LB -> out = m.BUTTON_LB >= 0 ? b + m.BUTTON_LB : none;
-        case LT -> {
-            if (m.BUTTON_LT >= 0) {
-                // Button
-                out = b + m.BUTTON_LT;
-            } else if (m.AXIS_LT >= 0) {
-                // Axis
-                out = a + m.AXIS_LT;
-            } else {
-                // None
-                out = none;
+            case LB -> out = m.BUTTON_LB >= 0 ? b + m.BUTTON_LB : none;
+            case LT -> {
+                if (m.BUTTON_LT >= 0) {
+                    // Button
+                    out = b + m.BUTTON_LT;
+                } else if (m.AXIS_LT >= 0) {
+                    // Axis
+                    out = a + m.AXIS_LT;
+                } else {
+                    // None
+                    out = none;
+                }
             }
-        }
-        case LSTICK_H -> out = m.AXIS_LSTICK_H >= 0 ? a + m.AXIS_LSTICK_H : none;
-        case LSTICK_V -> out = m.AXIS_LSTICK_V >= 0 ? a + m.AXIS_LSTICK_V : none;
-        case LSTICK -> out = m.BUTTON_LSTICK >= 0 ? b + m.BUTTON_LSTICK : none;
-        case RSTICK_H -> out = m.AXIS_RSTICK_H >= 0 ? a + m.AXIS_RSTICK_H : none;
-        case RSTICK_V -> out = m.AXIS_RSTICK_V >= 0 ? a + m.AXIS_RSTICK_V : none;
-        case RSTICK -> out = m.BUTTON_RSTICK >= 0 ? b + m.BUTTON_RSTICK : none;
-        default -> out = none;
+            case LSTICK_H -> out = m.AXIS_LSTICK_H >= 0 ? a + m.AXIS_LSTICK_H : none;
+            case LSTICK_V -> out = m.AXIS_LSTICK_V >= 0 ? a + m.AXIS_LSTICK_V : none;
+            case LSTICK -> out = m.BUTTON_LSTICK >= 0 ? b + m.BUTTON_LSTICK : none;
+            case RSTICK_H -> out = m.AXIS_RSTICK_H >= 0 ? a + m.AXIS_RSTICK_H : none;
+            case RSTICK_V -> out = m.AXIS_RSTICK_V >= 0 ? a + m.AXIS_RSTICK_V : none;
+            case RSTICK -> out = m.BUTTON_RSTICK >= 0 ? b + m.BUTTON_RSTICK : none;
+            default -> out = none;
         }
         return out;
     }
@@ -420,12 +426,12 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         OwnTextField i = inputFields.get(gp);
         String text = i.getText();
         if (text.equalsIgnoreCase(none)) {
-            return new int[] { -1, -1 };
+            return new int[]{-1, -1};
         } else {
             String[] tokens = text.split("\\s+");
             if (tokens.length != 2) {
                 logger.error("Failed to parse " + gp);
-                return new int[] { -1, -1 };
+                return new int[]{-1, -1};
             } else {
                 try {
                     int code = Parser.parseIntException(tokens[1]);
@@ -437,10 +443,10 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                             type = TYPE_AXIS;
                         }
                     }
-                    return new int[] { code, type };
+                    return new int[]{code, type};
                 } catch (Exception e) {
                     logger.error("Failed to parse " + gp);
-                    return new int[] { -1, -1 };
+                    return new int[]{-1, -1};
                 }
             }
         }
@@ -539,7 +545,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     public void notify(final Event event, Object source, final Object... data) {
     }
 
-    private enum GamepadInput {
+    public enum GamepadInput {
         A(TYPE_BUTTON),
         B(TYPE_BUTTON),
         X(TYPE_BUTTON),
