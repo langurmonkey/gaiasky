@@ -558,11 +558,11 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     view.setEntity(v.getEntity());
                 }
                 currentFocus = view;
-                final int focusFieldMaxLength = 14;
+                final int focusFieldMaxLength = 12;
 
                 // ID
                 String id = "";
-                if (view.getExtra() != null || view.getStarSet() != null) {
+                if (view.isStar() || view.isStarSet() || view.hasId()) {
                     if (view.getId() > 0) {
                         id = String.valueOf(view.getId());
                     } else if (view.getHip() > 0) {
@@ -574,7 +574,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 }
                 var idString = TextUtils.capString(id, focusFieldMaxLength);
 
-                // Link
+                // Link(view.getEx
                 boolean vis = Mapper.atmosphere.has(view.getEntity());
                 focusActionsGroup.removeActor(landOn);
                 focusActionsGroup.removeActor(landAt);

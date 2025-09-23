@@ -801,7 +801,7 @@
         "unit": "String"
       },
       "proximityDescriptorsLocation": {
-        "description": "Sometimes, it is desirable to load additional data whenever the camera gets close to specific particles. This attribute contains the location of a directory that contains descriptor JSON files that bear the names of objects in the dataset. These get loaded whenever the camera gets close to a particle. Whenever the solid angle of a particle gets over ``proximityThreshold``, the system checks this location for a file with the same name as that particle. If it exists, it is automatically loaded.",
+        "description": "Sometimes, it is desirable to load additional data whenever the camera gets close to specific particles. This attribute contains the location of a directory that contains descriptor JSON files that bear the names of objects in the dataset. These get loaded whenever the camera gets close to a particle. Whenever the solid angle of a particle gets over ``proximityThreshold``, the system checks this location for a file with the same name as that particle. If the particle has more than one name, every single one is tested for matching files. If it exists, it is automatically loaded.",
         "unit": "String",
         "aliases": [
           "proximityDescriptors",

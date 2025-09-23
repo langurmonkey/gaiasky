@@ -74,22 +74,27 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                     // About 4 degrees.
                     if (sa > set.proximityThreshold) {
                         // Load descriptor file, if it exists.
-                        var name = bean.names()[0];
-                        var path = set.proximityDescriptorsPath.resolve(name + ".json");
-                        if (Files.exists(path)) {
-                            // Remove current bean from index.
-                            for (var key : bean.names()) {
-                                var k = key.toLowerCase(Locale.ROOT)
-                                        .trim();
-                                GaiaSky.instance.scene.index()
-                                        .remove(k);
+                        // Check all names.
+                        var found = false;
+                        for (var name : bean.names()) {
+                            var path = set.proximityDescriptorsPath.resolve(name + ".json");
+                            if (Files.exists(path)) {
+                                // Remove current bean from index.
+                                for (var key : bean.names()) {
+                                    var k = key.toLowerCase(Locale.ROOT)
+                                            .trim();
+                                    GaiaSky.instance.scene.index()
+                                            .remove(k);
+                                }
+                                // Load descriptor.
+                                // Only re-focus (select) if our current focus is the object in question.
+                                GaiaSky.postRunnable(() -> GaiaSky.instance.scripting()
+                                        .loadJsonDataset(name, path.toString(), beanSelected, true));
+                                set.proximityLoaded.add(idxNearest);
+                                found = true;
                             }
-                            // Load descriptor.
-                            // Only re-focus (select) if our current focus is the object in question.
-                            GaiaSky.postRunnable(() -> GaiaSky.instance.scripting()
-                                    .loadJsonDataset(name, path.toString(), beanSelected, true));
-                            set.proximityLoaded.add(idxNearest);
-                        } else {
+                        }
+                        if (!found) {
                             set.proximityLoaded.add(idxNearest);
                             set.proximityMissing.add(idxNearest);
                         }

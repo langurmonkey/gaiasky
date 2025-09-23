@@ -52,6 +52,13 @@ public interface IFocus {
     long getCandidateId();
 
     /**
+     * Return whether the curent focus has a valid identifier number.
+     *
+     * @return True if the ID is valid.
+     */
+    boolean hasId();
+
+    /**
      * Return the localized name of this focus. If it has no localized name,
      * it returns the default name.
      *

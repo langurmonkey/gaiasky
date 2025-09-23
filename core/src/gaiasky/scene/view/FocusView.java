@@ -177,6 +177,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
+    public boolean hasId() {
+        return getId() > 0;
+    }
+
+    @Override
     public String getLocalizedName() {
         var set = getSet();
         if (set != null) {

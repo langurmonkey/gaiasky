@@ -295,6 +295,12 @@ public class Proximity {
         }
 
         @Override
+        public boolean hasId() {
+            return false;
+        }
+
+
+        @Override
         public String getLocalizedName() {
             return name;
         }

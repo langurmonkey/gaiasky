@@ -76,13 +76,6 @@ public class StarSet extends ParticleSet {
         return -1;
     }
 
-    public long getId() {
-        if (focus != null)
-            return focus.id();
-        else
-            return -1;
-    }
-
     public double getCandidateSolidAngleApparent() {
         return getSolidAngleApparent(candidateFocusIndex);
     }

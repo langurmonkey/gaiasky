@@ -1047,7 +1047,10 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public long getId() {
-        return 123L;
+        if (focus != null)
+            return focus.id();
+        else
+            return -1;
     }
 
     public String getName() {
