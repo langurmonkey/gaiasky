@@ -122,15 +122,42 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD,
-                Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE,
-                Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD,
-                Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
-                Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CMD,
-                Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE,
-                Event.CAMERA_ORIENTATION_UPDATE, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED,
-                Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
-                Event.FILM_GRAIN_CMD, Event.SHADER_RELOAD_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.SCREENSHOT_SIZE_UPDATE,
+                                        Event.FRAME_SIZE_UPDATE,
+                                        Event.BLOOM_CMD,
+                                        Event.UNSHARP_MASK_CMD,
+                                        Event.LENS_FLARE_CMD,
+                                        Event.SSR_CMD,
+                                        Event.MOTION_BLUR_CMD,
+                                        Event.LIGHT_POS_2D_UPDATE,
+                                        Event.LIGHT_GLOW_CMD,
+                                        Event.REPROJECTION_CMD,
+                                        Event.CUBEMAP_CMD,
+                                        Event.ANTIALIASING_CMD,
+                                        Event.BRIGHTNESS_CMD,
+                                        Event.CONTRAST_CMD,
+                                        Event.HUE_CMD,
+                                        Event.SATURATION_CMD,
+                                        Event.GAMMA_CMD,
+                                        Event.TONEMAPPING_TYPE_CMD,
+                                        Event.EXPOSURE_CMD,
+                                        Event.STEREO_PROFILE_CMD,
+                                        Event.STEREOSCOPIC_CMD,
+                                        Event.FOV_CMD,
+                                        Event.STAR_BRIGHTNESS_CMD,
+                                        Event.STAR_GLOW_FACTOR_CMD,
+                                        Event.STAR_POINT_SIZE_CMD,
+                                        Event.CAMERA_MOTION_UPDATE,
+                                        Event.CAMERA_ORIENTATION_UPDATE,
+                                        Event.BILLBOARD_TEXTURE_IDX_CMD,
+                                        Event.SCENE_LOADED,
+                                        Event.INDEXOFREFRACTION_CMD,
+                                        Event.BACKBUFFER_SCALE_CMD,
+                                        Event.UPSCALE_FILTER_CMD,
+                                        Event.CHROMATIC_ABERRATION_CMD,
+                                        Event.FILM_GRAIN_CMD,
+                                        Event.SHADER_RELOAD_CMD);
     }
 
     public void initializeOffScreenPostProcessors() {
@@ -138,7 +165,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         screenshot = getSize(RenderType.screenshot);
         frame = getSize(RenderType.frame);
         // Screenshots.
-        pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, screenshot[0], screenshot[1], screenshot[0], screenshot[1], manager);
+        pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot,
+                                                            screenshot[0],
+                                                            screenshot[1],
+                                                            screenshot[0],
+                                                            screenshot[1],
+                                                            manager);
         // Frame output mode.
         pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, frame[0], frame[1], frame[0], frame[1], manager);
     }
@@ -146,7 +178,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private int[] getSize(RenderType type) {
         return switch (type) {
             case screen ->
-                    new int[]{(int) FastMath.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) FastMath.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale)};
+                    new int[]{(int) FastMath.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) FastMath.round(
+                            Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale)};
             case screenshot -> new int[]{Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]};
             case frame -> new int[]{Settings.settings.frame.resolution[0], Settings.settings.frame.resolution[1]};
         };
@@ -171,7 +204,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         LightGlow lightGlow = new LightGlow((int) width, (int) height);
         lightGlow.setLightGlowTexture(glow);
-        lightGlow.setTextureScale(getGlowTextureScale(ss.brightness, ss.glowFactor, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), settings.program.modeCubemap.active));
+        lightGlow.setTextureScale(getGlowTextureScale(ss.brightness,
+                                                      ss.glowFactor,
+                                                      ss.pointSize,
+                                                      GaiaSky.instance.cameraManager.getFovFactor(),
+                                                      settings.program.modeCubemap.active));
         lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackBufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
@@ -181,31 +218,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         // RAY MARCHING SHADERS
         rayMarchingDefinitions.forEach((key, list) -> {
-            RaymarchObject rm = new RaymarchObject((String) list[0], width, height);
-            // Fixed uniforms
-            float zFar = (float) GaiaSky.instance.getCameraManager().current.getFar();
-            float k = Constants.getCameraK();
-            var entity = (Entity) list[2];
-            var body = Mapper.body.get(entity);
-            var raymarching = Mapper.raymarching.get(entity);
-            // We normalize the size.
-            rm.setSize(body.size * 0.1f);
-            rm.setZfarK(zFar, k);
-            if (list.length > 3 && list[3] != null) {
-                // Additional
-                rm.setAdditional((float[]) list[3]);
-            }
-            if (list.length > 4) {
-                // u_texture2
-                try {
-                    Texture tex = (Texture) list[4];
-                    rm.setAdditionalTexture(tex);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            }
-            rm.setEnabled(raymarching.isOn);
-            ppb.add(key, rm);
+            createRayMarchingEffect(ppb, key, list);
         });
 
         // COPY
@@ -260,7 +273,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             Texture lensStarBurst = manager.get(lensStarburstName);
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
-            PseudoLensFlare pseudoLensFlare = new PseudoLensFlare((int) (width * lensFlareSettings.fboScale), (int) (height * lensFlareSettings.fboScale));
+            PseudoLensFlare pseudoLensFlare = new PseudoLensFlare((int) (width * lensFlareSettings.fboScale),
+                                                                  (int) (height * lensFlareSettings.fboScale));
             pseudoLensFlare.setGhosts(lensFlareSettings.numGhosts);
             pseudoLensFlare.setHaloWidth(lensFlareSettings.haloWidth);
             pseudoLensFlare.setLensColorTexture(lensColor);
@@ -402,6 +416,44 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         return ppb;
     }
 
+    /**
+     * Creates a ray-marching effect from the given object list, and adds it to the given post process bean with
+     * the given key.
+     *
+     * @param ppb  The post process bean.
+     * @param key  The string key.
+     * @param list The object list.
+     */
+    private void createRayMarchingEffect(PostProcessBean ppb, String key, Object[] list) {
+        var viewportWidth = ppb.pp.getCombinedBuffer().width;
+        var viewportHeight = ppb.pp.getCombinedBuffer().height;
+        RaymarchObject rm = new RaymarchObject((String) list[0], viewportWidth, viewportHeight);
+        // Fixed uniforms
+        float zFar = (float) GaiaSky.instance.getCameraManager().current.getFar();
+        float k = Constants.getCameraK();
+        var entity = (Entity) list[2];
+        var body = Mapper.body.get(entity);
+        var raymarching = Mapper.raymarching.get(entity);
+        // We normalize the size.
+        rm.setSize(body.size * 0.1f);
+        rm.setZfarK(zFar, k);
+        if (list.length > 3 && list[3] != null) {
+            // Additional
+            rm.setAdditional((float[]) list[3]);
+        }
+        if (list.length > 4) {
+            // u_texture2
+            try {
+                Texture tex = (Texture) list[4];
+                rm.setAdditionalTexture(tex);
+            } catch (Exception e) {
+                logger.error(e);
+            }
+        }
+        rm.setEnabled(raymarching.isOn);
+        ppb.add(key, rm, LightGlow.class);
+    }
+
     private void updateGlow(PostProcessBean ppb, GraphicsQuality gq) {
         int lgw, lgh;
         if (gq.isUltra()) {
@@ -523,8 +575,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             PostProcessBean ppb = pps[i];
                             LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                             if (lightglow != null) {
-                                lightglow.setTextureScale(getGlowTextureScale(brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                                lightglow.setSpiralScale(getGlowSpiralScale(brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
+                                lightglow.setTextureScale(getGlowTextureScale(brightness,
+                                                                              Settings.settings.scene.star.glowFactor,
+                                                                              Settings.settings.scene.star.pointSize,
+                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
+                                                                              Settings.settings.program.modeCubemap.active));
+                                lightglow.setSpiralScale(getGlowSpiralScale(brightness,
+                                                                            Settings.settings.scene.star.pointSize,
+                                                                            GaiaSky.instance.cameraManager.getFovFactor()));
                             }
                         }
                     }
@@ -538,7 +596,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             PostProcessBean ppb = pps[i];
                             LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                             if (lightglow != null) {
-                                lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                                lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness,
+                                                                              glowFactor,
+                                                                              Settings.settings.scene.star.pointSize,
+                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
+                                                                              Settings.settings.program.modeCubemap.active));
                             }
                         }
                     }
@@ -552,8 +614,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             PostProcessBean ppb = pps[i];
                             LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                             if (lightglow != null) {
-                                lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, size, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                                lightglow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, size, GaiaSky.instance.cameraManager.getFovFactor()));
+                                lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness,
+                                                                              Settings.settings.scene.star.glowFactor,
+                                                                              size,
+                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
+                                                                              Settings.settings.program.modeCubemap.active));
+                                lightglow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness,
+                                                                            size,
+                                                                            GaiaSky.instance.cameraManager.getFovFactor()));
                             }
                         }
                     }
@@ -631,8 +699,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             // Light glow.
                             LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
                             if (lightGlow != null) {
-                                lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                                lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
+                                lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness,
+                                                                              Settings.settings.scene.star.glowFactor,
+                                                                              Settings.settings.scene.star.pointSize,
+                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
+                                                                              Settings.settings.program.modeCubemap.active));
+                                lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness,
+                                                                            Settings.settings.scene.star.pointSize,
+                                                                            GaiaSky.instance.cameraManager.getFovFactor()));
                             }
                             // Re-projection.
                             Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
@@ -750,9 +824,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             case RAYMARCHING_CMD -> {
-                var name = (String) data[0];
-                var status = (Boolean) data[1];
-                var entity = (Entity) data[2];
+                final var name = (String) data[0];
+                final var status = (Boolean) data[1];
+                final var entity = (Entity) data[2];
                 if (data.length > 3) {
                     // Add effect description for later initialization.
                     String shader = (String) data[3];
@@ -772,7 +846,21 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         l = new Object[]{shader, false, entity};
                     }
                     addRayMarchingDef(name, l);
-                    logger.debug("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
+
+                    // Actually load the effect if we are running (dynamic load).
+                    var loaded = false;
+                    if (pps != null && pps.length > 0 && pps[0] != null) {
+                        var ppb = pps[0];
+                        if (!ppb.has(name, RaymarchObject.class)) {
+                            // Add it.
+                            createRayMarchingEffect(pps[0], name, l);
+                            loaded = true;
+                            logger.debug("Ray marching effect definition added and loaded: [" + name + " | " + shader + " | " + entity + "]");
+                        }
+                    }
+                    if (!loaded) {
+                        logger.debug("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
+                    }
                 } else {
                     var rmTime = getRaymarchingTime();
                     for (int i = 0; i < RenderType.values().length; i++) {
@@ -943,7 +1031,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                         if (lightglow != null) {
                             lightglow.setNSamples(enabled ? 1 : Settings.settings.postprocess.lightGlow.samples);
-                            lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                            lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness,
+                                                                          Settings.settings.scene.star.glowFactor,
+                                                                          Settings.settings.scene.star.pointSize,
+                                                                          GaiaSky.instance.cameraManager.getFovFactor(),
+                                                                          Settings.settings.program.modeCubemap.active));
                         }
                     }
                 }

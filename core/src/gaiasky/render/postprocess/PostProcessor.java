@@ -236,6 +236,28 @@ public final class PostProcessor implements Disposable {
         effectsManager.remove(effect);
     }
 
+    /** Adds the given effect after an effect with the given type. If no effect with the given type exists, it adds the effect at the end. **/
+    public void addEffect(PostProcessorEffect effect, Class<? extends PostProcessorEffect> after) {
+       var it = effectsManager.iterator();
+       int idx = -1;
+       var found = false;
+       while(it.hasNext()) {
+          var o = it.next();
+          idx ++;
+          if (after.isInstance(o)) {
+              found = true;
+             break;
+          }
+       }
+       if (found) {
+           effectsManager.add(effect, idx + 1);
+       } else {
+           addEffect(effect);
+       }
+
+
+    }
+
     /** Sets the color that will be used to clear the buffer. */
     public void setClearColor(Color color) {
         clearColor.set(color);

@@ -14,6 +14,9 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Logger;
 
+/**
+ * Updates ray-marching objects, essentially activating or deactivating them depending on their solid angle w.r.t. the camera.
+ */
 public class RaymarchingUpdater extends AbstractUpdateSystem {
     private static final Logger.Log logger = Logger.getLogger(RaymarchingUpdater.class);
     public RaymarchingUpdater(Family family, int priority) {
@@ -34,18 +37,18 @@ public class RaymarchingUpdater extends AbstractUpdateSystem {
             var body = Mapper.body.get(entity);
 
             // Check enable/disable
-            double solidAngleThreshold = 0.5e-2;
+            double solidAngleThreshold = 0.1e-2;
             if (body.solidAngleApparent > solidAngleThreshold) {
                 if (!rm.isOn) {
                     // Turn on
-                    logger.info("Ray marching effect enabled: " + base.getName());
+                    logger.debug("Ray marching effect enabled: " + base.getName());
                     EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), true, entity);
                     rm.isOn = true;
                 }
             } else {
                 if (rm.isOn) {
                     // Turn off
-                    logger.info("Ray marching effect disabled: " + base.getName());
+                    logger.debug("Ray marching effect disabled: " + base.getName());
                     EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity);
                     rm.isOn = false;
                 }

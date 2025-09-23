@@ -39,9 +39,22 @@ public class ItemsManager<T extends Disposable> implements Iterable<T>, Disposab
         owned.add(own);
     }
 
+    public void add(T item, int index, boolean own) {
+        if (item == null) {
+            return;
+        }
+
+        items.insert(index, item);
+        owned.insert(index, own);
+    }
+
     /** Add an item to the manager and transfer ownership to it */
     public void add(T item) {
         add(item, true);
+    }
+
+    public void add(T item, int index) {
+       add(item, index, true);
     }
 
     /** Returns the item at the specified index */

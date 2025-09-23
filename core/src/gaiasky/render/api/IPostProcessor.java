@@ -74,20 +74,20 @@ public interface IPostProcessor extends Disposable {
         }
 
         /**
-         * Sets the given singleton effect to the post processor. This replaces any previous effect of the same type.
+         * Sets the given singleton effect to the post processor, with the given key.
          *
-         * @param key    The key
-         * @param effect The effect
+         * @param key    The key.
+         * @param effect The effect.
          */
         public void add(String key, PostProcessorEffect effect) {
             addEffect(key, effect);
         }
 
         /**
-         * Adds a new post-processing effect to this post-processor
+         * Adds a new post-processing effect to this post-processor with the given key.
          *
-         * @param key    The key to use
-         * @param effect The effect
+         * @param key    The key.
+         * @param effect The effect.
          */
         private void addEffect(String key, PostProcessorEffect effect) {
             if (effects != null) {
@@ -106,11 +106,48 @@ public interface IPostProcessor extends Disposable {
         }
 
         /**
-         * Gets the first effect of the given type
+         * Sets the given singleton effect to the post processor, after an effect of the given type.
+         * This replaces any previous effect of the same type.
          *
-         * @param clazz The class
+         * @param key    The key.
+         * @param effect The effect.
+         * @param after  Type of the effect after which this must be added.
+         */
+        public void add(String key, PostProcessorEffect effect, Class<? extends PostProcessorEffect> after) {
+            addEffect(key, effect, after);
+        }
+
+        /**
+         * Adds a new post-processing effect to this post-processor with the given key. It adds the effect after the effect with the
+         * given type, if exists.
          *
-         * @return The effect
+         * @param key    The key.
+         * @param effect The effect.
+         * @param after  Type of the effect after which this must be added.
+         */
+        private void addEffect(String key, PostProcessorEffect effect, Class<? extends PostProcessorEffect> after) {
+            if (effects != null) {
+                Map<String, PostProcessorEffect> l = effects.get(effect.getClass());
+                if (l != null) {
+                    l.put(key, effect);
+                } else {
+                    l = new HashMap<>();
+                    l.put(key, effect);
+                    effects.put(effect.getClass(), l);
+                }
+                pp.addEffect(effect, after);
+            } else {
+                logger.error("Effects list not initialized!");
+            }
+        }
+
+        /**
+         * Gets the effect of the given type with the given key.
+         *
+         * @param key   The key.
+         * @param clazz The class.
+         *
+         * @return The effect.
          */
         public PostProcessorEffect get(String key, Class<? extends PostProcessorEffect> clazz) {
             Map<String, PostProcessorEffect> l = effects.get(clazz);
@@ -118,6 +155,19 @@ public interface IPostProcessor extends Disposable {
                 return l.get(key);
             }
             return null;
+        }
+
+        /**
+         * Checks whether the effect of the given type with the given key exists.
+         *
+         * @param key   The key.
+         * @param clazz The class.
+         *
+         * @return True if it exists.
+         */
+        public boolean has(String key, Class<? extends PostProcessorEffect> clazz) {
+            Map<String, PostProcessorEffect> l = effects.get(clazz);
+            return l != null && l.containsKey(key);
         }
 
         /**
