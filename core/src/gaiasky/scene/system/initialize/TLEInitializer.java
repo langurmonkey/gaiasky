@@ -32,9 +32,14 @@ import java.time.Instant;
 
 /**
  * Initializes entities that have a {@link TLESource} component.
+ * <p>
+ * Fetches TLE data from the network and initializes orbital elements.
+ * </p>
  */
 public class TLEInitializer extends AbstractInitSystem {
-
+    /** Global synchronization lock. **/
+    private static final Object lock = new Object();
+    /** Scene reference. **/
     private final Scene scene;
 
     public TLEInitializer(Scene scene, boolean setUp, Family family, int priority) {
@@ -50,7 +55,8 @@ public class TLEInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         // Run update in background thread.
         var executorService = GaiaSky.instance.getExecutorService();
-            executorService.execute(() -> {
+        executorService.execute(() -> {
+            synchronized (lock) {
                 var base = Mapper.base.get(entity);
 
                 final var now = Instant.now();
@@ -80,7 +86,7 @@ public class TLEInitializer extends AbstractInitSystem {
                 // Fetch data!
                 OrbitalElements elements = null;
                 if (mustUpdate) {
-                    logger.info("Fetching TLE data for " + base.getName());
+                    logger.info("Fetching/updating TLE data for " + base.getName());
                     try {
                         // Fetch and parse TLE data.
                         TLEParser parser = new TLEParser();
@@ -103,6 +109,7 @@ public class TLEInitializer extends AbstractInitSystem {
                     logger.info("Using cached file: " + fileName);
                 }
 
+
                 // Update orbit data.
                 if (elements == null) {
                     // Read from file.
@@ -123,6 +130,7 @@ public class TLEInitializer extends AbstractInitSystem {
                         // Error reading file, update.
                         logger.error(e);
                     }
+
                 }
 
                 var trajectory = Mapper.trajectory.get(entity);
@@ -153,9 +161,9 @@ public class TLEInitializer extends AbstractInitSystem {
                         }
                     });
                 }
+            }
 
-
-            });
+        });
     }
 
     private void writeElements(Path filePath, Instant now, OrbitalElements elements) throws IOException {
