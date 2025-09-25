@@ -17,12 +17,10 @@ import java.util.List;
  */
 public class TLEParserTest {
 
-    TLEParser parser;
     List<String> lines;
 
     @Before
     public void setUp() {
-        parser = new TLEParser();
         var data = "ISS (ZARYA)             \n" +
                 "1 25544U 98067A   25142.17626388  .00007957  00000+0  14902-3 0  9991\n" +
                 "2 25544  51.6387  75.9349 0002437 130.6256  11.0458 15.49654472511124\n" +
@@ -80,6 +78,7 @@ public class TLEParserTest {
         String url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle";
 
         try {
+            var parser = new TLEParser();
             List<String> lines = parser.fetchTLEData(url);
             Assert.assertFalse("TLE data should not be empty", lines.isEmpty());
         } catch (IOException e) {
