@@ -149,7 +149,7 @@ project(":core") {
         // Scripting
         implementation group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         // System information
-        implementation group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
+        implementation group: "com.github.oshi", name: "oshi-core-java11", version: "$oshiVersion"
         // Yaml
         implementation group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
         implementation group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"

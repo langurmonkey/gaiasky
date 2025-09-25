@@ -50,7 +50,9 @@ public class AboutWindow extends GenericDialog {
     private MemInfoWindow memInfoWindow;
 
     public AboutWindow(Stage stage, Skin skin) {
-        super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build), skin, stage);
+        super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build),
+              skin,
+              stage);
         this.linkStyle = skin.get("link", LabelStyle.class);
         this.linkLargeStyle = skin.get("link-large", LabelStyle.class);
 
@@ -357,9 +359,10 @@ public class AboutWindow extends GenericDialog {
                             + "\n" + I18n.msg("gui.help.os.build") + ": " + os.getVersionInfo().getBuildNumber()
                             + "\n" + I18n.msg("gui.help.os.manufacturer") + ": " + os.getManufacturer()
                             + "\n" + I18n.msg("gui.help.os.arch") + ": " + System.getProperty("os.arch")
-                            + (SysUtils.isLinux() ? ("\n" + I18n.msg("gui.help.os.session") + ": " + st)  : ""), skin);
+                            + (SysUtils.isLinux() ? ("\n" + I18n.msg("gui.help.os.session") + ": " + st) : ""), skin);
         } catch (Error e) {
-            sysOS = new OwnLabel(System.getProperty("os.name") + "\n" + System.getProperty("os.version") + "\n" + System.getProperty("os.arch"), skin);
+            sysOS = new OwnLabel(System.getProperty("os.name") + "\n" + System.getProperty("os.version") + "\n" + System.getProperty("os.arch"),
+                                 skin);
         }
 
         var glRendererTitle = new OwnLabel(I18n.msg("gui.help.graphicsdevice"), skin);
@@ -495,20 +498,34 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(glRenderer).left().padTop(pad10);
         contentSystem.row();
 
-        // DISPLAYS
-        var displaysInfo = new OwnLabel(I18n.msg("gui.help.displays"), skin, "header");
+        // GRAPHICs CARDS
+        var gcInfo = new OwnLabel(I18n.msg("gui.help.graphicscards"), skin, "header");
 
-        contentSystem.add(displaysInfo).colspan(2).left().padTop(pad34 * 2f);
+        contentSystem.add(gcInfo).colspan(2).left().padTop(pad34 * 2f);
         contentSystem.row();
         contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
 
         try {
             var si = new SystemInfo();
-            var displays = si.getHardware().getDisplays();
-            for (var display : displays) {
-                var displayLabel = new OwnLabel(display.toString(), skin);
-                contentSystem.add(displayLabel).colspan(2).left().padBottom(pad34).row();
+
+            var gcs = si.getHardware().getGraphicsCards();
+            if (gcs.isEmpty()) {
+                var none = new OwnLabel(I18n.msg("gui.focusinfo.na"), skin);
+                contentSystem.add(none).colspan(2).left().padBottom(pad34).row();
+            } else {
+                for (var gc : gcs) {
+                    var gcName = new OwnLabel(gc.getName(), skin, "header-raw");
+                    var gcVendor = new OwnLabel(gc.getVendor(), skin);
+                    var gcId = new OwnLabel(gc.getDeviceId(), skin);
+                    var gcVers = new OwnLabel(gc.getVersionInfo(), skin);
+                    var gcRam = new OwnLabel(I18n.msg("gui.debug.vram") + ": " + gc.getVRam(), skin);
+                    contentSystem.add(gcName).colspan(2).left().padBottom(pad10).row();
+                    contentSystem.add(gcVendor).colspan(2).left().padBottom(pad10).row();
+                    contentSystem.add(gcId).colspan(2).left().padBottom(pad10).row();
+                    contentSystem.add(gcVers).colspan(2).left().padBottom(pad10).row();
+                    contentSystem.add(gcRam).colspan(2).left().padBottom(pad34).row();
+                }
             }
         } catch (Exception ignored) {
             var none = new OwnLabel(I18n.msg("gui.focusinfo.na"), skin);
@@ -558,7 +575,10 @@ public class AboutWindow extends GenericDialog {
                 getCheckVersionThread().start();
             } else {
                 // Inform latest
-                newVersionCheck(Settings.settings.version.version, Settings.settings.version.versionNumber, Settings.settings.version.buildTime, false);
+                newVersionCheck(Settings.settings.version.version,
+                                Settings.settings.version.versionNumber,
+                                Settings.settings.version.buildTime,
+                                false);
             }
             contentUpdates.add(checkTable).left().top().padTop(pad34);
         }
@@ -611,7 +631,9 @@ public class AboutWindow extends GenericDialog {
     private void newVersionCheck(String tagVersion, Integer versionNumber, Instant tagDate, boolean log) {
         Settings.settings.program.update.lastCheck = Instant.now();
         if (versionNumber > Settings.settings.version.versionNumber) {
-            DateTimeFormatter df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
+            DateTimeFormatter df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM)
+                    .withLocale(I18n.locale)
+                    .withZone(ZoneOffset.UTC);
             if (log) {
                 logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
             }
