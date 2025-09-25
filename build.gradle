@@ -22,7 +22,7 @@ allprojects {
         jafamaVersion = "2.3.+"
         commonsioVersion = "2.+"
         py4jVersion = "0.10.9.+"
-        oshiVersion = "6.6.+"
+        oshiVersion = "6.9.+"
         stilVersion = "4.3"
         jsampVersion = "1.3.+"
         jacksonVersion = "2.16.+"
