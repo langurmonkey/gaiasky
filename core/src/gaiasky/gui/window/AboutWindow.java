@@ -485,17 +485,17 @@ public class AboutWindow extends GenericDialog {
             var cpu = new OwnLabel(cp.toString(), skin);
 
             contentSystem.add(cpuTitle).left().top().padRight(pad18).padTop(pad10).padBottom(pad18);
-            contentSystem.add(cpu).left().padTop(pad10).padBottom(pad18);
+            contentSystem.add(cpu).left().top().padTop(pad10).padBottom(pad18);
             contentSystem.row();
         } catch (Exception ignored) {
             contentSystem.add(new OwnLabel(I18n.msg("gui.help.cpu.no"), skin)).colspan(2).left().padTop(pad18).padBottom(pad18).row();
         }
         contentSystem.add(sysOSTitle).left().top().padRight(pad18).padBottom(pad18);
-        contentSystem.add(sysOS).left().padBottom(pad18);
+        contentSystem.add(sysOS).left().top().padBottom(pad18);
         contentSystem.row();
 
-        contentSystem.add(glRendererTitle).left().top().padRight(pad18).padTop(pad18);
-        contentSystem.add(glRenderer).left().padTop(pad10);
+        contentSystem.add(glRendererTitle).left().top().padRight(pad18);
+        contentSystem.add(glRenderer).left().top();
         contentSystem.row();
 
         // GRAPHICs CARDS
