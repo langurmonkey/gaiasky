@@ -77,8 +77,9 @@ public class SysUtils {
         unix = OS.contains("unix");
         solaris = OS.contains("sunos");
 
-        var sysInfo = new SystemInfo();
-        flatpak = sysInfo.getOperatingSystem().getVersionInfo().getCodeName().contains("Flatpak");
+        final var sysInfo = new SystemInfo();
+        final var codeName = sysInfo.getOperatingSystem().getVersionInfo().getCodeName();
+        flatpak = codeName != null && codeName.contains("Flatpak");
 
         if (linux) {
             // Check Steam Deck.
