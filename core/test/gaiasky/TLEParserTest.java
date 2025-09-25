@@ -1,5 +1,7 @@
 package gaiasky;
 
+import gaiasky.util.Settings;
+import gaiasky.util.SettingsManager;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.TLEParser;
 import org.junit.Assert;
@@ -20,7 +22,8 @@ public class TLEParserTest {
     List<String> lines;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        SettingsManager.initialize(false);
         var data = "ISS (ZARYA)             \n" +
                 "1 25544U 98067A   25142.17626388  .00007957  00000+0  14902-3 0  9991\n" +
                 "2 25544  51.6387  75.9349 0002437 130.6256  11.0458 15.49654472511124\n" +

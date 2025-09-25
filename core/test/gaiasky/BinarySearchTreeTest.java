@@ -11,7 +11,6 @@ public class BinarySearchTreeTest {
 
     @Test
     public void test() {
-
         BinarySearchTree<Integer> t = new BinarySearchTree<>();
         final int NUMS = 4000;
         final int GAP = 37;
