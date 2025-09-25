@@ -733,12 +733,12 @@ public class WelcomeGui extends AbstractGui {
         // Exit button
         OwnTextIconButton exit = new OwnTextIconButton("", skin, "quit");
         exit.addListener(new OwnTextTooltip(I18n.msg("context.quit"), skin, 10));
-        exit.addListener(new ClickListener() {
-            public void clicked(InputEvent event,
-                                float x,
-                                float y) {
+        exit.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
                 GaiaSky.postRunnable(Gdx.app::exit);
+                return true;
             }
+            return false;
         });
         exit.pack();
 
@@ -746,8 +746,8 @@ public class WelcomeGui extends AbstractGui {
         // Add to button list.
         buttonList.add(preferences);
         buttonList.add(about);
-        buttonList.add(screenModeButton);
         buttonList.add(exit);
+        buttonList.add(screenModeButton);
 
         HorizontalGroup bottomRight = new HorizontalGroup();
         bottomRight.space(pad18);

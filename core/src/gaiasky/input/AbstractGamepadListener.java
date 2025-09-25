@@ -37,11 +37,11 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     /**
      * Delay between axis poll operations.
      */
-    protected long axisPollDelay = 200;
+    protected long axisPollDelay = 150;
     /**
      * Delay between button poll operations.
      */
-    protected long buttonPollDelay = 400;
+    protected long buttonPollDelay = 300;
 
     /** Reference to the global event manager. **/
     protected final EventManager em;
