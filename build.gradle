@@ -25,7 +25,7 @@ allprojects {
         oshiVersion = "6.9.+"
         stilVersion = "4.3"
         jsampVersion = "1.3.+"
-        jacksonVersion = "2.16.+"
+        jacksonVersion = "2.20.+"
         ashleyVersion = "1.7.4"
         jtarVersion = "2.+"
         junitVersion = "4.+"
