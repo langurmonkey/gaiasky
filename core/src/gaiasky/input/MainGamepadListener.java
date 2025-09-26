@@ -127,13 +127,14 @@ public class MainGamepadListener extends AbstractGamepadListener {
 
             boolean treated = false;
 
-            // Zero point
+            // Apply zero-point correction.
             value = (float) applyZeroPoint(value);
 
-            // Apply power function to axis reading
+            // Apply power function to axis reading.
             double val = FastMath.signum(value) * FastMath.pow(Math.abs(value), mappings.getAxisValuePower());
 
             if (axisCode == mappings.getAxisLstickH()) {
+
                 double valMapped = val * mappings.getAxisLstickHSensitivity();
                 if (cam.getMode().isFocus()) {
                     cam.setRoll(valMapped * 1.0e-1);
