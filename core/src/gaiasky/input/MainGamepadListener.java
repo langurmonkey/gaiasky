@@ -20,6 +20,23 @@ import net.jafama.FastMath;
 
 /**
  * Implements the gamepad/game controller listener in default mode.
+ * <p>The default mappings go like this:
+ * <ul>
+ *     <li>X - visibility of labels</li>
+ *     <li>Y - visibility of orbits</li>
+ *     <li>A - hold to speed up camera</li>
+ *     <li>B - visibility of asteroids</li>
+ *     <li>D-pad right - start time</li>
+ *     <li>D-pad left - stop time</li>
+ *     <li>Start - show preferences (gamepad menu)</li>
+ *     <li>Select - show quit window</li>
+ *     <li>RB - move vertically up</li>
+ *     <li>LB - move vertically down</li>
+ *     <li>Axis R - movement</li>
+ *     <li>Axis L - rotate view (free mode), rotate around object (focus mode)</li>
+ *     <li>ZR - roll right</li>
+ *     <li>ZL - roll left</li>
+ * </ul>
  */
 public class MainGamepadListener extends AbstractGamepadListener {
     private static final Log logger = Logger.getLogger(MainGamepadListener.class);
@@ -39,11 +56,11 @@ public class MainGamepadListener extends AbstractGamepadListener {
             logger.debug("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
             if (buttonCode == mappings.getButtonX()) {
-                em.post(Event.MINIMAP_TOGGLE_CMD, this);
+                em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
             } else if (buttonCode == mappings.getButtonY()) {
                 em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits");
             } else if (buttonCode == mappings.getButtonA()) {
-                em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
+                cam.setCameraMultipliers(6, 5);
             } else if (buttonCode == mappings.getButtonB()) {
                 em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.asteroids");
             } else if (buttonCode == mappings.getButtonDpadLeft()) {
@@ -92,6 +109,8 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 if (cam.getMode().isFree()) {
                     cam.setVertical(0.0);
                 }
+            } else if (buttonCode == mappings.getButtonA()) {
+                cam.setCameraMultipliers(1, 1);
             }
 
             cam.setGamepadInput(true);
@@ -171,7 +190,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
         if (active.get() && lastControllerUsed != null) {
             if (lastControllerUsed.getButton(mappings.getButtonDpadUp())) {
                 var t = GaiaSky.instance.time.getWarpFactor();
-                // Speed up.
+                // Time speed up.
                 if (t == 0) {
                     t = 0.1;
                 } else if (t > -0.1 && t < 0) {
@@ -181,7 +200,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + FastMath.abs(t * inc) : t + t * inc);
             } else if (lastControllerUsed.getButton(mappings.getButtonDpadDown())) {
                 var t = GaiaSky.instance.time.getWarpFactor();
-                // Slow down.
+                // Time slow down.
                 if (t == 0) {
                     t = -0.1;
                 } else if (t < 0.1 && t > 0) {

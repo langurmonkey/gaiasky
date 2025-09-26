@@ -29,6 +29,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.KeyframesView;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.ViewAngleComparator;
+import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 
 import java.util.Comparator;
@@ -380,8 +381,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     dragDx = 0;
                     dragDy = 0;
                 }
-                dragDx = lowPass(dragDx, deltaX * noAccelFactor, noAccelSmoothing);
-                dragDy = lowPass(dragDy, deltaY * noAccelFactor, noAccelSmoothing);
+                dragDx = MathUtilsDouble.lowPass(deltaX * noAccelFactor, dragDx, noAccelSmoothing);
+                dragDy = MathUtilsDouble.lowPass(deltaY * noAccelFactor, dragDy, noAccelSmoothing);
                 // Update last drag
                 lastDrag.set(currentDrag);
             }
@@ -421,11 +422,6 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         return false;
     }
 
-    private double lowPass(double smoothedValue,
-                           double newValue,
-                           double smoothing) {
-        return smoothedValue + (newValue - smoothedValue) / smoothing;
-    }
 
     @Override
     public boolean touchDragged(int screenX,
