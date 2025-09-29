@@ -240,127 +240,99 @@ tasks.register('genReleaseNotes', Exec) {
 tasks.register('dist') {
     dependsOn gaiaskyJar, genReleaseNotes
     description = 'Builds Gaia Sky and creates an executable distribution.'
+
     doLast {
-        // Version check
+        // ===============================
+        // Java version check
+        // ===============================
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
         boolean javaVersionOk = JavaVersion.current().isCompatibleWith(minJavaVersion)
+
         if (vsc.equalsIgnoreCase("false")) {
             if (!javaVersionOk) {
-                println("WARNING: Gaia Sky must be built with Java " + minJavaVersion + " or compatible, you are using " + JavaVersion.current())
+                println("WARNING: Gaia Sky must be built with Java $minJavaVersion or compatible, you are using ${JavaVersion.current()}")
             }
-        } else {
-            if (!javaVersionOk) {
-                print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
-                throw new GradleException("Gaia Sky must be built with java " + minJavaVersion + " or compatible, you are using " + JavaVersion.current())
-            }
+        } else if (!javaVersionOk) {
+            print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
+            throw new GradleException("Gaia Sky must be built with Java $minJavaVersion or compatible, you are using ${JavaVersion.current()}")
         }
 
         if (javaVersionOk) {
-            println("OK: Building with Java " + JavaVersion.current())
+            println("OK: Building with Java ${JavaVersion.current()}")
         }
 
-        // Copy conf
-        mkdir "$distDir/conf"
-        copy {
-            from "$baseDir/assets/conf"
-            into "$distDir/conf"
-        }
-
-        // Copy metainfo file
-        copy {
-            from "$baseDir/assets/metainfo"
-            into "$distDir/"
-        }
-
-        // Copy i18n files
-        mkdir "$distDir/i18n"
-        copy {
-            from "$baseDir/assets/i18n"
-            into "$distDir/i18n"
-        }
-
-        // Copy mappings
-        mkdir "$distDir/mappings"
-        copy {
-            from "../assets/mappings"
-            into "$distDir/mappings"
-        }
-
-        // Copy bookmarks
-        mkdir "$distDir/bookmarks"
-        copy {
-            from "../assets/bookmarks"
-            into "$distDir/bookmarks"
-        }
-
-        // Copy rest-static
-        mkdir "$distDir/rest-static"
-        copy {
-            from "../assets/rest-static"
-            into "$distDir/rest-static"
-        }
-
-        // Copy script files
-        mkdir "$distDir/scripts"
-        copy {
-            from "$baseDir/assets/scripts"
-            into "$distDir/scripts"
-        }
-
-        // Copy OptFlowCam scripts
-        mkdir "$distDir/extra"
-        copy {
-            from "$baseDir/core/scripts/optflowcam"
-            into "$distDir/extra/optflowcam"
-        }
-
-        // Copy scripts, README, LICENSE and AUTHORS
-        copy {
-            from "exe"
-            into "$distDir"
-            exclude "octreegen"
-            exclude ".idea"
-        }
-        copy {
-            from "$baseDir/"
-            into "$distDir"
-            include "README.md"
-            include "VR.md"
-            include "LICENSE"
-            include "AUTHORS"
-        }
-        copy {
-            from "$baseDir/assets/icon"
-            into "$distDir"
-            include "gs_round_256.png"
-            include "gs_icon.ico"
-            include "gs_icon.svg"
-            include "gsvr_round_256.png"
-            include "gsvr_icon.ico"
-        }
-
-        if (!DefaultNativePlatform.currentOperatingSystem.windows) {
-            // Give execute
-            exec {
-                commandLine "chmod", "ugo+x", "$distDir/gaiasky"
+        // ===============================
+        // Copy all files
+        // ===============================
+        def copyDir = { src, dest, includes = null, excludes = null ->
+            project.copy {
+                from src
+                into dest
+                if (includes) include includes
+                if (excludes) exclude excludes
             }
+        }
+
+        // conf
+        copyDir("$baseDir/assets/conf", "$distDir/conf")
+
+        // metainfo
+        copyDir("$baseDir/assets/metainfo", "$distDir")
+
+        // i18n
+        copyDir("$baseDir/assets/i18n", "$distDir/i18n")
+
+        // mappings
+        copyDir("../assets/mappings", "$distDir/mappings")
+
+        // bookmarks
+        copyDir("../assets/bookmarks", "$distDir/bookmarks")
+
+        // rest-static
+        copyDir("../assets/rest-static", "$distDir/rest-static")
+
+        // scripts
+        copyDir("$baseDir/assets/scripts", "$distDir/scripts")
+
+        // OptFlowCam scripts
+        copyDir("$baseDir/core/scripts/optflowcam", "$distDir/extra/optflowcam")
+
+        // exe, README, LICENSE, AUTHORS
+        println("distDir=$distDir")
+        println("Copying gaiasky from: ${file('exe/gaiasky').absolutePath}")
+        println("Target: ${file("$distDir/gaiasky").absolutePath}")
+
+        copyDir("exe", "$distDir", null, ["octreegen", ".idea"])
+        copyDir("$baseDir", "$distDir", ["README.md", "VR.md", "LICENSE", "AUTHORS"])
+        copyDir("$baseDir/assets/icon", "$distDir", ["gs_round_256.png","gs_icon.ico","gs_icon.svg","gsvr_round_256.png","gsvr_icon.ico"])
+
+        // ===============================
+        // Chmod executable on Linux/macOS
+        // ===============================
+        if (!DefaultNativePlatform.currentOperatingSystem.windows) {
+            def gaiaskyExe = file("$distDir/gaiasky")
+            if (!gaiaskyExe.exists()) throw new GradleException("Executable $gaiaskyExe does not exist!")
+
+            ["chmod", "ugo+x", gaiaskyExe.absolutePath].execute().waitFor()
 
             if (DefaultNativePlatform.currentOperatingSystem.linux) {
-                // Generate man
-                println("Generate man: $distDir/gaiasky.6.gz")
-                exec {
-                    workingDir "$distDir"
-                    commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
-                }
-                exec {
-                    commandLine "gzip", "$distDir/gaiasky.6"
-                }
+                println("Generating man page: $distDir/gaiasky.6.gz")
+                ["help2man",
+                 "--no-discard-stderr",
+                 "-N",
+                 "--section=6",
+                 "--include", "$baseDir/core/man/gaiasky.h2m",
+                 "--output=$distDir/gaiasky.6",
+                 gaiaskyExe.absolutePath
+                ].execute().waitFor()
+
+                ["gzip", "$distDir/gaiasky.6"].execute().waitFor()
             }
         }
     }
 }
-dist.dependsOn classes
 
+dist.dependsOn classes
 
 tasks.register('createTar') {
     dependsOn dist
@@ -463,11 +435,14 @@ tasks.register('createAppImage') {
         file("$appimgDir/gaiasky-appimage.desktop").renameTo(file("$appimgDir/gaiasky.desktop"))
 
         String appImgFilename = "$gsId" + "_" + "$tagRev" + "_x86_64.appimage"
-        // Generate appimage
-        exec {
-            executable "appimagetool"
-            args "-n", "$appimgDir", "$packageDir/$appImgFilename"
-            environment ARCH: "x86_64"
+        // Generate AppImage
+        def pb = new ProcessBuilder("appimagetool", "-n", "$appimgDir", "$packageDir/$appImgFilename")
+        pb.environment()["ARCH"] = "x86_64"   // set environment variable
+        pb.inheritIO()                        // inherit stdout/stderr so you see output
+        def process = pb.start()
+        def exitCode = process.waitFor()
+        if (exitCode != 0) {
+            throw new GradleException("appimagetool failed with exit code $exitCode")
         }
 
         // Checksums
@@ -560,10 +535,8 @@ tasks.register('createDebian') {
             from "$distDir/gaiasky.6.gz"
             into "$packageDir/debian/"
         }
-        exec {
-            commandLine "gunzip", "$packageDir/debian/gaiasky.6.gz"
-        }
 
+        ["gunzip", "$packageDir/debian/gaiasky.6.gz"].execute().waitFor()
 
     }
 }
