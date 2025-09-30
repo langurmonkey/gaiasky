@@ -237,14 +237,10 @@ tasks.register('genReleaseNotes', Exec) {
     commandLine "/bin/bash", "generate-releasenotes", "$tag", "$distDir/releasenotes.txt"
 }
 
-tasks.register('dist') {
-    dependsOn gaiaskyJar, genReleaseNotes
-    description = 'Builds Gaia Sky and creates an executable distribution.'
-
+// Task to check Java version
+tasks.register('javaVersionCheck') {
+    description = "Check that the current Java version (in \$GS_JAVA_VERSION_CHECK) is compatible with the configured minimum java version."
     doLast {
-        // ===============================
-        // Java version check
-        // ===============================
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
         boolean javaVersionOk = JavaVersion.current().isCompatibleWith(minJavaVersion)
 
@@ -260,79 +256,159 @@ tasks.register('dist') {
         if (javaVersionOk) {
             println("OK: Building with Java ${JavaVersion.current()}")
         }
+    }
+}
 
-        // ===============================
-        // Copy all files
-        // ===============================
-        def copyDir = { src, dest, includes = null, excludes = null ->
-            project.copy {
-                from src
-                into dest
-                if (includes) include includes
-                if (excludes) exclude excludes
-            }
-        }
+// Copy tasks
+tasks.register('copyConfig', Copy) {
+    description = 'Copy configuration files to distribution directory.'
+    from "$baseDir/assets/conf"
+    into "$distDir/conf"
+}
 
-        // conf
-        copyDir("$baseDir/assets/conf", "$distDir/conf")
+tasks.register('copyMetainfo', Copy) {
+    description = 'Copy metainfo files to distribution directory.'
+    from "$baseDir/assets/metainfo"
+    into "$distDir"
+}
 
-        // metainfo
-        copyDir("$baseDir/assets/metainfo", "$distDir")
+tasks.register('copyI18n', Copy) {
+    description = 'Copy internationalization files to distribution directory.'
+    from "$baseDir/assets/i18n"
+    into "$distDir/i18n"
+}
 
-        // i18n
-        copyDir("$baseDir/assets/i18n", "$distDir/i18n")
+tasks.register('copyMappings', Copy) {
+    description = 'Copy input mappings to distribution directory.'
+    from "../assets/mappings"
+    into "$distDir/mappings"
+}
 
-        // mappings
-        copyDir("../assets/mappings", "$distDir/mappings")
+tasks.register('copyBookmarks', Copy) {
+    description = 'Copy bookmarks files to distribution directory.'
+    from "../assets/bookmarks"
+    into "$distDir/bookmarks"
+}
 
-        // bookmarks
-        copyDir("../assets/bookmarks", "$distDir/bookmarks")
+tasks.register('copyRestStatic', Copy) {
+    description = 'Copy REST API static files to distribution directory.'
+    from "../assets/rest-static"
+    into "$distDir/rest-static"
+}
 
-        // rest-static
-        copyDir("../assets/rest-static", "$distDir/rest-static")
+tasks.register('copyScripts', Copy) {
+    description = 'Copy script files to distribution directory.'
+    from "$baseDir/assets/scripts"
+    into "$distDir/scripts"
+}
 
-        // scripts
-        copyDir("$baseDir/assets/scripts", "$distDir/scripts")
+tasks.register('copyOptFlowCam', Copy) {
+    description = 'Copy OptFlowCam scripts to distribution directory.'
+    from "$baseDir/core/scripts/optflowcam"
+    into "$distDir/extra/optflowcam"
+}
 
-        // OptFlowCam scripts
-        copyDir("$baseDir/core/scripts/optflowcam", "$distDir/extra/optflowcam")
+tasks.register('copyExecutables', Copy) {
+    description = 'Copy executable files to distribution directory.'
+    from "exe"
+    into "$distDir"
+    exclude "octreegen", ".idea"
 
-        // exe, README, LICENSE, AUTHORS
+    doFirst {
         println("distDir=$distDir")
         println("Copying gaiasky from: ${file('exe/gaiasky').absolutePath}")
         println("Target: ${file("$distDir/gaiasky").absolutePath}")
+    }
+}
 
-        copyDir("exe", "$distDir", null, ["octreegen", ".idea"])
-        copyDir("$baseDir", "$distDir", ["README.md", "VR.md", "LICENSE", "AUTHORS"])
-        copyDir("$baseDir/assets/icon", "$distDir", ["gs_round_256.png","gs_icon.ico","gs_icon.svg","gsvr_round_256.png","gsvr_icon.ico"])
+tasks.register('copyRootFiles', Copy) {
+    description = 'Copy root-level files (README, LICENSE, etc.) and icons to distribution directory.'
+    from "$baseDir"
+    include "README.md", "VR.md", "LICENSE", "AUTHORS"
+    into "$distDir"
 
-        // ===============================
-        // Chmod executable on Linux/macOS
-        // ===============================
-        if (!DefaultNativePlatform.currentOperatingSystem.windows) {
-            def gaiaskyExe = file("$distDir/gaiasky")
-            if (!gaiaskyExe.exists()) throw new GradleException("Executable $gaiaskyExe does not exist!")
+    from "$baseDir/assets/icon"
+    include "gs_round_256.png", "gs_icon.ico", "gs_icon.svg", "gsvr_round_256.png", "gsvr_icon.ico"
+    into "$distDir"
+}
 
-            ["chmod", "ugo+x", gaiaskyExe.absolutePath].execute().waitFor()
+// Platform-specific tasks
+tasks.register('makeExecutable', Exec) {
+    description = 'Make the main executable file executable on Unix-like systems (Linux/macOS).'
+    // This task depends on ALL copy tasks
+    dependsOn copyConfig, copyMetainfo, copyI18n, copyMappings, copyBookmarks,
+            copyRestStatic, copyScripts, copyOptFlowCam, copyExecutables, copyRootFiles
 
-            if (DefaultNativePlatform.currentOperatingSystem.linux) {
-                println("Generating man page: $distDir/gaiasky.6.gz")
-                ["help2man",
-                 "--no-discard-stderr",
-                 "-N",
-                 "--section=6",
-                 "--include", "$baseDir/core/man/gaiasky.h2m",
-                 "--output=$distDir/gaiasky.6",
-                 gaiaskyExe.absolutePath
-                ].execute().waitFor()
+    commandLine 'chmod', 'ugo+x', "$distDir/gaiasky"
 
-                ["gzip", "$distDir/gaiasky.6"].execute().waitFor()
-            }
+    doFirst {
+        def gaiaskyExe = file("$distDir/gaiasky")
+        if (!gaiaskyExe.exists()) {
+            throw new GradleException("Executable $gaiaskyExe does not exist!")
+        }
+        println("Making $gaiaskyExe executable")
+    }
+}
+
+tasks.register('generateManPage', Exec) {
+    description = 'Generate man page documentation using help2man (Linux only).'
+    dependsOn makeExecutable
+
+    def gaiaskyExe = file("$distDir/gaiasky")
+    def manPage = file("$distDir/gaiasky.6")
+
+    commandLine 'help2man',
+            '--no-discard-stderr',
+            '-N',
+            '--section=6',
+            "--include=$baseDir/core/man/gaiasky.h2m",
+            "--output=$manPage",
+            gaiaskyExe.absolutePath
+
+    doFirst {
+        println("Generating man page: $manPage")
+        if (!gaiaskyExe.exists()) {
+            throw new GradleException("Executable $gaiaskyExe does not exist!")
+        }
+        if (!gaiaskyExe.canExecute()) {
+            throw new GradleException("Executable $gaiaskyExe is not executable!")
         }
     }
 }
 
-dist.dependsOn classes
+tasks.register('gzipManPage', Exec) {
+    description = 'Compress the generated man page using gzip (Linux only).'
+    dependsOn generateManPage
+
+    def manPage = file("$distDir/gaiasky.6")
+    def compressedManPage = file("$distDir/gaiasky.6.gz")
+
+    commandLine 'gzip', '-f', "$manPage"
+
+    doFirst {
+        println("Compressing man page: $compressedManPage")
+        if (!manPage.exists()) {
+            throw new GradleException("Man page $manPage does not exist!")
+        }
+    }
+}
+
+// Distribution creation task
+tasks.register('dist') {
+    dependsOn javaVersionCheck
+    description = 'Builds Gaia Sky and creates an executable distribution.'
+
+    if (!DefaultNativePlatform.currentOperatingSystem.windows) {
+        dependsOn makeExecutable
+        if (DefaultNativePlatform.currentOperatingSystem.linux) {
+            dependsOn gzipManPage
+        }
+    } else {
+        // On Windows, just depend on all copy tasks
+        dependsOn copyConfig, copyMetainfo, copyI18n, copyMappings, copyBookmarks,
+                copyRestStatic, copyScripts, copyOptFlowCam, copyExecutables, copyRootFiles
+    }
+}
 
 tasks.register('createTar') {
     dependsOn dist
