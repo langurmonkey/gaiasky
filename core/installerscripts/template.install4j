@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="11.0.2" transformSequenceNumber="11">
   <directoryPresets config="@gs-git-folder@/assets/cert/cert.pfx" />
-  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="21" allowBetaVM="true">
-    <languages>
+  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://gaiasky.space" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="21" allowBetaVM="true">
+    <languages skipLanguageSelection="true">
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
+      <additionalLanguages>
+        <language id="fr" />
+        <language id="de" />
+        <language id="it" />
+        <language id="pt" />
+        <language id="es" />
+        <language id="tr" />
+      </additionalLanguages>
     </languages>
     <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="25/jdk-25+36" />
