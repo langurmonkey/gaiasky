@@ -529,7 +529,7 @@ tasks.register('createAppImage') {
 }
 
 tasks.register('createArch') {
-    dependsOn createTar
+    dependsOn createTar, genReleaseNotes
     description = 'Creates the Arch Linux AUR files for Gaia Sky.'
     doLast {
         File archDir = new File(project.packageDir + "/arch/")
@@ -570,7 +570,7 @@ tasks.register('createArch') {
 }
 
 tasks.register('createDebian') {
-    dependsOn createTar
+    dependsOn createTar, genReleaseNotes
     description = 'Creates the Debian package for Gaia Sky.'
     doLast {
         // DEBIAN directory
