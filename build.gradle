@@ -105,73 +105,73 @@ project(":core") {
         // *****************************
         // GENERATE SKINS (PackUITextures)
         // *****************************
-        compileOnly group: "com.badlogicgames.gdx", name: "gdx-tools", version: "$gdxVersion"
+        compileOnly "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS
         // ************
 
         // OpenXR
-        implementation group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
-        implementation group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
+        implementation "org.lwjgl:lwjgl-openxr:$lwjglVersion"
+        implementation "org.lwjgl:lwjgl-glfw:$lwjglVersion"
         runtimeOnly "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
         runtimeOnly "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-windows"
 
         // LibGDX
-        implementation group: "com.badlogicgames.gdx", name: "gdx", version: "$gdxVersion"
-        implementation group: "com.badlogicgames.gdx", name: "gdx-backend-lwjgl3", version: "$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
         // gdx-controllers:2.+ bases up on SDL 2.0.12
-        implementation group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-core", version: "$gdxcontrollersVersion"
-        implementation group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-desktop", version: "$gdxcontrollersVersion"
+        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
+        implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
 
         // Ashley
-        implementation group: "com.badlogicgames.ashley", name: "ashley", version: "$ashleyVersion"
+        implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
 
         // STIL library to load datasets
-        implementation group: "uk.ac.starlink", name: "stil", version: "$stilVersion"
+        implementation "uk.ac.starlink:stil:$stilVersion"
         // JSAMP for SAMP communication
-        implementation group: "uk.ac.starlink", name: "jsamp", version: "$jsampVersion"
+        implementation "uk.ac.starlink:jsamp:$jsampVersion"
 
         // File utilities
-        implementation group: "commons-io", name: "commons-io", version: "$commonsioVersion"
+        implementation "commons-io:commons-io:$commonsioVersion"
         // Command line arguments
-        implementation group: "org.jcommander", name: "jcommander", version: "$jcommanderVersion"
+        implementation "org.jcommander:jcommander:$jcommanderVersion"
         // Fast math
-        implementation group: "net.jafama", name: "jafama", version: "$jafamaVersion"
+        implementation "net.jafama:jafama:$jafamaVersion"
         // Tar
-        implementation group: "org.kamranzafar", name: "jtar", version: "$jtarVersion"
+        implementation "org.kamranzafar:jtar:$jtarVersion"
 
         // JPEGXL
-        // implementation group: "com.github.umjammer", name: "vavi-image-jpegxl", version: "0.0.7"
+        // implementation "com.github.umjammer:vavi-image-jpegxl:0.0.7"
 
         // Scripting
-        implementation group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
+        implementation "net.sf.py4j:py4j:$py4jVersion"
         // System information
-        implementation group: "com.github.oshi", name: "oshi-core-java11", version: "$oshiVersion"
+        implementation "com.github.oshi:oshi-core-java11:$oshiVersion"
         // Yaml
-        implementation group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
-        implementation group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"
-        implementation group: "com.fasterxml.jackson.datatype", name: "jackson-datatype-jsr310", version: "$jacksonVersion"
+        implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+        implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
+        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
 
         // ****************
         // REST SERVER DEPS
         // ****************
-        implementation group: "org.slf4j", name: "slf4j-nop", version: "$slf4jVersion"
-        implementation group: "com.sparkjava", name: "spark-core", version: "$sparkjavaVersion"
+        implementation "org.slf4j:slf4j-nop:$slf4jVersion"
+        implementation "com.sparkjava:spark-core:$sparkjavaVersion"
 
         // *******************
         // VULNERABILITY FIXES
         // *******************
         // CVE-2023-26049
-        implementation group: "org.eclipse.jetty", name: "jetty-xml", version: "$jettyVersion"
-        implementation group: "org.eclipse.jetty", name: "jetty-http", version: "$jettyVersion"
-        implementation group: "org.eclipse.jetty", name: "jetty-server", version: "$jettyVersion"
+        implementation "org.eclipse.jetty:jetty-xml:$jettyVersion"
+        implementation "org.eclipse.jetty:jetty-http:$jettyVersion"
+        implementation "org.eclipse.jetty:jetty-server:$jettyVersion"
         // CVE-2022-45690
-        implementation group: "org.json", name: "json", version: "$jsonVersion"
+        implementation "org.json:json:$jsonVersion"
         // CVE-2016-5002
-        implementation group: "org.apache.xmlrpc", name: "xmlrpc", version: "$xmlrpcVersion"
+        implementation "org.apache.xmlrpc:xmlrpc:$xmlrpcVersion"
 
         // *************
         // INTERNAL DEPS
@@ -181,13 +181,13 @@ project(":core") {
         // *********
         // TEST DEPS
         // *********
-        testImplementation group: "junit", name: "junit", version: "$junitVersion"
-        testRuntimeOnly group: "org.junit.platform", name: "junit-platform-launcher", version: "1.+"
+        testImplementation "junit:junit:$junitVersion"
+        testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.+"
 
         // **********
         // DEBUG DEPS
         // **********
-        //implementation group: "org.openjdk.jol", name: "jol-core", version: "+"
+        //implementation "org.openjdk.jol:jol-core:+"
     }
 
     jar {

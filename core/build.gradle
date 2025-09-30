@@ -732,7 +732,12 @@ tasks.named('test', Test) {
     maxHeapSize = '1G'
 
     testLogging {
-        events "passed"
+        events "passed", "skipped", "failed", "standard_out", "standard_error"
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat = 'full'
+        showStandardStreams = true
     }
 }
 
