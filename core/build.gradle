@@ -395,7 +395,7 @@ tasks.register('gzipManPage', Exec) {
 
 // Distribution creation task
 tasks.register('dist') {
-    dependsOn javaVersionCheck
+    dependsOn gaiaskyJar, javaVersionCheck
     description = 'Builds Gaia Sky and creates an executable distribution.'
 
     if (!DefaultNativePlatform.currentOperatingSystem.windows) {
