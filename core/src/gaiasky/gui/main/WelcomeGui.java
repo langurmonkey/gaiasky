@@ -312,7 +312,7 @@ public class WelcomeGui extends AbstractGui {
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         Image logo = new Image(iconTex);
-        logo.setScale(1.05f);
+        logo.setScale(0.9f);
         logo.setOrigin(Align.center);
 
         OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
@@ -332,10 +332,11 @@ public class WelcomeGui extends AbstractGui {
 
         titleGroup.add(logo)
                 .center()
-                .padRight(pad32 * 3f);
+                .padLeft(pad28)
+                .padRight(pad28 * 4f);
         titleGroup.add(new Separator(skin, "default"))
                 .fillY()
-                .padRight(pad32);
+                .padRight(pad28 * 2f);
         titleGroup.add(title);
 
         String textStyle = "main-title-s";
@@ -345,7 +346,7 @@ public class WelcomeGui extends AbstractGui {
         center.add(titleGroup)
                 .center()
                 .padLeft(pad32 * 2f)
-                .padBottom(pad18 * 6f)
+                .padBottom(pad18 * 5f)
                 .colspan(2)
                 .row();
 
@@ -483,12 +484,12 @@ public class WelcomeGui extends AbstractGui {
             center.add(startButton)
                     .right()
                     .top()
-                    .padBottom(pad18 * 10f)
+                    .padBottom(pad18 * 6f)
                     .padRight(pad28 * 2f);
             center.add(startGroup)
                     .top()
                     .left()
-                    .padBottom(pad18 * 10f)
+                    .padBottom(pad18 * 6f)
                     .row();
 
             // Dataset manager
@@ -507,7 +508,7 @@ public class WelcomeGui extends AbstractGui {
                     .colspan(2)
                     .center()
                     .top()
-                    .padBottom(pad32 * 4f)
+                    .padBottom(pad32 * 2f)
                     .row();
 
             if (numLocalDatasets == 0 && preventRecommended) {
