@@ -1,3 +1,37 @@
+<a name="3.7.0"></a>
+## [3.7.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.7.0) (2025-10-01)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.11...3.7.0)
+
+## Features
+- Gamepad mapping changes: map labels on/off to button X, unmap minimap, map A to camera speed-up (hold to make camera faster). RB and LB mapped to vertical movement (up/down) in free camera mode.
+- Replace 'displays' section in about window with 'graphics cards'.
+- Add infrastructure to be able to create and load ray-marching effects on-demand in the background. Make sure that ray-marching effects stay at their designated location by allowing addition of effects at a particular position in the post-processing chain.
+- Enable IDs in particle groups. Trim down IDs in camera info pane from 14 to 12 characters.
+- Improve 'no connection' dialog, with more information and hints as to whether the issue is with our server or with the local internet connection.
+- Do not show blocking dialog if base data is present when we can't connect to the datasets server. Show a popup notification instead. In the dataset manager window, make installed datasets tab the default view in some cases.
+- Add support for pulling cloud textures from online resources.
+- Add calls to clear label regexp filtering. Improve documentation on some API calls.
+
+## Bug Fixes
+- Guard OS code name getter behind NPE check during Flatpak discovery. This fixes a crash at startup with macOS Tahoe.
+- Remove UI window shadow, as it messes with the internal padding due to the 9-patch implementation in Libgdx.
+- Gamepad focus order in welcome GUI. Decrease poll delay for gamepad axes.
+- Misalignments in about window layout.
+- `TLEParserTest` does not initialize settings, leading to NPE.
+- Synchronize TLE initializer to prevent multiple creations/editions of TLE data and derived JSON files at the same time.
+- Size issue in gamepad image in gamepad settings window. Increase maximum value of axis power slider to 15. Set value of vertical movement (RB/LB) to 1 instead of 0.1, to match other camera motion inputs.
+- Reduce range of sensitivity and axis power sliders in gamepad config window.
+- Connect `LABEL_CLEAR_FILTER_REGEX_CMD` event to scene observer. This fixes the `clearLabelFilterRegexps()` method.
+- Increase maximum eye separation in stereo mode, fix star/particle label positioning in stereoscopic mode.
+
+## Build System
+- Update bundled JRE in install4j scripts to Java 25 (jdk-25+36).
+- Remove `-XX:+ZGenerational` flag from run script, as support was removed in Java 24.
+- Clean up gradle build file, and separate `dist` task into multiple sub-tasks to increase granularity and improve tracking in case of errors. Make it compatible with Gradle 9.1.x.
+- Migrate from multi-string notation to single-string notation for dependencies to prepare for Gradle 10.
+- Upgrade Jackson version to 2.20.0.
+- Upgrade OSHI to 6.9.0.
+- Add additional languages to installer (French, Deutsch, Italian, Portuguese, Spanish, Turkish).
 <a name="3.6.11"></a>
 ## [3.6.11](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.11) (2025-07-28)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.10...3.6.11)
