@@ -337,15 +337,15 @@ public class WelcomeGui extends AbstractGui {
         titleGroup.add(new Separator(skin, "default"))
                 .fillY()
                 .padRight(pad28 * 2f);
-        titleGroup.add(title);
+        titleGroup.add(title).expandX();
 
         String textStyle = "main-title-s";
 
 
         // Add title to center.
         center.add(titleGroup)
+                .expandX()
                 .center()
-                .padLeft(pad32 * 2f)
                 .padBottom(pad18 * 5f)
                 .colspan(2)
                 .row();
@@ -384,26 +384,29 @@ public class WelcomeGui extends AbstractGui {
             if (!baseDataPresent) {
                 // No basic data, can't start!
                 startButton.setDisabled(true);
-
-                OwnLabel noBaseData = new OwnLabel(I18n.msg("gui.welcome.start.nobasedata"), skin, textStyle);
+                var text = TextUtils.breakCharacters(I18n.msg("gui.welcome.start.nobasedata"), 50);
+                OwnLabel noBaseData = new OwnLabel(text, skin, textStyle);
                 noBaseData.setColor(ColorUtils.gRedC);
                 startGroup.add(noBaseData)
                         .bottom()
                         .left();
             } else if (numCatalogsAvailable > 0 && numTotalCatalogsEnabled == 0) {
-                OwnLabel noCatsSelected = new OwnLabel(I18n.msg("gui.welcome.start.nocatalogs"), skin, textStyle);
+                var text = TextUtils.breakCharacters(I18n.msg("gui.welcome.start.nocatalogs"), 50);
+                OwnLabel noCatsSelected = new OwnLabel(text, skin, textStyle);
                 noCatsSelected.setColor(ColorUtils.gRedC);
                 startGroup.add(noCatsSelected)
                         .bottom()
                         .left();
             } else if (numGaiaDRCatalogsEnabled > 1 || numStarCatalogsEnabled == 0) {
-                OwnLabel tooManyDR = new OwnLabel(I18n.msg("gui.welcome.start.check"), skin, textStyle);
+                var text = TextUtils.breakCharacters(I18n.msg("gui.welcome.start.check"), 50);
+                OwnLabel tooManyDR = new OwnLabel(text, skin, textStyle);
                 tooManyDR.setColor(ColorUtils.gRedC);
                 startGroup.add(tooManyDR)
                         .bottom()
                         .left();
             } else {
-                OwnLabel ready = new OwnLabel(I18n.msg("gui.welcome.start.ready"), skin, textStyle);
+                var text = TextUtils.breakCharacters(I18n.msg("gui.welcome.start.ready"), 50);
+                OwnLabel ready = new OwnLabel(text, skin, textStyle);
                 ready.setColor(ColorUtils.gGreenC);
                 startGroup.add(ready)
                         .bottom()
@@ -597,6 +600,7 @@ public class WelcomeGui extends AbstractGui {
 
             // Recommended datasets button
             center.add(recommendedDatasetsButton)
+                    .expandX()
                     .center()
                     .top()
                     .padBottom(pad18 * 3f)
@@ -604,12 +608,12 @@ public class WelcomeGui extends AbstractGui {
 
             // Customize datasets button
             center.add(customizeButton)
+                    .expandX()
                     .center()
                     .top()
                     .padBottom(pad32 * 5f)
                     .row();
         }
-
 
         // Add to center container
         centerContainer.add(center)

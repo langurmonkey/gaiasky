@@ -144,27 +144,46 @@ public class TextUtils {
         return str.chars().filter(ch -> ch == '\n' || ch == '\r').count();
     }
 
-    public static String breakSpaces(String in,
-                                     int breakSpaces) {
+    /**
+     * Breaks a string by replacing every Nth space character with a newline.
+     * This effectively wraps text at specified space intervals.
+     *
+     * @param in The input string to process
+     * @param breakSpaces The number of spaces after which to insert a line break.
+     *                    If <= 0, returns the original string unchanged.
+     * @return The processed string with spaces replaced by newlines at intervals,
+     *         or the original string if breakSpaces <= 0
+     */
+    public static String breakSpaces(String in, int breakSpaces) {
         // Warp text if breakSpaces > 0
         if (breakSpaces > 0) {
+            // Use StringBuilder for efficient character manipulation
             java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
-            int spaces = 0;
+
+            int spaces = 0; // Counter for consecutive space characters encountered
+
+            // Iterate through each character in the string
             for (int i = 0; i < sb.length(); i++) {
                 char c = sb.charAt(i);
+
+                // Check if current character is any type of space character
                 if (Character.isSpaceChar(c)) {
-                    spaces++;
+                    spaces++; // Increment space counter
                 }
+
+                // When we reach the specified number of spaces, replace with newline
                 if (spaces == breakSpaces) {
-                    sb.setCharAt(i, '\n');
-                    spaces = 0;
+                    sb.setCharAt(i, '\n'); // Replace current space with line break
+                    spaces = 0; // Reset counter for next interval
                 }
             }
+
+            // Convert StringBuilder back to String
             in = sb.toString();
         }
+
         return in;
     }
-
 
     public static String capString(String in,
                                    int targetLength) {
