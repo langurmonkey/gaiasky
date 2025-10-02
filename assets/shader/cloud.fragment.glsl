@@ -17,6 +17,7 @@ uniform float u_cameraK;
 // Varyings computed in the vertex shader
 in float v_opacity;
 in float v_alphaTest;
+in vec3 v_normal;
 
 #ifdef diffuseTextureFlag
 uniform sampler2D u_diffuseTexture;
@@ -60,12 +61,8 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
 }
 #endif// diffuseCubemapFlag && diffuseTextureFlag
 
-#ifdef eclipsingBodyFlag
-uniform float u_eclipsingBodyRadius;
-uniform vec3 u_eclipsingBodyPos;
-
-#include <shader/lib/math.glsl>
-#endif // eclipsingBodyFlag
+// Eclipses.
+#include <shader/lib/eclipses.glsl>
 
 //////////////////////////////////////////////////////
 ////// DIRECTIONAL LIGHTS
@@ -103,6 +100,7 @@ in mat3 v_tbn;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 layerBuffer;
 
+// Logarithmic depth buffer.
 #include <shader/lib/logdepthbuff.glsl>
 
 #define saturate(x) clamp(x, 0.0, 1.0)
@@ -117,17 +115,18 @@ void main() {
     vec4 cloud = fetchCloudColor(g_texCoord0, vec4(0.0, 0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
 
-    float shdw = 1.0;
+    float eclshdw = 1.0;
     // Eclipses
     #ifdef eclipsingBodyFlag
-    vec3 f = v_fragPosWorld;
-    vec3 m = u_eclipsingBodyPos;
-    vec3 l = -u_dirLights[0].direction;
-    vec3 fl = f + l;
-    float dist = dist_segment_point(f, fl, m);
-    if (dist < u_eclipsingBodyRadius) {
-        shdw *= dist / u_eclipsingBodyRadius;
-    }
+        vec3 lightDirection;
+        if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
+            lightDirection = -u_dirLights[0].direction;
+        } else {
+            lightDirection = normalize(u_pointLights[0].position - v_fragPosWorld);
+        }
+        int outline;
+        vec3 normalVector = v_normal;
+        vec4 outlineColor = eclipseColor(v_fragPosWorld, lightDirection, normalVector, outline, eclshdw);
     #endif // eclipsingBodyFlag
 
     // Stores lighting contribution.
@@ -164,7 +163,7 @@ void main() {
     float brightness = clamp(length(litColor + ambient), 0.1, 1.0);
     vec3 cloudColor = cloud.rgb * brightness;
 
-    fragColor = vec4(cloudColor * shdw, 1.0) * v_opacity;
+    fragColor = vec4(cloudColor * eclshdw, 1.0) * v_opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);

@@ -160,13 +160,9 @@ out float v_alphaTest;
     uniform sampler2D u_normalTexture;
 #endif
 
-
-
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
     #define textureFlag
 #endif
-
-
 
 #if defined(normalFlag) && defined(binormalFlag) && defined(tangentFlag)
     #define calculateTangentVectors() nop()
@@ -304,5 +300,6 @@ void main() {
     vec3 viewDir = (u_cameraPosition.xyz - pos.xyz);
     v_viewDir = normalize(viewDir * TBN);
 
+    pushNormal();
     pushTexCoord0(g_texCoord0);
 }
