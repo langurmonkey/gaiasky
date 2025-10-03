@@ -468,14 +468,15 @@ void main() {
 
     // Eclipses
     #ifdef eclipsingBodyFlag
+        float eclshdw = 1.0;
         vec3 lightDirection;
         if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
             lightDirection = -u_dirLights[0].direction;
         } else {
             lightDirection = normalize(u_pointLights[0].position - v_data.fragPosWorld);
         }
-        float outline;
-        vec4 outlineColor = eclipseColor(v_data.fragPosWorld, lightDirection, normalVector.xyz, outline, shdw);
+        int outline;
+        vec4 outlineColor = eclipseColor(v_data.fragPosWorld, lightDirection, normalVector.xyz, outline, eclshdw);
     #endif // eclipsingBodyFlag
 
     // Reflection
@@ -621,11 +622,21 @@ void main() {
         #endif // heightFlag
     #endif // atmosphereGround
 
-    #if defined(eclipsingBodyFlag) && defined(eclipseOutlines)
-        if (outline > 0.0) {
-            fragColor = outlineColor;
-        }
-    #endif // eclipsingBodyFlag && eclipseOutlines
+    #ifdef eclipsingBodyFlag
+        #ifdef eclipseOutlines
+            if (outline > 0) {
+                fragColor = outlineColor;
+            } else {
+                fragColor.rgb = fragColor.rgb * eclshdw;
+                // Uncomment line below (and comment above) to make the eclipse turn on the lights (night texture).
+                // fragColor.rgb = fragColor.rgb * eclshdw + night.rgb * 0.5 * (1.0 - eclshdw);
+            }
+        #else
+            fragColor.rgb = fragColor.rgb * eclshdw;
+            // Uncomment line below (and comment above) to make the eclipse turn on the lights (night texture).
+            // fragColor.rgb = fragColor.rgb * eclshdw + night.rgb * 0.5 * (1.0 - eclshdw);
+        #endif // eclipseOutlines
+    #endif // eclipsingBodyFlag
 
     if (fragColor.a <= 0.0) {
         discard;
