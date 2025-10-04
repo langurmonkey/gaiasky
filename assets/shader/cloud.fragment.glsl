@@ -115,7 +115,6 @@ void main() {
     vec4 cloud = fetchCloudColor(g_texCoord0, vec4(0.0, 0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
 
-    float eclshdw = 1.0;
     // Eclipses
     #ifdef eclipsingBodyFlag
         vec3 lightDirection;
@@ -124,9 +123,11 @@ void main() {
         } else {
             lightDirection = normalize(u_pointLights[0].position - v_fragPosWorld);
         }
+        float eclshdw;
+        vec3 diffractionTint;
         int outline;
         vec3 normalVector = v_normal;
-        vec4 outlineColor = eclipseColor(v_fragPosWorld, lightDirection, normalVector, outline, eclshdw);
+        vec4 outlineColor = eclipseColor(v_fragPosWorld, lightDirection, normalVector, outline, diffractionTint, eclshdw);
     #endif // eclipsingBodyFlag
 
     // Stores lighting contribution.
@@ -163,7 +164,11 @@ void main() {
     float brightness = clamp(length(litColor + ambient), 0.1, 1.0);
     vec3 cloudColor = cloud.rgb * brightness;
 
-    fragColor = vec4(cloudColor * eclshdw, 1.0) * v_opacity;
+    fragColor = vec4(cloudColor, 1.0) * v_opacity;
+    // Eclipses
+    #ifdef eclipsingBodyFlag
+        fragColor.rgb = clamp(fragColor.rgb + diffractionTint, 0.0, 1.0) * eclshdw;
+    #endif // eclipsingBodyFlag
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
