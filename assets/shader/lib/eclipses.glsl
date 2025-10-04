@@ -18,6 +18,18 @@ uniform vec3 u_eclipsingBodyPos;
 #define PENUMBRA0 1.7
 #define PENUMBRA1 1.69
 
+// Function to get orange-to-red spectrum only
+vec3 getDiffractionSpectrum(float pos) {
+    // Smooth transition from orange to red
+    // Orange: vec3(1.0, 0.5, 0.0)
+    // Red:    vec3(1.0, 0.0, 0.0)
+    
+    return mix(
+        vec3(1.0, 0.5, 0.0),  // Orange at pos = 0
+        vec3(1.0, 0.0, 0.0),  // Red at pos = 1
+        pos
+    );
+}
 /**
  * Computes the color of the fragment (shadow and outline) for eclipses.
 **/
@@ -48,13 +60,18 @@ vec4 eclipseColor(in vec3 fragPosWorld, in vec3 lightDirection, in vec3 normalVe
             float diffractionRange = diffractionEnd - diffractionStart;
 
             if (dist > diffractionStart && dist < diffractionEnd) {
-                float x = (dist - diffractionStart) / diffractionRange;
-                float diffractionIntensity = 4.0 * x * (1.0 - x);
-
-                // Apply edge fade to diffraction.
-                diffractionIntensity *= 0.18 * edgeFade;
+                float x = (dist - diffractionStart) / diffractionRange; // 0 to 1
+                float diffractionIntensity = 4.0 * x * (1.0 - x); // Perfect parabola: 0 → 1 → 0
+                diffractionIntensity *= 0.15; // Reduce intensity
                 
-                diffractionTint = vec3(0.7, 0.2, 0.05) * diffractionIntensity;
+                // Apply edge fade to diffraction
+                diffractionIntensity *= edgeFade;
+                
+                // Diffraction spectrum colors based on position in the diffraction band
+                float spectrumPos = x; // Use x to map across spectrum
+                vec3 spectrumColor = getDiffractionSpectrum(spectrumPos);
+                
+                diffractionTint = spectrumColor * diffractionIntensity;
             }
 
             // Apply edge fade to shadow as well
@@ -79,6 +96,7 @@ vec4 eclipseColor(in vec3 fragPosWorld, in vec3 lightDirection, in vec3 normalVe
     }
     return outlineColor;
 }
+
 #endif // eclipsingBodyFlag
 
 #endif // GLSL_LIB_ECLIPSES
