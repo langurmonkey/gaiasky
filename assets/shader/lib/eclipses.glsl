@@ -18,15 +18,11 @@ uniform vec3 u_eclipsingBodyPos;
 #define PENUMBRA0 1.7
 #define PENUMBRA1 1.69
 
-// Function to get orange-to-red spectrum only
+// Function to get diffraction spectrum
 vec3 getDiffractionSpectrum(float pos) {
-    // Smooth transition from orange to red
-    // Orange: vec3(1.0, 0.5, 0.0)
-    // Red:    vec3(1.0, 0.0, 0.0)
-    
     return mix(
-        vec3(1.0, 0.5, 0.0),  // Orange at pos = 0
-        vec3(1.0, 0.0, 0.0),  // Red at pos = 1
+        vec3(1.0, 1.0, 0.0),  // Yellow at pos = 0
+        vec3(1.0, 0.3, 0.0),  // Red at pos = 1
         pos
     );
 }
