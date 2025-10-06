@@ -117,20 +117,19 @@ abstract class GaiaSkyRun extends JavaExec {
 
         minHeapSize = "3g"
         maxHeapSize = "6g"
-        // Parallel GC
-        //jvmArgs = [ '-XX:+UseParNewGC']
-        // CMS GC
-        //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
-        // Default GC
-        //jvmArgs "-XX:+UseShenandoahGC"
+
         // ZGC
-        jvmArgs = [ '-XX:+UseZGC', '-XX:+ZGenerational']
+        jvmArgs = [ '-XX:+UseZGC']
         if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
             // Required to run lwjgl3 java apps on macOS
             jvmArgs += "-XstartOnFirstThread"
         }
         // Verbose GC
         // jvmArgs = ['-verbose:gc']
+
+        // Compact object headers
+        jvmArgs += ['-XX:+CompactObjectHeaders']
+
         classpath = project.ext.sourceSets.main.runtimeClasspath
         classpath += project.files(project.ext.assetsDir)
         standardInput = System.in

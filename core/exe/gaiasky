@@ -89,6 +89,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
 fi
 
+# Compact object headers
+OPTS="$OPTS -XX:+UseCompactObjectHeaders"
+
 # Assets location
 OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
 
