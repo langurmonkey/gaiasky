@@ -21,8 +21,8 @@ uniform vec3 u_eclipsingBodyPos;
 // Function to get diffraction spectrum
 vec3 getDiffractionSpectrum(float pos) {
     return mix(
-        vec3(1.0, 0.85, 0.0),  // Yellow at pos = 0
-        vec3(1.0, 0.4, 0.0),  // Red at pos = 1
+        vec3(1.0, 0.2, 0.0),  // Red at pos = 0
+        vec3(1.0, 0.75, 0.0),  // Orange at pos = 1
         pos
     );
 }
