@@ -608,12 +608,12 @@ void main() {
             if (outline > 0) {
                 fragColor = outlineColor;
             } else {
-                fragColor.rgb = clamp(fragColor.rgb + diffractionTint, 0.0, 1.0) * eclshdw;
+                fragColor.rgb = eclipseBlend(fragColor.rgb, diffractionTint, eclshdw);
                 // Uncomment line below (and comment above) to make the eclipse turn on the lights (night texture).
                 // fragColor.rgb = fragColor.rgb * eclshdw + night.rgb * 0.5 * (1.0 - eclshdw);
             }
         #else
-            fragColor.rgb = clamp(fragColor.rgb + diffractionTint, 0.0, 1.0) * eclshdw;
+            fragColor.rgb = eclipseBlend(fragColor.rgb, diffractionTint, eclshdw);
             // Uncomment line below (and comment above) to make the eclipse turn on the lights (night texture).
             // fragColor.rgb = fragColor.rgb * eclshdw + night.rgb * 0.5 * (1.0 - eclshdw);
         #endif // eclipseOutlines

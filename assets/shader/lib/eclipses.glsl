@@ -12,18 +12,19 @@ uniform vec3 u_eclipsingBodyPos;
 // Define width of umbra outline 
 #define UMBRA0 0.04
 #define UMBRA1 0.035
-// Where diffraction starts
-#define DIFFRACTION0 0.4
 // Define width of penumbra outline
 #define PENUMBRA0 1.7
 #define PENUMBRA1 1.69
+// Where diffraction starts
+#define DIFFRACTION0 0.2
+#define DIFFRACTION1 1.6
 
 // Function to get diffraction spectrum
 vec3 getDiffractionSpectrum(float pos) {
     return mix(
-        vec3(1.0, 0.2, 0.0),  // Red at pos = 0
-        vec3(1.0, 0.75, 0.0),  // Orange at pos = 1
-        pos
+    vec3(0.41, 0.26, 0.013),
+    vec3(0.88, 0.42, 0.063),
+    pos
     );
 }
 /**
@@ -43,30 +44,29 @@ vec4 eclipseColor(in vec3 fragPosWorld, in vec3 lightDirection, in vec3 normalVe
 
     // Calculate angle-based fade at the edge of the Earth
     float dot_NL = dot(normalize(normalVector), normalize(lightDirection));
-    float edgeFade = smoothstep(-0.1, 0.2, dot_NL); // Fade when approaching 90 degrees (dot_NL → 0)
+    float edgeFade = smoothstep(-0.1, 0.2, dot_NL);
 
     if (dot_NM > -0.15) {
         if (dist < u_eclipsingBodyRadius * 1.7) {
-            float eclfac = dist / (u_eclipsingBodyRadius * 1.7);
-            shdw *= eclfac;
+            shdw = dist / (u_eclipsingBodyRadius * 1.7);
 
-            // Diffraction between DIFFRACTION0 and PENUMBRA0
+            // Diffraction between DIFFRACTION0 and DIFFRACTION1
             float diffractionStart = u_eclipsingBodyRadius * DIFFRACTION0;
-            float diffractionEnd = u_eclipsingBodyRadius * PENUMBRA0;
+            float diffractionEnd = u_eclipsingBodyRadius * DIFFRACTION1;
             float diffractionRange = diffractionEnd - diffractionStart;
 
             if (dist > diffractionStart && dist < diffractionEnd) {
-                float x = (dist - diffractionStart) / diffractionRange; // 0 to 1
-                float diffractionIntensity = 4.0 * x * (1.0 - x); // Perfect parabola: 0 → 1 → 0
-                diffractionIntensity *= 0.19; // Reduce intensity
-                
+                float x = (dist - diffractionStart) / diffractionRange;
+                float diffractionIntensity = 4.0 * x * (1.0 - x);
+                diffractionIntensity *= 0.3;
+
                 // Apply edge fade to diffraction
                 diffractionIntensity *= edgeFade;
-                
+
                 // Diffraction spectrum colors based on position in the diffraction band
-                float spectrumPos = x; // Use x to map across spectrum
+                float spectrumPos = x;
                 vec3 spectrumColor = getDiffractionSpectrum(spectrumPos);
-                
+
                 diffractionTint = spectrumColor * diffractionIntensity;
             }
 
@@ -77,7 +77,7 @@ vec4 eclipseColor(in vec3 fragPosWorld, in vec3 lightDirection, in vec3 normalVe
             }
         }
         #ifdef eclipseOutlines
-        if(dot_NM > 0.0) {
+        if (dot_NM > 0.0) {
             if (dist < u_eclipsingBodyRadius * PENUMBRA0 && dist > u_eclipsingBodyRadius * PENUMBRA1) {
                 // Penumbra.
                 outline = 1;
@@ -93,6 +93,31 @@ vec4 eclipseColor(in vec3 fragPosWorld, in vec3 lightDirection, in vec3 normalVe
     return outlineColor;
 }
 
+// Simple additive blending.
+vec3 eclipseBlendAdditive(vec3 base, vec3 tint, float shadow) {
+    return clamp(base + tint, 0.0, 1.0) * shadow;
+}
+
+// A weighted mix function between base and tint based on the shadow value.
+vec3 eclipseBlendWeightedMix(vec3 base, vec3 tint, float shadow) {
+    return mix(base, tint, 1.0 - shadow);
+}
+
+// An energy-preserving blend.
+vec3 eclipseBlendPreserveEnergy(vec3 base, vec3 tint, float shadow) {
+    return base * shadow + tint * (1.0 - shadow);
+}
+
+// Emissive addition for a stronger glow.
+vec3 eclipseBlendEmissiveAddition(vec3 base, vec3 tint, float shadow) {
+    float alpha = 0.1;
+    return base * shadow + tint * pow(1.0 - shadow, alpha);
+}
+
+// Perform blending of base color, tint, and eclipse shadow.
+vec3 eclipseBlend(vec3 base, vec3 tint, float shadow) {
+    return eclipseBlendWeightedMix(base, tint, shadow);
+}
 #endif // eclipsingBodyFlag
 
 #endif // GLSL_LIB_ECLIPSES

@@ -167,7 +167,7 @@ void main() {
     fragColor = vec4(cloudColor, 1.0) * v_opacity;
     // Eclipses
     #ifdef eclipsingBodyFlag
-        fragColor.rgb = clamp(fragColor.rgb + diffractionTint, 0.0, 1.0) * eclshdw;
+        fragColor.rgb = eclipseBlend(fragColor.rgb, diffractionTint, eclshdw);
     #endif // eclipsingBodyFlag
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

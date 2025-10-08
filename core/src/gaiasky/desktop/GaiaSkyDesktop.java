@@ -284,7 +284,7 @@ public class GaiaSkyDesktop implements IObserver {
      * to determine whether the config file must be overwritten.
      *
      * @return True if the configuration file has been initialized or
-     * overwritten with the default one, false otherwise.
+     *         overwritten with the default one, false otherwise.
      *
      * @throws IOException If the file fails to be written successfully.
      */
@@ -392,6 +392,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         final var s = Settings.settings;
         cfg.setTitle(Settings.APPLICATION_NAME);
+        cfg.setPauseWhenMinimized(false);
         cfg.disableAudio(true);
         if (!cliArgs.vr) {
             // We also default to full screen in small displays (around 720p, or a bit larger).
@@ -463,7 +464,7 @@ public class GaiaSkyDesktop implements IObserver {
                 if (myMode == null) {
                     // Fall back to windowed mode.
                     logger.warn(I18n.msg("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
-                    cfg.setWindowedMode(s.graphics.getScreenWidth(), s.graphics.getScreenHeight());
+                    cfg.setWindowedMode(s.graphics.getApplicationWidth(), s.graphics.getApplicationHeight());
                     cfg.setResizable(s.graphics.resizable);
                 } else {
                     cfg.setFullscreenMode(myMode);
@@ -537,17 +538,17 @@ public class GaiaSkyDesktop implements IObserver {
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg,
                                      float widthFactor,
                                      float heightFactor) {
-        int w = Settings.settings.graphics.getScreenWidth();
-        int h = Settings.settings.graphics.getScreenHeight();
+        int w = Settings.settings.graphics.getApplicationWidth();
+        int h = Settings.settings.graphics.getApplicationHeight();
+        int[] displayResolution = SysUtils.getDisplayResolution();
         if (w <= 0 || h <= 0) {
-            int[] wh = SysUtils.getDisplayResolution();
             // Default values.
             w = Constants.DEFAULT_RESOLUTION_WIDTH;
             h = Constants.DEFAULT_RESOLUTION_HEIGHT;
-            if (wh != null && wh.length == 2 && wh[0] > 0 && wh[1] > 0) {
+            if (displayResolution != null && displayResolution.length == 2 && displayResolution[0] > 0 && displayResolution[1] > 0) {
                 // Use retrieved resolution.
-                w = (int) FastMath.max(w, wh[0] * 0.85f);
-                h = (int) FastMath.max(h, wh[1] * 0.85f);
+                w = (int) FastMath.max(w, displayResolution[0] * 0.85f);
+                h = (int) FastMath.max(h, displayResolution[1] * 0.85f);
             } else {
                 // Default.
                 logger.warn(I18n.msg("error.screensize.default", w, h));
@@ -563,8 +564,9 @@ public class GaiaSkyDesktop implements IObserver {
         h = (int) (h * heightFactor);
 
         // Set to config.
-        if (cfg != null)
+        if (cfg != null) {
             cfg.setWindowedMode(w, h);
+        }
     }
 
     private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
@@ -596,31 +598,31 @@ public class GaiaSkyDesktop implements IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
-        case SCENE_LOADED -> {
-            if (REST_ENABLED) {
-                /*
-                 * Notify REST server that GUI is loaded and everything should be in a
-                 * well-defined state
-                 */
-                try {
-                    RESTServer.activate();
-                } catch (SecurityException | IllegalArgumentException e) {
-                    logger.error(e);
+            case SCENE_LOADED -> {
+                if (REST_ENABLED) {
+                    /*
+                     * Notify REST server that GUI is loaded and everything should be in a
+                     * well-defined state
+                     */
+                    try {
+                        RESTServer.activate();
+                    } catch (SecurityException | IllegalArgumentException e) {
+                        logger.error(e);
+                    }
                 }
             }
-        }
-        case DISPOSE -> {
-            if (REST_ENABLED) {
-                /* Shutdown REST server thread on termination */
-                try {
-                    RESTServer.dispose();
-                } catch (SecurityException | IllegalArgumentException e) {
-                    logger.error(e);
+            case DISPOSE -> {
+                if (REST_ENABLED) {
+                    /* Shutdown REST server thread on termination */
+                    try {
+                        RESTServer.dispose();
+                    } catch (SecurityException | IllegalArgumentException e) {
+                        logger.error(e);
+                    }
                 }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
     }
 
@@ -628,59 +630,59 @@ public class GaiaSkyDesktop implements IObserver {
      * Program CLI arguments.
      */
     public static class CLIArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0)
+        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
         public boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1)
+        @Parameter(names = {"-v", "--version"}, description = "List Gaia Sky version and relevant information.", order = 1)
         public boolean version = false;
 
-        @Parameter(names = { "-i", "--ascii-art" }, description = "Add nice ascii art to --version information.", order = 1)
+        @Parameter(names = {"-i", "--ascii-art"}, description = "Add nice ascii art to --version information.", order = 1)
         public boolean asciiArt = false;
 
-        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
+        @Parameter(names = {"-s", "--skip-welcome"}, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
         public boolean skipWelcome = false;
 
-        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4)
+        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file.", order = 4)
         public String propertiesFile = null;
 
-        @Parameter(names = { "-a",
-                "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
+        @Parameter(names = {"-a",
+                "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
         public String assetsLocation = null;
 
-        @Parameter(names = { "-vr",
-                "--openxr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenXR. Make sure your OpenXR runtime is running.", order = 6)
+        @Parameter(names = {"-vr",
+                "--openxr"}, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenXR. Make sure your OpenXR runtime is running.", order = 6)
         public boolean vr = false;
 
-        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7)
+        @Parameter(names = {"-e", "--externalview"}, description = "Create a window with a view of the scene and no UI.", order = 7)
         public boolean externalView = false;
 
-        @Parameter(names = { "-n",
-                "--no-script" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
+        @Parameter(names = {"-n",
+                "--no-script"}, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
         public boolean noScriptingServer = false;
 
-        @Parameter(names = { "-d", "--debug" }, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9)
+        @Parameter(names = {"-d", "--debug"}, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9)
         public boolean debug = false;
 
-        @Parameter(names = { "-g",
-                "--debug-gpu" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10)
+        @Parameter(names = {"-g",
+                "--debug-gpu"}, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10)
         public boolean debugGpu = false;
 
         @Parameter(names = {
-                "--debug-input" }, description = "Activate input debug mode. Prints out debug information for all input events (keyboard/mouse/controllers).", order = 10)
+                "--debug-input"}, description = "Activate input debug mode. Prints out debug information for all input events (keyboard/mouse/controllers).", order = 10)
         public boolean debugInput = false;
 
-        @Parameter(names = { "-l", "--headless" }, description = "Use headless (windowless) mode, for servers.", order = 11)
+        @Parameter(names = {"-l", "--headless"}, description = "Use headless (windowless) mode, for servers.", order = 11)
         public boolean headless = false;
 
         @Parameter(names = {
-                "--safe-mode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12)
+                "--safe-mode"}, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12)
         public boolean safeMode = false;
 
         @Parameter(names = {
-                "--no-safe-mode" }, description = "Force deactivation of safe graphics mode. Warning: this bypasses internal checks and may break things! Useful to get rid of safe graphics mode in the settings.", order = 13)
+                "--no-safe-mode"}, description = "Force deactivation of safe graphics mode. Warning: this bypasses internal checks and may break things! Useful to get rid of safe graphics mode in the settings.", order = 13)
         public boolean noSafeMode = false;
 
-        @Parameter(names = { "--hdpi-mode" }, description =
+        @Parameter(names = {"--hdpi-mode"}, description =
                 "The HDPI mode to use. Defines how HiDPI monitors are handled. Operating systems may have a per-monitor HiDPI scale setting. The operating system " +
                         "may report window width/height and mouse coordinates in a logical coordinate system at a lower resolution than the actual " +
                         "physical resolution. This setting allows you to specify whether you want to work in logical or raw pixel units.", order = 14)

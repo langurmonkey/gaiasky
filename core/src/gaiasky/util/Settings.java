@@ -1090,13 +1090,21 @@ public class Settings extends SettingsObject {
             this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
         }
 
+        /**
+         * Get the width of the surface the application renders to.
+         * @return The width of the application surface.
+         */
         @JsonIgnore
-        public int getScreenWidth() {
+        public int getApplicationWidth() {
             return fullScreen.active ? fullScreen.resolution[0] : resolution[0];
         }
 
+        /**
+         * Get the height of the surface the application renders to.
+         * @return The height of the application surface.
+         */
         @JsonIgnore
-        public int getScreenHeight() {
+        public int getApplicationHeight() {
             return fullScreen.active ? fullScreen.resolution[1] : resolution[1];
         }
 
@@ -1599,7 +1607,7 @@ public class Settings extends SettingsObject {
              */
             public static float getStarPointSize() {
                 if (settings.program.modeCubemap.active) {
-                    float screenArea = settings.graphics.getScreenHeight() * settings.graphics.getScreenWidth();
+                    float screenArea = settings.graphics.getApplicationHeight() * settings.graphics.getApplicationWidth();
                     float cubemapRes = settings.program.modeCubemap.faceResolution;
                     float pointSize;
                     if (cubemapRes <= 2000) {
