@@ -28,6 +28,8 @@ import java.util.List;
 
 /**
  * Renders models with arbitrary shaders, kept in a map. The shaders themselves are defined in the {@link Volume} component.
+ * Optionally, the shader may receive one or more 3D texture (density, color, etc.). In this case, the shader must be a
+ * full-on volume rendering shader.
  */
 public class VolumeRenderer extends AbstractRenderSystem implements IObserver {
 

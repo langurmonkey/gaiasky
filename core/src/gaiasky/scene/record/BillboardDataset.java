@@ -21,6 +21,9 @@ import net.jafama.FastMath;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * A dataset composed of a single set of billboard-like particles.
+ */
 public class BillboardDataset {
     private static final Log logger = Logger.getLogger(BillboardDataset.class);
 

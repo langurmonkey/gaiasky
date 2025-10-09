@@ -49,7 +49,6 @@ public class BillboardSetInitializer extends AbstractInitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-
         transformData(entity);
     }
 

@@ -69,6 +69,7 @@ import gaiasky.util.coord.vsop87.VSOP87Loader;
 import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.gdx.TextureArrayLoader;
 import gaiasky.util.gdx.g2d.BitmapFont;
+import gaiasky.util.gdx.graphics.VolumeTexture;
 import gaiasky.util.gdx.loader.*;
 import gaiasky.util.gdx.loader.is.GzipInputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
@@ -484,6 +485,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(BitmapFont.class, new BitmapFontLoader(internalResolver));
         assetManager.setLoader(Texture.class, new OwnTextureLoader(internalResolver));
         assetManager.setLoader(TextureArray.class, new TextureArrayLoader(internalResolver));
+        assetManager.setLoader(VolumeTexture.class, new VolumeTextureLoader(internalResolver));
         assetManager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(internalResolver));
         assetManager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(internalResolver));
         assetManager.setLoader(TessellationShaderProvider.class, new TessellationShaderProviderLoader<>(internalResolver));

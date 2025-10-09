@@ -9,12 +9,16 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.data.AssetBean;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.graphics.VolumeTexture;
+import gaiasky.util.gdx.loader.VolumeTextureLoader;
 
 public class VolumeInitializer extends AbstractInitSystem {
     public VolumeInitializer(boolean setUp, Family family, int priority) {
@@ -29,6 +33,7 @@ public class VolumeInitializer extends AbstractInitSystem {
             // Key is hash code of concatenation.
             volume.key = (volume.fragmentShader + volume.vertexShader).hashCode();
         }
+
         // Renderer.
         model.renderConsumer = ModelEntityRenderSystem::renderVolume;
     }
@@ -39,6 +44,7 @@ public class VolumeInitializer extends AbstractInitSystem {
         var model = Mapper.model.get(entity);
         var label = Mapper.label.get(entity);
         var sa = Mapper.sa.get(entity);
+        var volume = Mapper.volume.get(entity);
 
         // Set units.
         model.model.setUnits(Constants.KM_TO_U);
@@ -53,5 +59,6 @@ public class VolumeInitializer extends AbstractInitSystem {
             label.labelFactor = 0.5e-3f;
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextBase;
+
     }
 }
