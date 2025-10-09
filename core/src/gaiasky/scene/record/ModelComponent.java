@@ -37,6 +37,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.model.data.OwnModelMaterial;
 import gaiasky.util.gdx.model.gltf.scene3d.model.ModelInstanceHack;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.Material;
@@ -45,6 +46,10 @@ import gaiasky.util.i18n.I18n;
 
 import java.util.*;
 
+/**
+ * Manages an actual 3D model, from its inception (loading) into a {@link IntModel} and instantiation into a {@link IntModelInstance}, to the
+ * environment (lights, etc.) and the material ({@link OwnModelMaterial}.
+ */
 public final class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
     private static final ColorAttribute globalAmbient;
@@ -372,7 +377,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         if (instance != null) {
             ICamera cam = GaiaSky.instance.getICamera();
             setVROffset(GaiaSky.instance.getCameraManager().naturalCamera);
-            setTransparency(alpha, blendSrc, blendDst, blendEnabled);
+            updateBlendMode(alpha, blendSrc, blendDst, blendEnabled);
             if (relativistic) {
                 updateRelativisticEffects(cam);
             } else {
@@ -504,7 +509,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
-    public void setTransparency(float alpha,
+    public void updateBlendMode(float alpha,
                                 int blendSrc,
                                 int blendDest,
                                 boolean blendEnabled) {
@@ -673,12 +678,12 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
-    public void setTransparency(float alpha) {
+    public void updateBlendMode(float alpha) {
         switch (blendMode) {
-            case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
-            case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
-            case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, true);
-            case NONE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, false);
+            case ALPHA -> updateBlendMode(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+            case COLOR -> updateBlendMode(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
+            case ADDITIVE -> updateBlendMode(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE, true);
+            case NONE -> updateBlendMode(alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
     }
 

@@ -286,6 +286,16 @@
                 "gaiasky.scenegraph.BillboardGroup"
             ]
         },
+        "VolumeGroup": {
+          "parent": "GenericCatalog",
+          "components": [
+            "VolumeSet",
+            "Coordinates"
+          ],
+          "aliases": [
+            "gaiasky.scenegraph.VolumeGroup"
+          ]
+        },
         "Text2D": {
             "parent": "SceneGraphNode",
             "components": [

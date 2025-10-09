@@ -127,7 +127,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     private void initialize(boolean force) {
         if (!Settings.settings.scene.initialization.lazyTexture || force) {
             this.generated.set(false);
-            if (url != null && TextUtils.isValidURL(url)) {
+            if (TextUtils.isValidURL(url)) {
                 try {
                     urlObject = new URI(url).toURL();
                     // Pull from URL, later.

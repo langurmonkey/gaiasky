@@ -47,6 +47,7 @@ public class Mapper {
     public static final ComponentMapper<Mesh> mesh = ComponentMapper.getFor(Mesh.class);
     public static final ComponentMapper<Shape> shape = ComponentMapper.getFor(Shape.class);
     public static final ComponentMapper<Billboard> billboard = ComponentMapper.getFor(Billboard.class);
+    public static final ComponentMapper<BillboardSet> billboardSet = ComponentMapper.getFor(BillboardSet.class);
     public static final ComponentMapper<SolidAngle> sa = ComponentMapper.getFor(SolidAngle.class);
     public static final ComponentMapper<Line> line = ComponentMapper.getFor(Line.class);
     public static final ComponentMapper<Arrow> arrow = ComponentMapper.getFor(Arrow.class);
@@ -56,7 +57,6 @@ public class Mapper {
     public static final ComponentMapper<MotorEngine> engine = ComponentMapper.getFor(MotorEngine.class);
     public static final ComponentMapper<RenderType> renderType = ComponentMapper.getFor(RenderType.class);
     public static final ComponentMapper<LocationMark> loc = ComponentMapper.getFor(LocationMark.class);
-    public static final ComponentMapper<BillboardSet> billboardSet = ComponentMapper.getFor(BillboardSet.class);
     public static final ComponentMapper<Axis> axis = ComponentMapper.getFor(Axis.class);
     public static final ComponentMapper<Cluster> cluster = ComponentMapper.getFor(Cluster.class);
     public static final ComponentMapper<SingleMatrix> matrix = ComponentMapper.getFor(SingleMatrix.class);
@@ -74,6 +74,7 @@ public class Mapper {
     public static final ComponentMapper<Perimeter> perimeter = ComponentMapper.getFor(Perimeter.class);
     public static final ComponentMapper<VRDevice> vr = ComponentMapper.getFor(VRDevice.class);
     public static final ComponentMapper<Volume> volume = ComponentMapper.getFor(Volume.class);
+    public static final ComponentMapper<VolumeSet> volumeSet = ComponentMapper.getFor(VolumeSet.class);
 
     // Tags
     public static final ComponentMapper<TagCopy> tagCopy = ComponentMapper.getFor(TagCopy.class);

@@ -66,7 +66,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_worldTrans;
     public final int u_normalMatrix;
     public final int u_bones;
-    // Material uniforms,
+    // Material uniforms
     public final int u_aoTexture;
     public final int u_opacity;
     public final int u_diffuseColor;
@@ -92,7 +92,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_bodySize;
     public final int u_alphaTest;
     public int u_ior;
-    // Iridescence.
+    // Iridescence
     public int u_iridescenceFactor;
     public int u_iridescenceIOR;
     public int u_iridescenceThicknessMin;
@@ -104,7 +104,13 @@ public class DefaultIntShader extends BaseIntShader {
     public int u_thicknessFactor;
     public int u_volumeDistance;
     public int u_volumeColor;
-    // Cubemaps.
+    public int u_volumeBoundsMin;
+    public int u_volumeBoundsMax;
+    protected final int u_volumeDensityTexture;
+    protected final int u_texture3d0;
+    protected final int u_texture3d1;
+
+    // Cubemaps
     protected final int u_reflectionCubemap;
     protected final int u_diffuseCubemap;
     protected final int u_normalCubemap;
@@ -115,7 +121,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_metallicCubemap;
     protected final int u_aoCubemap;
 
-    // SVT.
+    // SVT
     protected final int u_svtTileSize;
     protected final int u_svtResolution;
     protected final int u_svtDepth;
@@ -130,23 +136,23 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtIndirectionMetallicTexture;
     protected final int u_svtIndirectionRoughnessTexture;
     protected final int u_svtIndirectionAoTexture;
-    // Units.
+
+    // Units
     protected final int u_kmToU;
-    // Generic float values.
+    // Generic float values
     protected final int u_generic1;
     protected final int u_generic2;
-
-    // Generic textures.
+    // Generic textures
     protected final int u_texture0;
     protected final int u_texture1;
 
-    // Cascaded shadow maps.
+    // Cascaded shadow maps
     public int[] u_csmTransforms = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
     public int[] u_csmSamplers = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
     public int[] u_csmClip = new int[CascadedShadowMapRenderPass.CASCADE_COUNT];
     public int u_csmPCF;
 
-    // Lighting uniforms.
+    // Lighting uniforms
     protected final int u_ambientCubemap;
     protected final int u_dirLights0color;
     protected final int u_dirLights0direction;
@@ -319,12 +325,19 @@ public class DefaultIntShader extends BaseIntShader {
         u_iridescenceThicknessMax = register(Inputs.iridescenceThicknessMaxUniform, Setters.iridescenceThicknessMaxSetter);
         u_iridescenceTexture = register(Inputs.iridescenceTextureUniform, Setters.iridescenceTextureSetter);
         u_iridescenceThicknessTexture = register(Inputs.iridescenceThicknessTextureUniform, Setters.iridescenceThicknessTextureSetter);
-        // Volume, IOR
+        // IOR
         u_ior = register(Inputs.iorUniform, Setters.iorSetter);
+
+        // Volume
+        u_thicknessTexture = register(Inputs.thicknessTextureUniform, Setters.thicknessTextureSetter);
         u_thicknessFactor = register(Inputs.thicknessFactorUniform, Setters.thicknessFactorSetter);
         u_volumeDistance = register(Inputs.volumeDistanceUniform, Setters.volumeDistanceSetter);
         u_volumeColor = register(Inputs.volumeColorUniform, Setters.volumeColorSetter);
-        u_thicknessTexture = register(Inputs.thicknessTextureUniform, Setters.thicknessTextureSetter);
+        u_volumeDensityTexture = register(Inputs.volumeDensityTexture, Setters.volumeDensityTexture);
+        u_volumeBoundsMin = register(Inputs.volumeBoundsMinUniform, Setters.volumeBoundsMinSetter);
+        u_volumeBoundsMax = register(Inputs.volumeBoundsMaxUniform, Setters.volumeBoundsMaxSetter);
+        u_texture3d0 = register(Inputs.texture3d0, Setters.texture3d0);
+        u_texture3d1 = register(Inputs.texture3d1, Setters.texture3d1);
 
         // SVT.
         u_svtId = register(Inputs.svtId, Setters.svtId);
@@ -341,7 +354,6 @@ public class DefaultIntShader extends BaseIntShader {
 
         // Units.
         u_kmToU = register(Inputs.kmToU, Setters.kmToU);
-
 
         // Generic float values.
         u_generic1 = register(Inputs.generic1, Setters.generic1);
@@ -542,6 +554,10 @@ public class DefaultIntShader extends BaseIntShader {
         }
         if (attributes.has(PBRFloatAttribute.IOR)) {
             prefix.append("#define iorFlag\n");
+        }
+        // Density (3D)
+        if (attributes.has(Texture3DAttribute.VolumeDensity)) {
+            prefix.append("#define volumeDensityTextureFlag\n");
         }
 
         if (Settings.settings.postprocess.ssr.active) {
@@ -977,9 +993,10 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform occlusionMetallicRoughnessTexture = new Uniform("u_occlusionMetallicRoughnessTexture",
                 TextureAttribute.OcclusionMetallicRoughness);
 
-
         public final static Uniform texture0 = new Uniform("u_texture0", TextureAttribute.Texture0);
         public final static Uniform texture1 = new Uniform("u_texture1", TextureAttribute.Texture1);
+        public final static Uniform texture3d0 = new Uniform("u_texture3d0", Texture3DAttribute.Texture3d0);
+        public final static Uniform texture3d1 = new Uniform("u_texture3d1", Texture3DAttribute.Texture3d1);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
@@ -990,6 +1007,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform tessQuality = new Uniform("u_tessQuality", FloatAttribute.TessQuality);
         public final static Uniform bodySize = new Uniform("u_bodySize", FloatAttribute.BodySize);
         public final static Uniform alphaTest = new Uniform("u_alphaTest");
+
+        public final static Uniform volumeDensityTexture = new Uniform("u_volumeDensityTexture", Texture3DAttribute.VolumeDensity);
 
         public final static Uniform time = new Uniform("u_time", FloatAttribute.Time);
         public final static Uniform simuTime = new Uniform("u_simuTime", FloatAttribute.SimuTime);
@@ -1018,6 +1037,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform volumeDistanceUniform = new Uniform("u_attenuationDistance");
         public final static Uniform volumeColorUniform = new Uniform("u_attenuationColor");
         public final static Uniform thicknessTextureUniform = new Uniform("u_thicknessSampler", PBRTextureAttribute.ThicknessTexture);
+        public final static Uniform volumeBoundsMinUniform = new Uniform("u_volumeBoundsMin");
+        public final static Uniform volumeBoundsMaxUniform = new Uniform("u_volumeBoundsMax");
 
         public final static Uniform svtTileSize = new Uniform("u_svtTileSize", FloatAttribute.SvtTileSize);
         public final static Uniform svtResolution = new Uniform("u_svtResolution", Vector2Attribute.SvtResolution);
@@ -1809,6 +1830,42 @@ public class DefaultIntShader extends BaseIntShader {
                 }
             }
         };
+        public final static Setter volumeDensityTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(Texture3DAttribute.VolumeDensity)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(
+                            ((Texture3DAttribute) (Objects.requireNonNull(combinedAttributes.get(Texture3DAttribute.VolumeDensity)))).textureDescription));
+                }
+            }
+        };
+        public final static Setter volumeBoundsMinSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.VolumeBoundsMin)) {
+                    shader.set(inputID,
+                               ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.VolumeBoundsMin)))).value);
+                }
+            }
+        };
+        public final static Setter volumeBoundsMaxSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.VolumeBoundsMax)) {
+                    shader.set(inputID,
+                               ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.VolumeBoundsMax)))).value);
+                }
+            }
+        };
         public final static Setter kmToU = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,
@@ -1855,6 +1912,28 @@ public class DefaultIntShader extends BaseIntShader {
                             Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Texture1)))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter texture3d0 = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(
+                        ((Texture3DAttribute) (Objects.requireNonNull(combinedAttributes.get(Texture3DAttribute.Texture3d0)))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter texture3d1 = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(
+                        ((Texture3DAttribute) (Objects.requireNonNull(combinedAttributes.get(Texture3DAttribute.Texture3d1)))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
