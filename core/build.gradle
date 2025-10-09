@@ -128,7 +128,7 @@ abstract class GaiaSkyRun extends JavaExec {
         // jvmArgs = ['-verbose:gc']
 
         // Compact object headers
-        jvmArgs += ['-XX:+CompactObjectHeaders']
+        jvmArgs += ['-XX:+UseCompactObjectHeaders']
 
         classpath = project.ext.sourceSets.main.runtimeClasspath
         classpath += project.files(project.ext.assetsDir)

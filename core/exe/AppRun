@@ -37,7 +37,10 @@ OPTS="$OPTS -Xms2g -Xmx6g"
 # Shenandoah GC (only LTS)
 #OPTS="$OPTS -XX:+UseShenandoahGC"
 # ZGC
-OPTS="$OPTS -XX:+UseZGC -XX:+ZGenerational"
+OPTS="$OPTS -XX:+UseZGC"
+
+# Compact object headers
+OPTS="$OPTS -XX:+UseCompactObjectHeaders"
 
 # GC debug only
 #OPTS="$OPTS -verbose:gc -XX:+PrintGCDetails"

@@ -14,7 +14,7 @@ cd %GSDIR%
 :: Memory
 SET OPTS=-Xms2g -Xmx6g
 :: ZGC
-SET OPTS=%OPTS% -XX:+UseZGC -XX:+ZGenerational
+SET OPTS=%OPTS% -XX:+UseZGC -XX:+UseCompactObjectHeaders
 :: Assets location
 SET OPTS=%OPTS% -Dassets.location=.
 :: SimpleLogger defaults
