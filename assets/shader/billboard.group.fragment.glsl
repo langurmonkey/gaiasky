@@ -45,7 +45,7 @@ vec4 colorDust(float alpha, float dist) {
 }
 
 vec4 colorDustTex(float alpha, vec2 uv) {
-    return v_col * texture(u_textures, vec3(uv, v_layer)).r * alpha;
+    return -1.0 * v_col * texture(u_textures, vec3(uv, v_layer)).r * alpha;
 }
 
 vec4 colorStar(float alpha, float dist) {
@@ -65,17 +65,14 @@ void main() {
 
     if (v_type == T_DUST){
         fragColor = colorDustTex(u_alpha, uv);
-        if (fragColor.a < 1.0) {
-            if (dither(gl_FragCoord.xy, fragColor.a) < 0.5) {
-                discard;
-            }
-        }
     } else {
         fragColor = colorTex(u_alpha, uv);
     }
 
     // Logarithmic depth buffer
-    gl_FragDepth = getDepthValue(u_zfar, u_k);
+    if (fragColor.a > 0.7) {
+        gl_FragDepth = getDepthValue(u_zfar, u_k);
+    }
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Add outline

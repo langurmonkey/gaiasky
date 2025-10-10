@@ -378,11 +378,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             ICamera cam = GaiaSky.instance.getICamera();
             setVROffset(GaiaSky.instance.getCameraManager().naturalCamera);
             updateBlendMode(alpha, blendSrc, blendDst, blendEnabled);
-            if (relativistic) {
-                updateRelativisticEffects(cam);
-            } else {
-                updateRelativisticEffects(cam);
-            }
+            updateRelativisticEffects(cam);
         }
     }
 

@@ -353,6 +353,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
         return tex;
     }
+
     /**
      * Adds the 3D texture to load and unpacks any star (*) with the current
      * quality setting.
@@ -403,10 +404,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             diffuseColor[1] = diffuseCol[1];
             diffuseColor[2] = diffuseCol[2];
             diffuseColor[3] = diffuseCol[3];
-            if (colorIfTexture || diffuse == null) {
-                // Add diffuse colour
-                material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
-            }
+            // Add diffuse colour
+            material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
         }
 
         if (normal != null && material.get(TextureAttribute.Normal) == null) {
