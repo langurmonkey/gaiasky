@@ -113,6 +113,10 @@ public class StaticCoordinates implements IBodyCoordinates {
         this.position.mul(Coordinates.eclipticToEquatorial());
     }
 
+    public void setPositionAu(double[] position) {
+        this.position = new Vector3Q(position[0] * Constants.AU_TO_U, position[1] * Constants.AU_TO_U, position[2] * Constants.AU_TO_U);
+    }
+
     public void setPositionPc(double[] position) {
         this.position = new Vector3Q(position[0] * Constants.PC_TO_U, position[1] * Constants.PC_TO_U, position[2] * Constants.PC_TO_U);
     }

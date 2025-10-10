@@ -99,18 +99,19 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
     private void initializeTextureArray(GraphicsQuality gq) {
         // Create TextureArray with 8 layers
-        FileHandle s00 = unpack("star-00" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        FileHandle s01 = unpack("star-01" + Constants.STAR_SUBSTITUTE + ".png", gq);
+        FileHandle s00 = unpack("star-00.jpg", gq);
+        FileHandle s01 = unpack("star-01.jpg", gq);
+        FileHandle s02 = unpack("star-02.jpg", gq);
 
-        FileHandle d00 = unpack("dust-00" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        FileHandle d01 = unpack("dust-01" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        FileHandle d02 = unpack("dust-02" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        FileHandle d03 = unpack("dust-03" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        FileHandle d04 = unpack("dust-04" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        FileHandle d05 = unpack("dust-05" + Constants.STAR_SUBSTITUTE + ".png", gq);
+        FileHandle d00 = unpack("dust-00.jpg", gq);
+        FileHandle d01 = unpack("dust-01.jpg", gq);
+        FileHandle d02 = unpack("dust-02.jpg", gq);
+        FileHandle d03 = unpack("dust-03.jpg", gq);
+        FileHandle d04 = unpack("dust-04.jpg", gq);
+        FileHandle d05 = unpack("dust-05.jpg", gq);
 
         if (ta == null) {
-            ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
+            ta = new TextureArray(true, Format.RGBA8888, s00, s01, s02, d00, d01, d02, d03, d04, d05);
             ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         }
     }

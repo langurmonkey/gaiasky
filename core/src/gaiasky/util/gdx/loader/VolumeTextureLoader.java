@@ -27,7 +27,9 @@ import gaiasky.util.gdx.graphics.VolumeTexture;
 import gaiasky.util.gdx.graphics.VolumeType;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Utility class for loading .raw volume files into LibGDX {@link Texture3D} objects, wrapped into {@link VolumeTexture}s.
@@ -107,9 +109,12 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         // Remove _density.raw or _color.raw suffix
         var volumePath = volumeFile.path();
         String basePath = volumePath
+                .replace("_density.raw.gz", "")
+                .replace("_color.raw.gz", "")
+                .replace(".raw.gz", "")
                 .replace("_density.raw", "")
                 .replace("_color.raw", "")
-                .replace(".raw", ""); // Fallback
+                .replace(".raw", "");
 
         FileHandle metadataFile = new FileHandle(basePath + "_metadata.txt");
 
@@ -189,7 +194,20 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         if (!file.exists()) {
             throw new IOException("Volume file not found: " + file.path());
         }
-        byte[] fileData = file.readBytes();
+        byte[] fileData;
+
+        if (file.extension().equalsIgnoreCase("gz")) {
+            // Decompress gzipped .raw.gz file
+            try (var is = new GZIPInputStream(file.read())) {
+                fileData = is.readAllBytes();
+                logger.info("Decompressed gzipped volume file: " + file.name() + " (" + fileData.length + " bytes)");
+            } catch (IOException e) {
+                throw new IOException("Failed to decompress gzipped volume file: " + file.path(), e);
+            }
+        } else {
+            // Regular .raw file
+            fileData = file.readBytes();
+        }
 
         // Auto-detect type and dimensions
         var detection = detectVolumeTypeAndDimensions(fileData);
