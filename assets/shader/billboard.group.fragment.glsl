@@ -1,7 +1,6 @@
 #version 330 core
 
 #include <shader/lib/math.glsl>
-#include <shader/lib/dither8x8.glsl>
 #include <shader/lib/logdepthbuff.glsl>
 
 uniform float u_alpha;
