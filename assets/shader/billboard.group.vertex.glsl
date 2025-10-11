@@ -39,7 +39,7 @@ in vec3 a_additional;
 // OUTPUT
 out vec4 v_col;
 out vec2 v_uv;
-out vec3 v_fragWorldPos;
+out vec4 v_fragPos;
 // 0 - dust
 // 1 - star
 // 2 - bulge
@@ -85,6 +85,6 @@ void main() {
     #include <shader/snippet/billboard.glsl>
 
     gl_Position = gpos * u_vrScale;
-    v_fragWorldPos = gl_Position.xyz;
+    v_fragPos = gl_Position;
 
 }
