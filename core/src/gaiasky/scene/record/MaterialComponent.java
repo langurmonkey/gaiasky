@@ -338,6 +338,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 addDiffuseTex(tex);
             }
         }
+        // Conversion km->unit, always available.
+        material.set(new FloatAttribute(FloatAttribute.KmToU, (float) Constants.KM_TO_U));
+
         // Copy diffuse color
         if (diffuseCol != null) {
             diffuseColor = new float[4];

@@ -8,6 +8,8 @@ layout(vertices = N_VERTICES) out;
 uniform float u_tessQuality = 4.0;
 // Body size in kilometers.
 uniform float u_bodySize;
+// Km->unit
+uniform float u_kmToU;
 
 struct VertexData {
     vec2 texCoords;
@@ -51,8 +53,6 @@ out float l_fadeFactor[N_VERTICES];
 #define QUALITY_SCALE 1.0
 #endif
 
-#define U_TO_KM 1.0E6
-
 vec3 center(vec3 p1, vec3 p2){
     return (p1 + p2) / 2.0;
 }
@@ -62,7 +62,7 @@ vec3 center(vec3 p1, vec3 p2, vec3 p3){
 }
 
 float tessellationLevel(vec3 center){
-    float distKm = length(center) * U_TO_KM;
+    float distKm = length(center) / u_kmToU;
 
     // Tessellation based on screen-space coverage
     float screenCoverage = u_bodySize / max(distKm, 0.001);
