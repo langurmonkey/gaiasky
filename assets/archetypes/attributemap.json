@@ -617,13 +617,6 @@
         "unit": "String"
       }
     },
-    "VolumeSet": {
-      "description": "Defines attributes related to volume set objects. Essentially, it defines a list of volume datasets.",
-      "data:VolumeGroup": {
-        "description": "A list of ``VolumeDataset`` objects. Mainly used for the Milky Way model. |brsp| Each object contains: |ul| |li| ``impl`` -- implementation class. This should be ``gaiasky.scene.record.VolumeDataset``. |eli| |li| ``file`` -- source file location. |eli| |li| ``type`` -- particle type. For ``VolumeDataset`` s, this is one of ``POINT``, ``DUST``, ``BULGE``, ``STAR``, ``HII``, ``GALAXY``, ``OTHER``. |eli| |li| ``intensity`` -- the intensity factor. Defaults to 1. |eli| |eul| |brsp| See the Milky Way object in the ``universe.json`` file in the `default data pack <https://gaiasky.space/resources/datasets/#default-data>`__ for an example.",
-        "unit": "VolumeDataset[]"
-      }
-    },
     "Axis": {
       "description": "Defines attributes related to reference system axes.",
       "axesColors": {

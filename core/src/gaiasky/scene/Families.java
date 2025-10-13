@@ -48,7 +48,6 @@ public class Families {
             perimeters,
             verts,
             volumes,
-            volumeSets,
             vrdevices;
 
     public Families() {
@@ -90,7 +89,6 @@ public class Families {
         perimeters = Family.all(Perimeter.class).exclude(TagNoProcess.class).get();
         verts = Family.all(Verts.class).exclude(Keyframes.class, Trajectory.class, TagNoProcess.class).get();
         volumes = Family.all(Volume.class).exclude(TagNoProcess.class).get();
-        volumeSets = Family.all(VolumeSet.class).exclude(TagNoProcess.class).get();
         vrdevices = Family.one(VRDevice.class, TagVRUI.class).exclude(TagNoProcess.class).get();
     }
 
