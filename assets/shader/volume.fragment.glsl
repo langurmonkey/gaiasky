@@ -142,7 +142,7 @@ vec4 raymarchVolume(sampler3D volume, vec3 boundsMin, vec3 boundsMax, vec3 color
     vec3 entryPoint = rayOrigin + rayDir * entryDist;
     float stepSize = rayLength / float(ITERATIONS);
 
-    float transmittance = 1.0; // Light transmission along the ray
+    float transmittance = 1.0;
 
     vec3 baseColor = color;
 
@@ -199,7 +199,9 @@ void main() {
             result.rgb = result.rgb / (1.0 + result.rgb);
             fragColor = vec4(result.rgb, result.a);
         } else {
-            discard;
+            // See box
+            fragColor = vec4(0.2, 0.1, 0.0, 1.0);
+            //discard;
         }
 
         float depth = (firstDepth > 0.0) ? firstDepth : 1.0e10;

@@ -44,7 +44,6 @@ public class VolumeInitializer extends AbstractInitSystem {
         var model = Mapper.model.get(entity);
         var label = Mapper.label.get(entity);
         var sa = Mapper.sa.get(entity);
-        var volume = Mapper.volume.get(entity);
 
         // Set units.
         model.model.setUnits(Constants.KM_TO_U);
