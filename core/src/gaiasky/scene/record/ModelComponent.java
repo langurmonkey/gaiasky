@@ -540,7 +540,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     private boolean sizeSet = false;
 
     public void updateSizeKm(double sizeInternal) {
-        updateSize(sizeInternal * Constants.KM_TO_U);
+        updateSize(sizeInternal * Constants.U_TO_KM);
     }
 
     public void updateSize(double sizeInternal) {

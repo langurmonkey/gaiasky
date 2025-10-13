@@ -46,9 +46,9 @@ out float l_fadeFactor[N_VERTICES];
 #endif
 
 #ifdef svtIndirectionHeightTextureFlag
-#define QUALITY_SCALE 200.0
+#define QUALITY_SCALE 2.0
 #else
-#define QUALITY_SCALE 100.0
+#define QUALITY_SCALE 1.0
 #endif
 
 #define U_TO_KM 1.0E6
@@ -62,18 +62,20 @@ vec3 center(vec3 p1, vec3 p2, vec3 p3){
 }
 
 float tessellationLevel(vec3 center){
-    // Distance scaling variable.
-    float tessellationFactor = u_tessQuality * QUALITY_SCALE;
-    const float tessellationSlope = 1.0;
-
     float distKm = length(center) * U_TO_KM;
-    // Scaling factor, calibrated with the diameter of Earth.
-    float scalingFactor = u_bodySize / 12750.0;
-    return mix(0.0, float(gl_MaxTessGenLevel), scalingFactor * tessellationFactor / pow(distKm, tessellationSlope) );
+
+    // Tessellation based on screen-space coverage
+    float screenCoverage = u_bodySize / max(distKm, 0.001);
+
+    // Base level on desired detail
+    float baseLevel = u_tessQuality * screenCoverage;
+
+    return clamp(baseLevel, 1.0, float(gl_MaxTessGenLevel));
 }
 
 void main(){
     #define id gl_InvocationID
+    float level = 0;
     if(id == 0){
         // OUTER
         gl_TessLevelOuter[2] = tessellationLevel(center(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz));
@@ -81,7 +83,7 @@ void main(){
         gl_TessLevelOuter[1] = tessellationLevel(center(gl_in[2].gl_Position.xyz, gl_in[0].gl_Position.xyz));
 
         // INNER
-        float level = tessellationLevel(center(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz, gl_in[2].gl_Position.xyz));
+        level = tessellationLevel(center(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz, gl_in[2].gl_Position.xyz));
         level = clamp(level * 0.5, 0.0, float(gl_MaxTessGenLevel));
         gl_TessLevelInner[0] = level;
     }
