@@ -125,9 +125,12 @@ vec4 transferFunction(float density, vec3 baseColor, float stepSize, float trans
     return vec4(color, alpha);
 }
 
-vec4 raymarchVolume(sampler3D volume, vec3 boundsMin, vec3 boundsMax, vec3 color, inout float firstDepth) {
+vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, in vec3 color, inout float firstDepth) {
     vec3 rayOrigin = u_cameraPos;
     vec3 rayDir = normalize(v_data.fragPosWorld - u_cameraPos);
+    // Scale to size.
+    boundsMin = boundsMin * u_bodySize * 0.5;
+    boundsMax = boundsMax * u_bodySize * 0.5;
 
     vec2 intersection = boxIntersection(rayOrigin, rayDir, boundsMin, boundsMax);
     if (intersection.x < 0.0) {
@@ -200,8 +203,8 @@ void main() {
             fragColor = vec4(result.rgb, result.a);
         } else {
             // See box
-            fragColor = vec4(0.2, 0.1, 0.0, 1.0);
-            //discard;
+            //fragColor = vec4(0.2, 0.1, 0.0, 1.0);
+            discard;
         }
 
         float depth = (firstDepth > 0.0) ? firstDepth : 1.0e10;
