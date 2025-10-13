@@ -136,10 +136,6 @@ uniform sampler2D u_svtIndirectionSpecularTexture;
 uniform sampler2D u_svtIndirectionNormalTexture;
 #endif
 
-#ifdef svtIndirectionHeightTextureFlag
-uniform sampler2D u_svtIndirectionHeightTexture;
-#endif
-
 #ifdef svtIndirectionEmissiveTextureFlag
 uniform sampler2D u_svtIndirectionEmissiveTexture;
 #endif
