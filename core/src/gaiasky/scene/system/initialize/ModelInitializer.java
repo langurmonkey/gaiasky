@@ -155,6 +155,8 @@ public class ModelInitializer extends AbstractInitSystem {
 
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {
+            // Set units.
+            model.model.setUnits(Constants.KM_TO_U);
             // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
             // Initialize tessellated.
