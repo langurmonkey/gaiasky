@@ -48,6 +48,7 @@ public final class PingPongBuffer implements Disposable {
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
         addColorRenderTarget(frameBufferBuilder, pixmapFormat, preventFloatBuffer);
+
         owned1 = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
         owned2 = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
 

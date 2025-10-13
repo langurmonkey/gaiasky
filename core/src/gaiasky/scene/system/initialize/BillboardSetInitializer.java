@@ -9,6 +9,9 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.TextureArray;
+import gaiasky.data.AssetBean;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
@@ -18,8 +21,10 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.SysUtils;
+import gaiasky.util.gdx.TextureArrayLoader;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 import java.util.List;
 
@@ -34,6 +39,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
+        var base = Mapper.base.get(entity);
         var label = Mapper.label.get(entity);
 
         label.label = true;
@@ -45,10 +51,28 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         label.depthBufferConsumer = LabelView::noTextDepthBuffer;
 
         reloadData(entity);
+
+        // Textures.
+        var billboards = Mapper.billboardSet.get(entity);
+        AssetManager manager = AssetBean.manager();
+        var actualFilePaths = SysUtils.gatherFilesExtension(billboards.textureFiles, new String[]{"png", "jpeg", "jpg", "png"});
+        // Send to load.
+        if (!actualFilePaths.isEmpty()) {
+            manager.load(base.getName() + " TextureArray", TextureArray.class, new TextureArrayLoader.TextureArrayParameter(actualFilePaths));
+        }
     }
 
     @Override
     public void setUpEntity(Entity entity) {
+        // Textures.
+        var base = Mapper.base.get(entity);
+        var billboard = Mapper.billboardSet.get(entity);
+        AssetManager manager = AssetBean.manager();
+        if (manager.contains(base.getName() + " Textures")) {
+            billboard.textureArray = manager.get(base.getName() + " Textures");
+        }
+
+        // Transform.
         transformData(entity);
     }
 

@@ -11,7 +11,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.TextureArray;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
@@ -35,6 +34,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
@@ -42,13 +42,8 @@ import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
-import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -177,34 +172,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
         // Textures.
         AssetManager manager = AssetBean.manager();
-        if (set.textureFiles != null) {
-            // Convert to a list of actual file paths.
-            Array<String> actualFilePaths = new Array<>();
-            for (String textureFile : set.textureFiles) {
-                String unpackedFile = Settings.settings.data.dataFile(textureFile);
-                Path galLocationPath = Path.of(unpackedFile);
-                if (Files.exists(galLocationPath)) {
-                    if (Files.isDirectory(galLocationPath)) {
-                        // Directory.
-                        Collection<File> galaxyFiles = FileUtils.listFiles(galLocationPath.toFile(), new String[]{"png", "jpeg", "jpg"}, true);
-                        if (!galaxyFiles.isEmpty()) {
-                            for (File f : galaxyFiles) {
-                                actualFilePaths.add(f.getAbsolutePath());
-                            }
-                        }
-                    } else {
-                        // File.
-                        actualFilePaths.add(galLocationPath.toAbsolutePath()
-                                                    .toString());
-                    }
-                }
-            }
-            // Sort using natural order.
-            actualFilePaths.sort();
-            // Send to load.
-            if (!actualFilePaths.isEmpty()) {
-                manager.load(base.getName() + " Textures", TextureArray.class, new TextureArrayParameter(actualFilePaths));
-            }
+        var actualFilePaths = SysUtils.gatherFilesExtension(set.textureFiles, new String[]{"png", "jpeg", "jpg"});
+        // Send to load.
+        if (!actualFilePaths.isEmpty()) {
+            manager.load(base.getName() + " Textures", TextureArray.class, new TextureArrayParameter(actualFilePaths));
         }
 
         // Proximity descriptors.

@@ -607,6 +607,14 @@
       "data:BillboardGroup": {
         "description": "A list of ``BillboardDataset`` objects. Mainly used for the Milky Way model. |brsp| Each object contains: |ul| |li| ``impl`` -- implementation class. This should be ``gaiasky.scene.record.BillboardDataset``. |eli| |li| ``file`` -- source file location. |eli| |li| ``type`` -- particle type. For ``BillboardDataset`` s, this is one of ``POINT``, ``DUST``, ``BULGE``, ``STAR``, ``HII``, ``GALAXY``, ``OTHER``. |eli| |li| ``size`` -- particle size. Defaults to 1. |eli| |li| ``intensity`` -- the intensity factor. Defaults to 1. |eli| |li| ``layers`` -- texture layer indices to use for this set. |eli| |li| ``maxSizes`` -- array with 4 components containing the maximum size for each graphics quality setting (low, medium, high, ultra). |eli| |li| ``completion`` -- array with 4 components containing the completion rate per graphics quality setting (low, medium, high, ultra) in [0,1]. If set to [0.5, 0.5, 0.5, 1.0], half of the particles will be used in all graphics quality settings except ultra, which will use all particles. |eli| |eul| |brsp| See the Milky Way object in the ``universe.json`` file in the `default data pack <https://gaiasky.space/resources/datasets/#default-data>`__ for an example.",
         "unit": "BillboardDataset[]"
+      },
+      "textures:BillboardGroup": {
+        "description": "List of texture files to render the particles of this group. If more than one texture is provided, the order is determined alphabetically. Each texture corresponds to a layer in the ``data`` field, starting at 0. This can also point to one or more directories, in which case all the image files within are used. All images must have the same dimensions.",
+        "unit": "String[]"
+      },
+      "texture:BillboardGroup": {
+        "description": "A single texture file to render the particles of this group. This can point to a directory, in which case all images within are used. All images must have the same dimensions.",
+        "unit": "String"
       }
     },
     "VolumeSet": {
@@ -772,7 +780,7 @@
         "description": "Texture file to render the particles of this group. This can also point to a directory, in which case all the image files within are used (they must have the same dimensions). If this is provided, ``profileDecay`` is ignored.",
         "unit": "String"
       },
-      "textures": {
+      "textures:ParticleSet": {
         "description": "List of texture files to render the particles of this group. If more than one texture is provided, each particle is assigned a texture randomly. This can also point to one or more directories, in which case all the image files within are used. All images must have the same dimensions. If this is provided, ``profileDecay`` is ignored.",
         "unit": "String[]"
       },

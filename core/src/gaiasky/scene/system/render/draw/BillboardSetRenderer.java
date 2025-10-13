@@ -8,16 +8,10 @@
 package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -36,12 +30,9 @@ import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.BillboardDataset.ParticleType;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -57,18 +48,19 @@ import java.util.Set;
 public class BillboardSetRenderer extends PointCloudTriRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(BillboardSetRenderer.class);
 
-    private static final String texFolder = Constants.DATA_LOCATION_TOKEN + "galaxy/sprites/";
-
     private final Map<Render, MeshDataWrap[]> meshes;
     private final Map<Render, GpuData[]> gpus;
     private final Map<Render, Integer> loadIndices;
 
-    private TextureArray ta;
-
     private final ColorGenerator starColorGenerator;
     private final ColorGenerator dustColorGenerator;
 
-    public BillboardSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+
+
+    public BillboardSetRenderer(SceneRenderer sceneRenderer,
+                                RenderGroup rg,
+                                float[] alphas,
+                                ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
 
         starColorGenerator = new StarColorGenerator();
@@ -91,37 +83,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                 shaderProgram.end();
             }
         }
-        initializeTextureArray(Settings.settings.graphics.quality);
     }
 
-    private void initializeTextureArray(GraphicsQuality gq) {
-        // Create TextureArray with 8 layers
-        FileHandle s00 = unpack("star-00.jpg", gq);
-        FileHandle s01 = unpack("star-01.jpg", gq);
-        FileHandle s02 = unpack("star-02.jpg", gq);
-
-        FileHandle d00 = unpack("dust-00.jpg", gq);
-        FileHandle d01 = unpack("dust-01.jpg", gq);
-        FileHandle d02 = unpack("dust-02.jpg", gq);
-        FileHandle d03 = unpack("dust-03.jpg", gq);
-        FileHandle d04 = unpack("dust-04.jpg", gq);
-        FileHandle d05 = unpack("dust-05.jpg", gq);
-
-        if (ta == null) {
-            ta = new TextureArray(true, Format.RGBA8888, s00, s01, s02, d00, d01, d02, d03, d04, d05);
-            ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        }
-    }
-
-    private FileHandle unpack(String texName, GraphicsQuality gq) {
-        return Settings.settings.data.dataFileHandle(GlobalResources.unpackAssetPath(texFolder + texName, gq));
-    }
-
-    private void disposeTextureArray() {
-        if (ta != null) {
-            ta.dispose();
-        }
-    }
 
     private void disposeMeshes(Render key) {
         if (meshes != null && meshes.containsKey(key)) {
@@ -149,7 +112,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     public void dispose() {
         super.dispose();
         disposeMeshes();
-        disposeTextureArray();
     }
 
     @Override
@@ -351,14 +313,15 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         if (alpha > 0) {
             var fade = Mapper.fade.get(render.entity);
             var affine = Mapper.affine.get(render.entity);
+            var billboard = Mapper.billboardSet.get(render.entity);
 
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 
             // Global uniforms.
-            if (ta != null) {
-                ta.bind(0);
+            if (billboard.textureArray != null) {
+                billboard.textureArray.bind(0);
             }
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos());
