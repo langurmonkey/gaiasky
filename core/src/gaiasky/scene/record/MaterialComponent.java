@@ -106,10 +106,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     // Texture location strings.
     public boolean texInitialised, texLoading;
     public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao, occlusionMetallicRoughness,
-            texture0, texture1, texture3d0, texture3d1, volumeDensity;
+            texture0, texture1, volume0, volume1, volume2, volume3;
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked,
             heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked, texture0Unpacked,
-            texture1Unpacked, texture3d0Unpacked, texture3d1Unpacked, volumeDenstiyUnpacked;
+            texture1Unpacked, volume0Unpacked, volume1Unpacked, volume2Unpacked, volume3Unpacked;
     // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
@@ -205,12 +205,16 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             texture0Unpacked = addToLoad(texture0, getTP(texture0, true), manager);
         if (texture1 != null)
             texture1Unpacked = addToLoad(texture1, getTP(texture1, true), manager);
-        if (texture3d0 != null)
-            texture3d0Unpacked = addToLoad(texture3d0, new VolumeTextureLoader.VolumeTextureParameter(), manager);
-        if (texture3d1 != null)
-            texture3d1Unpacked = addToLoad(texture3d0, new VolumeTextureLoader.VolumeTextureParameter(), manager);
-        if (volumeDensity != null)
-            volumeDenstiyUnpacked = addToLoad(volumeDensity, new VolumeTextureLoader.VolumeTextureParameter(), manager);
+
+        // Volumes (3D textures)
+        if (volume0 != null)
+            volume0Unpacked = addToLoad(volume0, new VolumeTextureLoader.VolumeTextureParameter(), manager);
+        if (volume1 != null)
+            volume1Unpacked = addToLoad(volume1, new VolumeTextureLoader.VolumeTextureParameter(), manager);
+        if (volume2 != null)
+            volume2Unpacked = addToLoad(volume2, new VolumeTextureLoader.VolumeTextureParameter(), manager);
+        if (volume3 != null)
+            volume3Unpacked = addToLoad(volume3, new VolumeTextureLoader.VolumeTextureParameter(), manager);
 
         // Cube maps
         if (diffuseCubemap != null)
@@ -274,9 +278,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 && ComponentUtils.isLoaded(metallicCubemap, manager)
                 && ComponentUtils.isLoaded(heightCubemap, manager)
                 && ComponentUtils.isLoaded(aoCubemap, manager)
-                && ComponentUtils.isLoaded(texture3d0, manager)
-                && ComponentUtils.isLoaded(texture3d1, manager)
-                && ComponentUtils.isLoaded(volumeDensity, manager)
+                && ComponentUtils.isLoaded(volume0, manager)
+                && ComponentUtils.isLoaded(volume1, manager)
+                && ComponentUtils.isLoaded(volume2, manager)
+                && ComponentUtils.isLoaded(volume3, manager)
                 && ComponentUtils.isLoaded(texture0, manager)
                 && ComponentUtils.isLoaded(texture1, manager);
     }
@@ -517,24 +522,38 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             Texture tex = manager.get(texture1Unpacked, Texture.class);
             addTexture1(tex);
         }
-        if (volumeDensity != null && material.get(Texture3DAttribute.VolumeDensity) == null) {
-            VolumeTexture tex = manager.get(volumeDenstiyUnpacked, VolumeTexture.class);
+
+        // 3D textures; volumes.
+        if (volume0 != null && material.get(Texture3DAttribute.Volume0) == null) {
+            VolumeTexture tex = manager.get(volume0Unpacked, VolumeTexture.class);
             if (tex != null && material != null) {
-                material.set(new Texture3DAttribute(Texture3DAttribute.VolumeDensity, tex.texture()));
-                material.set(new Vector3Attribute(Vector3Attribute.VolumeBoundsMin, tex.boundsMin()));
-                material.set(new Vector3Attribute(Vector3Attribute.VolumeBoundsMax, tex.boundsMax()));
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume0, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMax, tex.boundsMax()));
             }
         }
-        if (texture3d0 != null && material.get(Texture3DAttribute.Texture3d0) == null) {
-            VolumeTexture tex = manager.get(texture3d0Unpacked, VolumeTexture.class);
+        if (volume1 != null && material.get(Texture3DAttribute.Volume1) == null) {
+            VolumeTexture tex = manager.get(volume1Unpacked, VolumeTexture.class);
             if (tex != null && material != null) {
-                material.set(new Texture3DAttribute(Texture3DAttribute.Texture3d0, tex.texture()));
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume1, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMax, tex.boundsMax()));
             }
         }
-        if (texture3d1 != null && material.get(Texture3DAttribute.Texture3d1) == null) {
-            VolumeTexture tex = manager.get(texture3d1Unpacked, VolumeTexture.class);
+        if (volume2 != null && material.get(Texture3DAttribute.Volume2) == null) {
+            VolumeTexture tex = manager.get(volume2Unpacked, VolumeTexture.class);
             if (tex != null && material != null) {
-                material.set(new Texture3DAttribute(Texture3DAttribute.Texture3d1, tex.texture()));
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume2, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMax, tex.boundsMax()));
+            }
+        }
+        if (volume3 != null && material.get(Texture3DAttribute.Volume3) == null) {
+            VolumeTexture tex = manager.get(volume3Unpacked, VolumeTexture.class);
+            if (tex != null && material != null) {
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume3, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMax, tex.boundsMax()));
             }
         }
 
@@ -1085,16 +1104,20 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         this.texture1 = Settings.settings.data.dataFile(texture1);
     }
 
-    public void setTexture3d0(String tex) {
-        this.texture3d0 = Settings.settings.data.dataFile(tex);
+    public void setVolume0(String tex) {
+        this.volume0 = Settings.settings.data.dataFile(tex);
     }
 
-    public void setTexture3d1(String tex) {
-        this.texture3d1 = Settings.settings.data.dataFile(tex);
+    public void setVolume1(String tex) {
+        this.volume1 = Settings.settings.data.dataFile(tex);
     }
 
-    public void setVolumeDensity(String tex) {
-        this.volumeDensity = Settings.settings.data.dataFile(tex);
+    public void setVolume2(String tex) {
+        this.volume2 = Settings.settings.data.dataFile(tex);
+    }
+
+    public void setVolume3(String tex) {
+        this.volume3 = Settings.settings.data.dataFile(tex);
     }
 
     public void setDiffuseCubemap(String cubemap) {

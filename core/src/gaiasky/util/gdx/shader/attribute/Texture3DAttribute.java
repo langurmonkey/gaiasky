@@ -13,13 +13,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class Texture3DAttribute extends Attribute {
-    public final static String VolumeDensityAlias = "volumeDensityTexture";
-    public final static int VolumeDensity = register(VolumeDensityAlias);
-
-    public final static String Texture3d0Alias = "texture3d0";
-    public final static int Texture3d0 = register(Texture3d0Alias);
-    public final static String Texture3d1Alias = "texture3d1";
-    public final static int Texture3d1 = register(Texture3d1Alias);
+    public final static String Volume0Alias = "volume0";
+    public final static int Volume0 = register(Volume0Alias);
+    public final static String Volume1Alias = "volume1";
+    public final static int Volume1 = register(Volume1Alias);
+    public final static String Volume2Alias = "volume2";
+    public final static int Volume2 = register(Volume2Alias);
+    public final static String Volume3Alias = "volume3";
+    public final static int Volume3 = register(Volume3Alias);
 
     public final TextureDescriptor<Texture3D> textureDescription;
     public float offsetU = 0;
@@ -66,11 +67,6 @@ public class Texture3DAttribute extends Attribute {
              copyFrom.scaleV,
              copyFrom.scaleW);
     }
-
-    public static Texture3DAttribute createVolumeDensity(final Texture3D texture) {
-        return new Texture3DAttribute(VolumeDensity, texture);
-    }
-
 
     @Override
     public Attribute copy() {
