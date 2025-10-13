@@ -267,8 +267,8 @@ scene:
       type: REGULAR
       # Elevation multiplier, in [0.0, 10.0]. 1.0 represents true elevation.
       multiplier: 1.0
-      # Tessellation quality, in [1.0, 7.0].
-      quality: 4.0
+      # Tessellation quality, in [1.0, 3.0].
+      quality: 1.5
     # Sparse Virtual Texture global settings.
     virtualTextures:
       # Cache size, in tiles per side.
