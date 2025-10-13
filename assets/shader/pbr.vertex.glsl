@@ -161,7 +161,6 @@ uniform sampler2D u_svtIndirectionHeightTexture;
 uniform float u_heightScale;
 uniform float u_elevationMultiplier;
 uniform vec2 u_heightSize;
-#define KM_TO_U 1.0E-6
 #define fetchHeightSize() vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y)
 #else
 #define fetchHeightSize() vec2(0.0)
