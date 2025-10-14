@@ -155,12 +155,12 @@ public class ModelInitializer extends AbstractInitSystem {
 
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {
-            // Set units.
-            model.model.setUnits(Constants.KM_TO_U);
             // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
             // Initialize tessellated.
             model.model.tessellated = Settings.settings.scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
+            // Set units.
+            model.model.setUnits(Constants.KM_TO_U);
         }
         if (atmosphere != null && model != null) {
             initializeAtmosphere(manager, atmosphere.atmosphere, model.model, body.size);
