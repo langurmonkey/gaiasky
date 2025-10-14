@@ -88,11 +88,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     public float[] alphas;
     private final ModelEntityRenderSystem modelEntityRenderSystem = new ModelEntityRenderSystem(this);
     /**
-     * Render lists for all render groups.
-     * The front render lists contain the objects which are actually rendered in the current cycle. The back
-     * render lists get updated by the update thread.
+     * Render lists for all render groups, for full and half resolution.
      **/
-    private List<List<IRenderable>> renderLists;
+    private List<List<IRenderable>> activeRenderLists, renderListsFull, renderListsHalf;
     private Map<RenderGroup, IRenderSystem> renderSystems;
     private List<RenderGroup> renderGroups;
     private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, noDepthWritesR, depthWritesR, clearDepthR;
@@ -188,6 +186,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
+    private List newRenderLists() {
+        RenderGroup[] renderGroups = values();
+        var renderLists = (new ArrayList<>(renderGroups.length));
+        for (int i = 0; i < renderGroups.length; i++) {
+            renderLists.add((new ArrayList<>(20)));
+        }
+        return renderLists;
+    }
+
     public void doneLoading(final AssetManager manager) {
         // Prepare render assets.
         renderAssets.doneLoading(manager);
@@ -198,11 +205,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
 
         // Initialize render lists.
-        RenderGroup[] renderGroups = values();
-        renderLists = (new ArrayList<>(renderGroups.length));
-        for (int i = 0; i < renderGroups.length; i++) {
-            renderLists.add((new ArrayList<>(20)));
-        }
+        renderListsFull = newRenderLists();
+        renderListsHalf = newRenderLists();
+        activeRenderLists = renderListsFull;
 
         // Set reference
         visible = new ComponentTypes();
@@ -236,7 +241,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // INIT GL STATE
         GL30.glClampColor(GL30.GL_CLAMP_READ_COLOR, GL30.GL_FALSE);
 
-        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.TOGGLE_VISIBILITY_CMD,
+                                        Event.LINE_RENDERER_UPDATE,
+                                        Event.STEREOSCOPIC_CMD,
+                                        Event.CAMERA_MODE_CMD,
+                                        Event.CUBEMAP_CMD,
+                                        Event.REBUILD_SHADOW_MAP_DATA_CMD,
+                                        Event.LIGHT_GLOW_CMD);
 
     }
 
@@ -334,18 +346,38 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case MODEL_VERT_STAR -> // MODEL STARS
                     system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
             case FONT_LABEL -> // LABELS
-                    system = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.fontDistanceFiled);
+                    system = new TextRenderer(this,
+                                              FONT_LABEL,
+                                              alphas,
+                                              renderAssets.fontBatch,
+                                              renderAssets.distanceFieldFontShader,
+                                              renderAssets.fontDistanceFiled);
             case BILLBOARD_SSO -> {
-                system = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.billboardShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", false);
+                system = new BillboardRenderer(this,
+                                               BILLBOARD_SSO,
+                                               alphas,
+                                               renderAssets.billboardShaders,
+                                               Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png",
+                                               false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case BILLBOARD_STAR -> {
-                system = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.billboardShaders, Settings.settings.scene.star.getStarTexture(), true);
+                system = new BillboardRenderer(this,
+                                               BILLBOARD_STAR,
+                                               alphas,
+                                               renderAssets.billboardShaders,
+                                               Settings.settings.scene.star.getStarTexture(),
+                                               true);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(lightGlowPass.getLpu());
             }
             case BILLBOARD_GAL -> {
-                system = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", false);
+                system = new BillboardRenderer(this,
+                                               BILLBOARD_GAL,
+                                               alphas,
+                                               renderAssets.galShaders,
+                                               Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg",
+                                               false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case BILLBOARD_SPRITE -> {
@@ -356,7 +388,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     system = new ModelRenderer(this, MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
                         @Override
                         public float getAlpha(IRenderable s) {
-                            return alphas[ComponentType.Atmospheres.ordinal()] * (float) FastMath.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
+                            return alphas[ComponentType.Atmospheres.ordinal()] * (float) FastMath.pow(alphas[s.getComponentType().getFirstOrdinal()],
+                                                                                                      2);
                         }
 
                         @Override
@@ -403,8 +436,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.rendering.set(rendering);
     }
 
-    public List<List<IRenderable>> getRenderLists() {
-        return renderLists;
+
+    public List<List<IRenderable>> getRenderLists(boolean full) {
+        return full ? renderListsFull : renderListsHalf;
+    }
+
+    public List<List<IRenderable>> getRenderListsFull() {
+        return renderListsFull;
+    }
+
+    public List<List<IRenderable>> getRenderListsHalf() {
+        return renderListsHalf;
     }
 
     private void initRenderMode(ICamera camera) {
@@ -509,7 +551,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             // Iterate over render groups and get systems.
             for (var renderGroup : renderGroups) {
-                List<IRenderable> l = renderLists.get(renderGroup.ordinal());
+                List<IRenderable> l = activeRenderLists.get(renderGroup.ordinal());
                 if (l != null && !l.isEmpty()) {
                     var renderSystem = getOrInitializeRenderSystem(renderGroup);
                     if (renderSystem != null) {
@@ -532,11 +574,24 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      */
     private final IRenderable stubRenderable = new StubRenderable();
 
+
+    public void resetRenderListsFull() {
+        resetRenderLists(renderListsFull);
+    }
+
+    public void resetRenderListsHalf() {
+        resetRenderLists(renderListsHalf);
+    }
+
+    public void resetRenderLists() {
+        resetRenderLists(activeRenderLists);
+    }
+
     /**
      * This must be called when all the rendering for the current frame has
      * finished.
      */
-    public void swapRenderLists() {
+    public void resetRenderLists(List<List<IRenderable>> renderLists) {
         // Clear lists to get them ready for update pass.
         for (var rg : values()) {
             renderLists.get(rg.ordinal()).clear();
@@ -691,7 +746,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             return alphas[ordinal];
         } else {
-            return visible.get(ordinal) ? MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 0, 1) : MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 1, 0);
+            return visible.get(ordinal) ? MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 0, 1) : MathUtilsDouble.lint(diff,
+                                                                                                                                     0,
+                                                                                                                                     Settings.settings.scene.fadeMs,
+                                                                                                                                     1,
+                                                                                                                                     0);
         }
     }
 
@@ -785,7 +844,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem sys;
         // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
         ExtShaderProgram[] lineGpuShaders;
-        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion()
+                .getMajorVersion() < 4 || Settings.settings.program.safeMode) {
             lineGpuShaders = renderAssets.primitiveGpuShaders;
         } else {
             lineGpuShaders = renderAssets.lineQuadGpuShaders;
@@ -798,7 +858,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private AbstractRenderSystem getLineCPURenderSystem() {
         AbstractRenderSystem sys;
         // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
-        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion().getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion()
+                .getMajorVersion() < 4 || Settings.settings.program.safeMode) {
             // Normal line renderer.
             sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineCpuShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);

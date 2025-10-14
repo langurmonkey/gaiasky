@@ -55,7 +55,6 @@ public class Mapper {
     public static final ComponentMapper<Cloud> cloud = ComponentMapper.getFor(Cloud.class);
     public static final ComponentMapper<ModelScaffolding> modelScaffolding = ComponentMapper.getFor(ModelScaffolding.class);
     public static final ComponentMapper<MotorEngine> engine = ComponentMapper.getFor(MotorEngine.class);
-    public static final ComponentMapper<RenderType> renderType = ComponentMapper.getFor(RenderType.class);
     public static final ComponentMapper<LocationMark> loc = ComponentMapper.getFor(LocationMark.class);
     public static final ComponentMapper<Axis> axis = ComponentMapper.getFor(Axis.class);
     public static final ComponentMapper<Cluster> cluster = ComponentMapper.getFor(Cluster.class);

@@ -18,14 +18,11 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.view.LabelView;
 
-import java.util.List;
-
 public abstract class AbstractExtractSystem extends IteratingSystem {
 
     protected final ICamera camera;
     protected ISceneRenderer renderer;
     protected LabelView view;
-    protected List<List<IRenderable>> renderLists;
 
     public AbstractExtractSystem(Family family, int priority) {
         super(family, priority);
@@ -39,7 +36,6 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
 
     public void setRenderer(ISceneRenderer renderer) {
         this.renderer = renderer;
-        this.renderLists = renderer.getRenderLists();
     }
 
     /**
@@ -65,7 +61,7 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         try {
-            return renderLists.get(rg.ordinal()).add(renderable);
+            return renderer.getRenderLists(!renderable.isHalfResolutionBuffer()).get(rg.ordinal()).add(renderable);
         } catch (Exception e) {
             return false;
         }
@@ -80,17 +76,17 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
      * @return True if removed, false otherwise.
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {
-        return renderLists.get(rg.ordinal()).remove(renderable);
+        return renderer.getRenderLists(!renderable.isHalfResolutionBuffer()).get(rg.ordinal()).remove(renderable);
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup rg) {
-        return renderLists.get(rg.ordinal()).contains(renderable);
+        return renderer.getRenderLists(!renderable.isHalfResolutionBuffer()).get(rg.ordinal()).contains(renderable);
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup... rgs) {
         boolean is = false;
         for (RenderGroup rg : rgs)
-            is = is || renderLists.get(rg.ordinal()).contains(renderable);
+            is = is || renderer.getRenderLists(!renderable.isHalfResolutionBuffer()).get(rg.ordinal()).contains(renderable);
         return is;
     }
 }

@@ -329,7 +329,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             }
         }
         // Clean lists.
-        sceneRenderer.swapRenderLists();
+        sceneRenderer.resetRenderLists();
         // Number of frames.
         frames++;
 
@@ -927,7 +927,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         scene.update(time);
 
         // Clear render lists.
-        sceneRenderer.swapRenderLists();
+        sceneRenderer.resetRenderLists();
         // Time back to zero.
         time.update(0);
         settings.runtime.timeOn = timeOnBak;

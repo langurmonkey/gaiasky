@@ -175,6 +175,7 @@ public enum RenderGroup {
      */
     SPRITE(13000);
 
+    /** Render priority, to establish a rendering order among the groups. **/
     public final int priority;
 
     RenderGroup(int priority) {

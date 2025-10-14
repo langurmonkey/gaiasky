@@ -39,7 +39,7 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
         var body = Mapper.body.get(entity);
         var model = Mapper.model.get(entity);
-        var renderType = Mapper.renderType.get(entity);
+        var renderType = Mapper.render.get(entity);
 
         // Size
         body.size *= (float) Constants.DISTANCE_SCALE_FACTOR;

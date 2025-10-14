@@ -109,7 +109,7 @@ public class SVTRenderPass extends RenderPass {
      */
     private void fetchCandidates(RenderGroup renderGroup,
                                  Array<IRenderable> candidates) {
-        List<IRenderable> models = sceneRenderer.getRenderLists().get(renderGroup.ordinal());
+        List<IRenderable> models = sceneRenderer.getRenderListsFull().get(renderGroup.ordinal());
         candidates.clear();
         // Collect SVT-enabled models.
         models.forEach(e -> {
@@ -131,7 +131,7 @@ public class SVTRenderPass extends RenderPass {
                                       Array<IRenderable> candidates) {
         List<IRenderable> models = new ArrayList<>();
         for (var rg : renderGroups) {
-            models.addAll(sceneRenderer.getRenderLists().get(rg.ordinal()));
+            models.addAll(sceneRenderer.getRenderListsFull().get(rg.ordinal()));
         }
         candidates.clear();
         // Collect SVT-enabled models with only clouds.

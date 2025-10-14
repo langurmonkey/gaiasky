@@ -62,7 +62,7 @@ public class Families {
         datasets = Family.all(Base.class, Body.class, DatasetDescription.class, Highlight.class).exclude(TagNoProcess.class).get();
         meshes = Family.all(Base.class, Body.class, Mesh.class, Model.class).exclude(TagNoProcess.class).get();
         particleSets = Family.one(ParticleSet.class, StarSet.class).exclude(TagNoProcess.class, TagOctreeObject.class).get();
-        particles = Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class)
+        particles = Family.all(Base.class, Celestial.class, ProperMotion.class, ParticleExtra.class)
                 .exclude(TagNoProcess.class)
                 .get();
         orbits = Family.all(Trajectory.class, Verts.class).exclude(TagNoProcess.class, TagSetElement.class).get();

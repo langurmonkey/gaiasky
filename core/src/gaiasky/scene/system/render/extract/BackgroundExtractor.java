@@ -37,9 +37,8 @@ public class BackgroundExtractor extends AbstractExtractSystem {
             } else {
                 // Regular background model (skybox)
                 var label = Mapper.label.get(entity);
-                var renderType = Mapper.renderType.get(entity);
 
-                addToRender(render, renderType.renderGroup);
+                addToRender(render, render.renderGroup);
                 if (label.label && label.renderLabel()) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }

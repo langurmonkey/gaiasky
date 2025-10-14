@@ -591,8 +591,12 @@
         "unit": "Double"
       }
     },
-    "RenderType": {
+    "Render": {
       "description": "Defines attributes that control rendering operations for this object.",
+      "halfResolutionBuffer": {
+        "description": "Whether this object is to be rendered in a post-pass to a half-resolution buffer. Defaults to ``false``.",
+        "unit": "Boolean"
+      },
       "renderGroup": {
         "description": "This is an internal property used to fine-tune exactly the environment and shader to use to render the object. See `RenderGroup.java <https://codeberg.org/gaiasky/gaiasky/src/branch/master/core/src/gaiasky/render/RenderGroup.java>`__ for more information.",
         "unit": "String",

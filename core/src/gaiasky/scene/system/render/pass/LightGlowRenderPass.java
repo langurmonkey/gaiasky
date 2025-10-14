@@ -75,7 +75,7 @@ public class LightGlowRenderPass extends RenderPass {
             frameBuffer = (FrameBuffer) params[0];
         }
         if (Settings.settings.postprocess.lightGlow.active && frameBuffer != null) {
-            var renderLists = sceneRenderer.getRenderLists();
+            var renderLists = sceneRenderer.getRenderListsFull();
             var renderAssets = sceneRenderer.getRenderAssets();
             // Get all billboard stars.
             List<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());

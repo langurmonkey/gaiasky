@@ -42,7 +42,6 @@
             "parent": "CelestialBody",
             "components": [
                 "Model",
-                "RenderType",
                 "ModelScaffolding",
                 "AffineTransformations"
             ],
@@ -68,7 +67,6 @@
             "parent": "CelestialBody",
             "components": [
                 "ProperMotion",
-                "RenderType",
                 "ParticleExtra"
             ],
             "aliases": [
@@ -245,8 +243,7 @@
                 "RefSysTransform",
                 "Model",
                 "Label",
-                "Coordinates",
-                "RenderType"
+                "Coordinates"
             ],
             "aliases": [
                 "gaiasky.scenegraph.BackgroundModel"
@@ -269,8 +266,7 @@
                 "RefSysTransform",
                 "Model",
                 "Label",
-                "Line*",
-                "RenderType"
+                "Line*"
             ],
             "aliases": [
                 "gaiasky.scenegraph.RecursiveGrid"
@@ -428,7 +424,6 @@
             "components": [
                 "Model",
                 "Focus",
-                "RenderType",
                 "Coordinates",
                 "SolidAngle",
                 "RefSysTransform",

@@ -39,20 +39,19 @@ public class ParticleExtractor extends AbstractExtractSystem {
         if (this.mustRender(base)) {
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
-            var renderType = Mapper.renderType.get(entity);
             var hip = Mapper.hip.get(entity);
 
 
             if (hip == null) {
-                addToRenderParticle(camera, entity, body, render, renderType);
+                addToRenderParticle(camera, entity, body, render);
             } else {
-                addToRenderStar(camera, entity, body, render, renderType);
+                addToRenderStar(camera, entity, body, render);
             }
         }
     }
 
-    private void addToRenderParticle(ICamera camera, Entity entity, Body body, Render render, RenderType renderType) {
-        addToRender(render, renderType.renderGroup);
+    private void addToRenderParticle(ICamera camera, Entity entity, Body body, Render render) {
+        addToRender(render, render.renderGroup);
 
         boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
         if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number && hasPm) {
@@ -63,7 +62,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
         }
     }
 
-    private void addToRenderStar(ICamera camera, Entity entity, Body body, Render render, RenderType renderType) {
+    private void addToRenderStar(ICamera camera, Entity entity, Body body, Render render) {
         addToRender(render, RenderGroup.POINT_STAR);
 
         if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point) {

@@ -76,8 +76,8 @@ public class CascadedShadowMapRenderPass extends RenderPass {
         var renderAssets = sceneRenderer.getRenderAssets();
 
         // Get models.
-        List<IRenderable> models = sceneRenderer.getRenderLists().get(MODEL_PIX.ordinal());
-        List<IRenderable> modelsTess = sceneRenderer.getRenderLists().get(MODEL_PIX_TESS.ordinal());
+        List<IRenderable> models = sceneRenderer.getRenderListsFull().get(MODEL_PIX.ordinal());
+        List<IRenderable> modelsTess = sceneRenderer.getRenderListsFull().get(MODEL_PIX_TESS.ordinal());
 
         // Prepare base light camera: direction and up.
         IFocus l = camera.getCloseLightSource(0);
