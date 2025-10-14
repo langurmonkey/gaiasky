@@ -1,7 +1,5 @@
 #version 330 core
 
-#include <shader/lib/geometry.glsl>
-
 uniform float u_pointAlphaMin;
 uniform float u_pointAlphaMax;
 uniform float u_starBrightness;
@@ -82,7 +80,7 @@ void main() {
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = quadSize;
-    #include <shader/snippet/billboard.glsl>
+    #include <shader/snippet/billboard.fast.glsl>
 
     gl_Position = gpos * u_vrScale;
     v_fragPos = gl_Position;

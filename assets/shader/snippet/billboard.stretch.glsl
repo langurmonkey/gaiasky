@@ -19,41 +19,38 @@
 //   gpos (vec4) - the vertex position
 vec3 s_obj, s_up, s_right;
 if (isnan(u_camUp.x)) {
-    // Mode CUBEMAP.
+    // Mode CUBEMAP - optimized
     // In panorama mode, we need a global orientation, so we use [0,1,0] as up.
     s_obj = normalize(s_obj_pos);
     s_right = cross(s_obj, vec3(0.0, 1.0, 0.0));
-    // s_obj_x_up is parallel to s_obj in some places, fix
-    float quality = abs(dot(s_obj, s_right));
-    s_right = normalize(quality * s_right + (1.0 - quality) * cross(s_obj, vec3(1.0, 0.0, 0.0)));
-    s_up = normalize(cross(s_obj, s_right));
+
+    // Optimized singularity fix - use dot product directly
+    float parallel_factor = dot(s_obj, vec3(0.0, 1.0, 0.0));
+    if (abs(parallel_factor) > 0.999) {
+        // Near parallel case - use alternative up vector
+        s_right = normalize(cross(s_obj, vec3(1.0, 0.0, 0.0)));
+    } else {
+        s_right = normalize(s_right);
+    }
+    s_up = cross(s_obj, s_right); // Already normalized
 } else {
-    // Mode REGULAR.
-    // In normal mode, use camera up.
+    // Mode REGULAR - optimized
     s_obj = normalize(s_obj_pos);
     s_right = normalize(cross(u_camUp, s_obj));
-    s_up = normalize(cross(s_obj, s_right));
+    s_up = cross(s_obj, s_right); // Already normalized
 }
 
 vec4 gpos;
-if (all(equal(u_camVel, vec3(0.0, 0.0, 0.0)))) {
+if (dot(u_camVel, u_camVel) == 0.0) {
     // NO TRAIL EFFECT
-    //vec4 s_quat = billboard_quaternion(s_obj, s_up, s_right);
-    vec4 s_quat = q_look_at(s_obj, s_up);
+    // Apply rotation directly without quaternions (major performance gain)
+    vec3 rotated_offset = s_vert_pos.x * s_right * s_size
+                        + s_vert_pos.y * s_up * s_size
+                        + s_vert_pos.z * s_obj * s_size;
 
-    // Quad size
-    vec4 vert_pos = vec4(s_vert_pos.xyz * s_size, s_vert_pos.w);
-
-    // Rotation
-    vec4 s_quat_conj = q_conj(s_quat);
-    vec4 q_tmp = qmul(s_quat, vert_pos);
-    vert_pos = qmul(q_tmp, s_quat_conj);
-
-    // Translation
-    vert_pos.xyz += s_obj_pos;
-
-    // Compute final position and return
-    gpos = s_proj_view * vert_pos;
+    // Translation and final position
+    vec3 world_pos = s_obj_pos + rotated_offset;
+    gpos = s_proj_view * vec4(world_pos, 1.0);
 } else {
     // MOTION TRAILS BASED ON ANGULAR SPEED
 
