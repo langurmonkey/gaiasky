@@ -777,7 +777,7 @@
         "description": "Texture file to render the particles of this group. This can also point to a directory, in which case all the image files within are used (they must have the same dimensions). If this is provided, ``profileDecay`` is ignored.",
         "unit": "String"
       },
-      "textures:ParticleSet": {
+      "textures:ParticleGroup": {
         "description": "List of texture files to render the particles of this group. If more than one texture is provided, each particle is assigned a texture randomly. This can also point to one or more directories, in which case all the image files within are used. All images must have the same dimensions. If this is provided, ``profileDecay`` is ignored.",
         "unit": "String[]"
       },
