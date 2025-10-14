@@ -27,12 +27,12 @@ if (isnan(u_camUp.x)) {
     } else {
         s_right = normalize(s_right);
     }
-    s_up = cross(s_obj, s_right); // Already normalized
+    s_up = cross(s_obj, s_right);
 } else {
     // Mode REGULAR - optimized
     s_obj = normalize(s_obj_pos);
     s_right = normalize(cross(u_camUp, s_obj));
-    s_up = cross(s_obj, s_right); // Already normalized
+    s_up = cross(s_obj, s_right);
 }
 
 // Apply rotation directly without quaternions (major performance gain)
