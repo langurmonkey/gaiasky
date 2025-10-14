@@ -90,7 +90,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     /**
      * Render lists for all render groups, for full and half resolution.
      **/
-    private List<List<IRenderable>> activeRenderLists, renderListsFull, renderListsHalf;
+    private List<List<IRenderable>> renderListsFull, renderListsHalf;
     private Map<RenderGroup, IRenderSystem> renderSystems;
     private List<RenderGroup> renderGroups;
     private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, noDepthWritesR, depthWritesR, clearDepthR;
@@ -207,7 +207,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Initialize render lists.
         renderListsFull = newRenderLists();
         renderListsHalf = newRenderLists();
-        activeRenderLists = renderListsFull;
 
         // Set reference
         visible = new ComponentTypes();
@@ -537,6 +536,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     /**
      * Renders the scene given a camera, a session time in seconds and a render context.
+     * Needs to manage full- and half-resolution render lists and buffers.
      *
      * @param camera        The camera to use.
      * @param t             The time in seconds since the start.
@@ -551,7 +551,18 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             // Iterate over render groups and get systems.
             for (var renderGroup : renderGroups) {
-                List<IRenderable> l = activeRenderLists.get(renderGroup.ordinal());
+                List<IRenderable> l = renderListsFull.get(renderGroup.ordinal());
+                if (l != null && !l.isEmpty()) {
+                    var renderSystem = getOrInitializeRenderSystem(renderGroup);
+                    if (renderSystem != null) {
+                        renderSystem.render(l, camera, t, renderContext);
+                    }
+                }
+            }
+
+            // Iterate over render groups and get systems.
+            for (var renderGroup : renderGroups) {
+                List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
                 if (l != null && !l.isEmpty()) {
                     var renderSystem = getOrInitializeRenderSystem(renderGroup);
                     if (renderSystem != null) {
@@ -575,32 +586,34 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private final IRenderable stubRenderable = new StubRenderable();
 
 
-    public void resetRenderListsFull() {
-        resetRenderLists(renderListsFull);
+    private void resetRenderListsFull() {
+        resetRenderLists(renderListsFull, true);
     }
 
-    public void resetRenderListsHalf() {
-        resetRenderLists(renderListsHalf);
+    private void resetRenderListsHalf() {
+        resetRenderLists(renderListsHalf, false);
     }
 
     public void resetRenderLists() {
-        resetRenderLists(activeRenderLists);
+        resetRenderListsFull();
+        resetRenderListsHalf();
     }
 
     /**
      * This must be called when all the rendering for the current frame has
      * finished.
      */
-    public void resetRenderLists(List<List<IRenderable>> renderLists) {
+    private void resetRenderLists(List<List<IRenderable>> renderLists, boolean addStub) {
         // Clear lists to get them ready for update pass.
         for (var rg : values()) {
             renderLists.get(rg.ordinal()).clear();
         }
 
         // Add stub for particle effects (the only system that does not need renderables).
-        for (var rg : autonomousGroups) {
-            renderLists.get(rg.ordinal()).add(stubRenderable);
-        }
+        if (addStub)
+            for (var rg : autonomousGroups) {
+                renderLists.get(rg.ordinal()).add(stubRenderable);
+            }
     }
 
     /**

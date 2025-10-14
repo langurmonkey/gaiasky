@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL30;
 public final class PingPongBuffer implements Disposable {
     public final boolean ownResources;
     // save/restore state
-    private final GaiaSkyFrameBuffer ownedMain, owned1, owned2;
+    private final GaiaSkyFrameBuffer ownedFull, ownedHalf, owned1, owned2;
     public Texture texture1, texture2;
     public int width, height;
     private GaiaSkyFrameBuffer buffer1, buffer2;
@@ -35,20 +35,32 @@ public final class PingPongBuffer implements Disposable {
     public PingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
         ownResources = true;
 
-        // BUFFER USED FOR THE ACTUAL RENDERING:
+        // BUFFERS (FULL- and HALF-RES) USED FOR THE ACTUAL RENDERING:
         // n RENDER TARGETS:
         //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (SCENE)
         //      1: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NON_SCENE: labels, lines, grids)
         //      2: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
         //      3: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
         //      4: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
-        ownedMain = createMainFrameBuffer(width, height, hasDepth, hasNormal, hasReflectionMask, pixmapFormat, preventFloatBuffer);
+        ownedFull = createMainFrameBuffer(width,
+                                          height,
+                                          hasDepth,
+                                          hasNormal,
+                                          hasReflectionMask,
+                                          pixmapFormat,
+                                          preventFloatBuffer);
+        ownedHalf = createMainFrameBuffer((int) (width * 0.5),
+                                          (int) (height * 0.5),
+                                          hasDepth,
+                                          hasNormal,
+                                          hasReflectionMask,
+                                          pixmapFormat,
+                                          preventFloatBuffer);
 
-        // EXTRA BUFFER:
+        // PING-PONG BUFFERS:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
         addColorRenderTarget(frameBufferBuilder, pixmapFormat, preventFloatBuffer);
-
         owned1 = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
         owned2 = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
 
@@ -267,8 +279,12 @@ public final class PingPongBuffer implements Disposable {
         return bufResult;
     }
 
-    public GaiaSkyFrameBuffer getMainBuffer() {
-        return ownedMain;
+    public GaiaSkyFrameBuffer getFullBuffer() {
+        return ownedFull;
+    }
+
+    public GaiaSkyFrameBuffer getHalfBuffer() {
+       return ownedHalf;
     }
 
     // internal use
