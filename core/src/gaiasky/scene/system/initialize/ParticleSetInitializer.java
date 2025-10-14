@@ -92,8 +92,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var base = Mapper.base.get(entity);
         var particleSet = Mapper.particleSet.get(entity);
         AssetManager manager = AssetBean.manager();
-        if (manager.contains(base.getName() + " Textures")) {
-            particleSet.textureArray = manager.get(base.getName() + " Textures");
+        if (manager.contains(base.getName() + " TextureArray")) {
+            particleSet.textureArray = manager.get(base.getName() + " TextureArray");
         }
 
         var starSet = Mapper.starSet.get(entity);
@@ -175,7 +175,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var actualFilePaths = SysUtils.gatherFilesExtension(set.textureFiles, new String[]{"png", "jpeg", "jpg"});
         // Send to load.
         if (!actualFilePaths.isEmpty()) {
-            manager.load(base.getName() + " Textures", TextureArray.class, new TextureArrayParameter(actualFilePaths));
+            manager.load(base.getName() + " TextureArray", TextureArray.class, new TextureArrayParameter(actualFilePaths));
         }
 
         // Proximity descriptors.

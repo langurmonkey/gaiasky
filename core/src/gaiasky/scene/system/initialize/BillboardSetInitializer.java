@@ -68,8 +68,8 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         var base = Mapper.base.get(entity);
         var billboard = Mapper.billboardSet.get(entity);
         AssetManager manager = AssetBean.manager();
-        if (manager.contains(base.getName() + " Textures")) {
-            billboard.textureArray = manager.get(base.getName() + " Textures");
+        if (manager.contains(base.getName() + " TextureArray")) {
+            billboard.textureArray = manager.get(base.getName() + " TextureArray");
         }
 
         // Transform.

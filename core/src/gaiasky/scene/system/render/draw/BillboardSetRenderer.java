@@ -321,7 +321,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
             // Global uniforms.
             if (billboard.textureArray != null) {
-                billboard.textureArray.bind(0);
+                billboard.textureArray.bind(GL20.GL_TEXTURE10);
             }
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos());
@@ -339,7 +339,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
             // General settings for all
             Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
-            Gdx.gl20.glEnable(GL20.GL_BLEND);
 
             MeshDataWrap[] m = meshes.get(render);
             for (MeshDataWrap meshDataWrap : m) {

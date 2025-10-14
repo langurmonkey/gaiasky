@@ -773,7 +773,7 @@
         "description": "Disable particle rendering by setting this to false. Labels, in case of star sets, will still be rendered.",
         "unit": "Boolean"
       },
-      "texture": {
+      "texture:ParticleGroup": {
         "description": "Texture file to render the particles of this group. This can also point to a directory, in which case all the image files within are used (they must have the same dimensions). If this is provided, ``profileDecay`` is ignored.",
         "unit": "String"
       },
