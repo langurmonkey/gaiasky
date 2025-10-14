@@ -91,10 +91,10 @@ public final class RaymarchObject extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
         // Get depth buffer texture from main frame buffer
-        filter.setDepthTexture(main.getDepthBufferTexture());
+        filter.setDepthTexture(full.getDepthBufferTexture());
         // Set input, output and render
         filter.setInput(src).setOutput(dest).render();
     }

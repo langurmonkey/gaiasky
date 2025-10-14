@@ -456,7 +456,7 @@ public final class PostProcessor implements Disposable {
                     {
                         // We use the main buffer as the first source.
                         var source = i == 0 ? composite.getFullBuffer() : composite.getSourceBuffer();
-                        e.render(source, composite.getResultBuffer(), composite.getFullBuffer());
+                        e.render(source, composite.getResultBuffer(), composite.getFullBuffer(), composite.getHalfBuffer());
                     }
                 }
 
@@ -471,7 +471,7 @@ public final class PostProcessor implements Disposable {
             }
 
             // render with null dest (to screen)
-            items.get(count - 1).render(composite.getResultBuffer(), destination, composite.getFullBuffer());
+            items.get(count - 1).render(composite.getResultBuffer(), destination, composite.getFullBuffer(), composite.getHalfBuffer());
 
             // ensure default texture unit #0 is active
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);

@@ -32,7 +32,13 @@ public final class PingPongBuffer implements Disposable {
     private int ownedW, ownedH;
 
     /** Creates a new ping-pong buffer and owns the resources. */
-    public PingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
+    public PingPongBuffer(int width,
+                          int height,
+                          Format pixmapFormat,
+                          boolean hasDepth,
+                          boolean hasNormal,
+                          boolean hasReflectionMask,
+                          boolean preventFloatBuffer) {
         ownResources = true;
 
         // BUFFERS (FULL- and HALF-RES) USED FOR THE ACTUAL RENDERING:
@@ -49,8 +55,11 @@ public final class PingPongBuffer implements Disposable {
                                           hasReflectionMask,
                                           pixmapFormat,
                                           preventFloatBuffer);
-        ownedHalf = createMainFrameBuffer((int) (width * 0.5),
-                                          (int) (height * 0.5),
+        // Default half-resolution factor is 0.4.
+        var halfWidth = Math.max(760, (int) (width * 0.4));
+        var halfHeight = (int) ((float) height / (float) width * (float) halfWidth);
+        ownedHalf = createMainFrameBuffer(halfWidth,
+                                          halfHeight,
                                           hasDepth,
                                           hasNormal,
                                           hasReflectionMask,
@@ -68,7 +77,13 @@ public final class PingPongBuffer implements Disposable {
         set(owned1, owned2);
     }
 
-    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
+    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width,
+                                                           int height,
+                                                           boolean hasDepth,
+                                                           boolean hasNormal,
+                                                           boolean hasReflectionMask,
+                                                           Format frameBufferFormat,
+                                                           boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
         int colorIndex, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
@@ -102,7 +117,7 @@ public final class PingPongBuffer implements Disposable {
         // Depth buffer.
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
-            if(!preventFloatBuffer) {
+            if (!preventFloatBuffer) {
                 depthIndex = idx;
             }
         }
@@ -284,7 +299,7 @@ public final class PingPongBuffer implements Disposable {
     }
 
     public GaiaSkyFrameBuffer getHalfBuffer() {
-       return ownedHalf;
+        return ownedHalf;
     }
 
     // internal use

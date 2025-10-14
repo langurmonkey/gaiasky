@@ -63,14 +63,14 @@ public class SSR extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
         // Get depth buffer texture from main frame buffer
-        filter.setDepthTexture(main.getDepthBufferTexture());
+        filter.setDepthTexture(full.getDepthBufferTexture());
         // Normal buffer
-        filter.setNormalTexture(main.getNormalBufferTexture());
+        filter.setNormalTexture(full.getNormalBufferTexture());
         // Reflection mask
-        filter.setReflectionTexture(main.getReflectionMaskBufferTexture());
+        filter.setReflectionTexture(full.getReflectionMaskBufferTexture());
         // Set input, output and render
         filter.setInput(src).setOutput(dest).render();
     }

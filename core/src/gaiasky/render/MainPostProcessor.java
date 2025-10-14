@@ -198,6 +198,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.pp = new PostProcessor(rt, FastMath.round(width), FastMath.round(height), true, true, false, !safeMode, !safeMode, safeMode);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
+        // BLEND FULL- and HALF-RES TARGETS
+        BlendFullHalfRes blendFullHalfRes = new BlendFullHalfRes();
+        ppb.add(blendFullHalfRes);
+
         // LIGHT GLOW
         LightGlowSettings glowSettings = Settings.settings.postprocess.lightGlow;
         Texture glow = manager.get(starLensTextureName);

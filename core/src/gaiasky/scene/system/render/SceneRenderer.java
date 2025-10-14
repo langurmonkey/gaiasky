@@ -26,6 +26,7 @@ import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.api.StubRenderable;
+import gaiasky.render.postprocess.util.FullscreenQuad;
 import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.process.RenderModeCubemapProjections;
 import gaiasky.render.process.RenderModeMain;
@@ -74,6 +75,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private final GlobalResources globalResources;
     private final AtomicBoolean rendering;
     private final RenderAssets renderAssets;
+    private final FullscreenQuad quad = new FullscreenQuad();
     /**
      * Contains the flags representing each type's visibility
      **/
@@ -544,6 +546,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      */
     public void renderScene(ICamera camera, double t, RenderingContext renderContext) {
         try {
+            var pp = renderContext.ppb.pp;
+
             // Update time difference since last update
             for (ComponentType ct : ComponentType.values()) {
                 alphas[ct.ordinal()] = calculateAlpha(ct, t);
@@ -560,6 +564,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 }
             }
 
+            // Bind half-resolution buffer.
+            pp.getCombinedBuffer().getFullBuffer().end();
+            pp.getCombinedBuffer().getHalfBuffer().begin();
+            clearScreen();
+
             // Iterate over render groups and get systems.
             for (var renderGroup : renderGroups) {
                 List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
@@ -570,6 +579,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     }
                 }
             }
+
+            // Back to full-resolution buffer.
+            pp.getCombinedBuffer().getHalfBuffer().end();
+            pp.getCombinedBuffer().getFullBuffer().begin();
+
         } catch (GdxRuntimeException | GaiaSkyShaderCompileException gre) {
             // Escalate.
             throw gre;

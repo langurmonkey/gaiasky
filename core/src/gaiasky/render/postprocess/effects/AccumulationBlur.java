@@ -46,7 +46,7 @@ public class AccumulationBlur extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
         if (dest != null) {
             motionFilter.setInput(src).setOutput(dest).render();

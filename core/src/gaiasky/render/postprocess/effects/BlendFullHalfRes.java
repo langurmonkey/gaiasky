@@ -9,34 +9,26 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
-import gaiasky.render.postprocess.filters.UnsharpMaskFilter;
+import gaiasky.render.postprocess.filters.CombineFilter;
+import gaiasky.render.postprocess.filters.CopyFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
-public final class UnsharpMask extends PostProcessorEffect {
-    private final UnsharpMaskFilter filter;
+public class BlendFullHalfRes extends PostProcessorEffect {
+    private final CombineFilter combine;
 
-    public UnsharpMask() {
-        filter = new UnsharpMaskFilter();
-        disposables.add(filter);
-    }
-
-    /**
-     * The sharpen factor. 0 to disable, 1 is default.
-     *
-     * @param sf The sharpen factor
-     */
-    public void setSharpenFactor(float sf) {
-        filter.setSharpenFactor(sf);
+    public BlendFullHalfRes() {
+        combine = new CombineFilter();
+        disposables.add(combine);
     }
 
     @Override
     public void rebind() {
-        filter.rebind();
+        combine.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
-        filter.setInput(src).setOutput(dest).render();
+        combine.setInput(full, half).setOutput(dest).render();
     }
 }

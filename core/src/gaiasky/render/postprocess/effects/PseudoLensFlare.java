@@ -189,7 +189,7 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     }
 
     @Override
-    public void render(final FrameBuffer src, final FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         boolean blendingWasEnabled = PostProcessor.isStateEnabled(GL20.GL_BLEND);
         Gdx.gl.glDisable(GL20.GL_BLEND);
 

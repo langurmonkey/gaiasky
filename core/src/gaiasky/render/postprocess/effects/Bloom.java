@@ -114,7 +114,7 @@ public final class Bloom extends PostProcessorEffect {
     }
 
     @Override
-    public void render(final FrameBuffer src, final FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         Texture texsrc = src.getColorBufferTexture();
 
         boolean blendingWasEnabled = PostProcessor.isStateEnabled(GL20.GL_BLEND);

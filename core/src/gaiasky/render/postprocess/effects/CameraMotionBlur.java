@@ -44,9 +44,7 @@ public final class CameraMotionBlur extends PostProcessorEffect {
     private final Vector3 aux = new Vector3();
 
     @Override
-    public void render(FrameBuffer src,
-                       FrameBuffer dest,
-                       GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         // Viewport.
         if (dest != null) {
             cameraMotionBlurFilter.setViewport(dest.getWidth(), dest.getHeight());
@@ -64,7 +62,7 @@ public final class CameraMotionBlur extends PostProcessorEffect {
         cameraMotionBlurFilter.setPrevProjView(cam.getPreviousProjView());
 
         restoreViewport(dest);
-        cameraMotionBlurFilter.setDepthTexture(main.getDepthBufferTexture());
+        cameraMotionBlurFilter.setDepthTexture(full.getDepthBufferTexture());
         cameraMotionBlurFilter.setInput(src).setOutput(dest).render();
     }
 }

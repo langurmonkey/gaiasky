@@ -157,7 +157,7 @@ public final class Levels extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
 
         if (levels.isToneMappingAuto()) {

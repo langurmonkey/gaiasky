@@ -32,7 +32,7 @@ public abstract class PostProcessorEffect implements Disposable {
     /**
      * Concrete objects shall implement its own rendering, given the source and destination buffers.
      */
-    public abstract void render(final FrameBuffer src, final FrameBuffer dest, final GaiaSkyFrameBuffer main);
+    public abstract void render(final FrameBuffer src, final FrameBuffer dest, final GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half);
 
     /**
      * Whether this effect is enabled and should be processed.
