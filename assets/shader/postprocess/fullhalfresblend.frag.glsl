@@ -21,13 +21,13 @@ void main() {
     vec3 halfRes = texture(u_texture1, v_texCoords).rgb;
 
     // Recover 'linear' depth values.
-    float zFull = 1.0 / recoverWValue(texture(u_texture2, v_texCoords).r, u_zFarK.x, u_zFarK.y);
-    float zHalf = 1.0 / recoverWValue(texture(u_texture3, v_texCoords).r, u_zFarK.x, u_zFarK.y);
+    float depthFull = 1.0 / recoverWValue(texture(u_texture2, v_texCoords).r, u_zFarK.x, u_zFarK.y);
+    float depthHalf = 1.0 / recoverWValue(texture(u_texture3, v_texCoords).r, u_zFarK.x, u_zFarK.y);
 
-    if (zFull < zHalf) {
+    if (depthFull < depthHalf) {
         // Full-res pixel is closer - use it
         fragColor = vec4(fullRes, 1.0);
-    } else if (zFull > zHalf) {
+    } else if (depthFull > depthHalf) {
         // Half-res pixel is closer - use it
         fragColor = vec4(halfRes, 1.0);
     } else {
