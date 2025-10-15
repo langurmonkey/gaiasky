@@ -8,27 +8,32 @@
 package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import gaiasky.GaiaSky;
 import gaiasky.render.postprocess.PostProcessorEffect;
-import gaiasky.render.postprocess.filters.CombineFilter;
-import gaiasky.render.postprocess.filters.CopyFilter;
+import gaiasky.render.postprocess.filters.BlendFullHalfResFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.util.Constants;
 
 public class BlendFullHalfRes extends PostProcessorEffect {
-    private final CombineFilter combine;
+    private final BlendFullHalfResFilter filter;
 
     public BlendFullHalfRes() {
-        combine = new CombineFilter();
-        disposables.add(combine);
+        filter = new BlendFullHalfResFilter();
+        disposables.add(filter);
     }
 
     @Override
     public void rebind() {
-        combine.rebind();
+        filter.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
+        // Z-far and K.
+        var cam = GaiaSky.instance.getICamera();
+        filter.setZFarK((float) cam.getFar(), Constants.getCameraK());
+
         restoreViewport(dest);
-        combine.setInput(full, half).setOutput(dest).render();
+        filter.setInput(full, half).setOutput(dest).render();
     }
 }

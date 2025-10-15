@@ -198,7 +198,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.pp = new PostProcessor(rt, FastMath.round(width), FastMath.round(height), true, true, false, !safeMode, !safeMode, safeMode);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
-        // BLEND FULL- and HALF-RES TARGETS
+        // BLEND FULL- and HALF-RES TARGETS in the main pipeline
         BlendFullHalfRes blendFullHalfRes = new BlendFullHalfRes();
         ppb.add(blendFullHalfRes);
 
