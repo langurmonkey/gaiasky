@@ -603,7 +603,13 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public void updateDepthTest() {
         switch (blendMode) {
             // Read-write depth test.
-            case ALPHA, COLOR, NONE -> depthTestReadWrite();
+            case ALPHA, COLOR, NONE -> {
+                depthTestReadWrite();
+                if (type != null && type.equals("ring")){
+                    // Second material (ring) depth test read only.
+                    setDepthTestRing();
+                }
+            }
             // Read-only depth test.
             case ADDITIVE -> depthTestReadOnly();
         }
@@ -646,6 +652,23 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
                 assert dta != null;
                 dta.depthFunc = func;
                 dta.depthMask = mask;
+            }
+        }
+    }
+    public void setDepthTestRing() {
+        if (instance != null) {
+            if (instance.materials.size > 1){
+                Material mat = instance.materials.get(1);
+                DepthTestAttribute dta;
+                if (mat.has(DepthTestAttribute.Type)) {
+                    dta = (DepthTestAttribute) mat.get(DepthTestAttribute.Type);
+                } else {
+                    dta = new DepthTestAttribute();
+                    mat.set(dta);
+                }
+                assert dta != null;
+                dta.depthFunc = GL20.GL_LEQUAL;
+                dta.depthMask = false;
             }
         }
     }

@@ -143,12 +143,12 @@ public class ModelExtractor extends AbstractExtractSystem {
         if (rt != null && rt.renderGroup != null) {
             rg = rt.renderGroup;
         } else {
-            rg = renderTessellated(model) ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
+            rg = needsTessellation(model) ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
         }
         addToRender(render, rg);
     }
 
-    private boolean renderTessellated(Model model) {
+    private boolean needsTessellation(Model model) {
         return Settings.settings.scene.renderer.elevation.type.isTessellation() && model.model.isTessellated();
     }
 

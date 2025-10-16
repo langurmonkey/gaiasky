@@ -19,6 +19,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.FocusActive;
@@ -189,7 +190,14 @@ public class ModelInitializer extends AbstractInitSystem {
                 EventManager.instance.unsubscribe(this.radio, Event.CAMERA_MODE_CMD);
                 this.radio = null;
             }
-            EventManager.instance.subscribe(new SpacecraftRadio(entity), Event.CAMERA_MODE_CMD, Event.SPACECRAFT_STABILISE_CMD, Event.SPACECRAFT_STOP_CMD, Event.SPACECRAFT_THRUST_DECREASE_CMD, Event.SPACECRAFT_THRUST_INCREASE_CMD, Event.SPACECRAFT_THRUST_SET_CMD, Event.SPACECRAFT_MACHINE_SELECTION_CMD);
+            EventManager.instance.subscribe(new SpacecraftRadio(entity),
+                                            Event.CAMERA_MODE_CMD,
+                                            Event.SPACECRAFT_STABILISE_CMD,
+                                            Event.SPACECRAFT_STOP_CMD,
+                                            Event.SPACECRAFT_THRUST_DECREASE_CMD,
+                                            Event.SPACECRAFT_THRUST_INCREASE_CMD,
+                                            Event.SPACECRAFT_THRUST_SET_CMD,
+                                            Event.SPACECRAFT_MACHINE_SELECTION_CMD);
         }
         if (fade != null) {
             // Billboards -- add depth test attribute, set to false.
@@ -204,7 +212,14 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    private void initializeSpacecraft(Entity entity, Base base, Body body, GraphNode graph, Model model, ModelScaffolding scaffolding, MotorEngine engine, Label label) {
+    private void initializeSpacecraft(Entity entity,
+                                      Base base,
+                                      Body body,
+                                      GraphNode graph,
+                                      Model model,
+                                      ModelScaffolding scaffolding,
+                                      MotorEngine engine,
+                                      Label label) {
 
         // Model renderer.
         model.renderConsumer = ModelEntityRenderSystem::renderSpacecraft;
@@ -317,32 +332,38 @@ public class ModelInitializer extends AbstractInitSystem {
         }
 
         // Clouds also act as ambient occlusion to models.
-        if (Mapper.cloud.has(entity)) {
-            var cloud = Mapper.cloud.get(entity);
-            if (model.model != null && model.model.mtc != null && cloud.cloud != null) {
-                // Do not add cloud occlusion with current configuration if clouds are pulled from URL.
-                if (!TextUtils.isValidURL(cloud.cloud.url)) {
-                    if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
-                        // Cloud shadows unsupported with SVT.
-                        // This is because we can't ensure that the cloud SVT is exactly the same (levels, size, etc.) as the
-                        // main diffuse SVT, and the visibility determination happens only once per layer.
-                        cloud.cloud.diffuse = null;
-                        cloud.cloud.diffuseCubemap = null;
-                        //model.model.mtc.setAoSVT(cloud.cloud.svtParams);
-                        //model.model.mtc.setOcclusionClouds(true);
-                    } else if (cloud.cloud.diffuse != null && !cloud.cloud.diffuse.endsWith(Constants.GEN_KEYWORD)) {
-                        model.model.mtc.ao = cloud.cloud.diffuse;
-                        model.model.mtc.setOcclusionClouds(true);
-                    } else if (cloud.cloud.diffuseCubemap != null) {
-                        model.model.mtc.setAmbientOcclusionCubemap(cloud.cloud.diffuseCubemap.location);
-                        model.model.mtc.setOcclusionClouds(true);
+        if (model.model != null) {
+            if (Mapper.cloud.has(entity)) {
+                var cloud = Mapper.cloud.get(entity);
+                if (model.model.mtc != null && cloud.cloud != null) {
+                    // Do not add cloud occlusion with current configuration if clouds are pulled from URL.
+                    if (!TextUtils.isValidURL(cloud.cloud.url)) {
+                        if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
+                            // Cloud shadows unsupported with SVT.
+                            // This is because we can't ensure that the cloud SVT is exactly the same (levels, size, etc.) as the
+                            // main diffuse SVT, and the visibility determination happens only once per layer.
+                            cloud.cloud.diffuse = null;
+                            cloud.cloud.diffuseCubemap = null;
+                            //model.model.mtc.setAoSVT(cloud.cloud.svtParams);
+                            //model.model.mtc.setOcclusionClouds(true);
+                        } else if (cloud.cloud.diffuse != null && !cloud.cloud.diffuse.endsWith(Constants.GEN_KEYWORD)) {
+                            model.model.mtc.ao = cloud.cloud.diffuse;
+                            model.model.mtc.setOcclusionClouds(true);
+                        } else if (cloud.cloud.diffuseCubemap != null) {
+                            model.model.mtc.setAmbientOcclusionCubemap(cloud.cloud.diffuseCubemap.location);
+                            model.model.mtc.setOcclusionClouds(true);
+                        }
                     }
                 }
             }
-        }
 
-        // Initialize model.
-        if (model.model != null) {
+            // Render group for transparent models.
+            var render = Mapper.renderType.get(entity);
+            if (model.model.type != null && model.model.type.equals("ring")) {
+                render.renderGroup = RenderGroup.MODEL_PIX_TRANSPARENT;
+            }
+
+            // Initialize model.
             model.model.initialize(base.getName());
         }
     }
@@ -435,7 +456,11 @@ public class ModelInitializer extends AbstractInitSystem {
         engine.mass = machine.getMass();
         scaffolding.selfShadow = machine.isSelfShadow();
         engine.drag = machine.getDrag();
-        engine.responsiveness = MathUtilsDouble.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
+        engine.responsiveness = MathUtilsDouble.lint(machine.getResponsiveness(),
+                                                     0d,
+                                                     1d,
+                                                     Constants.MIN_SC_RESPONSIVENESS,
+                                                     Constants.MAX_SC_RESPONSIVENESS);
         engine.machineName = machine.getName();
         body.setSize(machine.getSize() * Constants.KM_TO_U);
 

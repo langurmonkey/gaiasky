@@ -589,6 +589,7 @@ public class ModelEntityRenderSystem {
             model.model.updateEclipsingBodyUniforms(entity);
             model.model.update(alpha * base.opacity, relativistic);
             model.model.updateSizeKm(body.size);
+            model.model.updateDepthTest();
             batch.render(model.model.instance, model.model.env);
         }
     }

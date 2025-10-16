@@ -512,7 +512,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                     model.model.setBlendMode(BlendMode.ALPHA);
 
                     var rt = Mapper.renderType.get(entity);
-                    rt.renderGroup = RenderGroup.MODEL_PIX_TRANSPARENT;
+                    rt.renderGroup = RenderGroup.MODEL_SCENE_UI;
 
                     // Initialize shape.
                     scene.initializeEntity(entity);

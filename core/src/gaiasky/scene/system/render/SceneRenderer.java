@@ -272,10 +272,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case MODEL_PIX_DUST -> // MODELS DUST AND MESH
                     system = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
             case MODEL_VERT_ADDITIVE -> system = new ModelRenderer(this, MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
-            case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY
+            case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY (meses)
                     system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
-            case MODEL_VERT_EARLY -> // MODEL PER-VERTEX-LIGHTING EARLY
-                    system = new ModelRenderer(this, MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
             case MODEL_DIFFUSE -> system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
             case MODEL_PIX -> // MODEL PER-PIXEL-LIGHTING
                     system = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPixelLighting);
@@ -382,6 +380,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPreRunnables(additiveBlendR, noDepthTestR);
                 system.addPostRunnables(regularBlendR);
             }
+            case MODEL_SCENE_UI -> // MODEL PER-PIXEL-LIGHTING USED FOR SCENE UIs (VR)
+                    system = new ModelRenderer(this, MODEL_SCENE_UI, alphas, renderAssets.mbPixelLighting);
             case SPRITE -> {
                 system = new SpriteRenderer(this, SPRITE, alphas, globalResources.getSpriteShader());
                 system.addPreRunnables(regularBlendR, noDepthTestR);

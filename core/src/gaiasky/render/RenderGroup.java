@@ -39,7 +39,7 @@ public enum RenderGroup {
      **/
     MODEL_PIX_DUST(500),
     /**
-     * Per-pixel lighting (early in the rendering pipeline).
+     * PBR, per-pixel lighting (early in the rendering pipeline).
      **/
     MODEL_PIX_EARLY(600),
     /**
@@ -83,7 +83,7 @@ public enum RenderGroup {
      **/
     MODEL_DIFFUSE(1700),
     /**
-     * Using normal shader for per-pixel lighting.
+     * PBR, per-pixel lighting.
      **/
     MODEL_PIX(1800),
     /**
@@ -98,6 +98,10 @@ public enum RenderGroup {
      * Volume models.
      **/
     VOLUME(2110),
+    /**
+     * Using normal shader for per-pixel lighting, rendered late for items with transparency.
+     **/
+    MODEL_PIX_TRANSPARENT(2120),
     /**
      * Label.
      **/
@@ -147,10 +151,6 @@ public enum RenderGroup {
      **/
     MODEL_CLOUD(6500),
     /**
-     * Using normal shader for per-pixel lighting, rendered late for items with transparency.
-     **/
-    MODEL_PIX_TRANSPARENT(7000),
-    /**
      * Line late.
      **/
     LINE_LATE(8000),
@@ -167,9 +167,13 @@ public enum RenderGroup {
      **/
     MODEL_VERT_ADDITIVE(11000),
     /**
+     * In-scene UI, for VR.
+     **/
+    MODEL_SCENE_UI(12000),
+    /**
      * Single sprite.
      */
-    SPRITE(12000);
+    SPRITE(13000);
 
     public final int priority;
 
