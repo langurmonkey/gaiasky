@@ -10,26 +10,44 @@ import os
 def read_particles_file(filename):
     """
     Read particles from file, automatically handling .gz extension
+    Returns: (particles, header_line) where header_line is the first line if it looks like a header
     """
-    original_particles = []
+    particles = []
+    header_line = None
     
     try:
         if filename.endswith('.gz'):
-            with gzip.open(filename, 'rt') as f:  # 'rt' for reading text mode
-                for line in f:
-                    if line.strip():
-                        parts = line.split()
-                        if len(parts) >= 4:
-                            x, y, z, size = map(float, parts[:4])
-                            original_particles.append((x, y, z, size))
+            with gzip.open(filename, 'rt') as f:
+                lines = list(f)
         else:
             with open(filename, 'r') as f:
-                for line in f:
-                    if line.strip():
-                        parts = line.split()
-                        if len(parts) >= 4:
-                            x, y, z, size = map(float, parts[:4])
-                            original_particles.append((x, y, z, size))
+                lines = list(f)
+        
+        if not lines:
+            return particles, header_line
+            
+        # Check if first line looks like a header (contains letters)
+        first_line = lines[0].strip()
+        if first_line and any(c.isalpha() for c in first_line):
+            header_line = first_line
+            start_index = 1
+        else:
+            start_index = 0
+        
+        # Process the remaining lines
+        for line in lines[start_index:]:
+            if line.strip():
+                parts = line.split()
+                if len(parts) >= 4:
+                    try:
+                        # Parse first 4 columns as floats (x, y, z, size)
+                        x, y, z, size = map(float, parts[:4])
+                        # Store all columns - first 4 as floats, rest as strings to preserve formatting
+                        particle_data = [x, y, z, size] + parts[4:]
+                        particles.append(particle_data)
+                    except ValueError:
+                        print(f"Warning: Skipping line with invalid numeric data: {line.strip()}")
+                        
     except FileNotFoundError:
         print(f"Error: Input file '{filename}' not found.")
         sys.exit(1)
@@ -37,23 +55,33 @@ def read_particles_file(filename):
         print(f"Error reading input file: {e}")
         sys.exit(1)
     
-    return original_particles
+    return particles, header_line
 
-def write_particles_file(filename, particles):
+def write_particles_file(filename, particles, header_line=None):
     """
     Write particles to file, automatically handling .gz extension
     """
     try:
         if filename.endswith('.gz'):
-            with gzip.open(filename, 'wt') as f:  # 'wt' for writing text mode
+            with gzip.open(filename, 'wt') as f:
+                if header_line:
+                    f.write(header_line + '\n')
                 for particle in particles:
-                    x, y, z, size = particle
-                    f.write(f"{x} {y} {z} {size}\n")
+                    # Write all columns - first 4 are floats, rest are strings
+                    line_parts = [f"{particle[0]}", f"{particle[1]}", f"{particle[2]}", f"{particle[3]}"]
+                    if len(particle) > 4:
+                        line_parts.extend(particle[4:])
+                    f.write(" ".join(line_parts) + "\n")
         else:
             with open(filename, 'w') as f:
+                if header_line:
+                    f.write(header_line + '\n')
                 for particle in particles:
-                    x, y, z, size = particle
-                    f.write(f"{x} {y} {z} {size}\n")
+                    # Write all columns - first 4 are floats, rest are strings
+                    line_parts = [f"{particle[0]}", f"{particle[1]}", f"{particle[2]}", f"{particle[3]}"]
+                    if len(particle) > 4:
+                        line_parts.extend(particle[4:])
+                    f.write(" ".join(line_parts) + "\n")
     except Exception as e:
         print(f"Error writing to output file: {e}")
         sys.exit(1)
@@ -71,16 +99,18 @@ def spawn_dust_particles(input_file, output_file, multiplier=5, position_spread=
     """
     
     # Read original data
-    original_particles = read_particles_file(input_file)
+    original_particles, header_line = read_particles_file(input_file)
     print(f"Read {len(original_particles)} original particles from {input_file}")
+    if header_line:
+        print(f"Header detected and will be preserved: {header_line}")
     
     # Generate new particles
     new_particles = []
     
     for particle in original_particles:
-        x, y, z, size = particle
+        x, y, z, size = particle[:4]
         
-        # Keep the original particle
+        # Keep the original particle with all its columns
         new_particles.append(particle)
         
         # Generate new particles around this one
@@ -93,12 +123,18 @@ def spawn_dust_particles(input_file, output_file, multiplier=5, position_spread=
             # Add some variation to size, but keep it positive
             new_size = max(0.01, size + random.gauss(0, size_spread))
             
-            new_particles.append((new_x, new_y, new_z, new_size))
+            # Create new particle with modified position/size but same additional columns
+            new_particle = [new_x, new_y, new_z, new_size]
+            if len(particle) > 4:
+                # Copy additional columns (like RGB colors) from original particle
+                new_particle.extend(particle[4:])
+            
+            new_particles.append(new_particle)
     
     print(f"Generated {len(new_particles)} total particles ({len(new_particles) - len(original_particles)} new)")
     
-    # Write all particles to output file
-    write_particles_file(output_file, new_particles)
+    # Write all particles to output file (preserve header if present)
+    write_particles_file(output_file, new_particles, header_line)
     print(f"Saved to {output_file}")
 
 def spawn_dust_particles_spiral_aware(input_file, output_file, multiplier=5, 
@@ -109,20 +145,22 @@ def spawn_dust_particles_spiral_aware(input_file, output_file, multiplier=5,
     """
     
     # Read original data
-    original_particles = read_particles_file(input_file)
+    original_particles, header_line = read_particles_file(input_file)
     print(f"Read {len(original_particles)} original particles from {input_file}")
+    if header_line:
+        print(f"Header detected and will be preserved: {header_line}")
     
     new_particles = []
     
     for particle in original_particles:
-        x, y, z, size = particle
+        x, y, z, size = particle[:4]
+        
+        # Keep original particle with all its columns
+        new_particles.append(particle)
         
         # Convert to cylindrical coordinates
         r = np.sqrt(x**2 + y**2)
         theta = np.arctan2(y, x)
-        
-        # Keep original
-        new_particles.append(particle)
         
         # Generate new particles
         for _ in range(multiplier):
@@ -138,12 +176,18 @@ def spawn_dust_particles_spiral_aware(input_file, output_file, multiplier=5,
             # Size variation
             new_size = max(0.01, size + random.gauss(0, size_spread))
             
-            new_particles.append((new_x, new_y, new_z, new_size))
+            # Create new particle with modified position/size but same additional columns
+            new_particle = [new_x, new_y, new_z, new_size]
+            if len(particle) > 4:
+                # Copy additional columns (like RGB colors) from original particle
+                new_particle.extend(particle[4:])
+            
+            new_particles.append(new_particle)
     
     print(f"Generated {len(new_particles)} total particles ({len(new_particles) - len(original_particles)} new)")
     
-    # Write to file
-    write_particles_file(output_file, new_particles)
+    # Write to file (preserve header if present)
+    write_particles_file(output_file, new_particles, header_line)
     print(f"Saved to {output_file}")
 
 def main():
