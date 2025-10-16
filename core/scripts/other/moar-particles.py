@@ -1,9 +1,62 @@
-#!/usr/bin/env python
+#! python
 
 import numpy as np
 import random
 import argparse
 import sys
+import gzip
+import os
+
+def read_particles_file(filename):
+    """
+    Read particles from file, automatically handling .gz extension
+    """
+    original_particles = []
+    
+    try:
+        if filename.endswith('.gz'):
+            with gzip.open(filename, 'rt') as f:  # 'rt' for reading text mode
+                for line in f:
+                    if line.strip():
+                        parts = line.split()
+                        if len(parts) >= 4:
+                            x, y, z, size = map(float, parts[:4])
+                            original_particles.append((x, y, z, size))
+        else:
+            with open(filename, 'r') as f:
+                for line in f:
+                    if line.strip():
+                        parts = line.split()
+                        if len(parts) >= 4:
+                            x, y, z, size = map(float, parts[:4])
+                            original_particles.append((x, y, z, size))
+    except FileNotFoundError:
+        print(f"Error: Input file '{filename}' not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error reading input file: {e}")
+        sys.exit(1)
+    
+    return original_particles
+
+def write_particles_file(filename, particles):
+    """
+    Write particles to file, automatically handling .gz extension
+    """
+    try:
+        if filename.endswith('.gz'):
+            with gzip.open(filename, 'wt') as f:  # 'wt' for writing text mode
+                for particle in particles:
+                    x, y, z, size = particle
+                    f.write(f"{x} {y} {z} {size}\n")
+        else:
+            with open(filename, 'w') as f:
+                for particle in particles:
+                    x, y, z, size = particle
+                    f.write(f"{x} {y} {z} {size}\n")
+    except Exception as e:
+        print(f"Error writing to output file: {e}")
+        sys.exit(1)
 
 def spawn_dust_particles(input_file, output_file, multiplier=5, position_spread=0.1, size_spread=0.1):
     """
@@ -18,22 +71,7 @@ def spawn_dust_particles(input_file, output_file, multiplier=5, position_spread=
     """
     
     # Read original data
-    original_particles = []
-    try:
-        with open(input_file, 'r') as f:
-            for line in f:
-                if line.strip():  # skip empty lines
-                    parts = line.split()
-                    if len(parts) >= 4:
-                        x, y, z, size = map(float, parts[:4])
-                        original_particles.append((x, y, z, size))
-    except FileNotFoundError:
-        print(f"Error: Input file '{input_file}' not found.")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Error reading input file: {e}")
-        sys.exit(1)
-    
+    original_particles = read_particles_file(input_file)
     print(f"Read {len(original_particles)} original particles from {input_file}")
     
     # Generate new particles
@@ -60,15 +98,7 @@ def spawn_dust_particles(input_file, output_file, multiplier=5, position_spread=
     print(f"Generated {len(new_particles)} total particles ({len(new_particles) - len(original_particles)} new)")
     
     # Write all particles to output file
-    try:
-        with open(output_file, 'w') as f:
-            for particle in new_particles:
-                x, y, z, size = particle
-                f.write(f"{x} {y} {z} {size}\n")
-    except Exception as e:
-        print(f"Error writing to output file: {e}")
-        sys.exit(1)
-    
+    write_particles_file(output_file, new_particles)
     print(f"Saved to {output_file}")
 
 def spawn_dust_particles_spiral_aware(input_file, output_file, multiplier=5, 
@@ -79,22 +109,7 @@ def spawn_dust_particles_spiral_aware(input_file, output_file, multiplier=5,
     """
     
     # Read original data
-    original_particles = []
-    try:
-        with open(input_file, 'r') as f:
-            for line in f:
-                if line.strip():
-                    parts = line.split()
-                    if len(parts) >= 4:
-                        x, y, z, size = map(float, parts[:4])
-                        original_particles.append((x, y, z, size))
-    except FileNotFoundError:
-        print(f"Error: Input file '{input_file}' not found.")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Error reading input file: {e}")
-        sys.exit(1)
-    
+    original_particles = read_particles_file(input_file)
     print(f"Read {len(original_particles)} original particles from {input_file}")
     
     new_particles = []
@@ -128,15 +143,7 @@ def spawn_dust_particles_spiral_aware(input_file, output_file, multiplier=5,
     print(f"Generated {len(new_particles)} total particles ({len(new_particles) - len(original_particles)} new)")
     
     # Write to file
-    try:
-        with open(output_file, 'w') as f:
-            for particle in new_particles:
-                x, y, z, size = particle
-                f.write(f"{x} {y} {z} {size}\n")
-    except Exception as e:
-        print(f"Error writing to output file: {e}")
-        sys.exit(1)
-    
+    write_particles_file(output_file, new_particles)
     print(f"Saved to {output_file}")
 
 def main():
@@ -146,15 +153,18 @@ def main():
         epilog="""
 Examples:
   %(prog)s input.txt output.txt
-  %(prog)s input.txt output.txt --method spiral --multiplier 10
-  %(prog)s input.txt output.txt --method simple --position-spread 0.05 --multiplier 8
-  %(prog)s input.txt output.txt --method spiral --radial-spread 0.02 --angular-spread 0.05
+  %(prog)s input.dat.gz output_dense.dat.gz
+  %(prog)s input.txt output.dat.gz --method spiral --multiplier 10
+  %(prog)s input.dat.gz output.txt --method simple --position-spread 0.05 --multiplier 8
+  %(prog)s input.dat.gz output.dat.gz --method spiral --radial-spread 0.02 --angular-spread 0.05
         """
     )
     
     # Required arguments
-    parser.add_argument('input_file', help='Input file containing original particle data (X Y Z size format)')
-    parser.add_argument('output_file', help='Output file for enhanced particle data')
+    parser.add_argument('input_file', help='Input file containing original particle data (X Y Z size format). '
+                                         'Supports .gz compressed files.')
+    parser.add_argument('output_file', help='Output file for enhanced particle data. '
+                                          'Use .gz extension for compressed output.')
     
     # Method selection
     parser.add_argument('--method', choices=['simple', 'spiral'], default='spiral',
@@ -183,6 +193,12 @@ Examples:
     
     print(f"Processing: {args.input_file} -> {args.output_file}")
     print(f"Method: {args.method}, Multiplier: {args.multiplier}")
+    
+    # Show compression status
+    input_compressed = " (compressed)" if args.input_file.endswith('.gz') else ""
+    output_compressed = " (compressed)" if args.output_file.endswith('.gz') else ""
+    print(f"Input format: {args.input_file}{input_compressed}")
+    print(f"Output format: {args.output_file}{output_compressed}")
     
     if args.method == 'simple':
         print(f"Position spread: {args.position_spread}, Size spread: {args.size_spread}")
