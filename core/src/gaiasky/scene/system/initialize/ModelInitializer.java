@@ -357,12 +357,6 @@ public class ModelInitializer extends AbstractInitSystem {
                 }
             }
 
-            // Render group for transparent models.
-            var render = Mapper.renderType.get(entity);
-            if (model.model.type != null && model.model.type.equals("ring")) {
-                render.renderGroup = RenderGroup.MODEL_PIX_TRANSPARENT;
-            }
-
             // Initialize model.
             model.model.initialize(base.getName());
         }
