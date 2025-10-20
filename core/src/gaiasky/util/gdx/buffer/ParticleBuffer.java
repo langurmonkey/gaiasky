@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL43.*;
  * A particle buffer to hold particles generated with a {@link gaiasky.util.gdx.shader.ComputeShaderProgram}.
  * <p>Here is a usage example:</p>
  * <p>
- * <pre>
+ * <pre>{@code
  * ParticleBuffer particleBuffer = new ParticleBuffer(100_000);
  *
  * // Bind to shader (layout(binding = 0))
@@ -29,7 +29,7 @@ import static org.lwjgl.opengl.GL43.*;
  * int groups = (100_000 + 255) / 256;
  * glDispatchCompute(groups, 1, 1);
  * glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
- * </pre>
+ * }</pre>
  * </p>
  */
 public class ParticleBuffer {
