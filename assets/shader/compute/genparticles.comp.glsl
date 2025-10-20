@@ -3,8 +3,8 @@
 layout(local_size_x = 256) in;
 
 struct Particle {
-    vec4 position;
-    vec4 color;
+    vec4 position; // xyz = pos, w = size
+    vec4 color;    // rgba
 };
 
 layout(std430, binding = 0) buffer Particles {
