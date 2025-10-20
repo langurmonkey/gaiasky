@@ -37,7 +37,7 @@ public class ScreenModeCmd implements IObserver {
         if (event == Event.SCREEN_MODE_CMD) {
             boolean toFullScreen = Settings.settings.graphics.fullScreen.active;
             if (toFullScreen) {
-                Monitor m = Gdx.graphics.getPrimaryMonitor();
+                Monitor m = Gdx.graphics.getMonitor();
                 // Available modes for this monitor
                 DisplayMode[] modes = Gdx.graphics.getDisplayModes(m);
                 // Find best mode
@@ -56,6 +56,8 @@ public class ScreenModeCmd implements IObserver {
                     myMode = Gdx.graphics.getDisplayMode(m);
                     Settings.settings.graphics.fullScreen.resolution[0] = myMode.width;
                     Settings.settings.graphics.fullScreen.resolution[1] = myMode.height;
+                    Settings.settings.graphics.fullScreen.refreshRate = myMode.refreshRate;
+                    Settings.settings.graphics.fullScreen.bitDepth = myMode.bitsPerPixel;
                 }
 
                 // set the window to full screen mode
