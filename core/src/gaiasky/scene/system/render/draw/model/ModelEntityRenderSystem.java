@@ -108,7 +108,7 @@ public class ModelEntityRenderSystem {
                 mc.update(alpha * scaffolding.fadeOpacity);
                 modelBatch.render(mc.instance, mc.env);
             } else {
-                mc.setTransparency(alpha);
+                mc.updateBlendMode(alpha);
                 modelBatch.render(mc.instance, mc.env);
 
             }
@@ -124,7 +124,7 @@ public class ModelEntityRenderSystem {
                                     RenderGroup renderGroup,
                                     boolean shadow,
                                     boolean relativistic) {
-        model.model.setTransparency(alpha);
+        model.model.updateBlendMode(alpha);
         batch.render(model.model.instance, model.model.env);
 
         var vr = Mapper.vr.get(entity);
@@ -428,7 +428,7 @@ public class ModelEntityRenderSystem {
             if (set.proximity.updating[0] != null) {
                 float opacity = (float) MathUtilsDouble.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
                 if (alpha * opacity > 0) {
-                    mc.setTransparency(alpha * opacity);
+                    mc.updateBlendMode(alpha * opacity);
                     mc.updateDepthTest();
                     float[] col = set.proximity.updating[0].col;
                     ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(col[0], col[1], col[2], 1f);
@@ -523,7 +523,7 @@ public class ModelEntityRenderSystem {
             if (shadow) {
                 prepareShadowEnvironment(model, scaffolding);
             }
-            mc.setTransparency(alpha * scaffolding.fadeOpacity);
+            mc.updateBlendMode(alpha * scaffolding.fadeOpacity);
             if (cam.getMode().isSpacecraft())
                 // In SPACECRAFT_MODE mode, we are not affected by relativistic aberration or Doppler shift
                 mc.updateRelativisticEffects(cam, 0);
@@ -636,7 +636,7 @@ public class ModelEntityRenderSystem {
         cloud.cloud.touch(model);
         ICamera cam = GaiaSky.instance.getICamera();
         cloud.cloud.mc.updateRelativisticEffects(cam);
-        cloud.cloud.mc.setTransparency(alpha * base.opacity);
+        cloud.cloud.mc.updateBlendMode(alpha * base.opacity);
         cloud.cloud.mc.updateEclipsingBodyUniforms(entity);
         batch.render(cloud.cloud.mc.instance, model.model.env);
     }

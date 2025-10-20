@@ -119,16 +119,16 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
             // Project cubemap.
             cubemapProjection.setViewportSize(tw, th);
             cubemapProjection.setSides(xPosFb, xNegFb, yPosFb, yNegFb, zPosFb, zNegFb);
-            cubemapProjection.render(null, middleBuffer, null);
+            cubemapProjection.render(null, middleBuffer, null, null);
             // Geometry warp.
             geometryWarp.setViewportSize(tw, th);
-            geometryWarp.render(middleBuffer, resultBuffer, null);
+            geometryWarp.render(middleBuffer, resultBuffer, null, null);
         } else {
             // Render only cubemap projection.
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
             cubemapProjection.setViewportSize(tw, th);
             cubemapProjection.setSides(xPosFb, xNegFb, yPosFb, yNegFb, zPosFb, zNegFb);
-            cubemapProjection.render(null, resultBuffer, null);
+            cubemapProjection.render(null, resultBuffer, null, null);
         }
 
         // To screen

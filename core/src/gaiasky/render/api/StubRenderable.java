@@ -17,4 +17,9 @@ public final class StubRenderable implements IRenderable{
     public float getOpacity() {
         return 0;
     }
+
+    @Override
+    public boolean isHalfResolutionBuffer() {
+        return false;
+    }
 }

@@ -162,7 +162,7 @@ public final class NoiseComponent extends NamedComponent {
             surfaceGen.setEmissiveTexture(fbBiome.getTextureAttachments().get(1));
         }
         fbSurface.begin();
-        surfaceGen.render(fbBiome, fbSurface, null);
+        surfaceGen.render(fbBiome, fbSurface, null, null);
         fbSurface.end();
 
         if (DEBUG_UI_VIEW) {

@@ -264,7 +264,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         // Render mosaic to fb
         mosaic.setViewportSize(wh, wh);
         mosaic.setTiles(tlFb, blFb, trFb, brFb);
-        mosaic.render(null, fb, null);
+        mosaic.render(null, fb, null, null);
 
         // Reset camera
         cam.direction.set(dirBak);

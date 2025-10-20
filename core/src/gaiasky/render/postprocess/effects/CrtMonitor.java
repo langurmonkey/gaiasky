@@ -141,7 +141,7 @@ public final class CrtMonitor extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         // the original scene
         Texture in = src.getColorBufferTexture();
 

@@ -3,6 +3,7 @@ package gaiasky.util.io;
 import java.io.*;
 import java.util.zip.GZIPInputStream;
 
+/** Naive GZIP utilities class. **/
 public class GzipUtils {
 
     /**
@@ -49,13 +50,4 @@ public class GzipUtils {
         return magic == GZIPInputStream.GZIP_MAGIC;
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        File gzf = new File("/tmp/1.gz");
-
-        // Check if a file is gzipped.
-        System.out.println(isGZipped(gzf));
-
-        // Check if a input stream is gzipped.
-        System.out.println(isGZipped(new FileInputStream(gzf)));
-    }
 }

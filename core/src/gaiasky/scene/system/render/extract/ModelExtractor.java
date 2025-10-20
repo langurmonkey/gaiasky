@@ -139,7 +139,7 @@ public class ModelExtractor extends AbstractExtractSystem {
     private void addToRenderModel(Render render,
                                   Model model) {
         RenderGroup rg;
-        var rt = Mapper.renderType.get(render.entity);
+        var rt = Mapper.render.get(render.entity);
         if (rt != null && rt.renderGroup != null) {
             rg = rt.renderGroup;
         } else {

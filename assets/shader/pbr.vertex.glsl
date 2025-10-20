@@ -263,7 +263,7 @@ struct VertexData {
 };
 out VertexData v_data;
 out vec3 v_normalTan;
-#if defined(heightFlag) && !defined(parallaxMappingFlag)
+#if defined(heightFlag)
 out vec3 o_fragPosition;
 out float o_fragHeight;
 #endif // heightFlag
@@ -325,13 +325,13 @@ void main() {
     // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;
 
-    #if defined(heightFlag) && !defined(parallaxMappingFlag)
+    #if defined(heightFlag)
     // Use height texture to move vertex along normal.
     float h = fetchHeight(g_texCoord0).r;
     o_fragHeight = h * u_heightScale * u_elevationMultiplier;
     vec3 dh = g_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
-    #endif // heightFlag && !parallaxMappingFlag
+    #endif // heightFlag
 
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
@@ -341,7 +341,7 @@ void main() {
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWave
 
-    #if defined(heightFlag) && !defined(parallaxMappingFlag)
+    #if defined(heightFlag)
     o_fragPosition = pos.xyz;
     #endif // heightFlag
     v_data.fragPosWorld = pos.xyz;

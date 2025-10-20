@@ -32,4 +32,10 @@ public interface IRenderable {
      */
     float getOpacity();
 
+    /**
+     * Is this renderable flagged to be rendered in a half-resolution buffer?
+     * @return True if it renders to a half-resolution buffer.
+     */
+    boolean isHalfResolutionBuffer();
+
 }

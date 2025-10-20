@@ -30,8 +30,8 @@ public class Blend extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
-        combineFilter.setInput(src.getColorBufferTexture(), main.getLayerBufferTexture())
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
+        combineFilter.setInput(src.getColorBufferTexture(), full.getLayerBufferTexture())
                 .setOutput(dest)
                 .render();
     }

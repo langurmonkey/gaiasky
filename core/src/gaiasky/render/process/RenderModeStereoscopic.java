@@ -198,7 +198,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             anaglyphEffect.setTextureRight(texRight);
 
             // Render 
-            anaglyphEffect.render(null, resultBuffer, null);
+            anaglyphEffect.render(null, resultBuffer, null, null);
             resultBuffer.end();
 
             // ensure default texture unit #0 is active.

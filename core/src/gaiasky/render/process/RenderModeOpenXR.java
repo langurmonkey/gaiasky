@@ -136,14 +136,13 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
                 this.rh = rh;
                 this.t = t;
                 driver.renderFrameOpenXR();
-
             }
         }
     }
 
     @Override
     public void renderOpenXRView(XrCompositionLayerProjectionView layerView,
-                                 XrSwapchainImageOpenGLKHR swapchainImage,
+                                 XrSwapchainImageOpenGLKHR swapChainImage,
                                  FrameBuffer frameBuffer,
                                  int viewIndex) {
         rc.ppb = null;
@@ -162,13 +161,13 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
         // To swap-chain texture.
         frameBuffer.begin();
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapChainImage.image(), 0);
         frameBuffer.end();
         postProcessRender(ppb, frameBuffer, postProcess, camera, rw, rh);
 
         /* Render to screen */
         if (viewIndex == 0) {
-            textureView.setTexture(swapchainImage.image(), driver.getWidth(), driver.getHeight());
+            textureView.setTexture(swapChainImage.image(), driver.getWidth(), driver.getHeight());
             Gdx.gl.glEnable(GL40.GL_FRAMEBUFFER_SRGB);
             RenderUtils.renderKeepAspect(textureView, sbScreen, Gdx.graphics, lastSize);
             Gdx.gl.glDisable(GL40.GL_FRAMEBUFFER_SRGB);

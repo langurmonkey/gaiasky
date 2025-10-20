@@ -69,7 +69,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         var extra = Mapper.extra.get(entity);
         var sa = Mapper.sa.get(entity);
         var label = Mapper.label.get(entity);
-        var render = Mapper.renderType.get(entity);
+        var render = Mapper.render.get(entity);
         var hip = Mapper.hip.get(entity);
         var focus = Mapper.focus.get(entity);
         var bb = Mapper.billboard.get(entity);
@@ -109,7 +109,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         }
     }
 
-    private void baseInitialization(ProperMotion pm, ParticleExtra extra, Celestial celestial, SolidAngle sa, RenderType render) {
+    private void baseInitialization(ProperMotion pm, ParticleExtra extra, Celestial celestial, SolidAngle sa, Render render) {
         if (pm.pm == null) {
             pm.pm = new Vector3();
             pm.pmSph = new Vector3();
@@ -148,7 +148,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
     }
 
-    private void initializeParticle(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus) {
+    private void initializeParticle(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, Render render, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, render);
 
         sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
@@ -175,7 +175,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
     }
 
-    private void initializeStar(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus) {
+    private void initializeStar(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, Render render, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, render);
 
         sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;

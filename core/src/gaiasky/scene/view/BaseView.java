@@ -15,6 +15,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
+import gaiasky.scene.component.Render;
 import gaiasky.util.Settings;
 
 public non-sealed class BaseView extends AbstractView {
@@ -23,6 +24,8 @@ public non-sealed class BaseView extends AbstractView {
     public Base base;
     /** The body component. **/
     public Body body;
+    /** The render component. **/
+    public Render render;
 
     public BaseView() {
     }
@@ -33,25 +36,31 @@ public non-sealed class BaseView extends AbstractView {
 
     @Override
     protected boolean componentsCheck(Entity entity) {
-        return entity != null && Mapper.base.get(entity) == base && Mapper.body.get(entity) == body;
+        return entity != null
+                && Mapper.base.get(entity) == base
+                && Mapper.body.get(entity) == body
+                && Mapper.render.get(entity) == render;
     }
 
     @Override
     protected void entityCheck(Entity entity) {
         check(entity, Mapper.base, Base.class);
         check(entity, Mapper.body, Body.class);
+        check(entity, Mapper.render, Render.class);
     }
 
     @Override
     protected void entityChanged() {
         this.base = Mapper.base.get(entity);
         this.body = Mapper.body.get(entity);
+        this.render = Mapper.render.get(entity);
     }
 
     @Override
     protected void entityCleared() {
         this.base = null;
         this.body = null;
+        this.render = null;
     }
 
     public void setColor(float[] color) {
@@ -78,6 +87,10 @@ public non-sealed class BaseView extends AbstractView {
         return body;
     }
 
+    public Render getRender() {
+        return render;
+    }
+
     public boolean isVisible() {
         return base.visible || base.msSinceStateChange() <= Settings.settings.scene.fadeMs;
     }
@@ -102,4 +115,8 @@ public non-sealed class BaseView extends AbstractView {
         return ct != null && base.ct.isEnabled(ct);
     }
 
+
+    public boolean isHalfResolutionBuffer() {
+       return render.halfResolutionBuffer;
+    }
 }

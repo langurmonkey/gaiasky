@@ -94,7 +94,7 @@ public class ShapeInitializer extends AbstractInitSystem {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var modelComp = Mapper.model.get(entity);
-        var rt = Mapper.renderType.get(entity);
+        var rt = Mapper.render.get(entity);
 
         modelComp.renderConsumer = ModelEntityRenderSystem::renderShape;
         var mc = modelComp.model;

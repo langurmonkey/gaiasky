@@ -29,14 +29,14 @@ public final class DepthBuffer extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         // Z-far and K.
         var cam = GaiaSky.instance.getICamera();
         filter.setZFarK((float) cam.getFar(), Constants.getCameraK());
 
         restoreViewport(dest);
         // Get depth buffer texture from main frame buffer
-        filter.setDepthTexture(main.getDepthBufferTexture());
+        filter.setDepthTexture(full.getDepthBufferTexture());
         // Set input, output and render
         filter.setInput(src).setOutput(dest).render();
     }

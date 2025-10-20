@@ -178,7 +178,6 @@ public class ModelInitializer extends AbstractInitSystem {
             parentOrientation.orientationf = new Matrix4();
         }
 
-
         if (orientation != null) {
             // Quaternion-based orientation.
             orientation.setUp(manager);

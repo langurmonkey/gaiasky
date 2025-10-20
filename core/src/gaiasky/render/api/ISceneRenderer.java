@@ -77,8 +77,12 @@ public interface ISceneRenderer {
      */
     FrameBuffer getGlowFrameBuffer();
 
-    /** Returns he render lists of this renderer. **/
-    List<List<IRenderable>> getRenderLists();
+    /**
+     * Returns he render lists of this renderer.
+     *
+     * @param full Whether to return the render lists for the full- or the half-resolution buffer.
+     **/
+    List<List<IRenderable>> getRenderLists(boolean full);
 
     /** Gets the light glow pass object. **/
     LightGlowRenderPass getLightGlowPass();

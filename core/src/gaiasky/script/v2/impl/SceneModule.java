@@ -972,7 +972,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                 model.model.setBlendMode(BlendMode.ADDITIVE);
                 model.model.setCulling(false);
 
-                var rt = Mapper.renderType.get(newShape);
+                var rt = Mapper.render.get(newShape);
                 rt.renderGroup = RenderGroup.MODEL_VERT_ADDITIVE;
 
                 // Initialize shape.

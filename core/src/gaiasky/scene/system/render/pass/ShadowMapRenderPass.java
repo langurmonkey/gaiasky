@@ -431,7 +431,7 @@ public class ShadowMapRenderPass extends RenderPass {
          * shadow if different</li>
          * </ul>
          */
-        List<IRenderable> models = sceneRenderer.getRenderLists().get(MODEL_PIX.ordinal());
+        List<IRenderable> models = sceneRenderer.getRenderListsFull().get(MODEL_PIX.ordinal());
         //List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
         models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 

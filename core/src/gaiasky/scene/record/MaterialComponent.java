@@ -24,8 +24,10 @@ import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
+import gaiasky.util.gdx.graphics.VolumeTexture;
 import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
+import gaiasky.util.gdx.loader.VolumeTextureLoader;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
@@ -62,7 +64,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 for (Path p : l) {
                     String name = p.toString();
                     lookUpTables.add(Constants.DATA_LOCATION_TOKEN
-                            + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep)));
+                                             + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep)));
                 }
             } catch (Exception ignored) {
             }
@@ -103,9 +105,11 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
     // Texture location strings.
     public boolean texInitialised, texLoading;
-    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao, occlusionMetallicRoughness, texture0, texture1;
+    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao, occlusionMetallicRoughness,
+            texture0, texture1, volume0, volume1, volume2, volume3;
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked,
-            heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked, texture0Unpacked, texture1Unpacked;
+            heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked, texture0Unpacked,
+            texture1Unpacked, volume0Unpacked, volume1Unpacked, volume2Unpacked, volume3Unpacked;
     // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
@@ -151,7 +155,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         super();
         svts = new Array<>();
         EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD,
-                Event.TESSELLATION_QUALITY_CMD, Event.TOGGLE_VISIBILITY_CMD);
+                                        Event.TESSELLATION_QUALITY_CMD, Event.TOGGLE_VISIBILITY_CMD);
     }
 
     private static OwnTextureParameter getTP(String tex) {
@@ -201,6 +205,16 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             texture0Unpacked = addToLoad(texture0, getTP(texture0, true), manager);
         if (texture1 != null)
             texture1Unpacked = addToLoad(texture1, getTP(texture1, true), manager);
+
+        // Volumes (3D textures)
+        if (volume0 != null)
+            volume0Unpacked = addToLoad(volume0, new VolumeTextureLoader.VolumeTextureParameter(), manager);
+        if (volume1 != null)
+            volume1Unpacked = addToLoad(volume1, new VolumeTextureLoader.VolumeTextureParameter(), manager);
+        if (volume2 != null)
+            volume2Unpacked = addToLoad(volume2, new VolumeTextureLoader.VolumeTextureParameter(), manager);
+        if (volume3 != null)
+            volume3Unpacked = addToLoad(volume3, new VolumeTextureLoader.VolumeTextureParameter(), manager);
 
         // Cube maps
         if (diffuseCubemap != null)
@@ -264,12 +278,17 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 && ComponentUtils.isLoaded(metallicCubemap, manager)
                 && ComponentUtils.isLoaded(heightCubemap, manager)
                 && ComponentUtils.isLoaded(aoCubemap, manager)
+                && ComponentUtils.isLoaded(volume0, manager)
+                && ComponentUtils.isLoaded(volume1, manager)
+                && ComponentUtils.isLoaded(volume2, manager)
+                && ComponentUtils.isLoaded(volume3, manager)
                 && ComponentUtils.isLoaded(texture0, manager)
                 && ComponentUtils.isLoaded(texture1, manager);
     }
 
     public boolean hasSVT() {
-        return diffuseSvt != null || normalSvt != null || emissiveSvt != null || specularSvt != null || heightSvt != null || metallicSvt != null || roughnessSvt != null || aoSvt != null;
+        return diffuseSvt != null || normalSvt != null || emissiveSvt != null || specularSvt != null
+                || heightSvt != null || metallicSvt != null || roughnessSvt != null || aoSvt != null;
     }
 
     /**
@@ -316,6 +335,50 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         return tex;
     }
 
+    /**
+     * Adds the 3D texture to load and unpacks any star (*) with the current
+     * quality setting.
+     *
+     * @param tex The 3D texture file to load.
+     *
+     * @return The actual loaded 3D texture path
+     */
+    private String addToLoad(String tex,
+                             VolumeTextureLoader.VolumeTextureParameter texParams,
+                             AssetManager manager) {
+        if (manager == null)
+            return addToLoad(tex, texParams);
+
+        if (tex == null)
+            return null;
+
+        tex = GlobalResources.unpackAssetPath(tex);
+        logger.info(I18n.msg("notif.loading", tex));
+        manager.load(tex, VolumeTexture.class, texParams);
+
+        return tex;
+    }
+
+    /**
+     * Adds the 3D texture to load and unpacks any star (*) with the current
+     * quality setting.
+     *
+     * @param tex The 3D texture file to load.
+     *
+     * @return The actual loaded 3D texture path
+     */
+    private String addToLoad(String tex,
+                             VolumeTextureLoader.VolumeTextureParameter texParams) {
+        if (tex == null)
+            return null;
+
+        tex = GlobalResources.unpackAssetPath(tex);
+        logger.info(I18n.msg("notif.loading", tex));
+        AssetBean.addAsset(tex, VolumeTexture.class, texParams);
+
+        return tex;
+    }
+
     public void initMaterial(AssetManager manager,
                              IntModelInstance instance,
                              float[] diffuseCol,
@@ -332,6 +395,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                              boolean culling) {
         reflectionCubemap.initialize();
         this.material = mat;
+        assert material != null;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
             if (!diffuse.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(diffuseUnpacked, Texture.class);
@@ -345,10 +409,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             diffuseColor[1] = diffuseCol[1];
             diffuseColor[2] = diffuseCol[2];
             diffuseColor[3] = diffuseCol[3];
-            if (colorIfTexture || diffuse == null) {
-                // Add diffuse colour
-                material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
-            }
+            // Add diffuse colour
+            material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
         }
 
         if (normal != null && material.get(TextureAttribute.Normal) == null) {
@@ -376,7 +438,11 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             material.set(new ColorAttribute(ColorAttribute.Emissive, emissiveColor[0], emissiveColor[1], emissiveColor[2], 1f));
         }
         if (diffuseScatteringColor != null) {
-            material.set(new ColorAttribute(ColorAttribute.DiffuseScattering, diffuseScatteringColor[0], diffuseScatteringColor[1], diffuseScatteringColor[2], 1f));
+            material.set(new ColorAttribute(ColorAttribute.DiffuseScattering,
+                                            diffuseScatteringColor[0],
+                                            diffuseScatteringColor[1],
+                                            diffuseScatteringColor[2],
+                                            1f));
         }
         if (height != null && material.get(TextureAttribute.Height) == null) {
             if (!height.endsWith(Constants.GEN_KEYWORD)) {
@@ -397,8 +463,11 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             }
             if (ringDiffuseScatteringColor != null) {
                 ringMaterial.set(
-                        new ColorAttribute(ColorAttribute.DiffuseScattering, ringDiffuseScatteringColor[0], ringDiffuseScatteringColor[1], ringDiffuseScatteringColor[2],
-                                1f));
+                        new ColorAttribute(ColorAttribute.DiffuseScattering,
+                                           ringDiffuseScatteringColor[0],
+                                           ringDiffuseScatteringColor[1],
+                                           ringDiffuseScatteringColor[2],
+                                           1f));
             }
             // Alpha blending for ring.
             ringMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
@@ -452,6 +521,40 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         if (texture1 != null && material.get(TextureAttribute.Texture1) == null) {
             Texture tex = manager.get(texture1Unpacked, Texture.class);
             addTexture1(tex);
+        }
+
+        // 3D textures; volumes.
+        if (volume0 != null && material.get(Texture3DAttribute.Volume0) == null) {
+            VolumeTexture tex = manager.get(volume0Unpacked, VolumeTexture.class);
+            if (tex != null && material != null) {
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume0, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMax, tex.boundsMax()));
+            }
+        }
+        if (volume1 != null && material.get(Texture3DAttribute.Volume1) == null) {
+            VolumeTexture tex = manager.get(volume1Unpacked, VolumeTexture.class);
+            if (tex != null && material != null) {
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume1, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMax, tex.boundsMax()));
+            }
+        }
+        if (volume2 != null && material.get(Texture3DAttribute.Volume2) == null) {
+            VolumeTexture tex = manager.get(volume2Unpacked, VolumeTexture.class);
+            if (tex != null && material != null) {
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume2, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMax, tex.boundsMax()));
+            }
+        }
+        if (volume3 != null && material.get(Texture3DAttribute.Volume3) == null) {
+            VolumeTexture tex = manager.get(volume3Unpacked, VolumeTexture.class);
+            if (tex != null && material != null) {
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume3, tex.texture()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMin, tex.boundsMin()));
+                material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMax, tex.boundsMax()));
+            }
         }
 
         // Cubemaps.
@@ -547,14 +650,16 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         // Set attributes.
         material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
         material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
-        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor, (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
+        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor,
+                                        (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
         // Only update depth and resolution if it does not exist, or if it exists and its value is less than ours.
         if (!material.has(FloatAttribute.SvtDepth) || ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.SvtDepth))).value < svt.tree.depth) {
             // Depth.
             material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
             // Resolution.
             double svtResolution = svt.tileSize * FastMath.pow(2.0, svt.tree.depth);
-            material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
+            material.set(new Vector2Attribute(Vector2Attribute.SvtResolution,
+                                              new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
         }
 
         // Add to list.
@@ -601,11 +706,13 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             material.set(new TextureAttribute(TextureAttribute.Roughness, roughnessTex));
         }
     }
+
     private void addTexture0(Texture tex) {
         if (tex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Texture0, tex));
         }
     }
+
     private void addTexture1(Texture tex) {
         if (tex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Texture1, tex));
@@ -626,9 +733,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 final int N = Settings.settings.graphics.proceduralGenerationResolution[0];
                 final int M = Settings.settings.graphics.proceduralGenerationResolution[1];
                 logger.info(I18n.msg("gui.procedural.info.generate",
-                        I18n.msg("gui.procedural.surface"),
-                        Integer.toString(N),
-                        Integer.toString(M)));
+                                     I18n.msg("gui.procedural.surface"),
+                                     Integer.toString(N),
+                                     Integer.toString(M)));
 
                 Random rand = new Random();
                 if (nc == null) {
@@ -649,10 +756,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                     GaiaSky.postRunnable(() -> {
                         // 3RD FRAME - SURFACE.
                         FrameBuffer fbSurface = nc.generateSurface(N, M,
-                                biomeLUT,
-                                biomeHueShift,
-                                biomeSaturation,
-                                Settings.settings.scene.renderer.elevation.type.isNone());
+                                                                   biomeLUT,
+                                                                   biomeHueShift,
+                                                                   biomeSaturation,
+                                                                   Settings.settings.scene.renderer.elevation.type.isNone());
 
                         GaiaSky.postRunnable(() -> {
                             // 4TH FRAME - ADD TEXTURES TO MATERIAL.
@@ -717,18 +824,18 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                             // Save textures to disk as image files.
                             if (Settings.settings.program.saveProceduralTextures) {
                                 SysUtils.saveProceduralGLTextures(new Texture[]{
-                                                heightT,
-                                                diffuseT,
-                                                specularT,
-                                                normalT,
-                                                emissiveT},
-                                        new String[]{
-                                                name + "-biome",
-                                                name + "-diffuse",
-                                                name + "-specular",
-                                                name + "-normal",
-                                                name + "-emissive"},
-                                        Settings.ImageFormat.JPG);
+                                                                          heightT,
+                                                                          diffuseT,
+                                                                          specularT,
+                                                                          normalT,
+                                                                          emissiveT},
+                                                                  new String[]{
+                                                                          name + "-biome",
+                                                                          name + "-diffuse",
+                                                                          name + "-specular",
+                                                                          name + "-normal",
+                                                                          name + "-emissive"},
+                                                                  Settings.ImageFormat.JPG);
                             }
                         });
                     });
@@ -803,6 +910,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         float r = specular.floatValue();
         this.specularColor = new float[]{r, r, r};
     }
+
     public void setSpecular(Double specular) {
         this.setSpecularValue(specular);
     }
@@ -817,7 +925,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setSpecular(double[] specular) {
-       this.setSpecularValues(specular);
+        this.setSpecularValues(specular);
     }
 
     public void setNormal(String normal) {
@@ -987,11 +1095,29 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     public void setOcclusionMetallicRoughness(String texture) {
         this.occlusionMetallicRoughness = Settings.settings.data.dataFile(texture);
     }
+
     public void setTexture0(String texture0) {
         this.texture0 = Settings.settings.data.dataFile(texture0);
     }
+
     public void setTexture1(String texture1) {
         this.texture1 = Settings.settings.data.dataFile(texture1);
+    }
+
+    public void setVolume0(String tex) {
+        this.volume0 = Settings.settings.data.dataFile(tex);
+    }
+
+    public void setVolume1(String tex) {
+        this.volume1 = Settings.settings.data.dataFile(tex);
+    }
+
+    public void setVolume2(String tex) {
+        this.volume2 = Settings.settings.data.dataFile(tex);
+    }
+
+    public void setVolume3(String tex) {
+        this.volume3 = Settings.settings.data.dataFile(tex);
     }
 
     public void setDiffuseCubemap(String cubemap) {
@@ -1440,7 +1566,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setEmissive("generate");
 
         setBiomelut(randomBiomeLut(rand, "biome-lut", "biome-smooth-lut", "biome-vertical-lut",
-                "biomes-separate-lut", "brown-green-lut", "biome-snow2-lut", "biome-brown-green-lut"));
+                                   "biomes-separate-lut", "brown-green-lut", "biome-snow2-lut", "biome-brown-green-lut"));
 
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);

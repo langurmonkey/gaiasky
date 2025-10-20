@@ -107,7 +107,7 @@ public final class LightGlow extends PostProcessorEffect {
     }
 
     @Override
-    public void render(final FrameBuffer src, final FrameBuffer dest, GaiaSkyFrameBuffer main) {
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
         glow.setInput(src).setOutput(dest).render();
     }

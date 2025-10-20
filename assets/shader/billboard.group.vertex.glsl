@@ -1,7 +1,5 @@
 #version 330 core
 
-#include <shader/lib/geometry.glsl>
-
 uniform float u_pointAlphaMin;
 uniform float u_pointAlphaMax;
 uniform float u_starBrightness;
@@ -39,6 +37,7 @@ in vec3 a_additional;
 // OUTPUT
 out vec4 v_col;
 out vec2 v_uv;
+out float v_dist;
 // 0 - dust
 // 1 - star
 // 2 - bulge
@@ -81,8 +80,9 @@ void main() {
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = quadSize;
-    #include <shader/snippet/billboard.glsl>
+    #include <shader/snippet/billboard.fast.glsl>
 
     gl_Position = gpos * u_vrScale;
+    v_dist = dist;
 
 }

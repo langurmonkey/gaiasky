@@ -8,15 +8,27 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.TextureArray;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.util.tree.LoadStatus;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BillboardSet implements Component {
+/**
+ * A component that aggregates several sets of billboard datasets.
+ */
+public class BillboardSet implements Component, IDisposable {
 
+    /** List of {@link BillboardDataset} objects. **/
     public BillboardDataset[] datasets;
+    /** Location of the textures for the billboard particles. **/
+    public String[] textureFiles;
+    /** The GPU texture array for this set. **/
+    public TextureArray textureArray;
+    /** Fully qualified name of the data provider class. Loads particle data files. **/
     public String provider;
+    /** Current load status. **/
     public AtomicReference<LoadStatus> status = new AtomicReference<>(LoadStatus.NOT_LOADED);
 
     public void setData(Object[] data) {
@@ -33,5 +45,20 @@ public class BillboardSet implements Component {
 
     public void setStatus(LoadStatus status) {
         this.status.set(status);
+    }
+
+    public void setTextures(String[] textures) {
+        this.textureFiles = textures;
+    }
+
+    public void setTexture(String tex) {
+        this.textureFiles = new String[]{tex};
+    }
+
+    @Override
+    public void dispose(Entity e) {
+       if (this.textureArray != null) {
+           this.textureArray.dispose();
+       }
     }
 }

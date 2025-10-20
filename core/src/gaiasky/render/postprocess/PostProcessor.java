@@ -322,9 +322,7 @@ public final class PostProcessor implements Disposable {
             }
 
             capturing = true;
-            composite.getMainBuffer().begin();
-            //composite.begin();
-            //composite.capture();
+            composite.getFullBuffer().begin();
 
             if (useDepth) {
                 Gdx.gl.glClearDepthf(clearDepth);
@@ -377,8 +375,8 @@ public final class PostProcessor implements Disposable {
         if (enabled && capturing) {
             capturing = false;
             hasCaptured = true;
-            composite.getMainBuffer().end();
-            return composite.getMainBuffer();
+            composite.getFullBuffer().end();
+            return composite.getFullBuffer();
         }
 
         return null;
@@ -457,8 +455,8 @@ public final class PostProcessor implements Disposable {
                     composite.capture();
                     {
                         // We use the main buffer as the first source.
-                        var source = i == 0 ? composite.getMainBuffer() : composite.getSourceBuffer();
-                        e.render(source, composite.getResultBuffer(), composite.getMainBuffer());
+                        var source = i == 0 ? composite.getFullBuffer() : composite.getSourceBuffer();
+                        e.render(source, composite.getResultBuffer(), composite.getFullBuffer(), composite.getHalfBuffer());
                     }
                 }
 
@@ -473,7 +471,7 @@ public final class PostProcessor implements Disposable {
             }
 
             // render with null dest (to screen)
-            items.get(count - 1).render(composite.getResultBuffer(), destination, composite.getMainBuffer());
+            items.get(count - 1).render(composite.getResultBuffer(), destination, composite.getFullBuffer(), composite.getHalfBuffer());
 
             // ensure default texture unit #0 is active
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);

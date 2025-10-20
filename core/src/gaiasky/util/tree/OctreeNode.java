@@ -346,6 +346,11 @@ public class OctreeNode implements ILineRenderable {
         return opacity;
     }
 
+    @Override
+    public boolean isHalfResolutionBuffer() {
+        return false;
+    }
+
     public boolean add(IOctreeObject e) {
         if (objects == null)
             objects = new ArrayList<>(1);

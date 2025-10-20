@@ -30,6 +30,27 @@ public class Vector3Attribute extends Attribute {
     public static final int VrOffset = register(VrOffsetAlias);
     public static final String EclipsingBodyPosAlias = "eclipsingBodyPos";
     public static final int EclipsingBodyPos = register(EclipsingBodyPosAlias);
+
+    public static final String Volume0BoundsMinAlias = "volume0BoundsMin";
+    public static final int Volume0BoundsMin = register(Volume0BoundsMinAlias);
+    public static final String Volume0BoundsMaxAlias = "volume0BoundsMax";
+    public static final int Volume0BoundsMax = register(Volume0BoundsMaxAlias);
+
+    public static final String Volume1BoundsMinAlias = "volume1BoundsMin";
+    public static final int Volume1BoundsMin = register(Volume1BoundsMinAlias);
+    public static final String Volume1BoundsMaxAlias = "volume1BoundsMax";
+    public static final int Volume1BoundsMax = register(Volume1BoundsMaxAlias);
+
+    public static final String Volume2BoundsMinAlias = "volume2BoundsMin";
+    public static final int Volume2BoundsMin = register(Volume2BoundsMinAlias);
+    public static final String Volume2BoundsMaxAlias = "volume2BoundsMax";
+    public static final int Volume2BoundsMax = register(Volume2BoundsMaxAlias);
+
+    public static final String Volume3BoundsMinAlias = "volume3BoundsMin";
+    public static final int Volume3BoundsMin = register(Volume3BoundsMinAlias);
+    public static final String Volume3BoundsMaxAlias = "volume3BoundsMax";
+    public static final int Volume3BoundsMax = register(Volume3BoundsMaxAlias);
+
     public Vector3 value;
 
     public Vector3Attribute(int index) {

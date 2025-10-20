@@ -19,6 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.JPGWriter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
@@ -34,6 +35,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Locale;
 
 
@@ -650,7 +652,7 @@ public class SysUtils {
      * Gets the current display resolution.
      *
      * @return The display resolution in an array with [width, height], or null if the resolution could not be
-     * determined.
+     *         determined.
      */
     public static int[] getDisplayResolution() {
         int w, h;
@@ -768,5 +770,40 @@ public class SysUtils {
             i++;
         }
         return f;
+    }
+
+    /**
+     * Given an array of string representing either directories or actual files, this method walks the directory tree and gathers an array of
+     * all the files with the given extensions.
+     *
+     * @param files An alphabetically sorted list of files of the given type.
+     */
+    public static Array<String> gatherFilesExtension(String[] files, String[] extensions) {
+        Array<String> actualFilePaths = new Array<>();
+        if (files == null || extensions == null) {
+            return actualFilePaths;
+        }
+        for (String textureFile : files) {
+            String unpackedFile = Settings.settings.data.dataFile(textureFile);
+            Path galLocationPath = Path.of(unpackedFile);
+            if (Files.exists(galLocationPath)) {
+                if (Files.isDirectory(galLocationPath)) {
+                    // Directory.
+                    Collection<File> galaxyFiles = FileUtils.listFiles(galLocationPath.toFile(), extensions, true);
+                    if (!galaxyFiles.isEmpty()) {
+                        for (File f : galaxyFiles) {
+                            actualFilePaths.add(f.getAbsolutePath());
+                        }
+                    }
+                } else {
+                    // File.
+                    actualFilePaths.add(galLocationPath.toAbsolutePath()
+                                                .toString());
+                }
+            }
+        }
+        // Sort using natural order.
+        actualFilePaths.sort();
+        return actualFilePaths;
     }
 }
