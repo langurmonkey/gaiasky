@@ -46,7 +46,8 @@ public class ComputeShaderLoader<T extends ComputeShaderLoader.ComputeShaderPara
     public ComputeShaderProgram loadSync(AssetManager manager, String fileName, FileHandle file, T parameter) {
         try {
             if (!SysUtils.isComputeShaderSupported()) {
-               throw new RuntimeException("Compute shaders not supported on this platform: OpenGL 4.3+ or ARB_compute_shader extension required");
+               logger.warn("Compute shaders not supported on this platform: OpenGL 4.3+ or ARB_compute_shader extension required");
+               return null;
             }
             computeShaderProgram = new ComputeShaderProgram(parameter.name, shaderCode);
             return computeShaderProgram;
