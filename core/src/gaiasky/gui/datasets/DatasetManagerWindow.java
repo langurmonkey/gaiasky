@@ -1591,7 +1591,6 @@ public class DatasetManagerWindow extends GenericDialog {
             serverDataset.exists = false;
             actionDisableDataset(dataset);
             resetSelectedDataset();
-
         }
     }
 
