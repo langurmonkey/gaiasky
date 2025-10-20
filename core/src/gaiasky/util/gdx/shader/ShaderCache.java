@@ -17,6 +17,7 @@ import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL41;
+import org.lwjgl.opengl.GL43;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,6 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.PathMatcher;
+
+import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glDetachShader;
 
 /**
  * Implements shader caching to disk.
@@ -72,20 +76,12 @@ public class ShaderCache {
      * Output log.
      */
     protected String log;
-    /**
-     * Compiled flag.
-     */
-    boolean isCompiled = false;
 
     public ShaderCache() {
         // Cache is enabled if we use OpenGL 4.1+, for we need to access the binary format of shaders.
         cacheEnabled = Gdx.graphics.getGLVersion().isVersionEqualToOrHigher(4, 1) &&
                 Settings.settings.program.shaderCache &&
                 !Settings.settings.program.safeMode;
-    }
-
-    public boolean isCompiled() {
-        return isCompiled;
     }
 
     public String getLog() {
@@ -98,7 +94,6 @@ public class ShaderCache {
 
 
     public void clear() {
-        isCompiled = false;
         log = null;
         program = -1;
 
@@ -111,8 +106,10 @@ public class ShaderCache {
 
     /**
      * Checks the shader cache with the given name and code.
+     *
      * @param name The name of the shader.
      * @param code Concatenation of the code for all the shader stages.
+     *
      * @return The program handle (>= 0) if the cache was hit successfully, -1 otherwise.
      */
     private int checkCache(String name,
@@ -161,8 +158,6 @@ public class ShaderCache {
                         if (linked == 0) {
                             log = GL33.glGetProgramInfoLog(program);
                             program = -1;
-                        } else {
-                            isCompiled = true;
                         }
                         return program;
 
@@ -179,9 +174,11 @@ public class ShaderCache {
 
     /**
      * Puts the binary data of the given format in the disk cache (saves a file).
+     *
      * @param program The program handle.
-     * @param name The name of the shader.
-     * @param code Concatenation of the code for all the shader stages.
+     * @param name    The name of the shader.
+     * @param code    Concatenation of the code for all the shader stages.
+     *
      * @return True if the program was put in the cache successfully, false otherwise.
      */
     private boolean putInCache(int program,
@@ -235,11 +232,12 @@ public class ShaderCache {
     /**
      * Loads and compiles the shaders, creates a new program and links the shaders.
      *
-     * @param name           The name of the shader.
-     * @param vertexShader   The vertex shader code.
+     * @param name              The name of the shader.
+     * @param vertexShader      The vertex shader code.
      * @param tessControlShader The tessellation control shader code.
-     * @param tessEvalShader The tessellation evaluation shader code.
-     * @param fragmentShader The fragment shader code.
+     * @param tessEvalShader    The tessellation evaluation shader code.
+     * @param fragmentShader    The fragment shader code.
+     *
      * @return Integer array with the program handle, and the handle of every shader stage.
      *
      */
@@ -271,14 +269,12 @@ public class ShaderCache {
             logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
 
             if (vertexShaderHandle == -1 || controlShaderHandle == -1 || evaluationShaderHandle == -1 || fragmentShaderHandle == -1) {
-                isCompiled = false;
-                return new int[]{program, vertexShaderHandle, controlShaderHandle, evaluationShaderHandle, fragmentShaderHandle};
+                return new int[]{GL41.GL_FALSE, program, vertexShaderHandle, controlShaderHandle, evaluationShaderHandle, fragmentShaderHandle};
             }
 
             program = linkProgram(createProgram(), vertexShaderHandle, controlShaderHandle, evaluationShaderHandle, fragmentShaderHandle);
             if (program == -1) {
-                isCompiled = false;
-                return new int[]{program, vertexShaderHandle, controlShaderHandle, evaluationShaderHandle, fragmentShaderHandle};
+                return new int[]{GL41.GL_FALSE, program, vertexShaderHandle, controlShaderHandle, evaluationShaderHandle, fragmentShaderHandle};
             } else {
                 // Cache.
                 if (putInCache(program, name, vertexShader + controlShaderHandle + evaluationShaderHandle + fragmentShader)) {
@@ -286,8 +282,7 @@ public class ShaderCache {
                 }
             }
 
-            isCompiled = true;
-            return new int[]{program, vertexShaderHandle, controlShaderHandle, evaluationShaderHandle, fragmentShaderHandle};
+            return new int[]{GL41.GL_TRUE, program, vertexShaderHandle, controlShaderHandle, evaluationShaderHandle, fragmentShaderHandle};
         } else {
             logger.debug(I18n.msg("notif.shader.cache", name));
         }
@@ -302,6 +297,7 @@ public class ShaderCache {
      * @param vertexShader   The vertex shader code.
      * @param geometryShader The geometry shader code.
      * @param fragmentShader The fragment shader code.
+     *
      * @return Integer array with the program handle, and the handle of every shader stage.
      */
     public int[] compileShaders(String name,
@@ -330,14 +326,12 @@ public class ShaderCache {
             logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
 
             if (vertexShaderHandle == -1 || geometryShaderHandle == -1 || fragmentShaderHandle == -1) {
-                isCompiled = false;
-                return new int[]{program, vertexShaderHandle, geometryShaderHandle, fragmentShaderHandle};
+                return new int[]{GL41.GL_FALSE, program, vertexShaderHandle, geometryShaderHandle, fragmentShaderHandle};
             }
 
             program = linkProgram(createProgram(), vertexShaderHandle, geometryShaderHandle, fragmentShaderHandle);
             if (program == -1) {
-                isCompiled = false;
-                return new int[]{program, vertexShaderHandle, geometryShaderHandle, fragmentShaderHandle};
+                return new int[]{GL41.GL_FALSE, program, vertexShaderHandle, geometryShaderHandle, fragmentShaderHandle};
             } else {
                 // Cache.
                 if (putInCache(program, name, vertexShader + geometryShader + fragmentShader)) {
@@ -345,8 +339,7 @@ public class ShaderCache {
                 }
             }
 
-            isCompiled = true;
-            return new int[]{program, vertexShaderHandle, geometryShaderHandle, fragmentShaderHandle};
+            return new int[]{GL41.GL_TRUE, program, vertexShaderHandle, geometryShaderHandle, fragmentShaderHandle};
         } else {
             logger.debug(I18n.msg("notif.shader.cache", name));
         }
@@ -359,7 +352,8 @@ public class ShaderCache {
      * @param name           The name of the shader.
      * @param vertexShader   The vertex shader code.
      * @param fragmentShader The fragment shader code.
-     * @return Integer array with the program handle, and the handle of every shader stage.
+     *
+     * @return Integer array with the compile status, the program handle, and the handle of every shader stage.
      */
     public int[] compileShaders(String name,
                                 String vertexShader,
@@ -385,14 +379,12 @@ public class ShaderCache {
             logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
 
             if (vertexShaderHandle == -1 || fragmentShaderHandle == -1) {
-                isCompiled = false;
-                return new int[]{program, vertexShaderHandle, fragmentShaderHandle};
+                return new int[]{GL41.GL_FALSE, program, vertexShaderHandle, fragmentShaderHandle};
             }
 
             program = linkProgram(createProgram(), vertexShaderHandle, fragmentShaderHandle);
             if (program == -1) {
-                isCompiled = false;
-                return new int[]{program, vertexShaderHandle, fragmentShaderHandle};
+                return new int[]{GL41.GL_FALSE, program, vertexShaderHandle, fragmentShaderHandle};
             } else {
                 // Cache.
                 try {
@@ -404,8 +396,65 @@ public class ShaderCache {
                 }
             }
 
-            isCompiled = true;
-            return new int[]{program, vertexShaderHandle, fragmentShaderHandle};
+            return new int[]{GL41.GL_TRUE, program, vertexShaderHandle, fragmentShaderHandle};
+        } else {
+            logger.debug(I18n.msg("notif.shader.cache", name));
+        }
+        return new int[]{program, 0, 0};
+    }
+
+    /**
+     * Loads and compiles the compute shader, creates a new program and links it.
+     *
+     * @param name          The name of the shader.
+     * @param computeShader The compute shader code.
+     *
+     * @return Integer array with the program handle, and the handle of every shader stage.
+     */
+    public int[] compileShaders(String name,
+                                String computeShader) {
+
+        clear();
+
+        boolean logCompile = true;
+        if (name == null) {
+            name = DEFAULT_SHADER_NAME;
+            logCompile = false;
+        }
+
+        program = checkCache(name, computeShader);
+
+        // Load and compile shaders in the usual way.
+        if (program == -1) {
+            if (logCompile)
+                logger.info(I18n.msg("notif.shader.compile", name));
+
+            int shaderHandle = loadShader(GL43.GL_COMPUTE_SHADER, computeShader);
+            logger.debug(I18n.msg("notif.shader.load.compute.handle", shaderHandle));
+
+            if (shaderHandle == -1) {
+                return new int[]{GL41.GL_FALSE, program, -1};
+            }
+
+            program = linkProgram(createProgram(), shaderHandle);
+            if (program == -1) {
+                return new int[]{GL41.GL_FALSE, program, shaderHandle};
+            } else {
+                // Cache.
+                try {
+                    if (putInCache(program, name, computeShader)) {
+                        logger.debug("Shader " + name + " saved to cache");
+                    }
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            }
+
+            // Shader(s) and program no longer needed after linking
+            glDetachShader(program, shaderHandle);
+            glDeleteShader(shaderHandle);
+
+            return new int[]{GL41.GL_TRUE, program, shaderHandle};
         } else {
             logger.debug(I18n.msg("notif.shader.cache", name));
         }
@@ -428,10 +477,9 @@ public class ShaderCache {
 
         GL41.glShaderSource(shader, source);
         GL41.glCompileShader(shader);
-        GL41.glGetShaderiv(shader, GL20.GL_COMPILE_STATUS, intBuffer);
+        int compileStatus = GL41.glGetShaderi(shader, GL41.GL_COMPILE_STATUS);
 
-        int compiled = intBuffer.get(0);
-        if (compiled == 0) {
+        if (compileStatus == GL41.GL_FALSE) {
             String infoLog = GL41.glGetShaderInfoLog(shader);
             switch (type) {
                 case GL41.GL_VERTEX_SHADER -> log += "Vertex shader\n";
@@ -439,13 +487,36 @@ public class ShaderCache {
                 case GL41.GL_GEOMETRY_SHADER -> log += "Geometry shader\n";
                 case GL41.GL_TESS_CONTROL_SHADER -> log += "Tessellation control shader\n";
                 case GL41.GL_TESS_EVALUATION_SHADER -> log += "Tessellation evaluation shader\n";
+                case GL43.GL_COMPUTE_SHADER -> log += "Compute shader\n";
             }
+            GL41.glDeleteShader(shader);
             log += infoLog;
             // }
             return -1;
         }
 
         return shader;
+    }
+
+    private int linkProgram(int program,
+                            int computeShaderHandle) {
+
+        if (program == -1)
+            return -1;
+
+        GL41.glAttachShader(program, computeShaderHandle);
+        GL41.glLinkProgram(program);
+        GL41.glDetachShader(program, computeShaderHandle);
+
+        int linkStatus = GL41.glGetProgrami(program, GL41.GL_LINK_STATUS);
+        if (linkStatus == GL41.GL_FALSE) {
+            log = GL41.glGetProgramInfoLog(program);
+            GL41.glDeleteShader(computeShaderHandle);
+            GL41.glDeleteProgram(program);
+            return -1;
+        }
+
+        return program;
     }
 
     private int linkProgram(int program,

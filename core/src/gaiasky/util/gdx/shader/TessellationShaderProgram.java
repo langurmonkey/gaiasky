@@ -164,13 +164,13 @@ public class TessellationShaderProgram extends ExtShaderProgram {
     private void compileShaders(String vShader, String tcShader, String teShader, String fShader) {
         var cache = ShaderCache.instance();
         int[] handles = cache.compileShaders(name, vShader, tcShader, teShader, fShader);
-        program = handles[0];
-        vertexShaderHandle = handles[1];
-        controlShaderHandle = handles[2];
-        evaluationShaderHandle = handles[3];
-        fragmentShaderHandle = handles[4];
+        program = handles[1];
+        vertexShaderHandle = handles[2];
+        controlShaderHandle = handles[3];
+        evaluationShaderHandle = handles[4];
+        fragmentShaderHandle = handles[5];
 
-        isCompiled = cache.isCompiled();
+        isCompiled = handles[0] == GL41.GL_TRUE;
         log = cache.getLog();
     }
 
