@@ -16,7 +16,6 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Logger;
-import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.shader.ComputeShaderProgram;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import java.io.IOException;
  * @param <T> The parameters class.
  */
 public class ComputeShaderLoader<T extends ComputeShaderLoader.ComputeShaderParameter> extends AsynchronousAssetLoader<ComputeShaderProgram, T> {
-    private static final Logger.Log logger = Logger.getLogger(ComputeShaderProgram.class);
+    private static final Logger.Log logger = Logger.getLogger(ComputeShaderLoader.class);
 
     private String shaderCode;
     public ComputeShaderProgram computeShaderProgram;
@@ -45,10 +44,6 @@ public class ComputeShaderLoader<T extends ComputeShaderLoader.ComputeShaderPara
     @Override
     public ComputeShaderProgram loadSync(AssetManager manager, String fileName, FileHandle file, T parameter) {
         try {
-            if (!SysUtils.isComputeShaderSupported()) {
-               logger.warn("Compute shaders not supported on this platform: OpenGL 4.3+ or ARB_compute_shader extension required");
-               return null;
-            }
             computeShaderProgram = new ComputeShaderProgram(parameter.name, shaderCode);
             return computeShaderProgram;
         } catch (IOException e) {

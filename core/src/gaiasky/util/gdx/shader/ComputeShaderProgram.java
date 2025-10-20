@@ -7,6 +7,8 @@
 
 package gaiasky.util.gdx.shader;
 
+import gaiasky.util.Logger;
+import gaiasky.util.SysUtils;
 import org.lwjgl.opengl.GL43;
 
 import java.io.IOException;
@@ -14,9 +16,11 @@ import java.io.IOException;
 import static org.lwjgl.opengl.GL43.glUseProgram;
 
 /**
- * A compute shader. Requires OpenGL 4.3+ to work.
+ * A compute shader. Requires OpenGL 4.3+, otherwise the shader can't be compiled successfully.
  */
 public class ComputeShaderProgram {
+    private static final Logger.Log logger = Logger.getLogger(ComputeShaderProgram.class);
+
     private final String name;
     private final String shaderCode;
     private int programId;
@@ -33,7 +37,15 @@ public class ComputeShaderProgram {
     public ComputeShaderProgram(String name, String shaderCode) throws IOException {
         this.name = name;
         this.shaderCode = shaderCode;
-        compile();
+        if (!SysUtils.isComputeShaderSupported()) {
+            logger.warn("Compute shaders require OpenGL 4.3+ or ARB_compute_shader extension");
+        } else {
+            compile();
+        }
+    }
+
+    public boolean isCompiled() {
+        return isCompiled;
     }
 
     public void compile() {
