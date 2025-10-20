@@ -25,6 +25,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengl.GL41;
 
 import java.io.File;
 import java.io.IOException;
@@ -422,12 +423,12 @@ public class ExtShaderProgram implements Disposable {
 
         var cache = ShaderCache.instance();
         int[] handles = cache.compileShaders(name, vertexShader, geometryShader, fragmentShader);
-        program = handles[0];
-        vertexShaderHandle = handles[1];
-        geometryShaderHandle = handles[2];
-        fragmentShaderHandle = handles[3];
+        program = handles[1];
+        vertexShaderHandle = handles[2];
+        geometryShaderHandle = handles[3];
+        fragmentShaderHandle = handles[4];
 
-        isCompiled = cache.isCompiled();
+        isCompiled = handles[0] == GL41.GL_TRUE;
         log = cache.getLog();
     }
 
@@ -444,11 +445,11 @@ public class ExtShaderProgram implements Disposable {
 
         var cache = ShaderCache.instance();
         int[] handles = cache.compileShaders(name, vertexShader, fragmentShader);
-        program = handles[0];
-        vertexShaderHandle = handles[1];
-        fragmentShaderHandle = handles[2];
+        program = handles[1];
+        vertexShaderHandle = handles[2];
+        fragmentShaderHandle = handles[3];
 
-        isCompiled = cache.isCompiled();
+        isCompiled = handles[0] == GL41.GL_TRUE;
         log = cache.getLog();
     }
 

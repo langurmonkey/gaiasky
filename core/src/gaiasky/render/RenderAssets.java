@@ -24,8 +24,10 @@ import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.loader.BitmapFontLoader.BitmapFontParameter;
+import gaiasky.util.gdx.shader.ComputeShaderProgram;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.loader.AtmosphereShaderProviderLoader.AtmosphereShaderProviderParameter;
+import gaiasky.util.gdx.shader.loader.ComputeShaderLoader;
 import gaiasky.util.gdx.shader.loader.GroundShaderProviderLoader.GroundShaderProviderParameter;
 import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader.RelativisticShaderProviderParameter;
 import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader.TessellationShaderProviderParameter;
@@ -55,6 +57,7 @@ public class RenderAssets {
             mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque,
             mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation,
             mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
+    public ComputeShaderProgram genParticlesShader;
     public BitmapFont fontDistanceFiled;
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
@@ -241,6 +244,10 @@ public class RenderAssets {
                      new GroundShaderProviderParameter("shader/cloud.vertex.glsl", "shader/cloud.fragment.glsl"));
         manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
 
+        // Compute shaders
+        manager.load("compute-gen-particles", ComputeShaderProgram.class, new ComputeShaderLoader.ComputeShaderParameter("compute.genparticles", "shader/compute/genparticles.comp.glsl"));
+
+
         // Add fonts to load
         BitmapFontParameter bfp = new BitmapFontParameter();
         bfp.magFilter = TextureFilter.Linear;
@@ -377,6 +384,9 @@ public class RenderAssets {
         IntShaderProvider skybox = manager.get("skybox");
         IntShaderProvider atmosphere = manager.get("atmosphere");
         IntShaderProvider cloud = manager.get("cloud");
+
+        // Compute
+        genParticlesShader = manager.get("compute-gen-particles");
 
         // Create model batches
         mbVertexLighting = new IntModelBatch(perVertexLighting);
