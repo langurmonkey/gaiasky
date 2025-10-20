@@ -10,7 +10,6 @@ package gaiasky.util.gdx.shader;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL20;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -18,30 +17,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL42C.glMemoryBarrier;
-import static org.lwjgl.opengl.GL43C.GL_SHADER_STORAGE_BARRIER_BIT;
-import static org.lwjgl.opengl.GL43C.glDispatchCompute;
+import static org.lwjgl.opengl.GL43.*;
 
 /**
- * A compute shader program.
- * <p>Here is a usage example:</p>
+ * A compute shader program helper.
  * <p>
- * <pre>
+ * Usage pattern:
+ * <pre>{@code
  * ParticleBuffer particleBuffer = new ParticleBuffer(100_000);
+ * ComputeShaderProgram computeShader = new ComputeShaderProgram("galaxy", shaderCode);
  *
- * // Bind to shader (layout(binding = 0))
- * particleBuffer.bind(0);
- *
- * computeShader.bind();
+ * computeShader.begin();
  * computeShader.setUniform("seed", 1234);
  * computeShader.setUniform("count", 100_000);
  * computeShader.setUniform("radius", 1.0f);
  *
- * int groups = (100_000 + 255) / 256;
- * glDispatchCompute(groups, 1, 1);
- * glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
- * </pre>
- * </p>
+ * particleBuffer.bind(0); // matches layout(binding = 0) in GLSL
+ * computeShader.end(100_000);
+ * }</pre>
+ * <p>
+ * Notes:
+ * - Make sure your shader's `local_size_x` matches LOCAL_SIZE_X constant.
+ * - After dispatch, use the particle buffer in rendering. Memory barrier is applied automatically.
  */
 public class ComputeShaderProgram {
     private static final Logger.Log logger = Logger.getLogger(ComputeShaderProgram.class);
@@ -50,13 +47,13 @@ public class ComputeShaderProgram {
     private final String shaderCode;
     private int programId;
     private boolean isCompiled = false;
-
-    public int localSizeX = 256;
     private final Map<String, Integer> uniforms = new HashMap<>();
+    public int localSizeX = 256; // Must match compute shader layout.
 
     public ComputeShaderProgram(String name, String shaderCode) throws IOException {
         this.name = name;
         this.shaderCode = shaderCode;
+
         if (!SysUtils.isComputeShaderSupported()) {
             logger.warn("Compute shaders require OpenGL 4.3+ or ARB_compute_shader extension");
         } else {
@@ -68,6 +65,7 @@ public class ComputeShaderProgram {
         return isCompiled;
     }
 
+    /** Compile shader and detect uniforms */
     public void compile() {
         if (!isCompiled) {
             var cache = ShaderCache.instance();
@@ -83,12 +81,11 @@ public class ComputeShaderProgram {
     /** Detects active uniforms in the shader and caches their locations */
     private void detectUniforms() {
         int uniformCount = glGetProgrami(programId, GL_ACTIVE_UNIFORMS);
-
         IntBuffer sizeBuf = BufferUtils.createIntBuffer(1);
         IntBuffer typeBuf = BufferUtils.createIntBuffer(1);
 
         for (int i = 0; i < uniformCount; i++) {
-            String uniformName = GL20.glGetActiveUniform(programId, i, sizeBuf, typeBuf);
+            String uniformName = glGetActiveUniform(programId, i, sizeBuf, typeBuf);
             int location = glGetUniformLocation(programId, uniformName);
             uniforms.put(uniformName, location);
         }
@@ -115,24 +112,23 @@ public class ComputeShaderProgram {
         if (loc != null && loc >= 0) glUniform4f(loc, x, y, z, w);
     }
 
+    public void setLocalSizeX(int x) {
+        this.localSizeX = x;
+    }
+
+    /** Bind the shader program for dispatch */
     public void begin() {
         glUseProgram(programId);
     }
 
+    /**
+     * Dispatch the compute shader for numElements, inserting a memory barrier.
+     * @param numElements number of elements (particles) to process
+     */
     public void end(int numElements) {
-        // Compute number of groups
         int groups = (numElements + localSizeX - 1) / localSizeX;
-
-        // Dispatch compute shader
         glDispatchCompute(groups, 1, 1);
-
-        // Ensure writes are visible
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    }
-
-    /** Activate the compute shader program for dispatch */
-    public void bind() {
-        glUseProgram(programId);
     }
 
     /** Stop using any compute shader program */
@@ -140,8 +136,13 @@ public class ComputeShaderProgram {
         glUseProgram(0);
     }
 
-    /** Returns the program ID (for SSBO binding etc.) */
+    /** Returns the OpenGL program ID (for advanced usage, e.g., SSBO binding) */
     public int getProgramId() {
         return programId;
+    }
+
+    /** Deletes the program */
+    public void cleanup() {
+        glDeleteProgram(programId);
     }
 }
