@@ -262,8 +262,8 @@ public class DatasetManagerWindow extends GenericDialog {
         // - We have local datasets other than the base data.
         var localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
         if ((serverDd != null && serverDd.updatesAvailable)
-        || (serverDd == null || serverDd.datasets.isEmpty())
-        || (localDd != null && localDd.datasets.size() > 1))
+                || (serverDd == null || serverDd.datasets.isEmpty())
+                || (localDd != null && localDd.datasets.size() > 1))
             selectedTab = 1;
         tabs.setChecked(selectedTab == 0 ? tabAvail.getText().toString() : tabInstalled.getText().toString());
 
@@ -1348,6 +1348,9 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void actionUpdateDataset(DatasetDesc dataset) {
+        // First, delete old dataset.
+        actionDeleteDatasetDirect(dataset);
+        // Second, download update.
         downloadDataset(dataset, () -> {
             // Success!
             dataset.outdated = false;
@@ -1488,6 +1491,11 @@ public class DatasetManagerWindow extends GenericDialog {
         Settings.settings.data.disableDataset(dataset);
     }
 
+    /**
+     * This action deletes the given dataset, asking the user for confirmation first. After the fact, it reloads all UI panes.
+     *
+     * @param dataset The dataset to delete.
+     */
     private void actionDeleteDataset(DatasetDesc dataset) {
         GenericDialog question = new GenericDialog(I18n.msg("gui.download.delete.title"), skin, stage) {
 
@@ -1501,61 +1509,8 @@ public class DatasetManagerWindow extends GenericDialog {
 
             @Override
             protected boolean accept() {
-                DatasetDesc serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
-                boolean deleted = false;
-                // Delete
-                if (dataset.files != null) {
-                    for (String fileToDelete : dataset.files) {
-                        try {
-                            if (fileToDelete.endsWith("/")) {
-                                fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
-                            }
-                            // Separate parent from file.
-                            String baseParent = "";
-                            String baseName = fileToDelete;
-                            if (fileToDelete.contains("/")) {
-                                baseParent = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
-                                baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
-                            }
-                            // Add data location if necessary.
-                            Path dataPath;
-                            Path basePath = Path.of(baseParent);
-                            if (!basePath.isAbsolute()) {
-                                dataPath = Paths.get(Settings.settings.data.location).resolve(baseParent);
-                            } else {
-                                dataPath = basePath;
-                            }
-                            File directory = dataPath.toRealPath().toFile();
-                            // Expand possible wildcards.
-                            Collection<File> files = FileUtils.listFilesAndDirs(directory,
-                                                                                WildcardFileFilter.builder().setWildcards(baseName).get(),
-                                                                                WildcardFileFilter.builder().setWildcards(baseName).get());
-                            for (File file : files) {
-                                if (!file.equals(directory) && file.exists()) {
-                                    FileUtils.forceDelete(file);
-                                }
-                            }
-                            deleted = true;
-                        } catch (Exception e) {
-                            logger.error(e);
-                        }
-                    }
-                } else if (dataset.checkPath != null) {
-                    // Only remove "check"
-                    try {
-                        FileUtils.forceDelete(dataset.checkPath.toFile());
-                        deleted = true;
-                    } catch (IOException e) {
-                        logger.error(e);
-                    }
-                }
-                // Update server dataset status and selected
-                if (deleted && serverDataset != null) {
-                    serverDataset.exists = false;
-                    actionDisableDataset(dataset);
-                    resetSelectedDataset();
-
-                }
+                // Delete dataset.
+                actionDeleteDatasetDirect(dataset);
                 // RELOAD DATASETS VIEW
                 GaiaSky.postRunnable(() -> reloadAll());
                 return true;
@@ -1575,6 +1530,69 @@ public class DatasetManagerWindow extends GenericDialog {
         question.setCancelText(I18n.msg("gui.no"));
         question.buildSuper();
         question.show(stage);
+    }
+
+    /**
+     * Directly deletes the given dataset without asking for confirmation.
+     *
+     * @param dataset The dataset to delete.
+     */
+    private void actionDeleteDatasetDirect(DatasetDesc dataset) {
+        DatasetDesc serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
+        boolean deleted = false;
+        // Delete
+        if (dataset.files != null) {
+            for (String fileToDelete : dataset.files) {
+                try {
+                    if (fileToDelete.endsWith("/")) {
+                        fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
+                    }
+                    // Separate parent from file.
+                    String baseParent = "";
+                    String baseName = fileToDelete;
+                    if (fileToDelete.contains("/")) {
+                        baseParent = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
+                        baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
+                    }
+                    // Add data location if necessary.
+                    Path dataPath;
+                    Path basePath = Path.of(baseParent);
+                    if (!basePath.isAbsolute()) {
+                        dataPath = Paths.get(Settings.settings.data.location).resolve(baseParent);
+                    } else {
+                        dataPath = basePath;
+                    }
+                    File directory = dataPath.toRealPath().toFile();
+                    // Expand possible wildcards.
+                    Collection<File> files = FileUtils.listFilesAndDirs(directory,
+                                                                        WildcardFileFilter.builder().setWildcards(baseName).get(),
+                                                                        WildcardFileFilter.builder().setWildcards(baseName).get());
+                    for (File file : files) {
+                        if (!file.equals(directory) && file.exists()) {
+                            FileUtils.forceDelete(file);
+                        }
+                    }
+                    deleted = true;
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            }
+        } else if (dataset.checkPath != null) {
+            // Only remove "check"
+            try {
+                FileUtils.forceDelete(dataset.checkPath.toFile());
+                deleted = true;
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+        // Update server dataset status and selected
+        if (deleted && serverDataset != null) {
+            serverDataset.exists = false;
+            actionDisableDataset(dataset);
+            resetSelectedDataset();
+
+        }
     }
 
     private void resetSelectedDataset() {
