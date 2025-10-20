@@ -321,12 +321,12 @@ public class ModelInitializer extends AbstractInitSystem {
         }
 
         if (isRandomizeSurface(scaffolding)) {
-            // Ignore current model component (if any) and create a random one
-            model.model = new ModelComponent(true);
-            model.model.randomizeAll(scaffolding.getSeed("model"), body.size);
-            if (Settings.settings.program.debugInfo) {
-                logger.debug("::" + base.getName() + "::");
-                logger.debug("============MODEL===========");
+            // ignore current model component (if any) and create a random one
+            model.model = new modelcomponent(true);
+            model.model.randomizeall(scaffolding.getseed("model"), body.size);
+            if (settings.settings.program.debuginfo) {
+                logger.debug("::" + base.getname() + "::");
+                logger.debug("============model===========");
                 model.model.print(logger);
             }
         }
