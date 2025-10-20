@@ -22,7 +22,9 @@ import gaiasky.util.screenshot.JPGWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL41;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
@@ -98,9 +100,7 @@ public class SysUtils {
             CentralProcessor cp = (new SystemInfo()).getHardware().getProcessor();
             boolean deckAPU = cp.getProcessorIdentifier().getName().equalsIgnoreCase("AMD Custom APU 0405");
 
-            steamDeck = (boardVendor != null && boardVendor.equalsIgnoreCase("Valve"))
-                    || (boardName != null && boardName.equalsIgnoreCase("Jupiter"))
-                    || deckAPU;
+            steamDeck = (boardVendor != null && boardVendor.equalsIgnoreCase("Valve")) || (boardName != null && boardName.equalsIgnoreCase("Jupiter")) || deckAPU;
 
         } else {
             steamDeck = false;
@@ -181,16 +181,11 @@ public class SysUtils {
     }
 
     public static String getOSFamily() {
-        if (isLinux())
-            return "linux";
-        if (isWindows())
-            return "win";
-        if (isMac())
-            return "macos";
-        if (isUnix())
-            return "unix";
-        if (isSolaris())
-            return "solaris";
+        if (isLinux()) return "linux";
+        if (isWindows()) return "win";
+        if (isMac()) return "macos";
+        if (isUnix()) return "unix";
+        if (isSolaris()) return "solaris";
 
         return "unknown";
     }
@@ -526,9 +521,7 @@ public class SysUtils {
      * @param name    The name of the texture.
      * @param format  The image format to use.
      */
-    public static void saveProceduralGLTexture(Texture texture,
-                                               String name,
-                                               Settings.ImageFormat format) {
+    public static void saveProceduralGLTexture(Texture texture, String name, Settings.ImageFormat format) {
         if (texture != null && name != null) {
             Path proceduralDir = getProceduralPixmapDir();
             Path file = proceduralDir.resolve(name + "." + format.extension);
@@ -565,9 +558,7 @@ public class SysUtils {
      * @param names    The names of the textures.
      * @param format   The image format to use.
      */
-    public static void saveProceduralGLTextures(Texture[] textures,
-                                                String[] names,
-                                                Settings.ImageFormat format) {
+    public static void saveProceduralGLTextures(Texture[] textures, String[] names, Settings.ImageFormat format) {
         Path proceduralDir = getProceduralPixmapDir();
         Array<Pair<Pixmap, Integer>> pixmaps = new Array<>();
         // Prepare pixmaps in current (main) thread.
@@ -603,9 +594,9 @@ public class SysUtils {
                 pixmap.dispose();
             }
             // Post popup.
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, pixmaps,
-                                 I18n.msg("gui.procedural.info.savetextures",
-                                          SysUtils.getProceduralPixmapDir().toString()));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                 pixmaps,
+                                 I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()));
 
         });
 
@@ -720,11 +711,7 @@ public class SysUtils {
     }
 
     private static String getJarName() {
-        return new File(SysUtils.class.getProtectionDomain()
-                                .getCodeSource()
-                                .getLocation()
-                                .getPath())
-                .getName();
+        return new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
     }
 
     public static Path getProgramDirectory() {
@@ -797,13 +784,58 @@ public class SysUtils {
                     }
                 } else {
                     // File.
-                    actualFilePaths.add(galLocationPath.toAbsolutePath()
-                                                .toString());
+                    actualFilePaths.add(galLocationPath.toAbsolutePath().toString());
                 }
             }
         }
         // Sort using natural order.
         actualFilePaths.sort();
         return actualFilePaths;
+    }
+
+    /**
+     * Checks if compute shaders (OpenGL 4.3) are supported. This method <strong>must</strong> run on the main thread. Otherwise, it will crash.
+     *
+     * @return True if compute shaders are supported, false otherwise.
+     */
+    public static boolean isComputeShaderSupported() {
+        // Get the OpenGL version string
+        String version = GL41.glGetString(GL41.GL_VERSION);
+
+        if (version == null) {
+            return false;  // If no OpenGL version string, return false.
+        }
+
+        // Split the version string into components (e.g., "4.1.0 NVIDIA 580.32")
+        String[] versionParts = version.split(" ");
+
+        if (versionParts.length < 2) {
+            return false;  // Invalid version string
+        }
+
+        // Extract the OpenGL version (e.g., "4.1.0")
+        String openglVersion = versionParts[0];
+
+        // Split the OpenGL version into major, minor, and release numbers
+        String[] versionNumbers = openglVersion.split("\\.");
+
+        if (versionNumbers.length < 2) {
+            return false;  // Invalid version format
+        }
+
+        try {
+            int majorVersion = Integer.parseInt(versionNumbers[0]);
+            int minorVersion = Integer.parseInt(versionNumbers[1]);
+
+            // Check if the version is 4.3 or higher
+            if (majorVersion > 4 || (majorVersion == 4 && minorVersion >= 3)) {
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            logger.warn(e);
+        }
+
+        // If the OpenGL version is below 4.3, check for the compute shader extension
+        return GL.getCapabilities().GL_ARB_compute_shader;
     }
 }
