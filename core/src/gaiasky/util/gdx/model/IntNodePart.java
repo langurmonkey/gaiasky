@@ -78,7 +78,7 @@ public class IntNodePart {
             bones = null;
         } else {
             if (invBoneBindTransforms == null)
-                invBoneBindTransforms = new ArrayMap<>(true, other.invBoneBindTransforms.size, IntNode.class, Matrix4.class);
+                invBoneBindTransforms = new ArrayMap<>(true, other.invBoneBindTransforms.size, IntNode[]::new, Matrix4[]::new);
             else
                 invBoneBindTransforms.clear();
             invBoneBindTransforms.putAll(other.invBoneBindTransforms);

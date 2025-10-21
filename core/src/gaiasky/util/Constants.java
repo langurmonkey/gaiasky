@@ -11,8 +11,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import net.jafama.FastMath;
 
-import java.io.File;
-
 /**
  * Random constants holder.
  */
