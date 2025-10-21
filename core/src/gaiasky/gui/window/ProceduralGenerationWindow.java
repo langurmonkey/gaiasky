@@ -769,7 +769,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             } catch (Exception ignored) {
             }
             if (lookUpTables.isEmpty()) {
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.jpg");
                 lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
             }
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
