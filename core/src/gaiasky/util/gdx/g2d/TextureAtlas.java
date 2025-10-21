@@ -161,7 +161,7 @@ public class TextureAtlas implements Disposable {
      * uses string comparison to find the regions, so the result should be cached rather than calling this method multiple times.
      */
     public Array<AtlasRegion> findRegions(String name) {
-        Array<AtlasRegion> matched = new Array<>(AtlasRegion.class);
+        Array<AtlasRegion> matched = new Array<>(AtlasRegion[]::new);
         for (int i = 0, n = regions.size; i < n; i++) {
             AtlasRegion region = regions.get(i);
             if (region.name.equals(name))
@@ -177,7 +177,7 @@ public class TextureAtlas implements Disposable {
      * @see #createSprite(String)
      */
     public Array<Sprite> createSprites() {
-        Array<Sprite> sprites = new Array<>(true, regions.size, Sprite.class);
+        Array<Sprite> sprites = new Array<>(true, regions.size, Sprite[]::new);
         for (int i = 0, n = regions.size; i < n; i++)
             sprites.add(newSprite(regions.get(i)));
         return sprites;
@@ -225,7 +225,7 @@ public class TextureAtlas implements Disposable {
      * @see #createSprite(String)
      */
     public Array<Sprite> createSprites(String name) {
-        Array<Sprite> matched = new Array<>(Sprite.class);
+        Array<Sprite> matched = new Array<>(Sprite[]::new);
         for (int i = 0, n = regions.size; i < n; i++) {
             AtlasRegion region = regions.get(i);
             if (region.name.equals(name))
@@ -297,7 +297,7 @@ public class TextureAtlas implements Disposable {
                     String line = reader.readLine();
                     if (line == null)
                         break;
-                    if (line.trim().length() == 0)
+                    if (line.trim().isEmpty())
                         pageImage = null;
                     else if (pageImage == null) {
                         FileHandle file = imagesDir.child(line);
@@ -475,13 +475,13 @@ public class TextureAtlas implements Disposable {
         /** The height of the image, before whitespace was removed for packing. */
         public int originalHeight;
 
-        /** If true, the region has been rotated 90 degrees counter clockwise. */
+        /** If true, the region has been rotated 90 degrees counter-clockwise. */
         public boolean rotate;
 
-        /** The ninepatch splits, or null if not a ninepatch. Has 4 elements: left, right, top, bottom. */
+        /** The nine-patch splits, or null if not a nine-patch. Has 4 elements: left, right, top, bottom. */
         public int[] splits;
 
-        /** The ninepatch pads, or null if not a ninepatch or the has no padding. Has 4 elements: left, right, top, bottom. */
+        /** The nine-patch pads, or null if not a nine-patch or the has no padding. Has 4 elements: left, right, top, bottom. */
         public int[] pads;
 
         public AtlasRegion(Texture texture, int x, int y, int width, int height) {
@@ -506,8 +506,10 @@ public class TextureAtlas implements Disposable {
             splits = region.splits;
         }
 
+        /**
+         * Flips the region, adjusting the offset so the image appears to be flip as if no whitespace has been removed for packing.
+         **/
         @Override
-        /** Flips the region, adjusting the offset so the image appears to be flip as if no whitespace has been removed for packing. */
         public void flip(boolean x, boolean y) {
             super.flip(x, y);
             if (x)
