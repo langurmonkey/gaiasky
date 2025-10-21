@@ -61,7 +61,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     private Texture currentLutTexture;
     private Cell<?> lutImageCell;
     private OwnTextButton genCloudsButton, genSurfaceButton;
-    /** The surface generation is enabled only when the model is *NOT* using cubemap textures. **/
+    /**
+     * The surface generation is enabled only when the model is <b>NOT</b> using cubemap textures.
+     **/
     private boolean surfaceEnabled;
 
     private int genCloudNum = 0, genSurfaceNum = 0;
@@ -83,8 +85,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 initMtc.emissiveCubemap == null;
 
         EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO,
-                                        Event.PROCEDURAL_GENERATION_SURFACE_INFO,
-                                        Event.FOCUS_CHANGED);
+                Event.PROCEDURAL_GENERATION_SURFACE_INFO,
+                Event.FOCUS_CHANGED);
 
         setAcceptText(I18n.msg("gui.close"));
 
@@ -129,20 +131,24 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         HorizontalGroup group = new HorizontalGroup();
         group.align(Align.left);
 
-        final Button tabSurface = new OwnTextButton(I18n.msg("gui.procedural.surface"), skin, "toggle-big");
-        tabSurface.pad(pad10);
-        tabSurface.setWidth(tabWidth);
+        // SURFACE TAB
+        final Button tabSurface = this.surfaceEnabled ?  new OwnTextButton(I18n.msg("gui.procedural.surface"), skin, "toggle-big") : null;
+        if (this.surfaceEnabled) {
+            tabSurface.pad(pad10);
+            tabSurface.setWidth(tabWidth);
+            group.addActor(tabSurface);
+        }
+
+        // CLOUDS TAB
         final Button tabClouds = new OwnTextButton(I18n.msg("gui.procedural.cloud"), skin, "toggle-big");
         tabClouds.pad(pad10);
         tabClouds.setWidth(tabWidth);
+        group.addActor(tabClouds);
+
+        // ATMOSPHERE TAB
         final Button tabAtmosphere = new OwnTextButton(I18n.msg("gui.procedural.atmosphere"), skin, "toggle-big");
         tabAtmosphere.pad(pad10);
         tabAtmosphere.setWidth(tabWidth);
-
-        if (this.surfaceEnabled) {
-            group.addActor(tabSurface);
-        }
-        group.addActor(tabClouds);
         group.addActor(tabAtmosphere);
 
         content.add(group).left().row();
@@ -151,28 +157,26 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         Stack tabContent = new Stack();
 
         // SURFACE
-        final Table contentSurface = new Table(skin);
-        contentSurface.setWidth(tabContentWidth);
-        contentSurface.align(Align.top | Align.left);
-        buildContentSurface(contentSurface);
+        final Table contentSurface = this.surfaceEnabled ? new Table(skin) : null;
+        if (this.surfaceEnabled) {
+            contentSurface.setWidth(tabContentWidth);
+            contentSurface.align(Align.top | Align.left);
+            buildContentSurface(contentSurface);
+            tabContent.addActor(contentSurface);
+        }
 
         // CLOUDS
         final Table contentClouds = new Table(skin);
         contentClouds.setWidth(tabContentWidth);
         contentClouds.align(Align.top | Align.left);
         buildContentClouds(contentClouds);
+        tabContent.addActor(contentClouds);
 
         // ATMOSPHERE
         final Table contentAtmosphere = new Table(skin);
         contentAtmosphere.setWidth(tabContentWidth);
         contentAtmosphere.align(Align.top | Align.left);
         buildContentAtmosphere(contentAtmosphere);
-
-        /* ADD ALL CONTENT */
-        if (this.surfaceEnabled) {
-            tabContent.addActor(contentSurface);
-        }
-        tabContent.addActor(contentClouds);
         tabContent.addActor(contentAtmosphere);
 
         content.add(tabContent).padTop(pad34).padBottom(pad34).expand().fill().row();
@@ -183,20 +187,23 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             @Override
             public void changed(ChangeEvent event,
                                 Actor actor) {
-                contentSurface.setVisible(tabSurface.isChecked());
+                if (contentSurface != null && tabSurface != null) {
+                    contentSurface.setVisible(tabSurface.isChecked());
+                }
                 contentClouds.setVisible(tabClouds.isChecked());
                 contentAtmosphere.setVisible(tabAtmosphere.isChecked());
                 if (updateTabSelected) {
-                    if (tabSurface.isChecked())
+                    if (tabSurface != null && tabSurface.isChecked())
                         lastTabSelected = 0;
                     else if (tabClouds.isChecked())
-                        lastTabSelected = 1;
+                        lastTabSelected = surfaceEnabled ? 1 : 0;
                     else if (tabAtmosphere.isChecked())
-                        lastTabSelected = 2;
+                        lastTabSelected = surfaceEnabled ? 2 : 1;
                 }
             }
         };
-        tabSurface.addListener(tabListener);
+        if (tabSurface != null)
+            tabSurface.addListener(tabListener);
         tabClouds.addListener(tabListener);
         tabAtmosphere.addListener(tabListener);
 
@@ -205,7 +212,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         tabs.setMinCheckCount(1);
         tabs.setMaxCheckCount(1);
         updateTabSelected = false;
-        tabs.add(tabSurface);
+        
+        if (tabSurface != null)
+            tabs.add(tabSurface);
         tabs.add(tabClouds);
         tabs.add(tabAtmosphere);
         updateTabSelected = true;
@@ -228,10 +237,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Resolution
         OwnSliderPlus pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"),
-                                                       Constants.PG_RESOLUTION_MIN,
-                                                       Constants.PG_RESOLUTION_MAX,
-                                                       1,
-                                                       skin);
+                Constants.PG_RESOLUTION_MIN,
+                Constants.PG_RESOLUTION_MAX,
+                1,
+                skin);
         pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
         pgResolution.setWidth(fieldWidthTotal + 50f);
         pgResolution.setValue(Settings.settings.graphics.proceduralGenerationResolution[1]);
@@ -258,7 +267,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         });
         OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
         saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()),
-                                                           skin));
+                skin));
         HorizontalGroup saveTexturesGroup = new HorizontalGroup();
         saveTexturesGroup.space(pad10);
         saveTexturesGroup.addActor(saveTextures);
@@ -745,10 +754,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
             // Add button group with presets.
             addLocalButtons(content,
-                            this::randomizeSurfaceGasGiant,
-                            this::randomizeSurfaceEarthLike,
-                            this::randomizeSurfaceColdPlanet,
-                            this::randomizeSurfaceRockyPlanet);
+                    this::randomizeSurfaceGasGiant,
+                    this::randomizeSurfaceEarthLike,
+                    this::randomizeSurfaceColdPlanet,
+                    this::randomizeSurfaceRockyPlanet);
 
             // Add generate and randomize buttons
             genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
@@ -1026,9 +1035,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Fog density
         OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
-                                                     Constants.MIN_ATM_FOG_DENSITY,
-                                                     Constants.MAX_ATM_FOG_DENSITY,
-                                                     Constants.SLIDER_STEP_TINY, skin);
+                Constants.MIN_ATM_FOG_DENSITY,
+                Constants.MAX_ATM_FOG_DENSITY,
+                Constants.SLIDER_STEP_TINY, skin);
         fogDensity.setWidth(fieldWidthTotal);
         fogDensity.setValue(ac.fogDensity);
         fogDensity.addListener(new ChangeListener() {
