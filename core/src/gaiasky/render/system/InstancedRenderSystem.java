@@ -26,7 +26,6 @@ import gaiasky.util.gdx.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Vector3D;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,9 +45,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      */
     public static class InstancedModel {
         // Attribute offsets.
-        public int sizeOffset, particlePosOffset, properMotionOffset, textureIndexOffset,
+        public int sizeOffset, particlePosOffset, properMotionOffset, textureIndexOffset, additionalOffset,
                 nVariOffset, variMagsOffset, variTimesOffset, elems01Offset, elems02Offset;
-        
         /** Number of vertices. **/
         public int numVertices;
         /** Vertex size in floats (4-bytes). **/
