@@ -7,9 +7,11 @@
 
 package gaiasky.util.gdx.shader;
 
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
@@ -40,7 +42,7 @@ import static org.lwjgl.opengl.GL43.*;
  * - Make sure your shader's `local_size_x` matches LOCAL_SIZE_X constant.
  * - After dispatch, use the particle buffer in rendering. Memory barrier is applied automatically.
  */
-public class ComputeShaderProgram {
+public class ComputeShaderProgram implements Disposable {
     private static final Logger.Log logger = Logger.getLogger(ComputeShaderProgram.class);
 
     private final String name;
@@ -48,7 +50,7 @@ public class ComputeShaderProgram {
     private int programId;
     private boolean isCompiled = false;
     private final Map<String, Integer> uniforms = new HashMap<>();
-    public int localSizeX = 256; // Must match compute shader layout.
+    private final static int localSizeX = 256; // Must match compute shader layout.
 
     public ComputeShaderProgram(String name, String shaderCode) throws IOException {
         this.name = name;
@@ -112,10 +114,6 @@ public class ComputeShaderProgram {
         if (loc != null && loc >= 0) glUniform4f(loc, x, y, z, w);
     }
 
-    public void setLocalSizeX(int x) {
-        this.localSizeX = x;
-    }
-
     /** Bind the shader program for dispatch */
     public void begin() {
         glUseProgram(programId);
@@ -123,16 +121,21 @@ public class ComputeShaderProgram {
 
     /**
      * Dispatch the compute shader for numElements, inserting a memory barrier.
+     *
      * @param numElements number of elements (particles) to process
      */
     public void end(int numElements) {
         int groups = (numElements + localSizeX - 1) / localSizeX;
         glDispatchCompute(groups, 1, 1);
+        int error = GL11.glGetError();
+        if (error != GL11.GL_NO_ERROR) {
+            System.out.println("OpenGL error after dispatch: " + error);
+        }
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     }
 
     /** Stop using any compute shader program */
-    public static void unbind() {
+    public void unbind() {
         glUseProgram(0);
     }
 
@@ -144,5 +147,11 @@ public class ComputeShaderProgram {
     /** Deletes the program */
     public void cleanup() {
         glDeleteProgram(programId);
+    }
+
+    @Override
+    public void dispose() {
+        if (isCompiled)
+            cleanup();
     }
 }

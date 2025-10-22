@@ -28,25 +28,49 @@ import java.util.Locale;
 public class BillboardDataset {
     private static final Log logger = Logger.getLogger(BillboardDataset.class);
 
-    // The source file.
+    /**
+     * Number of particles to generate with procedural generation.
+     */
+    public int particleCount = 0;
+    /**
+     * Path to the file containing the particle data. Ignored if this dataset is in a procedural billboard group.
+     */
     public String file;
-    // Unpacked file path.
+    /**
+     * Unpacked file path. Ignored if this dataset is in a procedural billboard group.
+     */
     public String fileUnpack;
-    // The data points.
+    /**
+     * List of particle records with the particles of this dataset. Ignored if this dataset is in a procedural billboard group.
+     */
     public List<IParticleRecord> data;
-    // Type of data.
+    /**
+     * Type of particle.
+     */
     public ParticleType type;
-    // Texture layers to use.
+    /**
+     * Texture layers to use.
+     */
     public int[] layers;
-    // Array with completion rate per texture quality (to skip data).
+    /**
+     * Array with completion rate per texture quality (to skip data).
+     */
     public float[] completion;
-    // Render size factor.
+    /**
+     * Render size factor.
+     */
     public float size = 1;
-    // The intensity factor.
+    /**
+     * The intensity factor.
+     */
     public float intensity = 1;
-    // Whether to allow depth writes when rendering.
+    /**
+     * Whether to allow depth writes when rendering.
+     */
     public boolean depthMask = false;
-    // The blending mode.
+    /**
+     * The blending mode.
+     */
     public BlendMode blending = BlendMode.ADDITIVE;
 
     /**
@@ -80,6 +104,10 @@ public class BillboardDataset {
         } else {
             return new Pair<>(curr, srcUpk);
         }
+    }
+
+    public void setParticleCount(Long n) {
+        this.particleCount = n.intValue();
     }
 
     public void setFile(String file) {

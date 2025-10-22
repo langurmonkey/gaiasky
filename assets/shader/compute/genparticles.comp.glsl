@@ -3,8 +3,9 @@
 layout(local_size_x = 256) in;
 
 struct Particle {
-    vec4 position; // xyz = pos, w = size
-    vec4 color;    // rgba
+    vec3 position; // xyz = world position
+    vec4 color;    // rgba floats [0..1]
+    vec3 extra;    // x = size, y = type (as float), z = texLayer (as float)
 };
 
 layout(std430, binding = 0) buffer Particles {
@@ -38,9 +39,14 @@ void main() {
     r * cos(phi)
     );
 
+    float size = 0.002 + rand(state) * 0.006;
+    int type = 1;
+    int layer = 3;
+
     float brightness = clamp(1.0 - r / radius, 0.2, 1.0);
     vec4 color = vec4(brightness, brightness * 0.8, brightness * 0.6, 1.0);
 
-    particles[i].position = vec4(pos, 0.002 + rand(state) * 0.006);
+    particles[i].position = vec3(1.0, 2.0, 3.0);
     particles[i].color = color;
+    particles[i].extra = vec3(size, type, layer);
 }

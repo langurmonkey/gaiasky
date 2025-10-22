@@ -51,8 +51,8 @@ public class RenderAssets {
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
     public ExtShaderProgram[] billboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders,
-            primitiveGpuShaders, billboardGroupShaders, particleEffectShaders, particleGroupShaders, particleGroupExtBillboardShaders,
-            particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
+            primitiveGpuShaders, billboardGroupShaders, billboardProceduralShaders, particleEffectShaders, particleGroupShaders,
+            particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
     public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbVertexLightingThruster,
             mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque,
             mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation,
@@ -62,7 +62,7 @@ public class RenderAssets {
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
             variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
-            billboardGroupDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
+            billboardGroupDesc, billboardProceduralDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
 
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
@@ -110,6 +110,8 @@ public class RenderAssets {
         spriteDesc = loadShaderExt(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", TextUtils.concatAll("sprite", names), defines);
         billboardGroupDesc = loadShaderExt(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl",
                                            TextUtils.concatAll("billboard.group", names), defines);
+        billboardProceduralDesc = loadShaderExt(manager, "shader/billboard.proc.vertex.glsl", "shader/billboard.group.fragment.glsl",
+                                           TextUtils.concatAll("billboard.proc", names), defines);
         pointDesc = loadShaderExt(manager,
                                   "shader/point.cpu.vertex.glsl",
                                   "shader/point.cpu.fragment.glsl",
@@ -317,6 +319,11 @@ public class RenderAssets {
          * BILLBOARD GROUP
          */
         billboardGroupShaders = fetchShaderProgramExt(manager, billboardGroupDesc, TextUtils.concatAll("billboard.group", names));
+
+        /*
+         * BILLBOARD GROUP (PROCEDURAL)
+         */
+        billboardProceduralShaders = fetchShaderProgramExt(manager, billboardProceduralDesc, TextUtils.concatAll("billboard.proc", names));
 
         /*
          * PARTICLE EFFECT - default and relativistic
