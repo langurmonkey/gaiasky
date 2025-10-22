@@ -7,7 +7,7 @@
 
 package gaiasky.util;
 
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 import gaiasky.GaiaSky;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
@@ -217,7 +217,7 @@ public class TextUtils {
      */
     public static String propertyToMethodName(String property) {
         String[] parts = property.split("\\.");
-        StringBuilder b = new StringBuilder();
+        CharArray b = new CharArray();
         for (String part : parts) {
             b.append(capitalise(part));
         }

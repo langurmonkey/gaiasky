@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
 import gaiasky.gui.main.GSKeys;
 
@@ -196,9 +195,9 @@ public class MenuItem extends Button {
     }
 
     void fireChangeEvent() {
-        ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent::new);
+        ChangeListener.ChangeEvent changeEvent = POOLS.obtain(ChangeListener.ChangeEvent.class);
         fire(changeEvent);
-        Pools.free(changeEvent);
+        POOLS.free(changeEvent);
     }
 
     @Override
@@ -208,12 +207,11 @@ public class MenuItem extends Button {
 
     @Override
     public void setStyle(ButtonStyle style) {
-        if (!(style instanceof MenuItemStyle))
+        if (!(style instanceof MenuItemStyle textButtonStyle))
             throw new IllegalArgumentException("style must be a MenuItemStyle.");
         super.setStyle(style);
-        this.style = (MenuItemStyle) style;
+        this.style = textButtonStyle;
         if (label != null) {
-            TextButtonStyle textButtonStyle = (TextButtonStyle) style;
             LabelStyle labelStyle = label.getStyle();
             labelStyle.font = textButtonStyle.font;
             labelStyle.fontColor = textButtonStyle.fontColor;

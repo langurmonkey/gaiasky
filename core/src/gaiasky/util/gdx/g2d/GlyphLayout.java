@@ -23,8 +23,6 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import gaiasky.util.gdx.g2d.BitmapFont.Glyph;
 import net.jafama.FastMath;
 
-import java.lang.StringBuilder;
-
 import static gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
 
 /**
@@ -35,6 +33,7 @@ import static gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
  * @author Alexander Dorokhov
  */
 public class GlyphLayout implements Poolable {
+    public static final PoolManager POOLS = new PoolManager(GlyphRun::new, Color::new);
     public final Array<GlyphRun> runs = new Array<>();
     private final Array<Color> colorStack = new Array<>(4);
     public float width, height;
@@ -54,7 +53,15 @@ public class GlyphLayout implements Poolable {
     }
 
     /** @see #setText(BitmapFont, CharSequence) */
-    public GlyphLayout(BitmapFont font, CharSequence str, int start, int end, Color color, float targetWidth, int halign, boolean wrap, String truncate) {
+    public GlyphLayout(BitmapFont font,
+                       CharSequence str,
+                       int start,
+                       int end,
+                       Color color,
+                       float targetWidth,
+                       int halign,
+                       boolean wrap,
+                       String truncate) {
         setText(font, str, start, end, color, targetWidth, halign, wrap, truncate);
     }
 
@@ -84,7 +91,15 @@ public class GlyphLayout implements Poolable {
      *                    specified truncate string are placed at the end. Empty string can be used to truncate without adding glyphs.
      *                    Truncate should not be used with text that contains multiple lines. Wrap is ignored if truncate is not null.
      */
-    public void setText(BitmapFont font, CharSequence str, int start, int end, Color color, float targetWidth, int halign, boolean wrap, String truncate) {
+    public void setText(BitmapFont font,
+                        CharSequence str,
+                        int start,
+                        int end,
+                        Color color,
+                        float targetWidth,
+                        int halign,
+                        boolean wrap,
+                        String truncate) {
 
         BitmapFontData fontData = font.data;
 
@@ -95,7 +110,7 @@ public class GlyphLayout implements Poolable {
 
         boolean markupEnabled = fontData.markupEnabled;
 
-        Pool<GlyphRun> glyphRunPool = Pools.get(GlyphRun::new);
+        Pool<GlyphRun> glyphRunPool = POOLS.getPool(GlyphRun.class);
         Array<GlyphRun> runs = this.runs;
         glyphRunPool.freeAll(runs);
         runs.clear();
@@ -107,7 +122,7 @@ public class GlyphLayout implements Poolable {
         Array<Color> colorStack = this.colorStack;
         Color nextColor = color;
         colorStack.add(color);
-        Pool<Color> colorPool = Pools.get(Color::new);
+        Pool<Color> colorPool = POOLS.getPool(Color.class);
 
         int runStart = start;
         outer:
@@ -121,25 +136,25 @@ public class GlyphLayout implements Poolable {
                 runEnd = end; // End of string, process last run.
             } else {
                 switch (str.charAt(start++)) {
-                case '\n':
-                    // End of line.
-                    runEnd = start - 1;
-                    newline = true;
-                    break;
-                case '[':
-                    // Possible color tag.
-                    if (markupEnabled) {
-                        int length = parseColorMarkup(str, start, end, colorPool);
-                        if (length >= 0) {
-                            runEnd = start - 1;
-                            start += length + 1;
-                            nextColor = colorStack.peek();
-                        } else if (length == -2) {
-                            start++; // Skip first of "[[" escape sequence.
-                            continue outer;
+                    case '\n':
+                        // End of line.
+                        runEnd = start - 1;
+                        newline = true;
+                        break;
+                    case '[':
+                        // Possible color tag.
+                        if (markupEnabled) {
+                            int length = parseColorMarkup(str, start, end, colorPool);
+                            if (length >= 0) {
+                                runEnd = start - 1;
+                                start += length + 1;
+                                nextColor = colorStack.peek();
+                            } else if (length == -2) {
+                                start++; // Skip first of "[[" escape sequence.
+                                continue outer;
+                            }
                         }
-                    }
-                    break;
+                        break;
                 }
             }
 
@@ -445,40 +460,40 @@ public class GlyphLayout implements Poolable {
         if (start == end)
             return -1; // String ended with "[".
         switch (str.charAt(start)) {
-        case '#':
-            // Parse hex color RRGGBBAA where AA is optional and defaults to 0xFF if less than 6 chars are used.
-            int colorInt = 0;
-            for (int i = start + 1; i < end; i++) {
-                char ch = str.charAt(i);
-                if (ch == ']') {
-                    if (i < start + 2 || i > start + 9)
-                        break; // Illegal number of hex digits.
-                    if (i - start <= 7) { // RRGGBB or fewer chars.
-                        for (int ii = 0, nn = 9 - (i - start); ii < nn; ii++)
-                            colorInt = colorInt << 4;
-                        colorInt |= 0xff;
+            case '#':
+                // Parse hex color RRGGBBAA where AA is optional and defaults to 0xFF if less than 6 chars are used.
+                int colorInt = 0;
+                for (int i = start + 1; i < end; i++) {
+                    char ch = str.charAt(i);
+                    if (ch == ']') {
+                        if (i < start + 2 || i > start + 9)
+                            break; // Illegal number of hex digits.
+                        if (i - start <= 7) { // RRGGBB or fewer chars.
+                            for (int ii = 0, nn = 9 - (i - start); ii < nn; ii++)
+                                colorInt = colorInt << 4;
+                            colorInt |= 0xff;
+                        }
+                        Color color = colorPool.obtain();
+                        colorStack.add(color);
+                        Color.rgba8888ToColor(color, colorInt);
+                        return i - start;
                     }
-                    Color color = colorPool.obtain();
-                    colorStack.add(color);
-                    Color.rgba8888ToColor(color, colorInt);
-                    return i - start;
+                    if (ch >= '0' && ch <= '9')
+                        colorInt = colorInt * 16 + (ch - '0');
+                    else if (ch >= 'a' && ch <= 'f')
+                        colorInt = colorInt * 16 + (ch - ('a' - 10));
+                    else if (ch >= 'A' && ch <= 'F')
+                        colorInt = colorInt * 16 + (ch - ('A' - 10));
+                    else
+                        break; // Unexpected character in hex color.
                 }
-                if (ch >= '0' && ch <= '9')
-                    colorInt = colorInt * 16 + (ch - '0');
-                else if (ch >= 'a' && ch <= 'f')
-                    colorInt = colorInt * 16 + (ch - ('a' - 10));
-                else if (ch >= 'A' && ch <= 'F')
-                    colorInt = colorInt * 16 + (ch - ('A' - 10));
-                else
-                    break; // Unexpected character in hex color.
-            }
-            return -1;
-        case '[': // "[[" is an escaped left square bracket.
-            return -2;
-        case ']': // "[]" is a "pop" color tag.
-            if (colorStack.size > 1)
-                colorPool.free(colorStack.pop());
-            return 0;
+                return -1;
+            case '[': // "[[" is an escaped left square bracket.
+                return -2;
+            case ']': // "[]" is a "pop" color tag.
+                if (colorStack.size > 1)
+                    colorPool.free(colorStack.pop());
+                return 0;
         }
         // Parse named color.
         int colorStart = start;
@@ -498,7 +513,7 @@ public class GlyphLayout implements Poolable {
     }
 
     public void reset() {
-        Pools.get(GlyphRun::new).freeAll(runs);
+        POOLS.getPool(GlyphRun.class).freeAll(runs);
         runs.clear();
 
         width = 0;

@@ -24,7 +24,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -2072,17 +2071,17 @@ public class GamepadGui extends AbstractGui {
                     }
                 } else if (target instanceof Button b) {
                     // Touch-down event for buttons.
-                    InputEvent inputEvent = Pools.obtain(InputEvent::new);
+                    InputEvent inputEvent = POOLS.obtain(InputEvent.class);
                     inputEvent.setTarget(b);
                     inputEvent.setType(InputEvent.Type.touchDown);
                     b.fire(inputEvent);
-                    Pools.free(inputEvent);
+                    POOLS.free(inputEvent);
                 } else {
                     // Fire change event.
-                    ChangeEvent event = Pools.obtain(ChangeEvent::new);
+                    ChangeEvent event = POOLS.obtain(ChangeEvent.class);
                     event.setTarget(target);
                     target.fire(event);
-                    Pools.free(event);
+                    POOLS.free(event);
                 }
             }
         }
@@ -2093,11 +2092,11 @@ public class GamepadGui extends AbstractGui {
             if (target != null) {
                 if (target instanceof Button b) {
                     // Touch-up event.
-                    InputEvent inputEvent = Pools.obtain(InputEvent::new);
+                    InputEvent inputEvent = POOLS.obtain(InputEvent.class);
                     inputEvent.setTarget(b);
                     inputEvent.setType(InputEvent.Type.touchUp);
                     b.fire(inputEvent);
-                    Pools.free(inputEvent);
+                    POOLS.free(inputEvent);
                 }
             }
         }

@@ -32,6 +32,7 @@ import static gaiasky.util.gdx.g2d.GlyphLayout.GlyphRun;
  * @author Alexander Dorokhov
  */
 public class BitmapFontCache {
+    private static final PoolManager POOLS = new PoolManager(GlyphLayout::new);
     static private final Color tempColor = new Color(1, 1, 1, 1);
 
     private final BitmapFont font;
@@ -309,7 +310,8 @@ public class BitmapFontCache {
     public void clear() {
         x = 0;
         y = 0;
-        Pools.freeAll(pooledLayouts, true);
+        for (var o : pooledLayouts)
+            POOLS.free(o);
         pooledLayouts.clear();
         layouts.clear();
         for (int i = 0, n = idx.length; i < n; i++) {
@@ -476,7 +478,7 @@ public class BitmapFontCache {
      * @see #addText(CharSequence, float, float, int, int, float, int, boolean, String)
      */
     public GlyphLayout setText(CharSequence str, float x, float y, int start, int end, float targetWidth, int halign,
-            boolean wrap) {
+                               boolean wrap) {
         clear();
         return addText(str, x, y, start, end, targetWidth, halign, wrap);
     }
@@ -487,7 +489,7 @@ public class BitmapFontCache {
      * @see #addText(CharSequence, float, float, int, int, float, int, boolean, String)
      */
     public GlyphLayout setText(CharSequence str, float x, float y, int start, int end, float targetWidth, int halign,
-            boolean wrap, String truncate) {
+                               boolean wrap, String truncate) {
         clear();
         return addText(str, x, y, start, end, targetWidth, halign, wrap, truncate);
     }
@@ -526,30 +528,30 @@ public class BitmapFontCache {
      * @see #addText(CharSequence, float, float, int, int, float, int, boolean, String)
      */
     public GlyphLayout addText(CharSequence str, float x, float y, int start, int end, float targetWidth, int halign,
-            boolean wrap) {
+                               boolean wrap) {
         return addText(str, x, y, start, end, targetWidth, halign, wrap, null);
     }
 
     /**
-     * Adds glyphs for the the specified text.
+     * Adds glyphs for THE specified text.
      *
      * @param x           The x position for the left most character.
      * @param y           The y position for the top of most capital letters in the font (the {@link BitmapFontData#capHeight cap height}).
      * @param start       The first character of the string to draw.
      * @param end         The last character of the string to draw (exclusive).
      * @param targetWidth The width of the area the text will be drawn, for wrapping or truncation.
-     * @param halign      Horizontal alignment of the text, see {@link Align}.
+     * @param hAlign      Horizontal alignment of the text, see {@link Align}.
      * @param wrap        If true, the text will be wrapped within targetWidth.
-     * @param truncate    If not null, the text will be truncated within targetWidth with this string appended. May be an empty
+     * @param truncate    If not null, the text will be truncated within targetWidth with this string appended. It may be an empty
      *                    string.
      *
      * @return The glyph layout for the cached string (the layout's height is the distance from y to the baseline).
      */
-    public GlyphLayout addText(CharSequence str, float x, float y, int start, int end, float targetWidth, int halign,
-            boolean wrap, String truncate) {
-        GlyphLayout layout = Pools.obtain(GlyphLayout::new);
+    public GlyphLayout addText(CharSequence str, float x, float y, int start, int end, float targetWidth, int hAlign,
+                               boolean wrap, String truncate) {
+        GlyphLayout layout = POOLS.obtain(GlyphLayout.class);
         pooledLayouts.add(layout);
-        layout.setText(font, str, start, end, color, targetWidth, halign, wrap, truncate);
+        layout.setText(font, str, start, end, color, targetWidth, hAlign, wrap, truncate);
         addText(layout, x, y);
         return layout;
     }
@@ -576,7 +578,7 @@ public class BitmapFontCache {
     /**
      * Specifies whether to use integer positions or not. Default is to use them so filtering doesn't kick in as badly.
      *
-     * @param use
+     * @param use True to use integer positions.
      */
     public void setUseIntegerPositions(boolean use) {
         this.integer = use;

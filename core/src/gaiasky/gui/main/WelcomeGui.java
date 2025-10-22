@@ -29,7 +29,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
@@ -41,7 +44,6 @@ import gaiasky.gui.window.*;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.input.GuiKbdListener;
 import gaiasky.util.*;
-import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
@@ -1162,10 +1164,10 @@ public class WelcomeGui extends AbstractGui {
     public void fireChange() {
         if (buttonList != null) {
             Button b = buttonList.get(currentSelected);
-            ChangeEvent event = Pools.obtain(ChangeEvent::new);
+            ChangeEvent event = POOLS.obtain(ChangeEvent.class);
             event.setTarget(b);
             b.fire(event);
-            Pools.free(event);
+            POOLS.free(event);
         }
     }
 

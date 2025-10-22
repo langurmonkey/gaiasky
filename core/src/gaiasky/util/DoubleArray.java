@@ -8,8 +8,8 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.NumberUtils;
-import com.badlogic.gdx.utils.StringBuilder;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
@@ -482,7 +482,7 @@ public class DoubleArray {
         if (size == 0)
             return "[]";
         double[] items = this.items;
-        StringBuilder buffer = new StringBuilder(32);
+        CharArray buffer = new CharArray(32);
         buffer.append('[');
         buffer.append(items[0]);
         for (int i = 1; i < size; i++) {
@@ -497,7 +497,7 @@ public class DoubleArray {
         if (size == 0)
             return "";
         double[] items = this.items;
-        StringBuilder buffer = new StringBuilder(32);
+        CharArray buffer = new CharArray(32);
         buffer.append(items[0]);
         for (int i = 1; i < size; i++) {
             buffer.append(separator);

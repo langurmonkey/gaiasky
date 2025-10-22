@@ -98,10 +98,10 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
                 }
             } else if (target instanceof Button) {
                 // Fire change event on buttons.
-                ChangeEvent event = Pools.obtain(ChangeEvent::new);
+                ChangeEvent event = Actor.POOLS.obtain(ChangeEvent.class);
                 event.setTarget(target);
                 target.fire(event);
-                Pools.free(event);
+                Actor.POOLS.free(event);
                 return true;
             }
         }

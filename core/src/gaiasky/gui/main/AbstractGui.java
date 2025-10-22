@@ -8,10 +8,16 @@
 package gaiasky.gui.main;
 
 import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.PoolManager;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -26,6 +32,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
  * Base implementation for top-level GUIs. Contains the essentials used by (almost) all.
  */
 public abstract class AbstractGui implements IObserver, IGui {
+    static public PoolManager POOLS = new PoolManager(InputEvent::new, ChangeEvent::new);
 
     /**
      * Graphics instance.

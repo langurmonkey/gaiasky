@@ -131,11 +131,11 @@ public class OwnTextIconButton extends OwnTextButton {
         clearChildren();
         if (Align.isRight(contentAlign)) {
             this.align(contentAlign);
-            add(getLabel()).align(contentAlign).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1f) : space);
+            add(getLabel()).align(contentAlign).padRight(space <= 0 ? (getLabel().getText().size > 0 ? 12.8f : 1f) : space);
             add(this.icon).align(contentAlign).pad(pad);
         } else {
             this.align(contentAlign);
-            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1f) : space);
+            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().size > 0 ? 12.8f : 1f) : space);
             add(getLabel()).align(contentAlign).padRight(pad);
         }
     }

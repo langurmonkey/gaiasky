@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
@@ -236,7 +236,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         setVisible(true);
     }
 
-    private void setText(Label l, Cell<Label> c, StringBuilder text) {
+    private void setText(Label l, Cell<Label> c, CharArray text) {
         setText(l, c, text.toString());
     }
 
@@ -376,7 +376,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                             String[] keys = p.getFirst();
                             String action = p.getSecond();
                             if (keys != null && keys.length > 0 && action != null && !action.isEmpty()) {
-                                StringBuilder msg = new StringBuilder();
+                                CharArray msg = new CharArray();
                                 msg.append("<");
                                 for (int i = 0; i < keys.length; i++) {
                                     msg.append(keys[i].toUpperCase());

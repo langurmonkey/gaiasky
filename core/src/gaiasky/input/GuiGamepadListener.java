@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.gui.api.IGamepadMappings;
 import gaiasky.util.GuiUtils;
@@ -199,10 +198,10 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
                 }
             } else {
                 // Fire change event.
-                ChangeEvent event = Pools.obtain(ChangeEvent::new);
+                ChangeEvent event = Actor.POOLS.obtain(ChangeEvent.class);
                 event.setTarget(target);
                 target.fire(event);
-                Pools.free(event);
+                Actor.POOLS.free(event);
             }
         }
     }
