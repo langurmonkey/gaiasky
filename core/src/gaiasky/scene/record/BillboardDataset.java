@@ -16,6 +16,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -110,7 +111,7 @@ public class BillboardDataset {
      * @param completion The completion rate, applied to all graphics qualities.
      */
     public void setCompletion(Double completion) {
-        float c = completion.floatValue();
+        float c = (float) MathUtilsDouble.saturate(completion);
         this.completion = new float[]{c, c, c, c};
     }
 
@@ -122,7 +123,11 @@ public class BillboardDataset {
     public void setCompletion(double[] completion) {
         int len = GraphicsQuality.values().length;
         if (completion.length == len) {
-            this.completion = new float[]{(float) completion[0], (float) completion[1], (float) completion[2], (float) completion[3]};
+            var c0 = (float) MathUtilsDouble.saturate(completion[0]);
+            var c1 = (float) MathUtilsDouble.saturate(completion[1]);
+            var c2 = (float) MathUtilsDouble.saturate(completion[2]);
+            var c3 = (float) MathUtilsDouble.saturate(completion[0]);
+            this.completion = new float[]{c0, c1, c2, c3};
         } else {
             // What to do?
             logger.warn("The length of the completion array must be " + len + ", got " + completion.length);
