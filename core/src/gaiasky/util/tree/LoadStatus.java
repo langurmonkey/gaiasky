@@ -7,11 +7,15 @@
 
 package gaiasky.util.tree;
 
+/** The loading status of a dataset or file. **/
 public enum LoadStatus {
+    /** Data is not loaded. **/
     NOT_LOADED,
+    /** Data is queued, waiting to be loaded. **/
     QUEUED,
     /** Loading. **/
     LOADING,
+    /** Error during loading. **/
     LOADING_FAILED,
     /** Ready to stream data to GPU. **/
     READY,

@@ -27,12 +27,14 @@ uniform mat4 u_view;
 #endif // gravitationalWaves
 
 // INPUT
-in vec4 a_position;
-in vec4 a_color;
-in vec2 a_texCoord;
-in vec3 a_particlePos;
+// Regular attributes
+layout(location = 0) in vec4 a_position;
+layout(location = 1) in vec2 a_texCoord0;
+// Instance attributes
+layout(location = 2) in vec3 a_particlePos;
+layout(location = 3) in vec4 a_color;
 // x - size, y - type, z - layer
-in vec3 a_additional;
+layout(location = 4) in vec3 a_additional;
 
 // OUTPUT
 out vec4 v_col;
@@ -71,7 +73,7 @@ void main() {
     v_col = vec4(a_color.rgb, a_color.a * u_intensity * dscale);
     v_type = int(a_additional.y);
     v_layer = int(a_additional.z);
-    v_uv = a_texCoord;
+    v_uv = a_texCoord0;
 
     float quadSize = min(a_additional.x * u_sizeFactor, u_maxPointSize * dist);
 
