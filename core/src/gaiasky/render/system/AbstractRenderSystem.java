@@ -24,7 +24,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
-import net.jafama.FastMath;
 
 import java.util.Comparator;
 import java.util.List;
@@ -242,6 +241,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     protected ExtShaderProgram getShaderProgram(ExtShaderProgram[] programs) {
+        if (programs == null) return null;
         boolean gw = Settings.settings.runtime.gravitationalWaves;
         boolean ra = Settings.settings.runtime.relativisticAberration;
         boolean ssr = Settings.settings.postprocess.ssr.active;

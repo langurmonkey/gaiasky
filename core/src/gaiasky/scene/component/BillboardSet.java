@@ -20,6 +20,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class BillboardSet implements Component, IDisposable {
 
+    /** Use procedural generation to create the particles of this set. **/
+    public boolean procedural = false;
     /** List of {@link BillboardDataset} objects. **/
     public BillboardDataset[] datasets;
     /** Location of the textures for the billboard particles. **/
@@ -45,6 +47,10 @@ public class BillboardSet implements Component, IDisposable {
 
     public void setStatus(LoadStatus status) {
         this.status.set(status);
+    }
+
+    public void setProcedural(Boolean procedural) {
+        this.procedural = procedural;
     }
 
     public void setTextures(String[] textures) {

@@ -25,9 +25,20 @@ public class BillboardSetExtractor extends AbstractExtractSystem {
 
         if (mustRender(base) && (fade.fadeIn == null || fade.currentDistance > fade.fadeIn.x) && (fade.fadeOut == null || fade.currentDistance < fade.fadeOut.y)) {
             var render = Mapper.render.get(entity);
+            var label = Mapper.label.get(entity);
+            var billboard = Mapper.billboardSet.get(entity);
 
-            addToRender(render, RenderGroup.FONT_LABEL);
-            addToRender(render, RenderGroup.BILLBOARD_GROUP);
+            // Label.
+            if (label.label && label.renderLabel()) {
+                addToRender(render, RenderGroup.FONT_LABEL);
+            }
+
+            // Billboard group.
+            if (billboard.procedural) {
+                addToRender(render, RenderGroup.BILLBOARD_GROUP_PROCEDURAL);
+            } else {
+                addToRender(render, RenderGroup.BILLBOARD_GROUP);
+            }
         }
     }
 }

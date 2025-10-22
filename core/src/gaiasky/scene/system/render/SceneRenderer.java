@@ -284,7 +284,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case MODEL_PIX_DUST -> // MODELS DUST AND MESH
                     system = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
-            case MODEL_VERT_ADDITIVE -> system = new ModelRenderer(this, MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
+            case MODEL_VERT_ADDITIVE -> system = new ModelRenderer(this,
+                                                                   MODEL_VERT_ADDITIVE,
+                                                                   alphas,
+                                                                   renderAssets.mbVertexLightingAdditive);
             case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY (meses)
                     system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
             case MODEL_DIFFUSE -> system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
@@ -295,23 +298,43 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
-            case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
+            case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this,
+                                                                      BILLBOARD_GROUP,
+                                                                      alphas,
+                                                                      renderAssets.billboardGroupShaders);
+            case BILLBOARD_GROUP_PROCEDURAL -> system = new BillboardProceduralRenderer(this,
+                                                                                        BILLBOARD_GROUP_PROCEDURAL,
+                                                                                        alphas,
+                                                                                        renderAssets.billboardGroupShaders,
+                                                                                        renderAssets.genParticlesShader);
             case PARTICLE_GROUP -> {
                 final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudModeParticles) {
-                    case TRIANGLES -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
-                    case POINTS -> new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+                    case TRIANGLES -> new ParticleSetInstancedRenderer(this,
+                                                                       PARTICLE_GROUP,
+                                                                       alphas,
+                                                                       renderAssets.particleGroupShaders);
+                    case POINTS -> new ParticleSetPointRenderer(this,
+                                                                PARTICLE_GROUP,
+                                                                alphas,
+                                                                renderAssets.particleGroupShaders);
                 };
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case PARTICLE_GROUP_EXT_BILLBOARD -> {
-                system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_BILLBOARD, alphas, renderAssets.particleGroupExtBillboardShaders);
+                system = new ParticleSetInstancedRenderer(this,
+                                                          PARTICLE_GROUP_EXT_BILLBOARD,
+                                                          alphas,
+                                                          renderAssets.particleGroupExtBillboardShaders);
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case PARTICLE_GROUP_EXT_MODEL -> {
-                system = new ParticleSetInstancedRenderer(this, PARTICLE_GROUP_EXT_MODEL, alphas, renderAssets.particleGroupExtModelShaders);
+                system = new ParticleSetInstancedRenderer(this,
+                                                          PARTICLE_GROUP_EXT_MODEL,
+                                                          alphas,
+                                                          renderAssets.particleGroupExtModelShaders);
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }

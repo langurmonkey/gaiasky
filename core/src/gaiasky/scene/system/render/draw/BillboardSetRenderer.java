@@ -8,7 +8,6 @@
 package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -30,7 +29,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
 import net.jafama.FastMath;
@@ -67,7 +65,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
 
     @Override
     protected void addAttributesDivisor1(Array<VertexAttribute> attributes, int primitive) {
-        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorUnpacked, 3, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
         attributes.add(new VertexAttribute(OwnUsage.Additional, 3, "a_additional"));
     }
@@ -79,8 +77,8 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
 
     @Override
     protected void offsets1(MeshData curr, InstancedRenderSystem.InstancedModel model) {
-        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(
-                Usage.ColorPacked).offset / 4 : 0;
+        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorUnpacked) != null ? curr.mesh.getInstancedAttribute(
+                Usage.ColorUnpacked).offset / 4 : 0;
         model.particlePosOffset =
                 curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(
                         OwnUsage.ObjectPosition).offset / 4 : 0;
@@ -140,10 +138,9 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
                 // COLOR
                 double[] doubleData = pv.data();
                 float[] col = doubleData.length >= 7 ? new float[]{(float) doubleData[4], (float) doubleData[5], (float) doubleData[6]} : cg.generateColor();
-                col[0] = MathUtilsDouble.clamp(col[0], 0f, 1f);
-                col[1] = MathUtilsDouble.clamp(col[1], 0f, 1f);
-                col[2] = MathUtilsDouble.clamp(col[2], 0f, 1f);
-                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cg.generateAlpha());
+                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = col[0];
+                model.instanceAttributes[curr.instanceIdx + curr.colorOffset + 1] = col[1];
+                model.instanceAttributes[curr.instanceIdx + curr.colorOffset + 2] = col[2];
 
                 // SIZE, TYPE, TEX LAYER
                 double starSize = particle.size();
@@ -194,14 +191,14 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
                     }
                     set.setStatus(LoadStatus.LOADED);
                 }
-                case LOADED -> render(renderable, render, camera);
+                case LOADED -> render(render, camera);
             }
         }
     }
 
-    private void render(IRenderable renderable, Render render, ICamera camera) {
+    private void render(Render render, ICamera camera) {
         // RENDER
-        float alpha = getAlpha(renderable);
+        float alpha = getAlpha(render);
         if (alpha > 0) {
             var fade = Mapper.fade.get(render.entity);
             var affine = Mapper.affine.get(render.entity);
@@ -218,7 +215,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos());
             addCameraUpCubemapMode(shaderProgram, camera);
-            shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha * 1.5f);
+            shaderProgram.setUniformf("u_alpha", render.getOpacity() * alpha * 1.5f);
             shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
 
             // Arbitrary affine transformations.
@@ -283,8 +280,6 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
 
     private interface ColorGenerator {
         float[] generateColor();
-
-        float generateAlpha();
     }
 
     private static class StarColorGenerator implements ColorGenerator {
@@ -299,10 +294,6 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             }
         }
 
-        @Override
-        public float generateAlpha() {
-            return 1;
-        }
     }
 
     private static class DustColorGenerator implements ColorGenerator {
@@ -311,13 +302,5 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             float r = (float) FastMath.abs(StdRandom.uniform() * 0.2 + 0.07);
             return new float[]{r, r, r};
         }
-
-        @Override
-        public float generateAlpha() {
-            return 0.6f;
-        }
-    }
-
-    private record MeshDataWrap(MeshData meshData, BillboardDataset dataset) {
     }
 }

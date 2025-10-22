@@ -51,6 +51,10 @@ public enum RenderGroup {
      **/
     BILLBOARD_GROUP(800),
     /**
+     * Group of billboard datasets, using procedural generation.
+     **/
+    BILLBOARD_GROUP_PROCEDURAL(801),
+    /**
      * Particle group.
      **/
     PARTICLE_GROUP(1000),

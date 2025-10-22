@@ -79,11 +79,13 @@ public class BillboardSetInitializer extends AbstractInitSystem {
     public void reloadData(Entity entity) {
         try {
             var billboard = Mapper.billboardSet.get(entity);
-            var provider = new PointDataProvider();
-            boolean reload = false;
-            for (BillboardDataset dataset : billboard.datasets) {
-                boolean reloadNeeded = dataset.initialize(provider, reload);
-                reload = reload || reloadNeeded;
+            if(!billboard.procedural) {
+                var provider = new PointDataProvider();
+                boolean reload = false;
+                for (BillboardDataset dataset : billboard.datasets) {
+                    boolean reloadNeeded = dataset.initialize(provider, reload);
+                    reload = reload || reloadNeeded;
+                }
             }
         } catch (Exception e) {
             Logger.getLogger(this.getClass())
