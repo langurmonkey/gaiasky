@@ -10,6 +10,7 @@ package gaiasky.render.system;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.AffineTransformations;
@@ -25,8 +26,8 @@ import java.util.Set;
 public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
     // Offset and count per renderable, if needed.
-    private final Map<IRenderable, Integer> offsets;
-    private final Map<IRenderable, Integer> counts;
+    private final Map<IRenderable, IntArray> offsets;
+    private final Map<IRenderable, IntArray> counts;
     protected int meshIdx;
     protected Array<MeshData> meshes;
     protected MeshData curr;
@@ -129,11 +130,25 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         }
     }
 
+    private void initOffset(IRenderable renderable) {
+        if (!offsets.containsKey(renderable)) {
+            offsets.put(renderable, new IntArray(1));
+        }
+    }
+
+    private void initCounts(IRenderable renderable) {
+        if (!counts.containsKey(renderable)) {
+            counts.put(renderable, new IntArray(1));
+        }
+    }
+
+
     protected void setOffset(IRenderable renderable,
                              int offset) {
         if (offsets != null) {
             if (offset >= 0) {
-                offsets.put(renderable, offset);
+                initOffset(renderable);
+                offsets.get(renderable).add(offset);
             } else {
                 offsets.remove(renderable);
             }
@@ -142,23 +157,36 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
     protected int getOffset(IRenderable renderable) {
         if (offsets != null && offsets.containsKey(renderable)) {
-            return offsets.get(renderable);
+            return offsets.get(renderable).first();
         }
         return -1;
+    }
+    protected IntArray getOffsets(IRenderable renderable) {
+        if (offsets != null && offsets.containsKey(renderable)) {
+            return offsets.get(renderable);
+        }
+        return null;
     }
 
     protected void setCount(IRenderable renderable,
                             int count) {
         if (counts != null) {
-            counts.put(renderable, count);
+            initCounts(renderable);
+            counts.get(renderable).add(count);
         }
     }
 
     protected int getCount(IRenderable renderable) {
         if (counts != null && counts.containsKey(renderable)) {
-            return counts.get(renderable);
+            return counts.get(renderable).first();
         }
         return -1;
+    }
+    protected IntArray getCounts(IRenderable renderable) {
+        if (counts != null && counts.containsKey(renderable)) {
+            return counts.get(renderable);
+        }
+        return null;
     }
 
     public void dispose() {
@@ -283,7 +311,6 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         public static final int OrbitElems1 = 21000;
         public static final int OrbitElems2 = 22000;
     }
-
 
 
     protected void addAffineTransformUniforms(ExtShaderProgram program, AffineTransformations affine) {

@@ -13,18 +13,14 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.system.PointCloudTriRenderSystem;
+import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.BillboardSet;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.BillboardDataset.ParticleType;
@@ -33,29 +29,30 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
 import net.jafama.FastMath;
+import org.lwjgl.opengl.GL41;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-public class BillboardSetRenderer extends PointCloudTriRenderSystem implements IObserver {
+public class BillboardSetRenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(BillboardSetRenderer.class);
-
-    private final Map<Render, MeshDataWrap[]> meshes;
-    private final Map<Render, GpuData[]> gpus;
-    private final Map<Render, Integer> loadIndices;
 
     private final ColorGenerator starColorGenerator;
     private final ColorGenerator dustColorGenerator;
 
 
+    /**
+     * Creates a billboard set renderer.
+     *
+     * @param sceneRenderer The scene renderer.
+     * @param rg            The render group.
+     * @param alphas        Alphas array.
+     * @param shaders       The shaders.
+     */
     public BillboardSetRenderer(SceneRenderer sceneRenderer,
                                 RenderGroup rg,
                                 float[] alphas,
@@ -65,12 +62,32 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         starColorGenerator = new StarColorGenerator();
         dustColorGenerator = new DustColorGenerator();
 
-        meshes = new HashMap<>();
-        gpus = new HashMap<>();
-        loadIndices = new HashMap<>();
-
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_BILLBOARD_DATASET);
     }
+
+    @Override
+    protected void addAttributesDivisor1(Array<VertexAttribute> attributes, int primitive) {
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
+        attributes.add(new VertexAttribute(OwnUsage.Additional, 3, "a_additional"));
+    }
+
+    @Override
+    protected void offsets0(MeshData curr, InstancedRenderSystem.InstancedModel model) {
+        // Not needed
+    }
+
+    @Override
+    protected void offsets1(MeshData curr, InstancedRenderSystem.InstancedModel model) {
+        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(
+                Usage.ColorPacked).offset / 4 : 0;
+        model.particlePosOffset =
+                curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(
+                        OwnUsage.ObjectPosition).offset / 4 : 0;
+        model.additionalOffset = curr.mesh.getInstancedAttribute(OwnUsage.Additional) != null ? curr.mesh.getInstancedAttribute(
+                OwnUsage.Additional).offset / 4 : 0;
+    }
+
 
     @Override
     protected void initShaderProgram() {
@@ -84,224 +101,98 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         }
     }
 
-
-    private void disposeMeshes(Render key) {
-        if (meshes != null && meshes.containsKey(key)) {
-            MeshDataWrap[] m = meshes.get(key);
-            if (m != null && m.length > 0) {
-                for (MeshDataWrap meshDataWrap : m) {
-                    if (meshDataWrap != null && meshDataWrap.meshData != null) {
-                        meshDataWrap.meshData.dispose();
-                    }
-                }
-                meshes.remove(key);
-                gpus.remove(key);
-            }
-        }
-    }
-
-    private void disposeMeshes() {
-        Set<Render> keys = meshes.keySet();
-        for (Render key : keys) {
-            disposeMeshes(key);
-        }
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        disposeMeshes();
-    }
-
-    @Override
-    protected void initVertices() {
-    }
-
-    private MeshDataWrap toMeshData(GpuData ad, MeshDataWrap mdw) {
-        if (ad != null && ad.vertices != null) {
-            if (mdw != null && mdw.meshData != null) {
-                mdw.meshData.dispose();
-            }
-            mdw = new MeshDataWrap();
-            MeshData md = new MeshData();
-            VertexAttribute[] attributes = buildVertexAttributes();
-            md.mesh = new IntMesh(true, ad.vertices.length / 6, ad.indices.length, attributes);
-            md.vertexSize = md.mesh.getVertexAttributes().vertexSize / 4;
-            md.colorOffset = md.mesh.getVertexAttribute(Usage.ColorPacked) != null ? md.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-            md.vertexIdx = ad.vertexIdx;
-            md.mesh.setVertices(ad.vertices, 0, ad.vertices.length);
-            md.mesh.setIndices(ad.indices, 0, ad.indices.length);
-
-            mdw.meshData = md;
-            mdw.dataset = ad.dataset;
-
-            ad.vertices = null;
-            ad.indices = null;
-            return mdw;
-        }
-        return null;
-    }
-
     /**
-     * Converts a given list of particle records to GPU data.
+     * Prepares the data of a billboard dataset for the GPU.
      *
      * @param bd The billboard dataset.
      * @param cg The color generator.
      *
-     * @return The GPU data object.
      */
-    private GpuData convertDataToGpu(BillboardDataset bd, ColorGenerator cg) {
-        StdRandom.setSeed(11447799L);
-        GpuData ad = new GpuData();
-        // Dataset
-        ad.dataset = bd;
-
-        // vert_pos + col + uv + obj_pos + additional
-        int vertexSize = 2 + 1 + 2 + 3 + 3;
-        // Offsets
-        int posOffset = 0;
-        int colorOffset = 2;
-        int uvOffset = 3;
-        int particlePosOffset = 5;
-        int additionalOffset = 8;
+    private void prepareGPUData(IRenderable render, BillboardDataset bd, ColorGenerator cg) {
+        // True particle count for this dataset.
+        int totalCount = bd.data.size();
+        // Particle count after applying completion factor.
+        int count = 0;
+        // Compute what particles are in based on completion.
         float completion = bd.completion == null ? 1f : bd.completion[Settings.settings.graphics.quality.ordinal()];
+        StdRandom.setSeed(11447799L);
+        byte[] in = new byte[totalCount];
+        for (int i = 0; i < totalCount; i++) {
+            in[i] = (completion == 1f || StdRandom.uniform() <= completion) ? (byte) 1 : (byte) 0;
+            count += in[i];
+        }
 
-        List<IParticleRecord> data = bd.data;
-        ad.vertices = new float[data.size() * vertexSize * 4];
-        ad.indices = new int[data.size() * 6];
+        var model = getModel(null, "quad", null, GL41.GL_TRIANGLES, getOffset(render));
+        int offset = addMeshData(model, model.numVertices, count, model.numIndices, null, "quad",
+                                 GL41.GL_TRIANGLES);
+        setOffset(render, offset);
+        curr = meshes.get(offset);
+        model.ensureInstanceAttribsSize(count * curr.instanceSize);
 
         int nLayers = bd.layers.length;
 
-        for (IParticleRecord particle : data) {
-            if (completion == 1f || StdRandom.uniform() <= completion) {
+        for (int i = 0; i < in.length; i++) {
+            if (in[i] != 0) {
+                var particle = bd.data.get(i);
                 int layer = StdRandom.uniform(nLayers);
-                for (int vert = 0; vert < 4; vert++) {
-                    var pv = (ParticleVector) particle;
-                    // Vertex POSITION
-                    ad.vertices[ad.vertexIdx + posOffset] = vertPos[vert].getFirst();
-                    ad.vertices[ad.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
+                var pv = (ParticleVector) particle;
 
-                    // COLOR
-                    double[] doubleData = pv.data();
-                    float[] col = doubleData.length >= 7 ? new float[]{(float) doubleData[4], (float) doubleData[5], (float) doubleData[6]} : cg.generateColor();
-                    col[0] = MathUtilsDouble.clamp(col[0], 0f, 1f);
-                    col[1] = MathUtilsDouble.clamp(col[1], 0f, 1f);
-                    col[2] = MathUtilsDouble.clamp(col[2], 0f, 1f);
-                    ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cg.generateAlpha());
+                // COLOR
+                double[] doubleData = pv.data();
+                float[] col = doubleData.length >= 7 ? new float[]{(float) doubleData[4], (float) doubleData[5], (float) doubleData[6]} : cg.generateColor();
+                col[0] = MathUtilsDouble.clamp(col[0], 0f, 1f);
+                col[1] = MathUtilsDouble.clamp(col[1], 0f, 1f);
+                col[2] = MathUtilsDouble.clamp(col[2], 0f, 1f);
+                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cg.generateAlpha());
 
-                    // UV coordinates
-                    ad.vertices[ad.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                    ad.vertices[ad.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+                // SIZE, TYPE, TEX LAYER
+                double starSize = particle.size();
+                model.instanceAttributes[curr.instanceIdx + model.additionalOffset] = (float) starSize;
+                model.instanceAttributes[curr.instanceIdx + model.additionalOffset + 1] = (float) bd.type.ordinal();
+                model.instanceAttributes[curr.instanceIdx + model.additionalOffset + 2] = (float) bd.layers[layer];
 
-                    // SIZE, TYPE, TEX LAYER
-                    double starSize = particle.size();
-                    ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
-                    ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) bd.type.ordinal();
-                    ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) bd.layers[layer];
+                // OBJECT POSITION
+                model.instanceAttributes[curr.instanceIdx + model.particlePosOffset] = (float) particle.x();
+                model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 1] = (float) particle.y();
+                model.instanceAttributes[curr.instanceIdx + model.particlePosOffset + 2] = (float) particle.z();
 
-                    // OBJECT POSITION
-                    final int idx = ad.vertexIdx;
-                    ad.vertices[idx + particlePosOffset] = (float) particle.x();
-                    ad.vertices[idx + particlePosOffset + 1] = (float) particle.y();
-                    ad.vertices[idx + particlePosOffset + 2] = (float) particle.z();
-
-                    ad.vertexIdx += vertexSize;
-                    ad.numVertices++;
-                }
-                ad.quadIndices();
+                curr.instanceIdx += curr.instanceSize;
+                curr.numVertices++;
             }
         }
-        return ad;
+        // Global (divisor=0) vertices (position, uv?) plus optional indices
+        curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
+        if (model.numIndices > 0) {
+            curr.mesh.setIndices(model.indices, 0, model.numIndices);
+        }
+        // Per instance (divisor=1) vertices
+        int size = count * curr.instanceSize;
+        setCount(render, count);
+        curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, size);
+        model.instanceAttributes = null;
+
+        setInGpu(render, true);
     }
 
     private ColorGenerator getColorGenerator(final ParticleType type) {
         return type == ParticleType.DUST ? dustColorGenerator : starColorGenerator;
     }
 
-    /**
-     * Creates the GPU data objects for a given dataset provider and stores them.
-     *
-     * @param render The render object.
-     * @param base   The base component.
-     * @param set    The billboard set component.
-     */
-    private void convertDataToGpuFormat(Render render, Base base, BillboardSet set) {
-        logger.info("Converting billboard data to VRAM format: " + base.getLocalizedName());
-        BillboardDataset[] datasets = set.datasets;
-        GpuData[] g = new GpuData[datasets.length];
-        for (int i = 0; i < g.length; i++) {
-            g[i] = convertDataToGpu(datasets[i], getColorGenerator(datasets[i].type));
-        }
-        gpus.put(render, g);
-    }
-
-    /**
-     * Converts the GPU data objects for the given dataset provider to mesh data
-     * objects, and streams them to the GPU, one at a time (in each call to this method).
-     * When all objects have been converted and streamed, this method returns true.
-     *
-     * @param render The render object.
-     * @param base   The base component.
-     *
-     * @return True if all data is already in the GPU.
-     */
-    private boolean streamToGpu(Render render, Base base) {
-        GpuData[] g = gpus.get(render);
-        if (g != null) {
-            int index;
-            if (!loadIndices.containsKey(render)) {
-                loadIndices.put(render, 0);
-                index = 0;
-            } else {
-                index = loadIndices.get(render) + 1;
-                loadIndices.put(render, index);
-            }
-
-            MeshDataWrap[] m;
-            if (!meshes.containsKey(render)) {
-                m = new MeshDataWrap[g.length];
-                meshes.put(render, m);
-            } else {
-                m = meshes.get(render);
-            }
-
-            if (index >= m.length) {
-                // Done!
-                gpus.remove(render);
-                return true;
-            } else {
-                logger.info(String.format("Streaming dataset to GPU (%d/%d): %s", index + 1, m.length, base.getLocalizedName()));
-                m[index] = toMeshData(g[index], m[index]);
-                return false;
-            }
-        }
-        return false;
-    }
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         for (IRenderable renderable : renderables) {
             Render render = (Render) renderable;
-            var base = Mapper.base.get(render.entity);
             var set = Mapper.billboardSet.get(render.entity);
 
             switch (set.status.get()) {
                 case NOT_LOADED -> {
-                    // PRELOAD
+                    // Load data.
                     set.setStatus(LoadStatus.LOADING);
-                    GaiaSky.instance.getExecutorService().execute(() -> {
-                        convertDataToGpuFormat(render, base, set);
-                        set.setStatus(LoadStatus.READY);
-                    });
-                }
-                case READY, PARTIALLY_LOADED -> {
-                    // TO GPU, one component at a time.
-                    if (streamToGpu(render, base)) {
-                        set.setStatus(LoadStatus.LOADED);
-                    } else {
-                        set.setStatus(LoadStatus.PARTIALLY_LOADED);
+                    for (var bds : set.datasets) {
+                        prepareGPUData(render, bds, getColorGenerator(bds.type));
                     }
-                    render(renderable, render, camera);
+                    set.setStatus(LoadStatus.LOADED);
                 }
                 case LOADED -> render(renderable, render, camera);
             }
@@ -341,11 +232,13 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
             // Disable depth test because we are rendering to empty half-res buffer.
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
 
-            MeshDataWrap[] m = meshes.get(render);
-            for (MeshDataWrap meshDataWrap : m) {
-                if (meshDataWrap != null) {
-                    MeshData meshData = meshDataWrap.meshData;
-                    BillboardDataset dataset = meshDataWrap.dataset;
+            var offsets = getOffsets(render);
+            for (int i = 0; i < offsets.size; i++) {
+                var offset = offsets.get(i);
+                curr = meshes.get(offset);
+
+                if (curr != null) {
+                    BillboardDataset dataset = billboard.datasets[i];
                     // Blend mode
                     Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
                     Gdx.gl20.glEnable(GL20.GL_BLEND);
@@ -368,31 +261,22 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
 
                     Gdx.gl20.glDepthMask(dataset.depthMask);
                     // Render mesh
-                    meshData.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                    int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, count, getCounts(render).get(i));
                 }
             }
             shaderProgram.end();
         }
     }
 
-    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
-        attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
-        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
-        attributes.add(new VertexAttribute(OwnUsage.Additional, 3, "a_additional"));
-    }
-
-    @Override
-    protected void offsets(MeshData curr) {
-        // Empty, do not use mesh data
-    }
-
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
-            if (source instanceof Render) {
-                disposeMeshes((Render) source);
+            IRenderable renderable = (IRenderable) source;
+            int offset = getOffset(renderable);
+            if (offset >= 0) {
+                clearMeshData(offset);
+                models.set(offset, null);
             }
         }
     }
@@ -434,31 +318,6 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         }
     }
 
-    private static class GpuData {
-        float[] vertices;
-        int[] indices;
-        int vertexIdx;
-        int indexIdx;
-        int numVertices;
-        BillboardDataset dataset;
-
-        public void quadIndices() {
-            index(numVertices - 4);
-            index(numVertices - 3);
-            index(numVertices - 2);
-
-            index(numVertices - 2);
-            index(numVertices - 1);
-            index(numVertices - 4);
-        }
-
-        private void index(int idx) {
-            indices[indexIdx++] = idx;
-        }
-    }
-
-    private static class MeshDataWrap {
-        public MeshData meshData;
-        public BillboardDataset dataset;
+    private record MeshDataWrap(MeshData meshData, BillboardDataset dataset) {
     }
 }
