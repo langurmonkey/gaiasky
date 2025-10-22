@@ -136,43 +136,39 @@ public final class MathUtilsDouble {
     static public int clamp(int value,
                             int min,
                             int max) {
-        if (value < min)
-            return min;
-        return FastMath.min(value, max);
+        return FastMath.toRange(value, min, max);
     }
 
     static public short clamp(short value,
                               short min,
                               short max) {
-        if (value < min)
-            return min;
-        if (value > max)
-            return max;
-        return value;
+        return (short) FastMath.toRange(value, min, max);
     }
 
     static public long clamp(long value,
                              long min,
                              long max) {
-        if (value < min)
-            return min;
-        return FastMath.min(value, max);
+        return FastMath.toRange(value, min, max);
     }
 
     static public float clamp(float value,
                               float min,
                               float max) {
-        if (value < min)
-            return min;
-        return FastMath.min(value, max);
+        return FastMath.toRange(value, min, max);
     }
 
     static public double clamp(double value,
                                double min,
                                double max) {
-        if (value < min)
-            return min;
-        return FastMath.min(value, max);
+        return FastMath.toRange(value, min, max);
+    }
+
+    static public float saturate(float value) {
+        return FastMath.toRange(value, 0.0f, 1.0f);
+    }
+
+    static public double saturate(double value) {
+        return FastMath.toRange(value, 0.0, 1.0);
     }
 
     static public double max(double... values) {
