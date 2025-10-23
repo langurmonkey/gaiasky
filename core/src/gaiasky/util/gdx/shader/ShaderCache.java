@@ -458,7 +458,7 @@ public class ShaderCache {
         } else {
             logger.debug(I18n.msg("notif.shader.cache", name));
         }
-        return new int[]{program, 0, 0};
+        return new int[]{GL41.GL_TRUE, program, 0};
     }
 
     protected int createProgram() {

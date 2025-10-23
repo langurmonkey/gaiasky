@@ -21,10 +21,11 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.JPGWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL41;
+import org.lwjgl.opengl.GL43;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
@@ -34,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -793,49 +795,27 @@ public class SysUtils {
         return actualFilePaths;
     }
 
+    public static void checkForOpenGLErrors(String location) {
+        checkForOpenGLErrors(location, false);
+    }
+
+    public static void checkForOpenGLErrors(String location, boolean silent) {
+        int error = GL43.glGetError();
+        if (error != GL43.GL_NO_ERROR) {
+            if (!silent)
+                logger.error("OpenGL error at " + location + ": " + error);
+            // Optionally clear the error so it doesn't affect future operations
+            while (GL43.glGetError() != GL43.GL_NO_ERROR) ;
+        }
+    }
+
     /**
      * Checks if compute shaders (OpenGL 4.3) are supported. This method <strong>must</strong> run on the main thread. Otherwise, it will crash.
      *
      * @return True if compute shaders are supported, false otherwise.
      */
     public static boolean isComputeShaderSupported() {
-        // Get the OpenGL version string
-        String version = GL41.glGetString(GL41.GL_VERSION);
-
-        if (version == null) {
-            return false;  // If no OpenGL version string, return false.
-        }
-
-        // Split the version string into components (e.g., "4.1.0 NVIDIA 580.32")
-        String[] versionParts = version.split(" ");
-
-        if (versionParts.length < 2) {
-            return false;  // Invalid version string
-        }
-
-        // Extract the OpenGL version (e.g., "4.1.0")
-        String openglVersion = versionParts[0];
-
-        // Split the OpenGL version into major, minor, and release numbers
-        String[] versionNumbers = openglVersion.split("\\.");
-
-        if (versionNumbers.length < 2) {
-            return false;  // Invalid version format
-        }
-
-        try {
-            int majorVersion = Integer.parseInt(versionNumbers[0]);
-            int minorVersion = Integer.parseInt(versionNumbers[1]);
-
-            // Check if the version is 4.3 or higher
-            if (majorVersion > 4 || (majorVersion == 4 && minorVersion >= 3)) {
-                return true;
-            }
-        } catch (NumberFormatException e) {
-            logger.warn(e);
-        }
-
-        // If the OpenGL version is below 4.3, check for the compute shader extension
-        return GL.getCapabilities().GL_ARB_compute_shader;
+        return GL.getCapabilities().OpenGL43 || GL.getCapabilities().GL_ARB_compute_shader;
     }
 }
+
