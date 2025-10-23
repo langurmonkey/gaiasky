@@ -7,6 +7,7 @@
 
 package gaiasky;
 
+import org.lwjgl.BufferUtils;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
@@ -93,8 +94,10 @@ import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL43;
 
 import java.io.File;
+import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
@@ -447,6 +450,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
         logger.info(I18n.msg("notif.info.maxattribs", maxVertexAttributes = GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
         logger.info(I18n.msg("notif.info.maxtexsize", maxTextureSize = GL30.glGetInteger(GL30.GL_MAX_TEXTURE_SIZE)));
+        logger.info(I18n.msg("notif.info.compute", (settings.runtime.compute = SysUtils.isComputeShaderSupported()) ?
+                I18n.msg("gui.true") : I18n.msg("gui.false")));
 
         // Disable all kinds of input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);

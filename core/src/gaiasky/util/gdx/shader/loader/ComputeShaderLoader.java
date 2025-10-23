@@ -44,7 +44,7 @@ public class ComputeShaderLoader<T extends ComputeShaderLoader.ComputeShaderPara
     @Override
     public ComputeShaderProgram loadSync(AssetManager manager, String fileName, FileHandle file, T parameter) {
         try {
-            computeShaderProgram = new ComputeShaderProgram(parameter.name, shaderCode);
+            computeShaderProgram = new ComputeShaderProgram(parameter.name, fileName, shaderCode);
             return computeShaderProgram;
         } catch (IOException e) {
             logger.error("Error creating compute shader: " + parameter.name, e);

@@ -61,7 +61,7 @@ public class GaiaSkyDesktop implements IObserver {
     /**
      * Default minor OpenGL version.
      **/
-    private static final int DEFAULT_OPENGL_MINOR = 1;
+    private static final int DEFAULT_OPENGL_MINOR = 6;
     /**
      * Default minor OpenGL version in VR mode.
      **/

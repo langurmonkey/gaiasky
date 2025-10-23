@@ -20,12 +20,12 @@ uniform mat4 u_transform;
 uniform mat4 u_view;
 
 #ifdef relativisticEffects
-    #include <shader/lib/relativity.glsl>
-#endif // relativisticEffects
+#include <shader/lib/relativity.glsl>
+#endif// relativisticEffects
 
 #ifdef gravitationalWaves
-    #include <shader/lib/gravwaves.glsl>
-#endif // gravitationalWaves
+#include <shader/lib/gravwaves.glsl>
+#endif// gravitationalWaves
 
 // ========== INPUTS ==========
 // Regular vertex attributes (the quad geometry)
@@ -34,7 +34,7 @@ layout(location = 1) in vec2 a_texCoord0;
 
 // ========== SSBO ==========
 struct Particle {
-    vec3 position;   // xyz = position
+    vec3 position; // xyz = position
     vec3 color; // rgb
     vec3 extra; // x = size, y = type, z = layer
 };

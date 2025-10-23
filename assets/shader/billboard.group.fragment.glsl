@@ -60,7 +60,6 @@ void main() {
     //if (uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
     //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
     //}
-    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 
     #ifdef ssrFlag
     ssrBuffers();

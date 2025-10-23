@@ -4477,6 +4477,7 @@ public class Settings extends SettingsObject {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RuntimeSettings extends SettingsObject implements IObserver {
         public boolean openXr = false;
+        public boolean compute = false;
         public boolean displayGui = true;
         public boolean updatePause = false;
         public boolean timeOn = false;

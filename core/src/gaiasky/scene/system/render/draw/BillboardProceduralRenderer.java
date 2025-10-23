@@ -10,22 +10,28 @@ package gaiasky.scene.system.render.draw;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import gaiasky.event.Event;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.system.InstancedRenderSystem;
+import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.AffineTransformations;
+import gaiasky.scene.component.Body;
+import gaiasky.scene.component.RefSysTransform;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.system.render.SceneRenderer;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ComputeShaderProgram;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector3Q;
+import net.jafama.FastMath;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL43;
 
@@ -35,7 +41,8 @@ import java.util.List;
 /**
  * Renders billboard datasets generated procedurally using a compute shader stage.
  */
-public class BillboardProceduralRenderer extends InstancedRenderSystem {
+public class BillboardProceduralRenderer extends AbstractRenderSystem {
+    protected static final Logger.Log logger = Logger.getLogger(BillboardProceduralRenderer.class);
 
     /** The compute shader that generates particles. **/
     private final ComputeShaderProgram computeShader;
@@ -43,6 +50,8 @@ public class BillboardProceduralRenderer extends InstancedRenderSystem {
     private final ObjectIntMap<BillboardDataset> ssbos;
     /** Quad mesh, same for everyone. **/
     private IntMesh quadMesh;
+    /** Auxiliary matrix. **/
+    protected final Matrix4 auxMat = new Matrix4();
 
     /**
      * Creates a billboard set renderer.
@@ -63,20 +72,19 @@ public class BillboardProceduralRenderer extends InstancedRenderSystem {
         createQuadMesh();
     }
 
-
     private void createQuadMesh() {
         if (quadMesh == null) {
             // Create a simple quad with texture coordinates
             float[] vertices = {
-                    1f, 1f,  1.0f, 1.0f,  // Bottom-left
-                    1f, -1f, 1.0f, 0.0f,  // Bottom-right
-                    -1f, -1f, 0.0f, 0.0f,  // Top-left
-                    -1f, -1f, 0.0f, 0.0f,  // Top-left
-                    -1f, 1f, 0.0f, 1.0f,  // Top-right
-                    1f, 1f, 1.0f, 1.0f  // Bottom-left
+                    1f, 1f, 0.0f, 1.0f, 1.0f,
+                    1f, -1f, 0.0f, 1.0f, 0.0f,
+                    -1f, -1f, 0.0f, 0.0f, 0.0f,
+                    -1f, -1f, 0.0f, 0.0f, 0.0f,
+                    -1f, 1f, 0.0f, 0.0f, 1.0f,
+                    1f, 1f, 0.0f, 1.0f, 1.0f
             };
 
-            quadMesh = new IntMesh(true, vertices.length / 4, 0, new VertexAttribute[]{VertexAttribute.Position(), VertexAttribute.TexCoords(0)});
+            quadMesh = new IntMesh(true, vertices.length / 5, 0, new VertexAttribute[]{VertexAttribute.Position(), VertexAttribute.TexCoords(0)});
 
             quadMesh.setVertices(vertices);
         }
@@ -86,83 +94,124 @@ public class BillboardProceduralRenderer extends InstancedRenderSystem {
         return ssbos.containsKey(object);
     }
 
+
     /**
      * Prepares a given object for rendering by allocating the SSBO.
      *
+     * @param body    The body component.
      * @param dataset The billboard dataset object.
      */
-    private void prepareGPUBuffer(BillboardDataset dataset) {
+    private void prepareGPUBuffer(Body body, RefSysTransform transform, BillboardDataset dataset) {
         if (!isPrepared(dataset)) {
-            // Create an SSBO for particle data (positions, sizes, etc.)
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(dataset.particleCount * 9); // 9 floats per particle, 3*vec3
+            SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
+
             int bufferId = GL43.glGenBuffers();
-            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
-            GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, buffer, GL43.GL_DYNAMIC_DRAW);
-            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, 0);
 
-            // Put in map.
+            // Check if buffer was created
+            if (bufferId == 0) {
+                logger.error("Failed to generate buffer ID");
+                return;
+            }
+            logger.info("Generated buffer ID: " + bufferId);
+
+            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
+            GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, (long) dataset.particleCount * 12 * 4, GL43.GL_DYNAMIC_DRAW);
+
+
+            // Add to map.
             ssbos.put(dataset, bufferId);
+            logger.info("Buffer created successfully!");
 
-            // Run compute shader to generate particles.
+            // Bind SSBO and dispatch compute shader
             GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
-            dispatchComputeShader(123f, dataset.particleCount, 10f);
 
-            // Debugging: Read back SSBO data after compute shader dispatch
-            FloatBuffer buff = BufferUtils.createFloatBuffer(dataset.particleCount * 9);  // 9 floats per particle
-            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
+            // Double-check the binding worked
+            SysUtils.checkForOpenGLErrors("After bindBufferBase()");
+
+            dispatchComputeShader(dataset.particleCount,
+                                  123,
+                                  dataset.size,
+                                  dataset.type,
+                                  body.pos,
+                                  body.size,
+                                  transform.matrix.putIn(new Matrix4()));
+
+            // When reading back, account for 12 floats per particle (48 bytes / 4)
+            FloatBuffer buff = BufferUtils.createFloatBuffer(dataset.particleCount * 12);
             GL43.glGetBufferSubData(GL43.GL_SHADER_STORAGE_BUFFER, 0, buff);
-            for (int i = 0; i < dataset.particleCount; i++) {
-                System.out.println("Particle " + i + ": " +
-                                           buff.get(i * 9) + ", " +  // x position
-                                           buff.get(i * 9 + 1) + ", " +  // y position
-                                           buff.get(i * 9 + 2));  // z position
+            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, 0); // Unbind
+            for (int i = 0; i < FastMath.min(10, dataset.particleCount); i++) {
+                int baseIndex = i * 12; // 12 floats per particle with padding
+
+                var x = buff.get(baseIndex);
+                var y = buff.get(baseIndex + 1);
+                var z = buff.get(baseIndex + 2);
+                buff.get(baseIndex + 3); // Padding - ignore
+
+                var r = buff.get(baseIndex + 4);
+                var g = buff.get(baseIndex + 5);
+                var b = buff.get(baseIndex + 6);
+                buff.get(baseIndex + 7); // Padding - ignore
+
+                var size = buff.get(baseIndex + 8);
+                var type = (int) buff.get(baseIndex + 9);
+                var layer = (int) buff.get(baseIndex + 10);
+                buff.get(baseIndex + 11); // Padding - ignore
+
+                logger.info(String.format("Particle %d: pos[%.3f %.3f %.3f] col[%.2f %.2f %.2f] size[%.2f] type[%d] l[%d]",
+                                          i, x, y, z, r, g, b, size, type, layer));
             }
         }
     }
 
-    private void dispatchComputeShader(float seed, int particleCount, float radius) {
+    private void dispatchComputeShader(int elementCount,
+                                       int seed,
+                                       float radius,
+                                       BillboardDataset.ParticleType type,
+                                       Vector3Q bodyPos,
+                                       double bodySize,
+                                       Matrix4 transform) {
         if (computeShader != null && computeShader.isCompiled()) {
             computeShader.begin();
-            computeShader.setUniform("seed", seed);
-            computeShader.setUniform("count", particleCount);
-            computeShader.setUniform("radius", radius);
-            computeShader.end(particleCount);
+
+            // Verify the program is actually active
+            int currentProgram = GL43.glGetInteger(GL43.GL_CURRENT_PROGRAM);
+            if (currentProgram != computeShader.getProgram()) {
+                logger.error("Shader program not active! Current: " + currentProgram + ", Expected: " + computeShader.getProgram());
+            }
+
+            computeShader.setUniformUint("u_count", elementCount);
+            computeShader.setUniformUint("u_type", type.ordinal());
+            computeShader.setUniformUint("u_seed", seed);
+            computeShader.setUniform("u_radius", radius);
+
+            computeShader.setUniform("u_bodySize", (float) bodySize);
+            computeShader.setUniform("u_bodyPos", bodyPos.put(new Vector3()));
+            computeShader.setUniformMatrix("u_transform", transform);
+
+            // Check for uniform errors
+            SysUtils.checkForOpenGLErrors("After uniform setting");
+
+            computeShader.end(elementCount);
         }
     }
 
-    /**
-     * Binds the SSBO.
-     */
-    private void bindBuffer(int id) {
-        GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, id);
-    }
-
-
-    @Override
-    protected void addAttributesDivisor1(Array<VertexAttribute> attributes, int primitive) {
-        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
-        attributes.add(new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 3, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(OwnUsage.Additional, 3, "a_additional"));
-    }
-
-    @Override
-    protected void offsets0(MeshData curr, InstancedModel model) {
-        // Not used.
-    }
-
-    @Override
-    protected void offsets1(MeshData curr, InstancedModel model) {
-        curr.colorOffset = curr.mesh.getInstancedAttribute(VertexAttributes.Usage.ColorUnpacked) != null ? curr.mesh.getInstancedAttribute(
-                VertexAttributes.Usage.ColorUnpacked).offset / 4 : 0;
-        model.particlePosOffset =
-                curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(
-                        OwnUsage.ObjectPosition).offset / 4 : 0;
-        model.additionalOffset = curr.mesh.getInstancedAttribute(OwnUsage.Additional) != null ? curr.mesh.getInstancedAttribute(
-                OwnUsage.Additional).offset / 4 : 0;
+    protected void addAffineTransformUniforms(ExtShaderProgram program, AffineTransformations affine) {
+        // Arbitrary affine transformations.
+        if (affine != null && !affine.isEmpty()) {
+            program.setUniformi("u_transformFlag", 1);
+            affine.apply(auxMat.idt());
+            program.setUniformMatrix("u_transform", auxMat);
+        } else {
+            program.setUniformi("u_transformFlag", 0);
+        }
     }
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (!Settings.settings.runtime.compute) {
+            return;
+        }
         for (var renderable : renderables) {
             render((Render) renderable, camera);
         }
@@ -179,7 +228,9 @@ public class BillboardProceduralRenderer extends InstancedRenderSystem {
 
             // COMPUTE--Create SSBO and generate particle positions.
             for (var dataset : billboard.datasets) {
-                prepareGPUBuffer(dataset);
+                var body = Mapper.body.get(render.entity);
+                var transform = Mapper.transform.get(render.entity);
+                prepareGPUBuffer(body, transform, dataset);
             }
 
 
@@ -234,8 +285,8 @@ public class BillboardProceduralRenderer extends InstancedRenderSystem {
                 // Enable instancing (pass the SSBO data to the shader)
                 GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, ssbos.get(dataset, 0));
 
-                // Draw instanced quads for each particle
-                quadMesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, 1000);  // 1000 is the particle count for instancing
+                // Draw instanced quads
+                quadMesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, dataset.particleCount);
 
             }
             shaderProgram.end();
@@ -259,8 +310,4 @@ public class BillboardProceduralRenderer extends InstancedRenderSystem {
         }
     }
 
-    @Override
-    public void notify(Event event, Object source, Object... data) {
-
-    }
 }
