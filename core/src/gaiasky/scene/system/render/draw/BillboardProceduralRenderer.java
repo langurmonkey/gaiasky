@@ -31,11 +31,9 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ComputeShaderProgram;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3Q;
-import net.jafama.FastMath;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL43;
 
-import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -95,6 +93,8 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
     }
 
 
+    private int datasetNum = -1;
+
     /**
      * Prepares a given object for rendering by allocating the SSBO.
      *
@@ -103,6 +103,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
      */
     private void prepareGPUBuffer(Body body, RefSysTransform transform, BillboardDataset dataset) {
         if (!isPrepared(dataset)) {
+            datasetNum++;
             SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
 
             int bufferId = GL43.glGenBuffers();
@@ -112,15 +113,12 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
                 logger.error("Failed to generate buffer ID");
                 return;
             }
-            logger.info("Generated buffer ID: " + bufferId);
 
             GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
             GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, (long) dataset.particleCount * 12 * 4, GL43.GL_DYNAMIC_DRAW);
 
-
             // Add to map.
             ssbos.put(dataset, bufferId);
-            logger.info("Buffer created successfully!");
 
             // Bind SSBO and dispatch compute shader
             GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
@@ -128,50 +126,53 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
             // Double-check the binding worked
             SysUtils.checkForOpenGLErrors("After bindBufferBase()");
 
-            dispatchComputeShader(dataset.particleCount,
-                                  123,
-                                  dataset.size,
-                                  dataset.type,
+            dispatchComputeShader(dataset,
+                                  123 + datasetNum,
                                   body.pos,
                                   body.size,
                                   transform.matrix.putIn(new Matrix4()));
 
-            // When reading back, account for 12 floats per particle (48 bytes / 4)
-            FloatBuffer buff = BufferUtils.createFloatBuffer(dataset.particleCount * 12);
-            GL43.glGetBufferSubData(GL43.GL_SHADER_STORAGE_BUFFER, 0, buff);
-            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, 0); // Unbind
-            for (int i = 0; i < FastMath.min(10, dataset.particleCount); i++) {
-                int baseIndex = i * 12; // 12 floats per particle with padding
-
-                var x = buff.get(baseIndex);
-                var y = buff.get(baseIndex + 1);
-                var z = buff.get(baseIndex + 2);
-                buff.get(baseIndex + 3); // Padding - ignore
-
-                var r = buff.get(baseIndex + 4);
-                var g = buff.get(baseIndex + 5);
-                var b = buff.get(baseIndex + 6);
-                buff.get(baseIndex + 7); // Padding - ignore
-
-                var size = buff.get(baseIndex + 8);
-                var type = (int) buff.get(baseIndex + 9);
-                var layer = (int) buff.get(baseIndex + 10);
-                buff.get(baseIndex + 11); // Padding - ignore
-
-                logger.info(String.format("Particle %d: pos[%.3f %.3f %.3f] col[%.2f %.2f %.2f] size[%.2f] type[%d] l[%d]",
-                                          i, x, y, z, r, g, b, size, type, layer));
-            }
         }
     }
 
-    private void dispatchComputeShader(int elementCount,
+    private int[] prepareLayersUniform(int[] layers) {
+        final int size = 15;
+        int[] out = new int[size];
+        for (int i = 0; i < out.length; i++) {
+            if (i < layers.length) {
+                out[i] = layers[i];
+            } else {
+                out[i] = -1;
+            }
+        }
+        return out;
+    }
+
+    private void dispatchComputeShader(BillboardDataset dataset,
                                        int seed,
-                                       float radius,
-                                       BillboardDataset.ParticleType type,
                                        Vector3Q bodyPos,
                                        double bodySize,
                                        Matrix4 transform) {
         if (computeShader != null && computeShader.isCompiled()) {
+            // Total element count.
+            int elementCount = dataset.particleCount;
+            var type = dataset.type;
+            float[] col0, col1;
+            if (dataset.baseColors == null) {
+                col0 = new float[]{1.0f, 1.0f, 1.0f};
+                col1 = new float[]{-1.0f, -1.0f, -1.0f};
+            } else if (dataset.baseColors.length >= 3 && dataset.baseColors.length < 6) {
+                col0 = Arrays.copyOfRange(dataset.baseColors, 0, 3);
+                col1 = new float[]{-1.0f, -1.0f, -1.0f};
+            } else if (dataset.baseColors.length >= 6) {
+                col0 = Arrays.copyOfRange(dataset.baseColors, 0, 3);
+                col1 = Arrays.copyOfRange(dataset.baseColors, 3, 6);
+            } else {
+                col0 = new float[]{1.0f, 1.0f, 1.0f};
+                col1 = new float[]{-1.0f, -1.0f, -1.0f};
+                logger.warn("Incorrect size of baseColor array: " + Arrays.toString(dataset.baseColors));
+            }
+
             computeShader.begin();
 
             // Verify the program is actually active
@@ -180,14 +181,20 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
                 logger.error("Shader program not active! Current: " + currentProgram + ", Expected: " + computeShader.getProgram());
             }
 
+            var layers = prepareLayersUniform(dataset.layers);
+
             computeShader.setUniformUint("u_count", elementCount);
             computeShader.setUniformUint("u_type", type.ordinal());
             computeShader.setUniformUint("u_seed", seed);
-            computeShader.setUniform("u_radius", radius);
+            computeShader.setUniform("u_baseSize", dataset.size);
+            computeShader.setUniform("u_baseRadius", dataset.baseRadius);
+            computeShader.setUniform("u_baseColor0", col0[0], col0[1], col0[2]);
+            computeShader.setUniform("u_baseColor1", col1[0], col1[1], col1[2]);
 
             computeShader.setUniform("u_bodySize", (float) bodySize);
             computeShader.setUniform("u_bodyPos", bodyPos.put(new Vector3()));
             computeShader.setUniformMatrix("u_transform", transform);
+            computeShader.setUniform("u_layers[0]", layers);
 
             // Check for uniform errors
             SysUtils.checkForOpenGLErrors("After uniform setting");

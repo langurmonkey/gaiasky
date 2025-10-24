@@ -49,6 +49,11 @@ public class BillboardDataset {
      */
     public ParticleType type;
     /**
+     * Base color(s) for the particles of this dataset. These colors will be used as base to generate the particle colors.
+     * 2 RGBA colors are supported, so the size of this array must be either 3 or 6.
+     */
+    public float[] baseColors;
+    /**
      * Texture layers to use.
      */
     public int[] layers;
@@ -57,7 +62,11 @@ public class BillboardDataset {
      */
     public float[] completion;
     /**
-     * Render size factor.
+     * Base radius of this dataset. 1 is the default radius, but you can make this component spread out wider or thinner by changing this.
+     */
+    public float baseRadius = 1;
+    /**
+     * Render particle size scale factor.
      */
     public float size = 1;
     /**
@@ -122,12 +131,37 @@ public class BillboardDataset {
         this.intensity = intensity.floatValue();
     }
 
+    public void setBaseRadius(Double baseRadius) {
+        this.baseRadius = baseRadius.floatValue();
+    }
+
     public void setType(String type) {
         if (type != null && !type.isBlank()) {
             this.type = ParticleType.valueOf(type.toUpperCase(Locale.ROOT));
         }
     }
 
+    /**
+     * Sets the base colors. Two RGB colors are supported, so the size of the array must be either 3 or 6.
+     *
+     * @param baseColors The base colors.
+     */
+    public void setBaseColors(double[] baseColors) {
+        this.baseColors = new float[baseColors.length];
+        for (int i = 0; i < baseColors.length; i++) {
+            this.baseColors[i] = (float) baseColors[i];
+        }
+    }
+
+    public void setBaseColor(double[] baseColors) {
+        setBaseColors(baseColors);
+    }
+
+    /**
+     * Sets the texture layers of this dataset.
+     *
+     * @param layers The layers.
+     */
     public void setLayers(int[] layers) {
         this.layers = new int[layers.length];
         System.arraycopy(layers, 0, this.layers, 0, layers.length);

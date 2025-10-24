@@ -27,8 +27,8 @@ uniform mat4 u_view;
     #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
-// INPUT
-// Regular attributes
+// INPUTS
+// Regular vertex attributes
 layout(location = 0) in vec4 a_position;
 layout(location = 1) in vec2 a_texCoord0;
 // Instance attributes
@@ -37,7 +37,7 @@ layout(location = 3) in vec3 a_color;
 // x - size, y - type, z - layer
 layout(location = 4) in vec3 a_additional;
 
-// OUTPUT
+// OUTPUTS
 out vec4 v_col;
 out vec2 v_uv;
 out float v_dist;
@@ -54,7 +54,7 @@ void main() {
     vec3 particlePos = a_particlePos;
     if (u_transformFlag) {
         vec4 aux = u_transform * vec4(particlePos, 1.0);
-        particlePos.xyz = aux.xyz;
+        particlePos = aux.xyz;
     }
 
     vec3 pos = (particlePos - u_camPos) / u_vrScale;
