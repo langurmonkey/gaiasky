@@ -210,6 +210,50 @@ public class ComputeShaderProgram implements Disposable {
         checkGLError("setUniform(" + name + ", vec4)");
     }
 
+    public void setUniform(String name, float[] values) {
+        if (!checkUniformExists(name)) return;
+
+        Integer type = uniformTypes.get(name);
+        Integer loc = uniforms.get(name);
+
+        if (type == GL_FLOAT || type == GL_FLOAT_VEC4 || type == GL_FLOAT_VEC3 || type == GL_FLOAT_VEC2) {
+            // For uniform float arrays, just call glUniform1fv
+            FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+            buffer.put(values).flip();
+            glUniform1fv(loc, buffer);
+        } else {
+            logger.warn("Uniform '" + name + "' type mismatch. Expected float array, got type: " + type);
+            // Try anyway
+            FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+            buffer.put(values).flip();
+            glUniform1fv(loc, buffer);
+        }
+
+        checkGLError("setUniform(" + name + ", float[" + values.length + "])");
+    }
+
+    public void setUniform(String name, int[] values) {
+        if (!checkUniformExists(name)) return;
+
+        Integer type = uniformTypes.get(name);
+        Integer loc = uniforms.get(name);
+
+        if (type == GL_INT || type == GL_INT_VEC2 || type == GL_INT_VEC3 || type == GL_INT_VEC4) {
+            // For uniform int arrays, just call glUniform1iv
+            IntBuffer buffer = BufferUtils.createIntBuffer(values.length);
+            buffer.put(values).flip();
+            GL43.glUniform1iv(loc, buffer);
+        } else {
+            logger.warn("Uniform '" + name + "' type mismatch. Expected int array, got type: " + type);
+            // Try anyway
+            IntBuffer buffer = BufferUtils.createIntBuffer(values.length);
+            buffer.put(values).flip();
+            GL43.glUniform1iv(loc, buffer);
+        }
+
+        checkGLError("setUniform(" + name + ", int[" + values.length + "])");
+    }
+
     /**
      * Sets the uniform matrix with the given name. The {@link ExtShaderProgram} must be bound for this to work.
      *

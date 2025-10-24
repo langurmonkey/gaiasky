@@ -11,6 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -299,8 +300,8 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
     private static class DustColorGenerator implements ColorGenerator {
         @Override
         public float[] generateColor() {
-            float r = (float) FastMath.abs(StdRandom.uniform() * 0.2 + 0.07);
-            return new float[]{r, r, r};
+            float r = (float) MathUtils.clamp(FastMath.abs(StdRandom.uniform() * 0.4 + 0.6), 0.0, 1.0);
+            return new float[]{r * 0.7f, r * 0.8f, r};
         }
     }
 }
