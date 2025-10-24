@@ -18,7 +18,21 @@ uniform uint u_count;
 // Layers
 uniform int u_layers[15];
 // The billboard type
+// 0 - dust
+// 1 - bulge
+// 2 - star
+// 3 - gas
+// 4 - hii
+// 5 - galaxy
+// 6 - point
+// 7 - other
 uniform uint u_type;
+
+#define TYPE_DUST 0
+#define TYPE_BULGE 1
+#define TYPE_STAR 2
+#define TYPE_GAS 3
+#define TYPE_HII 4
 
 // Base colors.
 uniform vec3 u_baseColor0;
@@ -192,18 +206,22 @@ void main() {
 
     uint state = (uint(gl_GlobalInvocationID.x) * 747796405u + 2891336453u) * u_seed;
 
-
     int type = int(u_type);
     int layer = pickLayer(state);
     float size = u_baseSize * (rand(state) * 0.6 + 0.4);
     vec3 color = generateColor(state);
     vec3 pos;
-    if (type == 0) {
+    if (type == TYPE_DUST) {
         // Dust in spiral arms.
         pos = positionSpiral(state, 0.01, 4);
     } else {
         // The rest in a disk.
-        pos = positionDisk(state, 0.01);
+        float heightScale = 0.01;
+        if(type == TYPE_STAR || type == TYPE_BULGE) {
+            // Stars
+            heightScale = 0.06;
+        }
+        pos = positionDisk(state, heightScale);
     }
 
     // Transform position
