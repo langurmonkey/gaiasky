@@ -21,7 +21,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.system.PointCloudTriRenderSystem;
+import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
@@ -37,20 +37,14 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4D;
 import net.jafama.FastMath;
+import org.lwjgl.opengl.GL41;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IObserver {
+public class ElementsSetRenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ElementsSetRenderer.class);
 
     private final Matrix4 aux, refSysTransformF;
-    private int posOffset;
-    private int uvOffset;
-    private int elems01Offset;
-    private int elems02Offset;
-    private int sizeOffset;
-    private int textureIndexOffset;
     private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.075)), FastMath.tan(Math.toRadians(0.9))};
 
     public ElementsSetRenderer(SceneRenderer sceneRenderer,
@@ -64,9 +58,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     }
 
     @Override
-    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
-        attributes.add(new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE));
+    protected void addAttributesDivisor1(Array<VertexAttribute> attributes, int primitive) {
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems1, 4, "a_orbitelems01"));
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems2, 4, "a_orbitelems02"));
@@ -75,42 +67,57 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     }
 
     @Override
-    protected void offsets(MeshData curr) {
-        posOffset = curr.mesh.getVertexAttribute(Usage.Position) != null ? curr.mesh.getVertexAttribute(Usage.Position).offset / 4 : 0;
-        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
-        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        elems01Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1).offset / 4 : 0;
-        elems02Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
-        textureIndexOffset = curr.mesh.getVertexAttribute(OwnUsage.TextureIndex) != null ? curr.mesh.getVertexAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
+    protected void offsets0(MeshData curr, InstancedModel model) {
+        // Unused
     }
+
+    @Override
+    protected void offsets1(MeshData curr, InstancedModel model) {
+        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ?
+                curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
+        model.elems01Offset = curr.mesh.getInstancedAttribute(OwnUsage.OrbitElems1) != null ?
+                curr.mesh.getInstancedAttribute(OwnUsage.OrbitElems1).offset / 4 : 0;
+        model.elems02Offset = curr.mesh.getInstancedAttribute(OwnUsage.OrbitElems2) != null ?
+                curr.mesh.getInstancedAttribute(OwnUsage.OrbitElems2).offset / 4 : 0;
+        model.sizeOffset = curr.mesh.getInstancedAttribute(OwnUsage.Size) != null ?
+                curr.mesh.getInstancedAttribute(OwnUsage.Size).offset / 4 : 0;
+        model.textureIndexOffset = curr.mesh.getInstancedAttribute(OwnUsage.TextureIndex) != null ?
+                curr.mesh.getInstancedAttribute(OwnUsage.TextureIndex).offset / 4 : 0;
+    }
+
 
     @Override
     public void renderStud(List<IRenderable> renderables,
                            ICamera camera,
                            double t) {
+        final var primitive = GL41.GL_TRIANGLES;
         for (IRenderable renderable : renderables) {
             Render render = (Render) renderable;
             var graph = Mapper.graph.get(render.entity);
 
+            var model = getModelQuad(primitive,
+                                     getOffset(render));
             if (!inGpu(render) && graph.children != null && graph.children.size > 0) {
                 int n = graph.children.size;
-                int offset = addMeshData(n * 4, n * 6);
+                int offset = addMeshData(model,
+                                         model.numVertices,
+                                         n,
+                                         model.numIndices,
+                                         "quad",
+                                         primitive);
+                setModel(offset, model);
                 setOffset(render, offset);
                 curr = meshes.get(offset);
+                model.ensureInstanceAttribsSize(n * curr.instanceSize);
 
-                ensureTempVertsSize(n * 4 * curr.vertexSize);
-                ensureTempIndicesSize(n * 6);
-
-                AtomicInteger numVerticesAdded = new AtomicInteger(0);
-                AtomicInteger numParticlesAdded = new AtomicInteger(0);
+                int numParticlesAdded = 0;
 
                 var desc = Mapper.datasetDescription.get(render.entity);
                 var hl = Mapper.highlight.get(render.entity);
 
                 CatalogInfo ci = desc.catalogInfo;
                 Array<Entity> children = graph.children;
-                children.forEach(child -> {
+                for (var child : children) {
                     if (Mapper.trajectory.has(child)) {
                         var trajectory = Mapper.trajectory.get(child);
 
@@ -118,66 +125,57 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                         if (trajectory.bodyRepresentation.isBody()) {
 
                             OrbitComponent oc = trajectory.oc;
+                            // COLOR
+                            float[] c = hl.isHighlighted() && ci != null ? ci.getHlColor() : trajectory.bodyColor;
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
 
-                            // 4 vertices per particle
-                            for (int vert = 0; vert < 4; vert++) {
-                                // Vertex POSITION
-                                tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
-                                tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
+                            // ORBIT ELEMENTS 01
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) oc.period;
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 1] = (float) oc.epoch;
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 2] = (float) (oc.semiMajorAxis);
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 3] = (float) oc.e;
 
-                                // UV coordinates
-                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+                            // ORBIT ELEMENTS 02
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 1] = (float) (oc.ascendingNode * MathUtilsDouble.degRad);
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 2] = (float) (oc.argOfPericenter * MathUtilsDouble.degRad);
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (oc.meanAnomaly * MathUtilsDouble.degRad);
 
-                                // COLOR
-                                float[] c = hl.isHighlighted() && ci != null ? ci.getHlColor() : trajectory.bodyColor;
-                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                            // SIZE
+                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
 
-                                // ORBIT ELEMENTS 01
-                                tempVerts[curr.vertexIdx + elems01Offset] = (float) oc.period;
-                                tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                                tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semiMajorAxis);
-                                tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
+                            // TEXTURE INDEX
+                            model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = -1f;
 
-                                // ORBIT ELEMENTS 02
-                                tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingNode * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argOfPericenter * MathUtilsDouble.degRad);
-                                tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meanAnomaly * MathUtilsDouble.degRad);
-
-                                // SIZE
-                                tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
-
-                                // TEXTURE INDEX
-                                tempVerts[curr.vertexIdx + textureIndexOffset] = -1f;
-
-                                curr.vertexIdx += curr.vertexSize;
-                                curr.numVertices++;
-                                numVerticesAdded.incrementAndGet();
-                            }
-                            // Indices
-                            quadIndices(curr);
-                            numParticlesAdded.incrementAndGet();
-
-                            setInGpu(render, true);
+                            curr.instanceIdx += curr.instanceSize;
+                            numParticlesAdded++;
                         }
                     }
-                });
-                int count = numVerticesAdded.get() * curr.vertexSize;
-                setCount(render, count);
-                curr.mesh.setVertices(tempVerts, 0, count);
-                curr.mesh.setIndices(tempIndices, 0, numParticlesAdded.get() * 6);
+                }
+                // Global (divisor=0) vertices (position, uv?) plus optional indices
+                curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
+                if (model.numIndices > 0) {
+                    curr.mesh.setIndices(model.indices, 0, model.numIndices);
+                }
+                // Per instance (divisor=1) vertices
+                int count = numParticlesAdded * curr.instanceSize;
+                setCount(render, numParticlesAdded);
+                curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, count);
+                model.instanceAttributes = null;
 
                 setInGpu(render, true);
             }
 
-            curr = meshes.get(getOffset(renderable));
+            /*
+             * RENDER
+             */
+            curr = meshes.get(getOffset(render));
             if (curr != null) {
                 var hl = Mapper.highlight.get(render.entity);
 
                 ExtShaderProgram shaderProgram = getShaderProgram();
-
                 shaderProgram.begin();
+
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getPos());
                 addCameraUpCubemapMode(shaderProgram, camera);
@@ -222,7 +220,8 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 addEffectsUniforms(shaderProgram, camera);
 
                 try {
-                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                    int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
+                    curr.mesh.render(shaderProgram, primitive, 0, count, getCount(render));
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }

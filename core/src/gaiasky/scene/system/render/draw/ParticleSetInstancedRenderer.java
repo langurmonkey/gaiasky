@@ -136,10 +136,15 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
         if (!set.disposed) {
             boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
-            int n = set.pointData.size();
             var model = getModel(set, getOffset(render));
             if (!inGpu(render)) {
-                int offset = addMeshData(model, model.numVertices, n, model.numIndices, set.modelFile, set.modelType,
+                int n = set.pointData.size();
+                int offset = addMeshData(model,
+                                         model.numVertices,
+                                         n,
+                                         model.numIndices,
+                                         set.modelFile,
+                                         set.modelType,
                                          set.modelPrimitive);
                 setModel(offset, model);
                 setOffset(render, offset);
@@ -292,8 +297,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             /*
              * RENDER
              */
-            int offset = getOffset(render);
-            curr = meshes.get(offset);
+            curr = meshes.get(getOffset(render));
             if (curr != null) {
                 // Only quads are textured.
                 if (set.textureArray != null && !set.isWireframe()) {

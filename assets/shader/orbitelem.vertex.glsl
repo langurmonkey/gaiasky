@@ -20,13 +20,15 @@ uniform bool u_transformFlag = false;
 uniform mat4 u_transform;
 
 // INPUT
-in vec4 a_position;
-in vec2 a_texCoord;
-in vec4 a_color;
-in vec4 a_orbitelems01;
-in vec4 a_orbitelems02;
-in float a_size;
-in float a_textureIndex;
+// Regular attributes
+layout(location = 0) in vec4 a_position;
+layout(location = 1) in vec2 a_texCoord0;
+// Instanced attributes
+layout(location = 2) in vec4 a_color;
+layout(location = 3) in vec4 a_orbitelems01;
+layout(location = 4) in vec4 a_orbitelems02;
+layout(location = 5) in float a_size;
+layout(location = 6) in float a_textureIndex;
 
 // OUTPUT
 out vec4 v_col;
@@ -151,10 +153,10 @@ void main() {
     vec3 s_obj_pos = pos;
     mat4 s_proj_view = u_projView;
     float s_size = quadSize;
-    #include <shader/snippet/billboard.glsl>
+    #include <shader/snippet/billboard.fast.glsl>
 
     gl_Position = gpos;
 
-    v_uv = a_texCoord;
+    v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;
 }

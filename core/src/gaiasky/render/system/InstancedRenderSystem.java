@@ -46,7 +46,9 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      */
     public static class InstancedModel {
         // Attribute offsets.
-        public int sizeOffset, particlePosOffset, properMotionOffset, textureIndexOffset, nVariOffset, variMagsOffset, variTimesOffset;
+        public int sizeOffset, particlePosOffset, properMotionOffset, textureIndexOffset,
+                nVariOffset, variMagsOffset, variTimesOffset, elems01Offset, elems02Offset;
+        
         /** Number of vertices. **/
         public int numVertices;
         /** Vertex size in floats (4-bytes). **/
@@ -99,9 +101,9 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     }
 
     protected InstancedRenderSystem(SceneRenderer sceneRenderer,
-                                 RenderGroup rg,
-                                 float[] alphas,
-                                 ExtShaderProgram[] shaders) {
+                                    RenderGroup rg,
+                                    float[] alphas,
+                                    ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         meshes = new Array<>(20);
         utils = new ParticleUtils();
@@ -126,6 +128,11 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     protected InstancedModel getModel(ParticleSet set,
                                       int offset) {
         return getModel(set.model, set.modelType, set.modelParams, set.modelPrimitive, offset);
+    }
+
+    protected InstancedModel getModelQuad(int primitive,
+                                          int offset) {
+        return getModel(null, "quad", null, primitive, offset);
     }
 
     protected InstancedModel getModel(IntModel modelFile,
@@ -444,6 +451,26 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param model        The instanced model instance.
      * @param maxVerts     The max number of vertices the divisor 0 mesh data can hold.
      * @param maxInstances The max number of vertices the divisor 1 mesh data can hold.
+     * @param modelType    The model type string.
+     * @param primitive    The rendering primitive.
+     *
+     * @return The index of the new mesh data.
+     */
+    protected int addMeshData(InstancedModel model,
+                              int maxVerts,
+                              int maxInstances,
+                              int maxIndices,
+                              String modelType,
+                              int primitive) {
+        return addMeshData(model, maxVerts, maxInstances, maxIndices, null, modelType, primitive);
+    }
+
+    /**
+     * Adds a new mesh data to the meshes list and increases the mesh data index.
+     *
+     * @param model        The instanced model instance.
+     * @param maxVerts     The max number of vertices the divisor 0 mesh data can hold.
+     * @param maxInstances The max number of vertices the divisor 1 mesh data can hold.
      * @param modelFile    The model file, if any.
      * @param modelType    The model type string.
      * @param primitive    The rendering primitive.
@@ -461,7 +488,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         curr = meshes.get(mdi);
 
         VertexAttribute[] attributes0 = buildAttributesDivisor0(modelFile == null && modelType.equalsIgnoreCase("quad") ? 2 : 3, modelFile != null,
-                !isWireframe(primitive));
+                                                                !isWireframe(primitive));
         VertexAttribute[] attributes1 = buildAttributesDivisor1(primitive);
         curr.mesh = new IntMesh(true, maxVerts, maxInstances, maxIndices, attributes0, attributes1);
 
@@ -506,7 +533,6 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             shaderProgram.end();
         }
     }
-
 
 
 }

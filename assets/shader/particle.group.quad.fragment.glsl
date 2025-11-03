@@ -37,7 +37,7 @@ void main() {
     if (v_textureIndex < 0.0) {
         float dist = distance(vec2(0.5), v_uv) * 2.0;
         if (dist > 1.0) {
-            discard;
+            //discard;
         }
         fragColor = programmatic(dist);
     } else {
