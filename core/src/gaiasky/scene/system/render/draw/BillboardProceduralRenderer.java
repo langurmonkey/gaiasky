@@ -10,6 +10,8 @@ package gaiasky.scene.system.render.draw;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectIntMap;
@@ -74,15 +76,20 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
         if (quadMesh == null) {
             // Create a simple quad with texture coordinates
             float[] vertices = {
-                    1f, 1f, 0.0f, 1.0f, 1.0f,
-                    1f, -1f, 0.0f, 1.0f, 0.0f,
-                    -1f, -1f, 0.0f, 0.0f, 0.0f,
-                    -1f, -1f, 0.0f, 0.0f, 0.0f,
-                    -1f, 1f, 0.0f, 0.0f, 1.0f,
-                    1f, 1f, 0.0f, 1.0f, 1.0f
+                    1f, 1f, 1.0f, 1.0f,
+                    1f, -1f, 1.0f, 0.0f,
+                    -1f, -1f, 0.0f, 0.0f,
+                    -1f, -1f, 0.0f, 0.0f,
+                    -1f, 1f, 0.0f, 1.0f,
+                    1f, 1f, 1.0f, 1.0f
             };
 
-            quadMesh = new IntMesh(true, vertices.length / 5, 0, new VertexAttribute[]{VertexAttribute.Position(), VertexAttribute.TexCoords(0)});
+            quadMesh = new IntMesh(true,
+                                   vertices.length / 4,
+                                   0,
+                                   new VertexAttribute[]{
+                                           new VertexAttribute(VertexAttributes.Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
+                                           VertexAttribute.TexCoords(0)});
 
             quadMesh.setVertices(vertices);
         }
@@ -156,7 +163,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
         if (computeShader != null && computeShader.isCompiled()) {
             // Total element count.
             int elementCount = dataset.particleCount;
-            var type = dataset.type;
             float[] col0, col1;
             if (dataset.baseColors == null) {
                 col0 = new float[]{1.0f, 1.0f, 1.0f};
@@ -184,12 +190,17 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
             var layers = prepareLayersUniform(dataset.layers);
 
             computeShader.setUniformUint("u_count", elementCount);
-            computeShader.setUniformUint("u_type", type.ordinal());
+            computeShader.setUniformUint("u_distribution", dataset.distribution.ordinal());
             computeShader.setUniformUint("u_seed", seed);
             computeShader.setUniform("u_baseSize", dataset.size);
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
             computeShader.setUniform("u_baseColor0", col0[0], col0[1], col0[2]);
             computeShader.setUniform("u_baseColor1", col1[0], col1[1], col1[2]);
+            computeShader.setUniform("u_ellipticity", dataset.ellipticity);
+            computeShader.setUniform("u_aspect", dataset.aspect);
+            computeShader.setUniform("u_heightScale", dataset.heightScale);
+            computeShader.setUniform("u_spiralAngle", dataset.spiralAngle);
+            computeShader.setUniformUint("u_spiralArms", dataset.spiralArms);
 
             computeShader.setUniform("u_bodySize", (float) bodySize);
             computeShader.setUniform("u_bodyPos", bodyPos.put(new Vector3()));
