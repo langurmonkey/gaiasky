@@ -49,6 +49,10 @@ public class BillboardDataset {
      */
     public ParticleType type;
     /**
+     * Probability distribution, for procedural datasets.
+     */
+    public Distribution distribution = Distribution.DISK;
+    /**
      * Base color(s) for the particles of this dataset. These colors will be used as base to generate the particle colors.
      * 2 RGBA colors are supported, so the size of this array must be either 3 or 6.
      */
@@ -69,6 +73,35 @@ public class BillboardDataset {
      * Render particle size scale factor.
      */
     public float size = 1;
+
+    /**
+     * Height scale.
+     */
+    public float heightScale = 0.01f;
+    /**
+     * Ellipiticity, e.g. 0 = circle, 0.5 = mildly elliptical, 0.9 = very elongated.
+     */
+    public float ellipticity = 0.5f;
+    /**
+     * Bar aspect ratio, e.g. 0.3 = short bar, 1.0 = long bar.
+     */
+    public float aspect = 0.2f;
+
+    /**
+     * Spiral arm pitch angle in degrees.
+     * <p>
+     * Controls how tightly the spiral arms wind around the galactic center.
+     * Lower values (≈5–10°) produce tightly wound Sa-type spirals,
+     * while higher values (≈25–40°) yield open Sc–Sd morphologies.
+     * This parameter maps directly to the logarithmic spiral pitch angle
+     * used in the compute shader.
+     */
+    public float spiralAngle = 6.0f;
+    /**
+     * Number of spiral arms.
+     */
+    public int spiralArms = 4;
+
     /**
      * The intensity factor.
      */
@@ -135,9 +168,34 @@ public class BillboardDataset {
         this.baseRadius = baseRadius.floatValue();
     }
 
+    public void setEllipticity(Double ellipticity) {
+        this.ellipticity = ellipticity.floatValue();
+    }
+
+    public void setHeightScale(Double heightScale) {
+        this.heightScale = heightScale.floatValue();
+    }
+
+    public void setSpiralAngle(Double spiralAngle) {
+        this.spiralAngle = spiralAngle.floatValue();
+    }
+
+    public void setSpiralArms(Long spiralArms) {
+        this.spiralArms = spiralArms.intValue();
+    }
+
+    public void setAspect(Double aspect) {
+        this.aspect = aspect.floatValue();
+    }
+
     public void setType(String type) {
         if (type != null && !type.isBlank()) {
             this.type = ParticleType.valueOf(type.toUpperCase(Locale.ROOT));
+        }
+    }
+    public void setDistribution(String distribution) {
+        if (distribution != null && !distribution.isBlank()) {
+            this.distribution = Distribution.valueOf(distribution.toUpperCase(Locale.ROOT));
         }
     }
 
@@ -274,5 +332,13 @@ public class BillboardDataset {
         GALAXY,
         POINT,
         OTHER;
+    }
+
+    public enum Distribution {
+        SPHERE,
+        DISK,
+        SPIRAL,
+        BAR,
+        ELLIPSE
     }
 }

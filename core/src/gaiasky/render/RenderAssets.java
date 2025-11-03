@@ -247,7 +247,7 @@ public class RenderAssets {
         manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
 
         // Compute shaders
-        manager.load("compute-gen-particles", ComputeShaderProgram.class, new ComputeShaderLoader.ComputeShaderParameter("compute.genparticles", "shader/compute/genparticles.comp.glsl"));
+        manager.load("genparticles.comp.glsl", ComputeShaderProgram.class, new ComputeShaderLoader.ComputeShaderParameter("compute.genparticles", "shader/compute/genparticles.comp.glsl"));
 
 
         // Add fonts to load
@@ -393,7 +393,7 @@ public class RenderAssets {
         IntShaderProvider cloud = manager.get("cloud");
 
         // Compute
-        genParticlesShader = manager.get("compute-gen-particles");
+        genParticlesShader = manager.get("genparticles.comp.glsl");
 
         // Create model batches
         mbVertexLighting = new IntModelBatch(perVertexLighting);

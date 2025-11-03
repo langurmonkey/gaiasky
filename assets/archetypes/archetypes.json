@@ -276,7 +276,8 @@
             "parent": "GenericCatalog",
             "components": [
                 "BillboardSet",
-                "Coordinates"
+                "Coordinates",
+                "Focus"
             ],
             "aliases": [
                 "gaiasky.scenegraph.BillboardGroup"
