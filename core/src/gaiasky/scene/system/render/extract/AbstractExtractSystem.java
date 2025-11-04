@@ -60,8 +60,21 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
      * @return True if added, false otherwise.
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
+        return addToRender(renderable, rg, !renderable.isHalfResolutionBuffer());
+    }
+
+    /**
+     * Adds the given renderable to the given render group of the given list (full or half resolution).
+     *
+     * @param renderable     The renderable to add.
+     * @param rg             The render group that identifies the renderable list.
+     * @param fullResolution Whether the renderable must be rendered to the full or to the half resolution buffer.
+     *
+     * @return True if added, false otherwise.
+     */
+    protected boolean addToRender(IRenderable renderable, RenderGroup rg, boolean fullResolution) {
         try {
-            return renderer.getRenderLists(!renderable.isHalfResolutionBuffer()).get(rg.ordinal()).add(renderable);
+            return renderer.getRenderLists(fullResolution).get(rg.ordinal()).add(renderable);
         } catch (Exception e) {
             return false;
         }
@@ -76,7 +89,20 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
      * @return True if removed, false otherwise.
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {
-        return renderer.getRenderLists(!renderable.isHalfResolutionBuffer()).get(rg.ordinal()).remove(renderable);
+        return removeFromRender(renderable, rg, !renderable.isHalfResolutionBuffer());
+    }
+
+    /**
+     * Removes the given renderable from the given render group of the given list (full or half resolution).
+     *
+     * @param renderable     The renderable to remove.
+     * @param rg             The render group to remove from.
+     * @param fullResolution Whether the renderable must be rendered to the full or to the half resolution buffer.
+     *
+     * @return True if removed, false otherwise.
+     */
+    protected boolean removeFromRender(IRenderable renderable, RenderGroup rg, boolean fullResolution) {
+        return renderer.getRenderLists(fullResolution).get(rg.ordinal()).remove(renderable);
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup rg) {
