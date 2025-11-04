@@ -1389,7 +1389,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             return Double.MAX_VALUE;
         } else {
             var star = proximity.effective[0];
-            if (star == null) return 1.0e40;
+            if (star == null) return 1.0e20;
 
             var radius = star.getRadius();
             var distance = star.getClosestDistToCamera() + MIN_DIST;
@@ -1398,7 +1398,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             double dist1Scale = 1.0E7;
             double rawDistance = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
 
-            smoothedStarDistance = MathUtilsDouble.lowPass(rawDistance, smoothedStarDistance, 3.0); // smooth over ~3 frames
+            smoothedStarDistance = MathUtilsDouble.lowPass(rawDistance, smoothedStarDistance, 5.0);
             return smoothedStarDistance;
         }
     }
@@ -1418,7 +1418,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         var closestStarDistance = getClosestStarDistance();
 
         double dist = FastMath.min(closestStarDistance, FastMath.min(closestBodyDistance, focusDistance));
-        smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, 3.0);
+        smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, 5.0);
         final var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 
         return smoothedDistance >= 0 ? (Math.max(distanceMap,
