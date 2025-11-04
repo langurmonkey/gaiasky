@@ -42,6 +42,9 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         var base = Mapper.base.get(entity);
         var datasetDesc = Mapper.datasetDescription.get(entity);
+        var graph = Mapper.graph.get(entity);
+        // Do not create nested datasets (those whose parents are also datasets)
+        var nested = graph.parent != null && Mapper.datasetDescription.has(graph.parent);
         if (datasetDesc.catalogInfo == null && WelcomeGui.getLocalDatasets().get() != null) {
             // Try to get it from the datasets.
             var local = WelcomeGui.getLocalDatasets().get();
@@ -50,7 +53,7 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
                 datasetDesc.catalogInfo = fromDatasetDesc(dataset, entity);
             }
         }
-        initializeCatalogInfo(entity, datasetDesc, true, base.getName(), datasetDesc.description);
+        initializeCatalogInfo(entity, datasetDesc, !nested, base.getName(), datasetDesc.description);
     }
 
     private CatalogInfo fromDatasetDesc(DatasetDesc dd, Entity entity) {

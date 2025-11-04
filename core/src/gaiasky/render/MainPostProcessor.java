@@ -312,8 +312,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             ppb.add(lensFlare);
         }
 
-        // BLEND - color + layer (labels, lines, grids)
-        Blend blend = new Blend();
+        // BLEND - color + layers (labels, lines, grids)
+        Blend3 blend = new Blend3();
         blend.setEnabled(true);
         ppb.add(blend);
 

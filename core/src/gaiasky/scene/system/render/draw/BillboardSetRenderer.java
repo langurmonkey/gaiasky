@@ -121,7 +121,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             count += in[i];
         }
 
-        var model = getModel(null, "quad", null, GL41.GL_TRIANGLES, getOffset(render));
+        var model = getModel(null, "quad", null, GL41.GL_TRIANGLES, -1);
         int offset = addMeshData(model, model.numVertices, count, model.numIndices, null, "quad",
                                  GL41.GL_TRIANGLES);
         setOffset(render, offset);
