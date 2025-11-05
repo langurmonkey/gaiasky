@@ -70,6 +70,11 @@ public class BillboardDataset {
      */
     public float baseRadius = 1;
     /**
+     * Minimum radius to generate particles. Only available for spiral and density wave distributions.
+     * Must be in [0,1], where 0 is the very center, and 1 is baseRadius.
+     */
+    public float minRadius = 0.01f;
+    /**
      * Render particle size scale factor.
      */
     public float size = 1;
@@ -79,24 +84,30 @@ public class BillboardDataset {
      */
     public float heightScale = 0.01f;
     /**
-     * Ellipiticity, e.g. 0 = circle, 0.5 = mildly elliptical, 0.9 = very elongated.
+     * Eccentricity for ellipses and density wave, e.g. 0 = circle, 0.5 = mildly elliptical, 0.9 = very elongated.
      */
-    public float ellipticity = 0.5f;
+    public float eccentricity = 0.3f;
     /**
      * Bar aspect ratio, e.g. 0.3 = short bar, 1.0 = long bar.
      */
-    public float aspect = 0.2f;
+    public float aspect = 1.0f;
 
     /**
      * Spiral arm pitch angle in degrees.
      * <p>
-     * Controls how tightly the spiral arms wind around the galactic center.
+     * When using {@link Distribution#SPIRAL}, this controls how tightly the spiral arms wind around the galactic center.
      * Lower values (≈5–10°) produce tightly wound Sa-type spirals,
      * while higher values (≈25–40°) yield open Sc–Sd morphologies.
      * This parameter maps directly to the logarithmic spiral pitch angle
      * used in the compute shader.
+     * <p>
+     * When using {@link Distribution#DENSITY}, this controls the total rotation of the concentric ellipses.
      */
     public float spiralAngle = 6.0f;
+    /**
+     * Displacement of the ellipses in the {@link Distribution#DENSITY} mode.
+     */
+    public float[] displacement = new float[]{0.0f, 0.0f};
     /**
      * Number of spiral arms.
      */
@@ -168,8 +179,12 @@ public class BillboardDataset {
         this.baseRadius = baseRadius.floatValue();
     }
 
-    public void setEllipticity(Double ellipticity) {
-        this.ellipticity = ellipticity.floatValue();
+    public void setMinRadius(Double minRadius) {
+        this.minRadius = minRadius.floatValue();
+    }
+
+    public void setEccentricity(Double eccentricity) {
+        this.eccentricity = eccentricity.floatValue();
     }
 
     public void setHeightScale(Double heightScale) {
@@ -193,10 +208,26 @@ public class BillboardDataset {
             this.type = ParticleType.valueOf(type.toUpperCase(Locale.ROOT));
         }
     }
+
     public void setDistribution(String distribution) {
         if (distribution != null && !distribution.isBlank()) {
             this.distribution = Distribution.valueOf(distribution.toUpperCase(Locale.ROOT));
         }
+    }
+
+    public void setDisplacement(double[] d) {
+        if (d.length == 1) {
+            this.displacement[0] = (float) d[0];
+            this.displacement[1] = (float) d[0];
+        } else {
+            this.displacement[0] = (float) d[0];
+            this.displacement[1] = (float) d[1];
+        }
+    }
+
+    public void setDisplacement(Double d) {
+        this.displacement[0] = d.floatValue();
+        this.displacement[1] = d.floatValue();
     }
 
     /**
@@ -335,10 +366,19 @@ public class BillboardDataset {
     }
 
     public enum Distribution {
+        /** Simple sphere. **/
         SPHERE,
+        /** Simple disk. **/
         DISK,
+        /** A logarithmic spiral. **/
         SPIRAL,
+        /** A simple bar. **/
         BAR,
-        ELLIPSE
+        /** Density wave distribution. **/
+        DENSITY,
+        /** An ellipse. **/
+        ELLIPSE,
+        /** Gaussian distribution in a disk, with an overdense center. **/
+        GAUSS
     }
 }

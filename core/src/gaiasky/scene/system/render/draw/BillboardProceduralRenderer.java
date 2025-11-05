@@ -194,13 +194,16 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
             computeShader.setUniformUint("u_seed", seed);
             computeShader.setUniform("u_baseSize", dataset.size);
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
+            computeShader.setUniform("u_minRadius", dataset.minRadius);
             computeShader.setUniform("u_baseColor0", col0[0], col0[1], col0[2]);
             computeShader.setUniform("u_baseColor1", col1[0], col1[1], col1[2]);
-            computeShader.setUniform("u_ellipticity", dataset.ellipticity);
+            computeShader.setUniform("u_eccentricity", dataset.eccentricity);
             computeShader.setUniform("u_aspect", dataset.aspect);
             computeShader.setUniform("u_heightScale", dataset.heightScale);
             computeShader.setUniform("u_spiralAngle", dataset.spiralAngle);
             computeShader.setUniformUint("u_spiralArms", dataset.spiralArms);
+            if (dataset.displacement != null)
+                computeShader.setUniform("u_displacement", dataset.displacement[0], dataset.displacement[1]);
 
             computeShader.setUniform("u_bodySize", (float) bodySize);
             computeShader.setUniform("u_bodyPos", bodyPos.put(new Vector3()));
