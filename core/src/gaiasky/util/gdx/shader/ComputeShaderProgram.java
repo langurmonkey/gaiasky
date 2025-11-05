@@ -178,6 +178,22 @@ public class ComputeShaderProgram implements Disposable {
         setUniform(name, vec.x, vec.y, vec.z);
     }
 
+    public void setUniform(String name, float x, float y) {
+        if (!checkUniformExists(name)) return;
+
+        Integer type = uniformTypes.get(name);
+        Integer loc = uniforms.get(name);
+
+        if (type == GL_FLOAT_VEC2) {
+            glUniform2f(loc, x, y);
+        } else {
+            logger.warn("Uniform '" + name + "' type mismatch. Expected vec2, got type: " + type);
+            glUniform2f(loc, x, y);
+        }
+
+        checkGLError("setUniform(" + name + ", vec3)");
+    }
+
     public void setUniform(String name, float x, float y, float z) {
         if (!checkUniformExists(name)) return;
 

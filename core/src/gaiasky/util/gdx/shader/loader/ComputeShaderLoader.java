@@ -38,7 +38,7 @@ public class ComputeShaderLoader<T extends ComputeShaderLoader.ComputeShaderPara
     @Override
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, T parameter) {
         var shaderFile = Gdx.files.internal(parameter.computeShaderFile);
-        shaderCode = shaderFile.readString();
+        shaderCode = ShaderTemplatingLoader.load(shaderFile);
     }
 
     @Override

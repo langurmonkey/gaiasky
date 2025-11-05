@@ -51,9 +51,7 @@ void main() {
     fragColor = colorTex(u_alpha, texBrightness);
 
     // Logarithmic depth buffer (not used actually).
-    if (texBrightness  >= 0.9) {
-        gl_FragDepth = getDepthValue(v_dist, u_zfar, u_k);
-    }
+    gl_FragDepth = getDepthValue(v_dist, u_zfar, u_k);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Add outline
