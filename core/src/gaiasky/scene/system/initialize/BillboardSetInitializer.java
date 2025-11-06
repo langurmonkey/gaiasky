@@ -55,21 +55,27 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         // Textures.
         var billboards = Mapper.billboardSet.get(entity);
         AssetManager manager = AssetBean.manager();
+        billboards.textureArrayName = base.getName() + " TextureArray";
+        if (billboards.textureFiles.length == 1) {
+            // Single-directory arrays can be reutilized by using the directory name directly!
+            billboards.textureArrayName = billboards.textureFiles[0] + " TextureArray";
+        }
         var actualFilePaths = SysUtils.gatherFilesExtension(billboards.textureFiles, new String[]{"png", "jpeg", "jpg", "png"});
         // Send to load.
         if (!actualFilePaths.isEmpty()) {
-            manager.load(base.getName() + " TextureArray", TextureArray.class, new TextureArrayLoader.TextureArrayParameter(actualFilePaths));
+            manager.load(billboards.textureArrayName, TextureArray.class, new TextureArrayLoader.TextureArrayParameter(actualFilePaths));
         }
+
     }
 
     @Override
     public void setUpEntity(Entity entity) {
-        // Textures.
-        var base = Mapper.base.get(entity);
         var billboard = Mapper.billboardSet.get(entity);
+
+        // Textures.
         AssetManager manager = AssetBean.manager();
-        if (manager.contains(base.getName() + " TextureArray")) {
-            billboard.textureArray = manager.get(base.getName() + " TextureArray");
+        if (manager.contains(billboard.textureArrayName)) {
+            billboard.textureArray = manager.get(billboard.textureArrayName, false);
         }
 
         // Transform.
@@ -79,7 +85,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
     public void reloadData(Entity entity) {
         try {
             var billboard = Mapper.billboardSet.get(entity);
-            if(!billboard.procedural) {
+            if (!billboard.procedural) {
                 var provider = new PointDataProvider();
                 boolean reload = false;
                 for (BillboardDataset dataset : billboard.datasets) {
@@ -113,10 +119,11 @@ public class BillboardSetInitializer extends AbstractInitSystem {
                 for (IParticleRecord iParticleRecord : a) {
                     var pr = (ParticleVector) iParticleRecord;
                     aux.set((float) pr.x(), (float) pr.z(), (float) pr.y());
-                    aux.scl(body.size)
-                            .rotate(-90, 0, 1, 0)
-                            .mul(transform.matrix)
-                            .add(pos3b);
+                    aux.scl(body.size / 2.0)
+                            .rotate(-90, 0, 1, 0);
+                    if (transform.matrix != null)
+                        aux.mul(transform.matrix);
+                    aux.add(pos3b);
 
                     // We can modify the data vector because it is an array.
                     var dat = pr.data();

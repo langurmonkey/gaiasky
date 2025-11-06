@@ -33,6 +33,9 @@ public class BillboardSet implements Component, IDisposable {
     /** Current load status. **/
     public AtomicReference<LoadStatus> status = new AtomicReference<>(LoadStatus.NOT_LOADED);
 
+    /** Texture array name. **/
+    public String textureArrayName;
+
     public void setData(Object[] data) {
         int nData = data.length;
         this.datasets = new BillboardDataset[nData];

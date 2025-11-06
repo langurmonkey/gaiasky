@@ -769,7 +769,6 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
             var arrow = Mapper.arrow.get(entity);
             arrow.arrowCap = arrowCaps;
 
-            var verts = Mapper.verts.get(entity);
             synchronized (vertsView) {
                 vertsView.setEntity(entity);
                 vertsView.setPrimitiveSize((float) lineWidth);

@@ -16,12 +16,14 @@ import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.GaiaSkyShaderCompileException;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL43;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +56,7 @@ public class ComputeShaderProgram implements Disposable {
 
     private final String name;
     private final String shaderFile;
-    private final String shaderCode;
+    private String shaderCode;
     private String log;
     private int program;
     private boolean isCompiled = false;
@@ -75,12 +77,25 @@ public class ComputeShaderProgram implements Disposable {
             logger.warn("Compute shaders require OpenGL 4.3+ or ARB_compute_shader extension");
         } else {
             compile();
-            if (isCompiled) {
-                fetchUniforms();
-            } else {
-                throw new GaiaSkyShaderCompileException(this);
-            }
         }
+    }
+
+    /**
+     * Reloads and recompiles the program.
+     */
+    public void reload() {
+        // Reload code from disk.
+        var shaderFile = Gdx.files.internal(this.shaderFile);
+        shaderCode = ShaderTemplatingLoader.load(shaderFile);
+        // Mark compiled false.
+        isCompiled = false;
+        // Recompile.
+        if (!SysUtils.isComputeShaderSupported()) {
+            logger.warn("Compute shaders require OpenGL 4.3+ or ARB_compute_shader extension");
+        } else {
+            compile();
+        }
+        compile();
     }
 
     public String getName() {
@@ -88,7 +103,7 @@ public class ComputeShaderProgram implements Disposable {
     }
 
     public String getShaderFileName() {
-        return shaderFile;
+        return Path.of(shaderFile).getFileName().toString();
     }
 
     public String getShaderSource() {
@@ -112,6 +127,12 @@ public class ComputeShaderProgram implements Disposable {
 
             isCompiled = comp[0] == GL_TRUE;
             log = cache.getLog();
+        }
+
+        if (isCompiled) {
+            fetchUniforms();
+        } else {
+            throw new GaiaSkyShaderCompileException(this);
         }
     }
 
@@ -224,6 +245,17 @@ public class ComputeShaderProgram implements Disposable {
         }
 
         checkGLError("setUniform(" + name + ", vec4)");
+    }
+
+    public void setUniform3fv(String name, float[] values) {
+        if (!checkUniformExists(name)) return;
+
+        Integer loc = uniforms.get(name);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+        buffer.put(values).flip();
+        glUniform3fv(loc, buffer);
+
+        checkGLError("setUniform(" + name + ", float[" + values.length + "])");
     }
 
     public void setUniform(String name, float[] values) {

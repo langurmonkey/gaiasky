@@ -20,14 +20,17 @@ void main() {
     vec3 fullRes = texture(u_texture0, v_texCoords).rgb;
     vec3 halfRes = texture(u_texture1, v_texCoords).rgb;
 
-    // Simple additive blend, for now.
-    fragColor = vec4(clamp(fullRes + halfRes, 0.0, 1.0), 1.0);
-
     // Blend using depth buffers.
-    //
-    // // Recover 'linear' depth values.
-    // float depthFull = 1.0 / recoverWValue(texture(u_texture2, v_texCoords).r, u_zFarK.x, u_zFarK.y);
+
+    // Recover 'linear' depth values.
+    float depthFull = 1.0 / recoverWValue(texture(u_texture2, v_texCoords).r, u_zFarK.x, u_zFarK.y);
     // float depthHalf = 1.0 / recoverWValue(texture(u_texture3, v_texCoords).r, u_zFarK.x, u_zFarK.y);
+
+    if (depthFull < 1e5) {
+        fragColor = vec4(fullRes, 1.0);
+    } else {
+        fragColor = vec4(clamp(fullRes + halfRes, 0.0, 1.0), 1.0);
+    }
 
     // if (depthFull < depthHalf) {
     //     // Full-res pixel is closer - use it

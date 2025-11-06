@@ -41,8 +41,11 @@ uniform uint u_distribution;
 // RNG base seed.
 uniform uint u_seed;
 // Base colors.
-uniform vec3 u_baseColor0;
-uniform vec3 u_baseColor1;
+uniform vec3 u_baseColors[4];
+// Color noise.
+uniform float u_colorNoise;
+// Size factor to take body size into account and normalize particle sizes.
+uniform float u_sizeFactor;
 // Base particle size.
 uniform float u_baseSize;
 // Base radius for this distribution. 1 is default.
@@ -75,25 +78,11 @@ uniform mat4 u_transform;
 
 #include <shader/lib/distributions.glsl>
 
-// Generate RGB color based on u_baseColor0 / u_baseColor1 with random noise.
+// Generate RGB color based on u_baseColors with random noise.
 vec3 generateColor(inout uint state, float colorNoise) {
-    bool valid0 = all(greaterThanEqual(u_baseColor0, vec3(0.0)));
-    bool valid1 = all(greaterThanEqual(u_baseColor1, vec3(0.0)));
+    vec3 baseColor = u_baseColors[int(rand(state) * 4.0)];
 
-    vec3 baseColor;
-    if (valid0 && valid1) {
-        // Both valid → randomly pick one
-        baseColor = (rand(state) < 0.5) ? u_baseColor0 : u_baseColor1;
-    } else if (valid0) {
-        baseColor = u_baseColor0;
-    } else if (valid1) {
-        baseColor = u_baseColor1;
-    } else {
-        // Both invalid → fallback mid-gray
-        baseColor = vec3(1.0);
-    }
-
-    // Small random deviation
+    // Noise based on colorNoise parameter.
     vec3 noise = colorNoise
     * (vec3(
     rand(state),
@@ -389,8 +378,8 @@ void main() {
     int type = int(u_type);
     int distribution = int(u_distribution);
     int layer = pickLayer(state);
-    float size = u_baseSize * (rand(state) + 0.3);
-    vec3 color = generateColor(state, 0.05);
+    float size = u_baseSize * (rand(state) + 0.3) * u_sizeFactor;
+    vec3 color = generateColor(state, u_colorNoise);
     vec3 pos;
     if (distribution == D_SPIRAL) {
         pos = positionSpiral(state, u_heightScale, u_spiralAngle, u_spiralArms, u_minRadius);

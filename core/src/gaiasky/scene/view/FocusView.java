@@ -320,6 +320,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         }
     }
 
+    public boolean isSolidObject(){
+       return !Mapper.billboardSet.has(entity) && !Mapper.orbitElementsSet.has(entity);
+    }
+
+
     @Override
     public String getClosestName() {
         if (getSet() != null) {

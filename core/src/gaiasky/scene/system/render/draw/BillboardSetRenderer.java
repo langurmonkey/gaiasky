@@ -217,7 +217,6 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             shaderProgram.setUniformf("u_camPos", camera.getPos());
             addCameraUpCubemapMode(shaderProgram, camera);
             shaderProgram.setUniformf("u_alpha", render.getOpacity() * alpha * 1.5f);
-            shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
 
             // Arbitrary affine transformations.
             addAffineTransformUniforms(shaderProgram, affine);
