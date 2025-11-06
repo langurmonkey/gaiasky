@@ -15,6 +15,10 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectIntMap;
+import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
@@ -26,6 +30,7 @@ import gaiasky.scene.component.RefSysTransform;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.system.render.SceneRenderer;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
@@ -35,13 +40,12 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3Q;
 import org.lwjgl.opengl.GL43;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Renders billboard datasets generated procedurally using a compute shader stage.
  */
-public class BillboardProceduralRenderer extends AbstractRenderSystem {
+public class BillboardProceduralRenderer extends AbstractRenderSystem implements IObserver {
     protected static final Logger.Log logger = Logger.getLogger(BillboardProceduralRenderer.class);
 
     /** The compute shader that generates particles. **/
@@ -52,6 +56,8 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
     private IntMesh quadMesh;
     /** Auxiliary matrix. **/
     protected final Matrix4 auxMat = new Matrix4();
+    /** Seed per dataset. **/
+    private final ObjectIntMap<BillboardDataset> seeds;
 
     /**
      * Creates a billboard set renderer.
@@ -68,8 +74,11 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
                                        ComputeShaderProgram computeShader) {
         super(sceneRenderer, rg, alphas, shaders);
         this.computeShader = computeShader;
-        this.ssbos = new ObjectIntMap<>();
+        this.ssbos = new ObjectIntMap<>(15);
+        this.seeds = new ObjectIntMap<>(15);
         createQuadMesh();
+
+        EventManager.instance.subscribe(this, Event.SHADER_RELOAD_CMD);
     }
 
     private void createQuadMesh() {
@@ -102,6 +111,16 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
 
     private int datasetNum = -1;
 
+    private int getSeed(BillboardDataset ds) {
+        if (seeds.containsKey(ds)) {
+            return seeds.get(ds, 123);
+        } else {
+            var seed = 123 + datasetNum++;
+            seeds.put(ds, seed);
+            return seed;
+        }
+    }
+
     /**
      * Prepares a given object for rendering by allocating the SSBO.
      *
@@ -110,7 +129,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
      */
     private void prepareGPUBuffer(Body body, RefSysTransform transform, BillboardDataset dataset) {
         if (!isPrepared(dataset)) {
-            datasetNum++;
             SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
 
             int bufferId = GL43.glGenBuffers();
@@ -133,11 +151,15 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
             // Double-check the binding worked
             SysUtils.checkForOpenGLErrors("After bindBufferBase()");
 
+            var mat = new Matrix4();
+            if (transform.matrix != null) {
+                transform.matrix.putIn(mat);
+            }
             dispatchComputeShader(dataset,
-                                  123 + datasetNum,
+                                  getSeed(dataset),
                                   body.pos,
                                   body.size,
-                                  transform.matrix.putIn(new Matrix4()));
+                                  mat);
 
         }
     }
@@ -163,21 +185,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
         if (computeShader != null && computeShader.isCompiled()) {
             // Total element count.
             int elementCount = dataset.particleCount;
-            float[] col0, col1;
-            if (dataset.baseColors == null) {
-                col0 = new float[]{1.0f, 1.0f, 1.0f};
-                col1 = new float[]{-1.0f, -1.0f, -1.0f};
-            } else if (dataset.baseColors.length >= 3 && dataset.baseColors.length < 6) {
-                col0 = Arrays.copyOfRange(dataset.baseColors, 0, 3);
-                col1 = new float[]{-1.0f, -1.0f, -1.0f};
-            } else if (dataset.baseColors.length >= 6) {
-                col0 = Arrays.copyOfRange(dataset.baseColors, 0, 3);
-                col1 = Arrays.copyOfRange(dataset.baseColors, 3, 6);
-            } else {
-                col0 = new float[]{1.0f, 1.0f, 1.0f};
-                col1 = new float[]{-1.0f, -1.0f, -1.0f};
-                logger.warn("Incorrect size of baseColor array: " + Arrays.toString(dataset.baseColors));
-            }
 
             computeShader.begin();
 
@@ -192,11 +199,12 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
             computeShader.setUniformUint("u_count", elementCount);
             computeShader.setUniformUint("u_distribution", dataset.distribution.ordinal());
             computeShader.setUniformUint("u_seed", seed);
+            computeShader.setUniform("u_sizeFactor", (float) (bodySize / (26000.0 * Constants.PC_TO_U))); // Normalized to MW diameter.fproce
             computeShader.setUniform("u_baseSize", dataset.size);
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
             computeShader.setUniform("u_minRadius", dataset.minRadius);
-            computeShader.setUniform("u_baseColor0", col0[0], col0[1], col0[2]);
-            computeShader.setUniform("u_baseColor1", col1[0], col1[1], col1[2]);
+            computeShader.setUniform3fv("u_baseColors[0]", dataset.baseColors);
+            computeShader.setUniform("u_colorNoise", dataset.colorNoise);
             computeShader.setUniform("u_eccentricity", dataset.eccentricity);
             computeShader.setUniform("u_aspect", dataset.aspect);
             computeShader.setUniform("u_heightScale", dataset.heightScale);
@@ -242,6 +250,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
         // RENDER
         float alpha = getAlpha(render);
         if (alpha > 0) {
+            var body = Mapper.body.get(render.entity);
             var fade = Mapper.fade.get(render.entity);
             var affine = Mapper.affine.get(render.entity);
             var billboard = Mapper.billboardSet.get(render.entity);
@@ -249,7 +258,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
 
             // COMPUTE--Create SSBO and generate particle positions.
             for (var dataset : billboard.datasets) {
-                var body = Mapper.body.get(render.entity);
                 var transform = Mapper.transform.get(render.entity);
                 prepareGPUBuffer(body, transform, dataset);
             }
@@ -267,7 +275,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
             shaderProgram.setUniformf("u_camPos", camera.getPos());
             addCameraUpCubemapMode(shaderProgram, camera);
             shaderProgram.setUniformf("u_alpha", render.getOpacity() * alpha * 1.5f);
-            shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
 
             // Arbitrary affine transformations.
             addAffineTransformUniforms(shaderProgram, affine);
@@ -314,21 +321,35 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem {
         }
     }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-
+    private void cleanSSBOs() {
         if (ssbos != null && !ssbos.isEmpty()) {
             var ids = ssbos.values();
             while (ids.hasNext()) {
                 var id = ids.next();
                 GL43.glDeleteBuffers(id);
             }
+            ssbos.clear();
         }
+    }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        // Clean SSBOs.
+        cleanSSBOs();
+        // Dispose quad mesh.
         if (quadMesh != null) {
             quadMesh.dispose();
         }
     }
 
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.SHADER_RELOAD_CMD) {
+            GaiaSky.postRunnable(() -> {
+                cleanSSBOs();
+                computeShader.reload();
+            });
+        }
+    }
 }

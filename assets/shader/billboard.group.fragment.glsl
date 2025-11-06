@@ -49,6 +49,9 @@ void main() {
     }
     float texBrightness = texture(u_textures, vec3(uv, v_layer)).r;
     fragColor = colorTex(u_alpha, texBrightness);
+    // Apply non-linear intensity compression to prevent whiteout
+    fragColor.rgb = fragColor.rgb / (fragColor.rgb + vec3(1.2));
+    //fragColor.rgb = pow(fragColor.rgb, vec3(1.1));
 
     // Logarithmic depth buffer (not used actually).
     gl_FragDepth = getDepthValue(v_dist, u_zfar, u_k);

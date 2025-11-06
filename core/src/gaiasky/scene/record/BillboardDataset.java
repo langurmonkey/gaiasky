@@ -52,11 +52,17 @@ public class BillboardDataset {
      * Probability distribution, for procedural datasets.
      */
     public Distribution distribution = Distribution.DISK;
+    /** Maximum number of supported colors. **/
+    private static final int MAX_COLORS = 4;
     /**
      * Base color(s) for the particles of this dataset. These colors will be used as base to generate the particle colors.
-     * 2 RGBA colors are supported, so the size of this array must be either 3 or 6.
+     * {@link #MAX_COLORS} RGBA colors are supported, so the size of this array must be {@link #MAX_COLORS} * 3.
      */
     public float[] baseColors;
+    /**
+     * Default color noise to apply to the base colors to generate the final particle colors.
+     */
+    public float colorNoise = 0.08f;
     /**
      * Texture layers to use.
      */
@@ -231,12 +237,54 @@ public class BillboardDataset {
     }
 
     /**
-     * Sets the base colors. Two RGB colors are supported, so the size of the array must be either 3 or 6.
+     * Sets the given color to the given index in the colors array.
+     *
+     * @param r   The red.
+     * @param g   The green.
+     * @param b   The blue.
+     * @param idx The index of the color, in [0,MAX_COLORS-1]
+     */
+    private void setColor(double r, double g, double b, int idx) {
+        assert idx >= 0 && idx < MAX_COLORS;
+        this.baseColors[idx * 3] = (float) r;
+        this.baseColors[idx * 3 + 1] = (float) g;
+        this.baseColors[idx * 3 + 2] = (float) b;
+    }
+
+    /**
+     * Sets the base colors. Four RGB colors are supported, so the size of the array must be one of [3, 6, 9, 12].
      *
      * @param baseColors The base colors.
      */
     public void setBaseColors(double[] baseColors) {
-        this.baseColors = new float[baseColors.length];
+        assert baseColors.length == 3 || baseColors.length == 6 || baseColors.length == 9 || baseColors.length == 12;
+        this.baseColors = new float[MAX_COLORS * 3];
+        switch (baseColors.length) {
+            case 3 -> {
+                setColor(baseColors[0], baseColors[1], baseColors[2], 0);
+                setColor(baseColors[0], baseColors[1], baseColors[2], 1);
+                setColor(baseColors[0], baseColors[1], baseColors[2], 2);
+                setColor(baseColors[0], baseColors[1], baseColors[2], 3);
+            }
+            case 6 -> {
+                setColor(baseColors[0], baseColors[1], baseColors[2], 0);
+                setColor(baseColors[0], baseColors[1], baseColors[2], 1);
+                setColor(baseColors[3], baseColors[4], baseColors[5], 2);
+                setColor(baseColors[3], baseColors[4], baseColors[5], 3);
+            }
+            case 9 -> {
+                setColor(baseColors[0], baseColors[1], baseColors[2], 0);
+                setColor(baseColors[3], baseColors[4], baseColors[5], 1);
+                setColor(baseColors[6], baseColors[7], baseColors[8], 2);
+                setColor(baseColors[0], baseColors[1], baseColors[2], 3);
+            }
+            default -> {
+                setColor(baseColors[0], baseColors[1], baseColors[2], 0);
+                setColor(baseColors[3], baseColors[4], baseColors[5], 1);
+                setColor(baseColors[6], baseColors[7], baseColors[8], 2);
+                setColor(baseColors[9], baseColors[10], baseColors[11], 3);
+            }
+        }
         for (int i = 0; i < baseColors.length; i++) {
             this.baseColors[i] = (float) baseColors[i];
         }
@@ -244,6 +292,10 @@ public class BillboardDataset {
 
     public void setBaseColor(double[] baseColors) {
         setBaseColors(baseColors);
+    }
+
+    public void setColorNoise(Double colorNoise) {
+        this.colorNoise = MathUtilsDouble.clamp(colorNoise.floatValue(), 0f, 1f);
     }
 
     /**

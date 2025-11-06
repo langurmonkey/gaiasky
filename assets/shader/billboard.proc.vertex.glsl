@@ -9,7 +9,6 @@ uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform float u_sizeFactor;
 uniform float u_intensity;
-uniform vec2 u_edges;
 uniform float u_maxPointSize;
 uniform float u_vrScale;
 
@@ -20,12 +19,12 @@ uniform mat4 u_transform;
 uniform mat4 u_view;
 
 #ifdef relativisticEffects
-    #include <shader/lib/relativity.glsl>
-#endif // relativisticEffects
+#include <shader/lib/relativity.glsl>
+#endif// relativisticEffects
 
 #ifdef gravitationalWaves
-    #include <shader/lib/gravwaves.glsl>
-#endif // gravitationalWaves
+#include <shader/lib/gravwaves.glsl>
+#endif// gravitationalWaves
 
 // INPUTS
 // Regular vertex attributes
@@ -33,9 +32,9 @@ layout(location = 0) in vec4 a_position;
 layout(location = 1) in vec2 a_texCoord0;
 // SSBO
 struct Particle {
-    vec3 position; // xyz = position
-    vec3 color; // rgb
-    vec3 extra; // x = size, y = type, z = layer
+    vec3 position;// xyz = position
+    vec3 color;// rgb
+    vec3 extra;// x = size, y = type, z = layer
 };
 
 layout(std430, binding = 0) buffer Particles {
@@ -68,17 +67,14 @@ void main() {
     float dist = length(pos * 1e-8) * 1e8;
 
     #ifdef relativisticEffects
-        pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
-    #endif // relativisticEffects
+    pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
+    #endif// relativisticEffects
 
     #ifdef gravitationalWaves
-        pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
-    #endif // gravitationalWaves
+    pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    #endif// gravitationalWaves
 
-
-    float dscale = smoothstep(u_edges.y, u_edges.x, dist);
-
-    v_col = vec4(p.color, u_intensity * dscale);
+    v_col = vec4(p.color, u_intensity);
     v_type = int(p.extra.y);
     v_layer = int(p.extra.z);
     v_uv = a_texCoord0;

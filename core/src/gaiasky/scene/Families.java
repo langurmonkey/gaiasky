@@ -29,6 +29,7 @@ public class Families {
             locations,
             billboardSets,
             billboardGalaxies,
+            proceduralTriggers,
             axes,
             raymarchings,
             invisibles,
@@ -70,6 +71,7 @@ public class Families {
         locations = Family.all(LocationMark.class).exclude(TagNoProcess.class).get();
         billboardSets = Family.all(BillboardSet.class).exclude(TagNoProcess.class).get();
         billboardGalaxies = Family.all(TagBillboardGalaxy.class).exclude(TagNoProcess.class).get();
+        proceduralTriggers = Family.all(ProceduralTrigger.class).exclude(TagNoProcess.class).get();
         axes = Family.all(Axis.class).exclude(TagNoProcess.class).get();
         raymarchings = Family.all(Raymarching.class).exclude(TagNoProcess.class).get();
         invisibles = Family.all(TagInvisible.class).exclude(Raymarching.class, TagNoProcess.class).get();

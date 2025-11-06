@@ -253,7 +253,8 @@ public class Scene {
             addInitializer(new PerimeterInitializer(setUp, families.perimeters, priority++));
             addInitializer(new VRDeviceInitializer(setUp, families.vrdevices, priority++));
             addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++));
-            addInitializer(new VolumeInitializer(setUp, families.volumes, priority));
+            addInitializer(new VolumeInitializer(setUp, families.volumes, priority++));
+            addInitializer(new ProceduralTriggerInitializer(setUp, families.proceduralTriggers, priority));
 
             // Run once.
             runOnce(initializers);
@@ -339,6 +340,7 @@ public class Scene {
             addUpdater(new AxesUpdater(families.axes, priority++));
             addUpdater(new KeyframeUpdater(families.keyframes, priority++));
             addUpdater(new ShapeUpdater(families.shapes, priority++));
+            addUpdater(new ProceduralTriggerUpdater(this, families.proceduralTriggers, priority++));
             addUpdater(new LocUpdater(families.locations, priority++));
             addUpdater(new PerimeterUpdater(families.perimeters, priority++));
             addUpdater(new VRDeviceUpdater(families.vrdevices, priority++));

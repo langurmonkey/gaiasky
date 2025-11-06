@@ -552,13 +552,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         }
                         focus = focusBak;
 
-                        double dist = aux4b.dstD(pos);
-                        if (dist < focus.getRadius()) {
+                        // Stop camera at radius distance.
+                        var dist = aux4b.dstD(pos);
+                        var radius = focus.getRadius();
+                        if (focus.isSolidObject() && dist < radius) {
                             // aux2 <- focus-cam with a length of radius
                             aux2b.set(pos)
                                     .sub(aux4b)
                                     .nor()
-                                    .scl(focus.getRadius());
+                                    .scl(radius);
                             // Correct camera position
                             pos.set(aux4b)
                                     .add(aux2b);
@@ -823,7 +825,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 addYaw(deltaX * fovFactor, acceleration);
                 addPitch(deltaY * fovFactor, acceleration);
             } else {
-                double radius = focus.getRadius();
+                double radius = focus.isSolidObject() ? focus.getRadius() : 0;
                 double distanceInRadii = getFovFactor() * (focus.getDistToCamera() - radius) / radius;
                 double maxRadii = 2.0;
                 double factor = ((distanceInRadii < maxRadii) ? distanceInRadii / maxRadii : 1.0);

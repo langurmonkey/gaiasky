@@ -9,7 +9,6 @@ uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform float u_sizeFactor;
 uniform float u_intensity;
-uniform vec2 u_edges;
 uniform float u_maxPointSize;
 uniform float u_vrScale;
 
@@ -68,10 +67,7 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-
-    float dscale = smoothstep(u_edges.y, u_edges.x, dist);
-
-    v_col = vec4(a_color, u_intensity * dscale);
+    v_col = vec4(a_color, u_intensity);
     v_type = int(a_additional.y);
     v_layer = int(a_additional.z);
     v_uv = a_texCoord0;

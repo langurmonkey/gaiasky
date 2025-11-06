@@ -985,8 +985,15 @@
     "Highlight": {
       "description": "Defines attributes that apply to the visual representation of particle and star sets.",
       "pointScaling": {
-        "description": "Scale factor taht applies to the the visual representation for each object of this dataset.",
+        "description": "Scale factor that applies to the the visual representation for each object of this dataset.",
         "unit": "Double"
+      }
+    },
+    "ProceduralTrigger": {
+      "description": "Defines attributes related to the procedural generation of galaxies.",
+      "proceduralGeneration": {
+        "description":  "Whether procedural generation is enabled for the given object.",
+        "unit": "Boolean"
       }
     }
   }
