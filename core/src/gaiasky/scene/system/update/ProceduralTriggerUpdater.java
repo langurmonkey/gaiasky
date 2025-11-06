@@ -81,10 +81,10 @@ public class ProceduralTriggerUpdater extends AbstractUpdateSystem {
             bbSet.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
 
             // Generate Galaxy
-            var spiralAngle = 360.0;
-            var eccentricity = 0.3;
-            var minRadius = 0.13;
-            var displacement = new double[]{0.2, 0.1};
+            var spiralAngle = 460.0;
+            var eccentricity = 0.4;
+            var minRadius = 0.15;
+            var displacement = new double[]{0.2, 0.0};
 
             // Dust
             var dust = new BillboardDataset();
@@ -95,9 +95,9 @@ public class ProceduralTriggerUpdater extends AbstractUpdateSystem {
             dust.setMinRadius(minRadius);
             dust.setDisplacement(displacement);
             dust.setBaseColor(new double[]{0.8, 0.8, 1.0});
-            dust.setParticleCount(45000L);
-            dust.setSize(29.0);
-            dust.setIntensity(0.022);
+            dust.setParticleCount(55000L);
+            dust.setSize(28.0);
+            dust.setIntensity(0.011);
             dust.setBlending("subtractive");
             dust.setDepthMask(false);
             dust.setLayers(new int[]{1, 2});
@@ -112,21 +112,21 @@ public class ProceduralTriggerUpdater extends AbstractUpdateSystem {
             gas.setMinRadius(minRadius);
             gas.setDisplacement(displacement);
             gas.setBaseColors(new double[]{
-                    0.802,
-                    0.808,
-                    0.979,
-                    0.747,
-                    0.734,
-                    0.899,
+                    0.702,
+                    0.608,
+                    0.999,
+                    0.647,
+                    0.534,
+                    0.989,
                     0.8,
-                    0.8,
+                    0.7,
                     1.0
 
             });
-            gas.setParticleCount(5500L);
+            gas.setParticleCount(6500L);
             gas.setColorNoise(0.07);
-            gas.setSize(80.0);
-            gas.setIntensity(0.007);
+            gas.setSize(90.0);
+            gas.setIntensity(0.008);
             gas.setLayers(new int[]{0, 1, 2, 3, 4});
             gas.setMaxSize(20.0);
 
