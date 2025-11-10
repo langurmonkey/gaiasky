@@ -502,9 +502,6 @@ public class WelcomeGui extends AbstractGui {
                 vrDemoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.demo.info"), skin));
                 vrDemoTable.add(vrDemo).left().padRight(pad16);
                 vrDemoTable.add(vrDemoTooltip).left();
-
-                startGroup.add(vrDemoTable).bottom().left();
-
             }
 
 
