@@ -10,6 +10,7 @@ package gaiasky.scene.system.render.draw.billboard;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -94,6 +95,11 @@ public class BillboardEntityRenderSystem implements IObserver {
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
 
+
+    private Matrix4 mat = new Matrix4();
+    private Vector3 vec1 = new Vector3();
+    private Vector3 vec2 = new Vector3(0, 1, 0);
+
     private void renderCloseUpStar(StarSet set,
                                    Highlight highlight,
                                    DatasetDescription desc,
@@ -122,7 +128,8 @@ public class BillboardEntityRenderSystem implements IObserver {
                 // Ease into billboard.
                 alpha *= (float) MathUtilsDouble.flint(solidAngle, thPointTimesFovFactor, thPointTimesFovFactor * 2f, 0, 1);
 
-                shader.setUniformMatrix("u_matrix", camera.getCamera().view);
+                mat.setToLookAt(starPos.put(vec1), vec2);
+                shader.setUniformMatrix("u_matrix", mat);
                 shader.setUniformf("u_pos", starPos);
                 shader.setUniformf("u_size", (float) fuzzySize);
 
@@ -271,7 +278,8 @@ public class BillboardEntityRenderSystem implements IObserver {
                     .scl(len * 0.99f);
         } else {
             // Projection matrix for star corona.
-            shader.setUniformMatrix("u_matrix", camera.getCamera().view);
+            mat.setToLookAt(billboardPosition, vec2);
+            shader.setUniformMatrix("u_matrix", mat);
         }
 
         shader.setUniformf("u_pos", billboardPosition);

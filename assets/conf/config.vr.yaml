@@ -145,7 +145,7 @@ scene:
   # Star settings.
   star:
     # Render star spheres.
-    renderStarSpheres: true
+    renderStarSpheres: false
     # Star brightness factor.
     brightness: 2.0
     # Modulate the brightness of stars.
