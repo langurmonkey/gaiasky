@@ -19,4 +19,8 @@ public enum XrLoadStatus {
     public boolean vrInitFailed() {
         return this.equals(ERROR_NO_CONTEXT) || this.equals(ERROR_RENDERMODEL);
     }
+
+    public boolean vrInitOk() {
+        return this.equals(OK);
+    }
 }

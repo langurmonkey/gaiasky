@@ -106,6 +106,7 @@ public class WelcomeGui extends AbstractGui {
         this.skin = skin;
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
+        this.vr = vrStatus.vrInitOk();
         this.gamepadListener = new WelcomeGuiGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
     }
 
@@ -486,7 +487,7 @@ public class WelcomeGui extends AbstractGui {
             }
 
             Table vrDemoTable = null;
-            if (vr && vrStatus == XrLoadStatus.OK) {
+            if (vrStatus.vrInitOk()) {
                 vrDemoTable = new Table(skin);
                 var vrDemo = new OwnCheckBox(I18n.msg("gui.vr.demo"), skin, 10f);
                 vrDemo.setChecked(Settings.settings.runtime.vrDemoMode);
