@@ -27,7 +27,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public abstract class ActionSet implements AutoCloseable {
 
-
     protected XrDriver driver;
     public final String name;
     public final String localizedName;

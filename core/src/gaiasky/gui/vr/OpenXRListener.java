@@ -20,6 +20,8 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.RuntimeSettings;
 import gaiasky.util.comp.ViewAngleComparator;
 import gaiasky.util.math.Vector3D;
 import gaiasky.vr.openxr.XrDriver;
@@ -54,12 +56,16 @@ public class OpenXRListener implements XrInputListener, IObserver {
     private long selectingTime = 0;
     private long lastAxisMovedFrame = Long.MIN_VALUE;
 
+    /** Reference to runtime settings to check the state of {@link RuntimeSettings#vrDemoMode}. **/
+    private final RuntimeSettings runtime;
+
     public OpenXRListener(NaturalCamera cam) {
         this.cam = cam;
         this.comp = new ViewAngleComparator<>();
         this.p0 = new Vector3D();
         this.p1 = new Vector3D();
         this.focusView = new FocusView();
+        this.runtime = Settings.settings.runtime;
 
         EventManager.instance.subscribe(this, Event.VR_DRIVER_LOADED);
     }
@@ -175,7 +181,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
     @Override
     public boolean showUI(boolean value, XrControllerDevice device) {
         // On release.
-        if (!value) {
+        if (!runtime.vrDemoMode && !value) {
             EventManager.publish(Event.SHOW_VR_UI, this);
             return true;
         }
@@ -190,7 +196,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
     @Override
     public boolean cameraMode(boolean value, XrControllerDevice device) {
         // On release.
-        if (!value) {
+        if (!runtime.vrDemoMode && !value) {
             // Change mode from free to focus and vice-versa.
             CameraMode cm = cam.getMode().isFocus() ? CameraMode.FREE_MODE : CameraMode.FOCUS_MODE;
             // Stop.
@@ -209,8 +215,9 @@ public class OpenXRListener implements XrInputListener, IObserver {
 
     @Override
     public boolean move(Vector2 value, XrControllerDevice device) {
-        // Joystick for forward/backward movement
-        float valueX = value.x;
+        // Joystick for forward/backward and right/left movements.
+        // In VR demo mode, you can't go sideways.
+        float valueX = runtime.vrDemoMode ? 0 : value.x;
         float valueY = value.y;
         lazyInit();
         Entity sm = xrControllerToModel.get(device);
@@ -230,6 +237,11 @@ public class OpenXRListener implements XrInputListener, IObserver {
     public boolean select(float value, XrControllerDevice device) {
         // Selection.
         lazyInit();
+        // Can't select in demo mode.
+        if (runtime.vrDemoMode) {
+            selecting.clear();
+            return false;
+        }
         Entity sm = xrControllerToModel.get(device);
         var vr = sm != null ? Mapper.vr.get(sm) : null;
         boolean selectingDevice = selecting.contains(device);

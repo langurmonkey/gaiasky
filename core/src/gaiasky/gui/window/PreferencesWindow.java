@@ -82,6 +82,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox lodFadeCb;
     private OwnCheckBox cbAutoCamRec;
     private OwnCheckBox real;
+    private OwnCheckBox vrDemo;
     private OwnCheckBox invertX;
     private OwnCheckBox invertY;
     private OwnCheckBox highAccuracyPositions;
@@ -1830,28 +1831,61 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentControls = new Table(skin);
         contentControls.align(Align.top | Align.left);
 
+        // VR
+        Table vrTable = null;
+        OwnLabel titleVR = null;
+        if (vr) {
+            titleVR = new OwnLabel(I18n.msg("gui.vr"), skin, "header");
+
+            // Demo mode
+            OwnLabel vrDemoLabel = new OwnLabel(I18n.msg("gui.vr.demo"), skin);
+            vrDemo = new OwnCheckBox("", skin);
+            vrDemo.setChecked(settings.runtime.vrDemoMode);
+            vrDemo.listenTo(Event.VR_DEMO_MODE_CMD);
+            OwnImageButton vrDemoTooltip = new OwnImageButton(skin, "tooltip");
+            vrDemoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.demo.info"), skin));
+
+            labels.add(vrDemoLabel);
+
+            vrTable = new Table(skin);
+            vrTable.add(vrDemoLabel).left().padBottom(pad18).padRight(pad18);
+            vrTable.add(vrDemo).left().padBottom(pad18).padRight(pad18).fillX();
+            vrTable.add(vrDemoTooltip).right().padBottom(pad18).row();
+        }
+
+        // GAMEPAD
         OwnLabel titleController = new OwnLabel(I18n.msg("gui.controller"), skin, "header");
 
-        // DETECTED CONTROLLER NAMES
+        // Detected controller names
         controllersTable = new Table(skin);
         OwnLabel detectedLabel = new OwnLabel(I18n.msg("gui.controller.detected"), skin);
         generateGamepadsList(controllersTable);
 
-        // CONTROLLER MAPPINGS
+        // Controller mappings
         OwnLabel mappingsLabel = new OwnLabel(I18n.msg("gui.controller.mappingsfile"), skin);
         gamepadMappings = new OwnSelectBox<>(skin);
         reloadGamepadMappings(null);
 
-        // INVERT X
+        // Invert X
         OwnLabel invertXLabel = new OwnLabel(I18n.msg("gui.controller.axis.invert", "X"), skin);
         invertX = new OwnCheckBox("", skin);
         invertX.setChecked(settings.controls.gamepad.invertX);
-        // INVERT Y
+        // Invert Y
         OwnLabel invertYLabel = new OwnLabel(I18n.msg("gui.controller.axis.invert", "Y"), skin);
         invertY = new OwnCheckBox("", skin);
         invertY.setChecked(settings.controls.gamepad.invertY);
 
         labels.add(detectedLabel, mappingsLabel, invertXLabel, invertYLabel);
+
+        Table controller = new Table(skin);
+        controller.add(detectedLabel).left().padBottom(pad18).padRight(pad18);
+        controller.add(controllersTable).left().padBottom(pad18).row();
+        controller.add(mappingsLabel).left().padBottom(pad18).padRight(pad18);
+        controller.add(gamepadMappings).left().padBottom(pad18).row();
+        controller.add(invertXLabel).left().padBottom(pad18).padRight(pad18);
+        controller.add(invertX).left().padBottom(pad18).row();
+        controller.add(invertYLabel).left().padBottom(pad34).padRight(pad18);
+        controller.add(invertY).left().padBottom(pad34).row();
 
         // KEY BINDINGS
         OwnLabel titleKeybindings = new OwnLabel(I18n.msg("gui.keymappings"), skin, "header");
@@ -1919,18 +1953,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controlsScroll.setFadeScrollBars(false);
         scrolls.add(controlsScroll);
 
-        Table controller = new Table(skin);
-        controller.add(detectedLabel).left().padBottom(pad18).padRight(pad18);
-        controller.add(controllersTable).left().padBottom(pad18).row();
-        controller.add(mappingsLabel).left().padBottom(pad18).padRight(pad18);
-        controller.add(gamepadMappings).left().padBottom(pad18).row();
-        controller.add(invertXLabel).left().padBottom(pad18).padRight(pad18);
-        controller.add(invertX).left().padBottom(pad18).row();
-        controller.add(invertYLabel).left().padBottom(pad34).padRight(pad18);
-        controller.add(invertY).left().padBottom(pad34).row();
-
         // Add to content
-        addContentGroup(contentControls, titleController, controller, 0f);
+        if (titleVR != null && vrTable != null) {
+            addContentGroup(contentControls, titleVR, vrTable, 0f);
+            addContentGroup(contentControls, titleController, controller);
+        } else {
+            addContentGroup(contentControls, titleController, controller, 0f);
+        }
         addContentGroup(contentControls, titleKeybindings, controlsScroll);
 
         /*
@@ -3253,6 +3282,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Index of refraction
         if (celestialSphereIndexOfRefraction != null) {
             EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
+        }
+
+        // VR Demo mode
+        if (settings.runtime.openXr && vrDemo != null) {
+            EventManager.publish(Event.VR_DEMO_MODE_CMD, vrDemo, vrDemo.isChecked());
         }
 
         // Controllers

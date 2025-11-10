@@ -226,6 +226,7 @@ public class GuiUtils {
         exitDialog.setAcceptText(I18n.msg("gui.exit"));
         exitDialog.setCancelText(null);
         exitDialog.buildSuper();
+        exitDialog.setFillParent(true);
         exitDialog.show(stage);
     }
 
@@ -261,6 +262,7 @@ public class GuiUtils {
         exitDialog.setAcceptText(I18n.msg("gui.exit"));
         exitDialog.setCancelText(null);
         exitDialog.buildSuper();
+        exitDialog.setFillParent(true);
         exitDialog.show(stage);
     }
 

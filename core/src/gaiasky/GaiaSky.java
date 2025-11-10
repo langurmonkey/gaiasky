@@ -682,8 +682,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         } else {
             // Desktop mode.
             settings.runtime.openXr = false;
+            return XrLoadStatus.NO_VR;
         }
-        return XrLoadStatus.NO_VR;
     }
 
     /**

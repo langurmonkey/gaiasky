@@ -1522,6 +1522,9 @@ public enum Event {
      */
     VR_SELECTING_STATE,
 
+    /** VR demo mode command. Contains the new state of {@link RuntimeSettings#vrDemoMode}. **/
+    VR_DEMO_MODE_CMD,
+
     /** Show/hide controller GUI **/
     SHOW_CONTROLLER_GUI_ACTION,
 

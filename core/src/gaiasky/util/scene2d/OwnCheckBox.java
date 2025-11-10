@@ -16,10 +16,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 
-public class OwnCheckBox extends CheckBox {
+public class OwnCheckBox extends CheckBox implements IObserver {
     private final Color regularColor;
     private float ownWidth = 0f, ownHeight = 0f;
+    /**
+     * Event to listen to, so that this check box is connected to the event system.
+     * Only one event supported. Must have a boolean as the first parameter.
+     **/
+    private Event listenTo = null;
 
     public OwnCheckBox(String text, Skin skin) {
         super(text, skin);
@@ -160,7 +168,7 @@ public class OwnCheckBox extends CheckBox {
                 batch.flush();
                 float padLeft = this.getPadLeftValue().get(this), padBottom = this.getPadBottomValue().get(this);
                 if (clipBegin(padLeft, padBottom, getWidth() - padLeft - getPadBottomValue().get(this),
-                        getHeight() - padBottom - getPadTopValue().get(this))) {
+                              getHeight() - padBottom - getPadTopValue().get(this))) {
                     drawChildren(batch, parentAlpha);
                     batch.flush();
                     clipEnd();
@@ -192,5 +200,27 @@ public class OwnCheckBox extends CheckBox {
             Gdx.graphics.requestRendering();
         // End Button
         // End TextButton
+    }
+
+    public void listenTo(Event event) {
+        EventManager.instance.removeAllSubscriptions(this);
+        if (event != null) {
+            this.listenTo = event;
+            EventManager.instance.subscribe(this, this.listenTo);
+        }
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (event == listenTo
+                && source != this
+                && data != null
+                && data.length > 0
+                && data[0] instanceof Boolean state) {
+            setProgrammaticChangeEvents(false);
+            setChecked(state);
+            setProgrammaticChangeEvents(true);
+        }
+
     }
 }

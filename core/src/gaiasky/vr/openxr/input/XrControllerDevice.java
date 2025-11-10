@@ -122,6 +122,12 @@ public class XrControllerDevice {
         processMoveAction(move, listener);
     }
 
+    /**
+     * Button B and Y in VR controllers to show the VR UI.
+     *
+     * @param action   The action.
+     * @param listener The XR input listener.
+     */
     private void processShowUIAction(BoolAction action,
                                      XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
@@ -129,6 +135,12 @@ public class XrControllerDevice {
         }
     }
 
+    /**
+     * Button A and X in VR controllers.
+     *
+     * @param action   The action.
+     * @param listener The XR input listener.
+     */
     private void processCameraModeAction(BoolAction action,
                                          XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
@@ -136,6 +148,12 @@ public class XrControllerDevice {
         }
     }
 
+    /**
+     * Button B and Y in VR controllers.
+     *
+     * @param action   The action.
+     * @param listener The XR input listener.
+     */
     private void processAcceptAction(BoolAction action,
                                      XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
@@ -143,6 +161,12 @@ public class XrControllerDevice {
         }
     }
 
+    /**
+     * Focus on an object by pushing the trigger.
+     *
+     * @param action   The action.
+     * @param listener The XR input listener.
+     */
     private void processSelectAction(FloatAction action,
                                      XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {

@@ -485,6 +485,29 @@ public class WelcomeGui extends AbstractGui {
                 selectionInfo.add(noStarCatalogs);
             }
 
+            Table vrDemoTable = null;
+            if (vr && vrStatus == XrLoadStatus.OK) {
+                vrDemoTable = new Table(skin);
+                var vrDemo = new OwnCheckBox(I18n.msg("gui.vr.demo"), skin, 10f);
+                vrDemo.setChecked(Settings.settings.runtime.vrDemoMode);
+                vrDemo.listenTo(Event.VR_DEMO_MODE_CMD);
+                vrDemo.addListener((event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.publish(Event.VR_DEMO_MODE_CMD, vrDemo, vrDemo.isChecked());
+                        return true;
+                    }
+                    return false;
+                }));
+                OwnImageButton vrDemoTooltip = new OwnImageButton(skin, "tooltip");
+                vrDemoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.demo.info"), skin));
+                vrDemoTable.add(vrDemo).left().padRight(pad16);
+                vrDemoTable.add(vrDemoTooltip).left();
+
+                startGroup.add(vrDemoTable).bottom().left();
+
+            }
+
+
             // Start button
             center.add(startButton)
                     .right()
@@ -513,8 +536,17 @@ public class WelcomeGui extends AbstractGui {
                     .colspan(2)
                     .center()
                     .top()
-                    .padBottom(pad32 * 2f)
+                    .padBottom(pad32 * (vrDemoTable != null ? 1f : 2f))
                     .row();
+
+            if (vrDemoTable != null) {
+                center.add(vrDemoTable)
+                        .colspan(2)
+                        .center()
+                        .top()
+                        .padBottom(pad32 * 2f)
+                        .row();
+            }
 
             if (numLocalDatasets == 0 && preventRecommended) {
                 // Add back button

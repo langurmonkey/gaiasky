@@ -4461,10 +4461,14 @@ public class Settings extends SettingsObject {
         public boolean recordCamera = false;
         public boolean recordKeyframeCamera = false;
 
+        /** VR demo mode disables VR controller buttons and simplifies joystick movement. **/
+        public boolean vrDemoMode = false;
+        /** Display the VR GUI. **/
+        public boolean vrDisplayGui = false;
+
         public boolean drawOctree = false;
         public boolean relativisticAberration = false;
         public boolean gravitationalWaves = false;
-        public boolean displayVrGui = false;
         public boolean octreeLoadActive = false;
 
         // Max clock time, 5 Myr by default
@@ -4500,9 +4504,9 @@ public class Settings extends SettingsObject {
                     case DISPLAY_GUI_CMD -> displayGui = (boolean) data[0];
                     case DISPLAY_VR_GUI_CMD -> {
                         if (data.length > 1) {
-                            displayVrGui = (Boolean) data[1];
+                            vrDisplayGui = (Boolean) data[1];
                         } else {
-                            displayVrGui = !displayVrGui;
+                            vrDisplayGui = !vrDisplayGui;
                         }
                     }
                     case TOGGLE_UPDATEPAUSE -> {
@@ -4514,6 +4518,7 @@ public class Settings extends SettingsObject {
                     case RELATIVISTIC_ABERRATION_CMD -> relativisticAberration = (Boolean) data[0];
                     case GRAV_WAVE_START -> gravitationalWaves = true;
                     case GRAV_WAVE_STOP -> gravitationalWaves = false;
+                    case VR_DEMO_MODE_CMD -> vrDemoMode = (Boolean) data[0];
                     default -> {
                     }
                 }
@@ -4534,7 +4539,7 @@ public class Settings extends SettingsObject {
             EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD,
                                             Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD,
                                             Event.RELATIVISTIC_ABERRATION_CMD, Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP,
-                                            Event.DISPLAY_VR_GUI_CMD);
+                                            Event.DISPLAY_VR_GUI_CMD, Event.VR_DEMO_MODE_CMD);
         }
 
         @Override
@@ -4546,8 +4551,9 @@ public class Settings extends SettingsObject {
         public void apply() {
             EventManager.publish(Event.INPUT_ENABLED_CMD, this, inputEnabled);
             EventManager.publish(Event.DISPLAY_GUI_CMD, this, displayGui, I18n.msg("notif.cleanmode"));
-            EventManager.publish(Event.DISPLAY_VR_GUI_CMD, this, displayVrGui);
+            EventManager.publish(Event.DISPLAY_VR_GUI_CMD, this, vrDisplayGui);
             EventManager.publish(Event.TIME_STATE_CMD, this, timeOn);
+            EventManager.publish(Event.VR_DEMO_MODE_CMD, this, vrDemoMode);
         }
     }
 
