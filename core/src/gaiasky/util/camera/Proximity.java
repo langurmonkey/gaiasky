@@ -494,17 +494,7 @@ public class Proximity {
         }
 
         @Override
-        public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
-
-        }
-
-        @Override
         public void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
-
-        }
-
-        @Override
-        public void addHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<IFocus> hits) {
 
         }
 

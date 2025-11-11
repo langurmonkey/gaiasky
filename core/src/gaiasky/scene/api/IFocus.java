@@ -373,19 +373,7 @@ public interface IFocus {
      * @param camera    The camera.
      * @param hits      The list where to add the element.
      */
-    void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits);
-
     void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits);
-
-    /**
-     * Add this focus to the hits list if it is hit by the given ray.
-     *
-     * @param p0     Start point of the ray.
-     * @param p1     End point of the ray.
-     * @param camera The camera.
-     * @param hits   The list where the focus is to be added.
-     */
-    void addHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<IFocus> hits);
 
     void addEntityHitRay(Vector3D p0, Vector3D p1, NaturalCamera camera, Array<Entity> hits);
 

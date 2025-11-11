@@ -819,17 +819,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public void addHitCoordinate(int screenX,
-                                 int screenY,
-                                 int w,
-                                 int h,
-                                 int pixelDist,
-                                 NaturalCamera camera,
-                                 Array<IFocus> hits) {
-
-    }
-
-    @Override
     public void addEntityHitCoordinate(int screenX,
                                        int screenY,
                                        int w,
@@ -840,14 +829,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (focus != null && focus.focusable && focus.hitCoordinatesConsumer != null) {
             focus.hitCoordinatesConsumer.apply(focusHit, this, screenX, screenY, w, h, pixelDist, camera, hits);
         }
-    }
-
-    @Override
-    public void addHitRay(Vector3D p0,
-                          Vector3D p1,
-                          NaturalCamera camera,
-                          Array<IFocus> hits) {
-
     }
 
     @Override
@@ -1048,6 +1029,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public boolean isBillboard() {
         return isValid() && (Mapper.tagBillboard.has(entity) || Mapper.tagBillboardGalaxy.has(entity));
+    }
+
+    public boolean isBillboardDataset() {
+        return isValid() && Mapper.billboardSet.has(entity);
     }
 
     public boolean isCluster() {

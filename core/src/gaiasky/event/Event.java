@@ -1121,9 +1121,13 @@ public enum Event {
     SHOW_LOAD_CATALOG_ACTION,
     SHOW_LOG_CMD,
     /**
-     * Procedural surface and atmosphere generation.
+     * Procedural surface, atmosphere, and clouds generation.
      */
     SHOW_PROCEDURAL_GEN_CMD,
+    /**
+     * Procedural galaxy generation window.
+     */
+    SHOW_PROCEDURAL_GALAXY_CMD,
     /**
      * Shows the minimap window/interface. Contains a boolean with the state.
      */

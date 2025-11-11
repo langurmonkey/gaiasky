@@ -305,10 +305,24 @@ public class SceneContextMenu extends ContextMenu {
         if (procGalCandidate) {
             addSeparator();
             MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.edit"), skin, skin.getDrawable("icon-elem-galaxies"));
+            galGen.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
+                    return true;
+                }
+                return false;
+            });
             addItem(galGen);
         } else {
             addSeparator();
             MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
+            galGen.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
+                    return true;
+                }
+                return false;
+            });
             addItem(galGen);
         }
 
@@ -393,6 +407,8 @@ public class SceneContextMenu extends ContextMenu {
                 }
             }
         }
+
+        addSeparator();
 
         // Load
         MenuItem dsLoad = new MenuItem(I18n.msg("context.dataset.load"), skin, skin.getDrawable("open-icon"));

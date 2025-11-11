@@ -8,24 +8,26 @@
 package gaiasky.gui.window;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.BillboardDataset.ParticleType;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.scene2d.CollapsiblePane;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.DoubleValidator;
 
 import java.util.Random;
@@ -40,17 +42,35 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     private static final String DEFAULT_NAME = "new";
 
     private final Random rand = new Random();
+    private final Scene scene;
     private Entity entity;
     private final FocusView view;
-    private float fieldWidth, fieldWidthAll, fieldWidthTotal, textWidth;
+    private float fieldWidthTotal, fieldWidthBox, tabContentWidth;
 
-    public GalaxyGenerationWindow(FocusView target, Scene scene, Skin skin, Stage stage) {
-        super(I18n.msg("gui.galaxy.title", target == null ? DEFAULT_NAME : target.getLocalizedName()), skin, stage);
+    public GalaxyGenerationWindow(FocusView target, Scene scene, Stage stage, Skin skin) {
+        super("", skin, stage);
+        this.scene = scene;
+        this.view = new FocusView();
+
+        update(target);
+
+        setModal(false);
+        setCancelText(I18n.msg("gui.close"));
+
+        // Build UI
+        buildSuper();
+    }
+
+    private static String generateNewName() {
+        return "galaxy_" + sequence++;
+    }
+
+    private void update(FocusView target) {
 
         if (target == null) {
             // Create new object with a given radius r, and 2r in front of the camera.
             String name = generateNewName();
-            var radius = 5 * Constants.KPC_TO_U;
+            var radius = 10 * Constants.KPC_TO_U;
             var camera = GaiaSky.instance.getICamera();
             var cpos = camera.getPos();
             var cdir = new Vector3D(camera.getDirection());
@@ -72,25 +92,13 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         } else {
             this.entity = target.getEntity();
         }
-        this.view = new FocusView(this.entity);
-
-        this.setModal(false);
-        setAcceptText(I18n.msg("gui.close"));
-
-        // Build UI
-        buildSuper();
-    }
-
-    private static String generateNewName() {
-        return "galaxy_" + sequence++;
-    }
-
-    private void reinitialize(Entity entity) {
-        this.entity = entity;
-        this.view.setEntity(entity);
-        this.setModal(false);
-
+        this.view.setEntity(this.entity);
         this.getTitleLabel().setText(I18n.msg("gui.galaxy.title", view.getLocalizedName()));
+
+    }
+
+    public void reinitialize(FocusView target) {
+        update(target);
 
         // Build UI
         rebuild();
@@ -103,28 +111,31 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
     @Override
     protected void build() {
-        this.textWidth = 220f;
-        this.fieldWidth = 500f;
-        this.fieldWidthAll = 750f;
         this.fieldWidthTotal = 950f;
-        float tabContentWidth = 400f;
+        this.fieldWidthBox = 650f;
+        this.tabContentWidth = 700f;
 
-        // First, global parameters:
+        // FIRST: global parameters:
         // Size, fades, transforms, etc.
 
         // Size in KPC
-        var sizeVal = new DoubleValidator(0, 100);
-        OwnLabel sizeLabel = new OwnLabel(I18n.msg("gui.galaxy.size"), skin);
-        OwnTextField size = new OwnTextField(Double.toString(view.getSize() * Constants.U_TO_KPC), skin, sizeVal);
-        size.setWidth(fieldWidth);
-
-        content.add(sizeLabel).left().padRight(pad34).padBottom(pad18);
-        content.add(size).left().padBottom(pad18).row();
+        OwnSliderPlus sizeKpc = new OwnSliderPlus(I18n.msg("gui.galaxy.size"), 0.2f, 20.0f, 0.1f, skin);
+        sizeKpc.setWidth(fieldWidthTotal);
+        sizeKpc.setValue((float) (view.getSize() * Constants.U_TO_KPC));
+        sizeKpc.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                var sizeInternal = sizeKpc.getValue() * Constants.KPC_TO_U;
+                view.getBody().setSize(sizeInternal);
+            }
+        });
+        content.add(sizeKpc).left().padBottom(pad18).row();
 
         // Rotations.
 
 
-        // Second, billboard datasets.
+        // SECOND: billboard datasets.
         var render = Mapper.render.get(entity);
         var billboard = Mapper.billboardSet.get(entity);
         var datasets = billboard.datasets;
@@ -132,14 +143,60 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         for (var ds : datasets) {
             var table = new Table(skin);
 
+            // Size
+            OwnSliderPlus size = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.size"), 0.1f, 300.0f, 0.1f, skin);
+            size.setWidth(fieldWidthBox);
+            size.setValue(ds.size);
+            size.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setSize((double) size.getValue());
+                }
+            });
+            table.add(size).left().padBottom(pad18).row();
+
+            var dustGas = ds.type == ParticleType.GAS || ds.type == ParticleType.DUST;
+            float max =  dustGas ? 0.3f : 1.0f;
+            float step =  dustGas ? 0.001f : 0.01f;
+
+            // Intensity
+            OwnSliderPlus intensity = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.intensity"), 0.0f, max, step, skin);
+            intensity.setWidth(fieldWidthBox);
+            intensity.setValue(ds.intensity);
+            intensity.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setIntensity((double) intensity.getValue());
+                }
+            });
+            table.add(intensity).left().padBottom(pad18).row();
+
+
             // Header
             String title = ds.type.name() + (half ? " (half res)" : "");
             CollapsiblePane groupPane = new CollapsiblePane(stage, title,
                                                             table, tabContentWidth, skin, "hud-header", "expand-collapse",
                                                             null, true, null);
 
-            content.add(groupPane).colspan(2).padBottom(pad18).row();
+            content.add(groupPane).padBottom(pad18).row();
         }
+
+        // THIRD: generate button.
+        OwnTextButton generate = new OwnTextButton(I18n.msg("gui.galaxy.generate"), skin);
+        generate.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, this, render);
+            }
+        });
+        generate.pad(pad10, pad20, pad10, pad20);
+        generate.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.generate.info"), skin));
+
+        content.add(generate).center().padTop(pad34);
+
     }
 
     @Override

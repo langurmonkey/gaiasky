@@ -15,6 +15,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
@@ -41,7 +42,9 @@ public class BillboardSetInitializer extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
         var base = Mapper.base.get(entity);
         var label = Mapper.label.get(entity);
+        var focus = Mapper.focus.get(entity);
 
+        // Label.
         label.label = true;
         label.textScale = 3;
         label.labelMax = (float) (2e-3 / Constants.DISTANCE_SCALE_FACTOR);
@@ -49,6 +52,9 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         label.renderConsumer = LabelEntityRenderSystem::renderBillboardSet;
         label.renderFunction = LabelView::renderTextBase;
         label.depthBufferConsumer = LabelView::noTextDepthBuffer;
+
+        // Focus.
+        focus.hitCoordinatesConsumer = FocusHit::addHitBillboardSet;
 
         reloadData(entity);
 
