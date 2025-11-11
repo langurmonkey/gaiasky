@@ -16,6 +16,7 @@ import gaiasky.scene.component.AttitudeComponent;
 import gaiasky.scene.component.RigidRotation;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
+import gaiasky.script.v2.impl.APIv2;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.IPythonCoordinatesProvider;
@@ -32,6 +33,13 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("unused")
 public sealed interface IScriptingInterface permits EventScriptingInterface {
+
+    /**
+     * Return the APIv2 object to access v2 functionality.
+     *
+     * @return The {@link APIv2} object.
+     **/
+    APIv2 apiv2();
 
     /**
      * Get the location of the assets folder.

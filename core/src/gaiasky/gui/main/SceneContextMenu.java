@@ -65,7 +65,13 @@ public class SceneContextMenu extends ContextMenu {
     // Added items
     private int nItems = 0;
 
-    public SceneContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final FocusView candidate, final CatalogManager catalogManager, final Scene scene) {
+    public SceneContextMenu(final Skin skin,
+                            final String styleName,
+                            final int screenX,
+                            final int screenY,
+                            final FocusView candidate,
+                            final CatalogManager catalogManager,
+                            final Scene scene) {
         super(skin, styleName);
         this.skin = skin;
         this.screenX = (int) (screenX / Settings.settings.program.ui.scale);
@@ -91,8 +97,14 @@ public class SceneContextMenu extends ContextMenu {
     }
 
     private void build() {
+        boolean validCandidate = candidate != null && candidate.isValid();
+        boolean atmosphereCandidate = validCandidate && Mapper.atmosphere.has(candidate.getEntity());
+        boolean procGalCandidate = validCandidate
+                && Mapper.billboardSet.has(candidate.getEntity())
+                && Mapper.billboardSet.get(candidate.getEntity()).procedural;
+
         Drawable rulerDwb = skin.getDrawable("icon-elem-ruler");
-        if (candidate != null && candidate.isValid()) {
+        if (validCandidate) {
             MenuItem select = new MenuItem(I18n.msg("context.select", candidateNameShort), skin, skin.getDrawable("highlight-off"));
             select.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -149,7 +161,11 @@ public class SceneContextMenu extends ContextMenu {
             MenuItem addShape = new MenuItem(I18n.msg("context.shape.new", candidateNameShort), skin, skin.getDrawable("icon-elem-grids"));
             addShape.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    AddShapeDialog dialog = new AddShapeDialog(I18n.msg("context.shape.new", candidateNameShort), candidate, candidateName, skin, getStage());
+                    AddShapeDialog dialog = new AddShapeDialog(I18n.msg("context.shape.new", candidateNameShort),
+                                                               candidate,
+                                                               candidateName,
+                                                               skin,
+                                                               getStage());
                     dialog.setAcceptListener(() -> {
                         double size = dialog.units.getSelected().unit.toKm(dialog.size.getDoubleValue(1)) * 2.0;
                         float[] color = dialog.color.getPickedColor();
@@ -158,7 +174,19 @@ public class SceneContextMenu extends ContextMenu {
                         String orientation = dialog.orientation.getSelected().orientation.toString();
                         boolean showLabel = dialog.showLabel.isChecked();
                         boolean trackObj = dialog.track.isChecked();
-                        GaiaSky.instance.scripting().addShapeAroundObject(dialog.name.getText().trim(), shape, primitive, orientation, size, candidateName, color[0], color[1], color[2], color[3], showLabel, trackObj);
+                        GaiaSky.instance.scripting()
+                                .addShapeAroundObject(dialog.name.getText().trim(),
+                                                      shape,
+                                                      primitive,
+                                                      orientation,
+                                                      size,
+                                                      candidateName,
+                                                      color[0],
+                                                      color[1],
+                                                      color[2],
+                                                      color[3],
+                                                      showLabel,
+                                                      trackObj);
                     });
                     dialog.show(getStage());
                     return true;
@@ -203,62 +231,89 @@ public class SceneContextMenu extends ContextMenu {
                 return false;
             });
             addItem(removeShapesAll);
+        }
 
-            if (Mapper.atmosphere.has(candidate.getEntity())) {
-                addSeparator();
+        if (atmosphereCandidate) {
+            addSeparator();
 
-                MenuItem landOn = new MenuItem(I18n.msg("context.landon", candidateNameShort), skin, skin.getDrawable("land-on"));
-                landOn.addListener(event -> {
-                    if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.LAND_ON_OBJECT, landOn, candidate);
-                        return true;
-                    }
-                    return false;
-                });
-                addItem(landOn);
-
-                double[] lonlat = new double[2];
-                FocusView view = candidate;
-                boolean ok = CameraUtils.getLonLat(view, view.getEntity(), GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3D(), new Vector3D(), new Matrix4(), lonlat);
-                if (ok) {
-                    final Double pointerLon = lonlat[0];
-                    final Double pointerLat = lonlat[1];
-                    // Add mouse pointer
-                    MenuItem landOnPointer = new MenuItem(I18n.msg("context.landatpointer", candidateNameShort), skin, skin.getDrawable("land-on"));
-                    landOnPointer.addListener(event -> {
-                        if (event instanceof ChangeEvent) {
-                            EventManager.publish(Event.LAND_AT_LOCATION_OF_OBJECT, landOnPointer, candidate, pointerLon, pointerLat);
-                            return true;
-                        }
-                        return false;
-                    });
-                    addItem(landOnPointer);
+            MenuItem landOn = new MenuItem(I18n.msg("context.landon", candidateNameShort), skin, skin.getDrawable("land-on"));
+            landOn.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.LAND_ON_OBJECT, landOn, candidate);
+                    return true;
                 }
+                return false;
+            });
+            addItem(landOn);
 
-                MenuItem landOnCoord = new MenuItem(I18n.msg("context.landatcoord", candidateNameShort), skin, skin.getDrawable("land-at"));
-                landOnCoord.addListener(event -> {
+            double[] lonlat = new double[2];
+            FocusView view = candidate;
+            boolean ok = CameraUtils.getLonLat(view,
+                                               view.getEntity(),
+                                               GaiaSky.instance.getICamera(),
+                                               Gdx.input.getX(),
+                                               Gdx.input.getY(),
+                                               new Vector3(),
+                                               new Vector3(),
+                                               new Vector3(),
+                                               new Vector3(),
+                                               new Vector3D(),
+                                               new Vector3D(),
+                                               new Matrix4(),
+                                               lonlat);
+            if (ok) {
+                final Double pointerLon = lonlat[0];
+                final Double pointerLat = lonlat[1];
+                // Add mouse pointer
+                MenuItem landOnPointer = new MenuItem(I18n.msg("context.landatpointer", candidateNameShort), skin, skin.getDrawable("land-on"));
+                landOnPointer.addListener(event -> {
                     if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_LAND_AT_LOCATION_CMD, landOnCoord, candidate);
+                        EventManager.publish(Event.LAND_AT_LOCATION_OF_OBJECT, landOnPointer, candidate, pointerLon, pointerLat);
                         return true;
                     }
                     return false;
                 });
-                addItem(landOnCoord);
-
-                addSeparator();
-
-                MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort), skin, skin.getDrawable("iconic-fork"));
-                proceduralSurface.addListener(event -> {
-                    if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralSurface, candidate);
-                        return true;
-                    }
-                    return false;
-                });
-                addItem(proceduralSurface);
-
+                addItem(landOnPointer);
             }
 
+            MenuItem landOnCoord = new MenuItem(I18n.msg("context.landatcoord", candidateNameShort), skin, skin.getDrawable("land-at"));
+            landOnCoord.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_LAND_AT_LOCATION_CMD, landOnCoord, candidate);
+                    return true;
+                }
+                return false;
+            });
+            addItem(landOnCoord);
+
+            addSeparator();
+
+            MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort),
+                                                      skin,
+                                                      skin.getDrawable("iconic-fork"));
+            proceduralSurface.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralSurface, candidate);
+                    return true;
+                }
+                return false;
+            });
+            addItem(proceduralSurface);
+
+        }
+
+        if (procGalCandidate) {
+            addSeparator();
+            MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.edit"), skin, skin.getDrawable("icon-elem-galaxies"));
+            addItem(galGen);
+        } else {
+            addSeparator();
+            MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
+            addItem(galGen);
+        }
+
+
+        if (validCandidate) {
             addSeparator();
 
             // Cosmic ruler
@@ -318,36 +373,39 @@ public class SceneContextMenu extends ContextMenu {
                 if (rulerAttach1 != null)
                     addItem(rulerAttach1);
             }
-        }
-
-        // Clear ruler
-        Entity cr = scene.getEntity("Cosmicruler");
-        if (cr != null) {
-            var ruler = Mapper.ruler.get(cr);
-            if (ruler.rulerOk() || ruler.hasAttached()) {
-                MenuItem clearRuler = new MenuItem(I18n.msg("context.ruler.clear"), skin, rulerDwb);
-                clearRuler.addListener((evt) -> {
-                    if (evt instanceof ChangeEvent) {
-                        GaiaSky.postRunnable(() -> {
-                            EventManager.publish(Event.RULER_CLEAR, clearRuler);
-                        });
-                        return true;
-                    }
-                    return false;
-                });
-                addItem(clearRuler);
+        } else {
+            // Clear ruler
+            Entity cr = scene.getEntity("Cosmicruler");
+            if (cr != null) {
+                var ruler = Mapper.ruler.get(cr);
+                if (ruler.rulerOk() || ruler.hasAttached()) {
+                    MenuItem clearRuler = new MenuItem(I18n.msg("context.ruler.clear"), skin, rulerDwb);
+                    clearRuler.addListener((evt) -> {
+                        if (evt instanceof ChangeEvent) {
+                            GaiaSky.postRunnable(() -> {
+                                EventManager.publish(Event.RULER_CLEAR, clearRuler);
+                            });
+                            return true;
+                        }
+                        return false;
+                    });
+                    addItem(clearRuler);
+                }
             }
         }
 
         // Load
         MenuItem dsLoad = new MenuItem(I18n.msg("context.dataset.load"), skin, skin.getDrawable("open-icon"));
-        dsLoad.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, dsLoad);
-                return true;
-            }
-            return false;
-        });
+        dsLoad.addListener(event ->
+
+                           {
+                               if (event instanceof ChangeEvent) {
+                                   EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, dsLoad);
+                                   return true;
+                               }
+                               return false;
+                           });
+
         addItem(dsLoad);
 
         // Dataset highlight
@@ -412,13 +470,17 @@ public class SceneContextMenu extends ContextMenu {
             });
             addItem(bookmarkObject);
         }
+
         MenuItem bookmarkPosition = new MenuItem(I18n.msg("context.bookmark.pos"), skin, skin.getDrawable("iconic-star"));
-        bookmarkPosition.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_ADD_POSITION_BOOKMARK_ACTION, this);
-            }
-            return false;
-        });
+        bookmarkPosition.addListener(event ->
+
+                                     {
+                                         if (event instanceof ChangeEvent) {
+                                             EventManager.publish(Event.SHOW_ADD_POSITION_BOOKMARK_ACTION, this);
+                                         }
+                                         return false;
+                                     });
+
         addItem(bookmarkPosition);
 
 
@@ -452,25 +514,33 @@ public class SceneContextMenu extends ContextMenu {
         if (nItems > 0) {
             addSeparator();
         }
+
         // Preferences
         MenuItem preferences = new MenuItem(I18n.msg("gui.preferences"), skin, skin.getDrawable("prefs-icon"));
-        preferences.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_PREFERENCES_ACTION, preferences);
-                return true;
-            }
-            return false;
-        });
+        preferences.addListener((event) ->
+
+                                {
+                                    if (event instanceof ChangeEvent) {
+                                        EventManager.publish(Event.SHOW_PREFERENCES_ACTION, preferences);
+                                        return true;
+                                    }
+                                    return false;
+                                });
+
         addItem(preferences);
+
         // Quit
         MenuItem quit = new MenuItem(I18n.msg("context.quit"), skin, skin.getDrawable("quit-icon"));
-        quit.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_QUIT_ACTION, quit);
-                return true;
-            }
-            return false;
-        });
+        quit.addListener((event) ->
+
+                         {
+                             if (event instanceof ChangeEvent) {
+                                 EventManager.publish(Event.SHOW_QUIT_ACTION, quit);
+                                 return true;
+                             }
+                             return false;
+                         });
+
         addItem(quit);
     }
 }

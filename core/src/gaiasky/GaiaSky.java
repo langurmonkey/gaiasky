@@ -1102,9 +1102,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             executorService.shutDownThreadPool();
         }
 
-        // Scripting.
-        ScriptingServer.dispose();
-
         // Renderer.
         if (sceneRenderer != null) {
             sceneRenderer.dispose();
