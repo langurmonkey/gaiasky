@@ -269,7 +269,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
-            IRenderable renderable = (IRenderable) source;
+            IRenderable renderable = (IRenderable) data[0];
             int offset = getOffset(renderable);
             if (offset >= 0) {
                 clearMeshData(offset);

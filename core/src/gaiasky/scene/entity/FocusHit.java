@@ -22,8 +22,8 @@ import gaiasky.util.Functions.Function2;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -248,7 +248,16 @@ public class FocusHit {
                                      int pixelDist,
                                      NaturalCamera camera,
                                      Array<Entity> hits) {
-        addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness, this::computeHitSolidAngleStar, camera, hits);
+        addHitCoordinateCelestial(view,
+                                  screenX,
+                                  screenY,
+                                  w,
+                                  h,
+                                  pixelDist,
+                                  Settings.settings.scene.star.brightness,
+                                  this::computeHitSolidAngleStar,
+                                  camera,
+                                  hits);
     }
 
     public void addHitCoordinateParticleSet(FocusView view,
@@ -476,5 +485,69 @@ public class FocusHit {
                 }
             }
         }
+    }
+
+    /**
+     * Billboard sets have a hardcoded screen size.
+     *
+     * @param view      The focus view.
+     * @param screenX   The screen X coordinate.
+     * @param screenY   The screen Y coordinate.
+     * @param w         The screen width.
+     * @param h         The screen height.
+     * @param pixelDist The minimum pixel distance to consider as hit.
+     * @param camera    The camera.
+     * @param hits      The list of hit objects.
+     */
+    public void addHitBillboardSet(FocusView view,
+                                   int screenX,
+                                   int screenY,
+                                   int w,
+                                   int h,
+                                   int pixelDist,
+                                   NaturalCamera camera,
+                                   Array<Entity> hits) {
+        if (hitCondition(view)) {
+            var entity = view.getEntity();
+
+            Vector3 pos = F31;
+            Vector3D posDouble = EntityUtils.getAbsolutePosition(entity, D31).add(camera.getInversePos());
+            pos.set(posDouble.valuesF());
+
+            if (camera.direction.dot(posDouble) > 0) {
+                double angle = view.getSolidAngle() * 0.4f;
+
+                PerspectiveCamera perspectiveCamera;
+                if (Settings.settings.program.modeStereo.active) {
+                    if (screenX < w / 2f) {
+                        perspectiveCamera = camera.getCameraStereoLeft();
+                    } else {
+                        perspectiveCamera = camera.getCameraStereoRight();
+                    }
+                    perspectiveCamera.update();
+                } else {
+                    perspectiveCamera = camera.camera;
+                }
+
+                float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
+                float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
+
+                angle = (float) FastMath.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                double pixelSize = ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2;
+                perspectiveCamera.project(pos);
+                pos.y = viewportHeight - pos.y;
+                if (Settings.settings.program.modeStereo.active) {
+                    pos.x /= 2;
+                }
+
+                // Check click distance
+                if (checkClickDistance(screenX, screenY, pos, camera, viewportWidth, pixelSize)) {
+                    // Hit
+                    hits.add(entity);
+                }
+            }
+        }
+
     }
 }

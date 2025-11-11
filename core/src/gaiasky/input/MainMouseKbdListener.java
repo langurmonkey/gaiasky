@@ -243,7 +243,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                               int screenY) {
         Array<Entity> hits = getHits(screenX, screenY);
         if (hits.size != 0) {
-            // Sort using distance
+            // See ViewAngleComparator.
             hits.sort(comp);
             // Get closest
             return hits.get(hits.size - 1);

@@ -58,7 +58,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     private MaterialComponent initMtc, mtc;
     private CloudComponent initClc, clc;
     private AtmosphereComponent initAc, ac;
-    private float fieldWidth, fieldWidthAll, fieldWidthTotal, textWidth;
+    private float fieldWidth, fieldWidthAll, fieldWidthTotal, textWidth, scrollPaneHeight;
     private boolean updateTabSelected = true;
     private OwnSliderPlus hueShift;
     private Texture currentLutTexture;
@@ -127,6 +127,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         this.fieldWidth = 500f;
         this.fieldWidthAll = 750f;
         this.fieldWidthTotal = 950f;
+        this.scrollPaneHeight = 600f;
         float tabContentWidth = 400f;
         float tabWidth = 240f;
 
@@ -864,7 +865,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             // Noise
             addNoiseGroup(scrollContent, mtc.nc);
 
-            var scrollPane = scrollPane(scrollContent, 600f);
+            var scrollPane = scrollPane(scrollContent);
 
             content.add(scrollPane).colspan(2).center().top().row();
             content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad10).row();
@@ -921,7 +922,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         // Noise
         addNoiseGroup(scrollContent, clc.nc);
 
-        var scrollPane = scrollPane(scrollContent, 600f);
+        var scrollPane = scrollPane(scrollContent);
 
         content.add(scrollPane).colspan(2).center().top().row();
         content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
@@ -1225,8 +1226,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 materialComponent.disposeTextures(GaiaSky.instance.assetManager);
                 materialComponent.disposeNoiseBuffers();
             }
-            mtc.initialize(view.getName());
-            model.model.setMaterial(mtc);
+            if (mtc != null) {
+                mtc.initialize(view.getName());
+                model.model.setMaterial(mtc);
+            }
         } else {
             logger.info(I18n.msg("gui.procedural.error.gen", I18n.msg("gui.procedural.surface")));
         }
@@ -1307,10 +1310,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         genSurfaceButton.setDisabled(genSurfaceNum > 0);
     }
 
-    private ScrollPane scrollPane(Actor actor, float height) {
+    private ScrollPane scrollPane(Actor actor) {
         ScrollPane scroll = new OwnScrollPane(actor, skin, "minimalist-nobg");
         scroll.setWidth(fieldWidthTotal + 100f);
-        scroll.setHeight(height);
+        scroll.setHeight(scrollPaneHeight);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(false);
         scroll.setScrollingDisabled(true, false);

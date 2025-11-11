@@ -78,7 +78,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         this.seeds = new ObjectIntMap<>(15);
         createQuadMesh();
 
-        EventManager.instance.subscribe(this, Event.SHADER_RELOAD_CMD);
+        EventManager.instance.subscribe(this, Event.SHADER_RELOAD_CMD, Event.GPU_DISPOSE_BILLBOARD_DATASET);
     }
 
     private void createQuadMesh() {
@@ -251,7 +251,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         float alpha = getAlpha(render);
         if (alpha > 0) {
             var body = Mapper.body.get(render.entity);
-            var fade = Mapper.fade.get(render.entity);
             var affine = Mapper.affine.get(render.entity);
             var billboard = Mapper.billboardSet.get(render.entity);
 
@@ -332,6 +331,18 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         }
     }
 
+    private void cleanSSBO(BillboardDataset ds) {
+        if (ssbos != null && !ssbos.isEmpty()) {
+            if (ssbos.containsKey(ds)) {
+                var id = ssbos.remove(ds, -1);
+                if (id >= 0) {
+                    GL43.glDeleteBuffers(id);
+                }
+            }
+        }
+
+    }
+
     @Override
     public void dispose() {
         super.dispose();
@@ -350,6 +361,18 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
                 cleanSSBOs();
                 computeShader.reload();
             });
+        } else if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
+            IRenderable renderable = (IRenderable) data[0];
+            if (renderable instanceof Render r) {
+                GaiaSky.postRunnable(() -> {
+                    var bb = Mapper.billboardSet.get(r.getEntity());
+                    if (bb != null) {
+                        for (var ds : bb.datasets) {
+                            cleanSSBO(ds);
+                        }
+                    }
+                });
+            }
         }
     }
 }
