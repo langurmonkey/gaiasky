@@ -44,6 +44,9 @@ import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.function.Function;
 
+/**
+ * Interface to the procedural generation system for planetary surfaces, atmospheres and cloud layers.
+ */
 public class ProceduralGenerationWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(ProceduralGenerationWindow.class);
     // Selected tab persists across windows

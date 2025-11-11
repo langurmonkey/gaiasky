@@ -1494,6 +1494,11 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
+    public APIv2 apiv2() {
+        return apiv2;
+    }
+
+    @Override
     public String getAssetsLocation() {
         return apiv2.base.get_assets_dir();
     }
