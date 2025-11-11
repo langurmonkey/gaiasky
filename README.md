@@ -118,7 +118,9 @@ The most up-to-date information on Gaia Sky VR, as well as how to install and ru
 
 ##  5. Documentation and help
 
-The most up-to-date documentation of Gaia Sky is always hosted at [gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs). The documentation source repository is hosted [here](https://codeberg.org/gaiasky/gaiasky-docs).
+The most up-to-date user manual is always hosted at [docs.gaiasky.space](http://docs.gaiasky.space). The documentation source repository is hosted [here](https://codeberg.org/gaiasky/gaiasky-docs).
+
+An AI-generated technical wiki, documenting the whole codebase structured in components, can be found in [DeepWiki/langurmonkey/gaiasky](https://deepwiki.com/langurmonkey/gaiasky). I have reviewed it and as far as I can tell it is very accurate and correct.
 
 
 ##  6. Copyright and licensing information
