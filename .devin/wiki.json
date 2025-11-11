@@ -1,0 +1,302 @@
+{
+  "repo_notes": [
+    {
+      "content": "Gaia Sky is a 3D universe visualization platform with support for more than a billion objects."
+    }
+  ],
+  "pages": [
+    {
+      "title": "Overview",
+      "purpose": "Introduce Gaia Sky, its purpose as a 3D universe visualization platform, high-level architecture, and key features",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Getting Started",
+      "purpose": "Guide users through downloading, installing, running Gaia Sky, and understanding basic concepts",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Installation and Requirements",
+      "purpose": "Detail system requirements, installation methods (packages, source), and initial setup",
+      "parent": "Getting Started",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "First Run and Dataset Management",
+      "purpose": "Explain the welcome screen, dataset manager, downloading catalogs, and launching the application",
+      "parent": "Getting Started",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Configuration System",
+      "purpose": "Explain the config.yaml structure, settings hierarchy, and basic customization",
+      "parent": "Getting Started",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Core Architecture",
+      "purpose": "Describe the high-level architectural patterns: ECS, event system, rendering pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Application Lifecycle",
+      "purpose": "Document GaiaSky and GaiaSkyDesktop classes, initialization sequence, main loop, and shutdown",
+      "parent": "Core Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Entity-Component-System (ECS)",
+      "purpose": "Explain the Ashley ECS architecture, entities, components, systems, archetypes, and families",
+      "parent": "Core Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Settings and Event System",
+      "purpose": "Document the Settings singleton, event manager, 300+ event types, and observer pattern",
+      "parent": "Core Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Internationalization (i18n)",
+      "purpose": "Explain the gsbundle property files, supported languages, and localization system",
+      "parent": "Core Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Scene Management",
+      "purpose": "Deep dive into scene graph, entity lifecycle, camera system, and scene update loop",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Scene Initialization and Entity Loading",
+      "purpose": "Document the initialization systems, archetype loading, scene graph building, and entity setup",
+      "parent": "Scene Management",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Update Systems",
+      "purpose": "Explain GraphUpdater, ParticleSetUpdater, OctreeUpdater, and the update phase of the main loop",
+      "parent": "Scene Management",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Camera and Focus System",
+      "purpose": "Document NaturalCamera, camera modes (focus/free/game), IFocus interface, and proximity tracking",
+      "parent": "Scene Management",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Particle Sets and Star Rendering",
+      "purpose": "Explain ParticleSet/StarSet components, asynchronous sorting, TopNBuffer, and proximity loading",
+      "parent": "Scene Management",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Data Loading System",
+      "purpose": "Overview of data providers, catalog formats, and the data ingestion pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Dataset Descriptors and Management",
+      "purpose": "Explain DatasetDesc, DataDescriptor, DataDescriptorUtils, and the server/local descriptor system",
+      "parent": "Data Loading System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Data Providers",
+      "purpose": "Document STILDataProvider, BinaryDataProvider, and other providers for loading catalog files",
+      "parent": "Data Loading System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "UCD Parser and Column Interpretation",
+      "purpose": "Explain UCDParser, column classification, and mapping astronomical data to IParticleRecord",
+      "parent": "Data Loading System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Particle Record Types",
+      "purpose": "Document the IParticleRecord hierarchy: Particle, ParticleExt, ParticleStar, ParticleVariable",
+      "parent": "Data Loading System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Rendering Pipeline",
+      "purpose": "High-level overview of the rendering architecture, render modes, and render systems",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Scene Renderer and Render Modes",
+      "purpose": "Document SceneRenderer orchestration, IRenderMode implementations (normal, stereo, cubemap, VR)",
+      "parent": "Rendering Pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Render Systems",
+      "purpose": "Explain ModelEntityRenderSystem, BillboardEntityRenderSystem, LineEntityRenderSystem, LabelEntityRenderSystem",
+      "parent": "Rendering Pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Material System",
+      "purpose": "Document MaterialComponent, texture loading (lazy/eager), SVT, cubemaps, and height maps",
+      "parent": "Rendering Pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Model and Mesh Rendering",
+      "purpose": "Explain ModelComponent, IntModelInstance, model initialization, and rendering planets/spacecraft",
+      "parent": "Rendering Pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Billboard and Particle Rendering",
+      "purpose": "Document billboard sets, GPU data streaming, blend modes, and star rendering optimization",
+      "parent": "Rendering Pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Shadow Mapping and Lighting",
+      "purpose": "Explain shadow map render pass, light sources, and environment lighting in ModelComponent",
+      "parent": "Rendering Pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Shader System",
+      "purpose": "Overview of GLSL shaders, shader compilation, and the shader pipeline",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Tessellation Shaders",
+      "purpose": "Document tessellation evaluation/control shaders, height mapping, and terrain detail",
+      "parent": "Shader System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Billboard Shaders",
+      "purpose": "Explain billboard vertex/fragment shaders, rotation, and texture array sampling",
+      "parent": "Shader System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    }
+  ]
+}
