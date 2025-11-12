@@ -176,7 +176,7 @@ public class DatasetLoadDialog extends GenericDialog {
         addParticleColor(container);
 
         // Color noise
-        colorNoise = new OwnSliderPlus(I18n.msg("gui.dsload.color.noise"), Constants.MIN_COLOR_NOISE, Constants.MAX_COLOR_NOISE, Constants.SLIDER_STEP_TINY, false, skin);
+        colorNoise = new OwnSliderPlus(I18n.msg("gui.dsload.color.noise"), Constants.MIN_COLOR_NOISE, Constants.MAX_COLOR_NOISE, Constants.SLIDER_STEP_TINY, skin);
         colorNoise.setName("color noise");
         colorNoise.setWidth(sliderWidth);
         colorNoise.setValue(0.2f);
@@ -193,7 +193,7 @@ public class DatasetLoadDialog extends GenericDialog {
         addLabelColor(container);
 
         // Particle size
-        particleSize = new OwnSliderPlus(I18n.msg("gui.dsload.size"), Constants.MIN_PARTICLE_SIZE, Constants.MAX_PARTICLE_SIZE, Constants.SLIDER_STEP_TINY, false, skin);
+        particleSize = new OwnSliderPlus(I18n.msg("gui.dsload.size"), Constants.MIN_PARTICLE_SIZE, Constants.MAX_PARTICLE_SIZE, Constants.SLIDER_STEP_TINY, skin);
         particleSize.setName("particle size");
         particleSize.setWidth(sliderWidth);
         particleSize.setValue(10f);
@@ -347,7 +347,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addNumberLabels(Table container) {
         // Number of labels
-        numLabels = new OwnSliderPlus(I18n.msg("gui.dsload.numlabels"), Constants.MIN_NUM_LABELS, Constants.MAX_NUM_LABELS, Constants.SLIDER_STEP, false, skin);
+        numLabels = new OwnSliderPlus(I18n.msg("gui.dsload.numlabels"), Constants.MIN_NUM_LABELS, Constants.MAX_NUM_LABELS, Constants.SLIDER_STEP, skin);
         numLabels.setName("number labels");
         numLabels.setWidth(sliderWidth);
         numLabels.setValue(80);
@@ -364,7 +364,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addMinMaxSolidAngle(Table container) {
         // Min solid angle
-        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
         minSolidAngle.setName("min solid angle");
         minSolidAngle.setWidth(sliderWidth);
         minSolidAngle.setValue(0.0015f);
@@ -379,7 +379,7 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(minSolidAngle).colspan(2).left().padBottom(pad18).row();
 
         // Max solid angle
-        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
         maxSolidAngle.setName("max solid angle");
         maxSolidAngle.setWidth(sliderWidth);
         maxSolidAngle.setValue(0.02f);

@@ -126,7 +126,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         backupMaxSolidAngle = set.particleSizeLimits[1];
 
         // Min solid angle
-        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
         minSolidAngle.setName("min solid angle");
         minSolidAngle.setWidth(sliderWidth);
         minSolidAngle.setValue((float) set.particleSizeLimits[0]);
@@ -141,7 +141,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         container.add(minSolidAngle).top().left().colspan(2).left().padBottom(pad18).row();
 
         // Max solid angle
-        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, false, skin);
+        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
         maxSolidAngle.setName("max solid angle");
         maxSolidAngle.setWidth(sliderWidth);
         maxSolidAngle.setValue((float) set.particleSizeLimits[1]);

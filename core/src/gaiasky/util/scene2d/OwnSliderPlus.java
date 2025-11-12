@@ -37,49 +37,69 @@ public class OwnSliderPlus extends Slider {
     // produce the label to be displayed.
     private Function<Float, String> valueLabelTransform;
     private Color labelColorBackup;
+    private static final float LOG_EPSILON = 1e-6f; // smallest allowed positive value
+    private boolean logarithmic = false;
+    private double logExponent = 0.5;
 
-    public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin, String labelStyle) {
+    public OwnSliderPlus(String title,
+                         float min,
+                         float max,
+                         float stepSize,
+                         float mapMin,
+                         float mapMax,
+                         boolean logarithmic,
+                         Skin skin,
+                         String labelStyle) {
         super(min, max, stepSize, false, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
-        setUp(title, mapMin, mapMax, labelStyle);
+        setUp(title, mapMin, mapMax, logarithmic, labelStyle);
+    }
+
+    public OwnSliderPlus(String title,
+                         float min,
+                         float max,
+                         float stepSize,
+                         float mapMin,
+                         float mapMax,
+                         Skin skin,
+                         String labelStyle) {
+        this(title, min, max, stepSize, mapMin, mapMax, false, skin, labelStyle);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
-        this(title, min, max, stepSize, mapMin, mapMax, skin, "default");
-    }
-
-    public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
-        super(min, max, stepSize, false, skin.get("default-horizontal", OwnSliderStyle.class));
-        this.skin = skin;
-        setUp(title, min, max, "default");
+        this(title, min, max, stepSize, mapMin, mapMax, false, skin, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style) {
         super(min, max, stepSize, false, skin.get(style, OwnSliderStyle.class));
         this.skin = skin;
-        setUp(title, min, max, "default");
+        setUp(title, min, max, false, "default");
     }
 
-    public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin) {
-        super(min, max, stepSize, vertical, skin.get("default-horizontal", OwnSliderStyle.class));
+    public OwnSliderPlus(String title, float min, float max, float stepSize, boolean logarithmic, Skin skin) {
+        super(min, max, stepSize, false, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
-        setUp(title, min, max, "default");
+        setUp(title, min, max, logarithmic, "default");
+    }
+
+    public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
+        this(title, min, max, stepSize, false, skin);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String labelStyleName) {
         super(min, max, stepSize, vertical, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
-        setUp(title, min, max, labelStyleName);
+        setUp(title, min, max, false, labelStyleName);
     }
 
-    public void setUp(String title, float mapMin, float mapMax, String labelStyleName) {
-        setUp(title, mapMin, mapMax, new DecimalFormat("####0.###"), labelStyleName);
+    public void setUp(String title, float mapMin, float mapMax, boolean logarithmic, String labelStyleName) {
+        setUp(title, mapMin, mapMax, logarithmic, new DecimalFormat("####0.###"), labelStyleName);
     }
 
-    public void setUp(String title, float mapMin, float mapMax, DecimalFormat nf, String labelStyleName) {
+    public void setUp(String title, float mapMin, float mapMax, boolean logarithmic, DecimalFormat nf, String labelStyleName) {
         this.me = this;
         this.nf = nf;
-        setMapValues(mapMin, mapMax);
+        setMapValues(mapMin, mapMax, logarithmic);
 
         if (title != null && !title.isEmpty()) {
             this.titleLabel = new OwnLabel(title, skin, labelStyleName);
@@ -120,15 +140,17 @@ public class OwnSliderPlus extends Slider {
         this.displayValueMapped = displayValueMapped;
     }
 
-    public void setMapValues(float mapMin, float mapMax) {
+    public void setMapValues(float mapMin, float mapMax, boolean logarithmic) {
         this.mapMin = mapMin;
         this.mapMax = mapMax;
-        this.map = mapMin != getMinValue() || mapMax != getMaxValue();
+        this.logarithmic = logarithmic;
+        this.map = mapMin != getMinValue() || mapMax != getMaxValue() || logarithmic;
     }
 
     public void removeMapValues() {
         this.mapMin = 0;
         this.mapMax = 0;
+        this.logarithmic = false;
         this.map = false;
     }
 
@@ -146,11 +168,27 @@ public class OwnSliderPlus extends Slider {
     }
 
     public float getMappedValue() {
-        if (map) {
-            return MathUtilsDouble.lint(getValue(), getMinValue(), getMaxValue(), mapMin, mapMax);
-        } else {
-            return getValue();
+        float linearValue = getValue();
+
+        // map linear slider to map range if needed
+        float mappedValue = map
+                ? MathUtilsDouble.lint(linearValue, getMinValue(), getMaxValue(), mapMin, mapMax)
+                : linearValue;
+
+        if (logarithmic) {
+            // Ensure positive values for log
+            float safeMin = Math.max(mapMin, LOG_EPSILON);
+            float safeMax = Math.max(mapMax, LOG_EPSILON);
+
+            // Flatten the logarithmic scale using exponent
+            mappedValue = (float) Math.exp(
+                    Math.log(safeMin) + (mappedValue - mapMin) / (mapMax - mapMin) * Math.log(safeMax / safeMin)
+            );
+            // Apply the flattening exponent
+            mappedValue = (float) Math.pow(mappedValue, logExponent);
         }
+
+        return mappedValue;
     }
 
     public void setMappedValue(double mappedValue) {
@@ -158,11 +196,21 @@ public class OwnSliderPlus extends Slider {
     }
 
     public void setMappedValue(float mappedValue) {
-        if (map) {
-            setValue(MathUtilsDouble.lint(mappedValue, mapMin, mapMax, getMinValue(), getMaxValue()));
-        } else {
-            setValue(mappedValue);
+        if (logarithmic) {
+            float safeMin = Math.max(mapMin, LOG_EPSILON);
+            float safeMax = Math.max(mapMax, LOG_EPSILON);
+
+            // Apply the flattening exponent inverse
+            mappedValue = (float) Math.pow(mappedValue, 1.0 / logExponent); // Invert exponent
+
+            // Invert log mapping
+            float linearNormalized = (float) (Math.log(mappedValue / safeMin) / Math.log(safeMax / safeMin));
+            mappedValue = MathUtilsDouble.lint(linearNormalized, 0, 1, mapMin, mapMax);
+        } else if (map) {
+            mappedValue = MathUtilsDouble.lint(mappedValue, mapMin, mapMax, getMinValue(), getMaxValue());
         }
+
+        setValue(mappedValue);
     }
 
     public void setValuePrefix(String valuePrefix) {
@@ -220,7 +268,8 @@ public class OwnSliderPlus extends Slider {
             titleLabel.draw(batch, parentAlpha);
         }
         if (valueLabel != null) {
-            valueLabel.setPosition(getX() + getPrefWidth() - (valueLabel.getPrefWidth() + padX * 2f), getY() + getHeight() - valueLabel.getHeight() - padY);
+            valueLabel.setPosition(getX() + getPrefWidth() - (valueLabel.getPrefWidth() + padX * 2f),
+                                   getY() + getHeight() - valueLabel.getHeight() - padY);
             valueLabel.draw(batch, parentAlpha);
         }
     }
