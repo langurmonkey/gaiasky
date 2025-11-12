@@ -46,8 +46,6 @@ uniform vec3 u_baseColors[4];
 uniform float u_colorNoise;
 // Size factor to take body size into account and normalize particle sizes.
 uniform float u_sizeFactor;
-// Base particle size.
-uniform float u_baseSize;
 // Base radius for this distribution. 1 is default.
 uniform float u_baseRadius;
 // Minimum radius for the distribution (spiral, density).
@@ -378,7 +376,7 @@ void main() {
     int type = int(u_type);
     int distribution = int(u_distribution);
     int layer = pickLayer(state);
-    float size = u_baseSize * (rand(state) + 0.3) * u_sizeFactor;
+    float size = 1.0 * (rand(state) + 0.3) * u_sizeFactor;
     vec3 color = generateColor(state, u_colorNoise);
     vec3 pos;
     if (distribution == D_SPIRAL) {

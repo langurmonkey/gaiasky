@@ -38,6 +38,7 @@ import gaiasky.scene.view.VertsView;
 import gaiasky.script.v2.api.SceneAPI;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.*;
 import gaiasky.util.math.MathUtilsDouble;
@@ -987,78 +988,145 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     /**
      * Creates a new procedural galaxy entity and sets up the billboard datasets.
+     * The galaxy is split into two separate entities, one for the full-resolution channel (stars, HII, label), and one for the half-resolution
+     * channel (gas, dust, bulge).
      *
      * @param name   The name of the entity.
      * @param radius The radius of the galaxy in internal units.
      * @param pos    The position of the galaxy.
      *
-     * @return The entity.
+     * @return The full- and half-resolution entities that conform the galaxy, in a pair. The first one is the full-resolution, and the second
+     *         one is the half-resolution.
      */
-    public Entity createNewProceduralGalaxy(String name, double radius, Vector3Q pos) {
+    public Pair<Entity, Entity> createNewProceduralGalaxy(String name, double radius, Vector3Q pos) {
         var archetype = scene.archetypes().get("BillboardGroup");
-        var bbg = archetype.createEntity();
 
-        var bbgBase = Mapper.base.get(bbg);
-        bbgBase.setName(name + " (HALF)");
-        bbgBase.setComponentType(ComponentTypes.ComponentType.Galaxies);
-
-        var bbgBody = Mapper.body.get(bbg);
-        bbgBody.setSize(radius);
-
-        var coord = Mapper.coordinates.get(bbg);
-        var coordinates = new StaticCoordinates();
-        coordinates.setPosition(pos);
-        coord.coordinates = coordinates;
-
-        var fade = Mapper.fade.get(bbg);
-        fade.setFadeOut(new double[]{bbgBody.size * 5, bbgBody.size * 10});
-        fade.setFadeObjectName(bbgBase.getName());
-
-        var graph = Mapper.graph.get(bbg);
-        graph.setParent(Scene.ROOT_NAME);
-
-        var focus = Mapper.focus.get(bbg);
-        focus.focusable = true;
-
-        var render = Mapper.render.get(bbg);
-        render.halfResolutionBuffer = true;
-
-        var bbSet = Mapper.billboardSet.get(bbg);
-        bbSet.procedural = true;
-        bbSet.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
-
-        // Generate Galaxy
+        // Galaxy parameters
         var spiralAngle = 460.0;
         var eccentricity = 0.4;
         var minRadius = 0.15;
         var displacement = new double[]{0.2, 0.0};
 
+        // FULL RESOLUTION
+        var entityFull = archetype.createEntity();
+        var baseFull = Mapper.base.get(entityFull);
+        baseFull.setName(name);
+        baseFull.setComponentType(ComponentTypes.ComponentType.Galaxies);
+
+        var bodyFull = Mapper.body.get(entityFull);
+        bodyFull.cameraCollision = false;
+        bodyFull.setSize(radius);
+
+        var coordFull = Mapper.coordinates.get(entityFull);
+        var coordinatesFull = new StaticCoordinates();
+        coordinatesFull.setPosition(pos);
+        coordFull.coordinates = coordinatesFull;
+
+        var fadeFull = Mapper.fade.get(entityFull);
+        fadeFull.setFadeOut(new double[]{bodyFull.size * 5, bodyFull.size * 10});
+        fadeFull.setFadeObjectName(baseFull.getName());
+
+        var graphFull = Mapper.graph.get(entityFull);
+        graphFull.setParent(Scene.ROOT_NAME);
+
+        var focusFull = Mapper.focus.get(entityFull);
+        focusFull.focusable = true;
+
+        var renderFull = Mapper.render.get(entityFull);
+        renderFull.halfResolutionBuffer = false;
+
+        var bbSetFull = Mapper.billboardSet.get(entityFull);
+        bbSetFull.procedural = true;
+        bbSetFull.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
+
+
+        // Stars
+        var starsFull = new BillboardDataset();
+        starsFull.setType("star");
+        starsFull.setDistribution("gauss");
+        starsFull.setBaseColor(new double[]{0.93, 0.93, 0.75, 0.75, 0.75, 0.96, 0.93, 0.75, 0.75, 0.94, 0.94, 0.88});
+        starsFull.setParticleCount(60000L);
+        starsFull.setSize(3.9);
+        starsFull.setIntensity(2.0);
+        starsFull.setLayers(new int[]{0, 1, 2});
+        starsFull.setMaxSize(0.15);
+
+        // HII
+        var hiiFull = new BillboardDataset();
+        hiiFull.setType("hii");
+        hiiFull.setDistribution("density");
+        hiiFull.setSpiralAngle(spiralAngle);
+        hiiFull.setEccentricity(eccentricity);
+        hiiFull.setMinRadius(minRadius);
+        hiiFull.setDisplacement(displacement);
+        hiiFull.setBaseColors(new double[]{0.93, 0.6, 1.0, 1.0, 0.7, 0.94});
+        hiiFull.setParticleCount(160L);
+        hiiFull.setSize(19.6);
+        hiiFull.setIntensity(5.0);
+        hiiFull.setLayers(new int[]{4});
+        hiiFull.setMaxSize(10.0);
+
+        bbSetFull.setData(new BillboardDataset[]{starsFull, hiiFull});
+
+        // HALF RESOLUTION
+        var entityHalf = archetype.createEntity();
+        var baseHalf = Mapper.base.get(entityHalf);
+        baseHalf.setName(name + " (HALF)");
+        baseHalf.setComponentType(ComponentTypes.ComponentType.Galaxies);
+
+        var bodyHalf = Mapper.body.get(entityHalf);
+        bodyHalf.cameraCollision = false;
+        bodyHalf.setSize(radius);
+
+        var coordHalf = Mapper.coordinates.get(entityHalf);
+        var coordinatesHalf = new StaticCoordinates();
+        coordinatesHalf.setPosition(pos);
+        coordHalf.coordinates = coordinatesHalf;
+
+        var fadeHalf = Mapper.fade.get(entityHalf);
+        fadeHalf.setFadeOut(new double[]{bodyHalf.size * 5, bodyHalf.size * 10});
+        fadeHalf.setFadeObjectName(baseHalf.getName());
+
+        var graphHalf = Mapper.graph.get(entityHalf);
+        graphHalf.setParent(baseFull.getName());
+
+        var focusHalf = Mapper.focus.get(entityHalf);
+        focusHalf.focusable = false;
+
+        var renderHalf = Mapper.render.get(entityHalf);
+        renderHalf.halfResolutionBuffer = true;
+
+        var bbSetHalf = Mapper.billboardSet.get(entityHalf);
+        bbSetHalf.procedural = true;
+        bbSetHalf.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
+
+
         // Dust
-        var dust = new BillboardDataset();
-        dust.setType("dust");
-        dust.setDistribution("density");
-        dust.setSpiralAngle(spiralAngle);
-        dust.setEccentricity(eccentricity);
-        dust.setMinRadius(minRadius);
-        dust.setDisplacement(displacement);
-        dust.setBaseColor(new double[]{0.8, 0.8, 1.0});
-        dust.setParticleCount(55000L);
-        dust.setSize(28.0);
-        dust.setIntensity(0.011);
-        dust.setBlending("subtractive");
-        dust.setDepthMask(false);
-        dust.setLayers(new int[]{1, 2});
-        dust.setMaxSize(20.0);
+        var dustHalf = new BillboardDataset();
+        dustHalf.setType("dust");
+        dustHalf.setDistribution("density");
+        dustHalf.setSpiralAngle(spiralAngle);
+        dustHalf.setEccentricity(eccentricity);
+        dustHalf.setMinRadius(minRadius);
+        dustHalf.setDisplacement(displacement);
+        dustHalf.setBaseColor(new double[]{0.8, 0.8, 1.0});
+        dustHalf.setParticleCount(55000L);
+        dustHalf.setSize(28.0);
+        dustHalf.setIntensity(0.011);
+        dustHalf.setBlending("subtractive");
+        dustHalf.setDepthMask(false);
+        dustHalf.setLayers(new int[]{1, 2});
+        dustHalf.setMaxSize(20.0);
 
         // Gas
-        var gas = new BillboardDataset();
-        gas.setType("gas");
-        gas.setDistribution("density");
-        gas.setSpiralAngle(spiralAngle);
-        gas.setEccentricity(eccentricity);
-        gas.setMinRadius(minRadius);
-        gas.setDisplacement(displacement);
-        gas.setBaseColors(new double[]{
+        var gasHalf = new BillboardDataset();
+        gasHalf.setType("gas");
+        gasHalf.setDistribution("density");
+        gasHalf.setSpiralAngle(spiralAngle);
+        gasHalf.setEccentricity(eccentricity);
+        gasHalf.setMinRadius(minRadius);
+        gasHalf.setDisplacement(displacement);
+        gasHalf.setBaseColors(new double[]{
                 0.702,
                 0.608,
                 0.999,
@@ -1070,29 +1138,32 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                 1.0
 
         });
-        gas.setParticleCount(6500L);
-        gas.setColorNoise(0.07);
-        gas.setSize(90.0);
-        gas.setIntensity(0.008);
-        gas.setLayers(new int[]{0, 1, 2, 3, 4});
-        gas.setMaxSize(20.0);
+        gasHalf.setParticleCount(6500L);
+        gasHalf.setColorNoise(0.07);
+        gasHalf.setSize(90.0);
+        gasHalf.setIntensity(0.008);
+        gasHalf.setLayers(new int[]{0, 1, 2, 3, 4});
+        gasHalf.setMaxSize(20.0);
 
         // Bulge
-        var bulge = new BillboardDataset();
-        bulge.setType("bulge");
-        bulge.setDistribution("sphere");
-        bulge.setBaseRadius(minRadius + 0.05);
-        bulge.setBaseColor(new double[]{1.0, 0.93, 0.8});
-        bulge.setParticleCount(12L);
-        bulge.setColorNoise(0.09);
-        bulge.setSize(95.0);
-        bulge.setIntensity(0.6);
-        bulge.setLayers(new int[]{0, 1, 2});
-        bulge.setMaxSize(50.0);
+        var bulgeHalf = new BillboardDataset();
+        bulgeHalf.setType("bulge");
+        bulgeHalf.setDistribution("sphere");
+        bulgeHalf.setBaseRadius(minRadius + 0.05);
+        bulgeHalf.setBaseColor(new double[]{1.0, 0.93, 0.8});
+        bulgeHalf.setParticleCount(12L);
+        bulgeHalf.setColorNoise(0.09);
+        bulgeHalf.setSize(95.0);
+        bulgeHalf.setIntensity(0.6);
+        bulgeHalf.setLayers(new int[]{0, 1, 2});
+        bulgeHalf.setMaxSize(50.0);
 
-        bbSet.setData(new BillboardDataset[]{dust, gas, bulge});
+        bbSetHalf.setData(new BillboardDataset[]{dustHalf, gasHalf, bulgeHalf});
 
-        return bbg;
+        // Add children here and now.
+        graphFull.addChild(entityFull, entityHalf, false, 1);
+
+        return new Pair<>(entityFull, entityHalf);
     }
 
 

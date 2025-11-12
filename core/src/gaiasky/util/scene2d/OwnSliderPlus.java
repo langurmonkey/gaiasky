@@ -39,7 +39,7 @@ public class OwnSliderPlus extends Slider {
     private Color labelColorBackup;
     private static final float LOG_EPSILON = 1e-6f; // smallest allowed positive value
     private boolean logarithmic = false;
-    private double logExponent = 0.5;
+    private final double logExponent = 0.5;
 
     public OwnSliderPlus(String title,
                          float min,
