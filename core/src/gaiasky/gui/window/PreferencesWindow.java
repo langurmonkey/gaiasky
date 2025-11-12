@@ -1001,7 +1001,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             /* Gamma */
             OwnLabel gammaLabel = new OwnLabel(I18n.msg("gui.gamma"), skin, "default");
-            Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, Constants.SLIDER_STEP_TINY, false, skin);
+            Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, Constants.SLIDER_STEP_TINY, skin);
             gamma.setName("gamma");
             gamma.setWidth(sliderWidth);
             gamma.setValue(settings.postprocess.levels.gamma);
@@ -1035,7 +1035,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             /* Exposure */
             OwnLabel exposureLabel = new OwnLabel(I18n.msg("gui.exposure"), skin, "default");
             exposureLabel.setDisabled(settings.postprocess.toneMapping.type != ToneMapping.EXPOSURE);
-            Slider exposure = new OwnSliderPlus("", Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
+            Slider exposure = new OwnSliderPlus("", Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, skin);
             exposure.setName("exposure");
             exposure.setWidth(sliderWidth);
             exposure.setValue(settings.postprocess.toneMapping.exposure);

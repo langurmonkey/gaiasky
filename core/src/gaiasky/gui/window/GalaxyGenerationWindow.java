@@ -30,6 +30,7 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.DoubleValidator;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 
 /**
@@ -119,7 +120,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         // Size, fades, transforms, etc.
 
         // Size in KPC
-        OwnSliderPlus sizeKpc = new OwnSliderPlus(I18n.msg("gui.galaxy.size"), 0.2f, 20.0f, 0.1f, skin);
+        OwnSliderPlus sizeKpc = new OwnSliderPlus(I18n.msg("gui.galaxy.size"), 0.2f, 40.0f, 0.1f, skin);
         sizeKpc.setWidth(fieldWidthTotal);
         sizeKpc.setValue((float) (view.getSize() * Constants.U_TO_KPC));
         sizeKpc.addListener(new ChangeListener() {
@@ -156,19 +157,31 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             });
             table.add(size).left().padBottom(pad18).row();
 
-            var dustGas = ds.type == ParticleType.GAS || ds.type == ParticleType.DUST;
-            float max =  dustGas ? 0.3f : 1.0f;
-            float step =  dustGas ? 0.001f : 0.01f;
+            // Num particles
+            OwnSliderPlus nParticles = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.particles"), 1, 100_000, 1, skin);
+            nParticles.setNumberFormatter(new DecimalFormat("#####0"));
+            nParticles.setWidth(fieldWidthBox);
+            nParticles.setValue(ds.particleCount);
+            nParticles.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setParticleCount((long) nParticles.getValue());
+                }
+            });
+            table.add(nParticles).left().padBottom(pad18).row();
 
             // Intensity
-            OwnSliderPlus intensity = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.intensity"), 0.0f, max, step, skin);
+            OwnSliderPlus intensity = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.intensity"), 0.0f, 1.0f, 0.001f, true, skin);
+            intensity.setDisplayValueMapped(true);
+            intensity.setNumberFormatter(new DecimalFormat("#0.######"));
             intensity.setWidth(fieldWidthBox);
-            intensity.setValue(ds.intensity);
+            intensity.setMappedValue(ds.intensity);
             intensity.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
-                    ds.setIntensity((double) intensity.getValue());
+                    ds.setIntensity((double) intensity.getMappedValue());
                 }
             });
             table.add(intensity).left().padBottom(pad18).row();

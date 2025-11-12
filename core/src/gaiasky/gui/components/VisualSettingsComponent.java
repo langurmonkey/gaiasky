@@ -151,7 +151,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Elevation multiplier */
-        elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, Constants.SLIDER_STEP_TINY, false,
+        elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, Constants.SLIDER_STEP_TINY,
                 skin);
         elevMult.setWidth(componentWidth);
         elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
