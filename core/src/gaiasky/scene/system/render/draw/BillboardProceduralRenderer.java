@@ -199,8 +199,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             computeShader.setUniformUint("u_count", elementCount);
             computeShader.setUniformUint("u_distribution", dataset.distribution.ordinal());
             computeShader.setUniformUint("u_seed", seed);
-            computeShader.setUniform("u_sizeFactor", (float) (bodySize / (26000.0 * Constants.PC_TO_U))); // Normalized to MW diameter.fproce
-            computeShader.setUniform("u_baseSize", dataset.size);
+            computeShader.setUniform("u_sizeFactor", (float) (100 * bodySize / (26000.0 * Constants.PC_TO_U)));
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
             computeShader.setUniform("u_minRadius", dataset.minRadius);
             computeShader.setUniform3fv("u_baseColors[0]", dataset.baseColors);

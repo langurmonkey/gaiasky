@@ -43,14 +43,19 @@ public class ProceduralTriggerUpdater extends AbstractUpdateSystem {
 
             logger.info("Procedurally generating galaxy: " + base.getName());
 
-            var bbEntity = GaiaSky.instance.scripting().apiv2().scene.createNewProceduralGalaxy(base.getName() + " procedural",
-                                                                                                body.size / 2.0,
-                                                                                                body.pos);
+            var pair = GaiaSky.instance.scripting().apiv2().scene.createNewProceduralGalaxy(base.getName() + " procedural",
+                                                                                            body.size / 2.0,
+                                                                                            body.pos);
+            var entityFull = pair.getFirst();
+            var entityHalf = pair.getSecond();
+            // Add to scene.
             GaiaSky.postRunnable(() -> {
-                scene.initializeEntity(bbEntity);
-                scene.setUpEntity(bbEntity);
-                EventManager.instance.post(Event.SCENE_ADD_OBJECT_CMD, this, bbEntity, true);
-                trigger.billboardGroup = bbEntity;
+                scene.initializeEntity(entityFull);
+                scene.initializeEntity(entityHalf);
+                scene.setUpEntity(entityFull);
+                scene.setUpEntity(entityHalf);
+                EventManager.instance.post(Event.SCENE_ADD_OBJECT_CMD, this, entityFull, true);
+                trigger.billboardGroup = entityFull;
             });
         }
     }
