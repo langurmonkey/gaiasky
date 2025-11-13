@@ -7,6 +7,7 @@
 
 package gaiasky.scene.record;
 
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.api.IParticleRecord;
@@ -27,6 +28,10 @@ import java.util.Locale;
  */
 public class BillboardDataset {
     private static final Log logger = Logger.getLogger(BillboardDataset.class);
+    /**
+     * Maximum number of supported colors.
+     **/
+    private static final int MAX_COLORS = 4;
 
     /**
      * Number of particles to generate with procedural generation.
@@ -47,18 +52,16 @@ public class BillboardDataset {
     /**
      * Type of particle.
      */
-    public ParticleType type;
+    public ParticleType type = ParticleType.POINT;
     /**
      * Probability distribution, for procedural datasets.
      */
     public Distribution distribution = Distribution.DISK;
-    /** Maximum number of supported colors. **/
-    private static final int MAX_COLORS = 4;
     /**
      * Base color(s) for the particles of this dataset. These colors will be used as base to generate the particle colors.
      * {@link #MAX_COLORS} RGBA colors are supported, so the size of this array must be {@link #MAX_COLORS} * 3.
      */
-    public float[] baseColors;
+    public float[] baseColors = new float[MAX_COLORS * 3];
     /**
      * Default color noise to apply to the base colors to generate the final particle colors.
      */
@@ -86,6 +89,26 @@ public class BillboardDataset {
     public float size = 1;
 
     /**
+     * Variation in particle size, in [0.0..1.0].
+     */
+    public float sizeNoise = 0.1f;
+
+    /**
+     * Translation vector for the particles of this dataset.
+     */
+    public Vector3 translation = new Vector3(0f, 0f, 0f);
+
+    /**
+     * Scale vector for the particles of this dataset.
+     */
+    public Vector3 scale = new Vector3(1f, 1f, 1f);
+
+    /**
+     * Euler rotations for the particles of this dataset.
+     */
+    public Vector3 rotation = new Vector3(0f, 0f, 0f);
+
+    /**
      * Height scale.
      */
     public float heightScale = 0.01f;
@@ -101,19 +124,19 @@ public class BillboardDataset {
     /**
      * Spiral arm pitch angle in degrees.
      * <p>
-     * When using {@link Distribution#SPIRAL}, this controls how tightly the spiral arms wind around the galactic center.
+     * When using {@link Distribution#LOG_SPIRAL}, this controls how tightly the spiral arms wind around the galactic center.
      * Lower values (≈5–10°) produce tightly wound Sa-type spirals,
      * while higher values (≈25–40°) yield open Sc–Sd morphologies.
      * This parameter maps directly to the logarithmic spiral pitch angle
      * used in the compute shader.
      * <p>
-     * When using {@link Distribution#DENSITY}, this controls the total rotation of the concentric ellipses.
+     * When using {@link Distribution#SPIRAL}, this controls the total rotation of the concentric ellipses.
      */
-    public float spiralAngle = 6.0f;
+    public float baseAngle = 6.0f;
     /**
-     * Displacement of the ellipses in the {@link Distribution#DENSITY} mode.
+     * Displacement of the ellipses in the {@link Distribution#SPIRAL} mode.
      */
-    public float[] displacement = new float[]{0.0f, 0.0f};
+    public float[] spiralDeltaPos = new float[]{0.0f, 0.0f};
     /**
      * Number of spiral arms.
      */
@@ -136,7 +159,7 @@ public class BillboardDataset {
      * Maximum particle size for each texture quality mode. It has 4 entries, from LOW to ULTRA.
      * See {@link GraphicsQuality}.
      **/
-    public double[] maxSizes;
+    public double[] maxSizes = new double[GraphicsQuality.values().length];
 
     public BillboardDataset() {
         super();
@@ -177,6 +200,10 @@ public class BillboardDataset {
         this.size = size.floatValue();
     }
 
+    public void setSizeNoise(Double sizeNoise) {
+        this.sizeNoise = MathUtilsDouble.clamp(sizeNoise.floatValue(), 0f, 1f);
+    }
+
     public void setIntensity(Double intensity) {
         this.intensity = intensity.floatValue();
     }
@@ -189,6 +216,18 @@ public class BillboardDataset {
         this.minRadius = minRadius.floatValue();
     }
 
+    public void setTranslation(double[] d) {
+        this.translation.set((float) d[0], (float) d[1], (float) d[2]);
+    }
+
+    public void setScale(double[] s) {
+        this.scale.set((float) s[0], (float) s[1], (float) s[2]);
+    }
+
+    public void setRotation(double[] r) {
+        this.rotation.set((float) r[0], (float) r[1], (float) r[2]);
+    }
+
     public void setEccentricity(Double eccentricity) {
         this.eccentricity = eccentricity.floatValue();
     }
@@ -197,8 +236,8 @@ public class BillboardDataset {
         this.heightScale = heightScale.floatValue();
     }
 
-    public void setSpiralAngle(Double spiralAngle) {
-        this.spiralAngle = spiralAngle.floatValue();
+    public void setBaseAngle(Double baseAngle) {
+        this.baseAngle = baseAngle.floatValue();
     }
 
     public void setSpiralArms(Long spiralArms) {
@@ -209,10 +248,19 @@ public class BillboardDataset {
         this.aspect = aspect.floatValue();
     }
 
+    public void setType(ParticleType type) {
+        this.type = type;
+
+    }
+
     public void setType(String type) {
         if (type != null && !type.isBlank()) {
             this.type = ParticleType.valueOf(type.toUpperCase(Locale.ROOT));
         }
+    }
+
+    public void setDistribution(Distribution distribution) {
+        this.distribution = distribution;
     }
 
     public void setDistribution(String distribution) {
@@ -221,19 +269,19 @@ public class BillboardDataset {
         }
     }
 
-    public void setDisplacement(double[] d) {
+    public void setSpiralDeltaPos(double[] d) {
         if (d.length == 1) {
-            this.displacement[0] = (float) d[0];
-            this.displacement[1] = (float) d[0];
+            this.spiralDeltaPos[0] = (float) d[0];
+            this.spiralDeltaPos[1] = (float) d[0];
         } else {
-            this.displacement[0] = (float) d[0];
-            this.displacement[1] = (float) d[1];
+            this.spiralDeltaPos[0] = (float) d[0];
+            this.spiralDeltaPos[1] = (float) d[1];
         }
     }
 
     public void setDisplacement(Double d) {
-        this.displacement[0] = d.floatValue();
-        this.displacement[1] = d.floatValue();
+        this.spiralDeltaPos[0] = d.floatValue();
+        this.spiralDeltaPos[1] = d.floatValue();
     }
 
     /**
@@ -258,7 +306,6 @@ public class BillboardDataset {
      */
     public void setBaseColors(double[] baseColors) {
         assert baseColors.length == 3 || baseColors.length == 6 || baseColors.length == 9 || baseColors.length == 12;
-        this.baseColors = new float[MAX_COLORS * 3];
         switch (baseColors.length) {
             case 3 -> {
                 setColor(baseColors[0], baseColors[1], baseColors[2], 0);
@@ -292,6 +339,21 @@ public class BillboardDataset {
 
     public void setBaseColor(double[] baseColors) {
         setBaseColors(baseColors);
+    }
+
+    public float[] getColorRGBA(int i) {
+        var c = new float[4];
+        c[0] = baseColors[i * 3];
+        c[1] = baseColors[i * 3 + 1];
+        c[2] = baseColors[i * 3 + 2];
+        c[3] = 1f;
+        return c;
+    }
+
+    public void setColorRGBA(float[] rgba, int i) {
+        baseColors[i * 3] = rgba[0];
+        baseColors[i * 3 + 1] = rgba[1];
+        baseColors[i * 3 + 2] = rgba[2];
     }
 
     public void setColorNoise(Double colorNoise) {
@@ -406,15 +468,159 @@ public class BillboardDataset {
         setMaxSizes(maxSizes);
     }
 
+    /**
+     * Contains the different particle types. Particle types are essentially parameter
+     * ranges for all parameters of a billboard dataset.
+     */
     public enum ParticleType {
-        DUST,
-        BULGE,
-        STAR,
-        GAS,
-        HII,
-        GALAXY,
-        POINT,
-        OTHER;
+        DUST(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
+             new int[]{0, 30_000},
+             new int[]{0, 1, 2},
+             new float[]{0f, 100f},
+             new float[]{0f, 30f},
+             new float[]{0.0f, 0.05f},
+             null,
+             null,
+             null,
+             null,
+             null,
+             null),
+        BULGE(new String[]{"sphere", "bar", "ellipse", "gauss"},
+              new int[]{0, 100},
+              new int[]{0, 1, 2},
+              new float[]{0f, 100f},
+              new float[]{0f, 30f},
+              new float[]{0.0f, 2.0f},
+              new float[]{0.0f, 0.05f},
+              new float[]{0.05f, 0.25f},
+              null,
+              null,
+              null,
+              null),
+        STAR(new String[]{"gauss", "disk", "ellipse", "sphere"},
+             new int[]{0, 100_000},
+             new int[]{0, 1, 2},
+             new float[]{0.0f, 2.0f},
+             new float[]{0.05f, 0.2f},
+             new float[]{0.0f, 6.0f},
+             null,
+             null,
+             null,
+             null,
+             null,
+             null),
+        GAS(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
+            new int[]{0, 30_000},
+            new int[]{0, 1, 2, 3},
+            new float[]{0f, 100f},
+            new float[]{0f, 30f},
+            new float[]{0.0f, 0.05f},
+            null,
+            null,
+            null,
+            null,
+            null,
+            null),
+        HII(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
+            new int[]{0, 10_000},
+            new int[]{1, 2},
+            new float[]{0f, 10f},
+            new float[]{0f, 30f},
+            new float[]{0.0f, 6.0f},
+            null,
+            null,
+            null,
+            null,
+            null,
+            null),
+        POINT(new String[]{"density", "disk", "sphere", "bar", "ellipse", "gauss"},
+              new int[]{0, 1000},
+              new int[]{1},
+              new float[]{0f, 100f},
+              new float[]{0f, 30f},
+              new float[]{0.0f, 1.0f},
+              null,
+              null,
+              null,
+              null,
+              null,
+              null);
+
+        /** Available distributions. **/
+        public String[] distributions;
+        /** Number of particles range. **/
+        public int[] nParticles;
+        /** Particle layers range. **/
+        public int[] layers;
+        /** Particle size range. **/
+        public float[] size;
+        /** Particle max size range. **/
+        public float[] maxSize;
+        /** Particle intensity range. **/
+        public float[] intensity;
+        /** Minimum radius range. **/
+        public float[] minRadius = new float[]{0.08f, 0.18f};
+        /** Base radius range. **/
+        public float[] baseRadius = new float[]{0.95f, 1.5f};
+
+        /** Base angle [deg] range, for {@link Distribution#SPIRAL}, {@link Distribution#LOG_SPIRAL}, and {@link Distribution#CONE}. **/
+        public float[] baseAngle = new float[]{0f, 1000f};
+        /** Eccentricity range, for {@link Distribution#SPIRAL} and {@link Distribution#ELLIPSE}. **/
+        public float[] eccentricity = new float[]{0.0f, 0.8f};
+        /** Delta pos (in X and Y) range, for {@link Distribution#SPIRAL}. **/
+        public float[] spiralDeltaPos = new float[]{-0.5f, 0.5f};
+        /** Aspect ratio range, for {@link Distribution#BAR}. **/
+        public float[] aspect = new float[]{0.1f, 10f};
+
+        ParticleType(String[] distributions,
+                     int[] nParticles,
+                     int[] layers,
+                     float[] size,
+                     float[] maxSize,
+                     float[] intensity,
+                     float[] minRadius,
+                     float[] baseRadius,
+                     float[] spiralAngle,
+                     float[] eccentricity,
+                     float[] displacement,
+                     float[] aspect) {
+            if (distributions != null) {
+                this.distributions = distributions;
+            }
+            if (nParticles != null) {
+                this.nParticles = nParticles;
+            }
+            if (layers != null) {
+                this.layers = layers;
+            }
+            if (size != null) {
+                this.size = size;
+            }
+            if (maxSize != null) {
+                this.maxSize = maxSize;
+            }
+            if (intensity != null) {
+                this.intensity = intensity;
+            }
+            if (minRadius != null) {
+                this.minRadius = minRadius;
+            }
+            if (baseRadius != null) {
+                this.baseRadius = baseRadius;
+            }
+            if (spiralAngle != null) {
+                this.baseAngle = spiralAngle;
+            }
+            if (eccentricity != null) {
+                this.eccentricity = eccentricity;
+            }
+            if (displacement != null) {
+                this.spiralDeltaPos = displacement;
+            }
+            if (aspect != null) {
+                this.aspect = aspect;
+            }
+        }
     }
 
     public enum Distribution {
@@ -422,15 +628,17 @@ public class BillboardDataset {
         SPHERE,
         /** Simple disk. **/
         DISK,
-        /** A logarithmic spiral. **/
-        SPIRAL,
+        /** An artificial logarithmic spiral. **/
+        LOG_SPIRAL,
         /** A simple bar. **/
         BAR,
-        /** Density wave distribution. **/
-        DENSITY,
-        /** An ellipse. **/
+        /** Density wave distribution, producing natural spirals. **/
+        SPIRAL,
+        /** An ellipse, with an eccentricity. **/
         ELLIPSE,
         /** Gaussian distribution in a disk, with an overdense center. **/
-        GAUSS
+        GAUSS,
+        /** A cone distribution. **/
+        CONE,
     }
 }

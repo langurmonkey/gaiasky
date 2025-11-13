@@ -29,9 +29,12 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.AttitudeComponent;
+import gaiasky.scene.component.Label;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.BillboardDataset.Distribution;
+import gaiasky.scene.record.BillboardDataset.ParticleType;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
@@ -1005,7 +1008,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var spiralAngle = 460.0;
         var eccentricity = 0.4;
         var minRadius = 0.15;
-        var displacement = new double[]{0.2, 0.0};
+        var spiralDeltaPos = new double[]{0.2, 0.0};
 
         // FULL RESOLUTION
         var entityFull = archetype.createEntity();
@@ -1039,29 +1042,30 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         bbSetFull.procedural = true;
         bbSetFull.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
 
-
         // Stars
         var starsFull = new BillboardDataset();
-        starsFull.setType("star");
-        starsFull.setDistribution("gauss");
+        starsFull.setType(ParticleType.STAR);
+        starsFull.setDistribution(Distribution.GAUSS);
         starsFull.setBaseColor(new double[]{0.93, 0.93, 0.75, 0.75, 0.75, 0.96, 0.93, 0.75, 0.75, 0.94, 0.94, 0.88});
-        starsFull.setParticleCount(60000L);
-        starsFull.setSize(3.9);
+        starsFull.setParticleCount(33000L);
+        starsFull.setSize(0.2);
+        starsFull.setSizeNoise(0.7);
         starsFull.setIntensity(2.0);
         starsFull.setLayers(new int[]{0, 1, 2});
         starsFull.setMaxSize(0.15);
 
         // HII
         var hiiFull = new BillboardDataset();
-        hiiFull.setType("hii");
-        hiiFull.setDistribution("density");
-        hiiFull.setSpiralAngle(spiralAngle);
+        hiiFull.setType(ParticleType.HII);
+        hiiFull.setDistribution(Distribution.SPIRAL);
+        hiiFull.setBaseAngle(spiralAngle);
         hiiFull.setEccentricity(eccentricity);
         hiiFull.setMinRadius(minRadius);
-        hiiFull.setDisplacement(displacement);
+        hiiFull.setSpiralDeltaPos(spiralDeltaPos);
         hiiFull.setBaseColors(new double[]{0.93, 0.6, 1.0, 1.0, 0.7, 0.94});
         hiiFull.setParticleCount(160L);
-        hiiFull.setSize(19.6);
+        hiiFull.setSize(2.3);
+        starsFull.setSizeNoise(0.5);
         hiiFull.setIntensity(5.0);
         hiiFull.setLayers(new int[]{4});
         hiiFull.setMaxSize(10.0);
@@ -1077,6 +1081,9 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var bodyHalf = Mapper.body.get(entityHalf);
         bodyHalf.cameraCollision = false;
         bodyHalf.setSize(radius);
+
+        var labelHalf = Mapper.label.get(entityHalf);
+        labelHalf.display = Label.LabelDisplay.NEVER;
 
         var coordHalf = Mapper.coordinates.get(entityHalf);
         var coordinatesHalf = new StaticCoordinates();
@@ -1103,16 +1110,16 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
         // Dust
         var dustHalf = new BillboardDataset();
-        dustHalf.setType("dust");
-        dustHalf.setDistribution("density");
-        dustHalf.setSpiralAngle(spiralAngle);
+        dustHalf.setType(ParticleType.DUST);
+        dustHalf.setDistribution(Distribution.SPIRAL);
+        dustHalf.setBaseAngle(spiralAngle);
         dustHalf.setEccentricity(eccentricity);
         dustHalf.setMinRadius(minRadius);
-        dustHalf.setDisplacement(displacement);
+        dustHalf.setSpiralDeltaPos(spiralDeltaPos);
         dustHalf.setBaseColor(new double[]{0.8, 0.8, 1.0});
-        dustHalf.setParticleCount(55000L);
-        dustHalf.setSize(28.0);
-        dustHalf.setIntensity(0.011);
+        dustHalf.setParticleCount(13500L);
+        dustHalf.setSize(18.0);
+        dustHalf.setIntensity(0.008);
         dustHalf.setBlending("subtractive");
         dustHalf.setDepthMask(false);
         dustHalf.setLayers(new int[]{1, 2});
@@ -1120,41 +1127,42 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
         // Gas
         var gasHalf = new BillboardDataset();
-        gasHalf.setType("gas");
-        gasHalf.setDistribution("density");
-        gasHalf.setSpiralAngle(spiralAngle);
+        gasHalf.setType(ParticleType.GAS);
+        gasHalf.setDistribution(Distribution.SPIRAL);
+        gasHalf.setBaseAngle(spiralAngle);
         gasHalf.setEccentricity(eccentricity);
         gasHalf.setMinRadius(minRadius);
-        gasHalf.setDisplacement(displacement);
+        gasHalf.setSpiralDeltaPos(spiralDeltaPos);
         gasHalf.setBaseColors(new double[]{
-                0.702,
-                0.608,
-                0.999,
-                0.647,
-                0.534,
-                0.989,
-                0.8,
+                0.622,
+                0.618,
+                0.969,
+                0.627,
+                0.674,
+                0.779,
+                0.71,
                 0.7,
-                1.0
+                0.88
 
         });
-        gasHalf.setParticleCount(6500L);
+        gasHalf.setParticleCount(8900L);
         gasHalf.setColorNoise(0.07);
-        gasHalf.setSize(90.0);
-        gasHalf.setIntensity(0.008);
+        gasHalf.setSize(63.0);
+        gasHalf.setSizeNoise(0.09);
+        gasHalf.setIntensity(0.0036);
         gasHalf.setLayers(new int[]{0, 1, 2, 3, 4});
         gasHalf.setMaxSize(20.0);
 
         // Bulge
         var bulgeHalf = new BillboardDataset();
-        bulgeHalf.setType("bulge");
-        bulgeHalf.setDistribution("sphere");
+        bulgeHalf.setType(ParticleType.BULGE);
+        bulgeHalf.setDistribution(Distribution.SPHERE);
         bulgeHalf.setBaseRadius(minRadius + 0.05);
-        bulgeHalf.setBaseColor(new double[]{1.0, 0.93, 0.8});
+        bulgeHalf.setBaseColor(new double[]{0.96, 0.85, 0.64});
         bulgeHalf.setParticleCount(12L);
         bulgeHalf.setColorNoise(0.09);
-        bulgeHalf.setSize(95.0);
-        bulgeHalf.setIntensity(0.6);
+        bulgeHalf.setSize(90.0);
+        bulgeHalf.setIntensity(0.19);
         bulgeHalf.setLayers(new int[]{0, 1, 2});
         bulgeHalf.setMaxSize(50.0);
 

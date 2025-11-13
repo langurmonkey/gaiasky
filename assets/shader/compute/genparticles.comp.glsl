@@ -32,11 +32,12 @@ uniform uint u_type;
 uniform uint u_distribution;
 #define D_SPHERE 0
 #define D_DISK 1
-#define D_SPIRAL 2
+#define D_LOG_SPIRAL 2
 #define D_BAR 3
-#define D_DENSITY 4
+#define D_SPIRAL 4
 #define D_ELLIPSE 5
 #define D_GAUSS 6
+#define D_CONE 7
 
 // RNG base seed.
 uniform uint u_seed;
@@ -44,19 +45,24 @@ uniform uint u_seed;
 uniform vec3 u_baseColors[4];
 // Color noise.
 uniform float u_colorNoise;
-// Size factor to take body size into account and normalize particle sizes.
+// Size factor to take the full body size into account and normalize particle sizes.
 uniform float u_sizeFactor;
 // Base radius for this distribution. 1 is default.
 uniform float u_baseRadius;
 // Minimum radius for the distribution (spiral, density).
 uniform float u_minRadius;
 
-// Spiral tightness control (angle twist factor).
-uniform float u_spiralAngle;// e.g. 1.0 = normal, <1.0 = looser arms, >1.0 = tighter twist
+// Noise in the particle size generation, in [0..1].
+uniform float u_sizeNoise;
+
+// Base angle
+// Spirals: tightness control (angle twist factor).
+// Cone: cone angle
+uniform float u_baseAngle;
 // Number of arms for spiral galaxy.
 uniform int u_spiralArms;
-// Displacement.
-uniform vec2 u_displacement;
+// Delta position for the spiral pattern.
+uniform vec2 u_sprialDeltaPos;
 
 // Eccentricity
 uniform float u_eccentricity;
@@ -67,34 +73,21 @@ uniform float u_aspect;// e.g. 0.3 = short bar, 1.0 = long bar
 uniform float u_heightScale;
 
 // TRANSFORMATIONS
+// Dataset-specific transform matrix
+uniform mat4 u_dsTransform;
 // The body size
 uniform float u_bodySize;
 // The body position
 uniform vec3 u_bodyPos;
-// The matrix transform
+// Object transform matrix
 uniform mat4 u_transform;
 
 #include <shader/lib/distributions.glsl>
 
-// Generate RGB color based on u_baseColors with random noise.
-vec3 generateColor(inout uint state, float colorNoise) {
-    vec3 baseColor = u_baseColors[int(rand(state) * 4.0)];
-
-    // Noise based on colorNoise parameter.
-    vec3 noise = colorNoise
-    * (vec3(
-    rand(state),
-    rand(state),
-    rand(state)
-    ) * 2.0 - 1.0);
-
-    return clamp(baseColor + noise, 0.0, 1.0);
-}
-
 // Generates a new particle position in a spherical distribution.
 vec3 positionSphere(inout uint state) {
-    // The radius of the distribution times a random number.
-    float r = u_baseRadius * rand(state);
+    // The radius of the distribution times a random number, with some variation.
+    float r = (u_baseRadius + (rand(state) - 0.5) * 0.3) * sqrt(rand(state));
     float theta = rand(state) * 6.2831853;
     float phi = acos(rand(state) * 2.0 - 1.0);
 
@@ -106,10 +99,37 @@ vec3 positionSphere(inout uint state) {
     return pos;
 }
 
-// Density wave using discrete ellipses
+// Generates sparticles in a cone.
+vec3 positionCone(inout uint state, float coneAngleDeg) {
+    float coneAngle = radians(coneAngleDeg);
+
+    // Sample a random direction within the cone (uniformly distributed)
+    float cosCone = cos(coneAngle);
+    float cosPhi  = mix(cosCone, 1.0, rand(state)); // Uniform within cone
+    float phi     = acos(cosPhi);
+    float theta   = rand(state) * 6.2831853; // [0, 2π)
+
+    // Unit direction vector inside cone (axis = +Z)
+    vec3 dir = vec3(
+    sin(phi) * cos(theta),
+    cos(phi),
+    sin(phi) * sin(theta)
+    );
+
+    // Sample random distance along the cone (for uniform *volume* density)
+    float r = u_baseRadius * pow(rand(state), 1.0 / 3.0);
+    // (cube root ensures uniform density in 3D volume)
+
+    // Add small random variation to radius if desired
+    r += (rand(state) - 0.5) * 0.1 * u_baseRadius;
+
+    return r * dir - vec3(0.0, 0.5, 0.0);
+}
+
+// Density wave using discrete ellipses, leading to a natural spiral pattern.
 vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDeg, float eccentricity, vec2 displacement, float minRadius) {
     // Discrete ellipses parameters
-    const uint numEllipses = 80u;
+    const uint numEllipses = 200u;
 
     // Select which ellipse to use
     uint ellipseIndex = uint(rand(state) * float(numEllipses));
@@ -144,8 +164,18 @@ vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDe
     x += displacement.x * t;
     z += displacement.y * t;
 
-    x += gaussian(state) * (u_baseRadius * 0.01);
-    z += gaussian(state) * (u_baseRadius * 0.01);
+    x += gaussian(state) * (u_baseRadius * 0.015);
+    z += gaussian(state) * (u_baseRadius * 0.015);
+
+    // Apply random displacement.
+    if (rand(state) > 0.7) {
+        vec2 v = vec2(x, z);
+        float r = length(v);
+        v = normalize(v) * (r + (rand(state) * 2.0 - 1.0) * 0.2);
+        x = v.x;
+        z = v.y;
+    }
+
 
     // Add height (Y)
     float y = (rand(state) - 0.5) * 2.0 * heightScale;
@@ -163,9 +193,9 @@ vec3 positionEllipse(inout uint state, float eccentricity) {
     float r = pow(rand(state), 1.0/3.0) * u_baseRadius;
 
     // Ellipticity flattening on x-z plane
-    float a = u_baseRadius;// major axis
-    float b = u_baseRadius * (1.0 - eccentricity);// minor axis
-    float c = a * (0.8 - 0.3 * eccentricity);// vertical compression
+    float a = u_baseRadius;// Major axis
+    float b = u_baseRadius * (1.0 - eccentricity);// Minor axis
+    float c = b;// Vertical
 
     // Random orientation around Y
     float rot = rand(state) * 6.2831853;
@@ -198,8 +228,8 @@ vec3 positionDisk(inout uint state, float heightScale) {
     // Random angle [0, 2π)
     float theta = rand(state) * 6.2831853;
 
-    // The radius of the distribution is 1
-    float r = u_baseRadius * sqrt(rand(state));
+    // The radius of the distribution is baseRadius, with some variation.
+    float r = (u_baseRadius + (rand(state) - 0.5) * 0.3) * sqrt(rand(state));
 
     // Cartesian coordinates in ZX plane
     float z = r * cos(theta);
@@ -232,8 +262,8 @@ vec3 positionGauss(inout uint state, float heightScale) {
 
 }
 
-// Generates spiral arms and background particles
-vec3 positionSpiral(inout uint state, float heightScale, float pitchAngleDeg, uint numArms, float minRadius) {
+// Generates artificial logarithmic spiral arms and background particles
+vec3 positionLogSpiral(inout uint state, float heightScale, float pitchAngleDeg, uint numArms, float minRadius) {
     // Internal parameters
     float r_min = minRadius * u_baseRadius;// Minimum radius to avoid particles in the very center
     float r_max = u_baseRadius * 1.0;// Maximum radius for spiral arm
@@ -367,6 +397,31 @@ int pickLayer(inout uint state) {
     return 0;
 }
 
+// Generate RGB color based on u_baseColors with random noise.
+vec3 generateColor(inout uint state, float colorNoise) {
+    vec3 baseColor = u_baseColors[int(rand(state) * 4.0)];
+
+    // Noise based on colorNoise parameter.
+    vec3 noise = colorNoise
+    * (vec3(
+    rand(state),
+    rand(state),
+    rand(state)
+    ) * 2.0 - 1.0);
+
+    return clamp(baseColor + noise, 0.0, 1.0);
+}
+
+// Generate a size
+float generateSize(inout uint state, float sizeNoise) {
+    // Calculate size variation based on sizeNoise
+    // When sizeNoise = 0, the particle size is 1.
+    // When sizeNoise = 1, size is random between ~0.1 and ~4.
+    return mix(1.0, 0.1 + rand(state) * 3.9, sizeNoise) * u_sizeFactor;
+    // return  ((rand(state) + 0.3) * u_sizeNoise) * u_sizeFactor;
+}
+
+
 void main() {
     uint i = gl_GlobalInvocationID.x;
     if (i >= u_count) return;
@@ -376,13 +431,13 @@ void main() {
     int type = int(u_type);
     int distribution = int(u_distribution);
     int layer = pickLayer(state);
-    float size = 1.0 * (rand(state) + 0.3) * u_sizeFactor;
+    float size = generateSize(state, u_sizeNoise);
     vec3 color = generateColor(state, u_colorNoise);
     vec3 pos;
-    if (distribution == D_SPIRAL) {
-        pos = positionSpiral(state, u_heightScale, u_spiralAngle, u_spiralArms, u_minRadius);
-    } else if (distribution == D_DENSITY) {
-        pos = positionDensityWave(state, u_heightScale, u_spiralAngle, u_eccentricity, u_displacement, u_minRadius);
+    if (distribution == D_LOG_SPIRAL) {
+        pos = positionLogSpiral(state, u_heightScale, clamp(u_baseAngle * 0.5, 0.0, 1000.0) * 1.0e-2, u_spiralArms, u_minRadius);
+    } else if (distribution == D_SPIRAL) {
+        pos = positionDensityWave(state, u_heightScale, u_baseAngle, u_eccentricity, u_sprialDeltaPos, u_minRadius);
     } else if (distribution == D_DISK) {
         pos = positionDisk(state, u_heightScale);
     } else if (distribution == D_BAR) {
@@ -393,9 +448,13 @@ void main() {
         pos = positionSphere(state);
     } else if (distribution == D_GAUSS) {
         pos = positionGauss(state, u_heightScale);
+    } else if (distribution == D_CONE) {
+        pos = positionCone(state, u_baseAngle);
     }
+    // Dataset transformation
+    pos = (u_dsTransform * vec4(pos, 1.0)).xyz;
 
-    // Transform position
+    // Object transformation
     pos = (u_transform * vec4(pos, 1.0)).xyz * u_bodySize + u_bodyPos;
 
     particles[i].position = pos;
