@@ -8,10 +8,23 @@
 package gaiasky.util.math;
 
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 
 import java.nio.FloatBuffer;
 
 public class Matrix4Utils {
+
+    public static void setScaling(Matrix4 m, float scl) {
+        m.val[Matrix4.M00] = scl;
+        m.val[Matrix4.M11] = scl;
+        m.val[Matrix4.M22] = scl;
+    }
+
+    public static void setScaling(Matrix4 m, Vector3 scl) {
+        m.val[Matrix4.M00] = scl.x;
+        m.val[Matrix4.M11] = scl.y;
+        m.val[Matrix4.M22] = scl.z;
+    }
 
     public static void put(Matrix4 m, FloatBuffer buffer) {
         get(m, buffer.position(), buffer);

@@ -37,6 +37,7 @@ import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ComputeShaderProgram;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Matrix4Utils;
 import gaiasky.util.math.Vector3Q;
 import org.lwjgl.opengl.GL43;
 
@@ -195,22 +196,28 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             }
 
             var layers = prepareLayersUniform(dataset.layers);
+            var dsTransform = new Matrix4();
+            dsTransform.setFromEulerAngles(dataset.rotation.x, dataset.rotation.y, dataset.rotation.z);
+            dsTransform.setTranslation(dataset.translation);
+            Matrix4Utils.setScaling(dsTransform, dataset.scale);
 
             computeShader.setUniformUint("u_count", elementCount);
             computeShader.setUniformUint("u_distribution", dataset.distribution.ordinal());
             computeShader.setUniformUint("u_seed", seed);
             computeShader.setUniform("u_sizeFactor", (float) (100 * bodySize / (26000.0 * Constants.PC_TO_U)));
+            computeShader.setUniform("u_sizeNoise", dataset.sizeNoise);
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
             computeShader.setUniform("u_minRadius", dataset.minRadius);
+            computeShader.setUniformMatrix("u_dsTransform", dsTransform);
             computeShader.setUniform3fv("u_baseColors[0]", dataset.baseColors);
             computeShader.setUniform("u_colorNoise", dataset.colorNoise);
             computeShader.setUniform("u_eccentricity", dataset.eccentricity);
             computeShader.setUniform("u_aspect", dataset.aspect);
             computeShader.setUniform("u_heightScale", dataset.heightScale);
-            computeShader.setUniform("u_spiralAngle", dataset.spiralAngle);
+            computeShader.setUniform("u_baseAngle", dataset.baseAngle);
             computeShader.setUniformUint("u_spiralArms", dataset.spiralArms);
-            if (dataset.displacement != null)
-                computeShader.setUniform("u_displacement", dataset.displacement[0], dataset.displacement[1]);
+            if (dataset.spiralDeltaPos != null)
+                computeShader.setUniform("u_sprialDeltaPos", dataset.spiralDeltaPos[0], dataset.spiralDeltaPos[1]);
 
             computeShader.setUniform("u_bodySize", (float) bodySize);
             computeShader.setUniform("u_bodyPos", bodyPos.put(new Vector3()));

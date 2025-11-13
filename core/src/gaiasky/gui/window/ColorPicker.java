@@ -56,8 +56,7 @@ public class ColorPicker extends ColorPickerAbstract {
 
     protected void initialize() {
         this.addListener(event -> {
-            if (event instanceof InputEvent) {
-                InputEvent ie = (InputEvent) event;
+            if (event instanceof InputEvent ie) {
                 Type type = ie.getType();
                 // Click
                 if ((type == Type.touchDown) && (ie.getButton() == Buttons.LEFT)) {
