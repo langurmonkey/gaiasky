@@ -212,7 +212,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
                 computeShader.setUniform("u_sprialDeltaPos", dataset.spiralDeltaPos[0], dataset.spiralDeltaPos[1]);
 
             // Dataset and refsys transformations.
-            addBaseTransformUniform(dataset, transform, bodyPos, bodySize);
+            addDatasetTransformUniform(dataset);
             // Layers.
             computeShader.setUniform("u_layers[0]", layers);
 
@@ -223,19 +223,22 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         }
     }
 
-    protected void addBaseTransformUniform(BillboardDataset dataset, RefSysTransform transform, Vector3Q bodyPos, double bodySize) {
+    protected void addDatasetTransformUniform(BillboardDataset dataset) {
         var datasetTransform = auxMat1;
         datasetTransform.setFromEulerAngles(dataset.rotation.y, dataset.rotation.x, dataset.rotation.z);
         datasetTransform.setTranslation(dataset.translation);
         Matrix4Utils.setScaling(datasetTransform, dataset.scale);
 
+        computeShader.setUniformMatrix("u_baseTransform", datasetTransform);
+
+    }
+
+    protected void addBaseTransformUniform(ExtShaderProgram program, RefSysTransform transform, Vector3Q bodyPos, double bodySize) {
         Matrix4 objectTransform = transform.matrix == null ? auxMat2.idt() : transform.matrix.putIn(auxMat2);
         objectTransform.setTranslation(bodyPos.put(new Vector3()));
         Matrix4Utils.setScaling(objectTransform, (float) bodySize);
 
-        var finalTransform = objectTransform.mul(datasetTransform);
-
-        computeShader.setUniformMatrix("u_baseTransform", finalTransform);
+        program.setUniformMatrix("u_baseTransform", objectTransform);
 
     }
 
@@ -266,6 +269,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         if (alpha > 0) {
             var body = Mapper.body.get(render.entity);
             var affine = Mapper.affine.get(render.entity);
+            var trf = Mapper.transform.get(render.entity);
             var billboard = Mapper.billboardSet.get(render.entity);
 
 
@@ -291,6 +295,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
             // Arbitrary affine transformations.
             addAffineTransformUniforms(shaderProgram, affine);
+            addBaseTransformUniform(shaderProgram, trf, body.pos, body.size);
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);

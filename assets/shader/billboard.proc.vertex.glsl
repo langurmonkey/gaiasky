@@ -15,6 +15,7 @@ uniform float u_vrScale;
 // Arbitrary affine transformation(s)
 uniform bool u_transformFlag = false;
 uniform mat4 u_transform;
+uniform mat4 u_baseTransform;
 // View matrix
 uniform mat4 u_view;
 
@@ -58,9 +59,9 @@ void main() {
     // Fetch particle by instance ID
     Particle p = particles[gl_InstanceID];
     vec3 particlePos = p.position;
+    particlePos = (u_baseTransform * vec4(particlePos, 1.0)).xyz;
     if (u_transformFlag) {
-        vec4 aux = u_transform * vec4(particlePos, 1.0);
-        particlePos = aux.xyz;
+        particlePos = (u_transform * vec4(particlePos, 1.0)).xyz;
     }
 
     vec3 pos = (particlePos - u_camPos) / u_vrScale;

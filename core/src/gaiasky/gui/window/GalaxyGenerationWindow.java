@@ -32,6 +32,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Matrix4Utils;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
@@ -49,9 +50,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     private static int sequence = 153;
     private static final float pad5 = 5f;
     /** Saves the scroll position for each (full-res) entity. **/
-    private static ObjectFloatMap<Entity> scrollY = new ObjectFloatMap<>();
+    private static final ObjectFloatMap<Entity> scrollY = new ObjectFloatMap<>();
     /** Saves the datasets whose collapsible panes are expanded. **/
-    private static ObjectSet<BillboardDataset> expandedDatasets = new ObjectSet<>();
+    private static final ObjectSet<BillboardDataset> expandedDatasets = new ObjectSet<>();
 
     private final Scene scene;
     private Entity entityFull, entityHalf;
@@ -180,7 +181,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
         // Object rotation
         var trf = Mapper.transform.get(entityFull);
-        m = trf.matrix.putIn(m);
+        m = trf.matrix == null ? m.idt() : trf.matrix.putIn(m);
         var euler = Matrix4Utils.recoverEulerAngles(m);
         var yaw = euler[0];
         var pitch = euler[1];
@@ -808,11 +809,17 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         }
     }
 
-    private void commitRotation(float yaw, float pitch, float roll){
+    private void commitRotation(float yaw, float pitch, float roll) {
         m.setFromEulerAngles(pitch, yaw, roll);
         var full = Mapper.transform.get(entityFull);
         var half = Mapper.transform.get(entityHalf);
+        if (full.matrix == null) {
+            full.matrix = new Matrix4D();
+        }
         full.matrix.set(m);
+        if (half.matrix == null) {
+            half.matrix = new Matrix4D();
+        }
         half.matrix.set(m);
     }
 
