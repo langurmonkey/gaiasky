@@ -464,6 +464,15 @@
     "help": {
       "imageUp": "help-icon"
     },
+    "random": {
+      "imageUp": "iconic-random"
+    },
+    "new": {
+      "imageUp": "iconic-plus"
+    },
+    "generate": {
+      "imageUp": "iconic-wrench"
+    },
     "quit": {
       "down": "default-round-down",
       "up": "default-round",
