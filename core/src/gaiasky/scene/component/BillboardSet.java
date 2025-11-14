@@ -64,10 +64,38 @@ public class BillboardSet implements Component, IDisposable {
         this.textureFiles = new String[]{tex};
     }
 
+    public boolean contains(BillboardDataset bd) {
+        if (datasets == null) {
+            return false;
+        }
+        for (var dataset : datasets) {
+            if (bd == dataset)
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes the given dataset from the list, if it contains it.
+     * @param bd The dataset to remove.
+     */
+    public void removeDataset(BillboardDataset bd) {
+        if (contains(bd)) {
+            var newDatasets = new BillboardDataset[datasets.length - 1];
+            int j = 0;
+            for (var d : datasets) {
+                if (d != bd) {
+                    newDatasets[j++] = d;
+                }
+            }
+            this.datasets = newDatasets;
+        }
+    }
+
     @Override
     public void dispose(Entity e) {
-       if (this.textureArray != null) {
-           this.textureArray.dispose();
-       }
+        if (this.textureArray != null) {
+            this.textureArray.dispose();
+        }
     }
 }

@@ -72,15 +72,8 @@ uniform float u_aspect;// e.g. 0.3 = short bar, 1.0 = long bar
 // Thickness (height scale)
 uniform float u_heightScale;
 
-// TRANSFORMATIONS
-// Dataset-specific transform matrix
-uniform mat4 u_dsTransform;
-// The body size
-uniform float u_bodySize;
-// The body position
-uniform vec3 u_bodyPos;
-// Object transform matrix
-uniform mat4 u_transform;
+// TRANSFORMATION
+uniform mat4 u_baseTransform;
 
 #include <shader/lib/distributions.glsl>
 
@@ -451,11 +444,9 @@ void main() {
     } else if (distribution == D_CONE) {
         pos = positionCone(state, u_baseAngle);
     }
-    // Dataset transformation
-    pos = (u_dsTransform * vec4(pos, 1.0)).xyz;
 
-    // Object transformation
-    pos = (u_transform * vec4(pos, 1.0)).xyz * u_bodySize + u_bodyPos;
+    // Apply dataset + object transformation
+    pos = (u_baseTransform * vec4(pos, 1.0)).xyz;
 
     particles[i].position = pos;
     particles[i].color = color;

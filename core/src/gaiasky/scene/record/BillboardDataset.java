@@ -534,9 +534,9 @@ public class BillboardDataset {
             null,
             null),
         POINT(new String[]{"density", "disk", "sphere", "bar", "ellipse", "gauss"},
-              new int[]{0, 1000},
+              new int[]{0, 50_000},
               new int[]{1},
-              new float[]{0f, 100f},
+              new float[]{0f, 1000f},
               new float[]{0f, 30f},
               new float[]{0.0f, 1.0f},
               null,
@@ -570,7 +570,7 @@ public class BillboardDataset {
         /** Delta pos (in X and Y) range, for {@link Distribution#SPIRAL}. **/
         public float[] spiralDeltaPos = new float[]{-0.5f, 0.5f};
         /** Aspect ratio range, for {@link Distribution#BAR}. **/
-        public float[] aspect = new float[]{0.1f, 10f};
+        public float[] aspect = new float[]{0.0f, 0.3f};
 
         ParticleType(String[] distributions,
                      int[] nParticles,

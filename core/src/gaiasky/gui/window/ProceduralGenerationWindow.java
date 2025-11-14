@@ -226,7 +226,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         tabs.setChecked(((TextButton) tabs.getButtons().get(lastTabSelected)).getText().toString());
 
         // Randomize button
-        OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin, "big");
+        OwnTextButton randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin,  "random", "big");
         randomize.setColor(ColorUtils.gYellowC);
         randomize.addListener(new ChangeListener() {
             @Override
@@ -365,7 +365,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         String name = I18n.msg(key);
 
         // Randomize button
-        OwnTextButton randomize = new OwnTextButton(I18n.msg("gui.procedural.randomize", name), skin);
+        var randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", name), skin, "random");
         randomize.setColor(ColorUtils.gYellowC);
         randomize.addListener(new ChangeListener() {
             @Override
@@ -378,7 +378,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         randomize.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.button.randomize", name), skin));
 
         // Generate button
-        OwnTextButton generate = new OwnTextButton(I18n.msg("gui.procedural.generate", name), skin);
+        var generate = new OwnTextIconButton(I18n.msg("gui.procedural.generate", name), skin, "generate");
         generate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
