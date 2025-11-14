@@ -55,8 +55,9 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
     private final ObjectIntMap<BillboardDataset> ssbos;
     /** Quad mesh, same for everyone. **/
     private IntMesh quadMesh;
-    /** Auxiliary matrix. **/
-    protected final Matrix4 auxMat = new Matrix4();
+    /** Auxiliary matrices. **/
+    protected final Matrix4 auxMat1 = new Matrix4();
+    protected final Matrix4 auxMat2 = new Matrix4();
     /** Seed per dataset. **/
     private final ObjectIntMap<BillboardDataset> seeds;
 
@@ -152,15 +153,10 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             // Double-check the binding worked
             SysUtils.checkForOpenGLErrors("After bindBufferBase()");
 
-            var mat = new Matrix4();
-            if (transform.matrix != null) {
-                transform.matrix.putIn(mat);
-            }
             dispatchComputeShader(dataset,
                                   getSeed(dataset),
-                                  body.pos,
-                                  body.size,
-                                  mat);
+                                  body,
+                                  transform);
 
         }
     }
@@ -180,9 +176,8 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
     private void dispatchComputeShader(BillboardDataset dataset,
                                        int seed,
-                                       Vector3Q bodyPos,
-                                       double bodySize,
-                                       Matrix4 transform) {
+                                       Body body,
+                                       RefSysTransform transform) {
         if (computeShader != null && computeShader.isCompiled()) {
             // Total element count.
             int elementCount = dataset.particleCount;
@@ -196,10 +191,8 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             }
 
             var layers = prepareLayersUniform(dataset.layers);
-            var dsTransform = new Matrix4();
-            dsTransform.setFromEulerAngles(dataset.rotation.x, dataset.rotation.y, dataset.rotation.z);
-            dsTransform.setTranslation(dataset.translation);
-            Matrix4Utils.setScaling(dsTransform, dataset.scale);
+            var bodyPos = body.pos;
+            var bodySize = body.size;
 
             computeShader.setUniformUint("u_count", elementCount);
             computeShader.setUniformUint("u_distribution", dataset.distribution.ordinal());
@@ -208,7 +201,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             computeShader.setUniform("u_sizeNoise", dataset.sizeNoise);
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
             computeShader.setUniform("u_minRadius", dataset.minRadius);
-            computeShader.setUniformMatrix("u_dsTransform", dsTransform);
             computeShader.setUniform3fv("u_baseColors[0]", dataset.baseColors);
             computeShader.setUniform("u_colorNoise", dataset.colorNoise);
             computeShader.setUniform("u_eccentricity", dataset.eccentricity);
@@ -219,9 +211,9 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             if (dataset.spiralDeltaPos != null)
                 computeShader.setUniform("u_sprialDeltaPos", dataset.spiralDeltaPos[0], dataset.spiralDeltaPos[1]);
 
-            computeShader.setUniform("u_bodySize", (float) bodySize);
-            computeShader.setUniform("u_bodyPos", bodyPos.put(new Vector3()));
-            computeShader.setUniformMatrix("u_transform", transform);
+            // Dataset and refsys transformations.
+            addBaseTransformUniform(dataset, transform, bodyPos, bodySize);
+            // Layers.
             computeShader.setUniform("u_layers[0]", layers);
 
             // Check for uniform errors
@@ -231,12 +223,28 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         }
     }
 
+    protected void addBaseTransformUniform(BillboardDataset dataset, RefSysTransform transform, Vector3Q bodyPos, double bodySize) {
+        var datasetTransform = auxMat1;
+        datasetTransform.setFromEulerAngles(dataset.rotation.y, dataset.rotation.x, dataset.rotation.z);
+        datasetTransform.setTranslation(dataset.translation);
+        Matrix4Utils.setScaling(datasetTransform, dataset.scale);
+
+        Matrix4 objectTransform = transform.matrix == null ? auxMat2.idt() : transform.matrix.putIn(auxMat2);
+        objectTransform.setTranslation(bodyPos.put(new Vector3()));
+        Matrix4Utils.setScaling(objectTransform, (float) bodySize);
+
+        var finalTransform = objectTransform.mul(datasetTransform);
+
+        computeShader.setUniformMatrix("u_baseTransform", finalTransform);
+
+    }
+
     protected void addAffineTransformUniforms(ExtShaderProgram program, AffineTransformations affine) {
         // Arbitrary affine transformations.
         if (affine != null && !affine.isEmpty()) {
             program.setUniformi("u_transformFlag", 1);
-            affine.apply(auxMat.idt());
-            program.setUniformMatrix("u_transform", auxMat);
+            affine.apply(auxMat1.idt());
+            program.setUniformMatrix("u_transform", auxMat1);
         } else {
             program.setUniformi("u_transformFlag", 0);
         }

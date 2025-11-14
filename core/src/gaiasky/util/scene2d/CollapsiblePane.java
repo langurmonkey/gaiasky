@@ -39,8 +39,7 @@ public class CollapsiblePane extends Table {
     float space;
     Cell<?> contentCell;
     float targetHeight;
-    boolean expanding = false;
-    boolean collapsing = false;
+    boolean expanded = false;
     Runnable expandCollapseRunnable;
 
     /**
@@ -286,11 +285,21 @@ public class CollapsiblePane extends Table {
         this(stage, title, content, width, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
     }
 
+    public void setExpandCollapseRunnable(Runnable r) {
+        this.expandCollapseRunnable = r;
+    }
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
     public boolean expandPane() {
         if (!expandIcon.isChecked()) {
             expandIcon.setChecked(true);
-            expanding = true;
-            collapsing = false;
+            expanded = true;
+            if (expandCollapseRunnable != null) {
+                expandCollapseRunnable.run();
+            }
             return true;
         }
         return false;
@@ -299,8 +308,10 @@ public class CollapsiblePane extends Table {
     public boolean collapsePane() {
         if (expandIcon.isChecked()) {
             expandIcon.setChecked(false);
-            expanding = false;
-            collapsing = true;
+            expanded = false;
+            if (expandCollapseRunnable != null) {
+                expandCollapseRunnable.run();
+            }
             return true;
         }
         return false;
@@ -325,13 +336,11 @@ public class CollapsiblePane extends Table {
         if (expand && dialogWindow == null) {
             // Expand
             contentCell.setActor(content);
-            expanding = true;
-            collapsing = false;
+            expanded = true;
         } else {
             // Collapse
             contentCell.clearActor();
-            expanding = false;
-            collapsing = true;
+            expanded = false;
         }
         if (expandCollapseRunnable != null) {
             expandCollapseRunnable.run();
