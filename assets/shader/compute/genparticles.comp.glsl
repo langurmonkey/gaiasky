@@ -445,7 +445,7 @@ void main() {
         pos = positionCone(state, u_baseAngle);
     }
 
-    // Apply dataset + object transformation
+    // Apply dataset transformation
     pos = (u_baseTransform * vec4(pos, 1.0)).xyz;
 
     particles[i].position = pos;

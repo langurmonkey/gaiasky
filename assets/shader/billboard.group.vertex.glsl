@@ -52,8 +52,7 @@ flat out int v_layer;
 void main() {
     vec3 particlePos = a_particlePos;
     if (u_transformFlag) {
-        vec4 aux = u_transform * vec4(particlePos, 1.0);
-        particlePos = aux.xyz;
+        particlePos = (u_transform * vec4(particlePos, 1.0)).xyz;
     }
 
     vec3 pos = (particlePos - u_camPos) / u_vrScale;

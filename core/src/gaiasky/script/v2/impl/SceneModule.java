@@ -29,7 +29,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.AttitudeComponent;
-import gaiasky.scene.component.Label;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.BillboardDataset;
@@ -1081,9 +1080,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var bodyHalf = Mapper.body.get(entityHalf);
         bodyHalf.cameraCollision = false;
         bodyHalf.setSize(radius);
-
-        var labelHalf = Mapper.label.get(entityHalf);
-        labelHalf.display = Label.LabelDisplay.NEVER;
+        bodyHalf.labelColor = new float[]{0, 0, 0, 0};
 
         var coordHalf = Mapper.coordinates.get(entityHalf);
         var coordinatesHalf = new StaticCoordinates();
