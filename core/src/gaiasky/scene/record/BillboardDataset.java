@@ -559,9 +559,9 @@ public class BillboardDataset {
         /** Particle intensity range. **/
         public float[] intensity;
         /** Minimum radius range. **/
-        public float[] minRadius = new float[]{0.08f, 0.18f};
+        public float[] minRadius = new float[]{0.0f, 0.4f};
         /** Base radius range. **/
-        public float[] baseRadius = new float[]{0.95f, 1.5f};
+        public float[] baseRadius = new float[]{0.8f, 2.0f};
 
         /** Base angle [deg] range, for {@link Distribution#SPIRAL}, {@link Distribution#LOG_SPIRAL}, and {@link Distribution#CONE}. **/
         public float[] baseAngle = new float[]{0f, 1000f};
