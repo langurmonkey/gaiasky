@@ -247,6 +247,17 @@ public class ComputeShaderProgram implements Disposable {
         checkGLError("setUniform(" + name + ", vec4)");
     }
 
+    public void setUniform2fv(String name, float[] values) {
+        if (!checkUniformExists(name)) return;
+
+        Integer loc = uniforms.get(name);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+        buffer.put(values).flip();
+        glUniform2fv(loc, buffer);
+
+        checkGLError("setUniform(" + name + ", float[" + values.length + "])");
+    }
+
     public void setUniform3fv(String name, float[] values) {
         if (!checkUniformExists(name)) return;
 

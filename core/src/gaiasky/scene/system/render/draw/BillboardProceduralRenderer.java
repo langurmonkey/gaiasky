@@ -203,15 +203,16 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             computeShader.setUniform("u_minRadius", dataset.minRadius);
             computeShader.setUniform3fv("u_baseColors[0]", dataset.baseColors);
             computeShader.setUniform("u_colorNoise", dataset.colorNoise);
-            computeShader.setUniform("u_eccentricity", dataset.eccentricity);
+            computeShader.setUniform2fv("u_eccentricity", dataset.eccentricity);
             computeShader.setUniform("u_aspect", dataset.aspect);
             computeShader.setUniform("u_heightScale", dataset.heightScale);
             computeShader.setUniform("u_baseAngle", dataset.baseAngle);
-            computeShader.setUniformUint("u_spiralArms", dataset.spiralArms);
+            computeShader.setUniformUint("u_numArms", dataset.numArms);
+            computeShader.setUniform("u_armSigma", dataset.armSigma);
             if (dataset.spiralDeltaPos != null)
                 computeShader.setUniform("u_sprialDeltaPos", dataset.spiralDeltaPos[0], dataset.spiralDeltaPos[1]);
 
-            // Dataset and refsys transformations.
+            // Dataset and ref-sys transformations.
             addDatasetTransformUniform(dataset);
             // Layers.
             computeShader.setUniform("u_layers[0]", layers);
@@ -307,17 +308,30 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
             for (var dataset : billboard.datasets) {
                 // Blend mode
-                Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
-                Gdx.gl20.glEnable(GL20.GL_BLEND);
                 switch (dataset.blending) {
-                    case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-                    case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                    case COLOR -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
+                    case ALPHA -> {
+                        Gdx.gl20.glEnable(GL20.GL_BLEND);
+                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                    }
+                    case ADDITIVE -> {
+                        Gdx.gl20.glEnable(GL20.GL_BLEND);
+                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                        Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                    }
+                    case COLOR -> {
+                        Gdx.gl20.glEnable(GL20.GL_BLEND);
+                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                        Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
+                    }
                     case SUBTRACTIVE -> {
                         Gdx.gl20.glBlendEquation(GL20.GL_FUNC_REVERSE_SUBTRACT);
                         Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
                     }
-                    case NONE -> Gdx.gl20.glDisable(GL20.GL_BLEND);
+                    case NONE ->{
+                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                        Gdx.gl20.glDisable(GL20.GL_BLEND);
+                    }
                 }
 
                 // Specific uniforms
@@ -336,6 +350,11 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
             }
             shaderProgram.end();
+
+            // Restore blending
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         }
     }
 

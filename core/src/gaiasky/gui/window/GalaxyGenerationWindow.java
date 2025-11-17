@@ -23,6 +23,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.BlendMode;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.record.BillboardDataset;
@@ -376,6 +377,13 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 public void changed(ChangeEvent event,
                                     Actor actor) {
                     ds.type = type.getSelected();
+                    if (ds.type == BillboardDataset.ParticleType.DUST) {
+                        GaiaSky.postRunnable(()->{
+                            // Subtractive blending.
+                            ds.setBlending(BlendMode.SUBTRACTIVE);
+                            ds.setDepthMask(false);
+                        });
+                    }
                     rebuild();
                 }
             });
@@ -695,12 +703,12 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             });
             dsTable.add(intensity).colspan(2).left().padBottom(pad18).row();
 
-            if (ds.distribution == Distribution.LOG_SPIRAL) {
+            if (ds.distribution == Distribution.SPIRAL_LOG) {
                 // Number of arms
-                var numArms = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.arms"), 1f, 8f, 1f, skin);
+                var numArms = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.arm.number"), 1f, 8f, 1f, skin);
                 numArms.setNumberFormatter(new DecimalFormat("#0"));
-                numArms.setWidth(fullWidthBox);
-                numArms.setValue(ds.spiralArms);
+                numArms.setWidth(halfWidthBox);
+                numArms.setValue(ds.numArms);
                 numArms.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -708,15 +716,33 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                         ds.setSpiralArms((long) numArms.getValue());
                     }
                 });
-                dsTable.add(numArms).colspan(2).left().padBottom(pad18).row();
+                // Arm sigma
+                float minSigma = ds.type.armSigma[0];
+                float maxSigma = ds.type.armSigma[1];
+                float stepSigma = (maxSigma - minSigma) / SLIDER_STEPS;
+                var armSigma = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.arm.sigma"), minSigma, maxSigma, stepSigma, skin);
+                armSigma.setNumberFormatter(new DecimalFormat("#0.####"));
+                armSigma.setWidth(halfWidthBox);
+                armSigma.setValue(ds.armSigma);
+                armSigma.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setArmSigma((double) armSigma.getValue());
+                    }
+                });
+
+                dsTable.add(numArms).left().padRight(pad5).padBottom(pad18);
+                dsTable.add(armSigma).left().padBottom(pad18).row();
             }
 
-            if (ds.distribution == Distribution.SPIRAL || ds.distribution == Distribution.LOG_SPIRAL) {
+            if (ds.distribution == Distribution.SPIRAL || ds.distribution == Distribution.SPIRAL_LOG) {
                 // Spiral angle
                 float angleMin = ds.type.baseAngle[0];
                 float angleMax = ds.type.baseAngle[1];
                 float angleStep = (angleMax - angleMin) / SLIDER_STEPS;
-                var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"), angleMin, angleMax, angleStep, skin);
+                var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"), angleMin, angleMax, angleStep, true, skin);
+                baseAngle.setLogarithmicExponent(1.2);
                 baseAngle.setNumberFormatter(new DecimalFormat("##0.###"));
                 baseAngle.setWidth(fullWidthBox);
                 baseAngle.setValue(ds.baseAngle);
@@ -731,24 +757,55 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(baseAngle).colspan(2).left().padBottom(pad18).row();
             }
 
-            if (ds.distribution == Distribution.SPIRAL || ds.distribution == Distribution.ELLIPSE) {
-                // Eccentricity
+            if (ds.distribution == Distribution.SPIRAL) {
+                // Single eccentricity.
                 float eMin = ds.type.eccentricity[0];
                 float eMax = ds.type.eccentricity[1];
                 float eStep = (eMax - eMin) / SLIDER_STEPS;
-                var eccentricity = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity"), eMin, eMax, eStep, skin);
-                eccentricity.setNumberFormatter(new DecimalFormat("0.####"));
-                eccentricity.setWidth(fullWidthBox);
-                eccentricity.setValue(ds.eccentricity);
-                eccentricity.setResetValue(0.3f);
-                eccentricity.addListener(new ChangeListener() {
+                var ec = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity"), eMin, eMax, eStep, skin);
+                ec.setNumberFormatter(new DecimalFormat("0.####"));
+                ec.setWidth(fullWidthBox);
+                ec.setValue(ds.eccentricity[0]);
+                ec.setResetValue(0.3f);
+                ec.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
                                         Actor actor) {
-                        ds.setEccentricity((double) eccentricity.getValue());
+                        ds.setEccentricity((double) ec.getValue());
                     }
                 });
-                dsTable.add(eccentricity).colspan(2).left().padBottom(pad18).row();
+                dsTable.add(ec).colspan(2).left().padBottom(pad18).row();
+            } else if (ds.distribution == Distribution.ELLIPSOID) {
+                // Eccentricity in X and Y.
+                float eMin = ds.type.eccentricity[0];
+                float eMax = ds.type.eccentricity[1];
+                float eStep = (eMax - eMin) / SLIDER_STEPS;
+                var ecx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.x"), eMin, eMax, eStep, skin);
+                ecx.setNumberFormatter(new DecimalFormat("0.####"));
+                ecx.setWidth(halfWidthBox);
+                ecx.setValue(ds.eccentricity[0]);
+                ecx.setResetValue(0.0f);
+                ecx.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setEccentricityX((double) ecx.getValue());
+                    }
+                });
+                var ecy = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.y"), eMin, eMax, eStep, skin);
+                ecy.setNumberFormatter(new DecimalFormat("0.####"));
+                ecy.setWidth(halfWidthBox);
+                ecy.setValue(ds.eccentricity[1]);
+                ecy.setResetValue(0.0f);
+                ecy.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setEccentricityY((double) ecy.getValue());
+                    }
+                });
+                dsTable.add(ecy).left().padRight(pad5).padBottom(pad18);
+                dsTable.add(ecx).left().padBottom(pad18).row();
             }
 
             if (ds.distribution == Distribution.SPIRAL) {

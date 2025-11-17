@@ -113,9 +113,9 @@ public class BillboardDataset {
      */
     public float heightScale = 0.01f;
     /**
-     * Eccentricity for ellipses and density wave, e.g. 0 = circle, 0.5 = mildly elliptical, 0.9 = very elongated.
+     * Eccentricities for density wave [1] and ellipsoid [2].
      */
-    public float eccentricity = 0.3f;
+    public float[] eccentricity = new float[]{0.3f, 0f};
     /**
      * Bar aspect ratio, e.g. 0.3 = short bar, 1.0 = long bar.
      */
@@ -124,7 +124,7 @@ public class BillboardDataset {
     /**
      * Spiral arm pitch angle in degrees.
      * <p>
-     * When using {@link Distribution#LOG_SPIRAL}, this controls how tightly the spiral arms wind around the galactic center.
+     * When using {@link Distribution#SPIRAL_LOG}, this controls how tightly the spiral arms wind around the galactic center.
      * Lower values (≈5–10°) produce tightly wound Sa-type spirals,
      * while higher values (≈25–40°) yield open Sc–Sd morphologies.
      * This parameter maps directly to the logarithmic spiral pitch angle
@@ -140,7 +140,12 @@ public class BillboardDataset {
     /**
      * Number of spiral arms.
      */
-    public int spiralArms = 4;
+    public int numArms = 4;
+
+    /**
+     * Standard deviation across arm.
+     */
+    public float armSigma = 0.4f;
 
     /**
      * The intensity factor.
@@ -229,7 +234,20 @@ public class BillboardDataset {
     }
 
     public void setEccentricity(Double eccentricity) {
-        this.eccentricity = eccentricity.floatValue();
+        this.eccentricity[0] = eccentricity.floatValue();
+    }
+
+    public void setEccentricityX(Double eccentricity) {
+        setEccentricity(eccentricity);
+    }
+
+    public void setEccentricityY(Double eccentricity) {
+        this.eccentricity[1] = eccentricity.floatValue();
+    }
+
+    public void setEccentricity(double[] eccentricity) {
+        this.eccentricity[0] = (float) eccentricity[0];
+        this.eccentricity[1] = (float) eccentricity[1];
     }
 
     public void setHeightScale(Double heightScale) {
@@ -240,8 +258,16 @@ public class BillboardDataset {
         this.baseAngle = baseAngle.floatValue();
     }
 
+    public void setNumArms(Long numArms) {
+        this.numArms = numArms.intValue();
+    }
+
     public void setSpiralArms(Long spiralArms) {
-        this.spiralArms = spiralArms.intValue();
+        setNumArms(spiralArms);
+    }
+
+    public void setArmSigma(Double armSigma) {
+        this.armSigma = armSigma.floatValue();
     }
 
     public void setAspect(Double aspect) {
@@ -407,6 +433,10 @@ public class BillboardDataset {
         setDepthMask(depthMask);
     }
 
+    public void setBlending(BlendMode blending) {
+        this.blending = blending;
+    }
+
     public void setBlending(String blending) {
         this.blending = BlendMode.valueOf(blending.toUpperCase(Locale.ROOT));
     }
@@ -484,6 +514,7 @@ public class BillboardDataset {
              null,
              null,
              null,
+             null,
              null),
         BULGE(new String[]{"sphere", "bar", "ellipse", "gauss"},
               new int[]{0, 100},
@@ -496,6 +527,7 @@ public class BillboardDataset {
               null,
               null,
               null,
+              null,
               null),
         STAR(new String[]{"gauss", "disk", "ellipse", "sphere"},
              new int[]{0, 100_000},
@@ -503,6 +535,7 @@ public class BillboardDataset {
              new float[]{0.0f, 8.0f},
              new float[]{0.05f, 0.2f},
              new float[]{0.0f, 6.0f},
+             null,
              null,
              null,
              null,
@@ -520,6 +553,7 @@ public class BillboardDataset {
             null,
             null,
             null,
+            null,
             null),
         HII(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
             new int[]{0, 10_000},
@@ -532,6 +566,7 @@ public class BillboardDataset {
             null,
             null,
             null,
+            null,
             null),
         POINT(new String[]{"density", "disk", "sphere", "bar", "ellipse", "gauss"},
               new int[]{0, 50_000},
@@ -539,6 +574,7 @@ public class BillboardDataset {
               new float[]{0f, 1000f},
               new float[]{0f, 30f},
               new float[]{0.0f, 1.0f},
+              null,
               null,
               null,
               null,
@@ -563,14 +599,16 @@ public class BillboardDataset {
         /** Base radius range. **/
         public float[] baseRadius = new float[]{0.8f, 2.0f};
 
-        /** Base angle [deg] range, for {@link Distribution#SPIRAL}, {@link Distribution#LOG_SPIRAL}, and {@link Distribution#CONE}. **/
+        /** Base angle [deg] range, for {@link Distribution#SPIRAL}, {@link Distribution#SPIRAL_LOG}, and {@link Distribution#CONE}. **/
         public float[] baseAngle = new float[]{0f, 1000f};
-        /** Eccentricity range, for {@link Distribution#SPIRAL} and {@link Distribution#ELLIPSE}. **/
+        /** Eccentricity range, for {@link Distribution#SPIRAL} and {@link Distribution#ELLIPSOID}. **/
         public float[] eccentricity = new float[]{0.0f, 0.8f};
         /** Delta pos (in X and Y) range, for {@link Distribution#SPIRAL}. **/
         public float[] spiralDeltaPos = new float[]{-0.5f, 0.5f};
         /** Aspect ratio range, for {@link Distribution#BAR}. **/
         public float[] aspect = new float[]{0.0f, 0.3f};
+        /** Standard deviation across arm. **/
+        public float[] armSigma = new float[]{0.0f, 1.0f};
 
         ParticleType(String[] distributions,
                      int[] nParticles,
@@ -580,10 +618,11 @@ public class BillboardDataset {
                      float[] intensity,
                      float[] minRadius,
                      float[] baseRadius,
-                     float[] spiralAngle,
+                     float[] baseAngle,
                      float[] eccentricity,
                      float[] displacement,
-                     float[] aspect) {
+                     float[] aspect,
+                     float[] armSigma) {
             if (distributions != null) {
                 this.distributions = distributions;
             }
@@ -608,8 +647,8 @@ public class BillboardDataset {
             if (baseRadius != null) {
                 this.baseRadius = baseRadius;
             }
-            if (spiralAngle != null) {
-                this.baseAngle = spiralAngle;
+            if (baseAngle != null) {
+                this.baseAngle = baseAngle;
             }
             if (eccentricity != null) {
                 this.eccentricity = eccentricity;
@@ -620,6 +659,9 @@ public class BillboardDataset {
             if (aspect != null) {
                 this.aspect = aspect;
             }
+            if (armSigma != null) {
+                this.armSigma = armSigma;
+            }
         }
     }
 
@@ -628,14 +670,14 @@ public class BillboardDataset {
         SPHERE,
         /** Simple disk. **/
         DISK,
-        /** An artificial logarithmic spiral. **/
-        LOG_SPIRAL,
-        /** A simple bar. **/
-        BAR,
         /** Density wave distribution, producing natural spirals. **/
         SPIRAL,
+        /** An artificial logarithmic spiral. **/
+        SPIRAL_LOG,
+        /** A simple bar. **/
+        BAR,
         /** An ellipse, with an eccentricity. **/
-        ELLIPSE,
+        ELLIPSOID,
         /** Gaussian distribution in a disk, with an overdense center. **/
         GAUSS,
         /** A cone distribution. **/
