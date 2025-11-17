@@ -1047,6 +1047,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         starsFull.setDistribution(Distribution.GAUSS);
         starsFull.setBaseColor(new double[]{0.93, 0.93, 0.75, 0.75, 0.75, 0.96, 0.93, 0.75, 0.75, 0.94, 0.94, 0.88});
         starsFull.setParticleCount(33000L);
+        starsFull.setMinRadius(0.0);
         starsFull.setSize(0.2);
         starsFull.setSizeNoise(0.7);
         starsFull.setIntensity(2.0);
@@ -1059,7 +1060,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         hiiFull.setDistribution(Distribution.SPIRAL);
         hiiFull.setBaseAngle(spiralAngle);
         hiiFull.setEccentricity(eccentricity);
-        hiiFull.setMinRadius(minRadius);
+        hiiFull.setMinRadius(0.0);
         hiiFull.setSpiralDeltaPos(spiralDeltaPos);
         hiiFull.setBaseColors(new double[]{0.93, 0.6, 1.0, 1.0, 0.7, 0.94});
         hiiFull.setParticleCount(160L);
@@ -1154,6 +1155,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var bulgeHalf = new BillboardDataset();
         bulgeHalf.setType(ParticleType.BULGE);
         bulgeHalf.setDistribution(Distribution.SPHERE);
+        starsFull.setMinRadius(0.0);
         bulgeHalf.setBaseRadius(minRadius + 0.05);
         bulgeHalf.setBaseColor(new double[]{0.96, 0.85, 0.64});
         bulgeHalf.setParticleCount(12L);
