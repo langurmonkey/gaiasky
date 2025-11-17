@@ -32,10 +32,10 @@ uniform uint u_type;
 uniform uint u_distribution;
 #define D_SPHERE 0
 #define D_DISK 1
-#define D_LOG_SPIRAL 2
-#define D_BAR 3
-#define D_SPIRAL 4
-#define D_ELLIPSE 5
+#define D_SPIRAL 2
+#define D_SPIRAL_LOG 3
+#define D_BAR 4
+#define D_ELLIPSOID 5
 #define D_GAUSS 6
 #define D_CONE 7
 
@@ -60,12 +60,14 @@ uniform float u_sizeNoise;
 // Cone: cone angle
 uniform float u_baseAngle;
 // Number of arms for spiral galaxy.
-uniform int u_spiralArms;
+uniform int u_numArms;
+// Sigma across arm.
+uniform float u_armSigma;
 // Delta position for the spiral pattern.
 uniform vec2 u_sprialDeltaPos;
 
-// Eccentricity
-uniform float u_eccentricity;
+// Eccentricity in x, y and z
+uniform vec2 u_eccentricity;
 // Aspect ratio of the bar
 uniform float u_aspect;// e.g. 0.3 = short bar, 1.0 = long bar
 
@@ -99,9 +101,9 @@ vec3 positionCone(inout uint state, float coneAngleDeg) {
 
     // Sample a random direction within the cone (uniformly distributed)
     float cosCone = cos(coneAngle);
-    float cosPhi  = mix(cosCone, 1.0, rand(state)); // Uniform within cone
+    float cosPhi  = mix(cosCone, 1.0, rand(state));// Uniform within cone
     float phi     = acos(cosPhi);
-    float theta   = rand(state) * 6.2831853; // [0, 2π)
+    float theta   = rand(state) * 6.2831853;// [0, 2π)
 
     // Unit direction vector inside cone (axis = +Z)
     vec3 dir = vec3(
@@ -121,7 +123,7 @@ vec3 positionCone(inout uint state, float coneAngleDeg) {
 }
 
 // Density wave using discrete ellipses, leading to a natural spiral pattern.
-vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDeg, float eccentricity, vec2 displacement) {
+vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
     // Discrete ellipses parameters
     const uint numEllipses = 200u;
 
@@ -136,7 +138,7 @@ vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDe
 
     // Ellipse dimensions in XZ plane
     float a = ellipse_r;
-    float b = ellipse_r * (1.0 - eccentricity);
+    float b = ellipse_r * (1.0 - ec);
 
     // Rotate ellipse around Y axis by pitch angle - each ellipse has different rotation!
     float pitchRad = radians(pitchAngleDeg) * t;// Tilt increases with radius
@@ -177,45 +179,31 @@ vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDe
     return vec3(x, y, z);
 }
 
-// Generates particles in an elliptical distribution.
-vec3 positionEllipse(inout uint state, float eccentricity) {
-    // Generate random direction on a unit sphere
-    float theta = rand(state) * 6.2831853;
-    float phi = acos(rand(state) * 2.0 - 1.0);
+vec3 positionEllipsoid(inout uint state, vec2 ec) {
+    // --- sample random direction on unit sphere ---
+    float u1 = rand(state);
+    float u2 = rand(state);
+    float z = 2.0 * u1 - 1.0;
+    float phi = 6.283185307179586 * u2;
+    float rxy = sqrt(max(0.0, 1.0 - z*z));
+    vec3 dir = vec3(rxy * cos(phi), z, rxy * sin(phi));
 
-    // Radius scaled by cube root to get roughly uniform distribution
-    float r = u_minRadius + (u_baseRadius - u_minRadius) * pow(rand(state), 1.0/3.0);
+    // --- sample radius fraction uniformly inside shell ---
+    float s = rand(state);
+    float minFrac = clamp(u_minRadius / u_baseRadius, 0.0, 1.0);
+    float rFrac = mix(minFrac, 1.0, pow(s, 1.0/3.0));
 
-    // Ellipticity flattening on x-z plane
-    float a = u_baseRadius;// Major axis
-    float b = u_baseRadius * (1.0 - eccentricity);// Minor axis
-    float c = b;// Vertical
+    // --- compute semi-axes ---
+    float a = u_baseRadius;// X-axis (major)
+    float b = u_baseRadius * clamp(1.0 - ec.y, 0.0, 1.0);// Z-axis (minor)
+    float c = u_baseRadius * clamp(1.0 - ec.x, 0.0, 1.0);// Y-axis (vertical)
 
-    // Random orientation around Y
-    float rot = rand(state) * 6.2831853;
-    float cosr = cos(rot);
-    float sinr = sin(rot);
-
-    vec3 pos = vec3(
-    r * sin(phi) * cos(theta),
-    r * cos(phi),
-    r * sin(phi) * sin(theta)
-    );
-
-    // Scale to ellipsoid
-    pos.x *= a / u_baseRadius;
-    pos.z *= b / u_baseRadius;
-    pos.y *= c / u_baseRadius;
-
-    // Random rotation for more natural scatter
-    pos = vec3(
-    pos.x * cosr - pos.z * sinr,
-    pos.y,
-    pos.x * sinr + pos.z * cosr
-    );
+    // --- scale unit vector to ellipsoid shell ---
+    vec3 pos = vec3(a * dir.x, c * dir.y, b * dir.z) * rFrac;
 
     return pos;
 }
+
 
 // Generates a new particle position in a disk distribution, with the given heightScale.
 vec3 positionDisk(inout uint state, float heightScale) {
@@ -257,64 +245,54 @@ vec3 positionGauss(inout uint state, float heightScale) {
 }
 
 // Generates artificial logarithmic spiral arms and background particles
-vec3 positionLogSpiral(inout uint state, float heightScale, float pitchAngleDeg, uint numArms) {
+vec3 positionLogSpiral(inout uint state, float heightScale, float pitchAngleDeg, uint numArms, float armSigma) {
     // Internal parameters
     float r_min = u_minRadius;// Minimum radius to avoid particles in the very center
     float r_max = u_baseRadius;// Maximum radius for spiral arm
 
-    // Decide particle type (strong arm, weak arm, or diffuse background)
-    float selector = rand(state);
+    // Logarithmic spiral factor from pitch angle
+    float pitchDeg = clamp(pitchAngleDeg * 0.1, 0.0, 100.0);
+    float b = tan(radians(pitchDeg));
 
-    if (selector > 0.85) { // Diffuse background
-        // Spread the background particles across a wider range, not just along the arms
-        float r = r_min + rand(state) * (r_max - r_min);// Uniform distribution for background particles
-        // Return early for background particles to avoid arm logic
-        return vec3(r * cos(rand(state) * 6.2831853), (rand(state) - 0.5) * 2.0 * heightScale, r * sin(rand(state) * 6.2831853));
-    } else {
-        // Logarithmic spiral factor from pitch angle
-        float pitchRad = radians(clamp(pitchAngleDeg, 1.0, 80.0));
-        float b = 1.0 / tan(pitchRad);
+    float armWidth = 0.2 * u_baseRadius;// Width of the arm (controls how "thick" the arm is)
 
-        float armWidth = 0.1 * u_baseRadius;// Width of the arm (controls how "thick" the arm is)
+    // CLUMPING: Try multiple times to find a valid position
+    const int MAX_ATTEMPTS = 10;
+    bool found_valid_position = false;
+    float r, spiralAngle, armOffset;
+    int armIndex;
 
-        // CLUMPING: Try multiple times to find a valid position
-        const int MAX_ATTEMPTS = 10;
-        bool found_valid_position = false;
-        float r, spiralAngle, armOffset;
-        int armIndex;
+    for (int attempt = 0; attempt < MAX_ATTEMPTS && !found_valid_position; attempt++) {
+        // Generate candidate position
+        r = r_min + rand(state) * (r_max - r_min);
+        // Density falloff with radius
+        float radius_factor = 1.0 - 0.3 * (r - r_min) / (r_max - r_min);// 30% reduction at outer edge
+        if (rand(state) > radius_factor) {
+            // Try again or use alternative position
+            r = r_min + rand(state) * (r_max - r_min);// Simple retry
+        }
 
-        for (int attempt = 0; attempt < MAX_ATTEMPTS && !found_valid_position; attempt++) {
-            // Generate candidate position
-            r = r_min + rand(state) * (r_max - r_min);
-            // Density falloff with radius
-            float radius_factor = 1.0 - 0.3 * (r - r_min) / (r_max - r_min);// 30% reduction at outer edge
-            if (rand(state) > radius_factor) {
-                // Try again or use alternative position
-                r = r_min + rand(state) * (r_max - r_min);// Simple retry
-            }
+        r = r_min + (r_max - r_min) * pow(rand(state), mix(1.0, 2.0, (r - r_min) / (r_max - r_min)));
+        armIndex = int(rand(state) * float(numArms));
+        armOffset = float(armIndex) * 6.2831853 / float(numArms);
+        spiralAngle = b * log(r / (0.1 * u_baseRadius)) + armOffset;
 
-            r = r_min + (r_max - r_min) * pow(rand(state), mix(1.0, 2.0, (r - r_min) / (r_max - r_min)));
-            armIndex = int(rand(state) * float(numArms));
-            armOffset = float(armIndex) * 6.2831853 / float(numArms);
-            spiralAngle = b * log(r / (0.1 * u_baseRadius)) + armOffset;
+        // CLUMPING: Check if we should place a particle here
+        const float clump_freq1 = 13.0;
+        const float clump_freq2 = 9.0;
+        const float clump_bias = 0.0;
+        float arm_phase = float(armIndex) * 1.618;
 
-            // CLUMPING: Check if we should place a particle here
-            const float clump_freq1 = 13.0;
-            const float clump_freq2 = 9.0;
-            const float clump_bias = 0.05;
-            float arm_phase = float(armIndex) * 1.618;
+        // Create clump pattern
+        float base_pattern = (sin((spiralAngle + arm_phase) * clump_freq1) +
+        cos((spiralAngle + arm_phase) * clump_freq2) + 1.0) / 2.0;
 
-            // Create clump pattern
-            float base_pattern = (sin((spiralAngle + arm_phase) * clump_freq1) +
-            cos((spiralAngle + arm_phase) * clump_freq2) + 1.0) / 2.0;
+        // Apply bias and convert to probability
+        float probability = clamp(base_pattern + clump_bias, 0.0, 1.0);
 
-            // Apply bias and convert to probability
-            float probability = clamp(base_pattern + clump_bias, 0.0, 1.0);
-
-            // Check if this position should be kept
-            if (rand(state) <= probability) {
-                found_valid_position = true;
-            }
+        // Check if this position should be kept
+        if (rand(state) <= probability) {
+            found_valid_position = true;
         }
 
         // If we didn't find a valid position after max attempts, use the last one
@@ -323,29 +301,16 @@ vec3 positionLogSpiral(inout uint state, float heightScale, float pitchAngleDeg,
         // Compute tangent and normal directions.
         vec2 radialDir = vec2(cos(spiralAngle), sin(spiralAngle));
         vec2 tangentDir = normalize(vec2(-radialDir.y - b * radialDir.x, radialDir.x - b * radialDir.y));
-        vec2 normalDir = vec2(-tangentDir.y, tangentDir.x);
 
         // Stdev for arm spread.
-        float sigma = 0.2;
-
-        // Add perpendicular wobble to break the perfect line
-        float wobbleWidth = 0.2 * u_baseRadius;
-        const float wobbleFreq1 = 23.1;
-        const float wobbleFreq2 = 14.25;
-        const float wobbleAmp1 = 0.477;
-        const float wobbleAmp2 = 1.233;
-        float wobble1 = sin(r * wobbleFreq1 + armOffset) * wobbleAmp1;
-        float wobble2 = cos(r * wobbleFreq2 + armOffset * 1.5) * wobbleAmp2;
-        float totalWobble = wobble1 + wobble2;
-
-        vec2 wobbleDisplacement = totalWobble * wobbleWidth * normalDir;
+        float sigma = armSigma;
 
         // Your existing Gaussian spread
         float gaussianSpread = gaussian(state) * sigma;
         vec2 armSpread = gaussianSpread * armWidth * tangentDir;
 
         // Combine both displacements
-        vec2 totalDisplacement = armSpread + wobbleDisplacement;
+        vec2 totalDisplacement = armSpread;
 
         // Convert to Cartesian coordinates
         float x = r * cos(spiralAngle) + totalDisplacement.x;
@@ -428,16 +393,16 @@ void main() {
     float size = generateSize(state, u_sizeNoise);
     vec3 color = generateColor(state, u_colorNoise);
     vec3 pos;
-    if (distribution == D_LOG_SPIRAL) {
-        pos = positionLogSpiral(state, u_heightScale, clamp(u_baseAngle * 0.5, 0.0, 1000.0) * 1.0e-2, u_spiralArms);
+    if (distribution == D_SPIRAL_LOG) {
+        pos = positionLogSpiral(state, u_heightScale, u_baseAngle, u_numArms, u_armSigma);
     } else if (distribution == D_SPIRAL) {
-        pos = positionDensityWave(state, u_heightScale, u_baseAngle, u_eccentricity, u_sprialDeltaPos);
+        pos = positionDensityWave(state, u_heightScale, u_baseAngle, u_eccentricity.x, u_sprialDeltaPos);
     } else if (distribution == D_DISK) {
         pos = positionDisk(state, u_heightScale);
     } else if (distribution == D_BAR) {
         pos = positionBar(state, u_heightScale, u_aspect);
-    } else if (distribution == D_ELLIPSE) {
-        pos = positionEllipse(state, u_eccentricity);
+    } else if (distribution == D_ELLIPSOID) {
+        pos = positionEllipsoid(state, u_eccentricity);
     } else if (distribution == D_SPHERE) {
         pos = positionSphere(state);
     } else if (distribution == D_GAUSS) {

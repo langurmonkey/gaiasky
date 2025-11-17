@@ -1118,7 +1118,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         dustHalf.setParticleCount(13500L);
         dustHalf.setSize(18.0);
         dustHalf.setIntensity(0.008);
-        dustHalf.setBlending("subtractive");
+        dustHalf.setBlending(BlendMode.SUBTRACTIVE);
         dustHalf.setDepthMask(false);
         dustHalf.setLayers(new int[]{1, 2});
         dustHalf.setMaxSize(20.0);
