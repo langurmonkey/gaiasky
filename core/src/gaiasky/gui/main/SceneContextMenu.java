@@ -24,10 +24,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.CatalogInfo;
-import gaiasky.util.CatalogManager;
-import gaiasky.util.Settings;
-import gaiasky.util.TextUtils;
+import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
@@ -302,28 +299,30 @@ public class SceneContextMenu extends ContextMenu {
 
         }
 
-        if (procGalCandidate) {
-            addSeparator();
-            MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.edit"), skin, skin.getDrawable("icon-elem-galaxies"));
-            galGen.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
-                    return true;
-                }
-                return false;
-            });
-            addItem(galGen);
-        } else {
-            addSeparator();
-            MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
-            galGen.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
-                    return true;
-                }
-                return false;
-            });
-            addItem(galGen);
+        if (SysUtils.isComputeShaderSupported()) {
+            if (procGalCandidate) {
+                addSeparator();
+                MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.edit"), skin, skin.getDrawable("icon-elem-galaxies"));
+                galGen.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
+                        return true;
+                    }
+                    return false;
+                });
+                addItem(galGen);
+            } else {
+                addSeparator();
+                MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
+                galGen.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
+                        return true;
+                    }
+                    return false;
+                });
+                addItem(galGen);
+            }
         }
 
 
