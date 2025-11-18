@@ -70,15 +70,15 @@ float ggaussian(inout uint state, float beta) {
     return transformed * variance_correction;
 }
 
-float random (in vec2 st) {
+float random(in vec2 st) {
     return fract(sin(dot(st.xy,
     vec2(12.9898,78.233)))*
     43758.5453123);
 }
 
-// Based on Morgan McGuire @morgan3d
+// Perlin noise based on Morgan McGuire @morgan3d
 // https://www.shadertoy.com/view/4dS3Wd
-float noise (in vec2 st) {
+float noise(in vec2 st) {
     vec2 i = floor(st);
     vec2 f = fract(st);
 
