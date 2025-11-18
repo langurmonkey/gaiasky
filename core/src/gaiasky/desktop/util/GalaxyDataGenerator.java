@@ -28,15 +28,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
-public class GalaxyGenerator {
-    private static final Logger.Log logger = Logger.getLogger(GalaxyGenerator.class);
+public class GalaxyDataGenerator {
+    private static final Logger.Log logger = Logger.getLogger(GalaxyDataGenerator.class);
 
     private static final String separator = " ";
 
     /** Whether to write the results to disk **/
     private static final boolean writeFile = true;
 
-    enum GalaxyType {
+    enum GalaxyDataType {
         spiral, milkyway, uniform, bulge
     }
 
@@ -74,7 +74,7 @@ public class GalaxyGenerator {
         private boolean help = false;
 
         @Parameter(names = {"--galaxytype"}, required = true, description = "The galaxy type to use.", order = 1)
-        private GalaxyType galaxyType = GalaxyType.uniform;
+        private GalaxyDataType galaxyType = GalaxyDataType.uniform;
 
         @Parameter(names = {"--particletype"}, required = true, description = "The particle type to use.", order = 2)
         private BillboardDataset.ParticleType particleType = BillboardDataset.ParticleType.GAS;
@@ -339,7 +339,7 @@ public class GalaxyGenerator {
         gal.sort(Comparator.comparingDouble(f -> f[0]));
 
         String filePath = dir + "galaxy_";
-        if (cliArgs.galaxyType == GalaxyType.spiral) {
+        if (cliArgs.galaxyType == GalaxyDataType.spiral) {
             filePath += (bar ? "bar" + barLength + "_" : "nobar_") + Narms + "arms_" + N + "particles_" + radius + "radius_" + armWidthRatio + "ratio_" + maxRotation + "deg.dat.gz";
         } else {
             filePath += N + "particles.dat.gz";

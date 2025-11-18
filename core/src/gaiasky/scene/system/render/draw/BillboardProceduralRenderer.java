@@ -191,12 +191,12 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             }
 
             var layers = prepareLayersUniform(dataset.layers);
-            var bodyPos = body.pos;
             var bodySize = body.size;
 
             computeShader.setUniformUint("u_count", elementCount);
             computeShader.setUniformUint("u_distribution", dataset.distribution.ordinal());
             computeShader.setUniformUint("u_seed", seed);
+            computeShader.setUniformUint("u_type", dataset.type.ordinal());
             computeShader.setUniform("u_sizeFactor", (float) (100 * bodySize / (26000.0 * Constants.PC_TO_U)));
             computeShader.setUniform("u_sizeNoise", dataset.sizeNoise);
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
