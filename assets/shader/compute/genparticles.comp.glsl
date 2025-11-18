@@ -43,7 +43,7 @@ uniform uint u_distribution;
 uniform uint u_seed;
 // Base colors.
 uniform vec3 u_baseColors[4];
-// Color noise.
+// Color noise (if positive), noise size (negative).
 uniform float u_colorNoise;
 // Size factor to take the full body size into account and normalize particle sizes.
 uniform float u_sizeFactor;
@@ -378,9 +378,9 @@ float generateSize(inout uint state, float sizeNoise, vec2 pos) {
     // When sizeNoise = 1, size is random between ~0.1 and ~4.
     // When sizeNoise < 0, we use fbm as a mask.
     if (sizeNoise < 0.0) {
-        return fbm(pos * abs(sizeNoise)) * u_sizeFactor + (u_sizeNoise * 0.00001);
+        return fbm(pos * abs(sizeNoise)) * 2.0 * u_sizeFactor;
     } else {
-        return mix(1.0, 0.1 + rand(state) * 3.9, sizeNoise) * u_sizeFactor;
+        return mix(0.0, rand(state) * 10.0, sizeNoise) * u_sizeFactor;
     }
 }
 

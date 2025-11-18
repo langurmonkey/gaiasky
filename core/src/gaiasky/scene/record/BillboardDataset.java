@@ -63,7 +63,7 @@ public class BillboardDataset {
      */
     public float[] baseColors = new float[MAX_COLORS * 3];
     /**
-     * Default color noise to apply to the base colors to generate the final particle colors.
+     * Color randomness to apply to the base colors to generate the final particle colors.
      */
     public float colorNoise = 0.08f;
     /**
@@ -87,9 +87,16 @@ public class BillboardDataset {
      * Render particle size scale factor.
      */
     public float size = 1;
-
     /**
-     * Variation in particle size, in [0.0..1.0].
+     * Use FBM perlin noise to mask size generation.
+     */
+    public boolean sizeMask = false;
+    /**
+     * Used to compute the size.
+     * <ul>
+     *     <li>&ge; 0 &mdash; sizeMask false, randomness of sizes</li>
+     *     <li>&lt; 0 &mdash; sizeMask true, scale of FBM perlin noise</li>
+     * </ul>
      */
     public float sizeNoise = 0.1f;
 
@@ -205,8 +212,18 @@ public class BillboardDataset {
         this.size = size.floatValue();
     }
 
+    public void setSizeMask(Boolean b) {
+        this.sizeMask = b;
+    }
+
     public void setSizeNoise(Double sizeNoise) {
         this.sizeNoise = MathUtilsDouble.clamp(sizeNoise.floatValue(), 0f, 1f);
+        this.sizeMask = false;
+    }
+
+    public void setSizeNoiseScale(Double scale) {
+        this.sizeNoise = (float) MathUtilsDouble.clamp(Math.abs(scale), 0f, 100f);
+        this.sizeMask = true;
     }
 
     public void setIntensity(Double intensity) {

@@ -155,7 +155,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         float tabContentWidth = 900f;
         float scrollHeight = 800f;
         float fullWidthBox = 850f;
-        float halfWidthBox = fullWidthBox / 2f - 16f;
+        float halfWidthBox = fullWidthBox / 2f - 12f;
         float thirdWidthBox = fullWidthBox / 3f - 12f;
 
         // Title
@@ -378,7 +378,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                                     Actor actor) {
                     ds.type = type.getSelected();
                     if (ds.type == BillboardDataset.ParticleType.DUST) {
-                        GaiaSky.postRunnable(()->{
+                        GaiaSky.postRunnable(() -> {
                             // Subtractive blending.
                             ds.setBlending(BlendMode.SUBTRACTIVE);
                             ds.setDepthMask(false);
@@ -586,8 +586,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             colorsTable.add(c4).size(cpSize).left().padRight(pad10);
             var colorNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.color.noise"), 0.0f, 1f, 0.01f, skin);
             colorNoise.setWidth(halfWidthBox);
-            colorNoise.setValue(ds.sizeNoise);
-            colorNoise.setResetValue(0.1f);
+            colorNoise.setValue(ds.colorNoise);
+            colorNoise.setResetValue(0.0f);
             colorNoise.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -660,7 +660,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             size.setNumberFormatter(new DecimalFormat("######0.########"));
             size.setDisplayValueMapped(true);
             size.setLogarithmicExponent(4.0);
-            size.setWidth(halfWidthBox);
+            size.setWidth(thirdWidthBox + 115f);
             size.setMappedValue(ds.size);
             size.setResetValue(sizeMin + (sizeMax - sizeMin) / 2f);
             size.addListener(new ChangeListener() {
@@ -670,19 +670,45 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.setSize((double) size.getMappedValue());
                 }
             });
-            var sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.noise"), 0.0f, 1f, 0.01f, skin);
-            sizeNoise.setWidth(halfWidthBox);
+            var sizeMask = new OwnCheckBox(I18n.msg("gui.galaxy.ds.size.perlin"), skin, 4f);
+            sizeMask.setChecked(ds.sizeMask);
+            sizeMask.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    ds.setSizeMask(sizeMask.isChecked());
+                    if(ds.sizeMask) {
+                        ds.sizeNoise = 20f;
+                    } else {
+                        ds.sizeNoise = 0.2f;
+                    }
+                    GaiaSky.postRunnable(()->{
+                        rebuild();
+                    });
+                }
+            });
+            OwnSliderReset sizeNoise;
+            if (ds.sizeMask) {
+                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.scale"), 0.0f, 50f, 0.01f, skin);
+                sizeNoise.setResetValue(0.0f);
+            } else {
+                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.noise"), 0.0f, 1f, 0.01f, skin);
+                sizeNoise.setResetValue(10.0f);
+            }
+            sizeNoise.setWidth(thirdWidthBox);
             sizeNoise.setValue(ds.sizeNoise);
-            sizeNoise.setResetValue(0.1f);
             sizeNoise.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
-                    ds.setSizeNoise((double) sizeNoise.getValue());
+                    ds.sizeNoise = sizeNoise.getValue();
                 }
             });
-            dsTable.add(size).left().padRight(pad5).padBottom(pad18);
-            dsTable.add(sizeNoise).left().padBottom(pad18).row();
+            var sizeTable = new Table(skin);
+            sizeTable.add(size).left().padRight(pad34);
+            sizeTable.add(sizeMask).right().padRight(pad5);
+            sizeTable.add(sizeNoise).left().padRight(pad5);
+
+            dsTable.add(sizeTable).colspan(2).left().padBottom(pad18).row();
 
             // Intensity
             float iMin = ds.type.intensity[0];
