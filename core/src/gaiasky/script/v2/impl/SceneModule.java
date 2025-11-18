@@ -1051,7 +1051,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         starsFull.setSize(0.2);
         starsFull.setSizeNoise(0.7);
         starsFull.setIntensity(2.0);
-        starsFull.setLayers(new int[]{0, 1, 2});
+        starsFull.setLayers(new int[]{0, 1, 2, 4});
         starsFull.setMaxSize(0.15);
 
         // HII
@@ -1120,7 +1120,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         dustHalf.setIntensity(0.008);
         dustHalf.setBlending(BlendMode.SUBTRACTIVE);
         dustHalf.setDepthMask(false);
-        dustHalf.setLayers(new int[]{1, 2});
+        dustHalf.setLayers(new int[]{0, 1, 2});
         dustHalf.setMaxSize(20.0);
 
         // Gas
@@ -1148,7 +1148,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         gasHalf.setSize(63.0);
         gasHalf.setSizeNoise(0.09);
         gasHalf.setIntensity(0.0036);
-        gasHalf.setLayers(new int[]{0, 1, 2, 3, 4});
+        gasHalf.setLayers(new int[]{0, 1, 2, 3});
         gasHalf.setMaxSize(20.0);
 
         // Bulge
