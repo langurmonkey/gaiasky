@@ -688,7 +688,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             });
             OwnSliderReset sizeNoise;
             if (ds.sizeMask) {
-                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.scale"), 0.0f, 50f, 0.01f, skin);
+                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.scale"), 1.0f, 50f, 0.01f, skin);
                 sizeNoise.setResetValue(0.0f);
             } else {
                 sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.noise"), 0.0f, 1f, 0.01f, skin);
@@ -731,8 +731,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
             if (ds.distribution == Distribution.SPIRAL_LOG) {
                 // Number of arms
-                var numArms = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.arm.number"), 1f, 8f, 1f, skin);
+                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 1f, 8f, 1f, skin);
                 numArms.setNumberFormatter(new DecimalFormat("#0"));
+                numArms.setResetValue(4f);
                 numArms.setWidth(halfWidthBox);
                 numArms.setValue(ds.numArms);
                 numArms.addListener(new ChangeListener() {
@@ -746,8 +747,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 float minSigma = ds.type.armSigma[0];
                 float maxSigma = ds.type.armSigma[1];
                 float stepSigma = (maxSigma - minSigma) / SLIDER_STEPS;
-                var armSigma = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.arm.sigma"), minSigma, maxSigma, stepSigma, skin);
+                var armSigma = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.sigma"), minSigma, maxSigma, stepSigma, skin);
                 armSigma.setNumberFormatter(new DecimalFormat("#0.####"));
+                armSigma.setResetValue(0.2f);
                 armSigma.setWidth(halfWidthBox);
                 armSigma.setValue(ds.armSigma);
                 armSigma.addListener(new ChangeListener() {

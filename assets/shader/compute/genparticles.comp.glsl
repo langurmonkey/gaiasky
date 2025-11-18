@@ -380,7 +380,7 @@ float generateSize(inout uint state, float sizeNoise, vec2 pos) {
     if (sizeNoise < 0.0) {
         return fbm(pos * abs(sizeNoise)) * 2.0 * u_sizeFactor;
     } else {
-        return mix(0.0, rand(state) * 10.0, sizeNoise) * u_sizeFactor;
+        return u_sizeFactor + (rand(state) * 2.0 - 1.0) * u_sizeFactor * 2.0 * sizeNoise;
     }
 }
 
