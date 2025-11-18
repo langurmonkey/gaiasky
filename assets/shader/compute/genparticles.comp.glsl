@@ -372,12 +372,16 @@ vec3 generateColor(inout uint state, float colorNoise) {
 }
 
 // Generate a size
-float generateSize(inout uint state, float sizeNoise) {
+float generateSize(inout uint state, float sizeNoise, vec2 pos) {
     // Calculate size variation based on sizeNoise
     // When sizeNoise = 0, the particle size is 1.
     // When sizeNoise = 1, size is random between ~0.1 and ~4.
-    return mix(1.0, 0.1 + rand(state) * 3.9, sizeNoise) * u_sizeFactor;
-    // return  ((rand(state) + 0.3) * u_sizeNoise) * u_sizeFactor;
+    // When sizeNoise < 0, we use fbm as a mask.
+    if (sizeNoise < 0.0) {
+        return fbm(pos * abs(sizeNoise)) * u_sizeFactor + (u_sizeNoise * 0.00001);
+    } else {
+        return mix(1.0, 0.1 + rand(state) * 3.9, sizeNoise) * u_sizeFactor;
+    }
 }
 
 
@@ -387,11 +391,7 @@ void main() {
 
     uint state = (uint(gl_GlobalInvocationID.x) * 747796405u + 2891336453u) * u_seed;
 
-    int type = int(u_type);
     int distribution = int(u_distribution);
-    int layer = pickLayer(state);
-    float size = generateSize(state, u_sizeNoise);
-    vec3 color = generateColor(state, u_colorNoise);
     vec3 pos;
     if (distribution == D_SPIRAL_LOG) {
         pos = positionLogSpiral(state, u_heightScale, u_baseAngle, u_numArms, u_armSigma);
@@ -411,10 +411,15 @@ void main() {
         pos = positionCone(state, u_baseAngle);
     }
 
+    int layer = pickLayer(state);
+    float size = generateSize(state, u_sizeNoise, pos.xz);
+    vec3 color = generateColor(state, u_colorNoise);
+    int type = int(u_type);
+
     // Apply dataset transformation
     pos = (u_baseTransform * vec4(pos, 1.0)).xyz;
 
     particles[i].position = pos;
     particles[i].color = color;
-    particles[i].extra = vec3(size, distribution, layer);
+    particles[i].extra = vec3(size, type, layer);
 }

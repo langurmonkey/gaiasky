@@ -92,6 +92,14 @@ public class BillboardSet implements Component, IDisposable {
         }
     }
 
+    /**
+     * Replaces the current datasets list with the given one.
+     * @param datasets The new datasets.
+     */
+    public void replaceDatasets(BillboardDataset[] datasets){
+        this.datasets = datasets;
+    }
+
     @Override
     public void dispose(Entity e) {
         if (this.textureArray != null) {
