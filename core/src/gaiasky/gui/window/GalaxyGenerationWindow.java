@@ -28,6 +28,8 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.BillboardDataset.Distribution;
+import gaiasky.scene.record.GalaxyGenerator;
+import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -54,7 +56,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     private static final ObjectFloatMap<Entity> scrollY = new ObjectFloatMap<>();
     /** Saves the datasets whose collapsible panes are expanded. **/
     private static final ObjectSet<BillboardDataset> expandedDatasets = new ObjectSet<>();
+    private static GalaxyMorphology currentGm = GalaxyMorphology.E3;
 
+    private final GalaxyGenerator gen;
     private final Scene scene;
     private Entity entityFull, entityHalf;
     private final FocusView viewFull, viewHalf;
@@ -66,6 +70,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         this.scene = scene;
         this.viewFull = new FocusView();
         this.viewHalf = new FocusView();
+        this.gen = new GalaxyGenerator();
 
         update(target);
 
@@ -153,10 +158,11 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     protected void build() {
         float fieldWidthTotal = 950f;
         float tabContentWidth = 900f;
-        float scrollHeight = 800f;
+        float scrollHeight = 700f;
         float fullWidthBox = 850f;
         float halfWidthBox = fullWidthBox / 2f - 12f;
         float thirdWidthBox = fullWidthBox / 3f - 12f;
+        float buttonWidth = 380f;
 
         // Title
         var mainTitle = new OwnLabel(I18n.msg("gui.galaxy.galaxy", viewFull.getLocalizedName()), skin, "header");
@@ -284,22 +290,17 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         var buttonsBottom = new Table(skin);
 
         // Add channel (full)
-        var addChannelFull = newAddChannelButton(entityFull, "gui.galaxy.add.full");
-        buttonsTop.add(addChannelFull).center().padRight(pad34);
+        var addChannelFull = newAddChannelButton(entityFull, "gui.galaxy.add.full", buttonWidth);
+        buttonsTop.add(addChannelFull).center().padRight(pad34).padBottom(pad10);
 
         // Add channel (half)
-        var addChannelHalf = newAddChannelButton(entityHalf, "gui.galaxy.add.half");
-        buttonsTop.add(addChannelHalf).center().row();
-
-        // Randomize all
-        var randomize = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize.all"), skin, "random");
-        randomize.setColor(ColorUtils.gYellowC);
-        randomize.pad(pad10, pad20, pad10, pad20);
-        buttonsBottom.add(randomize).center().padRight(pad34);
+        var addChannelHalf = newAddChannelButton(entityHalf, "gui.galaxy.add.half", buttonWidth);
+        buttonsTop.add(addChannelHalf).center().padBottom(pad10).row();
 
         // Generate
         var generate = new OwnTextIconButton(I18n.msg("gui.galaxy.generate"), skin, "generate");
         generate.setColor(ColorUtils.gGreenC);
+        generate.setWidth(buttonWidth);
         generate.addListener(new
 
                                      ChangeListener() {
@@ -311,15 +312,91 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                                      });
         generate.pad(pad10, pad20, pad10, pad20);
         generate.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.generate.info"), skin));
-        buttonsBottom.add(generate).center();
+        buttonsTop.add(generate).colspan(2).center();
 
-        content.add(buttonsTop).center().padTop(pad34).padBottom(pad34).row();
+        // Random galaxy
+        var randomGal = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize"), skin, "random");
+        randomGal.setColor(ColorUtils.gYellowC);
+        randomGal.setWidth(buttonWidth);
+        randomGal.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                generateRandom(null, System.currentTimeMillis());
+            }
+        });
+        randomGal.pad(pad10, pad20, pad10, pad20);
+        buttonsBottom.add(randomGal).center().padRight(pad10).padBottom(pad10).row();
+
+        // Random galaxy of type
+        OwnSelectBox<GalaxyMorphology> morphology = new OwnSelectBox<>(skin);
+        morphology.setItems(GalaxyMorphology.values());
+        morphology.setSelected(currentGm);
+
+        var randomGalMorph = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize.morph", morphology.getSelected().name()), skin, "random");
+        randomGalMorph.setColor(ColorUtils.gYellowC);
+        randomGalMorph.setWidth(buttonWidth - 80f);
+
+        morphology.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                currentGm = morphology.getSelected();
+                randomGalMorph.setText(I18n.msg("gui.galaxy.randomize.morph", morphology.getSelected().name()));
+            }
+        });
+        randomGalMorph.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                generateRandom(morphology.getSelected(), System.currentTimeMillis());
+            }
+        });
+        randomGalMorph.pad(pad10, pad20, pad10, pad20);
+        var morphTable = new Table(skin);
+        morphTable.add(morphology).left().padRight(pad10);
+        morphTable.add(randomGalMorph).left();
+        buttonsBottom.add(morphTable).center().padRight(pad10).padBottom(pad10).row();
+
+
+        content.add(buttonsTop).center().padTop(pad34).padBottom(pad20).row();
+        content.add(new Separator(skin, "gray")).fillX().expandX().padBottom(pad20).row();
         content.add(buttonsBottom).center();
 
     }
 
-    private OwnTextIconButton newAddChannelButton(Entity entity, String key) {
+    private OwnTextIconButton getRandomButton(GalaxyMorphology gm) {
+        var button = new OwnTextIconButton(gm.name(), skin, "random");
+        button.setColor(ColorUtils.gYellowC);
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                generateRandom(gm, System.currentTimeMillis());
+            }
+        });
+        button.pad(pad10, pad20, pad10, pad20);
+        return button;
+    }
+
+    private void generateRandom(final GalaxyMorphology gm, final long seed) {
+        var pair = gen.generateGalaxy(gm, seed);
+        var full = pair.getFirst();
+        var half = pair.getSecond();
+        // Regenerate forces disposal of current datasets.
+        regenerate();
+        GaiaSky.postRunnable(() -> {
+            if (full != null && full.length > 0) {
+                var f = Mapper.billboardSet.get(entityFull);
+                f.datasets = full;
+            }
+            if (half != null && half.length > 0) {
+                var h = Mapper.billboardSet.get(entityHalf);
+                h.datasets = half;
+            }
+            rebuild();
+        });
+    }
+
+    private OwnTextIconButton newAddChannelButton(Entity entity, String key, float buttonWidth) {
         var button = new OwnTextIconButton(I18n.msg(key), skin, "new");
+        button.setWidth(buttonWidth);
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -676,12 +753,12 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     ds.setSizeMask(sizeMask.isChecked());
-                    if(ds.sizeMask) {
+                    if (ds.sizeMask) {
                         ds.sizeNoise = 20f;
                     } else {
                         ds.sizeNoise = 0.2f;
                     }
-                    GaiaSky.postRunnable(()->{
+                    GaiaSky.postRunnable(() -> {
                         rebuild();
                     });
                 }

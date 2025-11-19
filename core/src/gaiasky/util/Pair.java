@@ -17,6 +17,9 @@ public class Pair<A, B> {
     private A first;
     private B second;
 
+    public Pair() {
+    }
+
     public Pair(A first, B second) {
         super();
         this.first = first;
@@ -31,8 +34,7 @@ public class Pair<A, B> {
     }
 
     public boolean equals(Object other) {
-        if (other instanceof Pair) {
-            Pair otherPair = (Pair) other;
+        if (other instanceof Pair otherPair) {
             return ((this.first == otherPair.first || (this.first != null && otherPair.first != null && this.first.equals(otherPair.first))) && (this.second == otherPair.second || (this.second != null && otherPair.second != null && this.second.equals(otherPair.second))));
         }
 

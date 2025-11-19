@@ -1067,7 +1067,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         hiiFull.setSize(2.3);
         starsFull.setSizeNoise(0.5);
         hiiFull.setIntensity(5.0);
-        hiiFull.setLayers(new int[]{4});
+        hiiFull.setLayers(new int[]{4, 5, 6, 7, 8, 9, 10});
         hiiFull.setMaxSize(10.0);
 
         bbSetFull.setData(new BillboardDataset[]{starsFull, hiiFull});
@@ -1155,7 +1155,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var bulgeHalf = new BillboardDataset();
         bulgeHalf.setType(ParticleType.BULGE);
         bulgeHalf.setDistribution(Distribution.SPHERE);
-        starsFull.setMinRadius(0.0);
+        bulgeHalf.setMinRadius(0.0);
         bulgeHalf.setBaseRadius(minRadius + 0.05);
         bulgeHalf.setBaseColor(new double[]{0.96, 0.85, 0.64});
         bulgeHalf.setParticleCount(12L);
