@@ -372,15 +372,21 @@ vec3 generateColor(inout uint state, float colorNoise) {
 }
 
 // Generate a size
-float generateSize(inout uint state, float sizeNoise, vec2 pos) {
-    // Calculate size variation based on sizeNoise
+float generateSize(inout uint state, float sizeNoise, vec2 pos, int distrib, int type) {
+    // Compute radial mask for dust in SPIRAL_LOG
+    float radialMask = 1.0;
+    if (distrib == D_SPIRAL_LOG && type == TYPE_DUST) {
+        float r = length(pos);
+        // Up and down
+        radialMask = smoothstep(u_minRadius, u_baseRadius * 0.3, r) * smoothstep(u_baseRadius, u_baseRadius * 0.8, r);
+    }
     // When sizeNoise = 0, the particle size is 1.
     // When sizeNoise = 1, size is random between ~0.1 and ~4.
     // When sizeNoise < 0, we use fbm as a mask.
     if (sizeNoise < 0.0) {
-        return fbm(pos * abs(sizeNoise)) * 2.0 * u_sizeFactor;
+        return fbm(pos * abs(sizeNoise)) * 2.0 * u_sizeFactor * radialMask;
     } else {
-        return u_sizeFactor + (rand(state) * 2.0 - 1.0) * u_sizeFactor * 2.0 * sizeNoise;
+        return (u_sizeFactor + (rand(state) * 2.0 - 1.0) * u_sizeFactor * 2.0 * sizeNoise) * radialMask;
     }
 }
 
@@ -412,9 +418,9 @@ void main() {
     }
 
     int layer = pickLayer(state);
-    float size = generateSize(state, u_sizeNoise, pos.xz);
-    vec3 color = generateColor(state, u_colorNoise);
     int type = int(u_type);
+    float size = generateSize(state, u_sizeNoise, pos.xz, distribution, type);
+    vec3 color = generateColor(state, u_colorNoise);
 
     // Apply dataset transformation
     pos = (u_baseTransform * vec4(pos, 1.0)).xyz;

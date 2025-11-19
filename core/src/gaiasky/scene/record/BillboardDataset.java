@@ -20,6 +20,7 @@ import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -340,6 +341,10 @@ public class BillboardDataset {
         this.baseColors[idx * 3] = (float) r;
         this.baseColors[idx * 3 + 1] = (float) g;
         this.baseColors[idx * 3 + 2] = (float) b;
+    }
+
+    public void setBaseColors(float[] baseColors) {
+        this.baseColors = Arrays.copyOf(baseColors, baseColors.length);
     }
 
     /**
