@@ -23,6 +23,7 @@ import gaiasky.gui.window.AddShapeDialog;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
@@ -300,8 +301,8 @@ public class SceneContextMenu extends ContextMenu {
         }
 
         if (SysUtils.isComputeShaderSupported()) {
+            addSeparator();
             if (procGalCandidate) {
-                addSeparator();
                 MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.edit"), skin, skin.getDrawable("icon-elem-galaxies"));
                 galGen.addListener(event -> {
                     if (event instanceof ChangeEvent) {
@@ -311,18 +312,25 @@ public class SceneContextMenu extends ContextMenu {
                     return false;
                 });
                 addItem(galGen);
-            } else {
-                addSeparator();
-                MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
-                galGen.addListener(event -> {
+            }
+            MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
+            ContextMenu morphologiesMenu = new ContextMenu(skin, "default");
+            var gms = GalaxyGenerator.GalaxyMorphology.values();
+            for (var gm : gms) {
+                MenuItem gmEntry = new MenuItem(gm.name(), skin, skin.getDrawable("icon-elem-galaxies"));
+                gmEntry.addListener(event -> {
                     if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
+                        EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, null, gm);
                         return true;
                     }
                     return false;
                 });
-                addItem(galGen);
+                morphologiesMenu.addItem(gmEntry);
+
             }
+            galGen.setSubMenu(morphologiesMenu);
+            addItem(galGen);
+
         }
 
 

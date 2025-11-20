@@ -2,6 +2,7 @@ package gaiasky.scene.record;
 
 import gaiasky.render.BlendMode;
 import gaiasky.util.Pair;
+import gaiasky.util.math.StdRandom;
 
 import java.util.Objects;
 import java.util.Random;
@@ -15,6 +16,20 @@ import static gaiasky.scene.record.BillboardDataset.ParticleType.*;
  * Generates galaxies as lists of {@link BillboardDataset} objects.
  */
 public class GalaxyGenerator {
+
+    private static final String[] adjectives = {
+            "Nebulous", "Radiant", "Distant", "Ancient", "Fading",
+            "Eternal", "Frozen", "Mystic", "Vast", "Cosmic",
+            "Luminous", "Fierce", "Silent", "Shadowed", "Eclipsing",
+            "Majestic", "Crimson", "Whirling", "Burning", "Spiral",
+            "Twilight", "Endless", "Glowing", "Lost", "Twinkling",
+            "Mysterious", "Fragmented", "Golden", "Vibrant", "Dark"
+    };
+
+    public static String generateGalaxyName() {
+        StdRandom.setSeed(System.currentTimeMillis());
+        return adjectives[StdRandom.uniform(adjectives.length)] + " galaxy " + StdRandom.uniform(2, 100);
+    }
 
     /** RNG. **/
     private final Random rand;
@@ -200,7 +215,7 @@ public class GalaxyGenerator {
                 gas.setEccentricityX(eccX);
                 gas.setEccentricityY(eccY);
                 gas.setMinRadius(0.0);
-                gas.setSize(gas.size * (distribution == ELLIPSOID ?  1.5 : 1.0));
+                gas.setSize(gas.size * (distribution == ELLIPSOID ? 1.5 : 1.0));
                 gas.setColorNoise(rand.nextDouble(0.01, 0.4));
                 if (distribution == SPHERE_GAUSS) {
                     gas.setScaleY(1.0 + eccY);

@@ -14,7 +14,7 @@ import java.util.Random;
 
 public final class StdRandom {
 
-    private static Random random; // pseudo-random number generator
+    private static final Random random; // pseudo-random number generator
     private static long seed; // pseudo-random number generator seed
 
     // static initializer

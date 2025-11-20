@@ -38,13 +38,17 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.record.GalaxyGenerator;
+import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
 
@@ -410,21 +414,72 @@ public class MainGui extends AbstractGui {
             }
             case SHOW_PROCEDURAL_GALAXY_CMD -> {
                 var focus = (FocusView) data[0];
+                final GalaxyMorphology morphology = data.length == 1 ? GalaxyMorphology.Sb : (GalaxyMorphology) data[1];
 
                 if (focus == null || !focus.isValid() || !focus.isBillboardDataset()) {
                     focus = null;
                 }
-                var w = findActor("procedural-gal-window");
-                // Only one instance
-                if (w != null && w.hasParent() && w instanceof GalaxyGenerationWindow ggw) {
-                    if (!w.isVisible()) {
+                // Ask for name
+                if (focus == null) {
+                    GenericDialog nameDialog = new GenericDialog(I18n.msg("gui.galaxy.new"), skin, stage) {
+                        private String name;
+                        private OwnTextField nameField;
+
+                        @Override
+                        protected void build() {
+                            name = GalaxyGenerator.generateGalaxyName();
+                            nameField = new OwnTextField(name, skin);
+                            nameField.setWidth(500f);
+                            content.clear();
+                            content.add(new OwnLabel(I18n.msg("gui.galaxy.name"), skin)).left().padRight(pad18);
+                            content.add(nameField).left();
+                        }
+
+                        @Override
+                        protected boolean accept() {
+                            var w = findActor("procedural-gal-window");
+                            // Only one instance
+                            if (w != null && w.hasParent() && w instanceof GalaxyGenerationWindow ggw) {
+                                if (!w.isVisible()) {
+                                    ggw.reinitialize(null);
+                                    w.setVisible(true);
+                                }
+                            } else {
+                                if (nameField.getText() != null && !nameField.getText().isEmpty()) {
+                                    name = nameField.getText();
+                                }
+                                GalaxyGenerationWindow window = new GalaxyGenerationWindow(name, morphology, scene, stage, skin);
+                                window.setName("procedural-gal-window");
+                                window.show(stage);
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        protected void cancel() {
+                            // Nothing
+                        }
+
+                        @Override
+                        public void dispose() {
+                            // Nothing
+                        }
+                    };
+                    nameDialog.setAcceptText(I18n.msg("gui.ok"));
+                    nameDialog.setCancelText(I18n.msg("gui.cancel"));
+                    nameDialog.buildSuper();
+                    nameDialog.show(stage);
+                } else {
+                    var w = findActor("procedural-gal-window");
+                    // Only one instance
+                    if (w != null && w.hasParent() && w instanceof GalaxyGenerationWindow ggw) {
                         ggw.reinitialize(focus);
                         w.setVisible(true);
+                    } else {
+                        GalaxyGenerationWindow window = new GalaxyGenerationWindow(focus, scene, stage, skin);
+                        window.setName("procedural-gal-window");
+                        window.show(stage);
                     }
-                } else {
-                    GalaxyGenerationWindow window = new GalaxyGenerationWindow(focus, scene, stage, skin);
-                    window.setName("procedural-gal-window");
-                    window.show(stage);
                 }
             }
             case SHOW_LAND_AT_LOCATION_CMD -> {

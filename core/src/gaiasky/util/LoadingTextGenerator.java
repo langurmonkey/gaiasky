@@ -31,6 +31,10 @@ public class LoadingTextGenerator {
         set = createOrder("funny.order");
     }
 
+    public String getRandomAdjective() {
+        return adjectives[StdRandom.uniform(adjectives.length)];
+    }
+
     private String[] read(String keyPrefix) {
         return read(keyPrefix, 0);
     }
