@@ -56,7 +56,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     private static final ObjectFloatMap<Entity> scrollY = new ObjectFloatMap<>();
     /** Saves the datasets whose collapsible panes are expanded. **/
     private static final ObjectSet<BillboardDataset> expandedDatasets = new ObjectSet<>();
-    private static GalaxyMorphology currentGm = GalaxyMorphology.E3;
+    private static GalaxyMorphology currentGm = GalaxyMorphology.Sc;
 
     private final GalaxyGenerator gen;
     private final Scene scene;
@@ -100,7 +100,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             // Create entity.
             var pair = GaiaSky.instance.scripting().apiv2().scene.createNewProceduralGalaxy(name,
                                                                                             radius,
-                                                                                            pos);
+                                                                                            pos,
+                                                                                            currentGm);
 
             var entityFull = pair.getFirst();
             var entityHalf = pair.getSecond();
@@ -675,7 +676,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             dsTable.add(colorsTable).left().padRight(pad5).padBottom(pad18);
             dsTable.add(colorNoise).left().padBottom(pad18).row();
 
-            if (ds.distribution == Distribution.GAUSS || ds.distribution == Distribution.DISK) {
+            if (ds.distribution == Distribution.DISK_GAUSS || ds.distribution == Distribution.DISK) {
                 // Height scale
                 var heightScale = new OwnSliderReset(I18n.msg("gui.galaxy.ds.height"), 0.0f, 1.0f, 0.001f, skin);
                 heightScale.setWidth(fullWidthBox);

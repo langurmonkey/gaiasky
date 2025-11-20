@@ -3,9 +3,12 @@ package gaiasky.scene.record;
 import gaiasky.render.BlendMode;
 import gaiasky.util.Pair;
 
+import java.util.Objects;
 import java.util.Random;
 
+import static gaiasky.scene.record.BillboardDataset.Distribution;
 import static gaiasky.scene.record.BillboardDataset.Distribution.*;
+import static gaiasky.scene.record.BillboardDataset.ParticleType;
 import static gaiasky.scene.record.BillboardDataset.ParticleType.*;
 
 /**
@@ -168,55 +171,40 @@ public class GalaxyGenerator {
             // No HII, old and cool stars.
             case E0, E3, E5, E7 -> {
 
-                // Eccentricity in X and Y.
+                var distribution = rand.nextFloat() > 0.3f ? ELLIPSOID : SPHERE_GAUSS;
+                // Horizontal flattening.
                 double eccY = generateEccentricity(gm);
+                // Vertical flattening.
                 double eccX = eccY * rand.nextDouble(0.1f, 0.6f);
 
                 // Stars
-                var stars = new BillboardDataset();
-                stars.setType(STAR);
-                stars.setDistribution(BillboardDataset.Distribution.ELLIPSOID);
+                var stars = generateBase(STAR, distribution);
                 stars.setEccentricityX(eccX);
                 stars.setEccentricityY(eccY);
-                stars.setBaseColors(generateColors(STAR));
-                stars.setParticleCount(generateCount(STAR));
                 stars.setMinRadius(0.0);
-                stars.setSize(0.2);
-                stars.setSizeNoise(0.7);
-                stars.setIntensity(2.0);
-                stars.setLayers(new int[]{0, 1, 2, 4});
-                stars.setMaxSize(0.15);
+                if (distribution == SPHERE_GAUSS) {
+                    stars.setScaleY(1.0 + eccY);
+                }
 
                 // Dust (50% chance of being included)
-                var dust = new BillboardDataset();
-                dust.setType(DUST);
-                dust.setDistribution(BillboardDataset.Distribution.ELLIPSOID);
+                var dust = generateBase(DUST, distribution);
                 dust.setEccentricityX(eccX);
                 dust.setEccentricityY(eccY);
-                dust.setBaseColors(generateColors(DUST));
-                dust.setParticleCount(generateCount(DUST));
-                dust.setSize(rand.nextDouble(1.0, 4.9));
-                dust.setIntensity(rand.nextDouble(0.005, 0.01));
-                dust.setBlending(BlendMode.SUBTRACTIVE);
-                dust.setDepthMask(false);
-                dust.setLayers(new int[]{0, 1, 2});
-                dust.setMaxSize(20.0);
+                dust.setSize(rand.nextDouble(2.0, 6.9));
+                if (distribution == SPHERE_GAUSS) {
+                    dust.setScaleY(1.0 + eccY);
+                }
 
                 // Gas
-                var gas = new BillboardDataset();
-                gas.setType(GAS);
-                gas.setDistribution(BillboardDataset.Distribution.ELLIPSOID);
+                var gas = generateBase(GAS, distribution);
                 gas.setEccentricityX(eccX);
                 gas.setEccentricityY(eccY);
                 gas.setMinRadius(0.0);
-                gas.setBaseColors(generateColors(GAS));
+                gas.setSize(gas.size * (distribution == ELLIPSOID ?  1.5 : 1.0));
                 gas.setColorNoise(rand.nextDouble(0.01, 0.4));
-                gas.setParticleCount(generateCount(GAS));
-                gas.setSize(rand.nextDouble(50.0, 90.0));
-                gas.setSizeNoise(0.09);
-                gas.setIntensity(rand.nextDouble(0.009, 0.012));
-                gas.setLayers(new int[]{0, 1, 2, 3});
-                gas.setMaxSize(20.0);
+                if (distribution == SPHERE_GAUSS) {
+                    gas.setScaleY(1.0 + eccY);
+                }
 
 
                 var full = new BillboardDataset[]{stars};
@@ -225,115 +213,81 @@ public class GalaxyGenerator {
             }
             // Lenticulars
             case S0 -> {
+                var distribution = SPHERE_GAUSS;
 
+                // Stars
+                var stars = generateBase(STAR, distribution);
+                stars.setMinRadius(0.0);
+
+                // Dust
+                var dust = generateBase(DUST, SPIRAL);
+                dust.setIntensity(dust.intensity * 0.5);
+                dust.setBaseAngle(rand.nextGaussian(990.0, 10.0));
+                dust.setMinRadius(rand.nextGaussian(0.2, 0.01));
+
+                // Gas
+                var gas = generateBase(GAS, distribution);
+                gas.setBaseRadius(rand.nextDouble(1.5, 2.2));
+                gas.setMinRadius(0.0);
+                gas.setScale(new double[]{1.0, rand.nextDouble(0.1, 2.0), 1.0});
+
+                var full = new BillboardDataset[]{stars};
+                var half = rand.nextFloat() > 0.3 ? new BillboardDataset[]{gas, dust} : new BillboardDataset[]{gas};
+                result.set(full, half);
             }
             // Spirals
             case Sa, Sb, Sc -> {
                 var dustDistribution = generateSpiralDistribution(gm);
                 var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
                 var spiralAngle = generateSpiralAngle(gm, dustDistribution);
-                var eccentricity = rand.nextDouble(0.1, 0.4);
+                var eccentricity = rand.nextDouble(0.2, 0.3);
                 var minRadius = rand.nextDouble(0.08, 0.15);
-                var spiralDeltaPos = new double[]{rand.nextGaussian() * 0.1f, rand.nextGaussian() * 0.1f};
-                var armSigma = rand.nextDouble(0.3, 0.55);
-                var numArms = rand.nextFloat() > 0.2f ? 2L : 4L;
-                var heightScale = rand.nextDouble(0.05, 0.15);
+                var spiralDeltaPos = generateSpiralDeltaPos(dustDistribution);
+                var numArms = (rand.nextFloat() > 0.35f ? 2L : 4L) * (gm == GalaxyMorphology.Sc ? 2L : 1L);
+                var armSigma = rand.nextDouble(0.25, 0.45) / numArms;
+                var heightScale = generateHeightScale();
 
                 // Stars
-                var stars = new BillboardDataset();
-                stars.setType(STAR);
-                stars.setDistribution(BillboardDataset.Distribution.GAUSS);
-                stars.setBaseColors(generateColors(STAR));
-                stars.setParticleCount(generateCount(STAR));
+                var stars = generateBase(STAR, DISK_GAUSS);
                 stars.setMinRadius(minRadius);
                 stars.setHeightScale(heightScale);
-                stars.setSize(0.2);
-                stars.setSizeNoise(0.7);
-                stars.setIntensity(2.0);
-                stars.setLayers(new int[]{0, 1, 2, 4});
-                stars.setMaxSize(0.15);
 
                 // HII
-                var hii = new BillboardDataset();
-                hii.setType(HII);
-                hii.setDistribution(DISK);
-                hii.setBaseColors(generateColors(HII));
-                hii.setParticleCount(generateCount(HII));
+                var hii = generateBase(HII, DISK);
                 hii.setMinRadius(minRadius);
                 hii.setHeightScale(heightScale);
-                hii.setSize(0.2);
-                hii.setSizeNoise(0.7);
-                hii.setIntensity(2.0);
-                hii.setLayers(new int[]{0, 1, 2, 4});
-                hii.setMaxSize(0.15);
 
                 // DUST
-                var dust = new BillboardDataset();
-                dust.setType(DUST);
-                dust.setDistribution(dustDistribution);
-                dust.setBaseColors(generateColors(DUST));
-                dust.setParticleCount(generateCount(DUST));
+                var dust = generateBase(DUST, dustDistribution);
                 dust.setMinRadius(minRadius);
-                dust.setSize(rand.nextDouble(10.0, 25.0));
-                dust.setIntensity(rand.nextDouble(0.01, 0.045));
-                dust.setSizeMask(true);
-                dust.setSizeNoise(-rand.nextDouble(10.0, 25.0));
                 dust.setEccentricity(eccentricity);
                 dust.setBaseAngle(spiralAngle);
                 dust.setSpiralDeltaPos(spiralDeltaPos);
                 dust.setNumArms(numArms);
                 dust.setArmSigma(armSigma);
-                dust.setBlending(BlendMode.SUBTRACTIVE);
-                dust.setDepthMask(false);
-                dust.setLayers(new int[]{0, 1, 2});
-                dust.setMaxSize(20.0);
+
                 // DUST (field)
-                var dustF = new BillboardDataset();
-                dustF.setType(DUST);
-                dustF.setDistribution(DISK);
+                var dustF = generateBase(DUST, DISK);
                 dustF.setBaseColors(dust.baseColors);
+                dustF.setIntensity((double) dust.intensity);
                 dustF.setParticleCount(5000L);
                 dustF.setMinRadius(minRadius);
                 dustF.setSize(dust.size * 0.8);
-                dustF.setSizeMask(true);
-                dustF.setSizeNoise(-rand.nextDouble(10.0, 25.0));
-                dustF.setIntensity((double) dust.intensity);
-                dustF.setBlending(BlendMode.SUBTRACTIVE);
-                dustF.setDepthMask(false);
-                dustF.setLayers(new int[]{0, 1, 2});
-                dustF.setMaxSize(20.0);
 
                 // GAS
-                var gas = new BillboardDataset();
-                gas.setType(GAS);
-                gas.setDistribution(gasDistribution);
-                gas.setBaseColors(generateColors(GAS));
-                gas.setParticleCount(generateCount(GAS));
+                var gas = generateBase(GAS, gasDistribution);
                 gas.setMinRadius(minRadius);
-                gas.setSize(rand.nextDouble(50.0, 90.0));
-                gas.setSizeNoise(0.09);
-                gas.setIntensity(rand.nextGaussian(0.008, 0.0004));
                 gas.setEccentricity(eccentricity);
                 gas.setBaseAngle(spiralAngle);
                 gas.setSpiralDeltaPos(spiralDeltaPos);
                 gas.setNumArms(numArms);
                 gas.setArmSigma(armSigma);
-                gas.setLayers(new int[]{0, 1, 2, 3});
-                gas.setMaxSize(20.0);
 
                 // BULGE
-                var bulge = new BillboardDataset();
-                bulge.setType(BillboardDataset.ParticleType.BULGE);
-                bulge.setDistribution(BillboardDataset.Distribution.SPHERE);
+                var bulge = generateBase(BULGE, SPHERE);
                 bulge.setMinRadius(0.0);
                 bulge.setBaseRadius(minRadius + 0.05);
-                bulge.setBaseColor(generateColors(BULGE));
-                bulge.setParticleCount(generateCount(BULGE));
                 bulge.setColorNoise(0.09);
-                bulge.setSize(90.0);
-                bulge.setIntensity(rand.nextDouble(0.5, 1.2));
-                bulge.setLayers(new int[]{0, 1, 2});
-                bulge.setMaxSize(50.0);
 
 
                 var full = new BillboardDataset[]{stars, hii};
@@ -342,7 +296,69 @@ public class GalaxyGenerator {
             }
             // Barred spirals
             case SBa, SBb, SBc -> {
+                var dustDistribution = generateSpiralDistribution(gm);
+                var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
+                var spiralAngle = generateSpiralAngle(gm, dustDistribution);
+                var eccentricity = rand.nextDouble(0.2, 0.3);
+                var minRadius = rand.nextDouble(0.25, 0.4);
+                var spiralDeltaPos = generateSpiralDeltaPos(dustDistribution);
+                var numArms = (rand.nextFloat() > 0.35f ? 2L : 4L) * (gm == GalaxyMorphology.SBc ? 2L : 1L);
+                var armSigma = rand.nextDouble(0.25, 0.45) / numArms;
+                var heightScale = generateHeightScale();
 
+                // Stars
+                var stars = generateBase(STAR, DISK_GAUSS);
+                stars.setMinRadius(minRadius);
+                stars.setHeightScale(heightScale);
+
+                // HII
+                var hii = generateBase(HII, DISK);
+                hii.setMinRadius(minRadius);
+                hii.setHeightScale(heightScale);
+
+                // DUST
+                var dust = generateBase(DUST, dustDistribution);
+                dust.setMinRadius(minRadius / 2.0);
+                dust.setEccentricity(eccentricity);
+                dust.setBaseAngle(spiralAngle);
+                dust.setSpiralDeltaPos(spiralDeltaPos);
+                dust.setNumArms(numArms);
+                dust.setArmSigma(armSigma);
+
+                // DUST (field)
+                var dustF = generateBase(DUST, DISK);
+                dustF.setMinRadius(minRadius / 2.0);
+                dustF.setBaseColors(dust.baseColors);
+                dustF.setIntensity((double) dust.intensity);
+                dustF.setParticleCount(5000L);
+                dustF.setSize(dust.size * 0.8);
+
+                // GAS
+                var gas = generateBase(GAS, gasDistribution);
+                gas.setMinRadius(minRadius / 2.0);
+                gas.setEccentricity(eccentricity);
+                gas.setBaseAngle(spiralAngle);
+                gas.setSpiralDeltaPos(spiralDeltaPos);
+                gas.setNumArms(numArms);
+                gas.setArmSigma(armSigma);
+
+                // BAR
+                var bar = generateBase(BULGE, ELLIPSOID);
+                bar.setMinRadius(0.0);
+                bar.setBaseRadius(minRadius - 0.1);
+                bar.setParticleCount(70L);
+                bar.setSize(bar.size * 0.4);
+                bar.setIntensity(bar.intensity * 0.5);
+                bar.setEccentricityX(rand.nextDouble(0.4, 0.8));
+                bar.setEccentricityY(rand.nextDouble(0.4, 0.8));
+                bar.setBaseColors(gas.baseColors);
+                bar.setColorNoise(0.09);
+                bar.setRotationY(-36.0);
+
+
+                var full = new BillboardDataset[]{stars, hii};
+                var half = dustDistribution != SPIRAL_LOG ? new BillboardDataset[]{gas, dust, bar} : new BillboardDataset[]{gas, dust, dustF, bar};
+                result.set(full, half);
             }
             // Irregulars
             case Im -> {
@@ -353,23 +369,103 @@ public class GalaxyGenerator {
         return result;
     }
 
-    private BillboardDataset.Distribution generateSpiralDistribution(GalaxyMorphology m) {
+    private BillboardDataset generateBase(ParticleType type, Distribution distribution) {
+        var bd = new BillboardDataset();
+        bd.setType(type);
+        bd.setDistribution(distribution);
+        bd.setBaseColor(generateColors(type));
+        bd.setParticleCount(generateCount(type));
+        bd.setIntensity(generateIntensity(type));
+        bd.setLayers(getLayers(type));
+        bd.setSize(generateSize(type));
+        bd.setSizeNoise(getSizeNoise(type));
+        bd.setMaxSize(getMaxSize(type));
+
+        if (type == DUST) {
+            // Subtractive blending.
+            bd.setBlending(BlendMode.SUBTRACTIVE);
+            bd.setDepthMask(false);
+            // Use FBM perlin noise.
+            bd.setSizeNoiseScale(-rand.nextDouble(10.0, 25.0));
+        }
+        return bd;
+    }
+
+    private double getMaxSize(ParticleType type) {
+        return switch (type) {
+            case STAR -> 0.15;
+            case HII -> 0.4;
+            case DUST, GAS -> 25.0;
+            case BULGE -> 35.0;
+            case POINT -> 10.0;
+        };
+    }
+
+    private int[] getLayers(ParticleType type) {
+        return switch (type) {
+            case STAR -> new int[]{0, 1, 2, 4};
+            case HII -> new int[]{0, 3, 4, 5, 6, 7, 9, 10};
+            case DUST -> new int[]{0, 1, 2, 3};
+            case GAS -> new int[]{0, 1, 3};
+            case BULGE -> new int[]{0, 1, 2};
+            case POINT -> new int[]{0, 1, 2, 3, 4};
+        };
+    }
+
+    private double getSizeNoise(ParticleType type) {
+        return switch (type) {
+            case STAR -> 0.4;
+            case HII -> 0.6;
+            case DUST -> 0.3;
+            case GAS -> 0.09;
+            case BULGE -> 0.1;
+            case POINT -> 0.15;
+        };
+    }
+
+    private double generateSize(ParticleType type) {
+        return switch (type) {
+            case STAR -> 0.3;
+            case HII -> 2.2;
+            case DUST -> rand.nextDouble(10.0, 18.0);
+            case GAS -> rand.nextDouble(50.0, 90.0);
+            case BULGE -> rand.nextDouble(70.0, 90.0);
+            case POINT -> rand.nextDouble(1.0, 5.0);
+        };
+    }
+
+    private double generateIntensity(ParticleType type) {
+        return switch (type) {
+            case STAR -> 2.0;
+            case HII -> 1.0;
+            case DUST -> rand.nextDouble(0.015, 0.038);
+            case GAS -> rand.nextGaussian(0.007, 0.0003);
+            case BULGE -> rand.nextDouble(0.5, 1.2);
+            case POINT -> rand.nextGaussian(0.01, 0.001);
+        };
+    }
+
+    private Distribution generateSpiralDistribution(GalaxyMorphology m) {
         return switch (m) {
-            case Sb -> rand.nextFloat() > 0.3f ? SPIRAL : SPIRAL_LOG;
+            case Sb -> rand.nextFloat() > 0.25f ? SPIRAL : SPIRAL_LOG;
             case Sc -> rand.nextBoolean() ? SPIRAL : SPIRAL_LOG;
             default -> SPIRAL;
         };
     }
 
-    private double generateSpiralAngle(GalaxyMorphology m, BillboardDataset.Distribution d) {
+    private double generateHeightScale() {
+        return rand.nextDouble(0.01, 0.08);
+    }
+
+    private double generateSpiralAngle(GalaxyMorphology m, Distribution d) {
         if (d == SPIRAL) {
             return switch (m) {
-                case Sa -> rand.nextDouble(100.0, 200.0);
-                case Sb -> rand.nextDouble(200.0, 500.0);
-                case Sc -> rand.nextDouble(500.0, 1000.0);
+                case Sa, SBa -> rand.nextDouble(190.0, 300.0);
+                case Sb, SBb -> rand.nextDouble(300.0, 500.0);
+                case Sc, SBc -> rand.nextDouble(500.0, 1000.0);
                 default -> rand.nextDouble(50.0, 1000.0);
             };
-        } else if (d == BillboardDataset.Distribution.SPIRAL_LOG) {
+        } else if (d == Distribution.SPIRAL_LOG) {
             return switch (m) {
                 case Sa -> rand.nextDouble(500.0, 630.0);
                 case Sb -> rand.nextDouble(630.0, 770.0);
@@ -380,12 +476,36 @@ public class GalaxyGenerator {
         return -1;
     }
 
+    private double[] generateSpiralDeltaPos(Distribution d) {
+        if (Objects.requireNonNull(d) == SPIRAL) {
+            // Half of spirals have displacement.
+            if (rand.nextBoolean()) {
+                var dx = rand.nextGaussian() * 0.2f;
+                var dy = rand.nextGaussian() * 0.2f;
+                if (rand.nextBoolean()) {
+                    // Only delta in X or Y.
+                    if (rand.nextBoolean()) {
+                        return new double[]{dx, 0.0};
+                    } else {
+                        return new double[]{0.0, dy};
+                    }
+                } else {
+                    // Delta in both.
+                    return new double[]{dx, dy};
+                }
+            } else {
+                return new double[]{0.0, 0.0};
+            }
+        }
+        return new double[]{0.0, 0.0};
+    }
+
     private long generateCount(BillboardDataset.ParticleType gt) {
         return switch (gt) {
-            case STAR -> rand.nextLong(20_000L, 55_000L);
-            case HII -> rand.nextLong(50L, 200L);
-            case GAS -> rand.nextLong(3000L, 15_000L);
-            case DUST -> rand.nextLong(8000L, 19_500L);
+            case STAR -> rand.nextLong(20_000L, 30_000L);
+            case HII -> rand.nextLong(100L, 500L);
+            case GAS -> rand.nextLong(6000L, 8_000L);
+            case DUST -> rand.nextLong(9000L, 14_500L);
             case BULGE -> rand.nextLong(5L, 18L);
             case POINT -> rand.nextLong(1000L, 50_000L);
         };

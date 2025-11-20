@@ -14,6 +14,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.util.Logger;
 
 public class ProceduralTriggerUpdater extends AbstractUpdateSystem {
@@ -45,7 +46,8 @@ public class ProceduralTriggerUpdater extends AbstractUpdateSystem {
 
             var pair = GaiaSky.instance.scripting().apiv2().scene.createNewProceduralGalaxy(base.getName() + " procedural",
                                                                                             body.size / 2.0,
-                                                                                            body.pos);
+                                                                                            body.pos,
+                                                                                            GalaxyGenerator.GalaxyMorphology.Sc);
             var entityFull = pair.getFirst();
             var entityHalf = pair.getSecond();
             // Add to scene.

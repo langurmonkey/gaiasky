@@ -34,6 +34,7 @@ import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.BillboardDataset.Distribution;
 import gaiasky.scene.record.BillboardDataset.ParticleType;
+import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
@@ -1000,14 +1001,13 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
      * @return The full- and half-resolution entities that conform the galaxy, in a pair. The first one is the full-resolution, and the second
      *         one is the half-resolution.
      */
-    public Pair<Entity, Entity> createNewProceduralGalaxy(String name, double radius, Vector3Q pos) {
-        var archetype = scene.archetypes().get("BillboardGroup");
+    public Pair<Entity, Entity> createNewProceduralGalaxy(String name, double radius, Vector3Q pos, GalaxyGenerator.GalaxyMorphology morphology) {
+        var generator = new GalaxyGenerator();
+        var channels = generator.generateGalaxy(morphology, 123L);
+        var full = channels.getFirst();
+        var half = channels.getSecond();
 
-        // Galaxy parameters
-        var spiralAngle = 460.0;
-        var eccentricity = 0.4;
-        var minRadius = 0.15;
-        var spiralDeltaPos = new double[]{0.2, 0.0};
+        var archetype = scene.archetypes().get("BillboardGroup");
 
         // FULL RESOLUTION
         var entityFull = archetype.createEntity();
@@ -1040,37 +1040,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var bbSetFull = Mapper.billboardSet.get(entityFull);
         bbSetFull.procedural = true;
         bbSetFull.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
-
-        // Stars
-        var starsFull = new BillboardDataset();
-        starsFull.setType(ParticleType.STAR);
-        starsFull.setDistribution(Distribution.GAUSS);
-        starsFull.setBaseColor(new double[]{0.93, 0.93, 0.75, 0.75, 0.75, 0.96, 0.93, 0.75, 0.75, 0.94, 0.94, 0.88});
-        starsFull.setParticleCount(33000L);
-        starsFull.setMinRadius(0.0);
-        starsFull.setSize(0.2);
-        starsFull.setSizeNoise(0.7);
-        starsFull.setIntensity(2.0);
-        starsFull.setLayers(new int[]{0, 1, 2, 4});
-        starsFull.setMaxSize(0.15);
-
-        // HII
-        var hiiFull = new BillboardDataset();
-        hiiFull.setType(ParticleType.HII);
-        hiiFull.setDistribution(Distribution.SPIRAL);
-        hiiFull.setBaseAngle(spiralAngle);
-        hiiFull.setEccentricity(eccentricity);
-        hiiFull.setMinRadius(0.0);
-        hiiFull.setSpiralDeltaPos(spiralDeltaPos);
-        hiiFull.setBaseColors(new double[]{0.93, 0.6, 1.0, 1.0, 0.7, 0.94});
-        hiiFull.setParticleCount(160L);
-        hiiFull.setSize(2.3);
-        starsFull.setSizeNoise(0.5);
-        hiiFull.setIntensity(5.0);
-        hiiFull.setLayers(new int[]{4, 5, 6, 7, 8, 9, 10});
-        hiiFull.setMaxSize(10.0);
-
-        bbSetFull.setData(new BillboardDataset[]{starsFull, hiiFull});
+        bbSetFull.setData(full);
 
         // HALF RESOLUTION
         var entityHalf = archetype.createEntity();
@@ -1104,68 +1074,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var bbSetHalf = Mapper.billboardSet.get(entityHalf);
         bbSetHalf.procedural = true;
         bbSetHalf.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
-
-
-        // Dust
-        var dustHalf = new BillboardDataset();
-        dustHalf.setType(ParticleType.DUST);
-        dustHalf.setDistribution(Distribution.SPIRAL);
-        dustHalf.setBaseAngle(spiralAngle);
-        dustHalf.setEccentricity(eccentricity);
-        dustHalf.setMinRadius(minRadius);
-        dustHalf.setSpiralDeltaPos(spiralDeltaPos);
-        dustHalf.setBaseColor(new double[]{0.8, 0.8, 1.0});
-        dustHalf.setParticleCount(13500L);
-        dustHalf.setSize(4.5);
-        dustHalf.setIntensity(0.008);
-        dustHalf.setBlending(BlendMode.SUBTRACTIVE);
-        dustHalf.setDepthMask(false);
-        dustHalf.setLayers(new int[]{0, 1, 2});
-        dustHalf.setMaxSize(20.0);
-
-        // Gas
-        var gasHalf = new BillboardDataset();
-        gasHalf.setType(ParticleType.GAS);
-        gasHalf.setDistribution(Distribution.SPIRAL);
-        gasHalf.setBaseAngle(spiralAngle);
-        gasHalf.setEccentricity(eccentricity);
-        gasHalf.setMinRadius(minRadius);
-        gasHalf.setSpiralDeltaPos(spiralDeltaPos);
-        gasHalf.setBaseColors(new double[]{
-                0.622,
-                0.618,
-                0.969,
-                0.627,
-                0.674,
-                0.779,
-                0.71,
-                0.7,
-                0.88
-
-        });
-        gasHalf.setParticleCount(8900L);
-        gasHalf.setColorNoise(0.07);
-        gasHalf.setSize(63.0);
-        gasHalf.setSizeNoise(0.09);
-        gasHalf.setIntensity(0.0036);
-        gasHalf.setLayers(new int[]{0, 1, 2, 3});
-        gasHalf.setMaxSize(20.0);
-
-        // Bulge
-        var bulgeHalf = new BillboardDataset();
-        bulgeHalf.setType(ParticleType.BULGE);
-        bulgeHalf.setDistribution(Distribution.SPHERE);
-        bulgeHalf.setMinRadius(0.0);
-        bulgeHalf.setBaseRadius(minRadius + 0.05);
-        bulgeHalf.setBaseColor(new double[]{0.96, 0.85, 0.64});
-        bulgeHalf.setParticleCount(12L);
-        bulgeHalf.setColorNoise(0.09);
-        bulgeHalf.setSize(90.0);
-        bulgeHalf.setIntensity(0.19);
-        bulgeHalf.setLayers(new int[]{0, 1, 2});
-        bulgeHalf.setMaxSize(50.0);
-
-        bbSetHalf.setData(new BillboardDataset[]{dustHalf, gasHalf, bulgeHalf});
+        bbSetHalf.setData(half);
 
         // Add children here and now.
         graphFull.addChild(entityFull, entityHalf, false, 1);

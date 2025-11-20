@@ -36,8 +36,9 @@ uniform uint u_distribution;
 #define D_SPIRAL_LOG 3
 #define D_BAR 4
 #define D_ELLIPSOID 5
-#define D_GAUSS 6
-#define D_CONE 7
+#define D_DISK_GAUSS 6
+#define D_SPHERE_GAUSS 7
+#define D_CONE 8
 
 // RNG base seed.
 uniform uint u_seed;
@@ -79,11 +80,25 @@ uniform mat4 u_baseTransform;
 
 #include <shader/lib/distributions.glsl>
 
-// Generates a new particle position in a spherical distribution.
+// Generates a new particle position in a uniform spherical distribution.
 vec3 positionSphere(inout uint state) {
     // The radius of the distribution times a random number, with some variation.
     float r_0 = u_baseRadius - u_minRadius;
     float r = u_minRadius + (r_0 + (rand(state) - 0.5) * 0.3) * sqrt(rand(state));
+    float theta = rand(state) * 6.2831853;
+    float phi = acos(rand(state) * 2.0 - 1.0);
+
+    vec3 pos = vec3(
+    r * sin(phi) * cos(theta),
+    r * sin(phi) * sin(theta),
+    r * cos(phi)
+    );
+    return pos;
+}
+// Generates a new particle in a spherical gaussian distribution.
+vec3 positionSphereGauss(inout uint state) {
+    // The radius of the distribution follows a gaussian.
+    float r = u_minRadius + (u_baseRadius - u_minRadius) * sqrt(ggaussian(state, 1.0) * 0.15);
     float theta = rand(state) * 6.2831853;
     float phi = acos(rand(state) * 2.0 - 1.0);
 
@@ -191,7 +206,8 @@ vec3 positionEllipsoid(inout uint state, vec2 ec) {
     // --- sample radius fraction uniformly inside shell ---
     float s = rand(state);
     float minFrac = clamp(u_minRadius / u_baseRadius, 0.0, 1.0);
-    float rFrac = mix(minFrac, 1.0, pow(s, 1.0/3.0));
+    float centralDensity = rand(state) + 1.2; // The higher the denser
+    float rFrac = mix(minFrac, 1.0, pow(s, centralDensity/3.0));
 
     // --- compute semi-axes ---
     float a = u_baseRadius;// X-axis (major)
@@ -224,8 +240,8 @@ vec3 positionDisk(inout uint state, float heightScale) {
     return vec3(x, y, z);
 }
 
-// Lays out positions in a gaussian manner, with a very dense center and a falloff.
-vec3 positionGauss(inout uint state, float heightScale) {
+// Lays out positions in a disk wiht a gaussian distribution, with a very dense center and a falloff.
+vec3 positionDiskGauss(inout uint state, float heightScale) {
     // Random angle [0, 2π)
     float theta = rand(state) * 6.2831853;
 
@@ -411,8 +427,10 @@ void main() {
         pos = positionEllipsoid(state, u_eccentricity);
     } else if (distribution == D_SPHERE) {
         pos = positionSphere(state);
-    } else if (distribution == D_GAUSS) {
-        pos = positionGauss(state, u_heightScale);
+    } else if (distribution == D_DISK_GAUSS) {
+        pos = positionDiskGauss(state, u_heightScale);
+    } else if (distribution == D_SPHERE_GAUSS) {
+        pos = positionSphereGauss(state);
     } else if (distribution == D_CONE) {
         pos = positionCone(state, u_baseAngle);
     }

@@ -247,8 +247,32 @@ public class BillboardDataset {
         this.scale.set((float) s[0], (float) s[1], (float) s[2]);
     }
 
+    public void setScaleX(double s) {
+        this.scale.x = (float) s;
+    }
+
+    public void setScaleY(double s) {
+        this.scale.y = (float) s;
+    }
+
+    public void setScaleZ(double s) {
+        this.scale.z = (float) s;
+    }
+
     public void setRotation(double[] r) {
         this.rotation.set((float) r[0], (float) r[1], (float) r[2]);
+    }
+
+    public void setRotationX(double r) {
+        this.rotation.x = (float) r;
+    }
+
+    public void setRotationY(double r) {
+        this.rotation.y = (float) r;
+    }
+
+    public void setRotationZ(double r) {
+        this.rotation.z = (float) r;
     }
 
     public void setEccentricity(Double eccentricity) {
@@ -624,7 +648,7 @@ public class BillboardDataset {
         /** Base angle [deg] range, for {@link Distribution#SPIRAL}, {@link Distribution#SPIRAL_LOG}, and {@link Distribution#CONE}. **/
         public float[] baseAngle = new float[]{0f, 1000f};
         /** Eccentricity range, for {@link Distribution#SPIRAL} and {@link Distribution#ELLIPSOID}. **/
-        public float[] eccentricity = new float[]{0.0f, 0.8f};
+        public float[] eccentricity = new float[]{0.0f, 1.0f};
         /** Delta pos (in X and Y) range, for {@link Distribution#SPIRAL}. **/
         public float[] spiralDeltaPos = new float[]{-0.5f, 0.5f};
         /** Aspect ratio range, for {@link Distribution#BAR}. **/
@@ -688,9 +712,9 @@ public class BillboardDataset {
     }
 
     public enum Distribution {
-        /** Simple sphere. **/
+        /** Simple uniformly distributed sphere. **/
         SPHERE,
-        /** Simple disk. **/
+        /** Simple uniformly distributed disk. **/
         DISK,
         /** Density wave distribution, producing natural spirals. **/
         SPIRAL,
@@ -701,7 +725,9 @@ public class BillboardDataset {
         /** An ellipse, with an eccentricity. **/
         ELLIPSOID,
         /** Gaussian distribution in a disk, with an overdense center. **/
-        GAUSS,
+        DISK_GAUSS,
+        /** Gaussian distribution in a sphere. **/
+        SPHERE_GAUSS,
         /** A cone distribution. **/
         CONE,
     }
