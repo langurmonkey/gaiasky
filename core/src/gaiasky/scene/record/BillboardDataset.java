@@ -730,5 +730,7 @@ public class BillboardDataset {
         SPHERE_GAUSS,
         /** A cone distribution. **/
         CONE,
+        /** An irregular distribution. **/
+        IRREGULAR,
     }
 }

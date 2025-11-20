@@ -17,6 +17,7 @@ import static gaiasky.scene.record.BillboardDataset.ParticleType.*;
  */
 public class GalaxyGenerator {
 
+    /** Adjectives for random name generation. **/
     private static final String[] adjectives = {
             "Nebulous", "Radiant", "Distant", "Ancient", "Fading",
             "Eternal", "Frozen", "Mystic", "Vast", "Cosmic",
@@ -377,7 +378,39 @@ public class GalaxyGenerator {
             }
             // Irregulars
             case Im -> {
+                var sx = rand.nextDouble(0.1, 2.5);
+                var sy = rand.nextDouble(0.1, 2.5);
+                var sz = rand.nextDouble(0.1, 2.5);
+                var scale = new double[]{sx, sy, sz};
+                var sizeScale = rand.nextDouble(0.02, 0.4);
 
+                // Stars (random distribution with clumps)
+                var stars = generateBase(STAR, IRREGULAR);
+                stars.setSize(0.8);
+                stars.setIntensity(2.0);
+                stars.setScale(scale);
+                stars.setSizeNoiseScale(sizeScale);
+
+                // Gas (scattered, clumpy distribution)
+                var gas = generateBase(GAS, IRREGULAR);
+                gas.setIntensity(gas.intensity * rand.nextDouble(3.0, 8.0));
+                gas.setMinRadius(rand.nextDouble(0.1, 0.3));
+                gas.setScale(scale);
+                gas.setBaseRadius(rand.nextDouble(1.0, 2.0));
+                gas.setSizeNoiseScale(sizeScale);
+                gas.setSize(gas.size * rand.nextDouble(3.2, 5.0));
+
+                // Dust (random dust clouds, more chaotic)
+                var dust = generateBase(DUST, IRREGULAR);
+                dust.setIntensity(dust.intensity * rand.nextDouble(0.5, 2.2));
+                dust.setSize(rand.nextDouble(15.0, 35.0));
+                dust.setScale(scale);
+                dust.setSizeNoiseScale(sizeScale);
+
+                // Creating the final dataset
+                var full = new BillboardDataset[]{stars};
+                var half = new BillboardDataset[]{gas, dust};
+                result.set(full, half);
             }
         }
 
