@@ -32,7 +32,6 @@ import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
-import gaiasky.util.Logger;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4D;
@@ -47,21 +46,18 @@ import java.text.DecimalFormat;
  * Interface to the procedural generation of galaxies using billboard datasets and compute shaders.
  */
 public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(GalaxyGenerationWindow.class);
-
     private final static int SLIDER_STEPS = 1_000;
-    private static int sequence = 153;
     private static final float pad5 = 5f;
     /** Saves the scroll position for each (full-res) entity. **/
     private static final ObjectFloatMap<Entity> scrollY = new ObjectFloatMap<>();
     /** Saves the datasets whose collapsible panes are expanded. **/
     private static final ObjectSet<BillboardDataset> expandedDatasets = new ObjectSet<>();
-    private static GalaxyMorphology currentGm = GalaxyMorphology.Sc;
 
     private final GalaxyGenerator gen;
     private final Scene scene;
     private Entity entityFull, entityHalf;
     private final FocusView viewFull, viewHalf;
+    private GalaxyMorphology morphology = GalaxyMorphology.Sc;
 
     private Matrix4 m = new Matrix4();
 
@@ -72,24 +68,40 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         this.viewHalf = new FocusView();
         this.gen = new GalaxyGenerator();
 
-        update(target);
+        update(target, null);
 
         setModal(false);
         setCancelText(I18n.msg("gui.close"));
 
         // Build UI
         buildSuper();
+
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
     }
 
-    private static String generateNewName() {
-        return "galaxy_" + sequence++;
+    public GalaxyGenerationWindow(String newName, GalaxyMorphology morphology, Scene scene, Stage stage, Skin skin) {
+        super("", skin, stage);
+        this.scene = scene;
+        this.morphology = morphology;
+        this.viewFull = new FocusView();
+        this.viewHalf = new FocusView();
+        this.gen = new GalaxyGenerator();
+
+        update(null, newName);
+
+        setModal(false);
+        setCancelText(I18n.msg("gui.close"));
+
+        // Build UI
+        buildSuper();
+
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
     }
 
-    private void update(FocusView target) {
+    private void update(FocusView target, String name) {
 
         if (target == null) {
-            // Create new object with a given radius r, and 2r in front of the camera.
-            String name = generateNewName();
+            // Create new object with the given name, a given radius r, and 2r in front of the camera.
             var radius = 10 * Constants.KPC_TO_U;
             var camera = GaiaSky.instance.getICamera();
             var cpos = camera.getPos();
@@ -101,8 +113,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             var pair = GaiaSky.instance.scripting().apiv2().scene.createNewProceduralGalaxy(name,
                                                                                             radius,
                                                                                             pos,
-                                                                                            currentGm);
-
+                                                                                            morphology);
             var entityFull = pair.getFirst();
             var entityHalf = pair.getSecond();
             // Add to scene.
@@ -129,7 +140,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     }
 
     public void reinitialize(FocusView target) {
-        update(target);
+        update(target, null);
 
         // Build UI
         rebuild();
@@ -329,30 +340,30 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         buttonsBottom.add(randomGal).center().padRight(pad10).padBottom(pad10).row();
 
         // Random galaxy of type
-        OwnSelectBox<GalaxyMorphology> morphology = new OwnSelectBox<>(skin);
-        morphology.setItems(GalaxyMorphology.values());
-        morphology.setSelected(currentGm);
+        OwnSelectBox<GalaxyMorphology> morphologyBox = new OwnSelectBox<>(skin);
+        morphologyBox.setItems(GalaxyMorphology.values());
+        morphologyBox.setSelected(morphology);
 
-        var randomGalMorph = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize.morph", morphology.getSelected().name()), skin, "random");
+        var randomGalMorph = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize.morph", morphologyBox.getSelected().name()), skin, "random");
         randomGalMorph.setColor(ColorUtils.gYellowC);
         randomGalMorph.setWidth(buttonWidth - 80f);
 
-        morphology.addListener(new ChangeListener() {
+        morphologyBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                currentGm = morphology.getSelected();
-                randomGalMorph.setText(I18n.msg("gui.galaxy.randomize.morph", morphology.getSelected().name()));
+                morphology = morphologyBox.getSelected();
+                randomGalMorph.setText(I18n.msg("gui.galaxy.randomize.morph", morphologyBox.getSelected().name()));
             }
         });
         randomGalMorph.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                generateRandom(morphology.getSelected(), System.currentTimeMillis());
+                generateRandom(morphologyBox.getSelected(), System.currentTimeMillis());
             }
         });
         randomGalMorph.pad(pad10, pad20, pad10, pad20);
         var morphTable = new Table(skin);
-        morphTable.add(morphology).left().padRight(pad10);
+        morphTable.add(morphologyBox).left().padRight(pad10);
         morphTable.add(randomGalMorph).left();
         buttonsBottom.add(morphTable).center().padRight(pad10).padBottom(pad10).row();
 
@@ -1031,9 +1042,19 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
     }
 
+    private FocusView eventView = new FocusView();
     @Override
     public void notify(Event event, Object source, Object... data) {
-
+        if (event == Event.FOCUS_CHANGED) {
+            if (data[0] instanceof String) {
+                eventView.setEntity(scene.getEntity((String) data[0]));
+            } else if (data[0] instanceof FocusView fv) {
+                eventView.setEntity(fv.getEntity());
+            }
+            if (eventView.isBillboardDataset()) {
+                reinitialize(eventView);
+            }
+        }
     }
 
 }
