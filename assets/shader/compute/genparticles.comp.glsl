@@ -39,6 +39,7 @@ uniform uint u_distribution;
 #define D_DISK_GAUSS 6
 #define D_SPHERE_GAUSS 7
 #define D_CONE 8
+#define D_IRREGULAR 9
 
 // RNG base seed.
 uniform uint u_seed;
@@ -388,19 +389,26 @@ vec3 generateColor(inout uint state, float colorNoise) {
 }
 
 // Generate a size
-float generateSize(inout uint state, float sizeNoise, vec2 pos, int distrib, int type) {
+float generateSize(inout uint state, float sizeNoise, vec3 pos, int distrib, int type) {
     // Compute radial mask for dust in SPIRAL_LOG
     float radialMask = 1.0;
     if (distrib == D_SPIRAL_LOG && type == TYPE_DUST) {
-        float r = length(pos);
+        float r = length(pos.xz);
         // Up and down
         radialMask = smoothstep(u_minRadius, u_baseRadius * 0.3, r) * smoothstep(u_baseRadius, u_baseRadius * 0.8, r);
+    } else if (distrib == D_IRREGULAR) {
+        // For irregulars, do a 3D mask
+        if (rand(state) > 0.5) {
+            return fbm((pos + rand(state)) * (rand(state) * pow(abs(sizeNoise), 4.0))) * 2.0 * u_sizeFactor;
+        } else {
+            return fbm((pos.zxy + rand(state)) * (rand(state) * pow(abs(sizeNoise), 4.0))) * 2.0 * u_sizeFactor;
+        }
     }
     // When sizeNoise = 0, the particle size is 1.
     // When sizeNoise = 1, size is random between ~0.1 and ~4.
     // When sizeNoise < 0, we use fbm as a mask.
     if (sizeNoise < 0.0) {
-        return fbm(pos * abs(sizeNoise)) * 2.0 * u_sizeFactor * radialMask;
+        return fbm(pos.xz * abs(sizeNoise)) * 2.0 * u_sizeFactor * radialMask;
     } else {
         return (u_sizeFactor + (rand(state) * 2.0 - 1.0) * u_sizeFactor * 2.0 * sizeNoise) * radialMask;
     }
@@ -425,7 +433,7 @@ void main() {
         pos = positionBar(state, u_heightScale, u_aspect);
     } else if (distribution == D_ELLIPSOID) {
         pos = positionEllipsoid(state, u_eccentricity);
-    } else if (distribution == D_SPHERE) {
+    } else if (distribution == D_SPHERE || distribution == D_IRREGULAR) {
         pos = positionSphere(state);
     } else if (distribution == D_DISK_GAUSS) {
         pos = positionDiskGauss(state, u_heightScale);
@@ -437,7 +445,7 @@ void main() {
 
     int layer = pickLayer(state);
     int type = int(u_type);
-    float size = generateSize(state, u_sizeNoise, pos.xz, distribution, type);
+    float size = generateSize(state, u_sizeNoise, pos, distribution, type);
     vec3 color = generateColor(state, u_colorNoise);
 
     // Apply dataset transformation
