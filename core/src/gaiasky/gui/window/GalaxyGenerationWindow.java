@@ -886,6 +886,22 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(numArms).left().padRight(pad5).padBottom(pad18);
                 dsTable.add(armSigma).left().padBottom(pad18).row();
             }
+            if (ds.distribution == Distribution.SPIRAL) {
+                // Number of arms
+                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 2f, 4f, 2f, skin);
+                numArms.setNumberFormatter(new DecimalFormat("#0"));
+                numArms.setResetValue(4f);
+                numArms.setWidth(fullWidthBox);
+                numArms.setValue(ds.numArms);
+                numArms.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setSpiralArms((long) numArms.getValue());
+                    }
+                });
+                dsTable.add(numArms).colspan(2).left().padBottom(pad18).row();
+            }
 
             if (ds.distribution == Distribution.SPIRAL || ds.distribution == Distribution.SPIRAL_LOG) {
                 // Spiral angle
