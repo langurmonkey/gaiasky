@@ -138,8 +138,8 @@ vec3 positionCone(inout uint state, float coneAngleDeg) {
     return r * dir - vec3(0.0, 0.5, 0.0);
 }
 
-// Density wave using discrete ellipses, leading to a natural spiral pattern.
-vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
+// Density wave using discrete ellipses, leading to a natural spiral pattern with 2 arms.
+vec3 positionDensityWave2(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
     // Discrete ellipses parameters
     const uint numEllipses = 200u;
 
@@ -188,6 +188,65 @@ vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDe
         z = v.y;
     }
 
+    // Add height (Y)
+    float y = (rand(state) - 0.5) * 2.0 * heightScale;
+
+    return vec3(x, y, z);
+}
+
+// Density wave using concentric squircles, leading to a spiral pattern.
+vec3 positionDensityWave4(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
+    // Discrete squircles parameters
+    const uint numSquircles = 200u; // Number of concentric squircles
+
+    // Select which squircle to use
+    uint squircleIndex = uint(rand(state) * float(numSquircles));
+    float t = (float(squircleIndex) + 0.5) / float(numSquircles); // 0 to 1
+
+    // Squircle radius increases from center outward
+    float min = u_minRadius * 0.5;
+    float max = 1.0 - min;
+    float squircle_r = u_baseRadius * (min + max * t);
+
+    // Squircle exponent (2 for smoother transition, larger for more square-like)
+    float n = 3.0;  // Adjust n for squircle shape (2 = circle, higher = more square-like)
+
+    // Random position on squircle boundary
+    float squircle_angle = rand(state) * 6.2831853; // Random angle in [0, 2*PI]
+
+    // Squircle boundary equation for x and z coordinates
+    float cos_angle = cos(squircle_angle);
+    float sin_angle = sin(squircle_angle);
+
+    // Apply squircle formula to get the coordinates on the boundary
+    float x_squircle = squircle_r * sign(cos_angle) * pow(abs(cos_angle), 1.0 / n);
+    float z_squircle = squircle_r * sign(sin_angle) * pow(abs(sin_angle), 1.0 / n);
+
+    // Apply rotation around Y-axis (to tilt the squircle)
+    float pitchRad = radians(pitchAngleDeg) * t;
+    float cosPitch = cos(pitchRad);
+    float sinPitch = sin(pitchRad);
+
+    // Rotate the squircle coordinates (tilt in the XZ plane)
+    float x = x_squircle * cosPitch + z_squircle * sinPitch;
+    float z = -x_squircle * sinPitch + z_squircle * cosPitch;
+
+    // Apply progressive displacement for each squircle
+    x += displacement.x * t;
+    z += displacement.y * t;
+
+    // Apply random displacement
+    x += gaussian(state) * (u_baseRadius * 0.015);
+    z += gaussian(state) * (u_baseRadius * 0.015);
+
+    // Apply random displacement based on distance from the center
+    if (rand(state) > 0.7) {
+        vec2 v = vec2(x, z);
+        float r = length(v);
+        v = normalize(v) * (r + (rand(state) * 2.0 - 1.0) * 0.2);
+        x = v.x;
+        z = v.y;
+    }
 
     // Add height (Y)
     float y = (rand(state) - 0.5) * 2.0 * heightScale;
@@ -195,6 +254,16 @@ vec3 positionDensityWave(inout uint state, float heightScale, float pitchAngleDe
     return vec3(x, y, z);
 }
 
+// Density wave positions with 2 or 4 arms.
+vec3 positionDensityWave(inout uint state, float heightScale, int numArms, float pitchAngleDeg, float ec, vec2 displacement) {
+    if (numArms == 4) {
+        return positionDensityWave4(state, heightScale, pitchAngleDeg, ec, displacement);
+    } else {
+        return positionDensityWave2(state, heightScale, pitchAngleDeg, ec, displacement);
+    }
+}
+
+// Positions on an ellipsoid.
 vec3 positionEllipsoid(inout uint state, vec2 ec) {
     // --- sample random direction on unit sphere ---
     float u1 = rand(state);
@@ -221,7 +290,6 @@ vec3 positionEllipsoid(inout uint state, vec2 ec) {
     return pos;
 }
 
-
 // Generates a new particle position in a disk distribution, with the given heightScale.
 vec3 positionDisk(inout uint state, float heightScale) {
     // Random angle [0, 2π)
@@ -241,7 +309,7 @@ vec3 positionDisk(inout uint state, float heightScale) {
     return vec3(x, y, z);
 }
 
-// Lays out positions in a disk wiht a gaussian distribution, with a very dense center and a falloff.
+// Lays out positions in a disk with a gaussian distribution, with a very dense center and a falloff.
 vec3 positionDiskGauss(inout uint state, float heightScale) {
     // Random angle [0, 2π)
     float theta = rand(state) * 6.2831853;
@@ -426,7 +494,7 @@ void main() {
     if (distribution == D_SPIRAL_LOG) {
         pos = positionLogSpiral(state, u_heightScale, u_baseAngle, u_numArms, u_armSigma);
     } else if (distribution == D_SPIRAL) {
-        pos = positionDensityWave(state, u_heightScale, u_baseAngle, u_eccentricity.x, u_sprialDeltaPos);
+        pos = positionDensityWave(state, u_heightScale, u_numArms, u_baseAngle, u_eccentricity.x, u_sprialDeltaPos);
     } else if (distribution == D_DISK) {
         pos = positionDisk(state, u_heightScale);
     } else if (distribution == D_BAR) {
