@@ -358,7 +358,7 @@
         "description": "A list with the components of this model that need to be randomized via procedural generation. Can contain 'model', 'atmosphere', and/or 'cloud'.",
         "unit": "String[]"
       },
-      "seed": {
+      "seed:ModelScaffolding": {
         "description": "In case the 'randomize' attribute is defined, this attribute defines the RNG seed to use.",
         "unit": "Double"
       },
@@ -609,8 +609,15 @@
     "BillboardSet": {
       "description": "Defines attributes related to billboard set objects.",
       "procedural": {
-        "description": "Indicates whether the particles for this billboard set are generated procedurally in a compute shader, or whether they are loaded from a file. If this is set to true, each entry in the ``data`` attribute must contain a ``particleCount``, and the attribute ``file`` is ignored.",
+        "description": "Indicates whether the particles for this billboard set are generated procedurally in a compute shader, or whether they are loaded from a file. If this is set to true, each entry in the ``data`` attribute must contain a ``particleCount``, and the attribute ``file`` is ignored. Otherwise, you can also only specify the ``morphology`` and omit ``data`` altogether. In this case, the data entries are procedurally generated as well according to the given morphology.",
         "unit": "Boolean"
+      },
+      "morphology": {
+        "description": "Indicates the galaxy morphology for the procedural generation, according to the Hubble sequence. If set, the billboard datasets are generated to create a galaxy with the given morphology, and the ``data`` attribute is ignored. |brsp| Possible values are: |ul| |li| ``E0`` -- near circular. |eli| |li| ``E3`` -- elliptical with eccentricity ~0.3. |eli| |li| ``E5`` -- elliptical with eccentricity ~0.5. |eli| |li| ``E7`` -- elliptical with eccentricity ~0.7.  |eli| |li| ``S0`` -- lenticular. |eli| |li| ``Sa`` -- spiral, tightly wound, smooth arms, large, bright central bulge. |eli| |li| ``Sb`` -- spiral, less tightly wound spiral arms than ``Sa``. |eli| |li| ``Sc`` -- spiral, loosely wound spiral arms. |eli| |li| ``SBa`` -- same as ``Sa``, but with a bar. |eli| |li| ``SBc`` -- same as ``Sb``, but with a bar. |eli| |li| ``SBc`` -- same as ``Sc``, but with a bar.|eli| |li| ``Im`` -- irregular. |eli| |eul| |brsp|"
+      },
+      "seed:BillboardGroup": {
+        "description": "This attribute defines the RNG seed to use for the procedural generation.",
+        "unit": "Double"
       },
       "data:BillboardGroup": {
         "description": "A list of ``BillboardDataset`` objects. Renders particles using billboarding. |brsp| Each object contains: |ul| |li| ``impl`` -- implementation class. This should be ``gaiasky.scene.record.BillboardDataset``. |eli| |li| ``particleCount`` -- number of particles to generate. Only used if ``procedural`` is ``true`` in the billboard set object. |eli| |li| ``file`` -- source file location. Only used if ``procedural`` is ``false``. |eli| |li| ``type`` -- particle type. For ``BillboardDataset`` s, this is one of ``POINT``, ``DUST``, ``BULGE``, ``STAR``, ``HII``, ``GALAXY``, ``OTHER``. |eli| |li| ``size`` -- particle size. Defaults to 1. |eli| |li| ``intensity`` -- the intensity factor. Defaults to 1. |eli| |li| ``layers`` -- texture layer indices to use for this set. |eli| |li| ``maxSizes`` -- array with 4 components containing the maximum size for each graphics quality setting (low, medium, high, ultra). |eli| |li| ``completion`` -- array with 4 components containing the completion rate per graphics quality setting (low, medium, high, ultra) in [0,1]. If set to [0.5, 0.5, 0.5, 1.0], half of the particles will be used in all graphics quality settings except ultra, which will use all particles. Ignored in ``procedural`` mode. |eli| |eul| |brsp| See the Milky Way object in the ``universe.json`` file in the `default data pack <https://gaiasky.space/resources/datasets/#default-data>`__ for a non-procedural example.",
@@ -633,7 +640,7 @@
       }
     },
     "LocationMark": {
-      "description": "Defines attributes related to location objects. Location objects usually mark special points on the surface of objects, like cities, craters, etc. They have a label (text) and an optoinal marker. The label color is defined in the attribute 'labelColor', and the marker color is defined in the attribute 'color'. See :ref:`locations` for more information.",
+      "description": "Defines attributes related to location objects. Location objects usually mark special points on the surface of objects, like cities, craters, etc. They have a label (text) and an optional marker. The label color is defined in the attribute 'labelColor', and the marker color is defined in the attribute 'color'. See :ref:`locations` for more information.",
       "location": {
         "description": "A 2-dimensional position [longitude, latitude] on the surface of the parent, in degrees.",
         "unit": "Double[2]"
@@ -643,7 +650,7 @@
         "unit": "String"
       },
       "link": {
-        "description": "A link (URL) to an external resource, preferrably Wikipedia, with more information about this location.",
+        "description": "A link (URL) to an external resource, preferably Wikipedia, with more information about this location.",
         "unit": "String"
       },
       "locationType": {
