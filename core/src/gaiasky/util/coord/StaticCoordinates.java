@@ -76,6 +76,10 @@ public class StaticCoordinates implements IBodyCoordinates {
         trf = new Matrix4D(transformMatrix);
     }
 
+    public void setTransformMatrix(float[] transformMatrix) {
+        trf = new Matrix4D(transformMatrix);
+    }
+
     public Vector3Q getPosition() {
         return position;
     }
@@ -98,18 +102,27 @@ public class StaticCoordinates implements IBodyCoordinates {
 
     public void setPositionEquatorial(double[] position) {
         this.position = new Vector3Q();
-        this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD, position[1] * Nature.TO_RAD, position[2] * Constants.PC_TO_U, new Vector3D()));
+        this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD,
+                                                           position[1] * Nature.TO_RAD,
+                                                           position[2] * Constants.PC_TO_U,
+                                                           new Vector3D()));
     }
 
     public void setPositionGalactic(double[] position) {
         this.position = new Vector3Q();
-        this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD, position[1] * Nature.TO_RAD, position[2] * Constants.PC_TO_U, new Vector3D()));
+        this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD,
+                                                           position[1] * Nature.TO_RAD,
+                                                           position[2] * Constants.PC_TO_U,
+                                                           new Vector3D()));
         this.position.mul(Coordinates.galacticToEquatorial());
     }
 
     public void setPositionEcliptic(double[] position) {
         this.position = new Vector3Q();
-        this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD, position[1] * Nature.TO_RAD, position[2] * Constants.PC_TO_U, new Vector3D()));
+        this.position.set(Coordinates.sphericalToCartesian(position[0] * Nature.TO_RAD,
+                                                           position[1] * Nature.TO_RAD,
+                                                           position[2] * Constants.PC_TO_U,
+                                                           new Vector3D()));
         this.position.mul(Coordinates.eclipticToEquatorial());
     }
 
