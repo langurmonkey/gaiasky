@@ -24,10 +24,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.component.AffineTransformations;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.RefSysTransform;
-import gaiasky.scene.component.Render;
+import gaiasky.scene.component.*;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
@@ -58,8 +55,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
     /** Auxiliary matrices. **/
     protected final Matrix4 auxMat1 = new Matrix4();
     protected final Matrix4 auxMat2 = new Matrix4();
-    /** Seed per dataset. **/
-    private final ObjectIntMap<BillboardDataset> seeds;
 
     /**
      * Creates a billboard set renderer.
@@ -77,7 +72,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         super(sceneRenderer, rg, alphas, shaders);
         this.computeShader = computeShader;
         this.ssbos = new ObjectIntMap<>(15);
-        this.seeds = new ObjectIntMap<>(15);
         createQuadMesh();
 
         EventManager.instance.subscribe(this, Event.SHADER_RELOAD_CMD, Event.GPU_DISPOSE_BILLBOARD_DATASET);
@@ -110,26 +104,14 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
         return ssbos.containsKey(object);
     }
 
-
-    private int datasetNum = -1;
-
-    private int getSeed(BillboardDataset ds) {
-        if (seeds.containsKey(ds)) {
-            return seeds.get(ds, 123);
-        } else {
-            var seed = 123 + datasetNum++;
-            seeds.put(ds, seed);
-            return seed;
-        }
-    }
-
     /**
      * Prepares a given object for rendering by allocating the SSBO.
      *
-     * @param body    The body component.
-     * @param dataset The billboard dataset object.
+     * @param body      The body component.
+     * @param billboard The billboard set component.
+     * @param dataset   The billboard dataset object.
      */
-    private void prepareGPUBuffer(Body body, RefSysTransform transform, BillboardDataset dataset) {
+    private void prepareGPUBuffer(Body body, BillboardSet billboard, BillboardDataset dataset) {
         if (!isPrepared(dataset)) {
             SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
 
@@ -154,9 +136,8 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             SysUtils.checkForOpenGLErrors("After bindBufferBase()");
 
             dispatchComputeShader(dataset,
-                                  getSeed(dataset),
-                                  body,
-                                  transform);
+                                  (int) billboard.seed,
+                                  body);
 
         }
     }
@@ -176,8 +157,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
     private void dispatchComputeShader(BillboardDataset dataset,
                                        int seed,
-                                       Body body,
-                                       RefSysTransform transform) {
+                                       Body body) {
         if (computeShader != null && computeShader.isCompiled()) {
             // Total element count.
             int elementCount = dataset.particleCount;
@@ -198,7 +178,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             computeShader.setUniformUint("u_seed", seed);
             computeShader.setUniformUint("u_type", dataset.type.ordinal());
             computeShader.setUniform("u_sizeFactor", (float) (100 * bodySize / (26000.0 * Constants.PC_TO_U)));
-            computeShader.setUniform("u_sizeNoise", dataset.sizeMask  ? -Math.abs(dataset.sizeNoise) : Math.abs(dataset.sizeNoise));
+            computeShader.setUniform("u_sizeNoise", dataset.sizeMask ? -Math.abs(dataset.sizeNoise) : Math.abs(dataset.sizeNoise));
             computeShader.setUniform("u_baseRadius", dataset.baseRadius);
             computeShader.setUniform("u_minRadius", dataset.minRadius);
             computeShader.setUniform3fv("u_baseColors[0]", dataset.baseColors);
@@ -276,8 +256,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
             // COMPUTE--Create SSBO and generate particle positions.
             for (var dataset : billboard.datasets) {
-                var transform = Mapper.transform.get(render.entity);
-                prepareGPUBuffer(body, transform, dataset);
+                prepareGPUBuffer(body, billboard, dataset);
             }
 
 
@@ -328,7 +307,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
                         Gdx.gl20.glBlendEquation(GL20.GL_FUNC_REVERSE_SUBTRACT);
                         Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
                     }
-                    case NONE ->{
+                    case NONE -> {
                         Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
                         Gdx.gl20.glDisable(GL20.GL_BLEND);
                     }

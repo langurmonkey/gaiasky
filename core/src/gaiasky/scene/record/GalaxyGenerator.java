@@ -170,7 +170,8 @@ public class GalaxyGenerator {
     /**
      * Generates galaxies given a morphology.
      *
-     * @param gm The galaxy morphology.
+     * @param gm   The galaxy morphology.
+     * @param seed The RNG seed.
      *
      * @return A couple of {@link BillboardDataset} arrays, the first being the full-resolution channel, and the second being the half-resolution
      *         channel.
@@ -255,6 +256,7 @@ public class GalaxyGenerator {
             case Sa, Sb, Sc -> {
                 var dustDistribution = generateSpiralDistribution(gm);
                 var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
+                var starDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK_GAUSS;
                 var spiralAngle = generateSpiralAngle(gm, dustDistribution);
                 var eccentricity = rand.nextDouble(0.2, 0.3);
                 var minRadius = rand.nextDouble(0.08, 0.15);
@@ -264,14 +266,24 @@ public class GalaxyGenerator {
                 var heightScale = generateHeightScale();
 
                 // Stars
-                var stars = generateBase(STAR, DISK_GAUSS);
+                var stars = generateBase(STAR, starDistribution);
                 stars.setMinRadius(minRadius);
                 stars.setHeightScale(heightScale);
+                stars.setEccentricity(eccentricity);
+                stars.setBaseAngle(spiralAngle);
+                stars.setSpiralDeltaPos(spiralDeltaPos);
+                stars.setNumArms(numArms);
+                stars.setArmSigma(armSigma);
 
                 // HII
-                var hii = generateBase(HII, DISK);
+                var hii = generateBase(HII, gasDistribution);
                 hii.setMinRadius(minRadius);
                 hii.setHeightScale(heightScale);
+                hii.setEccentricity(eccentricity);
+                hii.setBaseAngle(spiralAngle);
+                hii.setSpiralDeltaPos(spiralDeltaPos);
+                hii.setNumArms(numArms);
+                hii.setArmSigma(armSigma);
 
                 // DUST
                 var dust = generateBase(DUST, dustDistribution);
@@ -314,6 +326,7 @@ public class GalaxyGenerator {
             case SBa, SBb, SBc -> {
                 var dustDistribution = generateSpiralDistribution(gm);
                 var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
+                var starDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK_GAUSS;
                 var spiralAngle = generateSpiralAngle(gm, dustDistribution);
                 var eccentricity = rand.nextDouble(0.2, 0.3);
                 var minRadius = rand.nextDouble(0.25, 0.4);
@@ -323,12 +336,12 @@ public class GalaxyGenerator {
                 var heightScale = generateHeightScale();
 
                 // Stars
-                var stars = generateBase(STAR, DISK_GAUSS);
+                var stars = generateBase(STAR, starDistribution);
                 stars.setMinRadius(minRadius);
                 stars.setHeightScale(heightScale);
 
                 // HII
-                var hii = generateBase(HII, DISK);
+                var hii = generateBase(HII, gasDistribution);
                 hii.setMinRadius(minRadius);
                 hii.setHeightScale(heightScale);
 
@@ -571,8 +584,7 @@ public class GalaxyGenerator {
         };
     }
 
-    public static double[] getRandomColors(double[][] colorMatrix) {
-        Random rand = new Random();
+    public double[] getRandomColors(double[][] colorMatrix) {
         double[] result = new double[12];  // Will hold 4 RGB colors (4 * 3 = 12 values)
 
         for (int i = 0; i < 4; i++) {

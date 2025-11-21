@@ -34,11 +34,9 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Matrix4Utils;
-import gaiasky.util.math.Vector3D;
-import gaiasky.util.math.Vector3Q;
+import gaiasky.util.math.*;
 import gaiasky.util.scene2d.*;
+import gaiasky.util.validator.LongValidator;
 
 import java.text.DecimalFormat;
 
@@ -57,7 +55,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     private final Scene scene;
     private Entity entityFull, entityHalf;
     private final FocusView viewFull, viewHalf;
-    private GalaxyMorphology morphology = GalaxyMorphology.Sc;
+    private GalaxyMorphology morphology;
+    private OwnSelectBox<GalaxyMorphology> morphologyBox;
 
     private Matrix4 m = new Matrix4();
 
@@ -134,6 +133,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             var archetype = scene.archetypes().get("BillboardGroup");
             this.entityHalf = graph.getFirstChildOfType(archetype);
         }
+        var fullBB = Mapper.billboardSet.get(this.entityFull);
+        this.morphology = fullBB.morphology != null ? fullBB.morphology : GalaxyMorphology.Sc;
         this.viewFull.setEntity(this.entityFull);
         this.viewHalf.setEntity(this.entityHalf);
         this.getTitleLabel().setText(I18n.msg("gui.galaxy.title", viewFull.getLocalizedName()));
@@ -182,6 +183,35 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
         // FIRST: global parameters:
         // Size, fades, transforms, etc.
+
+        var bb = Mapper.billboardSet.get(entityFull);
+        var seedLabel = new OwnLabel(I18n.msg("gui.galaxy.randomize.seed"), skin);
+        var seedValidator = new LongValidator(-999999L, 999999L);
+        var seed = new OwnTextField(Long.toString(bb.seed), skin, seedValidator);
+        seed.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (seed.isValid()) {
+                    bb.seed = seed.getLongValue(123L);
+                }
+            }
+        });
+        var morphologyLabel = new OwnLabel(I18n.msg("gui.galaxy.morphology"), skin);
+        morphologyBox = new OwnSelectBox<>(skin);
+        morphologyBox.setItems(GalaxyMorphology.values());
+        morphologyBox.setSelected(morphology);
+        morphologyBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                morphology = morphologyBox.getSelected();
+            }
+        });
+        var seedMorphTable = new Table(skin);
+        seedMorphTable.add(seedLabel).padRight(pad10);
+        seedMorphTable.add(seed).padRight(pad34);
+        seedMorphTable.add(morphologyLabel).padRight(pad10);
+        seedMorphTable.add(morphologyBox);
+        content.add(seedMorphTable).left().padBottom(pad20).row();
 
         // Size in KPC
         OwnSliderPlus sizeKpc = new OwnSliderPlus(I18n.msg("gui.galaxy.size"), 0.2f, 40.0f, 0.1f, skin);
@@ -313,59 +343,42 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         var generate = new OwnTextIconButton(I18n.msg("gui.galaxy.generate"), skin, "generate");
         generate.setColor(ColorUtils.gGreenC);
         generate.setWidth(buttonWidth);
-        generate.addListener(new
-
-                                     ChangeListener() {
-                                         @Override
-                                         public void changed(ChangeEvent event,
-                                                             Actor actor) {
-                                             regenerate();
-                                         }
-                                     });
+        generate.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                var bbFull = Mapper.billboardSet.get(entityFull);
+                if (morphologyBox != null &&
+                        bbFull.morphology != null &&
+                        morphologyBox.getSelected() != bbFull.morphology) {
+                    bbFull.morphology = morphologyBox.getSelected();
+                    morphology = morphologyBox.getSelected();
+                    // Regenerate full dataset!
+                    generateRandom(morphology, bb.seed);
+                } else {
+                    regenerate();
+                }
+            }
+        });
         generate.pad(pad10, pad20, pad10, pad20);
         generate.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.generate.info"), skin));
         buttonsTop.add(generate).colspan(2).center();
 
         // Random galaxy
-        var randomGal = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize"), skin, "random");
-        randomGal.setColor(ColorUtils.gYellowC);
-        randomGal.setWidth(buttonWidth);
-        randomGal.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                generateRandom(null, System.currentTimeMillis());
-            }
-        });
-        randomGal.pad(pad10, pad20, pad10, pad20);
-        buttonsBottom.add(randomGal).center().padRight(pad10).padBottom(pad10).row();
-
-        // Random galaxy of type
-        OwnSelectBox<GalaxyMorphology> morphologyBox = new OwnSelectBox<>(skin);
-        morphologyBox.setItems(GalaxyMorphology.values());
-        morphologyBox.setSelected(morphology);
-
-        var randomGalMorph = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize.morph", morphologyBox.getSelected().name()), skin, "random");
+        var randomGalMorph = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize", morphologyBox.getSelected().name()), skin, "random");
         randomGalMorph.setColor(ColorUtils.gYellowC);
         randomGalMorph.setWidth(buttonWidth - 80f);
-
-        morphologyBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                morphology = morphologyBox.getSelected();
-                randomGalMorph.setText(I18n.msg("gui.galaxy.randomize.morph", morphologyBox.getSelected().name()));
-            }
-        });
         randomGalMorph.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                generateRandom(morphologyBox.getSelected(), System.currentTimeMillis());
+                // New seed, same morphology.
+                var seedValue = StdRandom.uniform(999999);
+                bb.seed = seedValue;
+                generateRandom(bb.morphology, seedValue);
             }
         });
         randomGalMorph.pad(pad10, pad20, pad10, pad20);
-        var morphTable = new Table(skin);
-        morphTable.add(morphologyBox).left().padRight(pad10);
-        morphTable.add(randomGalMorph).left();
-        buttonsBottom.add(morphTable).center().padRight(pad10).padBottom(pad10).row();
+        buttonsBottom.add(randomGalMorph).center().padBottom(pad10).row();
 
 
         content.add(buttonsTop).center().padTop(pad34).padBottom(pad20).row();
@@ -1043,6 +1056,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     }
 
     private FocusView eventView = new FocusView();
+
     @Override
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.FOCUS_CHANGED) {

@@ -14,6 +14,7 @@ import gaiasky.render.ShadowMapImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ModelScaffolding implements Component {
@@ -102,7 +103,7 @@ public class ModelScaffolding implements Component {
     }
 
     public void setSeed(Long seed) {
-        this.seed = Arrays.asList(seed);
+        this.seed = Collections.singletonList(seed);
     }
 
     public void setSeed(int[] seed) {
@@ -113,7 +114,7 @@ public class ModelScaffolding implements Component {
     }
 
     public void setRandomize(String randomize) {
-        this.randomize = Arrays.asList(randomize);
+        this.randomize = Collections.singletonList(randomize);
     }
 
     public void setRefPlane(String refplane) {

@@ -11,12 +11,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.TextureArray;
+import com.badlogic.gdx.utils.ObjectMap;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
@@ -24,6 +27,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.TextureArrayLoader;
+import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 
@@ -32,6 +36,7 @@ import java.util.List;
 public class BillboardSetInitializer extends AbstractInitSystem {
 
     private final Vector3D D31;
+    private final ObjectMap<Entity, BillboardDataset[]> generatedDatasets = new ObjectMap<>();
 
     public BillboardSetInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -43,6 +48,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         var base = Mapper.base.get(entity);
         var label = Mapper.label.get(entity);
         var focus = Mapper.focus.get(entity);
+        var bb = Mapper.billboardSet.get(entity);
 
         // Label.
         label.label = true;
@@ -57,6 +63,11 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         focus.hitCoordinatesConsumer = FocusHit::addHitBillboardSet;
 
         reloadData(entity);
+
+        // Generate seed if needed.
+        if (!bb.hasSeed()) {
+            bb.seed = StdRandom.uniform(999999);
+        }
 
         // Textures.
         var billboards = Mapper.billboardSet.get(entity);
@@ -77,11 +88,49 @@ public class BillboardSetInitializer extends AbstractInitSystem {
     @Override
     public void setUpEntity(Entity entity) {
         var billboard = Mapper.billboardSet.get(entity);
+        var render = Mapper.render.get(entity);
 
         // Textures.
         AssetManager manager = AssetBean.manager();
         if (manager.contains(billboard.textureArrayName)) {
             billboard.textureArray = manager.get(billboard.textureArrayName, false);
+        }
+
+        // Generate.
+        // We need to take care because generation happens only once, but there are potentially two entities: one for
+        // the full-resolution buffer and one for the half-resolution buffer. Typically, the full resolution entity
+        // is the parent, and has the half-resolution entity as child.
+        // We save the generated datasets after generation.
+        if (billboard.procedural && billboard.morphology != null) {
+            if (generatedDatasets.containsKey(entity)) {
+                var datasets = generatedDatasets.get(entity);
+                billboard.datasets = datasets;
+            } else {
+                var graph = Mapper.graph.get(entity);
+                Entity full, half;
+                if (render.halfResolutionBuffer) {
+                    // We are the child.
+                    half = entity;
+                    full = graph.parent;
+                } else {
+                    // We are the parent.
+                    full = entity;
+                    half = graph.getFirstChildOfType(GaiaSky.instance.scene.archetypes().get("BillboardGroup"));
+                }
+                // Generate two components (full- and half-res). We assume full-res is always the parent.
+                GalaxyGenerator gg = new GalaxyGenerator();
+                var components = gg.generateGalaxy(billboard.morphology, billboard.seed);
+                if (full != null) {
+                    var bbFull = Mapper.billboardSet.get(full);
+                    bbFull.datasets = components.getFirst();
+                    generatedDatasets.put(full, bbFull.datasets);
+                }
+                if (half != null) {
+                    var bbHalf = Mapper.billboardSet.get(half);
+                    bbHalf.datasets = components.getSecond();
+                    generatedDatasets.put(half, bbHalf.datasets);
+                }
+            }
         }
 
         // Transform.
