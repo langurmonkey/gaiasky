@@ -1,6 +1,11 @@
 package gaiasky.scene.record;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonValue.ValueType;
 import gaiasky.render.BlendMode;
+import gaiasky.scene.Mapper;
+import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.math.StdRandom;
 
@@ -509,7 +514,7 @@ public class GalaxyGenerator {
     private Distribution generateSpiralDistribution(GalaxyMorphology m) {
         return switch (m) {
             case Sb -> rand.nextFloat() > 0.25f ? SPIRAL : SPIRAL_LOG;
-            case Sc -> rand.nextBoolean() ? SPIRAL : SPIRAL_LOG;
+            case Sa -> rand.nextBoolean() ? SPIRAL : SPIRAL_LOG;
             default -> SPIRAL;
         };
     }
@@ -521,16 +526,16 @@ public class GalaxyGenerator {
     private double generateSpiralAngle(GalaxyMorphology m, Distribution d) {
         if (d == SPIRAL) {
             return switch (m) {
-                case Sa, SBa -> rand.nextDouble(190.0, 300.0);
+                case Sc, SBc -> rand.nextDouble(190.0, 300.0);
                 case Sb, SBb -> rand.nextDouble(300.0, 500.0);
-                case Sc, SBc -> rand.nextDouble(500.0, 1000.0);
+                case Sa, SBa -> rand.nextDouble(500.0, 1000.0);
                 default -> rand.nextDouble(50.0, 1000.0);
             };
         } else if (d == Distribution.SPIRAL_LOG) {
             return switch (m) {
-                case Sa -> rand.nextDouble(500.0, 630.0);
+                case Sc -> rand.nextDouble(500.0, 630.0);
                 case Sb -> rand.nextDouble(630.0, 770.0);
-                case Sc -> rand.nextDouble(750.0, 870.0);
+                case Sa -> rand.nextDouble(750.0, 870.0);
                 default -> rand.nextDouble(50.0, 1000.0);
             };
         }
@@ -600,13 +605,53 @@ public class GalaxyGenerator {
 
     private double generateEccentricity(GalaxyMorphology gm) {
         return switch (gm) {
-            case E0 -> rand.nextDouble(0.0, 0.1);
-            case E3 -> rand.nextDouble(0.1, 0.25);
-            case E5 -> rand.nextDouble(0.25, 0.45);
-            case E7 -> rand.nextDouble(0.45, 0.6);
+            case E0 -> rand.nextDouble(0.0, 0.2);
+            case E3 -> rand.nextDouble(0.2, 0.4);
+            case E5 -> rand.nextDouble(0.4, 0.6);
+            case E7 -> rand.nextDouble(0.6, 0.8);
             default -> 0f;
         };
     }
 
+
+    public JsonValue convertToJson(Entity full, Entity half) {
+        var top = new JsonValue(ValueType.array);
+        top.setName("objects");
+
+        var fullJ = convertToJson(full);
+        var halfJ = convertToJson(half);
+        top.addChild(fullJ);
+        top.addChild(halfJ);
+        return top;
+    }
+
+    public JsonValue convertToJson(Entity e) {
+        var obj = new JsonValue(ValueType.object);
+
+        var base = Mapper.base.get(e);
+        var body = Mapper.body.get(e);
+        var coord = Mapper.coordinates.get(e);
+        var bb = Mapper.billboardSet.get(e);
+        var focus = Mapper.focus.get(e);
+        var render = Mapper.render.get(e);
+
+        if (base.names.length == 1) {
+            obj.addChild("name", new JsonValue(base.getName()));
+        } else {
+            var names = new JsonValue(ValueType.array);
+            for (var n : base.names) {
+                names.addChild(new JsonValue(n));
+            }
+        }
+        obj.addChild("sizePc", new JsonValue(body.size * Constants.U_TO_PC));
+        if (bb.procedural)
+            obj.addChild("procedural", new JsonValue(true));
+        if (bb.seed >= 0)
+            obj.addChild("seed", new JsonValue(bb.seed));
+        if (bb.morphology != null)
+            obj.addChild("morphology", new JsonValue(bb.morphology.name()));
+
+        return obj;
+    }
 
 }
