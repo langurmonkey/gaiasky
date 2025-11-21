@@ -168,25 +168,26 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         Vector3Q pos3b = body.pos;
 
         // Transform all
-        for (BillboardDataset bd : set.datasets) {
-            List<IParticleRecord> a = bd.data;
-            if (a != null) {
-                for (IParticleRecord iParticleRecord : a) {
-                    var pr = (ParticleVector) iParticleRecord;
-                    aux.set((float) pr.x(), (float) pr.z(), (float) pr.y());
-                    aux.scl(body.size / 2.0)
-                            .rotate(-90, 0, 1, 0);
-                    if (transform.matrix != null)
-                        aux.mul(transform.matrix);
-                    aux.add(pos3b);
+        if (set.datasets != null)
+            for (BillboardDataset bd : set.datasets) {
+                List<IParticleRecord> a = bd.data;
+                if (a != null) {
+                    for (IParticleRecord iParticleRecord : a) {
+                        var pr = (ParticleVector) iParticleRecord;
+                        aux.set((float) pr.x(), (float) pr.z(), (float) pr.y());
+                        aux.scl(body.size / 2.0)
+                                .rotate(-90, 0, 1, 0);
+                        if (transform.matrix != null)
+                            aux.mul(transform.matrix);
+                        aux.add(pos3b);
 
-                    // We can modify the data vector because it is an array.
-                    var dat = pr.data();
-                    dat[0] = aux.x;
-                    dat[1] = aux.y;
-                    dat[2] = aux.z;
+                        // We can modify the data vector because it is an array.
+                        var dat = pr.data();
+                        dat[0] = aux.x;
+                        dat[1] = aux.y;
+                        dat[2] = aux.z;
+                    }
                 }
             }
-        }
     }
 }
