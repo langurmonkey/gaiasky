@@ -55,6 +55,10 @@ public enum RenderGroup {
      **/
     BILLBOARD_GROUP_PROCEDURAL(801),
     /**
+     * Fallback to procedural generation in the CPU.
+     */
+    BILLBOARD_GROUP_PROCEDURAL_CPU(802),
+    /**
      * Particle group.
      **/
     PARTICLE_GROUP(1000),
@@ -191,6 +195,7 @@ public enum RenderGroup {
      *
      * @param renderGroupMask The bit mask
      * @param rgs             The render groups
+     *
      * @return The bits instance
      */
     public static Bits add(Bits renderGroupMask, RenderGroup... rgs) {
@@ -205,6 +210,7 @@ public enum RenderGroup {
      *
      * @param renderGroupMask The bit mask
      * @param rgs             The render groups
+     *
      * @return The bits instance
      */
     public static Bits set(Bits renderGroupMask, RenderGroup... rgs) {

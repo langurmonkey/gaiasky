@@ -1,4 +1,4 @@
-#version 430 core
+#version 330 core
 
 // ========== UNIFORMS ==========
 uniform float u_pointAlphaMin;
@@ -31,16 +31,11 @@ uniform mat4 u_view;
 // Regular vertex attributes
 layout(location = 0) in vec4 a_position;
 layout(location = 1) in vec2 a_texCoord0;
-// SSBO
-struct Particle {
-    vec3 position;// xyz = position
-    vec3 color;// rgb
-    vec3 extra;// x = size, y = type, z = layer
-};
-
-layout(std430, binding = 0) buffer Particles {
-    Particle particles[];
-};
+// Instance attributes
+layout(location = 2) in vec3 a_particlePos;
+layout(location = 3) in vec3 a_color;
+// x - size, y - type, z - layer
+layout(location = 4) in vec3 a_additional;
 
 // OUTPUTS
 out vec4 v_col;
@@ -56,9 +51,7 @@ flat out int v_type;
 flat out int v_layer;
 
 void main() {
-    // Fetch particle by instance ID
-    Particle p = particles[gl_InstanceID];
-    vec3 particlePos = p.position;
+    vec3 particlePos = a_particlePos;
     particlePos = (u_baseTransform * vec4(particlePos, 1.0)).xyz;
     if (u_transformFlag) {
         particlePos = (u_transform * vec4(particlePos, 1.0)).xyz;
@@ -75,12 +68,12 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    v_col = vec4(p.color, u_intensity);
-    v_type = int(p.extra.y);
-    v_layer = int(p.extra.z);
+    v_col = vec4(a_color, u_intensity);
+    v_type = int(a_additional.y);
+    v_layer = int(a_additional.z);
     v_uv = a_texCoord0;
 
-    float quadSize = min(p.extra.x * u_sizeFactor, u_maxPointSize * dist);
+    float quadSize = min(a_additional.x * u_sizeFactor, u_maxPointSize * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

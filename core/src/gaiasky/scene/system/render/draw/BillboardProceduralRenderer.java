@@ -26,7 +26,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.BillboardDataset;
-import gaiasky.scene.record.CPUGalGenFallback;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
@@ -119,119 +118,33 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
      */
     private void prepareGPUBuffer(Body body, BillboardSet set, BillboardDataset dataset, int index) {
         if (!isPrepared(dataset)) {
-            if (set.procedural
-                    && !Settings.settings.runtime.compute) {
-                // Compute shaders NOT supported -- Fallback to CPU.
-                if (dataset.getGenStatus() == GenStatus.NOT_STARTED) {
-                    // Start generation in the CPU.
-                    dataset.setGenStatus(GenStatus.RUNNING);
-                    final Runnable genTask = () -> {
-                        dataset.setGenStatus(GenStatus.RUNNING);
+            SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
 
-                        try {
-                            var generator = new CPUGalGenFallback(body.size);
-                            var data = generator.generate(dataset, (int) set.seed + index);
-                            dataset.data = data;
-                        } catch (Exception e) {
-                            dataset.setGenStatus(GenStatus.FAILED);
-                            logger.error(e);
-                        }
-                        // Done.
-                        dataset.setGenStatus(GenStatus.DONE);
-                    };
-                    GaiaSky.instance.getExecutorService().execute(genTask);
-                } else if (dataset.getGenStatus() == GenStatus.DONE) {
-                    // Ready to stream to GPU.
-                    SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
+            int bufferId = GL43.glGenBuffers();
 
-                    int bufferId = GL43.glGenBuffers();
-
-                    // Check if buffer was created
-                    if (bufferId == 0) {
-                        logger.error("Failed to generate buffer ID");
-                        return;
-                    }
-
-                    GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
-
-                    // Create and fill FloatBuffer with CPU-generated data
-                    FloatBuffer particleBuffer = createParticleBufferFromCPU(dataset);
-
-                    // Upload CPU data to SSBO
-                    GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, particleBuffer, GL43.GL_DYNAMIC_DRAW);
-
-                    // Add to map
-                    ssbos.put(dataset, bufferId);
-
-                    // Bind SSBO (still needed for rendering)
-                    GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
-
-                    // Double-check the binding worked
-                    SysUtils.checkForOpenGLErrors("After bindBufferBase()");
-                }
-            } else {
-                // Compute shaders supported.
-                SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
-
-                int bufferId = GL43.glGenBuffers();
-
-                // Check if buffer was created
-                if (bufferId == 0) {
-                    logger.error("Failed to generate buffer ID");
-                    return;
-                }
-
-                GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
-                // 12 is due alignment.
-                GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, (long) dataset.particleCount * 12 * 4, GL43.GL_DYNAMIC_DRAW);
-
-                // Add to map.
-                ssbos.put(dataset, bufferId);
-
-                // Bind SSBO and dispatch compute shader
-                GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
-
-                // Double-check the binding worked
-                SysUtils.checkForOpenGLErrors("After bindBufferBase()");
-
-                dispatchComputeShader(dataset,
-                                      (int) set.seed + index,
-                                      body);
+            // Check if buffer was created
+            if (bufferId == 0) {
+                logger.error("Failed to generate buffer ID");
+                return;
             }
+
+            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
+            // 12 is due alignment.
+            GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, (long) dataset.particleCount * 12 * 4, GL43.GL_DYNAMIC_DRAW);
+
+            // Add to map.
+            ssbos.put(dataset, bufferId);
+
+            // Bind SSBO and dispatch compute shader
+            GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
+
+            // Double-check the binding worked
+            SysUtils.checkForOpenGLErrors("After bindBufferBase()");
+
+            dispatchComputeShader(dataset,
+                                  (int) set.seed + index,
+                                  body);
         }
-    }
-
-    private FloatBuffer createParticleBufferFromCPU(BillboardDataset dataset) {
-        // Assuming you have CPU-generated particles as double[7][]
-        var data = dataset.data;
-
-        // Each particle has 9 floats: position(3) + color(3) + extra(3)
-        // vec3 in GLSL are aligned to vec4, so we need 12 floats per particle!
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(data.size() * 12);
-
-        for (var particle : data) {
-            var d = ((ParticleVector) particle).data();
-            // Position (xyz) - convert double to float
-            buffer.put((float) d[0]); // x
-            buffer.put((float) d[1]); // y
-            buffer.put((float) d[2]); // z
-            buffer.put(0f); // padding to vec4
-
-            // Color (rgb)
-            buffer.put((float) d[3]); // r
-            buffer.put((float) d[4]); // g
-            buffer.put((float) d[5]); // b
-            buffer.put(0f); // padding to vec4
-
-            // Extra data: size, type, layer
-            buffer.put((float) d[6]); // size -> extra.x
-            buffer.put((float) d[7]); // type -> extra.y (you can set this as needed)
-            buffer.put((float) d[8]); // layer -> extra.z (you can set this as needed)
-            buffer.put(0f); // padding to vec4
-        }
-
-        buffer.flip();
-        return buffer;
     }
 
     private int[] prepareLayersUniform(int[] layers) {
@@ -372,9 +285,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
             int qualityIndex = Settings.settings.graphics.quality.ordinal();
 
-            // Disable depth test because we are rendering to empty half-res buffer.
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
-
             for (var dataset : billboard.datasets) {
                 if (isPrepared(dataset)) {
                     // Blend mode
