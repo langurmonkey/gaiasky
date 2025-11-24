@@ -450,7 +450,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
         logger.info(I18n.msg("notif.info.maxattribs", maxVertexAttributes = GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
         logger.info(I18n.msg("notif.info.maxtexsize", maxTextureSize = GL30.glGetInteger(GL30.GL_MAX_TEXTURE_SIZE)));
-        logger.info(I18n.msg("notif.info.compute", (settings.runtime.compute = SysUtils.isComputeShaderSupported()) ?
+        logger.info(I18n.msg("notif.info.compute", (settings.runtime.compute = false && SysUtils.isComputeShaderSupported()) ?
                 I18n.msg("gui.true") : I18n.msg("gui.false")));
 
         // Disable all kinds of input.
