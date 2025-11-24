@@ -64,8 +64,11 @@ public class RenderAssets {
             variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
             billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
 
+    private boolean compute;
+
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
+        this.compute = Settings.settings.runtime.compute;
     }
 
     /**
@@ -74,8 +77,8 @@ public class RenderAssets {
      * @param manager The asset manager.
      */
     public void initialize(AssetManager manager) {
-
         var safeMode = Settings.settings.program.safeMode;
+
         ShaderLoader.Pedantic = false;
         ExtShaderProgram.pedantic = false;
 
@@ -107,13 +110,18 @@ public class RenderAssets {
                                       "shader/billboard.fragment.glsl",
                                       TextUtils.concatAll("regular.billboard", names),
                                       defines);
-        spriteDesc = loadShaderExt(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", TextUtils.concatAll("sprite", names), defines);
+        spriteDesc = loadShaderExt(manager,
+                                   "shader/sprite.vertex.glsl",
+                                   "shader/sprite.fragment.glsl",
+                                   TextUtils.concatAll("sprite", names),
+                                   defines);
         billboardGroupDesc = loadShaderExt(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl",
                                            TextUtils.concatAll("billboard.group", names), defines);
-        billboardProceduralDesc = loadShaderExt(manager, "shader/billboard.proc.vertex.glsl", "shader/billboard.group.fragment.glsl",
-                                           TextUtils.concatAll("billboard.proc", names), defines);
+        if (compute)
+            billboardProceduralDesc = loadShaderExt(manager, "shader/billboard.proc.vertex.glsl", "shader/billboard.group.fragment.glsl",
+                                                    TextUtils.concatAll("billboard.proc", names), defines);
         billboardProceduralCpuDesc = loadShaderExt(manager, "shader/billboard.proc.cpu.vertex.glsl", "shader/billboard.group.fragment.glsl",
-                                           TextUtils.concatAll("billboard.proc.cpu", names), defines);
+                                                   TextUtils.concatAll("billboard.proc.cpu", names), defines);
         pointDesc = loadShaderExt(manager,
                                   "shader/point.cpu.vertex.glsl",
                                   "shader/point.cpu.fragment.glsl",
@@ -249,7 +257,10 @@ public class RenderAssets {
         manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
 
         // Compute shaders
-        manager.load("galgen.comp.glsl", ComputeShaderProgram.class, new ComputeShaderLoader.ComputeShaderParameter("compute.galgen", "shader/compute/galgen.comp.glsl"));
+        if (compute)
+            manager.load("galgen.comp.glsl",
+                         ComputeShaderProgram.class,
+                         new ComputeShaderLoader.ComputeShaderParameter("compute.galgen", "shader/compute/galgen.comp.glsl"));
 
 
         // Add fonts to load
@@ -325,7 +336,8 @@ public class RenderAssets {
         /*
          * BILLBOARD GROUP (PROCEDURAL)
          */
-        billboardProceduralShaders = fetchShaderProgramExt(manager, billboardProceduralDesc, TextUtils.concatAll("billboard.proc", names));
+        if (compute)
+            billboardProceduralShaders = fetchShaderProgramExt(manager, billboardProceduralDesc, TextUtils.concatAll("billboard.proc", names));
 
         /*
          * BILLBOARD GROUP (PROCEDURAL CPU)
@@ -346,13 +358,15 @@ public class RenderAssets {
          * PARTICLE GROUP EXT BILLBOARDS - default and relativistic
          */
         particleGroupExtBillboardShaders = fetchShaderProgramExt(manager,
-                                                              particleGroupExtBillboardDesc,
-                                                              TextUtils.concatAll("particle.group.ext", names));
+                                                                 particleGroupExtBillboardDesc,
+                                                                 TextUtils.concatAll("particle.group.ext", names));
 
         /*
          * PARTICLE GROUP EXT MODELS - default and relativistic
          */
-        particleGroupExtModelShaders = fetchShaderProgramExt(manager, particleGroupExtModelDesc, TextUtils.concatAll("particle.group.ext.model", names));
+        particleGroupExtModelShaders = fetchShaderProgramExt(manager,
+                                                             particleGroupExtModelDesc,
+                                                             TextUtils.concatAll("particle.group.ext.model", names));
 
         /*
          * STAR GROUP (TRI) - default and relativistic
@@ -400,7 +414,8 @@ public class RenderAssets {
         IntShaderProvider cloud = manager.get("cloud");
 
         // Compute
-        galGenShader = manager.get("galgen.comp.glsl");
+        if (compute)
+            galGenShader = manager.get("galgen.comp.glsl");
 
         // Create model batches
         mbVertexLighting = new IntModelBatch(perVertexLighting);
@@ -450,9 +465,9 @@ public class RenderAssets {
      * @return The asset descriptor.
      */
     private AssetDescriptor<ShaderProgram> loadShader(AssetManager manager,
-                                                            String vertexShader,
-                                                            String fragmentShader,
-                                                            String name) {
+                                                      String vertexShader,
+                                                      String fragmentShader,
+                                                      String name) {
         ShaderProgramLoader.ShaderProgramParameter spp = new ShaderProgramLoader.ShaderProgramParameter();
         spp.prependVertexCode = "";
         spp.prependFragmentCode = spp.prependVertexCode;
@@ -590,8 +605,8 @@ public class RenderAssets {
     }
 
     private ShaderProgram[] fetchShaderProgram(final AssetManager manager,
-                                                     final AssetDescriptor<ShaderProgram>[] descriptors,
-                                                     final String... names) {
+                                               final AssetDescriptor<ShaderProgram>[] descriptors,
+                                               final String... names) {
         int n = descriptors.length;
         ShaderProgram[] shaders = new ShaderProgram[n];
 
@@ -603,6 +618,7 @@ public class RenderAssets {
         }
         return shaders;
     }
+
     private ExtShaderProgram[] fetchShaderProgramExt(final AssetManager manager,
                                                      final AssetDescriptor<ExtShaderProgram>[] descriptors,
                                                      final String... names) {
