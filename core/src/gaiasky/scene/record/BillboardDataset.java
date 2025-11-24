@@ -18,11 +18,13 @@ import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.tree.GenStatus;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A dataset composed of a single set of billboard-like particles.
@@ -53,7 +55,7 @@ public class BillboardDataset {
     /**
      * Type of particle.
      */
-    public ParticleType type = ParticleType.POINT;
+    public ChannelType type = ChannelType.POINT;
     /**
      * Probability distribution, for procedural datasets.
      */
@@ -174,8 +176,19 @@ public class BillboardDataset {
      **/
     public double[] maxSizes = new double[GraphicsQuality.values().length];
 
+    /** Current CPU generation status for this dataset. **/
+    public AtomicReference<GenStatus> genStatus = new AtomicReference<>(GenStatus.NOT_STARTED);
+
     public BillboardDataset() {
         super();
+    }
+
+    public GenStatus getGenStatus() {
+        return genStatus.get();
+    }
+
+    public void setGenStatus(GenStatus genStatus) {
+        this.genStatus.set(genStatus);
     }
 
     public boolean initialize(PointDataProvider provider, boolean reload) {
@@ -316,14 +329,14 @@ public class BillboardDataset {
         this.aspect = aspect.floatValue();
     }
 
-    public void setType(ParticleType type) {
+    public void setType(ChannelType type) {
         this.type = type;
 
     }
 
     public void setType(String type) {
         if (type != null && !type.isBlank()) {
-            this.type = ParticleType.valueOf(type.toUpperCase(Locale.ROOT));
+            this.type = ChannelType.valueOf(type.toUpperCase(Locale.ROOT));
         }
     }
 
@@ -545,10 +558,10 @@ public class BillboardDataset {
     }
 
     /**
-     * Contains the different particle types. Particle types are essentially parameter
+     * Contains the different channel types. Particle types are essentially parameter
      * ranges for all parameters of a billboard dataset.
      */
-    public enum ParticleType {
+    public enum ChannelType {
         DUST(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
              new int[]{0, 30_000},
              new int[]{0, 1, 2},
@@ -656,19 +669,19 @@ public class BillboardDataset {
         /** Standard deviation across arm. **/
         public float[] armSigma = new float[]{0.0f, 1.0f};
 
-        ParticleType(String[] distributions,
-                     int[] nParticles,
-                     int[] layers,
-                     float[] size,
-                     float[] maxSize,
-                     float[] intensity,
-                     float[] minRadius,
-                     float[] baseRadius,
-                     float[] baseAngle,
-                     float[] eccentricity,
-                     float[] displacement,
-                     float[] aspect,
-                     float[] armSigma) {
+        ChannelType(String[] distributions,
+                    int[] nParticles,
+                    int[] layers,
+                    float[] size,
+                    float[] maxSize,
+                    float[] intensity,
+                    float[] minRadius,
+                    float[] baseRadius,
+                    float[] baseAngle,
+                    float[] eccentricity,
+                    float[] displacement,
+                    float[] aspect,
+                    float[] armSigma) {
             if (distributions != null) {
                 this.distributions = distributions;
             }

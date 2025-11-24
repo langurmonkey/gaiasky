@@ -253,6 +253,60 @@ vec3 positionDensityWave4(inout uint state, float heightScale, float pitchAngleD
 
     return vec3(x, y, z);
 }
+vec3 positionDensityWaveOne(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
+    // Number of radial layers or "rings" along the triangle arms
+    const uint numLayers = 200u;
+
+    // Select which layer to use (each layer corresponds to a distance from the center)
+    uint layerIndex = uint(rand(state) * float(numLayers));
+    float t = (float(layerIndex) + 0.5) / float(numLayers);  // 0 to 1
+
+    // Triangle radius increases from the center outward
+    float min = u_minRadius;
+    float max = 1.0 - min;
+    float radius = u_baseRadius * (min + max * t);
+
+    // Compute the angle around the center
+    float angle = rand(state) * 6.2831853;
+
+    // Normalize the angle to one of the three triangle arms (3 arms, each separated by 120 degrees)
+    float armAngle = mod(angle, 2.0943951);  // 120 degrees in radians
+
+    // Compute the coordinates along the arm in the XZ plane (using a straight line)
+    float x_arm = radius * cos(armAngle);
+    float z_arm = radius * sin(armAngle);
+
+    // Rotate arm based on pitch angle (to give the spiral effect)
+    float pitchRad = radians(pitchAngleDeg) * t;  // Tilt increases with radius
+    float cosPitch = cos(pitchRad);
+    float sinPitch = sin(pitchRad);
+
+    // Apply rotation to the arm in the XZ plane
+    float x = x_arm * cosPitch + z_arm * sinPitch;
+    float z = -x_arm * sinPitch + z_arm * cosPitch;
+
+    // Apply displacement progressively (like the original code)
+    x += displacement.x * t;
+    z += displacement.y * t;
+
+    // Add some random Gaussian noise for randomness
+    x += gaussian(state) * (u_baseRadius * 0.015);
+    z += gaussian(state) * (u_baseRadius * 0.015);
+
+    // Optional random displacement for further variability
+    if (rand(state) > 0.7) {
+        vec2 v = vec2(x, z);
+        float r = length(v);
+        v = normalize(v) * (r + (rand(state) * 2.0 - 1.0) * 0.2);
+        x = v.x;
+        z = v.y;
+    }
+
+    // Apply random height (Y coordinate)
+    float y = (rand(state) - 0.5) * 2.0 * heightScale;
+
+    return vec3(x, y, z);
+}
 
 // Density wave positions with 2 or 4 arms.
 vec3 positionDensityWave(inout uint state, float heightScale, int numArms, float pitchAngleDeg, float ec, vec2 displacement) {

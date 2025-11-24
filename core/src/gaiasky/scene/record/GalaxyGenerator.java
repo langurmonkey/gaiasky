@@ -14,8 +14,8 @@ import java.util.Random;
 
 import static gaiasky.scene.record.BillboardDataset.Distribution;
 import static gaiasky.scene.record.BillboardDataset.Distribution.*;
-import static gaiasky.scene.record.BillboardDataset.ParticleType;
-import static gaiasky.scene.record.BillboardDataset.ParticleType.*;
+import static gaiasky.scene.record.BillboardDataset.ChannelType;
+import static gaiasky.scene.record.BillboardDataset.ChannelType.*;
 
 /**
  * Generates galaxies as lists of {@link BillboardDataset} objects.
@@ -435,7 +435,7 @@ public class GalaxyGenerator {
         return result;
     }
 
-    private BillboardDataset generateBase(ParticleType type, Distribution distribution) {
+    private BillboardDataset generateBase(ChannelType type, Distribution distribution) {
         var bd = new BillboardDataset();
         bd.setType(type);
         bd.setDistribution(distribution);
@@ -457,7 +457,7 @@ public class GalaxyGenerator {
         return bd;
     }
 
-    private double getMaxSize(ParticleType type) {
+    private double getMaxSize(ChannelType type) {
         return switch (type) {
             case STAR -> 0.15;
             case HII -> 0.4;
@@ -467,7 +467,7 @@ public class GalaxyGenerator {
         };
     }
 
-    private int[] getLayers(ParticleType type) {
+    private int[] getLayers(ChannelType type) {
         return switch (type) {
             case STAR -> new int[]{0, 1, 2, 4};
             case HII -> new int[]{0, 3, 4, 5, 6, 7, 9, 10};
@@ -478,7 +478,7 @@ public class GalaxyGenerator {
         };
     }
 
-    private double getSizeNoise(ParticleType type) {
+    private double getSizeNoise(ChannelType type) {
         return switch (type) {
             case STAR -> 0.4;
             case HII -> 0.6;
@@ -489,7 +489,7 @@ public class GalaxyGenerator {
         };
     }
 
-    private double generateSize(ParticleType type) {
+    private double generateSize(ChannelType type) {
         return switch (type) {
             case STAR -> 0.3;
             case HII -> 2.2;
@@ -500,7 +500,7 @@ public class GalaxyGenerator {
         };
     }
 
-    private double generateIntensity(ParticleType type) {
+    private double generateIntensity(ChannelType type) {
         return switch (type) {
             case STAR -> 2.0;
             case HII -> 1.0;
@@ -566,7 +566,7 @@ public class GalaxyGenerator {
         return new double[]{0.0, 0.0};
     }
 
-    private long generateCount(BillboardDataset.ParticleType gt) {
+    private long generateCount(ChannelType gt) {
         return switch (gt) {
             case STAR -> rand.nextLong(20_000L, 30_000L);
             case HII -> rand.nextLong(100L, 500L);
@@ -577,7 +577,7 @@ public class GalaxyGenerator {
         };
     }
 
-    private double[] generateColors(BillboardDataset.ParticleType gt) {
+    private double[] generateColors(ChannelType gt) {
         return switch (gt) {
             case STAR -> getRandomColors(starColors);
             case HII -> getRandomColors(hiiColors);

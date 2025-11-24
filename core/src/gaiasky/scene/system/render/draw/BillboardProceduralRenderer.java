@@ -26,6 +26,8 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.CPUGalGenFallback;
+import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -36,8 +38,11 @@ import gaiasky.util.gdx.shader.ComputeShaderProgram;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Matrix4Utils;
 import gaiasky.util.math.Vector3Q;
+import gaiasky.util.tree.GenStatus;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL43;
 
+import java.nio.FloatBuffer;
 import java.util.List;
 
 /**
@@ -107,39 +112,126 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
     /**
      * Prepares a given object for rendering by allocating the SSBO.
      *
-     * @param body      The body component.
-     * @param billboard The billboard set component.
-     * @param dataset   The billboard dataset object.
+     * @param body    The body component.
+     * @param set     The billboard set component.
+     * @param dataset The billboard dataset object.
+     * @param index   The indes of the billboard dataset in the billboard set.
      */
-    private void prepareGPUBuffer(Body body, BillboardSet billboard, BillboardDataset dataset) {
+    private void prepareGPUBuffer(Body body, BillboardSet set, BillboardDataset dataset, int index) {
         if (!isPrepared(dataset)) {
-            SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
+            if (set.procedural
+                    && !Settings.settings.runtime.compute) {
+                // Compute shaders NOT supported -- Fallback to CPU.
+                if (dataset.getGenStatus() == GenStatus.NOT_STARTED) {
+                    // Start generation in the CPU.
+                    dataset.setGenStatus(GenStatus.RUNNING);
+                    final Runnable genTask = () -> {
+                        dataset.setGenStatus(GenStatus.RUNNING);
 
-            int bufferId = GL43.glGenBuffers();
+                        try {
+                            var generator = new CPUGalGenFallback(body.size);
+                            var data = generator.generate(dataset, (int) set.seed + index);
+                            dataset.data = data;
+                        } catch (Exception e) {
+                            dataset.setGenStatus(GenStatus.FAILED);
+                            logger.error(e);
+                        }
+                        // Done.
+                        dataset.setGenStatus(GenStatus.DONE);
+                    };
+                    GaiaSky.instance.getExecutorService().execute(genTask);
+                } else if (dataset.getGenStatus() == GenStatus.DONE) {
+                    // Ready to stream to GPU.
+                    SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
 
-            // Check if buffer was created
-            if (bufferId == 0) {
-                logger.error("Failed to generate buffer ID");
-                return;
+                    int bufferId = GL43.glGenBuffers();
+
+                    // Check if buffer was created
+                    if (bufferId == 0) {
+                        logger.error("Failed to generate buffer ID");
+                        return;
+                    }
+
+                    GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
+
+                    // Create and fill FloatBuffer with CPU-generated data
+                    FloatBuffer particleBuffer = createParticleBufferFromCPU(dataset);
+
+                    // Upload CPU data to SSBO
+                    GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, particleBuffer, GL43.GL_DYNAMIC_DRAW);
+
+                    // Add to map
+                    ssbos.put(dataset, bufferId);
+
+                    // Bind SSBO (still needed for rendering)
+                    GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
+
+                    // Double-check the binding worked
+                    SysUtils.checkForOpenGLErrors("After bindBufferBase()");
+                }
+            } else {
+                // Compute shaders supported.
+                SysUtils.checkForOpenGLErrors("prepareGPUBuffer() start", true);
+
+                int bufferId = GL43.glGenBuffers();
+
+                // Check if buffer was created
+                if (bufferId == 0) {
+                    logger.error("Failed to generate buffer ID");
+                    return;
+                }
+
+                GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
+                // 12 is due alignment.
+                GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, (long) dataset.particleCount * 12 * 4, GL43.GL_DYNAMIC_DRAW);
+
+                // Add to map.
+                ssbos.put(dataset, bufferId);
+
+                // Bind SSBO and dispatch compute shader
+                GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
+
+                // Double-check the binding worked
+                SysUtils.checkForOpenGLErrors("After bindBufferBase()");
+
+                dispatchComputeShader(dataset,
+                                      (int) set.seed + index,
+                                      body);
             }
-
-            GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, bufferId);
-            GL43.glBufferData(GL43.GL_SHADER_STORAGE_BUFFER, (long) dataset.particleCount * 12 * 4, GL43.GL_DYNAMIC_DRAW);
-
-            // Add to map.
-            ssbos.put(dataset, bufferId);
-
-            // Bind SSBO and dispatch compute shader
-            GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, bufferId);
-
-            // Double-check the binding worked
-            SysUtils.checkForOpenGLErrors("After bindBufferBase()");
-
-            dispatchComputeShader(dataset,
-                                  (int) billboard.seed,
-                                  body);
-
         }
+    }
+
+    private FloatBuffer createParticleBufferFromCPU(BillboardDataset dataset) {
+        // Assuming you have CPU-generated particles as double[7][]
+        var data = dataset.data;
+
+        // Each particle has 9 floats: position(3) + color(3) + extra(3)
+        // vec3 in GLSL are aligned to vec4, so we need 12 floats per particle!
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(data.size() * 12);
+
+        for (var particle : data) {
+            var d = ((ParticleVector) particle).data();
+            // Position (xyz) - convert double to float
+            buffer.put((float) d[0]); // x
+            buffer.put((float) d[1]); // y
+            buffer.put((float) d[2]); // z
+            buffer.put(0f); // padding to vec4
+
+            // Color (rgb)
+            buffer.put((float) d[3]); // r
+            buffer.put((float) d[4]); // g
+            buffer.put((float) d[5]); // b
+            buffer.put(0f); // padding to vec4
+
+            // Extra data: size, type, layer
+            buffer.put((float) d[6]); // size -> extra.x
+            buffer.put((float) d[7]); // type -> extra.y (you can set this as needed)
+            buffer.put((float) d[8]); // layer -> extra.z (you can set this as needed)
+            buffer.put(0f); // padding to vec4
+        }
+
+        buffer.flip();
+        return buffer;
     }
 
     private int[] prepareLayersUniform(int[] layers) {
@@ -214,7 +306,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
     }
 
-    protected void addBaseTransformUniform(ExtShaderProgram program, RefSysTransform transform, Vector3Q bodyPos, double bodySize) {
+    protected void addObjectTransformUniform(ExtShaderProgram program, RefSysTransform transform, Vector3Q bodyPos, double bodySize) {
         Matrix4 objectTransform = transform.matrix == null ? auxMat2.idt() : transform.matrix.putIn(auxMat2);
         objectTransform.setTranslation(bodyPos.put(new Vector3()));
         Matrix4Utils.setScaling(objectTransform, (float) bodySize);
@@ -236,9 +328,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if (!Settings.settings.runtime.compute) {
-            return;
-        }
         for (var renderable : renderables) {
             render((Render) renderable, camera);
         }
@@ -255,10 +344,11 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
 
             // COMPUTE--Create SSBO and generate particle positions.
+            int i = 0;
             for (var dataset : billboard.datasets) {
-                prepareGPUBuffer(body, billboard, dataset);
+                prepareGPUBuffer(body, billboard, dataset, i);
+                i++;
             }
-
 
             // RENDER--Actually render particles.
             ExtShaderProgram shaderProgram = getShaderProgram();
@@ -275,7 +365,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
             // Arbitrary affine transformations.
             addAffineTransformUniforms(shaderProgram, affine);
-            addBaseTransformUniform(shaderProgram, trf, body.pos, body.size);
+            addObjectTransformUniform(shaderProgram, trf, body.pos, body.size);
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
@@ -286,46 +376,48 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
 
             for (var dataset : billboard.datasets) {
-                // Blend mode
-                switch (dataset.blending) {
-                    case ALPHA -> {
-                        Gdx.gl20.glEnable(GL20.GL_BLEND);
-                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
-                        Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                if (isPrepared(dataset)) {
+                    // Blend mode
+                    switch (dataset.blending) {
+                        case ALPHA -> {
+                            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                        }
+                        case ADDITIVE -> {
+                            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                        }
+                        case COLOR -> {
+                            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
+                        }
+                        case SUBTRACTIVE -> {
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_REVERSE_SUBTRACT);
+                            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                        }
+                        case NONE -> {
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glDisable(GL20.GL_BLEND);
+                        }
                     }
-                    case ADDITIVE -> {
-                        Gdx.gl20.glEnable(GL20.GL_BLEND);
-                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
-                        Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                    }
-                    case COLOR -> {
-                        Gdx.gl20.glEnable(GL20.GL_BLEND);
-                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
-                        Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
-                    }
-                    case SUBTRACTIVE -> {
-                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_REVERSE_SUBTRACT);
-                        Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                    }
-                    case NONE -> {
-                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
-                        Gdx.gl20.glDisable(GL20.GL_BLEND);
-                    }
+
+                    // Specific uniforms
+                    double pointScaleFactor = 1.8e7;
+                    shaderProgram.setUniformf("u_maxPointSize", (float) dataset.maxSizes[qualityIndex]);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", dataset.intensity);
+
+                    Gdx.gl20.glDepthMask(dataset.depthMask);
+
+                    // Enable instancing (pass the SSBO data to the shader)
+                    GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, ssbos.get(dataset, 0));
+
+                    // Draw instanced quads
+                    quadMesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, dataset.particleCount);
                 }
-
-                // Specific uniforms
-                double pointScaleFactor = 1.8e7;
-                shaderProgram.setUniformf("u_maxPointSize", (float) dataset.maxSizes[qualityIndex]);
-                shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
-                shaderProgram.setUniformf("u_intensity", dataset.intensity);
-
-                Gdx.gl20.glDepthMask(dataset.depthMask);
-
-                // Enable instancing (pass the SSBO data to the shader)
-                GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, ssbos.get(dataset, 0));
-
-                // Draw instanced quads
-                quadMesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, dataset.particleCount);
 
             }
             shaderProgram.end();
@@ -355,6 +447,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
                 if (id >= 0) {
                     GL43.glDeleteBuffers(id);
                 }
+                ds.setGenStatus(GenStatus.NOT_STARTED);
             }
         }
 

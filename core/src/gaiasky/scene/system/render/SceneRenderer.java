@@ -306,7 +306,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                                                         BILLBOARD_GROUP_PROCEDURAL,
                                                                                         alphas,
                                                                                         renderAssets.billboardProceduralShaders,
-                                                                                        renderAssets.genParticlesShader);
+                                                                                        renderAssets.galGenShader);
             case PARTICLE_GROUP -> {
                 final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudModeParticles) {
