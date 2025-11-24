@@ -23,7 +23,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
-import gaiasky.scene.record.BillboardDataset.ParticleType;
+import gaiasky.scene.record.BillboardDataset.ChannelType;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
@@ -172,8 +172,8 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
         setInGpu(render, true);
     }
 
-    private ColorGenerator getColorGenerator(final ParticleType type) {
-        return type == ParticleType.DUST ? dustColorGenerator : starColorGenerator;
+    private ColorGenerator getColorGenerator(final ChannelType type) {
+        return type == ChannelType.DUST ? dustColorGenerator : starColorGenerator;
     }
 
 
@@ -183,14 +183,14 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             Render render = (Render) renderable;
             var set = Mapper.billboardSet.get(render.entity);
 
-            switch (set.status.get()) {
+            switch (set.loadStatus.get()) {
                 case NOT_LOADED -> {
-                    // Load data.
-                    set.setStatus(LoadStatus.LOADING);
-                    for (var bds : set.datasets) {
-                        prepareGPUData(render, bds, getColorGenerator(bds.type));
+                    // Load data into GPU.
+                    set.setLoadStatus(LoadStatus.LOADING);
+                    for (var bd : set.datasets) {
+                        prepareGPUData(render, bd, getColorGenerator(bd.type));
                     }
-                    set.setStatus(LoadStatus.LOADED);
+                    set.setLoadStatus(LoadStatus.LOADED);
                 }
                 case LOADED -> render(render, camera);
             }
@@ -201,7 +201,6 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
         // RENDER
         float alpha = getAlpha(render);
         if (alpha > 0) {
-            var fade = Mapper.fade.get(render.entity);
             var affine = Mapper.affine.get(render.entity);
             var billboard = Mapper.billboardSet.get(render.entity);
 

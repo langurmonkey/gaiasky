@@ -57,7 +57,7 @@ public class RenderAssets {
             mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque,
             mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation,
             mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
-    public ComputeShaderProgram genParticlesShader;
+    public ComputeShaderProgram galGenShader;
     public BitmapFont fontDistanceFiled;
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
@@ -247,7 +247,7 @@ public class RenderAssets {
         manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
 
         // Compute shaders
-        manager.load("genparticles.comp.glsl", ComputeShaderProgram.class, new ComputeShaderLoader.ComputeShaderParameter("compute.genparticles", "shader/compute/genparticles.comp.glsl"));
+        manager.load("galgen.comp.glsl", ComputeShaderProgram.class, new ComputeShaderLoader.ComputeShaderParameter("compute.galgen", "shader/compute/galgen.comp.glsl"));
 
 
         // Add fonts to load
@@ -393,7 +393,7 @@ public class RenderAssets {
         IntShaderProvider cloud = manager.get("cloud");
 
         // Compute
-        genParticlesShader = manager.get("genparticles.comp.glsl");
+        galGenShader = manager.get("galgen.comp.glsl");
 
         // Create model batches
         mbVertexLighting = new IntModelBatch(perVertexLighting);

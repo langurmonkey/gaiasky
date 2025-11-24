@@ -14,9 +14,19 @@ import gaiasky.util.ucd.UCD;
 
 public record ParticleVector(double[] data) implements IParticleRecord {
 
+    public void setPos(double x, double y, double z) {
+        setX(x);
+        setY(y);
+        setZ(z);
+    }
+
     @Override
     public double x() {
         return data[0];
+    }
+
+    public void setX(double x) {
+        data[0] = x;
     }
 
     @Override
@@ -24,9 +34,17 @@ public record ParticleVector(double[] data) implements IParticleRecord {
         return data[1];
     }
 
+    public void setY(double y) {
+        data[1] = y;
+    }
+
     @Override
     public double z() {
         return data[2];
+    }
+
+    public void setZ(double z) {
+        data[2] = z;
     }
 
     @Override
@@ -88,6 +106,11 @@ public record ParticleVector(double[] data) implements IParticleRecord {
     public float size() {
         return data.length >= 4 ? (float) data[3] : 0;
     }
+    public void setSize(double size) {
+        if (data.length >= 4) {
+            data[3] = size;
+        }
+    }
 
     @Override
     public double radius() {
@@ -122,6 +145,14 @@ public record ParticleVector(double[] data) implements IParticleRecord {
     @Override
     public double[] rgb() {
         return data.length >= 7 ? new double[]{data[4], data[5], data[6]} : null;
+    }
+
+    public void setRGB(double r, double g, double b) {
+        if (data.length >= 7) {
+            data[4] = r;
+            data[5] = g;
+            data[6] = b;
+        }
     }
 
     @Override

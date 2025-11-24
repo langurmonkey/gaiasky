@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.TextureArray;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.tree.GenStatus;
 import gaiasky.util.tree.LoadStatus;
 import net.jafama.FastMath;
 
@@ -38,7 +39,8 @@ public class BillboardSet implements Component, IDisposable {
     /** Fully qualified name of the data provider class. Loads particle data files. **/
     public String provider;
     /** Current load status. **/
-    public AtomicReference<LoadStatus> status = new AtomicReference<>(LoadStatus.NOT_LOADED);
+    public AtomicReference<LoadStatus> loadStatus = new AtomicReference<>(LoadStatus.NOT_LOADED);
+
 
     /** Texture array name. **/
     public String textureArrayName;
@@ -51,12 +53,12 @@ public class BillboardSet implements Component, IDisposable {
         }
     }
 
-    public LoadStatus getStatus() {
-        return status.get();
+    public LoadStatus getLoadStatus() {
+        return loadStatus.get();
     }
 
-    public void setStatus(LoadStatus status) {
-        this.status.set(status);
+    public void setLoadStatus(LoadStatus loadStatus) {
+        this.loadStatus.set(loadStatus);
     }
 
     public void setProcedural(Boolean procedural) {

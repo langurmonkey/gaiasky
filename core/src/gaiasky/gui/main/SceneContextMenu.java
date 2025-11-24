@@ -25,7 +25,10 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.*;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.CatalogManager;
+import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
@@ -300,39 +303,35 @@ public class SceneContextMenu extends ContextMenu {
 
         }
 
-        if (SysUtils.isComputeShaderSupported()) {
-            addSeparator();
-            if (procGalCandidate) {
-                MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.edit"), skin, skin.getDrawable("icon-elem-galaxies"));
-                galGen.addListener(event -> {
-                    if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
-                        return true;
-                    }
-                    return false;
-                });
-                addItem(galGen);
-            }
-            MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
-            ContextMenu morphologiesMenu = new ContextMenu(skin, "default");
-            var gms = GalaxyGenerator.GalaxyMorphology.values();
-            for (var gm : gms) {
-                MenuItem gmEntry = new MenuItem(gm.name(), skin, skin.getDrawable("icon-elem-galaxies"));
-                gmEntry.addListener(event -> {
-                    if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, null, gm);
-                        return true;
-                    }
-                    return false;
-                });
-                morphologiesMenu.addItem(gmEntry);
-
-            }
-            galGen.setSubMenu(morphologiesMenu);
+        addSeparator();
+        if (procGalCandidate) {
+            MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.edit"), skin, skin.getDrawable("icon-elem-galaxies"));
+            galGen.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, candidate);
+                    return true;
+                }
+                return false;
+            });
             addItem(galGen);
+        }
+        MenuItem galGen = new MenuItem(I18n.msg("context.galaxy.new"), skin, skin.getDrawable("icon-elem-galaxies"));
+        ContextMenu morphologiesMenu = new ContextMenu(skin, "default");
+        var gms = GalaxyGenerator.GalaxyMorphology.values();
+        for (var gm : gms) {
+            MenuItem gmEntry = new MenuItem(gm.name(), skin, skin.getDrawable("icon-elem-galaxies"));
+            gmEntry.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, galGen, null, gm);
+                    return true;
+                }
+                return false;
+            });
+            morphologiesMenu.addItem(gmEntry);
 
         }
-
+        galGen.setSubMenu(morphologiesMenu);
+        addItem(galGen);
 
         if (validCandidate) {
             addSeparator();

@@ -77,7 +77,7 @@ public class GalaxyDataGenerator {
         private GalaxyDataType galaxyType = GalaxyDataType.uniform;
 
         @Parameter(names = {"--particletype"}, required = true, description = "The particle type to use.", order = 2)
-        private BillboardDataset.ParticleType particleType = BillboardDataset.ParticleType.GAS;
+        private BillboardDataset.ChannelType particleType = BillboardDataset.ChannelType.GAS;
 
         @Parameter(names = {"-o", "--ouptut"}, description = "The output directory.", required = true, order = 2)
         private String outputDir = "/home/tsagrista/.local/share/gaiasky/data/galaxy/";

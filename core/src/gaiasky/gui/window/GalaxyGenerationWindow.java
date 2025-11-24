@@ -454,7 +454,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     System.arraycopy(ds, 0, newDs, 0, ds.length);
 
                     var dataset = new BillboardDataset();
-                    dataset.setType(BillboardDataset.ParticleType.POINT);
+                    dataset.setType(BillboardDataset.ChannelType.POINT);
                     dataset.setLayers(new int[]{0, 1, 2});
                     dataset.setBaseColor(new double[]{0.8, 0.8, 0.8});
                     dataset.setMaxSize(20.0);
@@ -491,8 +491,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         for (var ds : datasets) {
             var dsTable = new Table(skin);
             // Type
-            OwnSelectBox<BillboardDataset.ParticleType> type = new OwnSelectBox<>(skin);
-            type.setItems(BillboardDataset.ParticleType.values());
+            OwnSelectBox<BillboardDataset.ChannelType> type = new OwnSelectBox<>(skin);
+            type.setItems(BillboardDataset.ChannelType.values());
             type.setWidth(halfWidthBox);
             type.setSelected(ds.type);
             type.addListener(new ChangeListener() {
@@ -500,7 +500,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 public void changed(ChangeEvent event,
                                     Actor actor) {
                     ds.type = type.getSelected();
-                    if (ds.type == BillboardDataset.ParticleType.DUST) {
+                    if (ds.type == BillboardDataset.ChannelType.DUST) {
                         GaiaSky.postRunnable(() -> {
                             // Subtractive blending.
                             ds.setBlending(BlendMode.SUBTRACTIVE);

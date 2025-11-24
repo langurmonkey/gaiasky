@@ -11,7 +11,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.util.Settings;
 
 public class BillboardSetExtractor extends AbstractExtractSystem {
 
@@ -35,9 +34,11 @@ public class BillboardSetExtractor extends AbstractExtractSystem {
             }
 
             // Billboard group.
-            if (billboard.procedural && Settings.settings.runtime.compute) {
+            if (billboard.procedural) {
+                // Procedural galaxy generation.
                 addToRender(render, RenderGroup.BILLBOARD_GROUP_PROCEDURAL);
             } else {
+                // Galaxy data comes from files.
                 addToRender(render, RenderGroup.BILLBOARD_GROUP);
             }
         }
