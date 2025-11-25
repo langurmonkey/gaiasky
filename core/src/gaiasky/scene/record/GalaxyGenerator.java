@@ -1,26 +1,30 @@
 package gaiasky.scene.record;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonValue.ValueType;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.util.Pair;
+import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.math.StdRandom;
 
 import java.util.Objects;
 import java.util.Random;
 
-import static gaiasky.scene.record.BillboardDataset.Distribution;
-import static gaiasky.scene.record.BillboardDataset.Distribution.*;
 import static gaiasky.scene.record.BillboardDataset.ChannelType;
 import static gaiasky.scene.record.BillboardDataset.ChannelType.*;
+import static gaiasky.scene.record.BillboardDataset.Distribution;
+import static gaiasky.scene.record.BillboardDataset.Distribution.*;
 
 /**
  * Generates galaxies as lists of {@link BillboardDataset} objects.
  */
 public class GalaxyGenerator {
+    private static final Logger.Log logger = Logger.getLogger(GalaxyGenerator.class);
 
     /** Adjectives for random name generation. **/
     private static final String[] adjectives = {
@@ -212,13 +216,15 @@ public class GalaxyGenerator {
                 var dust = generateBase(DUST, distribution);
                 dust.setEccentricityX(eccX);
                 dust.setEccentricityY(eccY);
-                dust.setSize(rand.nextDouble(2.0, 6.9));
+                dust.setSize(rand.nextDouble(20.0, 60.9));
+                dust.setIntensity(rand.nextDouble(0.005, 0.009));
                 if (distribution == SPHERE_GAUSS) {
                     dust.setScaleY(1.0 + eccY);
                 }
 
                 // Gas
                 var gas = generateBase(GAS, distribution);
+                gas.setParticleCount((long) (gas.particleCount * 0.6));
                 gas.setEccentricityX(eccX);
                 gas.setEccentricityY(eccY);
                 gas.setMinRadius(0.0);
@@ -605,10 +611,10 @@ public class GalaxyGenerator {
 
     private double generateEccentricity(GalaxyMorphology gm) {
         return switch (gm) {
-            case E0 -> rand.nextDouble(0.0, 0.2);
-            case E3 -> rand.nextDouble(0.2, 0.4);
-            case E5 -> rand.nextDouble(0.4, 0.6);
-            case E7 -> rand.nextDouble(0.6, 0.8);
+            case E0 -> rand.nextDouble(0.0, 0.25);
+            case E3 -> rand.nextDouble(0.25, 0.45);
+            case E5 -> rand.nextDouble(0.45, 0.67);
+            case E7 -> rand.nextDouble(0.67, 0.95);
             default -> 0f;
         };
     }
@@ -630,28 +636,163 @@ public class GalaxyGenerator {
 
         var base = Mapper.base.get(e);
         var body = Mapper.body.get(e);
+        var graph = Mapper.graph.get(e);
+        var label = Mapper.label.get(e);
         var coord = Mapper.coordinates.get(e);
+        var trf = Mapper.transform.get(e);
         var bb = Mapper.billboardSet.get(e);
         var focus = Mapper.focus.get(e);
+        var fade = Mapper.fade.get(e);
         var render = Mapper.render.get(e);
 
+        // Base
         if (base.names.length == 1) {
             obj.addChild("name", new JsonValue(base.getName()));
         } else {
-            var names = new JsonValue(ValueType.array);
-            for (var n : base.names) {
-                names.addChild(new JsonValue(n));
-            }
+            addArray(obj, "names", base.names);
+        }
+        if (body.color != null) {
+            addArray(obj, "color", body.color);
+        }
+        if (body.labelColor != null) {
+            addArray(obj, "labelColor", body.labelColor);
         }
         obj.addChild("sizePc", new JsonValue(body.size * Constants.U_TO_PC));
-        if (bb.procedural)
+        obj.addChild("archetype", new JsonValue("BillboardGroup"));
+        if (graph.parent != null) {
+            obj.addChild("parent", new JsonValue(Mapper.base.get(graph.parent).getName()));
+        }
+        // Fade
+        if (fade.fadePositionObjectName != null) {
+            obj.addChild("fadeObjectname", new JsonValue(fade.fadePositionObjectName));
+        }
+        if (fade.fadeIn != null) {
+            addArray(obj, "fadeIn", fade.fadeIn.values());
+        }
+        if (fade.fadeOut != null) {
+            addArray(obj, "fadeOut", fade.fadeOut.values());
+        }
+        // Generation
+        if (bb.procedural) {
             obj.addChild("procedural", new JsonValue(true));
+        }
         if (bb.seed >= 0)
             obj.addChild("seed", new JsonValue(bb.seed));
         if (bb.morphology != null)
             obj.addChild("morphology", new JsonValue(bb.morphology.name()));
+        obj.addChild("halfResolutionBuffer", new JsonValue(render.halfResolutionBuffer));
+        addArray(obj, "textures", bb.textureFiles);
+        // Misc
+        obj.addChild("focusable", new JsonValue(focus.focusable));
+        obj.addChild("renderLabel", new JsonValue(label.isDisplayAuto()));
+        if (trf.transformName != null) {
+            obj.addChild("transformName", new JsonValue(trf.transformName));
+        } else if (trf.matrix != null) {
+            addArray(obj, "transformMatrix", trf.matrix.val);
+        }
+        // Coordinates
+        var coordsObj = new JsonValue(ValueType.object);
+        var stc = (StaticCoordinates) coord.coordinates;
+        coordsObj.addChild("impl", new JsonValue(stc.getClass().getName()));
+        if (stc.getTransformName() != null)
+            coordsObj.addChild("transformName", new JsonValue(stc.getTransformName()));
+        if (stc.getPosition() != null)
+            addArray(coordsObj, "position", stc.getPosition().valuesD());
+        obj.addChild("coordinates", coordsObj);
+        // Data
+        var data = new JsonValue(ValueType.array);
+        for (var bd : bb.datasets) {
+            var dataset = new JsonValue(ValueType.object);
+            dataset.addChild("type", new JsonValue(bd.type.name()));
+            dataset.addChild("distribution", new JsonValue(bd.distribution.name()));
+            dataset.addChild("particleCount", new JsonValue(bd.particleCount));
+            dataset.addChild("size", new JsonValue(bd.size));
+            if (bd.sizeMask) {
+                dataset.addChild("sizeNoiseScale", new JsonValue(bd.sizeNoise));
+            } else {
+                dataset.addChild("sizeNoise", new JsonValue(bd.sizeNoise));
+            }
+            dataset.addChild("intensity", new JsonValue(bd.intensity));
+            dataset.addChild("heightScale", new JsonValue(bd.heightScale));
+            dataset.addChild("minRadius", new JsonValue(bd.minRadius));
+            dataset.addChild("baseRadius", new JsonValue(bd.baseRadius));
+            addArray(dataset, "translation", bd.translation);
+            addArray(dataset, "rotation", bd.rotation);
+            addArray(dataset, "scale", bd.scale);
+            addArray(dataset, "eccentricity", bd.eccentricity);
+            dataset.addChild("aspect", new JsonValue(bd.aspect));
+            dataset.addChild("baseAngle", new JsonValue(bd.baseAngle));
+            dataset.addChild("numArms", new JsonValue(bd.numArms));
+            dataset.addChild("armSigma", new JsonValue(bd.armSigma));
+            addArray(dataset, "spiralDeltaPos", bd.spiralDeltaPos);
+
+            data.addChild(dataset);
+        }
+        obj.addChild("data", data);
 
         return obj;
     }
 
+    private <T> void addArray(JsonValue parent, String name, T arr) {
+        var obj = new JsonValue(ValueType.array);
+
+        switch (arr) {
+            case int[] ints -> {
+                // Handle int[] (primitive type)
+                for (int n : ints) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case float[] floats -> {
+                // Handle float[] (primitive type)
+                for (float n : floats) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case double[] doubles -> {
+                // Handle double[] (primitive type)
+                for (double n : doubles) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case long[] longs -> {
+                // Handle long[] (primitive type)
+                for (long n : longs) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case short[] shorts -> {
+                // Handle short[] (primitive type)
+                for (short n : shorts) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case byte[] bytes -> {
+                // Handle byte[] (primitive type)
+                for (byte n : bytes) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case boolean[] booleans -> {
+                // Handle boolean[] (primitive type)
+                for (boolean n : booleans) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case String[] booleans -> {
+                // Handle String[]
+                for (String n : booleans) {
+                    obj.addChild(new JsonValue(n));
+                }
+            }
+            case Vector3 vec3 -> {
+                obj.addChild(new JsonValue(vec3.x));
+                obj.addChild(new JsonValue(vec3.y));
+                obj.addChild(new JsonValue(vec3.z));
+            }
+            default -> logger.warn("Unsupported array type: " + arr.getClass().getName());
+        }
+
+        parent.addChild(name, obj);
+    }
 }

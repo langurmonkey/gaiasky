@@ -72,6 +72,10 @@ public class StaticCoordinates implements IBodyCoordinates {
         }
     }
 
+    public String getTransformName() {
+        return transformName;
+    }
+
     public void setTransformMatrix(double[] transformMatrix) {
         trf = new Matrix4D(transformMatrix);
     }

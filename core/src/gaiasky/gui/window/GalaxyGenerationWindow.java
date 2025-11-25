@@ -238,10 +238,18 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         position.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                var camPos = GaiaSky.instance.getICamera().getPos();
                 GaiaSky.postRunnable(() -> {
-                    Mapper.body.get(entityFull).pos.set(camPos);
-                    Mapper.body.get(entityHalf).pos.set(camPos);
+                    var bodyFull =Mapper.body.get(entityFull);
+                    var bodyHalf =Mapper.body.get(entityHalf);
+
+                    var camera = GaiaSky.instance.getICamera();
+                    var cpos = camera.getPos();
+                    var cdir = new Vector3D(camera.getDirection());
+                    var pos = new Vector3Q(cpos);
+                    pos.add(cdir.nor().scl(bodyFull.size));
+
+                    bodyFull.pos.set(pos);
+                    bodyHalf.pos.set(pos);
                 });
             }
         });
@@ -406,19 +414,6 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         content.add(new Separator(skin, "gray")).fillX().expandX().padBottom(pad20).row();
         content.add(buttonsBottom).center();
 
-    }
-
-    private OwnTextIconButton getRandomButton(GalaxyMorphology gm) {
-        var button = new OwnTextIconButton(gm.name(), skin, "random");
-        button.setColor(ColorUtils.gYellowC);
-        button.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                generateRandom(gm, System.currentTimeMillis());
-            }
-        });
-        button.pad(pad10, pad20, pad10, pad20);
-        return button;
     }
 
     private void generateRandom(final GalaxyMorphology gm, final long seed) {

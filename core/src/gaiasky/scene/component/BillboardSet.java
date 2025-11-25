@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.TextureArray;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.tree.GenStatus;
 import gaiasky.util.tree.LoadStatus;
 import net.jafama.FastMath;
 
