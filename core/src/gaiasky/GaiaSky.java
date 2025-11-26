@@ -790,7 +790,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE,
                                         Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD,
                                         Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD,
-                                        Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE,
+                                        Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.SCENE_FORCE_UPDATE,
                                         Event.GO_HOME_INSTANT_CMD);
 
         // Re-enable input.
@@ -1644,11 +1644,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 String key;
                 key = (String) data[0];
                 removeRunnable(key);
-            }
-            case RESET_RENDERER -> {
-                if (sceneRenderer != null) {
-                    sceneRenderer.resetRenderSystemFlags();
-                }
             }
             case SCENE_FORCE_UPDATE -> touchSceneGraph();
         }

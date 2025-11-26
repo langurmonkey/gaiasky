@@ -225,14 +225,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             createRayMarchingEffect(ppb, key, list);
         });
 
-        // COPY
-        //DrawTexture copy = new DrawTexture();
-        //ppb.set(copy);
-
-        // DEPTH BUFFER
-        //DepthBuffer depthBuffer = new DepthBuffer();
-        //ppb.set(depthBuffer);
-
         // SSR
         SSR ssrEffect = new SSR();
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());

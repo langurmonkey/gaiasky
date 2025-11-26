@@ -2976,7 +2976,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 || settings.graphics.fullScreen.bitDepth != selected.bitsPerPixel)) || (
                 !settings.graphics.fullScreen.active && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText()))
                         || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
-        boolean resetRenderFlags = false;
 
         settings.graphics.fullScreen.active = fullScreen.isChecked();
 
@@ -3114,7 +3113,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // SSR
         if (ssr != null) {
             var reloadSSR = settings.postprocess.ssr.active != ssr.isChecked();
-            resetRenderFlags = reloadSSR;
             if (reloadSSR) {
                 GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
             }
@@ -3333,10 +3331,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
                 EventManager.publish(Event.REBUILD_SHADOW_MAP_DATA_CMD, this);
             });
-        }
-
-        if (resetRenderFlags) {
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.RESET_RENDERER, this));
         }
 
         if (reloadLang) {
