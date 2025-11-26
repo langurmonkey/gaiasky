@@ -60,7 +60,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol,
             focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
-    protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralGeneration;
+    protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralPlanet, proceduralGalaxy;
     protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
@@ -217,16 +217,28 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         refreshOrbit = new OwnTextIconButton("", skin, "reload");
         // This is filled later on.
 
-        proceduralGeneration = new OwnTextIconButton("", skin, "fork");
-        proceduralGeneration.addListener((event) -> {
+        proceduralPlanet = new OwnTextIconButton("", skin, "generate");
+        proceduralPlanet.addListener((event) -> {
             var view = (FocusView) currentFocus;
             if (currentFocus != null && Mapper.atmosphere.has(view.getEntity()) && event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralGeneration, currentFocus);
+                EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralPlanet, currentFocus);
                 return true;
             }
             return false;
         });
-        proceduralGeneration.addListener(new OwnTextTooltip(I18n.msg("gui.ui.procedural"), skin));
+        proceduralPlanet.addListener(new OwnTextTooltip(I18n.msg("gui.ui.procedural"), skin));
+
+        proceduralGalaxy = new OwnTextIconButton("", skin, "generate");
+        proceduralGalaxy.addListener((event) -> {
+            var view = (FocusView) currentFocus;
+            var bb = Mapper.billboardSet.get(view.getEntity());
+            if (currentFocus != null && bb != null && bb.procedural && event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, proceduralGalaxy, currentFocus);
+                return true;
+            }
+            return false;
+        });
+        proceduralGalaxy.addListener(new OwnTextTooltip(I18n.msg("gui.ui.procedural"), skin));
 
         objectVisibility = new OwnImageButton(skin, "eye-toggle");
         objectVisibility.addListener(event -> {
@@ -255,7 +267,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         landOn.setSize(bw, bw);
         landAt.setSize(bw, bw);
         refreshOrbit.setSize(bw, bw);
-        proceduralGeneration.setSize(bw, bw);
+        proceduralPlanet.setSize(bw, bw);
+        proceduralGalaxy.setSize(bw, bw);
 
         focusActionsGroup = new HorizontalGroup();
         focusActionsGroup.space(pad5);
@@ -266,7 +279,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusActionsGroup.addActor(landOn);
         focusActionsGroup.addActor(landAt);
         focusActionsGroup.addActor(refreshOrbit);
-        focusActionsGroup.addActor(proceduralGeneration);
+        focusActionsGroup.addActor(proceduralPlanet);
+        focusActionsGroup.addActor(proceduralGalaxy);
 
         float w = 170f;
         focusId.setWidth(w);
@@ -574,15 +588,21 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 }
                 var idString = TextUtils.capString(id, focusFieldMaxLength);
 
-                // Link(view.getEx
-                boolean vis = Mapper.atmosphere.has(view.getEntity());
+                boolean planet = Mapper.atmosphere.has(view.getEntity());
                 focusActionsGroup.removeActor(landOn);
                 focusActionsGroup.removeActor(landAt);
-                focusActionsGroup.removeActor(proceduralGeneration);
-                if (vis) {
+                focusActionsGroup.removeActor(proceduralPlanet);
+                if (planet) {
                     focusActionsGroup.addActor(landOn);
                     focusActionsGroup.addActor(landAt);
-                    focusActionsGroup.addActor(proceduralGeneration);
+                    focusActionsGroup.addActor(proceduralPlanet);
+                }
+
+                var bb = Mapper.billboardSet.get(view.getEntity());
+                boolean proceduralBillboardSet = bb != null && bb.procedural;
+                focusActionsGroup.removeActor(proceduralGalaxy);
+                if (proceduralBillboardSet) {
+                    focusActionsGroup.addActor(proceduralGalaxy);
                 }
 
                 // Refresh orbit

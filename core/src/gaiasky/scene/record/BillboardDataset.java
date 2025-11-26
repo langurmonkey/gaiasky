@@ -123,6 +123,10 @@ public class BillboardDataset {
      */
     public float heightScale = 0.01f;
     /**
+     * Height (vertical) profile.
+     */
+    public HeightProfile heightProfile = HeightProfile.CONSTANT;
+    /**
      * Eccentricities for density wave [1] and ellipsoid [2].
      */
     public float[] eccentricity = new float[]{0.3f, 0f};
@@ -348,6 +352,22 @@ public class BillboardDataset {
     public void setHeightScale(Long heightScale) {
         this.heightScale = heightScale.floatValue();
     }
+
+    public void setHeightProfile(String profile) {
+        if (profile != null && !profile.isBlank()) {
+            this.heightProfile = HeightProfile.valueOf(profile.toUpperCase(Locale.ROOT));
+        }
+    }
+
+    public void setHeightProfile(HeightProfile p) {
+        this.heightProfile = p;
+    }
+
+    public void setHeightParameters(Double heightScale, HeightProfile profile) {
+        setHeightScale(heightScale);
+        setHeightProfile(profile);
+    }
+
 
     public void setBaseAngle(Double baseAngle) {
         this.baseAngle = baseAngle.floatValue();
@@ -620,7 +640,24 @@ public class BillboardDataset {
     }
 
     /**
-     * Contains the different channel types. Particle types are essentially parameter
+     * Sets the spiral parameters all in one go.
+     *
+     * @param baseAngle The base angle.
+     * @param ec        The eccentricity.
+     * @param deltaPos  The delta pos.
+     * @param numArms   The number of arms.
+     * @param armSigma  The arm spread.
+     */
+    public void setSpiralData(double baseAngle, double ec, double[] deltaPos, long numArms, double armSigma) {
+        setBaseAngle(baseAngle);
+        setEccentricity(ec);
+        setSpiralDeltaPos(deltaPos);
+        setNumArms(numArms);
+        setArmSigma(armSigma);
+    }
+
+    /**
+     * Channel types. Particle types are essentially parameter
      * ranges for all parameters of a billboard dataset.
      */
     public enum ChannelType {
@@ -629,7 +666,7 @@ public class BillboardDataset {
              new int[]{0, 1, 2},
              new float[]{0f, 100f},
              new float[]{0f, 30f},
-             new float[]{0.0f, 0.05f},
+             new float[]{0.0f, 0.08f},
              null,
              null,
              null,
@@ -786,6 +823,7 @@ public class BillboardDataset {
         }
     }
 
+    /** Particle distributions. **/
     public enum Distribution {
         /** Simple uniformly distributed sphere. **/
         SPHERE,
@@ -807,5 +845,19 @@ public class BillboardDataset {
         CONE,
         /** An irregular distribution. **/
         IRREGULAR,
+    }
+
+    /** Vertical dispersion profile, with {@link #heightScale} as base. **/
+    public enum HeightProfile {
+        /** Constant over radius. **/
+        CONSTANT,
+        /** Increasing linearly with radius. **/
+        LINEAR_INC,
+        /** Decreasing linearly with radius. **/
+        LINEAR_DEC,
+        /** Increasing smoothly with radius (smoothstep). **/
+        SMOOTH_INC,
+        /** Decreasing smoothly with radius (smoothstep). **/
+        SMOOTH_DEC,
     }
 }
