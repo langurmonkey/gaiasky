@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonValue.ValueType;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.record.BillboardDataset.HeightProfile;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
@@ -244,6 +245,8 @@ public class GalaxyGenerator {
             // Lenticulars
             case S0 -> {
                 var distribution = SPHERE_GAUSS;
+                var heightScale = generateHeightScale();
+                var heightProfile = generateHeightProfile(SPIRAL, heightScale);
 
                 // Stars
                 var stars = generateBase(STAR, distribution);
@@ -254,6 +257,7 @@ public class GalaxyGenerator {
                 dust.setIntensity(dust.intensity * 0.5);
                 dust.setBaseAngle(rand.nextGaussian(990.0, 10.0));
                 dust.setMinRadius(rand.nextGaussian(0.2, 0.01));
+                dust.setHeightParameters(heightScale, heightProfile);
 
                 // Gas
                 var gas = generateBase(GAS, distribution);
@@ -270,42 +274,32 @@ public class GalaxyGenerator {
                 var dustDistribution = generateSpiralDistribution(gm);
                 var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
                 var starDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK_GAUSS;
+                var heightScale = generateHeightScale();
+                var heightProfile = generateHeightProfile(dustDistribution, heightScale);
                 var spiralAngle = generateSpiralAngle(gm, dustDistribution);
                 var eccentricity = rand.nextDouble(0.2, 0.3);
                 var minRadius = rand.nextDouble(0.08, 0.15);
                 var spiralDeltaPos = generateSpiralDeltaPos(dustDistribution);
                 var numArms = (rand.nextFloat() > 0.35f ? 2L : 4L) * (gm == GalaxyMorphology.Sc ? 2L : 1L);
                 var armSigma = rand.nextDouble(0.25, 0.45) / numArms;
-                var heightScale = generateHeightScale();
 
                 // Stars
                 var stars = generateBase(STAR, starDistribution);
+                stars.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 stars.setMinRadius(minRadius);
-                stars.setHeightScale(heightScale);
-                stars.setEccentricity(eccentricity);
-                stars.setBaseAngle(spiralAngle);
-                stars.setSpiralDeltaPos(spiralDeltaPos);
-                stars.setNumArms(numArms);
-                stars.setArmSigma(armSigma);
+                stars.setHeightParameters(heightScale, heightProfile);
 
                 // HII
                 var hii = generateBase(HII, gasDistribution);
+                hii.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 hii.setMinRadius(minRadius);
-                hii.setHeightScale(heightScale);
-                hii.setEccentricity(eccentricity);
-                hii.setBaseAngle(spiralAngle);
-                hii.setSpiralDeltaPos(spiralDeltaPos);
-                hii.setNumArms(numArms);
-                hii.setArmSigma(armSigma);
+                hii.setHeightParameters(heightScale, heightProfile);
 
                 // DUST
                 var dust = generateBase(DUST, dustDistribution);
+                dust.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 dust.setMinRadius(minRadius);
-                dust.setEccentricity(eccentricity);
-                dust.setBaseAngle(spiralAngle);
-                dust.setSpiralDeltaPos(spiralDeltaPos);
-                dust.setNumArms(numArms);
-                dust.setArmSigma(armSigma);
+                dust.setHeightParameters(heightScale, heightProfile);
 
                 // DUST (field)
                 var dustF = generateBase(DUST, DISK);
@@ -317,12 +311,9 @@ public class GalaxyGenerator {
 
                 // GAS
                 var gas = generateBase(GAS, gasDistribution);
+                gas.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 gas.setMinRadius(minRadius);
-                gas.setEccentricity(eccentricity);
-                gas.setBaseAngle(spiralAngle);
-                gas.setSpiralDeltaPos(spiralDeltaPos);
-                gas.setNumArms(numArms);
-                gas.setArmSigma(armSigma);
+                gas.setHeightParameters(heightScale, heightProfile);
 
                 // BULGE
                 var bulge = generateBase(BULGE, SPHERE);
@@ -340,32 +331,32 @@ public class GalaxyGenerator {
                 var dustDistribution = generateSpiralDistribution(gm);
                 var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
                 var starDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK_GAUSS;
+                var heightScale = generateHeightScale();
+                var heightProfile = generateHeightProfile(dustDistribution, heightScale);
                 var spiralAngle = generateSpiralAngle(gm, dustDistribution);
-                var eccentricity = rand.nextDouble(0.2, 0.3);
                 var minRadius = rand.nextDouble(0.25, 0.4);
+                var eccentricity = rand.nextDouble(0.2, 0.3);
                 var spiralDeltaPos = generateSpiralDeltaPos(dustDistribution);
                 var numArms = (rand.nextFloat() > 0.35f ? 2L : 4L) * (gm == GalaxyMorphology.SBc ? 2L : 1L);
                 var armSigma = rand.nextDouble(0.25, 0.45) / numArms;
-                var heightScale = generateHeightScale();
 
                 // Stars
                 var stars = generateBase(STAR, starDistribution);
+                stars.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 stars.setMinRadius(minRadius);
-                stars.setHeightScale(heightScale);
+                stars.setHeightParameters(heightScale, heightProfile);
 
                 // HII
                 var hii = generateBase(HII, gasDistribution);
+                hii.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 hii.setMinRadius(minRadius);
-                hii.setHeightScale(heightScale);
+                hii.setHeightParameters(heightScale, heightProfile);
 
                 // DUST
                 var dust = generateBase(DUST, dustDistribution);
+                dust.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 dust.setMinRadius(minRadius / 2.0);
-                dust.setEccentricity(eccentricity);
-                dust.setBaseAngle(spiralAngle);
-                dust.setSpiralDeltaPos(spiralDeltaPos);
-                dust.setNumArms(numArms);
-                dust.setArmSigma(armSigma);
+                dust.setHeightParameters(heightScale, heightProfile);
 
                 // DUST (field)
                 var dustF = generateBase(DUST, DISK);
@@ -377,12 +368,9 @@ public class GalaxyGenerator {
 
                 // GAS
                 var gas = generateBase(GAS, gasDistribution);
+                gas.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 gas.setMinRadius(minRadius / 2.0);
-                gas.setEccentricity(eccentricity);
-                gas.setBaseAngle(spiralAngle);
-                gas.setSpiralDeltaPos(spiralDeltaPos);
-                gas.setNumArms(numArms);
-                gas.setArmSigma(armSigma);
+                gas.setHeightParameters(heightScale, heightProfile);
 
                 // BAR
                 var bar = generateBase(BULGE, ELLIPSOID);
@@ -486,6 +474,28 @@ public class GalaxyGenerator {
         };
     }
 
+    private long generateCount(ChannelType gt) {
+        return switch (gt) {
+            case STAR -> rand.nextLong(26_000L, 33_000L);
+            case HII -> rand.nextLong(100L, 500L);
+            case GAS -> rand.nextLong(3_000L, 5_000L);
+            case DUST -> rand.nextLong(9_000L, 14_500L);
+            case BULGE -> rand.nextLong(5L, 18L);
+            case POINT -> rand.nextLong(1000L, 50_000L);
+        };
+    }
+
+    private double generateSize(ChannelType type) {
+        return switch (type) {
+            case STAR -> 0.3;
+            case HII -> 2.2;
+            case DUST -> rand.nextDouble(5.0, 10.0);
+            case GAS -> rand.nextDouble(50.0, 80.0);
+            case BULGE -> rand.nextDouble(70.0, 90.0);
+            case POINT -> rand.nextDouble(1.0, 5.0);
+        };
+    }
+
     private double getSizeNoise(ChannelType type) {
         return switch (type) {
             case STAR -> 0.4;
@@ -497,23 +507,12 @@ public class GalaxyGenerator {
         };
     }
 
-    private double generateSize(ChannelType type) {
-        return switch (type) {
-            case STAR -> 0.3;
-            case HII -> 2.2;
-            case DUST -> rand.nextDouble(10.0, 18.0);
-            case GAS -> rand.nextDouble(50.0, 90.0);
-            case BULGE -> rand.nextDouble(70.0, 90.0);
-            case POINT -> rand.nextDouble(1.0, 5.0);
-        };
-    }
-
     private double generateIntensity(ChannelType type) {
         return switch (type) {
             case STAR -> 2.0;
             case HII -> 1.0;
-            case DUST -> rand.nextDouble(0.015, 0.038);
-            case GAS -> rand.nextGaussian(0.007, 0.0003);
+            case DUST -> rand.nextDouble(0.03, 0.08);
+            case GAS -> rand.nextGaussian(0.011, 0.0002);
             case BULGE -> rand.nextDouble(0.5, 1.2);
             case POINT -> rand.nextGaussian(0.01, 0.001);
         };
@@ -528,7 +527,21 @@ public class GalaxyGenerator {
     }
 
     private double generateHeightScale() {
-        return rand.nextDouble(0.01, 0.08);
+        return rand.nextDouble(0.0, 0.06);
+    }
+
+    private HeightProfile generateHeightProfile(Distribution d, double heightScale) {
+
+        return switch (d) {
+            case SPHERE, SPHERE_GAUSS, ELLIPSOID, BAR, CONE, IRREGULAR -> HeightProfile.CONSTANT;
+            case SPIRAL, SPIRAL_LOG, DISK, DISK_GAUSS -> {
+                if (heightScale > 0.03) {
+                   yield rand.nextBoolean() ? HeightProfile.SMOOTH_INC : HeightProfile.LINEAR_INC;
+                } else {
+                    yield rand.nextDouble() > 0.6 ? (rand.nextBoolean() ? HeightProfile.SMOOTH_INC : HeightProfile.LINEAR_INC) : HeightProfile.CONSTANT;
+                }
+            }
+        };
     }
 
     private double generateSpiralAngle(GalaxyMorphology m, Distribution d) {
@@ -572,17 +585,6 @@ public class GalaxyGenerator {
             }
         }
         return new double[]{0.0, 0.0};
-    }
-
-    private long generateCount(ChannelType gt) {
-        return switch (gt) {
-            case STAR -> rand.nextLong(20_000L, 30_000L);
-            case HII -> rand.nextLong(100L, 500L);
-            case GAS -> rand.nextLong(6000L, 8_000L);
-            case DUST -> rand.nextLong(9000L, 14_500L);
-            case BULGE -> rand.nextLong(5L, 18L);
-            case POINT -> rand.nextLong(1000L, 50_000L);
-        };
     }
 
     private double[] generateColors(ChannelType gt) {

@@ -191,6 +191,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             computeShader.setUniform2fv("u_eccentricity", dataset.eccentricity);
             computeShader.setUniform("u_aspect", dataset.aspect);
             computeShader.setUniform("u_heightScale", dataset.heightScale);
+            computeShader.setUniform("u_heightProfile", dataset.heightProfile.ordinal());
             computeShader.setUniform("u_baseAngle", dataset.baseAngle);
             computeShader.setUniformUint("u_numArms", dataset.numArms);
             computeShader.setUniform("u_armSigma", dataset.armSigma);

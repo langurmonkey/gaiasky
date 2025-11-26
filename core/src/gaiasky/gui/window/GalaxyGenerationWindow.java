@@ -30,6 +30,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.BillboardDataset.Distribution;
+import gaiasky.scene.record.BillboardDataset.HeightProfile;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.view.FocusView;
@@ -716,10 +717,14 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             dsTable.add(colorsTable).left().padRight(pad5).padBottom(pad18);
             dsTable.add(colorNoise).left().padBottom(pad18).row();
 
-            if (ds.distribution == Distribution.DISK_GAUSS || ds.distribution == Distribution.DISK) {
+            if (ds.distribution == Distribution.DISK_GAUSS
+                    || ds.distribution == Distribution.DISK
+                    || ds.distribution == Distribution.SPIRAL
+                    || ds.distribution == Distribution.SPIRAL_LOG) {
+
                 // Height scale
-                var heightScale = new OwnSliderReset(I18n.msg("gui.galaxy.ds.height"), 0.0f, 1.0f, 0.001f, skin);
-                heightScale.setWidth(fullWidthBox);
+                var heightScale = new OwnSliderReset(I18n.msg("gui.galaxy.ds.height.scale"), 0.0f, 0.2f, 0.001f, skin);
+                heightScale.setWidth(halfWidthBox);
                 heightScale.setValue(ds.heightScale);
                 heightScale.setResetValue(0.01f);
                 heightScale.addListener(new ChangeListener() {
@@ -729,7 +734,24 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                         ds.setHeightScale((double) heightScale.getValue());
                     }
                 });
-                dsTable.add(heightScale).colspan(2).left().padBottom(pad18).row();
+
+                // Height profile
+                OwnSelectBox<HeightProfile> heightProfile = new OwnSelectBox<>(skin);
+                heightProfile.setItems(HeightProfile.values());
+                heightProfile.setWidth(halfWidthBox);
+                heightProfile.setSelected(ds.heightProfile);
+                heightProfile.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.heightProfile = heightProfile.getSelected();
+                    }
+                });
+                OwnLabel heightProfileLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.height.profile"), skin);
+                heightProfileLabel.setWidth(halfWidthBox);
+
+                dsTable.add(heightProfile).left().padBottom(pad18).padRight(pad5);
+                dsTable.add(heightScale).left().padBottom(pad18).row();
             }
 
             // Bar only has base_radius. All the others have also min_radius.

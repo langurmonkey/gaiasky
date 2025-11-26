@@ -75,11 +75,37 @@ uniform float u_aspect;// e.g. 0.3 = short bar, 1.0 = long bar
 
 // Thickness (height scale)
 uniform float u_heightScale;
+// Height profile with radius
+uniform uint u_heightProfile;
+#define H_CONSTANT 0
+#define H_LINEAR_INC 1
+#define H_LINEAR_DEC 2
+#define H_SMOOTH_INC 3
+#define H_SMOOTH_DEC 4
 
 // TRANSFORMATION
 uniform mat4 u_baseTransform;
 
 #include <shader/lib/distributions.glsl>
+
+float computeY(inout uint state, vec2 xz) {
+    float hsFactor;
+    if (u_heightProfile == H_CONSTANT) {
+       hsFactor = 1.0;
+    } else {
+        float r = length(xz);
+        if (u_heightProfile == H_SMOOTH_INC) {
+            hsFactor = (smoothstep(0.0, u_baseRadius, r));
+        } else if (u_heightProfile == H_SMOOTH_DEC) {
+            hsFactor = (smoothstep(u_baseRadius, 0.0, r));
+        } else if (u_heightProfile == H_LINEAR_INC) {
+            hsFactor = (r / u_baseRadius);
+        } else if (u_heightProfile == H_LINEAR_DEC) {
+            hsFactor = (1.0 - r / u_baseRadius);
+        }
+    }
+    return (rand(state) - 0.5) * 2.0 * hsFactor * u_heightScale;
+}
 
 // Generates a new particle position in a uniform spherical distribution.
 vec3 positionSphere(inout uint state) {
@@ -139,7 +165,7 @@ vec3 positionCone(inout uint state, float coneAngleDeg) {
 }
 
 // Density wave using discrete ellipses, leading to a natural spiral pattern with 2 arms.
-vec3 positionDensityWave2(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
+vec3 positionDensityWave2(inout uint state, float pitchAngleDeg, float ec, vec2 displacement) {
     // Discrete ellipses parameters
     const uint numEllipses = 200u;
 
@@ -176,11 +202,12 @@ vec3 positionDensityWave2(inout uint state, float heightScale, float pitchAngleD
     x += displacement.x * t;
     z += displacement.y * t;
 
+    // Position randomness
     x += gaussian(state) * (u_baseRadius * 0.015);
     z += gaussian(state) * (u_baseRadius * 0.015);
 
     // Apply random displacement.
-    if (rand(state) > 0.7) {
+    if (rand(state) > 0.6) {
         vec2 v = vec2(x, z);
         float r = length(v);
         v = normalize(v) * (r + (rand(state) * 2.0 - 1.0) * 0.2);
@@ -189,13 +216,13 @@ vec3 positionDensityWave2(inout uint state, float heightScale, float pitchAngleD
     }
 
     // Add height (Y)
-    float y = (rand(state) - 0.5) * 2.0 * heightScale;
+    float y = computeY(state, vec2(x, z));
 
     return vec3(x, y, z);
 }
 
 // Density wave using concentric squircles, leading to a spiral pattern.
-vec3 positionDensityWave4(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
+vec3 positionDensityWave4(inout uint state,  float pitchAngleDeg, float ec, vec2 displacement) {
     // Discrete squircles parameters
     const uint numSquircles = 200u; // Number of concentric squircles
 
@@ -235,7 +262,7 @@ vec3 positionDensityWave4(inout uint state, float heightScale, float pitchAngleD
     x += displacement.x * t;
     z += displacement.y * t;
 
-    // Apply random displacement
+    // Position randomness
     x += gaussian(state) * (u_baseRadius * 0.015);
     z += gaussian(state) * (u_baseRadius * 0.015);
 
@@ -249,71 +276,17 @@ vec3 positionDensityWave4(inout uint state, float heightScale, float pitchAngleD
     }
 
     // Add height (Y)
-    float y = (rand(state) - 0.5) * 2.0 * heightScale;
-
-    return vec3(x, y, z);
-}
-vec3 positionDensityWaveOne(inout uint state, float heightScale, float pitchAngleDeg, float ec, vec2 displacement) {
-    // Number of radial layers or "rings" along the triangle arms
-    const uint numLayers = 200u;
-
-    // Select which layer to use (each layer corresponds to a distance from the center)
-    uint layerIndex = uint(rand(state) * float(numLayers));
-    float t = (float(layerIndex) + 0.5) / float(numLayers);  // 0 to 1
-
-    // Triangle radius increases from the center outward
-    float min = u_minRadius;
-    float max = 1.0 - min;
-    float radius = u_baseRadius * (min + max * t);
-
-    // Compute the angle around the center
-    float angle = rand(state) * 6.2831853;
-
-    // Normalize the angle to one of the three triangle arms (3 arms, each separated by 120 degrees)
-    float armAngle = mod(angle, 2.0943951);  // 120 degrees in radians
-
-    // Compute the coordinates along the arm in the XZ plane (using a straight line)
-    float x_arm = radius * cos(armAngle);
-    float z_arm = radius * sin(armAngle);
-
-    // Rotate arm based on pitch angle (to give the spiral effect)
-    float pitchRad = radians(pitchAngleDeg) * t;  // Tilt increases with radius
-    float cosPitch = cos(pitchRad);
-    float sinPitch = sin(pitchRad);
-
-    // Apply rotation to the arm in the XZ plane
-    float x = x_arm * cosPitch + z_arm * sinPitch;
-    float z = -x_arm * sinPitch + z_arm * cosPitch;
-
-    // Apply displacement progressively (like the original code)
-    x += displacement.x * t;
-    z += displacement.y * t;
-
-    // Add some random Gaussian noise for randomness
-    x += gaussian(state) * (u_baseRadius * 0.015);
-    z += gaussian(state) * (u_baseRadius * 0.015);
-
-    // Optional random displacement for further variability
-    if (rand(state) > 0.7) {
-        vec2 v = vec2(x, z);
-        float r = length(v);
-        v = normalize(v) * (r + (rand(state) * 2.0 - 1.0) * 0.2);
-        x = v.x;
-        z = v.y;
-    }
-
-    // Apply random height (Y coordinate)
-    float y = (rand(state) - 0.5) * 2.0 * heightScale;
+    float y = computeY(state, vec2(x, z));
 
     return vec3(x, y, z);
 }
 
 // Density wave positions with 2 or 4 arms.
-vec3 positionDensityWave(inout uint state, float heightScale, int numArms, float pitchAngleDeg, float ec, vec2 displacement) {
+vec3 positionDensityWave(inout uint state,  int numArms, float pitchAngleDeg, float ec, vec2 displacement) {
     if (numArms == 4) {
-        return positionDensityWave4(state, heightScale, pitchAngleDeg, ec, displacement);
+        return positionDensityWave4(state, pitchAngleDeg, ec, displacement);
     } else {
-        return positionDensityWave2(state, heightScale, pitchAngleDeg, ec, displacement);
+        return positionDensityWave2(state, pitchAngleDeg, ec, displacement);
     }
 }
 
@@ -344,8 +317,8 @@ vec3 positionEllipsoid(inout uint state, vec2 ec) {
     return pos;
 }
 
-// Generates a new particle position in a disk distribution, with the given heightScale.
-vec3 positionDisk(inout uint state, float heightScale) {
+// Generates a new particle position in a disk distribution
+vec3 positionDisk(inout uint state) {
     // Random angle [0, 2π)
     float theta = rand(state) * 6.2831853;
 
@@ -357,14 +330,13 @@ vec3 positionDisk(inout uint state, float heightScale) {
     float x = r * sin(theta);
 
     // Vertical displacement in Y
-    float y = (rand(state) - 0.5) * 2.0 * heightScale;
-    // rand in [0,1) → y in [-heightScale, +heightScale]
+    float y = computeY(state, vec2(x, z));
 
     return vec3(x, y, z);
 }
 
 // Lays out positions in a disk with a gaussian distribution, with a very dense center and a falloff.
-vec3 positionDiskGauss(inout uint state, float heightScale) {
+vec3 positionDiskGauss(inout uint state) {
     // Random angle [0, 2π)
     float theta = rand(state) * 6.2831853;
 
@@ -376,15 +348,14 @@ vec3 positionDiskGauss(inout uint state, float heightScale) {
     float x = r * sin(theta);
 
     // Vertical displacement in Y
-    float y = (rand(state) - 0.5) * 2.0 * heightScale;
-    // rand in [0,1) → y in [-heightScale, +heightScale]
+    float y = computeY(state, vec2(x, z));
 
     return vec3(x, y, z);
 
 }
 
 // Generates artificial logarithmic spiral arms and background particles
-vec3 positionLogSpiral(inout uint state, float heightScale, float pitchAngleDeg, uint numArms, float armSigma) {
+vec3 positionLogSpiral(inout uint state, float pitchAngleDeg, uint numArms, float armSigma) {
     // Internal parameters
     float r_min = u_minRadius;// Minimum radius to avoid particles in the very center
     float r_max = u_baseRadius;// Maximum radius for spiral arm
@@ -454,19 +425,19 @@ vec3 positionLogSpiral(inout uint state, float heightScale, float pitchAngleDeg,
         // Convert to Cartesian coordinates
         float x = r * cos(spiralAngle) + totalDisplacement.x;
         float z = r * sin(spiralAngle) + totalDisplacement.y;
-        float y = (rand(state) - 0.5) * 2.0 * heightScale;
+        float y = computeY(state, vec2(x, z));
 
         return vec3(x, y, z);
     }
 }
 
-vec3 positionBar(inout uint state, float heightScale, float aspect) {
+vec3 positionBar(inout uint state, float aspect) {
     // Random position along bar major axis [-1,1]
     float x = (rand(state) * 2.0 - 1.0) * u_baseRadius * aspect;
 
     // Cross-section: Gaussian falloff around the bar
-    float y = (rand(state) - 0.5) * 2.0 * heightScale * u_baseRadius;
-    float z = (rand(state) - 0.5) * 2.0 * heightScale * u_baseRadius;
+    float y = computeY(state, vec2(x, 0.0)) * u_baseRadius;
+    float z = computeY(state, vec2(x, 0.0)) * u_baseRadius;
 
     // Optional: apply falloff to make it denser at center
     float falloff = exp(-0.5 * (x*x + z*z) / (u_baseRadius * u_baseRadius));
@@ -536,7 +507,7 @@ float generateSize(inout uint state, float sizeNoise, vec3 pos, int distrib, int
     }
 }
 
-
+// Main method.
 void main() {
     uint i = gl_GlobalInvocationID.x;
     if (i >= u_count) return;
@@ -546,19 +517,19 @@ void main() {
     int distribution = int(u_distribution);
     vec3 pos;
     if (distribution == D_SPIRAL_LOG) {
-        pos = positionLogSpiral(state, u_heightScale, u_baseAngle, u_numArms, u_armSigma);
+        pos = positionLogSpiral(state, u_baseAngle, u_numArms, u_armSigma);
     } else if (distribution == D_SPIRAL) {
-        pos = positionDensityWave(state, u_heightScale, u_numArms, u_baseAngle, u_eccentricity.x, u_sprialDeltaPos);
+        pos = positionDensityWave(state, u_numArms, u_baseAngle, u_eccentricity.x, u_sprialDeltaPos);
     } else if (distribution == D_DISK) {
-        pos = positionDisk(state, u_heightScale);
+        pos = positionDisk(state);
     } else if (distribution == D_BAR) {
-        pos = positionBar(state, u_heightScale, u_aspect);
+        pos = positionBar(state, u_aspect);
     } else if (distribution == D_ELLIPSOID) {
         pos = positionEllipsoid(state, u_eccentricity);
     } else if (distribution == D_SPHERE || distribution == D_IRREGULAR) {
         pos = positionSphere(state);
     } else if (distribution == D_DISK_GAUSS) {
-        pos = positionDiskGauss(state, u_heightScale);
+        pos = positionDiskGauss(state);
     } else if (distribution == D_SPHERE_GAUSS) {
         pos = positionSphereGauss(state);
     } else if (distribution == D_CONE) {

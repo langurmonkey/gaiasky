@@ -287,6 +287,20 @@ public class CPUGalGenFallback {
                 .toList();
     }
 
+    private double computeY(RNG rng, BillboardDataset ds, double x, double z) {
+        double r = FastMath.sqrt(x * x + z * z);
+        double hsFactor = switch (ds.heightProfile) {
+            case CONSTANT -> 1.0;
+            case SMOOTH_INC -> (MathUtilsDouble.smoothstep(0.0, ds.baseRadius, r));
+            case SMOOTH_DEC -> (MathUtilsDouble.smoothstep(ds.baseRadius, 0.0, r));
+            case LINEAR_INC -> (r / ds.baseRadius);
+            case LINEAR_DEC -> (1.0 - r / ds.baseRadius);
+
+        };
+        return (rng.rand() - 0.5) * 2.0 * hsFactor * ds.heightScale;
+    }
+
+
     // Position generators — approximate the GLSL ones. Use RNG methods to match behaviour.
 
     private double[] positionSphere(RNG rng, BillboardDataset ds) {
@@ -329,7 +343,7 @@ public class CPUGalGenFallback {
         double r = ds.minRadius + (ds.baseRadius - ds.minRadius + (rng.rand() - 0.5f) * 0.3f) * FastMath.sqrt(rng.rand());
         double z = r * FastMath.cos(theta);
         double x = r * FastMath.sin(theta);
-        double y = (rng.rand() - 0.5) * 2.0 * ds.heightScale;
+        double y = computeY(rng, ds, x, z);
         return new double[]{x, y, z};
     }
 
@@ -338,7 +352,7 @@ public class CPUGalGenFallback {
         double r = ds.minRadius + (ds.baseRadius - ds.minRadius) * FastMath.sqrt(rng.ggaussian(1.0f) * 0.15f);
         double z = r * FastMath.cos(theta);
         double x = r * FastMath.sin(theta);
-        double y = (rng.rand() - 0.5) * 2.0 * ds.heightScale;
+        double y = computeY(rng, ds, x, z);
         return new double[]{x, y, z};
     }
 
@@ -366,8 +380,8 @@ public class CPUGalGenFallback {
 
     private double[] positionBar(RNG rng, BillboardDataset ds) {
         double x = (rng.rand() * 2.0 - 1.0) * ds.baseRadius * ds.aspect;
-        double y = (rng.rand() - 0.5) * 2.0 * ds.heightScale * ds.baseRadius;
-        double z = (rng.rand() - 0.5) * 2.0 * ds.heightScale * ds.baseRadius;
+        double y = computeY(rng, ds, x, 0.0) * ds.baseRadius;
+        double z = computeY(rng, ds, x, 0.0) * ds.baseRadius;
         double falloff = FastMath.exp(-0.5 * (x * x + z * z) / (ds.baseRadius * ds.baseRadius));
         x *= falloff;
         z *= falloff;
@@ -403,7 +417,7 @@ public class CPUGalGenFallback {
             x = nnx;
             z = nnz;
         }
-        double y = (rng.rand() - 0.5) * 2.0 * ds.heightScale;
+        double y = computeY(rng, ds, x, z);
         return new double[]{x, y, z};
     }
 
@@ -434,7 +448,7 @@ public class CPUGalGenFallback {
             x = nnx;
             z = nnz;
         }
-        double y = (rng.rand() - 0.5) * 2.0 * ds.heightScale;
+        double y = computeY(rng, ds, x, z);
         return new double[]{x, y, z};
     }
 
@@ -474,7 +488,7 @@ public class CPUGalGenFallback {
                 double[] armSpread = new double[]{gaussianSpread * armWidth * tangentX, gaussianSpread * armWidth * tangentY};
                 double x = r * FastMath.cos(spiralAngle) + armSpread[0];
                 double z = r * FastMath.sin(spiralAngle) + armSpread[1];
-                double y = (rng.rand() - 0.5) * 2.0 * ds.heightScale;
+                double y = computeY(rng, ds, x, z);
                 return new double[]{x, y, z};
             }
         }
