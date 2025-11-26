@@ -39,7 +39,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;
     protected Array<RenderSystemRunnable> preRunners, postRunners;
-    private boolean vrScaleFlag = false, depthBufferFlag = false, unitsFlag = false;
 
     protected final Vector3 aux3f = new Vector3();
 
@@ -155,10 +154,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     /** Uniforms related to the motion trails effect for particle and star groups. **/
     protected void addMotionTrailsUniforms(ExtShaderProgram shaderProgram,
                                            ICamera camera) {
-        if (!unitsFlag) {
-            shaderProgram.setUniformf("u_uToMpc", (float) (Constants.U_TO_PC * 1.0e-6));
-            unitsFlag = true;
-        }
+        shaderProgram.setUniformf("u_uToMpc", (float) Constants.U_TO_MPC);
         updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
         if (Settings.settings.scene.particleGroups.motionTrails && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
             shaderProgram.setUniformf("u_camVel", smoothedCamVel);
@@ -170,10 +166,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     protected void addVRScale(ExtShaderProgram shaderProgram) {
-        if (!vrScaleFlag) {
-            shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
-            vrScaleFlag = true;
-        }
+        shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
     }
 
     protected void addRelativisticUniforms(ExtShaderProgram shaderProgram,
@@ -209,11 +202,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
      */
     public void addDepthBufferUniforms(ExtShaderProgram shaderProgram,
                                        ICamera camera) {
-        if (!depthBufferFlag) {
-            shaderProgram.setUniformf("u_zfar", (float) camera.getFar());
-            shaderProgram.setUniformf("u_k", Constants.getCameraK());
-            depthBufferFlag = true;
-        }
+        shaderProgram.setUniformf("u_zfar", (float) camera.getFar());
+        shaderProgram.setUniformf("u_k", Constants.getCameraK());
     }
 
     /**
@@ -269,11 +259,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         preRunners = null;
         postRunners.clear();
         postRunners = null;
-    }
-
-    public void resetFlags() {
-        vrScaleFlag = false;
-        depthBufferFlag = false;
     }
 
     @Override

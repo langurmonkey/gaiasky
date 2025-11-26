@@ -1504,11 +1504,6 @@ public enum Event {
     SHADER_RELOAD_CMD,
 
     /**
-     * Resets the main renderer.
-     */
-    RESET_RENDERER,
-
-    /**
      * Contains an array of booleans with the visibility of each ComponentType,
      * in the same order returned by ComponentType.values()
      **/

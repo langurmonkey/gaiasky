@@ -279,19 +279,23 @@ public class Constants {
     /**
      * Kilo parsec to local unit conversion. Multiply this by all values in Kpc.
      */
-    public static double KPC_TO_U = PC_TO_U * 1000d;
+    public static double KPC_TO_U = PC_TO_U * 1.0e3;
     /**
      * Megaparsec to local unit conversion. Multiply this by all values in Mpc.
      */
-    public static double MPC_TO_U = KPC_TO_U * 1000d;
+    public static double MPC_TO_U = KPC_TO_U * 1.0e3;
     /**
      * Local unit to pc conversion.
      */
     public static double U_TO_PC = 1d / PC_TO_U;
     /**
-     * Local unit to Kpc conversion.
+     * Local unit to kpc conversion.
      */
-    public static double U_TO_KPC = U_TO_PC / 1000d;
+    public static double U_TO_KPC = U_TO_PC / 1.0e3;
+    /**
+     * Local unit to Mpc conversion.
+     */
+    public static double U_TO_MPC = U_TO_PC / 1.0e6;
     /**
      * Solar radius to local units
      */

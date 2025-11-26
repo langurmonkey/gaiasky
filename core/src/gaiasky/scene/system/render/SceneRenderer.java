@@ -933,18 +933,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return this.lightGlowPass;
     }
 
-    /**
-     * Resets the render flags for all systems.
-     */
-    public void resetRenderSystemFlags() {
-        var systems = renderSystems.values();
-        for (IRenderSystem system : systems) {
-            if (system instanceof AbstractRenderSystem) {
-                ((AbstractRenderSystem) system).resetFlags();
-            }
-        }
-    }
-
     public RenderModeOpenXR getRenderModeOpenXR() {
         return (RenderModeOpenXR) sgrList[SGR_OPENXR_IDX];
     }
