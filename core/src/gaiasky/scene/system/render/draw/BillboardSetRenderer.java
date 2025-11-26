@@ -236,17 +236,30 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
                 if (curr != null) {
                     BillboardDataset dataset = billboard.datasets[i];
                     // Blend mode
-                    Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
-                    Gdx.gl20.glEnable(GL20.GL_BLEND);
                     switch (dataset.blending) {
-                        case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-                        case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                        case COLOR -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
+                        case ALPHA -> {
+                            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                        }
+                        case ADDITIVE -> {
+                            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                        }
+                        case COLOR -> {
+                            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
+                        }
                         case SUBTRACTIVE -> {
                             Gdx.gl20.glBlendEquation(GL20.GL_FUNC_REVERSE_SUBTRACT);
                             Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
                         }
-                        case NONE -> Gdx.gl20.glDisable(GL20.GL_BLEND);
+                        case NONE -> {
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glDisable(GL20.GL_BLEND);
+                        }
                     }
 
                     // Specific uniforms
@@ -262,6 +275,11 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
                 }
             }
             shaderProgram.end();
+
+            // Restore blending
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         }
     }
 

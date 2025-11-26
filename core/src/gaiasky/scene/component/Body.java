@@ -193,6 +193,15 @@ public class Body implements Component, ICopy {
     }
 
     /**
+     * Sets the label color, as an RGBA long array.
+     *
+     * @param color The label color.
+     */
+    public void setColor(int[] color) {
+        this.color = GlobalResources.toFloatArray(color);
+    }
+
+    /**
      * Sets the object color, as an RGBA float array.
      *
      * @param color The color.
@@ -207,6 +216,24 @@ public class Body implements Component, ICopy {
      * @param color The label color.
      */
     public void setLabelColor(double[] color) {
+        this.labelColor = GlobalResources.toFloatArray(color);
+    }
+
+    /**
+     * Sets the label color, as an RGBA long array.
+     *
+     * @param color The label color.
+     */
+    public void setLabelColor(long[] color) {
+        this.labelColor = GlobalResources.toFloatArray(color);
+    }
+
+    /**
+     * Sets the label color, as an RGBA int array.
+     *
+     * @param color The label color.
+     */
+    public void setLabelColor(int[] color) {
         this.labelColor = GlobalResources.toFloatArray(color);
     }
 

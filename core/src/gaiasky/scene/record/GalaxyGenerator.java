@@ -5,12 +5,14 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonValue.ValueType;
 import gaiasky.render.BlendMode;
+import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.math.StdRandom;
+import net.jafama.FastMath;
 
 import java.util.Objects;
 import java.util.Random;
@@ -621,13 +623,14 @@ public class GalaxyGenerator {
 
 
     public JsonValue convertToJson(Entity full, Entity half) {
-        var top = new JsonValue(ValueType.array);
-        top.setName("objects");
+        var top = new JsonValue(ValueType.object);
+        var array = new JsonValue(ValueType.array);
+        top.addChild("objects", array);
 
         var fullJ = convertToJson(full);
         var halfJ = convertToJson(half);
-        top.addChild(fullJ);
-        top.addChild(halfJ);
+        array.addChild(fullJ);
+        array.addChild(halfJ);
         return top;
     }
 
@@ -658,6 +661,7 @@ public class GalaxyGenerator {
             addArray(obj, "labelColor", body.labelColor);
         }
         obj.addChild("sizePc", new JsonValue(body.size * Constants.U_TO_PC));
+        obj.addChild("componentType", new JsonValue(ComponentTypes.ComponentType.values()[base.ct.getFirstOrdinal()].name()));
         obj.addChild("archetype", new JsonValue("BillboardGroup"));
         if (graph.parent != null) {
             obj.addChild("parent", new JsonValue(Mapper.base.get(graph.parent).getName()));
@@ -697,14 +701,17 @@ public class GalaxyGenerator {
         if (stc.getTransformName() != null)
             coordsObj.addChild("transformName", new JsonValue(stc.getTransformName()));
         if (stc.getPosition() != null)
-            addArray(coordsObj, "position", stc.getPosition().valuesD());
+            addArray(coordsObj, "positionPc", stc.getPosition().cpy().scl(Constants.U_TO_PC).valuesD());
         obj.addChild("coordinates", coordsObj);
         // Data
         var data = new JsonValue(ValueType.array);
         for (var bd : bb.datasets) {
             var dataset = new JsonValue(ValueType.object);
+            dataset.addChild("impl", new JsonValue("gaiasky.scene.record.BillboardDataset"));
             dataset.addChild("type", new JsonValue(bd.type.name()));
             dataset.addChild("distribution", new JsonValue(bd.distribution.name()));
+            dataset.addChild("blending", new JsonValue(bd.blending.name()));
+            dataset.addChild("depthMask", new JsonValue(bd.depthMask));
             dataset.addChild("particleCount", new JsonValue(bd.particleCount));
             dataset.addChild("size", new JsonValue(bd.size));
             if (bd.sizeMask) {
@@ -712,19 +719,29 @@ public class GalaxyGenerator {
             } else {
                 dataset.addChild("sizeNoise", new JsonValue(bd.sizeNoise));
             }
+            addArray(dataset, "baseColors", bd.baseColors);
+            dataset.addChild("maxSize", new JsonValue(Math.toDegrees(FastMath.atan(bd.maxSizes[0]))));
             dataset.addChild("intensity", new JsonValue(bd.intensity));
             dataset.addChild("heightScale", new JsonValue(bd.heightScale));
             dataset.addChild("minRadius", new JsonValue(bd.minRadius));
             dataset.addChild("baseRadius", new JsonValue(bd.baseRadius));
-            addArray(dataset, "translation", bd.translation);
-            addArray(dataset, "rotation", bd.rotation);
-            addArray(dataset, "scale", bd.scale);
-            addArray(dataset, "eccentricity", bd.eccentricity);
+            addArray(dataset, "layers", bd.layers);
+            if (!bd.translation.isZero())
+                addArray(dataset, "translation", bd.translation);
+            if (!bd.rotation.isZero())
+                addArray(dataset, "rotation", bd.rotation);
+            if (!(bd.scale.x == 1 && bd.scale.y == 1 && bd.scale.z == 1))
+                addArray(dataset, "scale", bd.scale);
+            if (bd.eccentricity[1] == 0)
+                dataset.addChild("eccentricity", new JsonValue(bd.eccentricity[0]));
+            else
+                addArray(dataset, "eccentricity", bd.eccentricity);
             dataset.addChild("aspect", new JsonValue(bd.aspect));
             dataset.addChild("baseAngle", new JsonValue(bd.baseAngle));
             dataset.addChild("numArms", new JsonValue(bd.numArms));
             dataset.addChild("armSigma", new JsonValue(bd.armSigma));
-            addArray(dataset, "spiralDeltaPos", bd.spiralDeltaPos);
+            if (!(bd.spiralDeltaPos[0] == 0 && bd.spiralDeltaPos[1] == 0))
+                addArray(dataset, "spiralDeltaPos", bd.spiralDeltaPos);
 
             data.addChild(dataset);
         }
@@ -746,13 +763,13 @@ public class GalaxyGenerator {
             case float[] floats -> {
                 // Handle float[] (primitive type)
                 for (float n : floats) {
-                    obj.addChild(new JsonValue(n));
+                    obj.addChild(new JsonValue(n, Float.toString(n)));
                 }
             }
             case double[] doubles -> {
                 // Handle double[] (primitive type)
                 for (double n : doubles) {
-                    obj.addChild(new JsonValue(n));
+                    obj.addChild(new JsonValue(n, Double.toString(n)));
                 }
             }
             case long[] longs -> {
