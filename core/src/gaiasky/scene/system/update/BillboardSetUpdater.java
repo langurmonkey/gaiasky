@@ -32,14 +32,9 @@ public class BillboardSetUpdater extends AbstractUpdateSystem {
         var graph = Mapper.graph.get(entity);
         var body = Mapper.body.get(entity);
         var transform = Mapper.transform.get(entity);
-        var fade = Mapper.fade.get(entity);
 
         graph.translation.setToTranslation(graph.localTransform).scl(body.size);
         if (transform.matrix != null)
             graph.localTransform.mul(transform.matrix.putIn(M41));
-
-        // Override distance
-        var camera = GaiaSky.instance.getICamera();
-        fade.currentDistance = camera.getDistance() * camera.getFovFactor();
     }
 }

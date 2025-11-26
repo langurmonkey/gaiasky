@@ -228,6 +228,36 @@ public class GlobalResources {
     }
 
     /**
+     * Transforms the given long array into a float array by casting each of
+     * its numbers
+     *
+     * @param array The array of longs
+     *
+     * @return The array of floats
+     */
+    public static float[] toFloatArray(long[] array) {
+        float[] res = new float[array.length];
+        for (int i = 0; i < array.length; i++)
+            res[i] = (float) array[i];
+        return res;
+    }
+
+    /**
+     * Transforms the given integer array into a float array by casting each of
+     * its numbers
+     *
+     * @param array The array of ints
+     *
+     * @return The array of floats
+     */
+    public static float[] toFloatArray(int[] array) {
+        float[] res = new float[array.length];
+        for (int i = 0; i < array.length; i++)
+            res[i] = (float) array[i];
+        return res;
+    }
+
+    /**
      * Computes whether a body with the given position is visible by a camera
      * with the given direction and angle. Coordinates are assumed to be in the
      * camera-origin system

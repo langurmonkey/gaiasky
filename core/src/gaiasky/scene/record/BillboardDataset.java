@@ -244,7 +244,15 @@ public class BillboardDataset {
         this.intensity = intensity.floatValue();
     }
 
+    public void setIntensity(Long intensity) {
+        this.intensity = intensity.floatValue();
+    }
+
     public void setBaseRadius(Double baseRadius) {
+        this.baseRadius = baseRadius.floatValue();
+    }
+
+    public void setBaseRadius(Long baseRadius) {
         this.baseRadius = baseRadius.floatValue();
     }
 
@@ -252,11 +260,23 @@ public class BillboardDataset {
         this.minRadius = minRadius.floatValue();
     }
 
+    public void setMinRadius(Long minRadius) {
+        this.minRadius = minRadius.floatValue();
+    }
+
     public void setTranslation(double[] d) {
         this.translation.set((float) d[0], (float) d[1], (float) d[2]);
     }
 
+    public void setTranslation(int[] d) {
+        this.translation.set((float) d[0], (float) d[1], (float) d[2]);
+    }
+
     public void setScale(double[] s) {
+        this.scale.set((float) s[0], (float) s[1], (float) s[2]);
+    }
+
+    public void setScale(int[] s) {
         this.scale.set((float) s[0], (float) s[1], (float) s[2]);
     }
 
@@ -276,6 +296,10 @@ public class BillboardDataset {
         this.rotation.set((float) r[0], (float) r[1], (float) r[2]);
     }
 
+    public void setRotation(int[] r) {
+        this.rotation.set((float) r[0], (float) r[1], (float) r[2]);
+    }
+
     public void setRotationX(double r) {
         this.rotation.x = (float) r;
     }
@@ -292,11 +316,23 @@ public class BillboardDataset {
         this.eccentricity[0] = eccentricity.floatValue();
     }
 
+    public void setEccentricity(Long eccentricity) {
+        this.eccentricity[0] = eccentricity.floatValue();
+    }
+
     public void setEccentricityX(Double eccentricity) {
         setEccentricity(eccentricity);
     }
 
+    public void setEccentricityX(Long eccentricity) {
+        setEccentricity(eccentricity);
+    }
+
     public void setEccentricityY(Double eccentricity) {
+        this.eccentricity[1] = eccentricity.floatValue();
+    }
+
+    public void setEccentricityY(Long eccentricity) {
         this.eccentricity[1] = eccentricity.floatValue();
     }
 
@@ -309,7 +345,15 @@ public class BillboardDataset {
         this.heightScale = heightScale.floatValue();
     }
 
+    public void setHeightScale(Long heightScale) {
+        this.heightScale = heightScale.floatValue();
+    }
+
     public void setBaseAngle(Double baseAngle) {
+        this.baseAngle = baseAngle.floatValue();
+    }
+
+    public void setBaseAngle(Long baseAngle) {
         this.baseAngle = baseAngle.floatValue();
     }
 
@@ -325,7 +369,15 @@ public class BillboardDataset {
         this.armSigma = armSigma.floatValue();
     }
 
+    public void setArmSigma(Long armSigma) {
+        this.armSigma = armSigma.floatValue();
+    }
+
     public void setAspect(Double aspect) {
+        this.aspect = aspect.floatValue();
+    }
+
+    public void setAspect(Long aspect) {
         this.aspect = aspect.floatValue();
     }
 
@@ -351,6 +403,16 @@ public class BillboardDataset {
     }
 
     public void setSpiralDeltaPos(double[] d) {
+        if (d.length == 1) {
+            this.spiralDeltaPos[0] = (float) d[0];
+            this.spiralDeltaPos[1] = (float) d[0];
+        } else {
+            this.spiralDeltaPos[0] = (float) d[0];
+            this.spiralDeltaPos[1] = (float) d[1];
+        }
+    }
+
+    public void setSpiralDeltaPos(int[] d) {
         if (d.length == 1) {
             this.spiralDeltaPos[0] = (float) d[0];
             this.spiralDeltaPos[1] = (float) d[0];
@@ -578,7 +640,7 @@ public class BillboardDataset {
         BULGE(new String[]{"sphere", "bar", "ellipse", "gauss"},
               new int[]{0, 100},
               new int[]{0, 1, 2},
-              new float[]{0f, 100f},
+              new float[]{0f, 300f},
               new float[]{0f, 30f},
               new float[]{0.0f, 2.0f},
               new float[]{0.0f, 0.05f},

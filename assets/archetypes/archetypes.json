@@ -280,7 +280,8 @@
       "components": [
         "BillboardSet",
         "Coordinates",
-        "Focus"
+        "Focus",
+        "Celestial"
       ],
       "aliases": [
         "gaiasky.scenegraph.BillboardGroup"
