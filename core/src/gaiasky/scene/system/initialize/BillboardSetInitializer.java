@@ -57,7 +57,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         label.labelFactor = 0.6f;
         label.renderConsumer = LabelEntityRenderSystem::renderBillboardSet;
         label.renderFunction = LabelView::renderTextBase;
-        label.depthBufferConsumer = LabelView::noTextDepthBuffer;
+        label.depthBufferConsumer = LabelView::defaultTextDepthBuffer;
 
         // Focus.
         focus.hitCoordinatesConsumer = FocusHit::addHitBillboardSet;
