@@ -119,6 +119,10 @@ public class BillboardDataset {
     public Vector3 rotation = new Vector3(0f, 0f, 0f);
 
     /**
+     * Strength of the warp, for flat distributions.
+     */
+    public float warpStrength = 0.0f;
+    /**
      * Height scale.
      */
     public float heightScale = 0.01f;
@@ -199,8 +203,7 @@ public class BillboardDataset {
         if (file != null && !file.isBlank()) {
             Pair<List<IParticleRecord>, String> p;
             p = reloadFile(provider, file, fileUnpack, data);
-            reload = reload || !p.getSecond()
-                    .equals(fileUnpack);
+            reload = reload || !p.getSecond().equals(fileUnpack);
             data = p.getFirst();
             fileUnpack = p.getSecond();
             return reload;
@@ -208,8 +211,7 @@ public class BillboardDataset {
         return false;
     }
 
-    private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk,
-                                                           List<IParticleRecord> curr) {
+    private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<IParticleRecord> curr) {
         String upk = GlobalResources.unpackAssetPath(Settings.settings.data.dataFile(src));
         if (srcUpk == null || !srcUpk.equals(upk)) {
             return new Pair<>(prov.loadData(upk), upk);
@@ -345,6 +347,14 @@ public class BillboardDataset {
         this.eccentricity[1] = (float) eccentricity[1];
     }
 
+    public void setWarpStrength(Double warpStrength) {
+        this.warpStrength = warpStrength.floatValue();
+    }
+
+    public void setWarpStrength(Long warpStrength) {
+        this.warpStrength = warpStrength.floatValue();
+    }
+
     public void setHeightScale(Double heightScale) {
         this.heightScale = heightScale.floatValue();
     }
@@ -363,7 +373,8 @@ public class BillboardDataset {
         this.heightProfile = p;
     }
 
-    public void setHeightParameters(Double heightScale, HeightProfile profile) {
+    public void setHeightParameters(Double warpStrength, Double heightScale, HeightProfile profile) {
+        setWarpStrength(warpStrength);
         setHeightScale(heightScale);
         setHeightProfile(profile);
     }
@@ -673,72 +684,67 @@ public class BillboardDataset {
              null,
              null,
              null,
-             null),
-        BULGE(new String[]{"sphere", "bar", "ellipse", "gauss"},
-              new int[]{0, 100},
-              new int[]{0, 1, 2},
-              new float[]{0f, 300f},
-              new float[]{0f, 30f},
-              new float[]{0.0f, 2.0f},
-              new float[]{0.0f, 0.05f},
-              new float[]{0.05f, 0.25f},
-              null,
-              null,
-              null,
-              null,
-              null),
-        STAR(new String[]{"gauss", "disk", "ellipse", "sphere"},
-             new int[]{0, 100_000},
-             new int[]{0, 1, 2},
-             new float[]{0.0f, 8.0f},
-             new float[]{0.05f, 0.2f},
-             new float[]{0.0f, 6.0f},
-             null,
-             null,
-             null,
-             null,
-             null,
-             null,
-             null),
-        GAS(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
-            new int[]{0, 30_000},
-            new int[]{0, 1, 2, 3},
-            new float[]{0f, 100f},
-            new float[]{0f, 30f},
-            new float[]{0.0f, 0.05f},
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null),
-        HII(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
-            new int[]{0, 10_000},
-            new int[]{4},
-            new float[]{0f, 10f},
-            new float[]{0f, 30f},
-            new float[]{0.0f, 6.0f},
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null),
-        POINT(new String[]{"density", "disk", "sphere", "bar", "ellipse", "gauss"},
-              new int[]{0, 50_000},
-              new int[]{1},
-              new float[]{0f, 1000f},
-              new float[]{0f, 30f},
-              new float[]{0.0f, 1.0f},
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null);
+             null), BULGE(new String[]{"sphere", "bar", "ellipse", "gauss"},
+                          new int[]{0, 100},
+                          new int[]{0, 1, 2},
+                          new float[]{0f, 300f},
+                          new float[]{0f, 30f},
+                          new float[]{0.0f, 2.0f},
+                          new float[]{0.0f, 0.05f},
+                          new float[]{0.05f, 0.25f},
+                          null,
+                          null,
+                          null,
+                          null,
+                          null), STAR(new String[]{"gauss", "disk", "ellipse", "sphere"},
+                                      new int[]{0, 100_000},
+                                      new int[]{0, 1, 2},
+                                      new float[]{0.0f, 8.0f},
+                                      new float[]{0.05f, 0.2f},
+                                      new float[]{0.0f, 6.0f},
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      null), GAS(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
+                                                 new int[]{0, 30_000},
+                                                 new int[]{0, 1, 2, 3},
+                                                 new float[]{0f, 100f},
+                                                 new float[]{0f, 30f},
+                                                 new float[]{0.0f, 0.05f},
+                                                 null,
+                                                 null,
+                                                 null,
+                                                 null,
+                                                 null,
+                                                 null,
+                                                 null), HII(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
+                                                            new int[]{0, 10_000},
+                                                            new int[]{4},
+                                                            new float[]{0f, 10f},
+                                                            new float[]{0f, 30f},
+                                                            new float[]{0.0f, 6.0f},
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null), POINT(new String[]{"density", "disk", "sphere", "bar", "ellipse", "gauss"},
+                                                                         new int[]{0, 50_000},
+                                                                         new int[]{1},
+                                                                         new float[]{0f, 1000f},
+                                                                         new float[]{0f, 30f},
+                                                                         new float[]{0.0f, 1.0f},
+                                                                         null,
+                                                                         null,
+                                                                         null,
+                                                                         null,
+                                                                         null,
+                                                                         null,
+                                                                         null);
 
         /** Available distributions. **/
         public String[] distributions;
@@ -756,6 +762,8 @@ public class BillboardDataset {
         public float[] minRadius = new float[]{0.0f, 0.4f};
         /** Base radius range. **/
         public float[] baseRadius = new float[]{0.8f, 2.0f};
+        /** Warp strength range. **/
+        public final float[] warpStrength = new float[]{-0.1f, 0.1f};
 
         /** Base angle [deg] range, for {@link Distribution#SPIRAL}, {@link Distribution#SPIRAL_LOG}, and {@link Distribution#CONE}. **/
         public float[] baseAngle = new float[]{0f, 1000f};
@@ -844,7 +852,31 @@ public class BillboardDataset {
         /** A cone distribution. **/
         CONE,
         /** An irregular distribution. **/
-        IRREGULAR,
+        IRREGULAR;
+
+        public boolean isFlat() {
+            return this == DISK || this == DISK_GAUSS || this == SPIRAL || this == SPIRAL_LOG;
+        }
+
+        public boolean isAnySpiral() {
+            return isDensityWaveSpiral() || isLogarithmicSpiral();
+        }
+
+        public boolean isDensityWaveSpiral() {
+            return this == SPIRAL;
+        }
+
+        public boolean isLogarithmicSpiral() {
+            return this == SPIRAL;
+        }
+
+        public boolean isEllipsoid() {
+            return this == ELLIPSOID;
+        }
+
+        public boolean isBar() {
+            return this == BAR;
+        }
     }
 
     /** Vertical dispersion profile, with {@link #heightScale} as base. **/

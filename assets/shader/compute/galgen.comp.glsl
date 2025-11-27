@@ -68,6 +68,9 @@ uniform float u_armSigma;
 // Delta position for the spiral pattern.
 uniform vec2 u_sprialDeltaPos;
 
+// Disks and co: warp.
+uniform float u_warpStrength;
+
 // Eccentricity in x, y and z
 uniform vec2 u_eccentricity;
 // Aspect ratio of the bar
@@ -89,22 +92,47 @@ uniform mat4 u_baseTransform;
 #include <shader/lib/distributions.glsl>
 
 float computeY(inout uint state, vec2 xz) {
-    float hsFactor;
+    float profileFactor;
+    float r = length(xz);
     if (u_heightProfile == H_CONSTANT) {
-       hsFactor = 1.0;
+        profileFactor = 1.0;
     } else {
-        float r = length(xz);
         if (u_heightProfile == H_SMOOTH_INC) {
-            hsFactor = (smoothstep(0.0, u_baseRadius, r));
+            profileFactor = (smoothstep(0.0, u_baseRadius, r));
         } else if (u_heightProfile == H_SMOOTH_DEC) {
-            hsFactor = (smoothstep(u_baseRadius, 0.0, r));
+            profileFactor = (smoothstep(u_baseRadius, 0.0, r));
         } else if (u_heightProfile == H_LINEAR_INC) {
-            hsFactor = (r / u_baseRadius);
+            profileFactor = (r / u_baseRadius);
         } else if (u_heightProfile == H_LINEAR_DEC) {
-            hsFactor = (1.0 - r / u_baseRadius);
+            profileFactor = (1.0 - r / u_baseRadius);
         }
     }
-    return (rand(state) - 0.5) * 2.0 * hsFactor * u_heightScale;
+    // Compute height from profile and scale.
+    float height = (rand(state) - 0.5) * 2.0 * profileFactor * u_heightScale;
+
+    if (u_warpStrength == 0.0) {
+        return height;
+    } else {
+        // Calculate warp component
+        float warpFactor = 0.0;
+        float normalizedR = r / u_baseRadius;
+
+        // Only apply warp in the outer regions of the disk, when r > warpStartRadius
+        float warpStartRadius = 0.7;
+        float warpStrength = u_warpStrength;
+        if (normalizedR > warpStartRadius) {
+            float warpIntensity = (normalizedR - warpStartRadius) / (1.0 - warpStartRadius);
+            //warpIntensity = smoothstep(0.0, 1.0, warpIntensity);// Smooth radial transition
+
+            // Smooth angular transition: use normalized Z coordinate for smooth blending
+            // xz.y is the Z coordinate, normalize it by radius for smooth transition
+            float angularBlend = xz.y / max(r, 0.001);// Avoid division by zero
+
+            warpFactor = angularBlend * warpIntensity * warpStrength;
+        }
+
+        return height + warpFactor;
+    }
 }
 
 // Generates a new particle position in a uniform spherical distribution.
@@ -222,13 +250,13 @@ vec3 positionDensityWave2(inout uint state, float pitchAngleDeg, float ec, vec2 
 }
 
 // Density wave using concentric squircles, leading to a spiral pattern.
-vec3 positionDensityWave4(inout uint state,  float pitchAngleDeg, float ec, vec2 displacement) {
+vec3 positionDensityWave4(inout uint state, float pitchAngleDeg, float ec, vec2 displacement) {
     // Discrete squircles parameters
-    const uint numSquircles = 200u; // Number of concentric squircles
+    const uint numSquircles = 200u;// Number of concentric squircles
 
     // Select which squircle to use
     uint squircleIndex = uint(rand(state) * float(numSquircles));
-    float t = (float(squircleIndex) + 0.5) / float(numSquircles); // 0 to 1
+    float t = (float(squircleIndex) + 0.5) / float(numSquircles);// 0 to 1
 
     // Squircle radius increases from center outward
     float min = u_minRadius * 0.5;
@@ -236,10 +264,10 @@ vec3 positionDensityWave4(inout uint state,  float pitchAngleDeg, float ec, vec2
     float squircle_r = u_baseRadius * (min + max * t);
 
     // Squircle exponent (2 for smoother transition, larger for more square-like)
-    float n = 3.0;  // Adjust n for squircle shape (2 = circle, higher = more square-like)
+    float n = 3.0;// Adjust n for squircle shape (2 = circle, higher = more square-like)
 
     // Random position on squircle boundary
-    float squircle_angle = rand(state) * 6.2831853; // Random angle in [0, 2*PI]
+    float squircle_angle = rand(state) * 6.2831853;// Random angle in [0, 2*PI]
 
     // Squircle boundary equation for x and z coordinates
     float cos_angle = cos(squircle_angle);
@@ -282,7 +310,7 @@ vec3 positionDensityWave4(inout uint state,  float pitchAngleDeg, float ec, vec2
 }
 
 // Density wave positions with 2 or 4 arms.
-vec3 positionDensityWave(inout uint state,  int numArms, float pitchAngleDeg, float ec, vec2 displacement) {
+vec3 positionDensityWave(inout uint state, int numArms, float pitchAngleDeg, float ec, vec2 displacement) {
     if (numArms == 4) {
         return positionDensityWave4(state, pitchAngleDeg, ec, displacement);
     } else {
@@ -303,7 +331,7 @@ vec3 positionEllipsoid(inout uint state, vec2 ec) {
     // --- sample radius fraction uniformly inside shell ---
     float s = rand(state);
     float minFrac = clamp(u_minRadius / u_baseRadius, 0.0, 1.0);
-    float centralDensity = rand(state) + 1.2; // The higher the denser
+    float centralDensity = rand(state) + 1.2;// The higher the denser
     float rFrac = mix(minFrac, 1.0, pow(s, centralDensity/3.0));
 
     // --- compute semi-axes ---

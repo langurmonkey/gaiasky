@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.GaiaSkyShaderCompileException;
+import gaiasky.util.ArrayUtils;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
@@ -162,8 +163,8 @@ public class ComputeShaderProgram implements Disposable {
     public void setUniform(String name, int value) {
         if (!checkUniformExists(name)) return;
 
-        Integer type = uniformTypes.get(name);
-        Integer loc = uniforms.get(name);
+        var type = uniformTypes.get(name);
+        var loc = uniforms.get(name);
 
         if (type == GL_INT) {
             glUniform1i(loc, value);
@@ -181,8 +182,8 @@ public class ComputeShaderProgram implements Disposable {
     public void setUniform(String name, float value) {
         if (!checkUniformExists(name)) return;
 
-        Integer type = uniformTypes.get(name);
-        Integer loc = uniforms.get(name);
+        var type = uniformTypes.get(name);
+        var loc = uniforms.get(name);
 
         if (type == GL_FLOAT) {
             glUniform1f(loc, value);
@@ -202,8 +203,8 @@ public class ComputeShaderProgram implements Disposable {
     public void setUniform(String name, float x, float y) {
         if (!checkUniformExists(name)) return;
 
-        Integer type = uniformTypes.get(name);
-        Integer loc = uniforms.get(name);
+        var type = uniformTypes.get(name);
+        var loc = uniforms.get(name);
 
         if (type == GL_FLOAT_VEC2) {
             glUniform2f(loc, x, y);
@@ -218,8 +219,8 @@ public class ComputeShaderProgram implements Disposable {
     public void setUniform(String name, float x, float y, float z) {
         if (!checkUniformExists(name)) return;
 
-        Integer type = uniformTypes.get(name);
-        Integer loc = uniforms.get(name);
+        var type = uniformTypes.get(name);
+        var loc = uniforms.get(name);
 
         if (type == GL_FLOAT_VEC3) {
             glUniform3f(loc, x, y, z);
@@ -234,8 +235,8 @@ public class ComputeShaderProgram implements Disposable {
     public void setUniform(String name, float x, float y, float z, float w) {
         if (!checkUniformExists(name)) return;
 
-        Integer type = uniformTypes.get(name);
-        Integer loc = uniforms.get(name);
+        var type = uniformTypes.get(name);
+        var loc = uniforms.get(name);
 
         if (type == GL_FLOAT_VEC4) {
             glUniform4f(loc, x, y, z, w);
@@ -250,8 +251,8 @@ public class ComputeShaderProgram implements Disposable {
     public void setUniform2fv(String name, float[] values) {
         if (!checkUniformExists(name)) return;
 
-        Integer loc = uniforms.get(name);
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+        var loc = uniforms.get(name);
+        var buffer = BufferUtils.createFloatBuffer(values.length);
         buffer.put(values).flip();
         glUniform2fv(loc, buffer);
 
@@ -261,8 +262,8 @@ public class ComputeShaderProgram implements Disposable {
     public void setUniform3fv(String name, float[] values) {
         if (!checkUniformExists(name)) return;
 
-        Integer loc = uniforms.get(name);
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+        var loc = uniforms.get(name);
+        var buffer = BufferUtils.createFloatBuffer(values.length);
         buffer.put(values).flip();
         glUniform3fv(loc, buffer);
 

@@ -287,6 +287,17 @@ public class CPUGalGenFallback {
                 .toList();
     }
 
+    /**
+     * Computes the Y component (vertical) in flat distributions like disks or spirals. It takes into
+     * account the XY position in the plane, the height scale and profile, and the warp factor.
+     *
+     * @param rng The RGN.
+     * @param ds  The dataset.
+     * @param x   X position.
+     * @param z   Z position.
+     *
+     * @return The vertical component, Y.
+     */
     private double computeY(RNG rng, BillboardDataset ds, double x, double z) {
         double r = FastMath.sqrt(x * x + z * z);
         double hsFactor = switch (ds.heightProfile) {
@@ -297,9 +308,35 @@ public class CPUGalGenFallback {
             case LINEAR_DEC -> (1.0 - r / ds.baseRadius);
 
         };
-        return (rng.rand() - 0.5) * 2.0 * hsFactor * ds.heightScale;
-    }
+        // Compute height from profile and scale.
+        var height = (rng.rand() - 0.5) * 2.0 * hsFactor * ds.heightScale;
 
+        if (ds.warpStrength == 0.0) {
+            return height;
+        } else {
+            // Warp.
+
+            var normalizedR = r / ds.baseRadius;
+            // Only apply warp in the outer regions of the disk, when r > warpStartRadius
+            var warpStartRadius = 0.7;
+            var warpStrength = ds.warpStrength;
+            double warpFactor;
+            if (normalizedR > warpStartRadius) {
+                var warpIntensity = (normalizedR - warpStartRadius) / (1.0 - warpStartRadius);
+                warpIntensity = MathUtilsDouble.smoothstep(0.0, 1.0, warpIntensity);
+
+                // Smooth angular transition: use normalized Z coordinate for smooth blending
+                // xz.y is the Z coordinate, normalize it by radius for smooth transition
+                var angularBlend = z / FastMath.max(r, 0.001); // Avoid division by zero
+
+                warpFactor = angularBlend * warpIntensity * warpStrength;
+            } else {
+                warpFactor = 0.0;
+            }
+
+            return height + warpFactor;
+        }
+    }
 
     // Position generators — approximate the GLSL ones. Use RNG methods to match behaviour.
 
