@@ -717,10 +717,20 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             dsTable.add(colorsTable).left().padRight(pad5).padBottom(pad18);
             dsTable.add(colorNoise).left().padBottom(pad18).row();
 
-            if (ds.distribution == Distribution.DISK_GAUSS
-                    || ds.distribution == Distribution.DISK
-                    || ds.distribution == Distribution.SPIRAL
-                    || ds.distribution == Distribution.SPIRAL_LOG) {
+            if (ds.distribution.isFlat()) {
+                // Warp
+                var warp = new OwnSliderReset(I18n.msg("gui.galaxy.ds.warp"), ds.type.warpStrength[0], ds.type.warpStrength[1], 0.001f, skin);
+                warp.setWidth(fullWidthBox);
+                warp.setValue(ds.warpStrength);
+                warp.setResetValue(0.00f);
+                warp.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setWarpStrength((double) warp.getValue());
+                    }
+                });
+                dsTable.add(warp).colspan(2).left().padBottom(pad18).row();
 
                 // Height scale
                 var heightScale = new OwnSliderReset(I18n.msg("gui.galaxy.ds.height.scale"), 0.0f, 0.2f, 0.001f, skin);
@@ -752,10 +762,10 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
                 dsTable.add(heightProfile).left().padBottom(pad18).padRight(pad5);
                 dsTable.add(heightScale).left().padBottom(pad18).row();
+
             }
 
             // Bar only has base_radius. All the others have also min_radius.
-            var isBar = ds.distribution == Distribution.BAR;
             // Min and base radii
             float minRadMin = ds.type.minRadius[0];
             float minRadMax = ds.type.minRadius[1];
@@ -775,7 +785,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             float baseRadMax = ds.type.baseRadius[1];
             float baseRadStep = (baseRadMax - baseRadMin) / SLIDER_STEPS;
             var baseRadius = new OwnSliderReset(I18n.msg("gui.galaxy.ds.radius.base"), baseRadMin, baseRadMax, baseRadStep, skin);
-            baseRadius.setWidth(isBar ? fullWidthBox : halfWidthBox);
+            baseRadius.setWidth(ds.distribution.isBar() ? fullWidthBox : halfWidthBox);
             baseRadius.setValue(ds.baseRadius);
             minRadius.setResetValue(baseRadMin + (baseRadMax - baseRadMin) / 2f);
             baseRadius.addListener(new ChangeListener() {
@@ -785,7 +795,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.setBaseRadius((double) baseRadius.getValue());
                 }
             });
-            if (!isBar) {
+            if (!ds.distribution.isBar()) {
                 dsTable.add(minRadius).left().padRight(pad5).padBottom(pad18);
                 dsTable.add(baseRadius).left().padBottom(pad18).row();
             } else {
@@ -869,7 +879,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             });
             dsTable.add(intensity).colspan(2).left().padBottom(pad18).row();
 
-            if (ds.distribution == Distribution.SPIRAL_LOG) {
+            if (ds.distribution.isLogarithmicSpiral()) {
                 // Number of arms
                 var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 1f, 8f, 1f, skin);
                 numArms.setNumberFormatter(new DecimalFormat("#0"));
@@ -903,7 +913,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(numArms).left().padRight(pad5).padBottom(pad18);
                 dsTable.add(armSigma).left().padBottom(pad18).row();
             }
-            if (ds.distribution == Distribution.SPIRAL) {
+            if (ds.distribution.isDensityWaveSpiral()) {
                 // Number of arms
                 var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 2f, 4f, 2f, skin);
                 numArms.setNumberFormatter(new DecimalFormat("#0"));
@@ -920,7 +930,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(numArms).colspan(2).left().padBottom(pad18).row();
             }
 
-            if (ds.distribution == Distribution.SPIRAL || ds.distribution == Distribution.SPIRAL_LOG) {
+            if (ds.distribution.isAnySpiral()) {
                 // Spiral angle
                 float angleMin = ds.type.baseAngle[0];
                 float angleMax = ds.type.baseAngle[1];
@@ -941,7 +951,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(baseAngle).colspan(2).left().padBottom(pad18).row();
             }
 
-            if (ds.distribution == Distribution.SPIRAL) {
+            if (ds.distribution.isDensityWaveSpiral()) {
                 // Single eccentricity.
                 float eMin = ds.type.eccentricity[0];
                 float eMax = ds.type.eccentricity[1];
@@ -959,7 +969,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     }
                 });
                 dsTable.add(ec).colspan(2).left().padBottom(pad18).row();
-            } else if (ds.distribution == Distribution.ELLIPSOID) {
+            } else if (ds.distribution.isEllipsoid()) {
                 // Eccentricity in X and Y.
                 float eMin = ds.type.eccentricity[0];
                 float eMax = ds.type.eccentricity[1];
@@ -992,7 +1002,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(ecx).left().padBottom(pad18).row();
             }
 
-            if (ds.distribution == Distribution.SPIRAL) {
+            if (ds.distribution.isDensityWaveSpiral()) {
                 // Displacement in x and y
                 float dMin = ds.type.spiralDeltaPos[0];
                 float dMax = ds.type.spiralDeltaPos[1];
@@ -1023,7 +1033,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(deltaY).left().padBottom(pad18).row();
             }
 
-            if (ds.distribution == Distribution.BAR) {
+            if (ds.distribution.isBar()) {
                 // Aspect
                 float aspectMin = ds.type.aspect[0];
                 float aspectMax = ds.type.aspect[1];

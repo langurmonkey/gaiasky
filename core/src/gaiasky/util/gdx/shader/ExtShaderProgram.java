@@ -30,7 +30,6 @@ import org.lwjgl.opengl.GL41;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.StringBuilder;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -455,8 +454,8 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @return the log info for the shader compilation and program linking stage. The shader needs to be bound for this
-     * method to
-     * have an effect.
+     *         method to
+     *         have an effect.
      */
     public String getLog() {
         if (isCompiled) {
@@ -612,8 +611,7 @@ public class ExtShaderProgram implements Disposable {
         gl.glUniform4i(location, value1, value2, value3, value4);
     }
 
-    /**
-     * Sets the uniform with the given name. The {@link ExtShaderProgram} must be bound for this to work.
+    /** * Sets the uniform with the given name. The {@link ExtShaderProgram} must be bound for this to work.
      *
      * @param name  the name of the uniform
      * @param value the value
@@ -1203,6 +1201,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return whether the attribute is available in the shader
      */
     public boolean hasAttribute(String name) {
@@ -1211,6 +1210,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return the type of the attribute, one of {@link GL20#GL_FLOAT}, {@link GL20#GL_FLOAT_VEC2} etc.
      */
     public int getAttributeType(String name) {
@@ -1219,6 +1219,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return the location of the attribute or -1.
      */
     public int getAttributeLocation(String name) {
@@ -1227,6 +1228,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return the size of the attribute or 0.
      */
     public int getAttributeSize(String name) {
@@ -1235,6 +1237,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return whether the uniform is available in the shader
      */
     public boolean hasUniform(String name) {
@@ -1243,6 +1246,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return the type of the uniform, one of {@link GL20#GL_FLOAT}, {@link GL20#GL_FLOAT_VEC2} etc.
      */
     public int getUniformType(String name) {
@@ -1251,6 +1255,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return the location of the uniform or -1.
      */
     public int getUniformLocation(String name) {
@@ -1259,6 +1264,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return the size of the uniform or 0.
      */
     public int getUniformSize(String name) {

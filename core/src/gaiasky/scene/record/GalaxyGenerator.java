@@ -245,19 +245,21 @@ public class GalaxyGenerator {
             // Lenticulars
             case S0 -> {
                 var distribution = SPHERE_GAUSS;
+                var warpStrength = generateWarpStrength(gm);
                 var heightScale = generateHeightScale();
                 var heightProfile = generateHeightProfile(SPIRAL, heightScale);
 
                 // Stars
                 var stars = generateBase(STAR, distribution);
                 stars.setMinRadius(0.0);
+                stars.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // Dust
                 var dust = generateBase(DUST, SPIRAL);
                 dust.setIntensity(dust.intensity * 0.5);
                 dust.setBaseAngle(rand.nextGaussian(990.0, 10.0));
                 dust.setMinRadius(rand.nextGaussian(0.2, 0.01));
-                dust.setHeightParameters(heightScale, heightProfile);
+                dust.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // Gas
                 var gas = generateBase(GAS, distribution);
@@ -274,6 +276,7 @@ public class GalaxyGenerator {
                 var dustDistribution = generateSpiralDistribution(gm);
                 var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
                 var starDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK_GAUSS;
+                var warpStrength = generateWarpStrength(gm);
                 var heightScale = generateHeightScale();
                 var heightProfile = generateHeightProfile(dustDistribution, heightScale);
                 var spiralAngle = generateSpiralAngle(gm, dustDistribution);
@@ -287,19 +290,19 @@ public class GalaxyGenerator {
                 var stars = generateBase(STAR, starDistribution);
                 stars.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 stars.setMinRadius(minRadius);
-                stars.setHeightParameters(heightScale, heightProfile);
+                stars.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // HII
                 var hii = generateBase(HII, gasDistribution);
                 hii.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 hii.setMinRadius(minRadius);
-                hii.setHeightParameters(heightScale, heightProfile);
+                hii.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // DUST
                 var dust = generateBase(DUST, dustDistribution);
                 dust.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 dust.setMinRadius(minRadius);
-                dust.setHeightParameters(heightScale, heightProfile);
+                dust.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // DUST (field)
                 var dustF = generateBase(DUST, DISK);
@@ -308,12 +311,13 @@ public class GalaxyGenerator {
                 dustF.setParticleCount(5000L);
                 dustF.setMinRadius(minRadius);
                 dustF.setSize(dust.size * 0.8);
+                dustF.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // GAS
                 var gas = generateBase(GAS, gasDistribution);
                 gas.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 gas.setMinRadius(minRadius);
-                gas.setHeightParameters(heightScale, heightProfile);
+                gas.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // BULGE
                 var bulge = generateBase(BULGE, SPHERE);
@@ -331,6 +335,7 @@ public class GalaxyGenerator {
                 var dustDistribution = generateSpiralDistribution(gm);
                 var gasDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK;
                 var starDistribution = dustDistribution == SPIRAL ? SPIRAL : DISK_GAUSS;
+                var warpStrength = generateWarpStrength(gm);
                 var heightScale = generateHeightScale();
                 var heightProfile = generateHeightProfile(dustDistribution, heightScale);
                 var spiralAngle = generateSpiralAngle(gm, dustDistribution);
@@ -344,19 +349,19 @@ public class GalaxyGenerator {
                 var stars = generateBase(STAR, starDistribution);
                 stars.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 stars.setMinRadius(minRadius);
-                stars.setHeightParameters(heightScale, heightProfile);
+                stars.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // HII
                 var hii = generateBase(HII, gasDistribution);
                 hii.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 hii.setMinRadius(minRadius);
-                hii.setHeightParameters(heightScale, heightProfile);
+                hii.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // DUST
                 var dust = generateBase(DUST, dustDistribution);
                 dust.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 dust.setMinRadius(minRadius / 2.0);
-                dust.setHeightParameters(heightScale, heightProfile);
+                dust.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // DUST (field)
                 var dustF = generateBase(DUST, DISK);
@@ -365,12 +370,13 @@ public class GalaxyGenerator {
                 dustF.setIntensity((double) dust.intensity);
                 dustF.setParticleCount(5000L);
                 dustF.setSize(dust.size * 0.8);
+                dustF.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // GAS
                 var gas = generateBase(GAS, gasDistribution);
                 gas.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
                 gas.setMinRadius(minRadius / 2.0);
-                gas.setHeightParameters(heightScale, heightProfile);
+                gas.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // BAR
                 var bar = generateBase(BULGE, ELLIPSOID);
@@ -526,8 +532,32 @@ public class GalaxyGenerator {
         };
     }
 
+    /**
+     * The warp is actually very common, and depends on the morphology.
+     * <ul>
+     * <li>
+     *      Spirals: 50%-70%
+     * </li><li>
+     *      Barred spirals: 30%-50%
+     * </li><li>
+     *      Lenticulars: 20%-30%
+     * </li>
+     * </ul>
+     * <p>
+     * We take the middle values, so 60% for spirals, 40% for barred spirals, and 25% for lenticulars.
+     */
+    private double generateWarpStrength(GalaxyMorphology m) {
+        var w = rand.nextDouble(GAS.warpStrength[0] * 0.6f, GAS.warpStrength[1] * 0.6f);
+        return switch (m) {
+            case Sa, Sb, Sc -> rand.nextDouble() < 0.6 ? w : 0.0;
+            case SBa, SBb, SBc -> rand.nextDouble() < 0.4 ? w : 0.0;
+            case S0 -> rand.nextDouble() < 0.25 ? w : 0.0;
+            default -> 0.0;
+        };
+    }
+
     private double generateHeightScale() {
-        return rand.nextDouble(0.0, 0.06);
+        return rand.nextDouble(0.0, 0.03);
     }
 
     private HeightProfile generateHeightProfile(Distribution d, double heightScale) {
@@ -536,9 +566,9 @@ public class GalaxyGenerator {
             case SPHERE, SPHERE_GAUSS, ELLIPSOID, BAR, CONE, IRREGULAR -> HeightProfile.CONSTANT;
             case SPIRAL, SPIRAL_LOG, DISK, DISK_GAUSS -> {
                 if (heightScale > 0.03) {
-                   yield rand.nextBoolean() ? HeightProfile.SMOOTH_INC : HeightProfile.LINEAR_INC;
+                    yield rand.nextDouble() > 0.4 ? HeightProfile.SMOOTH_INC : HeightProfile.LINEAR_INC;
                 } else {
-                    yield rand.nextDouble() > 0.6 ? (rand.nextBoolean() ? HeightProfile.SMOOTH_INC : HeightProfile.LINEAR_INC) : HeightProfile.CONSTANT;
+                    yield rand.nextDouble() > 0.8 ? (rand.nextBoolean() ? HeightProfile.SMOOTH_INC : HeightProfile.LINEAR_INC) : HeightProfile.CONSTANT;
                 }
             }
         };

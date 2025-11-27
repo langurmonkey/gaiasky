@@ -183,13 +183,14 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             computeShader.setUniformUint("u_seed", seed);
             computeShader.setUniformUint("u_type", dataset.type.ordinal());
             computeShader.setUniform("u_sizeFactor", (float) (100 * bodySize / (26000.0 * Constants.PC_TO_U)));
-            computeShader.setUniform("u_sizeNoise", dataset.sizeMask ? -Math.abs(dataset.sizeNoise) : Math.abs(dataset.sizeNoise));
-            computeShader.setUniform("u_baseRadius", dataset.baseRadius);
-            computeShader.setUniform("u_minRadius", dataset.minRadius);
+            computeShader.setUniform("u_sizeNoise", (float) (dataset.sizeMask ? -Math.abs(dataset.sizeNoise) : Math.abs(dataset.sizeNoise)));
+            computeShader.setUniform("u_baseRadius", (float) dataset.baseRadius);
+            computeShader.setUniform("u_minRadius", (float) dataset.minRadius);
             computeShader.setUniform3fv("u_baseColors[0]", dataset.baseColors);
-            computeShader.setUniform("u_colorNoise", dataset.colorNoise);
+            computeShader.setUniform("u_colorNoise", (float) dataset.colorNoise);
             computeShader.setUniform2fv("u_eccentricity", dataset.eccentricity);
             computeShader.setUniform("u_aspect", dataset.aspect);
+            computeShader.setUniform("u_warpStrength", dataset.warpStrength);
             computeShader.setUniform("u_heightScale", dataset.heightScale);
             computeShader.setUniform("u_heightProfile", dataset.heightProfile.ordinal());
             computeShader.setUniform("u_baseAngle", dataset.baseAngle);
