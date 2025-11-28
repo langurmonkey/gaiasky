@@ -147,7 +147,7 @@ public class BatchDownloadWindow extends GenericDialog {
         }
 
         String name = dataset.name;
-        String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
+        String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.getCurrentDataMirror());
 
         String filename = FilenameUtils.getName(url);
         FileHandle tempDownload = Gdx.files.absolute(tempDir + "/" + filename + ".part");

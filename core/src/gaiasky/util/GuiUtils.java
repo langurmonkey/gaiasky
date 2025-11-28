@@ -84,7 +84,7 @@ public class GuiUtils {
                 } else {
                     OwnLabel info = new OwnLabel(I18n.msg("gui.download.noconnection.continue"), skin);
                     content.add(info).pad(pad18).row();
-                    Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.dataMirror);
+                    Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.getCurrentDataMirror());
                     content.add(manualDownload).pad(pad18);
                 }
 
@@ -156,7 +156,7 @@ public class GuiUtils {
                 content.add(new Link(I18n.msg("gui.connection.fix.manual"),
                                      skin,
                                      "link",
-                                     Settings.settings.program.url.dataMirror)).pad(pad10).row();
+                                     Settings.settings.program.url.getCurrentDataMirror())).pad(pad10).row();
                 content.add(new Link(I18n.msg("gui.connection.fix.report"), skin, "link", Settings.REPO_ISSUES)).pad(pad10);
             }
 

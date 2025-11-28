@@ -44,6 +44,13 @@ public class GaiaSkyExecutorService {
         return false;
     }
 
+    public Future<?> submit(Runnable r) {
+        if (pool != null && !pool.isShutdown() && !inQueue(r)) {
+            return pool.submit(r);
+        }
+        return null;
+    }
+
     public ThreadPoolExecutor getPool() {
         return pool;
     }

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.CamrecorderSettings.KeyframeSettings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
@@ -312,8 +312,8 @@ public class SettingsMorph {
         program.update.lastVersion = "";
         program.url = new UrlSettings();
         program.url.versionCheck = escapeURL(str("program.url.versioncheck", p));
-        program.url.dataMirror = escapeURL(str("program.url.data.mirror", p));
-        program.url.dataDescriptor = escapeURL(str("program.url.data.descriptor", p));
+        program.url.dataMirrors = new String[]{escapeURL(str("program.url.data.mirror", p))};
+        program.url.dataDescriptors = new String[]{escapeURL(str("program.url.data.descriptor", p))};
         s.program = program;
 
         // Controls
@@ -336,7 +336,7 @@ public class SettingsMorph {
 
         // Persist to file
         YAMLFactory yaml = new YAMLFactory();
-        yaml.disable(Feature.WRITE_DOC_START_MARKER).enable(Feature.MINIMIZE_QUOTES).enable(Feature.INDENT_ARRAYS);
+        yaml.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER).enable(YAMLGenerator.Feature.MINIMIZE_QUOTES).enable(YAMLGenerator.Feature.INDENT_ARRAYS);
         ObjectMapper mapper = new ObjectMapper(yaml);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.findAndRegisterModules();

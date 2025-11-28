@@ -1092,6 +1092,7 @@ public class Settings extends SettingsObject {
 
         /**
          * Get the width of the surface the application renders to.
+         *
          * @return The width of the application surface.
          */
         @JsonIgnore
@@ -1101,6 +1102,7 @@ public class Settings extends SettingsObject {
 
         /**
          * Get the height of the surface the application renders to.
+         *
          * @return The height of the application surface.
          */
         @JsonIgnore
@@ -3269,8 +3271,12 @@ public class Settings extends SettingsObject {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UrlSettings extends SettingsObject {
             public String versionCheck;
-            public String dataMirror = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/";
-            public String dataDescriptor;
+            public String[] dataMirrors = new String[]{"https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/"};
+            public String[] dataDescriptors;
+
+            @JsonIgnore
+            public String currentMirror, currentDescriptor;
+
 
             public void setVersionCheck(String versionCheck) {
                 // Make sure it points to codeberg.
@@ -3278,6 +3284,24 @@ public class Settings extends SettingsObject {
                     versionCheck = "https://codeberg.org/api/v1/repos/gaiasky/gaiasky/tags";
                 }
                 this.versionCheck = versionCheck;
+            }
+
+            public void setDataMirror(String mirror) {
+                this.dataMirrors[0] = mirror;
+            }
+
+            public void setDataDescriptor(String descriptor) {
+                this.dataDescriptors = new String[]{descriptor};
+            }
+
+            @JsonIgnore
+            public String getCurrentDataMirror() {
+                return currentMirror;
+            }
+
+            @JsonIgnore
+            public String getCurrentDataDescriptor() {
+                return currentDescriptor;
             }
 
             @Override

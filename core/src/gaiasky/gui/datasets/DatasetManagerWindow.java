@@ -272,7 +272,7 @@ public class DatasetManagerWindow extends GenericDialog {
             addDataLocation(content);
 
         // Add manual download
-        Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.dataMirror);
+        Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.getCurrentDataMirror());
         content.add(manualDownload).center();
 
         initialized.set(true);
@@ -887,7 +887,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 int i = 0;
                 for (var link : dataset.links) {
                     if (!link.isBlank()) {
-                        String linkStr = link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
+                        String linkStr = link.replace("@mirror-url@", Settings.settings.program.url.getCurrentDataMirror());
                         var linkActor = new Link(TextUtils.breakCharacters(linkStr, 70, true), skin, link);
                         if (i > 0)
                             linksGroup.row();
@@ -1049,7 +1049,7 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
         String name = dataset.name;
-        String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
+        String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.getCurrentDataMirror());
 
         String filename = FilenameUtils.getName(url);
         FileHandle tempDownload = Gdx.files.absolute(tempDir + "/" + filename + ".part");

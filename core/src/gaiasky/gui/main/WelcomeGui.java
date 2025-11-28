@@ -135,17 +135,17 @@ public class WelcomeGui extends AbstractGui {
                 GaiaSky.instance.getExecutorService()
                         .execute(DataDescriptorUtils::cleanDataLocationOldDatasets);
                 // Continue immediately.
-                continueWelcomeGui();
+                continueWelcomeGui01();
             });
-            fsCheck.setCancelListener(this::continueWelcomeGui);
+            fsCheck.setCancelListener(this::continueWelcomeGui01);
             fsCheck.show(stage);
         } else {
-            continueWelcomeGui();
+            continueWelcomeGui01();
         }
 
     }
 
-    private void continueWelcomeGui() {
+    private void continueWelcomeGui01() {
         if (vrStatus.vrInitFailed()) {
             if (vrStatus.equals(XrLoadStatus.ERROR_NO_CONTEXT))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, stage));
@@ -172,65 +172,127 @@ public class WelcomeGui extends AbstractGui {
 
             buildWaitingUI();
 
-            // Fetch descriptor file.
-            dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
-            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor,
-                                        dataDescriptor,
-                                        Settings.settings.program.offlineMode,
-                                        null,
-                                        null,
-                                        (digest) -> GaiaSky.postRunnable(() -> {
-                                            // Data descriptor ok. Skip welcome screen only if flag and base data present
-                                            if (skipWelcome && baseDataPresent()) {
-                                                startLoading();
-                                            } else {
-                                                buildWelcomeUI();
-                                            }
-                                        }),
-                                        () -> {
-                                            // Fail?
-                                            downloadError = true;
-                                            if (Settings.settings.program.offlineMode) {
-                                                logger.warn(I18n.msg("gui.welcome.error.offlinemode"));
-                                            } else {
-                                                logger.error(I18n.msg("gui.welcome.error.nointernet"));
-                                            }
-                                            if (baseDataPresent()) {
-                                                // Just post a tooltip and go on.
-                                                GaiaSky.postRunnable(() -> {
-                                                    var title = I18n.msg("gui.download.noconnection.continue");
-                                                    if (Settings.settings.program.offlineMode) {
-                                                        title = I18n.msg("gui.system.offlinemode.tooltip");
-                                                    }
-                                                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, title, 10f);
-                                                    buildWelcomeUI();
-                                                });
-                                            } else {
-                                                // Error and exit.
-                                                logger.error(I18n.msg("gui.welcome.error.nobasedata"));
-                                                GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, stage));
-                                            }
-                                        }, null);
+            // Test mirrors in order and select the first working one.
+            testMirrorConnectionChain(0,
+                                      this::continueWelcomeGui02,
+                                      this::connectionError);
 
-            /* CAPTURE SCROLL FOCUS */
-            stage.addListener(event -> {
-                if (event instanceof InputEvent ie) {
+        }
+    }
 
-                    if (ie.getType() == Type.keyUp) {
-                        if (ie.getKeyCode() == Input.Keys.ESCAPE) {
-                            Gdx.app.exit();
-                        } else if (ie.getKeyCode() == Input.Keys.ENTER) {
-                            if (baseDataPresent()) {
-                                startLoading();
-                            } else {
-                                addDatasetManagerWindow(serverDatasets);
-                            }
+    /**
+     * Tests and selects the best data descriptor mirror, or displays an error if no mirror could be contacted.
+     * If successful, proceeds with {@link #continueWelcomeGui03()}.
+     */
+    private void continueWelcomeGui02() {
+        // Select working data descriptor mirror, in order.
+        testDataDescMirrorConnectionChain(0,
+                                          this::continueWelcomeGui03,
+                                          this::connectionError);
+    }
+
+    /**
+     * Once the mirrors have been selected, we proceed with downloading the data descriptor and building the UI.
+     */
+    private void continueWelcomeGui03() {
+        // Fetch descriptor file.
+        dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
+        DownloadHelper.downloadFile(Settings.settings.program.url.getCurrentDataDescriptor(),
+                                    dataDescriptor,
+                                    Settings.settings.program.offlineMode,
+                                    null,
+                                    null,
+                                    (digest) -> GaiaSky.postRunnable(() -> {
+                                        // Data descriptor ok. Skip welcome screen only if flag and base data present
+                                        if (skipWelcome && baseDataPresent()) {
+                                            startLoading();
+                                        } else {
+                                            buildWelcomeUI();
+                                        }
+                                    }),
+                                    this::connectionError, null);
+
+        /* CAPTURE SCROLL FOCUS */
+        stage.addListener(event -> {
+            if (event instanceof InputEvent ie) {
+
+                if (ie.getType() == Type.keyUp) {
+                    if (ie.getKeyCode() == Input.Keys.ESCAPE) {
+                        Gdx.app.exit();
+                    } else if (ie.getKeyCode() == Input.Keys.ENTER) {
+                        if (baseDataPresent()) {
+                            startLoading();
+                        } else {
+                            addDatasetManagerWindow(serverDatasets);
                         }
                     }
                 }
-                return false;
-            });
+            }
+            return false;
+        });
+    }
+
+    private void connectionError() {
+        // Fail?
+        downloadError = true;
+        if (Settings.settings.program.offlineMode) {
+            logger.warn(I18n.msg("gui.welcome.error.offlinemode"));
+        } else {
+            logger.error(I18n.msg("gui.welcome.error.nointernet"));
         }
+        if (baseDataPresent()) {
+            // Just post a tooltip and go on.
+            GaiaSky.postRunnable(() -> {
+                var title = I18n.msg("gui.download.noconnection.continue");
+                if (Settings.settings.program.offlineMode) {
+                    title = I18n.msg("gui.system.offlinemode.tooltip");
+                }
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, title, 10f);
+                buildWelcomeUI();
+            });
+        } else {
+            // Error and exit.
+            logger.error(I18n.msg("gui.welcome.error.nobasedata"));
+            GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, stage));
+        }
+    }
+
+    private void testMirrorConnectionChain(final int index, Runnable success, Runnable fail) {
+        var mirrors = Settings.settings.program.url.dataMirrors;
+        final var n = mirrors.length;
+        DownloadHelper.testConnection(mirrors[index] + "index.html",
+                                      (url) -> {
+                                          logger.info("Selected data mirror: " + url);
+                                          Settings.settings.program.url.currentMirror = mirrors[index];
+                                          success.run();
+                                      },
+                                      () -> {
+                                          // Fail, try next.
+                                          if (index + 1 < n) {
+                                              testMirrorConnectionChain(index + 1, success, fail);
+                                          } else {
+                                              fail.run();
+                                          }
+                                      });
+    }
+
+    private void testDataDescMirrorConnectionChain(final int index, Runnable success, Runnable fail) {
+        var mirrors = Settings.settings.program.url.dataDescriptors;
+        final var n = mirrors.length;
+        DownloadHelper.testConnection(mirrors[index],
+                                      (url) -> {
+                                          logger.info("Selected data descriptor mirror: " + url);
+                                          Settings.settings.program.url.currentDescriptor = mirrors[index];
+                                          success.run();
+                                      },
+                                      () -> {
+                                          // Fail, try next.
+                                          if (index + 1 < n) {
+                                              testDataDescMirrorConnectionChain(index + 1, success, fail);
+                                          } else {
+                                              fail.run();
+                                          }
+                                      });
     }
 
     private void buildWaitingUI() {

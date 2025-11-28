@@ -14,6 +14,7 @@ import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.net.HttpStatus;
+import com.badlogic.gdx.net.NetJavaImpl;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
@@ -27,21 +28,30 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * Contains utilities to download files and check connections.
+ */
 public class DownloadHelper {
     private static final Log logger = Logger.getLogger(DownloadHelper.class);
 
+    /** Default timeout is 10 seconds. **/
+    private static final int TIMEOUT = 10_000;
+    /** Modificatoin of {@link NetJavaImpl} to never set doInput to false, as we want to read status codes. **/
+    private static final ModifiedNetJavaImpl net = new ModifiedNetJavaImpl();
+
     /**
-     * Checks for an internet connection and runs the appropriate runnable depending on the outcome.
+     * Checks for an internet connection and runs the appropriate callback depending on the outcome.
      *
-     * @param success Success runnable.
-     * @param fail    Failure runnable.
+     * @param success Success callback.
+     * @param fail    Failure callback.
      */
     public static void checkInternetConnection(Runnable success, Runnable fail) {
         HttpRequest request = new HttpRequest(HttpMethods.GET);
         request.setFollowRedirects(true);
-        request.setTimeOut(6500);
+        request.setTimeOut(TIMEOUT);
         request.setUrl(Settings.INTERNET_CHECK_URL);
         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
 
@@ -73,9 +83,25 @@ public class DownloadHelper {
     }
 
     /**
-     * Spawns a new thread which downloads the file from the given location, running the
-     * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
-     * when finished.
+     * Downloads a file from the specified URL, with support for resuming interrupted downloads.
+     * A new thread is spawned to handle the download, and various progress and completion callbacks are provided.
+     * If the URL points to a local file (using the 'file://' protocol), it simply copies the file locally.
+     *
+     * @param url                The URL from which to download the file, or a local file path prefixed with 'file://'.
+     * @param to                 The target {@link FileHandle} where the downloaded file will be saved.
+     * @param offlineMode        A flag indicating whether the download should proceed in offline mode.
+     *                           If true, the download will be skipped, and the {@code fail} callback will be executed.
+     * @param progressDownload   A {@link ProgressRunnable} that reports the progress of the download (may be null).
+     * @param progressHashResume A {@link ProgressRunnable} that reports the progress of resuming the download (may be null).
+     * @param finish             A {@link Consumer<String>} callback that is invoked upon successful completion of the download.
+     *                           It receives an empty string if the file is downloaded successfully or a hash if the download was resumed.
+     * @param fail               A {@link Runnable} callback that is invoked if the download fails or is canceled.
+     * @param cancel             A {@link Runnable} callback that is invoked if the download is canceled by the user.
+     *
+     * @return An {@link HttpRequest} object representing the HTTP request for the download.
+     *         It can be used to cancel or modify the request if needed.
+     *
+     * @throws IllegalArgumentException if the provided URL is not valid or cannot be parsed.
      */
     public static HttpRequest downloadFile(String url,
                                            FileHandle to,
@@ -112,10 +138,10 @@ public class DownloadHelper {
             }
             return null;
         } else {
-            // Make a 'GET' request to get data descriptor.
+            // Make a 'GET' request to get the resource.
             HttpRequest request = new HttpRequest(HttpMethods.GET);
             request.setFollowRedirects(true);
-            request.setTimeOut(6500);
+            request.setTimeOut(TIMEOUT);
             request.setUrl(url);
 
             // Resume download if target file (?.tar.gz.part) exists.
@@ -144,6 +170,60 @@ public class DownloadHelper {
             }
 
             return request;
+        }
+    }
+
+    /**
+     * Tests if the provided URL is reachable. If reachable, runs the finish callback.
+     * If not reachable, runs the fail callback. This method handles both files and directories.
+     * <p>
+     * For file URLs, it checks if the file exists and is readable.
+     * For HTTP URLs, it checks if the server is responsive to a HEAD request.
+     * If the URL points to a directory, it checks if the server redirects to a default file or responds with a directory listing.
+     *
+     * @param url    The URL to test, or a local file path prefixed with 'file://'.
+     * @param finish A {@link Consumer<String>} callback that is invoked upon successful completion of the download.
+     *               It receives a status message for possible logging.
+     * @param fail   A {@link Runnable} callback that is invoked if the download fails or is canceled.
+     *
+     */
+    public static void testConnection(String url, Consumer<String> finish, Runnable fail) {
+        if (url.startsWith("file://")) {
+            // Local file path check
+            String srcString = url.replaceFirst("file://", "");
+            Path source = Paths.get(srcString);
+            logger.info("Using file:// protocol: " + srcString);
+            if (Files.exists(source) && Files.isRegularFile(source) && Files.isReadable(source)) {
+                // Local file exists, consider it as a successful "connection"
+                finish.accept(srcString);
+            } else {
+                logger.error(I18n.msg("error.loading.notexistent", srcString));
+                if (fail != null) {
+                    fail.run();
+                }
+            }
+        } else {
+            // HTTP connection test using HEAD request
+            HttpRequest request = new HttpRequest(HttpMethods.HEAD);
+            request.setFollowRedirects(true);
+            request.setTimeOut(TIMEOUT);
+            request.setUrl(url);
+
+            // Send the request to test connectivity
+            sendTestRequest(request, url, (msg, statusCode) -> {
+                // If the status code is in the 2xx range, consider it successful (200 OK or 301/302 redirect)
+                if (statusCode >= 200 && statusCode < 300) {
+                    finish.accept(url);
+                } else {
+                    // Connection failed due to an error status (e.g., 403, 404, etc.)
+                    logger.debug("Connection failed with status code " + statusCode + ": " + url);
+                    if (fail != null) {
+                        fail.run();
+                    }
+                }
+
+            }, fail);
+
         }
     }
 
@@ -323,5 +403,59 @@ public class DownloadHelper {
             }
         });
     }
+
+    /**
+     * Sends a simple HTTP HEAD request to the given URL to test the connection.
+     * If the server responds successfully (status code 2xx), the finish callback is called.
+     * If the server responds with an error or the request fails, the fail callback is called.
+     *
+     * @param request The request.
+     * @param url     The URL.
+     * @param finish  A {@link BiConsumer <String, Integer>} callback that runs if the connection is successful, with a message and the status code.
+     * @param fail    A {@link Runnable} callback that runs if the connection fails.
+     */
+    public static void sendTestRequest(HttpRequest request, String url, BiConsumer<String, Integer> finish, Runnable fail) {
+        // Send the request to test connectivity
+
+        // Here we use a modification of GDX's net implementation. Usually, GDX sets
+        // doInput to false for HEAD requests, which prevents the input stream to be read. This
+        // causes the response code to be -1 always. Our modification forces doInput to true, so
+        // that we can use HEAD requests and still read the response.
+        net.sendHttpRequest(request, new HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(HttpResponse httpResponse) {
+                int status = httpResponse.getStatus().getStatusCode();
+
+                // Check if the response status code indicates success (2xx)
+                if (status >= 200 && status < 300) {
+                    finish.accept(url, status);
+                } else {
+                    // If the server returns an error (e.g., 403, 404), handle it as a failure
+                    finish.accept("Connection failed with status code " + status + ": " + url, status);
+                }
+                // Close the response body immediately after checking the status code
+                try {
+                    httpResponse.getResultAsStream().close(); // Close the body stream immediately
+                } catch (IOException e) {
+                    logger.error("Failed to close response stream", e);
+                }
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                // If the request fails (e.g., no response), handle it as a failure
+                logger.error("Connection test failed: " + url, t);
+                if (fail != null) fail.run();
+            }
+
+            @Override
+            public void cancelled() {
+                // If the request is cancelled, handle it as a failure
+                logger.error("Connection test cancelled: " + url);
+                if (fail != null) fail.run();
+            }
+        });
+    }
+
 
 }
