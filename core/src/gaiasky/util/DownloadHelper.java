@@ -42,7 +42,7 @@ public class DownloadHelper {
         HttpRequest request = new HttpRequest(HttpMethods.GET);
         request.setFollowRedirects(true);
         request.setTimeOut(6500);
-        request.setUrl("http://fedoraproject.org/static/hotspot.txt");
+        request.setUrl(Settings.INTERNET_CHECK_URL);
         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
 
             @Override
