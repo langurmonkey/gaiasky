@@ -119,7 +119,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         ar = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
 
         // fov factor
-        fovFactor = camera.fieldOfView / 40f;
+        updateFovFactor();
 
         // Initialize mouse+keyboard input listener.
         spacecraftMouseKbdListener = new SpacecraftMouseKbdListener(this, new GestureAdapter());
@@ -264,7 +264,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     protected void updatePerspectiveCamera() {
         camera.fieldOfView = 40;
-        fovFactor = camera.fieldOfView / 40f;
+        updateFovFactor();
         camera.position.set(0, 0, 0);
         direction.put(camera.direction);
         up.put(camera.up);

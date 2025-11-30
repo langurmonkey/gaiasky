@@ -26,10 +26,21 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
+/**
+ * Common attributes and methods to all cameras.
+ */
 public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
+    /**
+     * Solid angle setting.
+     */
     private static final double VIEW_ANGLE = FastMath.toRadians(0.05);
+    /**
+     * Tangent of the reference fov to compute the FOV factor.
+     */
+    private static final double TAN_REF_FOV = FastMath.tan(FastMath.toRadians(40.0 / 2.0));
+
     /** Camera near value. **/
     public double CAM_NEAR;
     /** Camera far value. **/
@@ -128,6 +139,13 @@ public abstract class AbstractCamera implements ICamera {
         float ar = (float) width / (float) height;
         float w = angle * ar;
         return (float) (Math.toRadians(Math.sqrt(angle * angle + w * w))) / 2f;
+    }
+
+    /**
+     * Update the FOV factor using the reference FOV.
+     */
+    protected void updateFovFactor(){
+        fovFactor = (float) (FastMath.tan(FastMath.toRadians(camera.fieldOfView * 0.5)) / TAN_REF_FOV);
     }
 
     @Override

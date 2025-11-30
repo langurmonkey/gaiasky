@@ -36,7 +36,7 @@ public class RelativisticCamera extends AbstractCamera {
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
 
-        fovFactor = camera.fieldOfView / 40f;
+        updateFovFactor();
 
         up = new Vector3D(1, 0, 0);
         direction = new Vector3D(0, 1, 0);

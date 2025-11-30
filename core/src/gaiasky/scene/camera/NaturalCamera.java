@@ -64,6 +64,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
+    /**
+     * Minimum distance from camera to object.
+     */
     private static final double MIN_DIST = 1 * Constants.M_TO_U;
     /**
      * The force acting on the entity and the friction.
@@ -325,7 +328,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // init cameras vector.
         cameras = new PerspectiveCamera[]{camera, camLeft, camRight};
 
-        fovFactor = camera.fieldOfView / 40f;
+        updateFovFactor();
 
         focusDirection = new Vector3Q();
         desired = new Vector3Q();
@@ -916,7 +919,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Stops the camera movement.
      *
      * @return True if the camera had any movement at all and it has been stopped.
-     *         False if camera was already still.
+     * False if camera was already still.
      */
     public boolean stopMovement() {
         boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0 || horizontal.y != 0);
@@ -1384,7 +1387,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The minimum distance to a star, with a smoothing radius.
      */
     private double getClosestStarDistance() {
-        if (GaiaSky.instance.cameraManager.getMode().isFocus() || !Settings.settings.scene.camera.starDistanceScaling) {
+        if (GaiaSky.instance.cameraManager.getMode()
+                .isFocus() || !Settings.settings.scene.camera.starDistanceScaling) {
             // Do not use star distance to compute velocity scaling.
             // Occasionally, traversing the star field with speed scaling depending on the closest star is actually not good.
             // Speed jumps after metadata updates are too noticeable.
@@ -1479,7 +1483,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 for (PerspectiveCamera cam : cameras) {
                     cam.fieldOfView = fov;
                 }
-                fovFactor = camera.fieldOfView / 40f;
+                updateFovFactor();
             }
             case CUBEMAP_CMD -> {
                 boolean state = (boolean) data[0];
@@ -1637,7 +1641,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     setCenterFocus((Boolean) data[0]);
                 }
             }
-            case CONTROLLER_CONNECTED_INFO -> Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
+            case CONTROLLER_CONNECTED_INFO ->
+                    Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
             case CONTROLLER_DISCONNECTED_INFO -> {
                 // Empty.
             }
@@ -1651,7 +1656,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 final Entity newTrackingObject = (Entity) data[0];
                 final String newTrackingName = (String) data[1];
                 synchronized (updateLock) {
-                    this.setTrackingObject(newTrackingObject, newTrackingName != null ? newTrackingName.toLowerCase(Locale.ROOT) : null);
+                    this.setTrackingObject(newTrackingObject,
+                                           newTrackingName != null ? newTrackingName.toLowerCase(Locale.ROOT) : null);
                 }
             }
             default -> {
@@ -2160,7 +2166,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Projects to screen.
      *
      * @return False if projected point falls outside the screen bounds, true
-     *         otherwise.
+     * otherwise.
      */
     private boolean projectToScreen(Vector3D vec,
                                     Vector3 out,
