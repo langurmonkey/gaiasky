@@ -130,6 +130,12 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         if (releaseNotes != null) {
             if (releaseNotes.isString()) {
                 this.releaseNotes = releaseNotes.asString().split("\\r?\\n");
+                // Remove possible leading list items, for compatibility.
+                for (int i = 0; i < this.releaseNotes.length; i++) {
+                    if (this.releaseNotes[i].startsWith("- ") || this.releaseNotes[i].startsWith("* ")) {
+                        this.releaseNotes[i] = this.releaseNotes[i].substring(2);
+                    }
+                }
             } else if (releaseNotes.isArray()) {
                 this.releaseNotes = releaseNotes.asStringArray();
             }

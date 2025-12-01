@@ -913,6 +913,7 @@ public class DatasetManagerWindow extends GenericDialog {
             var releaseNotesTitle = new OwnLabel(I18n.msg("gui.download.releasenotes"), skin, "grey-large");
             var releaseNotesTable = new Table(skin);
             for(var rn : releaseNotes) {
+                releaseNotesTable.add("-").left().top().padRight(pad10);
                 var l = new OwnLabel(TextUtils.breakCharacters(rn, 70), skin);
                 l.setWidth(1000f);
                 releaseNotesTable.add(l).left().row();
