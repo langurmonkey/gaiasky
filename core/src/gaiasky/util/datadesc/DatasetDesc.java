@@ -47,7 +47,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
     public int minGsVersion = -1;
     public boolean outdated;
     public boolean baseData;
-    public String releaseNotes;
+    public String[] releaseNotes;
     public String[] files;
     // In case of local datasets, this links to the server description
     public DatasetDesc server;
@@ -126,8 +126,13 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         }
 
         // Release notes
-        if (source.has("releasenotes")) {
-            this.releaseNotes = TextUtils.unescape(source.getString("releasenotes"));
+        var releaseNotes = source.get("releasenotes");
+        if (releaseNotes != null) {
+            if (releaseNotes.isString()) {
+                this.releaseNotes = releaseNotes.asString().split("\\r?\\n");
+            } else if (releaseNotes.isArray()) {
+                this.releaseNotes = releaseNotes.asStringArray();
+            }
         } else {
             this.releaseNotes = null;
         }

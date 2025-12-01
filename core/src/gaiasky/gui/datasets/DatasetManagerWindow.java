@@ -906,14 +906,17 @@ public class DatasetManagerWindow extends GenericDialog {
             desc.setWidth(1000f);
 
             // Release notes.
-            var releaseNotesString = dataset.releaseNotes;
-            if (releaseNotesString == null || releaseNotesString.isBlank()) {
-                releaseNotesString = "-";
+            var releaseNotes = dataset.releaseNotes;
+            if (releaseNotes == null || releaseNotes.length == 0) {
+                releaseNotes = new String[]{"-"};
             }
-            releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 70);
             var releaseNotesTitle = new OwnLabel(I18n.msg("gui.download.releasenotes"), skin, "grey-large");
-            var releaseNotes = new OwnLabel(releaseNotesString, skin);
-            releaseNotes.setWidth(1000f);
+            var releaseNotesTable = new Table(skin);
+            for(var rn : releaseNotes) {
+                var l = new OwnLabel(TextUtils.breakCharacters(rn, 70), skin);
+                l.setWidth(1000f);
+                releaseNotesTable.add(l).left().row();
+            }
 
             // Credits
             var credits = dataset.credits;
@@ -953,7 +956,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
             infoTable.add(desc).top().left().padBottom(pad34).row();
             infoTable.add(releaseNotesTitle).top().left().padBottom(pad18).row();
-            infoTable.add(releaseNotes).top().left().padBottom(pad34).row();
+            infoTable.add(releaseNotesTable).top().left().padBottom(pad34).row();
             if (creditsContent != null) {
                 infoTable.add(creditsTitle).top().left().padBottom(pad18).row();
                 infoTable.add(creditsContent).top().left().padBottom(pad34).row();
