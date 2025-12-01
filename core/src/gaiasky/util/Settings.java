@@ -2842,11 +2842,16 @@ public class Settings extends SettingsObject {
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class ModeStereoSettings extends SettingsObject {
+        public static class ModeStereoSettings extends SettingsObject implements IObserver {
             public boolean active;
             public StereoProfile profile;
-            @JsonIgnore
-            public float eyeSeparation = 1f;
+
+            /** IPD, inter pupillary distance, in mm. **/
+            public double ipd = 64.0;
+            /** Screen distance, in mm. **/
+            public double screenDistance = 600.0;
+            /** Global aesthetic scale factor (or comfort multiplier). **/
+            public double k = 0.2;
 
             public void setProfile(String profileString) {
                 if (profileString.equalsIgnoreCase("ANAGLYPH")) {
@@ -2886,6 +2891,7 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
+                EventManager.instance.subscribe(this, Event.STEREO_K_CMD, Event.STEREO_IPD_CMD, Event.STEREO_SCREEN_DIST_CMD);
             }
 
             @Override
@@ -2894,6 +2900,15 @@ public class Settings extends SettingsObject {
 
             @Override
             public void apply() {
+            }
+
+            @Override
+            public void notify(Event event, Object source, Object... data) {
+                switch (event) {
+                    case STEREO_K_CMD -> this.k = (double) data[0];
+                    case STEREO_IPD_CMD -> this.ipd = (double) data[0];
+                    case STEREO_SCREEN_DIST_CMD -> this.screenDistance = (double) data[0];
+                }
             }
         }
 

@@ -1369,6 +1369,21 @@ public enum Event {
     STEREO_PROFILE_CMD,
 
     /**
+     * Change stereo K value. Contains the new value as a double.
+     */
+    STEREO_K_CMD,
+
+    /**
+     * Change stereo IPD value. Contains the new value as a double.
+     */
+    STEREO_IPD_CMD,
+
+    /**
+     * Change stereo screen distance value. Contains the new value as a double.
+     */
+    STEREO_SCREEN_DIST_CMD,
+
+    /**
      * Sets and unsets the target time. Contains a time (set), or nothing
      * (unset)
      **/

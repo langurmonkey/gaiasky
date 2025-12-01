@@ -32,6 +32,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
@@ -47,7 +48,8 @@ import java.util.Set;
  */
 public class RenderModeStereoscopic extends RenderModeAbstract implements IRenderMode, IObserver {
 
-    private static final double EYE_ANGLE_DEG = 1.5;
+    /** Current separation, for smoothing. **/
+    private double sep = 0.0;
 
     /**
      * Viewport to use in stereoscopic mode
@@ -78,7 +80,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
         // INIT FRAME BUFFER FOR 3D MODE
         fb3D = new HashMap<>();
-        fb3D.put(getKey(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()), new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), true));
+        fb3D.put(getKey(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()),
+                 new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), true));
 
         // Init anaglyph 3D effect
         anaglyphEffect = new AnaglyphEffect();
@@ -106,43 +109,44 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         }
     }
 
+    /**
+     * Gets the distance to the current focus or the closest body object.
+     *
+     * @param camera The camera.
+     *
+     * @return The distance, in internal units.
+     */
+    private double getObjectDistance(ICamera camera) {
+        IFocus body = camera.getMode().isFocus() ? camera.getFocus() : camera.getClosestBody();
+        return body.getDistToCamera() - body.getRadius();
+    }
+
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean moveCam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
 
         PerspectiveCamera perspectiveCam = camera.getCamera();
-        // Vector of 1 meter length pointing to the side of the camera.
-        double separation = Constants.M_TO_U * Settings.settings.program.modeStereo.eyeSeparation;
-        double separationCapped;
-        double dirAngleDeg = 0;
 
-        IFocus currentFocus = null;
-        if (camera.getMode() == CameraMode.FOCUS_MODE) {
-            currentFocus = camera.getFocus();
-        } else if (camera.getCurrent().getClosestBody() != null) {
-            currentFocus = camera.getCurrent().getClosestBody();
-        }
-        if (currentFocus != null) {
-            // If we have focus, we adapt the eye separation
-            double distToFocus = currentFocus.getDistToCamera() - currentFocus.getRadius();
-            // Let's calculate the separation
-            separation = FastMath.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;
-            // Let's cap it.
-            separationCapped = FastMath.min(separation, 1.0E8 * Constants.KM_TO_U);
-            dirAngleDeg = EYE_ANGLE_DEG;
-        } else {
-            separationCapped = FastMath.min(separation, 1.0E8 * Constants.KM_TO_U);
-        }
+        // Compute distance to focus or closest body object.
+        double closestDist = getObjectDistance(camera);
+        double k = Settings.settings.program.modeStereo.k;
+        double ipd = Settings.settings.program.modeStereo.ipd;
+        double screenDist = Settings.settings.program.modeStereo.screenDistance;
+        double maxSep = 1.0e8 * Constants.KM_TO_U;
+        // The magic formula.
+        double eyeSep = k * (closestDist * ipd / screenDist) * camera.getFovFactor();
+        sep = MathUtilsDouble.lowPass(eyeSep, sep, 4.0);
+        double eyeSepCapped = FastMath.min(sep, maxSep);
 
         // Aux5d contains the direction to the side of the camera, normalized.
         aux5d.set(camera.getDirection()).crs(camera.getUp()).nor();
 
-        Vector3D side = aux4d.set(aux5d).nor().scl(separation);
-        Vector3D sideRemainder = aux2d.set(aux5d).scl(separation - separationCapped);
-        Vector3D sideCapped = aux3d.set(aux5d).nor().scl(separationCapped);
+        Vector3D side = aux4d.set(aux5d).nor().scl(sep);
+        Vector3D sideRemainder = aux2d.set(aux5d).scl(sep - eyeSepCapped);
+        Vector3D sideCapped = aux3d.set(aux5d).nor().scl(eyeSepCapped);
         Vector3 backupPos = aux2.set(perspectiveCam.position);
         Vector3 backupDir = aux3.set(perspectiveCam.direction);
-        Vector3D backupPosd = aux1d.set(camera.getPos());
+        Vector3D backupPosD = aux1d.set(camera.getPos());
 
         if (Settings.settings.program.modeStereo.profile.isAnaglyph()) {
             // Update viewport.
@@ -155,7 +159,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             // Camera to the left.
             if (moveCam) {
-                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, false);
+                moveCamera(camera, sideRemainder, side, sideCapped, 0.0, false);
             }
             camera.setCameraStereoLeft(perspectiveCam);
 
@@ -175,8 +179,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             // Camera to the right.
             if (moveCam) {
-                restoreCameras(camera, perspectiveCam, backupPosd, backupPos, backupDir);
-                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, true);
+                restoreCameras(camera, perspectiveCam, backupPosD, backupPos, backupDir);
+                moveCamera(camera, sideRemainder, side, sideCapped, 0.0, true);
             }
             camera.setCameraStereoRight(perspectiveCam);
 
@@ -257,7 +261,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             // Camera to left
             if (moveCam) {
-                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, changeSides);
+                moveCamera(camera, sideRemainder, side, sideCapped, 0.0, changeSides);
             }
             camera.setCameraStereoLeft(perspectiveCam);
 
@@ -287,8 +291,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             // Camera to right
             if (moveCam) {
-                restoreCameras(camera, perspectiveCam, backupPosd, backupPos, backupDir);
-                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, !changeSides);
+                restoreCameras(camera, perspectiveCam, backupPosD, backupPos, backupDir);
+                moveCamera(camera, sideRemainder, side, sideCapped, 0.0, !changeSides);
             }
             camera.setCameraStereoRight(perspectiveCam);
 
@@ -305,7 +309,22 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             resultBuffer.begin();
             sb.begin();
             sb.setColor(1f, 1f, 1f, 1f);
-            sb.draw(tex, (float) start2w, (float) start2h, 0f, 0f, (float) boundsw, (float) boundsh, 1f, 1f, 0f, 0, 0, (int) boundsw, (int) boundsh, false, true);
+            sb.draw(tex,
+                    (float) start2w,
+                    (float) start2h,
+                    0f,
+                    0f,
+                    (float) boundsw,
+                    (float) boundsh,
+                    1f,
+                    1f,
+                    0f,
+                    0,
+                    0,
+                    (int) boundsw,
+                    (int) boundsh,
+                    false,
+                    true);
             sb.end();
             resultBuffer.end();
 
@@ -315,7 +334,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         }
 
         // RESTORE
-        restoreCameras(camera, perspectiveCam, backupPosd, backupPos, backupDir);
+        restoreCameras(camera, perspectiveCam, backupPosD, backupPos, backupDir);
 
         // To screen
         if (fb == null)
@@ -329,19 +348,31 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         cam.direction.set(backupDir);
     }
 
-    private void moveCamera(ICamera camera, Vector3D sideRemainder, Vector3D side, Vector3D sideCapped, double angle, boolean switchSides) {
+    /**
+     * Move the camera to the side for stereo projection.
+     *
+     * @param camera        Camera.
+     * @param sideRemainder Side remainder vector.
+     * @param side          The side vector.
+     * @param sideCapped    The side, capped.
+     * @param toeInAngle    Angle to use for rotating the direction vectors inwards towards the convergence point. Set to 0 for parallel projection.
+     * @param switchSides   Whether to switch sides.
+     */
+    private void moveCamera(ICamera camera, Vector3D sideRemainder, Vector3D side, Vector3D sideCapped, double toeInAngle, boolean switchSides) {
         PerspectiveCamera cam = camera.getCamera();
         Vector3 sideFloat = sideCapped.put(aux1);
 
         if (switchSides) {
             cam.position.add(sideFloat);
-            cam.direction.rotate(cam.up, (float) -angle);
+            if (toeInAngle != 0)
+                cam.direction.rotate(cam.up, (float) -toeInAngle);
 
             // Uncomment to enable 3D in GPU points
             camera.getPos().add(sideRemainder);
         } else {
             cam.position.sub(sideFloat);
-            cam.direction.rotate(cam.up, (float) angle);
+            if (toeInAngle != 0)
+                cam.direction.rotate(cam.up, (float) toeInAngle);
 
             // Uncomment to enable 3D in GPU points
             camera.getPos().sub(sideRemainder);

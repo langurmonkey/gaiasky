@@ -184,6 +184,12 @@ public class Constants {
     public final static float MAX_ATM_FOG_DENSITY = 3.5f;
     public final static float MIN_POINTER_GUIDES_WIDTH = 0.5f;
     public final static float MAX_POINTER_GUIDES_WIDTH = 20f;
+    public static final float MIN_STEREO_K = 0.01f;
+    public static final float MAX_STEREO_K = 1f;
+    public static final float MIN_STEREO_IPD = 10f;
+    public static final float MAX_STEREO_IPD = 100f;
+    public static final float MIN_STEREO_SD = 200f;
+    public static final float MAX_STEREO_SD = 1500f;
     public final static int MIN_TILE_CACHE = 4;
     public final static int MAX_TILE_CACHE = 20;
     public static final float UI_SCALE_MIN = 0.70f;

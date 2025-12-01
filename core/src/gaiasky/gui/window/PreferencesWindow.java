@@ -123,6 +123,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
             celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
             chromaticAberration, filmGrain, lensFlare, velocityVectors, motionBlur, pgResolution;
+    private OwnSliderReset stereoK, ipd, screenDistance;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
@@ -134,6 +135,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak,
             aberrationBak, lensFlareBak, filmGrainBak;
+    private double stereoKBak, stereoIpdBak, stereoSdBak;
     private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
     private int FXAAQuality, FXAAQualityBak;
     private ReprojectionMode reprojectionBak;
@@ -239,6 +241,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnTextIconButton tabScreenshots = createTab(I18n.msg("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin);
         final OwnTextIconButton tabFrames = createTab(I18n.msg("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin);
         final OwnTextIconButton tabCamera = createTab(I18n.msg("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin);
+        final OwnTextIconButton tabStereo = createTab(I18n.msg("gui.stereo.title"), new Image(skin.getDrawable("3d-icon")), skin);
         final OwnTextIconButton tab360 = createTab(I18n.msg("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin);
         final OwnTextIconButton tabPlanetarium = createTab(I18n.msg("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin);
         final OwnTextIconButton tabData = createTab(I18n.msg("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin);
@@ -252,6 +255,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabsTable.add(tabScreenshots).row();
         tabsTable.add(tabFrames).row();
         tabsTable.add(tabCamera).row();
+        tabsTable.add(tabStereo).row();
         tabsTable.add(tab360).row();
         tabsTable.add(tabPlanetarium).row();
         tabsTable.add(tabData).row();
@@ -267,6 +271,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabButtons.add(tabScreenshots);
         tabButtons.add(tabFrames);
         tabButtons.add(tabCamera);
+        tabButtons.add(tabStereo);
         tabButtons.add(tab360);
         tabButtons.add(tabPlanetarium);
         tabButtons.add(tabData);
@@ -1984,7 +1989,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Save location
         OwnLabel screenshotsLocationLabel = new OwnLabel(I18n.msg("gui.screenshots.save"), skin);
-        screenshotsLocation = new OwnTextButton(TextUtils.capString(settings.screenshot.location, 55), skin);
+        screenshotsLocation = new OwnTextButton(TextUtils.capString(settings.screenshot.location, 45, true), skin);
         screenshotsLocation.addListener(new OwnTextTooltip(settings.screenshot.location, skin));
         screenshotsLocation.setWidth(inputWidth);
         screenshotsPath = Path.of(settings.screenshot.location);
@@ -1998,7 +2003,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
-                        screenshotsLocation.setText(TextUtils.capString(result.toString(), 55));
+                        screenshotsLocation.setText(TextUtils.capString(result.toString(), 45, true));
                         screenshotsPath = result;
                         screenshotsLocation.addListener(new OwnTextTooltip(result.toString(), skin));
                     }
@@ -2128,7 +2133,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Save location
         OwnLabel frameOutputLocationLabel = new OwnLabel(I18n.msg("gui.frameoutput.location"), skin);
-        frameOutputLocation = new OwnTextButton(TextUtils.capString(settings.frame.location, 55), skin);
+        frameOutputLocation = new OwnTextButton(TextUtils.capString(settings.frame.location, 45, true), skin);
         frameOutputLocation.setWidth(inputWidth);
         frameOutputLocation.addListener(new OwnTextTooltip(settings.frame.location, skin));
         frameOutputPath = Path.of(settings.frame.location);
@@ -2142,7 +2147,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
-                        frameOutputLocation.setText(TextUtils.capString(result.toString(), 55));
+                        frameOutputLocation.setText(TextUtils.capString(result.toString(), 45, true));
                         frameOutputPath = result;
                         frameOutputLocation.addListener(new OwnTextTooltip(result.toString(), skin));
                     }
@@ -2347,13 +2352,84 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         addContentGroup(contentCamera, titleCamrec, camrec, 0f);
 
         /*
+         * ===== STEREO ======
+         */
+        final Table contentStereo = new Table(skin);
+        contentStereo.align(Align.top | Align.left);
+
+        // STEREO 3D
+        OwnLabel title3D = new OwnLabel(I18n.msg("gui.stereo"), skin, "header");
+        Table stereoTable = new Table(skin);
+
+        // K
+        var stereoKLabel = new OwnLabel(I18n.msg("gui.stereo.k"), skin);
+        stereoK = new OwnSliderReset("", Constants.MIN_STEREO_K, Constants.MAX_STEREO_K, Constants.SLIDER_STEP_TINY, skin);
+        stereoK.setName("stereo k");
+        stereoK.setWidth(sliderWidth);
+        stereoK.setResetValue(0.2f);
+        stereoK.setValue((float) settings.program.modeStereo.k);
+        stereoK.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.STEREO_K_CMD, stereoK, (double) stereoK.getValue());
+                return true;
+            }
+            return false;
+        });
+
+        final var nf = new DecimalFormat("###0");
+        // IPD
+        var ipdLabel = new OwnLabel(I18n.msg("gui.stereo.ipd"), skin);
+        ipd = new OwnSliderReset("", Constants.MIN_STEREO_IPD, Constants.MAX_STEREO_IPD, Constants.SLIDER_STEP_TINY, skin);
+        ipd.setName("stereo ipd");
+        ipd.setWidth(sliderWidth);
+        ipd.setValueLabelTransform((val) -> nf.format(val) + " " + I18n.msg("gui.unit.mm"));
+        ipd.setResetValue(64f);
+        ipd.setValue((float) settings.program.modeStereo.ipd);
+        ipd.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.STEREO_IPD_CMD, ipd, (double) ipd.getValue());
+                return true;
+            }
+            return false;
+        });
+        // Screen dist
+        var screenDistLabel = new OwnLabel(I18n.msg("gui.stereo.screen"), skin);
+        screenDistance = new OwnSliderReset("", Constants.MIN_STEREO_SD, Constants.MAX_STEREO_SD, Constants.SLIDER_STEP, skin);
+        screenDistance.setName("stereo screen dist");
+        screenDistance.setWidth(sliderWidth);
+        screenDistance.setValueLabelTransform((val) -> nf.format(val) + " " + I18n.msg("gui.unit.mm"));
+        screenDistance.setResetValue(600f);
+        screenDistance.setValue((float) settings.program.modeStereo.screenDistance);
+        screenDistance.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.STEREO_SCREEN_DIST_CMD, screenDistLabel, (double) screenDistance.getValue());
+                return true;
+            }
+            return false;
+        });
+
+        labels.add(stereoKLabel, ipdLabel, screenDistLabel);
+
+        // Add to table
+        stereoTable.add(stereoKLabel).left().padRight(pad34).padBottom(pad18 * 3f);
+        stereoTable.add(stereoK).left().fillX().padBottom(pad18 * 3f).row();
+        stereoTable.add(new Separator(skin, "gray")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20).row();
+        stereoTable.add(ipdLabel).left().padRight(pad34).padBottom(pad18);
+        stereoTable.add(ipd).left().fillX().padBottom(pad18).row();
+        stereoTable.add(screenDistLabel).left().padRight(pad34).padBottom(pad18);
+        stereoTable.add(screenDistance).left().fillX().padBottom(pad18).row();
+
+        // Add to content
+        addContentGroup(contentStereo, title3D, stereoTable, 0f);
+
+        /*
          * ==== PANORAMA ====
          */
         final Table content360 = new Table(skin);
         content360.align(Align.top | Align.left);
 
         // CUBEMAP
-        OwnLabel titleCubemap = new OwnLabel(I18n.msg("gui.360"), skin, "header");
+        var titleCubemap = new OwnLabel(I18n.msg("gui.360"), skin, "header");
         Table cubemap = new Table(skin);
 
         // Info
@@ -2743,6 +2819,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         addTabContent(contentScreenshots);
         addTabContent(contentFrames);
         addTabContent(contentCamera);
+        addTabContent(contentStereo);
         addTabContent(content360);
         addTabContent(contentPlanetarium);
         addTabContent(contentData);
@@ -2834,6 +2911,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         upscaleFilterBak = settings.postprocess.upscaleFilter;
         frameCoordinatesBak = settings.program.uvGrid.frameCoordinates;
         FXAAQualityBak = settings.postprocess.antialiasing.quality;
+        stereoKBak = settings.program.modeStereo.k;
+        stereoIpdBak = settings.program.modeStereo.ipd;
+        stereoSdBak = settings.program.modeStereo.screenDistance;
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -3373,6 +3453,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
         EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinatesBak);
         EventManager.publish(Event.FXAA_QUALITY_CMD, this, FXAAQualityBak);
+        EventManager.publish(Event.STEREO_K_CMD, this, stereoKBak);
+        EventManager.publish(Event.STEREO_IPD_CMD, this, stereoIpdBak);
+        EventManager.publish(Event.STEREO_SCREEN_DIST_CMD, this, stereoSdBak);
     }
 
     private void reloadLanguage() {

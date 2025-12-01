@@ -32,14 +32,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Contains utilities to download files and check connections.
+ * Useful utilities that help with downloads and connectivity checks.
  */
 public class DownloadHelper {
     private static final Log logger = Logger.getLogger(DownloadHelper.class);
 
     /** Default timeout is 10 seconds. **/
     private static final int TIMEOUT = 10_000;
-    /** Modificatoin of {@link NetJavaImpl} to never set doInput to false, as we want to read status codes. **/
+    /** Modification of {@link NetJavaImpl} to never set doInput to false, as we want to read status codes. **/
     private static final ModifiedNetJavaImpl net = new ModifiedNetJavaImpl();
 
     /**
