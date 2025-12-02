@@ -31,7 +31,7 @@ if (isnan(u_camUp.x)) {
 } else {
     // Mode REGULAR - optimized
     s_obj = normalize(s_obj_pos);
-    s_right = normalize(cross(u_camUp, s_obj));
+    s_right = normalize(cross(-u_camUp, s_obj));
     s_up = cross(s_obj, s_right);
 }
 
