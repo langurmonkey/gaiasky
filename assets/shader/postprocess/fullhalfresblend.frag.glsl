@@ -31,34 +31,19 @@ void main() {
     vec4 A = texture(u_texture4, v_texCoords);
     float R = texture(u_texture5, v_texCoords).r;
 
-    // Read the opaque background color
-    vec3 C_O = halfRes;
-
-    const float epsilon = 0.0001;
-
-    // 1. Calculate the final opacity of the transparent layer (alpha_T)
-    // The R value is the accumulated weighted (1 - alpha)
-    // We use the total accumulated weighted alpha (A.a) and total revealage (R)
-    // to calculate the final transparency contribution.
-
-    // The 5.0 factor here controls how opaque the layer appears. Lowering it makes it more opaque.
-    float alpha_T = 1.0 - exp(-A.a / 2.0);
-
-    // C_T is the weighted color average
-    vec3 C_T = A.rgb / max(A.a, epsilon);
-
-    // Final Compositing (Transparent over Opaque)
-    halfRes = mix(C_O, C_T, alpha_T);
+    vec4 fullRes4 = vec4(fullRes, 0.0);
+    vec4 halfRes4 = vec4(A.rgb / max(A.a, 1.0e-5), R);
 
     // Recover 'linear' depth values.
     float depthFull = 1.0 / recoverWValue(texture(u_texture2, v_texCoords).r, u_zFarK.x, u_zFarK.y);
     // float depthHalf = 1.0 / recoverWValue(texture(u_texture3, v_texCoords).r, u_zFarK.x, u_zFarK.y);
 
     if (depthFull < 1e5) {
-        fragColor = vec4(fullRes + halfRes, 1.0);
+        fragColor = clamp(fullRes4 + halfRes4, 0.0, 1.0);
     } else {
-        fragColor = vec4(clamp(fullRes + halfRes, 0.0, 1.0), 1.0);
+        fragColor = clamp(fullRes4 + halfRes4, 0.0, 1.0);
     }
+    fragColor = vec4(fullRes + halfRes4.rgb * 10.0, clamp(1.0 + halfRes4.a, 0.0, 1.0));
 
     // if (depthFull < depthHalf) {
     //     // Full-res pixel is closer - use it

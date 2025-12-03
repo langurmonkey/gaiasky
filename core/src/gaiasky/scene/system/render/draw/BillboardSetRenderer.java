@@ -235,8 +235,9 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             GL41.glBlendEquationi(2, GL41.GL_FUNC_ADD);
             GL41.glBlendFuncSeparatei(2, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE);
             // Configure Blending for Revealage RT (Attachment 3)
-            GL41.glBlendEquationi(3, GL41.GL_FUNC_REVERSE_SUBTRACT);
-            GL41.glBlendFuncSeparatei(3, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE);
+            GL41.glBlendEquationi(3, GL41.GL_FUNC_ADD);
+            GL41.glBlendFuncSeparatei(3, GL41.GL_SRC_ALPHA, GL41.GL_ONE_MINUS_SRC_ALPHA, GL41.GL_SRC_ALPHA, GL41.GL_ONE_MINUS_SRC_ALPHA);
+            //GL41.glBlendFuncSeparatei(3, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE);
 
             var offsets = getOffsets(render);
             for (int i = 0; i < offsets.size; i++) {

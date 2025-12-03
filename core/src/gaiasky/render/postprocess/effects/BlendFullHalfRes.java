@@ -23,6 +23,12 @@ public class BlendFullHalfRes extends PostProcessorEffect {
     }
 
     @Override
+    public void updateShaders() {
+        super.updateShaders();
+        filter.updateProgram();
+    }
+
+    @Override
     public void rebind() {
         filter.rebind();
     }

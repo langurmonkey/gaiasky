@@ -25,7 +25,7 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
     private final Vector2 zFarK = new Vector2();
 
     public BlendFullHalfResFilter() {
-        super(ShaderLoader.fromFile("screenspace", "fullhalfresblend"));
+        super("screenspace", "fullhalfresblend");
 
         rebind();
     }
