@@ -36,6 +36,14 @@ public class ParameterValidator {
         this.api = api;
     }
 
+    boolean checkIndex(int value, Object[] array, String name) {
+        if (value < 0 || value > array.length - 1) {
+            logger.error(name + " must be between " + 0 + " and " + (array.length - 1) + ": " + value);
+            return false;
+        }
+        return true;
+    }
+
     boolean checkNum(int value, int min, int max, String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);

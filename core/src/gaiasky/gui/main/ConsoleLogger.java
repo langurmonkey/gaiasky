@@ -208,7 +208,7 @@ public class ConsoleLogger implements IObserver {
                 addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
             }
             case STEREO_PROFILE_CMD ->
-                    addMessage(I18n.msg("notif.stereoscopic.profile", Settings.StereoProfile.values()[(Integer) data[0]].toString()));
+                    addMessage(I18n.msg("notif.stereoscopic.profile", data[0].toString()));
             case FRAME_OUTPUT_CMD -> {
                 boolean activated = (Boolean) data[0];
                 if (activated) {

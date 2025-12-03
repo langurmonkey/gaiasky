@@ -102,6 +102,7 @@ public class KeyBindings {
      * Finds an action given its name
      *
      * @param name The name
+     *
      * @return The action if it exists
      */
     public ProgramAction findAction(String name) {
@@ -118,6 +119,7 @@ public class KeyBindings {
      * If many sets of keys are assigned to the same action, only the first ones are returned.
      *
      * @param actionId The action ID.
+     *
      * @return The keys.
      */
     public TreeSet<Integer> getKeys(String actionId) {
@@ -137,6 +139,7 @@ public class KeyBindings {
      * Gets all the sets of keys that trigger the action identified by the given name.
      *
      * @param actionId The action ID.
+     *
      * @return The list of key sets.
      */
     public List<TreeSet<Integer>> getAllKeys(String actionId) {
@@ -295,49 +298,64 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.orbits", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits")));
 
         // Toggle planets
-        addAction(new ProgramAction("action.toggle/element.planets", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.planets")));
+        addAction(new ProgramAction("action.toggle/element.planets",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.planets")));
 
         // Toggle moons
         addAction(new ProgramAction("action.toggle/element.moons", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.moons")));
 
         // Toggle stars
-        addAction(new ProgramAction("action.toggle/element.stars", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.stars"), noGameCondition));
+        addAction(new ProgramAction("action.toggle/element.stars",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.stars"),
+                                    noGameCondition));
 
         // Toggle satellites
-        addAction(new ProgramAction("action.toggle/element.satellites", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.satellites")));
+        addAction(new ProgramAction("action.toggle/element.satellites",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.satellites")));
 
         // Toggle asteroids
-        addAction(new ProgramAction("action.toggle/element.asteroids", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.asteroids"), noGameCondition));
+        addAction(new ProgramAction("action.toggle/element.asteroids",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.asteroids"),
+                                    noGameCondition));
 
         // Toggle labels
         addAction(new ProgramAction("action.toggle/element.labels", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels")));
 
         // Toggle constellations
-        addAction(new ProgramAction("action.toggle/element.constellations", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.constellations"), noGameCondition));
+        addAction(new ProgramAction("action.toggle/element.constellations",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.constellations"),
+                                    noGameCondition));
 
         // Toggle boundaries
-        addAction(new ProgramAction("action.toggle/element.boundaries", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.boundaries")));
+        addAction(new ProgramAction("action.toggle/element.boundaries",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.boundaries")));
 
         // Toggle equatorial
-        addAction(new ProgramAction("action.toggle/element.equatorial", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.equatorial")));
+        addAction(new ProgramAction("action.toggle/element.equatorial",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.equatorial")));
 
         // Toggle ecliptic
-        addAction(new ProgramAction("action.toggle/element.ecliptic", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.ecliptic")));
+        addAction(new ProgramAction("action.toggle/element.ecliptic",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.ecliptic")));
 
         // Toggle galactic
-        addAction(new ProgramAction("action.toggle/element.galactic", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.galactic")));
+        addAction(new ProgramAction("action.toggle/element.galactic",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.galactic")));
 
         // Toggle recgrid
-        addAction(new ProgramAction("action.toggle/element.recursivegrid", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.recursivegrid")));
+        addAction(new ProgramAction("action.toggle/element.recursivegrid",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.recursivegrid")));
 
         // Toggle meshes
         addAction(new ProgramAction("action.toggle/element.meshes", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.meshes")));
 
         // Toggle clusters
-        addAction(new ProgramAction("action.toggle/element.clusters", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.clusters")));
+        addAction(new ProgramAction("action.toggle/element.clusters",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.clusters")));
 
         // Toggle keyframes
-        addAction(new ProgramAction("action.toggle/element.keyframes", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.keyframes")));
+        addAction(new ProgramAction("action.toggle/element.keyframes",
+                                    () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.keyframes")));
 
         // Divide time warp
         addAction(new ProgramAction("action.dividetime", () -> EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this), 500L));
@@ -356,10 +374,14 @@ public class KeyBindings {
         }));
 
         // Increase field of view
-        addAction(new ProgramAction("action.incfov", () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov + 1f), noSlaveProj));
+        addAction(new ProgramAction("action.incfov",
+                                    () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov + 1f),
+                                    noSlaveProj));
 
         // Decrease field of view
-        addAction(new ProgramAction("action.decfov", () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov - 1f), noSlaveProj));
+        addAction(new ProgramAction("action.decfov",
+                                    () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov - 1f),
+                                    noSlaveProj));
 
         // Fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {
@@ -368,16 +390,26 @@ public class KeyBindings {
         }));
 
         // Take screenshot
-        addAction(new ProgramAction("action.screenshot", () -> EventManager.publish(Event.SCREENSHOT_CMD, this, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1], Settings.settings.screenshot.location)));
+        addAction(new ProgramAction("action.screenshot",
+                                    () -> EventManager.publish(Event.SCREENSHOT_CMD,
+                                                               this,
+                                                               Settings.settings.screenshot.resolution[0],
+                                                               Settings.settings.screenshot.resolution[1],
+                                                               Settings.settings.screenshot.location)));
 
         // Save cubemap faces
-        addAction(new ProgramAction("action.screenshot.cubemap", () -> EventManager.publish(Event.SCREENSHOT_CUBEMAP_CMD, this, Settings.settings.screenshot.location)));
+        addAction(new ProgramAction("action.screenshot.cubemap",
+                                    () -> EventManager.publish(Event.SCREENSHOT_CUBEMAP_CMD, this, Settings.settings.screenshot.location)));
 
         // Toggle frame output
-        addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.publish(Event.FRAME_OUTPUT_CMD, this, !Settings.settings.frame.active)));
+        addAction(new ProgramAction("action.toggle/element.frameoutput",
+                                    () -> EventManager.publish(Event.FRAME_OUTPUT_CMD, this, !Settings.settings.frame.active)));
 
         // Toggle UI collapse/expand
-        addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.publish(Event.GUI_FOLD_CMD, this), fullGuiCondition, noCleanMode));
+        addAction(new ProgramAction("action.toggle/element.controls",
+                                    () -> EventManager.publish(Event.GUI_FOLD_CMD, this),
+                                    fullGuiCondition,
+                                    noCleanMode));
 
         // Toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
@@ -441,20 +473,26 @@ public class KeyBindings {
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // Toggle particle fade
-        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, !Settings.settings.scene.octree.fade)));
+        addAction(new ProgramAction("action.toggle/element.octreeparticlefade",
+                                    () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, !Settings.settings.scene.octree.fade)));
 
         // Toggle stereoscopic mode
-        addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active)));
+        addAction(new ProgramAction("action.toggle/element.stereomode",
+                                    () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active)));
 
         // Switch stereoscopic profile
         addAction(new ProgramAction("action.switchstereoprofile", () -> {
             int newidx = Settings.settings.program.modeStereo.profile.ordinal();
             newidx = (newidx + 1) % values().length;
-            EventManager.publish(Event.STEREO_PROFILE_CMD, this, newidx);
+            EventManager.publish(Event.STEREO_PROFILE_CMD, this, values()[newidx]);
         }));
 
         // Toggle clean (no GUI) mode
-        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.publish(Event.DISPLAY_GUI_CMD, this, !Settings.settings.runtime.displayGui, I18n.msg("notif.cleanmode"))));
+        addAction(new ProgramAction("action.toggle/element.cleanmode",
+                                    () -> EventManager.publish(Event.DISPLAY_GUI_CMD,
+                                                               this,
+                                                               !Settings.settings.runtime.displayGui,
+                                                               I18n.msg("notif.cleanmode"))));
 
         // Travel to focus object
         addAction(new ProgramAction("action.gotoobject", () -> EventManager.publish(Event.GO_TO_OBJECT_CMD, this)));
@@ -466,28 +504,41 @@ public class KeyBindings {
         addAction(new ProgramAction("action.home", () -> EventManager.publish(Event.HOME_CMD, this)));
 
         // Expand/collapse time pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.time", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "TimeComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.time",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "TimeComponent"),
+                                    noCleanMode));
 
         // Expand/collapse camera pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.camera", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "CameraComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.camera",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "CameraComponent"),
+                                    noCleanMode));
 
         // Expand/collapse visibility pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.visibility", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisibilityComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.visibility",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisibilityComponent"),
+                                    noCleanMode));
 
         // Expand/collapse visual effects pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisualSettingsComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisualSettingsComponent"),
+                                    noCleanMode));
 
         // Expand/collapse datasets pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.dataset.title", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "DatasetsComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.dataset.title",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "DatasetsComponent"),
+                                    noCleanMode));
 
         // Expand/collapse bookmarks pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.bookmarks", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "BookmarksComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.bookmarks",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "BookmarksComponent"),
+                                    noCleanMode));
 
         // Toggle mouse capture
         addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.publish(Event.MOUSE_CAPTURE_TOGGLE, this)));
 
         // Reload UI (debugging)
-        addAction(new ProgramAction("action.ui.reload", () -> EventManager.publish(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources())));
+        addAction(new ProgramAction("action.ui.reload",
+                                    () -> EventManager.publish(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources())));
 
         // Re-compile post-process shaders (debugging)
         addAction(new ProgramAction("action.shaders.reload", () -> EventManager.publish(Event.SHADER_RELOAD_CMD, this)));
@@ -508,7 +559,8 @@ public class KeyBindings {
         }));
 
         // Toggle cinematic camera behaviour
-        addAction(new ProgramAction("action.toggle/camera.cinematic", () -> EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, !Settings.settings.scene.camera.cinematic)));
+        addAction(new ProgramAction("action.toggle/camera.cinematic",
+                                    () -> EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, !Settings.settings.scene.camera.cinematic)));
 
         // Empty action, press to speed up camera
         addAction(new ProgramAction("action.camera.speedup", () -> {
@@ -586,7 +638,9 @@ public class KeyBindings {
      * @param backup Whether to create a backup of dst if it exists.
      */
     private void overwriteMappingsFile(Path src, Path dst, boolean backup) {
-        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : I18n.msg("error.file.exists.readable", src != null ? src.getFileName().toString() : "null");
+        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : I18n.msg("error.file.exists.readable",
+                                                                                                                  src != null ? src.getFileName()
+                                                                                                                          .toString() : "null");
         assert dst != null : I18n.msg("notif.null.not", "dest");
         if (backup && dst.toFile().exists() && dst.toFile().canRead()) {
             Date date = Calendar.getInstance().getTime();
@@ -608,7 +662,10 @@ public class KeyBindings {
             Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
             logger.info(I18n.msg("notif.file.update", dst.toString()));
             if (backup) {
-                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.file.overriden.backup", dst.toString()), -1f);
+                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION,
+                                                      this,
+                                                      I18n.msg("notif.file.overriden.backup", dst.toString()),
+                                                      -1f);
             } else {
                 EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.file.overriden", dst.toString()), -1f);
             }

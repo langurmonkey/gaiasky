@@ -169,7 +169,9 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public void set_stereo_profile(int index) {
-        api.base.post_runnable(() -> em.post(Event.STEREO_PROFILE_CMD, this, index));
+        var profiles = Settings.StereoProfile.values();
+        api.validator.checkIndex(index, profiles, "profile index");
+        api.base.post_runnable(() -> em.post(Event.STEREO_PROFILE_CMD, this, profiles[index]));
     }
 
     @Override

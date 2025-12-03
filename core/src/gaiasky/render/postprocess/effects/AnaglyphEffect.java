@@ -14,43 +14,52 @@ import gaiasky.render.postprocess.filters.AnaglyphFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
 public final class AnaglyphEffect extends PostProcessorEffect {
-    private final AnaglyphFilter anaglyphFilter;
+    private final AnaglyphFilter filter;
 
     public AnaglyphEffect() {
-        anaglyphFilter = new AnaglyphFilter();
-        disposables.add(anaglyphFilter);
+        filter = new AnaglyphFilter();
+        disposables.add(filter);
     }
 
     @Override
     public void rebind() {
-        anaglyphFilter.rebind();
+        filter.rebind();
     }
 
     public void setTextureLeft(Texture tex) {
-        anaglyphFilter.setTextureLeft(tex);
+        filter.setTextureLeft(tex);
+    }
+
+    @Override
+    public void updateShaders() {
+        super.updateShaders();
+        filter.updateProgram();
     }
 
     public void setTextureRight(Texture tex) {
-        anaglyphFilter.setTextureRight(tex);
+        filter.setTextureRight(tex);
     }
 
     /**
-     * Sets the mode:
-     * <ul>
-     *     <li>0 - red/blue</li>
-     *     <li>1 - red/cyan</li>
-     * </ul>
+     * Sets the Anaglyph mode:
+     * <ol start="0">
+     *     <li>red/cyan</li>
+     *     <li>red/cyan Dubois</li>
+     *     <li>amber/blue</li>
+     *     <li>amber/blue Dubois</li>
+     *     <li>red/blue</li>
+     * </ol>
      *
      * @param mode The mode.
      */
     public void setAnaglyphMode(int mode) {
-        anaglyphFilter.setAnaglyphMode(mode);
+        filter.setAnaglyphMode(mode);
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
-        anaglyphFilter.setInput(src).setOutput(dest).render();
+        filter.setInput(src).setOutput(dest).render();
     }
 
 }

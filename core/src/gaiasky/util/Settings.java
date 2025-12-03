@@ -503,11 +503,23 @@ public class Settings extends SettingsObject {
          **/
         PARALLEL_VIEW,
         /**
-         * Red-cyan anaglyph 3D mode
+         * Anaglyph red-cyan
          **/
         ANAGLYPH_RED_CYAN,
         /**
-         * Red-blue anaglyph 3D mode
+         * Anaglyph red-cyan Dubois
+         **/
+        ANAGLYPH_RED_CYAN_DUBOIS,
+        /**
+         * Anaglyph amber-blue
+         */
+        ANAGLYPH_AMBER_BLUE,
+        /**
+         * Anaglyph amber-blue Dubois-style
+         */
+        ANAGLYPH_AMBER_BLUE_DUBOIS,
+        /**
+         * Anaglyph red-blue
          **/
         ANAGLYPH_RED_BLUE;
 
@@ -524,25 +536,15 @@ public class Settings extends SettingsObject {
         }
 
         public boolean isAnaglyph() {
-            return this.equals(ANAGLYPH_RED_BLUE) || this.equals(ANAGLYPH_RED_CYAN);
-        }
-
-        public boolean isAnaglyphRedCyan() {
-            return this.equals(ANAGLYPH_RED_CYAN);
-        }
-
-        public boolean isAnaglyphRedBlue() {
-            return this.equals(ANAGLYPH_RED_BLUE);
+            return this.equals(ANAGLYPH_RED_BLUE)
+                    || this.equals(ANAGLYPH_RED_CYAN)
+                    || this.equals(ANAGLYPH_RED_CYAN_DUBOIS)
+                    || this.equals(ANAGLYPH_AMBER_BLUE)
+                    || this.equals(ANAGLYPH_AMBER_BLUE_DUBOIS);
         }
 
         public int getAnaglyphModeInteger() {
-            if (isAnaglyphRedBlue()) {
-                return 0;
-            } else if (isAnaglyphRedCyan()) {
-                return 1;
-            } else {
-                return 1;
-            }
+            return MathUtilsDouble.clamp(this.ordinal() - ANAGLYPH_RED_CYAN.ordinal(), 0, 4);
         }
 
         public boolean correctAspect() {
@@ -2453,7 +2455,7 @@ public class Settings extends SettingsObject {
                             EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                         }
                     }
-                    case STEREO_PROFILE_CMD -> modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
+                    case STEREO_PROFILE_CMD -> modeStereo.profile = (StereoProfile) data[0];
                     case CUBEMAP_CMD -> {
                         modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openXr;
                         if (modeCubemap.active) {
@@ -2632,7 +2634,7 @@ public class Settings extends SettingsObject {
             // Those need to run in the main thread, as they may need the OpenGL context.
             GaiaSky.postRunnable(() -> {
                 EventManager.publish(Event.STEREOSCOPIC_CMD, this, modeStereo.active);
-                EventManager.publish(Event.STEREO_PROFILE_CMD, this, modeStereo.profile.ordinal());
+                EventManager.publish(Event.STEREO_PROFILE_CMD, this, modeStereo.profile);
                 EventManager.publish(Event.CUBEMAP_CMD, this, modeCubemap.active, modeCubemap.projection);
                 EventManager.publish(Event.MINIMAP_DISPLAY_CMD, this, minimap.active);
 

@@ -100,7 +100,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         aux4d = new Vector3D();
         aux5d = new Vector3D();
 
-        EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE);
+        EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.SHADER_RELOAD_CMD);
     }
 
     public void updateAnaglyphMode() {
@@ -445,6 +445,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
             case SCREENSHOT_SIZE_UPDATE, FRAME_SIZE_UPDATE -> GaiaSky.postRunnable(this::clearFrameBufferMap);
+            case SHADER_RELOAD_CMD -> GaiaSky.postRunnable(anaglyphEffect::updateShaders);
             default -> {
             }
         }

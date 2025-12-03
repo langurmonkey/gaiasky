@@ -13,10 +13,19 @@ import gaiasky.render.util.ShaderLoader;
 public final class AnaglyphFilter extends Filter<AnaglyphFilter> {
 
     private Texture textureLeft, textureRight;
+    /**
+     * <ol start="0">
+     *     <li>red/cyan</li>
+     *     <li>red/cyan Dubois</li>
+     *     <li>amber/blue</li>
+     *     <li>amber/blue Dubois</li>
+     *     <li>red/blue</li>
+     * </ol>
+     */
     private int anaglyphMode;
 
     public AnaglyphFilter() {
-        super(ShaderLoader.fromFile("screenspace", "anaglyphic"));
+        super("screenspace", "anaglyph");
         rebind();
     }
 

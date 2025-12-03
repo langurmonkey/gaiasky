@@ -1042,7 +1042,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
             case STEREO_PROFILE_CMD -> {
                 if (!Settings.settings.runtime.openXr)
-                    updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
+                    updateStereo(Settings.settings.program.modeStereo.active, (StereoProfile) data[0]);
             }
             case ANTIALIASING_CMD -> {
                 final AntialiasType antiAliasingValue = (AntialiasType) data[0];
