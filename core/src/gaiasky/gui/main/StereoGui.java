@@ -13,7 +13,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
@@ -27,7 +27,9 @@ import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.scene2d.OwnSelectBox;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
+import gaiasky.util.scene2d.OwnTextIconButton;
 
 import java.text.DecimalFormat;
 
@@ -38,8 +40,9 @@ public class StereoGui extends AbstractGui {
     private final Skin skin;
 
     protected NotificationsInterface notificationsOne, notificationsTwo;
-    protected Container<Button> buttonContainer;
-    protected Button back;
+    protected HorizontalGroup bottomLayout;
+    protected OwnSelectBox<StereoProfile> profile;
+    protected Button backButton;
     protected CustomInterface customInterface;
 
     protected DecimalFormat nf;
@@ -92,23 +95,40 @@ public class StereoGui extends AbstractGui {
         interfaces.add(notificationsTwo);
 
         // Back to normal mode - Bottom right
-        float bw = 48f, bh = 48f;
         KeyBindings kb = KeyBindings.instance;
 
-        buttonContainer = new Container<>();
-        back = new OwnImageButton(skin, "sc-exit");
-        back.setSize(bw, bh);
-        back.setName("exit stereo mode");
-        back.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.stereo.notice.back"), kb.getStringKeys("action.toggle/element.stereomode", true), skin));
-        back.addListener(event -> {
+        // Stereo profile
+        profile = new OwnSelectBox<>(skin);
+        profile.setItems(StereoProfile.values());
+        profile.setSelected(Settings.settings.program.modeStereo.profile);
+        profile.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.STEREO_PROFILE_CMD, profile, profile.getSelected());
+            }
+            return false;
+        });
+
+
+        // Go back button
+        backButton = new OwnTextIconButton(I18n.msg("gui.back"), skin, "back");
+        backButton.setName("exit stereo mode");
+        backButton.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.stereo.notice.back"),
+                                                        kb.getStringKeys("action.toggle/element.stereomode", true),
+                                                        skin));
+        backButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active);
             }
             return false;
         });
-        buttonContainer.setActor(back);
-        buttonContainer.setFillParent(true);
-        buttonContainer.bottom().right().pad(0, 0, 5, 5);
+
+        // Bottom layout
+        bottomLayout = new HorizontalGroup();
+        bottomLayout.space(20f);
+        bottomLayout.addActor(backButton);
+        bottomLayout.addActor(profile);
+        bottomLayout.setFillParent(true);
+        bottomLayout.bottom().left().pad(0, 5, 5, 0);
 
         // CUSTOM MESSAGES
         customInterface = new CustomInterface(stage, skin, lock);
@@ -129,8 +149,8 @@ public class StereoGui extends AbstractGui {
             if (notificationsTwo != null) {
                 stage.addActor(notificationsTwo);
             }
-            if (buttonContainer != null) {
-                stage.addActor(buttonContainer);
+            if (bottomLayout != null) {
+                stage.addActor(bottomLayout);
             }
 
         }
@@ -160,8 +180,12 @@ public class StereoGui extends AbstractGui {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.STEREO_PROFILE_CMD) {
-            StereoProfile profile = StereoProfile.values()[(Integer) data[0]];
-            notificationsTwo.setVisible(!profile.isAnaglyph());
+            StereoProfile newProfile = (StereoProfile) data[0];
+            notificationsTwo.setVisible(!newProfile.isAnaglyph());
+
+            if (source != profile) {
+                profile.setSelected(newProfile);
+            }
         }
     }
 
