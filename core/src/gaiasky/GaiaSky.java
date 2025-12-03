@@ -1504,7 +1504,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             }
             case CAMERA_MODE_CMD -> { // Register/unregister GUI.
                 final var mode = (CameraMode) data[0];
-                if (settings.program.modeStereo.isEnabled()) {
+                if (settings.program.modeStereo.active) {
                     guiRegistry.change(stereoGui);
                 } else if (mode == CameraMode.SPACECRAFT_MODE) {
                     guiRegistry.change(spacecraftGui);
