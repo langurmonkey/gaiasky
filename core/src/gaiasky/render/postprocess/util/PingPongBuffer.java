@@ -8,14 +8,14 @@
 package gaiasky.render.postprocess.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 import gaiasky.util.Settings;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.*;
 
 public final class PingPongBuffer implements Disposable {
     public final boolean ownResources;
@@ -43,11 +43,13 @@ public final class PingPongBuffer implements Disposable {
 
         // BUFFERS (FULL- and HALF-RES) USED FOR THE ACTUAL RENDERING:
         // n RENDER TARGETS:
-        //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (SCENE)
-        //      1: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NON_SCENE: labels, lines, grids)
-        //      2: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
-        //      3: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
-        //      4: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
+        //      0: COLOR 0  - FLOAT TEXTURE ATTACHMENT (SCENE)
+        //      1: COLOR 1  - FLOAT TEXTURE ATTACHMENT (NON_SCENE: labels, lines, grids)
+        //      2: ACCUM    - RGBA16F WBOIT
+        //      3: REVELAGE - R16_UNORM WBOIT
+        //      4: COLOR 2  - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
+        //      5: COLOR 3  - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
+        //      6: DEPTH    - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
         ownedFull = createMainFrameBuffer(width,
                                           height,
                                           hasDepth,
@@ -86,7 +88,7 @@ public final class PingPongBuffer implements Disposable {
                                                            boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
-        int colorIndex, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+        int colorIndex, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1, accumIndex = -1, revelageIndex = -1;
         int idx = 0;
 
         // 0
@@ -100,20 +102,30 @@ public final class PingPongBuffer implements Disposable {
         layerIndex = idx++;
 
         // 2
+        // Accumulation buffer.
+        addFloatRenderTarget(frameBufferBuilder, GL41.GL_RGBA16F);
+        accumIndex = idx++;
+
+        // 3
+        // Revealage buffer. Unsigned float buffer.
+        frameBufferBuilder.addColorTextureAttachment(GL41.GL_R8, GL41.GL_RED, GL41.GL_UNSIGNED_BYTE);
+        revelageIndex = idx++;
+
+        // 4
         // Normal buffer.
         if (hasNormal) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             normalIndex = idx++;
         }
 
-        // 3
+        // 5
         // Reflection mask buffer.
         if (hasReflectionMask) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             reflectionMaskIndex = idx++;
         }
 
-        // 4
+        // 6
         // Depth buffer.
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
@@ -122,7 +134,7 @@ public final class PingPongBuffer implements Disposable {
             }
         }
 
-        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, layerIndex, normalIndex, reflectionMaskIndex);
+        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, layerIndex, accumIndex, revelageIndex, normalIndex, reflectionMaskIndex);
 
     }
 

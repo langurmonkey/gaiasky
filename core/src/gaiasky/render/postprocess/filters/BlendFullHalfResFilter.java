@@ -14,7 +14,12 @@ import gaiasky.render.util.ShaderLoader;
 
 public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter> {
 
+    private static final int u_texture4 = 4;
+    private static final int u_texture5 = 5;
+
     private Texture half = null;
+    private Texture halfAccum = null;
+    private Texture halfReveal = null;
     private Texture fullDepth = null;
     private Texture halfDepth = null;
     private final Vector2 zFarK = new Vector2();
@@ -28,6 +33,8 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
     public BlendFullHalfResFilter setInput(GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         this.inputTexture = full.getColorBufferTexture();
         this.half = half.getColorBufferTexture();
+        this.halfAccum = half.getAccumulationBufferTexture();
+        this.halfReveal = half.getRevealageBufferTexture();
         this.fullDepth = full.getDepthBufferTexture();
         this.halfDepth = half.getDepthBufferTexture();
         return this;
@@ -45,6 +52,8 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
         setParams(Param.Half, u_texture1);
         setParams(Param.FullDepth, u_texture2);
         setParams(Param.HalfDepth, u_texture3);
+        setParams(Param.HalfAccum, u_texture4);
+        setParams(Param.HalfReveal, u_texture5);
         setParams(Param.ZFarK, zFarK);
         endParams();
     }
@@ -55,6 +64,8 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
         half.bind(u_texture1);
         fullDepth.bind(u_texture2);
         halfDepth.bind(u_texture3);
+        halfAccum.bind(u_texture4);
+        halfReveal.bind(u_texture5);
     }
 
     public enum Param implements Parameter {
@@ -63,6 +74,8 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
         Half("u_texture1", 0),
         FullDepth("u_texture2", 0),
         HalfDepth("u_texture3", 0),
+        HalfAccum("u_texture4", 0),
+        HalfReveal("u_texture5", 0),
         ZFarK("u_zFarK", 2);
         // @formatter:on
 

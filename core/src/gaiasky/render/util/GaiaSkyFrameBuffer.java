@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 public class GaiaSkyFrameBuffer extends FrameBuffer {
 
     // Indices for all buffers
-    private int colorIndex = -1, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+    private int colorIndex = -1, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1, accumIndex = -1, revealageIndex = -1;
 
     /**
      * Creates a buffer. Contains the builder and the indices for color, depth, layer, normal and reflection mask buffers.
@@ -32,44 +32,41 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
         if (indices.length > 2)
             layerIndex = indices[2];
         if (indices.length > 3)
-            normalIndex = indices[3];
+            accumIndex = indices[3];
         if (indices.length > 4)
-            reflectionMaskIndex = indices[4];
+            revealageIndex = indices[4];
+        if (indices.length > 5)
+            normalIndex = indices[5];
+        if (indices.length > 6)
+            reflectionMaskIndex = indices[6];
     }
 
     public Texture getColorBufferTexture() {
-        if (colorIndex >= 0)
-            return textureAttachments.get(colorIndex);
-        else
-            return null;
+        return getTextureAttachment(colorIndex);
     }
 
     public Texture getDepthBufferTexture() {
-        if (depthIndex >= 0)
-            return textureAttachments.get(depthIndex);
-        else
-            return null;
+        return getTextureAttachment(depthIndex);
     }
 
     public Texture getLayerBufferTexture() {
-        if (layerIndex >= 0)
-            return textureAttachments.get(layerIndex);
-        else
-            return null;
+        return getTextureAttachment(layerIndex);
     }
 
     public Texture getNormalBufferTexture() {
-        if (normalIndex >= 0)
-            return textureAttachments.get(normalIndex);
-        else
-            return null;
+        return getTextureAttachment(normalIndex);
     }
 
     public Texture getReflectionMaskBufferTexture() {
-        if (reflectionMaskIndex >= 0)
-            return textureAttachments.get(reflectionMaskIndex);
-        else
-            return null;
+        return getTextureAttachment(reflectionMaskIndex);
+    }
+
+    public Texture getAccumulationBufferTexture() {
+        return getTextureAttachment(accumIndex);
+    }
+
+    public Texture getRevealageBufferTexture() {
+        return getTextureAttachment(revealageIndex);
     }
 
     public Texture getTextureAttachment(int index) {

@@ -57,6 +57,7 @@ import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL40;
+import org.lwjgl.opengl.GL41;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -501,10 +502,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
+    private final float[] clearColorAccum = new float[]{0.0f, 0.0f, 0.0f, 0.0f};
+    private final float[] clearColorReveal = new float[]{1.0f};
     public void clearScreen() {
-        Gdx.gl.glClearColor(0, 0, 0, 0);
+        GL41.glClearColor(0, 0, 0, 0);
         GL32.glClearDepth(1000000.0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        // Clear accumulation buffer
+        GL41.glClearBufferfv(GL30.GL_COLOR, 2, clearColorAccum);
+        // Clear revealage buffer
+        GL41.glClearBufferfv(GL30.GL_COLOR, 3, clearColorReveal);
     }
 
     /**
