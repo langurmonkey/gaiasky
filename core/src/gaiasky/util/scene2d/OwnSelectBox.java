@@ -16,6 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Null;
 
+/**
+ * A better select box, with a proven size, and exposing a programmatic change events setter.
+ *
+ * @param <T> The type of elements to hold.
+ */
 public class OwnSelectBox<T> extends SelectBox<T> {
 
     private float ownWidth = 0f, ownHeight = 0f;
@@ -30,6 +35,10 @@ public class OwnSelectBox<T> extends SelectBox<T> {
 
     public OwnSelectBox(Skin skin) {
         super(skin.get(OwnSelectBoxStyle.class));
+    }
+
+    public void setProgrammaticChangeEvents(boolean programmaticChangeEvents) {
+        getSelection().setProgrammaticChangeEvents(programmaticChangeEvents);
     }
 
     @Override
@@ -85,7 +94,7 @@ public class OwnSelectBox<T> extends SelectBox<T> {
         }
 
         public OwnSelectBoxStyle(BitmapFont font, Color fontColor, @Null Drawable background, ScrollPaneStyle scrollStyle,
-                ListStyle listStyle) {
+                                 ListStyle listStyle) {
             super(font, fontColor, background, scrollStyle, listStyle);
         }
 

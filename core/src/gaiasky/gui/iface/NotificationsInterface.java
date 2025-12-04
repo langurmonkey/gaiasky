@@ -349,7 +349,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                     boolean displayGui = (Boolean) data[0];
                     addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
                 }
-                case STEREO_PROFILE_CMD -> addMessage(I18n.msg("notif.stereoscopic.profile", data[0].toString()));
+                case STEREO_PROFILE_CMD -> addMessage(I18n.msg("notif.stereoscopic.profile", ((StereoProfile)data[0]).localizedName()));
                 case FRAME_OUTPUT_CMD -> {
                     boolean activated = (Boolean) data[0];
                     if (activated) {

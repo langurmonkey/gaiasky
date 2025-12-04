@@ -213,7 +213,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             float unitsPerPixel = GaiaSky.instance.getUnitsPerPixel();
             boolean stretch = Settings.settings.program.modeStereo.profile == StereoProfile.HORIZONTAL_3DTV || Settings.settings.program.modeStereo.profile == StereoProfile.VERTICAL_3DTV;
-            boolean changeSides = Settings.settings.program.modeStereo.profile == StereoProfile.CROSSEYE;
+            boolean changeSides = Settings.settings.program.modeStereo.profile == StereoProfile.CROSS_EYE;
 
             if (Settings.settings.program.modeStereo.profile.isHorizontal()) {
                 if (stretch) {

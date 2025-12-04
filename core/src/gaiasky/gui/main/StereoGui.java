@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.gui.iface.CustomInterface;
 import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -41,7 +42,7 @@ public class StereoGui extends AbstractGui {
 
     protected NotificationsInterface notificationsOne, notificationsTwo;
     protected HorizontalGroup bottomLayout;
-    protected OwnSelectBox<StereoProfile> profile;
+    protected OwnSelectBox<ComboBoxBean<StereoProfile>> profile;
     protected Button backButton;
     protected CustomInterface customInterface;
 
@@ -99,11 +100,12 @@ public class StereoGui extends AbstractGui {
 
         // Stereo profile
         profile = new OwnSelectBox<>(skin);
-        profile.setItems(StereoProfile.values());
-        profile.setSelected(Settings.settings.program.modeStereo.profile);
+
+        profile.setItems(ComboBoxBean.getValues(StereoProfile.class));
+        profile.setSelectedIndex(Settings.settings.program.modeStereo.profile.ordinal());
         profile.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STEREO_PROFILE_CMD, profile, profile.getSelected());
+                EventManager.publish(Event.STEREO_PROFILE_CMD, profile, profile.getSelected().value);
             }
             return false;
         });
@@ -184,7 +186,9 @@ public class StereoGui extends AbstractGui {
             notificationsTwo.setVisible(!newProfile.isAnaglyph());
 
             if (source != profile) {
-                profile.setSelected(newProfile);
+                profile.setProgrammaticChangeEvents(false);
+                profile.setSelectedIndex(newProfile.ordinal());
+                profile.setProgrammaticChangeEvents(true);
             }
         }
     }

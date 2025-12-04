@@ -7,16 +7,18 @@
 
 package gaiasky.gui.beans;
 
-public class ComboBoxBean {
+import gaiasky.util.LocalizedEnum;
+
+/**
+ * A generic combo box bean.
+ *
+ * @param <T> The type of the value.
+ */
+public class ComboBoxBean<T> {
     public String name;
-    public int value;
+    public T value;
 
-    public ComboBoxBean(String name) {
-        super();
-        this.name = name;
-    }
-
-    public ComboBoxBean(String name, int value) {
+    public ComboBoxBean(String name, T value) {
         super();
         this.name = name;
         this.value = value;
@@ -25,6 +27,15 @@ public class ComboBoxBean {
     @Override
     public String toString() {
         return name;
+    }
+
+    public static <T extends Enum<T> & LocalizedEnum> ComboBoxBean<T>[] getValues(Class<T> c) {
+        T[] values = c.getEnumConstants();
+        ComboBoxBean<T>[] result = new ComboBoxBean[values.length];
+        for (int i = 0; i < values.length; i++) {
+            result[i] = new ComboBoxBean<>(values[i].localizedName(), values[i]);
+        }
+        return result;
     }
 
 }

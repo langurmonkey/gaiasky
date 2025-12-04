@@ -108,7 +108,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> graphicsQuality, antiAlias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
+    private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect, textureIndex;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
@@ -585,10 +585,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             var graphicsQualityLabel = new OwnLabel(I18n.msg("gui.gquality"), skin);
             graphicsQualityLabel.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
 
-            ComboBoxBean[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
+            ComboBoxBean<Integer>[] gqs = new ComboBoxBean[GraphicsQuality.values().length];
             int i = 0;
             for (GraphicsQuality q : GraphicsQuality.values()) {
-                gqs[i] = new ComboBoxBean(I18n.msg(q.key), q.ordinal());
+                gqs[i] = new ComboBoxBean<Integer>(I18n.msg(q.key), q.ordinal());
                 i++;
             }
             graphicsQuality = new OwnSelectBox<>(skin);
@@ -597,7 +597,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             graphicsQuality.setSelected(gqs[settings.graphics.quality.ordinal()]);
             graphicsQuality.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    ComboBoxBean s = graphicsQuality.getSelected();
+                    ComboBoxBean<Integer> s = graphicsQuality.getSelected();
                     GraphicsQuality gq = GraphicsQuality.values()[s.value];
                     if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent(Constants.HI_RES_TEXTURES_DATASET_KEY)) && (gq.isHigh()
                             || gq.isUltra())) {
@@ -1258,7 +1258,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // Texture index
             OwnLabel textureIndexLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.texture"), skin);
             var indexList = settings.scene.star.getStarTextureIndices();
-            var indices = new Array<ComboBoxBean>(indexList.size);
+            var indices = new Array<ComboBoxBean<Integer>>(indexList.size);
             ComboBoxBean selected = null;
             for (int y = 0; y < indexList.size; y++) {
                 var idx = indexList.get(y);
@@ -2043,8 +2043,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Mode
         OwnLabel ssModeLabel = new OwnLabel(I18n.msg("gui.screenshots.mode"), skin);
-        ComboBoxBean[] screenshotModes = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.screenshots.mode.simple"), 0),
-                new ComboBoxBean(I18n.msg("gui.screenshots.mode.redraw"), 1)};
+        ComboBoxBean<Integer>[] screenshotModes = new ComboBoxBean[]{new ComboBoxBean<Integer>(I18n.msg("gui.screenshots.mode.simple"), 0),
+                new ComboBoxBean<Integer>(I18n.msg("gui.screenshots.mode.redraw"), 1)};
         screenshotMode = new OwnSelectBox<>(skin);
         screenshotMode.setItems(screenshotModes);
         screenshotMode.setWidth(selectWidth);
@@ -3070,7 +3070,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.graphics.resolution[1] = Integer.parseInt(heightField.getText());
 
         // Graphics
-        ComboBoxBean bean = graphicsQuality.getSelected();
+        ComboBoxBean<Integer> bean = graphicsQuality.getSelected();
         boolean restartDialog = settings.graphics.quality.ordinal() != bean.value;
         if (settings.graphics.quality.ordinal() != bean.value) {
             settings.graphics.quality = GraphicsQuality.values()[bean.value];

@@ -481,7 +481,7 @@ public class Settings extends SettingsObject {
         }
     }
 
-    public enum StereoProfile {
+    public enum StereoProfile implements LocalizedEnum {
         /**
          * Left image -> left eye, distortion
          **/
@@ -497,7 +497,7 @@ public class Settings extends SettingsObject {
         /**
          * Left image -> right eye, no distortion
          **/
-        CROSSEYE,
+        CROSS_EYE,
         /**
          * Left image -> left eye, no distortion
          **/
@@ -524,7 +524,7 @@ public class Settings extends SettingsObject {
         ANAGLYPH_RED_BLUE;
 
         public boolean isHorizontal() {
-            return this.equals(VR_HEADSET) || this.equals(HORIZONTAL_3DTV) || this.equals(CROSSEYE) || this.equals(PARALLEL_VIEW);
+            return this.equals(VR_HEADSET) || this.equals(HORIZONTAL_3DTV) || this.equals(CROSS_EYE) || this.equals(PARALLEL_VIEW);
         }
 
         public boolean isVertical() {
@@ -549,6 +549,10 @@ public class Settings extends SettingsObject {
 
         public boolean correctAspect() {
             return !this.equals(HORIZONTAL_3DTV) && !this.isAnaglyph();
+        }
+
+        public String localizedName() {
+           return I18n.get("gui.stereo.profile." + name().toLowerCase(Locale.ROOT));
         }
     }
 
@@ -2845,7 +2849,9 @@ public class Settings extends SettingsObject {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ModeStereoSettings extends SettingsObject implements IObserver {
+            /** Whether stero mode is active. **/
             public boolean active;
+            /** The stereoscopic profile. **/
             public StereoProfile profile;
 
             /** IPD, inter pupillary distance, in mm. **/
@@ -2857,7 +2863,9 @@ public class Settings extends SettingsObject {
 
             public void setProfile(String profileString) {
                 if (profileString.equalsIgnoreCase("ANAGLYPH")) {
-                    profileString = StereoProfile.ANAGLYPH_RED_CYAN.toString();
+                    profileString = StereoProfile.ANAGLYPH_RED_CYAN_DUBOIS.toString();
+                } else if (profileString.equalsIgnoreCase("CROSSEYE")) {
+                    profileString = StereoProfile.CROSS_EYE.toString();
                 }
                 this.profile = StereoProfile.valueOf(profileString.toUpperCase(Locale.ROOT));
             }

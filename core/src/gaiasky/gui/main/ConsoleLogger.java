@@ -63,7 +63,22 @@ public class ConsoleLogger implements IObserver {
     }
 
     public void subscribe() {
-        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.POST_NOTIFICATION,
+                                        Event.FOCUS_CHANGED,
+                                        Event.TIME_STATE_CMD,
+                                        Event.TOGGLE_VISIBILITY_CMD,
+                                        Event.CAMERA_MODE_CMD,
+                                        Event.TIME_WARP_CHANGED_INFO,
+                                        Event.FOCUS_LOCK_CMD,
+                                        Event.JAVA_EXCEPTION,
+                                        Event.ORBIT_DATA_LOADED,
+                                        Event.SCREENSHOT_INFO,
+                                        Event.STEREOSCOPIC_CMD,
+                                        Event.DISPLAY_GUI_CMD,
+                                        Event.FRAME_OUTPUT_CMD,
+                                        Event.STEREO_PROFILE_CMD,
+                                        Event.OCTREE_PARTICLE_FADE_CMD);
     }
 
     public void unsubscribe() {
@@ -83,6 +98,7 @@ public class ConsoleLogger implements IObserver {
      *
      * @param date  The date
      * @param level The logging level
+     *
      * @return The tag
      */
     private String tag(Instant date, LoggerLevel level) {
@@ -207,8 +223,7 @@ public class ConsoleLogger implements IObserver {
                 boolean displayGui = (Boolean) data[0];
                 addMessage(I18n.msg("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
             }
-            case STEREO_PROFILE_CMD ->
-                    addMessage(I18n.msg("notif.stereoscopic.profile", data[0].toString()));
+            case STEREO_PROFILE_CMD -> addMessage(I18n.msg("notif.stereoscopic.profile", ((Settings.StereoProfile) data[0]).localizedName()));
             case FRAME_OUTPUT_CMD -> {
                 boolean activated = (Boolean) data[0];
                 if (activated) {

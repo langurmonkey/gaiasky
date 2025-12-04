@@ -332,7 +332,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 gqs[cmapDef.getSecond()] = new ComboBoxBean(I18n.msg("gui.colormap." + cmapDef.getFirst()), cmapDef.getSecond());
             }
 
-            OwnSelectBox<ComboBoxBean> cmap = new OwnSelectBox<>(skin);
+            OwnSelectBox<ComboBoxBean<Integer>> cmap = new OwnSelectBox<>(skin);
             cmap.setItems(gqs);
             cmap.setWidth(sbWidth);
             cmap.addListener(event -> {
@@ -396,7 +396,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             if (view.isSet()) {
                 var set = view.getSet();
                 if (!set.data().isEmpty()) {
-                    IParticleRecord first = set.data().get(0);
+                    IParticleRecord first = set.data().getFirst();
                     if (first.hasExtra()) {
                         ObjectMap.Keys<UCD> ucds = first.extraKeys();
                         for (UCD ucd : ucds)
@@ -405,18 +405,18 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
             }
 
-            OwnSelectBox<AttributeComboBoxBean> attribs = new OwnSelectBox<>(skin);
-            attribs.setItems(attrs);
-            attribs.setWidth(sbWidth);
-            attribs.addListener(event -> {
+            OwnSelectBox<AttributeComboBoxBean> attributes = new OwnSelectBox<>(skin);
+            attributes.setItems(attrs);
+            attributes.setWidth(sbWidth);
+            attributes.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    cmapAttrib = attribs.getSelected().attr;
+                    cmapAttrib = attributes.getSelected().attr;
                     recomputeAttributeMinMax(catalogInfo, cmapAttrib);
                     return true;
                 }
                 return false;
             });
-            container.add(attribs).colspan(2).left().padBottom(pad10).row();
+            container.add(attributes).colspan(2).left().padBottom(pad10).row();
 
             // Min mapping value
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.min"), skin)).left().padRight(pad18).padBottom(pad10);
@@ -461,10 +461,10 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Select
             cmap.setSelectedIndex(catalogInfo.hlCmapIndex);
             alphaSlider.setValue(catalogInfo.hlCmapAlpha);
-            attribs.setSelectedIndex(findIndex(catalogInfo.hlCmapAttribute, attrs));
+            attributes.setSelectedIndex(findIndex(catalogInfo.hlCmapAttribute, attrs));
 
             // Trigger first update
-            attribs.getSelection().fireChangeEvent();
+            attributes.getSelection().fireChangeEvent();
             cmap.getSelection().fireChangeEvent();
 
         }
