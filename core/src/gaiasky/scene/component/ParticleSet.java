@@ -1092,15 +1092,18 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public long getCandidateId() {
-        return pointData.get(candidateFocusIndex)
-                .id();
+        return candidateFocusIndex >= 0 ? pointData.get(candidateFocusIndex).id() : -1L;
     }
 
     public String getCandidateName() {
-        return pointData.get(candidateFocusIndex)
-                .names() != null ?
-                pointData.get(candidateFocusIndex)
-                        .names()[0] : getName();
+        if (candidateFocusIndex >= 0) {
+            return pointData.get(candidateFocusIndex)
+                    .names() != null ?
+                    pointData.get(candidateFocusIndex)
+                            .names()[0] : getName();
+        } else {
+            return null;
+        }
     }
 
     public double getCandidateSolidAngleApparent() {

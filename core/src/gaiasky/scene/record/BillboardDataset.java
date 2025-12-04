@@ -11,12 +11,10 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.tree.GenStatus;
 import net.jafama.FastMath;
@@ -671,7 +669,7 @@ public class BillboardDataset {
      * Channel types. Particle types are essentially parameter
      * ranges for all parameters of a billboard dataset.
      */
-    public enum ChannelType {
+    public enum ChannelType implements LocalizedEnum {
         DUST(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
              new int[]{0, 30_000},
              new int[]{0, 1, 2},
@@ -684,67 +682,72 @@ public class BillboardDataset {
              null,
              null,
              null,
-             null), BULGE(new String[]{"sphere", "bar", "ellipse", "gauss"},
-                          new int[]{0, 100},
-                          new int[]{0, 1, 2},
-                          new float[]{0f, 300f},
-                          new float[]{0f, 30f},
-                          new float[]{0.0f, 2.0f},
-                          new float[]{0.0f, 0.05f},
-                          new float[]{0.05f, 0.25f},
-                          null,
-                          null,
-                          null,
-                          null,
-                          null), STAR(new String[]{"gauss", "disk", "ellipse", "sphere"},
-                                      new int[]{0, 100_000},
-                                      new int[]{0, 1, 2},
-                                      new float[]{0.0f, 8.0f},
-                                      new float[]{0.05f, 0.2f},
-                                      new float[]{0.0f, 6.0f},
-                                      null,
-                                      null,
-                                      null,
-                                      null,
-                                      null,
-                                      null,
-                                      null), GAS(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
-                                                 new int[]{0, 30_000},
-                                                 new int[]{0, 1, 2, 3},
-                                                 new float[]{0f, 100f},
-                                                 new float[]{0f, 30f},
-                                                 new float[]{0.0f, 0.05f},
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null,
-                                                 null), HII(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
-                                                            new int[]{0, 10_000},
-                                                            new int[]{4},
-                                                            new float[]{0f, 10f},
-                                                            new float[]{0f, 30f},
-                                                            new float[]{0.0f, 6.0f},
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            null), POINT(new String[]{"density", "disk", "sphere", "bar", "ellipse", "gauss"},
-                                                                         new int[]{0, 50_000},
-                                                                         new int[]{1},
-                                                                         new float[]{0f, 1000f},
-                                                                         new float[]{0f, 30f},
-                                                                         new float[]{0.0f, 1.0f},
-                                                                         null,
-                                                                         null,
-                                                                         null,
-                                                                         null,
-                                                                         null,
-                                                                         null,
-                                                                         null);
+             null),
+        BULGE(new String[]{"sphere", "bar", "ellipse", "gauss"},
+              new int[]{0, 100},
+              new int[]{0, 1, 2},
+              new float[]{0f, 300f},
+              new float[]{0f, 30f},
+              new float[]{0.0f, 2.0f},
+              new float[]{0.0f, 0.05f},
+              new float[]{0.05f, 0.25f},
+              null,
+              null,
+              null,
+              null,
+              null),
+        STAR(new String[]{"gauss", "disk", "ellipse", "sphere"},
+             new int[]{0, 100_000},
+             new int[]{0, 1, 2},
+             new float[]{0.0f, 8.0f},
+             new float[]{0.05f, 0.2f},
+             new float[]{0.0f, 6.0f},
+             null,
+             null,
+             null,
+             null,
+             null,
+             null,
+             null),
+        GAS(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
+            new int[]{0, 30_000},
+            new int[]{0, 1, 2, 3},
+            new float[]{0f, 100f},
+            new float[]{0f, 30f},
+            new float[]{0.0f, 0.05f},
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null),
+        HII(new String[]{"density", "disk", "sphere", "ellipse", "gauss"},
+            new int[]{0, 10_000},
+            new int[]{4},
+            new float[]{0f, 10f},
+            new float[]{0f, 30f},
+            new float[]{0.0f, 6.0f},
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null),
+        POINT(new String[]{"density", "disk", "sphere", "bar", "ellipse", "gauss"},
+              new int[]{0, 50_000},
+              new int[]{1},
+              new float[]{0f, 1000f},
+              new float[]{0f, 30f},
+              new float[]{0.0f, 1.0f},
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null);
 
         /** Available distributions. **/
         public String[] distributions;
@@ -829,10 +832,15 @@ public class BillboardDataset {
                 this.armSigma = armSigma;
             }
         }
+
+        @Override
+        public String localizedName() {
+            return I18n.msg("gui.galaxy.ds.type." + name().toLowerCase(Locale.ROOT));
+        }
     }
 
     /** Particle distributions. **/
-    public enum Distribution {
+    public enum Distribution implements LocalizedEnum {
         /** Simple uniformly distributed sphere. **/
         SPHERE,
         /** Simple uniformly distributed disk. **/
@@ -876,6 +884,11 @@ public class BillboardDataset {
 
         public boolean isBar() {
             return this == BAR;
+        }
+
+        @Override
+        public String localizedName() {
+            return I18n.msg("gui.galaxy.ds.distribution." + name().toLowerCase(Locale.ROOT));
         }
     }
 

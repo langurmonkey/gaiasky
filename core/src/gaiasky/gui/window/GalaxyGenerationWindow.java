@@ -25,10 +25,12 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.BillboardDataset.ChannelType;
 import gaiasky.scene.record.BillboardDataset.Distribution;
 import gaiasky.scene.record.BillboardDataset.HeightProfile;
 import gaiasky.scene.record.GalaxyGenerator;
@@ -450,7 +452,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     System.arraycopy(ds, 0, newDs, 0, ds.length);
 
                     var dataset = new BillboardDataset();
-                    dataset.setType(BillboardDataset.ChannelType.POINT);
+                    dataset.setType(ChannelType.POINT);
                     dataset.setLayers(new int[]{0, 1, 2});
                     dataset.setBaseColor(new double[]{0.8, 0.8, 0.8});
                     dataset.setMaxSize(20.0);
@@ -487,16 +489,16 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         for (var ds : datasets) {
             var dsTable = new Table(skin);
             // Type
-            OwnSelectBox<BillboardDataset.ChannelType> type = new OwnSelectBox<>(skin);
-            type.setItems(BillboardDataset.ChannelType.values());
+            OwnSelectBox<ComboBoxBean<ChannelType>> type = new OwnSelectBox<>(skin);
+            type.setItems(ComboBoxBean.getValues(ChannelType.class));
             type.setWidth(halfWidthBox);
-            type.setSelected(ds.type);
+            type.setSelectedIndex(ds.type.ordinal());
             type.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
-                    ds.type = type.getSelected();
-                    if (ds.type == BillboardDataset.ChannelType.DUST) {
+                    ds.type = type.getSelected().value;
+                    if (ds.type == ChannelType.DUST) {
                         GaiaSky.postRunnable(() -> {
                             // Subtractive blending.
                             ds.setBlending(BlendMode.SUBTRACTIVE);
@@ -513,15 +515,15 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             dsTable.add(type).left().padBottom(pad18).row();
 
             // Distribution
-            OwnSelectBox<Distribution> distribution = new OwnSelectBox<>(skin);
-            distribution.setItems(Distribution.values());
+            OwnSelectBox<ComboBoxBean<Distribution>> distribution = new OwnSelectBox<>(skin);
+            distribution.setItems(ComboBoxBean.getValues(Distribution.class));
             distribution.setWidth(halfWidthBox);
-            distribution.setSelected(ds.distribution);
+            distribution.setSelectedIndex(ds.distribution.ordinal());
             distribution.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
-                    ds.distribution = distribution.getSelected();
+                    ds.distribution = distribution.getSelected().value;
                     rebuild();
                     regenerate();
                 }
@@ -1119,7 +1121,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
     }
 
-    private FocusView eventView = new FocusView();
+    private final FocusView eventView = new FocusView();
 
     @Override
     public void notify(Event event, Object source, Object... data) {
