@@ -18,28 +18,13 @@ layout (location = 0) out vec4 fragColor;
 // From Peter Wimmer's "Optimized Anaglyphs"
 // This separates gamma operations on each color channel, boosts red
 // https://cybereality.com/rendepth-red-cyan-anaglyph-filter-optimized-for-stereoscopic-3d-on-lcd-monitors/
-const vec3 gamma_map = vec3(1.4, 0.8, 1.0);
+const vec3 gamma_map = vec3(1.6, 0.8, 1.0);
 vec3 correctColor(vec3 original) {
     vec3 corrected;
     corrected.r = pow(original.r, 1.0 / gamma_map.r);
     corrected.g = pow(original.g, 1.0 / gamma_map.g);
     corrected.b = pow(original.b, 1.0 / gamma_map.b);
     return corrected;
-}
-
-// sRGB <-> linear conversion (accurate, not just pow)
-vec3 srgb_to_linear(vec3 c) {
-    bvec3 low = lessThanEqual(c, vec3(0.04045));
-    vec3 low_val = c / 12.92;
-    vec3 high_val = pow((c + 0.055) / 1.055, vec3(2.4));
-    return mix(high_val, low_val, low);
-}
-
-vec3 linear_to_srgb(vec3 c) {
-    bvec3 low = lessThanEqual(c, vec3(0.0031308));
-    vec3 low_val = c * 12.92;
-    vec3 high_val = 1.055 * pow(c, vec3(1.0/2.4)) - 0.055;
-    return mix(high_val, low_val, low);
 }
 
 void main() {
@@ -91,8 +76,8 @@ void main() {
 
         const mat3 right_filter = mat3(
         vec3(-0.016,-0.123,-0.017),
-        vec3( 0.006, 0.062, 0.017),
-        vec3(-0.094,-0.185, 0.991));
+        vec3( 0.006, 0.062,-0.017),
+        vec3( 0.094, 0.185, 0.911));
 
         vec3 l = clamp(leftFrag.rgb * left_filter, vec3(0.0), vec3(1.0));
         vec3 r = clamp(rightFrag.rgb * right_filter, vec3(0.0), vec3(1.0));
