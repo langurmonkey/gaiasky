@@ -51,7 +51,7 @@ vec3(-0.015, -0.027, 0.021));
 
 const mat3 A_GREEN_MAGENTA_RIGHT_FILTER = mat3(
 vec3(0.529, 0.705, 0.024),
-vec3(-0.016, -0.015, 0.065),
+vec3(-0.016, -0.015, -0.065),
 vec3(0.009, 0.075, 0.937));
 
 // From Peter Wimmer's "Optimized Anaglyphs"
