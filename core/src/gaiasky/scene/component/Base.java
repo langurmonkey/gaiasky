@@ -88,7 +88,7 @@ public class Base implements Component, ICopy {
         if (names != null)
             names[0] = name;
         else
-            names = new String[] { name };
+            names = new String[]{name};
         updateLocalizedName();
     }
 
@@ -132,6 +132,32 @@ public class Base implements Component, ICopy {
     }
 
     /**
+     * Checks if the entity holding this {@link Base} component has a name that matches the candidate.
+     *
+     * @param candidate The candidate string.
+     * @param matchCase Whether to match the case.
+     *
+     * @return True if the entity has a name matching the candidate. False otherwise.
+     */
+    public boolean matchesName(String candidate, boolean matchCase) {
+        if (!matchCase) {
+            candidate = candidate.toLowerCase(Locale.ROOT);
+        }
+        if (names == null) {
+            return false;
+        } else {
+            for (String name : names) {
+                if (!matchCase) {
+                    name = name.toLowerCase(Locale.ROOT);
+                }
+                if (name.equals(candidate) || name.contains(candidate))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Adds a name to the list of names.
      *
      * @param name The name.
@@ -149,7 +175,7 @@ public class Base implements Component, ICopy {
                 names = newNames;
                 return idx;
             } else {
-                names = new String[] { name };
+                names = new String[]{name};
                 return 0;
             }
         } else {

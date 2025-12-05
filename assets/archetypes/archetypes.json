@@ -415,6 +415,7 @@
         "Highlight*",
         "Octree*",
         "Octant*",
+        "Label",
         "TagNoProcessChildren*",
         "AffineTransformations"
       ],

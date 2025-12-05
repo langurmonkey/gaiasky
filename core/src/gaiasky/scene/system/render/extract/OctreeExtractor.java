@@ -13,6 +13,7 @@ import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Label;
 import gaiasky.scene.component.Octree;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.Settings;
@@ -43,7 +44,7 @@ public class OctreeExtractor extends AbstractExtractSystem {
 
         if (base.isVisible() && !base.copy) {
             // Extract objects.
-            extractParticleSet(octree);
+            extractParticleSet(entity, octree);
 
             // Clear roulette.
             octree.roulette.clear();
@@ -56,11 +57,11 @@ public class OctreeExtractor extends AbstractExtractSystem {
     /**
      * Extracts all observed octree objects.
      */
-    private void extractParticleSet(Octree octree) {
+    private void extractParticleSet(Entity octreeEntity, Octree octree) {
         int size = octree.roulette.size();
         for (int i = 0; i < size; i++) {
             Entity entity = ((OctreeObjectView) octree.roulette.get(i)).getEntity();
-            particleSetExtractor.extractEntity(entity);
+            particleSetExtractor.extractEntity(entity, octreeEntity);
         }
     }
 

@@ -292,14 +292,15 @@ public class Index {
                 .trim();
 
         int i = 0;
-        // Starts with
         for (String key : keys) {
             if (key != null) {
                 if (abort != null && abort.get())
                     return;
                 var entity = index.get(key);
                 var focus = Mapper.focus.get(entity);
-                if (focus != null && focus.focusable && key.startsWith(name)) {
+                if (focus != null
+                        && focus.focusable
+                        && key.contains(name)) {
                     results.add(key);
                     i++;
                 }
@@ -307,14 +308,29 @@ public class Index {
                     return;
             }
         }
-        // Contains
+    }
+
+    /**
+     * Returns entities in this index matching the given string by name, to a maximum
+     * of <code>maxResults</code>. The <code>abort</code> atomic boolean can be used to stop
+     * the computation.
+     *
+     * @param name       The name.
+     * @param results    The set where the results are to be stored.
+     * @param maxResults The maximum number of results.
+     * @param abort      To enable abortion mid-computation.
+     */
+    public void matchingNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
+        String[] keys = index.keys();
+        name = name.toLowerCase(Locale.ROOT)
+                .trim();
+
+        int i = 0;
         for (String key : keys) {
             if (key != null) {
                 if (abort != null && abort.get())
                     return;
-                var entity = index.get(key);
-                var focus = Mapper.focus.get(entity);
-                if (focus != null && focus.focusable && key.contains(name)) {
+                if (key.contains(name)) {
                     results.add(key);
                     i++;
                 }

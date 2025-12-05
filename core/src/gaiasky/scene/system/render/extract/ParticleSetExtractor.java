@@ -12,6 +12,7 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Octree;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.StarSet;
 import gaiasky.util.Settings;
@@ -29,14 +30,29 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
         extractEntity(entity);
     }
 
+    /**
+     * Regular extract method.
+     *
+     * @param entity The entity.
+     */
     public void extractEntity(Entity entity) {
+        extractEntity(entity, null);
+    }
+
+    /**
+     * Octree path, for particle and star sets in an octree.
+     *
+     * @param entity The entity.
+     * @param octreeEntity The octree entity, if any.
+     */
+    public void extractEntity(Entity entity, Entity octreeEntity) {
         var base = Mapper.base.get(entity);
         if (mustRender(base)) {
             var render = Mapper.render.get(entity);
             if (Mapper.starSet.has(entity)) {
-                addToRenderLists(render, entity, Mapper.starSet.get(entity));
+                addToRenderLists(render, entity, Mapper.starSet.get(entity), octreeEntity);
             } else {
-                addToRenderLists(render);
+                addToRenderLists(render, octreeEntity);
             }
         }
     }
@@ -46,7 +62,8 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
      **/
     private void addToRenderLists(Render render,
                                   Entity entity,
-                                  StarSet starSet) {
+                                  StarSet starSet,
+                                  Entity octreeEntity) {
         if (starSet.renderParticles) {
             if (starSet.variableStars) {
                 addToRender(render, RenderGroup.VARIABLE_GROUP);
@@ -70,7 +87,11 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
                 addToRender(render, RenderGroup.LINE);
             }
         }
-        if ((starSet.renderParticleLabels && starSet.numLabels > 0) || starSet.renderSetLabel) {
+        var label = Mapper.label.get(entity);
+        // Our label is not set to display never, and we have no octree, or the octre is also not set to display never.
+        boolean labelCheck = !label.isDisplayNever() && (octreeEntity == null || !Mapper.label.get(octreeEntity).isDisplayNever());
+        if (labelCheck &&
+                ((starSet.renderParticleLabels && starSet.numLabels > 0) || starSet.renderSetLabel)) {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }
@@ -78,7 +99,7 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
     /**
      * For particle sets.
      **/
-    private void addToRenderLists(Render render) {
+    private void addToRenderLists(Render render, Entity octreeEntity) {
         var set = Mapper.particleSet.get(render.entity);
         if (set.renderParticles) {
             if (set.isExtended) {
@@ -91,7 +112,11 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
                 addToRender(render, RenderGroup.PARTICLE_GROUP);
             }
         }
-        if ((set.renderParticleLabels && set.numLabels > 0) || set.renderSetLabel) {
+        var label = Mapper.label.get(render.entity);
+        // Our label is not set to display never, and we have no octree, or the octre is also not set to display never.
+        boolean labelCheck = !label.isDisplayNever() && (octreeEntity == null || !Mapper.label.get(octreeEntity).isDisplayNever());
+        if (labelCheck &&
+                ((set.renderParticleLabels && set.numLabels > 0) || set.renderSetLabel)) {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }

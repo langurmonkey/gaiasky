@@ -35,6 +35,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
@@ -92,7 +93,7 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
         content.clear();
 
         candidates = new Table(skin);
-        candidates.setBackground("table-bg");
+        candidates.setBackground("dark-grey");
         candidates.setFillParent(false);
 
         searchInput = new OwnTextField("", skin);
@@ -126,7 +127,7 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
                         Timer.Task task = new Timer.Task() {
                             public void run() {
                                 synchronized (matching) {
-                                    matchingNodes(name, scene);
+                                    matchingNodes(name, scene, false);
 
                                     if (!matching.isEmpty()) {
                                         cIdx = -1;
@@ -229,6 +230,7 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
         for (var comp : comps) {
             cc.add(getComponentActor(comp)).expandX().left().padBottom(pad10).row();
         }
+        cc.top().left();
         var scroll = new OwnScrollPane(cc, skin, "minimalist-nobg");
         scroll.setWidth(width);
         scroll.setHeight(height);
@@ -251,12 +253,57 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
         return gd;
     }
 
+    public <T extends Enum<T>> OwnSelectBox<T> createEnumSelectBox(Class<T> enumType) {
+        // Ensure the class is an enum
+        if (!enumType.isEnum()) {
+            throw new IllegalArgumentException("Provided class is not an enum.");
+        }
+
+        // Get all enum constants of the specified enum type
+        T[] enumConstants = enumType.getEnumConstants();
+
+        // Create a new OwnSelectBox
+        OwnSelectBox<T> selectBox = new OwnSelectBox<>(skin);
+
+        // Populate the SelectBox with the enum constants
+        selectBox.setItems(enumConstants);
+
+        return selectBox;
+    }
+
+    /**
+     * Gets all fields of the given component and all its ancestors that are also components.
+     *
+     * @param component The component.
+     *
+     * @return An array of fields.
+     */
+    public static Array<Field> getAllFields(Component component) {
+        Array<Field> allFields = new Array<>();
+
+        Class<?> currentClass = component.getClass();
+
+        // Traverse the class hierarchy
+        while (currentClass != null && Component.class.isAssignableFrom(currentClass)) {
+            // Add the fields of the current class
+            Field[] fields = currentClass.getDeclaredFields();
+            for (Field field : fields) {
+                allFields.add(field);
+            }
+
+            // Move to the superclass
+            currentClass = currentClass.getSuperclass();
+        }
+
+        return allFields;
+    }
+
     private Actor getComponentActor(Component component) {
         var c = new Table(skin);
         c.left();
         c.padLeft(pad20);
 
-        var fields = component.getClass().getDeclaredFields();
+        var fields = getAllFields(component);
         for (var field : fields) {
             var modifiers = field.getModifiers();
             var type = field.getType();
@@ -280,32 +327,52 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
                 var fin = Modifier.isFinal(modifiers);
                 var priv = Modifier.isPrivate(modifiers);
                 var nil = value == null;
-                var primStr = isPrimitiveOrStringType(type);
+                var enu = isEnumType(type);
+                var primStrEnum = enu || isPrimitiveOrStringType(type);
                 var bool = isBoolean(type);
 
                 var valueStr = toString(value, type);
                 var valueCapped = TextUtils.capString(valueStr, 40);
                 Actor fieldActor;
-                if (fin || priv || nil || !primStr) {
+                if (fin || priv || nil || !primStrEnum) {
                     // Just show value, not editable.
                     fieldActor = new OwnLabel(valueCapped, skin);
                     fieldActor.setColor(ColorUtils.oDarkGrayC);
                     fieldActor.addListener(new OwnTextTooltip(valueStr, skin));
                 } else {
                     if (bool) {
+                        // Boolean, checkbox
                         fieldActor = new OwnCheckBox("", skin);
                         ((OwnCheckBox) fieldActor).setChecked((Boolean) value);
                         fieldActor.addListener((event) -> {
                             if (event instanceof ChangeListener.ChangeEvent) {
                                 try {
                                     field.set(component, ((OwnCheckBox) fieldActor).isChecked());
+                                    return true;
                                 } catch (IllegalAccessException e) {
                                     logger.error("Error setting value '" + ((OwnCheckBox) fieldActor).isChecked() + "' to " + name);
                                 }
                             }
                             return false;
                         });
+                    } else if (enu) {
+                        // Enum, select box
+                        var select = createEnumSelectBox((Class<? extends Enum>) type);
+                        fieldActor = select;
+                        select.addListener((event) -> {
+                            if (event instanceof ChangeListener.ChangeEvent) {
+                                try {
+                                    field.set(component, select.getSelected());
+                                    return true;
+                                } catch (IllegalAccessException e) {
+                                    logger.error("Error setting value '" + ((OwnSelectBox) fieldActor).getSelected() + "' to " + name);
+                                }
+                            }
+                            return false;
+                        });
+
                     } else {
+                        // Others, text input
                         var hor = new HorizontalGroup();
                         hor.space(pad10);
                         var tf = new OwnTextField(valueCapped, skin);
@@ -321,6 +388,7 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
                                     var val = parse(field.getType(), t);
                                     field.set(component, val);
                                     tf.setToRegularColor();
+                                    return true;
                                 } catch (IllegalAccessException e) {
                                     logger.debug(I18n.msg("gui.debug.error.set", tf.getText(), name));
                                 } catch (Exception e) {
@@ -370,6 +438,10 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
 
     private static boolean isPrimitiveOrStringType(Class source) {
         return source.isPrimitive() || WRAPPER_TYPE_MAP.contains(source) || isString(source);
+    }
+
+    private static boolean isEnumType(Class source) {
+        return source.isEnum();
     }
 
     private static boolean isBoolean(Class source) {
@@ -442,34 +514,37 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
      */
     private boolean checkString(String text, Scene scene) {
         try {
+            Entity entity;
             if (scene.index().containsEntity(text)) {
-                Entity entity = scene.getEntity(text);
-                if (Mapper.focus.has(entity)) {
-                    view.setEntity(entity);
-                    view.getFocus(text);
-                    filterView.setEntity(entity);
+                entity = scene.getEntity(text);
+            } else {
+                entity = scene.getNonIndexEntity(text);
+            }
+            if (entity != null) {
+                view.setEntity(entity);
+                view.getFocus(text);
+                filterView.setEntity(entity);
 
-                    boolean timeOverflow = view.isCoordinatesTimeOverflow();
-                    boolean canSelect = view.getSet() == null || view.getSet().canSelect(filterView);
-                    boolean ctOn = GaiaSky.instance.isOn(view.getCt());
-                    Optional<CatalogInfo> ci = GaiaSky.instance.getCatalogInfoFromEntity(entity);
-                    boolean datasetVisible = ci.isEmpty() || ci.get().isVisible(true);
-                    if (!timeOverflow && canSelect && ctOn && datasetVisible) {
-                        GaiaSky.postRunnable(() -> {
-                            updateContent(entity);
-                        });
-                        info(null);
-                    } else if (timeOverflow) {
-                        info(I18n.msg("gui.objects.search.timerange", text));
-                    } else if (!canSelect) {
-                        info(I18n.msg("gui.objects.search.filter", text));
-                    } else if (!datasetVisible) {
-                        info(I18n.msg("gui.objects.search.dataset.invisible", text, ci.get().name));
-                    } else {
-                        info(I18n.msg("gui.objects.search.invisible", text, Mapper.base.get(entity).ct.toString()));
-                    }
-                    return true;
+                boolean timeOverflow = view.isCoordinatesTimeOverflow();
+                boolean canSelect = view.getSet() == null || view.getSet().canSelect(filterView);
+                boolean ctOn = GaiaSky.instance.isOn(view.getCt());
+                Optional<CatalogInfo> ci = GaiaSky.instance.getCatalogInfoFromEntity(entity);
+                boolean datasetVisible = ci.isEmpty() || ci.get().isVisible(true);
+                if (!timeOverflow && canSelect && ctOn && datasetVisible) {
+                    GaiaSky.postRunnable(() -> {
+                        updateContent(entity);
+                    });
+                    info(null);
+                } else if (timeOverflow) {
+                    info(I18n.msg("gui.objects.search.timerange", text));
+                } else if (!canSelect) {
+                    info(I18n.msg("gui.objects.search.filter", text));
+                } else if (!datasetVisible) {
+                    info(I18n.msg("gui.objects.search.dataset.invisible", text, ci.get().name));
+                } else {
+                    info(I18n.msg("gui.objects.search.invisible", text, Mapper.base.get(entity).ct.toString()));
                 }
+                return true;
             } else {
                 info(null);
             }
@@ -533,10 +608,14 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
         }
     }
 
-    private void matchingNodes(String text, Scene scene) {
+    private void matchingNodes(String text, Scene scene, boolean focusable) {
         matching.clear();
         matchingLabels.clear();
-        scene.matchingFocusableNodes(text, matching, 10, null);
+        if (focusable) {
+            scene.matchingFocusableNodes(text, matching, 10, null);
+        } else {
+            scene.matchingNodes(text, matching, 10, null);
+        }
     }
 
     @Override

@@ -101,7 +101,7 @@ public class SearchDialog extends GenericDialog {
 
     public void build() {
         candidates = new Table(skin);
-        candidates.setBackground("table-bg");
+        candidates.setBackground("dark-grey");
         candidates.setFillParent(false);
 
         // Info message

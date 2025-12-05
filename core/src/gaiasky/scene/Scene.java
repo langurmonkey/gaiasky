@@ -17,10 +17,7 @@ import gaiasky.event.EventManager;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.ICopy;
-import gaiasky.scene.component.IDisposable;
+import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagCopy;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.render.extract.*;
@@ -498,6 +495,7 @@ public class Scene {
      * @param family         The family.
      * @param priority       The priority of the system (lower means the system gets executed before).
      * @param sceneRenderer  The scene renderer.
+     *
      * @return The new system instance.
      */
     private <T extends AbstractExtractSystem> T newExtractor(Class<T> extractorClass,
@@ -635,6 +633,7 @@ public class Scene {
      * Returns the entity with the given name, or null if it does not exist.
      *
      * @param name The name of the entity to retrieve.
+     *
      * @return The entity.
      */
     public Entity getEntity(String name) {
@@ -642,9 +641,31 @@ public class Scene {
     }
 
     /**
+     * Gets an entity from this scene that is not in the index, and thus not focusable.
+     *
+     * @param name The name of the entity.
+     *
+     * @return The entity, if it exists. Null otherwise.
+     */
+    public Entity getNonIndexEntity(String name) {
+        var list = findEntities();
+        for (int i = 0; i < list.size; i++) {
+            var e = list.get(i);
+            var base = Mapper.base.get(e);
+            if (base != null) {
+                if (base.hasName(name, false)) {
+                    return e;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the focus entity with the given name, if it exists.
      *
      * @param name The name.
+     *
      * @return The entity.
      */
     public Entity findFocus(String name) {
@@ -672,7 +693,9 @@ public class Scene {
     }
 
     /**
-     * Returns a list with all the entities which are focusable.
+     * Returns a list with all the focusable entities in the scene. Focusable entities are entities that have the {@link Focus} component.
+     * Check out the <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/_generated/Components.html#focus">focus component section</a>
+     * in the documentation for more information.
      *
      * @return A list with all focusable entities in this scene.
      */
@@ -692,6 +715,63 @@ public class Scene {
                     }
                 });
             }
+        });
+
+        return list;
+    }
+
+    /**
+     * Returns focus entities matching the given string by name, to a maximum
+     * of <code>maxResults</code>.
+     *
+     * @param name       The name.
+     * @param results    The set where the results are to be stored.
+     * @param maxResults The maximum number of results.
+     * @param abort      To enable abortion mid-computation.
+     */
+    public void matchingNodes(String name,
+                              SortedSet<String> results,
+                              int maxResults,
+                              AtomicBoolean abort) {
+        var list = findEntities();
+        int added = 0;
+        for (int i = 0; i < list.size; i++) {
+            if (abort != null && abort.get())
+                return;
+            var e = list.get(i);
+            var base = Mapper.base.get(e);
+            if (base != null) {
+                if (base.matchesName(name, false)) {
+                    results.add(base.getName());
+                    added++;
+                    if (added >= maxResults) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a list with all the entities in the scene.
+     *
+     * @return A list with all the entities in the scene.
+     */
+    public Array<Entity> findEntities() {
+        Array<Entity> list = new Array<>();
+
+        engine.getEntities().forEach((entity) -> {
+            if (Mapper.octree.has(entity)) {
+                // LOD objects are not in the scene graph structure.
+                var octree = Mapper.octree.get(entity);
+                Set<Entity> objects = octree.parenthood.keySet();
+                objects.forEach((object) -> {
+                    if (Mapper.focus.has(object)) {
+                        list.add(object);
+                    }
+                });
+            }
+            list.add(entity);
         });
 
         return list;
@@ -717,8 +797,9 @@ public class Scene {
      *
      * @param name The name of the object
      * @param out  The out double array
+     *
      * @return The out double array if the object exists, has a position and out has 3 or more
-     * slots. Null otherwise.
+     *         slots. Null otherwise.
      */
     public double[] getObjectPosition(String name,
                                       double[] out) {
@@ -744,7 +825,9 @@ public class Scene {
     /**
      * Gets a line copy of the given entity, and attaches a {@link gaiasky.scene.component.tag.TagCopy} component to all the
      * entities in the line.
+     *
      * @param entity The entity.
+     *
      * @return The line copied entity.
      */
     public Entity getLineCopy(Entity entity) {
@@ -792,7 +875,9 @@ public class Scene {
     /**
      * Gets a simple copy of the given entity and its components. Additionally, it attaches the {@link gaiasky.scene.component.tag.TagCopy} component
      * to the entity.
+     *
      * @param entity The entity to copy.
+     *
      * @return The copy.
      */
     public Entity getSimpleCopy(Entity entity) {
@@ -853,6 +938,7 @@ public class Scene {
      * actually hold and wrap many objects.
      *
      * @param entity The entity.
+     *
      * @return The number of objects it holds.
      */
     public int getNumberObjects(Entity entity) {
@@ -873,6 +959,7 @@ public class Scene {
      * Computes the number of objects in the given octree node, recursively.
      *
      * @param node The node.
+     *
      * @return The number of objects.
      */
     public int getNumberObjects(OctreeNode node) {
