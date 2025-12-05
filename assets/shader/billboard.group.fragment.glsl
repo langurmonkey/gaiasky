@@ -62,7 +62,6 @@ void main() {
     if (v_type == T_BULGE) {
         col.rgb = vec3(1.0, 1.0, 1.0);
         col.a = 1.0;
-        w_m = 50.3;
     } else if (v_type == T_DUST) {
         w_m = 1.6;
     }

@@ -29,6 +29,7 @@ import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.CPUGalGenFallback;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -242,6 +243,7 @@ public class BillboardProceduralCPURenderer extends InstancedRenderSystem implem
             shaderProgram.setUniformf("u_camPos", camera.getPos());
             addCameraUpCubemapMode(shaderProgram, camera);
             shaderProgram.setUniformf("u_alpha", render.getOpacity() * alpha * 1.5f);
+            shaderProgram.setUniformf("u_uToKpc", (float) Constants.U_TO_KPC);
 
             // Arbitrary affine transformations.
             addAffineTransformUniforms(shaderProgram, affine);
@@ -253,6 +255,16 @@ public class BillboardProceduralCPURenderer extends InstancedRenderSystem implem
             int qualityIndex = Settings.settings.graphics.quality.ordinal();
 
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+
+            // Configure Blending for Accumulation RT (Attachment 2)
+            GL41.glBlendEquationi(2, GL41.GL_FUNC_ADD);
+            GL41.glBlendFuncSeparatei(2, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE);
+            // Configure Blending for Revealage RT (Attachment 3)
+            GL41.glBlendEquationi(3, GL41.GL_FUNC_ADD);
+            GL41.glBlendFuncSeparatei(3, GL41.GL_SRC_ALPHA, GL41.GL_ONE_MINUS_SRC_ALPHA, GL41.GL_SRC_ALPHA, GL41.GL_ONE_MINUS_SRC_ALPHA);
+            //GL41.glBlendFuncSeparatei(3, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE);
+
             for (var dataset : billboard.datasets) {
                 if (isPrepared(dataset)) {
                     var offset = getOffset(dataset);
@@ -292,7 +304,7 @@ public class BillboardProceduralCPURenderer extends InstancedRenderSystem implem
                         shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
                         shaderProgram.setUniformf("u_intensity", dataset.intensity);
 
-                        Gdx.gl20.glDepthMask(dataset.depthMask);
+                        Gdx.gl20.glDepthMask(false);
                         // Render mesh
                         int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, count, dataset.particleCount);

@@ -10,7 +10,6 @@ package gaiasky.render.postprocess.filters;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
-import gaiasky.render.util.ShaderLoader;
 
 public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter> {
 

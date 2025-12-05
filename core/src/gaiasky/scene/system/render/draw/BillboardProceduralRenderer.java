@@ -39,6 +39,7 @@ import gaiasky.util.math.Matrix4Utils;
 import gaiasky.util.math.Vector3Q;
 import gaiasky.util.tree.GenStatus;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL41;
 import org.lwjgl.opengl.GL43;
 
 import java.nio.FloatBuffer;
@@ -277,6 +278,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             shaderProgram.setUniformf("u_camPos", camera.getPos());
             addCameraUpCubemapMode(shaderProgram, camera);
             shaderProgram.setUniformf("u_alpha", render.getOpacity() * alpha * 1.5f);
+            shaderProgram.setUniformf("u_uToKpc", (float) Constants.U_TO_KPC);
 
             // Arbitrary affine transformations.
             addAffineTransformUniforms(shaderProgram, affine);
@@ -288,6 +290,16 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             int qualityIndex = Settings.settings.graphics.quality.ordinal();
 
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+
+            // Configure Blending for Accumulation RT (Attachment 2)
+            GL41.glBlendEquationi(2, GL41.GL_FUNC_ADD);
+            GL41.glBlendFuncSeparatei(2, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE);
+            // Configure Blending for Revealage RT (Attachment 3)
+            GL41.glBlendEquationi(3, GL41.GL_FUNC_ADD);
+            GL41.glBlendFuncSeparatei(3, GL41.GL_SRC_ALPHA, GL41.GL_ONE_MINUS_SRC_ALPHA, GL41.GL_SRC_ALPHA, GL41.GL_ONE_MINUS_SRC_ALPHA);
+            //GL41.glBlendFuncSeparatei(3, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE, GL41.GL_ONE);
+
             for (var dataset : billboard.datasets) {
                 if (isPrepared(dataset)) {
                     // Blend mode
@@ -323,7 +335,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
                     shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", dataset.intensity);
 
-                    Gdx.gl20.glDepthMask(dataset.depthMask);
+                    Gdx.gl20.glDepthMask(false);
 
                     // Enable instancing (pass the SSBO data to the shader)
                     GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, 0, ssbos.get(dataset, 0));
