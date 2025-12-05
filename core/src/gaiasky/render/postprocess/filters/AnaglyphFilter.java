@@ -14,13 +14,7 @@ public final class AnaglyphFilter extends Filter<AnaglyphFilter> {
 
     private Texture textureLeft, textureRight;
     /**
-     * <ol start="0">
-     *     <li>red/cyan</li>
-     *     <li>red/cyan Dubois</li>
-     *     <li>amber/blue</li>
-     *     <li>amber/blue Dubois</li>
-     *     <li>red/blue</li>
-     * </ol>
+     * Anaglyph mode, see {@link gaiasky.util.Settings.StereoProfile}.
      */
     private int anaglyphMode;
 

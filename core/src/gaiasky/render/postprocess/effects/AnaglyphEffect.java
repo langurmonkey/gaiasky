@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.AnaglyphFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.util.Settings;
 
 public final class AnaglyphEffect extends PostProcessorEffect {
     private final AnaglyphFilter filter;
@@ -41,14 +42,7 @@ public final class AnaglyphEffect extends PostProcessorEffect {
     }
 
     /**
-     * Sets the Anaglyph mode:
-     * <ol start="0">
-     *     <li>red/cyan</li>
-     *     <li>red/cyan Dubois</li>
-     *     <li>amber/blue</li>
-     *     <li>amber/blue Dubois</li>
-     *     <li>red/blue</li>
-     * </ol>
+     * Sets the Anaglyph mode. See {@link Settings.StereoProfile}.
      *
      * @param mode The mode.
      */

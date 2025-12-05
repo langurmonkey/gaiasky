@@ -519,6 +519,14 @@ public class Settings extends SettingsObject {
          */
         ANAGLYPH_AMBER_BLUE_DUBOIS,
         /**
+         * Anaglyph green-magenta
+         */
+        ANAGLYPH_GREEN_MAGENTA,
+        /**
+         * Anaglyph green-magenta Dubois-style
+         */
+        ANAGLYPH_GREEN_MAGENTA_DUBOIS,
+        /**
          * Anaglyph red-blue
          **/
         ANAGLYPH_RED_BLUE;
@@ -540,11 +548,13 @@ public class Settings extends SettingsObject {
                     || this.equals(ANAGLYPH_RED_CYAN)
                     || this.equals(ANAGLYPH_RED_CYAN_DUBOIS)
                     || this.equals(ANAGLYPH_AMBER_BLUE)
-                    || this.equals(ANAGLYPH_AMBER_BLUE_DUBOIS);
+                    || this.equals(ANAGLYPH_AMBER_BLUE_DUBOIS)
+                    || this.equals(ANAGLYPH_GREEN_MAGENTA)
+                    || this.equals(ANAGLYPH_GREEN_MAGENTA_DUBOIS);
         }
 
         public int getAnaglyphModeInteger() {
-            return MathUtilsDouble.clamp(this.ordinal() - ANAGLYPH_RED_CYAN.ordinal(), 0, 4);
+            return MathUtilsDouble.clamp(this.ordinal() - ANAGLYPH_RED_CYAN.ordinal(), 0, 6);
         }
 
         public boolean correctAspect() {
