@@ -24,6 +24,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Label;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
@@ -34,12 +35,15 @@ import gaiasky.util.scene2d.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Panel that offers visibility toggles for individual objects.
+ */
 public class IndividualVisibilityWindow extends GenericDialog implements IObserver {
 
     protected final Scene scene;
     protected float space8, space4, space2;
     protected Cell<?> elementsCell;
-    // Component type currently selected
+    /** Currently selected component type. **/
     protected String currentComponentType = null;
     protected ComponentType currentCt = null;
     protected Map<String, CheckBox> cbMap;
@@ -82,8 +86,14 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         buttonGroup.setMinCheckCount(1);
         buttonGroup.setMaxCheckCount(1);
 
-        content.add(buttonTable).top().center().padBottom(pad18).row();
-        elementsCell = content.add().top().left();
+        content.add(buttonTable)
+                .top()
+                .center()
+                .padBottom(pad18)
+                .row();
+        elementsCell = content.add()
+                .top()
+                .left();
 
         ComponentType[] visibilityEntities = ComponentType.values();
         int j = 0;
@@ -124,7 +134,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 if (name.equals(cct)) {
                     button.setChecked(true);
                 }
-                Cell<?> c = buttonTable.add(button).padBottom(buttonPadVert);
+                Cell<?> c = buttonTable.add(button)
+                        .padBottom(buttonPadVert);
                 if ((j + 1) % visTableCols == 0) {
                     buttonTable.row();
                 } else {
@@ -142,12 +153,13 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     /**
      * Filters component types for the individual visibility window. Returns true for those components that should be listed
      * in the window.
+     *
      * @param ct The component type.
+     *
      * @return Whether it should be listed or not.
      */
     private boolean componentFilter(ComponentType ct) {
-        return ct != ComponentType.Labels
-                && ct != ComponentType.Atmospheres
+        return ct != ComponentType.Atmospheres
                 && ct != ComponentType.Clouds
                 && ct != ComponentType.Effects
                 && ct != ComponentType.VelocityVectors
@@ -165,18 +177,100 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             return true;
 
         for (final String name : names) {
-            if (name.toLowerCase(Locale.ROOT).contains(filter))
+            if (name.toLowerCase(Locale.ROOT)
+                    .contains(filter))
                 return true;
         }
         return false;
     }
 
-    private void addObjects(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
+    private void addObjects(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct,
+                            final String filter) {
+        // Locations and labels are special cases.
         if (ct == ComponentType.Locations) {
+            // Locations are grouped by object.
             addObjectsLocations(objectsGroup, checkBoxes, filter);
+        } else if (ct == ComponentType.Labels) {
+            // Labels are not objects at all!
+            addObjectsLabels(objectsGroup, checkBoxes, filter);
         } else {
             addObjectsRegular(objectsGroup, checkBoxes, ct, filter);
         }
+    }
+
+    private void addObjectsLabels(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final String filter) {
+        objectsGroup.clear();
+        checkBoxes.clear();
+        Array<Entity> objects = new Array<>();
+        scene.findEntities(objects, false);
+        Array<String> names = new Array<>(false, objects.size);
+        Map<String, Entity> objMap = new HashMap<>();
+        cbMap.clear();
+
+        for (var entity : objects) {
+            // Omit stars with no proper names and particle groups
+            var base = Mapper.base.get(entity);
+            var label = Mapper.label.get(entity);
+            var loc = Mapper.loc.get(entity);
+            var name = base.getName();
+            // We need a label component, and do not add locations.
+            if (label != null
+                    && loc == null
+                    && name != null
+                    && filter(base.names, filter)
+                    && !isHookObject(base)) {
+                names.add(name);
+                objMap.put(name, entity);
+            }
+        }
+        names.sort();
+
+        if (names.isEmpty()) {
+            objectsGroup.addActor(new OwnLabel(I18n.msg("gui.elements.type.none"), skin));
+        } else {
+            for (String name : names) {
+                var objectHGroup = new HorizontalGroup();
+                objectHGroup.space(space4);
+                objectHGroup.left();
+                var cb = new OwnCheckBox(name, skin, space4);
+                var obj = objMap.get(name);
+                var label = Mapper.label.get(obj);
+                cb.setChecked(!label.isDisplayNever());
+                cbMap.put(name, cb);
+
+                cb.addListener((event) -> {
+                    if (event instanceof ChangeListener.ChangeEvent && objMap.containsKey(name)) {
+                        GaiaSky.postRunnable(() -> {
+                            if (cb.isChecked()) {
+                                label.display = Label.LabelDisplay.AUTO;
+                            } else {
+                                label.display = Label.LabelDisplay.NEVER;
+                            }
+
+                        });
+                        return true;
+                    }
+                    return false;
+                });
+
+                objectHGroup.addActor(cb);
+                // Tooltips
+                var dd = Mapper.datasetDescription.get(obj);
+                if (dd != null) {
+                    ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
+                    meshDescTooltip.addListener(new OwnTextTooltip((dd.description == null ||
+                            dd.description.isEmpty() ? "No description" : dd.description), skin));
+                    objectHGroup.addActor(meshDescTooltip);
+                }
+
+                objectsGroup.addActor(objectHGroup);
+                checkBoxes.add(cb);
+            }
+        }
+
+        objectsGroup.pack();
+
+
     }
 
     private void addObjectsLocations(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final String filter) {
@@ -208,13 +302,16 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                     typeNames.add(type);
                 }
                 Pair<Map<String, IVisibilitySwitch>, Array<String>> pair = typeMap.get(type);
-                pair.getSecond().add(name);
-                pair.getFirst().put(name, new FocusView(object));
+                pair.getSecond()
+                        .add(name);
+                pair.getFirst()
+                        .put(name, new FocusView(object));
             }
         }
         // Sort all names.
         typeNames.sort();
-        typeMap.forEach((key, value) -> value.getSecond().sort());
+        typeMap.forEach((key, value) -> value.getSecond()
+                .sort());
 
 
         if (typeNames.isEmpty()) {
@@ -228,7 +325,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
                 // Table for type checkboxes.
                 Table cbs = new Table(skin);
-                cbs.top().left();
+                cbs.top()
+                        .left();
                 for (String name : names) {
                     HorizontalGroup objectHGroup = new HorizontalGroup();
                     objectHGroup.space(space4);
@@ -259,11 +357,16 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                     // Tooltips
                     if (obj.getDescription() != null) {
                         ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
-                        meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
+                        meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription()
+                                .isEmpty() ? "No description" : obj.getDescription()), skin));
                         objectHGroup.addActor(meshDescTooltip);
                     }
 
-                    cbs.add(objectHGroup).top().left().padBottom(space2).row();
+                    cbs.add(objectHGroup)
+                            .top()
+                            .left()
+                            .padBottom(space2)
+                            .row();
                     checkBoxes.add(cb);
                 }
 
@@ -302,8 +405,15 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 final float buttonSize = 17f;
                 buttons = new Table(skin);
                 buttons.padRight(pad20);
-                buttons.add(selectAll).size(buttonSize, buttonSize).right().bottom().padRight(pad10);
-                buttons.add(selectNone).size(buttonSize, buttonSize).right().bottom();
+                buttons.add(selectAll)
+                        .size(buttonSize, buttonSize)
+                        .right()
+                        .bottom()
+                        .padRight(pad10);
+                buttons.add(selectNone)
+                        .size(buttonSize, buttonSize)
+                        .right()
+                        .bottom();
 
                 CollapsiblePane cp = new CollapsiblePane(
                         stage,
@@ -324,7 +434,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         objectsGroup.pack();
     }
 
-    private void addObjectsRegular(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
+    private void addObjectsRegular(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct,
+                                   final String filter) {
         objectsGroup.clear();
         checkBoxes.clear();
         Array<Entity> objects = new Array<>();
@@ -379,7 +490,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 // Tooltips
                 if (obj.getDescription() != null) {
                     ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
-                    meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
+                    meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription()
+                            .isEmpty() ? "No description" : obj.getDescription()), skin));
                     objectHgroup.addActor(meshDescTooltip);
                 }
 
@@ -422,7 +534,9 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         filter.setMessageText(I18n.msg("gui.dataset.filter"));
         filter.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                addObjects(objectsGroup, checkBoxes, ct, filter.getText().trim().toLowerCase(Locale.ROOT));
+                addObjects(objectsGroup, checkBoxes, ct, filter.getText()
+                        .trim()
+                        .toLowerCase(Locale.ROOT));
                 return true;
             }
             return false;
@@ -455,8 +569,14 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         buttons.addActor(selNone);
 
         Table header = new Table(skin);
-        header.add(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header")).left().pad(5f).width(componentWidth - 100f);
-        header.add(buttons).right().pad(5f).width(100f);
+        header.add(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"))
+                .left()
+                .pad(5f)
+                .width(componentWidth - 100f);
+        header.add(buttons)
+                .right()
+                .pad(5f)
+                .width(100f);
 
         VerticalGroup group = new VerticalGroup();
         group.left();
@@ -473,15 +593,22 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     /**
      * Checks whether the given archetype is a hook object, i.e., a virtual object that is there only to
      * aggregate a group of objects as children in the scene graph.
+     *
      * @param b The base component.
+     *
      * @return Whether it is a hook object.
      */
     private boolean isHookObject(Base b) {
-        return b.archetype.getName().equals("FadeNode") ||
-                b.archetype.getName().equals("OrbitalElementsGroup") ||
-                b.archetype.getName().equals("GenericCatalog") ||
-                b.archetype.getName().equals("Invisible") ||
-                b.getName().endsWith("-hook");
+        return b.archetype.getName()
+                .equals("FadeNode") ||
+                b.archetype.getName()
+                        .equals("OrbitalElementsGroup") ||
+                b.archetype.getName()
+                        .equals("GenericCatalog") ||
+                b.archetype.getName()
+                        .equals("Invisible") ||
+                b.getName()
+                        .endsWith("-hook");
     }
 
     /**

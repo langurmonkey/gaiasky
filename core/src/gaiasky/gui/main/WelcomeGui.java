@@ -164,7 +164,8 @@ public class WelcomeGui extends AbstractGui {
                     @Override
                     public void run() {
                         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
-                                             I18n.msg("gui.welcome.gamepad.notification", Controllers.getControllers().size), 10f);
+                                             I18n.msg("gui.welcome.gamepad.notification", Controllers.getControllers().size),
+                                             10f);
                     }
                 };
                 Timer.schedule(notification, 2);
@@ -180,11 +181,25 @@ public class WelcomeGui extends AbstractGui {
         }
     }
 
+    private void checkDataMirror(){
+        // If no data mirror was selected, choose first.
+        if (Settings.settings.program.url.currentMirror == null) {
+            Settings.settings.program.url.currentMirror = Settings.settings.program.url.dataMirrors[0];
+        }
+    }
+    private void checkDescriptorMirror() {
+        // If no descriptor mirror was selected, choose first.
+        if (Settings.settings.program.url.currentDescriptor == null) {
+            Settings.settings.program.url.currentDescriptor = Settings.settings.program.url.dataDescriptors[0];
+        }
+    }
+
     /**
      * Tests and selects the best data descriptor mirror, or displays an error if no mirror could be contacted.
      * If successful, proceeds with {@link #continueWelcomeGui03()}.
      */
     private void continueWelcomeGui02() {
+        checkDataMirror();
         // Select working data descriptor mirror, in order.
         testDataDescMirrorConnectionChain(0,
                                           this::continueWelcomeGui03,
@@ -195,6 +210,7 @@ public class WelcomeGui extends AbstractGui {
      * Once the mirrors have been selected, we proceed with downloading the data descriptor and building the UI.
      */
     private void continueWelcomeGui03() {
+        checkDescriptorMirror();
         // Fetch descriptor file.
         dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
         DownloadHelper.downloadFile(Settings.settings.program.url.getCurrentDataDescriptor(),
@@ -248,6 +264,8 @@ public class WelcomeGui extends AbstractGui {
                     title = I18n.msg("gui.system.offlinemode.tooltip");
                 }
                 EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, title, 10f);
+                checkDataMirror();
+                checkDescriptorMirror();
                 buildWelcomeUI();
             });
         } else {
@@ -302,7 +320,8 @@ public class WelcomeGui extends AbstractGui {
             // Central table
             Table centerContainer = new Table(skin);
             centerContainer.setFillParent(true);
-            centerContainer.bottom().right();
+            centerContainer.bottom()
+                    .right();
             if (bgTex == null) {
                 bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
             }
@@ -311,11 +330,16 @@ public class WelcomeGui extends AbstractGui {
 
             var table = new Table(skin);
             var gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
-            table.add(gaiaSky).row();
+            table.add(gaiaSky)
+                    .row();
             var msg = new OwnLabel(I18n.msg("gui.welcome.datasets.updates"), skin);
             table.add(msg);
 
-            centerContainer.add(table).bottom().right().padBottom(30f).padRight(30f);
+            centerContainer.add(table)
+                    .bottom()
+                    .right()
+                    .padBottom(30f)
+                    .padRight(30f);
 
             stage.addActor(centerContainer);
         }
@@ -402,7 +426,8 @@ public class WelcomeGui extends AbstractGui {
         titleGroup.add(new Separator(skin, "default"))
                 .fillY()
                 .padRight(pad28 * 2f);
-        titleGroup.add(title).expandX();
+        titleGroup.add(title)
+                .expandX();
 
         String textStyle = "main-title-s";
 
@@ -422,7 +447,8 @@ public class WelcomeGui extends AbstractGui {
         if (regularStart) {
             // Regular Welcome screen options: Start Gaia Sky, Dataset Manager, Dataset List
             // Start Gaia Sky button
-            OwnTextIconButton startButton = new OwnTextIconButton(I18n.msg("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
+            OwnTextIconButton startButton = new OwnTextIconButton(I18n.msg("gui.welcome.start", Settings.APPLICATION_NAME), skin,
+                                                                  "start");
             startButton.setSpace(pad18);
             startButton.setPad(pad16);
             startButton.setContentAlign(Align.center);
@@ -479,7 +505,8 @@ public class WelcomeGui extends AbstractGui {
             }
 
             // Dataset manager button
-            OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.msg("gui.welcome.dsmanager"), skin, "cloud-download");
+            OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.msg("gui.welcome.dsmanager"), skin,
+                                                                           "cloud-download");
             datasetManagerButton.setSpace(pad18);
             datasetManagerButton.setPad(pad16);
             datasetManagerButton.setContentAlign(Align.center);
@@ -503,7 +530,8 @@ public class WelcomeGui extends AbstractGui {
                     .padBottom(pad16);
             if (serverDatasets != null && serverDatasets.updatesAvailable) {
                 datasetManagerInfo.row();
-                OwnLabel updates = new OwnLabel(I18n.msg("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin, textStyle);
+                OwnLabel updates = new OwnLabel(I18n.msg("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin,
+                                                textStyle);
                 updates.setColor(ColorUtils.gYellowC);
                 datasetManagerInfo.add(updates)
                         .bottom()
@@ -517,8 +545,9 @@ public class WelcomeGui extends AbstractGui {
                         .left();
             } else {
                 // Number selected
-                OwnLabel numCatalogsEnabled = new OwnLabel(I18n.msg("gui.welcome.enabled", numTotalCatalogsEnabled, numCatalogsAvailable), skin,
-                                                           textStyle);
+                OwnLabel numCatalogsEnabled = new OwnLabel(
+                        I18n.msg("gui.welcome.enabled", numTotalCatalogsEnabled, numCatalogsAvailable), skin,
+                        textStyle);
                 numCatalogsEnabled.setColor(ColorUtils.gBlueC);
                 datasetManagerInfo.row()
                         .padBottom(pad16);
@@ -563,8 +592,11 @@ public class WelcomeGui extends AbstractGui {
                 }));
                 OwnImageButton vrDemoTooltip = new OwnImageButton(skin, "tooltip");
                 vrDemoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.demo.info"), skin));
-                vrDemoTable.add(vrDemo).left().padRight(pad16);
-                vrDemoTable.add(vrDemoTooltip).left();
+                vrDemoTable.add(vrDemo)
+                        .left()
+                        .padRight(pad16);
+                vrDemoTable.add(vrDemoTooltip)
+                        .left();
             }
 
 
@@ -633,7 +665,8 @@ public class WelcomeGui extends AbstractGui {
 
         } else {
             // Recommended datasets
-            OwnTextIconButton recommendedDatasetsButton = new OwnTextIconButton(I18n.msg("gui.welcome.recommended"), skin, "start");
+            OwnTextIconButton recommendedDatasetsButton = new OwnTextIconButton(I18n.msg("gui.welcome.recommended"), skin,
+                                                                                "start");
             recommendedDatasetsButton.setSpace(pad18);
             recommendedDatasetsButton.setPad(pad16);
             recommendedDatasetsButton.setContentAlign(Align.center);
@@ -650,7 +683,8 @@ public class WelcomeGui extends AbstractGui {
                     } else {
                         recommendedDatasets = Settings.settings.program.recommendedDatasets;
                     }
-                    var recommended = serverDatasets.datasets.stream().filter(ds -> recommendedDatasets.contains(ds.key))
+                    var recommended = serverDatasets.datasets.stream()
+                            .filter(ds -> recommendedDatasets.contains(ds.key))
                             .sorted(Comparator.comparing(datasetDesc -> datasetDesc.name))
                             .toList();
                     var bdwTitle = I18n.msg("gui.batch.recommended.title");
@@ -733,28 +767,34 @@ public class WelcomeGui extends AbstractGui {
                 .row();
 
         if (enabledDatasets != null && !enabledDatasets.isEmpty()) {
-            enabledDatasets.stream().sorted().forEach(ds -> {
-                var typeIcon = new OwnImage(skin.getDrawable(DatasetManagerWindow.getIcon(ds.type)));
-                typeIcon.setSize(30f, 30f);
-                var disable = new OwnTextIconButton("", skin, "select-none");
-                disable.setSize(40f, 35f);
-                disable.addListener(new OwnTextTooltip(I18n.msg("gui.download.disable") + " " + ds.name, skin, 40));
-                disable.addListener(new ChangeListener() {
-                    @Override
-                    public void changed(ChangeEvent event, Actor actor) {
-                        Settings.settings.data.disableDataset(ds);
-                        reloadView();
-                    }
-                });
-                var dsName = new OwnLabel(TextUtils.capString(ds.name, 32), skin);
-                dsName.setWidth(410f);
-                var g = hg(typeIcon, dsName);
-                datasets.add(disable).center().padRight(pad16 / 2f).left().padBottom(pad16);
-                datasets.add(g)
-                        .left()
-                        .padBottom(pad16)
-                        .row();
-            });
+            enabledDatasets.stream()
+                    .sorted()
+                    .forEach(ds -> {
+                        var typeIcon = new OwnImage(skin.getDrawable(DatasetManagerWindow.getIcon(ds.type)));
+                        typeIcon.setSize(30f, 30f);
+                        var disable = new OwnTextIconButton("", skin, "select-none");
+                        disable.setSize(40f, 35f);
+                        disable.addListener(new OwnTextTooltip(I18n.msg("gui.download.disable") + " " + ds.name, skin, 40));
+                        disable.addListener(new ChangeListener() {
+                            @Override
+                            public void changed(ChangeEvent event, Actor actor) {
+                                Settings.settings.data.disableDataset(ds);
+                                reloadView();
+                            }
+                        });
+                        var dsName = new OwnLabel(TextUtils.capString(ds.name, 32), skin);
+                        dsName.setWidth(410f);
+                        var g = hg(typeIcon, dsName);
+                        datasets.add(disable)
+                                .center()
+                                .padRight(pad16 / 2f)
+                                .left()
+                                .padBottom(pad16);
+                        datasets.add(g)
+                                .left()
+                                .padBottom(pad16)
+                                .row();
+                    });
         } else {
             var noDatasets = new OwnLabel(I18n.msg("gui.welcome.datasets.enabled.no"), skin);
             noDatasets.setWidth(410f);
@@ -765,7 +805,9 @@ public class WelcomeGui extends AbstractGui {
         datasets.pack();
 
         final var datasetsScroll = getOwnScrollPane(datasets);
-        datasetsTable.add(datasetsScroll).top().left();
+        datasetsTable.add(datasetsScroll)
+                .top()
+                .left();
 
         datasetsContainer.add(datasetsTable)
                 .right()
@@ -878,7 +920,9 @@ public class WelcomeGui extends AbstractGui {
                             content.clear();
                             content.pad(pad34, pad28 * 2f, pad34, pad28 * 2f);
                             content.add(
-                                            new OwnLabel(I18n.msg("gui.basedata.default", baseData.name, I18n.msg("gui.welcome.dsmanager")), skin, "huge"))
+                                            new OwnLabel(
+                                                    I18n.msg("gui.basedata.default", baseData.name, I18n.msg("gui.welcome.dsmanager")),
+                                                    skin, "huge"))
                                     .left()
                                     .colspan(
                                             3)
@@ -890,7 +934,8 @@ public class WelcomeGui extends AbstractGui {
                             content.add(new OwnLabel("->", skin, "main-title-s"))
                                     .center()
                                     .padRight(pad34);
-                            content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.serverVersion), skin, "header-large"))
+                            content.add(
+                                            new OwnLabel(I18n.msg("gui.basedata.version", baseData.serverVersion), skin, "header-large"))
                                     .center()
                                     .padRight(pad34);
                         }

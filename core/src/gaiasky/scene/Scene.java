@@ -263,13 +263,15 @@ public class Scene {
      */
     public void initializeIndex() {
         if (engine != null) {
-            int numEntities = engine.getEntities().size();
+            int numEntities = engine.getEntities()
+                    .size();
 
             index = new Index(archetypes, numEntities);
             copyIndex = ThreadLocal.withInitial(HashMap::new);
 
             // Prepare system.
-            indexInitializer = new IndexInitializer(index, Family.all(Base.class).get(), 0);
+            indexInitializer = new IndexInitializer(index, Family.all(Base.class)
+                    .get(), 0);
 
             // Run once.
             runOnce(indexInitializer);
@@ -388,7 +390,8 @@ public class Scene {
     public void initializeEntity(Entity entity) {
         if (initializers != null) {
             for (AbstractInitSystem system : initializers) {
-                if (system.getFamily().matches(entity)) {
+                if (system.getFamily()
+                        .matches(entity)) {
                     system.initializeEntity(entity);
                 }
             }
@@ -404,7 +407,8 @@ public class Scene {
     public void setUpEntity(Entity entity) {
         if (initializers != null) {
             for (AbstractInitSystem system : initializers) {
-                if (system.getFamily().matches(entity)) {
+                if (system.getFamily()
+                        .matches(entity)) {
                     system.setUpEntity(entity);
                 }
             }
@@ -431,7 +435,8 @@ public class Scene {
             } else {
                 // Regular search.
                 for (EntityUpdater system : updaters) {
-                    if (system.getFamily().matches(entity)) {
+                    if (system.getFamily()
+                            .matches(entity)) {
                         system.updateEntity(entity, deltaTime);
                     }
                 }
@@ -448,7 +453,8 @@ public class Scene {
     public void extractEntity(Entity entity) {
         if (extractors != null) {
             for (AbstractExtractSystem system : extractors) {
-                if (system.getFamily().matches(entity)) {
+                if (system.getFamily()
+                        .matches(entity)) {
                     system.extract(entity);
                 }
             }
@@ -480,7 +486,8 @@ public class Scene {
     private <T extends EntityUpdater> T findUpdater(Class<T> updaterClass) {
         if (updaters != null) {
             for (EntityUpdater updater : updaters) {
-                if (updater.getClass().isAssignableFrom(updaterClass)) {
+                if (updater.getClass()
+                        .isAssignableFrom(updaterClass)) {
                     return (T) updater;
                 }
             }
@@ -532,7 +539,8 @@ public class Scene {
             ok = index.addToIndex(entity);
         }
         if (!ok) {
-            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity).getName() + ")"));
+            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity)
+                    .getName() + ")"));
         } else {
             if (parent != null) {
                 var parentGraph = Mapper.graph.get(parent);
@@ -623,10 +631,11 @@ public class Scene {
      * Updates the localized names of all entities in the scene.
      */
     public void updateLocalizedNames() {
-        engine.getEntities().forEach((entity) -> {
-            var base = Mapper.base.get(entity);
-            base.updateLocalizedName();
-        });
+        engine.getEntities()
+                .forEach((entity) -> {
+                    var base = Mapper.base.get(entity);
+                    base.updateLocalizedName();
+                });
     }
 
     /**
@@ -702,20 +711,21 @@ public class Scene {
     public Array<Entity> findFocusableEntities() {
         Array<Entity> list = new Array<>();
 
-        engine.getEntities().forEach((entity) -> {
-            if (Mapper.focus.has(entity)) {
-                list.add(entity);
-            } else if (Mapper.octree.has(entity)) {
-                // LOD objects are not in the scene graph structure.
-                var octree = Mapper.octree.get(entity);
-                Set<Entity> objects = octree.parenthood.keySet();
-                objects.forEach((object) -> {
-                    if (Mapper.focus.has(object)) {
-                        list.add(object);
+        engine.getEntities()
+                .forEach((entity) -> {
+                    if (Mapper.focus.has(entity)) {
+                        list.add(entity);
+                    } else if (Mapper.octree.has(entity)) {
+                        // LOD objects are not in the scene graph structure.
+                        var octree = Mapper.octree.get(entity);
+                        Set<Entity> objects = octree.parenthood.keySet();
+                        objects.forEach((object) -> {
+                            if (Mapper.focus.has(object)) {
+                                list.add(object);
+                            }
+                        });
                     }
                 });
-            }
-        });
 
         return list;
     }
@@ -759,22 +769,30 @@ public class Scene {
      */
     public Array<Entity> findEntities() {
         Array<Entity> list = new Array<>();
-
-        engine.getEntities().forEach((entity) -> {
-            if (Mapper.octree.has(entity)) {
-                // LOD objects are not in the scene graph structure.
-                var octree = Mapper.octree.get(entity);
-                Set<Entity> objects = octree.parenthood.keySet();
-                objects.forEach((object) -> {
-                    if (Mapper.focus.has(object)) {
-                        list.add(object);
-                    }
-                });
-            }
-            list.add(entity);
-        });
-
+        findEntities(list, true);
         return list;
+    }
+
+    /**
+     * Finds all the entities in the scene and puts them in the result list.
+     *
+     * @param result The list to hold the entities.
+     */
+    public void findEntities(Array<Entity> result, boolean expandOctree) {
+        engine.getEntities()
+                .forEach((entity) -> {
+                    if (expandOctree && Mapper.octree.has(entity)) {
+                        // LOD objects are not in the scene graph structure.
+                        var octree = Mapper.octree.get(entity);
+                        Set<Entity> objects = octree.parenthood.keySet();
+                        objects.forEach((object) -> {
+                            if (Mapper.focus.has(object)) {
+                                result.add(object);
+                            }
+                        });
+                    }
+                    result.add(entity);
+                });
     }
 
     public ImmutableArray<Entity> findEntitiesByFamily(Family family) {
@@ -783,11 +801,12 @@ public class Scene {
 
     public void findEntitiesByComponentType(gaiasky.render.ComponentTypes.ComponentType componentType,
                                             Array<Entity> list) {
-        engine.getEntities().forEach((entity) -> {
-            var base = Mapper.base.get(entity);
-            if (base.ct != null && base.ct.isEnabled(componentType))
-                list.add(entity);
-        });
+        engine.getEntities()
+                .forEach((entity) -> {
+                    var base = Mapper.base.get(entity);
+                    if (base.ct != null && base.ct.isEnabled(componentType))
+                        list.add(entity);
+                });
     }
 
     /**
@@ -799,12 +818,13 @@ public class Scene {
      * @param out  The out double array
      *
      * @return The out double array if the object exists, has a position and out has 3 or more
-     *         slots. Null otherwise.
+     * slots. Null otherwise.
      */
     public double[] getObjectPosition(String name,
                                       double[] out) {
         if (out.length >= 3 && name != null) {
-            name = name.toLowerCase(Locale.ROOT).trim();
+            name = name.toLowerCase(Locale.ROOT)
+                    .trim();
             if (index.containsEntity(name)) {
                 Entity entity = index.getEntity(name);
                 focusView.setEntity(entity);
@@ -861,7 +881,8 @@ public class Scene {
         var copy = getSimpleCopy(entity);
         // Add to copy index.
         var base = Mapper.base.get(copy);
-        index.put(base.getName().toLowerCase(Locale.ROOT), copy);
+        index.put(base.getName()
+                          .toLowerCase(Locale.ROOT), copy);
         var graph = Mapper.graph.get(entity);
         if (graph.parent != null) {
             var parentCopy = getLineCopy(graph.parent, index);
@@ -893,10 +914,13 @@ public class Scene {
                 copy.add(componentCopy);
             } else {
                 try {
-                    Component componentCopy = component.getClass().getDeclaredConstructor().newInstance();
+                    Component componentCopy = component.getClass()
+                            .getDeclaredConstructor()
+                            .newInstance();
                     copy.add(componentCopy);
                 } catch (Exception e) {
-                    logger.error("Could not create copy of component " + component.getClass().getSimpleName());
+                    logger.error("Could not create copy of component " + component.getClass()
+                            .getSimpleName());
                 }
             }
             // Attach copy tag.
@@ -944,9 +968,13 @@ public class Scene {
     public int getNumberObjects(Entity entity) {
 
         if (Mapper.particleSet.has(entity)) {
-            return Mapper.particleSet.get(entity).data().size();
+            return Mapper.particleSet.get(entity)
+                    .data()
+                    .size();
         } else if (Mapper.starSet.has(entity)) {
-            return Mapper.starSet.get(entity).data().size();
+            return Mapper.starSet.get(entity)
+                    .data()
+                    .size();
         } else if (Mapper.octree.has(entity)) {
             var octant = Mapper.octant.get(entity);
             return getNumberObjects(octant.octant);
