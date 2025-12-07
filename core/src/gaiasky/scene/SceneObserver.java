@@ -71,7 +71,7 @@ public class SceneObserver implements IObserver {
                     final String name = (String) data[1];
                     final boolean state = (boolean) data[2];
 
-                    focusView.setForceLabel(state, name.toLowerCase(Locale.ROOT));
+                    focusView.setForceLabel(state, name);
                     logger.info(I18n.msg("notif.object.flag", "forceLabel", name, I18n.msg("gui." + state)));
                 }
             }
@@ -85,10 +85,10 @@ public class SceneObserver implements IObserver {
                 }
                 if (focusView != null) {
                     final String name = (String) data[1];
-                    final boolean state = (boolean) data[2];
+                    final boolean mute = (boolean) data[2];
 
-                    focusView.setRenderLabel(!state, name.toLowerCase(Locale.ROOT));
-                    logger.info(I18n.msg("notif.object.flag", "muteLabel", name, I18n.msg("gui." + state)));
+                    focusView.setRenderLabel(!mute, name);
+                    logger.info(I18n.msg("notif.object.flag", "muteLabel", name, I18n.msg("gui." + mute)));
                 }
             }
             case LABEL_EXCLUDE_REGEX_CMD -> {

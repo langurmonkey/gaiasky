@@ -911,7 +911,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public void setRenderLabel(Boolean renderLabel,
                               String name) {
-        if (isSet()) {
+        if (isSet() && name != null && !name.isBlank()) {
             getSet().setRenderLabel(renderLabel, name);
         } else if (Mapper.label.has(entity)) {
             Mapper.label.get(entity).setRenderLabel(renderLabel);

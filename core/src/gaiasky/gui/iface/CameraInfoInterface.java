@@ -549,7 +549,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE,
                                         Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED,
                                         Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR,
-                                        Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD);
+                                        Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD,
+                                        Event.MUTE_OBJECT_LABEL_CMD);
     }
 
     private void unsubscribe() {
@@ -621,7 +622,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                         focusActionsGroup.addActor(refreshOrbit);
                         refreshOrbit.addListener(lastRefreshListener = (evt) -> {
                             if (evt instanceof ChangeEvent) {
-                                GaiaSky.postRunnable(() -> EventManager.publish(Event.ORBIT_REFRESH_CMD, refreshOrbit, orbitEntity));
+                                GaiaSky.postRunnable(
+                                        () -> EventManager.publish(Event.ORBIT_REFRESH_CMD, refreshOrbit, orbitEntity));
                                 return true;
                             }
                             return false;
@@ -919,9 +921,21 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 if (source != labelVisibility) {
                     if (data[0] instanceof Entity entity) {
                         String name = (String) data[1];
-                        if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
+                        if (currentFocus == view && view.getEntity() == entity && (name == null || currentFocus.hasName(name))) {
                             boolean forceLabel = (boolean) data[2];
                             labelVisibility.setCheckedNoFire(forceLabel);
+                        }
+                    }
+                }
+            }
+            case MUTE_OBJECT_LABEL_CMD -> {
+                if (source != labelVisibility) {
+                    if (data[0] instanceof Entity entity) {
+                        String name = (String) data[1];
+                        if (currentFocus == view && view.getEntity() == entity && (name == null || currentFocus.hasName(name))) {
+                            boolean muteLabel = (boolean) data[2];
+                            if (muteLabel)
+                                labelVisibility.setCheckedNoFire(false);
                         }
                     }
                 }

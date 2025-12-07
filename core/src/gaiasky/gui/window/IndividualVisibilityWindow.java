@@ -241,12 +241,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 cb.addListener((event) -> {
                     if (event instanceof ChangeListener.ChangeEvent && objMap.containsKey(name)) {
                         GaiaSky.postRunnable(() -> {
-                            if (cb.isChecked()) {
-                                label.display = Label.LabelDisplay.AUTO;
-                            } else {
-                                label.display = Label.LabelDisplay.NEVER;
-                            }
-
+                            EventManager.publish(Event.MUTE_OBJECT_LABEL_CMD, me, obj, null, !cb.isChecked());
                         });
                         return true;
                     }
