@@ -26,6 +26,7 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
@@ -40,6 +41,9 @@ import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
+
+import static gaiasky.scene.component.Label.LabelDisplay.ALWAYS;
+import static gaiasky.scene.component.Label.LabelDisplay.NEVER;
 
 /**
  * Builds the pane that contains information on the current camera state.
@@ -61,7 +65,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol,
             focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
     protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralPlanet, proceduralGalaxy;
-    protected OwnImageButton objectVisibility, labelVisibility;
+    protected OwnImageButton objectVisibility, forceLabel;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
@@ -245,18 +249,18 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
                 EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, objectVisibility, currentFocus, currentFocus.getName(),
-                                     !objectVisibility.isChecked());
+                                     objectVisibility.isChecked());
                 return true;
             }
             return false;
         });
 
-        labelVisibility = new OwnImageButton(skin, "label-toggle");
-        labelVisibility.addListener(event -> {
+        forceLabel = new OwnImageButton(skin, "label-toggle");
+        forceLabel.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
-                EventManager.publish(Event.FORCE_OBJECT_LABEL_CMD, labelVisibility, currentFocus, currentFocus.getName(),
-                                     !labelVisibility.isChecked());
+                var state = forceLabel.isChecked() ? ALWAYS : LabelDisplay.AUTO;
+                EventManager.publish(Event.LABEL_DISPLAY_CMD, forceLabel, currentFocus, currentFocus.getName(), state);
                 return true;
             }
             return false;
@@ -273,7 +277,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusActionsGroup = new HorizontalGroup();
         focusActionsGroup.space(pad5);
         focusActionsGroup.addActor(objectVisibility);
-        focusActionsGroup.addActor(labelVisibility);
+        focusActionsGroup.addActor(forceLabel);
         focusActionsGroup.addActor(bookmark);
         focusActionsGroup.addActor(goTo);
         focusActionsGroup.addActor(landOn);
@@ -549,8 +553,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE,
                                         Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED,
                                         Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR,
-                                        Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD,
-                                        Event.MUTE_OBJECT_LABEL_CMD);
+                                        Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.LABEL_DISPLAY_CMD);
     }
 
     private void unsubscribe() {
@@ -651,12 +654,12 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 bookmark.setProgrammaticChangeEvents(true);
 
                 // Visible
-                objectVisibility.setCheckedNoFire(!((IVisibilitySwitch) currentFocus).isVisible(true));
+                objectVisibility.setCheckedNoFire(((IVisibilitySwitch) currentFocus).isVisible(true));
                 objectVisibility.addListener(new OwnTextTooltip(I18n.msg("action.visibility", currentFocus.getName()), skin));
 
                 // Force label
-                labelVisibility.setCheckedNoFire(!currentFocus.isForceLabel(currentFocus.getName()));
-                labelVisibility.addListener(new OwnTextTooltip(I18n.msg("action.forcelabel", currentFocus.getName()), skin));
+                forceLabel.setCheckedNoFire(currentFocus.isForceLabel(currentFocus.getName()));
+                forceLabel.addListener(new OwnTextTooltip(I18n.msg("action.forcelabel", currentFocus.getName()), skin));
 
                 // ID, names
                 focusId.setText(idString);
@@ -904,7 +907,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                         String name = (String) data[1];
                         if (vs == currentFocus && currentFocus.hasName(name)) {
                             boolean visible = (boolean) data[2];
-                            objectVisibility.setCheckedNoFire(!visible);
+                            objectVisibility.setCheckedNoFire(visible);
                         }
                     }
 
@@ -912,33 +915,22 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                         String name = (String) data[1];
                         if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
                             boolean visible = (boolean) data[2];
-                            objectVisibility.setCheckedNoFire(!visible);
+                            objectVisibility.setCheckedNoFire(visible);
                         }
                     }
                 }
             }
-            case FORCE_OBJECT_LABEL_CMD -> {
-                if (source != labelVisibility) {
+            case LABEL_DISPLAY_CMD -> {
+                if (source != forceLabel) {
                     if (data[0] instanceof Entity entity) {
                         String name = (String) data[1];
                         if (currentFocus == view && view.getEntity() == entity && (name == null || currentFocus.hasName(name))) {
-                            boolean forceLabel = (boolean) data[2];
-                            labelVisibility.setCheckedNoFire(forceLabel);
+                            var newState = (LabelDisplay) data[2];
+                            this.forceLabel.setCheckedNoFire(newState == LabelDisplay.ALWAYS);
                         }
                     }
                 }
-            }
-            case MUTE_OBJECT_LABEL_CMD -> {
-                if (source != labelVisibility) {
-                    if (data[0] instanceof Entity entity) {
-                        String name = (String) data[1];
-                        if (currentFocus == view && view.getEntity() == entity && (name == null || currentFocus.hasName(name))) {
-                            boolean muteLabel = (boolean) data[2];
-                            if (muteLabel)
-                                labelVisibility.setCheckedNoFire(false);
-                        }
-                    }
-                }
+
             }
             default -> {
             }

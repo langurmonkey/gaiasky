@@ -20,6 +20,7 @@ import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.component.*;
+import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
@@ -320,8 +321,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         }
     }
 
-    public boolean isSolidObject(){
-       return !Mapper.billboardSet.has(entity) && !Mapper.orbitElementsSet.has(entity);
+    public boolean isSolidObject() {
+        return !Mapper.billboardSet.has(entity) && !Mapper.orbitElementsSet.has(entity);
     }
 
 
@@ -883,13 +884,14 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return -1;
     }
 
-    public void setForceLabel(Boolean forceLabel,
-                              String name) {
-        if (isSet()) {
-            getSet().setForceLabel(forceLabel, name);
+    public void setLabelDisplay(LabelDisplay state, String name) {
+        // If name is empty with a set, we set the value on the set itself.
+        if (isSet() && name != null && !name.isBlank()) {
+            getSet().setLabelDisplay(state, name);
         } else if (Mapper.label.has(entity)) {
-            Mapper.label.get(entity).setForceLabel(forceLabel);
+            Mapper.label.get(entity).setLabelDisplay(state);
         }
+
     }
 
     @Override
@@ -907,15 +909,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             return Mapper.label.get(entity).forceLabel();
         }
         return false;
-    }
-
-    public void setRenderLabel(Boolean renderLabel,
-                              String name) {
-        if (isSet() && name != null && !name.isBlank()) {
-            getSet().setRenderLabel(renderLabel, name);
-        } else if (Mapper.label.has(entity)) {
-            Mapper.label.get(entity).setRenderLabel(renderLabel);
-        }
     }
 
     @Override

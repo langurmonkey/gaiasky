@@ -15,8 +15,10 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Consumers.Consumer7;
+import gaiasky.util.LocalizedEnum;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3Q;
 
 import java.util.Locale;
@@ -27,13 +29,18 @@ import java.util.function.Function;
 public class Label implements Component {
 
     /** Enum with states for the label display property. **/
-    public enum LabelDisplay {
+    public enum LabelDisplay implements LocalizedEnum {
         /** Always display the label for this object. **/
         ALWAYS,
         /** Never display the label for this object. **/
         NEVER,
         /** Display the label for this object based on the automatic labelling algorithm. **/
         AUTO;
+
+        @Override
+        public String localizedName() {
+            return I18n.msg("gui.enum.label.display." + name().toLowerCase(Locale.ROOT));
+        }
     }
 
     /**
@@ -94,9 +101,13 @@ public class Label implements Component {
     public void setLabelDisplay(String value) {
         try {
             var d = LabelDisplay.valueOf(value.toUpperCase(Locale.ROOT));
-            this.display = d;
+            setLabelDisplay(d);
         } catch (IllegalArgumentException ignored) {
         }
+    }
+
+    public void setLabelDisplay(LabelDisplay value) {
+        this.display = value;
     }
 
     public void setForceLabel(Boolean force) {

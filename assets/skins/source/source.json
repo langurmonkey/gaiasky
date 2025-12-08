@@ -700,12 +700,12 @@
       "imageDisabled": "bin-s-icon-grey"
     },
     "eye-toggle": {
-      "imageUp": "eye-icon",
-      "imageChecked": "eye-closed-icon"
+      "imageUp": "eye-closed-icon",
+      "imageChecked": "eye-icon"
     },
     "label-toggle": {
-      "imageUp": "iconic-tag",
-      "imageChecked": "iconic-tag-gray"
+      "imageUp": "iconic-tag-gray",
+      "imageChecked": "iconic-tag"
     },
     "highlight-ds": {
       "imageUp": "highlight-off",

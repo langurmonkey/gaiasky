@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
@@ -28,8 +29,7 @@ public class SceneObserver implements IObserver {
 
         EventManager.instance.subscribe(this,
                                         Event.PER_OBJECT_VISIBILITY_CMD,
-                                        Event.FORCE_OBJECT_LABEL_CMD,
-                                        Event.MUTE_OBJECT_LABEL_CMD,
+                                        Event.LABEL_DISPLAY_CMD,
                                         Event.LABEL_EXCLUDE_REGEX_CMD,
                                         Event.LABEL_INCLUDE_REGEX_CMD,
                                         Event.LABEL_CLEAR_FILTER_REGEX_CMD,
@@ -59,7 +59,7 @@ public class SceneObserver implements IObserver {
                     logger.warn("PER_OBJECT_VISIBILITY_CMD needs a FocusView or an Entity, got " + data[0].getClass().getSimpleName());
                 }
             }
-            case FORCE_OBJECT_LABEL_CMD -> {
+            case LABEL_DISPLAY_CMD -> {
                 FocusView focusView = null;
                 if (data[0] instanceof Entity entity) {
                     view.setEntity(entity);
@@ -68,27 +68,11 @@ public class SceneObserver implements IObserver {
                     focusView = fv;
                 }
                 if (focusView != null) {
-                    final String name = (String) data[1];
-                    final boolean state = (boolean) data[2];
+                    final var name = (String) data[1];
+                    final var state = (LabelDisplay) data[2];
 
-                    focusView.setForceLabel(state, name);
-                    logger.info(I18n.msg("notif.object.flag", "forceLabel", name, I18n.msg("gui." + state)));
-                }
-            }
-            case MUTE_OBJECT_LABEL_CMD -> {
-                FocusView focusView = null;
-                if (data[0] instanceof Entity entity) {
-                    view.setEntity(entity);
-                    focusView = view;
-                } else if (data[0] instanceof FocusView fv) {
-                    focusView = fv;
-                }
-                if (focusView != null) {
-                    final String name = (String) data[1];
-                    final boolean mute = (boolean) data[2];
-
-                    focusView.setRenderLabel(!mute, name);
-                    logger.info(I18n.msg("notif.object.flag", "muteLabel", name, I18n.msg("gui." + mute)));
+                    focusView.setLabelDisplay(state, name);
+                    logger.info(I18n.msg("notif.object.property", "labelDisplay", name, state.localizedName()));
                 }
             }
             case LABEL_EXCLUDE_REGEX_CMD -> {

@@ -29,6 +29,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.AttitudeComponent;
+import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.GalaxyGenerator;
@@ -554,7 +555,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     public void set_force_display_label(String name, boolean force) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
-            em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, name, force);
+            em.post(Event.LABEL_DISPLAY_CMD, this, obj, name, force ? LabelDisplay.ALWAYS : LabelDisplay.AUTO);
         }
     }
 
@@ -581,7 +582,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     public void set_mute_label(String name, boolean mute) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
-            em.post(Event.MUTE_OBJECT_LABEL_CMD, this, obj, name, mute);
+            em.post(Event.LABEL_DISPLAY_CMD, this, obj, name, mute ? LabelDisplay.NEVER : LabelDisplay.AUTO);
         }
     }
 

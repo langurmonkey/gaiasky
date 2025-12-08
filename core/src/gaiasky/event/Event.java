@@ -11,6 +11,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
+import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
@@ -1148,18 +1149,16 @@ public enum Event {
     PER_OBJECT_VISIBILITY_CMD,
 
     /**
-     * Sets the force label flag on the given object which causes the label to always be rendered regardless of the solid angle.
-     * Contains the entity, the name of the object, a boolean with the new force label state, and the
-     * source object.
+     * Sets the label display property on the given object. The display property is a {@link LabelDisplay} object, and it can take the
+     * values:
+     * <ul>
+     *     <li>{@link LabelDisplay#NEVER} &mdash; The label is muted, never displayed.</li>
+     *     <li>{@link LabelDisplay#AUTO} &mdash; The system decides when the label is displayed according to the internal logic. Default value</li>
+     *     <li>{@link LabelDisplay#ALWAYS} &mdash; The label is forced, always displayed.</li>
+     * </ul>
+     * Contains the entity, the name of the object, and the new {@link LabelDisplay} state.
      */
-    FORCE_OBJECT_LABEL_CMD,
-
-    /**
-     * Sets the mute label flag on the given object which causes the label to never be rendered.
-     * Contains the entity, the name of the object, a boolean with the new mute label state, and the
-     * source object.
-     */
-    MUTE_OBJECT_LABEL_CMD,
+    LABEL_DISPLAY_CMD,
 
     /**
      * Set include regular expression. Only labels matching this regex are rendered.

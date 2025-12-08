@@ -25,6 +25,7 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Label;
+import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
@@ -241,7 +242,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 cb.addListener((event) -> {
                     if (event instanceof ChangeListener.ChangeEvent && objMap.containsKey(name)) {
                         GaiaSky.postRunnable(() -> {
-                            EventManager.publish(Event.MUTE_OBJECT_LABEL_CMD, me, obj, null, !cb.isChecked());
+                            var state = cb.isChecked()? LabelDisplay.AUTO : LabelDisplay.NEVER;
+                            EventManager.publish(Event.LABEL_DISPLAY_CMD, me, obj, null, state);
                         });
                         return true;
                     }

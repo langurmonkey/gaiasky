@@ -1168,22 +1168,34 @@ public class ParticleSet implements Component, IDisposable {
         return model == null && modelType.equalsIgnoreCase("quad");
     }
 
-    public void setForceLabel(Boolean forceLabel,
+    public void setLabelDisplay(LabelDisplay state,
                               String name) {
         name = name.toLowerCase(Locale.ROOT)
                 .trim();
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
-                if (this.labelDisplayAlways.contains(idx)) {
-                    if (!forceLabel) {
-                        this.labelDisplayAlways.remove(idx);
+                switch(state) {
+                    case ALWAYS -> {
+                        this.labelDisplayAlways.add(idx);
+                        this.labelDisplayNever.remove(idx);
                     }
-                } else if (forceLabel) {
-                    this.labelDisplayAlways.add(idx);
+                    case NEVER -> {
+                        this.labelDisplayAlways.remove(idx);
+                        this.labelDisplayNever.add(idx);
+                    }
+                    case AUTO -> {
+                        this.labelDisplayAlways.remove(idx);
+                        this.labelDisplayNever.remove(idx);
+                    }
                 }
             }
         }
+    }
+
+    public void setForceLabel(Boolean forceLabel,
+                              String name) {
+        setLabelDisplay(forceLabel ? LabelDisplay.ALWAYS : LabelDisplay.AUTO, name);
     }
 
     public boolean isForceLabel(String name) {
@@ -1200,20 +1212,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setRenderLabel(Boolean renderLabel,
                                String name) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
-        synchronized (indexSync) {
-            if (index != null && index.containsKey(name)) {
-                int idx = index.get(name);
-                if (!this.labelDisplayNever.contains(idx)) {
-                    if (!renderLabel) {
-                        this.labelDisplayNever.add(idx);
-                    }
-                } else if (renderLabel) {
-                    this.labelDisplayNever.remove(idx);
-                }
-            }
-        }
+        setLabelDisplay(renderLabel ? LabelDisplay.AUTO : LabelDisplay.NEVER, name);
     }
 
     public boolean isRenderLabel(String name) {
