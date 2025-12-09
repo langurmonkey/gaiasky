@@ -85,21 +85,55 @@ public interface SceneAPI {
                               double timeout);
 
     /**
-     * Get the reference to an entity given its name.
+     * Get the reference to an entity given its name using the internal index. This method
+     * returns proper scene entities only. If you need any other kind of entity (datasets,
+     * hooks, etc.), use {@link #get_non_index_entity(String, double)}.
      *
      * @param name Entity name.
+     *
+     * @return Reference to the entity.
      **/
     Entity get_entity(String name);
 
     /**
      * Get the reference to an entity given its name and a timeout in seconds.
+     * This method returns proper scene entities only. If you need any other kind of entity
+     * (datasets, hooks, etc.), use {@link #get_non_index_entity(String)}
      * If the entity is not in the scene after the timeout has passed, ths method
      * returns null.
      *
      * @param name    Entity name.
      * @param timeout Timeout time, in seconds.
+     *
+     * @return Reference to the entity.
      **/
     Entity get_entity(String name, double timeout);
+
+    /**
+     * Gets the reference to an entity given its name without using the index. This method
+     * is slower than its indexed counterpart ({@link #get_entity(String)}, but it can
+     * get any type of entity.
+     *
+     * @param name Entity name.
+     *
+     * @return Reference to the entity.
+     */
+    Entity get_non_index_entity(String name);
+
+    /**
+     * Get the reference to an entity given its name and a timeout in seconds, without using the index.
+     * This method is slower than its indexed counterpart ({@link #get_entity(String, double)}, but it
+     * can get non-indexed entities.
+     * <p>
+     * If the entity is not in the scene after the timeout has passed, ths method
+     * returns null.
+     *
+     * @param name    Entity name.
+     * @param timeout Timeout time, in seconds.
+     *
+     * @return Reference to the entity.
+     **/
+    Entity get_non_index_entity(String name, double timeout);
 
     /**
      * Get a focus object from the scene given its name.
@@ -672,7 +706,8 @@ public interface SceneAPI {
      * rendered after this call. This call disables the global exclude regular expression (set with {@link #set_label_exclude_regexp(String)}), if
      * it is set.
      * <p>
-     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API programmatically (i.e.
+     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API
+     * programmatically (i.e.
      * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
      * <p>
      * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clear_label_filter_regexps()}.
@@ -686,10 +721,12 @@ public interface SceneAPI {
 
     /**
      * Set the global exclude regular expression for filtering labels. Labels that match this regular expression are
-     * not rendered after this call. This call disables the global include regular expression (set with {@link #set_label_include_regexp(String)}), if
+     * not rendered after this call. This call disables the global include regular expression (set with {@link #set_label_include_regexp(String)}),
+     * if
      * it is set.
      * <p>
-     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API programmatically (i.e.
+     * Java (like many other c-style languages) interprets backslashes (<code>'\'</code>) as escape characters. If you are calling the API
+     * programmatically (i.e.
      * from Python), make sure to escape the backslashes in your source code; use <code>"\\d+"</code> instead of <code>"\d+"</code>.
      * <p>
      * You clear all label-filtering regular expressions, effectively reverting the effects of this call, with {@link #clear_label_filter_regexps()}.

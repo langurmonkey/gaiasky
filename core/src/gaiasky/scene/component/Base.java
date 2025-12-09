@@ -133,6 +133,8 @@ public class Base implements Component, ICopy {
 
     /**
      * Checks if the entity holding this {@link Base} component has a name that matches the candidate.
+     * If the candidate string is not a regex, the matching is done with equals() and contains(). If the
+     * candidate string is a regex
      *
      * @param candidate The candidate string.
      * @param matchCase Whether to match the case.

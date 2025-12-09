@@ -52,6 +52,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Loads Gaia Sky LOD datasets backed by an octree.
  */
 public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOctantLoader {
+    /** Star group name prefix. **/
+    public static final String STAR_GROUP_NAME_PREFIX = "stargroup-";
+    /** Star group name template. **/
+    private static final String STAR_GROUP_NAME_TEMPLATE = STAR_GROUP_NAME_PREFIX + "%%SGID%%";
+
     /**
      * Data will be preloaded at startup down to this octree depth.
      */
@@ -542,7 +547,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         var octree = Mapper.octree.get(octreeWrapper);
 
         List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
-        Entity sg = SetUtils.createStarSet(scene, "stargroup-%%SGID%%", data, baseInitializer, setInitializer, fullInit);
+        Entity sg = SetUtils.createStarSet(scene, STAR_GROUP_NAME_TEMPLATE, data, baseInitializer, setInitializer, fullInit);
         sg.add(new TagOctreeObject());
 
         var set = Mapper.starSet.get(sg);

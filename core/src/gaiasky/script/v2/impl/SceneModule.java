@@ -145,6 +145,36 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
+    public Entity get_non_index_entity(String name) {
+       return get_non_index_entity(name, 0);
+    }
+
+    @Override
+    public Entity get_non_index_entity(String name, double timeout) {
+        Entity obj = scene.getNonIndexEntity(name);
+        if (obj == null) {
+            if (name.matches("[0-9]+")) {
+                // Check with 'HIP '
+                obj = scene.getNonIndexEntity("hip " + name);
+            } else if (name.matches("hip [0-9]+")) {
+                obj = scene.getNonIndexEntity(name.substring(4));
+            }
+        }
+
+        // If negative, no limit in waiting
+        if (timeout < 0) timeout = Double.MAX_VALUE;
+
+        double startMs = System.currentTimeMillis();
+        double elapsedSeconds = 0;
+        while (obj == null && elapsedSeconds < timeout) {
+            api.base.sleep_frames(1);
+            obj = scene.getEntity(name);
+            elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
+        }
+        return obj;
+    }
+
+    @Override
     public Entity get_focus(String name) {
         return scene.findFocus(name);
     }
