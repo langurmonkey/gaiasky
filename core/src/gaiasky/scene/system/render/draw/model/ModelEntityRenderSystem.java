@@ -159,7 +159,7 @@ public class ModelEntityRenderSystem {
                                    boolean relativistic) {
         var scaffolding = Mapper.modelScaffolding.get(entity);
 
-        ModelComponent mc = model.model;
+        var mc = model.model;
         if (mc != null && mc.instance != null && mc.isModelInitialised()) {
             var base = Mapper.base.get(entity);
             var body = Mapper.body.get(entity);
@@ -181,7 +181,7 @@ public class ModelEntityRenderSystem {
                 mc.setFloatExtAttribute(FloatAttribute.Generic2, cam.getFovFactor());
             }
 
-
+            mc.updateEclipsingBodyUniforms(entity);
             float colorAlpha = Mapper.tagBillboard.has(entity) || Mapper.tagBillboardGalaxy.has(entity) ? body.color[3] : 1.0f;
             mc.update(alpha * alphaFactor * colorAlpha, relativistic);
             mc.updateSizeKm(body.size);
@@ -516,8 +516,8 @@ public class ModelEntityRenderSystem {
         var scaffolding = Mapper.modelScaffolding.get(entity);
         var graph = Mapper.graph.get(entity);
 
-        ICamera cam = GaiaSky.instance.getICamera();
-        ModelComponent mc = model.model;
+        var cam = GaiaSky.instance.getICamera();
+        var mc = model.model;
         if (mc.isModelInitialised()) {
             // Good, render
             if (shadow) {
@@ -529,6 +529,7 @@ public class ModelEntityRenderSystem {
                 mc.updateRelativisticEffects(cam, 0);
             else
                 mc.updateRelativisticEffects(cam);
+            mc.updateEclipsingBodyUniforms(entity);
             batch.render(mc.instance, mc.env);
         } else {
             // Keep loading

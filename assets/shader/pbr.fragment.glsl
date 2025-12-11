@@ -451,19 +451,19 @@ void main() {
     #ifdef shadowMapFlag
         #ifdef numCSM
             // Cascaded shadow mapping.
-            float shdw = clamp(getShadow(v_data.shadowMapUv, v_data.csmLightSpacePos, length(v_data.fragPosWorld)), 0.0, 1.0);
+            float shadowMap = clamp(getShadow(v_data.shadowMapUv, v_data.csmLightSpacePos, length(v_data.fragPosWorld)), 0.0, 1.0);
         #else
             // Regular shadow mapping.
             float transparency = 1.0 - texture(u_shadowTexture, v_data.shadowMapUv.xy).g;
 
             #ifdef shadowMapGlobalFlag
-                float shdw = clamp(getShadow(v_data.shadowMapUv, v_data.shadowMapUvGlobal) + transparency, 0.0, 1.0);
+                float shadowMap = clamp(getShadow(v_data.shadowMapUv, v_data.shadowMapUvGlobal) + transparency, 0.0, 1.0);
             #else
-                float shdw = clamp(getShadow(v_data.shadowMapUv) + transparency, 0.0, 1.0);
+                float shadowMap = clamp(getShadow(v_data.shadowMapUv) + transparency, 0.0, 1.0);
             #endif // shadowMapGlobalFlag
         #endif // numCSM
     #else
-        float shdw = 1.0;
+        float shadowMap = 1.0;
     #endif // shadowMapFlag
 
     // Eclipses
@@ -580,8 +580,8 @@ void main() {
             selfShadow *= saturate(4.0 * NL);
 
             specularColor += specular * min(1.0, pow(NH, 40.0));
-            shadowColor += col * night * max(0.0, 0.5 - NL);
-            diffuseColor = saturate(diffuseColor + col * NL + ambient * (1.0 - NL));
+            shadowColor += col * night * max(0.0, 0.5 - NL) * shadowMap;
+            diffuseColor = saturate(diffuseColor + col * NL * shadowMap + ambient * (1.0 - NL));
         }
     #endif // pointLightsFlag
 
@@ -611,8 +611,9 @@ void main() {
     #endif // diffuseScatteringColorFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor * shdw + diffuseScattering * shdw + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_data.opacity);
-    fragColor.rgb += selfShadow * specularColor;
+    selfShadow = pow(clamp(selfShadow, 0.0, 1.0), 1.0);
+    float finalShadow = shadowMap * selfShadow;
+    fragColor = vec4(diffuseColor * finalShadow + diffuseScattering * finalShadow + shadowColor + emissive.rgb + reflectionColor + specularColor, texAlpha * v_data.opacity);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef atmosphereGround

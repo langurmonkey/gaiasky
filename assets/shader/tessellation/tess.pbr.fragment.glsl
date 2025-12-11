@@ -376,8 +376,8 @@ void main() {
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = o_data.ambientLight;
 
-    #ifdef atmosphereGround
-        vec3 night = emissive.rgb;
+    #if defined(atmosphereGround) || defined(atmosphereObject)
+        vec3 night = max(vec3(0.0, 0.0, 0.0), emissive.rgb - ambient.rgb);
         emissive = vec4(0.0);
     #else
         vec3 night = vec3(0.0);
@@ -428,19 +428,19 @@ void main() {
     #ifdef shadowMapFlag
         #ifdef numCSM
             // Cascaded shadow mapping.
-            float shdw = clamp(getShadow(o_data.shadowMapUv, o_data.csmLightSpacePos, length(o_data.fragPosWorld)), 0.0, 1.0);
+            float shadowMap = clamp(getShadow(o_data.shadowMapUv, o_data.csmLightSpacePos, length(o_data.fragPosWorld)), 0.0, 1.0);
         #else
             // Regular shadow mapping.
             float transparency = 1.0 - texture(u_shadowTexture, o_data.shadowMapUv.xy).g;
 
             #ifdef shadowMapGlobalFlag
-                float shdw = clamp(getShadow(o_data.shadowMapUv, o_data.shadowMapUvGlobal) + transparency, 0.0, 1.0);
+                float shadowMap = clamp(getShadow(o_data.shadowMapUv, o_data.shadowMapUvGlobal) + transparency, 0.0, 1.0);
             #else
-                float shdw = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
+                float shadowMap = clamp(getShadow(o_data.shadowMapUv) + transparency, 0.0, 1.0);
             #endif // shadowMapGlobalFlag
         #endif // numCSM
     #else
-        float shdw = 1.0;
+        float shadowMap = 1.0;
     #endif // shadowMapFlag
 
     // Eclipses
@@ -548,6 +548,7 @@ void main() {
             vec3 H = normalize(L - V);
             float NL = max(0.00001, dot(N, L));
             float NH = max(0.00001, dot(N, H));
+
             if (validLights == 1){
                 NL0 = NL;
                 L0 = L;
@@ -556,8 +557,8 @@ void main() {
             selfShadow *= saturate(4.0 * NL);
 
             specularColor += specular * min(1.0, pow(NH, 40.0));
-            shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
-            diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
+            shadowColor += col * night * max(0.0, 0.5 - NL) * shadowMap;
+            diffuseColor = saturate(diffuseColor + col * NL * shadowMap + ambient * (1.0 - NL));
         }
     #endif // pointLightsFlag
 
@@ -567,11 +568,11 @@ void main() {
         diffuseColor = saturate(diffuse.rgb * ambient);
     } else {
         #ifdef occlusionCloudsFlag
-        // Ambient occlusion contains clouds, take into account light direction and normal.
-        float ambientOcclusion = fetchColorAmbientOcclusion(texCoords + L0.xy  * 0.0015);
-        ambientOcclusion = clamp(1.0 - 1.7 * ambientOcclusion, 0.0, 1.0);
-        diffuseColor *= ambientOcclusion;
-        specularColor *= ambientOcclusion;
+            // Ambient occlusion contains clouds, take into account light direction and normal.
+            float ambientOcclusion = clamp(fetchColorAmbientOcclusion(texCoords + L0.xy  * 0.0015), 0.0, 1.0);
+            ambientOcclusion = pow(1.0 - ambientOcclusion, 0.7);
+            diffuseColor *= ambientOcclusion;
+            specularColor *= ambientOcclusion;
         #endif // occlusionCloudsFlag
 
         // Regular shading.
@@ -587,8 +588,9 @@ void main() {
     #endif // diffuseScatteringColorFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor * shdw + diffuseScattering * shdw + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
-    fragColor.rgb += selfShadow * specularColor;
+    selfShadow = pow(clamp(selfShadow, 0.0, 1.0), 1.0);
+    float finalShadow = shadowMap * selfShadow;
+    fragColor = vec4(diffuseColor * finalShadow + diffuseScattering * finalShadow + shadowColor + emissive.rgb + reflectionColor + specularColor, texAlpha * o_data.opacity);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef atmosphereGround

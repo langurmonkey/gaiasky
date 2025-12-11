@@ -56,7 +56,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
 
     static {
         globalAmbient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient,
-                (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
+                                           (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
         // Ambient light watcher.
         var observer = new Observer() {
             @Override
@@ -126,6 +126,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
      * Returns the given point light.
      *
      * @param i The index of the light (must be less than {@link Constants#N_POINT_LIGHTS}).
+     *
      * @return The point light with index i.
      */
     public PointLight pointLight(int i) {
@@ -161,6 +162,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
      * Returns the given directional light.
      *
      * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}).
+     *
      * @return The directional light with index i.
      */
     public DirectionalLight dirLight(int i) {
@@ -225,7 +227,11 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         env = new Environment();
         if (staticLight || (ambientColor[0] >= 0 && ambientColor[1] >= 0 && ambientColor[2] >= 0 && ambientColor[3] >= 0)) {
             // If lazy texture init, we turn off the lights until the texture is loaded.
-            ColorAttribute staticAmbientLight = new ColorAttribute(ColorAttribute.AmbientLight, ambientColor[0], ambientColor[1], ambientColor[2], ambientColor[3]);
+            ColorAttribute staticAmbientLight = new ColorAttribute(ColorAttribute.AmbientLight,
+                                                                   ambientColor[0],
+                                                                   ambientColor[1],
+                                                                   ambientColor[2],
+                                                                   ambientColor[3]);
             env.set(staticAmbientLight);
         } else {
             // Use global ambient.
@@ -561,6 +567,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
 
     }
+
     public void setUnits(double kmToUnits) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
@@ -606,7 +613,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             // Read-write depth test.
             case ALPHA, COLOR, NONE -> {
                 depthTestReadWrite();
-                if (type != null && type.equals("ring")){
+                if (type != null && type.equals("ring")) {
                     // Second material (ring) depth test read only.
                     setDepthTestRing();
                 }
@@ -656,9 +663,10 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             }
         }
     }
+
     public void setDepthTestRing() {
         if (instance != null) {
-            if (instance.materials.size > 1){
+            if (instance.materials.size > 1) {
                 Material mat = instance.materials.get(1);
                 DepthTestAttribute dta;
                 if (mat.has(DepthTestAttribute.Type)) {
@@ -848,6 +856,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         setBlendMode(blendModeString);
     }
 
+    Array<Entity> eclipsingBodies = new Array<>();
+
     public void updateEclipsingBodyUniforms(Entity entity) {
         if (!Settings.settings.scene.renderer.eclipses.active) {
             return;
@@ -856,41 +866,39 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         if (graph == null) {
             return;
         }
-        Entity eclipsingBody = null;
-        // Look down at moons.
+        eclipsingBodies.clear();
+        // Look down at children (only moons).
+        String me = Mapper.base.get(entity).getName();
         if (graph.children != null && !graph.children.isEmpty()) {
             for (var child : graph.children) {
                 var base = Mapper.base.get(child);
-                if (base.hasCt(ComponentType.Moons)) {
-                    eclipsingBody = child;
-                    break;
+                if (Mapper.model.has(child) && base.hasCt(ComponentType.Moons)) {
+                    eclipsingBodies.add(child);
                 }
             }
         }
 
         // Look up at planets.
-        if (eclipsingBody == null) {
-            var base = Mapper.base.get(entity);
-            if (base.hasCt(ComponentType.Moons) && graph.parent != null) {
-                var parentBase = Mapper.base.get(graph.parent);
-                if (parentBase.hasCt(ComponentType.Planets)) {
-                    // Found!
-                    eclipsingBody = graph.parent;
-                }
-
+        if (Mapper.model.has(entity) && graph.parent != null) {
+            var parentBase = Mapper.base.get(graph.parent);
+            if (parentBase.hasCt(ComponentType.Planets)) {
+                // Found!
+                eclipsingBodies.add(graph.parent);
             }
         }
 
         // Add.
-        if (eclipsingBody != null) {
+        if (!eclipsingBodies.isEmpty()) {
             for (Material mat : instance.materials) {
-                updateEclipsingBodyUniforms(mat, eclipsingBody);
+                updateEclipsingBodyUniforms(mat, eclipsingBodies);
             }
         }
     }
 
     private void updateEclipsingBodyUniforms(Material mat,
-                                             Entity eclipsingBody) {
+                                             Array<Entity> eclipsingBodies) {
+        // Only first, shader only supports one eclipsing body for now.
+        var eclipsingBody = eclipsingBodies.get(0);
         var body = Mapper.body.get(eclipsingBody);
         var graph = Mapper.graph.get(eclipsingBody);
 

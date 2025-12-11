@@ -455,10 +455,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         if (ring != null) {
             // Ring material
             ringMaterial = ring;
-            if (ringMaterial.get(TextureAttribute.Diffuse) == null) {
+            if (ringMaterial.get(TextureAttribute.Diffuse) == null && ringUnpacked != null) {
                 ringMaterial.set(new TextureAttribute(TextureAttribute.Diffuse, manager.get(ringUnpacked, Texture.class)));
             }
-            if (ringnormal != null && ringMaterial.get(TextureAttribute.Normal) == null) {
+            if (ringnormal != null && ringMaterial.get(TextureAttribute.Normal) == null && ringnormalUnpacked != null) {
                 ringMaterial.set(new TextureAttribute(TextureAttribute.Normal, manager.get(ringnormalUnpacked, Texture.class)));
             }
             if (ringDiffuseScatteringColor != null) {
