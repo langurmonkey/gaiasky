@@ -879,12 +879,10 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
 
         // Look up at planets.
-        if (Mapper.model.has(entity) && graph.parent != null) {
-            var parentBase = Mapper.base.get(graph.parent);
-            if (parentBase.hasCt(ComponentType.Planets)) {
-                // Found!
-                eclipsingBodies.add(graph.parent);
-            }
+        var planetAncestor = graph.getFirstAncestorOfType(ComponentType.Planets);
+        if (planetAncestor != null) {
+            // Found!
+            eclipsingBodies.add(planetAncestor);
         }
 
         // Add.

@@ -12,6 +12,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.update.GraphUpdater;
@@ -189,7 +190,7 @@ public class GraphNode implements Component, ICopy {
     public Entity getChildByName(String name) {
         int size = children.size;
         for (int i = 0; i < size; i++) {
-            Entity child = children.get(i);
+            var child = children.get(i);
             if (child != null) {
                 var base = Mapper.base.get(child);
                 if (base.getName().equalsIgnoreCase(name)) {
@@ -203,7 +204,7 @@ public class GraphNode implements Component, ICopy {
     public Entity getFirstChildOfType(Archetype type) {
         int size = children.size;
         for (int i = 0; i < size; i++) {
-            Entity child = children.get(i);
+            var child = children.get(i);
             if (child != null) {
                 if (type.matches(child)) {
                     return child;
@@ -211,5 +212,15 @@ public class GraphNode implements Component, ICopy {
             }
         }
         return null;
+    }
+
+    public Entity getFirstAncestorOfType(ComponentType ct) {
+        if (parent == null) {
+            return null;
+        } else if (Mapper.base.get(parent).hasCt(ct)) {
+            return parent;
+        } else {
+            return Mapper.graph.get(parent).getFirstAncestorOfType(ct);
+        }
     }
 }
