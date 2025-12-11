@@ -41,7 +41,7 @@ public class DataDescriptorUtils {
     private final JsonReader reader;
     private FileHandle fh;
 
-    private static final Set<String> specialDirectories = Set.of(SysUtils.TMP_DIR_NAME, SysUtils.CACHE_DIR_NAME);
+    private static final Set<String> specialDirectories = Set.of(SysUtils.TMP_DIR_NAME, SysUtils.CACHE_DIR_NAME, SysUtils.PROCEDURAL_TEX_DIR_NAME);
 
     private DataDescriptorUtils() {
         super();

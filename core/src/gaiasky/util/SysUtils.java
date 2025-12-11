@@ -71,6 +71,7 @@ public class SysUtils {
     private static final String LOG_DIR_NAME = "log";
     public static final String TMP_DIR_NAME = "tmp";
     public static final String CACHE_DIR_NAME = "cache";
+    public static final String PROCEDURAL_TEX_DIR_NAME = "procedural-planet-textures";
 
 
     static {
@@ -511,7 +512,7 @@ public class SysUtils {
     }
 
     public static Path getProceduralPixmapDir() {
-        return Settings.settings.data.dataPath("$data/", null).resolve("procedural-planet-textures");
+        return Settings.settings.data.dataPath("$data/", null).resolve(PROCEDURAL_TEX_DIR_NAME);
     }
 
     /**
