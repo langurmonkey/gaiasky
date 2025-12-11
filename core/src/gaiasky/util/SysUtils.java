@@ -21,7 +21,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.JPGWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL30;
@@ -35,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -513,7 +511,7 @@ public class SysUtils {
     }
 
     public static Path getProceduralPixmapDir() {
-        return Settings.settings.data.dataPath("$data/default-data/tex").resolve("procedural");
+        return Settings.settings.data.dataPath("$data/", null).resolve("procedural-planet-textures");
     }
 
     /**
@@ -527,6 +525,12 @@ public class SysUtils {
         if (texture != null && name != null) {
             Path proceduralDir = getProceduralPixmapDir();
             Path file = proceduralDir.resolve(name + "." + format.extension);
+            try {
+                Files.createDirectories(file);
+            } catch (IOException e) {
+                logger.error("Error creating parent directories for file: " + file.toAbsolutePath());
+                return;
+            }
 
             int w = texture.getWidth();
             int h = texture.getHeight();
@@ -588,6 +592,12 @@ public class SysUtils {
                 var pixmap = pair.getFirst();
                 var name = names[pair.getSecond()];
                 Path file = proceduralDir.resolve(name + "." + format.extension);
+                try {
+                    Files.createDirectories(file);
+                } catch (IOException e) {
+                    logger.error("Error creating parent directories for file: " + file.toAbsolutePath());
+                    return;
+                }
                 switch (format) {
                     case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
                     case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);

@@ -33,8 +33,7 @@ float random(vec2 st) {
 
 void main() {
     // Get height and moisture.
-    //vec4 biome = texture(u_texture0, v_texCoords);
-    vec4 biome = textureGaussianBlur5x5(u_texture0, v_texCoords, 1.0);
+    vec4 biome = texture(u_texture0, v_texCoords);
     float height = biome.r;
     float moisture = biome.g;
     #ifdef emissiveMapFlag
