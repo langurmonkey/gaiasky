@@ -88,8 +88,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                 initMtc.emissiveCubemap == null;
 
         EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO,
-                Event.PROCEDURAL_GENERATION_SURFACE_INFO,
-                Event.FOCUS_CHANGED);
+                                        Event.PROCEDURAL_GENERATION_SURFACE_INFO,
+                                        Event.FOCUS_CHANGED);
 
         setAcceptText(I18n.msg("gui.close"));
 
@@ -136,7 +136,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         group.align(Align.left);
 
         // SURFACE TAB
-        final Button tabSurface = this.surfaceEnabled ?  new OwnTextButton(I18n.msg("gui.procedural.surface"), skin, "toggle-big") : null;
+        final Button tabSurface = this.surfaceEnabled ? new OwnTextButton(I18n.msg("gui.procedural.surface"), skin, "toggle-big") : null;
         if (this.surfaceEnabled) {
             tabSurface.pad(pad10);
             tabSurface.setWidth(tabWidth);
@@ -216,17 +216,21 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         tabs.setMinCheckCount(1);
         tabs.setMaxCheckCount(1);
         updateTabSelected = false;
-        
+
         if (tabSurface != null)
             tabs.add(tabSurface);
         tabs.add(tabClouds);
         tabs.add(tabAtmosphere);
         updateTabSelected = true;
 
-        tabs.setChecked(((TextButton) tabs.getButtons().get(lastTabSelected)).getText().toString());
+        var selectedTab = lastTabSelected;
+        if (selectedTab >= tabs.getButtons().size) {
+            selectedTab = 0;
+        }
+        tabs.setChecked(((TextButton) tabs.getButtons().get(selectedTab)).getText().toString());
 
         // Randomize button
-        OwnTextButton randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin,  "random", "big");
+        OwnTextButton randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin, "random", "big");
         randomize.setColor(ColorUtils.gYellowC);
         randomize.addListener(new ChangeListener() {
             @Override
@@ -241,10 +245,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Resolution
         OwnSliderPlus pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"),
-                Constants.PG_RESOLUTION_MIN,
-                Constants.PG_RESOLUTION_MAX,
-                1,
-                skin);
+                                                       Constants.PG_RESOLUTION_MIN,
+                                                       Constants.PG_RESOLUTION_MAX,
+                                                       1,
+                                                       skin);
         pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
         pgResolution.setWidth(fieldWidthTotal + 50f);
         pgResolution.setValue(Settings.settings.graphics.proceduralGenerationResolution[1]);
@@ -271,7 +275,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         });
         OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
         saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()),
-                skin));
+                                                           skin));
         HorizontalGroup saveTexturesGroup = new HorizontalGroup();
         saveTexturesGroup.space(pad10);
         saveTexturesGroup.addActor(saveTextures);
@@ -758,10 +762,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
             // Add button group with presets.
             addLocalButtons(content,
-                    this::randomizeSurfaceGasGiant,
-                    this::randomizeSurfaceEarthLike,
-                    this::randomizeSurfaceColdPlanet,
-                    this::randomizeSurfaceRockyPlanet);
+                            this::randomizeSurfaceGasGiant,
+                            this::randomizeSurfaceEarthLike,
+                            this::randomizeSurfaceColdPlanet,
+                            this::randomizeSurfaceRockyPlanet);
 
             // Add generate and randomize buttons
             genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
@@ -1040,9 +1044,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Fog density
         OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
-                Constants.MIN_ATM_FOG_DENSITY,
-                Constants.MAX_ATM_FOG_DENSITY,
-                Constants.SLIDER_STEP_TINY, skin);
+                                                     Constants.MIN_ATM_FOG_DENSITY,
+                                                     Constants.MAX_ATM_FOG_DENSITY,
+                                                     Constants.SLIDER_STEP_TINY, skin);
         fogDensity.setWidth(fieldWidthTotal);
         fogDensity.setValue(ac.fogDensity);
         fogDensity.addListener(new ChangeListener() {
