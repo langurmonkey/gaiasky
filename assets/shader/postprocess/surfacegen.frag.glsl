@@ -4,6 +4,7 @@
 
 #include <shader/lib/colors.glsl>
 #include <shader/lib/luma.glsl>
+#include <shader/lib/sampleblur.glsl>
 
 // Biome texture (elevation in x, moisture in y).
 uniform sampler2D u_texture0;
@@ -32,7 +33,8 @@ float random(vec2 st) {
 
 void main() {
     // Get height and moisture.
-    vec4 biome = texture(u_texture0, v_texCoords);
+    //vec4 biome = texture(u_texture0, v_texCoords);
+    vec4 biome = textureGaussianBlur5x5(u_texture0, v_texCoords, 1.0);
     float height = biome.r;
     float moisture = biome.g;
     #ifdef emissiveMapFlag
@@ -59,16 +61,12 @@ void main() {
     diffuseColor = rgba;
 
     // Specular.
+    float waterFac = smoothstep(0.1, 0.05, height);
     bool water = height < 0.1 || (c.b / c.r > 3.4 && c.b / c.g > 3.4);
+    float snowFac = smoothstep(0.9, 0.99, luma(diffuseColor.rgb));
     bool snow = luma(diffuseColor.rgb) > 0.9;
 
-    vec4 spec = vec4(0.0, 0.0, 0.0, 1.0);
-    if (water) {
-        spec.rgb = vec3(1.0, 1.0, 1.0);
-    } else if (snow) {
-        spec.rgb = vec3(0.5, 0.5, 0.5);
-    }
-    specularColor = spec;
+    specularColor = vec4(vec3(waterFac + snowFac), 1.0);
 
     #ifdef normalMapFlag
     // Normal.

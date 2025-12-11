@@ -46,6 +46,9 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     /** Create different noise patterns in each of the different RGB channels. **/
     private int channels = 1;
 
+    /** Number of extra render targets. If &lt 1, we use 2 targets, the default noise, and an emission channel.  **/
+    private int targets = 1;
+
     /**
      * <p>The type of noise:</p>
      * <ol>
@@ -71,9 +74,18 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
                 "screenspace",
                 "noise",
                 targets > 1 ? "#define extraTarget\n" : ""));
+        this.targets = targets;
         this.viewport = viewportSize;
 
         rebind();
+    }
+
+    @Override
+    public void updateProgram() {
+        super.updateProgram(ShaderLoader.fromFile(
+                "screenspace",
+                "noise",
+                targets > 1 ? "#define extraTarget\n" : ""));
     }
 
     public void setViewportSize(float width, float height) {

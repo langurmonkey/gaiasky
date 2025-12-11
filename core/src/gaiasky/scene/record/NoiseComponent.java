@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.render.postprocess.effects.Noise;
 import gaiasky.render.postprocess.effects.SurfaceGen;
 import gaiasky.render.postprocess.filters.NoiseFilter.NoiseType;
@@ -93,9 +94,7 @@ public final class NoiseComponent extends NamedComponent {
 
         Noise noise = getNoiseEffect(N, M, channels, targets);
         noise.setColor(color);
-        fbNoise.begin();
         noise.render(null, fbNoise);
-        fbNoise.end();
 
         return fbNoise;
     }
@@ -154,7 +153,7 @@ public final class NoiseComponent extends NamedComponent {
         lut.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, generateNormalMap ? 3 : 2);
 
-        SurfaceGen surfaceGen = new SurfaceGen(generateNormalMap, genEmissiveMap);
+        var surfaceGen = new SurfaceGen(generateNormalMap, genEmissiveMap);
         surfaceGen.setLutTexture(lut);
         surfaceGen.setLutHueShift(biomeHueShift);
         surfaceGen.setLutSaturation(biomeSaturation);
@@ -294,16 +293,14 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
+        int d = rand.nextInt(3);
         if (clouds) {
             // Type for clouds: PERLIN, SIMPLEX or CURL.
-            int d = rand.nextInt(3);
             d = d == 2 ? 3 : d;
-            setType(NoiseType.values()[d].name());
         } else {
             // PERLIN, SIMPLEX, VORONOI or CURL
-            int d = rand.nextInt(3);
-            setType(NoiseType.values()[d].name());
         }
+        setType(NoiseType.values()[d].name());
         // Scale.
         double scaleFac = type == NoiseType.CURL ? 2.5 : 1;
         double baseSize = FastMath.abs(gaussian(rand, 4.0, 1.0, 0.5));
@@ -354,15 +351,16 @@ public final class NoiseComponent extends NamedComponent {
             setNumTerraces(0L);
         }
         // Range.
+        double minRange;
+        double maxRange;
         if (clouds) {
-            double minRange = gaussian(rand, 0.0, 0.2, -0.2);
-            double maxRange = FastMath.abs(rand.nextDouble(0.7, 1.7));
-            setRange(new double[]{minRange, maxRange});
+            minRange = gaussian(rand, 0.0, 0.2, -0.2);
+            maxRange = FastMath.abs(rand.nextDouble(0.7, 1.7));
         } else {
-            double minRange = gaussian(rand, 0.0, 0.3);
-            double maxRange = 0.5 + FastMath.abs(rand.nextDouble());
-            setRange(new double[]{minRange, maxRange});
+            minRange = gaussian(rand, 0.0, 0.3);
+            maxRange = 0.5 + FastMath.abs(rand.nextDouble());
         }
+        setRange(new double[]{minRange, maxRange});
         // Power.
         if (clouds) {
             setPower(gaussian(rand, 1.0, 1.0, 0.5));
@@ -372,7 +370,7 @@ public final class NoiseComponent extends NamedComponent {
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
-        setRidge(turbulence ? rand.nextBoolean() : false);
+        setRidge(turbulence && rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(10) == 9;
     }
@@ -411,7 +409,7 @@ public final class NoiseComponent extends NamedComponent {
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
-        setRidge(turbulence ? rand.nextInt(3) < 2 : false);
+        setRidge(turbulence && rand.nextInt(3) < 2);
         // Emission.
         genEmissiveMap = rand.nextInt(20) == 19;
     }
@@ -450,7 +448,7 @@ public final class NoiseComponent extends NamedComponent {
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
-        setRidge(turbulence ? rand.nextInt(4) < 3 : false);
+        setRidge(turbulence && rand.nextInt(4) < 3);
         // Emission.
         genEmissiveMap = rand.nextInt(4) == 3;
     }
@@ -489,7 +487,7 @@ public final class NoiseComponent extends NamedComponent {
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
-        setRidge(turbulence ? rand.nextInt(4) < 3 : false);
+        setRidge(turbulence && rand.nextInt(4) < 3);
         // Emission.
         genEmissiveMap = rand.nextInt(15) == 14;
     }
@@ -537,7 +535,7 @@ public final class NoiseComponent extends NamedComponent {
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
-        setRidge(turbulence ? rand.nextBoolean() : false);
+        setRidge(turbulence && rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(10) == 9;
     }
