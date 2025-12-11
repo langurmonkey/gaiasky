@@ -527,9 +527,9 @@ public class SysUtils {
             Path proceduralDir = getProceduralPixmapDir();
             Path file = proceduralDir.resolve(name + "." + format.extension);
             try {
-                Files.createDirectories(file);
+                Files.createDirectories(proceduralDir);
             } catch (IOException e) {
-                logger.error("Error creating parent directories for file: " + file.toAbsolutePath());
+                logger.error("Error creating procedural textures directory: " + proceduralDir);
                 return;
             }
 
@@ -567,6 +567,12 @@ public class SysUtils {
      */
     public static void saveProceduralGLTextures(Texture[] textures, String[] names, Settings.ImageFormat format) {
         Path proceduralDir = getProceduralPixmapDir();
+        try {
+            Files.createDirectories(proceduralDir);
+        } catch (IOException e) {
+            logger.error("Error creating procedural textures directory: " + proceduralDir);
+            return;
+        }
         Array<Pair<Pixmap, Integer>> pixmaps = new Array<>();
         // Prepare pixmaps in current (main) thread.
         for (int i = 0; i < textures.length; i++) {
@@ -593,12 +599,6 @@ public class SysUtils {
                 var pixmap = pair.getFirst();
                 var name = names[pair.getSecond()];
                 Path file = proceduralDir.resolve(name + "." + format.extension);
-                try {
-                    Files.createDirectories(file);
-                } catch (IOException e) {
-                    logger.error("Error creating parent directories for file: " + file.toAbsolutePath());
-                    return;
-                }
                 switch (format) {
                     case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
                     case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
