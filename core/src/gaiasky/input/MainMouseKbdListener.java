@@ -487,30 +487,58 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         boolean result = false;
 
         // Process cursors.
+        // UP/DOWN => move forward/backward
+        // RIGHT/LEFT => roll right/left
+        // modifier + UP/DOWN/RIGHT/LEFT => camera look (free mode), rotate around (focus mode)
+        var modifier = isKeyPressed(Keys.SHIFT_LEFT) || isKeyPressed(Keys.CONTROL_LEFT);
         var keyboardFocus = GaiaSky.instance.mainGui.getGuiStage().getKeyboardFocus();
         if (!(keyboardFocus instanceof TextField)) {
-            float horizontalScale = Settings.settings.scene.camera.cinematic ? 0.01f : 1f;
+            float scaling = Settings.settings.scene.camera.cinematic ? 0.01f : 1f;
             if (isKeyPressed(Keys.UP)) {
-                camera.addForwardForce(1.0f);
+                if (!modifier) {
+                    camera.addForwardForce(1.0f);
+                } else {
+                    if (camera.getMode().isFocus()) {
+                        camera.addVertical(-scaling, true);
+                    } else {
+                        camera.addPitch(scaling, true);
+                    }
+                }
                 result = true;
             }
             if (isKeyPressed(Keys.DOWN)) {
-                camera.addForwardForce(-1.0f);
+                if (!modifier) {
+                    camera.addForwardForce(-1.0f);
+                } else {
+                    if (camera.getMode().isFocus()) {
+                        camera.addVertical(scaling, true);
+                    } else {
+                        camera.addPitch(-scaling, true);
+                    }
+                }
                 result = true;
             }
             if (isKeyPressed(Keys.RIGHT)) {
-                if (camera.getMode().isFocus()) {
-                    camera.addHorizontal(-1.0f * horizontalScale, true);
+                if (!modifier) {
+                    camera.addRoll(2f * -scaling, true);
                 } else {
-                    camera.addYaw(horizontalScale, true);
+                    if (camera.getMode().isFocus()) {
+                        camera.addHorizontal(-scaling, true);
+                    } else {
+                        camera.addYaw(scaling, true);
+                    }
                 }
                 result = true;
             }
             if (isKeyPressed(Keys.LEFT)) {
-                if (camera.getMode().isFocus()) {
-                    camera.addHorizontal(horizontalScale, true);
+                if (!modifier) {
+                    camera.addRoll(2f * scaling, true);
                 } else {
-                    camera.addYaw(-1.0f * horizontalScale, true);
+                    if (camera.getMode().isFocus()) {
+                        camera.addHorizontal(scaling, true);
+                    } else {
+                        camera.addYaw(-scaling, true);
+                    }
                 }
                 result = true;
             }
