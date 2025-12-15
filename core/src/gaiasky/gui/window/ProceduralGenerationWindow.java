@@ -972,7 +972,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         });
         OwnSliderPlus wavelength2 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "2"), 0.4f, 1.0f, 0.01f, skin);
         wavelength2.setWidth(fieldWidthTotal / 3f - pad10 * 1.3f);
-        wavelength2.setValue((float) ac.wavelengths[1]);
+        wavelength2.setValue((float) ac.wavelengths[2]);
         wavelength2.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
