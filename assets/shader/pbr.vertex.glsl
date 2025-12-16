@@ -98,7 +98,8 @@ uniform float u_vrScale;
 uniform vec3 u_vrOffset = vec3(0.0);
 
 #include <shader/lib/shadowmap.vert.glsl>
-#include <shader/lib/atmscattering.glsl>
+
+#include <shader/lib/atmscattering.vert.glsl>
 
 // GEOMETRY (QUATERNIONS)
 #if defined(relativisticEffects)

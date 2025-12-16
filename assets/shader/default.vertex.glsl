@@ -112,8 +112,6 @@ out vec3 v_ambientLight;
 
 #endif // lightingFlag
 
-#include <shader/lib/atmscattering.glsl>
-
 // GEOMETRY (QUATERNIONS)
 #if defined(relativisticEffects)
 #include <shader/lib/geometry.glsl>
@@ -128,8 +126,6 @@ out vec3 v_ambientLight;
 #endif // gravitationalWaves
 
 void main() {
-	computeAtmosphericScatteringGround();
-
 	v_time = u_time;
 	v_texCoords0 = a_texCoord0;
 

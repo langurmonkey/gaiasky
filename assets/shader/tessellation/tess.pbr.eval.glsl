@@ -118,6 +118,7 @@ in VertexData l_data[gl_MaxPatchVertices];
 #ifdef atmosphereGround
 in vec4 l_atmosphereColor[gl_MaxPatchVertices];
 in float l_fadeFactor[gl_MaxPatchVertices];
+in vec3 l_direction[gl_MaxPatchVertices];
 #endif // atmosphereGround
 
 // OUTPUT
@@ -125,7 +126,8 @@ out VertexData o_data;
 #ifdef atmosphereGround
 out vec4 o_atmosphereColor;
 out float o_fadeFactor;
-#endif
+out vec3 o_direction;
+#endif // atmosphereGround
 out vec3 o_normalTan;
 out vec3 o_fragPosition;
 out float o_fragHeight;
@@ -215,6 +217,7 @@ void main(void){
     #ifdef atmosphereGround
         o_atmosphereColor = (u * l_atmosphereColor[0] + v * l_atmosphereColor[1] + w * l_atmosphereColor[2]);
         o_fadeFactor = (u * l_fadeFactor[0] + v * l_fadeFactor[1] + w * l_fadeFactor[2]);
+        o_direction = (u * l_direction[0] + v * l_direction[1] + w * l_direction[2]);
     #endif
 
     #ifdef shadowMapFlag

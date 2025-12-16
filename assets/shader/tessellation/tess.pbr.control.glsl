@@ -39,13 +39,15 @@ in VertexData v_data[gl_MaxPatchVertices];
 #ifdef atmosphereGround
 in vec4 v_atmosphereColor[gl_MaxPatchVertices];
 in float v_fadeFactor[gl_MaxPatchVertices];
-#endif
+in vec3 v_direction[gl_MaxPatchVertices];
+#endif // atmosphereGround
 // OUTPUT
 out VertexData l_data[N_VERTICES];
 #ifdef atmosphereGround
 out vec4 l_atmosphereColor[N_VERTICES];
 out float l_fadeFactor[N_VERTICES];
-#endif
+out vec3 l_direction[N_VERTICES];
+#endif // atmosphereGround
 
 #ifdef svtIndirectionHeightTextureFlag
 #define QUALITY_SCALE 2.0
@@ -105,7 +107,8 @@ void main(){
     #ifdef atmosphereGround
     l_atmosphereColor[id] = v_atmosphereColor[id];
     l_fadeFactor[id] = v_fadeFactor[id];
-    #endif
+    l_direction[id] = v_direction[id];
+    #endif // atmosphereGround
 
     #ifdef shadowMapFlag
     l_data[id].shadowMapUv = v_data[id].shadowMapUv;

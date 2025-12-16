@@ -5,7 +5,7 @@ uniform mat4 u_worldTrans;
 
 in vec3 a_position;
 
-#include <shader/lib/atmscattering.glsl>
+#include <shader/lib/atmscattering.vert.glsl>
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX

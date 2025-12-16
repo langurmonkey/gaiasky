@@ -342,8 +342,18 @@ struct VertexData {
 in VertexData o_data;
 
 #ifdef atmosphereGround
+// Uniforms required to compute fCos
+uniform vec3 v3LightPos;
+uniform float fG;
+uniform vec3 v3InvWavelength; /* 1 / pow(wavelength, 4) for the red, green, and blue channels*/
+uniform float fKrESun; /* Kr * ESun*/
+uniform float fKmESun; /* Km * ESun*/
+// Fetch atmosphere color, fade factor, and direction from vertex shader
 in vec4 o_atmosphereColor;
 in float o_fadeFactor;
+// Direction from the vertex to the camera
+in vec3 o_direction;
+#include <shader/lib/atmscattering.frag.glsl>
 #endif // atmosphereGround
 
 #if !defined(normalTextureFlag) && !defined(normalCubemapFlag) && !defined(svtIndirectionNormalTextureFlag)
@@ -594,8 +604,21 @@ void main() {
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef atmosphereGround
-        #define exposure 1.0
-        fragColor.rgb = clamp(fragColor.rgb + (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * o_fadeFactor, 0.0, 1.0);
+        float fCos = dot(-v3LightPos, normalize(o_direction));
+        float fCos2 = fCos * fCos;
+        // Rayleigh phase
+        float fRayleighPhase = rayleighPhase(fCos2);
+        vec3 rayleighColor = o_atmosphereColor.rgb * (v3InvWavelength * fKrESun) * fRayleighPhase;
+        // Mie phase
+        float fMiePhase = miePhase(fCos2, fCos2);
+        vec3 mieColor = o_atmosphereColor.rgb * fKmESun * fMiePhase;
+// Atmosphere color
+vec3 atmosphereColor = rayleighColor + mieColor;
+        // Tone mapping in final atmosphere color
+        #define exposure 0.9
+        vec3 finalAtmosphere = vec3(1.0) - exp(atmosphereColor * -exposure);
+        // Combine with current color
+        fragColor.rgb = clamp(fragColor.rgb + finalAtmosphere * o_atmosphereColor.a * o_fadeFactor, 0.0, 1.0);
         #if defined(heightFlag)
             fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
         #endif // heightFlag

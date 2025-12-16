@@ -1,11 +1,10 @@
 #version 330 core
 
-#define exposure 0.2
 
 #include <shader/lib/logdepthbuff.glsl>
 
 uniform vec3 v3LightPos;
-uniform float g;
+uniform float fG;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
@@ -30,16 +29,20 @@ layout (location = 1) out vec4 layerBuffer;
 #endif // ssrFlag
 
 #include <shader/lib/luma.glsl>
+#include <shader/lib/atmscattering.frag.glsl>
 
 void main(void) {
-    float g2 = g * g;
-    float fCos = dot (-v3LightPos, v_direction) / length (v_direction);
+    float fCos = dot(-v3LightPos, normalize(v_direction));
     float fCos2 = fCos * fCos;
-    float fRayleighPhase = 0.75 + 0.75 * fCos2;
-    float fMiePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow (1.0 + g2 - 2.0 * g * fCos, 1.5);
+    // Rayleigh phase
+    float fRayleighPhase = rayleighPhase(fCos2);
+    // Mie phase
+    float fMiePhase = miePhase(fCos2, fCos2);
 
-    fragColor.rgb = (fRayleighPhase * v_frontColor.rgb + fMiePhase * v_frontSecondaryColor);
-    fragColor.rgb = vec3(1.0) - exp(-exposure * fragColor.rgb);
+    vec3 atmosphereColor = fRayleighPhase * v_frontColor.rgb + fMiePhase * v_frontSecondaryColor;
+
+    #define exposure 0.15
+    fragColor.rgb = vec3(1.0) - exp(atmosphereColor * -exposure);
 
     float lma = luma(fragColor.rbg);
     float scl = smoothstep(0.05, 0.2, lma);

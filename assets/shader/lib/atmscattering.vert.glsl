@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_ATMSCAT
+#define GLSL_LIB_ATMSCAT
+
 #if defined(atmosphereGround) || defined(atmosphericScattering)
 uniform vec3 v3PlanetPos; /* The position of the planet */
 uniform vec3 v3CameraPos; /* The camera's current position*/
@@ -15,6 +18,7 @@ uniform float fScale; /* 1 / (fOuterRadius - fInnerRadius)*/
 uniform float fScaleDepth; /* The scale depth (i.e. the altitude at which the atmosphere's average density is found)*/
 uniform float fScaleOverScaleDepth; /* fScale / fScaleDepth*/
 uniform float fAlpha; /* Atmosphere effect opacity */
+uniform float fG; /* Mie asymmetry factor */
 
 uniform int nSamples;
 
@@ -35,14 +39,11 @@ float getNearIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
     return 0.5 * (-B - sqrt (fDet));
 }
 
-float expScale(float cosine) {
-    float x = 1.0 - cosine;
-    return fScaleDepth * exp (-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
-}
 #endif // atmosphereGround || atmosphericScattering
 
 #ifdef atmosphereGround
 
+out vec3 v_direction;
 out vec4 v_atmosphereColor;
 
 // Computes the ground atmosphere color and puts it in v_atmosphereColor
@@ -74,19 +75,20 @@ void computeAtmosphericScatteringGround() {
     float fSampleLength = fFar / float(nSamples);
     float fScaledLength = fSampleLength * fScale;
     vec3 v3SampleRay = v3Ray * fSampleLength;
-    vec3 v3SamplePoint = v3Start + v3SampleRay * 0.5;
+    vec3 v3SamplePoint = v3Start;
 
     // Now loop through the sample rays
     vec3 v3FrontColor = vec3(0.0, 0.0, 0.0);
     vec3 v3Attenuate;
     for (int i = 0; i < nSamples; i++) {
-        float fHeight = length (v3SamplePoint);
-        float fDepth = exp (fScaleOverScaleDepth * (fInnerRadius - fHeight));
-        float fScatter = fDepth * fTemp - fCameraOffset;
+        vec3 v3SamplePointMid = v3SamplePoint + v3SampleRay * 0.5;
+        float fHeight = length (v3SamplePointMid);
+        float fLocalDepth = exp (fScaleOverScaleDepth * (fInnerRadius - fHeight));
+        float fScatter = fLocalDepth * fTemp - fCameraOffset;
 
         v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
 
-        v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
+        v3FrontColor += v3Attenuate * (fLocalDepth * fSampleLength * fScale);
         v3SamplePoint += v3SampleRay;
     }
 
@@ -94,7 +96,10 @@ void computeAtmosphericScatteringGround() {
     float heightNormalized = clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
     v_fadeFactor = smoothstep(0.5, 1.0, heightNormalized);
 
-    v_atmosphereColor = vec4(v3FrontColor * (v3InvWavelength * fKrESun + fKmESun), fAlpha);
+    // Rayleigh and Mie phases computed in fragment shader!
+    v_atmosphereColor = vec4(v3FrontColor, fAlpha);
+
+    v_direction = v3CameraPos - v3Pos;
 }
 #else
 // Computes the ground atmosphere color and puts it in v_atmosphereColor
@@ -106,6 +111,7 @@ out vec4 v_frontColor;
 out vec3 v_frontSecondaryColor;
 out vec3 v_direction;
 
+// Mie and Rayleigh phases are computed in the fragment shader.
 void computeAtmosphericScattering() {
     float fCameraHeight2 = fCameraHeight * fCameraHeight;
     float fOuterRadius2 = fOuterRadius * fOuterRadius;
@@ -156,8 +162,7 @@ void computeAtmosphericScattering() {
         v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
         v3SamplePoint += v3SampleRay;
     }
-
-    // Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader
+    // Mie and Rayleigh phases computed in fragment shader!
     v_frontColor.rgb = v3FrontColor * (v3InvWavelength * fKrESun);
     v_frontColor.a = fAlpha;
     v_frontSecondaryColor = v3FrontColor * fKmESun;
@@ -174,3 +179,5 @@ void computeAtmosphericScattering() {
 #else
 void computeAtmosphericScattering(){ }
 #endif// atmosphericScattering
+
+#endif // ATMSCAT

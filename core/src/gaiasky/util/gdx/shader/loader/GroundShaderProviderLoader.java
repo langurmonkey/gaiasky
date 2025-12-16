@@ -19,7 +19,7 @@ import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 
 public class GroundShaderProviderLoader<T extends GroundShaderProviderLoader.GroundShaderProviderParameter> extends AsynchronousAssetLoader<GroundShaderProvider, T> {
 
-    GroundShaderProvider shaderProvider;
+    private GroundShaderProvider shaderProvider;
 
     public GroundShaderProviderLoader(FileHandleResolver resolver) {
         super(resolver);

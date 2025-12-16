@@ -992,7 +992,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(wavelengthTooltip).left().padBottom(pad18).row();
 
         // eSun
-        OwnSliderPlus eSun = new OwnSliderPlus(I18n.msg("gui.procedural.esun"), -1.0f, 25.0f, 0.1f, skin);
+        OwnSliderPlus eSun = new OwnSliderPlus(I18n.msg("gui.procedural.esun"), -1.0f, 30.0f, 0.1f, skin);
         eSun.setWidth(fieldWidthTotal);
         eSun.setValue(ac.m_eSun);
         eSun.addListener(new ChangeListener() {
@@ -1009,7 +1009,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         DecimalFormat nf = new DecimalFormat("#0.0000##");
         // Kr
-        OwnSliderPlus kr = new OwnSliderPlus(I18n.msg("gui.procedural.kr"), 0.0f, 0.01f, 0.0001f, skin);
+        OwnSliderPlus kr = new OwnSliderPlus(I18n.msg("gui.procedural.kr"), 0.0f, 0.03f, 0.0001f, skin);
         kr.setWidth(fieldWidthTotal);
         kr.setNumberFormatter(nf);
         kr.setValue(ac.m_Kr);
