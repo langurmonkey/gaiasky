@@ -3,8 +3,12 @@
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 
-in vec3 a_position;
+uniform vec3 v3PlanetPos; /* The position of the planet */
+uniform vec3 v3LightPos; /* The direction vector to the light source*/
+uniform float fCameraHeight;
+uniform float fOuterRadius; /* The outer (atmosphere) radius*/
 
+in vec3 a_position;
 #include <shader/lib/atmscattering.vert.glsl>
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +36,7 @@ out float v_eclipseFactor;
 #endif// eclipsingBodyFlag
 
 void main(void) {
-    computeAtmosphericScattering();
+    prepareAtmosphericScattering();
     vec4 pos = u_worldTrans * vec4(a_position, 1.0);
 
     #ifdef relativisticEffects

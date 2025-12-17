@@ -313,6 +313,11 @@ public class ExtShaderProgram implements Disposable {
                             String fragmentShader) {
         this(null, null, vertexShader, fragmentShader);
     }
+    public ExtShaderProgram(String name,
+                            String vertexShader,
+                            String fragmentShader) {
+        this(name, null, null, vertexShader, fragmentShader);
+    }
 
     public ExtShaderProgram(FileHandle vertexShader,
                             FileHandle fragmentShader) {

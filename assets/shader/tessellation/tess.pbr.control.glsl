@@ -37,16 +37,12 @@ struct VertexData {
 // INPUT
 in VertexData v_data[gl_MaxPatchVertices];
 #ifdef atmosphereGround
-in vec4 v_atmosphereColor[gl_MaxPatchVertices];
-in float v_fadeFactor[gl_MaxPatchVertices];
-in vec3 v_direction[gl_MaxPatchVertices];
+in vec3 v_position[gl_MaxPatchVertices];
 #endif // atmosphereGround
 // OUTPUT
 out VertexData l_data[N_VERTICES];
 #ifdef atmosphereGround
-out vec4 l_atmosphereColor[N_VERTICES];
-out float l_fadeFactor[N_VERTICES];
-out vec3 l_direction[N_VERTICES];
+out vec3 l_position[N_VERTICES];
 #endif // atmosphereGround
 
 #ifdef svtIndirectionHeightTextureFlag
@@ -105,9 +101,7 @@ void main(){
     #endif // reflectionCubemapFlag
 
     #ifdef atmosphereGround
-    l_atmosphereColor[id] = v_atmosphereColor[id];
-    l_fadeFactor[id] = v_fadeFactor[id];
-    l_direction[id] = v_direction[id];
+    l_position[id] = v_position[id];
     #endif // atmosphereGround
 
     #ifdef shadowMapFlag

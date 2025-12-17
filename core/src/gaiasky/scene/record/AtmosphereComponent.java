@@ -111,7 +111,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         m_fInnerRadius = planetSize / 2f;
         m_fOuterRadius = this.size;
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
-        float m_fScaleDepth = .20f;
+        float m_fScaleDepth = 0.2f;
         float m_fScale = 1.0f / (m_fAtmosphereHeight);
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
@@ -370,7 +370,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Samples
         setSamples((long) rand.nextInt(10, 20));
         // Params
-        setParams(createModelParameters(600L, 2.0, true));
+        setParams(createModelParameters(200L, 2.0, true));
     }
 
     public void copyFrom(AtmosphereComponent other) {

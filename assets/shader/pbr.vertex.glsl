@@ -306,7 +306,7 @@ vec3 calcNormal(vec2 p, vec2 dp) {
 #endif // heightTexture/Cubemap/SVT
 
 void main() {
-    computeAtmosphericScatteringGround();
+    prepareAtmosphericScattering();
 
     // Tangent space transform
     calculateTangentVectors();

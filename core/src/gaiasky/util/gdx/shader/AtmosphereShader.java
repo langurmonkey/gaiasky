@@ -101,7 +101,7 @@ public class AtmosphereShader extends BaseIntShader {
                             final String vertexShader,
                             final String fragmentShader) {
         this(renderable, config,
-             new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+             new ExtShaderProgram("atmosphere", ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
     public AtmosphereShader(final IntRenderable renderable,

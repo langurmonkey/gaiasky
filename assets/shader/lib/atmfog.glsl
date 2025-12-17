@@ -3,9 +3,11 @@
 
 #ifdef atmosphereGround
     // FOG
+    #ifndef GLSL_LIB_ATMSCAT
     uniform float fInnerRadius; /* The inner (planetary) radius*/
     uniform float fOuterRadius;
     uniform float fCameraHeight;
+    #endif // LIB_ATMSCAT
     uniform float u_fogDensity;
     uniform vec3 u_fogCol;
 
