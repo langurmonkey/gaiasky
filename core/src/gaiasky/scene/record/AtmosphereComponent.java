@@ -29,8 +29,8 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
@@ -53,8 +53,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public float fogDensity = 0.3f;
     public Vector3 fogColor;
     public float m_eSun = 10f;
-
-    public int samples = 11;
+    public int samples = 23;
 
     // Model parameters
     public Map<String, Object> params;
@@ -79,7 +78,10 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
         Material atmMat;
         if (mc.instance == null) {
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indices(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere",
+                                                                                   params,
+                                                                                   Bits.indices(Usage.Position, Usage.Normal),
+                                                                                   GL20.GL_TRIANGLES);
             IntModel atmosphereModel = pair.getFirst();
             atmMat = pair.getSecond().get("base");
 
@@ -108,10 +110,11 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         float m_Km4PI = m_Km * 4.0f * (float) FastMath.PI;
         float m_ESun = m_eSun; // Sun brightness (almost) constant
         float m_g = 0.76f; // The Mie phase asymmetry factor
-        m_fInnerRadius = planetSize / 2f;
-        m_fOuterRadius = this.size;
+        float normFactor = 2f / planetSize;
+        m_fInnerRadius = (planetSize / 2f) * normFactor;
+        m_fOuterRadius = this.size * normFactor;
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
-        float m_fScaleDepth = 0.2f;
+        float m_fScaleDepth = (float) (8.5 * Constants.KM_TO_U) * normFactor;
         float m_fScale = 1.0f / (m_fAtmosphereHeight);
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
@@ -148,7 +151,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         mat.set(new Vector3Attribute(Vector3Attribute.PlanetPos, new Vector3()));
         mat.set(new Vector3Attribute(Vector3Attribute.CameraPos, new Vector3()));
         mat.set(new Vector3Attribute(Vector3Attribute.LightPos, new Vector3()));
-        mat.set(new Vector3Attribute(Vector3Attribute.InvWavelength, new Vector3(1.0f / m_fWavelength4[0], 1.0f / m_fWavelength4[1], 1.0f / m_fWavelength4[2])));
+        mat.set(new Vector3Attribute(Vector3Attribute.InvWavelength,
+                                     new Vector3(1.0f / m_fWavelength4[0], 1.0f / m_fWavelength4[1], 1.0f / m_fWavelength4[2])));
     }
 
     public void removeAtmosphericScattering(Material mat) {
@@ -179,13 +183,13 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
             parentTranslation = Mapper.graph.get(parent).translation;
         }
         updateAtmosphericScatteringParams(mat,
-                alpha,
-                ground,
-                graph.translation,
-                rigidRotation,
-                scaffolding.inverseRefPlaneTransform,
-                parentTranslation,
-                vrOffset);
+                                          alpha,
+                                          ground,
+                                          graph.translation,
+                                          rigidRotation,
+                                          scaffolding.inverseRefPlaneTransform,
+                                          parentTranslation,
+                                          vrOffset);
     }
 
     /**
@@ -208,6 +212,20 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
                                                   Vector3Q parentTranslation,
                                                   Vector3D vrOffset) {
 
+        // DEBUG
+        float normFactor = 2f / planetSize;
+        m_fInnerRadius = (planetSize / 2f) * normFactor;
+        m_fOuterRadius = this.size * normFactor;
+        m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
+        float m_fScaleDepth = 0.085f;
+        float m_fScale = 1.0f / (m_fAtmosphereHeight);
+        float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
+
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.Scale, m_fScale));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.ScaleDepth, m_fScaleDepth));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.ScaleOverScaleDepth, m_fScaleOverScaleDepth));
+        // END DEBUG
+
         translation.put(aux3);
         if (vrOffset != null) {
             aux1.set(vrOffset).scl(1 / Constants.M_TO_U);
@@ -215,7 +233,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         }
 
         // Distance to planet
-        float camHeight = (float) (aux3.len());
+        float camHeight = (float) (aux3.len()) * normFactor;
         float m_ESun = m_eSun;
         float camHeightGr = camHeight - m_fInnerRadius;
         float atmFactor = (m_fAtmosphereHeight - camHeightGr) / m_fAtmosphereHeight;
@@ -250,6 +268,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
                     .rotate(-rc.inclination - rc.axialTilt, 0, 0, 1)
                     .rotate(-rc.angle, 0, 1, 0);
         }
+        // Normalize planet pos
+        aux3.scl(normFactor);
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.PlanetPos))).value.set(aux3.put(aux));
         // CameraPos = -PlanetPos
         aux3.scl(-1f);
@@ -258,7 +278,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
         // Light position respect the earth: LightPos = SunPos - EarthPos
         if (parentTranslation != null) {
-            aux3.add(parentTranslation);
+            var tr = new Vector3Q(parentTranslation).scl(normFactor);
+            aux3.add(tr);
         }
         aux3.nor();
         if (ground && rc != null) {
@@ -310,8 +331,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
     public void setFogDensity(Double fogDensity) {
         this.fogDensity = MathUtils.clamp(fogDensity.floatValue(),
-                Constants.MIN_ATM_FOG_DENSITY,
-                Constants.MAX_ATM_FOG_DENSITY);
+                                          Constants.MIN_ATM_FOG_DENSITY,
+                                          Constants.MAX_ATM_FOG_DENSITY);
     }
 
     public void setFogdensity(Double fogDensity) {
@@ -368,7 +389,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Fog color
         setFogcolor(new double[]{0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5});
         // Samples
-        setSamples((long) rand.nextInt(10, 20));
+        setSamples((long) rand.nextInt(20, 24));
         // Params
         setParams(createModelParameters(200L, 2.0, true));
     }
