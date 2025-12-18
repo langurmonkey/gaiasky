@@ -362,6 +362,7 @@ layout (location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/atmfog.glsl>
 #include <shader/lib/logdepthbuff.glsl>
+#include <shader/lib/light.glsl>
 
 #ifdef ssrFlag
     #include <shader/lib/pack.glsl>
@@ -515,19 +516,7 @@ void main() {
             }
             // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
             vec3 L = normalize(-u_dirLights[i].direction * o_data.tbn);
-            vec3 H = normalize(L - V);
-            float NL = max(0.00001, dot(N, L));
-            float NH = max(0.00001, dot(N, H));
-            if (validLights == 1) {
-                NL0 = NL;
-                L0 = L;
-            }
-
-            selfShadow *= saturate(4.0 * NL);
-
-            specularColor += specular * min(1.0, pow(NH, 40.0));
-            shadowColor += col * night * max(0.0, 0.5 - NL);
-            diffuseColor = saturate(diffuseColor + col * NL + ambient * (1.0 - NL));
+            processLight(col, V, N, L, validLights, specular, night, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
         }
     #endif // directionalLightsFlag
 
@@ -545,22 +534,11 @@ void main() {
             }
             // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
             vec3 L = normalize((u_pointLights[i].position - o_data.fragPosWorld) * o_data.tbn);
-            vec3 H = normalize(L - V);
-            float NL = max(0.00001, dot(N, L));
-            float NH = max(0.00001, dot(N, H));
-
-            if (validLights == 1){
-                NL0 = NL;
-                L0 = L;
-            }
-
-            selfShadow *= saturate(4.0 * NL);
-
-            specularColor += specular * min(1.0, pow(NH, 40.0));
-            shadowColor += col * night * max(0.0, 0.5 - NL) * shadowMap;
-            diffuseColor = saturate(diffuseColor + col * NL * shadowMap + ambient * (1.0 - NL));
+            processLight(col, V, N, L, validLights, specular, night, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
         }
     #endif // pointLightsFlag
+    // Ambient light in shadow
+    selfShadow = saturate(selfShadow + (ambient.r));
 
     // Diffuse texture contribution.
     if (validLights == 0) {
@@ -576,7 +554,7 @@ void main() {
         #endif // occlusionCloudsFlag
 
         // Regular shading.
-        diffuseColor *= diffuse.rgb;
+        diffuseColor = diffuseColor * diffuse.rgb + ambient * diffuse.rgb;
     }
 
     // Diffuse scattering

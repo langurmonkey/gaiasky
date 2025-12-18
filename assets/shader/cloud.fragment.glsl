@@ -102,6 +102,7 @@ layout(location = 1) out vec4 layerBuffer;
 
 // Logarithmic depth buffer.
 #include <shader/lib/logdepthbuff.glsl>
+#include <shader/lib/light.glsl>
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -141,9 +142,10 @@ void main() {
         vec3 lightCol = u_dirLights[i].color;
         vec3 N = vec3(0.0, 0.0, 1.0);
         vec3 L = normalize(u_dirLights[i].direction * v_tbn);
-        float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
+        float NL = dot(N, L);
+        float dayFactor = 1.0 - linstep(-0.25, 0.12, -NL);
 
-        litColor += lightCol * NL;
+        litColor += lightCol * dayFactor;
     }
     #endif // directionalLightsFlag
 
@@ -155,13 +157,14 @@ void main() {
         vec3 lightCol = u_pointLights[i].color * u_pointLights[i].intensity;
         vec3 N = vec3(0.0, 0.0, 1.0);
         vec3 L = normalize((u_pointLights[i].position - v_fragPosWorld) * v_tbn);
-        float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
+        float NL = dot(N, L);
+        float dayFactor = 1.0 - linstep(-0.25, 0.12, -NL);
 
-        litColor += lightCol * NL;
+        litColor += lightCol * dayFactor;
     }
     #endif // pointLightsFlag
 
-    float brightness = clamp(length(litColor + ambient), 0.1, 1.0);
+    float brightness = clamp(length(litColor + ambient), 0.08, 1.0);
     vec3 cloudColor = cloud.rgb * brightness;
 
     fragColor = vec4(cloudColor, 1.0) * v_opacity;
