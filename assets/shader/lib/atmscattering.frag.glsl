@@ -2,7 +2,8 @@
 #define GLSL_LIB_ATMSCAT
 
 #if defined(atmosphereGround) || defined(atmosphericScattering)
-#define exposure 0.25
+#define exposureGround 0.9
+#define exposureSky 0.25
 uniform vec3 v3PlanetPos; /* The position of the planet */
 uniform vec3 v3CameraPos; /* The camera's current position*/
 uniform vec3 v3LightPos; /* The direction vector to the light source*/
@@ -24,8 +25,6 @@ uniform float fG; /* Mie asymmetry factor */
 uniform int nSamples;
 
 // INPUTS
-// Defined in shaders themselves!
-
 float rayleighPhase(float fCos2) {
     // Calculate the angle between view direction and light direction
     // This gives us the phase function for reddening at sunset
@@ -36,18 +35,25 @@ float rayleighPhase(float fCos2) {
 float miePhase(float fCos, float fCos2) {
     // Mie phase function (Henyey-Greenstein)
     float g2 = fG * fG;
-    return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow (1.0 + g2 - 2.0 * fG * fCos, 1.5);
+    return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow (abs(1.0 + g2 - 2.0 * fG * fCos), 1.5);
 }
 float scale(float fCos) {
     float x = 1.0 - fCos;
     return fScaleDepth * exp (-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
 }
-
+// Returns the far intersection point of a line and a sphere
 float getNearIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
     float B = 2.0 * dot (pos, ray);
     float C = distance2 - radius2;
     float fDet = max (0.0, B * B - 4.0 * C);
     return 0.5 * (-B - sqrt(fDet));
+}
+// Returns the far intersection point of a line and a sphere
+float getFarIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
+    float B = 2.0 * dot(pos, ray);
+    float C = distance2 - radius2;
+    float fDet = max(0.0, B*B - 4.0 * C);
+    return 0.5 * (-B + sqrt(fDet));
 }
 
 #endif// atmosphereGround || atmosphericScattering
@@ -69,6 +75,7 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     vec3 v3Start;
     float fStartDepth;
 
+    // Calculate the ray-s starting position, and the scattering offset
     if (fCameraHeight < fOuterRadius) {
         // Inside atmosphere
         v3Start = v3CameraPos;
@@ -80,26 +87,28 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
         fFar -= fNear;
         fStartDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
     }
-
-    float poslen = length(v_position);
-    float fCameraAngle = dot(-v3Ray, v_position) / poslen;
-    float fLightAngle = dot(v3LightPos, v_position) / poslen;
+    vec3 surfaceDir = normalize(v3Pos);
+    float fCameraAngle = dot(-v3Ray, surfaceDir);
     float fCameraScale = scale(fCameraAngle);
+    float fLightAngle = dot(v3LightPos, surfaceDir);
     float fLightScale = scale(fLightAngle);
     float fCameraOffset = fStartDepth * fCameraScale;
     float fTemp = (fLightScale + fCameraScale);
 
+    // Initialize scattering loop vairables
     float fSampleLength = fFar / float(nSamples);
     float fScaledLength = fSampleLength * fScale;
     vec3 v3SampleRay = v3Ray * fSampleLength;
     vec3 v3SamplePoint = v3Start + v3SampleRay * 0.5;
 
+    // Loop through the rays
     vec3 v3FrontColor = vec3(0.0);
+    vec3 v3Attenuate;
     for (int i = 0; i < nSamples; i++) {
         float fHeight = length(v3SamplePoint);
         float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
         float fScatter = fDepth * fTemp - fCameraOffset;
-        vec3 v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
+        v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
 
         v3FrontColor += v3Attenuate * (fScaledLength);
         v3SamplePoint += v3SampleRay;
@@ -122,7 +131,7 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     vec3 mieColor = fMiePhase * v3FrontColor * fKmESun;
 
     // Tone mapping
-    vec3 tonedAtmosphere = vec3(1.0) - exp((rayleighColor + mieColor) * -exposure);
+    vec3 tonedAtmosphere = vec3(1.0) - exp((rayleighColor + mieColor) * -exposureGround);
 
     return tonedAtmosphere * fAlpha * fadeFactor;
 }
@@ -210,7 +219,7 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
 
     // Tone mapping
     vec4 tonedAtmosphere;
-    tonedAtmosphere.rgb = vec3(1.0) - exp((rayleighColor + mieColor) * -exposure);
+    tonedAtmosphere.rgb = vec3(1.0) - exp((rayleighColor + mieColor) * -exposureSky);
 
     float lma = luma(tonedAtmosphere.rbg);
     float scl = smoothstep(0.05, 0.2, lma);

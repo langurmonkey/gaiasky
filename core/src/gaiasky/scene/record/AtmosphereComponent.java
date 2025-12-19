@@ -109,14 +109,14 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         float m_Kr4PI = m_Kr * 4.0f * (float) FastMath.PI;
         float m_Km4PI = m_Km * 4.0f * (float) FastMath.PI;
         float m_ESun = m_eSun; // Sun brightness (almost) constant
-        float m_g = 0.76f; // The Mie phase asymmetry factor .................
+        float m_g = 0.98f; // The Mie phase asymmetry factor
 
         // Normalization factor is inner radius.
         float normFactor = 2f / planetSize;
         m_fInnerRadius = (planetSize / 2f) * normFactor;
         m_fOuterRadius = this.size * normFactor;
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
-        float m_fScaleDepth = 0.085f;
+        float m_fScaleDepth = 0.35f;
         float m_fScale = 1.0f / (m_fAtmosphereHeight);
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
