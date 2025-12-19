@@ -358,11 +358,9 @@ layout (location = 1) out vec4 layerBuffer;
     #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-#define saturate(x) clamp(x, 0.0, 1.0)
-
 #include <shader/lib/atmfog.glsl>
 #include <shader/lib/logdepthbuff.glsl>
-#include <shader/lib/light.glsl>
+#include <shader/lib/pbr.glsl>
 
 #ifdef ssrFlag
     #include <shader/lib/pack.glsl>

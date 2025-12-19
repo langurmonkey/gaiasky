@@ -35,7 +35,6 @@ layout (location = 1) out vec4 layerBuffer;
 #endif// ssrFlag
 
 #define decay 0.2
-#define PI 3.1415927
 
 vec4 colorTex(float alpha, float texBrightness) {
     return v_col * v_col.a * texBrightness * alpha;

@@ -102,9 +102,7 @@ layout(location = 1) out vec4 layerBuffer;
 
 // Logarithmic depth buffer.
 #include <shader/lib/logdepthbuff.glsl>
-#include <shader/lib/light.glsl>
-
-#define saturate(x) clamp(x, 0.0, 1.0)
+#include <shader/lib/math.glsl>
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
