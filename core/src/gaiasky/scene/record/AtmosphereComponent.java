@@ -217,14 +217,16 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
         translation.put(aux3);
         if (vrOffset != null) {
-            aux1.set(vrOffset).scl(1 / Constants.M_TO_U);
+            aux1.set(vrOffset).scl(Constants.U_TO_M);
             aux3.sub(aux1);
         }
 
         // Normalization factor is inner radius.
         float normFactor = 2f / planetSize;
+        // Normalize planet pos
+        aux3.scl(normFactor);
         // Distance to planet
-        float camHeight = (float) (aux3.len()) * normFactor;
+        float camHeight = (float) (aux3.len());
         float m_ESun = m_eSun;
         float camHeightGr = camHeight - m_fInnerRadius;
         float atmFactor = (m_fAtmosphereHeight - camHeightGr) / m_fAtmosphereHeight;
@@ -259,8 +261,6 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
                     .rotate(-rc.inclination - rc.axialTilt, 0, 0, 1)
                     .rotate(-rc.angle, 0, 1, 0);
         }
-        // Normalize planet pos
-        aux3.scl(normFactor);
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.PlanetPos))).value.set(aux3.put(aux));
         // CameraPos = -PlanetPos
         aux3.scl(-1f);
