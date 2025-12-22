@@ -29,13 +29,13 @@ float rayleighPhase(float fCos2) {
     // Calculate the angle between view direction and light direction
     // This gives us the phase function for reddening at sunset
     // Rayleigh phase function: 3/16π * (1 + cos²θ)
-    return 0.75 * (1.0 + fCos2);// The 3/(16π) is included in fKrESun
+    return 0.75 + 0.75 * fCos2;
 }
 
 float miePhase(float fCos, float fCos2) {
     // Mie phase function (Henyey-Greenstein)
     float g2 = fG * fG;
-    return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow (abs(1.0 + g2 - 2.0 * fG * fCos), 1.5);
+    return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow (1.0 + g2 - 2.0 * fG * fCos, 1.5);
 }
 float scale(float fCos) {
     float x = 1.0 - fCos;
@@ -72,25 +72,13 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     v3Ray /= fFar;
 
     // Calculate starting position
-    vec3 v3Start;
-    float fStartDepth;
-
-    // Calculate the ray-s starting position, and the scattering offset
-    if (fCameraHeight < fOuterRadius) {
-        // Inside atmosphere
-        v3Start = v3CameraPos;
-        fStartDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fCameraHeight));
-    } else {
-        // Outside atmosphere
-        float fNear = getNearIntersection(v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
-        v3Start = v3CameraPos + v3Ray * fNear;
-        fFar -= fNear;
-        fStartDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
-    }
-    vec3 surfaceDir = normalize(v3Pos);
-    float fCameraAngle = dot(-v3Ray, surfaceDir);
+    float fNear = getNearIntersection(v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
+    vec3 v3Start = v3CameraPos + v3Ray * fNear;
+    fFar -= fNear;
+    float fStartDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
+    float fCameraAngle = dot(-v3Ray, v_position) / length(v_position);
+    float fLightAngle = dot(v3LightPos, v_position) / length(v_position);
     float fCameraScale = scale(fCameraAngle);
-    float fLightAngle = dot(v3LightPos, surfaceDir);
     float fLightScale = scale(fLightAngle);
     float fCameraOffset = fStartDepth * fCameraScale;
     float fTemp = (fLightScale + fCameraScale);
@@ -108,9 +96,9 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
         float fHeight = length(v3SamplePoint);
         float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
         float fScatter = fDepth * fTemp - fCameraOffset;
-        v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
 
-        v3FrontColor += v3Attenuate * (fScaledLength);
+        v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
+        v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
         v3SamplePoint += v3SampleRay;
     }
 
@@ -136,7 +124,7 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     return tonedAtmosphere * fAlpha * fadeFactor;
 }
 #else
-vec3 computeAtmosphericScatteringGround(){
+vec3 computeAtmosphericScatteringGround(vec3 v_position){
     return vec3(0.0);
 }
 #endif// atmosphereGround

@@ -593,6 +593,7 @@ void main() {
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef atmosphereGround
+        vec3 attenuate;
         vec3 atmosphereColor = computeAtmosphericScatteringGround(v_position);
         fragColor.rgb = clamp(fragColor.rgb + atmosphereColor, 0.0, 1.0);
         #if defined(heightFlag)

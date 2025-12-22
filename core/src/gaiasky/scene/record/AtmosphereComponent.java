@@ -109,14 +109,15 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         float m_Kr4PI = m_Kr * 4.0f * (float) FastMath.PI;
         float m_Km4PI = m_Km * 4.0f * (float) FastMath.PI;
         float m_ESun = m_eSun; // Sun brightness (almost) constant
-        float m_g = 0.98f; // The Mie phase asymmetry factor
+        float m_g = 0.76f; // The Mie phase asymmetry factor
 
-        // Normalization factor is inner radius.
+        // Normalization factor is inner radius * 100f.
         float normFactor = 2f / planetSize;
         m_fInnerRadius = (planetSize / 2f) * normFactor;
-        m_fOuterRadius = this.size * normFactor;
+        //m_fOuterRadius = this.size * normFactor;
+        m_fOuterRadius = 1.025f;
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
-        float m_fScaleDepth = 0.35f;
+        float m_fScaleDepth = 0.25f;
         float m_fScale = 1.0f / (m_fAtmosphereHeight);
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
@@ -214,7 +215,6 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
                                                   Vector3Q parentTranslation,
                                                   Vector3D vrOffset) {
 
-
         translation.put(aux3);
         if (vrOffset != null) {
             aux1.set(vrOffset).scl(Constants.U_TO_M);
@@ -263,7 +263,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         }
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.PlanetPos))).value.set(aux3.put(aux));
         // CameraPos = -PlanetPos
-        aux3.scl(-1f);
+        aux3.scl(-1.0);
 
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.CameraPos))).value.set(aux3.put(aux));
 
@@ -366,7 +366,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         Random rand = new Random(seed);
         // Size
         double bodyRadiusKm = bodyRadius * Constants.U_TO_KM;
-        setSize(bodyRadiusKm + bodyRadiusKm * 0.029);
+        setSize(bodyRadiusKm + bodyRadiusKm * 0.025);
         // Wavelengths
         setWavelengths(new double[]{gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1)});
         // Kr
@@ -374,13 +374,13 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Km
         setM_Km(rand.nextDouble(0.001f, 0.0079f));
         // eSun
-        setM_eSun(gaussian(rand, 7.0, 4.0, 3.0));
+        setM_eSun(gaussian(rand, 10.0, 2.0, 8.0));
         // Fog density
         setFogdensity(gaussian(rand, 0.6, 0.3, 0.01));
         // Fog color
         setFogcolor(new double[]{0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5});
         // Samples
-        setSamples((long) rand.nextInt(20, 24));
+        setSamples((long) rand.nextInt(14, 18));
         // Params
         setParams(createModelParameters(200L, 2.0, true));
     }

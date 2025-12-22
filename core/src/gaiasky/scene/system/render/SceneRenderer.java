@@ -249,7 +249,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                         Event.CAMERA_MODE_CMD,
                                         Event.CUBEMAP_CMD,
                                         Event.REBUILD_SHADOW_MAP_DATA_CMD,
-                                        Event.LIGHT_GLOW_CMD);
+                                        Event.LIGHT_GLOW_CMD,
+                                        Event.SHADER_RELOAD_CMD);
 
     }
 
@@ -308,9 +309,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                                                         renderAssets.billboardProceduralShaders,
                                                                                         renderAssets.galGenShader);
             case BILLBOARD_GROUP_PROCEDURAL_CPU -> system = new BillboardProceduralCPURenderer(this,
-                                                                                        BILLBOARD_GROUP_PROCEDURAL_CPU,
-                                                                                        alphas,
-                                                                                        renderAssets.billboardProceduralCpuShaders);
+                                                                                               BILLBOARD_GROUP_PROCEDURAL_CPU,
+                                                                                               alphas,
+                                                                                               renderAssets.billboardProceduralCpuShaders);
             case PARTICLE_GROUP -> {
                 final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudModeParticles) {
@@ -354,7 +355,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case VARIABLE_GROUP -> {
                 final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
                 system = switch (pointCloudMode) {
-                    case TRIANGLES -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+                    case TRIANGLES ->
+                            new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
                     case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
                 };
                 system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -416,7 +418,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     system = new ModelRenderer(this, MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
                         @Override
                         public float getAlpha(IRenderable s) {
-                            return alphas[ComponentType.Atmospheres.ordinal()] * (float) FastMath.pow(alphas[s.getComponentType().getFirstOrdinal()],
+                            return alphas[ComponentType.Atmospheres.ordinal()] * (float) FastMath.pow(alphas[s.getComponentType()
+                                                                                                              .getFirstOrdinal()],
                                                                                                       2);
                         }
 
@@ -592,8 +595,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
 
             // Bind half-resolution buffer.
-            pp.getCombinedBuffer().getFullBuffer().end();
-            pp.getCombinedBuffer().getHalfBuffer().begin();
+            pp.getCombinedBuffer()
+                    .getFullBuffer()
+                    .end();
+            pp.getCombinedBuffer()
+                    .getHalfBuffer()
+                    .begin();
             clearScreen();
 
             // Iterate over render groups and get systems.
@@ -608,8 +615,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
 
             // Back to full-resolution buffer.
-            pp.getCombinedBuffer().getHalfBuffer().end();
-            pp.getCombinedBuffer().getFullBuffer().begin();
+            pp.getCombinedBuffer()
+                    .getHalfBuffer()
+                    .end();
+            pp.getCombinedBuffer()
+                    .getFullBuffer()
+                    .begin();
 
         } catch (GdxRuntimeException | GaiaSkyShaderCompileException gre) {
             // Escalate.
@@ -647,13 +658,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private void resetRenderLists(List<List<IRenderable>> renderLists, boolean addStub) {
         // Clear lists to get them ready for update pass.
         for (var rg : values()) {
-            renderLists.get(rg.ordinal()).clear();
+            renderLists.get(rg.ordinal())
+                    .clear();
         }
 
         // Add stub for particle effects (the only system that does not need renderables).
         if (addStub)
             for (var rg : autonomousGroups) {
-                renderLists.get(rg.ordinal()).add(stubRenderable);
+                renderLists.get(rg.ordinal())
+                        .add(stubRenderable);
             }
     }
 
@@ -776,6 +789,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     lightGlowPass.buildLightGlowData();
                 }
             }
+            case SHADER_RELOAD_CMD -> GaiaSky.postRunnable(() -> {
+                logger.info("Shader reload");
+                ExtShaderProgram.invalidateAllShaderPrograms(Gdx.app);
+            });
             default -> {
             }
         }
@@ -800,11 +817,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             return alphas[ordinal];
         } else {
-            return visible.get(ordinal) ? MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 0, 1) : MathUtilsDouble.lint(diff,
-                                                                                                                                     0,
-                                                                                                                                     Settings.settings.scene.fadeMs,
-                                                                                                                                     1,
-                                                                                                                                     0);
+            return visible.get(ordinal) ? MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 0,
+                                                               1) : MathUtilsDouble.lint(diff,
+                                                                                         0,
+                                                                                         Settings.settings.scene.fadeMs,
+                                                                                         1,
+                                                                                         0);
         }
     }
 
@@ -864,7 +882,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // Dispose SGRs
         if (sgrList != null) {
-            Arrays.stream(sgrList).forEach(IRenderMode::dispose);
+            Arrays.stream(sgrList)
+                    .forEach(IRenderMode::dispose);
             sgrList = null;
         }
 
