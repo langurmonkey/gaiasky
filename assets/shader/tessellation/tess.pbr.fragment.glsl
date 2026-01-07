@@ -382,19 +382,13 @@ void main() {
         vec3 night = vec3(0.0);
     #endif // atmosphereGround
 
+    float ambientOcclusion = 1.0;
     #if !defined(occlusionCloudsFlag)
-        float ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
+        ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
         #if defined(occlusionMetallicRoughnessTextureFlag)
-            // Sometimes ambient occlusion is not used, and it is set to 0.
-            if (ambientOcclusion == 0.0) {
-                ambientOcclusion = 1.0;
-            }
-        #endif // occlusionMetallicRoughnessTextureFlag
-
-        // Occlusion strength is 1 by default.
-        diffuse.rgb *= ambientOcclusion;
-        specular.rgb *= ambientOcclusion;
-    #endif // !occlusionCloudsFlag
+            if (ambientOcclusion == 0.0) ambientOcclusion = 1.0;
+        #endif
+    #endif
 
     // Alpha value from textures
     float texAlpha = 1.0;
@@ -514,7 +508,7 @@ void main() {
             }
             // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
             vec3 L = normalize(-u_dirLights[i].direction * o_data.tbn);
-            processLight(col, V, N, L, validLights, specular, night, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
+            processLight(col, V, N, L, validLights, specular, night, o_data.texCoords, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
         }
     #endif // directionalLightsFlag
 
@@ -532,7 +526,7 @@ void main() {
             }
             // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
             vec3 L = normalize((u_pointLights[i].position - o_data.fragPosWorld) * o_data.tbn);
-            processLight(col, V, N, L, validLights, specular, night, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
+            processLight(col, V, N, L, validLights, specular, night, o_data.texCoords, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
         }
     #endif // pointLightsFlag
     // Ambient light in shadow
@@ -544,19 +538,9 @@ void main() {
         diffuseColor = ambient;
     }
 
-    #ifdef occlusionCloudsFlag
-    if (validLights > 0) {
-        // Cloud occlusion
-        float ambientOcclusion = clamp(fetchColorAmbientOcclusion(texCoords + L0.xy * 0.0015), 0.0, 1.0);
-        ambientOcclusion = pow(1.0 - ambientOcclusion, 0.7);
-        diffuseColor *= ambientOcclusion;
-        specularColor *= ambientOcclusion;
-    }
-    #endif
-
-    // Apply albedo to diffuse (albedo is already in F0 for metallic specular)
-    // Add ambient contribution
-    diffuseColor = diffuse.rgb * (diffuseColor + ambient);
+    // Apply AO
+    vec3 finalAmbient = ambient * ambientOcclusion;
+    vec3 finalReflection = reflectionColor * ambientOcclusion;
 
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag
@@ -568,8 +552,28 @@ void main() {
 
     // Final color equation
     selfShadow = pow(clamp(selfShadow, 0.0, 1.0), 1.0);
-    float finalShadow = shadowMap * selfShadow;
-    fragColor = vec4(diffuseColor * finalShadow + diffuseScattering * finalShadow + shadowColor + emissive.rgb + reflectionColor + specularColor, texAlpha * o_data.opacity);
+
+    // 1. Calculate the Indirect (Ambient) part
+    vec3 ambientTerm = diffuse.rgb * finalAmbient;
+
+    // 2. Calculate the Direct part (Accumulated from light loops)
+    // Note: diffuseColor at this point is just (kD / PI) * LightColor * NdotL
+    vec3 directDiffuseTerm = diffuse.rgb * diffuseColor;
+
+    // 3. Combine them using the shadow only on the direct part
+    float directLightingShadow = shadowMap * selfShadow;
+
+    // Final color equation
+    fragColor = vec4(
+            (directDiffuseTerm + diffuseScattering) * directLightingShadow + // Direct light effects
+            (specularColor * directLightingShadow) +                        // Shaded Specular
+            ambientTerm +                                                   // Unshaded Ambient
+            finalReflection +                                               // Unshaded Indirect Specular
+            shadowColor +                                                   // Night lights
+            emissive.rgb,                                                   // Glow
+            texAlpha * o_data.opacity
+    );
+
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
     #ifdef atmosphereGround

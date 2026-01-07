@@ -53,6 +53,7 @@ void processLight(
                 int validLights,
                 vec3 specular,
                 vec3 night,
+                vec2 tc,
                 inout float NL0,
                 inout vec3 L0,
                 inout float selfShadow,
@@ -76,6 +77,14 @@ void processLight(
         NL0 = clamp(NdotL, 0.0, 1.0);
         L0 = Ln;
     }
+
+    // Cloud shadow, if needed
+    float cloudShadow = 1.0;
+    #ifdef occlusionCloudsFlag
+        // Use Ln (current light direction) for projection instead of L0
+        float cloudMap = fetchColorAmbientOcclusion(tc + Ln.xy * 0.0015);
+        cloudShadow = clamp(pow(1.0 - cloudMap, 0.7), 0.0, 1.0);
+    #endif
 
     // Day/night transition for emissive (keep existing behavior)
     float dayFactor = 1.0 - linstep(-0.1, 0.1, -NdotL);
@@ -140,8 +149,8 @@ void processLight(
     // Accumulate lighting contributions
     // diffuseColor accumulates irradiance * BRDF (without albedo yet)
     // specularColor accumulates full specular term with mask applied
-    specularColor += specularBRDF * col * NdotL_clamped;
-    diffuseColor += diffuseBRDF * col * NdotL_clamped;
+    specularColor += specularBRDF * col * NdotL_clamped * cloudShadow;
+    diffuseColor += diffuseBRDF * col * NdotL_clamped * cloudShadow;
 }
 
 // Process a single point or directional light
