@@ -400,6 +400,7 @@ void main() {
 
     vec4 normalVector;
     vec3 N;
+    vec3 V = o_data.viewDir;
     #if defined(normalTextureFlag) || defined(normalCubemapFlag) || defined(svtIndirectionNormalTextureFlag)
         // Fetch from normal map.
         N = normalize(fetchColorNormal(texCoords).rgb * 2.0 - 1.0);
@@ -453,28 +454,40 @@ void main() {
     // Reflection
     vec3 reflectionColor = vec3(0.0);
 
+    float roughnessValue = 0.5; // Default
+    float metallicValue = 0.0; // Default
+
     #ifdef metallicFlag
-        // Roughness.
-        float roughness = 0.0;
+        // 1. Fetch Roughness
         #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
             vec3 roughness3 = fetchColorRoughness(texCoords);
-            roughness = roughness3.r;
+            roughnessValue = roughness3.r;
         #elif defined(shininessFlag)
-            roughness = 1.0 - u_shininess;
-        #endif // roughnessTextureFlag, shininessFlag
+            roughnessValue = 1.0 - u_shininess;
+        #endif // roughness
 
+        // 2. Fetch Metallic
+        metallicValue = fetchColorMetallic(texCoords).r;
+
+        // 3. Handle Environment Reflections (Indirect Specular)
         #ifdef reflectionCubemapFlag
-            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 10.0).rgb;
+            // Sample cubemap with roughness-based LOD (10.0 is approx max mip level)
+            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughnessValue * 10.0).rgb;
+
+            // PBR Fresnel for Environment:
+            // Non-metals reflect ~4% (white), Metals reflect Albedo color.
+            vec3 F0_env = mix(vec3(0.04), diffuse.rgb, metallicValue);
+
+            // Use Schlick-GGX approximation for the environment reflection strength
+            // We use NdotV because the reflection is viewed from the camera
+            reflectionColor *= fresnelSchlick(max(dot(N, V), 0.0), F0_env);
         #endif // reflectionCubemapFlag
 
-        // Metallic.
-        vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
+        // 4. SSR (Screen Space Reflections) Support
         #ifdef ssrFlag
-            vec3 rmc = diffuse.rgb * metallicColor.r;
-            reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
+            vec3 rmc = diffuse.rgb * metallicValue;
+            reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughnessValue, 1.0);
         #endif // ssrFlag
-        // Cubemap reflection color.
-        reflectionColor = reflectionColor * metallicColor.r;
     #endif // metallicFlag
 
     //#ifdef iorFlag
@@ -498,7 +511,6 @@ void main() {
     #ifdef directionalLightsFlag
         // Loop for directional light contributions.
         for (int i = 0; i < numDirectionalLights; i++) {
-            vec3 V = o_data.viewDir;
             vec3 col = u_dirLights[i].color;
             // Skip non-lights
             if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
@@ -508,7 +520,23 @@ void main() {
             }
             // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
             vec3 L = normalize(-u_dirLights[i].direction * o_data.tbn);
-            processLight(col, V, N, L, validLights, specular, night, o_data.texCoords, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
+            processLight(col,
+                    V,
+                    N,
+                    L,
+                    validLights,
+                    specular,
+                    night,
+                    diffuse.rgb,
+                    metallicValue,
+                    roughnessValue,
+                    texCoords,
+                    NL0,
+                    L0,
+                    selfShadow,
+                    specularColor,
+                    shadowColor,
+                    diffuseColor);
         }
     #endif // directionalLightsFlag
 
@@ -516,7 +544,6 @@ void main() {
     #ifdef pointLightsFlag
         // Loop for point light contributions.
         for (int i = 0; i < numPointLights; i++) {
-            vec3 V = o_data.viewDir;
             vec3 col = u_pointLights[i].color * u_pointLights[i].intensity;
             // Skip non-lights
             if (all(equal(col, vec3(0.0)))) {
@@ -526,7 +553,23 @@ void main() {
             }
             // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
             vec3 L = normalize((u_pointLights[i].position - o_data.fragPosWorld) * o_data.tbn);
-            processLight(col, V, N, L, validLights, specular, night, o_data.texCoords, NL0, L0, selfShadow, specularColor, shadowColor, diffuseColor);
+            processLight(col,
+                    V,
+                    N,
+                    L,
+                    validLights,
+                    specular,
+                    night,
+                    diffuse.rgb,
+                    metallicValue,
+                    roughnessValue,
+                    texCoords,
+                    NL0,
+                    L0,
+                    selfShadow,
+                    specularColor,
+                    shadowColor,
+                    diffuseColor);
         }
     #endif // pointLightsFlag
     // Ambient light in shadow
@@ -580,7 +623,7 @@ void main() {
         vec3 atmosphereColor = computeAtmosphericScatteringGround(o_position);
         fragColor.rgb = clamp(fragColor.rgb + atmosphereColor, 0.0, 1.0);
         #if defined(heightFlag)
-            fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
+            fragColor.rgb = applyFog(fragColor.rgb, V, L0 * -1.0, NL0);
         #endif // heightFlag
     #endif // atmosphereGround
 
