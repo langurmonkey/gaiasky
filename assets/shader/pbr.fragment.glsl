@@ -555,6 +555,7 @@ void main() {
                         diffuse.rgb,
                         metallicValue,
                         roughnessValue,
+                        shadowMap,
                         texCoords,
                         NL0,
                         L0,
@@ -588,6 +589,7 @@ void main() {
                     diffuse.rgb,
                     metallicValue,
                     roughnessValue,
+                    shadowMap,
                     texCoords,
                     NL0,
                     L0,
@@ -628,17 +630,14 @@ void main() {
     // Note: diffuseColor at this point is just (kD / PI) * LightColor * NdotL
     vec3 directDiffuseTerm = diffuse.rgb * diffuseColor;
 
-    // 3. Combine them using the shadow only on the direct part
-    float directLightingShadow = shadowMap * selfShadow;
-
     // Final color equation
     fragColor = vec4(
-        (directDiffuseTerm + diffuseScattering) * directLightingShadow + // Direct light effects
-        (specularColor * directLightingShadow) +                        // Shaded Specular
-        ambientTerm +                                                   // Unshaded Ambient
-        finalReflection +                                               // Unshaded Indirect Specular
-        shadowColor +                                                   // Night lights
-        emissive.rgb,                                                   // Glow
+        (directDiffuseTerm + diffuseScattering) * selfShadow + // Direct light effects
+        (specularColor * selfShadow) +                        // Shaded Specular
+        ambientTerm +                                         // Unshaded Ambient
+        finalReflection +                                     // Unshaded Indirect Specular
+        shadowColor +                                         // Night lights
+        emissive.rgb,                                         // Glow
         texAlpha * v_data.opacity
     );
 

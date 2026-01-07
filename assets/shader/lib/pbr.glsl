@@ -56,6 +56,7 @@ void processLight(
         vec3 albedo,    // The clean base color (diffuse.rgb)
         float metallic, // The metallic value (0.0 - 1.0)
         float roughness,// The roughness value (0.0 - 1.0)
+        float shadowMapFactor,
         vec2 tc,
         inout float NL0,
         inout vec3 L0,
@@ -75,17 +76,24 @@ void processLight(
     float NdotH = max(dot(N, H), 0.0);
     float HdotV = max(dot(H, Vn), 0.0);
 
-    if (validLights == 1) {
-        NL0 = clamp(NdotL, 0.0, 1.0);
-        L0 = Ln;
-    }
-
     // Cloud shadow
     float cloudShadow = 1.0;
     #ifdef occlusionCloudsFlag
     float cloudMap = fetchColorAmbientOcclusion(tc + Ln.xy * 0.0015);
     cloudShadow = clamp(pow(1.0 - cloudMap, 0.7), 0.0, 1.0);
     #endif
+
+    // Combine shadows
+    float totalShadow = cloudShadow;
+
+    // Only the first light (the star) uses the shadow map
+    if (validLights == 1) {
+        totalShadow *= shadowMapFactor;
+
+        // Update global L0 and NL0 for atmosphere/fog logic
+        NL0 = clamp(NdotL, 0.0, 1.0);
+        L0 = Ln;
+    }
 
     float dayFactor = 1.0 - linstep(-0.1, 0.1, -NdotL);
     float nightFactor = 1.0 - dayFactor;
@@ -119,7 +127,7 @@ void processLight(
     kD *= (1.0 - metallic);   // Metals have NO diffuse scattering
 
     // 5. Final Accumulation
-    vec3 lightIntensity = col * NdotL_clamped * cloudShadow;
+    vec3 lightIntensity = col * NdotL_clamped * totalShadow;
     specularColor += specularBRDF * lightIntensity;
     diffuseColor  += (kD / PI) * lightIntensity; // Irradiance (Albedo applied in main)
 }
