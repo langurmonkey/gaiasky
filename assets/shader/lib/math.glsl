@@ -2,7 +2,7 @@
 #define GLSL_LIB_MATH
 
 #ifndef PI
-#define PI 3.14159265
+#define PI 3.14159265359
 #endif // PI
 
 #ifndef saturate
