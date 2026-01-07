@@ -540,20 +540,23 @@ void main() {
 
     // Diffuse texture contribution.
     if (validLights == 0) {
-        // Only ambient contribution, we have no illuminating directional lights.
-        diffuseColor = saturate(diffuse.rgb * ambient);
-    } else {
-        #ifdef occlusionCloudsFlag
-            // Ambient occlusion contains clouds, take into account light direction and normal.
-            float ambientOcclusion = clamp(fetchColorAmbientOcclusion(texCoords + L0.xy  * 0.0015), 0.0, 1.0);
-            ambientOcclusion = pow(1.0 - ambientOcclusion, 0.7);
-            diffuseColor *= ambientOcclusion;
-            specularColor *= ambientOcclusion;
-        #endif // occlusionCloudsFlag
-
-        // Regular shading.
-        diffuseColor = diffuseColor * diffuse.rgb + ambient * diffuse.rgb;
+        // Only ambient contribution
+        diffuseColor = ambient;
     }
+
+    #ifdef occlusionCloudsFlag
+    if (validLights > 0) {
+        // Cloud occlusion
+        float ambientOcclusion = clamp(fetchColorAmbientOcclusion(texCoords + L0.xy * 0.0015), 0.0, 1.0);
+        ambientOcclusion = pow(1.0 - ambientOcclusion, 0.7);
+        diffuseColor *= ambientOcclusion;
+        specularColor *= ambientOcclusion;
+    }
+    #endif
+
+    // Apply albedo to diffuse (albedo is already in F0 for metallic specular)
+    // Add ambient contribution
+    diffuseColor = diffuse.rgb * (diffuseColor + ambient);
 
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag

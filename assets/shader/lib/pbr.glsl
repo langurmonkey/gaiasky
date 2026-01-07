@@ -122,6 +122,10 @@ void processLight(
     float denominator = 4.0 * NdotV * NdotL_clamped;
     vec3 specularBRDF = numerator / max(denominator, 0.0001);
 
+    // Apply specular mask (e.g., water vs land on planets)
+    // specular parameter contains per-pixel specular intensity mask
+    specularBRDF *= specular;
+
     // Energy conservation: kS is Fresnel (specular), kD is what's left for diffuse
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
@@ -130,12 +134,12 @@ void processLight(
     // For now, assume non-metallic
     // kD *= (1.0 - metallic); // Will be added in item 4
 
-    // Lambertian diffuse
+    // Lambertian diffuse (will be multiplied by albedo later)
     vec3 diffuseBRDF = kD / PI;
 
-    // Accumulate lighting
-    // Note: specular input is being ignored now in favor of PBR calculation
-    // The old 'specular' parameter can be used for albedo in item 4
+    // Accumulate lighting contributions
+    // diffuseColor accumulates irradiance * BRDF (without albedo yet)
+    // specularColor accumulates full specular term with mask applied
     specularColor += specularBRDF * col * NdotL_clamped;
     diffuseColor += diffuseBRDF * col * NdotL_clamped;
 }
