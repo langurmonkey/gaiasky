@@ -166,6 +166,6 @@ public class ModelScaffolding implements Component {
             }
         }
         // Get first otherwise
-        return this.seed.get(0);
+        return this.seed.getFirst();
     }
 }

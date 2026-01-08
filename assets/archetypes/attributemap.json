@@ -358,7 +358,7 @@
         "description": "A list with the components of this model that need to be randomized via procedural generation. Can contain 'model', 'atmosphere', and/or 'cloud'.",
         "unit": "String[]"
       },
-      "seed:ModelScaffolding": {
+      "seed": {
         "description": "In case the 'randomize' attribute is defined, this attribute defines the RNG seed to use.",
         "unit": "Double"
       },
