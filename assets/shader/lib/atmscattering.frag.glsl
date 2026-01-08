@@ -2,7 +2,7 @@
 #define GLSL_LIB_ATMSCAT
 
 #if defined(atmosphereGround) || defined(atmosphericScattering)
-#define exposureGround 0.9
+#define exposureGround 0.5
 #define exposureSky 0.25
 uniform vec3 v3PlanetPos; /* The position of the planet */
 uniform vec3 v3CameraPos; /* The camera's current position*/
