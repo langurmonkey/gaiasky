@@ -65,7 +65,7 @@ vec4 eclipseColor(in vec3 fragPosWorld, in vec3 lightDirection, in vec3 normalVe
 
                 // Diffraction spectrum colors based on position in the diffraction band
                 float spectrumPos = x;
-                vec3 spectrumColor = getDiffractionSpectrum(spectrumPos);
+                vec3 spectrumColor = getDiffractionSpectrum(spectrumPos) * 0.5;
 
                 diffractionTint = spectrumColor * diffractionIntensity;
             }
