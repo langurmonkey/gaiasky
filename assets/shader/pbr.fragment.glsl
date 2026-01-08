@@ -481,8 +481,9 @@ void main() {
     float roughnessValue = 0.5; // Default
     float metallicValue = 0.0; // Default
 
+    vec3 F_env = vec3(0.0);
     #ifdef metallicFlag
-        // 1. Fetch Roughness
+        // Fetch Roughness
         #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
             vec3 roughness3 = fetchColorRoughness(texCoords);
             roughnessValue = roughness3.r;
@@ -490,30 +491,34 @@ void main() {
             roughnessValue = 1.0 - u_shininess;
         #endif // roughness
 
-        // 2. Fetch Metallic
+        // Fetch Metallic
         metallicValue = fetchColorMetallic(texCoords).r;
 
-        // 3. Handle Environment Reflections (Indirect Specular)
+        // Handle Environment Reflections (Indirect Specular)
         #ifdef reflectionCubemapFlag
-            // Sample cubemap with roughness-based LOD (10.0 is approx max mip level)
-            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughnessValue * 10.0).rgb;
+            // Sample cubemap with roughness-based LOD (13.0 is approx max mip level)
+            float lod = roughnessValue * 13.0;
+            reflectionColor = texture(u_reflectionCubemap,
+                                        vec3(-reflectDir.x, reflectDir.y, reflectDir.z),
+                                        lod).rgb;
 
             // PBR Fresnel for Environment:
             // Non-metals reflect ~4% (white), Metals reflect Albedo color.
             vec3 F0_env = mix(vec3(0.04), diffuse.rgb, metallicValue);
 
-            // Use Schlick-GGX approximation for the environment reflection strength
-            // We use NdotV because the reflection is viewed from the camera
-            reflectionColor *= fresnelSchlick(max(dot(N, V), 0.0), F0_env);
+            // Use roughness-dependent Fresnel
+            F_env = F0_env + (max(vec3(1.0 - roughnessValue), F0_env) - F0_env) * pow(clamp(1.0 - max(dot(N, V), 0.0), 0.0, 1.0), 5.0);
+
+            // Apply F_env (do not use fresnelSchlick approximation)
+            reflectionColor *= F_env;
         #endif // reflectionCubemapFlag
 
-        // 4. SSR (Screen Space Reflections) Support
+        // SSR (Screen Space Reflections) Support
         #ifdef ssrFlag
             vec3 rmc = diffuse.rgb * metallicValue;
             reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughnessValue, 1.0);
         #endif // ssrFlag
     #endif // metallicFlag
-
 
     //#ifdef iorFlag
     //    vec3 f0 = vec3(pow(( u_ior - 1.0) /  (u_ior + 1.0), 2.0));
@@ -609,7 +614,7 @@ void main() {
     }
 
     // Apply AO
-    vec3 finalAmbient = ambient * ambientOcclusion;
+    vec3 finalAmbient = (ambient * ambientOcclusion) * (vec3(1.0) - F_env);
     vec3 finalReflection = reflectionColor * ambientOcclusion;
 
     // Diffuse scattering

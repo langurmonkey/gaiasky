@@ -79,9 +79,9 @@ void processLight(
     // Cloud shadow
     float cloudShadow = 1.0;
     #ifdef occlusionCloudsFlag
-    float cloudMap = fetchColorAmbientOcclusion(tc + Ln.xy * 0.0015);
-    cloudShadow = clamp(pow(1.0 - cloudMap, 0.7), 0.0, 1.0);
-    #endif
+        float cloudMap = fetchColorAmbientOcclusion(tc + Ln.xy * 0.0015);
+        cloudShadow = clamp(pow(1.0 - cloudMap, 0.7), 0.0, 1.0);
+    #endif // occlusionCloudsFlag
 
     // Combine shadows
     float totalShadow = cloudShadow;
@@ -140,15 +140,15 @@ void processLight(
     specularBRDF *= specular;
 
     // Energy Conservation (kD)
+    float diffuseAlbedoMultiplier = 1.0 - metallic;
     vec3 kS = F;            // Specular ratio
-    vec3 kD = vec3(1.0) - kS; // Remaining energy
-    kD *= (1.0 - metallic);   // Metals have NO diffuse scattering
+    vec3 kD = (vec3(1.0) - kS) * diffuseAlbedoMultiplier; // Remaining energy
 
     // Final Accumulation
     vec3 lightIntensitySpecular = col * NdotL_clamped * totalShadow;
     vec3 lightIntensityDiffuse  = col * scatterFactor * totalShadow;
 
     specularColor += specularBRDF * lightIntensitySpecular;
-    diffuseColor  += (kD / PI) * lightIntensityDiffuse;
+    diffuseColor  += kD * lightIntensityDiffuse;
 }
 #endif
