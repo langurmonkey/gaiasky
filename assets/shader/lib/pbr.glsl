@@ -97,23 +97,41 @@ void processLight(
 
     float dayFactor = 1.0 - linstep(-0.1, 0.1, -NdotL);
     float nightFactor = 1.0 - dayFactor;
-    selfShadow *= dayFactor;
+    #ifndef thinSurfaceFlag
+        // Rings do not have night factor.
+        selfShadow *= dayFactor;
+    #endif // thinSurfaceFlag
     shadowColor += night * nightFactor;
-
-    if (NdotL <= 0.0) return;
 
     float NdotL_clamped = clamp(NdotL, 0.0, 1.0);
 
-    // 1. Calculate Base Reflectivity (F0)
+    float scatterFactor;
+    #ifdef thinSurfaceFlag
+        // Wrap lighting: prevents the edge-on black line by allowing light to
+        // "bleed" past the 90-degree mark.
+        float wrap = 0.2;
+
+        // Use abs(NdotL) for the rings so that the back side is lit
+        // exactly like the front side (translucency).
+        scatterFactor = max(0.0, (abs(NdotL) + wrap) / (1.0 + wrap));
+    #else
+        // Standard Lambertian for solid objects
+        scatterFactor = NdotL_clamped;
+
+        // Early exit for solid objects only
+        if (NdotL <= 0.0) return;
+    #endif // thinSurfaceFlag
+
+    // Calculate Base Reflectivity (F0)
     // Non-metals use 0.04. Metals use the albedo color.
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
-    // 2. BRDF Components
+    // BRDF Components
     float D = distributionGGX(NdotH, roughness);
     float G = geometrySmith(NdotV, NdotL_clamped, roughness);
     vec3 F = fresnelSchlick(HdotV, F0);
 
-    // 3. Specular term
+    // Specular term
     vec3 numerator = D * G * F;
     float denominator = 4.0 * NdotV * NdotL_clamped;
     vec3 specularBRDF = numerator / max(denominator, 0.0001);
@@ -121,14 +139,16 @@ void processLight(
     // Apply the legacy specular mask (if used for specific intensity control)
     specularBRDF *= specular;
 
-    // 4. Energy Conservation (kD)
+    // Energy Conservation (kD)
     vec3 kS = F;            // Specular ratio
     vec3 kD = vec3(1.0) - kS; // Remaining energy
     kD *= (1.0 - metallic);   // Metals have NO diffuse scattering
 
-    // 5. Final Accumulation
-    vec3 lightIntensity = col * NdotL_clamped * totalShadow;
-    specularColor += specularBRDF * lightIntensity;
-    diffuseColor  += (kD / PI) * lightIntensity; // Irradiance (Albedo applied in main)
+    // Final Accumulation
+    vec3 lightIntensitySpecular = col * NdotL_clamped * totalShadow;
+    vec3 lightIntensityDiffuse  = col * scatterFactor * totalShadow;
+
+    specularColor += specularBRDF * lightIntensitySpecular;
+    diffuseColor  += (kD / PI) * lightIntensityDiffuse;
 }
 #endif

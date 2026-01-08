@@ -469,6 +469,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                                            ringDiffuseScatteringColor[2],
                                            1f));
             }
+            // Thin surface
+            ringMaterial.set(new FlagAttribute(FlagAttribute.ThinSurface, true));
             // Alpha blending for ring.
             ringMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
             if (!culling)

@@ -545,6 +545,10 @@ public class DefaultIntShader extends BaseIntShader {
         if (attributes.has(FloatAttribute.Shininess))
             prefix.append("#define " + FloatAttribute.ShininessAlias + "Flag\n");
 
+        if (attributes.has(FlagAttribute.ThinSurface)) {
+            prefix.append("#define " + FlagAttribute.ThinSurfaceAlias + "Flag\n");
+        }
+
         if (attributes.has(ColorAttribute.Metallic) || attributes.has(TextureAttribute.Metallic)) {
             prefix.append("#define metallicFlag\n");
             if (attributes.has(CubemapAttribute.ReflectionCubemap)) {

@@ -477,6 +477,7 @@ void main() {
             // PBR Fresnel for Environment:
             // Non-metals reflect ~4% (white), Metals reflect Albedo color.
             vec3 F0_env = mix(vec3(0.04), diffuse.rgb, metallicValue);
+            vec3 F_env = F0_env + (max(vec3(1.0 - roughnessValue), F0_env) - F0_env) * pow(clamp(1.0 - max(dot(N, V), 0.0), 0.0, 1.0), 5.0);
 
             // Use Schlick-GGX approximation for the environment reflection strength
             // We use NdotV because the reflection is viewed from the camera
@@ -587,12 +588,12 @@ void main() {
     vec3 finalAmbient = ambient * ambientOcclusion;
     vec3 finalReflection = reflectionColor * ambientOcclusion;
 
+
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag
-        vec3 diffuseScattering = fetchColorDiffuseScattering();
-        diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion;
+        vec3 baseScattering = diffuse.rgb * fetchColorDiffuseScattering() * ambientOcclusion;
     #else
-        vec3 diffuseScattering = vec3(0.0);
+        vec3 baseScattering = vec3(0.0);
     #endif // diffuseScatteringColorFlag
 
     // Final color equation
@@ -605,14 +606,18 @@ void main() {
     // Note: diffuseColor at this point is just (kD / PI) * LightColor * NdotL
     vec3 directDiffuseTerm = diffuse.rgb * diffuseColor;
 
+    // Calculate scattering effect
+    vec3 shadedScattering = baseScattering * shadowMap;
+
     // Final color equation
     fragColor = vec4(
-            (directDiffuseTerm + diffuseScattering) * selfShadow + // Direct light effects
-            (specularColor * selfShadow) +                        // Shaded Specular
-            ambientTerm +                                         // Unshaded Ambient
-            finalReflection +                                     // Unshaded Indirect Specular
-            shadowColor +                                         // Night lights
-            emissive.rgb,                                         // Glow
+            (directDiffuseTerm * selfShadow) + // Direct light effects
+            (specularColor * selfShadow) +     // Shaded Specular
+            shadedScattering +                 // Diffuse scattering
+            ambientTerm +                      // Unshaded Ambient
+            finalReflection +                  // Unshaded Indirect Specular
+            shadowColor +                      // Night lights
+            emissive.rgb,                      // Glow
             texAlpha * o_data.opacity
     );
 

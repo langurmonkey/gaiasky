@@ -614,30 +614,33 @@ void main() {
 
     // Diffuse scattering
     #ifdef diffuseScatteringColorFlag
-        vec3 diffuseScattering = fetchColorDiffuseScattering();
-        diffuseScattering = diffuse.rgb * diffuseScattering * ambientOcclusion;
+        vec3 baseScattering = diffuse.rgb * fetchColorDiffuseScattering() * ambientOcclusion;
     #else
-        vec3 diffuseScattering = vec3(0.0);
+        vec3 baseScattering = vec3(0.0);
     #endif // diffuseScatteringColorFlag
 
     // Clamp self-shadow
     selfShadow = pow(clamp(selfShadow, 0.0, 1.0), 1.0);
 
-    // 1. Calculate the Indirect (Ambient) part
+    // Calculate the Indirect (Ambient) part
     vec3 ambientTerm = diffuse.rgb * finalAmbient;
 
-    // 2. Calculate the Direct part (Accumulated from light loops)
+    // Calculate the Direct part (Accumulated from light loops)
     // Note: diffuseColor at this point is just (kD / PI) * LightColor * NdotL
     vec3 directDiffuseTerm = diffuse.rgb * diffuseColor;
 
+    // Calculate scattering effect
+    vec3 shadedScattering = baseScattering * shadowMap;
+
     // Final color equation
     fragColor = vec4(
-        (directDiffuseTerm + diffuseScattering) * selfShadow + // Direct light effects
-        (specularColor * selfShadow) +                        // Shaded Specular
-        ambientTerm +                                         // Unshaded Ambient
-        finalReflection +                                     // Unshaded Indirect Specular
-        shadowColor +                                         // Night lights
-        emissive.rgb,                                         // Glow
+        (directDiffuseTerm * selfShadow) + // Direct light effects
+        (specularColor * selfShadow) +     // Shaded Specular
+        shadedScattering +                 // Diffuse scattering
+        ambientTerm +                      // Unshaded Ambient
+        finalReflection +                  // Unshaded Indirect Specular
+        shadowColor +                      // Night lights
+        emissive.rgb,                      // Glow
         texAlpha * v_data.opacity
     );
 
