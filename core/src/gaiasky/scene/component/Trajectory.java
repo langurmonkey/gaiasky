@@ -66,7 +66,7 @@ public class Trajectory implements Component {
     /**
      * Number of samples for the orbit data provider.
      **/
-    public int numSamples = 100;
+    public int numSamples = 200;
 
     /**
      * Sampling strategy for the orbit component.
