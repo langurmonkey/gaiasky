@@ -162,7 +162,7 @@ void main() {
     }
     #endif // pointLightsFlag
 
-    float brightness = clamp(length(litColor + ambient), 0.08, 1.0);
+    float brightness = clamp(length(litColor + ambient), 0.03, 1.0);
     vec3 cloudColor = cloud.rgb * brightness;
 
     fragColor = vec4(cloudColor, 1.0) * v_opacity;
