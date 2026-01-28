@@ -7,17 +7,72 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 /**
  * An image that keeps track of the given width and height.
+ * It also can, optionally, include a hyperlink.
  */
 public class OwnImage extends Image {
     private float ownWidth = 0f, ownHeight = 0f;
+    private String linkURL;
 
+    /**
+     * Create an image.
+     *
+     * @param drawable The drawable.
+     */
     public OwnImage(Drawable drawable) {
+        this(drawable, null);
+    }
+
+    /**
+     * Creates a new image with a link.
+     *
+     * @param drawable The drawable.
+     * @param url      The URL of the link.
+     */
+    public OwnImage(Drawable drawable, String url) {
         super(drawable);
+        if (url != null && !url.isBlank()) {
+            this.linkURL = url;
+            initialize();
+        }
+    }
+
+    private void initialize() {
+        // Fix touchUp issue
+        this.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return super.touchDown(event, x, y, pointer, button);
+            }
+
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if (button == Input.Buttons.LEFT && linkURL != null && !linkURL.isEmpty())
+                    Gdx.net.openURI(linkURL);
+
+                // Bubble up
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
+        this.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent.Type type = ((InputEvent) event).getType();
+                if (type == InputEvent.Type.enter) {
+                    Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Hand);
+                } else if (type == InputEvent.Type.exit) {
+                    Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+                }
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override

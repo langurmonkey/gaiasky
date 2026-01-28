@@ -50,7 +50,8 @@ public class AboutWindow extends GenericDialog {
     private MemInfoWindow memInfoWindow;
 
     public AboutWindow(Stage stage, Skin skin) {
-        super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build),
+        super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " (" + I18n.msg("gui.build",
+                                                                                                      Settings.settings.version.build) + ")",
               skin,
               stage);
         this.linkStyle = skin.get("link", LabelStyle.class);
@@ -121,6 +122,14 @@ public class AboutWindow extends GenericDialog {
 
         var gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
 
+        var versionBig = new OwnLabel(Settings.settings.version.version,
+                                      skin,
+                                      "mono-big");
+        var build = new OwnLabel(I18n.msg("gui.build",
+                                          Settings.settings.version.build),
+                                 skin,
+                                 "big");
+
         // Home page.
         var homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin, "header");
         var homepageLink = new Link(Settings.HOMEPAGE, linkLargeStyle, Settings.HOMEPAGE);
@@ -141,18 +150,22 @@ public class AboutWindow extends GenericDialog {
         gaiaSkyIcon.setOrigin(Align.center);
 
         // Add all to content
-        contentHelp.add(gaiaSkyIcon).colspan(2).padTop(pad34).align(Align.center);
+        contentHelp.add(gaiaSkyIcon).padTop(pad34 * 2f).align(Align.center).colspan(2);
         contentHelp.row();
-        contentHelp.add(gaiasky).pad(pad18).padBottom(pad18 * 5f).colspan(2);
+        contentHelp.add(gaiasky).pad(pad18).colspan(2);
         contentHelp.row();
-        contentHelp.add(homepageTitle).left().padBottom(pad34).row();
-        contentHelp.add(homepageLink).left().padBottom(pad34 * 2f);
+        contentHelp.add(versionBig).padTop(pad10).padBottom(pad10).align(Align.center).colspan(2);
         contentHelp.row();
-        contentHelp.add(docsTitle).left().padBottom(pad34).row();
-        contentHelp.add(docsLink).left().padBottom(pad18 * 4f);
+        contentHelp.add(build).padBottom(pad18 * 5f).align(Align.center).colspan(2);
         contentHelp.row();
-        contentHelp.add(repoTitle).left().padBottom(pad34).row();
-        contentHelp.add(repoLink).left().padBottom(pad18 * 4f);
+        contentHelp.add(homepageTitle).left().padBottom(pad18).row();
+        contentHelp.add(homepageLink).left().padBottom(pad34);
+        contentHelp.row();
+        contentHelp.add(docsTitle).left().padBottom(pad18).row();
+        contentHelp.add(docsLink).left().padBottom(pad34);
+        contentHelp.row();
+        contentHelp.add(repoTitle).left().padBottom(pad18).row();
+        contentHelp.add(repoLink).left().padBottom(pad34);
         contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
@@ -169,7 +182,7 @@ public class AboutWindow extends GenericDialog {
         var homePageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
         var homepage = new Link(Settings.HOMEPAGE, linkStyle, Settings.HOMEPAGE);
 
-        // Twitter
+        // Dev news
         var devNewsTitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
         var tw = new Link(Settings.SOCIAL_MEDIA_NAME, linkStyle, Settings.SOCIAL_MEDIA_URL);
 
@@ -216,14 +229,14 @@ public class AboutWindow extends GenericDialog {
 
         // Thanks
         HorizontalGroup thanks = new HorizontalGroup();
-        thanks.space(pad18).pad(pad18);
+        thanks.space(pad18 * 3f).pad(pad18);
         Container<Actor> thanksSc = new Container<>(thanks);
         thanksSc.setBackground(skin.getDrawable("bg-clear"));
 
-        var zah = new Image(getSpriteDrawable(Gdx.files.internal("img/zah.png")));
-        var dlr = new Image(getSpriteDrawable(Gdx.files.internal("img/dlr.png")));
-        var bwt = new Image(getSpriteDrawable(Gdx.files.internal("img/bwt.png")));
-        var dpac = new Image(getSpriteDrawable(Gdx.files.internal("img/dpac.png")));
+        var zah = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/zah.png")), "https://zah.uni-heidelberg.de");
+        var dlr = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/dlr.png")), "https://dlr.de");
+        var bwt = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/bmftr.png")), "https://www.bmftr.bund.de");
+        var dpac = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/dpac.png")), "https://www.cosmos.esa.int/web/gaia/dpac/consortium");
 
         thanks.addActor(zah);
         thanks.addActor(dlr);

@@ -177,15 +177,6 @@
         "b": 0,
         "a": 0.45
       }
-    },
-    "bg-clear": {
-      "name": "white",
-      "color": {
-        "r": 1,
-        "g": 1,
-        "b": 1,
-        "a": 0.7
-      }
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
