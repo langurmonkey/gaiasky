@@ -37,10 +37,16 @@ public abstract class ColorPickerAbstract extends Image {
         return color;
     }
 
-    public void setPickedColor(float[] rgba) {
+    public void setPickedColor(float[] color) {
         initColor();
-        System.arraycopy(rgba, 0, this.color, 0, rgba.length);
-        super.setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+        if (color.length >= 4) {
+            System.arraycopy(color, 0, this.color, 0, color.length);
+            super.setColor(color[0], color[1], color[2], color[3]);
+        } else if (color.length == 3) {
+            System.arraycopy(color, 0, this.color, 0, color.length);
+            this.color[3] = 1f;
+            super.setColor(color[0], color[1], color[2], 1f);
+        }
     }
 
     public double[] getPickedColorDouble() {

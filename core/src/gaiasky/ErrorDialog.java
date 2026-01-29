@@ -57,11 +57,9 @@ public class ErrorDialog implements ApplicationListener {
         this.vp = vp;
         this.sb = initializeSpriteBatch();
         ui = new Stage(this.vp, this.sb);
-        FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
+        FileHandle fh = Gdx.files.internal("skins/default/default.json");
         if (!fh.exists()) {
-            // Default to dark-green
-            Settings.settings.program.ui.theme = "dark-green";
-            fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
+            fh = Gdx.files.internal("skins/default/default.json");
         }
         skin = new Skin(fh);
         // Linear filtering.

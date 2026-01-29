@@ -29,10 +29,11 @@ import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
 
@@ -54,7 +55,6 @@ public class GlobalResources {
     private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
     // Global all-purpose sprite batch.
     private final SpriteBatch spriteBatch;
-    private final ExtShaderProgram extSpriteShader;
     // Sprite batch using int indices.
     private final ExtSpriteBatch extSpriteBatch;
     private final ShaderProgram shapeShader;
@@ -85,7 +85,9 @@ public class GlobalResources {
             logger.info("ShapeRenderer shader compilation failed: " + shapeShader.getLog());
         }
         // Sprite shader
-        this.spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        this.spriteShader = new ShaderProgram(
+                ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl")),
+                ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.accent.fragment.glsl")));
         if (!spriteShader.isCompiled()) {
             logger.info("SpriteBatch shader compilation failed: " + spriteShader.getLog());
         }
@@ -93,14 +95,16 @@ public class GlobalResources {
         this.spriteBatch = new SpriteBatch(500, getSpriteShader());
 
         // ExtSprite shader
-        this.extSpriteShader = new ExtShaderProgram("spritebatch", Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        var extSpriteShader = new ExtShaderProgram("spritebatch",
+                                                    ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl")),
+                                                    ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.fragment.glsl")));
         if (!extSpriteShader.isCompiled()) {
             logger.info("ExtSpriteBatch shader compilation failed: " + extSpriteShader.getLog());
         }
         // Sprite batch
-        this.extSpriteBatch = new ExtSpriteBatch(1000, getExtSpriteShader());
+        this.extSpriteBatch = new ExtSpriteBatch(1000, extSpriteShader);
 
-        updateSkin();
+        initSkin();
     }
 
     public void initialize(AssetManager manager) {
@@ -140,7 +144,8 @@ public class GlobalResources {
         textures.put("loc-marker-city", manager.get("img/markers/loc-marker-city.png"));
         textures.put("loc-marker-town", manager.get("img/markers/loc-marker-town.png"));
         textures.put("loc-marker-landmark", manager.get("img/markers/loc-marker-landmark.png"));
-        textures.put("attitude-indicator", manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class));
+        textures.put("attitude-indicator",
+                     manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class));
 
     }
 
@@ -770,14 +775,8 @@ public class GlobalResources {
 
     }
 
-    public void updateSkin() {
-        FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
-        if (!fh.exists()) {
-            // Default to dark-green
-            logger.info("User interface theme '" + Settings.settings.program.ui.theme + "' not found, using 'dark-green' instead");
-            Settings.settings.program.ui.theme = "dark-green";
-            fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
-        }
+    private void initSkin() {
+        FileHandle fh = Gdx.files.internal("skins/default/default.json");
         setSkin(new Skin(fh));
         ObjectMap<String, BitmapFont> fonts = getSkin().getAll(BitmapFont.class);
         for (String key : fonts.keys()) {
@@ -795,11 +794,6 @@ public class GlobalResources {
 
     public SpriteBatch getSpriteBatch() {
         return spriteBatch;
-    }
-
-
-    public ExtShaderProgram getExtSpriteShader() {
-        return extSpriteShader;
     }
 
     public ExtSpriteBatch getExtSpriteBatch() {

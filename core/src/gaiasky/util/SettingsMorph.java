@@ -30,6 +30,7 @@ import gaiasky.util.Settings.SceneSettings.RendererSettings.ShadowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.GroupSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.ThresholdSettings;
 import gaiasky.util.camera.rec.KeyframesManager.PathType;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.parse.Parser;
 
 import java.io.FileInputStream;
@@ -304,7 +305,7 @@ public class SettingsMorph {
         program.net.slave.warpFile = str("program.net.slave.warp", p);
         program.net.slave.blendFile = str("program.net.slave.blend", p);
         program.ui = new UiSettings();
-        program.ui.theme = str("program.ui.theme", p);
+        program.ui.accentColor = ColorUtils.hexToRgb(str("program.ui.accentColor", p));
         program.ui.scale = f32("program.ui.scale", p);
         program.exitConfirmation = bool("program.exit.confirmation", p);
         program.locale = str("program.locale", p);

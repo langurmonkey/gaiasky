@@ -56,6 +56,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
@@ -113,7 +114,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin, recGridStyle;
-    private OwnSelectBox<StringComobBoxBean> theme;
+    private ColorPicker accentColor;
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnSelectBox<UpscaleFilter> upscaleFilter;
@@ -137,6 +138,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             aberrationBak, lensFlareBak, filmGrainBak;
     private double stereoKBak, stereoIpdBak, stereoSdBak;
     private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
+    private float[] accentColorBak;
     private int FXAAQuality, FXAAQualityBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
@@ -1086,7 +1088,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 svtCacheSize.setValueLabelTransform((val) -> {
                     var valInt = val.intValue();
                     var value = Integer.toString(valInt * valInt);
-                    return value.toString() + " (" + valInt + "x" + valInt + ")";
+                    return value + " (" + valInt + "x" + valInt + ")";
                 });
                 svtCacheSize.setName("cacheSize");
                 svtCacheSize.setWidth(sliderWidth);
@@ -1492,14 +1494,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
-
-        StringComobBoxBean[] themes = new StringComobBoxBean[]{
-                new StringComobBoxBean(I18n.msg("gui.theme.default"), "default")};
-        theme = new OwnSelectBox<>(skin);
-        theme.setWidth(selectWidth);
-        theme.setItems(themes);
-        int themeIndex = 0;
-        theme.setSelectedIndex(themeIndex);
+        accentColor = new ColorPicker(Settings.settings.program.ui.accentColor, stage, skin);
+        accentColor.setNewColorRunnable(() -> {
+            EventManager.publish(Event.UI_ACCENT_COLOR_CMD, accentColor, accentColor.getPickedColor());
+        });
 
         // SCALING
         OwnLabel uiScaleLabel = new OwnLabel(I18n.msg("gui.ui.theme.scale"), skin);
@@ -1573,7 +1571,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ui.add(langLabel).left().padRight(pad34).padBottom(pad18);
         ui.add(lang).colspan(2).left().padBottom(pad18).row();
         ui.add(themeLabel).left().padRight(pad34).padBottom(pad18);
-        ui.add(theme).colspan(2).left().padBottom(pad18).row();
+        ui.add(accentColor).colspan(2).left().padBottom(pad18).row();
         ui.add(uiScaleLabel).left().padRight(pad34).padBottom(pad18);
         ui.add(uiScale).left().padRight(pad10).padBottom(pad18);
         ui.add(applyUiScale).left().padBottom(pad18).row();
@@ -2914,6 +2912,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         stereoKBak = settings.program.modeStereo.k;
         stereoIpdBak = settings.program.modeStereo.ipd;
         stereoSdBak = settings.program.modeStereo.screenDistance;
+        accentColorBak = Arrays.copyOf(settings.program.ui.accentColor, 3);
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -3207,7 +3206,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // User Interface
         LangComboBoxBean languageBean = lang.getSelected();
-        StringComobBoxBean newTheme = theme.getSelected();
         // UI scale
         float factor = uiScale.getMappedValue();
         EventManager.publish(Event.UI_SCALE_FACTOR_CMD, this, factor);
@@ -3216,7 +3214,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Interface language
         boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.getLocale());
         boolean reloadUI = reloadLang ||
-                !settings.program.ui.theme.equals(newTheme.value) ||
                 settings.program.minimap.size != minimapSize.getValue() ||
                 settings.program.ui.newUI != newUI.isChecked();
 
@@ -3225,7 +3222,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                        new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
 
         // UI theme
-        settings.program.ui.theme = newTheme.value;
         boolean previousPointerCoords = settings.program.pointer.coordinates;
         settings.program.pointer.coordinates = pointerCoords.isChecked();
         if (previousPointerCoords != settings.program.pointer.coordinates) {
@@ -3456,6 +3452,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.STEREO_K_CMD, this, stereoKBak);
         EventManager.publish(Event.STEREO_IPD_CMD, this, stereoIpdBak);
         EventManager.publish(Event.STEREO_SCREEN_DIST_CMD, this, stereoSdBak);
+        EventManager.publish(Event.UI_ACCENT_COLOR_CMD, this, accentColorBak);
     }
 
     private void reloadLanguage() {

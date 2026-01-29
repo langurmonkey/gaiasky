@@ -1482,6 +1482,10 @@ public enum Event {
      */
     UI_RELOAD_CMD,
     /**
+     * Updates the UI accent color.
+     */
+    UI_ACCENT_COLOR_CMD,
+    /**
      * Displays a dialog to restart. Contains the text, or nothing.
      */
     SHOW_RESTART_ACTION,

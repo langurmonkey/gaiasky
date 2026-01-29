@@ -33,6 +33,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.KeyframesManager;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -562,7 +563,7 @@ public class Settings extends SettingsObject {
         }
 
         public String localizedName() {
-           return I18n.get("gui.stereo.profile." + name().toLowerCase(Locale.ROOT));
+            return I18n.get("gui.stereo.profile." + name().toLowerCase(Locale.ROOT));
         }
     }
 
@@ -3199,8 +3200,8 @@ public class Settings extends SettingsObject {
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class UiSettings extends SettingsObject {
-            public String theme;
+        public static class UiSettings extends SettingsObject implements IObserver {
+            public float[] accentColor = new float[]{0.43f, 0.62f, 0.824f};
             public float scale;
             public long animationMs = 600;
             public boolean newUI = true;
@@ -3211,16 +3212,22 @@ public class Settings extends SettingsObject {
             public DistanceUnits distanceUnits;
 
             /**
-             * Set the UI theme. For now, we only have one.
+             * Set the UI accent color.
              *
-             * @param theme The theme.
+             * @param colorHex The color as a HEX string (#AABBCC).
              */
-            @JsonProperty("theme")
-            public void setTheme(String theme) {
-                if (!theme.equals("default")) {
-                    theme = "default";
+            @JsonProperty("accentColor")
+            public void setAccentColor(String colorHex) {
+                try {
+                    accentColor = ColorUtils.hexToRgb(colorHex);
+                } catch (Exception e) {
+                    logger.warn("Error decoding color (" + colorHex + "), using default.");
+                    accentColor = ColorUtils.hexToRgb("#709fd3");
                 }
-                this.theme = theme;
+            }
+
+            public String getAccentColor() {
+                return ColorUtils.rgbToHex(accentColor);
             }
 
             public void setScale(Float scale) {
@@ -3252,6 +3259,7 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
+                EventManager.instance.subscribe(this, Event.UI_ACCENT_COLOR_CMD);
             }
 
             @Override
@@ -3260,6 +3268,15 @@ public class Settings extends SettingsObject {
 
             @Override
             public void apply() {
+                EventManager.publish(Event.UI_ACCENT_COLOR_CMD, this, (Object) accentColor);
+            }
+
+            @Override
+            public void notify(Event event, Object source, Object... data) {
+                if (source != this && event == Event.UI_ACCENT_COLOR_CMD) {
+                    var newColor = (float[]) data[0];
+                    System.arraycopy(newColor, 0, this.accentColor, 0, this.accentColor.length);
+                }
             }
         }
 

@@ -369,6 +369,8 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     public void render(int rw,
                        int rh) {
         if (stage != null) {
+            var accent = Settings.settings.program.ui.accentColor;
+            stage.getBatch().getShader().setUniform3fv("u_accentColor", accent, 0, 3);
             buffer.begin();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
             stage.draw();

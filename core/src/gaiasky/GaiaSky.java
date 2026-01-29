@@ -7,7 +7,6 @@
 
 package gaiasky;
 
-import org.lwjgl.BufferUtils;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
@@ -20,7 +19,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureArray;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
@@ -94,10 +92,8 @@ import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL43;
 
 import java.io.File;
-import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
@@ -242,8 +238,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * List of GUIs.
      */
     private List<IGui> guis;
-    // The sprite batch to render the back buffer to screen
-    private SpriteBatch renderBatch;
     // Gaia Sky has finished initialization
     private boolean initialized = false;
     /**
@@ -545,8 +539,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         for (AssetBean ab : assets) {
             ab.load(assetManager);
         }
-
-        renderBatch = globalResources.getSpriteBatch();
 
         EventManager.instance.subscribe(this, Event.LOAD_DATA_CMD, Event.UI_SCALE_RECOMPUTE_CMD);
 
@@ -1321,16 +1313,13 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
             if (!initialized) {
                 resizeImmediate(width, height, true, true, true, true);
+            } else {
+                globalResources.resize(width, height);
             }
 
             resizeWidth = width;
             resizeHeight = height;
             lastResizeTime = System.currentTimeMillis();
-
-            if (renderBatch != null) {
-                renderBatch.getProjectionMatrix()
-                        .setToOrtho2D(0, 0, width, height);
-            }
 
             Settings.settings.graphics.resolution[0] = width;
             Settings.settings.graphics.resolution[1] = height;

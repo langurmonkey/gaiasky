@@ -1225,7 +1225,6 @@ public class WelcomeGui extends AbstractGui {
                 GaiaSky.postRunnable(() -> {
                     GlobalResources globalResources = GaiaSky.instance.getGlobalResources();
                     // Reinitialise GUI system
-                    globalResources.updateSkin();
                     GenericDialog.updatePads();
                     // UI theme reload broadcast
                     EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
