@@ -12,6 +12,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -3226,6 +3227,7 @@ public class Settings extends SettingsObject {
                 }
             }
 
+            @JsonProperty("accentColor")
             public String getAccentColor() {
                 return ColorUtils.rgbToHex(accentColor);
             }
