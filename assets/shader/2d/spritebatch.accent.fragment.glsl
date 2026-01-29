@@ -11,7 +11,8 @@ layout (location = 0) out vec4 fragColor;
 #include <shader/lib/colors.glsl>
 
 bool isPurple(vec3 color) {
-    return color.r > 0.5 && color.b > 0.5 && color.g < 0.5 * min(color.r, color.b);
+    float minRB = min(color.r, color.b);
+    return minRB > 0.2 && color.g < 0.5 * minRB && color.g < 0.7;
 }
 
 vec3 transformColor(vec3 color, vec3 target) {
