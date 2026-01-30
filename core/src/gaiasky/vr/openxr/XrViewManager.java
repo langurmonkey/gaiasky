@@ -25,6 +25,8 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 public class XrViewManager {
 
     private final Quaternion quaternion = new Quaternion();
+    private final Quaternion rot = new Quaternion();
+    private final Matrix4 viewMat = new Matrix4();
 
     public void updateCamera(XrCompositionLayerProjectionView layerView,
                              PerspectiveCamera camera) {

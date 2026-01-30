@@ -250,6 +250,10 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         }
     }
 
+    @Override
+    public void renderMirrorToDesktop(int textureHandle) {
+    }
+
 
     private void renderControllers() {
         if (controllers != null) {

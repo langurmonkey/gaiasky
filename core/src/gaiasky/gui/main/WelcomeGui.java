@@ -577,9 +577,10 @@ public class WelcomeGui extends AbstractGui {
                 selectionInfo.add(noStarCatalogs);
             }
 
-            Table vrDemoTable = null;
+            Table vrOptionsTable = null;
             if (vrStatus.vrInitOk()) {
-                vrDemoTable = new Table(skin);
+                vrOptionsTable = new Table(skin);
+                // VR demo mode.
                 var vrDemo = new OwnCheckBox(I18n.msg("gui.vr.demo"), skin, 10f);
                 vrDemo.setChecked(Settings.settings.runtime.vrDemoMode);
                 vrDemo.listenTo(Event.VR_DEMO_MODE_CMD);
@@ -592,10 +593,29 @@ public class WelcomeGui extends AbstractGui {
                 }));
                 OwnImageButton vrDemoTooltip = new OwnImageButton(skin, "tooltip");
                 vrDemoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.demo.info"), skin));
-                vrDemoTable.add(vrDemo)
+                // VR desktop mirror.
+                var vrMirror = new OwnCheckBox(I18n.msg("gui.vr.mirror"), skin, 10f);
+                vrMirror.setChecked(Settings.settings.runtime.vrDesktopMirror);
+                vrMirror.listenTo(Event.VR_DESKTOP_MIRROR_CMD);
+                vrMirror.addListener((event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.publish(Event.VR_DESKTOP_MIRROR_CMD, vrMirror, vrMirror.isChecked());
+                        return true;
+                    }
+                    return false;
+                }));
+                OwnImageButton vrMirrorTooltip = new OwnImageButton(skin, "tooltip");
+                vrMirrorTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mirror.info"), skin));
+                // Add to table.
+                vrOptionsTable.add(vrDemo)
                         .left()
                         .padRight(pad16);
-                vrDemoTable.add(vrDemoTooltip)
+                vrOptionsTable.add(vrDemoTooltip)
+                        .left().row();
+                vrOptionsTable.add(vrMirror)
+                        .left()
+                        .padRight(pad16);
+                vrOptionsTable.add(vrMirrorTooltip)
                         .left();
             }
 
@@ -628,11 +648,11 @@ public class WelcomeGui extends AbstractGui {
                     .colspan(2)
                     .center()
                     .top()
-                    .padBottom(pad32 * (vrDemoTable != null ? 1f : 2f))
+                    .padBottom(pad32 * (vrOptionsTable != null ? 1f : 2f))
                     .row();
 
-            if (vrDemoTable != null) {
-                center.add(vrDemoTable)
+            if (vrOptionsTable != null) {
+                center.add(vrOptionsTable)
                         .colspan(2)
                         .center()
                         .top()

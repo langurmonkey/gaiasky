@@ -1839,7 +1839,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel titleVR = null;
         if (vr) {
             titleVR = new OwnLabel(I18n.msg("gui.vr"), skin, "header");
-
             // Demo mode
             OwnLabel vrDemoLabel = new OwnLabel(I18n.msg("gui.vr.demo"), skin);
             vrDemo = new OwnCheckBox("", skin);

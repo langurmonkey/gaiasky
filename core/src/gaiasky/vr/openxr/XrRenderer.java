@@ -29,4 +29,9 @@ public interface XrRenderer {
                           FrameBuffer frameBuffer,
                           int viewIndex);
 
+    /**
+     * Render to the desktop.
+     * @param textureHandle The texture handle
+     */
+    void renderMirrorToDesktop(int textureHandle) ;
 }

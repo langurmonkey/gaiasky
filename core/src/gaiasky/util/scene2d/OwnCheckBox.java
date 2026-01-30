@@ -202,6 +202,10 @@ public class OwnCheckBox extends CheckBox implements IObserver {
         // End TextButton
     }
 
+    /**
+     * Let the checkbox update its state by listening to the current event. The event's first
+     * parameter must be a boolean with the state.
+     */
     public void listenTo(Event event) {
         EventManager.instance.removeAllSubscriptions(this);
         if (event != null) {

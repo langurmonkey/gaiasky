@@ -9,6 +9,7 @@ package gaiasky.render.process;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
@@ -42,6 +43,9 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.*;
 
+/**
+ * Render mode for Gaia Sky VR via OpenXR.
+ */
 public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode, XrRenderer {
     private final Scene scene;
     private final XrDriver driver;
@@ -51,6 +55,8 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
     private final Map<XrControllerDevice, Entity> vrDeviceToModel;
     private Environment controllersEnvironment;
     private TextureView textureView;
+    // Cache FBOs to avoid glFramebufferTexture2D.
+    private final Map<Integer, FrameBuffer> swapChainFboCache;
 
     // GUI
     private ExtSpriteBatch sbScreen;
@@ -65,16 +71,17 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         this.driver = xrDriver;
         this.viewManager = new XrViewManager();
         this.vrDeviceToModel = new HashMap<>();
+        this.swapChainFboCache = new HashMap<>();
 
         if (xrDriver != null) {
             this.textureView = new TextureView(0, xrDriver.getWidth(), xrDriver.getHeight());
-            // Aux vectors
+            // Aux vectors.
             lastSize = new Vector2();
 
-            // Controllers
+            // Controllers.
             Array<XrControllerDevice> controllers = xrDriver.getControllerDevices();
 
-            // Env
+            // Environment.
             controllersEnvironment = new Environment();
             controllersEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
             DirectionalLight directionalLight = new DirectionalLight();
@@ -82,7 +89,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
             directionalLight.direction.set(0f, -0.3f, -4.0f);
             controllersEnvironment.add(directionalLight);
 
-            // Controller objects
+            // Controller objects.
             controllerObjects = new Array<>(false, controllers.size);
             for (XrControllerDevice controller : controllers) {
                 if (!controller.isInitialized())
@@ -145,33 +152,64 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
                                  XrSwapchainImageOpenGLKHR swapChainImage,
                                  FrameBuffer frameBuffer,
                                  int viewIndex) {
+        // Force viewport.
+        int w = layerView.subImage().imageRect().extent().width();
+        int h = layerView.subImage().imageRect().extent().height();
+        Gdx.gl.glViewport(0, 0, w, h);
+
         rc.ppb = null;
+
+        // Light Glow Pass.
         sgr.getLightGlowPass().render(camera, sgr.getGlowFrameBuffer());
 
-        // Update camera.
+        // Update Camera Matrices.
         viewManager.updateCamera(layerView, camera.getCamera(), (NaturalCamera) camera.getCurrent(), rc);
+
+        // Setup Post-Processing.
         boolean postProcess = postProcessCapture(ppb, frameBuffer, rw, rh, ppb::captureVR);
 
-        // Render scene.
+        // Render Scene.
         sgr.renderScene(camera, t, rc);
 
-        // Render camera.
+        // Camera & Orientation.
         camera.render(rw, rh);
         sendOrientationUpdate(camera.getCamera(), rw, rh);
 
-        // To swap-chain texture.
-        frameBuffer.begin();
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapChainImage.image(), 0);
-        frameBuffer.end();
-        postProcessRender(ppb, frameBuffer, postProcess, camera, rw, rh);
+        // Get or create an FBO for this specific swapchain image handle.
+        FrameBuffer targetFbo = getOrCreateSwapChainFbo(swapChainImage.image(), driver.getWidth(), driver.getHeight());
 
-        /* Render to screen */
-        if (viewIndex == 0) {
-            textureView.setTexture(swapChainImage.image(), driver.getWidth(), driver.getHeight());
-            Gdx.gl.glEnable(GL40.GL_FRAMEBUFFER_SRGB);
-            RenderUtils.renderKeepAspect(textureView, sbScreen, Gdx.graphics, lastSize);
-            Gdx.gl.glDisable(GL40.GL_FRAMEBUFFER_SRGB);
-        }
+        // Blit from your internal framebuffer to the OpenXR swapchain FBO.
+        // This is usually faster than re-attaching textures.
+        targetFbo.begin();
+        postProcessRender(ppb, targetFbo, postProcess, camera, rw, rh);
+        targetFbo.end();
+
+    }
+
+    /**
+     * Renders a mirror of the VR view to the desktop window.
+     * This should be called after the eye loop but before xrEndFrame.
+     *
+     * @param textureHandle The OpenGL texture handle from the OpenXR swapchain (usually eye 0).
+     */
+    public void renderMirrorToDesktop(int textureHandle) {
+        textureView.setTexture(textureHandle, driver.getWidth(), driver.getHeight());
+        Gdx.gl.glEnable(GL40.GL_FRAMEBUFFER_SRGB);
+        RenderUtils.renderKeepAspect(textureView, sbScreen, Gdx.graphics, lastSize);
+        Gdx.gl.glDisable(GL40.GL_FRAMEBUFFER_SRGB);
+    }
+
+    /**
+     * Helper to avoid glFramebufferTexture2D state changes every frame.
+     */
+    private FrameBuffer getOrCreateSwapChainFbo(int textureHandle, int w, int h) {
+        return swapChainFboCache.computeIfAbsent(textureHandle, handle -> {
+            FrameBuffer fb = new FrameBuffer(Pixmap.Format.RGBA8888, w, h, true);
+            fb.begin();
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, handle, 0);
+            fb.end();
+            return fb;
+        });
     }
 
     public void resize(int rw,
@@ -221,6 +259,9 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
     @Override
     public void dispose() {
-
+        for (FrameBuffer fb : swapChainFboCache.values()) {
+            fb.dispose();
+        }
+        swapChainFboCache.clear();
     }
 }

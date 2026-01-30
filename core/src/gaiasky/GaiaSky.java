@@ -419,9 +419,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         // Update back-buffer resolution.
         settings.graphics.updateBackBufferResolution();
 
-        // Initialize array pool.
-        Pools.get(Array.class, 200);
-
         // Initialize timer.
         // Doing this preemptively helps prevent some macOS errors.
         Timer.instance();

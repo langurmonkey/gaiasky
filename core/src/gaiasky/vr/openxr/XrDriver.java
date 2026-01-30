@@ -69,6 +69,7 @@ public class XrDriver implements Disposable {
     private final Array<XrInputListener> listeners;
     // One swap-chain per view.
     public SwapChain[] swapChains;
+    private int leftEyeSwapchainIndex = -1;
     public XrViewConfigurationView.Buffer viewConfigs;
     public final int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
     private FrameBuffer[] viewFrameBuffers;
@@ -165,8 +166,8 @@ public class XrDriver implements Disposable {
                     .next(NULL)
                     .createFlags(0)
                     .applicationInfo(XrApplicationInfo.calloc(stack)
-                            .applicationName(stack.UTF8(Settings.getApplicationName(false)))
-                            .apiVersion(XR_CURRENT_API_VERSION))
+                                             .applicationName(stack.UTF8(Settings.getApplicationName(false)))
+                                             .apiVersion(XR_CURRENT_API_VERSION))
                     .enabledApiLayerNames(wantedLayers)
                     .enabledExtensionNames(wantedExtensions);
 
@@ -189,7 +190,8 @@ public class XrDriver implements Disposable {
             check(XR10.xrGetInstanceProperties(xrInstance, properties));
             runtimeName = properties.runtimeNameString();
             runtimeVersion = properties.runtimeVersion();
-            runtimeVersionString = XR10.XR_VERSION_MAJOR(runtimeVersion) + "." + XR10.XR_VERSION_MINOR(runtimeVersion) + "." + XR10.XR_VERSION_PATCH(runtimeVersion);
+            runtimeVersionString = XR10.XR_VERSION_MAJOR(runtimeVersion) + "." + XR10.XR_VERSION_MINOR(runtimeVersion) + "." + XR10.XR_VERSION_PATCH(
+                    runtimeVersion);
 
             logger.info(I18n.msg("vr.runtime.name", runtimeName));
             logger.info(I18n.msg("vr.runtime.version", runtimeVersionString));
@@ -238,14 +240,14 @@ public class XrDriver implements Disposable {
 
             if (minMajorVersion > actualMajorVersion || (minMajorVersion == actualMajorVersion && minMinorVersion > actualMinorVersion)) {
                 throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + minMajorVersion + "." + minMinorVersion
-                        + " and later, but we got OpenGL "
-                        + actualMajorVersion + "." + actualMinorVersion);
+                                                        + " and later, but we got OpenGL "
+                                                        + actualMajorVersion + "." + actualMinorVersion);
             }
 
             if (actualMajorVersion > maxMajorVersion || (actualMajorVersion == maxMajorVersion && actualMinorVersion > maxMinorVersion)) {
                 throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + maxMajorVersion + "." + minMajorVersion
-                        + " and earlier, but we got OpenGL "
-                        + actualMajorVersion + "." + actualMinorVersion);
+                                                        + " and earlier, but we got OpenGL "
+                                                        + actualMajorVersion + "." + actualMinorVersion);
             }
         }
     }
@@ -261,9 +263,9 @@ public class XrDriver implements Disposable {
 
             XrSessionCreateInfo sessionCreateInfo = XrSessionCreateInfo.calloc(stack)
                     .set(XR10.XR_TYPE_SESSION_CREATE_INFO,
-                            graphicsBinding.address(),
-                            0,
-                            systemId);
+                         graphicsBinding.address(),
+                         0,
+                         systemId);
 
             PointerBuffer pp = stack.mallocPointer(1);
             check(xrCreateSession(xrInstance, sessionCreateInfo, pp));
@@ -274,8 +276,8 @@ public class XrDriver implements Disposable {
                 XrDebugUtilsMessengerCreateInfoEXT ciDebugUtils = XrDebugUtilsMessengerCreateInfoEXT.calloc(stack)
                         .type$Default()
                         .messageSeverities(XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-                                | XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-                                | XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+                                                   | XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                                                   | XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
                         .messageTypes(
                                 XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
                                         | XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
@@ -308,12 +310,12 @@ public class XrDriver implements Disposable {
                     .next(NULL)
                     .referenceSpaceType(XR_REFERENCE_SPACE_TYPE_LOCAL)
                     .poseInReferenceSpace(XrPosef.malloc(stack)
-                            .orientation(XrQuaternionf.malloc(stack)
-                                    .x(0)
-                                    .y(0)
-                                    .z(0)
-                                    .w(1))
-                            .position$(XrVector3f.calloc(stack))), pp));
+                                                  .orientation(XrQuaternionf.malloc(stack)
+                                                                       .x(0)
+                                                                       .y(0)
+                                                                       .z(0)
+                                                                       .w(1))
+                                                  .position$(XrVector3f.calloc(stack))), pp));
 
             xrAppSpace = new XrSpace(pp.get(0), xrSession);
         }
@@ -348,7 +350,7 @@ public class XrDriver implements Disposable {
 
             check(xrEnumerateViewConfigurationViews(xrInstance, systemId, viewConfigType, pi, null));
             viewConfigs = XrHelper.fill(XrViewConfigurationView.calloc(pi.get(0)), // Don't use malloc() because that would mess up the `next` field
-                    XrViewConfigurationView.TYPE, XR_TYPE_VIEW_CONFIGURATION_VIEW);
+                                        XrViewConfigurationView.TYPE, XR_TYPE_VIEW_CONFIGURATION_VIEW);
 
             check(xrEnumerateViewConfigurationViews(xrInstance, systemId, viewConfigType, pi, viewConfigs));
             int viewCountNumber = pi.get(0);
@@ -357,22 +359,20 @@ public class XrDriver implements Disposable {
 
             if (viewCountNumber > 0) {
                 check(xrEnumerateSwapchainFormats(xrSession, pi, null));
-                LongBuffer swapchainFormats = stack.mallocLong(pi.get(0));
-                check(xrEnumerateSwapchainFormats(xrSession, pi, swapchainFormats));
+                LongBuffer swapChainFormats = stack.mallocLong(pi.get(0));
+                check(xrEnumerateSwapchainFormats(xrSession, pi, swapChainFormats));
 
-                long[] desiredSwapchainFormats = {
+                long[] desiredSwapChainFormats = {
+                        GL_RGBA8,
                         GL_SRGB8_ALPHA8,
                         GL_RGB10_A2,
                         GL_RGBA16F,
-                        // The two below should only be used as a fallback, as they are linear color formats without enough bits for color
-                        // depth, thus leading to banding.
-                        GL_RGBA8,
                         GL31.GL_RGBA8_SNORM};
 
                 out:
-                for (long glFormatIter : desiredSwapchainFormats) {
-                    for (int i = 0; i < swapchainFormats.limit(); i++) {
-                        if (glFormatIter == swapchainFormats.get(i)) {
+                for (long glFormatIter : desiredSwapChainFormats) {
+                    for (int i = 0; i < swapChainFormats.limit(); i++) {
+                        if (glFormatIter == swapChainFormats.get(i)) {
                             glColorFormat = glFormatIter;
                             break out;
                         }
@@ -411,11 +411,13 @@ public class XrDriver implements Disposable {
                     check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi, null));
                     int imageCount = pi.get(0);
 
-                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XrHelper.fill(XrSwapchainImageOpenGLKHR.create(imageCount), XrSwapchainImageOpenGLKHR.TYPE,
-                            XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR);
+                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XrHelper.fill(XrSwapchainImageOpenGLKHR.create(imageCount),
+                                                                                          XrSwapchainImageOpenGLKHR.TYPE,
+                                                                                          XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR);
 
                     check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi,
-                            XrSwapchainImageBaseHeader.create(swapchainImageBuffer.address(), swapchainImageBuffer.capacity())));
+                                                     XrSwapchainImageBaseHeader.create(swapchainImageBuffer.address(),
+                                                                                       swapchainImageBuffer.capacity())));
                     swapchainWrapper.images = swapchainImageBuffer;
                     swapChains[i] = swapchainWrapper;
                 }
@@ -513,6 +515,15 @@ public class XrDriver implements Disposable {
 
             if (frameState.shouldRender()) {
                 if (renderLayerOpenXR(stack, currentFrameTime, layerProjection)) {
+                    // Desktop mirroring.
+                    if (Settings.settings.runtime.vrDesktopMirror
+                            && currentRenderer.get() != null
+                            && leftEyeSwapchainIndex != -1) {
+                        // Get the actual GL texture ID from the swapchain buffer.
+                        int textureHandle = swapChains[0].images.get(leftEyeSwapchainIndex).image();
+                        // Call the new blit method we created.
+                        currentRenderer.get().renderMirrorToDesktop(textureHandle);
+                    }
                     layers.put(0, layerProjection.address());
                     didRender = true;
                 }
@@ -532,45 +543,72 @@ public class XrDriver implements Disposable {
                                       long predictedDisplayTime,
                                       XrCompositionLayerProjection layer) {
         XrViewState viewState = XrViewState.calloc(stack).type$Default();
-
         IntBuffer pi = stack.mallocInt(1);
-        check(xrLocateViews(xrSession,
-                XrViewLocateInfo.malloc(stack).type$Default().next(NULL).viewConfigurationType(viewConfigType).displayTime(predictedDisplayTime).space(
-                        xrAppSpace), viewState, pi, views));
 
-        if ((viewState.viewStateFlags() & XR_VIEW_STATE_POSITION_VALID_BIT) == 0 || (viewState.viewStateFlags() & XR_VIEW_STATE_ORIENTATION_VALID_BIT) == 0) {
-            return false;  // There is no valid tracking poses for the views.
+        // Locate views once for both eyes.
+        check(xrLocateViews(xrSession,
+                            XrViewLocateInfo.malloc(stack).type$Default().next(NULL)
+                                    .viewConfigurationType(viewConfigType)
+                                    .displayTime(predictedDisplayTime)
+                                    .space(xrAppSpace), viewState, pi, views));
+
+        // Check tracking validity.
+        if ((viewState.viewStateFlags() & XR_VIEW_STATE_POSITION_VALID_BIT) == 0 ||
+                (viewState.viewStateFlags() & XR_VIEW_STATE_ORIENTATION_VALID_BIT) == 0) {
+            return false;
         }
 
-        int viewCountOutput = pi.get(0);
-        assert (viewCountOutput == views.capacity());
-        assert (viewCountOutput == viewConfigs.capacity());
-        assert (viewCountOutput == swapChains.length);
+        int viewCount = pi.get(0);
+        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(
+                XrCompositionLayerProjectionView.calloc(viewCount, stack),
+                XrCompositionLayerProjectionView.TYPE,
+                XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW);
 
-        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(XrCompositionLayerProjectionView.calloc(viewCountOutput, stack),
-                // Use calloc() since malloc() messes up the `next` field
-                XrCompositionLayerProjectionView.TYPE, XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW);
+        // Pre-compute and Acquire loop.
+        // We acquire all swapchain images before we start waiting or rendering.
+        // This gives the OpenXR runtime a 'heads up' on the work queue.
+        int[] imageIndices = new int[viewCount];
+        for (int i = 0; i < viewCount; i++) {
+            check(xrAcquireSwapchainImage(swapChains[i].handle,
+                                          XrSwapchainImageAcquireInfo.calloc(stack).type$Default(), pi));
+            imageIndices[i] = pi.get(0);
+        }
 
-        // Render view to the appropriate part of the swapchain image.
-        for (int viewIndex = 0; viewIndex < viewCountOutput; viewIndex++) {
-            // Each view has a separate swapchain which is acquired, rendered to, and released.
+        // Capture left eye index for desktop rendering.
+        this.leftEyeSwapchainIndex = imageIndices[0];
+
+        // Render Loop.
+        for (int viewIndex = 0; viewIndex < viewCount; viewIndex++) {
             SwapChain viewSwapchain = swapChains[viewIndex];
 
-            check(xrAcquireSwapchainImage(viewSwapchain.handle, XrSwapchainImageAcquireInfo.calloc(stack).type$Default(), pi));
-            int swapchainImageIndex = pi.get(0);
+            // Only wait for the image right before we are about to draw to it.
+            // On Pascal/Linux, this minimizes the "bubble" where both CPU and GPU are idle.
+            check(xrWaitSwapchainImage(viewSwapchain.handle,
+                                       XrSwapchainImageWaitInfo.malloc(stack).type$Default().next(NULL)
+                                               .timeout(XR_INFINITE_DURATION)));
 
-            check(xrWaitSwapchainImage(viewSwapchain.handle, XrSwapchainImageWaitInfo.malloc(stack).type$Default().next(NULL).timeout(XR_INFINITE_DURATION)));
+            // Setup projection view for this eye.
+            projectionLayerViews.get(viewIndex)
+                    .pose(views.get(viewIndex).pose())
+                    .fov(views.get(viewIndex).fov())
+                    .subImage(si -> si
+                            .swapchain(viewSwapchain.handle)
+                            .imageRect(rect -> rect
+                                    .offset(off -> off.x(0).y(0))
+                                    .extent(ext -> ext.width(viewSwapchain.width).height(viewSwapchain.height))));
 
-            XrCompositionLayerProjectionView projectionLayerView = projectionLayerViews.get(viewIndex).pose(views.get(viewIndex).pose()).fov(
-                    views.get(viewIndex).fov()).subImage(si -> si.swapchain(viewSwapchain.handle).imageRect(
-                    rect -> rect.offset(offset -> offset.x(0).y(0)).extent(extent -> extent.width(viewSwapchain.width).height(viewSwapchain.height))));
-
+            // Dispatch to the optimized RenderModeOpenXR.
             if (currentRenderer.get() != null) {
-                currentRenderer.get().renderOpenXRView(projectionLayerView, viewSwapchain.images.get(swapchainImageIndex),
-                        viewFrameBuffers == null ? null : viewFrameBuffers[viewIndex], viewIndex);
+                currentRenderer.get().renderOpenXRView(
+                        projectionLayerViews.get(viewIndex),
+                        viewSwapchain.images.get(imageIndices[viewIndex]),
+                        viewFrameBuffers == null ? null : viewFrameBuffers[viewIndex],
+                        viewIndex);
             }
 
-            check(xrReleaseSwapchainImage(viewSwapchain.handle, XrSwapchainImageReleaseInfo.calloc(stack).type$Default()));
+            // Release the image as soon as the GL commands for this eye are recorded.
+            check(xrReleaseSwapchainImage(viewSwapchain.handle,
+                                          XrSwapchainImageReleaseInfo.calloc(stack).type$Default()));
         }
 
         layer.space(xrAppSpace);
@@ -663,7 +701,7 @@ public class XrDriver implements Disposable {
         sessionState = stateChangedEvent.state();
 
         logger.debug("XrEventDataSessionStateChanged: state " + oldState + "->" + sessionState + " session=" + stateChangedEvent.session() + " time="
-                + stateChangedEvent.time());
+                             + stateChangedEvent.time());
 
         if ((stateChangedEvent.session() != NULL) && (stateChangedEvent.session() != xrSession.address())) {
             logger.error("XrEventDataSessionStateChanged for unknown session");
@@ -674,7 +712,8 @@ public class XrDriver implements Disposable {
             case XR_SESSION_STATE_READY -> {
                 assert (xrSession != null);
                 try (MemoryStack stack = stackPush()) {
-                    check(xrBeginSession(xrSession, XrSessionBeginInfo.malloc(stack).type$Default().next(NULL).primaryViewConfigurationType(viewConfigType)));
+                    check(xrBeginSession(xrSession,
+                                         XrSessionBeginInfo.malloc(stack).type$Default().next(NULL).primaryViewConfigurationType(viewConfigType)));
                     sessionRunning = true;
                     return false;
                 }
@@ -714,7 +753,7 @@ public class XrDriver implements Disposable {
         throw new IllegalStateException(String.format("[XrResult failure %d in xrPollEvent]", result));
     }
 
-    public void dispose() {
+    public void disposeOld() {
         logger.info("Disposing OpenXR context.");
         disposing = true;
         sessionRunning = false;
@@ -755,6 +794,46 @@ public class XrDriver implements Disposable {
                 frameBuffer.dispose();
             }
         }
+    }
+
+    public void dispose() {
+        logger.info("Disposing OpenXR context.");
+        disposing = true;
+
+        // End session.
+        if (xrSession != null && sessionRunning) {
+            xrEndSession(xrSession);
+        }
+        sessionRunning = false;
+
+        disposeInput();
+
+        // Destroy handles.
+        if (swapChains != null) {
+            for (SwapChain swapchain : swapChains) {
+                if (swapchain != null && swapchain.handle != null) {
+                    xrDestroySwapchain(swapchain.handle);
+                }
+            }
+        }
+
+        if (viewFrameBuffers != null) {
+            for (var frameBuffer : viewFrameBuffers) {
+                if (frameBuffer != null) frameBuffer.dispose();
+            }
+        }
+
+        if (xrAppSpace != null) xrDestroySpace(xrAppSpace);
+        if (xrSession != null) xrDestroySession(xrSession);
+        if (xrDebugMessenger != null) xrDestroyDebugUtilsMessengerEXT(xrDebugMessenger);
+        if (xrInstance != null) xrDestroyInstance(xrInstance);
+
+        // Nullify.
+        xrAppSpace = null;
+        xrSession = null;
+        xrInstance = null;
+
+        logger.info("OpenXR context destroyed safely.");
     }
 
     public void disposeInput() {

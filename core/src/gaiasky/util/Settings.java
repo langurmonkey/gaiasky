@@ -12,7 +12,6 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -4542,6 +4541,8 @@ public class Settings extends SettingsObject {
 
         /** VR demo mode disables VR controller buttons and simplifies joystick movement. **/
         public boolean vrDemoMode = false;
+        /** Mirror the VR view to the desktop. **/
+        public boolean vrDesktopMirror = true;
         /** Display the VR GUI. **/
         public boolean vrDisplayGui = false;
 
@@ -4598,6 +4599,7 @@ public class Settings extends SettingsObject {
                     case GRAV_WAVE_START -> gravitationalWaves = true;
                     case GRAV_WAVE_STOP -> gravitationalWaves = false;
                     case VR_DEMO_MODE_CMD -> vrDemoMode = (Boolean) data[0];
+                    case VR_DESKTOP_MIRROR_CMD -> vrDesktopMirror = (Boolean) data[0];
                     default -> {
                     }
                 }
@@ -4618,7 +4620,7 @@ public class Settings extends SettingsObject {
             EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD,
                                             Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD,
                                             Event.RELATIVISTIC_ABERRATION_CMD, Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP,
-                                            Event.DISPLAY_VR_GUI_CMD, Event.VR_DEMO_MODE_CMD);
+                                            Event.DISPLAY_VR_GUI_CMD, Event.VR_DEMO_MODE_CMD, Event.VR_DESKTOP_MIRROR_CMD);
         }
 
         @Override
@@ -4633,6 +4635,7 @@ public class Settings extends SettingsObject {
             EventManager.publish(Event.DISPLAY_VR_GUI_CMD, this, vrDisplayGui);
             EventManager.publish(Event.TIME_STATE_CMD, this, timeOn);
             EventManager.publish(Event.VR_DEMO_MODE_CMD, this, vrDemoMode);
+            EventManager.publish(Event.VR_DESKTOP_MIRROR_CMD, this, vrDesktopMirror);
         }
     }
 
