@@ -99,7 +99,6 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
     private XrControllerDevice interactingController;
 
-    private final Vector3D auxDouble = new Vector3D();
     private final Vector3 aux = new Vector3();
     private final Vector3D mouseP0 = new Vector3D();
     private final Vector3D mouseP1 = new Vector3D();

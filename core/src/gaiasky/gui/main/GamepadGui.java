@@ -1478,8 +1478,13 @@ public class GamepadGui extends AbstractGui {
     }
 
     private void addDeviceTypeInfo(Table table, String name, String text) {
-        table.add(new OwnLabel(name, skin, "header")).top().left().padRight(pad40).padBottom(pad10);
-        table.add(new OwnLabel(text, skin, "big")).top().left().padBottom(pad10).row();
+        var textShort = TextUtils.capString(text, 25);
+        var l1 = new OwnLabel(name, skin, "header");
+        var l2 = new OwnLabel(textShort, skin, "big");
+        l2.addListener(new OwnTextTooltip(text, skin, 10));
+
+        table.add(l1).top().left().padRight(pad40).padBottom(pad10);
+        table.add(l2).top().left().padBottom(pad10).row();
     }
 
     private void addTextKey(String text, Actor[][] m, int i, int j, boolean nl) {
@@ -1617,6 +1622,7 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1662,6 +1668,7 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {

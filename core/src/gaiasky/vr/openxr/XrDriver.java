@@ -363,8 +363,8 @@ public class XrDriver implements Disposable {
                 check(xrEnumerateSwapchainFormats(xrSession, pi, swapChainFormats));
 
                 long[] desiredSwapChainFormats = {
-                        GL_RGBA8,
                         GL_SRGB8_ALPHA8,
+                        GL_RGBA8,
                         GL_RGB10_A2,
                         GL_RGBA16F,
                         GL31.GL_RGBA8_SNORM};
