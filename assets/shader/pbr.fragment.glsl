@@ -259,17 +259,19 @@ uniform float u_shininess;
 
 // COLOR METALLIC
 #if defined(svtIndirectionMetallicTextureFlag)
-    #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
+    #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord)).rgb
 #elif defined(metallicCubemapFlag)
-    #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
+    #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord)).rgb
 #elif defined(metallicTextureFlag)
-    #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
+    #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord).rgb
 #elif defined(occlusionMetallicRoughnessTextureFlag) && defined(metallicColorFlag)
     #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b) * u_metallicColor.rgb
 #elif defined(occlusionMetallicRoughnessTextureFlag)
     #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b)
 #elif defined(metallicColorFlag)
-    #define fetchColorMetallic(texCoord) u_metallicColor
+    #define fetchColorMetallic(texCoord) u_metallicColor.rgb
+#else
+    #define fetchColorMetallic(texCoord) vec3(0.0, 0.0, 0.0)
 #endif // metallic
 
 // COLOR ROUGHNESS
@@ -492,7 +494,8 @@ void main() {
         #endif // roughness
 
         // Fetch Metallic
-        metallicValue = fetchColorMetallic(texCoords).r;
+        vec3 fetchedMetallic = fetchColorMetallic(texCoords);
+        metallicValue = fetchedMetallic.r;
 
         // Handle Environment Reflections (Indirect Specular)
         #ifdef reflectionCubemapFlag
