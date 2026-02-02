@@ -14,7 +14,7 @@
       </additionalLanguages>
     </languages>
     <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.2+10" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.1+8" />
   </application>
   <files defaultOverwriteMode="1" defaultUninstallMode="2">
     <filesets>
@@ -1314,7 +1314,7 @@ return true;</property>
         <entry filesetId="970" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.2+10" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.1+8" usePack200="false" overrideJdkRelease="true" />
     </windows>
     <macosArchive name="macOS Archive" id="966" includeAllDownloadableComponents="false" architecture="universal" launcherId="573">
       <exclude>
@@ -1327,7 +1327,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.2+10" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.1+8" overrideJdkRelease="true" />
     </macosArchive>
     <unixInstaller name="Unix Installer" id="28" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1359,7 +1359,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.2+10" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.1+8" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxDeb>
@@ -1377,7 +1377,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.1+8" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
@@ -1397,7 +1397,7 @@ return true;</property>
         <entry filesetId="970" />
         <entry filesetId="972" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.2+10" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.1+8" overrideJdkRelease="true" />
     </windowsArchive>
     <unixArchive name="Unix Archive" id="952" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
@@ -1411,7 +1411,7 @@ return true;</property>
         <entry filesetId="967" />
         <entry filesetId="970" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.2+10" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="25/jdk-25.0.1+8" overrideJdkRelease="true" />
     </unixArchive>
   </mediaSets>
   <buildIds>
