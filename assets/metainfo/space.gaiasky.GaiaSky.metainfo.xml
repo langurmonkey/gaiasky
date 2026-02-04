@@ -33,38 +33,127 @@
 
   <description>
     <p>
-      Gaia Sky is an astronomy visualisation platform for desktop and VR that runs on Linux, Windows and macOS. It is developed in the framework of ESA&apos;s Gaia mission to chart about 1 billion stars of our Galaxy in the Gaia group of the Astronomisches Rechen-Institut (ZAH, Universität Heidelberg). Explore the Solar System, the Milky Way, and even the most distant galaxies of our Universe with up-to-date, real scientific data.
+      Gaia Sky is an astronomy visualization platform for desktop and VR that runs on Linux, Windows and macOS. It is developed in the framework of ESA&apos;s Gaia mission to chart about 1 billion stars of our Galaxy in the Gaia group of the Astronomisches Rechen-Institut (ZAH, Universität Heidelberg). Explore the Solar System, the Milky Way, and even the most distant galaxies of our Universe with up-to-date, real scientific data.
       </p>
     </description>
 
   <releases>
 
-    <release version="3.7.0" date="2025-10-01" urgency="high">
-      <url>https://gaiasky.space/news/2025/gaiasky_3.7.0</url>
+    <release version="3.7.1" date="2026-02-04" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.7.1</url>
       <description>
         <p>Features</p>
         <ul>
-          <li>Gamepad mapping changes: map labels on/off to button X, unmap minimap, map A to camera speed-up (hold to make camera faster). RB and LB mapped to vertical movement (up/down) in free camera mode.</li>
-          <li>Replace ‘displays’ section in about window with ‘graphics cards’.</li>
-          <li>Add infrastructure to be able to create and load ray-marching effects on-demand in the background. Make sure that ray-marching effects stay at their designated location by allowing addition of effects at a particular position in the post-processing chain.</li>
-          <li>Enable IDs in particle groups. Trim down IDs in camera info pane from 14 to 12 characters.</li>
-          <li>Improve ‘no connection’ dialog, with more information and hints as to whether the issue is with our server or with the local internet connection.</li>
-          <li>Do not show blocking dialog if base data is present when we can’t connect to the datasets server. Show a popup notification instead. In the dataset manager window, make installed datasets tab the default view in some cases.</li>
-          <li>Add support for pulling cloud textures from online resources.</li>
-          <li>Add calls to clear label regexp filtering. Improve documentation on some API calls.</li>
+          <li>Volume rendering and galaxies:
+            <ul>
+              <li>Support true volume rendering using 3D textures loaded from <code>.raw</code> files.
+              </li>
+              <li>Add infrastructure to use volumes with up to 4 3D textures. Add sample example shader that renders each volume as emissive.</li>
+              <li>Improve particle-based Milky Way dataset to enhance volumetric appearance, and ditch dithering method for occlusion.</li>
+              <li>Add <code>halfResolutionBuffer</code> attribute to all objects; when it is true, the objects get derived through a different set of render lists that will end up rendered to a lower resolution buffer.</li>
+              <li>Billboard set texture(s) defined now in data descriptor files.</li>
+              <li>Use 3-way combine filter to blend full and half resolution layer. Prevent nested datasets from publishing a catalog info.</li>
+            </ul>
+          </li>
+          <li>PBR shaders:
+            <ul>
+              <li>Blinn-Phong specular model to Cook-Torrance PBR BRDF. Add proper PBR functions (GGX distribution, Smith geometry, Fresnel-Schlick). Energy conservation via Fresnel (<code>kS + kD = 1</code>).</li>
+              <li>Lambertian diffuse divided by PI for energy conservation.</li>
+              <li>Add early exit when light is behind surface.</li>
+              <li>Fix light accumulation in PBR pipeline, making sure that energy is conserved properly, albedo only affects the final color once, and ambient lighting is treated as another light source before albedo.</li>
+              <li>Ambient occlusion rework to follow a physical light interaction model.</li>
+              <li>Separation of light types into indirect (ambient) light and direct light. Move per-light occlusion processing to the light processing block.</li>
+              <li>Metallic workflow revisited. Use proper Fresnel calculation. Pass metallic/roughness values in light processing method in PBR lib.</li>
+              <li>Rearrange shadows to be computed per-light instead of globally.</li>
+              <li>Add <code>thinSurface</code> flag to materials and implement proper diffuse scattering (for rings and other volumetric materials).</li>
+              <li>Redistribute PBR and math GLSL libraries.</li>
+              <li>Enable model bodies other than moons (i.e. spacecraft, satellites, etc.) to be eclipsed by planets.</li>
+            </ul>
+          </li>
+          <li>Anaglyph and 3D stereo modes:
+            <ul>
+              <li>Implement adaptive stereo separation and expose user controls</li>
+              <li>Add new anaglyph modes: red/cyan Dubois-style, amber/blue, and amber/blue Dubois style. Improve regular red/cyan method with a separate gamma operation on each channel that boosts red and mutes green.</li>
+              <li>Add green/magenta anaglyph profile, and its Dubois-style variant.</li>
+              <li>Add stereo profile selector at the bottom of the stereo GUI. Update “Back” button style, move buttons to the left.</li>
+            </ul>
+          </li>
+          <li>Virtual Reality:
+            <ul>
+              <li>Improve handling of OpenXR swapchain to avoid reattaching a texture to a frame buffer every frame. This increases performance.</li>
+              <li>Move desktop mirroring to separate pass to remove synchronicity with VR compositor. Improves performance.</li>
+              <li>Add VR demo mode, where all VR controller buttons are disabled, and only forward/backward movement is allowed. This prevents common pitfalls during demonstrations where the user is not acquainted with the VR controls.</li>
+              <li>Add check boxes to toggle VR demo mode and mirror to desktop to the welcome GUI and preferences window.</li>
+            </ul>
+          </li>
+          <li>Eclipses and occlusion:
+            <ul>
+              <li>Add diffraction effect in Eclipses.</li>
+              <li>Improve eclipse shadow rendering by artificially darkening the umbra and penumbra.</li>
+            </ul>
+          </li>
+          <li>Atmospheric scattering system:
+            <ul>
+              <li>Move entire atmospheric scattering computation from vertex to fragment shaders, both for ground and sky. This enables a drastic reduction of the model complexity for atmospheres.</li>
+              <li>Normalize atmospheric scattering parameters to inner radius, as in the original implementation by Sean O’Neil. This grounds the scattering algorithm physically and makes it more reliable. Needs new parameters in base dataset.</li>
+            </ul>
+          </li>
+          <li>Rendering engine:
+            <ul>
+              <li>Update default number of samples per orbit from 100 to 200.</li>
+              <li>Use instanced rendering for orbital elements groups, improving performance.</li>
+              <li>Increase maximum back-buffer scale from 4 to 8.</li>
+            </ul>
+          </li>
+          <li>Add new localized enum type:
+            <ul>
+              <li>Convert stereoscopic mode select box to use localized profile names.</li>
+              <li>Use localized enum type for galaxy channel type and distribution.</li>
+            </ul>
+          </li>
+          <li>UI/UX:
+            <ul>
+              <li>Interactive UI accent color feature to replace old static theme system.</li>
+              <li>Add labels to individual visibility panel. Object labels can now be toggled on/off individually and at dataset level.</li>
+              <li>Add logarithmic scale to (plus) sliders.</li>
+              <li>Add new slider variant with option to show button to reset slider state to original value.</li>
+              <li>Improve layout of ‘About’ window, update BMFTR icon, add hyperlink capabilities to <code>OwnImage</code> widgets.</li>
+              <li>Rework layout of welcome GUI by properly aligning elements vertically and resizing the Gaia Sky icon.</li>
+              <li>Update translation files for Bulgarian, Catalan, Deutsch, Spanish, French, and Turkish: add missing keys, fix typos and errors, ensure UI layout consistency.</li>
+            </ul>
+          </li>
+          <li>Add multiple mirrors for both data descriptor and data repository. At startup, Gaia Sky makes HEAD requests in sequence to each mirror of both lists until we find one that responds. This one is the ‘selected mirror’ for the session.</li>
+          <li>Improve object debug feature to include non-focusable entities, and to enable the modification of enum-type attributes.</li>
+          <li>Improve keyboard navigation by adding modifier keys that enable vertical rotations, camera pitches, and camera rolls.</li>
+          <li>Move default output location for procedural textures from <code>$data/default-data/tex/procedural</code> to <code>$data/procedural-planet-textures</code>. </li>
+          <li>Add API calls to get non-indexed entities.</li>
+          <li>Release notes attribute in dataset descriptor is now a string array.</li>
         </ul>
         <p>Bug fixes</p>
         <ul>
-          <li>Guard OS code name getter behind NPE check during Flatpak discovery. This fixes a crash at startup with macOS Tahoe.</li>
-          <li>Remove UI window shadow, as it messes with the internal padding due to the 9-patch implementation in Libgdx.</li>
-          <li>Gamepad focus order in welcome GUI. Decrease poll delay for gamepad axes.</li>
-          <li>Misalignments in about window layout.</li>
-          <li><code>TLEParserTest</code> does not initialize settings, leading to NPE.</li>
-          <li>Synchronize TLE initializer to prevent multiple creations/editions of TLE data and derived JSON files at the same time.</li>
-          <li>Size issue in gamepad image in gamepad settings window. Increase maximum value of axis power slider to 15. Set value of vertical movement (RB/LB) to 1 instead of 0.1, to match other camera motion inputs.</li>
-          <li>Reduce range of sensitivity and axis power sliders in gamepad config window.</li>
-          <li>Connect <code>LABEL_CLEAR_FILTER_REGEX_CMD</code> event to scene observer. This fixes the <code>clearLabelFilterRegexps()</code> method.</li>
-          <li>Increase maximum eye separation in stereo mode, fix star/particle label positioning in stereoscopic mode.</li>
+          <li>Incorrect initialization of third wavelength in procedural surface generation window (atmosphere tab).</li>
+          <li>Hard edges in specular channel of procedural planet generation due to binary operation.</li>
+          <li>Planetary surface procedural generation window automatic reload on focus change crashes when target object uses cubemaps due to selected tab index.</li>
+          <li>Fix orientation of fast bill-boarding GLSL snippet, which rotated the billboards upside down.</li>
+          <li>Replace linear <code>fov/ref</code> ratio with the trigonometric <code>tan(fov/2)/tan(ref/2)</code> to ensure that the FOV factor correctly maps the geometric change in the view frustum, improving accuracy for general scaling, visibility culling, and label resizing across all zoom levels. </li>
+          <li>Remove abstract render system state flags in favor of continuous parameter update.</li>
+          <li>Restore default depth buffer mode for billboard set labels.</li>
+          <li>Disable motion trails for non-star particles.</li>
+          <li>Backgrounds not using 9-patch method, resulting in spilled colors in some widgets’ backgrounds.</li>
+          <li>Clamp completion values in billboard datasets between 0 and 1.</li>
+          <li>Use constant for internet connection check URL instead of hardcoded string.</li>
+          <li>Panning view must not modify rotation matrix of star corona. Only position changes have this effect now.</li>
+          <li>VR shutdown sequence rework by making sure no resource is destroyed when inactive. This fixes the Linux JVM crash on exit.</li>
+          <li>Small fixes in speed scaling for VR.</li>
+          <li>Take into account windows-style paths when building LUT table in procedural generation window.</li>
+          <li>Initial presentation of procedural generation window for planets that do not have procedural surfaces enabled is blank.</li>
+          <li>Default biome LUT file had wrong extension.</li>
+          <li>Delete old dataset version before update. Otherwise, old files are not removed and sometimes conflict with wildcard definitions in descriptor files.</li>
+          <li>Use current monitor when going to full screen mode. Save refresh rate and bit depth of preferred full screen mode.</li>
+          <li>Move translucent models (ring) to <code>MODEL_PIX_TRANSPARENT</code> render group, and move it right after main <code>MODEL_PIX</code>. Disable depth mask for translucent materials, i.e., rings. Create <code>MODEL_SCENE_UI</code> at the end of the pipeline for in-scene UI elements (VR UI).</li>
+          <li>Use real km-to-unit conversion in tessellation control shader.</li>
+          <li>Pass right units in body distance to tessellation shaders. Improve tessellation level determination function.</li>
+          <li>Clouds are not affected by eclipses. The shader code that implemented the eclipse projection on the cloud layer has been reviewed and fixed.</li>
         </ul>
       </description>
       </release>

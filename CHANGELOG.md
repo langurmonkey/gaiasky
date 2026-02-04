@@ -1,3 +1,107 @@
+<a name="3.7.1"></a>
+## [3.7.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.7.1) (2026-02-02)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.7.0...3.7.1)
+
+## Features
+- Volume rendering and galaxies:
+	- Support true volume rendering using 3D textures loaded from `.raw` files.
+	- Add infrastructure to use volumes with up to 4 3D textures. Add sample example shader that renders each volume as emissive.
+	- Improve particle-based Milky Way dataset to enhance volumetric appearance, and ditch dithering method for occlusion.
+	- Add `halfResolutionBuffer` attribute to all objects; when it is true, the objects get derived through a different set of render lists that will end up rendered to a lower resolution buffer.
+	- Billboard set texture(s) defined now in data descriptor files.
+	- Use 3-way combine filter to blend full and half resolution layer. Prevent nested datasets from publishing a catalog info.
+- PBR shaders:
+	- Blinn-Phong specular model to Cook-Torrance PBR BRDF. Add proper PBR functions (GGX distribution, Smith geometry, Fresnel-Schlick). Energy conservation via Fresnel (`kS + kD = 1`).
+	- Lambertian diffuse divided by PI for energy conservation.
+	- Add early exit when light is behind surface.
+	- Fix light accumulation in PBR pipeline, making sure that energy is conserved properly, albedo only affects the final color once, and ambient lighting is treated as another light source before albedo.
+	- Ambient occlusion rework to follow a physical light interaction model.
+	- Separation of light types into indirect (ambient) light and direct light. Move per-light occlusion processing to the light processing block.
+	- Metallic workflow revisited. Use proper Fresnel calculation. Pass metallic/roughness values in light processing method in PBR lib.
+	- Rearrange shadows to be computed per-light instead of globally.
+	- Add `thinSurface` flag to materials and implement proper diffuse scattering (for rings and other volumetric materials).
+	- Redistribute PBR and math GLSL libraries.
+	- Enable model bodies other than moons (i.e. spacecraft, satellites, etc.) to be eclipsed by planets.
+- Anaglyph and 3D stereo modes:
+	- Implement adaptive stereo separation and expose user controls
+	- Add new anaglyph modes: red/cyan Dubois-style, amber/blue, and amber/blue Dubois style. Improve regular red/cyan method with a separate gamma operation on each channel that boosts red and mutes green. Part of [#874](https://codeberg.org/gaiasky/gaiasky/issues/874).
+	- Add green/magenta anaglyph profile, and its Dubois-style variant.
+	- Add stereo profile selector at the bottom of the stereo GUI. Update "Back" button style, move buttons to the left.
+- Virtual Reality:
+	- Improve handling of OpenXR swapchain to avoid reattaching a texture to a frame buffer every frame. This increases performance.
+	- Move desktop mirroring to separate pass to remove synchronicity with VR compositor. Improves performance.
+	- Add VR demo mode, where all VR controller buttons are disabled, and only forward/backward movement is allowed. This prevents common pitfalls during demonstrations where the user is not acquainted with the VR controls.
+	- Add check boxes to toggle VR demo mode and mirror to desktop to the welcome GUI and preferences window.
+- Eclipses and occlusion:
+	- Add diffraction effect in Eclipses.
+	- Improve eclipse shadow rendering by artificially darkening the umbra and penumbra.
+- Atmospheric scattering system:
+	- Move entire atmospheric scattering computation from vertex to fragment shaders, both for ground and sky. This enables a drastic reduction of the model complexity for atmospheres.
+	- Normalize atmospheric scattering parameters to inner radius, as in the original implementation by Sean O'Neil. This grounds the scattering algorithm physically and makes it more reliable. Needs new parameters in base dataset.
+- Rendering engine:
+	- Update default number of samples per orbit from 100 to 200.
+	- Use instanced rendering for orbital elements groups, improving performance.
+	- Increase maximum back-buffer scale from 4 to 8.
+- Add new localized enum type:
+	- Convert stereoscopic mode select box to use localized profile names.
+	- Use localized enum type for galaxy channel type and distribution.
+- UI/UX:
+ 	- Interactive UI accent color feature to replace old static theme system.
+	- Add labels to individual visibility panel. Object labels can now be toggled on/off individually and at dataset level. Part of [#875](https://codeberg.org/gaiasky/gaiasky/issues/875).
+	- Add logarithmic scale to (plus) sliders.
+	- Add new slider variant with option to show button to reset slider state to original value.
+	- Improve layout of 'About' window, update BMFTR icon, add hyperlink capabilities to `OwnImage` widgets.
+	- Rework layout of welcome GUI by properly aligning elements vertically and resizing the Gaia Sky icon.
+	- Update translation files for Bulgarian, Catalan, Deutsch, Spanish, French, and Turkish: add missing keys, fix typos and errors, ensure UI layout consistency.
+- Add multiple mirrors for both data descriptor and data repository. At startup, Gaia Sky makes HEAD requests in sequence to each mirror of both lists until we find one that responds. This one is the 'selected mirror' for the session. Fixes [#871](https://codeberg.org/gaiasky/gaiasky/issues/871).
+- Improve object debug feature to include non-focusable entities, and to enable the modification of enum-type attributes.
+- Improve keyboard navigation by adding modifier keys that enable vertical rotations, camera pitches, and camera rolls. Part of [#876](https://codeberg.org/gaiasky/gaiasky/issues/876).
+- Move default output location for procedural textures from `$data/default-data/tex/procedural` to `$data/procedural-planet-textures`.
+- Add API calls to get non-indexed entities.
+- Release notes attribute in dataset descriptor is now a string array.
+
+## Bug Fixes
+- Incorrect initialization of third wavelength in procedural surface generation window (atmosphere tab).
+- Hard edges in specular channel of procedural planet generation due to binary operation.
+- Planetary surface procedural generation window automatic reload on focus change crashes when target object uses cubemaps due to selected tab index.
+- Fix orientation of fast bill-boarding GLSL snippet, which rotated the billboards upside down.
+- Replace linear `fov/ref` ratio with the trigonometric `tan(fov/2)/tan(ref/2)` to ensure that the FOV factor correctly maps the geometric change in the view frustum, improving accuracy for general scaling, visibility culling, and label resizing across all zoom levels.
+- Remove abstract render system state flags in favor of continuous parameter update.
+- Restore default depth buffer mode for billboard set labels.
+- Disable motion trails for non-star particles.
+- Backgrounds not using 9-patch method, resulting in spilled colors in some widgets' backgrounds.
+- Clamp completion values in billboard datasets between 0 and 1.
+- Use constant for internet connection check URL instead of hardcoded string.
+- Panning view must not modify rotation matrix of star corona. Only position changes have this effect now.
+- VR shutdown sequence rework by making sure no resource is destroyed when inactive. This fixes the Linux JVM crash on exit.
+- Small fixes in speed scaling for VR.
+- Take into account windows-style paths when building LUT table in procedural generation window. Fixes [#867](https://codeberg.org/gaiasky/gaiasky/issues/867).
+- Initial presentation of procedural generation window for planets that do not have procedural surfaces enabled is blank.
+- Default biome LUT file had wrong extension.
+- Delete old dataset version before update. Otherwise, old files are not removed and sometimes conflict with wildcard definitions in descriptor files.
+- Use current monitor when going to full screen mode. Save refresh rate and bit depth of preferred full screen mode. Part of [#864](https://codeberg.org/gaiasky/gaiasky/issues/864).
+- Move translucent models (ring) to `MODEL_PIX_TRANSPARENT` render group, and move it right after main `MODEL_PIX`. Disable depth mask for translucent materials, i.e., rings. Create `MODEL_SCENE_UI` at the end of the pipeline for in-scene UI elements (VR UI). Fixes [#862](https://codeberg.org/gaiasky/gaiasky/issues/862).
+- Use real km-to-unit conversion in tessellation control shader.
+- Pass right units in body distance to tessellation shaders. Improve tessellation level determination function.
+- Clouds are not affected by eclipses. The shader code that implemented the eclipse projection on the cloud layer has been reviewed and fixed.
+
+## Performance Improvements
+- Use instanced rendering for billboard groups to save on VRAM memory transfers and boost performance.
+- Marginal performance gains in billboard rotation shader.
+
+## Build System
+- Increase minimum and maximum heap size for the VR launcher to 4 and 10 GB.
+- Update to LibGDX 1.14.0, which requires quite a few changes in how object pools are handled.
+- Remove ZGC Generational flag, add compact object headers flag to Install4j and Gradle for free memory savings with Java 25+.
+
+## Documentation
+- Update documentation theme and refactor its structure.
+- Add pointer to DeepWiki Gaia Sky codebase documentation in the readme file.
+- Create `wiki.json` for deepwiki/devin.
+
+## Merge Requests
+- Merge branch 'volumerendering'
+
 <a name="3.7.0"></a>
 ## [3.7.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.7.0) (2025-10-01)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.6.11...3.7.0)
