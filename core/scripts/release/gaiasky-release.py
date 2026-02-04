@@ -209,7 +209,7 @@ if __name__ == '__main__':
             print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
             print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
             print(" > Add new release to codeberg: https://codeberg.org/gaiasky/gaiasky/releases")
-            print(" > Create new docs tag (%s) and generate the docs: make versions publish" % arguments.tag)
+            print(" > Create new docs tag (%s) and generate the docs: make server VERSION=%s" % (arguments.tag, arguments.tag))
             print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
             print(" > Update flatpak repo and do pull request. See here: https://codeberg.org/gaiasky/gaiasky/issues/337#issuecomment-521949")
             print(" > Post to social media")
