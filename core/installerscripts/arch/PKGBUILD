@@ -20,9 +20,8 @@ backup=()
 options=()
 install=gaiasky.install
 changelog=releasenotes.txt
-source=("http://gaia.ari.uni-heidelberg.de/gaiasky/files/releases/${versionstr//_/-}/$pkgname-${versionstr//_/-}.tar.gz")
+source=("https://gaia.ari.uni-heidelberg.de/gaiasky/files/releases/${versionstr//_/-}/$pkgname-${versionstr//_/-}.tar.gz")
 noextract=()
-md5sums=("@md5checksum@")
 sha256sums=("@sha256checksum@")
 validpgpkeys=()
 
