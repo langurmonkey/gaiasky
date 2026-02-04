@@ -411,7 +411,7 @@ public class DownloadHelper {
      *
      * @param request The request.
      * @param url     The URL.
-     * @param finish  A {@link BiConsumer <String, Integer>} callback that runs if the connection is successful, with a message and the status code.
+     * @param finish  A {@link BiConsumer} callback that runs if the connection is successful, with a message and the status code.
      * @param fail    A {@link Runnable} callback that runs if the connection fails.
      */
     public static void sendTestRequest(HttpRequest request, String url, BiConsumer<String, Integer> finish, Runnable fail) {

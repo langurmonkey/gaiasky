@@ -150,9 +150,9 @@ public class TextUtils {
      *
      * @param in The input string to process
      * @param breakSpaces The number of spaces after which to insert a line break.
-     *                    If <= 0, returns the original string unchanged.
+     *                    If &le; 0, returns the original string unchanged.
      * @return The processed string with spaces replaced by newlines at intervals,
-     *         or the original string if breakSpaces <= 0
+     *         or the original string if breakSpaces &le; 0
      */
     public static String breakSpaces(String in, int breakSpaces) {
         // Warp text if breakSpaces > 0

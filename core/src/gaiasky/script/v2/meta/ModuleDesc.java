@@ -22,6 +22,7 @@ import java.util.Map;
  *
  * @param name      The module name.
  * @param path      The module path.
+ * @param clazz     The class of the module.
  * @param methodMap The method map.
  * @param modules   References to the inner modules.
  */

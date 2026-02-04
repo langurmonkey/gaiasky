@@ -30,7 +30,7 @@ import static gaiasky.scene.record.BillboardDataset.Distribution.SPIRAL_LOG;
 
 /**
  * CPU equivalent of the GLSL compute shader for procedural billboard particle generation.
- * Produces List<ParticleVector> where each ParticleVector contains:
+ * Produces a {@link List} where each ParticleVector contains:
  * [x, y, z, size, r, g, b]
  * <p>
  * This is not bit-for-bit identical to the GPU shader, but replicates distributions,
