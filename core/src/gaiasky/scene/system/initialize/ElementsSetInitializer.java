@@ -10,6 +10,8 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.data.api.IParticleGroupDataProvider;
+import gaiasky.data.group.STILDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -17,6 +19,10 @@ import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.OrbitElementsSet;
 import gaiasky.scene.component.tag.TagSetElement;
 import gaiasky.scene.entity.ElementsSetRadio;
+import gaiasky.scene.record.ParticleType;
+import gaiasky.util.Logger;
+
+import java.util.HashMap;
 
 public class ElementsSetInitializer extends AbstractInitSystem {
     public ElementsSetInitializer(boolean setUp, Family family, int priority) {
@@ -25,6 +31,24 @@ public class ElementsSetInitializer extends AbstractInitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
+
+        var set = Mapper.orbitElementsSet.get(entity);
+        boolean initializeData = set.data == null;
+
+        if (initializeData && set.provider != null) {
+            // Load data.
+            try {
+                Class<?> clazz = Class.forName(set.provider);
+                IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor()
+                        .newInstance();
+                // By default, do not generate index in particle sets.
+                set.setData(provider.loadData(set.datafile, 1));
+            } catch (Exception e) {
+                Logger.getLogger(this.getClass())
+                        .error(e);
+                set.data = null;
+            }
+        }
 
     }
 

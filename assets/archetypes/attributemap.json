@@ -937,6 +937,17 @@
         "unit": "Integer"
       }
     },
+    "OrbitElementsSet" : {
+      "description": "Defines attributes related to orbita elements sets.",
+      "provider:OrbitalElementsGroup": {
+        "description": "The class to be used to load the data. This class must implement ``IParticleGroupDataProvider``. This should have the fully-qualified class name. For instance, ``gaiasky.data.group.ElementsGroupVOTableProvider``.",
+        "unit": "String"
+      },
+      "dataFile:OrbitalElementsGroup": {
+        "description": "The path to the data file with the orbital elements to be loaded by the provider.",
+        "unit": "String"
+      }
+    },
     "ParticleExtra": {
       "description": "Defines attributes related to single particles and single star objects.",
       "primitiveRenderScale": {

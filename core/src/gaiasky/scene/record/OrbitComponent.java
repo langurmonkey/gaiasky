@@ -32,7 +32,7 @@ public class OrbitComponent {
     public double epoch;
     /** Semi major axis of the ellipse, in Km. **/
     public double semiMajorAxis;
-    /** Eccentricity of the ellipse, in degrees. **/
+    /** Eccentricity of the ellipse. **/
     public double e;
     /** Inclination, angle between the reference plane and the orbital plane, in degrees. **/
     public double i;
@@ -270,7 +270,7 @@ public class OrbitComponent {
         double zPf = 0;
 
         // Uncomment for velocity vector.
-        //double p = semimajoraxis * (1 - e * e);
+        //double p = semiMajorAxis * (1 - e * e);
         //double vxPf = -FastMath.sqrt(mu / p) * FastMath.sin(nu);
         //double vyPf = FastMath.sqrt(mu / p) * (e + FastMath.cos(nu));
         //double vzPf = 0;
@@ -327,7 +327,7 @@ public class OrbitComponent {
         double zPf = 0;
 
         // Uncomment for velocity vector.
-        //double p = semimajoraxis * (1 - e * e);
+        //double p = semiMajorAxis * (1 - e * e);
         //double vxPf = -FastMath.sqrt(mu / p) * FastMath.sin(nu);
         //double vyPf = FastMath.sqrt(mu / p) * (e + FastMath.cos(nu));
         //double vzPf = 0;

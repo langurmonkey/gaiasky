@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.api.IParticleRecord;
+
+import java.util.List;
 
 /**
  * Aggregates children entities (typically orbits) so that they are treated as one,
@@ -21,7 +24,37 @@ public class OrbitElementsSet implements Component {
     public Array<Entity> alwaysUpdate;
     public boolean initialUpdate = true;
 
+    /**
+     * Particle data.
+     */
+    public List<IParticleRecord> data;
+
+    /**
+     * Fully qualified name of data provider class.
+     */
+    public String provider;
+
+    /**
+     * Pointer to the data file.
+     */
+    public String datafile;
+
     public void markForUpdate(Render render) {
         EventManager.publish(Event.GPU_DISPOSE_ORBITAL_ELEMENTS, render);
+    }
+
+    /**
+     * Returns the list of particles.
+     */
+    public List<IParticleRecord> data() {
+        return data;
+    }
+
+    public void setDataFile(String dataFile) {
+        this.datafile = dataFile;
+    }
+
+    public void setData(List<IParticleRecord> pointData) {
+        this.data = pointData;
     }
 }

@@ -9,7 +9,6 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -26,6 +25,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.OrbitComponent;
+import gaiasky.scene.record.ParticleKepler;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
@@ -97,61 +97,111 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
             var model = getModelQuad(primitive,
                                      getOffset(render));
-            if (!inGpu(render) && graph.children != null && graph.children.size > 0) {
-                int n = graph.children.size;
-                int offset = addMeshData(model,
-                                         model.numVertices,
-                                         n,
-                                         model.numIndices,
-                                         "quad",
-                                         primitive);
-                setModel(offset, model);
-                setOffset(render, offset);
-                curr = meshes.get(offset);
-                model.ensureInstanceAttribsSize(n * curr.instanceSize);
+            var desc = Mapper.datasetDescription.get(render.entity);
+            var hl = Mapper.highlight.get(render.entity);
 
+            CatalogInfo ci = desc.catalogInfo;
+            if (!inGpu(render)) {
+                // Check children nodes.
                 int numParticlesAdded = 0;
+                if (graph.children != null && graph.children.size > 0) {
+                    int n = graph.children.size;
+                    int offset = addMeshData(model,
+                                             model.numVertices,
+                                             n,
+                                             model.numIndices,
+                                             "quad",
+                                             primitive);
+                    setModel(offset, model);
+                    setOffset(render, offset);
+                    curr = meshes.get(offset);
+                    model.ensureInstanceAttribsSize(n * curr.instanceSize);
 
-                var desc = Mapper.datasetDescription.get(render.entity);
-                var hl = Mapper.highlight.get(render.entity);
 
-                CatalogInfo ci = desc.catalogInfo;
-                Array<Entity> children = graph.children;
-                for (var child : children) {
-                    if (Mapper.trajectory.has(child)) {
-                        var trajectory = Mapper.trajectory.get(child);
+                    Array<Entity> children = graph.children;
+                    for (var child : children) {
+                        if (Mapper.trajectory.has(child)) {
+                            var trajectory = Mapper.trajectory.get(child);
 
-                        // Respect body representation in trajectory.
-                        if (trajectory.bodyRepresentation.isBody()) {
+                            // Respect body representation in trajectory.
+                            if (trajectory.bodyRepresentation.isBody()) {
 
-                            OrbitComponent oc = trajectory.oc;
-                            // COLOR
-                            float[] c = hl.isHighlighted() && ci != null ? ci.getHlColor() : trajectory.bodyColor;
-                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                                OrbitComponent oc = trajectory.oc;
+                                // COLOR
+                                float[] c = hl.isHighlighted() && ci != null ? ci.getHlColor() : trajectory.bodyColor;
+                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
 
-                            // ORBIT ELEMENTS 01
-                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) oc.period;
-                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 1] = (float) oc.epoch;
-                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 2] = (float) (oc.semiMajorAxis);
-                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 3] = (float) oc.e;
+                                // ORBIT ELEMENTS 01
+                                model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) oc.period;
+                                model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 1] = (float) oc.epoch;
+                                model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 2] = (float) (oc.semiMajorAxis);
+                                model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 3] = (float) oc.e;
 
-                            // ORBIT ELEMENTS 02
-                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
-                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 1] = (float) (oc.ascendingNode * MathUtilsDouble.degRad);
-                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 2] = (float) (oc.argOfPericenter * MathUtilsDouble.degRad);
-                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (oc.meanAnomaly * MathUtilsDouble.degRad);
+                                // ORBIT ELEMENTS 02
+                                model.instanceAttributes[curr.instanceIdx + model.elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
+                                model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 1] = (float) (oc.ascendingNode * MathUtilsDouble.degRad);
+                                model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 2] = (float) (oc.argOfPericenter * MathUtilsDouble.degRad);
+                                model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (oc.meanAnomaly * MathUtilsDouble.degRad);
 
-                            // SIZE
-                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
+                                // SIZE
+                                model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
 
-                            // TEXTURE INDEX
-                            model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = -1f;
+                                // TEXTURE INDEX
+                                model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = -1f;
 
-                            curr.instanceIdx += curr.instanceSize;
-                            numParticlesAdded++;
+                                curr.instanceIdx += curr.instanceSize;
+                                numParticlesAdded++;
+                            }
                         }
                     }
                 }
+                // Check own list.
+                var set = Mapper.orbitElementsSet.get(render.entity);
+                if (set != null && set.data != null && !set.data.isEmpty()) {
+                    int n = set.data.size();
+                    int offset = addMeshData(model,
+                                             model.numVertices,
+                                             n,
+                                             model.numIndices,
+                                             "quad",
+                                             primitive);
+                    setModel(offset, model);
+                    setOffset(render, offset);
+                    curr = meshes.get(offset);
+                    model.ensureInstanceAttribsSize(n * curr.instanceSize);
+
+                    float[] bodyColor = new float[]{1f, 1f, 1f, 0.2f};
+
+                    for (var p : set.data) {
+                        var k = (ParticleKepler) p;
+                        // COLOR
+                        float[] c = hl.isHighlighted() && ci != null ? ci.getHlColor() : bodyColor;
+                        model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+
+                        // ORBIT ELEMENTS 01
+                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) k.period();
+                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 1] = (float) k.epoch();
+                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 2] = (float) k.semiMajorAxis();
+                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 3] = (float) k.eccentricity();
+
+                        // ORBIT ELEMENTS 02
+                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset] = (float) (k.inclination() * MathUtilsDouble.degRad);
+                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 1] = (float) (k.ascendingNode() * MathUtilsDouble.degRad);
+                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 2] = (float) (k.argOfPericenter() * MathUtilsDouble.degRad);
+                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (k.meanAnomaly() * MathUtilsDouble.degRad);
+
+                        // SIZE
+                        model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
+
+                        // TEXTURE INDEX
+                        model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = -1f;
+
+                        curr.instanceIdx += curr.instanceSize;
+                        numParticlesAdded++;
+                    }
+
+                }
+
                 // Global (divisor=0) vertices (position, uv?) plus optional indices
                 curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
                 if (model.numIndices > 0) {
@@ -169,10 +219,10 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
             /*
              * RENDER
              */
-            curr = meshes.get(getOffset(render));
+            var offset = getOffset(render);
+            if (offset < 0) return;
+            curr = meshes.get(offset);
             if (curr != null) {
-                var hl = Mapper.highlight.get(render.entity);
-
                 ExtShaderProgram shaderProgram = getShaderProgram();
                 shaderProgram.begin();
 

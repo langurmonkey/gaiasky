@@ -19,6 +19,8 @@ public enum ParticleType {
     STAR,
     /** Variable stars. Corresponds to {@link ParticleVariable}. **/
     VARIABLE,
+    /** Particle whose location is described as Keplerian orbital elements. **/
+    KEPLER,
     /** Particle implemented as a double array. Can hold anything. Corresponds to {@link ParticleVector}. **/
     VECTOR;
 }
