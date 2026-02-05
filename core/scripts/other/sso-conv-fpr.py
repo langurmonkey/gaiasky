@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 
 import json, io, re, math
 
@@ -7,7 +7,7 @@ N_MAX = 180000
 # Ref epoch in jd: Jan 1 2010
 REF_EPOCH = 2455197.5
 # Unit conversion
-AU_TO_KM = 149598000
+AU_TO_KM = 149597870.7
 Y_TO_D = 365.25 
 # Standard gravitational parameter of the Sun
 GM_SUN = 1.32712440019e20
