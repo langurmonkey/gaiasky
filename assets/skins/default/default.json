@@ -691,8 +691,8 @@
       "imageDisabled": "bin-s-icon-grey"
     },
     "eye-toggle": {
-      "imageUp": "eye-closed-icon",
-      "imageChecked": "eye-icon"
+      "imageUp": "eye-icon",
+      "imageChecked": "eye-closed-icon"
     },
     "label-toggle": {
       "imageUp": "iconic-tag-gray",
