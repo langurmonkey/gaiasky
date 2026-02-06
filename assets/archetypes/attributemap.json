@@ -946,6 +946,13 @@
       "dataFile:OrbitalElementsGroup": {
         "description": "The path to the data file with the orbital elements to be loaded by the provider.",
         "unit": "String"
+      },
+      "colorNoise:OrbitalElementsGroup": {
+        "description": "Noise factor for the color, in [0,1]. This randomly generates colors from the main color. The larger the color noise, the more different the generated colors from the main color.",
+        "unit": "Double",
+        "aliases": [
+          "colornoise:OrbitalElementsGroup"
+        ]
       }
     },
     "ParticleExtra": {

@@ -24,12 +24,18 @@ public class AstroUtilsTest {
         testJulianDate("2000-01-01T00:00:00.00Z", 2451544.5);
         testJulianDate("2010-01-01T00:00:00.00Z", 2455197.5);
         testJulianDate("2013-01-01T00:30:00.00Z", 2456293.520833);
+        testJulianDate(2457907.5, "2017-06-03T00:00:00Z");
     }
 
     public void testJulianDate(String dateUTC, double expected) {
         var instant = Instant.parse(dateUTC);
         double jd = AstroUtils.getJulianDate(instant);
         Assert.assertEquals(expected, jd, 0.00001);
+    }
+
+    public void testJulianDate(double jd, String expectedUTC) {
+        var instant = AstroUtils.julianDateToInstant(jd);
+        Assert.assertEquals(instant.toString(), expectedUTC);
     }
 
 

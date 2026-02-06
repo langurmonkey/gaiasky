@@ -20,7 +20,6 @@ class SSO(object):
         self.parent = "fpr-asteroids-hook"
         self.archetype = "Orbit"
         self.provider = "gaiasky.data.orbit.OrbitalParametersProvider"
-        self.transformFunction = "eclipticToEquatorial"
         self.ct = [ "Asteroids", "Orbits" ]
         self.orbit = {}
         self.orbit["epoch"] = epoch

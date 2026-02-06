@@ -87,8 +87,8 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         int n = renderables.size();
-        if (n > 0 && renderables.get(0).getOpacity() > 0) {
-            Render first = (Render) renderables.get(0);
+        if (n > 0 && renderables.getFirst().getOpacity() > 0) {
+            Render first = (Render) renderables.getFirst();
             var base = Mapper.base.get(first.entity);
 
             if (forceAdd || !inGpu(first)) {

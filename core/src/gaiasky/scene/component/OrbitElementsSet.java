@@ -30,6 +30,11 @@ public class OrbitElementsSet implements Component {
     public List<IParticleRecord> data;
 
     /**
+     * Noise factor for the color in [0,1].
+     */
+    public float colorNoise = 0;
+
+    /**
      * Fully qualified name of data provider class.
      */
     public String provider;
@@ -56,5 +61,12 @@ public class OrbitElementsSet implements Component {
 
     public void setData(List<IParticleRecord> pointData) {
         this.data = pointData;
+    }
+    public void setColorNoise(Double colorNoise) {
+        this.colorNoise = colorNoise.floatValue();
+    }
+
+    public void setColornoise(Double colorNoise) {
+        this.setColorNoise(colorNoise);
     }
 }

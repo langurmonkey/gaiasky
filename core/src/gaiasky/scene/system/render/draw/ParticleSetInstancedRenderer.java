@@ -34,7 +34,6 @@ import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.StdRandom;
 import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
 
@@ -135,7 +134,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
         if (!set.disposed) {
-            boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
             var model = getModel(set, getOffset(render));
             if (!inGpu(render)) {
                 int n = set.pointData.size();
@@ -156,7 +154,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 float[] colorMax = set.getColorMax();
                 double minDistance = set.getMinDistance();
                 double maxDistance = set.getMaxDistance();
+                boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
 
+                float[] colorNoise = new float[3];
                 int numParticlesAdded = 0;
                 for (int i = 0; i < n; i++) {
                     if (utils.filter(i, set, desc) && set.isVisible(i)) {
@@ -222,17 +222,11 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                 if (set.colorFromTexture && set.textureArray != null && textureIndex >= 0f) {
                                     // Generate color using texture index, so particles with the same index get the
                                     // same color.
-                                    float r = 0, g = 0, b = 0;
-                                    if (set.colorNoise != 0) {
-                                        StdRandom.setSeed((long) textureIndex);
-                                        r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                        g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                        b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    }
+                                    generateChannelNoise((long) textureIndex, set.colorNoise, colorNoise);
                                     model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
-                                            MathUtils.clamp(c[0] + r, 0, 1),
-                                            MathUtils.clamp(c[1] + g, 0, 1),
-                                            MathUtils.clamp(c[2] + b, 0, 1),
+                                            MathUtils.clamp(c[0] + colorNoise[0], 0, 1),
+                                            MathUtils.clamp(c[1] + colorNoise[1], 0, 1),
+                                            MathUtils.clamp(c[2] + colorNoise[2], 0, 1),
                                             MathUtils.clamp(c[3], 0, 1));
 
                                 } else {
@@ -242,16 +236,11 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                         double fac = (dist - minDistance) / (maxDistance - minDistance);
                                         interpolateColor(colorMin, colorMax, c, fac);
                                     }
-                                    float r = 0, g = 0, b = 0;
-                                    if (set.colorNoise != 0) {
-                                        r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                        g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                        b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    }
+                                    generateChannelNoise(particle.id(), set.colorNoise, colorNoise);
                                     model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
-                                            MathUtils.clamp(c[0] + r, 0, 1),
-                                            MathUtils.clamp(c[1] + g, 0, 1),
-                                            MathUtils.clamp(c[2] + b, 0, 1),
+                                            MathUtils.clamp(c[0] + colorNoise[0], 0, 1),
+                                            MathUtils.clamp(c[1] + colorNoise[1], 0, 1),
+                                            MathUtils.clamp(c[2] + colorNoise[2], 0, 1),
                                             MathUtils.clamp(c[3], 0, 1));
                                 }
                             }

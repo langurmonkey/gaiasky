@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -22,7 +23,10 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.Highlight;
+import gaiasky.scene.component.OrbitElementsSet;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.scene.record.ParticleKepler;
@@ -32,6 +36,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -46,12 +51,14 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
     private final Matrix4 aux, refSysTransformF;
     private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.075)), FastMath.tan(Math.toRadians(0.9))};
+    private final Colormap cmap;
 
     public ElementsSetRenderer(SceneRenderer sceneRenderer,
                                RenderGroup rg,
                                float[] alphas,
                                ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
+        cmap = new Colormap();
         aux = new Matrix4();
         refSysTransformF = new Matrix4();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
@@ -103,6 +110,11 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
             CatalogInfo ci = desc.catalogInfo;
             if (!inGpu(render)) {
                 // Check children nodes.
+                var body = Mapper.body.get(render.entity);
+                var set = Mapper.orbitElementsSet.get(render.entity);
+                float[] colorNoiseContainer = new float[3];
+                float[] baseColor = utils.getColor(body, hl);
+
                 int numParticlesAdded = 0;
                 if (graph.children != null && graph.children.size > 0) {
                     int n = graph.children.size;
@@ -121,6 +133,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     Array<Entity> children = graph.children;
                     for (var child : children) {
                         if (Mapper.trajectory.has(child)) {
+                            var base = Mapper.base.get(child);
                             var trajectory = Mapper.trajectory.get(child);
 
                             // Respect body representation in trajectory.
@@ -128,8 +141,18 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
                                 OrbitComponent oc = trajectory.oc;
                                 // COLOR
-                                float[] c = hl.isHighlighted() && ci != null ? ci.getHlColor() : trajectory.bodyColor;
-                                model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                                if (hl.isHighlighted()) {
+                                    // Do not apply noise to base color.
+                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(baseColor[0], baseColor[1], baseColor[2], baseColor[3]);
+                                } else {
+                                    var c = trajectory.bodyColor;
+                                    generateChannelNoise(base.id, set.colorNoise, colorNoiseContainer);
+                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
+                                            MathUtils.clamp(c[0] + colorNoiseContainer[0], 0, 1),
+                                            MathUtils.clamp(c[1] + colorNoiseContainer[1], 0, 1),
+                                            MathUtils.clamp(c[2] + colorNoiseContainer[2], 0, 1),
+                                            MathUtils.clamp(c[3], 0, 1));
+                                }
 
                                 // ORBIT ELEMENTS 01
                                 model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) oc.period;
@@ -156,7 +179,6 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     }
                 }
                 // Check own list.
-                var set = Mapper.orbitElementsSet.get(render.entity);
                 if (set != null && set.data != null && !set.data.isEmpty()) {
                     int n = set.data.size();
                     int offset = addMeshData(model,
@@ -170,13 +192,10 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     curr = meshes.get(offset);
                     model.ensureInstanceAttribsSize(n * curr.instanceSize);
 
-                    float[] bodyColor = new float[]{1f, 1f, 1f, 0.2f};
-
                     for (var p : set.data) {
                         var k = (ParticleKepler) p;
                         // COLOR
-                        float[] c = hl.isHighlighted() && ci != null ? ci.getHlColor() : bodyColor;
-                        model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                        setParticleColorAttributes(k, set, hl, baseColor, colorNoiseContainer, model);
 
                         // ORBIT ELEMENTS 01
                         model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) k.period();
@@ -277,6 +296,59 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                 }
                 shaderProgram.end();
             }
+        }
+    }
+
+    /**
+     * Computes and sets the color of the given particle to the instanced attributes.
+     *
+     * @param k          The particle.
+     * @param set        The elements set.
+     * @param hl         The {@link Highlight} component.
+     * @param baseColor  The base color for the particle.
+     * @param colorNoiseContainer The color noise value.
+     * @param model      The instanced model.
+     */
+    private void setParticleColorAttributes(IParticleRecord k,
+                                            OrbitElementsSet set,
+                                            Highlight hl,
+                                            float[] baseColor,
+                                            float[] colorNoiseContainer,
+                                            InstancedModel model) {
+        if (hl.isHighlighted()) {
+            setHighlightColorAttributes(k, hl, baseColor, model);
+        } else {
+            generateChannelNoise(k.id(), set.colorNoise, colorNoiseContainer);
+            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
+                    MathUtils.clamp(baseColor[0] + colorNoiseContainer[0], 0, 1),
+                    MathUtils.clamp(baseColor[1] + colorNoiseContainer[1], 0, 1),
+                    MathUtils.clamp(baseColor[2] + colorNoiseContainer[2], 0, 1),
+                    MathUtils.clamp(baseColor[3], 0, 1));
+        }
+    }
+
+    /**
+     * Sets the color in highlight mode.
+     * @param k          The particle.
+     * @param hl         The {@link Highlight} component.
+     * @param baseColor  The base color for the particle.
+     * @param model      The instanced model.
+     */
+    private void setHighlightColorAttributes(IParticleRecord k,
+                                             Highlight hl,
+                                             float[] baseColor,
+                                             InstancedModel model) {
+        if (!hl.isHlplain()) {
+            // Color map.
+            double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma()
+                    .getNumber(k), hl.getHlcmmin(), hl.getHlcmmax());
+            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
+                    (float) color[0], (float) color[1], (float) color[2],
+                    hl.getHlcmAlpha());
+        } else {
+            // Plain highlight color.
+            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(baseColor[0], baseColor[1],
+                                                                                              baseColor[2], baseColor[3]);
         }
     }
 

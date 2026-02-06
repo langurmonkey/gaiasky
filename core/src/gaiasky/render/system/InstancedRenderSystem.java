@@ -26,6 +26,7 @@ import gaiasky.util.gdx.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.StdRandom;
 
 import java.util.HashMap;
 import java.util.List;
@@ -529,6 +530,27 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             // Post-render
             postRenderObjects(shaderProgram, camera);
             shaderProgram.end();
+        }
+    }
+
+    /**
+     * Generates color noise per channel, given a seed and an (n).
+     *
+     * @param seed   The seed for the RNG.
+     * @param noise  The noise value in [0,1].
+     * @param result The result array.
+     */
+    protected void generateChannelNoise(long seed, double noise, float[] result) {
+        StdRandom.setSeed(seed);
+        if (noise > 0 && noise <= 1) {
+            result[0] = (float) ((StdRandom.uniform() - 0.5) * 2.0 * noise);
+            result[1] = (float) ((StdRandom.uniform() - 0.5) * 2.0 * noise);
+            result[2] = (float) ((StdRandom.uniform() - 0.5) * 2.0 * noise);
+        } else {
+            result[0] = 0;
+            result[1] = 0;
+            result[2] = 0;
+
         }
     }
 
