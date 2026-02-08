@@ -77,27 +77,15 @@ public class OwnSliderPlus extends Slider {
                          float stepSize,
                          float mapMin,
                          float mapMax,
-                         boolean logarithmic,
                          Skin skin,
                          String labelStyle) {
         super(min, max, stepSize, false, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
-        setUp(title, mapMin, mapMax, logarithmic, labelStyle);
-    }
-
-    public OwnSliderPlus(String title,
-                         float min,
-                         float max,
-                         float stepSize,
-                         float mapMin,
-                         float mapMax,
-                         Skin skin,
-                         String labelStyle) {
-        this(title, min, max, stepSize, mapMin, mapMax, false, skin, labelStyle);
+        setUp(title, mapMin, mapMax, false, labelStyle);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
-        this(title, min, max, stepSize, mapMin, mapMax, false, skin, "default");
+        this(title, min, max, stepSize, mapMin, mapMax, skin, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style) {
@@ -106,14 +94,19 @@ public class OwnSliderPlus extends Slider {
         setUp(title, min, max, false, "default");
     }
 
-    public OwnSliderPlus(String title, float min, float max, float stepSize, boolean logarithmic, Skin skin) {
-        super(min, max, stepSize, false, skin.get("default-horizontal", OwnSliderStyle.class));
+    public OwnSliderPlus(String title, float min, float max, boolean logarithmic, Skin skin) {
+        this(title, min, max, logarithmic, skin, "default");
+    }
+
+    public OwnSliderPlus(String title, float min, float max, boolean logarithmic, Skin skin, String labelStyle) {
+        super(logarithmic ? 0f : min, logarithmic ? 1f : max, logarithmic ? 0.00001f : (max - min) / 100f, false,
+              skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
-        setUp(title, min, max, logarithmic, "default");
+        setUp(title, min, max, logarithmic, labelStyle);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
-        this(title, min, max, stepSize, false, skin);
+        this(title, min, max, stepSize, skin, "default-horizontal");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String labelStyleName) {
@@ -190,6 +183,7 @@ public class OwnSliderPlus extends Slider {
         this.mapMax = mapMax;
         this.logarithmic = logarithmic;
         this.map = mapMin != getMinValue() || mapMax != getMaxValue() || logarithmic;
+        this.displayValueMapped = map;
     }
 
     public void removeMapValues() {
@@ -346,7 +340,8 @@ public class OwnSliderPlus extends Slider {
 
     public void setLabelColor(float r, float g, float b, float a) {
         if (this.titleLabel != null) {
-            labelColorBackup = this.titleLabel.getColor().cpy();
+            labelColorBackup = this.titleLabel.getColor()
+                    .cpy();
             this.titleLabel.setColor(r, g, b, a);
             if (this.valueLabel != null) {
                 this.valueLabel.setColor(r, g, b, a);

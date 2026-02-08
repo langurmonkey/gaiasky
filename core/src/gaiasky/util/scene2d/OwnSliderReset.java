@@ -9,34 +9,40 @@ package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import gaiasky.util.i18n.I18n;
 
 import java.text.DecimalFormat;
 import java.util.function.Function;
 
+/**
+ * Wrapper around {@link OwnSliderPlus} that adds a "Reset value" button to the right of the slider.
+ */
 public class OwnSliderReset extends Table {
     private Skin skin;
     private OwnSliderPlus slider;
-    private OwnTextIconButton resetButton;
+    private OwnImageButton resetButton;
     private Float resetValue;
 
     // Constructors matching OwnSliderPlus
-    public OwnSliderReset(String title, float min, float max, float stepSize,
-                          float mapMin, float mapMax, boolean logarithmic,
+    public OwnSliderReset(String title, float min, float max, boolean logarithmic,
                           Skin skin, String labelStyle) {
-        initializeSlider(title, min, max, stepSize, mapMin, mapMax, logarithmic, skin, labelStyle);
+        initializeSlider(title, min, max, logarithmic, skin, labelStyle);
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize,
                           float mapMin, float mapMax, Skin skin, String labelStyle) {
-        this(title, min, max, stepSize, mapMin, mapMax, false, skin, labelStyle);
+        slider = new OwnSliderPlus(title, min, max, stepSize, mapMin, mapMax, skin, labelStyle);
+        this.skin = skin;
+        initializeLayout();
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize,
                           float mapMin, float mapMax, Skin skin) {
-        this(title, min, max, stepSize, mapMin, mapMax, false, skin, "default");
+        this(title, min, max, stepSize, mapMin, mapMax, skin, "default");
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize,
@@ -46,15 +52,15 @@ public class OwnSliderReset extends Table {
         initializeLayout();
     }
 
-    public OwnSliderReset(String title, float min, float max, float stepSize,
+    public OwnSliderReset(String title, float min, float max,
                           boolean logarithmic, Skin skin) {
-        slider = new OwnSliderPlus(title, min, max, stepSize, logarithmic, skin);
+        slider = new OwnSliderPlus(title, min, max, logarithmic, skin);
         this.skin = skin;
         initializeLayout();
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize, Skin skin) {
-        this(title, min, max, stepSize, false, skin);
+        this(title, min, max, stepSize, false, skin, "default");
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize,
@@ -64,17 +70,17 @@ public class OwnSliderReset extends Table {
         initializeLayout();
     }
 
-    private void initializeSlider(String title, float min, float max, float stepSize,
-                                  float mapMin, float mapMax, boolean logarithmic,
+    private void initializeSlider(String title, float min, float max, boolean logarithmic,
                                   Skin skin, String labelStyle) {
-        slider = new OwnSliderPlus(title, min, max, stepSize, mapMin, mapMax, logarithmic, skin, labelStyle);
+        slider = new OwnSliderPlus(title, min, max, logarithmic, skin, labelStyle);
         this.skin = skin;
         initializeLayout();
     }
 
     private void initializeLayout() {
         // Add slider to take most of the space
-        add(slider).expandX().fillX();
+        add(slider).expandX()
+                .fillX();
     }
 
     /**
@@ -99,8 +105,8 @@ public class OwnSliderReset extends Table {
 
         if (value != null && resetButton == null) {
             // Create reset button
-            resetButton = new OwnTextIconButton("", skin, "reload");
-            resetButton.setSize(10f, 10f);
+            resetButton = new OwnImageButton(skin, "reload-s");
+            resetButton.setSize(18f, 18f);
             resetButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -109,9 +115,10 @@ public class OwnSliderReset extends Table {
                     }
                 }
             });
-
+            resetButton.addListener(new OwnTextTooltip(I18n.msg("gui.reset"), skin));
             // Add button to the right of the slider
-            add(resetButton).size(10f).padLeft(2f);
+            add(resetButton).size(18f, 18f)
+                    .padLeft(1f);
 
         } else if (value == null && resetButton != null) {
             // Remove reset button
@@ -268,7 +275,7 @@ public class OwnSliderReset extends Table {
         return slider;
     }
 
-    public OwnTextIconButton getResetButton() {
+    public Button getResetButton() {
         return resetButton;
     }
 

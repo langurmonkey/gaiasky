@@ -807,8 +807,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             // Particle size and size noise
             float sizeMin = ds.type.size[0];
             float sizeMax = ds.type.size[1];
-            float sizeStep = (sizeMax - sizeMin) / SLIDER_STEPS;
-            var size = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size"), sizeMin, sizeMax, sizeStep, true, skin);
+            var size = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size"), sizeMin, sizeMax, true, skin);
             size.setNumberFormatter(new DecimalFormat("######0.########"));
             size.setDisplayValueMapped(true);
             size.setLogarithmicExponent(4.0);
@@ -936,8 +935,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 // Spiral angle
                 float angleMin = ds.type.baseAngle[0];
                 float angleMax = ds.type.baseAngle[1];
-                float angleStep = (angleMax - angleMin) / SLIDER_STEPS;
-                var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"), angleMin, angleMax, angleStep, true, skin);
+                var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"), angleMin, angleMax, true, skin);
                 baseAngle.setLogarithmicExponent(1.2);
                 baseAngle.setNumberFormatter(new DecimalFormat("##0.###"));
                 baseAngle.setWidth(fullWidthBox);

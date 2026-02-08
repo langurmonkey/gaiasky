@@ -434,6 +434,9 @@
     "reload": {
       "imageUp": "reload"
     },
+    "reload-s": {
+      "imageUp": "reload-s"
+    },
     "fork": {
       "imageUp": "iconic-fork"
     },
@@ -748,7 +751,10 @@
     },
     "matrix": {
       "imageUp": "icon-matrix"
-    }
+    },
+    "reload-s": {
+      "imageUp": "reload-s"
+    },
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
     "default": {

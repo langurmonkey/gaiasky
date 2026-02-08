@@ -189,7 +189,7 @@ public class Constants {
     public static final float MIN_STEREO_IPD = 10f;
     public static final float MAX_STEREO_IPD = 100f;
     public static final float MIN_STEREO_SD = 200f;
-    public static final float MAX_STEREO_SD = 1500f;
+    public static final float MAX_STEREO_SD = 50000f;
     public final static int MIN_TILE_CACHE = 4;
     public final static int MAX_TILE_CACHE = 20;
     public static final float UI_SCALE_MIN = 0.70f;

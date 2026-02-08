@@ -2951,6 +2951,13 @@ reload
   orig: 21, 21
   offset: 0, 0
   index: -1
+reload-s
+  rotate: false
+  xy: 369, 599
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
 save
   rotate: false
   xy: 348, 417
@@ -3239,14 +3246,14 @@ white
   index: -1
 window-collapse
   rotate: false
-  xy: 369, 599
+  xy: 383, 599
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 window-expand
   rotate: false
-  xy: 383, 599
+  xy: 430, 389
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
