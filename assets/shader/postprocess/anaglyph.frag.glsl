@@ -5,6 +5,9 @@
 uniform sampler2D u_texture0;
 uniform sampler2D u_texture1;
 uniform int u_anaglyphMode;
+uniform vec4 u_customColorLeft;
+uniform vec4 u_customColorRight;
+
 #define A_RED_CYAN 0
 #define A_RED_CYAN_DUBOIS 1
 #define A_AMBER_BLUE 2
@@ -12,6 +15,7 @@ uniform int u_anaglyphMode;
 #define A_GREEN_MAGENTA 4
 #define A_GREEN_MAGENTA_DUBOIS 5
 #define A_RED_BLUE 6
+#define A_CUSTOM 7
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
@@ -66,6 +70,8 @@ vec3 correctColor(vec3 original) {
     return corrected;
 }
 
+#include <shader/lib/luma.glsl>
+
 void main() {
     vec2 texcoord = v_texCoords;
 
@@ -116,6 +122,17 @@ void main() {
         vec3 blue = vec3(0.0, 0.0, rightFrag.b);
         fragColor = vec4(red.rgb + blue.rgb, 1.0);
 
+    } else if (u_anaglyphMode == A_CUSTOM) {
+        // Compute pixel luma for each eye
+        float leftLum = luma(leftFrag.rgb);
+        float rightLum = luma(rightFrag.rgb);
+
+        // Apply the custom colors as filters
+        vec3 leftFinal = rightLum * u_customColorRight.rgb;
+        vec3 rightFinal = leftLum * u_customColorLeft.rgb;
+
+        // Combine using additive blending (standard for anaglyph)
+        fragColor = vec4(clamp(leftFinal + rightFinal, 0.0, 1.0), 1.0);
     }
 
 }

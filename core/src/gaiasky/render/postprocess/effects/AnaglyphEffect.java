@@ -7,6 +7,7 @@
 
 package gaiasky.render.postprocess.effects;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
@@ -17,8 +18,8 @@ import gaiasky.util.Settings;
 public final class AnaglyphEffect extends PostProcessorEffect {
     private final AnaglyphFilter filter;
 
-    public AnaglyphEffect() {
-        filter = new AnaglyphFilter();
+    public AnaglyphEffect(Color left, Color right) {
+        filter = new AnaglyphFilter(left, right);
         disposables.add(filter);
     }
 
@@ -31,14 +32,23 @@ public final class AnaglyphEffect extends PostProcessorEffect {
         filter.setTextureLeft(tex);
     }
 
+    public void setTextureRight(Texture tex) {
+        filter.setTextureRight(tex);
+    }
+
+
     @Override
     public void updateShaders() {
         super.updateShaders();
         filter.updateProgram();
     }
 
-    public void setTextureRight(Texture tex) {
-        filter.setTextureRight(tex);
+    public void setCustomColorLeft(Color c) {
+        filter.setCustomColorLeft(c);
+    }
+
+    public void setCustomColorRight(Color c) {
+        filter.setCustomColorRight(c);
     }
 
     /**
@@ -53,7 +63,9 @@ public final class AnaglyphEffect extends PostProcessorEffect {
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
-        filter.setInput(src).setOutput(dest).render();
+        filter.setInput(src)
+                .setOutput(dest)
+                .render();
     }
 
 }

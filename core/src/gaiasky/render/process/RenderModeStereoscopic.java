@@ -8,6 +8,7 @@
 package gaiasky.render.process;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -84,7 +85,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                  new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), true));
 
         // Init anaglyph 3D effect
-        anaglyphEffect = new AnaglyphEffect();
+        anaglyphEffect = new AnaglyphEffect(Settings.settings.program.modeStereo.customColorLeft, Settings.settings.program.modeStereo.customColorRight);
         updateAnaglyphMode();
 
         // Copy
@@ -100,7 +101,9 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         aux4d = new Vector3D();
         aux5d = new Vector3D();
 
-        EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.SHADER_RELOAD_CMD);
+        EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.SHADER_RELOAD_CMD,
+                                        Event.STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD,
+                                        Event.STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD);
     }
 
     public void updateAnaglyphMode() {
@@ -117,12 +120,14 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
      * @return The distance, in internal units.
      */
     private double getObjectDistance(ICamera camera) {
-        IFocus body = camera.getMode().isFocus() ? camera.getFocus() : camera.getClosestBody();
+        IFocus body = camera.getMode()
+                .isFocus() ? camera.getFocus() : camera.getClosestBody();
         return body.getDistToCamera() - body.getRadius();
     }
 
     @Override
-    public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb,
+                       PostProcessBean ppb) {
         boolean moveCam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
 
         PerspectiveCamera perspectiveCam = camera.getCamera();
@@ -139,11 +144,18 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         double eyeSepCapped = FastMath.min(sep, maxSep);
 
         // Aux5d contains the direction to the side of the camera, normalized.
-        aux5d.set(camera.getDirection()).crs(camera.getUp()).nor();
+        aux5d.set(camera.getDirection())
+                .crs(camera.getUp())
+                .nor();
 
-        Vector3D side = aux4d.set(aux5d).nor().scl(sep);
-        Vector3D sideRemainder = aux2d.set(aux5d).scl(sep - eyeSepCapped);
-        Vector3D sideCapped = aux3d.set(aux5d).nor().scl(eyeSepCapped);
+        Vector3D side = aux4d.set(aux5d)
+                .nor()
+                .scl(sep);
+        Vector3D sideRemainder = aux2d.set(aux5d)
+                .scl(sep - eyeSepCapped);
+        Vector3D sideCapped = aux3d.set(aux5d)
+                .nor()
+                .scl(eyeSepCapped);
         Vector3 backupPos = aux2.set(perspectiveCam.position);
         Vector3 backupDir = aux3.set(perspectiveCam.direction);
         Vector3D backupPosD = aux1d.set(camera.getPos());
@@ -163,7 +175,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             }
             camera.setCameraStereoLeft(perspectiveCam);
 
-            sgr.getLightGlowPass().render(camera);
+            sgr.getLightGlowPass()
+                    .render(camera);
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
             boolean postProcess = postProcessCapture(ppb, fb1, tw, th, ppb::capture);
@@ -184,7 +197,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             }
             camera.setCameraStereoRight(perspectiveCam);
 
-            sgr.getLightGlowPass().render(camera);
+            sgr.getLightGlowPass()
+                    .render(camera);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
             postProcess = postProcessCapture(ppb, fb2, tw, th, ppb::capture);
@@ -219,10 +233,10 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                 if (stretch) {
                     srw = rw;
                 } else {
-                    srw = rw / 2;
+                    srw = rw / 2f;
                 }
                 srh = rh;
-                boundsw = rw / 2;
+                boundsw = rw / 2f;
                 boundsh = rh;
                 start2w = boundsw;
                 start2h = 0;
@@ -230,11 +244,11 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                 if (stretch) {
                     srh = rh;
                 } else {
-                    srh = rh / 2;
+                    srh = rh / 2f;
                 }
                 srw = rw;
                 boundsw = rw;
-                boundsh = rh / 2;
+                boundsh = rh / 2f;
                 start2w = 0;
                 start2h = boundsh;
             }
@@ -265,7 +279,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             }
             camera.setCameraStereoLeft(perspectiveCam);
 
-            sgr.getLightGlowPass().render(camera);
+            sgr.getLightGlowPass()
+                    .render(camera);
 
             FrameBuffer fb3d = getFrameBuffer((int) boundsw, (int) boundsh, 3);
             boolean postProcess = postProcessCapture(ppb, fb3d, (int) boundsw, (int) boundsh, ppb::capture);
@@ -280,7 +295,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             resultBuffer.begin();
             sb.begin();
             sb.setColor(1f, 1f, 1f, 1f);
-            sb.draw(tex, 0f, 0f, 0f, 0f, (float) boundsw, (float) boundsh, 1f, 1f, 0f, 0, 0, (int) boundsw, (int) boundsh, false, true);
+            sb.draw(tex, 0f, 0f, 0f, 0f, (float) boundsw, (float) boundsh, 1f, 1f, 0f, 0, 0, (int) boundsw, (int) boundsh, false,
+                    true);
             sb.end();
             resultBuffer.end();
 
@@ -296,7 +312,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             }
             camera.setCameraStereoRight(perspectiveCam);
 
-            sgr.getLightGlowPass().render(camera);
+            sgr.getLightGlowPass()
+                    .render(camera);
 
             postProcess = postProcessCapture(ppb, fb3d, (int) boundsw, (int) boundsh, ppb::capture);
             sgr.renderScene(camera, t, rc);
@@ -338,11 +355,14 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
         // To screen
         if (fb == null)
-            copyFilter.setInput(resultBuffer).setOutput(null).render();
+            copyFilter.setInput(resultBuffer)
+                    .setOutput(null)
+                    .render();
 
     }
 
-    private void restoreCameras(ICamera camera, PerspectiveCamera cam, Vector3D backupPosd, Vector3 backupPos, Vector3 backupDir) {
+    private void restoreCameras(ICamera camera, PerspectiveCamera cam, Vector3D backupPosd, Vector3 backupPos,
+                                Vector3 backupDir) {
         camera.setPos(backupPosd);
         cam.position.set(backupPos);
         cam.direction.set(backupDir);
@@ -358,7 +378,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
      * @param toeInAngle    Angle to use for rotating the direction vectors inwards towards the convergence point. Set to 0 for parallel projection.
      * @param switchSides   Whether to switch sides.
      */
-    private void moveCamera(ICamera camera, Vector3D sideRemainder, Vector3D side, Vector3D sideCapped, double toeInAngle, boolean switchSides) {
+    private void moveCamera(ICamera camera, Vector3D sideRemainder, Vector3D side, Vector3D sideCapped, double toeInAngle,
+                            boolean switchSides) {
         PerspectiveCamera cam = camera.getCamera();
         Vector3 sideFloat = sideCapped.put(aux1);
 
@@ -368,14 +389,16 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                 cam.direction.rotate(cam.up, (float) -toeInAngle);
 
             // Uncomment to enable 3D in GPU points
-            camera.getPos().add(sideRemainder);
+            camera.getPos()
+                    .add(sideRemainder);
         } else {
             cam.position.sub(sideFloat);
             if (toeInAngle != 0)
                 cam.direction.rotate(cam.up, (float) toeInAngle);
 
             // Uncomment to enable 3D in GPU points
-            camera.getPos().sub(sideRemainder);
+            camera.getPos()
+                    .sub(sideRemainder);
         }
         cam.update();
     }
@@ -416,11 +439,13 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                 fb3D.put(keyFull, new FrameBuffer(Format.RGB888, tw, th, true));
             }
 
-            Iterator<Map.Entry<Integer, FrameBuffer>> iterator = fb3D.entrySet().iterator();
+            Iterator<Map.Entry<Integer, FrameBuffer>> iterator = fb3D.entrySet()
+                    .iterator();
             while (iterator.hasNext()) {
                 Map.Entry<Integer, FrameBuffer> entry = iterator.next();
                 if (entry.getKey() != keyHalf && entry.getKey() != keyFull) {
-                    entry.getValue().dispose();
+                    entry.getValue()
+                            .dispose();
                     iterator.remove();
                 }
             }
@@ -446,6 +471,10 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         switch (event) {
             case SCREENSHOT_SIZE_UPDATE, FRAME_SIZE_UPDATE -> GaiaSky.postRunnable(this::clearFrameBufferMap);
             case SHADER_RELOAD_CMD -> GaiaSky.postRunnable(anaglyphEffect::updateShaders);
+            case STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD ->
+                    GaiaSky.postRunnable(() -> anaglyphEffect.setCustomColorLeft((Color) data[0]));
+            case STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD ->
+                    GaiaSky.postRunnable(() -> anaglyphEffect.setCustomColorRight((Color) data[0]));
             default -> {
             }
         }

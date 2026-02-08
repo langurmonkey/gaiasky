@@ -7,6 +7,7 @@
 
 package gaiasky.render.postprocess.filters;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -165,6 +166,12 @@ public abstract class Filter<T> implements Disposable {
         return (T) this;
     }
 
+    // Color
+    protected void setParam(Parameter param, Color value) {
+        program.bind();
+        program.setUniformf(param.mnemonic(), value);
+    }
+
     /**
      * Sets the parameter to the specified value for this filter. When you are
      * finished building the batch you shall signal it by invoking endParams().
@@ -264,6 +271,16 @@ public abstract class Filter<T> implements Disposable {
         case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
         }
 
+        return (T) this;
+    }
+
+    // Color into vec3
+    protected T setParams(Parameter param, Color value) {
+        if (!programBegan) {
+            programBegan = true;
+            program.bind();
+        }
+        program.setUniformf(param.mnemonic(), value);
         return (T) this;
     }
 

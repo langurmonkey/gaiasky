@@ -533,7 +533,13 @@ public class Settings extends SettingsObject {
         /**
          * Anaglyph red-blue
          **/
-        ANAGLYPH_RED_BLUE;
+        ANAGLYPH_RED_BLUE,
+
+        /**
+         * Custom anaglyph. Uses {@link Settings.ProgramSettings.ModeStereoSettings#customColorRight}
+         * and {@link Settings.ProgramSettings.ModeStereoSettings#customColorLeft}.
+         */
+        ANAGLYPH_CUSTOM;
 
         public boolean isHorizontal() {
             return this.equals(VR_HEADSET) || this.equals(HORIZONTAL_3DTV) || this.equals(CROSS_EYE) || this.equals(
@@ -555,11 +561,12 @@ public class Settings extends SettingsObject {
                     || this.equals(ANAGLYPH_AMBER_BLUE)
                     || this.equals(ANAGLYPH_AMBER_BLUE_DUBOIS)
                     || this.equals(ANAGLYPH_GREEN_MAGENTA)
-                    || this.equals(ANAGLYPH_GREEN_MAGENTA_DUBOIS);
+                    || this.equals(ANAGLYPH_GREEN_MAGENTA_DUBOIS)
+                    || this.equals(ANAGLYPH_CUSTOM);
         }
 
         public int getAnaglyphModeInteger() {
-            return MathUtilsDouble.clamp(this.ordinal() - ANAGLYPH_RED_CYAN.ordinal(), 0, 6);
+            return MathUtilsDouble.clamp(this.ordinal() - ANAGLYPH_RED_CYAN.ordinal(), 0, 7);
         }
 
         public boolean correctAspect() {
@@ -2896,7 +2903,7 @@ public class Settings extends SettingsObject {
             /** Custom anaglyph color left. **/
             public Color customColorLeft = Color.RED;
             /** Custom anaglyph color right. **/
-            public Color customColorRight = Color.CYAN;
+            public Color customColorRight = Color.GREEN;
 
             /** IPD, inter pupillary distance, in mm. **/
             public double ipd = 64.0;
@@ -2978,12 +2985,14 @@ public class Settings extends SettingsObject {
 
             @Override
             public void notify(Event event, Object source, Object... data) {
-                switch (event) {
-                    case STEREO_K_CMD -> this.k = (double) data[0];
-                    case STEREO_IPD_CMD -> this.ipd = (double) data[0];
-                    case STEREO_SCREEN_DIST_CMD -> this.screenDistance = (double) data[0];
-                    case STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD -> this.customColorLeft = (Color) data[0];
-                    case STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD -> this.customColorRight = (Color) data[0];
+                if (source != this) {
+                    switch (event) {
+                        case STEREO_K_CMD -> this.k = (double) data[0];
+                        case STEREO_IPD_CMD -> this.ipd = (double) data[0];
+                        case STEREO_SCREEN_DIST_CMD -> this.screenDistance = (double) data[0];
+                        case STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD -> this.customColorLeft = (Color) data[0];
+                        case STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD -> this.customColorRight = (Color) data[0];
+                    }
                 }
             }
         }
