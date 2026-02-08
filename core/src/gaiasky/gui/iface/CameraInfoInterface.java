@@ -43,7 +43,6 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 
 import static gaiasky.scene.component.Label.LabelDisplay.ALWAYS;
-import static gaiasky.scene.component.Label.LabelDisplay.NEVER;
 
 /**
  * Builds the pane that contains information on the current camera state.
@@ -249,7 +248,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
                 EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, objectVisibility, currentFocus, currentFocus.getName(),
-                                     objectVisibility.isChecked());
+                                     !objectVisibility.isChecked());
                 return true;
             }
             return false;
@@ -654,7 +653,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 bookmark.setProgrammaticChangeEvents(true);
 
                 // Visible
-                objectVisibility.setCheckedNoFire(((IVisibilitySwitch) currentFocus).isVisible(true));
+                objectVisibility.setCheckedNoFire(!((IVisibilitySwitch) currentFocus).isVisible(true));
                 objectVisibility.addListener(new OwnTextTooltip(I18n.msg("action.visibility", currentFocus.getName()), skin));
 
                 // Force label
@@ -907,7 +906,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                         String name = (String) data[1];
                         if (vs == currentFocus && currentFocus.hasName(name)) {
                             boolean visible = (boolean) data[2];
-                            objectVisibility.setCheckedNoFire(visible);
+                            objectVisibility.setCheckedNoFire(!visible);
                         }
                     }
 
@@ -915,7 +914,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                         String name = (String) data[1];
                         if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
                             boolean visible = (boolean) data[2];
-                            objectVisibility.setCheckedNoFire(visible);
+                            objectVisibility.setCheckedNoFire(!visible);
                         }
                     }
                 }
@@ -947,7 +946,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         }
     }
 
-    private void displayInfo(Cell cell, Actor info) {
+    private void displayInfo(Cell<?> cell, Actor info) {
         cell.setActor(info);
         pack();
     }
