@@ -1382,6 +1382,11 @@ public enum Event {
      */
     STEREO_SCREEN_DIST_CMD,
 
+    /** Change anaglyph custom color left. Contains the new {@link com.badlogic.gdx.graphics.Color} instance. **/
+    STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD,
+    /** Change anaglyph custom color right. Contains the new {@link com.badlogic.gdx.graphics.Color} instance. **/
+    STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD,
+
     /**
      * Sets and unsets the target time. Contains a time (set), or nothing
      * (unset)

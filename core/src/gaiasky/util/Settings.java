@@ -12,6 +12,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -75,7 +76,8 @@ public class Settings extends SettingsObject {
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the
      * {@link File#getAbsolutePath()} call.
      **/
-    public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
+    public static final String ASSETS_LOC = (new File(
+            System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
     public static final String HOMEPAGE = "https://gaiasky.space";
     public static final String HOMEPAGE_DOWNLOADS = "https://gaiasky.space/downloads";
@@ -452,7 +454,8 @@ public class Settings extends SettingsObject {
         @Override
         public String toString() {
             try {
-                String name = I18n.msg("gui.reproj.mode." + this.name().toLowerCase(Locale.ROOT));
+                String name = I18n.msg("gui.reproj.mode." + this.name()
+                        .toLowerCase(Locale.ROOT));
                 if (name != null && !name.isEmpty()) {
                     return name;
                 } else {
@@ -533,7 +536,8 @@ public class Settings extends SettingsObject {
         ANAGLYPH_RED_BLUE;
 
         public boolean isHorizontal() {
-            return this.equals(VR_HEADSET) || this.equals(HORIZONTAL_3DTV) || this.equals(CROSS_EYE) || this.equals(PARALLEL_VIEW);
+            return this.equals(VR_HEADSET) || this.equals(HORIZONTAL_3DTV) || this.equals(CROSS_EYE) || this.equals(
+                    PARALLEL_VIEW);
         }
 
         public boolean isVertical() {
@@ -682,7 +686,8 @@ public class Settings extends SettingsObject {
         }
 
         public String toString() {
-            return I18n.msg("gui.upscale." + this.name().toLowerCase(Locale.ROOT));
+            return I18n.msg("gui.upscale." + this.name()
+                    .toLowerCase(Locale.ROOT));
         }
     }
 
@@ -808,7 +813,9 @@ public class Settings extends SettingsObject {
             this.builder = builder;
             this.system = system;
             this.build = build;
-            dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.getDefault()).withZone(ZoneId.systemDefault());
+            dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                    .withLocale(Locale.getDefault())
+                    .withZone(ZoneId.systemDefault());
         }
 
         @Override
@@ -884,7 +891,8 @@ public class Settings extends SettingsObject {
                 // Path is in data directory, just remove leading 'data/' and prepend data location
                 String pathFromDataStr = resolvedPathStr.replace(Constants.DATA_LOCATION_TOKEN, "");
                 Path pathFromData = Path.of(pathFromDataStr);
-                Path resolvedPath = Path.of(location).resolve(pathFromDataStr);
+                Path resolvedPath = Path.of(location)
+                        .resolve(pathFromDataStr);
                 // We inject the location if:
                 // - the current resolved path does not exist, and
                 // - the dataset location is not null or empty, and
@@ -893,19 +901,23 @@ public class Settings extends SettingsObject {
                         .toString()
                         .equals(dsLocation)) {
                     // Use dsLocation
-                    return Path.of(location).resolve(dsLocation).resolve(pathFromDataStr);
+                    return Path.of(location)
+                            .resolve(dsLocation)
+                            .resolve(pathFromDataStr);
                 } else {
                     // It exists, use as it is
                     return resolvedPath;
                 }
             } else {
                 var p = Path.of(resolvedPathStr);
-                if (p.toFile().exists()) {
+                if (p.toFile()
+                        .exists()) {
                     // Relative to working dir, or absolute.
                     return p;
                 } else {
                     // In data directory.
-                    return Path.of(location).resolve(resolvedPathStr);
+                    return Path.of(location)
+                            .resolve(resolvedPathStr);
                 }
             }
         }
@@ -916,7 +928,8 @@ public class Settings extends SettingsObject {
 
         public String dataFile(String path,
                                String dsLocation) {
-            return dataPath(path, dsLocation).toString().replaceAll("\\\\", "/");
+            return dataPath(path, dsLocation).toString()
+                    .replaceAll("\\\\", "/");
         }
 
         public String dataFile(String path) {
@@ -942,7 +955,7 @@ public class Settings extends SettingsObject {
          * @param dataset The dataset descriptor file pointer.
          *
          * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not
-         *         readable, or it is already in the list.
+         * readable, or it is already in the list.
          */
         public boolean enableDataset(Path dataset) {
             // Look for catalog already existing
@@ -1025,7 +1038,8 @@ public class Settings extends SettingsObject {
         @JsonIgnore
         public int getNumberOfThreads() {
             if (numberThreads <= 0)
-                return Runtime.getRuntime().availableProcessors();
+                return Runtime.getRuntime()
+                        .availableProcessors();
             else
                 return numberThreads;
         }
@@ -1264,7 +1278,8 @@ public class Settings extends SettingsObject {
         public void setVisibility(final Map<String, Object> map) {
             ComponentType[] cts = ComponentType.values();
             // Sort using the order of the {@link ComponentType} elements
-            Comparator<String> componentTypeComparator = Comparator.comparingInt(s -> ComponentType.valueOf(s).ordinal());
+            Comparator<String> componentTypeComparator = Comparator.comparingInt(s -> ComponentType.valueOf(s)
+                    .ordinal());
             visibility = new TreeMap<>(componentTypeComparator);
             for (ComponentType ct : cts) {
                 String key = ct.name();
@@ -1409,7 +1424,8 @@ public class Settings extends SettingsObject {
                         case FOV_CMD -> {
                             if (!SlaveManager.projectionActive()) {
                                 boolean checkMax = source instanceof Actor;
-                                fov = MathUtilsDouble.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
+                                fov = MathUtilsDouble.clamp((Float) data[0], Constants.MIN_FOV,
+                                                            checkMax ? Constants.MAX_FOV : 179f);
                             }
                         }
                         case CAMERA_SPEED_CMD -> speed = (float) data[0];
@@ -1645,17 +1661,19 @@ public class Settings extends SettingsObject {
             public String getStarTexture(int textureIndex) {
                 String starTexIdx = String.format("%02d", textureIndex);
                 String texture = settings.data.dataFile(
-                        GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
-                                                                  ".jpg",
-                                                                  ".png"));
+                        GlobalResources.unpackAssetPathExtensions(
+                                Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                                ".jpg",
+                                ".png"));
                 if (texture == null) {
                     // Fall back to whatever is available.
                     for (int i = 1; i < 9; i++) {
                         starTexIdx = String.format("%02d", i);
                         texture = settings.data.dataFile(
-                                GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
-                                                                          ".jpg",
-                                                                          ".png"));
+                                GlobalResources.unpackAssetPathExtensions(
+                                        Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                                        ".jpg",
+                                        ".png"));
                         if (texture != null)
                             return texture;
                     }
@@ -1676,9 +1694,10 @@ public class Settings extends SettingsObject {
                 // Fall back to whatever is available.
                 for (int i = 1; i < 9; i++) {
                     var starTexIdx = String.format("%02d", i);
-                    var t = GlobalResources.unpackAssetPathExtensions(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
-                                                                      ".jpg",
-                                                                      ".png");
+                    var t = GlobalResources.unpackAssetPathExtensions(
+                            Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                            ".jpg",
+                            ".png");
                     if (t != null) {
                         result.add(i);
                     }
@@ -1725,7 +1744,8 @@ public class Settings extends SettingsObject {
                         }
                         case BILLBOARD_TEXTURE_IDX_CMD -> textureIndex = (int) data[0];
                         case STAR_BRIGHTNESS_CMD ->
-                                brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS);
+                                brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS,
+                                                                   Constants.MAX_STAR_BRIGHTNESS);
                         case STAR_BRIGHTNESS_POW_CMD -> power = (float) data[0];
                         case STAR_GLOW_FACTOR_CMD -> glowFactor = (float) data[0];
                     }
@@ -1936,10 +1956,10 @@ public class Settings extends SettingsObject {
                                final Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
-                        case PM_NUM_FACTOR_CMD ->
-                                number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
-                        case PM_LEN_FACTOR_CMD ->
-                                length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
+                        case PM_NUM_FACTOR_CMD -> number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR,
+                                                                                 Constants.MAX_PM_NUM_FACTOR);
+                        case PM_LEN_FACTOR_CMD -> length = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR,
+                                                                                 Constants.MAX_PM_LEN_FACTOR);
                         case PM_COLOR_MODE_CMD -> colorMode = MathUtilsDouble.clamp((int) data[0], 0, 5);
                         case PM_ARROWHEADS_CMD -> arrowHeads = (boolean) data[0];
                     }
@@ -2343,7 +2363,8 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
-                EventManager.instance.subscribe(this, Event.CROSSHAIR_FOCUS_CMD, Event.CROSSHAIR_CLOSEST_CMD, Event.CROSSHAIR_HOME_CMD);
+                EventManager.instance.subscribe(this, Event.CROSSHAIR_FOCUS_CMD, Event.CROSSHAIR_CLOSEST_CMD,
+                                                Event.CROSSHAIR_HOME_CMD);
             }
 
             @Override
@@ -2419,7 +2440,8 @@ public class Settings extends SettingsObject {
 
         /** The recommended datasets, as a list of keys. **/
         @JsonIgnore
-        public final Set<String> recommendedDatasets = Set.of("default-data", "gaia-dr3-best", "catalog-nbg", "catalog-nebulae", "catalog-sdss-12");
+        public final Set<String> recommendedDatasets = Set.of("default-data", "gaia-dr3-best", "catalog-nbg", "catalog-nebulae",
+                                                              "catalog-sdss-12");
 
         @JsonIgnore
         public String getDefaultLocale() {
@@ -2428,7 +2450,8 @@ public class Settings extends SettingsObject {
 
         public String getLocale() {
             if (locale == null || locale.isEmpty()) {
-                locale = Locale.getDefault().toLanguageTag();
+                locale = Locale.getDefault()
+                        .toLanguageTag();
             }
             return locale;
         }
@@ -2480,7 +2503,8 @@ public class Settings extends SettingsObject {
                             ModePopupInfo mpi = new ModePopupInfo();
                             if (modeCubemap.projection.isPanorama()) {
                                 String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.360");
-                                String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.projection");
+                                String[] keysStrProj = KeyBindings.instance.getStringArrayKeys(
+                                        "action.toggle/element.projection");
                                 mpi.title = I18n.msg("gui.360.title");
                                 mpi.header = I18n.msg("gui.360.notice.header");
                                 mpi.addMapping(I18n.msg("gui.360.notice.back"), keysStrToggle);
@@ -2490,7 +2514,8 @@ public class Settings extends SettingsObject {
                                 }
                             } else if (modeCubemap.projection.isPlanetarium()) {
                                 String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
-                                String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium.projection");
+                                String[] keysStrProj = KeyBindings.instance.getStringArrayKeys(
+                                        "action.toggle/element.planetarium.projection");
                                 mpi.title = I18n.msg("gui.planetarium.title");
                                 mpi.header = I18n.msg("gui.planetarium.notice.header");
                                 mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
@@ -2499,8 +2524,10 @@ public class Settings extends SettingsObject {
                                     mpi.warn = I18n.msg("gui.360.notice.renderer");
                                 }
                             } else if (modeCubemap.projection.isOrthosphere()) {
-                                String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere");
-                                String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere.profile");
+                                String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys(
+                                        "action.toggle/element.orthosphere");
+                                String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys(
+                                        "action.toggle/element.orthosphere.profile");
                                 mpi.title = I18n.msg("gui.orthosphere.title");
                                 mpi.header = I18n.msg("gui.orthosphere.notice.header");
                                 mpi.addMapping(I18n.msg("gui.orthosphere.notice.back"), keysStrToggle);
@@ -2521,7 +2548,8 @@ public class Settings extends SettingsObject {
                         modeCubemap.projection = (CubemapProjection) data[0];
                         if (modeCubemap.projection.isSphericalMirror() && modeCubemap.planetarium.sphericalMirrorWarp == null) {
                             modeCubemap.projection = CubemapProjection.AZIMUTHAL_EQUIDISTANT;
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.planetarium.sphericalmirror.nowarpfile"), 10f);
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
+                                                 I18n.msg("gui.planetarium.sphericalmirror.nowarpfile"), 10f);
                         } else {
                             logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
                         }
@@ -2644,7 +2672,8 @@ public class Settings extends SettingsObject {
             EventManager.publish(Event.PLANETARIUM_APERTURE_CMD, this, modeCubemap.planetarium.aperture);
             EventManager.publish(Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, this, modeCubemap.planetarium.sphericalMirrorWarp);
             EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, modeCubemap.planetarium.angle);
-            EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointer.guides.active, pointer.guides.color, pointer.guides.width);
+            EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointer.guides.active, pointer.guides.color,
+                                 pointer.guides.width);
 
             // Those need to run in the main thread, as they may need the OpenGL context.
             GaiaSky.postRunnable(() -> {
@@ -2864,6 +2893,10 @@ public class Settings extends SettingsObject {
             public boolean active;
             /** The stereoscopic profile. **/
             public StereoProfile profile;
+            /** Custom anaglyph color left. **/
+            public Color customColorLeft = Color.RED;
+            /** Custom anaglyph color right. **/
+            public Color customColorRight = Color.CYAN;
 
             /** IPD, inter pupillary distance, in mm. **/
             public double ipd = 64.0;
@@ -2879,6 +2912,24 @@ public class Settings extends SettingsObject {
                     profileString = StereoProfile.CROSS_EYE.toString();
                 }
                 this.profile = StereoProfile.valueOf(profileString.toUpperCase(Locale.ROOT));
+            }
+
+            public String getCustomColorLeft() {
+                return this.customColorLeft.toString()
+                        .substring(0, 6);
+            }
+
+            public void setCustomColorLeft(String hex) {
+                this.customColorLeft = Color.valueOf(hex);
+            }
+
+            public String getCustomColorRight() {
+                return this.customColorRight.toString()
+                        .substring(0, 6);
+            }
+
+            public void setCustomColorRight(String hex) {
+                this.customColorRight = Color.valueOf(hex);
             }
 
             @JsonIgnore
@@ -2912,7 +2963,9 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
-                EventManager.instance.subscribe(this, Event.STEREO_K_CMD, Event.STEREO_IPD_CMD, Event.STEREO_SCREEN_DIST_CMD);
+                EventManager.instance.subscribe(this, Event.STEREO_K_CMD, Event.STEREO_IPD_CMD, Event.STEREO_SCREEN_DIST_CMD,
+                                                Event.STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD,
+                                                Event.STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD);
             }
 
             @Override
@@ -2929,6 +2982,8 @@ public class Settings extends SettingsObject {
                     case STEREO_K_CMD -> this.k = (double) data[0];
                     case STEREO_IPD_CMD -> this.ipd = (double) data[0];
                     case STEREO_SCREEN_DIST_CMD -> this.screenDistance = (double) data[0];
+                    case STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD -> this.customColorLeft = (Color) data[0];
+                    case STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD -> this.customColorRight = (Color) data[0];
                 }
             }
         }
@@ -3676,7 +3731,8 @@ public class Settings extends SettingsObject {
                             try {
                                 mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase(Locale.ROOT));
                             } catch (IllegalArgumentException e) {
-                                logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
+                                logger.error(
+                                        "Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
                             }
                         } else {
                             mode = (ScreenshotMode) newMode;
@@ -3726,7 +3782,8 @@ public class Settings extends SettingsObject {
 
         @Override
         protected void setupListeners() {
-            EventManager.instance.subscribe(this, Event.CONFIG_FRAME_OUTPUT_CMD, Event.FRAME_OUTPUT_CMD, Event.FRAME_OUTPUT_MODE_CMD);
+            EventManager.instance.subscribe(this, Event.CONFIG_FRAME_OUTPUT_CMD, Event.FRAME_OUTPUT_CMD,
+                                            Event.FRAME_OUTPUT_MODE_CMD);
         }
 
         @Override
@@ -3753,7 +3810,8 @@ public class Settings extends SettingsObject {
                             try {
                                 mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase(Locale.ROOT));
                             } catch (IllegalArgumentException e) {
-                                logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
+                                logger.error(
+                                        "Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
                             }
                         } else {
                             mode = (ScreenshotMode) newMode;
@@ -3949,10 +4007,13 @@ public class Settings extends SettingsObject {
                         reprojection.active = (Boolean) data[0];
                         reprojection.mode = (ReprojectionMode) data[1];
                     }
-                    case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
-                    case CONTRAST_CMD -> levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
+                    case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS,
+                                                                               Constants.MAX_BRIGHTNESS);
+                    case CONTRAST_CMD ->
+                            levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
                     case HUE_CMD -> levels.hue = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
-                    case SATURATION_CMD -> levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
+                    case SATURATION_CMD -> levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION,
+                                                                               Constants.MAX_SATURATION);
                     case GAMMA_CMD -> levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
                     case TONEMAPPING_TYPE_CMD -> {
                         ToneMapping newTM;
@@ -3963,8 +4024,8 @@ public class Settings extends SettingsObject {
                         }
                         toneMapping.type = newTM;
                     }
-                    case EXPOSURE_CMD ->
-                            toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+                    case EXPOSURE_CMD -> toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE,
+                                                                                      Constants.MAX_EXPOSURE);
                     case UPSCALE_FILTER_CMD -> upscaleFilter = (UpscaleFilter) data[0];
                     default -> {
                     }
@@ -4013,9 +4074,12 @@ public class Settings extends SettingsObject {
         @Override
         protected void setupListeners() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD,
-                                            Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
-                                            Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD,
-                                            Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD, Event.FILM_GRAIN_CMD,
+                                            Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD,
+                                            Event.BRIGHTNESS_CMD,
+                                            Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD,
+                                            Event.TONEMAPPING_TYPE_CMD,
+                                            Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
+                                            Event.FILM_GRAIN_CMD,
                                             Event.ANTIALIASING_CMD, Event.FXAA_QUALITY_CMD);
 
             antialiasing.setupListeners();
