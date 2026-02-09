@@ -25,6 +25,7 @@ import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.TextUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.validator.DirectoryNameValidator;
 
@@ -192,6 +193,7 @@ public class FileChooser extends GenericDialog {
 
         // Text input with current location
         location = new OwnTextField("", skin);
+        location.setErrorColor(ColorUtils.gRedC);
         location.setWidth(710f);
         location.setAlignment(Align.left);
         location.addListener(event -> {
@@ -200,13 +202,19 @@ public class FileChooser extends GenericDialog {
                     Path locPath = Path.of(location.getText());
                     if (Files.exists(locPath) && Files.isDirectory(locPath)) {
                         previousDir = currentDir;
-                        changeDirectory(locPath);
+                        changeDirectory(locPath, location.getText());
                         GaiaSky.postRunnable(() -> {
                             stage.setKeyboardFocus(location);
                             location.setCursorPosition(location.getText().length());
+                            location.setToRegularColor();
                         });
+                    } else {
+                        location.setToErrorColor();
                     }
+                } catch (InvalidPathException ignored) {
+                    location.setToErrorColor();
                 } catch (IOException e) {
+                    location.setToErrorColor();
                     logger.error(e);
                 }
                 return true;
@@ -404,6 +412,18 @@ public class FileChooser extends GenericDialog {
     }
 
     private void changeDirectory(Path directory) throws IOException {
+        changeDirectory(directory, null);
+    }
+
+    /**
+     * Changes the directory to the current path, with the given text (if any).
+     *
+     * @param directory Path to the directory.
+     * @param text      The text, if necessary. May be null.
+     *
+     * @throws IOException If an I/O exception occurs.
+     */
+    private void changeDirectory(Path directory, String text) throws IOException {
         Path lastDir = directory != currentDir ? currentDir : null;
         currentDir = directory;
         String path = currentDir.toAbsolutePath().toString();
@@ -412,7 +432,7 @@ public class FileChooser extends GenericDialog {
         while (path.length() * maxPathLength > scrollPaneWidth * 0.9f) {
             path = TextUtils.capString(path, path.length() - 4, true);
         }
-        location.setText(path);
+        location.setText(text != null && !text.isBlank() ? text : path);
 
         final Array<FileListItem> items = new Array<>();
 
