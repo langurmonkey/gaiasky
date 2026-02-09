@@ -12,13 +12,18 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.Logger.Log;
 
 /**
  * Helper to generate and inject FreeType fonts into the Gaia Sky skin.
  */
-public class FontFactory {
+public class FontFactory implements Disposable {
     private static final Log logger = Logger.getLogger(FontFactory.class);
+
+    private FreeTypeFontGenerator uiGen;
+    private FreeTypeFontGenerator monoGen;
+    private FreeTypeFontGenerator titleGen;
 
     /** Western languages character set (Spanish, Catala, German, French, Italian, Slovenian, Turkish, Russian, Bulgarian). **/
     public static final String COMMON_CHARS = """
@@ -30,58 +35,45 @@ public class FontFactory {
             ±∓×·÷√∑∫∮¬∝∞≠≈⇔↔≪≫≤≥°ℏÅ⊙☉☼☀¶ß©®£€¼½¾²³čžšČŽŠ„“"
             """;
 
-    /** Common 3500 simplified Chinese characters. **/
-    public static final String CHINESE_CHARS = loadChineseChars();
-    private static String loadChineseChars() {
-        try {
-            return Gdx.files.internal("fonts/sc-chars.txt").readString("utf-8");
-        } catch (Exception e) {
-            // Fallback to a very basic set if file is missing
-            return """
-                    的一是在不了有和人这中大为上个国我以要他时来用们生到作地于出就
-                    分对成会可主发年样能下过子说产种面而方最后多分业意宣由本事其里所去
-                    前用后方种形想看起得定法通性都题那现把事此物则明实各自本形理道才
-                    外正其公向情者意果其见之问第此由也机由
-                    """;
-        }
-    }
-
-    public static void generateFonts(Skin skin, String lang) {
+    public void generateFonts(Skin skin, String lang) {
         long start = System.currentTimeMillis();
         boolean isChinese = lang.startsWith("zh");
 
-        // Prepare Generators
+        // Prepare Generators.
         String uiFontPath = isChinese ? "fonts/NotoSansSC-Regular.ttf" : "fonts/InterDisplay-Regular.ttf";
         String monoFontPath = isChinese ? "fonts/NotoSansSC-Regular.ttf" : "fonts/LiberationMono-Bold.ttf";
         String titleFontPath = "fonts/InterDisplay-Bold.ttf";
         String titleBigFontPath = "fonts/Ethnocentric-Regular.ttf";
 
-        FreeTypeFontGenerator uiGen = new FreeTypeFontGenerator(Gdx.files.internal(uiFontPath));
-        FreeTypeFontGenerator monoGen = new FreeTypeFontGenerator(Gdx.files.internal(monoFontPath));
-        FreeTypeFontGenerator titleGen = new FreeTypeFontGenerator(Gdx.files.internal(titleFontPath));
+        uiGen = new FreeTypeFontGenerator(Gdx.files.internal(uiFontPath));
+        monoGen = new FreeTypeFontGenerator(Gdx.files.internal(monoFontPath));
+        titleGen = new FreeTypeFontGenerator(Gdx.files.internal(titleFontPath));
         FreeTypeFontGenerator titleBigGen = new FreeTypeFontGenerator(Gdx.files.internal(titleBigFontPath));
 
         FreeTypeFontParameter params = new FreeTypeFontParameter();
         params.hinting = FreeTypeFontGenerator.Hinting.AutoMedium;
         params.magFilter = TextureFilter.Linear;
         params.minFilter = TextureFilter.Linear;
-        params.incremental = isChinese;
+        // Common characters.
+        params.characters = COMMON_CHARS;
+        // Chinese characters are loaded on-demand (incremental).
+        if (isChinese) {
+            params.incremental = true;
+            FreeTypeFontGenerator.setMaxTextureSize(1024);
+        }
 
-        // Add Chinese characters to the generation set if needed
-        params.characters = COMMON_CHARS + (isChinese ? CHINESE_CHARS : "");
-
-        // Generate UI Fonts
+        // Generate UI Fonts.
         int[] uiSizes = {15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 33};
         for (int size : uiSizes) {
             params.size = size;
             skin.add("ui-" + size, uiGen.generateFont(params));
         }
 
-        // Generate Title Fonts
+        // Generate Title Fonts.
         // Only use Ethnocentric for non-Chinese. For Chinese, use bold UI font.
         int[] titleSizes = {17, 20, 21, 23, 25, 27, 30, 40, 60};
         if (isChinese) {
-            // Re-use UI generator for titles in Chinese
+            // Re-use UI generator for titles in Chinese.
             for (int size : titleSizes) {
                 params.size = size;
                 skin.add("title-" + size, uiGen.generateFont(params));
@@ -93,32 +85,41 @@ public class FontFactory {
             }
         }
 
-        // Generate mono fonts
+        // Generate mono fonts.
         params.mono = true;
         params.size = 22; // default mono
         skin.add("mono", monoGen.generateFont(params));
         params.size = 32; // mono-big
         skin.add("mono-big", monoGen.generateFont(params));
 
-        // Generate distance field Font
+        // Generate distance field Font.
         FreeTypeFontParameter sdfParams = new FreeTypeFontParameter();
         // The key settings for Distance Field
         if (isChinese) {
-            sdfParams.size = 32; // Base size for the SDF generation
-            sdfParams.renderCount = 3; // Quality of the distance field
+            sdfParams.size = 32; // Base size for the SDF generation.
+            sdfParams.renderCount = 3; // Quality of the distance field.
             skin.add("font-distance-field", uiGen.generateFont(sdfParams));
         } else {
-            // For English/Latin, load your existing static SDF font
+            // For English/Latin, load your existing static SDF font.
             skin.add("font-distance-field", new BitmapFont(Gdx.files.internal("skins/fonts/font-distance-field.fnt")));
         }
 
-        // Cleanup
-        if (!params.incremental) {
+        // Cleanup only big titles.
+        titleBigGen.dispose();
+
+        logger.info("Font generation for [" + lang + "] took " + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    public void dispose() {
+        if (uiGen != null) {
             uiGen.dispose();
+        }
+        if (monoGen != null) {
             monoGen.dispose();
+        }
+        if (titleGen != null) {
             titleGen.dispose();
         }
 
-        logger.info("Font generation for [" + lang + "] took " + (System.currentTimeMillis() - start) + "ms");
     }
 }

@@ -1110,7 +1110,14 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         }
 
         // OpenXR context.
-        if (xrDriver != null) xrDriver.dispose();
+        if (xrDriver != null) {
+            xrDriver.dispose();
+        }
+
+        // Global resources.
+        if (globalResources != null) {
+            globalResources.dispose();
+        }
 
         // Write session log.
         CrashReporter.writeLastSessionLog(logger);

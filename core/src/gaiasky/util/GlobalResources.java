@@ -13,7 +13,6 @@ import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -21,7 +20,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger.Log;
@@ -50,10 +49,11 @@ import java.util.stream.Stream;
 /**
  * Contains resources that don't change during the runtime of the application.
  */
-public class GlobalResources {
+public class GlobalResources implements Disposable {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
     private static final Vector3D aux = new Vector3D();
     private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
+    private final FontFactory fontFactory;
     // Global all-purpose sprite batch.
     private final SpriteBatch spriteBatch;
     // Sprite batch using int indices.
@@ -97,14 +97,16 @@ public class GlobalResources {
 
         // ExtSprite shader
         var extSpriteShader = new ExtShaderProgram("spritebatch",
-                                                    ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl")),
-                                                    ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.fragment.glsl")));
+                                                   ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl")),
+                                                   ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.fragment.glsl")));
         if (!extSpriteShader.isCompiled()) {
             logger.info("ExtSpriteBatch shader compilation failed: " + extSpriteShader.getLog());
         }
         // Sprite batch
         this.extSpriteBatch = new ExtSpriteBatch(1000, extSpriteShader);
 
+        // Init font factory and skin.
+        this.fontFactory = new FontFactory();
         initSkin();
     }
 
@@ -782,7 +784,7 @@ public class GlobalResources {
 
         // Inject fonts programmatically.
         String locale = I18n.locale.getLanguage();
-        FontFactory.generateFonts(skin, locale);
+        fontFactory.generateFonts(skin, locale);
 
         // Load the JSON (now it finds the injected fonts by name)
         skin.load(Gdx.files.internal("skins/default/default.json"));
@@ -817,6 +819,13 @@ public class GlobalResources {
     public void resize(int width, int height) {
         if (spriteBatch != null) {
             spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        if (fontFactory != null) {
+            fontFactory.dispose();
         }
     }
 }
