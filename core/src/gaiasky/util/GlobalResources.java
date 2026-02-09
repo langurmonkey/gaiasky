@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -776,12 +777,17 @@ public class GlobalResources {
     }
 
     private void initSkin() {
-        FileHandle fh = Gdx.files.internal("skins/default/default.json");
-        setSkin(new Skin(fh));
-        ObjectMap<String, BitmapFont> fonts = getSkin().getAll(BitmapFont.class);
-        for (String key : fonts.keys()) {
-            fonts.get(key).getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        }
+        var skin = new Skin();
+        skin.addRegions(new TextureAtlas(Gdx.files.internal("skins/default/default.atlas")));
+
+        // Inject fonts programmatically.
+        String locale = I18n.locale.getLanguage();
+        FontFactory.generateFonts(skin, locale);
+
+        // Load the JSON (now it finds the injected fonts by name)
+        skin.load(Gdx.files.internal("skins/default/default.json"));
+
+        setSkin(skin);
     }
 
     public ShaderProgram getShapeShader() {

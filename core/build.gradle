@@ -201,6 +201,7 @@ tasks.register('copyToLib') {
         delete project.distLib + '/conf'
         delete project.distLib + '/data'
         delete project.distLib + '/font'
+        delete project.distLib + '/fonts'
         delete project.distLib + '/i18n'
         delete project.distLib + '/icon'
         delete project.distLib + '/img'

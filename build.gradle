@@ -122,9 +122,14 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
+        // gdx-freetype
+        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        runtimeOnly "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+
         // gdx-controllers:2.+ bases up on SDL 2.0.12
         implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
         implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
+
 
         // Ashley
         implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
@@ -197,8 +202,7 @@ project(":core") {
                     "Main-Class": "gaiasky.desktop.GaiaSkyDesktop"
         }
         from("../assets") {
-            include "font/font-distance-field.fnt"
-            include "font/font-distance-field.png"
+            include "fonts/**"
             include "icon/gs_icon_256.png"
             include "icon/gs_round_256.png"
             include "icon/gsvr_round_256.png"

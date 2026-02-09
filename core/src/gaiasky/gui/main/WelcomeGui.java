@@ -765,7 +765,8 @@ public class WelcomeGui extends AbstractGui {
 
         // Add to center container
         centerContainer.add(center)
-                .center();
+                .center().row();
+        centerContainer.add(new OwnLabel("的一是在不了有和人这", skin));
 
         // Enabled DATASETS
         datasetsContainer = new Table(skin);
