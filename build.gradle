@@ -41,22 +41,44 @@ allprojects {
     }
 }
 
+// Fetch git info method.
+def fetchGitInfo(List<String> cmd) {
+    try {
+        // Handle Windows shell requirement if necessary
+        def finalCmd = cmd
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            finalCmd = ["cmd", "/c"] + cmd
+        }
+
+        def pb = new ProcessBuilder(finalCmd)
+        pb.directory(rootDir)
+        def proc = pb.start()
+
+        // Use text.trim() but handle empty streams gracefully
+        def output = proc.inputStream.text.trim()
+        proc.waitForOrKill(5000)
+
+        return proc.exitValue() == 0 ? output : null
+    } catch (Exception e) {
+        // Only shows if the command itself can't start
+        println "DEBUG: Native Process failed: ${e.message}"
+        return null
+    }
+}
+def gitTag = fetchGitInfo(['git', 'describe', '--abbrev=0', '--tags', 'HEAD']) ?: "unknown"
+def gitRev = fetchGitInfo(['git', 'rev-parse', '--short', 'HEAD']) ?: "???"
+
 project(":core") {
     apply plugin: "java-library"
 
-    def cmd = "git describe --abbrev=0 --tags HEAD"
-    def proc = cmd.execute()
-    project.ext.tag = proc.text.trim()
-
-    cmd = "git rev-parse --short HEAD"
-    proc = cmd.execute()
-    project.ext.rev = proc.text.trim()
+    project.ext.tag = gitTag
+    project.ext.rev = gitRev
 
     if (DefaultNativePlatform.currentOperatingSystem.windows) {
         project.ext.system = DefaultNativePlatform.currentOperatingSystem.getName() + " " + DefaultNativePlatform.currentArchitecture.getName()
     } else {
-        cmd = "uname -snmr"
-        proc = cmd.execute()
+        def cmd = "uname -snmr"
+        def proc = cmd.execute()
         project.ext.system = proc.text.trim()
     }
 
