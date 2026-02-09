@@ -905,7 +905,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         ColorPicker cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
         cloudColor.setSize(128f, 128f);
         cloudColor.setNewColorRunnable(() -> {
-            float[] col = cloudColor.getPickedColor();
+            float[] col = cloudColor.getPickedColorArray();
             clc.color[0] = col[0];
             clc.color[1] = col[1];
             clc.color[2] = col[2];
@@ -1080,7 +1080,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         // Fog color
         ColorPicker fogColor = new ColorPicker(new float[]{ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f}, stage, skin);
         fogColor.setNewColorRunnable(() -> {
-            float[] col = fogColor.getPickedColor();
+            float[] col = fogColor.getPickedColorArray();
             ac.fogColor.x = col[0];
             ac.fogColor.y = col[1];
             ac.fogColor.z = col[2];

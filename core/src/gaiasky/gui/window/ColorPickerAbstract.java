@@ -7,6 +7,7 @@
 
 package gaiasky.gui.window;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -25,7 +26,7 @@ public abstract class ColorPickerAbstract extends Image {
         this.stage = stage;
     }
 
-    protected abstract void initialize();
+    protected abstract void initialize(boolean showAlpha);
 
     protected void initColor() {
         if (color == null || color.length != 4) {
@@ -33,8 +34,16 @@ public abstract class ColorPickerAbstract extends Image {
         }
     }
 
-    public float[] getPickedColor() {
+    public float[] getPickedColorArray() {
         return color;
+    }
+
+    public Color getPickedColor() {
+        return new Color(color[0], color[1], color[2], color[3]);
+    }
+
+    public void setPickedColor(Color color) {
+        setPickedColor(color.r, color.g, color.b, color.a);
     }
 
     public void setPickedColor(float[] color) {

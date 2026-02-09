@@ -169,7 +169,7 @@ public class SceneContextMenu extends ContextMenu {
                                                                getStage());
                     dialog.setAcceptListener(() -> {
                         double size = dialog.units.getSelected().unit.toKm(dialog.size.getDoubleValue(1)) * 2.0;
-                        float[] color = dialog.color.getPickedColor();
+                        float[] color = dialog.color.getPickedColorArray();
                         String shape = dialog.shape.getSelected().shape.toString();
                         String primitive = dialog.primitive.getSelected().primitive.toString();
                         String orientation = dialog.orientation.getSelected().orientation.toString();

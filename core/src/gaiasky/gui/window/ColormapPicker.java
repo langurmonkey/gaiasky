@@ -82,7 +82,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         this.drawableColor = skin.getDrawable("white");
         this.drawableColormap = skin.getDrawable("iconic-star");
         this.view = new FocusView();
-        initialize();
+        initialize(true);
     }
 
     public ColormapPicker(float[] rgba,
@@ -113,7 +113,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         return cmapList.get(index).getFirst();
     }
 
-    protected void initialize() {
+    protected void initialize(boolean unused) {
 
         this.addListener(new ClickListener() {
             public boolean touchDown(InputEvent event,

@@ -9,6 +9,7 @@ package gaiasky.gui.window;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
@@ -31,17 +32,21 @@ import java.util.Arrays;
 public class ColorPicker extends ColorPickerAbstract {
 
     public ColorPicker(Stage stage, Skin skin) {
+        this(stage, skin, true);
+    }
+
+    public ColorPicker(Stage stage, Skin skin, boolean showAlpha) {
         super(I18n.msg("gui.colorpicker.title"), stage, skin);
         this.skin = skin;
         this.stage = stage;
-        initialize();
+        initialize(showAlpha);
     }
 
     public ColorPicker(String name, Stage stage, Skin skin) {
         super(name, stage, skin);
         this.skin = skin;
         this.stage = stage;
-        initialize();
+        initialize(true);
     }
 
     public ColorPicker(float[] rgba, Stage stage, Skin skin) {
@@ -49,19 +54,29 @@ public class ColorPicker extends ColorPickerAbstract {
         setPickedColor(rgba);
     }
 
+    public ColorPicker(Color color, Stage stage, Skin skin) {
+        this(stage, skin);
+        setPickedColor(color);
+    }
+
+    public ColorPicker(Color color, Stage stage, Skin skin, boolean showAlpha) {
+        this(stage, skin, showAlpha);
+        setPickedColor(color);
+    }
+
     public ColorPicker(String name, float[] rgba, Stage stage, Skin skin) {
         this(name, stage, skin);
         setPickedColor(rgba);
     }
 
-    protected void initialize() {
+    protected void initialize(boolean showAlpha) {
         this.addListener(event -> {
             if (event instanceof InputEvent ie) {
                 Type type = ie.getType();
                 // Click
                 if ((type == Type.touchDown) && (ie.getButton() == Buttons.LEFT)) {
                     // Launch color picker window
-                    ColorPickerDialog cpd = new ColorPickerDialog(name, color, stage, skin);
+                    ColorPickerDialog cpd = new ColorPickerDialog(name, color, showAlpha, stage, skin);
                     cpd.setAcceptListener(() -> {
                         // Set color and run runnable, if any
                         setPickedColor(cpd.color);
@@ -97,8 +112,9 @@ public class ColorPicker extends ColorPickerAbstract {
         private OwnSlider[] sliders;
         private Image newColorImage;
         private boolean changeEvents = true;
+        private boolean showAlpha = true;
 
-        public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
+        public ColorPickerDialog(String elementName, float[] color, boolean showAlpha, Stage stage, Skin skin) {
             super(I18n.msg("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
             this.cpd = this;
             this.color = new float[4];
@@ -107,6 +123,7 @@ public class ColorPicker extends ColorPickerAbstract {
             this.color[1] = color[1];
             this.color[2] = color[2];
             this.color[3] = color[3];
+            this.showAlpha = showAlpha;
 
             this.nf = new DecimalFormat("0.00");
 
@@ -115,6 +132,10 @@ public class ColorPicker extends ColorPickerAbstract {
             setModal(true);
 
             buildSuper();
+        }
+
+        public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
+           this(elementName, color, true, stage, skin);
         }
 
         public ColorPickerDialog(float[] color, Stage stage, Skin skin) {
@@ -200,7 +221,7 @@ public class ColorPicker extends ColorPickerAbstract {
                     for (float b = 0f; b <= 1f; b += 0.3333f) {
                         Image c = new Image(skin.getDrawable("white"));
                         c.setColor(r, g, b, a);
-                        final float[] pick = new float[] { r, g, b, a };
+                        final float[] pick = new float[]{r, g, b, a};
                         c.addListener(new ClickListener() {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {
@@ -256,9 +277,11 @@ public class ColorPicker extends ColorPickerAbstract {
             content.add(sBlue).left().padRight(pad18).padBottom(pad18);
             content.add(tBlue).padBottom(pad18).row();
 
-            content.add(new OwnLabel(I18n.msg("gui.colorpicker.alpha"), skin)).padRight(pad18).padBottom(pad18);
-            content.add(sAlpha).left().padRight(pad18).padBottom(pad18);
-            content.add(tAlpha).padBottom(pad18).row();
+            if (showAlpha) {
+                content.add(new OwnLabel(I18n.msg("gui.colorpicker.alpha"), skin)).padRight(pad18).padBottom(pad18);
+                content.add(sAlpha).left().padRight(pad18).padBottom(pad18);
+                content.add(tAlpha).padBottom(pad18).row();
+            }
 
             content.add(new OwnLabel(I18n.msg("gui.colorpicker.hex"), skin)).padRight(pad18).padBottom(pad18);
             content.add(hexfield).colspan(2).left().padBottom(pad18).row();

@@ -128,8 +128,8 @@ void main() {
         float rightLum = luma(rightFrag.rgb);
 
         // Apply the custom colors as filters
-        vec3 leftFinal = rightLum * u_customColorRight.rgb;
-        vec3 rightFinal = leftLum * u_customColorLeft.rgb;
+        vec3 leftFinal = leftLum * u_customColorLeft.rgb;
+        vec3 rightFinal =  rightLum * u_customColorRight.rgb;
 
         // Combine using additive blending (standard for anaglyph)
         fragColor = vec4(clamp(leftFinal + rightFinal, 0.0, 1.0), 1.0);

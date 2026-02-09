@@ -269,7 +269,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         if (ci.hasParticleAttributes()) {
             ColormapPicker cmp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
             cmp.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
-            cmp.setNewColorRunnable(() -> ci.setHlColor(cmp.getPickedColor()));
+            cmp.setNewColorRunnable(() -> ci.setHlColor(cmp.getPickedColorArray()));
             cmp.setNewColormapRunnable(() -> ci.setHlColormap(cmp.getPickedCmapIndex(),
                                                               cmp.getPickedCmapAttribute(),
                                                               cmp.getPickedCmapMin(),
@@ -278,7 +278,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         } else {
             ColorPicker clp = new ColorPicker(ci.name, ci.hlColor, stage, skin);
             clp.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
-            clp.setNewColorRunnable(() -> ci.setHlColor(clp.getPickedColor()));
+            clp.setNewColorRunnable(() -> ci.setHlColor(clp.getPickedColorArray()));
             cp = clp;
         }
         colorMap.put(ci.name, cp);

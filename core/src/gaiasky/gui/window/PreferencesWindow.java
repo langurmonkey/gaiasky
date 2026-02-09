@@ -129,7 +129,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
-    private ColorPicker pointerGuidesColor;
+    private ColorPicker pointerGuidesColor, anaglyphCustomLeft, anaglyphCustomRight;
     private OwnLabel tessQualityLabel;
     private Cell<?> noticeHiResCell;
     private Table controllersTable;
@@ -1944,7 +1944,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
         accentColor = new ColorPicker(Settings.settings.program.ui.accentColor, stage, skin);
         accentColor.setNewColorRunnable(() -> {
-            EventManager.publish(Event.UI_ACCENT_COLOR_CMD, accentColor, accentColor.getPickedColor());
+            EventManager.publish(Event.UI_ACCENT_COLOR_CMD, accentColor, accentColor.getPickedColorArray());
         });
 
         // SCALING
@@ -3211,8 +3211,27 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
+        // Anaglyph custom colors
+        var customColorsLabel = new OwnLabel(I18n.msg("gui.stereo.anaglyph.custom"), skin);
+        // Left
+        anaglyphCustomLeft = new ColorPicker(Settings.settings.program.modeStereo.customColorLeft, stage, skin);
+        anaglyphCustomLeft.setNewColorRunnable(() -> {
+            EventManager.publish(Event.STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD, anaglyphCustomLeft, anaglyphCustomLeft.getPickedColor());
+        });
 
-        labels.add(stereoKLabel, ipdLabel, screenDistLabel);
+        // Right
+        anaglyphCustomRight = new ColorPicker(Settings.settings.program.modeStereo.customColorRight, stage, skin);
+        anaglyphCustomRight.setNewColorRunnable(() -> {
+            EventManager.publish(Event.STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD, anaglyphCustomRight, anaglyphCustomRight.getPickedColor());
+        });
+        // Table
+        var customColorsTable = new Table(skin);
+        customColorsTable.add(new OwnLabel(I18n.msg("gui.left"), skin)).left().padRight(pad18);
+        customColorsTable.add(anaglyphCustomLeft).left().padRight(pad34 * 2f);
+        customColorsTable.add(new OwnLabel(I18n.msg("gui.right"), skin)).left().padRight(pad18);
+        customColorsTable.add(anaglyphCustomRight).left().padRight(pad34);
+
+        labels.add(stereoKLabel, ipdLabel, screenDistLabel, customColorsLabel);
 
         // Add to table
         stereoTable.add(stereoKLabel)
@@ -3248,6 +3267,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         stereoTable.add(screenDistance)
                 .left()
                 .fillX()
+                .padBottom(pad18)
+                .row();
+        stereoTable.add(customColorsLabel)
+                .left()
+                .padRight(pad34)
+                .padBottom(pad18);
+        stereoTable.add(customColorsTable)
+                .left()
                 .padBottom(pad18)
                 .row();
 
@@ -4206,7 +4233,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.POINTER_GUIDES_CMD,
                              this,
                              pointerGuides.isChecked(),
-                             pointerGuidesColor.getPickedColor(),
+                             pointerGuidesColor.getPickedColorArray(),
                              pointerGuidesWidth.getMappedValue());
 
         // Recursive grid
