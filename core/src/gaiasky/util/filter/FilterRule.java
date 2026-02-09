@@ -76,12 +76,12 @@ public class FilterRule {
 
     public IComparator getComparatorFromString(String c) {
         return switch (c) {
-            default -> new ComparatorG();
             case ">=" -> new ComparatorGeq();
             case "<" -> new ComparatorL();
             case "<=" -> new ComparatorLeq();
             case "==" -> new ComparatorEq();
             case "!=" -> new ComparatorNeq();
+            default -> new ComparatorG();
         };
     }
 

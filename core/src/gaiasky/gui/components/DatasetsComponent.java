@@ -250,21 +250,16 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         if (ci.isHighlightable()) {
             controls.add(visibilityButton).padRight(pad6);
             controls.add(highlightButton).padRight(pad30);
-
             controls.add(visualSettingsButton).padRight(pad6);
             if (ci.hasParticleAttributes()) {
                 controls.add(filtersButton).padRight(pad6);
             }
-            controls.add(transformsButton).padRight(pad30);
-
-            controls.add(infoButton).padRight(pad6);
-            controls.add(rubbishButton);
         } else {
             controls.add(visibilityButton).padRight(pad30);
-            controls.add(transformsButton).padRight(pad30);
-            controls.add(infoButton).padRight(pad6);
-            controls.add(rubbishButton);
         }
+        controls.add(transformsButton).padRight(pad30);
+        controls.add(infoButton).padRight(pad6);
+        controls.add(rubbishButton);
 
         // Dataset table
         Table t = new Table(skin);
