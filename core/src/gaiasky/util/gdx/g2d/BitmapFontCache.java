@@ -21,6 +21,8 @@ import com.badlogic.gdx.utils.*;
 import gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
 import net.jafama.FastMath;
 
+import java.util.Arrays;
+
 import static gaiasky.util.gdx.g2d.GlyphLayout.GlyphRun;
 
 /**
@@ -55,6 +57,34 @@ public class BitmapFontCache {
     private IntArray[] pageGlyphIndices;
     /** Used internally to ensure a correct capacity for multi-page font vertex data. */
     private int[] tempGlyphCount;
+
+    public BitmapFontCache(com.badlogic.gdx.graphics.g2d.BitmapFontCache cache, BitmapFont font) {
+        this.font = font;
+        for (var gl : layouts) {
+            this.layouts.add(gl);
+        }
+        this.color.set(cache.getColor());
+        this.integer = cache.usesIntegerPositions();
+        this.glyphCount = layouts.size;
+        this.x = cache.getX();
+        this.y = cache.getY();
+        this.currentTint = Color.WHITE.toFloatBits();
+        int pageCount = font.regions.size;
+        this.pageVertices = new float[pageCount][];
+        for (int p = 0; p < pageCount; p++) {
+            if (cache.getVertices(p) != null)
+                this.pageVertices[p] = Arrays.copyOf(cache.getVertices(p), cache.getVertices(p).length);
+            else this.pageVertices[p] = null;
+        }
+        this.idx = new int[pageCount];
+        if (pageCount > 1) {
+            // Contains the indices of the glyph in the cache as they are added.
+            pageGlyphIndices = new IntArray[pageCount];
+            for (int i = 0, n = pageGlyphIndices.length; i < n; i++)
+                pageGlyphIndices[i] = new IntArray();
+        }
+        tempGlyphCount = new int[pageCount];
+    }
 
     public BitmapFontCache(BitmapFont font) {
         this(font, font.usesIntegerPositions());

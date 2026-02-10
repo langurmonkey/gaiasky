@@ -225,6 +225,9 @@ project(":core") {
         }
         from("../assets") {
             include "fonts/**"
+            include "fonts/**/*.md"
+            exclude "fonts/chars"
+            exclude "fonts/src"
             include "icon/gs_icon_256.png"
             include "icon/gs_round_256.png"
             include "icon/gsvr_round_256.png"

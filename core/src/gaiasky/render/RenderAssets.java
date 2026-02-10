@@ -58,13 +58,13 @@ public class RenderAssets {
             mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation,
             mbPixelLightingDepthTessellation, mbSkybox, mbAtmosphere, mbCloud;
     public ComputeShaderProgram galGenShader;
-    public BitmapFont fontDistanceFiled;
+    public BitmapFont fontDistanceField;
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
             variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
             billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
 
-    private boolean compute;
+    private final boolean compute;
 
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
@@ -441,7 +441,7 @@ public class RenderAssets {
         mbCloud = new IntModelBatch(cloud);
 
         // Fonts - all of these are distance field fonts
-        fontDistanceFiled = manager.get("skins/fonts/font-distance-field.fnt");
+        fontDistanceField = manager.get("skins/fonts/font-distance-field.fnt");
 
         // Sprites
         spriteBatch = globalResources.getExtSpriteBatch();

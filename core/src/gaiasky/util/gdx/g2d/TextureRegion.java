@@ -36,6 +36,16 @@ public class TextureRegion {
     public TextureRegion() {
     }
 
+    public TextureRegion(com.badlogic.gdx.graphics.g2d.TextureRegion region) {
+        this.texture = region.getTexture();
+        this.u = region.getU();
+        this.v = region.getV();
+        this.u2 = region.getU2();
+        this.v2 = region.getV2();
+        this.regionHeight = region.getRegionHeight();
+        this.regionWidth = region.getRegionWidth();
+    }
+
     /** Constructs a region the size of the specified texture. */
     public TextureRegion(Texture texture) {
         if (texture == null)

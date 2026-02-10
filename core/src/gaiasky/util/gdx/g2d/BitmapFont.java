@@ -67,13 +67,25 @@ public class BitmapFont implements Disposable {
     boolean integer;
     private boolean ownsTexture;
 
+    public BitmapFont(com.badlogic.gdx.graphics.g2d.BitmapFont font) {
+        this.data = new BitmapFontData(font.getData());
+        this.regions = new Array<>();
+        for (var r : font.getRegions()) {
+            this.regions.add(new TextureRegion(r));
+        }
+        this.cache = new BitmapFontCache(font.getCache(), this);
+        this.flipped = font.isFlipped();
+        this.integer = font.usesIntegerPositions();
+        this.ownsTexture = font.ownsTexture();
+    }
+
     /**
      * Creates a BitmapFont using the default 15pt Arial font included in the libgdx JAR file. This is convenient to easily
      * display text without bothering without generating a bitmap font yourself.
      */
     public BitmapFont() {
         this(Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.fnt"), Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.png"),
-                false, true);
+             false, true);
     }
 
     /**
@@ -84,7 +96,7 @@ public class BitmapFont implements Disposable {
      */
     public BitmapFont(boolean flip) {
         this(Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.fnt"), Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.png"),
-                flip, true);
+             flip, true);
     }
 
     /**
@@ -205,14 +217,6 @@ public class BitmapFont implements Disposable {
         load(data);
     }
 
-    static int indexOf(CharSequence text, char ch, int start) {
-        final int n = text.length();
-        for (; start < n; start++)
-            if (text.charAt(start) == ch)
-                return start;
-        return n;
-    }
-
     protected void load(BitmapFontData data) {
         for (Glyph[] page : data.glyphs) {
             if (page == null)
@@ -255,7 +259,7 @@ public class BitmapFont implements Disposable {
      * @see BitmapFontCache#addText(CharSequence, float, float, int, int, float, int, boolean, String)
      */
     public GlyphLayout draw(ExtBatch batch, CharSequence str, float x, float y, int start, int end, float targetWidth, int halign,
-            boolean wrap) {
+                            boolean wrap) {
         cache.clear();
         GlyphLayout layout = cache.addText(str, x, y, start, end, targetWidth, halign, wrap);
         cache.draw(batch);
@@ -268,7 +272,7 @@ public class BitmapFont implements Disposable {
      * @see BitmapFontCache#addText(CharSequence, float, float, int, int, float, int, boolean, String)
      */
     public GlyphLayout draw(ExtBatch batch, CharSequence str, float x, float y, int start, int end, float targetWidth, int halign,
-            boolean wrap, String truncate) {
+                            boolean wrap, String truncate) {
         cache.clear();
         GlyphLayout layout = cache.addText(str, x, y, start, end, targetWidth, halign, wrap, truncate);
         cache.draw(batch);
@@ -479,6 +483,26 @@ public class BitmapFont implements Disposable {
         public byte[][] kerning;
         public boolean fixedWidth;
 
+        public Glyph() {
+        }
+
+        public Glyph(com.badlogic.gdx.graphics.g2d.BitmapFont.Glyph g) {
+            this.fixedWidth = g.fixedWidth;
+            this.kerning = g.kerning;
+            this.id = g.id;
+            this.xadvance = g.xadvance;
+            this.u2 = g.u2;
+            this.width = g.width;
+            this.height = g.height;
+            this.page = g.page;
+            this.srcX = g.srcX;
+            this.srcY = g.srcY;
+            this.v = g.v;
+            this.v2 = g.v2;
+            this.xoffset = g.xoffset;
+            this.yoffset = g.yoffset;
+        }
+
         /** The index to the texture page that holds this glyph. */
         public int page = 0;
 
@@ -548,15 +572,54 @@ public class BitmapFont implements Disposable {
 
         /** Additional characters besides whitespace where text is wrapped. Eg, a hyphen (-). */
         public char[] breakChars;
-        public char[] xChars = { 'x', 'e', 'a', 'o', 'n', 's', 'r', 'c', 'u', 'm', 'v', 'w', 'z' };
-        public char[] capChars = { 'M', 'N', 'B', 'D', 'C', 'E', 'F', 'K', 'A', 'G', 'H', 'I', 'J', 'L', 'O', 'P', 'Q', 'R', 'S',
-                'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+        public char[] xChars = {'x', 'e', 'a', 'o', 'n', 's', 'r', 'c', 'u', 'm', 'v', 'w', 'z'};
+        public char[] capChars = {'M', 'N', 'B', 'D', 'C', 'E', 'F', 'K', 'A', 'G', 'H', 'I', 'J', 'L', 'O', 'P', 'Q', 'R', 'S',
+                'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
         /**
          * Creates an empty BitmapFontData for configuration before calling {@link #load(FileHandle, boolean)}, to subclass, or to
          * populate yourself, e.g. using stb-truetype or FreeType.
          */
         public BitmapFontData() {
+        }
+
+        public BitmapFontData(com.badlogic.gdx.graphics.g2d.BitmapFont.BitmapFontData data) {
+            for (int i = 0; i < this.glyphs.length; i++) {
+                if (data.glyphs[i] != null) {
+                    this.glyphs[i] = new Glyph[data.glyphs[i].length];
+                    for (int j = 0; j < this.glyphs[i].length; j++) {
+                        var gg = data.glyphs[i][j];
+                        if (gg != null) {
+                            var g = new Glyph(gg);
+                            this.glyphs[i][j] = g;
+                        } else {
+                            this.glyphs[i][j] = null;
+                        }
+                    }
+                } else {
+                    this.glyphs[i] = null;
+                }
+            }
+            this.imagePaths = data.imagePaths;
+            this.fontFile = data.fontFile;
+            this.scaleX = data.scaleX;
+            this.scaleY = data.scaleY;
+            this.ascent = data.ascent;
+            this.blankLineScale = data.blankLineScale;
+            this.breakChars = data.breakChars;
+            this.capChars = data.capChars;
+            this.capHeight = data.capHeight;
+            this.down = data.down;
+            this.padLeft = data.padLeft;
+            this.padBottom = data.padBottom;
+            this.padRight = data.padRight;
+            this.padTop = data.padTop;
+            this.lineHeight = data.lineHeight;
+            this.markupEnabled = data.markupEnabled;
+            this.flipped = data.flipped;
+            this.missingGlyph = new Glyph(data.missingGlyph);
+            this.xChars = data.xChars;
+            this.xHeight = data.xHeight;
         }
 
         public BitmapFontData(FileHandle fontFile, boolean flip) {
@@ -964,13 +1027,13 @@ public class BitmapFont implements Disposable {
 
         public boolean isWhitespace(char c) {
             switch (c) {
-            case '\n':
-            case '\r':
-            case '\t':
-            case ' ':
-                return true;
-            default:
-                return false;
+                case '\n':
+                case '\r':
+                case '\t':
+                case ' ':
+                    return true;
+                default:
+                    return false;
             }
         }
 

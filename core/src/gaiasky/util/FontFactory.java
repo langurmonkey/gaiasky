@@ -8,7 +8,6 @@ package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -24,6 +23,7 @@ public class FontFactory implements Disposable {
     private FreeTypeFontGenerator uiGen;
     private FreeTypeFontGenerator monoGen;
     private FreeTypeFontGenerator titleGen;
+    private FreeTypeFontGenerator titleBigGen;
 
     /** Western languages character set (Spanish, Catala, German, French, Italian, Slovenian, Turkish, Russian, Bulgarian). **/
     public static final String COMMON_CHARS = """
@@ -36,22 +36,27 @@ public class FontFactory implements Disposable {
             """;
 
     public void generateFonts(Skin skin, String lang) {
+        // Dispose old generators.
+        dispose();
+
+        // Timing.
         long start = System.currentTimeMillis();
-        boolean isChinese = lang.startsWith("zh");
 
         // Prepare Generators.
-        String uiFontPath = isChinese ? "fonts/NotoSansSC-Regular.ttf" : "fonts/InterDisplay-Regular.ttf";
-        String monoFontPath = isChinese ? "fonts/NotoSansSC-Regular.ttf" : "fonts/LiberationMono-Bold.ttf";
-        String titleFontPath = "fonts/InterDisplay-Bold.ttf";
+        boolean isChinese = lang.startsWith("zh");
+        String uiFontPath = isChinese ? "fonts/NotoSansSC-Regular-Subset.ttf" : "fonts/InterDisplay-Regular.ttf";
+        String monoFontPath = isChinese ? "fonts/NotoSansSC-Regular-Subset.ttf" : "fonts/LiberationMono-Bold.ttf";
+        String titleFontPath = isChinese ? "fonts/NotoSansSC-Bold-Subset.ttf" : "fonts/InterDisplay-Bold.ttf";
         String titleBigFontPath = "fonts/Ethnocentric-Regular.ttf";
 
-        uiGen = new FreeTypeFontGenerator(Gdx.files.internal(uiFontPath));
         monoGen = new FreeTypeFontGenerator(Gdx.files.internal(monoFontPath));
         titleGen = new FreeTypeFontGenerator(Gdx.files.internal(titleFontPath));
-        FreeTypeFontGenerator titleBigGen = new FreeTypeFontGenerator(Gdx.files.internal(titleBigFontPath));
+        titleBigGen = new FreeTypeFontGenerator(Gdx.files.internal(titleBigFontPath));
+        uiGen = new FreeTypeFontGenerator(Gdx.files.internal(uiFontPath));
 
         FreeTypeFontParameter params = new FreeTypeFontParameter();
-        params.hinting = FreeTypeFontGenerator.Hinting.AutoMedium;
+        params.mono = false;
+        params.hinting = FreeTypeFontGenerator.Hinting.Slight;
         params.magFilter = TextureFilter.Linear;
         params.minFilter = TextureFilter.Linear;
         // Common characters.
@@ -70,42 +75,20 @@ public class FontFactory implements Disposable {
         }
 
         // Generate Title Fonts.
-        // Only use Ethnocentric for non-Chinese. For Chinese, use bold UI font.
+        // Use Ethnocentric only for size 60.
         int[] titleSizes = {17, 20, 21, 23, 25, 27, 30, 40, 60};
-        if (isChinese) {
-            // Re-use UI generator for titles in Chinese.
-            for (int size : titleSizes) {
-                params.size = size;
-                skin.add("title-" + size, uiGen.generateFont(params));
-            }
-        } else {
-            for (int size : titleSizes) {
-                params.size = size;
-                skin.add("title-" + size, size < 60 ? titleGen.generateFont(params) : titleBigGen.generateFont(params));
-            }
+        for (int size : titleSizes) {
+            params.size = size;
+            skin.add("title-" + size, size < 60 ? titleGen.generateFont(params) : titleBigGen.generateFont(params));
         }
 
         // Generate mono fonts.
         params.mono = true;
+        params.kerning = false;
         params.size = 22; // default mono
         skin.add("mono", monoGen.generateFont(params));
         params.size = 32; // mono-big
         skin.add("mono-big", monoGen.generateFont(params));
-
-        // Generate distance field Font.
-        FreeTypeFontParameter sdfParams = new FreeTypeFontParameter();
-        // The key settings for Distance Field
-        if (isChinese) {
-            sdfParams.size = 32; // Base size for the SDF generation.
-            sdfParams.renderCount = 3; // Quality of the distance field.
-            skin.add("font-distance-field", uiGen.generateFont(sdfParams));
-        } else {
-            // For English/Latin, load your existing static SDF font.
-            skin.add("font-distance-field", new BitmapFont(Gdx.files.internal("skins/fonts/font-distance-field.fnt")));
-        }
-
-        // Cleanup only big titles.
-        titleBigGen.dispose();
 
         logger.info("Font generation for [" + lang + "] took " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -120,6 +103,8 @@ public class FontFactory implements Disposable {
         if (titleGen != null) {
             titleGen.dispose();
         }
-
+        if (titleBigGen != null) {
+            titleBigGen.dispose();
+        }
     }
 }

@@ -381,7 +381,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                               alphas,
                                               renderAssets.fontBatch,
                                               renderAssets.distanceFieldFontShader,
-                                              renderAssets.fontDistanceFiled);
+                                              renderAssets.fontDistanceField);
             case BILLBOARD_SSO -> {
                 system = new BillboardRenderer(this,
                                                BILLBOARD_SSO,
