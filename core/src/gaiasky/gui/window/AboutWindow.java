@@ -124,7 +124,7 @@ public class AboutWindow extends GenericDialog {
 
         var versionBig = new OwnLabel(Settings.settings.version.version,
                                       skin,
-                                      "mono-big");
+                                      "msg-33");
         var build = new OwnLabel(I18n.msg("gui.build",
                                           Settings.settings.version.build),
                                  skin,

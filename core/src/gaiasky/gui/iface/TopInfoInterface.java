@@ -72,15 +72,15 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
 
-        date = new ClickableLabel(I18n.msg("gui.top.date.ut"), skin, "mono", () -> EventManager.publish(Event.SHOW_DATE_TIME_EDIT_ACTION, this));
+        date = new ClickableLabel(I18n.msg("gui.top.date.ut"), skin, "default", () -> EventManager.publish(Event.SHOW_DATE_TIME_EDIT_ACTION, this));
         date.setName("label date tii");
         date.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
-        time = new ClickableLabel(I18n.msg("gui.top.time.ut"), skin, "mono", () -> EventManager.publish(Event.SHOW_DATE_TIME_EDIT_ACTION, this));
+        time = new ClickableLabel(I18n.msg("gui.top.time.ut"), skin, "default", () -> EventManager.publish(Event.SHOW_DATE_TIME_EDIT_ACTION, this));
         time.setName("label time tii");
         time.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
-        pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "mono");
+        pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "default");
         pace.setName("pace tii");
 
         // Datetime table.
@@ -90,19 +90,19 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         timeTable.add(pace).center();
 
 
-        focus = new OwnLabel("", skin, "mono");
+        focus = new OwnLabel("", skin, "default");
         focus.setName("focus tii");
         focus.setColor(ColorUtils.gGreenC);
 
-        s1 = new OwnLabel("|", skin, "mono");
+        s1 = new OwnLabel("|", skin, "default");
 
-        closest = new OwnLabel("", skin, "mono");
+        closest = new OwnLabel("", skin, "default");
         closest.setName("closest tii");
         closest.setColor(ColorUtils.gBlueC);
 
-        OwnLabel s2 = new OwnLabel("|", skin, "mono");
+        OwnLabel s2 = new OwnLabel("|", skin, "default");
 
-        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(Settings.settings.scene.homeObject), maxNameLen)), skin, "mono");
+        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(Settings.settings.scene.homeObject), maxNameLen)), skin, "default");
         home.setName("home tii");
         home.setColor(ColorUtils.aOrangeC);
 

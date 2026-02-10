@@ -93,7 +93,7 @@ public class BookmarkInfoDialog extends GenericDialog {
                 content.add(bookmarkSettings).pad(pad, 0, pad20, pad).left().padBottom(pad10).minWidth(minWidth).row();
 
                 // UUID
-                OwnLabel bookmarkUUID = new OwnLabel(stringToString(bookmark.uuid), skin, bookmark.uuid != null ? "mono-pink" : "default");
+                OwnLabel bookmarkUUID = new OwnLabel(stringToString(bookmark.uuid), skin, bookmark.uuid != null ? "default-pink" : "default");
                 content.add(new OwnLabel(I18n.msg("gui.bookmark.info.location.settings.id"), skin, "header-s")).left().padRight(pad34).padBottom(pad10).minWidth(minWidth);
                 content.add(bookmarkUUID).pad(pad, 0, pad20, pad).left().padBottom(pad10).minWidth(minWidth).row();
 

@@ -41,11 +41,9 @@ public class FontFactory implements Disposable {
 
         // Prepare Generators.
         String uiFontPath = "fonts/SarasaUiSC-Regular-Subset.ttf";
-        String monoFontPath = "fonts/SarasaMonoSC-Regular-Subset.ttf";
         String titleFontPath = "fonts/SarasaUiSC-Bold-Subset.ttf";
         String titleBigFontPath = "fonts/Ethnocentric-Regular.ttf";
 
-        monoGen = new FreeTypeFontGenerator(Gdx.files.internal(monoFontPath));
         titleGen = new FreeTypeFontGenerator(Gdx.files.internal(titleFontPath));
         titleBigGen = new FreeTypeFontGenerator(Gdx.files.internal(titleBigFontPath));
         uiGen = new FreeTypeFontGenerator(Gdx.files.internal(uiFontPath));
@@ -76,21 +74,12 @@ public class FontFactory implements Disposable {
             skin.add("title-" + size, size < 60 ? titleGen.generateFont(params) : titleBigGen.generateFont(params));
         }
 
-        // Generate mono fonts.
-        params.size = 22; // default mono
-        skin.add("mono", monoGen.generateFont(params));
-        params.size = 32; // mono-big
-        skin.add("mono-big", monoGen.generateFont(params));
-
         logger.info("Font generation for [" + lang + "] took " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public void dispose() {
         if (uiGen != null) {
             uiGen.dispose();
-        }
-        if (monoGen != null) {
-            monoGen.dispose();
         }
         if (titleGen != null) {
             titleGen.dispose();

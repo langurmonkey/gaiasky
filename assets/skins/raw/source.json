@@ -893,14 +893,6 @@
       "font": "ui-28",
       "fontColor": "white"
     },
-    "mono": {
-      "font": "mono",
-      "fontColor": "white"
-    },
-    "mono-big": {
-      "font": "mono-big",
-      "fontColor": "white"
-    },
     "menuitem-shortcut": {
       "font": "ui-20",
       "fontColor": "grey"
@@ -973,14 +965,6 @@
     "main-title-xs": {
       "font": "title-20",
       "fontColor": "white"
-    },
-    "mono-pink": {
-      "font": "mono",
-      "fontColor": "pink"
-    },
-    "mono-pink-big": {
-      "font": "mono-big",
-      "fontColor": "pink"
     },
     "msg-15": {
       "font": "ui-15",
@@ -1082,13 +1066,6 @@
     "disabled-nobg": {
       "selection": "selection",
       "font": "ui-20",
-      "fontColor": "white",
-      "messageFontColor": "dark-gray",
-      "cursor": "cursor"
-    },
-    "monospace-txt": {
-      "selection": "selection",
-      "font": "mono",
       "fontColor": "white",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"

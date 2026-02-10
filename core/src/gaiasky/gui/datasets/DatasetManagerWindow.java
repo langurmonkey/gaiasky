@@ -820,22 +820,22 @@ public class DatasetManagerWindow extends GenericDialog {
             // Status.
             OwnLabel status = null;
             if (mode == DatasetMode.AVAILABLE) {
-                status = new OwnLabel(I18n.msg("gui.download.available"), skin, "mono");
+                status = new OwnLabel(I18n.msg("gui.download.available"), skin, "default");
             } else if (mode == DatasetMode.INSTALLED) {
                 if (dataset.baseData || dType.equals("texture-pack")) {
                     // Always enabled.
-                    status = new OwnLabel(I18n.msg("gui.download.enabled"), skin, "mono");
+                    status = new OwnLabel(I18n.msg("gui.download.enabled"), skin, "default");
                 } else if (dataset.minGsVersion > Settings.SOURCE_VERSION) {
                     // Notify version mismatch.
                     status = new OwnLabel(I18n.msg("gui.download.version.gs.mismatch.short",
                                                    Integer.toString(Settings.SOURCE_VERSION),
-                                                   Integer.toString(dataset.minGsVersion)), skin, "mono");
+                                                   Integer.toString(dataset.minGsVersion)), skin, "default");
                     status.setColor(ColorUtils.gRedC);
                 } else {
                     // Notify status.
                     List<String> currentSetting = Settings.settings.data.dataFiles;
                     boolean enabled = DatasetDownloadUtils.isPathIn(dataset.catalogFile.path(), currentSetting);
-                    status = new OwnLabel(I18n.msg(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
+                    status = new OwnLabel(I18n.msg(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "default");
                 }
             }
 
@@ -948,11 +948,11 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
                 filesString = filesString.replace(dataLocation, Constants.DATA_LOCATION_TOKEN);
             }
-            var files = new OwnLabel(filesString, skin, "mono");
+            var files = new OwnLabel(filesString, skin, "default");
 
             // Data location.
             var dataLocationNoteString = Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location;
-            var dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin, "mono-pink");
+            var dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin, "default-pink");
             dataLocationNote.addListener(new OwnTextTooltip(dataLocationNoteString, skin, 10));
 
             infoTable.add(desc).top().left().padBottom(pad34).row();

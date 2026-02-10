@@ -108,7 +108,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
 
         prompt = new OwnLabel(">", skin, "header");
 
-        input = new OwnTextField("", skin, "monospace-txt");
+        input = new OwnTextField("", skin, "msg-22");
 
         input.addListener((event) -> {
             if (event instanceof InputEvent ie && this.getParent() != null) {
@@ -269,7 +269,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     }
 
     private void addMessageWidget(Message msg) {
-        var status = new OwnLabel(msg.type().getCodeString(), getSkin(), "mono");
+        var status = new OwnLabel(msg.type().getCodeString(), getSkin(), "default");
         status.addListener(new OwnTextTooltip(msg.type().getNameString(), getSkin()));
         status.setColor(msg.type().getTagColor());
         var message = constructMessage(msg);
@@ -345,7 +345,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             segments++;
         }
         if (segments == 0) {
-            var actor = new OwnLabel(TextUtils.breakCharacters(msg.msg(), maxLen), getSkin(), "mono");
+            var actor = new OwnLabel(TextUtils.breakCharacters(msg.msg(), maxLen), getSkin(), "default");
             actor.setColor(msg.type().getMsgColor());
             return actor;
         } else {
@@ -356,7 +356,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private HorizontalGroup addTextLabel(String str, Table vg, HorizontalGroup hg, Color col) {
         if (str.indexOf('\n') < 0) {
             // No breaks.
-            var text = new OwnLabel(str, getSkin(), "mono");
+            var text = new OwnLabel(str, getSkin(), "default");
             text.setColor(col);
             hg.addActor(text);
         } else {
@@ -365,7 +365,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             int idx;
             while ((idx = part.indexOf('\n')) >= 0) {
                 String pre = part.substring(0, idx);
-                var text = new OwnLabel(pre, getSkin(), "mono");
+                var text = new OwnLabel(pre, getSkin(), "default");
                 text.setColor(col);
                 hg.addActor(text);
                 // New horizontal group.
@@ -377,7 +377,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             }
             // Last chunk.
             if (!part.isEmpty()) {
-                var text = new OwnLabel(part, getSkin(), "mono");
+                var text = new OwnLabel(part, getSkin(), "default");
                 text.setColor(col);
                 hg.addActor(text);
             }

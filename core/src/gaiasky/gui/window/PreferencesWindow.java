@@ -2572,7 +2572,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 .padRight(pad34)
                 .padBottom(pad10);
         controls.add(new OwnLabel(GSKeys.toString(Keys.UP)
-                                          .toUpperCase(Locale.ROOT), skin, "mono-pink"))
+                                          .toUpperCase(Locale.ROOT), skin, "default-pink"))
                 .padBottom(pad10)
                 .left()
                 .row();
@@ -2581,7 +2581,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 .padRight(pad34)
                 .padBottom(pad10);
         controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN)
-                                          .toUpperCase(Locale.ROOT), skin, "mono-pink"))
+                                          .toUpperCase(Locale.ROOT), skin, "default-pink"))
                 .padBottom(pad10)
                 .left()
                 .row();
@@ -2590,7 +2590,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 .padRight(pad34)
                 .padBottom(pad10);
         controls.add(new OwnLabel(GSKeys.toString(Keys.LEFT)
-                                          .toUpperCase(Locale.ROOT), skin, "mono-pink"))
+                                          .toUpperCase(Locale.ROOT), skin, "default-pink"))
                 .padBottom(pad10)
                 .left()
                 .row();
@@ -2599,13 +2599,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 .padRight(pad34)
                 .padBottom(pad10);
         controls.add(new OwnLabel(GSKeys.toString(Keys.RIGHT)
-                                          .toUpperCase(Locale.ROOT), skin, "mono-pink"))
+                                          .toUpperCase(Locale.ROOT), skin, "default-pink"))
                 .padBottom(pad10)
                 .left()
                 .row();
 
         // Controls
-        boolean plus = false;
         for (String[] action : data) {
             HorizontalGroup keysGroup = new HorizontalGroup();
             keysGroup.space(pad10);
@@ -2614,7 +2613,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 for (int k = 0; k < keys.length; k++) {
                     keysGroup.addActor(new OwnLabel(keys[k].trim()
                                                             .replace('_', '-')
-                                                            .replace("PL", "+"), skin, "mono-pink"));
+                                                            .replace("PL", "+"), skin, "default-pink"));
                     if (k < keys.length - 1)
                         keysGroup.addActor(new OwnLabel("+", skin));
                 }
@@ -3822,7 +3821,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private Label getRequiresRestartLabel() {
-        OwnLabel restart = new OwnLabel("*", skin, "mono-pink-big");
+        OwnLabel restart = new OwnLabel("*", skin, "header-red");
         restart.addListener(new OwnTextTooltip(I18n.msg("gui.restart"), skin));
         return restart;
     }
