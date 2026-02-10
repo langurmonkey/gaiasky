@@ -20,10 +20,7 @@ import gaiasky.util.Logger.Log;
 public class FontFactory implements Disposable {
     private static final Log logger = Logger.getLogger(FontFactory.class);
 
-    private FreeTypeFontGenerator uiGen;
-    private FreeTypeFontGenerator monoGen;
-    private FreeTypeFontGenerator titleGen;
-    private FreeTypeFontGenerator titleBigGen;
+    private FreeTypeFontGenerator uiGen, monoGen, titleGen, titleBigGen, interGen, notoGen;
 
     /** Western languages character set (Spanish, Catala, German, French, Italian, Slovenian, Turkish, Russian, Bulgarian). **/
     public static final String COMMON_CHARS = """
@@ -43,10 +40,9 @@ public class FontFactory implements Disposable {
         long start = System.currentTimeMillis();
 
         // Prepare Generators.
-        boolean isChinese = lang.startsWith("zh");
-        String uiFontPath = isChinese ? "fonts/NotoSansSC-Regular-Subset.ttf" : "fonts/InterDisplay-Regular.ttf";
-        String monoFontPath = isChinese ? "fonts/NotoSansSC-Regular-Subset.ttf" : "fonts/LiberationMono-Bold.ttf";
-        String titleFontPath = isChinese ? "fonts/NotoSansSC-Bold-Subset.ttf" : "fonts/InterDisplay-Bold.ttf";
+        String uiFontPath = "fonts/SarasaUiSC-Regular-Subset.ttf";
+        String monoFontPath = "fonts/SarasaMonoSC-Regular-Subset.ttf";
+        String titleFontPath = "fonts/SarasaUiSC-Bold-Subset.ttf";
         String titleBigFontPath = "fonts/Ethnocentric-Regular.ttf";
 
         monoGen = new FreeTypeFontGenerator(Gdx.files.internal(monoFontPath));
@@ -62,10 +58,8 @@ public class FontFactory implements Disposable {
         // Common characters.
         params.characters = COMMON_CHARS;
         // Chinese characters are loaded on-demand (incremental).
-        if (isChinese) {
-            params.incremental = true;
-            FreeTypeFontGenerator.setMaxTextureSize(1024);
-        }
+        params.incremental = true;
+        FreeTypeFontGenerator.setMaxTextureSize(1024);
 
         // Generate UI Fonts.
         int[] uiSizes = {15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 33};
@@ -83,8 +77,6 @@ public class FontFactory implements Disposable {
         }
 
         // Generate mono fonts.
-        params.mono = true;
-        params.kerning = false;
         params.size = 22; // default mono
         skin.add("mono", monoGen.generateFont(params));
         params.size = 32; // mono-big

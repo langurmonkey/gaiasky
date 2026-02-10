@@ -1243,7 +1243,7 @@ public class WelcomeGui extends AbstractGui {
         switch (event) {
             case UI_RELOAD_CMD -> {
                 GaiaSky.postRunnable(() -> {
-                    GlobalResources globalResources = GaiaSky.instance.getGlobalResources();
+                    var globalResources = (GlobalResources) data[0];
                     // Reinitialise GUI system
                     GenericDialog.updatePads();
                     // UI theme reload broadcast

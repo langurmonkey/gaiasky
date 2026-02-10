@@ -778,6 +778,9 @@ public class GlobalResources implements Disposable {
 
     }
 
+    /**
+     * Initializes the skin for the given locale.
+     */
     private void initSkin() {
         var skin = new Skin();
         skin.addRegions(new TextureAtlas(Gdx.files.internal("skins/default/default.atlas")));
