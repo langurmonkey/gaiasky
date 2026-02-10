@@ -47,9 +47,9 @@ public class I18nFormatter {
         Path p0 = i18nDir.resolve(args[0]);
         Path p1 = i18nDir.resolve(args[1]);
         File f0 = p0.toFile();
-        File f1 = p1.toFile();
+        File outFile = p1.toFile();
 
-        if (checkFile(f0) || checkFile(f1)) {
+        if (checkFile(f0) || checkFile(outFile)) {
             return;
         }
 
@@ -59,7 +59,7 @@ public class I18nFormatter {
             CommentedProperties props0 = new CommentedProperties();
             props0.load(isr0);
 
-            FileInputStream fis1 = new FileInputStream(f1);
+            FileInputStream fis1 = new FileInputStream(outFile);
             InputStreamReader isr1 = new InputStreamReader(fis1, StandardCharsets.UTF_8);
             Properties props1 = new Properties();
             props1.load(isr1);
@@ -75,9 +75,15 @@ public class I18nFormatter {
             for (Object key : keys) {
                 var originalVal = props0.getProperty((String) key);
                 var val = props1.getProperty((String) key);
-                if (val != null && !val.equals(originalVal)) {
-                    // Substitute value
-                    outputProperties.setProperty((String) key, val);
+                if (val != null) {
+                    if (!val.equals(originalVal)) {
+                        // Substitute value
+                        outputProperties.setProperty((String) key, val);
+                    } else {
+                        // Keep it (1), or comment it (2).
+                        //outputProperties.setProperty((String) key, val);
+                        missing.put((String) key, TextUtils.escape(props0.getProperty((String) key)));
+                    }
                 } else {
                     // Use default (English), commented
                     log.error("Property not found: " + key);
@@ -86,8 +92,6 @@ public class I18nFormatter {
             }
 
             // Store result
-            //File outFile = new File(args[1].substring(0, args[1].contains(".") ? args[1].lastIndexOf(".") : args[1].length()) + ".mod.properties");
-            File outFile = f1;
             Files.deleteIfExists(outFile.toPath());
 
             FileOutputStream fos1 = new FileOutputStream(outFile, true);
