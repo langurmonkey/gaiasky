@@ -33,7 +33,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected OwnLabel date;
     protected SelectBox<String> cameraSpeedLimit;
     protected SelectBox<CameraComboBoxBean> cameraMode;
-    protected OwnSliderPlus fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
+    protected OwnSliderReset fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
     protected CheckBox focusLock, orientationLock, cinematic;
     protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonMaster;
     protected OwnImageButton recCamera, recKeyframeCamera, playCamera;
@@ -269,7 +269,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
         }
 
-        fieldOfView = new OwnSliderPlus(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_TINY, skin);
+        fieldOfView = new OwnSliderReset(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_TINY, 45f, skin);
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(componentWidth);
@@ -330,8 +330,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeedLimit.setSelectedIndex(Settings.settings.scene.camera.speedLimitIndex);
 
         // CAMERA SPEED
-        cameraSpeed = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED,
-                                        Constants.MAX_CAM_SPEED, skin);
+        cameraSpeed = new OwnSliderReset(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED,
+                                        Constants.MAX_CAM_SPEED, 10f, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(componentWidth);
         cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
@@ -344,8 +344,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // ROTATION SPEED
-        rotateSpeed = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED,
-                                        Constants.MAX_ROT_SPEED, skin);
+        rotateSpeed = new OwnSliderReset(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED,
+                                        Constants.MAX_ROT_SPEED, 5000f, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(componentWidth);
         rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
@@ -358,8 +358,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // TURNING SPEED
-        turnSpeed = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED,
-                                      Constants.MAX_TURN_SPEED, skin);
+        turnSpeed = new OwnSliderReset(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED,
+                                      Constants.MAX_TURN_SPEED, 1060f, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(componentWidth);
         turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);

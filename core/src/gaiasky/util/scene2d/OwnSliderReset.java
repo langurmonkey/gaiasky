@@ -8,6 +8,7 @@
 package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -108,7 +109,6 @@ public class OwnSliderReset extends Table implements Disableable {
         slider.setLogarithmicExponent(exp);
     }
 
-
     private void setResetValue(Float value) {
         this.resetValue = value;
 
@@ -135,6 +135,12 @@ public class OwnSliderReset extends Table implements Disableable {
             resetButton.remove();
             resetButton = null;
         }
+    }
+
+    @Override
+    public boolean addListener (EventListener listener) {
+        // The listeners should go to the underlying slider.
+        return slider.addListener(listener);
     }
 
     // Delegate all OwnSliderPlus methods

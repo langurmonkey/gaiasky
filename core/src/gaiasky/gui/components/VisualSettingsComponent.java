@@ -21,7 +21,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.scene2d.OwnSliderPlus;
+import gaiasky.util.scene2d.OwnSliderReset;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 import org.yaml.snakeyaml.Yaml;
@@ -33,8 +33,7 @@ import java.util.Map;
 
 public class VisualSettingsComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(VisualSettingsComponent.class);
-    private OwnSliderPlus starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
-    private OwnSliderPlus ambientLight, labelSize, lineWidth, elevMult;
+    private OwnSliderReset starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, ambientLight, labelSize, lineWidth, elevMult;
 
     public VisualSettingsComponent(Skin skin,
                                    Stage stage) {
@@ -44,8 +43,8 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     @Override
     public void initialize(float componentWidth) {
         /* Star brightness */
-        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY,
-                Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
+        starBrightness = new OwnSliderReset(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY,
+                                            Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, 2.22f, skin);
         starBrightness.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.info"), skin));
         starBrightness.setWidth(componentWidth);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
@@ -58,8 +57,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star brightness power */
-        magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW,
-                Constants.SLIDER_STEP_TINY, skin);
+        magnitudeMultiplier = new OwnSliderReset(I18n.msg("gui.star.brightness.pow"),
+                                                 Constants.MIN_STAR_BRIGHTNESS_POW,
+                                                 Constants.MAX_STAR_BRIGHTNESS_POW,
+                                                 Constants.SLIDER_STEP_TINY,
+                                                 1f,
+                                                 skin);
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(componentWidth);
         magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
@@ -72,8 +75,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star glow factor */
-        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR,
-                Constants.SLIDER_STEP_TINY * 0.1f, skin);
+        starGlowFactor = new OwnSliderReset(I18n.msg("gui.star.glowfactor"),
+                                            Constants.MIN_STAR_GLOW_FACTOR,
+                                            Constants.MAX_STAR_GLOW_FACTOR,
+                                            Constants.SLIDER_STEP_TINY * 0.1f,
+                                            0.075f,
+                                            skin);
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
         starGlowFactor.setWidth(componentWidth);
         starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
@@ -86,7 +93,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Point size */
-        pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
+        pointSize = new OwnSliderReset(I18n.msg("gui.star.size"),
+                                       Constants.MIN_STAR_POINT_SIZE,
+                                       Constants.MAX_STAR_POINT_SIZE,
+                                       Constants.SLIDER_STEP_TINY,
+                                       3f,
+                                       skin);
         pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
         pointSize.setWidth(componentWidth);
         pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
@@ -99,7 +111,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star min opacity */
-        starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
+        starBaseLevel = new OwnSliderReset(I18n.msg("gui.star.opacity"),
+                                           Constants.MIN_STAR_MIN_OPACITY,
+                                           Constants.MAX_STAR_MIN_OPACITY,
+                                           Constants.SLIDER_STEP_TINY,
+                                           0f,
+                                           skin);
         starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
         starBaseLevel.setWidth(componentWidth);
         starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
@@ -112,7 +129,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Ambient light */
-        ambientLight = new OwnSliderPlus(I18n.msg("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
+        ambientLight = new OwnSliderReset(I18n.msg("gui.light.ambient"),
+                                          Constants.MIN_AMBIENT_LIGHT,
+                                          Constants.MAX_AMBIENT_LIGHT,
+                                          Constants.SLIDER_STEP_TINY,
+                                          0f,
+                                          skin);
         ambientLight.setWidth(componentWidth);
         ambientLight.setMappedValue(Settings.settings.scene.renderer.ambient);
         ambientLight.addListener(event -> {
@@ -124,7 +146,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Label size */
-        labelSize = new OwnSliderPlus(I18n.msg("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
+        labelSize = new OwnSliderReset(I18n.msg("gui.label.size"),
+                                       Constants.MIN_LABEL_SIZE,
+                                       Constants.MAX_LABEL_SIZE,
+                                       Constants.SLIDER_STEP_TINY,
+                                       1.3f,
+                                       skin);
         labelSize.setWidth(componentWidth);
         labelSize.setMappedValue(Settings.settings.scene.label.size);
         labelSize.addListener(event -> {
@@ -137,8 +164,14 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Line width */
-        lineWidth = new OwnSliderPlus(I18n.msg("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY,
-                Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
+        lineWidth = new OwnSliderReset(I18n.msg("gui.line.width"),
+                                       Constants.MIN_LINE_WIDTH,
+                                       Constants.MAX_LINE_WIDTH,
+                                       Constants.SLIDER_STEP_TINY,
+                                       Constants.MIN_LINE_WIDTH,
+                                       Constants.MAX_LINE_WIDTH,
+                                       1f,
+                                       skin);
         lineWidth.setWidth(componentWidth);
         lineWidth.setMappedValue(Settings.settings.scene.renderer.line.width);
         lineWidth.addListener(event -> {
@@ -151,8 +184,12 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         });
 
         /* Elevation multiplier */
-        elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, Constants.SLIDER_STEP_TINY,
-                skin);
+        elevMult = new OwnSliderReset(I18n.msg("gui.elevation.multiplier"),
+                                      Constants.MIN_ELEVATION_MULT,
+                                      Constants.MAX_ELEVATION_MULT,
+                                      Constants.SLIDER_STEP_TINY,
+                                      1f,
+                                      skin);
         elevMult.setWidth(componentWidth);
         elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
         elevMult.addListener(event -> {
@@ -194,8 +231,16 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         component = lightingGroup;
 
-        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD,
-                Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.RESET_VISUAL_SETTINGS_DEFAULTS);
+        EventManager.instance.subscribe(this,
+                                        Event.STAR_POINT_SIZE_CMD,
+                                        Event.STAR_BRIGHTNESS_CMD,
+                                        Event.STAR_BRIGHTNESS_POW_CMD,
+                                        Event.STAR_GLOW_FACTOR_CMD,
+                                        Event.STAR_BASE_LEVEL_CMD,
+                                        Event.LABEL_SIZE_CMD,
+                                        Event.LINE_WIDTH_CMD,
+                                        Event.ELEVATION_MULTIPLIER_CMD,
+                                        Event.RESET_VISUAL_SETTINGS_DEFAULTS);
     }
 
     private void resetVisualSettingsDefaults(Object source) {
@@ -209,13 +254,14 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
             float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
             float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
             float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
-            float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(
-                    0)).floatValue();
+            float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).getFirst(
+            )).floatValue();
             float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
             float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
             float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("line")).get(
                     "width")).floatValue();
-            float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get(
+            float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get(
+                    "elevation")).get(
                     "multiplier")).floatValue();
 
             // Post events to reset all.
