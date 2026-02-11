@@ -91,11 +91,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnSelectBox<UpscaleFilter> upscaleFilter;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix,
-            frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle,
+            frameOutputFps, foWidthField, foHeightField, camRecFps,
             smResolution, maxFpsInput, evwField, evhField;
     private OwnSliderReset minimapSize, uiScale, lensFlare, bloomEffect, unsharpMask, chromaticAberration, filmGrain, svtCacheSize,
             backBufferScale, motionBlur, tessQuality, celestialSphereIndexOfRefraction, pointerGuidesWidth, lodTransitions, velocityVectors,
-            stereoK, ipd, screenDistance, screenshotQuality, frameQuality, pgResolution;
+            stereoK, ipd, screenDistance, screenshotQuality, frameQuality, pgResolution, cmResolution, plResolution, plAperture, plAngle;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber, tessQualityLabel;
@@ -488,7 +488,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             widthField.setWidth(inputSmallWidth);
             heightField = new OwnTextField("", skin, heightValidator);
             heightField.setWidth(inputSmallWidth);
-            final OwnLabel xLabel = new OwnLabel("x", skin);
+            final OwnLabel xLabel = new OwnLabel("×", skin);
             populateWidthHeight(false);
 
             windowedResolutions.add(widthField)
@@ -1814,7 +1814,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // Resolution
             OwnLabel pgResolutionLabel = new OwnLabel(I18n.msg("gui.ui.procedural.resolution"), skin);
             pgResolution = new OwnSliderReset("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, 1500f, skin);
-            pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
+            pgResolution.setValueLabelTransform((value) -> String.format("%d×%d", value.intValue() * 2, value.intValue()));
             pgResolution.setWidth(sliderWidth);
             pgResolution.setValue(settings.graphics.proceduralGenerationResolution[1]);
 
@@ -2719,7 +2719,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Quality
         OwnLabel ssQualityLabel = new OwnLabel(I18n.msg("gui.screenshots.quality"), skin);
         screenshotQuality = new OwnSliderReset("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY,
-                                              Constants.SLIDER_STEP, 93f, skin);
+                                               Constants.SLIDER_STEP, 93f, skin);
         screenshotQuality.setName("screenshot quality");
         screenshotQuality.setWidth(sliderWidth);
         screenshotQuality.setValue(settings.screenshot.quality * 100f);
@@ -2892,7 +2892,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Quality
         OwnLabel foQualityLabel = new OwnLabel(I18n.msg("gui.screenshots.quality"), skin);
         frameQuality = new OwnSliderReset("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY,
-                                         Constants.SLIDER_STEP, 93f, skin);
+                                          Constants.SLIDER_STEP, 93f, skin);
         frameQuality.setName("frame quality");
         frameQuality.setWidth(sliderWidth);
         frameQuality.setValue(settings.frame.quality * 100f);
@@ -3270,18 +3270,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Resolution
         OwnLabel cmResolutionLabel = new OwnLabel(I18n.msg("gui.360.resolution"), skin);
-        cmResolution = new OwnTextField(Integer.toString(settings.program.modeCubemap.faceResolution), skin,
-                                        new IntValidator(20, 15000));
-        cmResolution.setWidth(inputWidth);
+        cmResolution = new OwnSliderReset("", Constants.MIN_CUBEMAP_RES, Constants.MAX_CUBEMAP_RES, Constants.SLIDER_STEP, 1500f, skin);
+        cmResolution.setWidth(sliderWidth);
+        cmResolution.setValueLabelTransform((value) -> String.format("%d×%d", value.intValue(), value.intValue()));
+        cmResolution.setValue(settings.program.modeCubemap.faceResolution);
         cmResolution.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                if (cmResolution.isValid()) {
-                    plResolution.setText(cmResolution.getText());
-                }
+                plResolution.setValue(cmResolution.getValue());
                 return true;
             }
             return false;
         });
+        cmResolution.addListener(new OwnTextTooltip(I18n.msg("gui.360.resolution"), skin));
 
         // LABELS
         labels.add(cmResolutionLabel);
@@ -3312,44 +3312,48 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentPlanetarium.align(Align.top | Align.left);
 
         // Planetarium title
-        OwnLabel titlePlanetarium = new OwnLabel(I18n.msg("gui.planetarium"), skin, "header");
-        Table planetarium = new Table(skin);
+        var titlePlanetarium = new OwnLabel(I18n.msg("gui.planetarium"), skin, "header");
+        var planetarium = new Table(skin);
 
         // Aperture
-        OwnLabel apertureLabel = new OwnLabel(I18n.msg("gui.planetarium.aperture"), skin);
-        plAperture = new OwnTextField(Float.toString(settings.program.modeCubemap.planetarium.aperture), skin,
-                                      new FloatValidator(30, 360));
-        plAperture.setWidth(inputWidth);
+        var apertureLabel = new OwnLabel(I18n.msg("gui.planetarium.aperture"), skin);
+        plAperture = new OwnSliderReset("", Constants.MIN_PL_APERTURE, Constants.MAX_PL_APERTURE, Constants.SLIDER_STEP, 180f, skin);
+        plAperture.setValueLabelTransform((value) -> String.format("%.1f°", value));
+        plAperture.setValue(settings.program.modeCubemap.planetarium.aperture);
+        plAperture.setWidth(sliderWidth);
+        plAperture.addListener(new OwnTextTooltip(I18n.msg("gui.planetarium.aperture"), skin));
 
         // Skew angle
-        OwnLabel plAngleLabel = new OwnLabel(I18n.msg("gui.planetarium.angle"), skin);
-        plAngle = new OwnTextField(Float.toString(settings.program.modeCubemap.planetarium.angle), skin,
-                                   new FloatValidator(-180, 180));
-        plAngle.setWidth(inputWidth);
+        var plAngleLabel = new OwnLabel(I18n.msg("gui.planetarium.angle"), skin);
+        plAngle = new OwnSliderReset("", Constants.MIN_PL_ZENITH_ANGLE, Constants.MAX_PL_ZENITH_ANGLE, Constants.SLIDER_STEP, 50f, skin);
+        plAngle.setValueLabelTransform((value) -> String.format("%.1f°", value));
+        plAngle.setValue(settings.program.modeCubemap.planetarium.angle);
+        plAngle.setWidth(sliderWidth);
+        plAngle.addListener(new OwnTextTooltip(I18n.msg("gui.planetarium.angle"), skin));
 
         // Info
-        String plInfoStr = I18n.msg("gui.planetarium.info") + '\n';
+        var plInfoStr = I18n.msg("gui.planetarium.info") + '\n';
         ssLines = GlobalResources.countOccurrences(plInfoStr, '\n');
-        TextArea plInfo = new OwnTextArea(plInfoStr, skin, "info");
+        var plInfo = new OwnTextArea(plInfoStr, skin, "info");
         plInfo.setDisabled(true);
         plInfo.setPrefRows(ssLines + 1);
         plInfo.setWidth(taWidth);
         plInfo.clearListeners();
 
         // Resolution
-        OwnLabel plResolutionLabel = new OwnLabel(I18n.msg("gui.360.resolution"), skin);
-        plResolution = new OwnTextField(Integer.toString(settings.program.modeCubemap.faceResolution), skin,
-                                        new IntValidator(20, 15000));
-        plResolution.setWidth(inputWidth);
+        var plResolutionLabel = new OwnLabel(I18n.msg("gui.360.resolution"), skin);
+        plResolution = new OwnSliderReset("", Constants.MIN_CUBEMAP_RES, Constants.MAX_CUBEMAP_RES, Constants.SLIDER_STEP, 1500f, skin);
+        plResolution.setWidth(sliderWidth);
+        plResolution.setValueLabelTransform((value) -> String.format("%d×%d", value.intValue(), value.intValue()));
+        plResolution.setValue(settings.program.modeCubemap.faceResolution);
         plResolution.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                if (plResolution.isValid()) {
-                    cmResolution.setText(plResolution.getText());
-                }
+                cmResolution.setValue(plResolution.getValue());
                 return true;
             }
             return false;
         });
+        plResolution.addListener(new OwnTextTooltip(I18n.msg("gui.360.resolution"), skin));
 
         // LABELS
         labels.add(plResolutionLabel, plAngleLabel, plResolutionLabel);
@@ -4304,18 +4308,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.camrecorder.auto = cbAutoCamRec.isChecked();
 
         // Cubemap resolution (same as plResolution)
-        int newResolution = Integer.parseInt(cmResolution.getText());
+        int newResolution = (int) cmResolution.getValue();
         if (newResolution != settings.program.modeCubemap.faceResolution)
             EventManager.publish(Event.CUBEMAP_RESOLUTION_CMD, this, newResolution);
 
         // Planetarium aperture
-        float ap = Float.parseFloat(plAperture.getText());
+        float ap = plAperture.getValue();
         if (ap != settings.program.modeCubemap.planetarium.aperture) {
             EventManager.publish(Event.PLANETARIUM_APERTURE_CMD, this, ap);
         }
 
         // Planetarium angle
-        float pa = Float.parseFloat(plAngle.getText());
+        float pa = plAngle.getValue();
         if (pa != settings.program.modeCubemap.planetarium.angle) {
             EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, pa);
         }

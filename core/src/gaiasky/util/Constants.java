@@ -219,6 +219,13 @@ public class Constants {
     public static final float MAX_MINIMAP_SIZE = 350f;
     // Minimum minimap size (px)
     public static final float MIN_MINIMAP_SIZE = 150f;
+    public static final float MIN_CUBEMAP_RES = 400;
+    public static final float MAX_CUBEMAP_RES = 15000;
+    public static final float MIN_PL_APERTURE = 30f;
+    public static final float MAX_PL_APERTURE = 360f;
+    public static final float MIN_PL_ZENITH_ANGLE = -180f;
+    public static final float MAX_PL_ZENITH_ANGLE = 180f;
+
     // Separates the array of names when converted to a single string
     public static final String nameSeparatorRegex = "\\|";
     public static final String nameSeparator = "|";
