@@ -765,7 +765,8 @@ public class WelcomeGui extends AbstractGui {
 
         // Add to center container
         centerContainer.add(center)
-                .center();
+                .center().row();
+        centerContainer.add(new OwnLabel("木星土星天王星海王星冥王", skin)).center();
 
         // Enabled DATASETS
         datasetsContainer = new Table(skin);

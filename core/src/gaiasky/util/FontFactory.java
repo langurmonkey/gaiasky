@@ -48,6 +48,29 @@ public class FontFactory implements Disposable {
         titleBigGen = new FreeTypeFontGenerator(Gdx.files.internal(titleBigFontPath));
         uiGen = new FreeTypeFontGenerator(Gdx.files.internal(uiFontPath));
 
+        // Generate UI Fonts.
+        int[] uiSizes = {15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 33};
+        for (int size : uiSizes) {
+            skin.add("ui-" + size, uiGen.generateFont(fontParams(size)));
+        }
+
+        // Generate Title Fonts.
+        // Use Ethnocentric only for size 60.
+        int[] titleSizes = {17, 20, 21, 23, 25, 27, 30, 40, 60};
+        for (int size : titleSizes) {
+            skin.add("title-" + size, size < 60 ? titleGen.generateFont(fontParams(size)) : titleBigGen.generateFont(fontParams(size)));
+        }
+
+        logger.info("Font generation for [" + lang + "] took " + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    /**
+     * Gets the font parameters instance for the given size. It is important that the parameters
+     * are recreated for each size because we use {@link FreeTypeFontParameter#incremental}.
+     * @param size The font size.
+     * @return The parameters instance.
+     */
+    private FreeTypeFontParameter fontParams(int size) {
         FreeTypeFontParameter params = new FreeTypeFontParameter();
         params.mono = false;
         params.hinting = FreeTypeFontGenerator.Hinting.Slight;
@@ -58,23 +81,8 @@ public class FontFactory implements Disposable {
         // Chinese characters are loaded on-demand (incremental).
         params.incremental = true;
         FreeTypeFontGenerator.setMaxTextureSize(1024);
-
-        // Generate UI Fonts.
-        int[] uiSizes = {15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 33};
-        for (int size : uiSizes) {
-            params.size = size;
-            skin.add("ui-" + size, uiGen.generateFont(params));
-        }
-
-        // Generate Title Fonts.
-        // Use Ethnocentric only for size 60.
-        int[] titleSizes = {17, 20, 21, 23, 25, 27, 30, 40, 60};
-        for (int size : titleSizes) {
-            params.size = size;
-            skin.add("title-" + size, size < 60 ? titleGen.generateFont(params) : titleBigGen.generateFont(params));
-        }
-
-        logger.info("Font generation for [" + lang + "] took " + (System.currentTimeMillis() - start) + "ms");
+        params.size = size;
+        return params;
     }
 
     public void dispose() {
