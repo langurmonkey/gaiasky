@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import gaiasky.util.i18n.I18n;
 
 import java.text.DecimalFormat;
@@ -21,53 +22,60 @@ import java.util.function.Function;
 /**
  * Wrapper around {@link OwnSliderPlus} that adds a "Reset value" button to the right of the slider.
  */
-public class OwnSliderReset extends Table {
+public class OwnSliderReset extends Table implements Disableable {
     private Skin skin;
     private OwnSliderPlus slider;
     private OwnImageButton resetButton;
     private Float resetValue;
+    private final float RESET_BUTTON_SIZE = 20f;
+    private final float SLIDER_BUTTON_SPACE = 1f;
 
     // Constructors matching OwnSliderPlus
     public OwnSliderReset(String title, float min, float max, boolean logarithmic,
-                          Skin skin, String labelStyle) {
+                          float resetValue, Skin skin, String labelStyle) {
         initializeSlider(title, min, max, logarithmic, skin, labelStyle);
+        setResetValue(resetValue);
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize,
-                          float mapMin, float mapMax, Skin skin, String labelStyle) {
+                          float mapMin, float mapMax, float resetValue, Skin skin, String labelStyle) {
         slider = new OwnSliderPlus(title, min, max, stepSize, mapMin, mapMax, skin, labelStyle);
         this.skin = skin;
         initializeLayout();
+        setResetValue(resetValue);
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize,
-                          float mapMin, float mapMax, Skin skin) {
-        this(title, min, max, stepSize, mapMin, mapMax, skin, "default");
+                          float mapMin, float mapMax, float resetValue, Skin skin) {
+        this(title, min, max, stepSize, mapMin, mapMax, resetValue, skin, "default");
     }
 
-    public OwnSliderReset(String title, float min, float max, float stepSize,
+    public OwnSliderReset(String title, float min, float max, float stepSize, float resetValue,
                           Skin skin, String style) {
         slider = new OwnSliderPlus(title, min, max, stepSize, skin, style);
         this.skin = skin;
         initializeLayout();
+        setResetValue(resetValue);
     }
 
     public OwnSliderReset(String title, float min, float max,
-                          boolean logarithmic, Skin skin) {
+                          boolean logarithmic, float resetValue, Skin skin) {
         slider = new OwnSliderPlus(title, min, max, logarithmic, skin);
         this.skin = skin;
         initializeLayout();
+        setResetValue(resetValue);
     }
 
-    public OwnSliderReset(String title, float min, float max, float stepSize, Skin skin) {
-        this(title, min, max, stepSize, false, skin, "default");
+    public OwnSliderReset(String title, float min, float max, float stepSize, float resetValue, Skin skin) {
+        this(title, min, max, stepSize, false, resetValue, skin, "default");
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize,
-                          boolean vertical, Skin skin, String labelStyleName) {
+                          boolean vertical, float resetValue, Skin skin, String labelStyleName) {
         slider = new OwnSliderPlus(title, min, max, stepSize, vertical, skin, labelStyleName);
         this.skin = skin;
         initializeLayout();
+        setResetValue(resetValue);
     }
 
     private void initializeSlider(String title, float min, float max, boolean logarithmic,
@@ -100,13 +108,15 @@ public class OwnSliderReset extends Table {
         slider.setLogarithmicExponent(exp);
     }
 
-    public void setResetValue(Float value) {
+
+    private void setResetValue(Float value) {
         this.resetValue = value;
 
         if (value != null && resetButton == null) {
+            var size = RESET_BUTTON_SIZE;
             // Create reset button
             resetButton = new OwnImageButton(skin, "reload-s");
-            resetButton.setSize(18f, 18f);
+            resetButton.setSize(size, size);
             resetButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -117,8 +127,8 @@ public class OwnSliderReset extends Table {
             });
             resetButton.addListener(new OwnTextTooltip(I18n.msg("gui.reset"), skin));
             // Add button to the right of the slider
-            add(resetButton).size(18f, 18f)
-                    .padLeft(1f);
+            add(resetButton).size(size, size)
+                    .padLeft(SLIDER_BUTTON_SPACE);
 
         } else if (value == null && resetButton != null) {
             // Remove reset button
@@ -186,7 +196,7 @@ public class OwnSliderReset extends Table {
 
     @Override
     public void setWidth(float width) {
-        slider.setWidth(width);
+        slider.setWidth(resetButton != null ? width - RESET_BUTTON_SIZE - SLIDER_BUTTON_SPACE : width);
     }
 
     @Override
@@ -211,6 +221,10 @@ public class OwnSliderReset extends Table {
     @Override
     public float getPrefHeight() {
         return slider.getPrefHeight();
+    }
+
+    public boolean isDisabled() {
+        return slider != null && slider.isDisabled();
     }
 
     public void setDisabled(boolean disabled) {
@@ -281,6 +295,10 @@ public class OwnSliderReset extends Table {
 
     public Float getResetValue() {
         return resetValue;
+    }
+
+    public void setProgrammaticChangeEvents(boolean programmaticChangeEvents) {
+        slider.setProgrammaticChangeEvents(programmaticChangeEvents);
     }
 }
 

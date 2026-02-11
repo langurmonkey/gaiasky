@@ -76,61 +76,30 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final GlobalResources globalResources;
     // This flag is active when the dialog is called from the welcome screen.
     private final boolean welcomeScreen;
-    private OwnCheckBox fullScreen;
-    private OwnCheckBox windowed;
-    private OwnCheckBox maxFps;
-    private OwnCheckBox multithreadCb;
-    private OwnCheckBox lodFadeCb;
-    private OwnCheckBox cbAutoCamRec;
-    private OwnCheckBox real;
-    private OwnCheckBox vrDemo;
-    private OwnCheckBox invertX;
-    private OwnCheckBox invertY;
-    private OwnCheckBox highAccuracyPositions;
-    private OwnCheckBox shadowsCb;
-    private OwnCheckBox displayNotifications;
-    private OwnCheckBox displayTimeNoUi;
-    private OwnCheckBox pointerCoords;
-    private OwnCheckBox modeChangeInfo;
-    private OwnCheckBox debugInfo;
-    private OwnCheckBox crosshairFocus;
-    private OwnCheckBox crosshairClosest;
-    private OwnCheckBox crosshairHome;
-    private OwnCheckBox pointerGuides;
-    private OwnCheckBox newUI;
-    private OwnCheckBox exitConfirmation;
-    private OwnCheckBox recGridProjectionLines;
-    private OwnCheckBox frameCoordinates;
-    private OwnCheckBox dynamicResolution;
-    private OwnCheckBox ssr;
-    private OwnCheckBox eclipses;
-    private OwnCheckBox eclipseOutlines;
-    private OwnCheckBox starSpheres, starDistanceScaling, motionTrails;
-    private OwnCheckBox shaderCache;
-    private OwnCheckBox saveTextures;
+    private OwnCheckBox fullScreen, windowed, maxFps, multithreadCb, lodFadeCb, cbAutoCamRec, real, vrDemo, invertX,
+            invertY, highAccuracyPositions, shadowsCb, displayNotifications, displayTimeNoUi, pointerCoords, modeChangeInfo,
+            debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, newUI, exitConfirmation,
+            recGridProjectionLines, frameCoordinates, dynamicResolution, ssr, eclipses, eclipseOutlines, starSpheres,
+            starDistanceScaling, motionTrails, shaderCache, saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect, textureIndex;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin, recGridStyle;
-    private ColorPicker accentColor;
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnSelectBox<UpscaleFilter> upscaleFilter;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix,
             frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle,
             smResolution, maxFpsInput, evwField, evhField;
-    private OwnSliderPlus lodTransitions, tessQuality, pointerGuidesWidth, backBufferScale,
-            celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
-            chromaticAberration, filmGrain, lensFlare, velocityVectors, motionBlur, pgResolution;
-    private OwnSliderReset minimapSize, uiScale;
-    private OwnSliderReset stereoK, ipd, screenDistance;
+    private OwnSliderReset minimapSize, uiScale, lensFlare, bloomEffect, unsharpMask, chromaticAberration, filmGrain, svtCacheSize,
+            backBufferScale, motionBlur, tessQuality, celestialSphereIndexOfRefraction, pointerGuidesWidth, lodTransitions, velocityVectors,
+            stereoK, ipd, screenDistance, screenshotQuality, frameQuality, pgResolution;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
-    private OwnLabel frameSequenceNumber;
-    private ColorPicker pointerGuidesColor, anaglyphCustomLeft, anaglyphCustomRight;
-    private OwnLabel tessQualityLabel;
+    private OwnLabel frameSequenceNumber, tessQualityLabel;
+    private ColorPicker pointerGuidesColor, anaglyphCustomLeft, anaglyphCustomRight, accentColor;
     private Cell<?> noticeHiResCell;
     private Table controllersTable;
     // Backup values
@@ -784,7 +753,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // BLOOM
             OwnLabel bloomLabel = new OwnLabel(I18n.msg("gui.bloom"), skin, "default");
-            bloomEffect = new OwnSliderPlus("", Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
+            bloomEffect = new OwnSliderReset("", Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, 0f, skin);
             bloomEffect.setName("bloom effect");
             bloomEffect.setWidth(sliderWidth);
             bloomEffect.setValue(settings.postprocess.bloom.intensity);
@@ -798,11 +767,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // UNSHARP MASK
             OwnLabel unsharpMaskLabel = new OwnLabel(I18n.msg("gui.unsharpmask"), skin, "default");
-            unsharpMask = new OwnSliderPlus("",
-                                            Constants.MIN_UNSHARP_MASK_FACTOR,
-                                            Constants.MAX_UNSHARP_MASK_FACTOR,
-                                            Constants.SLIDER_STEP_TINY,
-                                            skin);
+            unsharpMask = new OwnSliderReset("",
+                                             Constants.MIN_UNSHARP_MASK_FACTOR,
+                                             Constants.MAX_UNSHARP_MASK_FACTOR,
+                                             Constants.SLIDER_STEP_TINY,
+                                             0f,
+                                             skin);
             unsharpMask.setName("unsharp mask factor");
             unsharpMask.setWidth(sliderWidth);
             unsharpMask.setValue(settings.postprocess.unsharpMask.factor);
@@ -816,9 +786,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // CHROMATIC ABERRATION
             OwnLabel chromaticAberrationLabel = new OwnLabel(I18n.msg("gui.chromaticaberration"), skin, "default");
-            chromaticAberration = new OwnSliderPlus("", Constants.MIN_CHROMATIC_ABERRATION_AMOUNT,
-                                                    Constants.MAX_CHROMATIC_ABERRATION_AMOUNT,
-                                                    Constants.SLIDER_STEP_TINY * 0.1f, skin);
+            chromaticAberration = new OwnSliderReset("", Constants.MIN_CHROMATIC_ABERRATION_AMOUNT,
+                                                     Constants.MAX_CHROMATIC_ABERRATION_AMOUNT,
+                                                     Constants.SLIDER_STEP_TINY * 0.1f, 0.003f, skin);
             chromaticAberration.setName("chromatic aberration amount");
             chromaticAberration.setWidth(sliderWidth);
             chromaticAberration.setValue(settings.postprocess.chromaticAberration.amount);
@@ -832,8 +802,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // FILM GRAIN
             OwnLabel filmGrainLabel = new OwnLabel(I18n.msg("gui.filmgrain"), skin, "default");
-            filmGrain = new OwnSliderPlus("", Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY,
-                                          Constants.SLIDER_STEP_TINY * 0.1f, skin);
+            filmGrain = new OwnSliderReset("", Constants.MIN_FILM_GRAIN_INTENSITY, Constants.MAX_FILM_GRAIN_INTENSITY,
+                                           Constants.SLIDER_STEP_TINY * 0.1f, 0f, skin);
             filmGrain.setName("film grain intensity");
             filmGrain.setWidth(sliderWidth);
             filmGrain.setValue(settings.postprocess.filmGrain.intensity);
@@ -850,8 +820,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // LENS FLARE
             OwnLabel lensFlareLabel = new OwnLabel(I18n.msg("gui.lensflare"), skin);
-            lensFlare = new OwnSliderPlus("", Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH,
-                                          Constants.SLIDER_STEP_TINY, skin);
+            lensFlare = new OwnSliderReset("", Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH,
+                                           Constants.SLIDER_STEP_TINY, 1f, skin);
             lensFlare.setName("lens flare strength");
             lensFlare.setWidth(sliderWidth);
             lensFlare.setValue(settings.postprocess.lensFlare.strength);
@@ -1033,7 +1003,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             tessQualityLabel = new OwnLabel(I18n.msg("gui.elevation.tessellation.quality"), skin);
             tessQualityLabel.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
 
-            tessQuality = new OwnSliderPlus("", Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, skin);
+            tessQuality = new OwnSliderReset("", Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, 1.5f, skin);
             tessQuality.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
             tessQuality.setWidth(sliderWidth);
             tessQuality.setValue((float) settings.scene.renderer.elevation.quality);
@@ -1152,7 +1122,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             /* Brightness */
             OwnLabel brightnessLabel = new OwnLabel(I18n.msg("gui.brightness"), skin, "default");
-            Slider brightness = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            var brightness = new OwnSliderReset("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, 50f, skin);
             brightness.setName("brightness");
             brightness.setWidth(sliderWidth);
             brightness.setValue(MathUtilsDouble.lint(settings.postprocess.levels.brightness,
@@ -1185,7 +1155,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             /* Contrast */
             OwnLabel contrastLabel = new OwnLabel(I18n.msg("gui.contrast"), skin, "default");
-            Slider contrast = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            var contrast = new OwnSliderReset("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, 50f, skin);
             contrast.setName("contrast");
             contrast.setWidth(sliderWidth);
             contrast.setValue(
@@ -1217,7 +1187,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             /* Hue */
             OwnLabel hueLabel = new OwnLabel(I18n.msg("gui.hue"), skin, "default");
-            Slider hue = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            var hue = new OwnSliderReset("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, 50f, skin);
             hue.setName("hue");
             hue.setWidth(sliderWidth);
             hue.setValue(MathUtilsDouble.lint(settings.postprocess.levels.hue,
@@ -1250,7 +1220,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             /* Saturation */
             OwnLabel saturationLabel = new OwnLabel(I18n.msg("gui.saturation"), skin, "default");
-            Slider saturation = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+            var saturation = new OwnSliderReset("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, 50f, skin);
             saturation.setName("saturation");
             saturation.setWidth(sliderWidth);
             saturation.setValue(MathUtilsDouble.lint(settings.postprocess.levels.saturation,
@@ -1283,7 +1253,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             /* Gamma */
             OwnLabel gammaLabel = new OwnLabel(I18n.msg("gui.gamma"), skin, "default");
-            Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, Constants.SLIDER_STEP_TINY, skin);
+            var gamma = new OwnSliderReset("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, Constants.SLIDER_STEP_TINY, 1f, skin);
             gamma.setName("gamma");
             gamma.setWidth(sliderWidth);
             gamma.setValue(settings.postprocess.levels.gamma);
@@ -1380,7 +1350,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
                 /* Cache size */
                 OwnLabel svtCacheSizeLabel = new OwnLabel(I18n.msg("gui.svt.cachesize"), skin, "default");
-                svtCacheSize = new OwnSliderPlus("", Constants.MIN_TILE_CACHE, Constants.MAX_TILE_CACHE, 1, skin);
+                svtCacheSize = new OwnSliderReset("", Constants.MIN_TILE_CACHE, Constants.MAX_TILE_CACHE, 1, 10f, skin);
                 svtCacheSize.setValueLabelTransform((val) -> {
                     var valInt = val.intValue();
                     var value = Integer.toString(valInt * valInt);
@@ -1403,7 +1373,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                         .padBottom(pad10);
                 svtTable.add(cacheSizeTooltip)
                         .left()
-                        .padRight(pad18)
+                        .padRight(pad10)
                         .padBottom(pad10);
                 svtTable.add(getRequiresRestartLabel())
                         .left()
@@ -1474,11 +1444,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 // Back-buffer scale
                 OwnLabel backBufferScaleLabel = new OwnLabel(I18n.msg("gui.backbuffer.scale"), skin);
                 backBufferScaleLabel.setDisabled(settings.graphics.dynamicResolution);
-                backBufferScale = new OwnSliderPlus("",
-                                                    Constants.BACKBUFFER_SCALE_MIN,
-                                                    Constants.BACKBUFFER_SCALE_MAX,
-                                                    Constants.BACKBUFFER_SCALE_STEP,
-                                                    skin);
+                backBufferScale = new OwnSliderReset("",
+                                                     Constants.BACKBUFFER_SCALE_MIN,
+                                                     Constants.BACKBUFFER_SCALE_MAX,
+                                                     Constants.BACKBUFFER_SCALE_STEP,
+                                                     1f,
+                                                     skin);
                 backBufferScale.setWidth(sliderWidth);
                 backBufferScale.setMappedValue(settings.graphics.backBufferScale);
                 backBufferScale.setDisabled(settings.graphics.dynamicResolution);
@@ -1535,7 +1506,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
                 // Index of refraction of celestial sphere
                 OwnLabel celestialSphereIndexOfRefractionLabel = new OwnLabel(I18n.msg("gui.indexofrefraction"), skin);
-                celestialSphereIndexOfRefraction = new OwnSliderPlus("", 1.f, 2.5f, 0.05f, skin);
+                celestialSphereIndexOfRefraction = new OwnSliderReset("", 1.f, 2.5f, 0.05f, 1f, skin);
                 celestialSphereIndexOfRefraction.setWidth(sliderWidth);
                 celestialSphereIndexOfRefraction.setMappedValue(settings.program.modeCubemap.celestialSphereIndexOfRefraction);
                 OwnImageButton celestialSphereIndexOfRefractionTooltip = new OwnImageButton(skin, "tooltip");
@@ -1578,8 +1549,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
                 // MOTION BLUR
                 OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
-                motionBlur = new OwnSliderPlus("", Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY,
-                                               skin);
+                motionBlur = new OwnSliderReset("", Constants.MOTIONBLUR_MIN, Constants.MOTIONBLUR_MAX, Constants.SLIDER_STEP_TINY, 0f,
+                                                skin);
                 motionBlur.setWidth(sliderWidth);
                 motionBlur.setMappedValue(settings.postprocess.motionBlur.strength);
                 motionBlur.addListener(event -> {
@@ -1842,7 +1813,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // Resolution
             OwnLabel pgResolutionLabel = new OwnLabel(I18n.msg("gui.ui.procedural.resolution"), skin);
-            pgResolution = new OwnSliderPlus("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, skin);
+            pgResolution = new OwnSliderReset("", Constants.PG_RESOLUTION_MIN, Constants.PG_RESOLUTION_MAX, 1, 1500f, skin);
             pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
             pgResolution.setWidth(sliderWidth);
             pgResolution.setValue(settings.graphics.proceduralGenerationResolution[1]);
@@ -1944,13 +1915,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
         accentColor = new ColorPicker(Settings.settings.program.ui.accentColor, stage, skin);
         accentColor.setNewColorRunnable(() -> {
-            EventManager.publish(Event.UI_ACCENT_COLOR_CMD, accentColor, accentColor.getPickedColorArray());
+            EventManager.publish(Event.UI_ACCENT_COLOR_CMD, accentColor, (Object) accentColor.getPickedColorArray());
         });
 
         // SCALING
         OwnLabel uiScaleLabel = new OwnLabel(I18n.msg("gui.ui.theme.scale"), skin);
-        uiScale = new OwnSliderReset("", Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_TINY, skin);
-        uiScale.setResetValue(1f);
+        uiScale = new OwnSliderReset("", Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_TINY, 1f, skin);
         uiScale.setWidth(sliderWidth);
         uiScale.setValue(settings.program.ui.scale);
         final Image applyImage = new Image(skin.getDrawable("iconic-check"));
@@ -1968,8 +1938,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // MINIMAP SIZE
         OwnLabel minimapSizeLabel = new OwnLabel(I18n.msg("gui.ui.minimap.size"), skin, "default");
-        minimapSize = new OwnSliderReset("", Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE, 1f, skin);
-        minimapSize.setResetValue(200f);
+        minimapSize = new OwnSliderReset("", Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE, 1f, 200f, skin);
         minimapSize.setName("minimapSize");
         minimapSize.setWidth(sliderWidth);
         minimapSize.setValue(settings.program.minimap.size);
@@ -2189,11 +2158,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // GUIDES WIDTH
         OwnLabel pointerGuidesWidthLabel = new OwnLabel(I18n.msg("gui.ui.pointer.guides.width"), skin, "default");
-        pointerGuidesWidth = new OwnSliderPlus("",
-                                               Constants.MIN_POINTER_GUIDES_WIDTH,
-                                               Constants.MAX_POINTER_GUIDES_WIDTH,
-                                               Constants.SLIDER_STEP_TINY,
-                                               skin);
+        pointerGuidesWidth = new OwnSliderReset("",
+                                                Constants.MIN_POINTER_GUIDES_WIDTH,
+                                                Constants.MAX_POINTER_GUIDES_WIDTH,
+                                                Constants.SLIDER_STEP_TINY,
+                                                1.5f,
+                                                skin);
         pointerGuidesWidth.setName("pointerguideswidth");
         pointerGuidesWidth.setWidth(sliderWidth);
         pointerGuidesWidth.setValue(settings.program.pointer.guides.width);
@@ -2361,13 +2331,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Draw distance
         OwnLabel ddLabel = new OwnLabel(I18n.msg("gui.lod.thresholds"), skin);
-        lodTransitions = new OwnSliderPlus("",
-                                           Constants.MIN_SLIDER,
-                                           Constants.MAX_SLIDER,
-                                           0.1f,
-                                           Constants.MIN_LOD_TRANS_ANGLE_DEG,
-                                           Constants.MAX_LOD_TRANS_ANGLE_DEG,
-                                           skin);
+        lodTransitions = new OwnSliderReset("",
+                                            Constants.MIN_SLIDER,
+                                            Constants.MAX_SLIDER,
+                                            0.1f,
+                                            Constants.MIN_LOD_TRANS_ANGLE_DEG,
+                                            Constants.MAX_LOD_TRANS_ANGLE_DEG,
+                                            85.9f,
+                                            skin);
         lodTransitions.setDisplayValueMapped(true);
         lodTransitions.setWidth(sliderWidth);
         lodTransitions.setMappedValue(settings.scene.octree.threshold[0] * MathUtilsDouble.radDeg);
@@ -2407,11 +2378,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Max num of velocity vectors per star set.
         OwnLabel velVectorsLabel = new OwnLabel(I18n.msg("gui.velvec.num"), skin);
-        velocityVectors = new OwnSliderPlus("",
-                                            Constants.MIN_VELOCITY_VECTORS_STAR_GROUP,
-                                            Constants.MAX_VELOCITY_VECTORS_STAR_GROUP,
-                                            Constants.SLIDER_STEP,
-                                            skin);
+        velocityVectors = new OwnSliderReset("",
+                                             Constants.MIN_VELOCITY_VECTORS_STAR_GROUP,
+                                             Constants.MAX_VELOCITY_VECTORS_STAR_GROUP,
+                                             Constants.SLIDER_STEP,
+                                             50f,
+                                             skin);
         velocityVectors.setWidth(sliderWidth);
         velocityVectors.setValue(settings.scene.star.group.numVelocityVector);
 
@@ -2746,8 +2718,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Quality
         OwnLabel ssQualityLabel = new OwnLabel(I18n.msg("gui.screenshots.quality"), skin);
-        screenshotQuality = new OwnSliderPlus("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY,
-                                              Constants.SLIDER_STEP, skin);
+        screenshotQuality = new OwnSliderReset("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY,
+                                              Constants.SLIDER_STEP, 93f, skin);
         screenshotQuality.setName("screenshot quality");
         screenshotQuality.setWidth(sliderWidth);
         screenshotQuality.setValue(settings.screenshot.quality * 100f);
@@ -2919,8 +2891,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Quality
         OwnLabel foQualityLabel = new OwnLabel(I18n.msg("gui.screenshots.quality"), skin);
-        frameQuality = new OwnSliderPlus("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY,
-                                         Constants.SLIDER_STEP, skin);
+        frameQuality = new OwnSliderReset("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY,
+                                         Constants.SLIDER_STEP, 93f, skin);
         frameQuality.setName("frame quality");
         frameQuality.setWidth(sliderWidth);
         frameQuality.setValue(settings.frame.quality * 100f);
@@ -3165,10 +3137,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // K
         var stereoKLabel = new OwnLabel(I18n.msg("gui.stereo.k"), skin);
-        stereoK = new OwnSliderReset("", Constants.MIN_STEREO_K, Constants.MAX_STEREO_K, Constants.SLIDER_STEP_TINY, skin);
+        stereoK = new OwnSliderReset("", Constants.MIN_STEREO_K, Constants.MAX_STEREO_K, Constants.SLIDER_STEP_TINY, 0.2f, skin);
         stereoK.setName("stereo k");
         stereoK.setWidth(sliderWidth);
-        stereoK.setResetValue(0.2f);
         stereoK.setValue((float) settings.program.modeStereo.k);
         stereoK.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -3181,11 +3152,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final var nf = new DecimalFormat("###0");
         // IPD
         var ipdLabel = new OwnLabel(I18n.msg("gui.stereo.ipd"), skin);
-        ipd = new OwnSliderReset("", Constants.MIN_STEREO_IPD, Constants.MAX_STEREO_IPD, Constants.SLIDER_STEP_TINY, skin);
+        ipd = new OwnSliderReset("", Constants.MIN_STEREO_IPD, Constants.MAX_STEREO_IPD, Constants.SLIDER_STEP_TINY, 64f, skin);
         ipd.setName("stereo ipd");
         ipd.setWidth(sliderWidth);
         ipd.setValueLabelTransform((val) -> nf.format(val) + " " + I18n.msg("gui.unit.mm"));
-        ipd.setResetValue(64f);
         ipd.setValue((float) settings.program.modeStereo.ipd);
         ipd.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -3196,12 +3166,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
         // Screen dist
         var screenDistLabel = new OwnLabel(I18n.msg("gui.stereo.screen"), skin);
-        screenDistance = new OwnSliderReset("", Constants.MIN_STEREO_SD, Constants.MAX_STEREO_SD, true, skin);
+        screenDistance = new OwnSliderReset("", Constants.MIN_STEREO_SD, Constants.MAX_STEREO_SD, true, 600f, skin);
         screenDistance.setLogarithmicExponent(3.0);
         screenDistance.setName("stereo screen dist");
         screenDistance.setWidth(sliderWidth);
         screenDistance.setValueLabelTransform((val) -> nf.format(val) + " " + I18n.msg("gui.unit.mm"));
-        screenDistance.setResetValue(600f);
         screenDistance.setMappedValue((float) settings.program.modeStereo.screenDistance);
         screenDistance.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -3852,6 +3821,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         enableComponents(fullscreen, fullScreenResolutions);
     }
 
+    private void setSlider(OwnSliderReset slider,
+                           float value) {
+        slider.setProgrammaticChangeEvents(false);
+        slider.setValue(value);
+        slider.setProgrammaticChangeEvents(true);
+    }
+
     private void setSlider(OwnSliderPlus slider,
                            float value) {
         slider.setProgrammaticChangeEvents(false);
@@ -4448,7 +4424,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.STEREO_K_CMD, this, stereoKBak);
         EventManager.publish(Event.STEREO_IPD_CMD, this, stereoIpdBak);
         EventManager.publish(Event.STEREO_SCREEN_DIST_CMD, this, stereoSdBak);
-        EventManager.publish(Event.UI_ACCENT_COLOR_CMD, this, accentColorBak);
+        EventManager.publish(Event.UI_ACCENT_COLOR_CMD, this, (Object) accentColorBak);
     }
 
     private void reloadLanguage() {

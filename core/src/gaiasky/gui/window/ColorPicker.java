@@ -22,6 +22,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnSlider;
 import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.scene2d.OwnTextTooltip;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.HexColorValidator;
 import gaiasky.util.validator.IValidator;
@@ -95,6 +96,9 @@ public class ColorPicker extends ColorPickerAbstract {
             }
             return false;
         });
+        if (name != null && !name.isBlank()) {
+            this.addListener(new OwnTextTooltip(name, skin));
+        }
     }
 
     public void setNewColorRunnable(Runnable r) {
@@ -135,7 +139,7 @@ public class ColorPicker extends ColorPickerAbstract {
         }
 
         public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
-           this(elementName, color, true, stage, skin);
+            this(elementName, color, true, stage, skin);
         }
 
         public ColorPickerDialog(float[] color, Stage stage, Skin skin) {

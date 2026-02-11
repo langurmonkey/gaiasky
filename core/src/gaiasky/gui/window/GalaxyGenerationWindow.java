@@ -242,8 +242,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 GaiaSky.postRunnable(() -> {
-                    var bodyFull =Mapper.body.get(entityFull);
-                    var bodyHalf =Mapper.body.get(entityHalf);
+                    var bodyFull = Mapper.body.get(entityFull);
+                    var bodyHalf = Mapper.body.get(entityHalf);
 
                     var camera = GaiaSky.instance.getICamera();
                     var cpos = camera.getPos();
@@ -269,14 +269,13 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         float rotMin = -180.0f;
         float rotMax = 180.0f;
         float rotStep = (rotMax - rotMin) / SLIDER_STEPS;
-        var rx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rx"), rotMin, rotMax, rotStep, skin);
-        var ry = new OwnSliderReset(I18n.msg("gui.galaxy.ds.ry"), rotMin, rotMax, rotStep, skin);
-        var rz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rz"), rotMin, rotMax, rotStep, skin);
+        var rx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rx"), rotMin, rotMax, rotStep, 0f, skin);
+        var ry = new OwnSliderReset(I18n.msg("gui.galaxy.ds.ry"), rotMin, rotMax, rotStep, 0f, skin);
+        var rz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rz"), rotMin, rotMax, rotStep, 0f, skin);
 
         // Set up Rx
         rx.setWidth(thirdWidthBox);
         rx.setValue(yaw);
-        rx.setResetValue(0f);
         rx.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -287,7 +286,6 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         // Set up Ry
         ry.setWidth(thirdWidthBox);
         ry.setValue(pitch);
-        ry.setResetValue(0f);
         ry.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -298,7 +296,6 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         // Set up Rz
         rz.setWidth(thirdWidthBox);
         rz.setValue(roll);
-        rz.setResetValue(0f);
         rz.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -538,7 +535,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             float nMin = ds.type.nParticles[0];
             float nMax = ds.type.nParticles[1];
             float nStep = (nMax - nMin) / SLIDER_STEPS;
-            var nParticles = new OwnSliderReset(I18n.msg("gui.galaxy.ds.particles"), nMin, nMax, nStep, skin);
+            var nParticles = new OwnSliderReset(I18n.msg("gui.galaxy.ds.particles"), nMin, nMax, nStep, nMin + (nMax - nMin) / 2, skin);
             nParticles.setNumberFormatter(new DecimalFormat("#####0"));
             nParticles.setWidth(fullWidthBox);
             nParticles.setValue(ds.particleCount);
@@ -549,17 +546,15 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.setParticleCount((long) nParticles.getValue());
                 }
             });
-            nParticles.setResetValue(nMin + (nMax - nMin) / 2);
             dsTable.add(nParticles).colspan(2).left().padBottom(pad18).row();
 
             // Dataset translation, XYZ
             float transMin = -1.0f;
             float transMax = 1.0f;
             float transStep = (transMax - transMin) / SLIDER_STEPS;
-            var x = new OwnSliderReset(I18n.msg("gui.galaxy.ds.x"), transMin, transMax, transStep, skin);
+            var x = new OwnSliderReset(I18n.msg("gui.galaxy.ds.x"), transMin, transMax, transStep, 0f, skin);
             x.setWidth(thirdWidthBox);
             x.setValue(ds.translation.x);
-            x.setResetValue(0f);
             x.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -567,10 +562,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.translation.x = x.getValue();
                 }
             });
-            var y = new OwnSliderReset(I18n.msg("gui.galaxy.ds.y"), transMin, transMax, transStep, skin);
+            var y = new OwnSliderReset(I18n.msg("gui.galaxy.ds.y"), transMin, transMax, transStep, 0f, skin);
             y.setWidth(thirdWidthBox);
             y.setValue(ds.translation.y);
-            y.setResetValue(0f);
             y.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -578,10 +572,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.translation.y = y.getValue();
                 }
             });
-            var z = new OwnSliderReset(I18n.msg("gui.galaxy.ds.z"), transMin, transMax, transStep, skin);
+            var z = new OwnSliderReset(I18n.msg("gui.galaxy.ds.z"), transMin, transMax, transStep, 0f, skin);
             z.setWidth(thirdWidthBox);
             z.setValue(ds.translation.z);
-            z.setResetValue(0f);
             z.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -599,10 +592,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             float rotMin = -180.0f;
             float rotMax = 180.0f;
             float rotStep = (rotMax - rotMin) / SLIDER_STEPS;
-            var rx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rx"), rotMin, rotMax, rotStep, skin);
+            var rx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rx"), rotMin, rotMax, rotStep, 0f, skin);
             rx.setWidth(thirdWidthBox);
             rx.setValue(ds.rotation.x);
-            rx.setResetValue(0f);
             rx.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -610,10 +602,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.rotation.x = rx.getValue();
                 }
             });
-            var ry = new OwnSliderReset(I18n.msg("gui.galaxy.ds.ry"), rotMin, rotMax, rotStep, skin);
+            var ry = new OwnSliderReset(I18n.msg("gui.galaxy.ds.ry"), rotMin, rotMax, rotStep, 0f, skin);
             ry.setWidth(thirdWidthBox);
             ry.setValue(ds.rotation.y);
-            ry.setResetValue(0f);
             ry.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -621,10 +612,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.rotation.y = ry.getValue();
                 }
             });
-            var rz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rz"), rotMin, rotMax, rotStep, skin);
+            var rz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rz"), rotMin, rotMax, rotStep, 0f, skin);
             rz.setWidth(thirdWidthBox);
             rz.setValue(ds.rotation.z);
-            rz.setResetValue(0f);
             rz.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -642,10 +632,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             float sMin = -3.0f;
             float sMax = 3.0f;
             float sStep = (sMax - sMin) / SLIDER_STEPS;
-            var sx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sx"), sMin, sMax, sStep, skin);
+            var sx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sx"), sMin, sMax, sStep, 1f, skin);
             sx.setWidth(thirdWidthBox);
             sx.setValue(ds.scale.x);
-            sx.setResetValue(1f);
             sx.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -653,10 +642,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.scale.x = sx.getValue();
                 }
             });
-            var sy = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sy"), sMin, sMax, sStep, skin);
+            var sy = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sy"), sMin, sMax, sStep, 1f, skin);
             sy.setWidth(thirdWidthBox);
             sy.setValue(ds.scale.y);
-            sy.setResetValue(1f);
             sy.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -664,10 +652,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                     ds.scale.y = sy.getValue();
                 }
             });
-            var sz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sz"), sMin, sMax, sStep, skin);
+            var sz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sz"), sMin, sMax, sStep, 1f, skin);
             sz.setWidth(thirdWidthBox);
             sz.setValue(ds.scale.z);
-            sz.setResetValue(1f);
             sz.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -705,10 +692,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             colorsTable.add(c2).size(cpSize).left().padRight(pad10);
             colorsTable.add(c3).size(cpSize).left().padRight(pad10);
             colorsTable.add(c4).size(cpSize).left().padRight(pad10);
-            var colorNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.color.noise"), 0.0f, 1f, 0.01f, skin);
+            var colorNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.color.noise"), 0.0f, 1f, 0.01f, 0f, skin);
             colorNoise.setWidth(halfWidthBox);
             colorNoise.setValue(ds.colorNoise);
-            colorNoise.setResetValue(0.0f);
             colorNoise.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -721,10 +707,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
             if (ds.distribution.isFlat()) {
                 // Warp
-                var warp = new OwnSliderReset(I18n.msg("gui.galaxy.ds.warp"), ds.type.warpStrength[0], ds.type.warpStrength[1], 0.001f, skin);
+                var warp = new OwnSliderReset(I18n.msg("gui.galaxy.ds.warp"), ds.type.warpStrength[0], ds.type.warpStrength[1], 0.001f, 0f, skin);
                 warp.setWidth(fullWidthBox);
                 warp.setValue(ds.warpStrength);
-                warp.setResetValue(0.00f);
                 warp.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -735,10 +720,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 dsTable.add(warp).colspan(2).left().padBottom(pad18).row();
 
                 // Height scale
-                var heightScale = new OwnSliderReset(I18n.msg("gui.galaxy.ds.height.scale"), 0.0f, 0.2f, 0.001f, skin);
+                var heightScale = new OwnSliderReset(I18n.msg("gui.galaxy.ds.height.scale"), 0.0f, 0.2f, 0.001f, 0.01f, skin);
                 heightScale.setWidth(halfWidthBox);
                 heightScale.setValue(ds.heightScale);
-                heightScale.setResetValue(0.01f);
                 heightScale.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -772,10 +756,14 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             float minRadMin = ds.type.minRadius[0];
             float minRadMax = ds.type.minRadius[1];
             float minRadStep = (minRadMax - minRadMin) / SLIDER_STEPS;
-            var minRadius = new OwnSliderReset(I18n.msg("gui.galaxy.ds.radius.min"), minRadMin, minRadMax, minRadStep, skin);
+            var minRadius = new OwnSliderReset(I18n.msg("gui.galaxy.ds.radius.min"),
+                                               minRadMin,
+                                               minRadMax,
+                                               minRadStep,
+                                               minRadMin + (minRadMax - minRadMin) / 2f,
+                                               skin);
             minRadius.setWidth(halfWidthBox);
             minRadius.setValue(ds.minRadius);
-            minRadius.setResetValue(minRadMin + (minRadMax - minRadMin) / 2f);
             minRadius.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -786,10 +774,14 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             float baseRadMin = ds.type.baseRadius[0];
             float baseRadMax = ds.type.baseRadius[1];
             float baseRadStep = (baseRadMax - baseRadMin) / SLIDER_STEPS;
-            var baseRadius = new OwnSliderReset(I18n.msg("gui.galaxy.ds.radius.base"), baseRadMin, baseRadMax, baseRadStep, skin);
+            var baseRadius = new OwnSliderReset(I18n.msg("gui.galaxy.ds.radius.base"),
+                                                baseRadMin,
+                                                baseRadMax,
+                                                baseRadStep,
+                                                baseRadMin + (baseRadMax - baseRadMin) / 2f,
+                                                skin);
             baseRadius.setWidth(ds.distribution.isBar() ? fullWidthBox : halfWidthBox);
             baseRadius.setValue(ds.baseRadius);
-            minRadius.setResetValue(baseRadMin + (baseRadMax - baseRadMin) / 2f);
             baseRadius.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -807,13 +799,12 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             // Particle size and size noise
             float sizeMin = ds.type.size[0];
             float sizeMax = ds.type.size[1];
-            var size = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size"), sizeMin, sizeMax, true, skin);
+            var size = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size"), sizeMin, sizeMax, true, sizeMin + (sizeMax - sizeMin) / 2f, skin);
             size.setNumberFormatter(new DecimalFormat("######0.########"));
             size.setDisplayValueMapped(true);
             size.setLogarithmicExponent(4.0);
             size.setWidth(thirdWidthBox + 115f);
             size.setMappedValue(ds.size);
-            size.setResetValue(sizeMin + (sizeMax - sizeMin) / 2f);
             size.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -839,11 +830,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             });
             OwnSliderReset sizeNoise;
             if (ds.sizeMask) {
-                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.scale"), 1.0f, 50f, 0.01f, skin);
-                sizeNoise.setResetValue(0.0f);
+                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.scale"), 1.0f, 50f, 0.01f, 0f, skin);
             } else {
-                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.noise"), 0.0f, 1f, 0.01f, skin);
-                sizeNoise.setResetValue(10.0f);
+                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.noise"), 0.0f, 1f, 0.01f, 10f, skin);
             }
             sizeNoise.setWidth(thirdWidthBox);
             sizeNoise.setValue(ds.sizeNoise);
@@ -865,12 +854,11 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             float iMin = ds.type.intensity[0];
             float iMax = ds.type.intensity[1];
             float iStep = (iMax - iMin) / SLIDER_STEPS;
-            var intensity = new OwnSliderReset(I18n.msg("gui.galaxy.ds.intensity"), iMin, iMax, iStep, skin);
+            var intensity = new OwnSliderReset(I18n.msg("gui.galaxy.ds.intensity"), iMin, iMax, iStep, iMin + (iMax - iMin) / 2f, skin);
             intensity.setDisplayValueMapped(true);
             intensity.setNumberFormatter(new DecimalFormat("#0.######"));
             intensity.setWidth(fullWidthBox);
             intensity.setMappedValue(ds.intensity);
-            intensity.setResetValue(iMin + (iMax - iMin) / 2f);
             intensity.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
@@ -882,9 +870,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
             if (ds.distribution.isLogarithmicSpiral()) {
                 // Number of arms
-                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 1f, 8f, 1f, skin);
+                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 1f, 8f, 1f, 4f, skin);
                 numArms.setNumberFormatter(new DecimalFormat("#0"));
-                numArms.setResetValue(4f);
                 numArms.setWidth(halfWidthBox);
                 numArms.setValue(ds.numArms);
                 numArms.addListener(new ChangeListener() {
@@ -898,9 +885,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 float minSigma = ds.type.armSigma[0];
                 float maxSigma = ds.type.armSigma[1];
                 float stepSigma = (maxSigma - minSigma) / SLIDER_STEPS;
-                var armSigma = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.sigma"), minSigma, maxSigma, stepSigma, skin);
+                var armSigma = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.sigma"), minSigma, maxSigma, stepSigma, 0.2f, skin);
                 armSigma.setNumberFormatter(new DecimalFormat("#0.####"));
-                armSigma.setResetValue(0.2f);
                 armSigma.setWidth(halfWidthBox);
                 armSigma.setValue(ds.armSigma);
                 armSigma.addListener(new ChangeListener() {
@@ -916,9 +902,8 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             }
             if (ds.distribution.isDensityWaveSpiral()) {
                 // Number of arms
-                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 2f, 4f, 2f, skin);
+                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 2f, 4f, 2f, 4f, skin);
                 numArms.setNumberFormatter(new DecimalFormat("#0"));
-                numArms.setResetValue(4f);
                 numArms.setWidth(fullWidthBox);
                 numArms.setValue(ds.numArms);
                 numArms.addListener(new ChangeListener() {
@@ -935,12 +920,16 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 // Spiral angle
                 float angleMin = ds.type.baseAngle[0];
                 float angleMax = ds.type.baseAngle[1];
-                var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"), angleMin, angleMax, true, skin);
+                var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"),
+                                                   angleMin,
+                                                   angleMax,
+                                                   true,
+                                                   angleMin + (angleMax - angleMin) / 2f,
+                                                   skin);
                 baseAngle.setLogarithmicExponent(1.2);
                 baseAngle.setNumberFormatter(new DecimalFormat("##0.###"));
                 baseAngle.setWidth(fullWidthBox);
                 baseAngle.setValue(ds.baseAngle);
-                baseAngle.setResetValue(angleMin + (angleMax - angleMin) / 2f);
                 baseAngle.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -956,11 +945,10 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 float eMin = ds.type.eccentricity[0];
                 float eMax = ds.type.eccentricity[1];
                 float eStep = (eMax - eMin) / SLIDER_STEPS;
-                var ec = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity"), eMin, eMax, eStep, skin);
+                var ec = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity"), eMin, eMax, eStep, 0.3f, skin);
                 ec.setNumberFormatter(new DecimalFormat("0.####"));
                 ec.setWidth(fullWidthBox);
                 ec.setValue(ds.eccentricity[0]);
-                ec.setResetValue(0.3f);
                 ec.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -974,11 +962,10 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 float eMin = ds.type.eccentricity[0];
                 float eMax = ds.type.eccentricity[1];
                 float eStep = (eMax - eMin) / SLIDER_STEPS;
-                var ecx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.x"), eMin, eMax, eStep, skin);
+                var ecx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.x"), eMin, eMax, eStep, 0.0f, skin);
                 ecx.setNumberFormatter(new DecimalFormat("0.####"));
                 ecx.setWidth(halfWidthBox);
                 ecx.setValue(ds.eccentricity[0]);
-                ecx.setResetValue(0.0f);
                 ecx.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -986,11 +973,10 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                         ds.setEccentricityX((double) ecx.getValue());
                     }
                 });
-                var ecy = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.y"), eMin, eMax, eStep, skin);
+                var ecy = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.y"), eMin, eMax, eStep, 0.0f, skin);
                 ecy.setNumberFormatter(new DecimalFormat("0.####"));
                 ecy.setWidth(halfWidthBox);
                 ecy.setValue(ds.eccentricity[1]);
-                ecy.setResetValue(0.0f);
                 ecy.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -1007,10 +993,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 float dMin = ds.type.spiralDeltaPos[0];
                 float dMax = ds.type.spiralDeltaPos[1];
                 float dStep = (dMax - dMin) / SLIDER_STEPS;
-                var deltaX = new OwnSliderReset(I18n.msg("gui.galaxy.ds.delta.x"), dMin, dMax, dStep, skin);
+                var deltaX = new OwnSliderReset(I18n.msg("gui.galaxy.ds.delta.x"), dMin, dMax, dStep, 0f, skin);
                 deltaX.setWidth(halfWidthBox);
                 deltaX.setValue(ds.spiralDeltaPos[0]);
-                deltaX.setResetValue(0f);
                 deltaX.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -1018,10 +1003,9 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                         ds.spiralDeltaPos[0] = deltaX.getValue();
                     }
                 });
-                var deltaY = new OwnSliderReset(I18n.msg("gui.galaxy.ds.delta.y"), dMin, dMax, dStep, skin);
+                var deltaY = new OwnSliderReset(I18n.msg("gui.galaxy.ds.delta.y"), dMin, dMax, dStep, 0f, skin);
                 deltaY.setWidth(halfWidthBox);
                 deltaY.setValue(ds.spiralDeltaPos[1]);
-                deltaY.setResetValue(0f);
                 deltaY.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
@@ -1038,11 +1022,10 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
                 float aspectMin = ds.type.aspect[0];
                 float aspectMax = ds.type.aspect[1];
                 float aspectStep = (aspectMax - aspectMin) / SLIDER_STEPS;
-                var aspect = new OwnSliderReset(I18n.msg("gui.galaxy.ds.aspect"), aspectMin, aspectMax, aspectStep, skin);
+                var aspect = new OwnSliderReset(I18n.msg("gui.galaxy.ds.aspect"), aspectMin, aspectMax, aspectStep, 1f, skin);
                 aspect.setNumberFormatter(new DecimalFormat("#0.###"));
                 aspect.setWidth(fullWidthBox);
                 aspect.setValue(ds.aspect);
-                aspect.setResetValue(1f);
                 aspect.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
