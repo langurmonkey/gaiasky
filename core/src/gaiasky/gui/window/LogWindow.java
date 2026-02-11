@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.gui.main.MessageBean;
 import gaiasky.util.Logger;
@@ -130,7 +132,7 @@ public class LogWindow extends GenericDialog {
             }
             bw.flush();
             bw.close();
-            Logger.getLogger(this.getClass()).info("Log file written to " + log.toAbsolutePath());
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.log.export.ok", log.toAbsolutePath()), -1f);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
