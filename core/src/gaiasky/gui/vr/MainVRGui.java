@@ -66,9 +66,9 @@ import java.util.Set;
 public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserver, Disposable {
 
     /** Width of the UI frame buffer. **/
-    public static final int WIDTH = (int) (1920 * 0.85);
+    public static final int WIDTH = (int) (1920 * 0.9);
     /** Height of the UI frame buffer. **/
-    public static final int HEIGHT = (int) (1080 * 0.85);
+    public static final int HEIGHT = (int) (1080 * 0.9);
 
     /** Ratio between height and width. **/
     public static final double HEIGHT_OVER_WIDTH = (double) HEIGHT / (double) WIDTH;
@@ -111,9 +111,6 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     private final Matrix4D transform = new Matrix4D();
     private final Matrix4D inverse = new Matrix4D();
     private final Vector3D camDir = new Vector3D();
-    private final Vector3D camUp = new Vector3D();
-    private final Vector3D up = new Vector3D();
-    private final Vector3D side = new Vector3D();
 
     public MainVRGui(Skin skin) {
         setSkin(skin);
