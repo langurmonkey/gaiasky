@@ -199,6 +199,12 @@ public class LoadingGui extends AbstractGui {
     }
 
     @Override
+    public void render(int rw, int rh) {
+        clearScreen();
+        super.render(rw, rh);
+    }
+
+    @Override
     public void update(double dt) {
         super.update(dt);
         long currTime = System.currentTimeMillis();

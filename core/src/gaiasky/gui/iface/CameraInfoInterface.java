@@ -50,14 +50,9 @@ import static gaiasky.scene.component.Label.LabelDisplay.ALWAYS;
 public class CameraInfoInterface extends TableGuiInterface implements IObserver {
     static private final int MAX_RULER_NAME_LEN = 9;
     private final FocusView view;
-    private final Table focusInfo;
-    private final Table moreInfo;
-    private final Table rulerInfo;
-    private final Table focusNames;
-    private final Table content;
+    private final Table focusInfo,moreInfo, rulerInfo, focusNames, content;
     private final Cell<Table> contentCell;
-    private final Cell<?> focusInfoCell;
-    private final Cell<?> rulerCell;
+    private final Cell<?> focusInfoCell, rulerCell;
     private final Vector3D pos;
     private final Vector3Q posQ;
     protected Skin skin;
@@ -65,9 +60,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
     protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralPlanet, proceduralGalaxy;
     protected OwnImageButton objectVisibility, forceLabel;
-    protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
-    protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
-    protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
+    protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC, camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel,
+            RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel,rulerName, rulerName0, rulerName1, rulerDist;
     protected HorizontalGroup focusActionsGroup;
     protected IFocus currentFocus;
     DecimalFormat nf;

@@ -15,9 +15,9 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,8 +27,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -378,9 +376,9 @@ public class WelcomeGui extends AbstractGui {
         Stack stack = new Stack();
         stack.setFillParent(true); // The stack fills the stage
 
-        // Background in layer 0.
+        // Background image.
         stack.add(bgImage);
-        // Container in layer 1.
+        // Center container.
         stack.add(centerContainer);
 
         stage.addActor(stack);
@@ -1005,7 +1003,15 @@ public class WelcomeGui extends AbstractGui {
             }
         }
         updateFocused();
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
+
+    @Override
+    public void render(int rw, int rh) {
+        clearScreen();
+        super.render(rw, rh);
+    }
+
 
     private OwnScrollPane getOwnScrollPane(Table datasets) {
         var datasetsScroll = new OwnScrollPane(datasets, skin, "minimalist-nobg");
@@ -1247,7 +1253,6 @@ public class WelcomeGui extends AbstractGui {
 
     @Override
     protected void rebuildGui() {
-
     }
 
     protected HorizontalGroup hg(Actor... actors) {

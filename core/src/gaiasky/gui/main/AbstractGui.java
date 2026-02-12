@@ -7,14 +7,13 @@
 
 package gaiasky.gui.main;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.PoolManager;
@@ -28,6 +27,7 @@ import gaiasky.gui.api.IGuiInterface;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Settings;
+import org.lwjgl.opengl.GL32;
 
 /**
  * Base implementation for top-level GUIs. Contains the essentials used by (almost) all.
@@ -92,6 +92,12 @@ public abstract class AbstractGui implements IObserver, IGui {
             stage.getBatch().getShader().setUniform3fv("u_accentColor", accent, 0, 3);
             stage.draw();
         }
+    }
+
+    protected void clearScreen() {
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        GL32.glClearDepth(1000000.0);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
     @Override
