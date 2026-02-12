@@ -1610,6 +1610,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // Do not show texture index if we did not find any texture (i.e. the base data package is not downloaded yet).
             if (!indexList.isEmpty()) {
                 textureIndex = new OwnSelectBox<>(skin);
+                textureIndex.setWidth(selectWidth);
                 textureIndex.setItems(indices);
                 if (selected != null)
                     textureIndex.setSelected(selected);
