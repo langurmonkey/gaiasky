@@ -10,6 +10,7 @@ package gaiasky.gui.main;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
@@ -207,7 +208,7 @@ public class GamepadGui extends AbstractGui {
 
         // Create contents
 
-        if (vr || true) {
+        if (vr) {
             // TOP LINE (time)
             topLine = new TopInfoInterface(skin, GaiaSky.instance.scene);
 
@@ -308,7 +309,7 @@ public class GamepadGui extends AbstractGui {
         addTextKey("8", searchModel, 7, 0, false);
         addTextKey("9", searchModel, 8, 0, false);
         addTextKey("0", searchModel, 9, 0, false);
-        addTextKey("<--", (event) -> {
+        addTextKey("⬅", (event) -> {
             if (event instanceof ChangeEvent) {
                 if (!searchField.getText().isBlank()) {
                     searchField.setText(searchField.getText().substring(0, searchField.getText().length() - 1));
@@ -356,7 +357,7 @@ public class GamepadGui extends AbstractGui {
         // Fourth row
         searchT.add().padRight(pad5).padBottom(pad10);
         searchT.add().padRight(pad5).padBottom(pad10);
-        addTextKey("SPACE", (event) -> {
+        addTextKey("Space", (event) -> {
             if (event instanceof ChangeEvent) {
                 searchField.setText(searchField.getText() + " ");
             }
@@ -2061,6 +2062,8 @@ public class GamepadGui extends AbstractGui {
             if (buttonCode == mappings.getButtonA()) {
                 actionUp();
                 return true;
+            } else if (buttonCode == mappings.getButtonX()) {
+
             }
             return false;
         }
@@ -2078,8 +2081,13 @@ public class GamepadGui extends AbstractGui {
                 } else if (target instanceof Button b) {
                     // Touch-down event for buttons.
                     InputEvent inputEvent = POOLS.obtain(InputEvent.class);
-                    inputEvent.setTarget(b);
                     inputEvent.setType(InputEvent.Type.touchDown);
+                    inputEvent.setStage(stage);
+                    inputEvent.setStageX(0);
+                    inputEvent.setStageY(0);
+                    inputEvent.setPointer(0);
+                    inputEvent.setButton(Input.Buttons.LEFT);
+                    inputEvent.setTarget(b);
                     b.fire(inputEvent);
                     POOLS.free(inputEvent);
                 } else {
@@ -2099,8 +2107,13 @@ public class GamepadGui extends AbstractGui {
                 if (target instanceof Button b) {
                     // Touch-up event.
                     InputEvent inputEvent = POOLS.obtain(InputEvent.class);
-                    inputEvent.setTarget(b);
                     inputEvent.setType(InputEvent.Type.touchUp);
+                    inputEvent.setStage(stage);
+                    inputEvent.setStageX(0);
+                    inputEvent.setStageY(0);
+                    inputEvent.setPointer(0);
+                    inputEvent.setButton(Input.Buttons.LEFT);
+                    inputEvent.setTarget(b);
                     b.fire(inputEvent);
                     POOLS.free(inputEvent);
                 }
