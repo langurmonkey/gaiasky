@@ -29,10 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
@@ -44,6 +41,7 @@ import gaiasky.gui.window.*;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.input.GuiKbdListener;
 import gaiasky.util.*;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
@@ -314,24 +312,25 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWaitingUI() {
-        // Render message.
         if (!Settings.settings.program.offlineMode) {
             this.updateUnitsPerPixel(1.6f);
-            // Central table
-            Table centerContainer = new Table(skin);
-            centerContainer.setFillParent(true);
-            centerContainer.bottom()
-                    .right();
+
+            // Prepare the background image.
             if (bgTex == null) {
                 bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
             }
-            Drawable bg = new SpriteDrawable(new Sprite(bgTex));
-            centerContainer.setBackground(bg);
+
+            Image bgImage = new Image(bgTex);
+            bgImage.setScaling(Scaling.fit);
+            bgImage.setAlign(Align.center);
+
+            // Central table
+            Table centerContainer = new Table(skin);
+            centerContainer.bottom().right();
 
             var table = new Table(skin);
             var gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
-            table.add(gaiaSky)
-                    .row();
+            table.add(gaiaSky).row();
             var msg = new OwnLabel(I18n.msg("gui.welcome.datasets.updates"), skin);
             table.add(msg);
 
@@ -341,7 +340,16 @@ public class WelcomeGui extends AbstractGui {
                     .padBottom(30f)
                     .padRight(30f);
 
-            stage.addActor(centerContainer);
+            // Create a Stack to layer them.
+            Stack stack = new Stack();
+            stack.setFillParent(true);
+
+            // Background in layer 0.
+            stack.add(bgImage);
+            // Container in layer 1.
+            stack.add(centerContainer);
+
+            stage.addActor(stack);
         }
     }
 
@@ -354,14 +362,28 @@ public class WelcomeGui extends AbstractGui {
         reloadLocalDatasets();
 
         // Central table
-        Table centerContainer = new Table(skin);
-        centerContainer.setFillParent(true);
-        centerContainer.center();
         if (bgTex == null) {
             bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
         }
-        Drawable bg = new SpriteDrawable(new Sprite(bgTex));
-        centerContainer.setBackground(bg);
+        Image bgImage = new Image(bgTex);
+        bgImage.setScaling(Scaling.fit);
+        bgImage.setAlign(Align.center);
+
+        // Central table
+        Table centerContainer = new Table(skin);
+        centerContainer.setFillParent(true);
+        centerContainer.center();
+
+        // Create a Stack to layer them
+        Stack stack = new Stack();
+        stack.setFillParent(true); // The stack fills the stage
+
+        // Background in layer 0.
+        stack.add(bgImage);
+        // Container in layer 1.
+        stack.add(centerContainer);
+
+        stage.addActor(stack);
 
         float pad16 = 16f;
         float pad18 = 18f;

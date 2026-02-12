@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
@@ -48,7 +49,8 @@ import java.util.Objects;
 public class LoadingGui extends AbstractGui {
     private static final long tipTime = 3500;
     public NotificationsInterface notificationsInterface;
-    protected Table center, topLeft, bottomMiddle, screenMode;
+    protected Stack stack;
+    protected Table topLeft, bottomMiddle, screenMode;
     private TipsGenerator tipGenerator;
     private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
@@ -84,18 +86,27 @@ public class LoadingGui extends AbstractGui {
             vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
 
-        center = new Table(skin);
+        // Create a Stack to layer background and content.
+        stack = new Stack();
+        stack.setFillParent(true);
         if (!vr) {
             Texture tex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
-            Drawable bg = new SpriteDrawable(new Sprite(tex));
-            center.setBackground(bg);
+            Image bgImage = new Image(tex);
+            bgImage.setScaling(Scaling.fit);
+            bgImage.setAlign(Align.center);
+            // Background in layer 0.
+            stack.add(bgImage);
         }
+        // Content.
+        var center = new Table(skin);
         center.setFillParent(true);
         center.center();
 
-        Table centerContent = new Table(skin);
+        // Content table in layer 1.
+        stack.add(center);
+
+        var centerContent = new Table(skin);
         centerContent.center();
-        centerContent.setBackground("bg-pane");
         centerContent.pad(pad30);
         centerContent.padLeft(pad30 * 5f);
         centerContent.padRight(pad30 * 5f);
@@ -223,7 +234,7 @@ public class LoadingGui extends AbstractGui {
     public void rebuildGui() {
         if (stage != null) {
             stage.clear();
-            stage.addActor(center);
+            stage.addActor(stack);
             stage.addActor(bottomMiddle);
             if (!vr) {
                 stage.addActor(screenMode);
