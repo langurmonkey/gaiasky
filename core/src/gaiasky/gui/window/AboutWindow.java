@@ -120,7 +120,7 @@ public class AboutWindow extends GenericDialog {
         final var contentHelp = new Table(skin);
         contentHelp.top();
 
-        var gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+        var gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title-s");
 
         var versionBig = new OwnLabel(Settings.settings.version.version,
                                       skin,

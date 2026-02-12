@@ -185,7 +185,6 @@ public class GamepadGui extends AbstractGui {
         rebuildGui();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void rebuildGui() {
 
@@ -208,7 +207,7 @@ public class GamepadGui extends AbstractGui {
 
         // Create contents
 
-        if (vr) {
+        if (vr || true) {
             // TOP LINE (time)
             topLine = new TopInfoInterface(skin, GaiaSky.instance.scene);
 
@@ -233,7 +232,7 @@ public class GamepadGui extends AbstractGui {
             vrInfoT.setSize(tw1, th);
 
             // Title
-            OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "header-large");
+            OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title-s");
             OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "header-raw");
             vrInfoT.add(welcomeTitle).center().top().padBottom(pad20).colspan(2).row();
             vrInfoT.add(version).center().top().padBottom(pad40).colspan(2).row();
@@ -720,7 +719,7 @@ public class GamepadGui extends AbstractGui {
         boolean timeOn = Settings.settings.runtime.timeOn;
         timeStartStop = new OwnTextButton(I18n.msg(timeOn ? "gui.time.pause" : "gui.time.start"), skin, "toggle-big");
         timeModel[1][0] = timeStartStop;
-        timeStartStop.setWidth(ww);
+        timeStartStop.setWidth(ww * 0.7f);
         timeStartStop.setChecked(timeOn);
         timeStartStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -732,7 +731,7 @@ public class GamepadGui extends AbstractGui {
         });
         timeUp = new OwnTextIconButton(I18n.msg("gui.time.speedup"), Align.right, skin, "fwd");
         timeModel[2][0] = timeUp;
-        timeUp.setWidth(ww);
+        timeUp.setWidth(ww * 0.7f);
         timeUp.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 em.post(Event.TIME_WARP_INCREASE_CMD, timeUp);
@@ -742,7 +741,7 @@ public class GamepadGui extends AbstractGui {
         });
         timeDown = new OwnTextIconButton(I18n.msg("gui.time.slowdown"), skin, "bwd");
         timeModel[0][0] = timeDown;
-        timeDown.setWidth(ww);
+        timeDown.setWidth(ww * 0.7f);
         timeDown.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 em.post(Event.TIME_WARP_DECREASE_CMD, timeDown);
@@ -752,7 +751,7 @@ public class GamepadGui extends AbstractGui {
         });
         timeReset = new OwnTextIconButton(I18n.msg("action.resettime"), Align.center, skin, "reload");
         timeModel[1][1] = timeReset;
-        timeReset.setWidth(ww);
+        timeReset.setWidth(ww * 0.7f);
         timeReset.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 em.post(Event.TIME_CHANGE_CMD, timeReset, Instant.now());

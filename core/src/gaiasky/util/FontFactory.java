@@ -20,7 +20,7 @@ import gaiasky.util.Logger.Log;
 public class FontFactory implements Disposable {
     private static final Log logger = Logger.getLogger(FontFactory.class);
 
-    private FreeTypeFontGenerator uiGen, monoGen, titleGen, titleBigGen, interGen, notoGen;
+    private FreeTypeFontGenerator regularGen, monoGen, boldGen, titleGen, interGen, notoGen;
 
     /** Western languages character set (Spanish, Catala, German, French, Italian, Slovenian, Turkish, Russian, Bulgarian). **/
     public static final String COMMON_CHARS = """
@@ -40,25 +40,30 @@ public class FontFactory implements Disposable {
         long start = System.currentTimeMillis();
 
         // Prepare Generators.
-        String uiFontPath = "fonts/SarasaUiSC-Regular-Subset.ttf";
-        String titleFontPath = "fonts/SarasaUiSC-Bold-Subset.ttf";
-        String titleBigFontPath = "fonts/Ethnocentric-Regular.ttf";
+        String regularFontPath = "fonts/SarasaUiSC-Regular-Subset.ttf";
+        String boldFontPath = "fonts/SarasaUiSC-Bold-Subset.ttf";
+        String titleFontPath = "fonts/Ethnocentric-Regular.ttf";
 
+        boldGen = new FreeTypeFontGenerator(Gdx.files.internal(boldFontPath));
         titleGen = new FreeTypeFontGenerator(Gdx.files.internal(titleFontPath));
-        titleBigGen = new FreeTypeFontGenerator(Gdx.files.internal(titleBigFontPath));
-        uiGen = new FreeTypeFontGenerator(Gdx.files.internal(uiFontPath));
+        regularGen = new FreeTypeFontGenerator(Gdx.files.internal(regularFontPath));
 
-        // Generate UI Fonts.
-        int[] uiSizes = {15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 33};
-        for (int size : uiSizes) {
-            skin.add("ui-" + size, uiGen.generateFont(fontParams(size)));
+        // Generate regular Fonts.
+        int[] regularSizes = {15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 33};
+        for (int size : regularSizes) {
+            skin.add("regular-" + size, regularGen.generateFont(fontParams(size)));
         }
 
-        // Generate Title Fonts.
-        // Use Ethnocentric only for size 60.
-        int[] titleSizes = {17, 20, 21, 23, 25, 27, 30, 40, 60};
+        // Generate bold Fonts.
+        int[] boldSizes = {17, 20, 21, 23, 25, 27, 30, 40};
+        for (int size : boldSizes) {
+            skin.add("bold-" + size,boldGen.generateFont(fontParams(size)));
+        }
+
+        // Generate title fonts
+        int[] titleSizes = {30, 60};
         for (int size : titleSizes) {
-            skin.add("title-" + size, size < 60 ? titleGen.generateFont(fontParams(size)) : titleBigGen.generateFont(fontParams(size)));
+            skin.add("title-" + size, titleGen.generateFont(fontParams(size)));
         }
 
         logger.info("Font generation for [" + lang + "] took " + (System.currentTimeMillis() - start) + "ms");
@@ -86,14 +91,14 @@ public class FontFactory implements Disposable {
     }
 
     public void dispose() {
-        if (uiGen != null) {
-            uiGen.dispose();
+        if (regularGen != null) {
+            regularGen.dispose();
+        }
+        if (boldGen != null) {
+            boldGen.dispose();
         }
         if (titleGen != null) {
             titleGen.dispose();
-        }
-        if (titleBigGen != null) {
-            titleBigGen.dispose();
         }
     }
 }

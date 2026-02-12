@@ -449,7 +449,7 @@ public class WelcomeGui extends AbstractGui {
         titleGroup.add(title)
                 .expandX();
 
-        String textStyle = "main-title-s";
+        String textStyle = "title-s";
 
 
         // Add title to center.
@@ -971,7 +971,7 @@ public class WelcomeGui extends AbstractGui {
                             content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.myVersion), skin, "header-large"))
                                     .center()
                                     .padRight(pad34);
-                            content.add(new OwnLabel("->", skin, "main-title-s"))
+                            content.add(new OwnLabel("->", skin, "title-s"))
                                     .center()
                                     .padRight(pad34);
                             content.add(

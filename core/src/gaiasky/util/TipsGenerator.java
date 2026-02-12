@@ -141,7 +141,7 @@ public class TipsGenerator {
                     button.pad(pad2, pad5, pad2, pad5);
                     g.addActor(button);
                     if (i < n - 1) {
-                        OwnLabel plus = new OwnLabel("+", skin, "main-title-s");
+                        OwnLabel plus = new OwnLabel("+", skin, "title-s");
                         plus.setColor(0.5f, 0.5f, 0.5f, 1f);
                         g.addActor(plus);
                     }
@@ -151,7 +151,7 @@ public class TipsGenerator {
     }
 
     private static class TipPart {
-        public String style = "main-title-s";
+        public String style = "title-s";
         public String text;
         public String drawable;
 

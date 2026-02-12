@@ -10,10 +10,10 @@ package gaiasky.desktop.util;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
-import java.awt.*;
-import java.io.File;
-import java.nio.file.Files;
-
+/**
+ * Generates the <code>default.atlas</code> and <code>default.png</code> files from the UI skin images
+ * at <code>assets/skins/raw/source</code>.
+ */
 public class PackUITextures {
     public static void main(String[] args) {
         TexturePacker.Settings x2settings = new TexturePacker.Settings();
@@ -24,50 +24,16 @@ public class PackUITextures {
         x2settings.filterMag = Texture.TextureFilter.Linear;
         x2settings.filterMin = Texture.TextureFilter.Linear;
 
-        final Color purple = Color.decode("#ff00ff");
-        final String themeName = "default";
-
         // Use current path variable
         String gs = (new java.io.File("")).getAbsolutePath();
 
-            try {
+        try {
+            // Process
+            TexturePacker.process(x2settings, gs + "/assets/skins/raw/source/", gs + String.format("/assets/skins/%s/", "default"), "default");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-                // Process
-                TexturePacker.process(x2settings, gs + "/assets/skins/raw/source/", gs + String.format("/assets/skins/%s/", themeName), themeName);
-
-                // Process and copy theme JSON file.
-                File templateFile = new File(gs + "/assets/skins/raw/source.json");
-                File outputDir = new File(gs + String.format("/assets/skins/%s/", themeName));
-                if (!outputDir.exists()) {
-                    if (outputDir.mkdirs()) {
-                        System.out.println("Created output directory");
-                    }
-                }
-                File outputFile = new File(outputDir, themeName + ".json");
-
-                String jsonTemplate = Files.readString(templateFile.toPath());
-                String result = replaceColors(jsonTemplate, purple);
-
-                Files.writeString(outputFile.toPath(), result);
-                System.out.println("Written to: " + outputFile.getAbsolutePath());
-
-
-            } catch (Exception e) {
-                System.out.println(String.format("Error generating theme: %s", themeName));
-                throw new RuntimeException(e);
-            }
-
-    }
-
-    private static String replaceColors(String template, Color theme) {
-        return template
-                .replace("\"%theme_r%\"", format(theme.getRed()))
-                .replace("\"%theme_g%\"", format(theme.getGreen()))
-                .replace("\"%theme_b%\"", format(theme.getBlue()));
-    }
-
-    private static String format(int value) {
-        return String.format("%.4f", value / 255.0);
     }
 
 }

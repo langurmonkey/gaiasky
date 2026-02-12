@@ -136,7 +136,7 @@ public class LoadingGui extends AbstractGui {
         // Funny text.
         loadingTextGenerator = new LoadingTextGenerator();
         lastFunnyTime = 0;
-        spin = new OwnLabel("0", skin, "main-title-s");
+        spin = new OwnLabel("0", skin, "title-s");
         spin.setColor(skin.getColor("theme"));
 
         centerContent.add(titleGroup).width(1300).center().padBottom(pad30 * 2f).row();

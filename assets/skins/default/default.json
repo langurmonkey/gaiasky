@@ -68,9 +68,9 @@
     },
     "theme": {
       "a": 1,
-      "b": 1.0000,
-      "g": 0.0000,
-      "r": 1.0000
+      "b": 1,
+      "g": 0,
+      "r": 1
     },
     "highlight": {
       "a": 1,
@@ -125,7 +125,7 @@
       "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
-      "font": "title-20",
+      "font": "bold-20",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
@@ -135,7 +135,7 @@
       "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
@@ -145,7 +145,7 @@
       "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
-      "font": "title-27",
+      "font": "bold-27",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
@@ -158,7 +158,7 @@
       "checked": "default-round-down",
       "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-17",
+      "font": "bold-17",
       "fontColor": "white",
       "downFontColor": "black"
     },
@@ -171,27 +171,27 @@
       "checked": "default-round-down",
       "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "white",
       "downFontColor": "black"
     },
     "key": {
       "up": "key",
-      "font": "ui-18",
+      "font": "regular-18",
       "fontColor": "black"
     },
     "key-big": {
       "up": "key",
-      "font": "ui-33",
+      "font": "regular-33",
       "fontColor": "black"
     },
     "link": {
-      "font": "ui-18",
+      "font": "regular-18",
       "fontColor": "blue",
       "downFontColor": "theme"
     },
     "link-big": {
-      "font": "ui-33",
+      "font": "regular-33",
       "fontColor": "blue",
       "downFontColor": "theme"
     }
@@ -393,7 +393,7 @@
       "checked": "default-round-down",
       "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-21",
+      "font": "bold-21",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "quit-icon"
@@ -446,7 +446,7 @@
       "checked": "default-round-down",
       "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-27",
+      "font": "bold-27",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-play-circle"
@@ -460,7 +460,7 @@
       "checked": "default-round-down",
       "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-data-transfer-download"
@@ -474,7 +474,7 @@
       "checked": "default-round-down",
       "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-task"
@@ -488,7 +488,7 @@
       "checked": "default-round-down",
       "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-17",
+      "font": "bold-17",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-plus"
@@ -703,7 +703,7 @@
   },
   "gaiasky.util.scene2d.OwnSelectBox$OwnSelectBoxStyle": {
     "default": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white",
       "overFontColor": "highlight",
       "disabledFontColor": "grey",
@@ -712,7 +712,7 @@
       "backgroundFocused": "default-select-focused",
       "scrollStyle": "default",
       "listStyle": {
-        "font": "ui-23",
+        "font": "regular-23",
         "fontColorSelected": "white",
         "fontColorUnselected": "white",
         "selection": "default-select-selection",
@@ -720,7 +720,7 @@
       }
     },
     "big": {
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "white",
       "overFontColor": "highlight",
       "disabledFontColor": "grey",
@@ -729,7 +729,7 @@
       "backgroundFocused": "default-select-focused",
       "scrollStyle": "default",
       "listStyle": {
-        "font": "title-23",
+        "font": "bold-23",
         "fontColorSelected": "white",
         "fontColorUnselected": "white",
         "selection": "default-select-selection",
@@ -739,7 +739,7 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle": {
     "default": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white",
       "overFontColor": "highlight",
       "disabledFontColor": "grey",
@@ -747,7 +747,7 @@
       "backgroundDisabled": "default-select-disabled",
       "scrollStyle": "default",
       "listStyle": {
-        "font": "ui-23",
+        "font": "regular-23",
         "fontColorSelected": "white",
         "fontColorUnselected": "white",
         "selection": "default-select-selection",
@@ -765,17 +765,17 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
     "default": {
-      "titleFont": "title-21",
+      "titleFont": "bold-21",
       "background": "default-window",
       "titleFontColor": "white"
     },
     "info": {
-      "titleFont": "title-21",
+      "titleFont": "bold-21",
       "background": "info-window",
       "titleFontColor": "white"
     },
     "dialog": {
-      "titleFont": "title-21",
+      "titleFont": "bold-21",
       "background": "default-window",
       "titleFontColor": "white",
       "stageBackground": "dialogDim"
@@ -818,139 +818,139 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
     "object-name": {
-      "font": "ui-19",
+      "font": "regular-19",
       "fontColor": "lightblue"
     },
     "object-name-large": {
-      "font": "ui-25",
+      "font": "regular-25",
       "fontColor": "lightblue"
     },
     "header-large": {
-      "font": "title-40",
+      "font": "bold-40",
       "fontColor": "theme"
     },
     "header": {
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "theme"
     },
     "header-raw": {
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "white"
     },
     "header-blue": {
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "blue"
     },
     "header-red": {
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "red"
     },
     "header-s": {
-      "font": "title-20",
+      "font": "bold-20",
       "fontColor": "theme"
     },
     "question": {
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "grey"
     },
     "hotkey": {
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "theme"
     },
     "default": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white"
     },
     "default-blue": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "blue"
     },
     "default-scblue": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "sc-blue"
     },
     "default-red": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "red"
     },
     "default-pink": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "pink"
     },
     "default-inv": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "black"
     },
     "small": {
-      "font": "ui-20",
+      "font": "regular-20",
       "fontColor": "white"
     },
     "big": {
-      "font": "ui-25",
+      "font": "regular-25",
       "fontColor": "white"
     },
     "huge": {
-      "font": "ui-28",
+      "font": "regular-28",
       "fontColor": "white"
     },
     "menuitem-shortcut": {
-      "font": "ui-20",
+      "font": "regular-20",
       "fontColor": "grey"
     },
     "grey-normal": {
-      "font": "ui-21",
+      "font": "regular-21",
       "fontColor": "grey"
     },
     "grey-large": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "grey"
     },
     "warp": {
-      "font": "title-25",
+      "font": "bold-25",
       "fontColor": "theme"
     },
     "headline": {
-      "font": "title-40",
+      "font": "bold-40",
       "fontColor": "white"
     },
     "subhead": {
-      "font": "ui-30",
+      "font": "regular-30",
       "fontColor": "white"
     },
     "hud": {
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "white"
     },
     "hud-med": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white"
     },
     "hud-big": {
-      "font": "ui-27",
+      "font": "regular-27",
       "fontColor": "white"
     },
     "hud-header": {
-      "font": "title-27",
+      "font": "bold-27",
       "fontColor": "theme"
     },
     "hud-subheader": {
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "theme"
     },
     "link": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "blue"
     },
     "link-large": {
-      "font": "ui-25",
+      "font": "regular-25",
       "fontColor": "blue"
     },
     "sc-header": {
-      "font": "title-23",
+      "font": "bold-23",
       "fontColor": "sc-blue"
     },
     "tooltip": {
-      "font": "ui-21",
+      "font": "regular-21",
       "fontColor": "white",
       "background": "tooltip-bg"
     },
@@ -962,72 +962,72 @@
       "font": "title-30",
       "fontColor": "white"
     },
-    "main-title-xs": {
-      "font": "title-20",
+    "title-s": {
+      "font": "bold-30",
       "fontColor": "white"
     },
     "msg-15": {
-      "font": "ui-15",
+      "font": "regular-15",
       "fontColor": "white"
     },
     "msg-17": {
-      "font": "ui-17",
+      "font": "regular-17",
       "fontColor": "white"
     },
     "msg-18": {
-      "font": "ui-18",
+      "font": "regular-18",
       "fontColor": "white"
     },
     "msg-19": {
-      "font": "ui-19",
+      "font": "regular-19",
       "fontColor": "white"
     },
     "msg-20": {
-      "font": "ui-20",
+      "font": "regular-20",
       "fontColor": "white"
     },
     "msg-21": {
-      "font": "ui-21",
+      "font": "regular-21",
       "fontColor": "white"
     },
     "msg-22": {
-      "font": "ui-21",
+      "font": "regular-21",
       "fontColor": "white"
     },
     "msg-23": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white"
     },
     "msg-24": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white"
     },
     "msg-25": {
-      "font": "ui-25",
+      "font": "regular-25",
       "fontColor": "white"
     },
     "msg-26": {
-      "font": "ui-25",
+      "font": "regular-25",
       "fontColor": "white"
     },
     "msg-27": {
-      "font": "ui-28",
+      "font": "regular-28",
       "fontColor": "white"
     },
     "msg-28": {
-      "font": "ui-28",
+      "font": "regular-28",
       "fontColor": "white"
     },
     "msg-29": {
-      "font": "ui-28",
+      "font": "regular-28",
       "fontColor": "white"
     },
     "msg-30": {
-      "font": "ui-30",
+      "font": "regular-30",
       "fontColor": "white"
     },
     "msg-33": {
-      "font": "ui-33",
+      "font": "regular-33",
       "fontColor": "white"
     }
   },
@@ -1037,7 +1037,7 @@
       "background": "textfield",
       "focusedBackground": "textfield-focused",
       "disabledBackground": "textfield-disabled",
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "white",
       "disabledFontColor": "grey",
       "messageFontColor": "dark-gray",
@@ -1048,7 +1048,7 @@
       "background": "textfield",
       "focusedBackground": "textfield-focused",
       "disabledBackground": "textfield-disabled",
-      "font": "ui-30",
+      "font": "regular-30",
       "fontColor": "white",
       "disabledFontColor": "grey",
       "messageFontColor": "dark-gray",
@@ -1058,104 +1058,104 @@
       "selection": "selection",
       "background": "textfield",
       "focusedBackground": "textfield-focused",
-      "font": "ui-20",
+      "font": "regular-20",
       "fontColor": "white",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
     "disabled-nobg": {
       "selection": "selection",
-      "font": "ui-20",
+      "font": "regular-20",
       "fontColor": "white",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
     "info": {
-      "font": "ui-20",
+      "font": "regular-20",
       "fontColor": "sc-blue",
       "background": null
     },
     "regular": {
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "white",
       "background": null
     },
     "msg-15": {
-      "font": "ui-15",
+      "font": "regular-15",
       "fontColor": "white",
       "background": null
     },
     "msg-17": {
-      "font": "ui-17",
+      "font": "regular-17",
       "fontColor": "white",
       "background": null
     },
     "msg-18": {
-      "font": "ui-18",
+      "font": "regular-18",
       "fontColor": "white",
       "background": null
     },
     "msg-19": {
-      "font": "ui-19",
+      "font": "regular-19",
       "fontColor": "white",
       "background": null
     },
     "msg-20": {
-      "font": "ui-20",
+      "font": "regular-20",
       "fontColor": "white",
       "background": null
     },
     "msg-21": {
-      "font": "ui-21",
+      "font": "regular-21",
       "fontColor": "white",
       "background": null
     },
     "msg-22": {
-      "font": "ui-21",
+      "font": "regular-21",
       "fontColor": "white",
       "background": null
     },
     "msg-23": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white",
       "background": null
     },
     "msg-24": {
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white",
       "background": null
     },
     "msg-25": {
-      "font": "ui-25",
+      "font": "regular-25",
       "fontColor": "white",
       "background": null
     },
     "msg-26": {
-      "font": "ui-25",
+      "font": "regular-25",
       "fontColor": "white",
       "background": null
     },
     "msg-27": {
-      "font": "ui-28",
+      "font": "regular-28",
       "fontColor": "white",
       "background": null
     },
     "msg-28": {
-      "font": "ui-28",
+      "font": "regular-28",
       "fontColor": "white"
     },
     "msg-29": {
-      "font": "ui-28",
+      "font": "regular-28",
       "fontColor": "white",
       "background": null
     },
     "msg-30": {
-      "font": "ui-30",
+      "font": "regular-30",
       "fontColor": "white",
       "background": null
     },
     "msg-33": {
-      "font": "ui-33",
+      "font": "regular-33",
       "fontColor": "white",
       "background": null
     }
@@ -1172,7 +1172,7 @@
       "checkedFocused": "check-on-focused",
       "focusedFontColor": "yellow",
       "checkedFocusedFontColor": "yellow",
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "white"
     },
     "large": {
@@ -1186,7 +1186,7 @@
       "checkedFocused": "check-on-focused",
       "focusedFontColor": "yellow",
       "checkedFocusedFontColor": "yellow",
-      "font": "ui-26",
+      "font": "regular-26",
       "fontColor": "white"
     },
     "title": {
@@ -1200,7 +1200,7 @@
       "checkedFocused": "check-on-focused",
       "focusedFontColor": "yellow",
       "checkedFocusedFontColor": "yellow",
-      "font": "ui-22",
+      "font": "regular-22",
       "fontColor": "theme"
     },
     "radio": {
@@ -1214,7 +1214,7 @@
       "checkedFocused": "radio-on-focused",
       "focusedFontColor": "yellow",
       "checkedFocusedFontColor": "yellow",
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white"
     }
   },
@@ -1223,21 +1223,21 @@
       "fontColorUnselected": "white",
       "selection": "selection",
       "fontColorSelected": "white",
-      "font": "ui-23",
+      "font": "regular-23",
       "background": "dark-grey"
     },
     "light": {
       "fontColorUnselected": "black",
       "selection": "selection",
       "fontColorSelected": "black",
-      "font": "ui-23",
+      "font": "regular-23",
       "background": "light-grey"
     },
     "normal": {
       "fontColorUnselected": "white",
       "selection": "selection",
       "fontColorSelected": "white",
-      "font": "ui-25",
+      "font": "regular-25",
       "background": "dark-grey"
     }
   },
@@ -1310,7 +1310,7 @@
       "up": "button-dark",
       "over": "button-over",
       "disabled": "button",
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white",
       "disabledFontColor": "grey"
     },
@@ -1318,7 +1318,7 @@
       "checked": "button-down",
       "down": "button-down",
       "up": "button-dark",
-      "font": "ui-23",
+      "font": "regular-23",
       "fontColor": "white",
       "over": "button-over",
       "disabled": "button",

@@ -51,7 +51,7 @@ public class MinimapWidget implements Disposable {
 
         SpriteBatch sb = new SpriteBatch(1000, spriteShader);
 
-        BitmapFont font = skin.getFont("ui-23");
+        BitmapFont font = skin.getFont("regular-23");
 
         tfb = new FrameBuffer(Format.RGBA8888, side, side, true);
         sfb = new FrameBuffer(Format.RGBA8888, side, sideShort, true);
