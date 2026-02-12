@@ -26,9 +26,9 @@ import java.util.function.Function;
 public class OwnSliderReset extends Table implements Disableable {
     private Skin skin;
     private OwnSliderPlus slider;
-    private OwnImageButton resetButton;
+    private OwnTextButton resetButton;
     private Float resetValue;
-    private final float RESET_BUTTON_SIZE = 20f;
+    private final float RESET_BUTTON_SIZE = 22f;
     private final float SLIDER_BUTTON_SPACE = 1f;
 
     // Constructors matching OwnSliderPlus
@@ -115,7 +115,7 @@ public class OwnSliderReset extends Table implements Disableable {
         if (value != null && resetButton == null) {
             var size = RESET_BUTTON_SIZE;
             // Create reset button
-            resetButton = new OwnImageButton(skin, "reload-s");
+            resetButton = new OwnTextButton("↻", skin, "default");
             resetButton.setSize(size, size);
             resetButton.addListener(new ClickListener() {
                 @Override
