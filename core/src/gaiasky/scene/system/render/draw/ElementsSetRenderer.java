@@ -45,6 +45,7 @@ import net.jafama.FastMath;
 import org.lwjgl.opengl.GL41;
 
 import java.util.List;
+import java.util.Random;
 
 public class ElementsSetRenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ElementsSetRenderer.class);
@@ -52,6 +53,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     private final Matrix4 aux, refSysTransformF;
     private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.075)), FastMath.tan(Math.toRadians(0.9))};
     private final Colormap cmap;
+    private final Random rand;
 
     public ElementsSetRenderer(SceneRenderer sceneRenderer,
                                RenderGroup rg,
@@ -60,6 +62,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
         super(sceneRenderer, rg, alphas, shaders);
         cmap = new Colormap();
         aux = new Matrix4();
+        rand = new Random(123L);
         refSysTransformF = new Matrix4();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
@@ -106,12 +109,12 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                      getOffset(render));
             var desc = Mapper.datasetDescription.get(render.entity);
             var hl = Mapper.highlight.get(render.entity);
+            var set = Mapper.orbitElementsSet.get(render.entity);
 
             CatalogInfo ci = desc.catalogInfo;
             if (!inGpu(render)) {
                 // Check children nodes.
                 var body = Mapper.body.get(render.entity);
-                var set = Mapper.orbitElementsSet.get(render.entity);
                 float[] colorNoiseContainer = new float[3];
                 float[] baseColor = utils.getColor(body, hl);
 
@@ -170,7 +173,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                 model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
 
                                 // TEXTURE INDEX
-                                model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = -1f;
+                                float textureIndex = computeTextureIndex(null, rand, set.textureArray, set.textureAttribute);
+                                model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = textureIndex;
 
                                 curr.instanceIdx += curr.instanceSize;
                                 numParticlesAdded++;
@@ -213,7 +217,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                         model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
 
                         // TEXTURE INDEX
-                        model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = -1f;
+                        float textureIndex = computeTextureIndex(k, rand, set.textureArray, set.textureAttribute);
+                        model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = textureIndex;
 
                         curr.instanceIdx += curr.instanceSize;
                         numParticlesAdded++;
@@ -238,63 +243,80 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
             /*
              * RENDER
              */
-            var offset = getOffset(render);
-            if (offset < 0) return;
-            curr = meshes.get(offset);
-            if (curr != null) {
-                ExtShaderProgram shaderProgram = getShaderProgram();
-                shaderProgram.begin();
-
-                shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-                shaderProgram.setUniformf("u_camPos", camera.getPos());
-                addCameraUpCubemapMode(shaderProgram, camera);
-                shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
-                shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.1f * hl.pointscaling);
-                shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
-
-                // VR scale
-                shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
-                // Emulate double, for compatibility
-                double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
-                float curRt1 = (float) curRt;
-                float curRt2 = (float) (curRt - (double) curRt1);
-                shaderProgram.setUniformf("u_t", curRt1, curRt2);
-
-                // Reference system transform
-                Matrix4D refSysTransform = null;
-                if (graph.children != null && graph.children.size > 0) {
-                    if (Mapper.transform.has(graph.children.get(0))) {
-                        refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
+            if (set != null) {
+                var offset = getOffset(render);
+                if (offset < 0) return;
+                curr = meshes.get(offset);
+                if (curr != null) {
+                    if (set.textureArray != null) {
+                        set.textureArray.bind(0);
                     }
+
+                    int shadingType = preShadingType(hl, set.shadingType);
+
+                    ExtShaderProgram shaderProgram = getShaderProgram();
+                    shaderProgram.begin();
+
+                    shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+                    shaderProgram.setUniformf("u_camPos", camera.getPos());
+                    addCameraUpCubemapMode(shaderProgram, camera);
+                    shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
+                    shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, set.profileDecay));
+                    shaderProgram.setUniformf("u_sizeFactor",
+                                              Settings.settings.scene.star.pointSize * 0.1f * hl.pointscaling);
+                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
+
+                    // Shading type.
+                    setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower);
+
+                    // VR scale
+                    shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
+
+                    // Emulate double, for compatibility
+                    double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
+                    float curRt1 = (float) curRt;
+                    float curRt2 = (float) (curRt - (double) curRt1);
+                    shaderProgram.setUniformf("u_t", curRt1, curRt2);
+
+                    // Reference system transform
+                    Matrix4D refSysTransform = null;
+                    if (graph.children != null && graph.children.size > 0) {
+                        if (Mapper.transform.has(graph.children.get(0))) {
+                            refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
+                        }
+                    }
+                    if (refSysTransform != null
+                            && graph.children != null && graph.children.size > 0
+                            && Mapper.trajectory.has(graph.children.get(0))
+                            && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
+                        refSysTransform.putIn(aux).inv();
+                        refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
+                    } else if (refSysTransform != null) {
+                        refSysTransform.putIn(refSysTransformF).inv();
+                    } else {
+                        refSysTransformF.idt();
+                    }
+                    shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
+
+
+                    // Affine transformations.
+                    addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
+                    // Relativistic effects.
+                    addEffectsUniforms(shaderProgram, camera);
+
+                    try {
+                        int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
+                        curr.mesh.render(shaderProgram, primitive, 0, count, getCount(render));
+                    } catch (IllegalArgumentException e) {
+                        logger.error(e, "Render exception");
+                    }
+                    shaderProgram.end();
+
+                    postShadingType();
                 }
-                if (refSysTransform != null
-                        && graph.children != null && graph.children.size > 0
-                        && Mapper.trajectory.has(graph.children.get(0))
-                        && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
-                    refSysTransform.putIn(aux).inv();
-                    refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
-                } else if (refSysTransform != null) {
-                    refSysTransform.putIn(refSysTransformF).inv();
-                } else {
-                    refSysTransformF.idt();
-                }
-                shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
 
 
-                // Affine transformations.
-                addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
-
-                // Relativistic effects.
-                addEffectsUniforms(shaderProgram, camera);
-
-                try {
-                    int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
-                    curr.mesh.render(shaderProgram, primitive, 0, count, getCount(render));
-                } catch (IllegalArgumentException e) {
-                    logger.error(e, "Render exception");
-                }
-                shaderProgram.end();
             }
         }
     }

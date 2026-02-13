@@ -5,6 +5,7 @@
 #include <shader/lib/doublefloat.glsl>
 #endif // extendedParticlesFlag
 
+
 // UNIFORMS
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
@@ -50,6 +51,9 @@ layout(location = 5) in float a_textureIndex;
 out vec4 v_col;
 out vec2 v_uv;
 out float v_textureIndex;
+
+// Shading type (fake lighting).
+#include <shader/lib/shadingtype.vert.glsl>
 
 #ifdef relativisticEffects
 #include <shader/lib/relativity.glsl>
@@ -104,7 +108,6 @@ void main() {
     float shadingStyleFactor = 1.0;
     if (u_shadingStyle == 1) {
         float noise = abs(gold_noise(vec2(float(gl_InstanceID * 0.001)), 2334.943));
-        //float reflectionFactor = (1.0 + dot(normalize(pos), normalize(particlePos / vrScale))) * 0.5;
         shadingStyleFactor = clamp(pow(
                     (1.0 + sin(mod(u_appTime + noise * 6.0, 3.141597))) / 2.0, 5.0), 0.0, 1.0);
     }
@@ -124,6 +127,7 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
+
     v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
     float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
@@ -136,6 +140,8 @@ void main() {
     #include <shader/snippet/billboard.fast.glsl>
 
     gl_Position = gpos * vrScale;
+
+    computeShadingTypeOutputs(pos);
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;

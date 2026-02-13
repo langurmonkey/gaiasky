@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.TextureArray;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
@@ -109,6 +110,7 @@ public class ParticleSet implements Component, IDisposable {
      */
     public String datafile;
 
+
     /**
      * Model file to use (<code>obj</code>, <code>g3db</code>, <code>g3dj</code>, <code>gltf</code>, <code>glb</code>). If present, modelType and
      * modelParams are ignored.
@@ -157,7 +159,7 @@ public class ParticleSet implements Component, IDisposable {
     public IntSet proximityMissing;
 
     /**
-     * Profile decay of the particles in the shader, when using quads.
+     * Profile decay of the particles in the shader, when using quads and plain {@link ShadingType}.
      */
     public float profileDecay = 0.2f;
 
@@ -203,6 +205,22 @@ public class ParticleSet implements Component, IDisposable {
      **/
     public TextureArray textureArray;
 
+    /**
+     * Shading type, for lighting the particles.
+     */
+    public enum ShadingType {
+        /** Plain lighting. **/
+        PLAIN,
+        BILLBOARD_LIGHTING,
+        SPHERICAL_LIGHTING
+    }
+
+    /** The shading type, for lighting the particles. **/
+    public ShadingType shadingType = ShadingType.PLAIN;
+    /** Controls how sharply the sphere edges darken (higher values = more pronounced sphere appearance with darker edges). **/
+    public float sphericalPower = 3f;
+
+    /** Controls whether the brightness twinkles. **/
     public enum ShadingStyle {
         /** No special shading, only default color determination. **/
         DEFAULT,
@@ -573,6 +591,25 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setTextures(String[] textures) {
         this.textureFiles = textures;
+    }
+
+    public void setShadingType(int type) {
+        type = MathUtils.clamp(type, 0, ShadingType.values().length - 1);
+        this.shadingType = ShadingType.values()[type];
+    }
+
+    public void setShadingType(String type) {
+        try {
+            this.shadingType = ShadingType.valueOf(type.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            Logger.getLogger(this.getClass()
+                                     .getSimpleName())
+                    .error("Error setting shading type: " + type, e);
+        }
+    }
+
+    public void setSphericalPower(Double power) {
+        this.sphericalPower = (float) MathUtilsDouble.clamp(power, 0.1, 20.0);
     }
 
     public void setShadingStyle(String style) {
@@ -1169,13 +1206,13 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setLabelDisplay(LabelDisplay state,
-                              String name) {
+                                String name) {
         name = name.toLowerCase(Locale.ROOT)
                 .trim();
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
-                switch(state) {
+                switch (state) {
                     case ALWAYS -> {
                         this.labelDisplayAlways.add(idx);
                         this.labelDisplayNever.remove(idx);

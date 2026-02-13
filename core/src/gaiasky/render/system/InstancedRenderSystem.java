@@ -7,7 +7,10 @@
 
 package gaiasky.render.system;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
+import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
@@ -15,22 +18,29 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.Highlight;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Bits;
 import gaiasky.util.ModelCache;
+import gaiasky.util.Settings;
+import gaiasky.util.camera.Proximity;
 import gaiasky.util.gdx.IcoSphereCreator;
 import gaiasky.util.gdx.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
+import gaiasky.util.parse.Parser;
+import org.lwjgl.opengl.GL40;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem implements IObserver {
 
@@ -506,6 +516,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     }
 
     protected void renderObject(ExtShaderProgram shaderProgram,
+                                ICamera camera,
                                 IRenderable renderable) {
         // Empty, override if needed
     }
@@ -526,7 +537,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             // Pre-render
             preRenderObjects(shaderProgram, camera);
             // Render
-            renderables.forEach((r) -> renderObject(shaderProgram, r));
+            renderables.forEach((r) -> renderObject(shaderProgram, camera, r));
             // Post-render
             postRenderObjects(shaderProgram, camera);
             shaderProgram.end();
@@ -554,5 +565,108 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         }
     }
 
+    /**
+     * Apply blending mode and depth mask depending on the  highlight component and shading type.
+     *
+     * @param hl          The highlight component.
+     * @param shadingType The shading type.
+     *
+     * @return The ordinal shading type.
+     */
+    protected int preShadingType(Highlight hl, ParticleSet.ShadingType shadingType) {
+        int st = hl.isHighlighted() ? 0 : shadingType.ordinal();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        if (st >= 1) {
+            // Lighting is in effect.
+            // Regular blending.
+            GL40.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            // Depth test, write.
+            Gdx.gl.glDepthMask(true);
+        } else {
+            // No lighting.
+            // Additive blending.
+            GL40.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+            // Depth test, no writes.
+            Gdx.gl.glDepthMask(false);
+        }
+        return st;
+    }
+
+    /**
+     * Restore regular blending and depth writes.
+     */
+    protected void postShadingType() {
+        GL40.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glDepthMask(true);
+
+    }
+
+    /**
+     * Returns the profile decay for the given shading type.
+     *
+     * @param shadingType  The shading type.
+     * @param profileDecay The profile decay.
+     *
+     * @return The effective profile decay.
+     */
+    protected float getProfileDecay(int shadingType, float profileDecay) {
+        return shadingType >= 1 ? 1e5f : profileDecay;
+    }
+
+    /**
+     * Sets uniforms pertaining to the shading type.
+     *
+     * @param shaderProgram  The program.
+     * @param shadingType    The shading type ordinal.
+     * @param sphericalPower The spherical power value.
+     */
+    protected void setShadingTypeUniforms(ExtShaderProgram shaderProgram, ICamera camera, int shadingType, float sphericalPower) {
+        // Get nearest light source (our star).
+        var light = (Proximity.NearbyRecord) camera.getCloseLightSource(0);
+        shaderProgram.setUniformf("u_lightPos", light.pos);
+        shaderProgram.setUniformf("u_ambientLight", (float) Settings.settings.scene.renderer.ambient);
+        shaderProgram.setUniformi("u_shadingType", shadingType);
+        shaderProgram.setUniformf("u_lightIntensity", 1f);
+        shaderProgram.setUniformf("u_sphericalPower", sphericalPower);
+    }
+
+    /**
+     * Computes the texture index for a given particle, for particle and orbital elements sets, given their texture array and texture attribute.
+     *
+     * @param pr               The particle record
+     * @param rand             The RNG.
+     * @param textureArray     The texture array. May be null.
+     * @param textureAttribute The texture attribute. May be null.
+     *
+     * @return The texture index for the given particle.
+     */
+    public static int computeTextureIndex(IParticleRecord pr, Random rand, TextureArray textureArray, String textureAttribute) {
+        int textureIndex = -1;
+        if (textureArray != null) {
+            int nTextures = textureArray.getDepth();
+            if (textureAttribute != null && pr != null && pr.hasExtra(textureAttribute)) {
+                var value = pr.getExtra(textureAttribute);
+                if (value instanceof Number num) {
+                    textureIndex = MathUtils.clamp(num.intValue() - 1, 0, nTextures - 1);
+                } else if (value instanceof String str) {
+                    // Try to parse it as integer, otherwise, use hash code.
+                    try {
+                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0,
+                                                       nTextures - 1);
+                    } catch (NumberFormatException ignored) {
+                        textureIndex = value.hashCode() % nTextures;
+                    }
+                } else {
+                    // Any other type, use hash code.
+                    textureIndex = value.hashCode() % nTextures;
+                }
+            } else {
+                // Random index.
+                textureIndex = rand.nextInt(nTextures);
+            }
+        }
+        return textureIndex;
+    }
 
 }

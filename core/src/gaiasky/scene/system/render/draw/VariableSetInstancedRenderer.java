@@ -99,6 +99,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         this.triComponent.initShaderProgram(getShaderProgram());
     }
 
+    @Override
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -108,7 +109,9 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         addEffectsUniforms(shaderProgram, camera);
     }
 
+    @Override
     protected void renderObject(ExtShaderProgram shaderProgram,
+                                ICamera camera,
                                 IRenderable renderable) {
         final Render render = (Render) renderable;
         var base = Mapper.base.get(render.entity);

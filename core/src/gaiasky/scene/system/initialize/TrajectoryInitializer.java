@@ -64,16 +64,17 @@ public class TrajectoryInitializer extends AbstractInitSystem {
             body.color = new float[]{0.8f, 0.8f, 0.8f, 1f};
         }
         if (trajectory.bodyColor == null) {
-            trajectory.bodyColor = new float[]{0.8f, 0.8f, 0.8f, 0.6f};
+            trajectory.bodyColor = body.color;
         }
     }
 
     /**
      * Loads the provider class and samples this trajectory.
-     * @param entity The entity.
-     * @param base The base component.
+     *
+     * @param entity     The entity.
+     * @param base       The base component.
      * @param trajectory The trajectory.
-     * @param verts The verts object.
+     * @param verts      The verts object.
      */
     public static void loadTrajectory(Entity entity, Base base, Trajectory trajectory, Verts verts) {
         if (trajectory.bodyRepresentation.isOrbit()) {
@@ -139,7 +140,7 @@ public class TrajectoryInitializer extends AbstractInitSystem {
         trajectory.isInOrbitalElementsGroup = graph.parent != null && Mapper.orbitElementsSet.has(graph.parent);
     }
 
-    public static void initializeBodyConnection(Entity entity, Trajectory trajectory){
+    public static void initializeBodyConnection(Entity entity, Trajectory trajectory) {
 
         if (trajectory.body != null) {
             var bodyBase = Mapper.base.get(trajectory.body);

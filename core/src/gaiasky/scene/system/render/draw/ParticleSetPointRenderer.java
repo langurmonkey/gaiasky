@@ -20,6 +20,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
@@ -132,30 +133,7 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
                                 (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
 
                         // TEXTURE INDEX
-                        float textureIndex = -1.0f;
-                        if (set.textureArray != null) {
-                            int nTextures = set.textureArray.getDepth();
-                            if (set.textureAttribute != null && pb.hasExtra(set.textureAttribute)) {
-                                var value = pb.getExtra(set.textureAttribute);
-                                if (value instanceof Number num) {
-                                    textureIndex = MathUtils.clamp(num.intValue() - 1, 0, nTextures - 1);
-                                } else if (value instanceof String str) {
-                                    // Try to parse it as integer, otherwise, use hash code.
-                                    try {
-                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0,
-                                                                       nTextures - 1);
-                                    } catch (NumberFormatException ignored) {
-                                        textureIndex = value.hashCode() % nTextures;
-                                    }
-                                } else {
-                                    // Any other type, use hash code.
-                                    textureIndex = value.hashCode() % nTextures;
-                                }
-                            } else {
-                                // Random index.
-                                textureIndex = (float) rand.nextInt(nTextures);
-                            }
-                        }
+                        float textureIndex = InstancedRenderSystem.computeTextureIndex(pb, rand, set.textureArray, set.textureAttribute);
                         tempVerts[curr.vertexIdx + textureIndexOffset] = textureIndex;
 
                         // COLOR

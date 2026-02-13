@@ -730,14 +730,14 @@
         "description": "Number of labels to render for this particle group. Defaults to the configuration setting.",
         "unit": "Integer"
       },
-      "profileDecay": {
-        "description": "The profile decay of the particles in the shader. Controls how sudden is the color and intensity falloff from the center.",
+      "profileDecay:ParticleGroup": {
+        "description": "The profile decay of the particles in the shader, when using the default shading type, `shadingType`=`PLAIN`. Controls how sudden is the color and intensity fall-off from the center.",
         "unit": "Double",
         "aliases": [
           "profiledecay"
         ]
       },
-      "colorNoise": {
+      "colorNoise:ParticleGroup": {
         "description": "Noise factor for the color, in [0,1]. This randomly generates colors from the main color. The larger the color noise, the more different the generated colors from the main color.",
         "unit": "Double",
         "aliases": [
@@ -761,7 +761,7 @@
         "unit": "Double[4]"
       },
       "colorFromTexture": {
-        "description": "If true, color of this particle depends on the texture assigned to it. This is useful when using 'textureAttribute', for instance, where the texture is assigned depending on the value of an attribute for this object. This feature requires a non-zero 'colorNoise', as it is used to generate the colors.",
+        "description": "If true, color of this particle depends on the texture assigned to it. This is useful when using ``textureAttribute``, for instance, where the texture is assigned depending on the value of an attribute for this object. This feature requires a non-zero 'colorNoise', as it is used to generate the colors.",
         "unit": "Boolean"
       },
       "fixedAngularSize": {
@@ -795,6 +795,14 @@
       "textureAttribute": {
         "description": "If present, this attribute is used to assign textures to particles. It should be an integer attribute in [1,n], where n is the number of textures. If the value of the attribute is out of this range, it is clamped. The attribute value is used as an index to query the texture array, where the textures are sorted using the natural order of their file names. If the attribute is of any other type, Gaia Sky will do its best to use it to assign textures as well, but no guarantees.",
         "unit": "String"
+      },
+      "shadingType:ParticleGroup": {
+        "description": "The shading type to use to light the particles in the set. |brsp| **Values:** |ul| |li| ``PLAIN`` -- plain uniform lighting. |eli| |li| ``BILLBOARD_LIGHTING`` -- per-billboard flat lighting, computed from the closest light source. |eli| |li| ``SPHERICAL_LIGHTING`` -- particles are lighted as if they were spheres. See ``sphericalPower``. |eli| |eul| |brsp| Defaults to ``PLAIN``.",
+        "unit": "String"
+      },
+      "sphericalPower:ParticleGroup": {
+        "description": "Controls how sharply the sphere edges darken (higher values = more pronounced sphere appearance with darker edges). Defaults to 3.0.",
+        "unit": "Double"
       },
       "shadingStyle": {
         "description": "Special shading style to apply to the particles of this set. |brsp| **Values** |ul| |li| ``default`` -- no special shading (default). |eli| |li| ``twinkle`` -- particles twinkle randomly with (app) time. |eli| |eul|",
@@ -877,7 +885,7 @@
         "unit": "Double"
       },
       "profileDecay:StarGroup": {
-        "description": "The profile decay of the particles in the shader. Controls how sudden is the color and intensity falloff from the center.",
+        "description": "The profile decay of the particles in the shader, when using the default shading type, `shadingType`=`PLAIN`. Controls how sudden is the color and intensity fall-off from the center.",
         "unit": "Double",
         "aliases": [
           "profiledecay:StarGroup"
@@ -947,12 +955,39 @@
         "description": "The path to the data file with the orbital elements to be loaded by the provider.",
         "unit": "String"
       },
+      "profileDecay:OrbitalElementsGroup": {
+        "description": "The profile decay of the particles in the shader, when using the default shading type, ``shadingType``=``PLAIN``. Controls how sudden is the color and intensity fall-off from the center.",
+        "unit": "Double",
+        "aliases": [
+          "profiledecay:OrbitalElementsGroup"
+        ]
+      },
       "colorNoise:OrbitalElementsGroup": {
         "description": "Noise factor for the color, in [0,1]. This randomly generates colors from the main color. The larger the color noise, the more different the generated colors from the main color.",
         "unit": "Double",
         "aliases": [
           "colornoise:OrbitalElementsGroup"
         ]
+      },
+      "texture:OrbitalElementsGroup": {
+        "description": "Texture file to render the particles of this group. This can also point to a directory, in which case all the image files within are used (they must have the same dimensions). If this is provided, ``profileDecay`` is ignored.",
+        "unit": "String"
+      },
+      "textures:OrbitalElementsGroup": {
+        "description": "List of texture files to render the particles of this group. If more than one texture is provided, each particle is assigned a texture randomly. This can also point to one or more directories, in which case all the image files within are used. All images must have the same dimensions. If this is provided, ``profileDecay`` is ignored.",
+        "unit": "String[]"
+      },
+      "textureAttribute:OrbitalElementsGroup": {
+        "description": "If present, this attribute is used to assign textures to particles. It should be an integer attribute in [1,n], where n is the number of textures. If the value of the attribute is out of this range, it is clamped. The attribute value is used as an index to query the texture array, where the textures are sorted using the natural order of their file names. If the attribute is of any other type, Gaia Sky will do its best to use it to assign textures as well, but no guarantees.",
+        "unit": "String"
+      },
+      "shadingType:OrbitalElementsGroup": {
+        "description": "The shading type to use to light the particles in the set. |brsp| **Values:** |ul| |li| ``PLAIN`` -- plain uniform lighting. |eli| |li| ``BILLBOARD_LIGHTING`` -- per-billboard flat lighting, computed from the closest light source. |eli| |li| ``SPHERICAL_LIGHTING`` -- particles are lighted as if they were spheres. See ``sphericalPower``. |eli| |eul| |brsp| Defaults to ``PLAIN``.",
+        "unit": "String"
+      },
+      "sphericalPower:OrbitalElementsGroup": {
+        "description": "Controls how sharply the sphere edges darken (higher values = more pronounced sphere appearance with darker edges). Defaults to 3.0.",
+        "unit": "Double"
       }
     },
     "ParticleExtra": {

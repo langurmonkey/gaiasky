@@ -35,6 +35,9 @@ out vec4 v_col;
 out vec2 v_uv;
 out float v_textureIndex;
 
+// Shading type (fake lighting).
+#include <shader/lib/shadingtype.vert.glsl>
+
 #ifdef relativisticEffects
 #include <shader/lib/relativity.glsl>
 #endif // relativisticEffects
@@ -131,9 +134,10 @@ void main() {
     } else {
         pos4 = keplerToCartesian() * u_refSysTransform;
     }
+    // Position relative to camera.
     vec3 pos = pos4.xyz - u_camPos;
 
-    // Distance to point
+    // Distance to point.
     float dist = length(pos);
 
     #ifdef relativisticEffects
@@ -156,6 +160,8 @@ void main() {
     #include <shader/snippet/billboard.fast.glsl>
 
     gl_Position = gpos;
+
+    computeShadingTypeOutputs(pos);
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;

@@ -9,7 +9,10 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.event.Event;
@@ -21,6 +24,8 @@ import gaiasky.scene.component.tag.TagSetElement;
 import gaiasky.scene.entity.ElementsSetRadio;
 import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Logger;
+import gaiasky.util.SysUtils;
+import gaiasky.util.gdx.TextureArrayLoader;
 
 import java.util.HashMap;
 
@@ -33,8 +38,10 @@ public class ElementsSetInitializer extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
 
         var set = Mapper.orbitElementsSet.get(entity);
+        var base = Mapper.base.get(entity);
         boolean initializeData = set.data == null;
 
+        // Data.
         if (initializeData && set.provider != null) {
             // Load data.
             try {
@@ -50,12 +57,27 @@ public class ElementsSetInitializer extends AbstractInitSystem {
             }
         }
 
+        // Textures.
+        AssetManager manager = AssetBean.manager();
+        var actualFilePaths = SysUtils.gatherFilesExtension(set.textureFiles, new String[]{"png", "jpeg", "jpg"});
+        // Send to load.
+        if (!actualFilePaths.isEmpty()) {
+            manager.load(base.getName() + " TextureArray", TextureArray.class, new TextureArrayLoader.TextureArrayParameter(actualFilePaths));
+        }
+
     }
 
     @Override
     public void setUpEntity(Entity entity) {
         var graph = Mapper.graph.get(entity);
         var set = Mapper.orbitElementsSet.get(entity);
+        var base = Mapper.base.get(entity);
+
+        // Textures.
+        AssetManager manager = AssetBean.manager();
+        if (manager.contains(base.getName() + " TextureArray")) {
+            set.textureArray = manager.get(base.getName() + " TextureArray");
+        }
 
         // Check children which need updating every time
         initializeObjectsWithOrbit(graph, set);

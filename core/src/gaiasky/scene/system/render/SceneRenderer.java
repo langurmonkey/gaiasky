@@ -324,7 +324,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                                 alphas,
                                                                 renderAssets.particleGroupShaders);
                 };
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case PARTICLE_GROUP_EXT_BILLBOARD -> {
@@ -332,7 +332,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                           PARTICLE_GROUP_EXT_BILLBOARD,
                                                           alphas,
                                                           renderAssets.particleGroupExtBillboardShaders);
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case PARTICLE_GROUP_EXT_MODEL -> {
@@ -340,7 +340,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                           PARTICLE_GROUP_EXT_MODEL,
                                                           alphas,
                                                           renderAssets.particleGroupExtModelShaders);
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case STAR_GROUP -> {
@@ -349,7 +349,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     case TRIANGLES -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
                     case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
                 };
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case VARIABLE_GROUP -> {
@@ -359,18 +359,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                             new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
                     case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
                 };
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case ORBITAL_ELEMENTS_PARTICLE -> {
                 system = new ElementsRenderer(this, ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case ORBITAL_ELEMENTS_GROUP -> {
                 system = new ElementsSetRenderer(this, ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
-                system.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-                system.addPostRunnables(regularBlendR, depthWritesR);
+                // Blending controlled by shadingType in the renderer.
 
             }
             case MODEL_VERT_STAR -> // MODEL STARS
@@ -435,7 +434,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case LINE_LATE -> {
                 // LINE LATE (TRANSPARENCIES)
                 system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineCpuShaders);
-                system.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
+                system.addPreRunnables(regularBlendR, depthTestNoWritesR);
             }
             case VOLUME -> // VOLUME MODEL
                     system = new VolumeRenderer(this, VOLUME, alphas);
@@ -924,7 +923,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             lineGpuShaders = renderAssets.lineQuadGpuShaders;
         }
         sys = new PrimitiveVertexRenderSystem<>(this, LINE_GPU, alphas, lineGpuShaders, true);
-        sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        sys.addPreRunnables(additiveBlendR, depthTestNoWritesR);
         return sys;
     }
 
@@ -935,11 +934,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 .getMajorVersion() < 4 || Settings.settings.program.safeMode) {
             // Normal line renderer.
             sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineCpuShaders);
-            sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
+            sys.addPreRunnables(regularBlendR, depthTestNoWritesR);
         } else {
             // Polyline quad-strip renderer.
             sys = new LineQuadstripRenderer(this, LINE, alphas, renderAssets.lineQuadCpuShaders);
-            sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+            sys.addPreRunnables(additiveBlendR, depthTestNoWritesR);
         }
         return sys;
     }

@@ -30,7 +30,9 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
+import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
+import gaiasky.util.camera.Proximity;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -112,6 +114,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         }
     }
 
+    @Override
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -123,6 +126,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
     @Override
     protected void renderObject(ExtShaderProgram shaderProgram,
+                                ICamera camera,
                                 IRenderable renderable) {
         final var render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
@@ -173,30 +177,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         }
 
                         // TEXTURE INDEX
-                        float textureIndex = -1.0f;
-                        if (set.textureArray != null && !set.isWireframe()) {
-                            int nTextures = set.textureArray.getDepth();
-                            if (set.textureAttribute != null && particle.hasExtra(set.textureAttribute)) {
-                                var value = particle.getExtra(set.textureAttribute);
-                                if (value instanceof Number num) {
-                                    textureIndex = MathUtils.clamp(num.intValue() - 1, 0, nTextures - 1);
-                                } else if (value instanceof String str) {
-                                    // Try to parse it as integer, otherwise, use hash code.
-                                    try {
-                                        textureIndex = MathUtils.clamp((int) Parser.parseDoubleException(str) - 1, 0,
-                                                                       nTextures - 1);
-                                    } catch (NumberFormatException ignored) {
-                                        textureIndex = value.hashCode() % nTextures;
-                                    }
-                                } else {
-                                    // Any other type, use hash code.
-                                    textureIndex = value.hashCode() % nTextures;
-                                }
-                            } else {
-                                // Random index.
-                                textureIndex = (float) rand.nextInt(nTextures);
-                            }
-                        }
+                        float textureIndex = computeTextureIndex(particle, rand, set.textureArray, set.textureAttribute);
                         model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = textureIndex;
 
                         // COLOR
@@ -300,14 +281,12 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
                 }
-                // Shading style.
-                shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
-                shaderProgram.setUniformi("u_shadingStyle", set.shadingStyle.ordinal());
 
+                int shadingType = preShadingType(hl, set.shadingType);
                 float meanDist = (float) (set.getMeanDistance());
 
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
-                shaderProgram.setUniformf("u_falloff", set.profileDecay);
+                shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, set.profileDecay));
                 shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * sizeFactor),
                                           (float) (set.particleSizeLimits[1] * sizeFactor));
                 if (extended) {
@@ -318,6 +297,13 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                                               (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                 }
                 shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
+
+                // Shading type.
+                setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower);
+
+                // Shading style.
+                shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
+                shaderProgram.setUniformi("u_shadingStyle", set.shadingStyle.ordinal());
 
                 // Affine transformations.
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));

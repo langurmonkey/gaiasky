@@ -43,7 +43,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
-    private final Map<String, OwnSliderPlus> scalingMap;
+    private final Map<String, OwnSliderReset> scalingMap;
     private final Map<String, DatasetVisualSettingsWindow> visualSettingsMap;
     private final Map<String, DatasetFiltersWindow> filtersMap;
     private final Map<String, DatasetInfoWindow> infoMap;
@@ -317,10 +317,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
 
         if (ci.isHighlightable()) {
-            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"),
+            var sizeScaling = new OwnSliderReset(I18n.msg("gui.dataset.size"),
                                                           Constants.MIN_POINT_SIZE_SCALE,
                                                           Constants.MAX_POINT_SIZE_SCALE,
                                                           Constants.SLIDER_STEP_TINY,
+                                                          1f,
                                                           skin);
             sizeScaling.setWidth(350f);
             if (ci.entity != null) {
@@ -535,7 +536,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                     String datasetName = (String) data[0];
                     double val = (Double) data[1];
                     if (scalingMap.containsKey(datasetName)) {
-                        OwnSliderPlus slider = scalingMap.get(datasetName);
+                        var slider = scalingMap.get(datasetName);
                         slider.setProgrammaticChangeEvents(false);
                         slider.setMappedValue(val);
                         slider.setProgrammaticChangeEvents(true);
