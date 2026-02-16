@@ -164,14 +164,25 @@ vec4 textured() {
     float lighting = 1.0;
 
     if (u_shadingType == 2) {
-        // Use the new bulging normal for the whole texture
         vec3 normal = getBulgingQuadNormal(v_uv);
+
+        // Core Lighting (Sunlight).
         lighting = calculateLighting(normal, false);
 
-        // Optional: Soften the edges of the 'sphere' effect
-        float dist = length((v_uv - 0.5) * 2.0);
-        float edgeFactor = 1.0 - (0.3 * pow(min(dist, 1.0), u_sphericalPower));
+        // Edge Darkening (Spherical roundness).
+        float d = length((v_uv - 0.5) * 2.0);
+        float edgeFactor = 1.0 - (0.2 * pow(min(d, 1.0), u_sphericalPower));
         lighting *= edgeFactor;
+
+        // Rim Light Effect.
+        // v_viewDir points from fragment to camera.
+        // Dot product is 1.0 at center, 0.0 at edges.
+        float rim = 1.0 - max(dot(normal, v_viewDir), 0.0);
+        rim = pow(rim, 3.0);
+
+        // Add a bit of the rim glow to the lighting
+        // (multiplied by u_lightIntensity to keep it consistent with scene brightness).
+        lighting += rim * u_lightIntensity * 0.5;
     } else if (u_shadingType == 1) {
         // Simple billboard lighting.
         lighting = calculateLighting(vec3(0.0), true);
