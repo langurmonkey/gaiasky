@@ -12,6 +12,11 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 
+/**
+ * A particle record that only contains positions, stored in a double array.
+ *
+ * @param data The data array containing the position.
+ */
 public record ParticleVector(double[] data) implements IParticleRecord {
 
     public void setPos(double x, double y, double z) {
@@ -106,6 +111,7 @@ public record ParticleVector(double[] data) implements IParticleRecord {
     public float size() {
         return data.length >= 4 ? (float) data[3] : 0;
     }
+
     public void setSize(double size) {
         if (data.length >= 4) {
             data[3] = size;

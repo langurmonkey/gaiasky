@@ -16,6 +16,7 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
+import gaiasky.scene.record.ParticleKepler;
 import gaiasky.scene.record.RotationComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.i18n.I18n;
@@ -196,22 +197,37 @@ public class Proximity {
     }
 
     public NearbyRecord convert(IParticleRecord pr, NearbyRecord c, ICamera camera, double deltaYears) {
-        c.pm.set(pr.vx(), pr.vy(), pr.vz()).scl(deltaYears);
-        c.absolutePos.set(pr.x(), pr.y(), pr.z()).add(c.pm);
-        c.pos.set(c.absolutePos).sub(camera.getPos());
-        c.size = pr.size();
-        c.radius = pr.radius();
-        c.distToCamera = c.pos.len() - c.radius;
-        c.name = pr.names()[0];
-        c.type = TYPE_STAR_GROUP;
+        return switch (pr.getType()) {
+            case PARTICLE, STAR, PARTICLE_EXT, VARIABLE -> {
+                c.pm.set(pr.vx(), pr.vy(), pr.vz()).scl(deltaYears);
+                c.absolutePos.set(pr.x(), pr.y(), pr.z()).add(c.pm);
+                c.pos.set(c.absolutePos).sub(camera.getPos());
+                c.size = pr.size();
+                c.radius = pr.radius();
+                c.distToCamera = c.pos.len() - c.radius;
+                c.name = pr.names()[0];
+                c.type = TYPE_STAR_GROUP;
 
-        Color col = new Color();
-        Color.abgr8888ToColor(col, pr.color());
-        c.col[0] = col.r;
-        c.col[1] = col.g;
-        c.col[2] = col.b;
-        c.col[3] = col.a;
-        return c;
+                Color col = new Color();
+                Color.abgr8888ToColor(col, pr.color());
+                c.col[0] = col.r;
+                c.col[1] = col.g;
+                c.col[2] = col.b;
+                c.col[3] = col.a;
+                yield c;
+            }
+            case KEPLER -> {
+                var k = (ParticleKepler) pr;
+
+                c.absolutePos.set(pr.x(), pr.y(), pr.z());
+                yield c;
+            }
+            case VECTOR -> {
+                c.absolutePos.set(pr.x(), pr.y(), pr.z());
+                c.pos.set(c.absolutePos).sub(camera.getPos());
+                yield c;
+            }
+        };
     }
 
     public NearbyRecord convert(IFocus focus, NearbyRecord c, ICamera camera) {

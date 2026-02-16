@@ -23,4 +23,16 @@ public enum ParticleType {
     KEPLER,
     /** Particle implemented as a double array. Can hold anything. Corresponds to {@link ParticleVector}. **/
     VECTOR;
+
+    public boolean isParticleOrStar() {
+        return this == PARTICLE || this == PARTICLE_EXT || this == STAR || this == VARIABLE;
+    }
+
+    public boolean isKeplerElements() {
+        return this == KEPLER;
+    }
+
+    public boolean isVector() {
+        return this == VECTOR;
+    }
 }

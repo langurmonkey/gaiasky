@@ -238,7 +238,7 @@ public class ParticleSet implements Component, IDisposable {
     public Vector3D meanPosition;
 
     /**
-     * Factor to apply to the data points, usually to normalise distances.
+     * Factor to apply to the data points, usually to normalize distances.
      */
     public Double factor = null;
 

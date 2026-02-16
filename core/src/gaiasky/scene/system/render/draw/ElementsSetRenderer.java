@@ -214,7 +214,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                         model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (k.meanAnomaly() * MathUtilsDouble.degRad);
 
                         // SIZE
-                        model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
+                        var size = rand.nextFloat() * 1.5f + 0.1f;
+                        model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : size);
 
                         // TEXTURE INDEX
                         float textureIndex = computeTextureIndex(k, rand, set.textureArray, set.textureAttribute);

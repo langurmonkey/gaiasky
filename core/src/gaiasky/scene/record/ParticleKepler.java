@@ -80,12 +80,12 @@ public record ParticleKepler(long id,
 
     @Override
     public float[] variMags() {
-        return new float[0];
+        return null;
     }
 
     @Override
     public double[] variTimes() {
-        return new double[0];
+        return null;
     }
 
     @Override
