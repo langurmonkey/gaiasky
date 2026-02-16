@@ -26,7 +26,6 @@ import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.api.StubRenderable;
-import gaiasky.render.postprocess.util.FullscreenQuad;
 import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.process.RenderModeCubemapProjections;
 import gaiasky.render.process.RenderModeMain;
@@ -75,7 +74,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private final GlobalResources globalResources;
     private final AtomicBoolean rendering;
     private final RenderAssets renderAssets;
-    private final FullscreenQuad quad = new FullscreenQuad();
     /**
      * Contains the flags representing each type's visibility
      **/
