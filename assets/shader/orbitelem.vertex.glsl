@@ -161,7 +161,7 @@ void main() {
 
     gl_Position = gpos;
 
-    computeShadingTypeOutputs(pos);
+    computeShadingTypeOutputs(pos, s_up, s_right);
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;

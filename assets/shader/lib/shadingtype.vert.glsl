@@ -21,22 +21,27 @@ void computeLightingVectors(vec3 pos) {
     }
 }
 
-// Compute billboard right and up vectors for spherical lighting.
-void computeBillboardDirectons(vec3 pos) {
+// Set billboard right and up vectors for spherical lighting.
+void setBillboardDirectons(vec3 pos, vec3 s_up, vec3 s_right) {
     if (u_shadingType == 2) {
-        vec3 viewDirNorm = normalize(pos);
-        vec3 right = normalize(cross(u_camUp, viewDirNorm));
-        vec3 up = normalize(cross(viewDirNorm, right));
-        v_billboardRight = -right;
-        v_billboardUp = -up;
+        v_billboardRight = s_right;
+        v_billboardUp = s_up;
     }
 }
 
 // Computes the lighting vectors and the billboard directoins for the
 // fragment stage of the fake lighting.
-void computeShadingTypeOutputs(vec3 pos) {
+void computeShadingTypeOutputs(vec3 pos, vec3 s_up, vec3 s_right) {
     computeLightingVectors(pos);
-    computeBillboardDirectons(pos);
+    setBillboardDirectons(pos, s_up, s_right);
+}
+
+// Rotate UV coordinates around center by the given angle in radians.
+vec2 rotateUV(vec2 uv, float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    mat2 r = mat2(c, -s, s, c);
+    return r * (uv - 0.5) + 0.5;
 }
 
 #endif //GLSL_LIB_SHADINGTYPE_VERT

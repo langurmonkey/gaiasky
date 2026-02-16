@@ -20,7 +20,6 @@ import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.ISceneRenderer;
-import gaiasky.render.postprocess.effects.Mosaic;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 
@@ -32,7 +31,6 @@ import java.util.Map;
  */
 public abstract class RenderModeCubemap extends RenderModeAbstract {
 
-    private final Mosaic mosaic;
     protected Vector3 aux1, aux2, aux3, dirEffective, upEffective, dirBackup, upBackup, dirUpCrs;
     protected StretchViewport stretchViewport;
     // Frame buffers for each side of the cubemap
@@ -57,8 +55,6 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         upBackup = new Vector3();
         dirUpCrs = new Vector3();
         stretchViewport = new StretchViewport(Gdx.graphics.getHeight(), Gdx.graphics.getHeight());
-
-        mosaic = new Mosaic(0, 0);
 
         xPosFlag = true;
         xNegFlag = true;
@@ -194,94 +190,6 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
 
     protected void renderFace(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         renderRegularFace90(fb, camera, sgr, ppb, rw, rh, wh, t);
-    }
-
-    protected void renderRegularFace45(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
-
-        // -----------------
-        // |       |       |
-        // |  TL   |   TR  |
-        // |       |       |
-        // -----------------
-        // |       |       |
-        // |  BL   |   BR  |
-        // |       |       |
-        // -----------------
-
-        wh = wh / 2;
-
-        FrameBuffer tlFb = getFrameBuffer(wh, wh, 10);
-        FrameBuffer blFb = getFrameBuffer(wh, wh, 11);
-        FrameBuffer trFb = getFrameBuffer(wh, wh, 12);
-        FrameBuffer brFb = getFrameBuffer(wh, wh, 13);
-
-        float fov = 45f;
-        float fov2 = fov / 2f;
-
-        EventManager.publish(Event.FOV_CMD, this, fov);
-
-        PerspectiveCamera cam = camera.getCamera();
-
-        Vector3 upBak = aux2.set(cam.up);
-        Vector3 dirBak = aux3.set(cam.direction);
-
-        // TL
-        cam.direction.rotate(upBak, fov2);
-        Vector3 dirUpX = aux1.set(cam.direction).crs(upBak);
-        cam.direction.rotate(dirUpX, fov2);
-        cam.up.rotate(dirUpX, fov2);
-        cam.update();
-
-        renderFacePart(tlFb, camera, sgr, ppb, rw, rh, wh, t);
-
-        // BL
-        cam.direction.rotate(dirUpX, -fov);
-        cam.up.rotate(dirUpX, -fov);
-        cam.update();
-
-        renderFacePart(blFb, camera, sgr, ppb, rw, rh, wh, t);
-
-        // Reset
-        cam.direction.set(dirBak);
-        cam.up.set(upBak);
-
-        // TR
-        cam.direction.rotate(upBak, -fov2);
-        dirUpX = aux1.set(cam.direction).crs(upBak);
-        cam.direction.rotate(dirUpX, fov2);
-        cam.up.rotate(dirUpX, fov2);
-        cam.update();
-
-        renderFacePart(trFb, camera, sgr, ppb, rw, rh, wh, t);
-
-        // BR
-        cam.direction.rotate(dirUpX, -fov);
-        cam.up.rotate(dirUpX, -fov);
-        cam.update();
-
-        renderFacePart(brFb, camera, sgr, ppb, rw, rh, wh, t);
-
-        // Render mosaic to fb
-        mosaic.setViewportSize(wh, wh);
-        mosaic.setTiles(tlFb, blFb, trFb, brFb);
-        mosaic.render(null, fb, null, null);
-
-        // Reset camera
-        cam.direction.set(dirBak);
-        cam.up.set(upBak);
-        cam.update();
-    }
-
-    private void renderFacePart(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
-        sgr.getLightGlowPass().render(camera);
-
-        boolean postProcess = postProcessCapture(ppb, fb, wh, wh, ppb::captureCubemap);
-        try {
-            sgr.renderScene(camera, t, rc);
-        } finally {
-            sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postProcessRender(ppb, fb, postProcess, camera, rw, rh);
-        }
     }
 
     protected void renderRegularFace90(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
