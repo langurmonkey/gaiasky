@@ -174,6 +174,12 @@ public class ParticleSet implements Component, IDisposable {
     public boolean colorFromTexture = false;
 
     /**
+     * The noise in the size determination for particles. This only has effect if particles themselves do not provide a size.
+     * In that case, the final size is computed as <code>clamp(body.size + rand.gaussian() * body.size * sizeNoise)</code>.
+     */
+    public double sizeNoise = 1.0 / 5.0;
+
+    /**
      * Fixed angular size for all particles in this set, in radians. Applies only to quads. Negative to disable.
      */
     public double fixedAngularSize = -1;
@@ -542,6 +548,13 @@ public class ParticleSet implements Component, IDisposable {
      */
     public void setFixedAngularSize(Double fixedAngularSize) {
         setFixedAngularSizeRad(fixedAngularSize);
+    }
+
+    /**
+     * Set the size noise.
+     */
+    public void setSizeNoise(Double sizeNoise) {
+        this.sizeNoise = sizeNoise;
     }
 
     /**

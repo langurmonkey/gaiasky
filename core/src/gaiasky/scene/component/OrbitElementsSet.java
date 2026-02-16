@@ -17,6 +17,7 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.math.MathUtilsDouble;
+import net.jafama.FastMath;
 
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +54,18 @@ public class OrbitElementsSet implements Component {
      * Pointer to the data file.
      */
     public String datafile;
+
+    /**
+     * The noise in the size determination for particles. This only has effect if particles themselves do not provide a size.
+     * In that case, the final size is computed as <code>clamp(body.size + rand.gaussian() * body.size * sizeNoise)</code>.
+     */
+    public double sizeNoise = 1.0;
+
+    /**
+     * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
+     * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
+     */
+    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.02)), FastMath.tan(Math.toRadians(20.0))};
 
     /**
      * The texture attribute is an attribute in the original table that points to the texture to use. Ideally, it should
@@ -112,6 +125,36 @@ public class OrbitElementsSet implements Component {
 
     public void setColornoise(Double colorNoise) {
         this.setColorNoise(colorNoise);
+    }
+
+    /**
+     * Set the size noise.
+     */
+    public void setSizeNoise(Double sizeNoise) {
+        this.sizeNoise = sizeNoise;
+    }
+
+    public void setParticleSizeLimitsDeg(double[] sizeLimits) {
+        sizeLimits[0] = MathUtilsDouble.clamp(sizeLimits[0], 0, 90.0);
+        sizeLimits[1] = MathUtilsDouble.clamp(sizeLimits[1], 0, 90.0);
+        if (sizeLimits[0] > sizeLimits[1])
+            sizeLimits[0] = sizeLimits[1];
+
+        sizeLimits[0] = FastMath.toRadians(sizeLimits[0]);
+        sizeLimits[1] = FastMath.toRadians(sizeLimits[1]);
+        this.particleSizeLimits = sizeLimits;
+    }
+
+    public void setParticleSizeLimits(double[] sizeLimits) {
+        sizeLimits[0] = MathUtilsDouble.clamp(sizeLimits[0], 0, 1.57);
+        sizeLimits[1] = MathUtilsDouble.clamp(sizeLimits[1], 0, 1.57);
+        if (sizeLimits[0] > sizeLimits[1])
+            sizeLimits[0] = sizeLimits[1];
+        this.particleSizeLimits = sizeLimits;
+    }
+
+    public void setParticlesizelimits(double[] sizeLimits) {
+        setParticleSizeLimits(sizeLimits);
     }
 
     public void setTextureAttribute(String textureAttribute) {

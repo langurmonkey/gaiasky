@@ -39,7 +39,13 @@ public class ElementsSetInitializer extends AbstractInitSystem {
 
         var set = Mapper.orbitElementsSet.get(entity);
         var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
         boolean initializeData = set.data == null;
+
+        // Point size.
+        if (body.size == 0) {
+            body.size = 1f;
+        }
 
         // Data.
         if (initializeData && set.provider != null) {

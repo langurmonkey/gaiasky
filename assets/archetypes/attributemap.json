@@ -731,7 +731,7 @@
         "unit": "Integer"
       },
       "profileDecay:ParticleGroup": {
-        "description": "The profile decay of the particles in the shader, when using the default shading type, `shadingType`=`PLAIN`. Controls how sudden is the color and intensity fall-off from the center.",
+        "description": "The profile decay of the particles in the shader, when using the default shading type, ``shadingType``=``PLAIN``. Controls how sudden is the color and intensity fall-off from the center.",
         "unit": "Double",
         "aliases": [
           "profiledecay"
@@ -743,6 +743,10 @@
         "aliases": [
           "colornoise"
         ]
+      },
+      "sizeNoise:ParticleGroup": {
+        "description": "Noise factor for the sizes, in [0,1]. This only has effect if particles themselves do not provide a size. In that case, the final size is computed as ``clamp(body.size + rand.gaussian() * body.size * sizeNoise)``.",
+        "unit": "Double"
       },
       "particleSizeLimits": {
         "description": "Minimum and maximum solid angle limits of the particles in radians. They are used as :math:`(dist * tan(\\alpha_{min}), dist * tan(\\alpha_{max}))`. The minimum and maximum values must be in [0,1.57].",
@@ -967,6 +971,18 @@
         "unit": "Double",
         "aliases": [
           "colornoise:OrbitalElementsGroup"
+        ]
+      },
+      "sizeNoise:OrbitalElementsGroup": {
+        "description": "Noise factor for the sizes, in [0,1]. This only has effect if particles themselves do not provide a size. In that case, the final size is computed as ``clamp(body.size + rand.gaussian() * body.size * sizeNoise)``.",
+        "unit": "Double"
+      },
+      "particleSizeLimits:OrbitalelementsGroup": {
+        "description": "Minimum and maximum solid angle limits of the particles in radians. They are used as :math:`(dist * tan(\\alpha_{min}), dist * tan(\\alpha_{max}))`. The minimum and maximum values must be in [0,1.57].",
+        "unit": "Double[2]",
+        "aliases": [
+          "particlesizelimits:OrbitalElementsGroup",
+          "particleSizeLimitsDeg:OrbitalElementsGroup"
         ]
       },
       "texture:OrbitalElementsGroup": {

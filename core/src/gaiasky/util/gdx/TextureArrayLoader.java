@@ -7,12 +7,14 @@
 
 package gaiasky.util.gdx;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureArray;
@@ -40,18 +42,23 @@ public class TextureArrayLoader extends AsynchronousAssetLoader<TextureArray, Te
                 FileHandle fh = resolve(f);
                 textureFiles[i++] = fh;
             }
-            data = TextureArrayData.Factory.loadFromFiles(Format.RGBA8888, false, textureFiles);
+            boolean useMipMaps = parameter.minFilter.isMipMap();
+            data = TextureArrayData.Factory.loadFromFiles(Format.RGBA8888, useMipMaps, textureFiles);
         }
     }
 
     @Override
-    public TextureArray loadSync(AssetManager manager,
-                                 String fileName,
-                                 FileHandle file,
-                                 TextureArrayParameter parameter) {
+    public TextureArray loadSync(AssetManager manager, String fileName, FileHandle file, TextureArrayParameter parameter) {
         if (data != null) {
             var ta = new TextureArray(data);
-            ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            ta.setFilter(parameter.minFilter, parameter.magFilter);
+
+            // IMPORTANT: If mipmaps are used, generate them now on the GL thread
+            if (parameter.minFilter.isMipMap()) {
+                ta.bind();
+                Gdx.gl30.glGenerateMipmap(GL30.GL_TEXTURE_2D_ARRAY);
+            }
+
             return ta;
         }
         return null;
@@ -66,10 +73,8 @@ public class TextureArrayLoader extends AsynchronousAssetLoader<TextureArray, Te
 
     static public class TextureArrayParameter extends AssetLoaderParameters<TextureArray> {
         public String[] files;
-
-        public TextureArrayParameter(String[] files) {
-            this.files = files;
-        }
+        public TextureFilter minFilter = TextureFilter.MipMap;
+        public TextureFilter magFilter = TextureFilter.Linear;
 
         public TextureArrayParameter(Array<String> files) {
             if (files != null && !files.isEmpty()) {

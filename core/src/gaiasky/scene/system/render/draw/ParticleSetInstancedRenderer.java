@@ -140,6 +140,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         if (!set.disposed) {
             var model = getModel(set, getOffset(render));
             if (!inGpu(render)) {
+                rand.setSeed(123L);
                 int n = set.pointData.size();
                 int offset = addMeshData(model,
                                          model.numVertices,
@@ -173,7 +174,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         if (extended && particle.hasSize()) {
                             model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = particle.size();
                         } else {
-                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5.0));
+                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = Math.max(body.size + (float) (rand.nextGaussian() * body.size * set.sizeNoise), 0.01f);
                         }
 
                         // TEXTURE INDEX

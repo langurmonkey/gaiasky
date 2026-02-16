@@ -51,7 +51,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     protected static final Log logger = Logger.getLogger(ElementsSetRenderer.class);
 
     private final Matrix4 aux, refSysTransformF;
-    private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.075)), FastMath.tan(Math.toRadians(0.9))};
+    private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), FastMath.tan(Math.toRadians(9.6))};
     private final Colormap cmap;
     private final Random rand;
 
@@ -113,6 +113,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
             CatalogInfo ci = desc.catalogInfo;
             if (!inGpu(render)) {
+                rand.setSeed(123L);
                 // Check children nodes.
                 var body = Mapper.body.get(render.entity);
                 float[] colorNoiseContainer = new float[3];
@@ -214,7 +215,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                         model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (k.meanAnomaly() * MathUtilsDouble.degRad);
 
                         // SIZE
-                        var size = rand.nextFloat() * 1.5f + 0.1f;
+                        var size = (body.size + (float) (rand.nextGaussian() * body.size * set.sizeNoise));
                         model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : size);
 
                         // TEXTURE INDEX
@@ -224,7 +225,6 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                         curr.instanceIdx += curr.instanceSize;
                         numParticlesAdded++;
                     }
-
                 }
 
                 // Global (divisor=0) vertices (position, uv?) plus optional indices

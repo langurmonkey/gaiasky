@@ -64,6 +64,40 @@ vec3 getSphereNormal(vec2 uv) {
     return normalize(worldNormal);
 }
 
+//  Calculates a pseudo-spherical normal for the entire UV quad.
+//  Unlike a standard sphere, this ensures that pixels in the 'corners' of the
+//  UV (dist > 1.0) still receive a valid outward-facing normal.
+//  * This prevents 'black holes' or unlit regions on textured particles
+//  like asteroids that have irregular, non-circular silhouettes.
+vec3 getBulgingQuadNormal(vec2 uv) {
+    // Transform UV [0,1] to centered coordinates [-1,1].
+    vec2 centered = (uv - 0.5) * 2.0;
+
+    // Determine how far this pixel is from the billboard center.
+    float distSq = dot(centered, centered);
+
+    // Calculate Z (depth). We clamp distSq to 0.999 to avoid
+    // imaginary numbers/NaNs at the corners of the quad.
+    float z = sqrt(1.0 - min(distSq, 0.999));
+
+    // For pixels inside the 1.0 radius, we use the standard sphere math.
+    // For pixels in the corners (distSq > 1.0), we normalize the XY
+    // to push the normal to the extreme 'horizon' edge.
+    vec3 billboardNormal;
+    if (distSq > 1.0) {
+        billboardNormal = vec3(normalize(centered), z);
+    } else {
+        billboardNormal = vec3(centered.x, centered.y, z);
+    }
+
+    // Transform from Billboard/Tangent space to World Space
+    vec3 worldNormal = billboardNormal.x * v_billboardRight +
+    billboardNormal.y * v_billboardUp +
+    billboardNormal.z * v_viewDir;
+
+    return normalize(worldNormal);
+}
+
 // Calculate lighting with both directional sun and ambient.
 float calculateLighting(vec3 normal, bool isBillboard) {
     float diffuse;
@@ -123,28 +157,21 @@ vec4 textured() {
     vec4 c = texture(u_textures, vec3(v_uv, v_textureIndex));
     vec3 baseColor = c.rgb * v_col.rgb;
     // Discard transparent fragments.
-    if (c.a <= 0.001) {
+    if (c.a <= 0.05) {
         discard;
     }
 
     float lighting = 1.0;
 
     if (u_shadingType == 2) {
-        // Get sphere normal for this fragment.
-        vec2 centered = (v_uv - 0.5) * 2.0;
-        float dist2 = dot(centered, centered);
+        // Use the new bulging normal for the whole texture
+        vec3 normal = getBulgingQuadNormal(v_uv);
+        lighting = calculateLighting(normal, false);
 
-        if (dist2 <= 1.0) {
-            vec3 sphereNormal = getSphereNormal(v_uv);
-
-            if (length(sphereNormal) > 0.0) {
-                lighting = calculateLighting(sphereNormal, false);
-
-                // Add edge darkening.
-                float edgeFactor = 1.0 - pow(sqrt(dist2), u_sphericalPower);
-                lighting *= edgeFactor;
-            }
-        }
+        // Optional: Soften the edges of the 'sphere' effect
+        float dist = length((v_uv - 0.5) * 2.0);
+        float edgeFactor = 1.0 - (0.3 * pow(min(dist, 1.0), u_sphericalPower));
+        lighting *= edgeFactor;
     } else if (u_shadingType == 1) {
         // Simple billboard lighting.
         lighting = calculateLighting(vec3(0.0), true);

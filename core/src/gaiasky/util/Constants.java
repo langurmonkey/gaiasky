@@ -64,7 +64,7 @@ public class Constants {
     /** Default step value for sliders (tiny). **/
     public static final float SLIDER_STEP_TINY = 0.01f;
     public static final float MIN_POINT_SIZE_SCALE = 0.1f;
-    public static final float MAX_POINT_SIZE_SCALE = 8f;
+    public static final float MAX_POINT_SIZE_SCALE = 4f;
     public static final long MIN_FADE_TIME_MS = 0;
     public static final long MAX_FADE_TIME_MS = 30000;
     /** Maximum fov value, in degrees. **/
