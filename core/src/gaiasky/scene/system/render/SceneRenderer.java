@@ -95,7 +95,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private List<List<IRenderable>> renderListsFull, renderListsHalf;
     private Map<RenderGroup, IRenderSystem> renderSystems;
     private List<RenderGroup> renderGroups;
-    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, noDepthWritesR, depthWritesR, clearDepthR;
+    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, depthWritesR, clearDepthR;
     /**
      * The particular current scene graph renderer
      **/
@@ -171,7 +171,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(false);
         };
-        noDepthWritesR = (renderSystem, renderList, camera) -> Gdx.gl.glDepthMask(false);
         depthWritesR = (renderSystem, renderList, camera) -> Gdx.gl.glDepthMask(true);
         additiveBlendR = (renderSystem, renderList, camera) -> {
             Gdx.gl.glEnable(GL20.GL_BLEND);

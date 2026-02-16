@@ -151,7 +151,7 @@ public class LightGlowRenderPass extends RenderPass {
             if (DEBUG_UI_VIEW) {
                 GaiaSky.postRunnable(() -> {
                     // Create UI view
-                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", occlusionFrameBuffer, 0.5f, false, true);
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Occlusion FB", occlusionFrameBuffer, 0.5f, false, true);
                 });
                 DEBUG_UI_VIEW = false;
             }
