@@ -7,8 +7,6 @@
 uniform sampler2D u_texture0;
 // Star texture.
 uniform sampler2D u_texture1;
-// Occlusion pass.
-uniform sampler2D u_texture2;
 
 uniform vec2 u_viewport;
 uniform float u_textureScale;

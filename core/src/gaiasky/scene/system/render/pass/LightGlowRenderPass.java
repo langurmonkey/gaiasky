@@ -66,8 +66,14 @@ public class LightGlowRenderPass extends RenderPass {
         }
     }
 
+    /**
+     * This method renders the occlusion pass for the light glow effect.
+     *
+     * @param camera The camera.
+     * @param params The parameters.
+     */
     protected void renderPass(ICamera camera,
-                           Object... params) {
+                                    Object... params) {
         FrameBuffer frameBuffer;
         if (params == null || params.length == 0) {
             frameBuffer = occlusionFrameBuffer;

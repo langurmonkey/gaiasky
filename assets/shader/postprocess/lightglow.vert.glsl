@@ -37,6 +37,7 @@ out vec2 v_texCoords;
 
 out float v_lums[N];
 
+#include <shader/lib/luma.glsl>
 #define saturate(x) clamp(x, 0.0, 1.0)
 
 float fx(float t, float a){
@@ -60,10 +61,13 @@ void main() {
         float lum = 0.0;
         for (int idx = 0; idx < u_nSamples; idx++){
             vec2 curr_coord = clamp(u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
-            lum += (saturate(texture(u_texture2, curr_coord))).r;
+            float value = luma((texture(u_texture2, curr_coord)).rgb);
+            lum += step(0.99, value) * value;
             t += dt;
         }
-        lum += texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar)).r;
+        // Threshold the incoming texture at 0.9 so that only the brightest pixels pass.
+        float value = luma((texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar))).rgb);
+        lum += step(0.99, value) * value;
         lum /= u_nSamples;
 
         v_lums[li] = saturate(lum);

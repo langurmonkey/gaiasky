@@ -71,19 +71,9 @@ public interface ISceneRenderer {
     IRenderMode getRenderProcess();
 
     /**
-     * Returns the post-processing glow frame buffer.
-     *
-     * @return The glow frame buffer.
-     */
-    FrameBuffer getGlowFrameBuffer();
-
-    /**
      * Returns he render lists of this renderer.
      *
      * @param full Whether to return the render lists for the full- or the half-resolution buffer.
      **/
     List<List<IRenderable>> getRenderLists(boolean full);
-
-    /** Gets the light glow pass object. **/
-    LightGlowRenderPass getLightGlowPass();
 }

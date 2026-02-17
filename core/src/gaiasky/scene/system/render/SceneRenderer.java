@@ -34,6 +34,7 @@ import gaiasky.render.process.RenderModeStereoscopic;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.IRenderSystem;
+import gaiasky.render.system.LightPositionUpdater;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
@@ -74,6 +75,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private final GlobalResources globalResources;
     private final AtomicBoolean rendering;
     private final RenderAssets renderAssets;
+
+    /** Light position updater runnable. **/
+    private final LightPositionUpdater lpu;
     /**
      * Contains the flags representing each type's visibility
      **/
@@ -109,7 +113,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private Map<Integer, FrameBuffer> frameBufferMap;
 
     private final ShadowMapRenderPass shadowMapPass;
-    private final LightGlowRenderPass lightGlowPass;
 
     private final List<RenderPass> renderPasses;
 
@@ -127,7 +130,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         this.shadowMapPass = new ShadowMapRenderPass(this);
         CascadedShadowMapRenderPass cascadedShadowMapRenderPass = new CascadedShadowMapRenderPass(this);
-        this.lightGlowPass = new LightGlowRenderPass(this);
         SVTRenderPass svtPass = new SVTRenderPass(this);
 
         this.shadowMapPass.setCondition(() -> Settings.settings.scene.renderer.shadow.active);
@@ -135,10 +137,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         cascadedShadowMapRenderPass.setEnabled(false);
 
+        this.lpu = new LightPositionUpdater();
+
         this.renderPasses = new ArrayList<>();
         this.renderPasses.add(shadowMapPass);
         this.renderPasses.add(cascadedShadowMapRenderPass);
-        this.renderPasses.add(lightGlowPass);
         this.renderPasses.add(svtPass);
     }
 
@@ -395,7 +398,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                Settings.settings.scene.star.getStarTexture(),
                                                true);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
-                system.addPostRunnables(lightGlowPass.getLpu());
+                system.addPostRunnables(lpu);
             }
             case BILLBOARD_GAL -> {
                 system = new BillboardRenderer(this,
@@ -546,11 +549,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     @Override
     public IRenderMode getRenderProcess() {
         return renderMode;
-    }
-
-    @Override
-    public FrameBuffer getGlowFrameBuffer() {
-        return lightGlowPass.getOcclusionFrameBuffer();
     }
 
     public IRenderSystem getOrInitializeRenderSystem(RenderGroup rg) {
@@ -779,12 +777,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             }
             case REBUILD_SHADOW_MAP_DATA_CMD -> shadowMapPass.buildShadowMapData();
-            case LIGHT_GLOW_CMD -> {
-                boolean glow = (Boolean) data[0];
-                if (glow) {
-                    lightGlowPass.buildLightGlowData();
-                }
-            }
             case SHADER_RELOAD_CMD -> GaiaSky.postRunnable(() -> {
                 logger.info("Shader reload");
                 ExtShaderProgram.invalidateAllShaderPrograms(Gdx.app);
@@ -942,10 +934,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     public RenderAssets getRenderAssets() {
         return this.renderAssets;
-    }
-
-    public LightGlowRenderPass getLightGlowPass() {
-        return this.lightGlowPass;
     }
 
     public RenderModeOpenXR getRenderModeOpenXR() {

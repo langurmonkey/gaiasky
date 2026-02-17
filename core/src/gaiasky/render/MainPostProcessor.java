@@ -629,7 +629,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 var angles = (float[]) data[2];
                 var colors = (float[]) data[3];
                 var alphas = new float[nLights];
-                var occlusionTexture = (Texture) data[4];
+                // Use source texture as occlusion texture, it is enough for us.
+                var occlusionTexture = this.pps[0].pp.getCombinedBuffer().getSouceTexture();
                 var lensFlareSettings = Settings.settings.postprocess.lensFlare;
                 var nLightsFlare = 0;
                 int i = 0;

@@ -175,9 +175,6 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             }
             camera.setCameraStereoLeft(perspectiveCam);
 
-            sgr.getLightGlowPass()
-                    .render(camera);
-
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
             boolean postProcess = postProcessCapture(ppb, fb1, tw, th, ppb::capture);
             try {
@@ -196,9 +193,6 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                 moveCamera(camera, sideRemainder, side, sideCapped, 0.0, true);
             }
             camera.setCameraStereoRight(perspectiveCam);
-
-            sgr.getLightGlowPass()
-                    .render(camera);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
             postProcess = postProcessCapture(ppb, fb2, tw, th, ppb::capture);
@@ -279,9 +273,6 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             }
             camera.setCameraStereoLeft(perspectiveCam);
 
-            sgr.getLightGlowPass()
-                    .render(camera);
-
             FrameBuffer fb3d = getFrameBuffer((int) boundsw, (int) boundsh, 3);
             boolean postProcess = postProcessCapture(ppb, fb3d, (int) boundsw, (int) boundsh, ppb::capture);
             sgr.renderScene(camera, t, rc);
@@ -311,9 +302,6 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                 moveCamera(camera, sideRemainder, side, sideCapped, 0.0, !changeSides);
             }
             camera.setCameraStereoRight(perspectiveCam);
-
-            sgr.getLightGlowPass()
-                    .render(camera);
 
             postProcess = postProcessCapture(ppb, fb3d, (int) boundsw, (int) boundsh, ppb::capture);
             sgr.renderScene(camera, t, rc);
