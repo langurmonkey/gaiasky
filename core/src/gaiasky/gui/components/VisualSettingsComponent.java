@@ -30,10 +30,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 
 public class VisualSettingsComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(VisualSettingsComponent.class);
-    private OwnSliderReset starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, ambientLight, labelSize, lineWidth, elevMult;
 
     public VisualSettingsComponent(Skin skin,
                                    Stage stage) {
@@ -43,166 +43,114 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     @Override
     public void initialize(float componentWidth) {
         /* Star brightness */
-        starBrightness = new OwnSliderReset(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY,
-                                            Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, 2.22f, skin);
-        starBrightness.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.info"), skin));
+        var starBrightness = new OwnSliderReset(I18n.msg("gui.star.brightness"),
+                                                           Constants.MIN_SLIDER,
+                                                           Constants.MAX_SLIDER,
+                                                           Constants.SLIDER_STEP_TINY,
+                                                           Constants.MIN_STAR_BRIGHTNESS,
+                                                           Constants.MAX_STAR_BRIGHTNESS,
+                                                           2.22f,
+                                                           skin);
+        starBrightness.setTooltip(I18n.msg("gui.star.brightness.info"));
         starBrightness.setWidth(componentWidth);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
-        starBrightness.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STAR_BRIGHTNESS_CMD, starBrightness, starBrightness.getMappedValue());
-                return true;
-            }
-            return false;
-        });
+        starBrightness.connect(Event.STAR_BRIGHTNESS_CMD);
 
         /* Star brightness power */
-        magnitudeMultiplier = new OwnSliderReset(I18n.msg("gui.star.brightness.pow"),
-                                                 Constants.MIN_STAR_BRIGHTNESS_POW,
-                                                 Constants.MAX_STAR_BRIGHTNESS_POW,
-                                                 Constants.SLIDER_STEP_TINY,
-                                                 1f,
-                                                 skin);
-        magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
+        var magnitudeMultiplier = new OwnSliderReset(I18n.msg("gui.star.brightness.pow"),
+                                                                Constants.MIN_STAR_BRIGHTNESS_POW,
+                                                                Constants.MAX_STAR_BRIGHTNESS_POW,
+                                                                Constants.SLIDER_STEP_WEENY,
+                                                                1f,
+                                                                skin);
+        magnitudeMultiplier.setTooltip(I18n.msg("gui.star.brightness.pow.info"));
         magnitudeMultiplier.setWidth(componentWidth);
         magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
-        magnitudeMultiplier.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, magnitudeMultiplier.getValue());
-                return true;
-            }
-            return false;
-        });
+        magnitudeMultiplier.connect(Event.STAR_BRIGHTNESS_POW_CMD);
 
         /* Star glow factor */
-        starGlowFactor = new OwnSliderReset(I18n.msg("gui.star.glowfactor"),
-                                            Constants.MIN_STAR_GLOW_FACTOR,
-                                            Constants.MAX_STAR_GLOW_FACTOR,
-                                            Constants.SLIDER_STEP_TINY * 0.1f,
-                                            0.075f,
-                                            skin);
-        starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
+        var starGlowFactor = new OwnSliderReset(I18n.msg("gui.star.glowfactor"),
+                                                           Constants.MIN_STAR_GLOW_FACTOR,
+                                                           Constants.MAX_STAR_GLOW_FACTOR,
+                                                           Constants.SLIDER_STEP_TINY * 0.1f,
+                                                           0.075f,
+                                                           skin);
+        starGlowFactor.setTooltip(I18n.msg("gui.star.glowfactor.info"));
         starGlowFactor.setWidth(componentWidth);
         starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
-        starGlowFactor.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STAR_GLOW_FACTOR_CMD, starGlowFactor, starGlowFactor.getValue());
-                return true;
-            }
-            return false;
-        });
+        starGlowFactor.connect(Event.STAR_GLOW_FACTOR_CMD);
 
         /* Point size */
-        pointSize = new OwnSliderReset(I18n.msg("gui.star.size"),
-                                       Constants.MIN_STAR_POINT_SIZE,
-                                       Constants.MAX_STAR_POINT_SIZE,
-                                       Constants.SLIDER_STEP_TINY,
-                                       3f,
-                                       skin);
-        pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
+        var pointSize = new OwnSliderReset(I18n.msg("gui.star.size"),
+                                                      Constants.MIN_STAR_POINT_SIZE,
+                                                      Constants.MAX_STAR_POINT_SIZE,
+                                                      Constants.SLIDER_STEP_TINY,
+                                                      3f,
+                                                      skin);
+        pointSize.setTooltip(I18n.msg("gui.star.size.info"));
         pointSize.setWidth(componentWidth);
         pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
-        pointSize.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STAR_POINT_SIZE_CMD, pointSize, pointSize.getMappedValue());
-                return true;
-            }
-            return false;
-        });
+        pointSize.connect(Event.STAR_POINT_SIZE_CMD);
 
         /* Star min opacity */
-        starBaseLevel = new OwnSliderReset(I18n.msg("gui.star.opacity"),
-                                           Constants.MIN_STAR_MIN_OPACITY,
-                                           Constants.MAX_STAR_MIN_OPACITY,
-                                           Constants.SLIDER_STEP_TINY,
-                                           0f,
-                                           skin);
-        starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
+        var starBaseLevel = new OwnSliderReset(I18n.msg("gui.star.opacity"),
+                                                          Constants.MIN_STAR_MIN_OPACITY,
+                                                          Constants.MAX_STAR_MIN_OPACITY,
+                                                          Constants.SLIDER_STEP_TINY,
+                                                          0f,
+                                                          skin);
         starBaseLevel.setWidth(componentWidth);
         starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
-        starBaseLevel.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STAR_BASE_LEVEL_CMD, starBaseLevel, starBaseLevel.getMappedValue());
-                return true;
-            }
-            return false;
-        });
+        starBaseLevel.connect(Event.STAR_BASE_LEVEL_CMD);
 
         /* Ambient light */
-        ambientLight = new OwnSliderReset(I18n.msg("gui.light.ambient"),
-                                          Constants.MIN_AMBIENT_LIGHT,
-                                          Constants.MAX_AMBIENT_LIGHT,
-                                          Constants.SLIDER_STEP_TINY,
-                                          0f,
-                                          skin);
+        var ambientLight = new OwnSliderReset(I18n.msg("gui.light.ambient"),
+                                                         Constants.MIN_AMBIENT_LIGHT,
+                                                         Constants.MAX_AMBIENT_LIGHT,
+                                                         Constants.SLIDER_STEP_TINY,
+                                                         0f,
+                                                         skin);
         ambientLight.setWidth(componentWidth);
         ambientLight.setMappedValue(Settings.settings.scene.renderer.ambient);
-        ambientLight.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.AMBIENT_LIGHT_CMD, ambientLight, ambientLight.getMappedValue());
-                return true;
-            }
-            return false;
-        });
+        ambientLight.connect(Event.AMBIENT_LIGHT_CMD);
 
         /* Label size */
-        labelSize = new OwnSliderReset(I18n.msg("gui.label.size"),
-                                       Constants.MIN_LABEL_SIZE,
-                                       Constants.MAX_LABEL_SIZE,
-                                       Constants.SLIDER_STEP_TINY,
-                                       1.3f,
-                                       skin);
+        var labelSize = new OwnSliderReset(I18n.msg("gui.label.size"),
+                                                      Constants.MIN_LABEL_SIZE,
+                                                      Constants.MAX_LABEL_SIZE,
+                                                      Constants.SLIDER_STEP_TINY,
+                                                      1.3f,
+                                                      skin);
         labelSize.setWidth(componentWidth);
         labelSize.setMappedValue(Settings.settings.scene.label.size);
-        labelSize.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                float val = labelSize.getMappedValue();
-                EventManager.publish(Event.LABEL_SIZE_CMD, labelSize, val);
-                return true;
-            }
-            return false;
-        });
+        labelSize.connect(Event.LABEL_SIZE_CMD);
 
         /* Line width */
-        lineWidth = new OwnSliderReset(I18n.msg("gui.line.width"),
-                                       Constants.MIN_LINE_WIDTH,
-                                       Constants.MAX_LINE_WIDTH,
-                                       Constants.SLIDER_STEP_TINY,
-                                       Constants.MIN_LINE_WIDTH,
-                                       Constants.MAX_LINE_WIDTH,
-                                       1f,
-                                       skin);
+        var lineWidth = new OwnSliderReset(I18n.msg("gui.line.width"),
+                                                      Constants.MIN_LINE_WIDTH,
+                                                      Constants.MAX_LINE_WIDTH,
+                                                      Constants.SLIDER_STEP_TINY,
+                                                      Constants.MIN_LINE_WIDTH,
+                                                      Constants.MAX_LINE_WIDTH,
+                                                      1f,
+                                                      skin);
         lineWidth.setWidth(componentWidth);
         lineWidth.setMappedValue(Settings.settings.scene.renderer.line.width);
-        lineWidth.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                float val = lineWidth.getMappedValue();
-                EventManager.publish(Event.LINE_WIDTH_CMD, lineWidth, val);
-                return true;
-            }
-            return false;
-        });
+        lineWidth.connect(Event.LINE_WIDTH_CMD);
 
         /* Elevation multiplier */
-        elevMult = new OwnSliderReset(I18n.msg("gui.elevation.multiplier"),
-                                      Constants.MIN_ELEVATION_MULT,
-                                      Constants.MAX_ELEVATION_MULT,
-                                      Constants.SLIDER_STEP_TINY,
-                                      1f,
-                                      skin);
+        var elevMult = new OwnSliderReset(I18n.msg("gui.elevation.multiplier"),
+                                                     Constants.MIN_ELEVATION_MULT,
+                                                     Constants.MAX_ELEVATION_MULT,
+                                                     Constants.SLIDER_STEP_TINY,
+                                                     1f,
+                                                     skin);
         elevMult.setWidth(componentWidth);
         elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
-        elevMult.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                float val = elevMult.getValue();
-                EventManager.publish(Event.ELEVATION_MULTIPLIER_CMD, elevMult, val);
-                return true;
-            }
-            return false;
-        });
+        elevMult.connect(Event.ELEVATION_MULTIPLIER_CMD);
 
         /* Reset visual settings defaults */
-        OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
+        var resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
         resetDefaults.align(Align.center);
         resetDefaults.setWidth(componentWidth);
         resetDefaults.addListener(new OwnTextTooltip(I18n.msg("gui.resetdefaults.tooltip"), skin));
@@ -232,14 +180,6 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         component = lightingGroup;
 
         EventManager.instance.subscribe(this,
-                                        Event.STAR_POINT_SIZE_CMD,
-                                        Event.STAR_BRIGHTNESS_CMD,
-                                        Event.STAR_BRIGHTNESS_POW_CMD,
-                                        Event.STAR_GLOW_FACTOR_CMD,
-                                        Event.STAR_BASE_LEVEL_CMD,
-                                        Event.LABEL_SIZE_CMD,
-                                        Event.LINE_WIDTH_CMD,
-                                        Event.ELEVATION_MULTIPLIER_CMD,
                                         Event.RESET_VISUAL_SETTINGS_DEFAULTS);
     }
 
@@ -285,77 +225,8 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     public void notify(final Event event,
                        Object source,
                        final Object... data) {
-        switch (event) {
-            case RESET_VISUAL_SETTINGS_DEFAULTS -> {
-                resetVisualSettingsDefaults(source);
-            }
-            case STAR_POINT_SIZE_CMD -> {
-                if (source != pointSize) {
-                    float newSize = (float) data[0];
-                    pointSize.setProgrammaticChangeEvents(false);
-                    pointSize.setMappedValue(newSize);
-                    pointSize.setProgrammaticChangeEvents(true);
-                }
-            }
-            case STAR_BRIGHTNESS_CMD -> {
-                if (source != starBrightness) {
-                    Float brightness = (Float) data[0];
-                    starBrightness.setProgrammaticChangeEvents(false);
-                    starBrightness.setMappedValue(brightness);
-                    starBrightness.setProgrammaticChangeEvents(true);
-                }
-            }
-            case STAR_BRIGHTNESS_POW_CMD -> {
-                if (source != magnitudeMultiplier) {
-                    Float pow = (Float) data[0];
-                    magnitudeMultiplier.setProgrammaticChangeEvents(false);
-                    magnitudeMultiplier.setMappedValue(pow);
-                    magnitudeMultiplier.setProgrammaticChangeEvents(true);
-                }
-            }
-            case STAR_GLOW_FACTOR_CMD -> {
-                if (source != starGlowFactor) {
-                    Float glowFactor = (Float) data[0];
-                    starGlowFactor.setProgrammaticChangeEvents(false);
-                    starGlowFactor.setMappedValue(glowFactor);
-                    starGlowFactor.setProgrammaticChangeEvents(true);
-                }
-            }
-            case STAR_BASE_LEVEL_CMD -> {
-                if (source != starBaseLevel) {
-                    Float baseLevel = (Float) data[0];
-                    starBaseLevel.setProgrammaticChangeEvents(false);
-                    starBaseLevel.setMappedValue(baseLevel);
-                    starBaseLevel.setProgrammaticChangeEvents(true);
-                }
-            }
-            case LABEL_SIZE_CMD -> {
-                if (source != labelSize) {
-                    Float newLabelSize = (Float) data[0];
-                    labelSize.setProgrammaticChangeEvents(false);
-                    labelSize.setMappedValue(newLabelSize);
-                    labelSize.setProgrammaticChangeEvents(true);
-                }
-            }
-            case LINE_WIDTH_CMD -> {
-                if (source != lineWidth) {
-                    Float newWidth = (Float) data[0];
-                    lineWidth.setProgrammaticChangeEvents(false);
-                    lineWidth.setMappedValue(newWidth);
-                    lineWidth.setProgrammaticChangeEvents(true);
-                }
-            }
-            case ELEVATION_MULTIPLIER_CMD -> {
-                if (source != elevMult) {
-                    Float newElevationMultiplier = (Float) data[0];
-                    elevMult.setProgrammaticChangeEvents(false);
-                    elevMult.setMappedValue(newElevationMultiplier);
-                    elevMult.setProgrammaticChangeEvents(true);
-                }
-            }
-            default -> {
-            }
-
+        if (Objects.requireNonNull(event) == Event.RESET_VISUAL_SETTINGS_DEFAULTS) {
+            resetVisualSettingsDefaults(source);
         }
     }
 

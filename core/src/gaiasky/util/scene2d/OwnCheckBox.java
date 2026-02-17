@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
@@ -27,7 +28,7 @@ public class OwnCheckBox extends CheckBox implements IObserver {
      * Event to listen to, so that this check box is connected to the event system.
      * Only one event supported. Must have a boolean as the first parameter.
      **/
-    private Event listenTo = null;
+    private Event connectedEvent = null;
 
     public OwnCheckBox(String text, Skin skin) {
         super(text, skin);
@@ -203,20 +204,29 @@ public class OwnCheckBox extends CheckBox implements IObserver {
     }
 
     /**
-     * Let the checkbox update its state by listening to the current event. The event's first
-     * parameter must be a boolean with the state.
+     * Connect the checkbox with the given event. The first parameter of the event must be a boolean
+     * with the state. The event updates its state by listening to the event, and publishes
+     * changes via the same event when modified.
      */
-    public void listenTo(Event event) {
+    public void connect(Event event) {
         EventManager.instance.removeAllSubscriptions(this);
         if (event != null) {
-            this.listenTo = event;
-            EventManager.instance.subscribe(this, this.listenTo);
+            this.connectedEvent = event;
+            EventManager.instance.subscribe(this, this.connectedEvent);
+
+            this.addListener((evt -> {
+                if (evt instanceof ChangeListener.ChangeEvent) {
+                    EventManager.publish(event, this, isChecked());
+                    return true;
+                }
+                return false;
+            }));
         }
     }
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if (event == listenTo
+        if (event == connectedEvent
                 && source != this
                 && data != null
                 && data.length > 0
@@ -225,6 +235,5 @@ public class OwnCheckBox extends CheckBox implements IObserver {
             setChecked(state);
             setProgrammaticChangeEvents(true);
         }
-
     }
 }

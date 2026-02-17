@@ -24,13 +24,11 @@ import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.gui.iface.CustomInterface;
 import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.OwnImageButton;
-import gaiasky.util.scene2d.OwnSelectBox;
-import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
-import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
 
@@ -44,6 +42,7 @@ public class StereoGui extends AbstractGui {
     protected HorizontalGroup bottomLayout;
     protected OwnSelectBox<ComboBoxBean<StereoProfile>> profile;
     protected Button backButton;
+    protected OwnSliderReset k;
     protected CustomInterface customInterface;
 
     protected DecimalFormat nf;
@@ -110,6 +109,12 @@ public class StereoGui extends AbstractGui {
             return false;
         });
 
+        // Comfort slider
+        k = new OwnSliderReset(I18n.msg("gui.stereo.k"), Constants.MIN_STEREO_K, Constants.MAX_STEREO_K, Constants.SLIDER_STEP_TINY, 0.2f, skin);
+        k.setName("stereo k");
+        k.setWidth(1000);
+        k.setValue((float) Settings.settings.program.modeStereo.k);
+        k.connect(Event.STEREO_K_CMD);
 
         // Go back button
         backButton = new OwnTextIconButton(I18n.msg("gui.back"), skin, "back");
@@ -129,6 +134,7 @@ public class StereoGui extends AbstractGui {
         bottomLayout.space(20f);
         bottomLayout.addActor(backButton);
         bottomLayout.addActor(profile);
+        bottomLayout.addActor(k);
         bottomLayout.setFillParent(true);
         bottomLayout.bottom().left().pad(0, 5, 5, 0);
 

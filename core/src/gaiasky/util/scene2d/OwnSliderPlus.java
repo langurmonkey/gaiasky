@@ -16,6 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Null;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnSlider.OwnSliderStyle;
 
@@ -23,22 +26,36 @@ import java.text.DecimalFormat;
 import java.util.function.Function;
 
 /**
- * An extended {@link Slider} that adds:
+ * An extended {@link Slider} designed for complex data input in Gaia Sky.
+ * <h3>Key Features:</h3>
+ * <ul>
+ * <li><b>Integrated Labels:</b> Draws a title (left-aligned) and a dynamic value (right-aligned)
+ * directly above the slider track.</li>
+ * <li><b>Value Mapping:</b> Decouples the physical slider position from the returned value.
+ * The slider can represent a range (e.g., 0.001 to 100,000) while the internal
+ * widget logic remains in a normalized or manageable range.</li>
+ * <li><b>Non-linear (Power Curve) Scaling:</b> When {@code logarithmic} is enabled,
+ * the slider applies a transform of the form $f(t) = t^k$. This allows for
+ * fine-grained control at one end of the scale and coarse control at the other.</li>
+ * <li><b>Visual Feedback:</b> Automatic highlighting of labels and slider assets when
+ * the widget gains keyboard/controller focus.</li>
+ * <li><b>Event Integration:</b> Built-in support for the {@link EventManager} system.</li>
+ * </ul>
+ * <h3>Mapping Logic:</h3>
+ * <p>
+ * The slider maintains an <b>Internal Range</b> defined by {@code [min, max]}.
+ * The <b>Mapped Range</b> is defined by {@code [mapMin, mapMax]}.
+ * </p>
  *
  * <ul>
- *   <li>a title label and a value label drawn above the slider;</li>
- *   <li>optional value mapping to a different numeric range;</li>
- *   <li>optional non-linear (log-like) scaling using a power curve;</li>
- *   <li>customizable label formatting and prefix/suffix support;</li>
- *   <li>manual preferred-size overrides;</li>
- *   <li>focus-dependent highlighting of labels and slider visuals.</li>
+ * <li><b>Linear:</b> If {@code logarithmic} is false, the value is interpolated
+ * linearly between the two ranges.</li>
+ * <li><b>Logarithmic/Power:</b> If true, the normalized slider position $t \in [0,1]$
+ * is raised to {@link #logExponent}. If $k < 1$, the high-end resolution is expanded;
+ * if $k > 1$, the low-end resolution is expanded.</li>
  * </ul>
- * <p>
- * The slider always stores values in its normal LibGDX range {@code [min, max]},
- * but callers may choose to work with an alternate mapped range or a non-linear scale.
- * The class exposes helpers for converting between slider values and mapped values.
  */
-public class OwnSliderPlus extends Slider {
+public class OwnSliderPlus extends Slider implements IObserver {
 
     private final Skin skin;
     private OwnSliderPlus me;
@@ -53,7 +70,12 @@ public class OwnSliderPlus extends Slider {
     // produce the label to be displayed.
     private Function<Float, String> valueLabelTransform;
     private Color labelColorBackup;
-    private static final float LOG_EPSILON = 1e-6f; // smallest allowed positive value
+    /**
+     * Event to listen to, so that this check box is connected to the event system.
+     * Only one event supported. Must have a boolean as the first parameter.
+     **/
+    private Event connectedEvent = null;
+    private boolean connectUnmapped = false;
     /** Whether to use a logarithmic scale (with exponent) in the mapped values. **/
     private boolean logarithmic = false;
     /**
@@ -71,6 +93,18 @@ public class OwnSliderPlus extends Slider {
      */
     private double logExponent = 0.5;
 
+    /**
+     * Creates a slider with a specific mapped range and custom label style.
+     *
+     * @param title      The text displayed inside (left) the slider.
+     * @param min        The internal minimum value of the slider widget.
+     * @param max        The internal maximum value of the slider widget.
+     * @param stepSize   The size of the discrete steps between min and max.
+     * @param mapMin     The logical value represented when the slider is at its minimum position.
+     * @param mapMax     The logical value represented when the slider is at its maximum position.
+     * @param skin       The UI skin to use.
+     * @param labelStyle The name of the label style within the skin.
+     */
     public OwnSliderPlus(String title,
                          float min,
                          float max,
@@ -84,20 +118,63 @@ public class OwnSliderPlus extends Slider {
         setUp(title, mapMin, mapMax, false, labelStyle);
     }
 
+    /**
+     * Creates a slider with a mapped range using the default label style.
+     *
+     * @param title    The text displayed inside (left) the slider.
+     * @param min      The internal minimum value.
+     * @param max      The internal maximum value.
+     * @param stepSize The size of the discrete steps.
+     * @param mapMin   The logical value represented at the far left/bottom.
+     * @param mapMax   The logical value represented at the far right/top.
+     * @param skin     The UI skin to use.
+     */
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
         this(title, min, max, stepSize, mapMin, mapMax, skin, "default");
     }
 
+    /**
+     * Creates a slider where the internal range and mapped range are identical.
+     *
+     * @param title    The text displayed inside (left) the slider.
+     * @param min      The range minimum (both internal and display).
+     * @param max      The range maximum (both internal and display).
+     * @param stepSize The step increment.
+     * @param skin     The UI skin to use.
+     * @param style    The name of the slider style within the skin.
+     */
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style) {
         super(min, max, stepSize, false, skin.get(style, OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, false, "default");
     }
 
+    /**
+     * Creates a slider with logarithmic scaling support using default styles.
+     *
+     * @param title       The text displayed inside (left) the slider.
+     * @param min         The minimum value of the mapped range.
+     * @param max         The maximum value of the mapped range.
+     * @param logarithmic Whether to use a power-curve distribution for values.
+     * @param skin        The UI skin to use.
+     */
     public OwnSliderPlus(String title, float min, float max, boolean logarithmic, Skin skin) {
         this(title, min, max, logarithmic, skin, "default");
     }
 
+    /**
+     * Creates a slider with an option for logarithmic scaling.
+     * <p>
+     * Note: If {@code logarithmic} is true, the internal range is forced to {@code [0, 1]}
+     * and step size is set to a very small value to ensure smooth power-curve math.
+     *
+     * @param title       The text displayed inside (left) the slider.
+     * @param min         The logical minimum value of the mapped range.
+     * @param max         The logical maximum value of the mapped range.
+     * @param logarithmic Whether to use a power-curve distribution.
+     * @param skin        The UI skin to use.
+     * @param labelStyle  The name of the label style.
+     */
     public OwnSliderPlus(String title, float min, float max, boolean logarithmic, Skin skin, String labelStyle) {
         super(logarithmic ? 0f : min, logarithmic ? 1f : max, logarithmic ? 0.00001f : (max - min) / 100f, false,
               skin.get("default-horizontal", OwnSliderStyle.class));
@@ -105,10 +182,30 @@ public class OwnSliderPlus extends Slider {
         setUp(title, min, max, logarithmic, labelStyle);
     }
 
+    /**
+     * Simple constructor for a basic linear slider with a title.
+     *
+     * @param title    The text displayed inside (left) the slider.
+     * @param min      The range minimum.
+     * @param max      The range maximum.
+     * @param stepSize The step increment.
+     * @param skin     The UI skin to use.
+     */
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
         this(title, min, max, stepSize, skin, "default-horizontal");
     }
 
+    /**
+     * Creates a slider with orientation and custom label style support.
+     *
+     * @param title          The text displayed inside (left) the slider.
+     * @param min            The internal minimum value.
+     * @param max            The internal maximum value.
+     * @param stepSize       The step increment.
+     * @param vertical       True if the slider should be vertical, false for horizontal.
+     * @param skin           The UI skin to use.
+     * @param labelStyleName The name of the label style.
+     */
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String labelStyleName) {
         super(min, max, stepSize, vertical, skin.get("default-horizontal", OwnSliderStyle.class));
         this.skin = skin;
@@ -209,13 +306,14 @@ public class OwnSliderPlus extends Slider {
     public float getMappedValue() {
         float v = getValue();
 
-        // normalize slider range to 0..1
+        // Normalize slider range to [min..max].
         float t = (v - getMinValue()) / (getMaxValue() - getMinValue());
 
         if (!logarithmic) {
             return map ? MathUtilsDouble.lint(v, getMinValue(), getMaxValue(), mapMin, mapMax) : v;
         }
 
+        // Logarithmic case.
         double k = logExponent;
 
         // power curve
@@ -355,6 +453,71 @@ public class OwnSliderPlus extends Slider {
             if (this.valueLabel != null) {
                 this.valueLabel.setColor(labelColorBackup);
             }
+        }
+    }
+
+    public void setTooltip(String tooltip) {
+        addListener(new OwnTextTooltip(tooltip, skin));
+    }
+
+    /**
+     * Connect this slider with the given event. Slider events contain a float value as the first
+     * parameter. When a slider is connected to an event, it is subscribed to it, and it publishes it
+     * when its value is modified. The connected value is unmapped if {@code connectUnmapped} is true, and mapped if
+     * it is false.
+     */
+    public void connect(Event event, boolean connectUnmapped) {
+        this.connectUnmapped = connectUnmapped;
+        EventManager.instance.removeAllSubscriptions(this);
+        if (event != null) {
+            this.connectedEvent = event;
+
+            // Subscribe.
+            EventManager.instance.subscribe(this, this.connectedEvent);
+
+            // Listen to.
+            this.addListener(evt -> {
+                if (evt instanceof ChangeEvent) {
+                    EventManager.publish(this.connectedEvent, this, connectUnmapped ? getValue() : getMappedValue());
+                    return true;
+                }
+                return false;
+            });
+        }
+    }
+
+    /**
+     * Connect this slider with the given event. Slider events contain a float value as the first
+     * parameter. When a slider is connected to an event, it is subscribed to it, and it publishes it
+     * when its value is modified. This variation publishes the mapped value.
+     */
+    public void connect(Event event) {
+        connect(event, false);
+    }
+
+    /**
+     * Connect this slider with the given event. Slider events contain a float value as the first
+     * parameter. When a slider is connected to an event, it is subscribed to it, and it publishes it
+     * when its value is modified. This variation publishes the unmapped internal value.
+     */
+    public void connectUnmapped(Event event) {
+        connect(event, true);
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (event == connectedEvent
+                && source != this
+                && data != null
+                && data.length > 0
+                && data[0] instanceof Float value) {
+            setProgrammaticChangeEvents(false);
+            if (connectUnmapped) {
+                setValue(value);
+            } else {
+                setMappedValue(value);
+            }
+            setProgrammaticChangeEvents(true);
         }
     }
 

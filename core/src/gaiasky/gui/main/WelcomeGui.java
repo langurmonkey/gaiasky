@@ -15,7 +15,6 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -603,27 +602,13 @@ public class WelcomeGui extends AbstractGui {
                 // VR demo mode.
                 var vrDemo = new OwnCheckBox(I18n.msg("gui.vr.demo"), skin, 10f);
                 vrDemo.setChecked(Settings.settings.runtime.vrDemoMode);
-                vrDemo.listenTo(Event.VR_DEMO_MODE_CMD);
-                vrDemo.addListener((event -> {
-                    if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.VR_DEMO_MODE_CMD, vrDemo, vrDemo.isChecked());
-                        return true;
-                    }
-                    return false;
-                }));
+                vrDemo.connect(Event.VR_DEMO_MODE_CMD);
                 OwnImageButton vrDemoTooltip = new OwnImageButton(skin, "tooltip");
                 vrDemoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.demo.info"), skin));
                 // VR desktop mirror.
                 var vrMirror = new OwnCheckBox(I18n.msg("gui.vr.mirror"), skin, 10f);
                 vrMirror.setChecked(Settings.settings.runtime.vrDesktopMirror);
-                vrMirror.listenTo(Event.VR_DESKTOP_MIRROR_CMD);
-                vrMirror.addListener((event -> {
-                    if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.VR_DESKTOP_MIRROR_CMD, vrMirror, vrMirror.isChecked());
-                        return true;
-                    }
-                    return false;
-                }));
+                vrMirror.connect(Event.VR_DESKTOP_MIRROR_CMD);
                 OwnImageButton vrMirrorTooltip = new OwnImageButton(skin, "tooltip");
                 vrMirrorTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mirror.info"), skin));
                 // Add to table.

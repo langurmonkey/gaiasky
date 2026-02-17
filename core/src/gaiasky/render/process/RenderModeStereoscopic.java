@@ -137,7 +137,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         double k = Settings.settings.program.modeStereo.k;
         double ipd = Settings.settings.program.modeStereo.ipd;
         double screenDist = Settings.settings.program.modeStereo.screenDistance;
-        double maxSep = 1.0e8 * Constants.KM_TO_U;
+        double maxSep = 1.6e8 * Constants.KM_TO_U;
         // The magic formula.
         double eyeSep = k * (closestDist * ipd / screenDist) * camera.getFovFactor();
         sep = MathUtilsDouble.lowPass(eyeSep, sep, 4.0);

@@ -376,7 +376,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
 
                     // Save speed, set it to 50
                     double speed = Settings.settings.scene.camera.speed;
-                    em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f, false);
+                    em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f);
 
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
@@ -472,7 +472,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                     Settings.settings.scene.camera.cinematic = cinematic;
 
                     // Restore speed
-                    em.post(Event.CAMERA_SPEED_CMD, this, (float) speed, false);
+                    em.post(Event.CAMERA_SPEED_CMD, this, (float) speed);
 
                     // Restore turning speed
                     em.post(Event.TURNING_SPEED_CMD, this, (float) turnSpeedBak, false);

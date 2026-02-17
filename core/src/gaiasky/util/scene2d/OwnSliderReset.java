@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
+import gaiasky.event.Event;
 import gaiasky.util.i18n.I18n;
 
 import java.text.DecimalFormat;
@@ -138,7 +139,7 @@ public class OwnSliderReset extends Table implements Disableable {
     }
 
     @Override
-    public boolean addListener (EventListener listener) {
+    public boolean addListener(EventListener listener) {
         // The listeners should go to the underlying slider.
         return slider.addListener(listener);
     }
@@ -305,6 +306,22 @@ public class OwnSliderReset extends Table implements Disableable {
 
     public void setProgrammaticChangeEvents(boolean programmaticChangeEvents) {
         slider.setProgrammaticChangeEvents(programmaticChangeEvents);
+    }
+
+    public void setTooltip(String tooltip) {
+        slider.setTooltip(tooltip);
+    }
+
+    public void connect(Event event, boolean connectUnmapped) {
+        slider.connect(event, connectUnmapped);
+    }
+
+    public void connect(Event event) {
+        slider.connect(event);
+    }
+
+    public void connectUnmapped(Event event) {
+        slider.connectUnmapped(event);
     }
 }
 

@@ -79,7 +79,6 @@ public class GamepadGui extends AbstractGui {
     private final float bh;
     private final FocusView view;
     private final FilterView filterView;
-    boolean hackProgrammaticChangeEvents = true;
     private Table searchT;
     private Cell<?> contentCell, infoCell;
     private OwnTextButton vrInfoButton, searchButton, bookmarksButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
@@ -96,8 +95,7 @@ public class GamepadGui extends AbstractGui {
     private OwnTextButton starGlowButton;
     private OwnTextButton invertYButton;
     private OwnTextButton invertXButton;
-    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness,
-            magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, lensFlare, motionBlur;
+    private OwnSliderPlus fovSlider;
     private OwnTextField searchField;
     private OwnLabel infoMessage, cameraModeLabel, cameraFocusLabel;
     private Actor[][] currentModel;
@@ -455,14 +453,7 @@ public class GamepadGui extends AbstractGui {
             fovSlider.setWidth(ww);
             fovSlider.setValue(Settings.settings.scene.camera.fov);
             fovSlider.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
-            fovSlider.addListener(event -> {
-                if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
-                    float value = fovSlider.getMappedValue();
-                    EventManager.publish(Event.FOV_CMD, fovSlider, value);
-                    return true;
-                }
-                return false;
-            });
+            fovSlider.connect(Event.FOV_CMD);
             camT.add(fovLabel).right().padBottom(pad20).padRight(pad20);
             camT.add(fovSlider).left().padBottom(pad20).row();
         } else {
@@ -481,73 +472,55 @@ public class GamepadGui extends AbstractGui {
 
         // Speed
         final Label speedLabel = new Label(I18n.msg("gui.camera.speed"), skin, "header-raw");
-        camSpeedSlider = new OwnSliderPlus("",
-                                           Constants.MIN_SLIDER,
-                                           Constants.MAX_SLIDER,
-                                           Constants.SLIDER_STEP,
-                                           Constants.MIN_CAM_SPEED,
-                                           Constants.MAX_CAM_SPEED,
-                                           skin,
-                                           "header-raw");
+        OwnSliderPlus camSpeedSlider = new OwnSliderPlus("",
+                                                         Constants.MIN_SLIDER,
+                                                         Constants.MAX_SLIDER,
+                                                         Constants.SLIDER_STEP,
+                                                         Constants.MIN_CAM_SPEED,
+                                                         Constants.MAX_CAM_SPEED,
+                                                         skin,
+                                                         "header-raw");
         cameraModel[0][3] = camSpeedSlider;
         camSpeedSlider.setName("camera speed");
         camSpeedSlider.setWidth(ww);
         camSpeedSlider.setMappedValue(Settings.settings.scene.camera.speed);
-        camSpeedSlider.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.CAMERA_SPEED_CMD, camSpeedSlider, camSpeedSlider.getMappedValue(), false);
-                return true;
-            }
-            return false;
-        });
+        camSpeedSlider.connect(Event.CAMERA_SPEED_CMD);
         camT.add(speedLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camSpeedSlider).left().padBottom(pad20).row();
 
         // Rot
         final Label rotationLabel = new Label(I18n.msg("gui.rotation.speed"), skin, "header-raw");
-        camRotSlider = new OwnSliderPlus("",
-                                         Constants.MIN_SLIDER,
-                                         Constants.MAX_SLIDER,
-                                         Constants.SLIDER_STEP,
-                                         Constants.MIN_ROT_SPEED,
-                                         Constants.MAX_ROT_SPEED,
-                                         skin,
-                                         "header-raw");
+        OwnSliderPlus camRotSlider = new OwnSliderPlus("",
+                                                       Constants.MIN_SLIDER,
+                                                       Constants.MAX_SLIDER,
+                                                       Constants.SLIDER_STEP,
+                                                       Constants.MIN_ROT_SPEED,
+                                                       Constants.MAX_ROT_SPEED,
+                                                       skin,
+                                                       "header-raw");
         cameraModel[0][4] = camRotSlider;
         camRotSlider.setName("rotate speed");
         camRotSlider.setWidth(ww);
         camRotSlider.setMappedValue(Settings.settings.scene.camera.rotate);
-        camRotSlider.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.ROTATION_SPEED_CMD, camRotSlider, camRotSlider.getMappedValue());
-                return true;
-            }
-            return false;
-        });
+        camRotSlider.connect(Event.ROTATION_SPEED_CMD);
         camT.add(rotationLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camRotSlider).left().padBottom(pad20).row();
 
         // Turn
         final Label turnLabel = new Label(I18n.msg("gui.turn.speed"), skin, "header-raw");
-        camTurnSlider = new OwnSliderPlus("",
-                                          Constants.MIN_SLIDER,
-                                          Constants.MAX_SLIDER,
-                                          Constants.SLIDER_STEP,
-                                          Constants.MIN_TURN_SPEED,
-                                          Constants.MAX_TURN_SPEED,
-                                          skin,
-                                          "header-raw");
+        OwnSliderPlus camTurnSlider = new OwnSliderPlus("",
+                                                        Constants.MIN_SLIDER,
+                                                        Constants.MAX_SLIDER,
+                                                        Constants.SLIDER_STEP,
+                                                        Constants.MIN_TURN_SPEED,
+                                                        Constants.MAX_TURN_SPEED,
+                                                        skin,
+                                                        "header-raw");
         cameraModel[0][5] = camTurnSlider;
         camTurnSlider.setName("turn speed");
         camTurnSlider.setWidth(ww);
         camTurnSlider.setMappedValue(Settings.settings.scene.camera.turn);
-        camTurnSlider.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.TURNING_SPEED_CMD, camTurnSlider, camTurnSlider.getMappedValue(), false);
-                return true;
-            }
-            return false;
-        });
+        camTurnSlider.connect(Event.TURNING_SPEED_CMD);
         camT.add(turnLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camTurnSlider).left().padBottom(pad20).row();
 
@@ -938,143 +911,103 @@ public class GamepadGui extends AbstractGui {
         Table graphicsT = new Table(skin);
 
         // Star brightness
-        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"),
-                                           Constants.MIN_SLIDER,
-                                           Constants.MAX_SLIDER,
-                                           Constants.SLIDER_STEP_TINY,
-                                           Constants.MIN_STAR_BRIGHTNESS,
-                                           Constants.MAX_STAR_BRIGHTNESS,
-                                           skin,
-                                           "header-raw");
+        var starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"),
+                                               Constants.MIN_SLIDER,
+                                               Constants.MAX_SLIDER,
+                                               Constants.SLIDER_STEP_TINY,
+                                               Constants.MIN_STAR_BRIGHTNESS,
+                                               Constants.MAX_STAR_BRIGHTNESS,
+                                               skin,
+                                               "header-raw");
         starBrightness.setWidth(ww);
         starBrightness.setHeight(sh);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
-        starBrightness.addListener(event -> {
-            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.publish(Event.STAR_BRIGHTNESS_CMD, starBrightness, starBrightness.getMappedValue());
-                return true;
-            }
-            return false;
-        });
+        starBrightness.connect(Event.STAR_BRIGHTNESS_CMD);
 
         // Magnitude multiplier
-        magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"),
-                                                Constants.MIN_STAR_BRIGHTNESS_POW,
-                                                Constants.MAX_STAR_BRIGHTNESS_POW,
-                                                Constants.SLIDER_STEP_TINY,
-                                                false,
-                                                skin,
-                                                "header-raw");
+        var magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"),
+                                                    Constants.MIN_STAR_BRIGHTNESS_POW,
+                                                    Constants.MAX_STAR_BRIGHTNESS_POW,
+                                                    Constants.SLIDER_STEP_WEENY,
+                                                    false,
+                                                    skin,
+                                                    "header-raw");
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
         magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
-        magnitudeMultiplier.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, magnitudeMultiplier.getValue());
-                return true;
-            }
-            return false;
-        });
+        magnitudeMultiplier.connect(Event.STAR_BRIGHTNESS_POW_CMD);
 
         // Star glow factor
-        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"),
-                                           Constants.MIN_STAR_GLOW_FACTOR,
-                                           Constants.MAX_STAR_GLOW_FACTOR,
-                                           Constants.SLIDER_STEP_TINY * 0.1f,
-                                           false,
-                                           skin,
-                                           "header-raw");
+        var starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"),
+                                               Constants.MIN_STAR_GLOW_FACTOR,
+                                               Constants.MAX_STAR_GLOW_FACTOR,
+                                               Constants.SLIDER_STEP_TINY * 0.1f,
+                                               false,
+                                               skin,
+                                               "header-raw");
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
         starGlowFactor.setWidth(ww);
         starGlowFactor.setHeight(sh);
         starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
-        starGlowFactor.addListener(event -> {
-            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.publish(Event.STAR_GLOW_FACTOR_CMD, starGlowFactor, starGlowFactor.getValue());
-                return true;
-            }
-            return false;
-        });
+        starGlowFactor.connect(Event.STAR_GLOW_FACTOR_CMD);
 
         // Point size
-        pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"),
-                                      Constants.MIN_STAR_POINT_SIZE,
-                                      Constants.MAX_STAR_POINT_SIZE,
-                                      Constants.SLIDER_STEP_TINY,
-                                      false,
-                                      skin,
-                                      "header-raw");
-        pointSize.setWidth(ww);
-        pointSize.setHeight(sh);
-        pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
-        pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
-        pointSize.addListener(event -> {
-            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.publish(Event.STAR_POINT_SIZE_CMD, pointSize, pointSize.getMappedValue());
-                return true;
-            }
-            return false;
-        });
-
-        // Base star level
-        starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"),
-                                          Constants.MIN_STAR_MIN_OPACITY,
-                                          Constants.MAX_STAR_MIN_OPACITY,
+        var pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"),
+                                          Constants.MIN_STAR_POINT_SIZE,
+                                          Constants.MAX_STAR_POINT_SIZE,
                                           Constants.SLIDER_STEP_TINY,
                                           false,
                                           skin,
                                           "header-raw");
-        starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
-        starBaseLevel.setWidth(ww);
-        starBaseLevel.setHeight(sh);
-        starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
-        starBaseLevel.addListener(event -> {
-            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.publish(Event.STAR_BASE_LEVEL_CMD, starBaseLevel, starBaseLevel.getMappedValue());
-                return true;
-            }
-            return false;
-        });
+        pointSize.setWidth(ww);
+        pointSize.setHeight(sh);
+        pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
+        pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
+        pointSize.connect(Event.STAR_POINT_SIZE_CMD);
 
-        // Bloom
-        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"),
-                                        Constants.MIN_BLOOM,
-                                        Constants.MAX_BLOOM,
-                                        Constants.SLIDER_STEP_TINY,
-                                        false,
-                                        skin,
-                                        "header-raw");
-        bloomSlider.setWidth(ww);
-        bloomSlider.setHeight(sh);
-        bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity);
-        bloomSlider.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.BLOOM_CMD, bloomSlider, bloomSlider.getValue());
-                return true;
-            }
-            return false;
-        });
-
-        // Unsharp mask
-        unsharpMaskSlider = new OwnSliderPlus(I18n.msg("gui.unsharpmask"),
-                                              Constants.MIN_UNSHARP_MASK_FACTOR,
-                                              Constants.MAX_UNSHARP_MASK_FACTOR,
+        // Base star level
+        var starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"),
+                                              Constants.MIN_STAR_MIN_OPACITY,
+                                              Constants.MAX_STAR_MIN_OPACITY,
                                               Constants.SLIDER_STEP_TINY,
                                               false,
                                               skin,
                                               "header-raw");
+        starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
+        starBaseLevel.setWidth(ww);
+        starBaseLevel.setHeight(sh);
+        starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
+        starBaseLevel.connect(Event.STAR_BASE_LEVEL_CMD);
+
+        // Bloom
+        var bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"),
+                                            Constants.MIN_BLOOM,
+                                            Constants.MAX_BLOOM,
+                                            Constants.SLIDER_STEP_TINY,
+                                            false,
+                                            skin,
+                                            "header-raw");
+        bloomSlider.setWidth(ww);
+        bloomSlider.setHeight(sh);
+        bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity);
+        bloomSlider.connect(Event.BLOOM_CMD);
+
+        // Unsharp mask
+        var unsharpMaskSlider = new OwnSliderPlus(I18n.msg("gui.unsharpmask"),
+                                                  Constants.MIN_UNSHARP_MASK_FACTOR,
+                                                  Constants.MAX_UNSHARP_MASK_FACTOR,
+                                                  Constants.SLIDER_STEP_TINY,
+                                                  false,
+                                                  skin,
+                                                  "header-raw");
         unsharpMaskSlider.setWidth(ww);
         unsharpMaskSlider.setHeight(sh);
         unsharpMaskSlider.setValue(Settings.settings.postprocess.unsharpMask.factor);
-        unsharpMaskSlider.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.UNSHARP_MASK_CMD, unsharpMaskSlider, unsharpMaskSlider.getValue());
-                return true;
-            }
-            return false;
-        });
+        unsharpMaskSlider.connect(Event.UNSHARP_MASK_CMD);
 
+        OwnSliderPlus lensFlare = null;
+        OwnSliderPlus motionBlur = null;
         if (!vr) {
             // Lens flare
             lensFlare = new OwnSliderPlus(I18n.msg("gui.lensflare"),
@@ -1087,13 +1020,8 @@ public class GamepadGui extends AbstractGui {
             lensFlare.setWidth(ww);
             lensFlare.setHeight(sh);
             lensFlare.setValue(Settings.settings.postprocess.lensFlare.strength);
-            lensFlare.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.getValue());
-                    return true;
-                }
-                return false;
-            });
+            lensFlare.connect(Event.LENS_FLARE_CMD);
+
             // Star glow
             starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
             starGlowButton.setWidth(ww);
@@ -1117,13 +1045,7 @@ public class GamepadGui extends AbstractGui {
             motionBlur.setWidth(ww);
             motionBlur.setHeight(sh);
             motionBlur.setMappedValue(Settings.settings.postprocess.motionBlur.strength);
-            motionBlur.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.MOTION_BLUR_CMD, motionBlur, motionBlur.getMappedValue());
-                    return true;
-                }
-                return false;
-            });
+            motionBlur.connect(Event.MOTION_BLUR_CMD);
         }
 
         /* Reset defaults */
@@ -1849,46 +1771,6 @@ public class GamepadGui extends AbstractGui {
                             focusName = view.getLocalizedName();
                         }
                         cameraFocusLabel.setText(focusName);
-                    }
-                }
-                case STAR_POINT_SIZE_CMD -> {
-                    if (source != pointSize && pointSize != null) {
-                        hackProgrammaticChangeEvents = false;
-                        float newSize = (float) data[0];
-                        pointSize.setMappedValue(newSize);
-                        hackProgrammaticChangeEvents = true;
-                    }
-                }
-                case STAR_BRIGHTNESS_CMD -> {
-                    if (source != starBrightness && starBrightness != null) {
-                        Float brightness = (Float) data[0];
-                        hackProgrammaticChangeEvents = false;
-                        starBrightness.setMappedValue(brightness);
-                        hackProgrammaticChangeEvents = true;
-                    }
-                }
-                case STAR_BRIGHTNESS_POW_CMD -> {
-                    if (source != magnitudeMultiplier && magnitudeMultiplier != null) {
-                        Float pow = (Float) data[0];
-                        hackProgrammaticChangeEvents = false;
-                        magnitudeMultiplier.setMappedValue(pow);
-                        hackProgrammaticChangeEvents = true;
-                    }
-                }
-                case STAR_GLOW_FACTOR_CMD -> {
-                    if (source != starGlowFactor && starGlowFactor != null) {
-                        Float glowFactor = (Float) data[0];
-                        hackProgrammaticChangeEvents = false;
-                        starGlowFactor.setMappedValue(glowFactor);
-                        hackProgrammaticChangeEvents = true;
-                    }
-                }
-                case STAR_BASE_LEVEL_CMD -> {
-                    if (source != starBaseLevel && starBaseLevel != null) {
-                        Float baseLevel = (Float) data[0];
-                        hackProgrammaticChangeEvents = false;
-                        starBaseLevel.setMappedValue(baseLevel);
-                        hackProgrammaticChangeEvents = true;
                     }
                 }
                 case STEREOSCOPIC_CMD -> {
