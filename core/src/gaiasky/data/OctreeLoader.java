@@ -186,7 +186,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         particles = filePaths[0];
         metadata = filePaths[1];
 
-        sceneGraphBuilder = new SceneGraphBuilderSystem(scene.index(), null, 0);
+        sceneGraphBuilder = new SceneGraphBuilderSystem(scene, null, 0);
         setInitializer = new ParticleSetInitializer(true, null, 0);
         baseInitializer = new BaseInitializer(scene, true, null, 0);
     }

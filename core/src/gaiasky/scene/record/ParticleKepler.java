@@ -9,6 +9,7 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 
@@ -321,17 +322,17 @@ public record ParticleKepler(long id,
 
     @Override
     public boolean hasSize() {
-        return false;
+        return true;
     }
 
     @Override
     public float size() {
-        return Float.NaN;
+        return (float) (1.0e6 * Constants.KM_TO_U);
     }
 
     @Override
     public double radius() {
-        return Float.NaN;
+        return size();
     }
 
     @Override

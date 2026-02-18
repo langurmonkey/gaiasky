@@ -9,11 +9,13 @@ package gaiasky.scene.view;
 
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.DatasetDescription;
+import gaiasky.scene.component.OrbitElementsSet;
 import gaiasky.scene.component.ParticleSet;
 
 public class FilterView extends BaseView {
 
     private ParticleSet set;
+    private OrbitElementsSet elementsSet;
     private DatasetDescription dataset;
 
     public FilterView() {
@@ -24,14 +26,19 @@ public class FilterView extends BaseView {
         super.entityChanged();
         this.dataset = Mapper.datasetDescription.get(entity);
         this.set = Mapper.particleSet.has(entity) ? Mapper.particleSet.get(entity) : Mapper.starSet.get(entity);
+        this.elementsSet = Mapper.orbitElementsSet.get(entity);
     }
 
     public boolean filter(int i) {
-        if (set == null) {
+        if (set == null && elementsSet == null) {
             return false;
         }
         if (dataset != null && dataset.catalogInfo != null && dataset.catalogInfo.filter != null) {
-            return dataset.catalogInfo.filter.evaluate(set.pointData.get(i));
+            if (set != null) {
+                return dataset.catalogInfo.filter.evaluate(set.pointData.get(i));
+            } else {
+                return dataset.catalogInfo.filter.evaluate(elementsSet.data().get(i));
+            }
         }
         return true;
     }

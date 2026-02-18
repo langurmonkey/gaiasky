@@ -40,6 +40,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.TextureArrayLoader.TextureArrayParameter;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
@@ -74,7 +75,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateParticleSet;
         focus.hitRayConsumer = FocusHit::addHitRayParticleSet;
-
 
         // Initialize particle set
         if (starSet == null) {
@@ -224,6 +224,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                         .isEmpty() && set.data()
                         .getFirst()
                         .getType() == ParticleType.PARTICLE_EXT;
+                set.isElements = !set.data()
+                        .isEmpty() && set.data()
+                        .getFirst()
+                        .getType() == ParticleType.KEPLER;
 
                 if (provider instanceof STILDataProvider stil) {
                     set.setColumnInfoList(stil.getColumnInfoList());
@@ -320,7 +324,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         List<Double> distances = new ArrayList<>();
         for (IParticleRecord point : set.data()) {
             // Add sample to mean distance
-            double dist = len(point.x(), point.y(), point.z());
+            var pos = set.fetchPositionDouble(point, GaiaSky.instance.getCameraManager().getPos(), new Vector3D(), 0);
+            double dist = pos.len();
             if (Double.isFinite(dist)) {
                 distances.add(dist);
                 set.maxDistance = FastMath.max(set.maxDistance, dist);
@@ -346,7 +351,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         } else {
             // Compute mean position from particles.
             for (IParticleRecord point : set.data()) {
-                body.pos.add(point.x(), point.y(), point.z());
+                var pos = set.fetchPositionDouble(point, GaiaSky.instance.getCameraManager().getPos(), new Vector3D(), 0);
+                body.pos.add(pos);
             }
             body.pos.scl(1d / set.data()
                     .size());

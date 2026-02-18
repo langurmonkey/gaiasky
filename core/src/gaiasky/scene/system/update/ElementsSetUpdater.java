@@ -38,9 +38,9 @@ public class ElementsSetUpdater extends AbstractUpdateSystem {
     public void updateEntity(Entity entity, float deltaTime) {
         var time = GaiaSky.instance.time;
         var graph = Mapper.graph.get(entity);
+        var set = Mapper.orbitElementsSet.get(entity);
         if (graph.children != null) {
             var base = Mapper.base.get(entity);
-            var set = Mapper.orbitElementsSet.get(entity);
 
             graphUpdater.setCamera(GaiaSky.instance.cameraManager);
             if (set.initialUpdate) {
@@ -56,6 +56,15 @@ public class ElementsSetUpdater extends AbstractUpdateSystem {
                     Entity child = set.alwaysUpdate.get(i);
                     update(child, deltaTime, time, graph, base);
                 }
+            }
+
+        }
+        if (set.pointData != null) {
+            var camera = GaiaSky.instance.cameraManager;
+            //set.cPosD.set(camera.getPos());
+
+            if (set.focusIndex >= 0) {
+                set.updateFocus(camera);
             }
         }
     }

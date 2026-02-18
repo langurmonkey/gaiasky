@@ -4,7 +4,6 @@
 
 uniform sampler2D u_texture;
 uniform float u_scale;
-uniform float u_opacity;
 uniform float u_zfar;
 uniform float u_k;
 
@@ -17,19 +16,25 @@ in float v_opacity;
 // We use the location of the layer buffer (1).
 layout (location = 1) out vec4 layerBuffer;
 
-void main(void){
+void main(void) {
+    // Discard early based on opacity.
+    if (v_opacity < 0.001) {
+        discard;
+    }
+
     // Smoothing is adapted arbitrarily to produce crisp borders at all sizes)
     float smoothing = 1.0 / (16.0 * u_scale);
     float dist = texture(u_texture, v_texCoords).a;
-    float alpha = smoothstep(0.6 - smoothing, 0.6 + smoothing, dist);
-    float aa = alpha * v_opacity * u_opacity;
-	
-	if (aa < 0.001)
-	    discard;
+    float alpha = smoothstep(0.6 - smoothing, 0.6 + smoothing, dist) * v_opacity;
 
-    // Additive
-    float a = aa * v_color.a;
-    layerBuffer = vec4(v_color.rgb, 1.0) * a;
+    // Discard based on final alpha.
+	if (alpha < 0.001) {
+        discard;
+    }
+
+    // Additive blending, premultiply color alpha.
+    alpha *= v_color.a;
+    layerBuffer = vec4(v_color.rgb, 1.0) * alpha;
 
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 }

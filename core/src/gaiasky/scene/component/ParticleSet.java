@@ -21,12 +21,14 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Label.LabelDisplay;
+import gaiasky.scene.record.ParticleKepler;
 import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.FilterView;
 import gaiasky.util.*;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.KeplerianElements;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
@@ -81,6 +83,11 @@ public class ParticleSet implements Component, IDisposable {
      * Flag indicating whether the particle set holds extended particles.
      **/
     public boolean isExtended;
+
+    /**
+     * Flag indicating whether the particle set holds Keplerian elements particles (type {@link ParticleKepler}).
+     */
+    public boolean isElements;
 
     /**
      * Whether to render the global set label or not.
@@ -193,7 +200,7 @@ public class ParticleSet implements Component, IDisposable {
      * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
-    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.07)), FastMath.tan(Math.toRadians(6.0))};
+    public double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), FastMath.tan(Math.toRadians(10.0))};
 
     /**
      * The texture attribute is an attribute in the original table that points to the texture to use. Ideally, it should
@@ -788,8 +795,8 @@ public class ParticleSet implements Component, IDisposable {
         Vector3Q aux = this.fetchPosition(focus, cPosD, B31, currDeltaYears);
         this.focusPosition.set(aux)
                 .add(camera.getPos());
-        this.focusDistToCamera = aux.lenDouble();
         this.focusSize = getFocusSize();
+        this.focusDistToCamera = aux.lenDouble() - this.focusSize;
         this.focusSolidAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
         this.focusSolidAngleApparent = this.focusSolidAngle;
     }
@@ -863,7 +870,11 @@ public class ParticleSet implements Component, IDisposable {
 
     public void markForUpdate(Render render) {
         if (render != null) {
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, render));
+            if (isElements) {
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_ORBITAL_ELEMENTS, render));
+            } else {
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, render));
+            }
         }
     }
 
@@ -995,31 +1006,48 @@ public class ParticleSet implements Component, IDisposable {
                                         Vector3Q camPos,
                                         Vector3D out,
                                         double deltaYears) {
-        Vector3D pm = D32.set(0, 0, 0);
-        if (pb.hasProperMotion()) {
-            pm.set(pb.vx(),
-                   pb.vy(),
-                   pb.vz())
-                    .scl(deltaYears);
-        }
-        Vector3D destination = out.set(pb.x(), pb.y(), pb.z());
-        // Apply affine transformations, if any.
-        if (entity != null) {
-            var affine = Mapper.affine.get(entity);
-            if (affine != null && !affine.isEmpty()) {
-                synchronized (mat) {
-                    affine.apply(mat.idt());
-                    destination.mul(mat);
+        synchronized (D32) {
+            Vector3D pm = D32.setZero();
+            if (pb instanceof ParticleKepler k) {
+                // KEPLER ELEMENTS.
+                var dtDays = deltaYears * Nature.Y_TO_D;
+                KeplerianElements.keplerianToCartesianTime(out,
+                                                           dtDays,
+                                                           k.period(),
+                                                           k.inclination(),
+                                                           k.eccentricity(),
+                                                           k.ascendingNode(),
+                                                           k.argOfPericenter(),
+                                                           k.semiMajorAxis(),
+                                                           k.meanAnomaly());
+            } else {
+                // REGULAR PARTICLE.
+                if (pb.hasProperMotion()) {
+                    pm.set(pb.vx(),
+                           pb.vy(),
+                           pb.vz())
+                            .scl(deltaYears);
+                }
+                out.set(pb.x(), pb.y(), pb.z());
+            }
+            // Apply affine transformations, if any.
+            if (entity != null) {
+                var affine = Mapper.affine.get(entity);
+                if (affine != null && !affine.isEmpty()) {
+                    synchronized (mat) {
+                        affine.apply(mat.idt());
+                        out.mul(mat);
+                    }
                 }
             }
+            if (camPos != null && !camPos.hasNaN()) {
+                out.sub(camPos);
+            }
+            if (!pm.isZero()) {
+                out.add(pm);
+            }
         }
-        if (camPos != null && !camPos.hasNaN())
-            destination.sub(camPos)
-                    .add(pm);
-        else
-            destination.add(pm);
-
-        return destination;
+        return out;
     }
 
     /**
@@ -1039,33 +1067,37 @@ public class ParticleSet implements Component, IDisposable {
                                   Vector3Q camPos,
                                   Vector3Q out,
                                   double deltaYears) {
-        Vector3D pm = D32;
-        if (pb.hasProperMotion()) {
-            pm.set(pb.vx(),
-                   pb.vy(),
-                   pb.vz())
-                    .scl(deltaYears);
+        if (pb instanceof ParticleKepler k) {
+            fetchPositionDouble(k, camPos, D31, deltaYears);
+            out.set(D31);
         } else {
-            pm.set(0, 0, 0);
-        }
-        out.set(pb.x(), pb.y(), pb.z());
-        // Apply affine transformations, if any.
-        if (entity != null && Mapper.affine.has(entity)) {
-            var affine = Mapper.affine.get(entity);
-            if (affine != null && !affine.isEmpty()) {
-                synchronized (mat) {
-                    affine.apply(mat.idt());
-                    out.mul(mat);
+            Vector3D pm = D32;
+            if (pb.hasProperMotion()) {
+                pm.set(pb.vx(),
+                       pb.vy(),
+                       pb.vz())
+                        .scl(deltaYears);
+            } else {
+                pm.set(0, 0, 0);
+            }
+            out.set(pb.x(), pb.y(), pb.z());
+            // Apply affine transformations, if any.
+            if (entity != null && Mapper.affine.has(entity)) {
+                var affine = Mapper.affine.get(entity);
+                if (affine != null && !affine.isEmpty()) {
+                    synchronized (mat) {
+                        affine.apply(mat.idt());
+                        out.mul(mat);
+                    }
                 }
             }
+            if (camPos != null && !camPos.hasNaN()) {
+                out.sub(camPos);
+            }
+            if (!pm.isZero()) {
+                out.add(pm);
+            }
         }
-        if (camPos != null && !camPos.hasNaN()) {
-            out.sub(camPos);
-        }
-        if (!pm.isZero()) {
-            out.add(pm);
-        }
-
         return out;
     }
 
@@ -1163,11 +1195,10 @@ public class ParticleSet implements Component, IDisposable {
     public double getSolidAngleApparent(int idx) {
         if (idx >= 0 && idx < pointData.size()) {
             IParticleRecord candidate = pointData.get(idx);
-            Vector3D aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
             float size = candidate.hasSize() ? candidate.size() : 0.5e2f;
-            return (float) ((size / aux.sub(camera.getPos())
-                    .len()) / camera.getFovFactor());
+            var pos = fetchPositionDouble(candidate, camera.getPos(), D31, currDeltaYears);
+            return (float) ((size / pos.len2()) / camera.getFovFactor());
         } else {
             return -1;
         }

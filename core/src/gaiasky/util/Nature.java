@@ -87,8 +87,10 @@ public class Nature {
     public static final double D_TO_NS = D_TO_S * 1.0e9;
     /** Nanoseconds to days **/
     public static final double NS_TO_D = 1.0 / D_TO_NS;
+    /** Years to days. **/
+    public static final double Y_TO_D = 365.25;
     /** Years to seconds **/
-    public static final double Y_TO_S = 31557600.0;
+    public static final double Y_TO_S =  Y_TO_D * D_TO_S;
     /** Seconds to years **/
     public static final double S_TO_Y = 1.0 / Y_TO_S;
     /** Years to milliseconds **/

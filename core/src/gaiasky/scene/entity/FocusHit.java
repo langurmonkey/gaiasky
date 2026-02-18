@@ -270,12 +270,12 @@ public class FocusHit {
                                             Array<Entity> hits) {
         var set = view.getSet();
         List<IParticleRecord> pointData = set.pointData;
-        int n = pointData.size();
-        if (hitCondition(view)) {
+        if (hitCondition(view) && pointData != null) {
             var entity = view.getEntity();
 
             filter.setEntity(entity);
             Array<Pair<Integer, Double>> temporalHits = new Array<>();
+            int n = pointData.size();
             for (int i = 0; i < n; i++) {
                 if (filter.filter(i)) {
                     IParticleRecord pb = pointData.get(i);
@@ -549,5 +549,146 @@ public class FocusHit {
             }
         }
 
+    }
+
+    public void addHitCoordinateElementsSet(FocusView view,
+                                            int screenX,
+                                            int screenY,
+                                            int w,
+                                            int h,
+                                            int pixelDist,
+                                            NaturalCamera camera,
+                                            Array<Entity> hits) {
+        var set = view.getElementsSet();
+        List<IParticleRecord> pointData = set.data();
+        if (hitCondition(view) && pointData != null) {
+            var entity = view.getEntity();
+
+            filter.setEntity(entity);
+            Array<Pair<Integer, Double>> temporalHits = new Array<>();
+            int n = pointData.size();
+            for (int i = 0; i < n; i++) {
+                if (filter.filter(i)) {
+                    IParticleRecord pb = pointData.get(i);
+                    Vector3 posFloat = F31;
+                    Vector3D pos = set.fetchPositionDouble(pb, camera.getPos(), D31, GaiaSky.instance.time.getTime());
+                    posFloat.set(pos.valuesF());
+
+                    if (camera.direction.dot(pos) > 0) {
+                        // The particle is in front of us
+                        // Diminish the size of the star
+                        // when we are close by
+                        double dist = pos.len();
+                        double angle = set.getRadius(i) / dist / camera.getFovFactor();
+
+                        PerspectiveCamera perspectiveCamera;
+                        if (Settings.settings.program.modeStereo.active) {
+                            if (screenX < w / 2f) {
+                                perspectiveCamera = camera.getCameraStereoLeft();
+                            } else {
+                                perspectiveCamera = camera.getCameraStereoRight();
+                            }
+                            perspectiveCamera.update();
+                        } else {
+                            perspectiveCamera = camera.camera;
+                        }
+
+                        float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                        float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
+                        float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
+
+                        angle = (float) FastMath.toDegrees(angle * camera.fovFactor) * (40f / perspectiveCamera.fieldOfView);
+                        double pixelSize = FastMath.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                        perspectiveCamera.project(posFloat);
+                        posFloat.y = viewportHeight - posFloat.y;
+                        if (Settings.settings.program.modeStereo.active) {
+                            posFloat.x /= 2;
+                        }
+
+                        // Check click distance
+                        if (posFloat.dst(screenX % viewportWidth, screenY, posFloat.z) <= pixelSize) {
+                            //Hit
+                            temporalHits.add(new Pair<>(i, angle));
+                        }
+                    }
+                }
+            }
+
+            Pair<Integer, Double> best = null;
+            for (Pair<Integer, Double> hit : temporalHits) {
+                if (best == null)
+                    best = hit;
+                else if (hit.getSecond() > best.getSecond()) {
+                    best = hit;
+                }
+            }
+            if (best != null) {
+                // We found the best hit
+                set.candidateFocusIndex = best.getFirst();
+                set.updateFocusDataPos();
+                hits.add(entity);
+                return;
+            }
+
+        }
+        set.candidateFocusIndex = -1;
+        set.updateFocusDataPos();
+    }
+
+    public void addHitRayElementsSet(FocusView view,
+                                     Vector3D p0,
+                                     Vector3D p1,
+                                     NaturalCamera camera,
+                                     Array<Entity> hits) {
+        var set = view.getElementsSet();
+        List<IParticleRecord> pointData = set.data();
+        if (hitCondition(view) && pointData != null) {
+            var entity = view.getEntity();
+
+            Vector3D beamDir = new Vector3D();
+            filter.setEntity(entity);
+            Array<Pair<Integer, Double>> temporalHits = new Array<>();
+            var t = GaiaSky.instance.time.getTime();
+            int n = pointData.size();
+            for (int i = 0; i < n; i++) {
+                if (filter.filter(i)) {
+                    IParticleRecord pb = pointData.get(i);
+                    Vector3D pos = set.fetchPositionDouble(pb, camera.getPos(), D31, GaiaSky.instance.time.getTime());
+                    beamDir.set(p1).sub(p0);
+                    if (camera.direction.dot(pos) > 0) {
+                        // The star is in front of us
+                        // Diminish the size of the star
+                        // when we are close by
+                        double dist = pos.len();
+                        double angle = set.getRadius(i) / dist / camera.getFovFactor();
+                        double distToLine = IntersectorDouble.distanceLinePoint(p0, p1, pos.put(D31));
+                        double value = distToLine / dist;
+
+                        if (value < 0.01) {
+                            temporalHits.add(new Pair<>(i, angle));
+                        }
+                    }
+                }
+            }
+
+            Pair<Integer, Double> best = null;
+            for (Pair<Integer, Double> hit : temporalHits) {
+                if (best == null)
+                    best = hit;
+                else if (hit.getSecond() > best.getSecond()) {
+                    best = hit;
+                }
+            }
+            if (best != null) {
+                // We found the best hit
+                set.candidateFocusIndex = best.getFirst();
+                set.updateFocusDataPos();
+                hits.add(entity);
+                return;
+            }
+
+        }
+        set.candidateFocusIndex = -1;
+        set.updateFocusDataPos();
     }
 }

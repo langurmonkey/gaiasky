@@ -142,7 +142,7 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
                         var sourceId = (long) row[0];
                         var name = (String) row[2];
                         var epoch = (double) row[5];
-                        var semiMajorAxis = (double) row[6] * Constants.AU_TO_U * Constants.U_TO_KM;
+                        var semiMajorAxis = (double) row[6] * Constants.AU_TO_U * Constants.U_TO_KM * factor;
                         var e = (double) row[7];
                         var i = (double) row[8];
                         var ascendingNode = (double) row[9];
@@ -151,7 +151,7 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
                         var period = (double) row[12];
 
                         var typeShort = (short) row[3];
-                        var type = typeShort == 3 ? "A" : "C";
+                        var type = (int) typeShort;
                         var nObs = (int) row[4];
                         var map = new ObjectMap<UCD, Object>();
                         map.put(typeUCD, type);
@@ -198,6 +198,5 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
 
     @Override
     public void setTransformMatrix(Matrix4D matrix) {
-
     }
 }

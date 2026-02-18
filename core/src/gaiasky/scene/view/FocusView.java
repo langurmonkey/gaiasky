@@ -73,6 +73,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      **/
     private StarSet starSet;
     /**
+     * The elements set component, if any.
+     **/
+    private OrbitElementsSet elementsSet;
+    /**
      * The highlight component, initialized lazily.
      **/
     private Highlight hl;
@@ -135,6 +139,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         this.extra = Mapper.extra.get(entity);
         this.particleSet = Mapper.particleSet.get(entity);
         this.starSet = Mapper.starSet.get(entity);
+        this.elementsSet = Mapper.orbitElementsSet.get(entity);
+        this.hl = Mapper.highlight.get(entity);
     }
 
     @Override
@@ -146,6 +152,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         this.extra = null;
         this.particleSet = null;
         this.starSet = null;
+        this.elementsSet = null;
         this.hl = null;
     }
 
@@ -159,9 +166,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public long getId() {
-        var set = getSet();
-        if (set != null) {
-            return set.getId();
+        if (isSet()) {
+            return getSet().getId();
+        } else if (isElementsSet()) {
+            return getElementsSet().getId();
         } else {
             return base.id;
         }
@@ -169,9 +177,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public long getCandidateId() {
-        var set = getSet();
-        if (set != null) {
-            return set.getCandidateId();
+        if (isSet()) {
+            return getSet().getCandidateId();
+        } else if (isElementsSet()) {
+            return getElementsSet().getCandidateId();
         } else {
             return base.id;
         }
@@ -184,8 +193,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public String getLocalizedName() {
-        var set = getSet();
-        if (set != null) {
+        if (isSet()) {
+            var set = getSet();
+            String particleName = set.getLocalizedName();
+            if (particleName == null) {
+                return base.getLocalizedName();
+            } else {
+                return particleName;
+            }
+        } else if (isElementsSet()) {
+            var set = getElementsSet();
             String particleName = set.getLocalizedName();
             if (particleName == null) {
                 return base.getLocalizedName();
@@ -199,9 +216,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public String getName() {
-        var set = getSet();
-        if (set != null) {
-            var name = set.getName();
+        if (isSet()) {
+            var name = getSet().getName();
+            if (name != null)
+                return name;
+        } else if (isElementsSet()) {
+            var name = getElementsSet().getName();
             if (name != null)
                 return name;
         }
@@ -214,9 +234,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public String[] getNames() {
-        var set = getSet();
-        if (set != null) {
-            var names = set.getNames();
+        if (isSet()) {
+            var names = getSet().getNames();
+            if (names != null)
+                return names;
+        } else if (isElementsSet()) {
+            var names = getElementsSet().getNames();
             if (names != null)
                 return names;
         }
@@ -235,9 +258,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public boolean hasName(String name,
                            boolean matchCase) {
-        var set = getSet();
-        if (set != null) {
-            return set.hasName(name, matchCase);
+        if (isSet()) {
+            return getSet().hasName(name, matchCase);
+        } else if (isElementsSet()) {
+            return getElementsSet().hasName(name, matchCase);
         }
         return base.hasName(name, matchCase);
     }
@@ -259,9 +283,13 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public int getNumParticles() {
         var set = getSet();
-        if (set != null && set.data() != null) {
+        var eset = getElementsSet();
+        if (isSet() && set.data() != null) {
             // Particles in set.
             return set.data().size();
+        } else if (isElementsSet() && eset.data() != null) {
+            // Particles in eset.
+            return eset.data().size();
         } else if (Mapper.octree.has(entity)) {
             // Number of objects in root node.
             return Mapper.octant.get(entity).octant.numObjectsRec;
@@ -280,9 +308,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public String getDataFile() {
-        var set = getSet();
-        if (set != null) {
-            return set.datafile;
+        if (isSet()) {
+            return getSet().datafile;
+        } else if (isElementsSet()) {
+            return getElementsSet().datafile;
         } else {
             return null;
         }
@@ -291,8 +320,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public boolean isVisible(String name) {
         var set = getSet();
-        if (set != null && set.index.containsKey(name)) {
+        var eset = getElementsSet();
+        if (isSet() && set.index.containsKey(name)) {
             return set.isVisible(set.index.get(name));
+        }else if (isElementsSet() && eset.index.containsKey(name)) {
+            return true;
         } else {
             return isVisible();
         }
@@ -328,7 +360,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public String getClosestName() {
-        if (getSet() != null) {
+        if (isSet()) {
             return getSet().getClosestName();
         } else {
             return getName();
@@ -347,6 +379,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public String getCandidateName() {
         if (getSet() != null) {
             return getSet().getCandidateName();
+        } else if (getElementsSet() != null) {
+            return getElementsSet().getCandidateName();
         } else {
             return getName();
         }
@@ -410,8 +444,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public Vector3Q getAbsolutePosition(Vector3Q out) {
-        if (getSet() != null) {
+        if (isSet()) {
             return getSet().getAbsolutePosition(out);
+        }else if (isElementsSet()) {
+            return getElementsSet().getAbsolutePosition(out);
         } else {
             return EntityUtils.getAbsolutePosition(entity, out);
         }
@@ -506,12 +542,19 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (!isValid()) {
             return out;
         }
-        if (getSet() != null) {
+        if (isSet()) {
             if (name != null && !name.isBlank()) {
                 return getSet().getAbsolutePosition(name, time.getTime(), out);
             } else {
                 return getSet().getAbsolutePosition(time.getTime(), out);
             }
+        } else if (isElementsSet()) {
+            if (name != null && !name.isBlank()) {
+                return getElementsSet().getAbsolutePosition(name, time.getTime(), out);
+            } else {
+                return getElementsSet().getAbsolutePosition(time.getTime(), out);
+            }
+
         } else {
             if (!mustUpdatePosition(time) && !force) {
                 return getAbsolutePosition(out);
@@ -548,9 +591,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (!isValid()) {
             return 0;
         }
-        var set = getSet();
-        if (set != null) {
-            return set.getDistToCamera();
+        if (isSet()) {
+            return getSet().getDistToCamera();
+        }else if (isElementsSet()) {
+            return getElementsSet().getDistToCamera();
         } else {
             return body.distToCamera;
         }
@@ -638,9 +682,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (!isValid()) {
             return 0;
         }
-        var set = getSet();
-        if (set != null) {
-            return set.getSize();
+        if (isSet()) {
+            return getSet().getSize();
+        } else if (isElementsSet()) {
+            return getElementsSet().getSize();
         } else {
             return body.size;
         }
@@ -651,9 +696,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (!isValid()) {
             return 0;
         }
-        var set = getSet();
-        if (set != null) {
-            return set.getRadius();
+        if (isSet()) {
+            return getSet().getRadius();
+        } else if (isElementsSet()) {
+            return getElementsSet().getRadius();
         } else {
             return extra != null ? extra.radius : body.size / 2.0;
         }
@@ -846,6 +892,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public void makeFocus() {
         if (isSet()) {
             getSet().makeFocus();
+        } else if (isElementsSet()) {
+            getElementsSet().makeFocus();
         }
     }
 
@@ -854,6 +902,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (name != null) {
             if (isSet()) {
                 getSet().setFocusIndex(name);
+            } else if (isElementsSet()) {
+                getElementsSet().setFocusIndex(name);
             }
         }
         return this;
@@ -888,6 +938,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         // If name is empty with a set, we set the value on the set itself.
         if (isSet() && name != null && !name.isBlank()) {
             getSet().setLabelDisplay(state, name);
+        } else if (isElementsSet() && name != null && !name.isBlank()) {
+            // TODO
         } else if (Mapper.label.has(entity)) {
             Mapper.label.get(entity).setLabelDisplay(state);
         }
@@ -1016,6 +1068,14 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return particleSet != null ? particleSet : starSet;
     }
 
+    public boolean isElementsSet() {
+        return isValid() && elementsSet != null;
+    }
+
+    public OrbitElementsSet getElementsSet() {
+        return elementsSet;
+    }
+
     public boolean isModel() {
         return isValid() && Mapper.modelScaffolding.has(entity);
     }
@@ -1047,6 +1107,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 return set.focus.muAlpha();
             else
                 return 0;
+        } else if (isElementsSet()) {
+            var set = getElementsSet();
+            if (set.focus != null && set.focus.hasProperMotion())
+                return set.focus.muAlpha();
+            else
+                return 0;
         } else if (Mapper.pm.has(entity)) {
             var pm = Mapper.pm.get(entity);
             if (pm.pmSph != null) {
@@ -1065,6 +1131,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 return set.focus.muDelta();
             else
                 return 0;
+        } else if (isElementsSet()) {
+            var set = getElementsSet();
+            if (set.focus != null && set.focus.hasProperMotion())
+                return set.focus.muDelta();
+            else
+                return 0;
         } else if (isValid() && Mapper.pm.has(entity)) {
             var pm = Mapper.pm.get(entity);
             if (pm.pmSph != null) {
@@ -1079,6 +1151,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public double getRadialVelocity() {
         if (isSet()) {
             var set = getSet();
+            if (set.focus != null && set.focus.hasProperMotion())
+                return set.focus.radVel();
+            else
+                return 0;
+        } else if (isElementsSet()) {
+            var set = getElementsSet();
             if (set.focus != null && set.focus.hasProperMotion())
                 return set.focus.radVel();
             else
@@ -1127,12 +1205,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (!isValid()) {
             return;
         }
-        var set = getSet();
-        if (set != null) {
-            set.markForUpdate(Mapper.render.get(entity));
+        if (isSet()) {
+            getSet().markForUpdate(Mapper.render.get(entity));
         }
-        if (Mapper.orbitElementsSet.has(entity)) {
-            Mapper.orbitElementsSet.get(entity).markForUpdate(Mapper.render.get(entity));
+        if (isElementsSet()) {
+           getElementsSet().markForUpdate(Mapper.render.get(entity));
         }
         if (Mapper.verts.has(entity)) {
             Mapper.verts.get(entity).markForUpdate(Mapper.render.get(entity));

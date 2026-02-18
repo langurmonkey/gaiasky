@@ -850,6 +850,13 @@
           "proximityThresholdDeg",
           "proximityThresholdRad"
         ]
+      },
+      "epochJd:ParticleGroup": {
+        "description": "The epoch for the positions of this particle group as a Julian date.",
+        "unit": "Double",
+        "aliases": [
+          "epoch:ParticleGroup"
+        ]
       }
     },
     "StarSet": {
@@ -929,13 +936,6 @@
       "renderParticles:StarGroup": {
         "description": "Disable particle rendering by setting this to false. Labels, in case of star sets, will still be rendered.",
         "unit": "Boolean"
-      },
-      "epochJd:StarGroup": {
-        "description": "The epoch for the positions of this star group as a Julian date.",
-        "unit": "Double",
-        "aliases": [
-          "epoch:StarGroup"
-        ]
       },
       "variabilityEpochJd:StarGroup": {
         "description": "The light curve epoch for the variable stars in this star group as a Julian date.",

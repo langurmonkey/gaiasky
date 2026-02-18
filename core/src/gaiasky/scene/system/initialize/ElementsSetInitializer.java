@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
-import gaiasky.data.group.STILDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -22,12 +21,12 @@ import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.OrbitElementsSet;
 import gaiasky.scene.component.tag.TagSetElement;
 import gaiasky.scene.entity.ElementsSetRadio;
-import gaiasky.scene.record.ParticleType;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.TextureArrayLoader;
-
-import java.util.HashMap;
+import gaiasky.util.math.Vector2D;
+import gaiasky.util.math.Vector3Q;
 
 public class ElementsSetInitializer extends AbstractInitSystem {
     public ElementsSetInitializer(boolean setUp, Family family, int priority) {
@@ -36,16 +35,24 @@ public class ElementsSetInitializer extends AbstractInitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-
         var set = Mapper.orbitElementsSet.get(entity);
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
-        boolean initializeData = set.data == null;
+        var focus = Mapper.focus.get(entity);
+        boolean initializeData = set.pointData == null;
 
         // Point size.
         if (body.size == 0) {
             body.size = 1f;
         }
+
+        // Focus hits.
+        focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateElementsSet;
+        focus.hitRayConsumer = FocusHit::addHitRayElementsSet;
+
+        // Set.
+        set.focusPosition = new Vector3Q();
+        set.focusPositionSph = new Vector2D();
 
         // Data.
         if (initializeData && set.provider != null) {
@@ -55,11 +62,11 @@ public class ElementsSetInitializer extends AbstractInitSystem {
                 IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor()
                         .newInstance();
                 // By default, do not generate index in particle sets.
-                set.setData(provider.loadData(set.datafile, 1));
+                set.setPointData(provider.loadData(set.datafile, 1));
             } catch (Exception e) {
                 Logger.getLogger(this.getClass())
                         .error(e);
-                set.data = null;
+                set.pointData = null;
             }
         }
 

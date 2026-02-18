@@ -353,21 +353,13 @@ public class LabelEntityRenderSystem {
 
         // Dataset label.
         if (view.particleSet.renderSetLabel) {
-            var pos = D31;
-            pos.set(view.label.labelPosition)
-                    .add(camera.getInversePos());
-            shader.setUniformf("u_viewAngle", 90f);
-            shader.setUniformf("u_viewAnglePow", 1f);
-            shader.setUniformf("u_thLabel", 1f);
-            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, pos.len(),
-                          view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(),
-                          view.label.forceLabel());
+            renderSetLabel(view, batch, shader, sys, rc, camera);
         }
 
         // Particle labels.
         var active = view.particleSet.indices;
         if (view.particleSet.renderParticleLabels && active != null) {
-            float thresholdLabel = 1f;
+            float thresholdLabel = 1f / view.label.labelBias;
             var pointData = view.particleSet.pointData;
             int n = FastMath.min(pointData.size(), view.particleSet.numLabels);
             for (int i = 0; i < n; i++) {
@@ -420,24 +412,34 @@ public class LabelEntityRenderSystem {
         }
     }
 
+    private void renderSetLabel(LabelView view,
+                                ExtSpriteBatch batch,
+                                ExtShaderProgram shader,
+                                TextRenderer sys,
+                                RenderingContext rc,
+                                ICamera camera) {
+        var pos = D31;
+        pos.set(view.label.labelPosition)
+                .add(camera.getInversePos());
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+        render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, pos.len(),
+                      view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(),
+                      view.label.forceLabel());
+    }
+
     public void renderStarSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
         var set = view.starSet;
 
         // Dataset label.
         if (view.starSet.renderSetLabel && view.label.labelPosition != null) {
-            var pos = D31;
-            pos.set(view.label.labelPosition)
-                    .add(camera.getInversePos());
-            shader.setUniformf("u_viewAngle", 90f);
-            shader.setUniformf("u_viewAnglePow", 1f);
-            shader.setUniformf("u_thLabel", 1f);
-            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, view.text(), pos, pos.len(),
-                          view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(),
-                          view.label.forceLabel());
+            renderSetLabel(view, batch, shader, sys, rc, camera);
         }
 
         if (view.starSet.renderParticleLabels) {
             float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
+            thresholdLabel /= view.label.labelBias;
 
             var active = set.indices;
 

@@ -296,7 +296,7 @@ public class Scene {
     public void buildSceneGraph() {
         if (engine != null) {
             // Prepare system.
-            EntitySystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(index, families.graphNodes, 0);
+            EntitySystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(this, families.graphNodes, 0);
 
             // Run once.
             runOnce(sceneGraphBuilderSystem);

@@ -11,28 +11,34 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.util.i18n.I18n;
 
 public class SceneGraphBuilderSystem extends AbstractInitSystem {
 
-    /** The index reference. **/
-    private final Index index;
+    /** The scene. **/
+    private final Scene scene;
 
-    public SceneGraphBuilderSystem(final Index index, Family family, int priority) {
+    public SceneGraphBuilderSystem(final Scene scene, Family family, int priority) {
         super(false, family, priority);
-        this.index = index;
+        this.scene = scene;
     }
 
     @Override
     public void initializeEntity(Entity entity) {
         var graph = entity.getComponent(GraphNode.class);
         if (graph.parentName != null) {
-            var parent = index.getEntity(graph.parentName);
+            var parent = scene.getEntity(graph.parentName);
             if (parent != null) {
                 addChild(parent, entity, true);
             } else {
-                logger.error(I18n.msg("error.parent.notfound", Mapper.base.get(entity).getName(), graph.parentName));
+                parent = scene.getNonIndexEntity(graph.parentName);
+                if (parent != null) {
+                    addChild(parent, entity, true);
+                } else {
+                    logger.error(I18n.msg("error.parent.notfound", Mapper.base.get(entity).getName(), graph.parentName));
+                }
             }
         }
 

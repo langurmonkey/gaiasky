@@ -26,7 +26,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Highlight;
-import gaiasky.scene.component.OrbitElementsSet;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.scene.record.ParticleKepler;
@@ -109,10 +108,20 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                      getOffset(render));
             var desc = Mapper.datasetDescription.get(render.entity);
             var hl = Mapper.highlight.get(render.entity);
-            var set = Mapper.orbitElementsSet.get(render.entity);
+            var set = Mapper.particleSet.get(render.entity);
+            var eSet = Mapper.orbitElementsSet.get(render.entity);
+
 
             CatalogInfo ci = desc.catalogInfo;
             if (!inGpu(render)) {
+                // Fetch parameters from particle or elements set.
+                var pointData = set != null ? set.pointData : eSet.pointData;
+                var colorNoise = set != null ? set.colorNoise : eSet.colorNoise;
+                var sizeNoise = set != null ? set.sizeNoise : eSet.sizeNoise;
+                var textureArray = set != null ? set.textureArray : eSet.textureArray;
+                var textureAttribute = set != null ? set.textureAttribute : eSet.textureAttribute;
+
+
                 rand.setSeed(123L);
                 // Check children nodes.
                 var body = Mapper.body.get(render.entity);
@@ -120,7 +129,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                 float[] baseColor = utils.getColor(body, hl);
 
                 int numParticlesAdded = 0;
-                if (graph.children != null && graph.children.size > 0) {
+                if (eSet != null && graph.children != null && graph.children.size > 0) {
                     int n = graph.children.size;
                     int offset = addMeshData(model,
                                              model.numVertices,
@@ -147,10 +156,13 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                 // COLOR
                                 if (hl.isHighlighted()) {
                                     // Do not apply noise to base color.
-                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(baseColor[0], baseColor[1], baseColor[2], baseColor[3]);
+                                    model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(baseColor[0],
+                                                                                                                      baseColor[1],
+                                                                                                                      baseColor[2],
+                                                                                                                      baseColor[3]);
                                 } else {
                                     var c = trajectory.bodyColor;
-                                    generateChannelNoise(base.id, set.colorNoise, colorNoiseContainer);
+                                    generateChannelNoise(base.id, colorNoise, colorNoiseContainer);
                                     model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
                                             MathUtils.clamp(c[0] + colorNoiseContainer[0], 0, 1),
                                             MathUtils.clamp(c[1] + colorNoiseContainer[1], 0, 1),
@@ -171,11 +183,11 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                 model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (oc.meanAnomaly * MathUtilsDouble.degRad);
 
                                 // SIZE
-                                var size = (body.size + (float) (rand.nextGaussian() * body.size * set.sizeNoise));
+                                var size = (body.size + (float) (rand.nextGaussian() * body.size * sizeNoise));
                                 model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : size);
 
                                 // TEXTURE INDEX
-                                float textureIndex = computeTextureIndex(null, rand, set.textureArray, set.textureAttribute);
+                                float textureIndex = computeTextureIndex(null, rand, textureArray, textureAttribute);
                                 model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = textureIndex;
 
                                 curr.instanceIdx += curr.instanceSize;
@@ -185,8 +197,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     }
                 }
                 // Check own list.
-                if (set != null && set.data != null && !set.data.isEmpty()) {
-                    int n = set.data.size();
+                if (pointData != null && !pointData.isEmpty()) {
+                    int n = pointData.size();
                     int offset = addMeshData(model,
                                              model.numVertices,
                                              n,
@@ -198,33 +210,36 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     curr = meshes.get(offset);
                     model.ensureInstanceAttribsSize(n * curr.instanceSize);
 
-                    for (var p : set.data) {
-                        var k = (ParticleKepler) p;
-                        // COLOR
-                        setParticleColorAttributes(k, set, hl, baseColor, colorNoiseContainer, model);
+                    for (int i = 0; i < n; i++) {
+                        if (set == null || utils.filter(i, set, desc) && set.isVisible(i)) {
+                            var p = pointData.get(i);
+                            var k = (ParticleKepler) p;
+                            // COLOR
+                            setParticleColorAttributes(k, hl, baseColor, colorNoise, colorNoiseContainer, model);
 
-                        // ORBIT ELEMENTS 01
-                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) k.period();
-                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 1] = (float) k.epoch();
-                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 2] = (float) k.semiMajorAxis();
-                        model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 3] = (float) k.eccentricity();
+                            // ORBIT ELEMENTS 01
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset] = (float) k.period();
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 1] = (float) k.epoch();
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 2] = (float) k.semiMajorAxis();
+                            model.instanceAttributes[curr.instanceIdx + model.elems01Offset + 3] = (float) k.eccentricity();
 
-                        // ORBIT ELEMENTS 02
-                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset] = (float) (k.inclination() * MathUtilsDouble.degRad);
-                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 1] = (float) (k.ascendingNode() * MathUtilsDouble.degRad);
-                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 2] = (float) (k.argOfPericenter() * MathUtilsDouble.degRad);
-                        model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (k.meanAnomaly() * MathUtilsDouble.degRad);
+                            // ORBIT ELEMENTS 02
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset] = (float) (k.inclination() * MathUtilsDouble.degRad);
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 1] = (float) (k.ascendingNode() * MathUtilsDouble.degRad);
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 2] = (float) (k.argOfPericenter() * MathUtilsDouble.degRad);
+                            model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (k.meanAnomaly() * MathUtilsDouble.degRad);
 
-                        // SIZE
-                        var size = (body.size + (float) (rand.nextGaussian() * body.size * set.sizeNoise));
-                        model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : size);
+                            // SIZE
+                            var size = Math.max((body.size + (float) (rand.nextGaussian() * body.size * sizeNoise)), 0.1f);
+                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : size);
 
-                        // TEXTURE INDEX
-                        float textureIndex = computeTextureIndex(k, rand, set.textureArray, set.textureAttribute);
-                        model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = textureIndex;
+                            // TEXTURE INDEX
+                            float textureIndex = computeTextureIndex(k, rand, textureArray, textureAttribute);
+                            model.instanceAttributes[curr.instanceIdx + model.textureIndexOffset] = textureIndex;
 
-                        curr.instanceIdx += curr.instanceSize;
-                        numParticlesAdded++;
+                            curr.instanceIdx += curr.instanceSize;
+                            numParticlesAdded++;
+                        }
                     }
                 }
 
@@ -245,16 +260,23 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
             /*
              * RENDER
              */
-            if (set != null) {
+
+            if (set != null || eSet != null) {
+                // Fetch parameters from particle or elements set.
+                var textureArray = set != null ? set.textureArray : eSet.textureArray;
+                var sphericalPower = set != null ? set.sphericalPower : eSet.sphericalPower;
+                var profileDecay = set != null ? set.profileDecay : eSet.profileDecay;
+                var shadingTyp = set != null ? set.shadingType : eSet.shadingType;
+
                 var offset = getOffset(render);
                 if (offset < 0) return;
                 curr = meshes.get(offset);
                 if (curr != null) {
-                    if (set.textureArray != null) {
-                        set.textureArray.bind(0);
+                    if (textureArray != null) {
+                        textureArray.bind(0);
                     }
 
-                    int shadingType = preShadingType(hl, set.shadingType);
+                    int shadingType = preShadingType(hl, shadingTyp);
 
                     ExtShaderProgram shaderProgram = getShaderProgram();
                     shaderProgram.begin();
@@ -263,13 +285,13 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     shaderProgram.setUniformf("u_camPos", camera.getPos());
                     addCameraUpCubemapMode(shaderProgram, camera);
                     shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
-                    shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, set.profileDecay));
+                    shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, profileDecay));
                     shaderProgram.setUniformf("u_sizeFactor",
                                               Settings.settings.scene.star.pointSize * 0.1f * hl.pointscaling);
                     shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
 
                     // Shading type.
-                    setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower);
+                    setShadingTypeUniforms(shaderProgram, camera, shadingType, sphericalPower);
 
                     // VR scale
                     shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
@@ -326,23 +348,22 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     /**
      * Computes and sets the color of the given particle to the instanced attributes.
      *
-     * @param k          The particle.
-     * @param set        The elements set.
-     * @param hl         The {@link Highlight} component.
-     * @param baseColor  The base color for the particle.
+     * @param k                   The particle.
+     * @param hl                  The {@link Highlight} component.
+     * @param baseColor           The base color for the particle.
      * @param colorNoiseContainer The color noise value.
-     * @param model      The instanced model.
+     * @param model               The instanced model.
      */
     private void setParticleColorAttributes(IParticleRecord k,
-                                            OrbitElementsSet set,
                                             Highlight hl,
                                             float[] baseColor,
+                                            float colorNoise,
                                             float[] colorNoiseContainer,
                                             InstancedModel model) {
         if (hl.isHighlighted()) {
             setHighlightColorAttributes(k, hl, baseColor, model);
         } else {
-            generateChannelNoise(k.id(), set.colorNoise, colorNoiseContainer);
+            generateChannelNoise(k.id(), colorNoise, colorNoiseContainer);
             model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(
                     MathUtils.clamp(baseColor[0] + colorNoiseContainer[0], 0, 1),
                     MathUtils.clamp(baseColor[1] + colorNoiseContainer[1], 0, 1),
@@ -353,10 +374,11 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
     /**
      * Sets the color in highlight mode.
-     * @param k          The particle.
-     * @param hl         The {@link Highlight} component.
-     * @param baseColor  The base color for the particle.
-     * @param model      The instanced model.
+     *
+     * @param k         The particle.
+     * @param hl        The {@link Highlight} component.
+     * @param baseColor The base color for the particle.
+     * @param model     The instanced model.
      */
     private void setHighlightColorAttributes(IParticleRecord k,
                                              Highlight hl,

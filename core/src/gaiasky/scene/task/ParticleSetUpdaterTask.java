@@ -107,7 +107,13 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         if (particleSet.isStars) {
             updateMetadataConsumer = this::updateMetadataParticlesExt;
         } else {
-            updateMetadataConsumer = this.particleSet.isExtended ? this::updateMetadataParticlesExt : this::updateMetadataParticles;
+            if (particleSet.isExtended) {
+                updateMetadataConsumer = this::updateMetadataParticlesExt;
+            } else if (particleSet.isElements) {
+                updateMetadataConsumer = this::updateMetadataElements;
+            } else {
+                updateMetadataConsumer = this::updateMetadataParticles;
+            }
         }
 
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
@@ -267,6 +273,34 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 // Use magnitude.
                 particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ?
                         brightnessProxy(d.absMag(), camPos.dst2(pos)) :
+                        Double.MAX_VALUE;
+            }
+        }
+    }
+
+    /**
+     * Updates the orbital elements particle metadata information, used for sorting. In this case, the position (distance
+     * from camera), the proper motion, and the size are important.
+     *
+     * @param time   The time frame provider.
+     * @param camera The camera.
+     */
+    private void updateMetadataElements(ITimeFrameProvider time,
+                                        ICamera camera) {
+        // Extended particles and stars, propagate proper motion, weigh with pseudo-size.
+        Vector3D camPos = camera.getPos()
+                .tov3d(D34);
+        double deltaYears = AstroUtils.getMsSince(time.getTime(), particleSet.epochJd) * Nature.MS_TO_Y;
+        if (particleSet.pointData != null) {
+            int n = particleSet.pointData.size();
+            for (int i = 0; i < n; i++) {
+                IParticleRecord d = particleSet.pointData.get(i);
+                // Pos
+                var pos = particleSet.fetchPositionDouble(d, null, D31, deltaYears);
+
+                // Use distance.
+                particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ?
+                        camPos.dst2(pos) :
                         Double.MAX_VALUE;
             }
         }

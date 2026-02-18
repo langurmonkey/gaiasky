@@ -108,6 +108,8 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
                 } else {
                     addToRender(render, RenderGroup.PARTICLE_GROUP_EXT_MODEL);
                 }
+            }else if (set.isElements) {
+                addToRender(render, RenderGroup.ORBITAL_ELEMENTS_GROUP);
             } else {
                 addToRender(render, RenderGroup.PARTICLE_GROUP);
             }

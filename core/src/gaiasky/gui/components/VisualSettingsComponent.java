@@ -99,6 +99,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                           Constants.SLIDER_STEP_TINY,
                                                           0f,
                                                           skin);
+        starBaseLevel.setTooltip(I18n.msg("gui.star.opacity.info"));
         starBaseLevel.setWidth(componentWidth);
         starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
         starBaseLevel.connect(Event.STAR_BASE_LEVEL_CMD);

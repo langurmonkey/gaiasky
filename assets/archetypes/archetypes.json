@@ -333,7 +333,6 @@
       "parent": "GenericCatalog",
       "components": [
         "ParticleSet",
-        "TagNoProcessChildren*",
         "Focus"
       ],
       "aliases": [
@@ -391,6 +390,7 @@
       "parent": "GenericCatalog",
       "components": [
         "OrbitElementsSet*",
+        "Focus",
         "TagNoProcessChildren*"
       ],
       "aliases": [

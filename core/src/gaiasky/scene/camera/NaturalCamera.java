@@ -1809,7 +1809,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Checks the position of the camera does not collide with the focus object.
      */
     private void checkFocus() {
-        if (focus.isValid() && !Mapper.hip.has(focus.getEntity()) && focus.getSet() == null) {
+        if (focus.isValid() && !Mapper.hip.has(focus.getEntity()) && focus.getSet() == null && focus.getElementsSet() == null) {
             // Move camera if too close to focus.
             this.focus.getAbsolutePosition(aux1b);
             if (pos.dstD(aux1b, aux2b) < this.focus.getRadius()) {
