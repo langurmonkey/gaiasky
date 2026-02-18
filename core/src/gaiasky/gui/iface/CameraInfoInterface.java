@@ -569,7 +569,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     view.setEntity(v.getEntity());
                 }
                 currentFocus = view;
-                final int focusFieldMaxLength = 12;
+                final int focusFieldMaxLength = 18;
 
                 // ID
                 String id = "";

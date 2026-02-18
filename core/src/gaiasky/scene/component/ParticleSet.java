@@ -912,7 +912,7 @@ public class ParticleSet implements Component, IDisposable {
     public Vector3Q getAbsolutePosition(IParticleRecord object,
                                         Instant date,
                                         Vector3Q out) {
-        if (object.hasProperMotion()) {
+        if (object.hasProperMotion() || object.getType().isKeplerElements()) {
             double deltaYears = AstroUtils.getMsSince(date == null ? GaiaSky.instance.time.getTime() : date, epochJd) * Nature.MS_TO_Y;
             Vector3Q aux = this.fetchPosition(object, null, B31, deltaYears);
             return out.set(aux);

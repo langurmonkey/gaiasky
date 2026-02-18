@@ -18,6 +18,7 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Keyframes;
+import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.view.LabelView;
@@ -361,54 +362,74 @@ public class LabelEntityRenderSystem {
         if (view.particleSet.renderParticleLabels && active != null) {
             float thresholdLabel = 1f / view.label.labelBias;
             var pointData = view.particleSet.pointData;
+
+            // Render regular labels.
             int n = FastMath.min(pointData.size(), view.particleSet.numLabels);
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
-                if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i) && set.isRenderLabel(i)) {
-                    IParticleRecord pb = pointData.get(idx);
-                    if (pb.names() != null) {
-                        Vector3Q particlePosition = view.particleSet.fetchPosition(pb, camera.getPos(), B31, view.particleSet.currDeltaYears);
-                        float distToCamera = (float) particlePosition.lenDouble();
-                        float solidAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
-
-                        Vector3D labelPosition = particlePosition.put(D32);
-                        if (view.particleSet.isWireframe()) {
-                            textPosition(camera, labelPosition, distToCamera, solidAngle * 0.3e-6, 0);
-                        } else {
-                            textPosition(camera, labelPosition, distToCamera, FastMath.min(view.particleSet.particleSizeLimits[1], solidAngle) * 1e-6,
-                                         0);
-                        }
-
-                        shader.setUniformf("u_viewAngle", solidAngle);
-                        shader.setUniformf("u_viewAnglePow", 1f);
-                        shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
-                        float textSize = (float) FastMath.tanh(solidAngle) * distToCamera * 1e5f;
-                        float alpha = FastMath.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
-
-                        // Also fade labels in proximity.
-                        var size = pb.hasSize() ? pb.size() : view.body.size;
-                        var sa = size / distToCamera;
-                        if (set.proximityLoadingFlag && set.proximityLoaded.contains(idx) && sa > set.proximityThreshold * 0.5) {
-                            alpha *= (float) MathUtilsDouble.lint(sa, set.proximityThreshold * 0.5f, set.proximityThreshold * 1.5f, 1.0, 0.0);
-                        }
-
-                        textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                        render3DLabel(view,
-                                      batch,
-                                      shader,
-                                      sys.fontDistanceField,
-                                      camera,
-                                      rc,
-                                      I18n.localize(pb.names()[0]),
-                                      labelPosition,
-                                      distToCamera,
-                                      view.textScale() * camera.getFovFactor(),
-                                      textSize * camera.getFovFactor(),
-                                      view.getRadius(),
-                                      view.label.forceLabel());
-                    }
+                if (idx >= 0 && set.metadata[i] < Double.MAX_VALUE && set.isVisible(idx) && set.isRenderLabel(idx)) {
+                    renderParticleLabel(view, set, idx, thresholdLabel, batch, shader, sys, rc, camera);
                 }
             }
+
+            // Render forced labels.
+            var it = set.labelDisplayAlways.iterator();
+            while (it.hasNext) {
+                var i = it.next();
+                if (set.metadata[i] < Double.MAX_VALUE && set.isVisible(i)) {
+                    renderParticleLabel(view, set, i, thresholdLabel, batch, shader, sys, rc, camera);
+                }
+            }
+        }
+    }
+
+    /**
+     * Renders the label for a single particle in a particle group.
+     */
+    private void renderParticleLabel(LabelView view, ParticleSet set, int idx, float thresholdLabel, ExtSpriteBatch batch,
+                                     ExtShaderProgram shader, TextRenderer sys, RenderingContext rc, ICamera camera) {
+        IParticleRecord pb = set.pointData.get(idx);
+        if (pb.names() != null) {
+            boolean forceLabel = set.labelDisplayAlways.contains(idx);
+            Vector3Q particlePosition = view.particleSet.fetchPosition(pb, camera.getPos(), B31, view.particleSet.currDeltaYears);
+            float distToCamera = (float) particlePosition.lenDouble();
+            float solidAngle = (2e15f * (float) Constants.DISTANCE_SCALE_FACTOR / distToCamera) / camera.getFovFactor();
+
+            Vector3D labelPosition = particlePosition.put(D32);
+            if (view.particleSet.isWireframe()) {
+                textPosition(camera, labelPosition, distToCamera, solidAngle * 0.3e-6, 0);
+            } else {
+                textPosition(camera, labelPosition, distToCamera, FastMath.min(view.particleSet.particleSizeLimits[1], solidAngle) * 1e-6,
+                             0);
+            }
+
+            shader.setUniformf("u_viewAngle", solidAngle);
+            shader.setUniformf("u_viewAnglePow", 1f);
+            shader.setUniformf("u_thLabel", forceLabel ? 1f : thresholdLabel * camera.getFovFactor());
+            float textSize = (float) FastMath.tanh(solidAngle) * distToCamera * 1e5f;
+            float alpha = FastMath.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+
+            // Also fade labels in proximity.
+            var size = (pb.hasSize() ? pb.size() : view.body.size) * (forceLabel ? 1e5 : 1);
+            var sa = size / distToCamera;
+            if (set.proximityLoadingFlag && set.proximityLoaded.contains(idx) && sa > set.proximityThreshold * 0.5) {
+                alpha *= (float) MathUtilsDouble.lint(sa, set.proximityThreshold * 0.5f, set.proximityThreshold * 1.5f, 1.0, 0.0);
+            }
+
+            textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+            render3DLabel(view,
+                          batch,
+                          shader,
+                          sys.fontDistanceField,
+                          camera,
+                          rc,
+                          I18n.localize(pb.names()[0]),
+                          labelPosition,
+                          distToCamera,
+                          view.textScale() * camera.getFovFactor(),
+                          textSize * camera.getFovFactor(),
+                          view.getRadius(),
+                          forceLabel);
         }
     }
 
@@ -443,6 +464,7 @@ public class LabelEntityRenderSystem {
 
             var active = set.indices;
 
+            // Render regular labels.
             int n = FastMath.min(active.length, set.numLabels);
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
@@ -450,6 +472,7 @@ public class LabelEntityRenderSystem {
                     renderStarLabel(view, set, idx, thresholdLabel, batch, shader, sys, rc, camera);
                 }
             }
+            // Render forced labels.
             var it = set.labelDisplayAlways.iterator();
             while (it.hasNext) {
                 var i = it.next();
@@ -484,7 +507,7 @@ public class LabelEntityRenderSystem {
 
             shader.setUniformf("u_viewAngle", solidAngle);
             shader.setUniformf("u_viewAnglePow", 1f);
-            shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
+            shader.setUniformf("u_thLabel", forceLabel ? 1f : thresholdLabel * camera.getFovFactor());
             // Override object color
             shader.setUniform4fv("u_color", view.textColour(star.names()[0]), 0, 4);
 
