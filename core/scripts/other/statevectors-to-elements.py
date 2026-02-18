@@ -174,7 +174,7 @@ def process_sso_data(input_file, output_file):
     G_msol_AU_day = (4.0 * np.pi**2) / (365.25**2)
     
     # Storage for computed values
-    results = {k: [] for k in ['a', 'e', 'i', 'om', 'w', 'ma', 'period']}
+    results = {k: [] for k in ['a', 'e', 'i', 'om', 'w', 'ma', 'period', 'epoch']}
 
     print(f"[*] Processing {len(data)} rows...")
     for row in tqdm(data, desc="Calculating Elements"):
@@ -189,9 +189,10 @@ def process_sso_data(input_file, output_file):
         results['w'].append(np.degrees(orbit.argper))
         results['ma'].append(np.degrees(orbit.meananom))
         results['period'].append(orbit.period)
+        results['epoch'].append(row['epoch_state_vector_jd'])
 
     # Insert calculated columns into the Astropy Table
-    data['epoch'] = row['epoch_state_vector_jd']
+    data['epoch'] = results['epoch']
     data['semimajoraxis'] = results['a']
     data['eccentricity'] = results['e']
     data['inclination'] = results['i']
