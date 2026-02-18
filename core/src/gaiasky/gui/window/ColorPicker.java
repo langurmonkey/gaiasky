@@ -19,10 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnSlider;
-import gaiasky.util.scene2d.OwnTextField;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.HexColorValidator;
 import gaiasky.util.validator.IValidator;
@@ -114,7 +111,7 @@ public class ColorPicker extends ColorPickerAbstract {
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
-        private Image newColorImage;
+        private OwnImage newColorImage;
         private boolean changeEvents = true;
         private boolean showAlpha = true;
 
@@ -155,11 +152,11 @@ public class ColorPicker extends ColorPickerAbstract {
 
             HorizontalGroup hg = new HorizontalGroup();
             hg.space(pad18);
-            Image oldColorImage = new Image(skin.getDrawable("white"));
+            var oldColorImage = new OwnImage(skin.getDrawable("white"), false);
             oldColorImage.setColor(color[0], color[1], color[2], color[3]);
             Table oColor = new Table();
             oColor.add(oldColorImage).size(colSize);
-            newColorImage = new Image(skin.getDrawable("white"));
+            newColorImage = new OwnImage(skin.getDrawable("white"), false);
             newColorImage.setColor(color[0], color[1], color[2], color[3]);
             Table col = new Table();
             col.add(newColorImage).size(colSize);
@@ -223,7 +220,7 @@ public class ColorPicker extends ColorPickerAbstract {
             for (float r = 0f; r <= 1f; r += 0.3333f) {
                 for (float g = 0f; g <= 1f; g += 0.3333f) {
                     for (float b = 0f; b <= 1f; b += 0.3333f) {
-                        Image c = new Image(skin.getDrawable("white"));
+                        var c = new OwnImage(skin.getDrawable("white"), false);
                         c.setColor(r, g, b, a);
                         final float[] pick = new float[]{r, g, b, a};
                         c.addListener(new ClickListener() {

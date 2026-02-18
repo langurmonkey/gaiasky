@@ -11,8 +11,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.util.scene2d.OwnImage;
 
-public abstract class ColorPickerAbstract extends Image {
+public abstract class ColorPickerAbstract extends OwnImage {
     protected Stage stage;
     protected Skin skin;
     protected Runnable newColorRunnable, newColormapRunnable;
@@ -20,7 +21,7 @@ public abstract class ColorPickerAbstract extends Image {
     protected String name;
 
     protected ColorPickerAbstract(String name, Stage stage, Skin skin) {
-        super(skin.getDrawable("white"));
+        super(skin.getDrawable("white"), false);
         this.name = name;
         this.skin = skin;
         this.stage = stage;

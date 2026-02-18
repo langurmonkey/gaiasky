@@ -2,6 +2,7 @@
 
 uniform sampler2D u_texture;
 uniform vec3 u_accentColor;
+uniform int u_applyAccent = 1;
 
 in vec4 v_color;
 in vec2 v_texCoords;
@@ -36,7 +37,7 @@ vec3 transformColor(vec3 color, vec3 target) {
 
 void main() {
     vec4 renderColor = v_color * texture(u_texture, v_texCoords);
-    if (isPurple(renderColor.rgb)) {
+    if (u_applyAccent != 0 && isPurple(renderColor.rgb)) {
         renderColor = vec4(transformColor(renderColor.rgb, u_accentColor), renderColor.a);
     }
     fragColor = renderColor;

@@ -10,6 +10,8 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -22,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 public class OwnImage extends Image {
     private float ownWidth = 0f, ownHeight = 0f;
     private String linkURL;
+    private boolean applyAccentColor = true;
 
     /**
      * Create an image.
@@ -30,6 +33,22 @@ public class OwnImage extends Image {
      */
     public OwnImage(Drawable drawable) {
         this(drawable, null);
+    }
+
+    public OwnImage(Drawable drawable, boolean applyAccentColor) {
+        this(drawable, null);
+        this.applyAccentColor = applyAccentColor;
+    }
+
+    /**
+     * Create an image.
+     *
+     * @param tex The texture.
+     * @param applyAccentColor Whether to apply the accent color for this image.
+     */
+    public OwnImage(Texture tex, boolean applyAccentColor) {
+        super(tex);
+        this.applyAccentColor = applyAccentColor;
     }
 
     /**
@@ -112,4 +131,15 @@ public class OwnImage extends Image {
         }
     }
 
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        if (!applyAccentColor) {
+           batch.getShader().setUniformi("u_applyAccent", 0);
+        }
+        super.draw(batch, parentAlpha);
+        if (!applyAccentColor) {
+            batch.flush();
+            batch.getShader().setUniformi("u_applyAccent", 1);
+        }
+    }
 }

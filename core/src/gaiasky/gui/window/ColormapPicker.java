@@ -259,8 +259,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             cmapImages = new HashMap<>();
             for (Pair<String, Integer> cmapDef : cmapList) {
                 var tex = new Texture(Gdx.files.internal("img/cmap/cmap_" + cmapDef.getFirst() + ".png"));
-                var image = new Image(tex);
-                cmapImages.put(cmapDef.getSecond(), new Image(tex));
+                cmapImages.put(cmapDef.getSecond(), new OwnImage(tex, false));
             }
 
             setAcceptText(I18n.msg("gui.ok"));
