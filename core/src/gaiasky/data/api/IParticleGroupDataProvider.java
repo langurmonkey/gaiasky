@@ -79,8 +79,17 @@ public interface IParticleGroupDataProvider {
 
     /**
      * Sets a transform matrix to apply to all data points.
+     *
      * @param matrix The transform matrix.
      */
     void setTransformMatrix(Matrix4D matrix);
 
+    /**
+     * Do all particles in the group have the same epoch?
+     *
+     * @return Whether all particles in the group have the same epoch;
+     */
+    default boolean isUniformEpoch() {
+        return true;
+    }
 }

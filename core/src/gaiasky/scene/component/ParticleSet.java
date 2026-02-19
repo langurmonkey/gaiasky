@@ -298,6 +298,11 @@ public class ParticleSet implements Component, IDisposable {
     public double epochJd;
 
     /**
+     * Flag indicating if all particles in the group share the same epoch.
+     */
+    private boolean uniformEpoch = true;
+
+    /**
      * Current computed epoch time.
      **/
     public double currDeltaYears = 0;
@@ -411,10 +416,11 @@ public class ParticleSet implements Component, IDisposable {
                         boolean regenerateIndex) {
         this.pointData = pointData;
 
-        // Regenerate index
+        // Regenerate index.
         if (regenerateIndex)
             regenerateIndex();
-        // Initialize visibility - all visible
+
+        // Initialize visibility - all visible.
         this.invisibilityArray = new IntSet();
     }
 
@@ -1010,7 +1016,14 @@ public class ParticleSet implements Component, IDisposable {
             Vector3D pm = D32.setZero();
             if (pb instanceof ParticleKepler k) {
                 // KEPLER ELEMENTS.
-                var dtDays = deltaYears * Nature.Y_TO_D;
+                double dtDays;
+                if (uniformEpoch) {
+                    // Epoch is the same for all particles. Use incoming deltaYears.
+                    dtDays = deltaYears * Nature.Y_TO_D;
+                } else {
+                    // Epoch is not the same for all particles, compute dtDays.
+                    dtDays = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), k.epoch());
+                }
                 KeplerianElements.keplerianToCartesianTime(out,
                                                            dtDays,
                                                            k.period(),
@@ -1322,6 +1335,10 @@ public class ParticleSet implements Component, IDisposable {
                 labelColors.put(idx, color);
             }
         }
+    }
+
+    public void setUniformEpoch(boolean uniformEpoch) {
+        this.uniformEpoch = uniformEpoch;
     }
 
     @Override

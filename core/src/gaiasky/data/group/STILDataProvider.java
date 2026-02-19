@@ -15,10 +15,7 @@ import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.Particle;
-import gaiasky.scene.record.ParticleExt;
-import gaiasky.scene.record.ParticleStar;
-import gaiasky.scene.record.ParticleVariable;
+import gaiasky.scene.record.*;
 import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
 import gaiasky.util.*;
 import gaiasky.util.color.BVToTeffBallesteros;
@@ -69,6 +66,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     private DatasetOptions datasetOptions;
     /** The list of {@link ColumnInfo} objects of the last table loaded by this provider. **/
     private List<ColumnInfo> columnInfoList;
+
+    /** Do all particles have the same epoch? **/
+    private boolean uniformEpoch = true;
 
     public STILDataProvider() {
         super();
@@ -274,6 +274,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                     }
                 }
                 boolean isStars = datasetOptions == null || isAnyType(DatasetLoadType.VARIABLES, DatasetLoadType.STARS);
+                boolean isKepler = isOfType(DatasetLoadType.KEPLER)
+                        || (ucdParser.hasKeplerElements && !ucdParser.hasPos);
+                if (isKepler && datasetOptions != null) {
+                    datasetOptions.type = DatasetLoadType.KEPLER;
+                }
 
                 int resampledLightCurves = 0;
                 int noPeriods = 0;
@@ -403,7 +408,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                         sizePc = sizePair.getSecond()
                                                 .floatValue();
                                     }
-                                    if (TextUtils.containsOrMatches(UCDParser.radiusColNames, sizeUcd.colName, true)) {
+                                    if (TextUtils.containsOrMatches(UCDParser.RADIUS_NAMES, sizeUcd.colName, true)) {
                                         // Radius, need to multiply by 2 to get diameter.
                                         sizePc *= 2.0;
                                     }
@@ -695,6 +700,80 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                     if (noPeriods > 0) {
                         logger.warn(I18n.msg("warn.star.vari.noperiod", noPeriods));
                     }
+                } else if (isKepler) {
+                    long i = 0L;
+                    long step = FastMath.max(1L, FastMath.round(count / 100d));
+                    RowSequence rs = table.getRowSequence();
+                    double prevEpoch = -1.0;
+                    while (rs.next()) {
+                        Object[] row = rs.getRow();
+                        try {
+                            Pair<UCD, Double> epochPair = getDoubleUcd(ucdParser.EPOCH, row);
+                            Pair<UCD, Double> smaPair = getDoubleUcd(ucdParser.SMA, row);
+                            Pair<UCD, Double> eccPair = getDoubleUcd(ucdParser.ECC, row);
+                            Pair<UCD, Double> incPair = getDoubleUcd(ucdParser.INC, row);
+                            Pair<UCD, Double> ascnodePair = getDoubleUcd(ucdParser.ASCNODE, row);
+                            Pair<UCD, Double> argperiPair = getDoubleUcd(ucdParser.ARGPERI, row);
+                            Pair<UCD, Double> manomalyPair = getDoubleUcd(ucdParser.MANOMALY, row);
+
+                            if (epochPair == null || smaPair == null || eccPair == null || incPair == null
+                                    || ascnodePair == null || argperiPair == null || manomalyPair == null) {
+                                logger.warn(I18n.msg("debug.parse.row.skip", i));
+                                i++;
+                                continue;
+                            }
+
+                            double epoch = epochPair.getSecond();
+                            double semiMajorAxis = smaPair.getSecond() * Constants.AU_TO_U * Constants.U_TO_KM * factor;
+                            double e = eccPair.getSecond();
+                            double inc = incPair.getSecond();
+                            double ascendingNode = ascnodePair.getSecond();
+                            double argOfPericenter = argperiPair.getSecond();
+                            double meanAnomaly = manomalyPair.getSecond();
+
+                            // Is the epoch uniform?
+                            if (prevEpoch > 0 && epoch != prevEpoch) {
+                                uniformEpoch = false;
+                            }
+                            prevEpoch = epoch;
+
+                            Pair<UCD, Double> periodPair = getDoubleUcd(ucdParser.VARI_PERIOD, row);
+                            double period = periodPair != null ? periodPair.getSecond() : 0.0;
+
+                            long id;
+                            if (!ucdParser.ID.isEmpty()) {
+                                Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
+                                try {
+                                    id = idPair != null ? Parser.parseLongException(idPair.getSecond()) : ++objectId;
+                                } catch (NumberFormatException ex) {
+                                    id = ++objectId;
+                                }
+                            } else {
+                                id = ++objectId;
+                            }
+
+                            String[] names;
+                            if (!ucdParser.NAME.isEmpty()) {
+                                Pair<UCD, String> namePair = getStringUcd(ucdParser.NAME, row);
+                                names = namePair != null ? new String[]{namePair.getSecond()} : new String[]{Long.toString(id)};
+                            } else {
+                                names = new String[]{Long.toString(id)};
+                            }
+
+                            ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
+
+                            var particle = new ParticleKepler(id, names[0], epoch, meanAnomaly, semiMajorAxis,
+                                                              e, argOfPericenter, ascendingNode, inc, period, extraAttributes);
+                            list.add(particle);
+
+                        } catch (Exception e) {
+                            logger.error(I18n.msg("debug.parse.row.skip", i), e);
+                        }
+                        i++;
+                        if (updateCallback != null && i % step == 0) {
+                            updateCallback.accept(i, count);
+                        }
+                    }
                 } else {
                     var msg = I18n.msg("error.star.noposition");
                     logger.error(msg);
@@ -853,5 +932,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             this.datasetOptions = dOps;
         }
 
+    }
+
+    @Override
+    public boolean isUniformEpoch() {
+        return uniformEpoch;
     }
 }

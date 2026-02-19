@@ -117,7 +117,8 @@ public class DatasetOptions {
         PARTICLES_EXT,
         STARS,
         CLUSTERS,
-        VARIABLES;
+        VARIABLES,
+        KEPLER;
 
         public boolean isSelectable() {
             return this != PARTICLES;

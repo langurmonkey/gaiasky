@@ -229,6 +229,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                         .getFirst()
                         .getType() == ParticleType.KEPLER;
 
+                // Same epoch for all particles?
+                set.setUniformEpoch(provider.isUniformEpoch());
+
                 if (provider instanceof STILDataProvider stil) {
                     set.setColumnInfoList(stil.getColumnInfoList());
                 }

@@ -17,7 +17,6 @@ import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.ucd.UCD;
-import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.StarTableFactory;
 import uk.ac.starlink.table.TableBuilder;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
@@ -62,17 +61,20 @@ import java.util.logging.Level;
  * <li><b>Object Type:</b> A hardcoded mapping is used where a short value of 3
  * designates an Asteroid ("A"), and all other values default to Comet ("C").</li>
  * </ul>
+ *
+ * @deprecated Use {@link STILDataProvider} instead.
  * @see ParticleKepler
  */
+@Deprecated
 public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider {
     private static final Logger.Log logger = Logger.getLogger(ElementsGroupVOTableProvider.class);
 
     /** Table factory. **/
     private StarTableFactory factory;
-    /** Dataset options, may be null. **/
-    private DatasetOptions datasetOptions;
-    /** The list of {@link ColumnInfo} objects of the last table loaded by this provider. **/
-    private List<ColumnInfo> columnInfoList;
+
+    /** Do all particles have the same epoch? **/
+    private boolean uniformEpoch = true;
+
 
     public ElementsGroupVOTableProvider() {
         try {
@@ -130,12 +132,13 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
             builders.add(new CsvTableBuilder());
             builders.add(new AsciiTableBuilder());
             try (var table = factory.makeStarTable(ds)) {
-                long count = table.getRowCount();
-                List<IParticleRecord> list = new ArrayList<>((int) count);
+                long nRows = table.getRowCount();
+                List<IParticleRecord> list = new ArrayList<>((int) nRows);
 
                 var typeUCD = new UCD(table.getColumnInfo(3).getUCD(), "type", null, 4);
                 var obsUCD = new UCD(table.getColumnInfo(4).getUCD(), "n_observations", null, 5);
 
+                double prevEpoch = -1;
                 try (var rs = table.getRowSequence()) {
                     while (rs.next()) {
                         var row = rs.getRow();
@@ -156,6 +159,12 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
                         var map = new ObjectMap<UCD, Object>();
                         map.put(typeUCD, type);
                         map.put(obsUCD, nObs);
+
+                        // Is the epoch uniform?
+                        if (prevEpoch > 0 && epoch != prevEpoch) {
+                            uniformEpoch = false;
+                        }
+                        prevEpoch = epoch;
 
                         var particle = new ParticleKepler(sourceId,
                                                           name,
@@ -194,6 +203,11 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
     @Override
     public void setProviderParams(Map<String, Object> params) {
 
+    }
+
+    @Override
+    public boolean isUniformEpoch() {
+        return uniformEpoch;
     }
 
     @Override

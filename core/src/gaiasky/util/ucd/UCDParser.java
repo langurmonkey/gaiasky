@@ -22,28 +22,35 @@ import java.util.Set;
 public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked
     // first with equals() and then with matches()
-    public static String[] idColNames = new String[] { "hip", "id", "source_id", "tycho2_id", "identifier" };
-    public static String[] nameColNames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "names", "proper", "proper_name", "common_name",
-            "designation" };
-    public static String[] raColNames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
-    public static String[] xColNames = new String[] { "x", "X" };
-    public static String[] deColNames = new String[] { "dec", "de", "declination", "delta", "dej2000" };
-    public static String[] yColNames = new String[] { "y", "Y" };
-    public static String[] distColNames = new String[] { "dist", "distance" };
-    public static String[] zColNames = new String[] { "z", "Z" };
-    public static String[] parallaxColNames = new String[] { "plx", "parallax", "pllx", "par" };
-    public static String[] magColNames = new String[] { "phot_g_mean_mag", "mag", "g_mag", "bmag", "gmag" };
-    public static String[] colorColNames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
-    public static String[] tEffColNames = new String[] { "teff", "t_eff", "temperature", "effective_temperature" };
-    public static String[] pmRaColNames = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
-    public static String[] pmDecColNames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
-    public static String[] radVelColNames = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
-    public static String[] radiusColNames = new String[] { "radius", "rcluster", "radi", "core_radius", "tidal_radius", "total_radius" };
-    public static String[] sizeColNames = new String[] { "diameter", "size", "linear_diameter" };
-    public static String[] nStarsColNames = new String[] { "n", "nstars", "n_stars", "n_star" };
-    public static String[] variMagsColNames = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
-    public static String[] variTimesColNames = new String[] { "g_transit_time", "time_list", "time_series" };
-    public static String[] periodColNames = new String[] { "pf", "period" };
+    public static String[] ID_NAMES = new String[] { "hip", "id", "source_id", "tycho2_id", "identifier" };
+    public static String[] NAME_NAMES = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "names", "proper", "proper_name", "common_name",
+            "designation", "denomination" };
+    public static String[] RA_NAMES = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
+    public static String[] X_NAMES = new String[] { "x", "X" };
+    public static String[] DEC_NAMES = new String[] { "dec", "de", "declination", "delta", "dej2000" };
+    public static String[] Y_NAMES = new String[] { "y", "Y" };
+    public static String[] DIST_NAMES = new String[] { "dist", "distance" };
+    public static String[] Z_NAMES = new String[] { "z", "Z" };
+    public static String[] PLLX_NAMES = new String[] { "plx", "parallax", "pllx", "par" };
+    public static String[] MAG_NAMES = new String[] { "phot_g_mean_mag", "mag", "g_mag", "bmag", "gmag" };
+    public static String[] COLOR_NAMES = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
+    public static String[] TEFF_NAMES = new String[] { "teff", "t_eff", "temperature", "effective_temperature" };
+    public static String[] PMRA_NAMES = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
+    public static String[] PMDEC_NAMES = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
+    public static String[] RADVEL_NAMES = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
+    public static String[] RADIUS_NAMES = new String[] { "radius", "rcluster", "radi", "core_radius", "tidal_radius", "total_radius" };
+    public static String[] SIZE_NAMES = new String[] { "diameter", "size", "linear_diameter" };
+    public static String[] NSTARS_NAMES = new String[] { "n", "nstars", "n_stars", "n_star" };
+    public static String[] VARIMAGS_NAMES = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
+    public static String[] VARITIMES_NAMES = new String[] { "g_transit_time", "time_list", "time_series" };
+    public static String[] PERIOD_NAMES = new String[] { "pf", "period" };
+    public static String[] EPOCH_NAMES = new String[] { "epoch", "epoch_state_vector", "epoch_jd", "epochjd" };
+    public static String[] SMA_NAMES = new String[]{"semimajoraxis", "sma", "semimajax"};
+    public static String[] ECC_NAMES = new String[]{"e", "eccentricity", "ecc"};
+    public static String[] INC_NAMES = new String[]{"i", "inclination", "inc"};
+    public static String[] ASCNODE_NAMES = new String[]{"an", "ascendingnode", "ascnode", "ascending_node"};
+    public static String[] ARGPERI_NAMES = new String[]{"aop", "argofpericenter", "aopericenter", "aperi", "argperi", "arg_of_pericenter"};
+    public static String[] MANOMALY_NAMES = new String[]{"ma", "man", "meananomaly", "mean_anomaly"};
     public Map<UCDType, Array<UCD>> ucdmap;
     // IDS
     public boolean hasId = false;
@@ -72,6 +79,9 @@ public class UCDParser {
     public boolean hasVariability = false;
     public boolean hasPeriod = false;
     public Array<UCD> VARI_TIMES, VARI_MAGS, VARI_PERIOD;
+    // KEPLERIAN ELEMENTS
+    public boolean hasKeplerElements = false;
+    public Array<UCD> EPOCH, SMA, ECC, INC, ASCNODE, ARGPERI, MANOMALY;
     // REST
     public Array<UCD> extra;
 
@@ -93,67 +103,74 @@ public class UCDParser {
         VARI_TIMES = new Array<>();
         VARI_MAGS = new Array<>();
         VARI_PERIOD = new Array<>();
+        EPOCH = new Array<>();
+        SMA = new Array<>();
+        ECC = new Array<>();
+        INC = new Array<>();
+        ASCNODE = new Array<>();
+        ARGPERI = new Array<>();
+        MANOMALY = new Array<>();
         extra = new Array<>();
     }
 
     public static boolean isName(String colName) {
-        return TextUtils.contains(nameColNames, colName, true);
+        return TextUtils.contains(NAME_NAMES, colName, true);
     }
 
     public static boolean isId(String colName) {
-        return TextUtils.contains(idColNames, colName, true);
+        return TextUtils.contains(ID_NAMES, colName, true);
     }
 
     public static boolean isRa(String colName) {
-        return TextUtils.contains(raColNames, colName, true);
+        return TextUtils.contains(RA_NAMES, colName, true);
     }
 
     public static boolean isX(String colName) {
-        return TextUtils.contains(xColNames, colName, true);
+        return TextUtils.contains(X_NAMES, colName, true);
     }
 
     public static boolean isDec(String colName) {
-        return TextUtils.contains(deColNames, colName, true);
+        return TextUtils.contains(DEC_NAMES, colName, true);
     }
 
     public static boolean isY(String colName) {
-        return TextUtils.contains(yColNames, colName, true);
+        return TextUtils.contains(Y_NAMES, colName, true);
     }
 
     public static boolean isDist(String colName) {
-        return TextUtils.contains(distColNames, colName, true);
+        return TextUtils.contains(DIST_NAMES, colName, true);
     }
 
     public static boolean isZ(String colName) {
-        return TextUtils.contains(zColNames, colName, true);
+        return TextUtils.contains(Z_NAMES, colName, true);
     }
 
     public static boolean isPllx(String colName) {
-        return TextUtils.contains(parallaxColNames, colName, true);
+        return TextUtils.contains(PLLX_NAMES, colName, true);
     }
 
     public static boolean isMag(String colName) {
-        return TextUtils.contains(magColNames, colName, true);
+        return TextUtils.contains(MAG_NAMES, colName, true);
     }
 
     public static boolean isColor(String colName) {
-        return TextUtils.contains(colorColNames, colName, true);
+        return TextUtils.contains(COLOR_NAMES, colName, true);
     }
 
     public static boolean isTeff(String colName) {
-        return TextUtils.contains(tEffColNames, colName, true);
+        return TextUtils.contains(TEFF_NAMES, colName, true);
     }
 
     public static boolean isPmra(String colName) {
-        return TextUtils.contains(pmRaColNames, colName, true);
+        return TextUtils.contains(PMRA_NAMES, colName, true);
     }
 
     public static boolean isPmde(String colName) {
-        return TextUtils.contains(pmDecColNames, colName, true);
+        return TextUtils.contains(PMDEC_NAMES, colName, true);
     }
 
     public static boolean isRadvel(String colName) {
-        return TextUtils.contains(radVelColNames, colName, true);
+        return TextUtils.contains(RADVEL_NAMES, colName, true);
     }
 
     public static boolean isSize(String colName) {
@@ -161,23 +178,23 @@ public class UCDParser {
     }
 
     public static boolean isRadius(String colName) {
-        return TextUtils.contains(radiusColNames, colName, true);
+        return TextUtils.contains(RADIUS_NAMES, colName, true);
     }
 
     public static boolean isNstars(String colName) {
-        return TextUtils.contains(nStarsColNames, colName, true);
+        return TextUtils.contains(NSTARS_NAMES, colName, true);
     }
 
     public static boolean isGVariMags(String colName) {
-        return TextUtils.contains(variMagsColNames, colName, true);
+        return TextUtils.contains(VARIMAGS_NAMES, colName, true);
     }
 
     public static boolean isGVariTimes(String colName) {
-        return TextUtils.contains(variTimesColNames, colName, true);
+        return TextUtils.contains(VARITIMES_NAMES, colName, true);
     }
 
     public static boolean isPeriod(String colName) {
-        return TextUtils.contains(periodColNames, colName, true);
+        return TextUtils.contains(PERIOD_NAMES, colName, true);
     }
 
     /**
@@ -208,12 +225,12 @@ public class UCDParser {
                 }
             }
         if (this.ID.isEmpty()) {
-            this.ID.addAll(getByColNames(idColNames));
+            this.ID.addAll(getByColNames(ID_NAMES));
         }
         this.hasId = !this.ID.isEmpty();
 
         if (this.NAME.isEmpty()) {
-            this.NAME.addAll(getByColNames(new UCDType[] { UCDType.META, UCDType.UNKNOWN, UCDType.MISSING }, nameColNames, null));
+            this.NAME.addAll(getByColNames(new UCDType[] { UCDType.META, UCDType.UNKNOWN, UCDType.MISSING }, NAME_NAMES, null));
         }
         this.hasName = !this.NAME.isEmpty();
 
@@ -233,11 +250,11 @@ public class UCDParser {
                         switch (Objects.requireNonNull(coord)) {
                         case "ra" -> {
                             setDefaultUnit(candidate, "deg");
-                            add(candidate, raColNames, this.POS1);
+                            add(candidate, RA_NAMES, this.POS1);
                         }
                         case "dec" -> {
                             setDefaultUnit(candidate, "deg");
-                            add(candidate, deColNames, this.POS2);
+                            add(candidate, DEC_NAMES, this.POS2);
                         }
                         }
                     }
@@ -263,11 +280,11 @@ public class UCDParser {
                     }
                     case "parallax" -> {
                         setDefaultUnit(candidate, "mas");
-                        add(candidate, parallaxColNames, this.POS3);
+                        add(candidate, PLLX_NAMES, this.POS3);
                     }
                     case "distance" -> {
                         setDefaultUnit(candidate, "pc");
-                        add(candidate, distColNames, this.POS3);
+                        add(candidate, DIST_NAMES, this.POS3);
                     }
                     }
                 }
@@ -275,19 +292,19 @@ public class UCDParser {
         }
         if (this.POS1.isEmpty() || this.POS2.isEmpty()) {
             // Try to work out from names
-            this.POS1 = getByColNames(raColNames, "deg");
+            this.POS1 = getByColNames(RA_NAMES, "deg");
             if (!this.POS1.isEmpty()) {
-                this.POS2 = getByColNames(deColNames, "deg");
-                this.POS3 = getByColNames(distColNames, "pc");
+                this.POS2 = getByColNames(DEC_NAMES, "deg");
+                this.POS3 = getByColNames(DIST_NAMES, "pc");
                 if (this.POS3.isEmpty()) {
-                    this.POS3 = getByColNames(parallaxColNames, "mas");
+                    this.POS3 = getByColNames(PLLX_NAMES, "mas");
                 }
             }
             // Try cartesian
             if (this.POS1.isEmpty() || this.POS2.isEmpty()) {
-                this.POS1 = getByColNames(xColNames, "pc");
-                this.POS2 = getByColNames(yColNames, "pc");
-                this.POS3 = getByColNames(zColNames, "pc");
+                this.POS1 = getByColNames(X_NAMES, "pc");
+                this.POS2 = getByColNames(Y_NAMES, "pc");
+                this.POS3 = getByColNames(Z_NAMES, "pc");
             }
         }
 
@@ -319,10 +336,10 @@ public class UCDParser {
         }
         if (this.PMRA.isEmpty() || this.PMDEC.isEmpty()) {
             // Try to work out from names
-            this.PMRA = getByColNames(pmRaColNames, "mas/yr");
+            this.PMRA = getByColNames(PMRA_NAMES, "mas/yr");
             if (!this.PMRA.isEmpty()) {
-                this.PMDEC = getByColNames(pmDecColNames, "mas/yr");
-                this.RADVEL = getByColNames(radVelColNames, "km/s");
+                this.PMDEC = getByColNames(PMDEC_NAMES, "mas/yr");
+                this.RADVEL = getByColNames(RADVEL_NAMES, "km/s");
             }
         }
         this.hasPm = !this.PMRA.isEmpty() && !this.PMDEC.isEmpty();
@@ -346,7 +363,7 @@ public class UCDParser {
                 }
             }
         if (this.MAG == null || this.MAG.isEmpty()) {
-            this.MAG = getByColNames(magColNames, "mag");
+            this.MAG = getByColNames(MAG_NAMES, "mag");
         }
         this.hasMag = !this.MAG.isEmpty();
 
@@ -361,7 +378,7 @@ public class UCDParser {
             }
         }
         if (this.COL == null || this.COL.isEmpty()) {
-            this.COL = getByColNames(colorColNames);
+            this.COL = getByColNames(COLOR_NAMES);
         }
         this.hasColor = !this.COL.isEmpty();
 
@@ -376,7 +393,7 @@ public class UCDParser {
             }
         }
         if (this.SIZE == null || this.SIZE.isEmpty()) {
-            this.SIZE = getByColNames(radiusColNames, sizeColNames);
+            this.SIZE = getByColNames(RADIUS_NAMES, SIZE_NAMES);
         }
         this.hasSize = !this.SIZE.isEmpty();
 
@@ -390,7 +407,7 @@ public class UCDParser {
             }
         }
         if (this.TEFF == null || this.TEFF.isEmpty()) {
-            this.TEFF = getByColNames(tEffColNames);
+            this.TEFF = getByColNames(TEFF_NAMES);
         }
         this.hasTEff = !this.TEFF.isEmpty();
 
@@ -409,16 +426,41 @@ public class UCDParser {
             }
         }
         if (this.VARI_TIMES == null || this.VARI_TIMES.isEmpty()) {
-            this.VARI_TIMES = getByColNames(variTimesColNames, "d");
+            this.VARI_TIMES = getByColNames(VARITIMES_NAMES, "d");
         }
         if (this.VARI_MAGS == null || this.VARI_MAGS.isEmpty()) {
-            this.VARI_MAGS = getByColNames(variMagsColNames, "mag");
+            this.VARI_MAGS = getByColNames(VARIMAGS_NAMES, "mag");
         }
         this.hasVariability = !this.VARI_MAGS.isEmpty();
         if (this.VARI_PERIOD == null || this.VARI_PERIOD.isEmpty()) {
-            this.VARI_PERIOD = getByColNames(periodColNames, "d");
+            this.VARI_PERIOD = getByColNames(PERIOD_NAMES, "d");
         }
         this.hasPeriod = !this.VARI_PERIOD.isEmpty();
+
+        // KEPLER ORBITAL ELEMENTS
+        if (this.EPOCH == null || this.EPOCH.isEmpty()) {
+            this.EPOCH = getByColNames(EPOCH_NAMES, "d");
+        }
+        if (this.SMA == null || this.SMA.isEmpty()) {
+            this.SMA = getByColNames(SMA_NAMES, "au");
+        }
+        if (this.ECC == null || this.ECC.isEmpty()) {
+            this.ECC = getByColNames(ECC_NAMES, null);
+        }
+        if (this.INC == null || this.INC.isEmpty()) {
+            this.INC = getByColNames(INC_NAMES, "deg");
+        }
+        if (this.ASCNODE == null || this.ASCNODE.isEmpty()) {
+            this.ASCNODE = getByColNames(ASCNODE_NAMES, "deg");
+        }
+        if (this.ARGPERI == null || this.ARGPERI.isEmpty()) {
+            this.ARGPERI = getByColNames(ARGPERI_NAMES, "deg");
+        }
+        if (this.MANOMALY == null || this.MANOMALY.isEmpty()) {
+            this.MANOMALY = getByColNames(MANOMALY_NAMES, "deg");
+        }
+        this.hasKeplerElements = !this.SMA.isEmpty() && !this.ECC.isEmpty() && !this.INC.isEmpty()
+                && !this.ASCNODE.isEmpty() && !this.ARGPERI.isEmpty() && !this.MANOMALY.isEmpty();
 
         // REST OF COLUMNS
         Set<UCDType> keys = ucdmap.keySet();
@@ -433,17 +475,13 @@ public class UCDParser {
     }
 
     public boolean has(UCD ucd) {
-        return has(ucd, POS1)
-                || has(ucd, POS2)
-                || has(ucd, POS3)
-                || has(ucd, PMRA)
-                || has(ucd, PMDEC)
-                || has(ucd, RADVEL)
-                || has(ucd, ID)
-                || has(ucd, COL)
-                || has(ucd, TEFF)
-                || has(ucd, NAME)
-                || has(ucd, MAG);
+        return has(ucd, POS1) || has(ucd, POS2) || has(ucd, POS3)
+                || has(ucd, PMRA) || has(ucd, PMDEC) || has(ucd, RADVEL)
+                || has(ucd, ID) || has(ucd, COL) || has(ucd, TEFF)
+                || has(ucd, NAME) || has(ucd, MAG)
+                || has(ucd, EPOCH) || has(ucd, SMA) || has(ucd, ECC)
+                || has(ucd, INC) || has(ucd, ASCNODE) || has(ucd, ARGPERI)
+                || has(ucd, MANOMALY);
     }
 
     public boolean has(UCD ucd,
