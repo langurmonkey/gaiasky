@@ -21,6 +21,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 
+/**
+ * Contains a datasets' description, constructed from a JSON file or object.
+ */
 public class DatasetDesc implements Comparable<DatasetDesc> {
     private final Log logger = Logger.getLogger(DatasetDesc.class);
     public JsonValue source;
@@ -29,6 +32,8 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
     public String description;
     public String[] links;
     public String[] credits;
+    public String[] replaces;
+    public String replacedBy;
     public String creator;
     public String type;
     public String file;
@@ -88,15 +93,13 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         }
 
         this.status = exists ? DatasetStatus.INSTALLED : DatasetStatus.AVAILABLE;
+
         // The key marks the new version
-        boolean hasKey = source.has("key");
-        if (hasKey) {
-            this.key = source.getString("key");
-        }
+        this.key = getString("key");
+        boolean hasKey = this.key != null;
         hasKey = hasKey || localCatalogFile != null;
-        if (source.has("name")) {
-            this.name = source.getString("name");
-        }
+        this.name = getString("name");
+
         // Fill key with name
         if (this.key == null && this.name != null) {
             this.key = this.name.replaceAll("\\s+", "-");
@@ -104,14 +107,16 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         if (this.key != null)
             this.baseData = key.equals(Constants.DEFAULT_DATASET_KEY);
 
+        // Version
         if (source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
 
+        // Mingsversion
         if (source.has("mingsversion"))
             this.minGsVersion = VersionChecker.correctVersionNumber(source.getInt("mingsversion"));
 
-        if (source.has("file"))
-            this.file = source.getString("file");
+        // File
+        this.file = getString("file");
 
         // Description
         if (source.has("description")) {
@@ -144,49 +149,16 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         }
 
         // Links
-        JsonValue links = null;
-        if (source.has("links"))
-            links = source.get("links");
-        else if (source.has("link"))
-            links = source.get("link");
-        if (links != null) {
-            if (links.isArray()) {
-                this.links = links.asStringArray();
-            } else if (links.isString()) {
-                this.links = new String[]{links.asString()};
-            } else {
-                logger.warn("Attribute credits must be a String or String[].");
-            }
-        } else {
-            this.links = null;
-        }
-
+        this.links = getStringOrArray("links", "link");
 
         // Creator
-        if (source.has("creator"))
-            this.creator = source.getString("creator");
-        else
-            this.creator = null;
+        this.creator = getString("creator", "author");
 
         // Credits
-        if (source.has("credits")) {
-            var c = source.get("credits");
-            if (c.isArray()) {
-                this.credits = c.asStringArray();
-            } else if (c.isString()) {
-                this.credits = new String[]{c.asString()};
-            } else {
-                logger.warn("Attribute credits must be a String or String[].");
-            }
-        } else
-            this.credits = null;
+        this.credits = getStringOrArray("credits", "credit");
 
         // Type
-        if (source.has("type")) {
-            this.type = source.getString("type");
-        } else {
-            this.type = "other";
-        }
+        this.type = getStringOr("type", "other");
 
         // Size
         try {
@@ -206,11 +178,14 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
             nObjectsStr = "N/A";
         }
 
+        // Replaces
+        this.replaces = getStringOrArray("replaces");
+
+        // Replaced by
+        this.replacedBy = getString("replacedby", "replacedBy");
+
         // Digest
-        if (source.has("sha256"))
-            sha256 = source.getString("sha256");
-        else
-            sha256 = null;
+        this.sha256 = getString("sha256");
 
         // Data
         JsonValue dataFiles = null;
@@ -230,6 +205,67 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         } else {
             this.files = null;
         }
+    }
+
+    private String getString(String... attrNames) {
+        for (var name : attrNames) {
+            var result = getString(name);
+            if (result != null && !result.isBlank()) {
+                return result;
+            }
+        }
+        return null;
+
+    }
+
+    private String getString(String attrName) {
+        if (source.has(attrName)) {
+            var c = source.get(attrName);
+            if (c.isString()) {
+                return c.asString();
+            } else {
+                logger.warn(String.format("Attribute '%s' must be a String.", attrName));
+            }
+        }
+        return null;
+    }
+
+    private String getStringOr(String attrName, String defaultValue) {
+        if (source.has(attrName)) {
+            var c = source.get(attrName);
+            if (c.isString()) {
+                return c.asString();
+            } else {
+                logger.warn(String.format("Attribute '%s' must be a String.", attrName));
+            }
+        }
+        return defaultValue;
+    }
+
+    private String[] getStringOrArray(String... attrNames) {
+        for (var name : attrNames) {
+            var result = getStringOrArray(name);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    private String[] getStringOrArray(String attrName) {
+        if (source.has(attrName)) {
+            var c = source.get(attrName);
+            if (c.isArray()) {
+                return c.asStringArray();
+            } else if (c.isString()) {
+                return new String[]{c.asString()};
+            } else {
+                logger.warn(String.format("Attribute '%s' must be a String or String[].", attrName));
+            }
+        } else {
+            this.credits = null;
+        }
+        return null;
     }
 
     /**

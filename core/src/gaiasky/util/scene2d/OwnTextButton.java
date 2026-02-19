@@ -122,4 +122,7 @@ public class OwnTextButton extends TextButton {
         listeners.end();
     }
 
+    public void setTooltip(String tooltip) {
+        addListener(new OwnTextTooltip(tooltip, getSkin()));
+    }
 }

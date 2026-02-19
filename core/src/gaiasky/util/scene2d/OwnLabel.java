@@ -18,40 +18,48 @@ public class OwnLabel extends Label implements Disableable {
     private final Color regularColor;
     private float ownPrefWidth = 0f, ownPrefHeight = 0f;
     private boolean disabled = false;
+    private final Skin skin;
 
     public OwnLabel(CharSequence text, Skin skin, float width) {
         super(text, skin);
+        this.skin = skin;
         this.regularColor = this.getColor().cpy();
         this.setWidth(width);
     }
 
     public OwnLabel(CharSequence text, Skin skin, String styleName, int breakCharacters) {
         super(TextUtils.breakCharacters(text, breakCharacters), skin, styleName);
+        this.skin = skin;
         this.regularColor = this.getColor().cpy();
     }
 
     public OwnLabel(CharSequence text, Skin skin) {
         super(text, skin);
+        this.skin = skin;
         this.regularColor = this.getColor().cpy();
     }
 
     public OwnLabel(CharSequence text, LabelStyle style) {
         super(text, style);
+        this.skin = null;
         this.regularColor = this.getColor().cpy();
     }
 
     public OwnLabel(CharSequence text, Skin skin, String fontName, Color color) {
         super(text, skin, fontName, color);
+        this.skin = skin;
         this.regularColor = this.getColor().cpy();
     }
 
     public OwnLabel(CharSequence text, Skin skin, String fontName, String colorName) {
         super(text, skin, fontName, colorName);
+        this.skin = skin;
         this.regularColor = this.getColor().cpy();
     }
 
     public OwnLabel(CharSequence text, Skin skin, String styleName) {
         super(text, skin, styleName);
+        this.skin = skin;
         this.regularColor = this.getColor().cpy();
     }
 
@@ -121,6 +129,10 @@ public class OwnLabel extends Label implements Disableable {
             disabled = false;
             this.setColor(regularColor);
         }
+    }
+
+    public void setTooltip(String tooltip) {
+        addListener(new OwnTextTooltip(tooltip, skin));
     }
 
 }

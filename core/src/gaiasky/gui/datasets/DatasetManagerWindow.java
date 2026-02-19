@@ -97,6 +97,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private final Set<DatasetWatcher> watchers;
     private final AtomicBoolean initialized;
     private DataDescriptor serverDd;
+    private DataDescriptor localDd;
     private DatasetMode currentMode;
     private Cell<?> right;
     private OwnScrollPane leftScroll;
@@ -260,7 +261,7 @@ public class DatasetManagerWindow extends GenericDialog {
         // - There are updates to installed datasets.
         // - We can't contact the server.
         // - We have local datasets other than the base data.
-        var localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
+        localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
         if ((serverDd != null && serverDd.updatesAvailable)
                 || (serverDd == null || serverDd.datasets.isEmpty())
                 || (localDd != null && localDd.datasets.size() > 1))
@@ -352,7 +353,7 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void reloadInstalled(Table content, float width) {
-        var localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
+        localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
         reloadBothPanes(content, width, localDd, currentMode = DatasetMode.INSTALLED);
     }
 
@@ -471,7 +472,7 @@ public class DatasetManagerWindow extends GenericDialog {
             Table buttons = null;
             if (mode == DatasetMode.INSTALLED) {
                 // Select all.
-                Button selectAll = new OwnImageButton(skin, "select-all");
+                var selectAll = new OwnImageButton(skin, "select-all");
                 selectAll.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         for (var checkBox : groupCheckBoxes) {
@@ -486,7 +487,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 selectAll.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.select.all"), skin));
 
                 // Select none.
-                Button selectNone = new OwnImageButton(skin, "select-none");
+                var selectNone = new OwnImageButton(skin, "select-none");
                 selectNone.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         for (var checkBox : groupCheckBoxes) {
@@ -633,10 +634,19 @@ public class DatasetManagerWindow extends GenericDialog {
                         version = new OwnLabel(I18n.msg("gui.download.version.local", dataset.myVersion), skin, "grey-large");
                     }
                 }
-                var versionSize = new HorizontalGroup();
-                versionSize.space(pad34 * 2f);
-                versionSize.addActor(version);
-                versionSize.addActor(size);
+
+                var versionSizePlus = new HorizontalGroup();
+                versionSizePlus.space(pad34);
+                versionSizePlus.addActor(version);
+                versionSizePlus.addActor(size);
+
+                // Notice.
+                OwnLabel replacedBy = null;
+                if (dataset.replacedBy != null) {
+                    replacedBy = new OwnLabel(I18n.msg("gui.download.outdated"), skin, "default-red");
+                    replacedBy.setTooltip(I18n.msg("gui.download.replaced-by", dataset.replacedBy));
+                    versionSizePlus.addActor(replacedBy);
+                }
 
                 // Progress.
                 var progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "small-horizontal");
@@ -648,7 +658,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 t.add(title).left().padRight(pad18);
                 t.add(installOrSelect).right().row();
                 t.add();
-                t.add(versionSize).colspan(2).left().padRight(pad18).padBottom(pad10).row();
+                t.add(versionSizePlus).colspan(2).left().padRight(pad18).padBottom(pad10).row();
                 t.add(progress).colspan(3).expandX();
                 t.pack();
                 OwnButton button = new OwnButton(t, skin, "dataset", false);
@@ -879,11 +889,11 @@ public class DatasetManagerWindow extends GenericDialog {
             var nObjects = new OwnLabel(nObjStr, skin, "grey-large");
             nObjects.addListener(new OwnTextTooltip(I18n.msg("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
 
+
             // Links.
             Table linksGroup = null;
             if (dataset.links != null) {
                 linksGroup = new Table(skin);
-
                 int i = 0;
                 for (var link : dataset.links) {
                     if (!link.isBlank()) {
@@ -912,7 +922,7 @@ public class DatasetManagerWindow extends GenericDialog {
             }
             var releaseNotesTitle = new OwnLabel(I18n.msg("gui.download.releasenotes"), skin, "grey-large");
             var releaseNotesTable = new Table(skin);
-            for(var rn : releaseNotes) {
+            for (var rn : releaseNotes) {
                 releaseNotesTable.add("-").left().top().padRight(pad10);
                 var l = new OwnLabel(TextUtils.breakCharacters(rn, 70), skin);
                 l.setWidth(1000f);
@@ -966,6 +976,95 @@ public class DatasetManagerWindow extends GenericDialog {
             infoTable.add(files).top().left().padBottom(pad34).row();
             infoTable.add(dataLocationNote).top().left();
 
+            // Replaces.
+            Table replaces = null;
+            if (dataset.replaces != null && dataset.replaces.length > 0) {
+                replaces = new Table(skin);
+                replaces.add(new OwnLabel(I18n.msg("gui.download.replaces"), skin, "grey-normal")).top().left().padRight(pad10);
+                int i = 0;
+                for (var r : dataset.replaces) {
+                    replaces.add(new OwnLabel(r, skin, "grey-normal")).left().padRight(5f);
+                    i++;
+                }
+            }
+
+            // Replaced by: add visible warning!
+            Table replacedBy = null;
+            if (dataset.replacedBy != null) {
+                var server = serverDd != null ? serverDd.findDatasetByKey(dataset.replacedBy) : null;
+                var local = localDd != null ? localDd.findDatasetByKey(dataset.replacedBy) : null;
+                String text = null;
+                DatasetDesc dd = null;
+                if (local != null) {
+                    text = I18n.msg("gui.download.replaced-by.info.local");
+                    dd = local;
+                } else if (server != null) {
+                    text = I18n.msg("gui.download.replaced-by.info.server");
+                    dd = server;
+                }
+                if (text != null) {
+                    // We have found the dataset: dd
+                    replacedBy = new Table(skin);
+                    replacedBy.setBackground("bg-pane-border");
+                    var info = new OwnLabel(text, skin, "default-red");
+                    var buttonText = I18n.msg((local != null? "gui.download.enable.ds" : "gui.download.view.ds"), dd.name);
+                    var buttonTextShort = TextUtils.capString(buttonText, 60);
+                    var button = new OwnTextButton(buttonTextShort, skin);
+                    button.setTooltip(buttonText);
+                    button.addListener((evt) -> {
+                        if (evt instanceof ChangeEvent) {
+                            if (local != null) {
+                                // LOCAL.
+                                // Enable new, disable current.
+                                actionEnableDataset(local, null);
+                                actionDisableDataset(dataset);
+                                var index = localDd.datasets.indexOf(local);
+                                selectedIndex = index;
+                                Timer.schedule(new Timer.Task() {
+                                    @Override
+                                    public void run() {
+                                        // Switch to installed tab and select the new dataset.
+                                        selectedTab = 1;
+                                        selectedDataset[DatasetMode.INSTALLED.ordinal()] = local;
+                                        reloadAll();
+                                        // After reload, scroll to and highlight the new dataset.
+                                        GaiaSky.postRunnable(() -> {
+                                            Button targetButton = buttonMap[DatasetMode.INSTALLED.ordinal()].get(local.key);
+                                            if (targetButton != null && leftScroll != null) {
+                                                // Scroll so the button is visible.
+                                                Vector2 pos = targetButton.localToAscendantCoordinates(leftScroll, new Vector2(0, 0));
+                                                leftScroll.scrollTo(pos.x, pos.y, targetButton.getWidth(), targetButton.getHeight());
+                                            }
+                                            reloadRightPane(right, local, DatasetMode.INSTALLED);
+                                        });
+                                    }
+                                }, 0.5f);
+                            } else {
+                                // SERVER.
+                                // Switch to available tab and select the server dataset.
+                                selectedTab = 0;
+                                selectedDataset[DatasetMode.AVAILABLE.ordinal()] = server;
+                                reloadAll();
+                                GaiaSky.postRunnable(() -> {
+                                    Button targetButton = buttonMap[DatasetMode.AVAILABLE.ordinal()].get(server.key);
+                                    if (targetButton != null && leftScroll != null) {
+                                        Vector2 pos = targetButton.localToAscendantCoordinates(leftScroll, new Vector2(0, 0));
+                                        leftScroll.scrollTo(pos.x, pos.y, targetButton.getWidth(), targetButton.getHeight());
+                                    }
+                                    reloadRightPane(right, server, DatasetMode.AVAILABLE);
+                                });
+
+                            }
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    replacedBy.add(info).center().padBottom(pad10).row();
+                    replacedBy.add(button).center();
+                }
+            }
+
             // Scroll.
             var infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
             infoScroll.setScrollingDisabled(true, false);
@@ -993,6 +1092,9 @@ public class DatasetManagerWindow extends GenericDialog {
 
             rightTable.add(titleGroup).top().left().padBottom(pad10).padTop(pad34).row();
             rightTable.add(status).top().left().padLeft(pad18 * 3f).padBottom(pad34).row();
+            if (replacedBy != null) {
+                rightTable.add(replacedBy).top().left().fillX().padBottom(pad10 * 3f).row();
+            }
             rightTable.add(type).top().left().padBottom(pad10).row();
             rightTable.add(version).top().left().padBottom(pad10).row();
             rightTable.add(key).top().left().padBottom(pad10).row();
@@ -1000,8 +1102,12 @@ public class DatasetManagerWindow extends GenericDialog {
                 rightTable.add(creator).top().left().padBottom(pad10).row();
             rightTable.add(size).top().left().padBottom(pad10).row();
             rightTable.add(nObjects).top().left().padBottom(pad18).row();
-            rightTable.add(linksGroup).top().left().padBottom(pad34 * 2f).row();
+            if (linksGroup != null)
+                rightTable.add(linksGroup).top().left().padBottom(pad34 * 2f).row();
             rightTable.add(infoScroll).top().left().padBottom(pad34).row();
+            if (replaces != null) {
+                rightTable.add(replaces).top().left().padBottom(pad10).row();
+            }
             rightTable.add(cancelDownloadButton).padTop(pad34).center();
             rightTable.pack();
 
@@ -1376,6 +1482,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * Enables a given dataset, so that it is loaded when Gaia Sky starts.
      *
      * @param dataset The dataset to enable.
+     * @param cb The checkbox to enable the dataset.
      */
     private void actionEnableDataset(DatasetDesc dataset, OwnCheckBox cb) {
         // Texture packs can't be enabled here.
