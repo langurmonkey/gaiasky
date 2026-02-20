@@ -355,7 +355,7 @@ public class DataDescriptorUtils {
     private void updateReplacedBy() {
         // Build full list.
         var list = new ArrayList<DatasetDesc>();
-        var index = new FastStringObjectMap<>(100, DatasetDesc.class);
+        var index = new FastStringObjectMap<>(100, Set.class);
         if (DataDescriptor.serverDataDescriptor != null) {
             list.addAll(DataDescriptor.serverDataDescriptor.datasets);
         }
@@ -363,15 +363,27 @@ public class DataDescriptorUtils {
             list.addAll(DataDescriptor.localDataDescriptor.datasets);
         }
         // Fill index.
-        list.forEach((ds) -> index.put(ds.key, ds));
+        list.forEach((ds) -> {
+            if (index.containsKey(ds.key)) {
+                index.get(ds.key).add(ds);
+            } else {
+                var set = new HashSet<DatasetDesc>();
+                set.add(ds);
+                index.put(ds.key, set);
+            }
+        });
 
         // Update 'replacedBy' attribute in datasets.
         for (var ds : list) {
             if (ds.replaces != null) {
                 for (var k : ds.replaces) {
-                    var other = index.get(k);
-                    if (other != null && !other.isReplacedBy(ds.key)) {
-                        other.replacedBy = ds.key;
+                    var others = (HashSet<DatasetDesc>) index.get(k);
+                    if (others != null && !others.isEmpty()) {
+                        for (var other : others) {
+                            if (other != null && !other.isReplacedBy(ds.key)) {
+                                other.replacedBy = ds.key;
+                            }
+                        }
                     }
                 }
             }
@@ -379,9 +391,13 @@ public class DataDescriptorUtils {
         // Update 'replaces' attribute if needed.
         for (var ds : list) {
             if (ds.replacedBy != null && !ds.replacedBy.isBlank()) {
-                var other = index.get(ds.replacedBy);
-                if (other != null) {
-                    other.addReplacesEntry(ds.key);
+                var others = (HashSet<DatasetDesc>) index.get(ds.replacedBy);
+                if (others != null && !others.isEmpty()) {
+                    for (var other : others) {
+                        if (other != null) {
+                            other.addReplacesEntry(ds.key);
+                        }
+                    }
                 }
             }
         }

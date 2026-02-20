@@ -207,6 +207,11 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         }
     }
 
+    @Override
+    public String toString() {
+        return key != null ? key : name;
+    }
+
     private String getString(String... attrNames) {
         for (var name : attrNames) {
             var result = getString(name);
