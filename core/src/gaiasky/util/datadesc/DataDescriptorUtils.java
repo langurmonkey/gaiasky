@@ -15,11 +15,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.datasets.DatasetManagerWindow;
-import gaiasky.util.Constants;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
-import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.update.VersionChecker;
 import org.apache.commons.io.FileUtils;
@@ -123,6 +120,7 @@ public class DataDescriptorUtils {
      * it returns null.
      *
      * @param fh The pointer to the server JSON file.
+     *
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildServerDatasets(FileHandle fh) {
@@ -159,10 +157,10 @@ public class DataDescriptorUtils {
                 // Parse "recommended".
                 var rec = dataDesc.get("recommended");
                 String[] recommended = null;
-                if(rec != null) {
+                if (rec != null) {
                     try {
                         recommended = rec.asStringArray();
-                    } catch(IllegalStateException ignored) {
+                    } catch (IllegalStateException ignored) {
                         // Nothing.
                     }
                 }
@@ -233,6 +231,7 @@ public class DataDescriptorUtils {
 
                 DataDescriptor desc = new DataDescriptor(typesList, datasetsList, recommended);
                 DataDescriptor.serverDataDescriptor = desc;
+                updateReplacedBy();
                 return desc;
             } catch (Exception e) {
                 logger.error(e);
@@ -250,6 +249,7 @@ public class DataDescriptorUtils {
      * or 'dataset-'.
      *
      * @param server The server data descriptor, for combining with the local catalogs.
+     *
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
@@ -344,6 +344,46 @@ public class DataDescriptorUtils {
 
         DataDescriptor desc = new DataDescriptor(types, datasets);
         DataDescriptor.localDataDescriptor = desc;
+        updateReplacedBy();
         return desc;
+    }
+
+    /**
+     * Updates the {@link DatasetDesc#replacedBy} attribute of datasets by looking at the {@link DatasetDesc#replaces} attributes
+     * and cross-referencing them. This function works across both local and server datasets
+     */
+    private void updateReplacedBy() {
+        // Build full list.
+        var list = new ArrayList<DatasetDesc>();
+        var index = new FastStringObjectMap<>(100, DatasetDesc.class);
+        if (DataDescriptor.serverDataDescriptor != null) {
+            list.addAll(DataDescriptor.serverDataDescriptor.datasets);
+        }
+        if (DataDescriptor.localDataDescriptor != null) {
+            list.addAll(DataDescriptor.localDataDescriptor.datasets);
+        }
+        // Fill index.
+        list.forEach((ds) -> index.put(ds.key, ds));
+
+        // Update 'replacedBy' attribute in datasets.
+        for (var ds : list) {
+            if (ds.replaces != null) {
+                for (var k : ds.replaces) {
+                    var other = index.get(k);
+                    if (other != null && !other.isReplacedBy(ds.key)) {
+                        other.replacedBy = ds.key;
+                    }
+                }
+            }
+        }
+        // Update 'replaces' attribute if needed.
+        for (var ds : list) {
+            if (ds.replacedBy != null && !ds.replacedBy.isBlank()) {
+                var other = index.get(ds.replacedBy);
+                if (other != null) {
+                    other.addReplacesEntry(ds.key);
+                }
+            }
+        }
     }
 }

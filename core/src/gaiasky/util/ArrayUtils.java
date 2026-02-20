@@ -44,4 +44,30 @@ public class ArrayUtils {
         }
         return ret;
     }
+
+    /**
+     * Returns a new array containing all elements of the original array
+     * plus the specified value appended at the end.
+     *
+     * <p>Since Java arrays are immutable in size, this method creates
+     * a new array, copies the original contents, and adds the new value.</p>
+     *
+     * @param original the source array; may be {@code null}
+     * @param value the string to append to the array
+     * @return a new array containing the original elements and the appended value
+     */
+    public static String[] addString(String[] original, String value) {
+        // If the original array is null, return a new single-element array
+        if (original == null) {
+            return new String[]{ value };
+        }
+
+        // Create a new array with one additional slot
+        String[] result = Arrays.copyOf(original, original.length + 1);
+
+        // Assign the new value to the last position
+        result[result.length - 1] = value;
+
+        return result;
+    }
 }

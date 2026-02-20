@@ -269,6 +269,47 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
     }
 
     /**
+     * Checks if the current dataset is replaced by the dataset with the given key.
+     *
+     * @param key The key.
+     *
+     * @return True if the current dataset is replaced by the dataset with the given key.
+     */
+    public boolean isReplacedBy(String key) {
+        return replacedBy != null && replacedBy.equals(key);
+    }
+
+    /**
+     * Checks whether the current dataset replaces the dataset with the given key.
+     *
+     * @param key The key.
+     *
+     * @return True if the current dataset replaces the dataset with the given key.
+     */
+    public boolean replaces(String key) {
+        if (replaces != null) {
+            for (var k : replaces) {
+                if (k.equals(key)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds the key to the {@link #replaces} array of this dataset.
+     *
+     * @param key The key to add.
+     */
+    public void addReplacesEntry(String key) {
+        // Add key only if it is not yet there.
+        if (!replaces(key)) {
+            replaces = ArrayUtils.addString(replaces, key);
+        }
+    }
+
+    /**
      * Checks the version file of the given path, if it is a correct JSON
      * file and contains a top-level "version" attribute. Otherwise, it
      * returns the default the lowest version (0)
@@ -362,6 +403,8 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         copy.releaseNotes = this.releaseNotes;
         copy.files = this.files;
         copy.server = this.server;
+        copy.replaces = this.replaces;
+        copy.replacedBy = this.replacedBy;
         return copy;
     }
 

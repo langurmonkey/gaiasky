@@ -7,20 +7,24 @@
 
 package gaiasky.util.datadesc;
 
+import gaiasky.util.FastStringObjectMap;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * Contains a list of dataset descriptors, as {@link DatasetDesc}s.
+ */
 public class DataDescriptor {
 
     public static DataDescriptor localDataDescriptor, serverDataDescriptor;
 
     /** View organised by types, where each time has a list of datasets **/
-    public List<DatasetType> types;
+    public final List<DatasetType> types;
     /** Raw datasets list, where each dataset has a type **/
-    public List<DatasetDesc> datasets;
+    public final List<DatasetDesc> datasets;
 
     /** Recommended datasets as an array of keys. **/
     public String[] recommended;
@@ -33,15 +37,23 @@ public class DataDescriptor {
         this.datasets = datasets;
         this.recommended = recommended;
 
-        for (DatasetDesc ds : datasets) {
-            updatesAvailable = updatesAvailable || ds.outdated;
-            if (ds.outdated)
-                numUpdates++;
-        }
+        this.initialize();
 
     }
+
     public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets) {
         this(types, datasets, null);
+    }
+
+    private void initialize() {
+        // Index and number of updates.
+        for (DatasetDesc ds : datasets) {
+            if (ds != null) {
+                updatesAvailable = updatesAvailable || ds.outdated;
+                if (ds.outdated)
+                    numUpdates++;
+            }
+        }
     }
 
     /**

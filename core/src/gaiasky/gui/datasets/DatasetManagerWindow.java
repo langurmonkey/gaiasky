@@ -983,7 +983,10 @@ public class DatasetManagerWindow extends GenericDialog {
                 replaces.add(new OwnLabel(I18n.msg("gui.download.replaces"), skin, "grey-normal")).top().left().padRight(pad10);
                 int i = 0;
                 for (var r : dataset.replaces) {
-                    replaces.add(new OwnLabel(r, skin, "grey-normal")).left().padRight(5f);
+                    if (i > 0) {
+                        replaces.add();
+                    }
+                    replaces.add(new OwnLabel(r, skin, "grey-normal")).left().row();
                     i++;
                 }
             }
