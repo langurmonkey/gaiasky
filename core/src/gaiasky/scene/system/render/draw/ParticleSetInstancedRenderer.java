@@ -30,13 +30,10 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
-import gaiasky.util.camera.Proximity;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
 
 import java.util.Random;
@@ -315,6 +312,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 }
 
                 try {
+                    if (set.isModel() && set.isWireframe()) {
+                        Gdx.gl30.glLineWidth(1f);
+                    }
                     Gdx.gl30.glEnable(GL30.GL_CULL_FACE);
                     Gdx.gl30.glCullFace(GL30.GL_BACK);
                     int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();

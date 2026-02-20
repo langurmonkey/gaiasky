@@ -1262,6 +1262,10 @@ public class ParticleSet implements Component, IDisposable {
         return model == null && modelType.equalsIgnoreCase("quad");
     }
 
+    public boolean isModel() {
+       return model != null || !modelType.equalsIgnoreCase("quad");
+    }
+
     public void setLabelDisplay(LabelDisplay state,
                                 String name) {
         name = name.toLowerCase(Locale.ROOT)
