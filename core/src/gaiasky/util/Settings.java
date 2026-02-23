@@ -2987,9 +2987,9 @@ public class Settings extends SettingsObject {
             public void notify(Event event, Object source, Object... data) {
                 if (source != this) {
                     switch (event) {
-                        case STEREO_K_CMD -> this.k = (float) data[0];
-                        case STEREO_IPD_CMD -> this.ipd = (float) data[0];
-                        case STEREO_SCREEN_DIST_CMD -> this.screenDistance = (float) data[0];
+                        case STEREO_K_CMD -> this.k = (double) data[0];
+                        case STEREO_IPD_CMD -> this.ipd = (double) data[0];
+                        case STEREO_SCREEN_DIST_CMD -> this.screenDistance = (double) data[0];
                         case STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD -> this.customColorLeft = (Color) data[0];
                         case STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD -> this.customColorRight = (Color) data[0];
                     }
