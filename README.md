@@ -20,21 +20,21 @@ To get the latest up-to-date and most complete information,
 *  Submit a [**bug** or a **feature request**](https://codeberg.org/gaiasky/gaiasky/issues)
 *  Follow development news at [@gaiasky.bsky.social](https://bsky.app/profile/gaiasky.bsky.social) or [#GaiaSky@mastodon](https://mastodon.social/tags/GaiaSky)
 
-This file contains the following sections:
+---
 
-1. [Installation instructions and requirements](#1-installation-instructions-and-requirements)
-2. [Pre-built packages](#2-pre-built-packages)
-3. [Running from source](#3-development-branch)
-4. [Gaia Sky VR](#4-gaia-sky-vr)
-5. [Documentation and help](#5-documentation-and-help)
-6. [Copyright and licensing information](#6-copyright-and-licensing-information)
-7. [Contact information](#7-contact-information)
-8. [Contributing](#8-contributing)
-9. [Credits and acknowledgements](#9-acknowledgements)
+## 1. Overview and Stack
 
-##  1. Installation instructions and requirements
+Gaia Sky is a 3D universe platform built using the following technologies:
 
-### 1.1. Requirements
+*   **Language:** Java
+*   **Frameworks:** [libGDX](https://libgdx.com/) (core 3D engine), [Ashley](https://github.com/libgdx/ashley) (entity-component system), [LWJGL 3](https://www.lwjgl.org/) (desktop backend).
+*   **Package Manager/Build Tool:** [Gradle](https://gradle.org/).
+*   **Scripting Interface:** Python (via [Py4J](https://www.py4j.org/)).
+*   **VR Support:** OpenXR.
+
+## 2. Requirements
+
+### 2.1 Hardware
 
 | Component             | Minimum requirement                                           |
 |-----------------------|---------------------------------------------------------------|
@@ -45,97 +45,104 @@ This file contains the following sections:
 | **Memory**            | 4+ GB RAM (depends on loaded datasets)                        |
 | **Hard drive**        | 1+ GB of free disk space (depends on downloaded datasets)     |
 
-### 2. Pre-built packages
+### 2.2 Software
 
-This is the Gaia Sky source repository. We recommend using the [pre-built packages](https://gaiasky.space/downloads) for the different Operating Systems in case you want a stable and hassle-free experience.
+- **Java Development Kit (JDK):** Gaia Sky is developed on the most recent JDK version. We recommend using at least the latest LTS version (JDK 25+).
+- **Git:** To clone the repository.
+- **Python (Optional):** For external scripting.
 
+## 3. Setup and Run
 
-### 3. Development branch
+### 3.1 Installation from Source
 
-In order to compile and run Gaia Sky using the `master` branch sources, you need the following installed in your system:
-
-- Java Development Kit, `JDK`. Gaia Sky is developed on the most recent JDK version, so we recommend using at least the latest LTS (Long-Term Support) version
-- `git`
-
-First, clone the [Gaia Sky repository](https://codeberg.org/gaiasky/gaiasky):
+Clone the [Gaia Sky repository](https://codeberg.org/gaiasky/gaiasky):
 
 ```console
 git clone https://codeberg.org/gaiasky/gaiasky.git
+cd gaiasky
 ```
 
-Then, run Gaia Sky (Linux, macOS) with the provided script:
+### 3.2 Running Gaia Sky
 
+**On Linux and macOS:**
+Using the provided wrapper script:
 ```console
-cd gaiasky
 ./gaiasky
 ```
+Or directly with Gradle:
+```console
+./gradlew core:run
+```
 
-On Windows, open PowerShell, make sure your `$JAVA_HOME` environment variable points to a valid JDK installation, and run:
-
-```batchfile
+**On Windows:**
+Open PowerShell and run:
+```powershell
 .\gradlew.bat core:run
 ```
 
-Et voilà! The bleeding edge Gaia Sky is running in your machine.
+### 3.3 CLI Arguments
 
-You can run the tests with:
-
+Run `./gaiasky -h` to find out about launch arguments. If running with Gradle, use the `--args` flag:
 ```console
-gradlew core:test
+./gradlew core:run --args='-h'
 ```
 
+### 3.4 Gaia Sky VR
 
-### 3.1 CLI arguments
-
-Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and what arguments are accepted.
-
-If running directly with gradle, you can add arguments using the gradle `--args` flag, like this: 
-
-```
-gradlew core:run --args='-h'
-```
-
-### 3.2 Getting the data
-
-As of version `2.1.0`, Gaia Sky offers an integrated way to download and manage all datasets and catalogs from within the application. The dataset manager, accessible from the welcome screen, enables browsing and downloading available datasets, and enabling and disabling already installed/downloaded datasets.
-
-You can also download the **datasets manually** [here](https://gaia.ari.uni-heidelberg.de/gaiasky/repository/). Once downloaded, the datasets, which usually come in `.tar.gz` packages, can be extracted directly in the [Gaia Sky data directory](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Folders.html#dataset-location).
-
-##  4. Gaia Sky VR
-
-Gaia Sky VR works with [OpenXR](https://registry.khronos.org/OpenXR/)-enabled runtimes to interface with virtual reality sets. 
-
-Run Gaia Sky in VR using the `-vr` flag from the CLI, or, on Windows, run the `gaiaskyvr.exe` file.
-
+Gaia Sky VR works with [OpenXR](https://registry.khronos.org/OpenXR/)-enabled runtimes.
+To run in VR:
 ```console
-gaiasky -vr
+# Windows
+gradlew.bat core:run --args='-vr'
+# Linux
+./gradlew core:run --args='-vr'
 ```
 
-The most up-to-date information on Gaia Sky VR, as well as how to install and run it, is available in the official documentation:
+## 4. Scripts and Project Structure
 
-- [Gaia Sky VR documentation](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Gaia-sky-vr.html)
+### 4.1 Key Scripts
+- `gaiasky`: A bash script to run Gaia Sky with Gradle.
+- `gradlew` / `gradlew.bat`: The Gradle wrapper for building and running.
+- `makefile`: Primarily for Linux/Debian packaging and installation.
+  - `make install`: Installs Gaia Sky to `/opt/gaiasky`.
+- `justfile`: Contains commands for Monado-service (OpenXR) management on Linux.
 
+### 4.2 Project Structure
+- `core/`: Contains the main Java source code and assets.
+  - `src/gaiasky/`: Root of the Java package structure.
+  - `src/gaiasky/desktop/GaiaSkyDesktop.java`: Main entry point for the desktop application.
+  - `scripts/`: Scripts and utilities to create releases and manipulate datasets.
+- `assets/`: Textures, shaders, data, scripts, and internationalization files.
+- `gradle/`: Gradle wrapper and configuration.
 
-##  5. Documentation and help
+## 5. Environment Variables
 
-The most up-to-date user manual is always hosted at [docs.gaiasky.space](http://docs.gaiasky.space). The documentation source repository is hosted [here](https://codeberg.org/gaiasky/gaiasky-docs).
+- `JAVA_HOME`: Should point to your JDK installation.
+- `XDG_DATA_HOME`, `LOCALAPPDATA`: Used to determine where to store data.
+- `GS`: Points to the `gaiasky` project directory.
 
-An AI-generated technical wiki, documenting the whole codebase structured in components, can be found in [DeepWiki/langurmonkey/gaiasky](https://deepwiki.com/langurmonkey/gaiasky). I have reviewed it and as far as I can tell it is very accurate and correct.
+## 6. Tests
 
+Run the test suite using Gradle:
+```console
+./gradlew core:test
+```
 
-##  6. Copyright and licensing information
+## 7. Documentation and Help
 
-This software is published and distributed under the MPL 2.0 (Mozilla Public License 2.0). You can find the [full license text here](LICENSE.md) or visiting [opensource.org/licenses/MPL-2.0](https://opensource.org/licenses/MPL-2.0).
+- [**User Manual**](http://docs.gaiasky.space)
+- [**Gaia Sky VR Docs**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Gaia-sky-vr.html)
+- [**DeepWiki Technical Docs**](https://deepwiki.com/langurmonkey/gaiasky)
 
-##  7. Contact information
+## 8. License
 
-Up-to-date contact information can be found in the main webpage of the project, [gaiasky.space/contact](https://gaiasky.space/contact).
+This software is published and distributed under the **Mozilla Public License 2.0 (MPL 2.0)**. See the [LICENSE.md](LICENSE.md) file for details.
 
-##  8. Contributing
+---
 
-Find information about contributing translations, code or ideas in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+### Contributing
+Find information about contributing in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-##  9. Acknowledgements
-
-The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md) file.
+### Acknowledgements
+See [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md) and [AUTHORS.md](AUTHORS.md).
 
