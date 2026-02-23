@@ -12,8 +12,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
-import py4j.ClientServer;
 import py4j.DefaultGatewayServerListener;
+import py4j.GatewayServer;
 import py4j.GatewayServerListener;
 import py4j.Py4JServerConnection;
 
@@ -25,13 +25,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ScriptingServer {
     private static final Logger.Log logger = Logger.getLogger(ScriptingServer.class);
     private static final AtomicInteger connections = new AtomicInteger(0);
-    private static ClientServer gatewayServer;
+    private static GatewayServer gatewayServer;
     private static GatewayServerListener listener;
 
     public static void initialize(IScriptingInterface scriptingInterface) {
         initialize(scriptingInterface, false);
     }
 
+
+    /**
+     * Initializes the gateway server and the default listener. This method does not start the server, only initializes it.
+     *
+     * @param scriptingInterface The scripting interface.
+     * @param force              Force the initialization of the server.
+     */
     public static void initialize(IScriptingInterface scriptingInterface, boolean force) {
         if (!Settings.settings.program.net.slave.active) {
             if (force && gatewayServer != null) {
@@ -44,7 +51,7 @@ public class ScriptingServer {
             }
             if (gatewayServer == null) {
                 try {
-                    gatewayServer = new ClientServer(scriptingInterface);
+                    gatewayServer = new GatewayServer(scriptingInterface);
                     listener = new DefaultGatewayServerListener() {
 
                         @Override
@@ -60,18 +67,8 @@ public class ScriptingServer {
                         }
 
                         @Override
-                        public void serverPostShutdown() {
-                            logger.debug("Post shutdown");
-                        }
-
-                        @Override
-                        public void serverPreShutdown() {
-                            logger.debug("Pre shutdown");
-                        }
-
-                        @Override
                         public void serverStarted() {
-                            logger.info("Server started on port " + gatewayServer.getJavaServer().getListeningPort());
+                            logger.info("Server started on port " + gatewayServer.getListeningPort());
                         }
 
                         @Override
@@ -91,17 +88,25 @@ public class ScriptingServer {
                             initialize(scriptingInterface, force);
                         }
                     };
-                    gatewayServer.getJavaServer().addListener(listener);
+                    gatewayServer.addListener(listener);
                 } catch (Exception e) {
-                    logger.error("Could not initialize the Py4J gateway server, is there another instance of Gaia Sky running? Proceeding without scripting...");
-                    logger.error(e);
+                    logger.error(
+                            "Could not initialize the Py4J gateway server. Proceeding without scripting.", e);
                 }
             }
+        }
+    }
+
+    /**
+     * Actually starts the server. This must be called, or scripting won't work.
+     */
+    public static void startServer() {
+        if (gatewayServer != null) {
             try {
-                gatewayServer.startServer();
+                gatewayServer.start();
             } catch (Exception e) {
-                logger.error("Could not initialize the Py4J gateway server, is there another instance of Gaia Sky running? Proceeding without scripting...");
-                logger.error(e);
+                logger.error(
+                        "Could not start the scripting gateway server. Proceeding without scripting.", e);
             }
         }
     }
@@ -109,7 +114,7 @@ public class ScriptingServer {
     public static void dispose() {
         if (gatewayServer != null) {
             if (listener != null) {
-                gatewayServer.getJavaServer().removeListener(listener);
+                gatewayServer.removeListener(listener);
                 listener = null;
             }
             gatewayServer.shutdown();

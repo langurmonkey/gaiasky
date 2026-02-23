@@ -56,6 +56,7 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.ConsoleManager;
+import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
@@ -892,12 +893,17 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         // Initial report.
         scene.reportDebugObjects();
 
+        // Restore VSync to user setting.
+        graphics.setVSync(settings.graphics.vsync);
+
+        // Start scripting server.
+        if (!cliArgs.noScriptingServer) {
+            ScriptingServer.startServer();
+        }
+
         // Initialized.
         EventManager.publish(Event.INITIALIZED_INFO, this);
         sceneRenderer.setRendering(true);
-
-        // Restore VSync to user setting.
-        graphics.setVSync(settings.graphics.vsync);
 
         startTimeScene = TimeUtils.millis();
         initialized = true;
