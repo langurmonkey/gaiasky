@@ -621,11 +621,13 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param shadingType    The shading type ordinal.
      * @param sphericalPower The spherical power value.
      */
-    protected void setShadingTypeUniforms(ExtShaderProgram shaderProgram, ICamera camera, int shadingType, float sphericalPower) {
+    protected void setShadingTypeUniforms(ExtShaderProgram shaderProgram, ICamera camera, int shadingType, float sphericalPower, float ambient) {
         // Get nearest light source (our star).
         var light = (Proximity.NearbyRecord) camera.getCloseLightSource(0);
         shaderProgram.setUniformf("u_lightPos", light.pos);
-        shaderProgram.setUniformf("u_ambientLight", (float) Settings.settings.scene.renderer.ambient);
+
+        var finalAmbient = (float) MathUtils.clamp(Settings.settings.scene.renderer.ambient + Math.max(ambient, 0f), 0f, 1f);
+        shaderProgram.setUniformf("u_ambientLight", finalAmbient);
         shaderProgram.setUniformi("u_shadingType", shadingType);
         shaderProgram.setUniformf("u_lightIntensity", 1f);
         shaderProgram.setUniformf("u_sphericalPower", sphericalPower);

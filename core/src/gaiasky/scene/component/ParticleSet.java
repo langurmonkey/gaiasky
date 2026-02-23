@@ -232,6 +232,10 @@ public class ParticleSet implements Component, IDisposable {
     public ShadingType shadingType = ShadingType.PLAIN;
     /** Controls how sharply the sphere edges darken (higher values = more pronounced sphere appearance with darker edges). **/
     public float sphericalPower = 3f;
+    /**
+     * Ambient light for billboard and spherical lighting. If this is set, the final ambient light used is this plus the global setting.
+     */
+    public float ambientLight = -1;
 
     /** Controls whether the brightness twinkles. **/
     public enum ShadingStyle {
@@ -636,6 +640,10 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setSphericalPower(Double power) {
         this.sphericalPower = (float) MathUtilsDouble.clamp(power, 0.1, 20.0);
+    }
+
+    public void setAmbientLight(Double ambient) {
+        this.ambientLight = ambient.floatValue();
     }
 
     public void setShadingStyle(String style) {
@@ -1263,7 +1271,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public boolean isModel() {
-       return model != null || !modelType.equalsIgnoreCase("quad");
+        return model != null || !modelType.equalsIgnoreCase("quad");
     }
 
     public void setLabelDisplay(LabelDisplay state,

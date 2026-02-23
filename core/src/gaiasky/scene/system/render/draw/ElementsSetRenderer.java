@@ -291,7 +291,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
 
                     // Shading type.
-                    setShadingTypeUniforms(shaderProgram, camera, shadingType, sphericalPower);
+                    setShadingTypeUniforms(shaderProgram, camera, shadingType, sphericalPower, 0f);
 
                     // VR scale
                     shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);

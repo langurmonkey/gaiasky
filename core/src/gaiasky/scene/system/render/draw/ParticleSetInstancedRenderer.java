@@ -297,7 +297,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 
                 // Shading type.
-                setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower);
+                setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower, set.ambientLight);
 
                 // Shading style.
                 shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());

@@ -823,10 +823,11 @@ public class DataInfoWindow extends GenericDialog {
                     if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
                         // Ok
                         JsonValue root = reader.parse(httpResponse.getResultAsString());
-                        listener.ok(root);
+                        GaiaSky.postRunnable(() -> listener.ok(root));
                     } else {
                         // Ko with code
                         var err = I18n.msg("gui.download.error.httpstatus", httpResponse.getStatus().getStatusCode());
+                        GaiaSky.postRunnable(() -> listener.ko(err));
                         listener.ko(err);
                     }
 
@@ -880,6 +881,10 @@ public class DataInfoWindow extends GenericDialog {
         public void ok(JsonValue root) {
             if (!root.has("displaytitle")) {
                 ko(I18n.msg("gui.wiki.attributemissing", "displaytitle"));
+                return;
+            }
+
+            if (!me.hasParent() || !me.isVisible()) {
                 return;
             }
 

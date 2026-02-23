@@ -808,6 +808,10 @@
         "description": "Controls how sharply the sphere edges darken (higher values = more pronounced sphere appearance with darker edges). Defaults to 3.0.",
         "unit": "Double"
       },
+      "ambientLight": {
+        "description": "The ambient light for the ``BILLBOARD_LIGHTING`` and ``SPHERICAL_LIGHTING`` shading types. The final ambient light used is this value plus the global ambient light setting, capped between 0 and 1.",
+        "unit": "Double"
+      },
       "shadingStyle": {
         "description": "Special shading style to apply to the particles of this set. |brsp| **Values** |ul| |li| ``default`` -- no special shading (default). |eli| |li| ``twinkle`` -- particles twinkle randomly with (app) time. |eli| |eul|",
         "unit": "String",
