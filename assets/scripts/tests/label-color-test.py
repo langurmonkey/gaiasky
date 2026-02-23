@@ -15,4 +15,4 @@ gs.setLabelColor("Aldebaran", [0.8, 0.2, 0.3, 0.8])
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

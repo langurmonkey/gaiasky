@@ -27,4 +27,4 @@ gs.setObjectQuaternionSlerpOrientation("Gaia", data_file)
 # At this point, Gaia sources its orientation from the CSV file.
 lprint("Gaia is now using quaternion-orientaitons.csv")
 
-gateway.shutdown()
+gateway.close()

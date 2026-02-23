@@ -39,4 +39,4 @@ gs.enableInput()
 
 printall("Script finishes")
 
-gateway.shutdown()
+gateway.close()

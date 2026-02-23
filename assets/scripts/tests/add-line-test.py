@@ -36,4 +36,4 @@ gs.cameraStop()
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

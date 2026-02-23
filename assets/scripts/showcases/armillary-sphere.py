@@ -105,4 +105,4 @@ gs.stopSimulationTime()
 gs.setOrthosphereViewMode(False)
 gs.forceUpdateScene();
 
-gateway.shutdown()
+gateway.close()

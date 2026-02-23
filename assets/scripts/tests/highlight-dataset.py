@@ -40,4 +40,4 @@ gs.removeDataset(name)
 
 lprint("Test finished")
 
-gateway.shutdown()
+gateway.close()

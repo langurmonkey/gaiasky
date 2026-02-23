@@ -47,4 +47,4 @@ gs.sleep(1)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

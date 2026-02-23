@@ -98,4 +98,4 @@ gs.setVisibility("element.labels", False)
 # Restore
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

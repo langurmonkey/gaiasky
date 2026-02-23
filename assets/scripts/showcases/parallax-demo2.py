@@ -103,4 +103,4 @@ gs.setOrbitCoordinatesScaling("EarthVSOP87", 1.0)
 gs.refreshAllOrbits();
 gs.forceUpdateScene();
 
-gateway.shutdown()
+gateway.close()

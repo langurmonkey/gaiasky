@@ -150,7 +150,7 @@ lprint("%d indices read from %s" % (nindices, indices_file))
 # Check sizes match
 if npoints != nindices:
     lprint("Number of points does not match the number of indices: %d != %d" % (npoints, nindices))
-    gateway.shutdown()
+    gateway.close()
     exit()
 
 # Create final positions list
@@ -179,5 +179,5 @@ while not finished:
 # Cleanup and exit
 gs.enableInput()
 gs.unparkRunnable("line-updater")
-gateway.shutdown()
+gateway.close()
 

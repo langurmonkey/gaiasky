@@ -26,4 +26,4 @@ gs.setStarSize(3.0)
 
 
 # close connection
-gateway.shutdown()
+gateway.close()

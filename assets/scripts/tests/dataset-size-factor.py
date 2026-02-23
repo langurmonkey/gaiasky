@@ -31,4 +31,4 @@ gs.highlightDataset("TestDS", False)
 gs.removeDataset("TestDS")
 
 # close connection
-gateway.shutdown()
+gateway.close()

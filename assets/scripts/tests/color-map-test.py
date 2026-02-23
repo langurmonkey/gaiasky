@@ -42,4 +42,4 @@ for i in range(8):
 gs.removeDataset("hip-script")
 lprint("Test finished")
 
-gateway.shutdown()
+gateway.close()

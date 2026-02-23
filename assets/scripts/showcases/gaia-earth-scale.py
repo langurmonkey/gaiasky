@@ -65,4 +65,4 @@ gs.setObjectSizeScaling("Gaia orbit", 1.0)
 gs.refreshAllOrbits()
 gs.restoreSettings()
 
-gateway.shutdown()
+gateway.close()

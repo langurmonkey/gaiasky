@@ -37,4 +37,4 @@ gs.setLensFlare(True)
 
 gs.setCinematicCamera(False)
 
-gateway.shutdown()
+gateway.close()

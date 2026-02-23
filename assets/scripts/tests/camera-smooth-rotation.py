@@ -22,4 +22,4 @@ for dxy in np.arange(0.0, 0.3, 0.01):
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

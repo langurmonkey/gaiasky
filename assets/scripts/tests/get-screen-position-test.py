@@ -16,4 +16,4 @@ if pos is not None:
 else:
     print("Object does not exist, or is off-screen.")
 
-gateway.shutdown()
+gateway.close()

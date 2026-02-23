@@ -25,4 +25,4 @@ gs.stopRecordingCameraPath()
 
 printall("Script done")
 
-gateway.shutdown()
+gateway.close()

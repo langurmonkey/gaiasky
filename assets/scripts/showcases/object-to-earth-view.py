@@ -58,4 +58,4 @@ def view_from_earth(target_name: str):
 target_name = input("Enter the name of the target object: ")
 view_from_earth(target_name)
 
-gateway.shutdown()
+gateway.close()

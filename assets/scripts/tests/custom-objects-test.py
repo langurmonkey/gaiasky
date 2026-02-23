@@ -44,4 +44,4 @@ gs.removeObject(10)
 gs.sleep(1.5)
 
 
-gateway.shutdown()
+gateway.close()

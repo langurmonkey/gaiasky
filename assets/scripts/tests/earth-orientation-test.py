@@ -48,4 +48,4 @@ gs.sleep(10)
 gs.setCameraFocus("Earth") # again look at nadir; this time gaiasky shows lat/lon on earth.
 
 # close connection
-gateway.shutdown()
+gateway.close()

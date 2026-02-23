@@ -163,4 +163,4 @@ gs.setVisibility('element.planets',True)
 gs.setVisibility('element.moons',True)
 
 # close gateway
-gateway.shutdown()
+gateway.close()

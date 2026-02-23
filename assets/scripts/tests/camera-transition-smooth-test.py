@@ -51,4 +51,4 @@ gs.cameraTransition([-5593.0417731364, 13008.1430225486, 1542.9688571213],
 
 lprint("Script ended")
 
-gateway.shutdown()
+gateway.close()

@@ -31,4 +31,4 @@ mute = boolean_prompt("Mute [Y/N]: ")
 
 gs.setMuteLabel(name, mute)
 
-gateway.shutdown()
+gateway.close()

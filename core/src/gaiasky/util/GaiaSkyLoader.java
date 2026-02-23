@@ -65,9 +65,6 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
 
         // Scripting interface.
         assets.scriptingInterface = new EventScriptingInterface(parameter.gaiaSky.assetManager, assets.catalogManager);
-        if (!parameter.noScripting) {
-            ScriptingServer.initialize(assets.scriptingInterface);
-        }
 
         // Bookmarks manager.
         assets.bookmarksManager = new BookmarksManager();
@@ -103,11 +100,9 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
 
     static public class GaiaSkyLoaderParameters extends AssetLoaderParameters<GaiaSkyAssets> {
         public GaiaSky gaiaSky;
-        public boolean noScripting;
 
-        public GaiaSkyLoaderParameters(GaiaSky gaiaSky, boolean noScripting) {
+        public GaiaSkyLoaderParameters(GaiaSky gaiaSky) {
             this.gaiaSky = gaiaSky;
-            this.noScripting = noScripting;
         }
     }
 }

@@ -19,4 +19,4 @@ gs.setForceDisplayLabel("unukalhai", True)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

@@ -44,4 +44,4 @@ gs.enableInput()
 
 lprint("Script ended")
 
-gateway.shutdown()
+gateway.close()

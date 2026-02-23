@@ -27,4 +27,4 @@ gs.sleep(1.0)
 gs.setCameraSpeed(100)
 gs.sleep(1.0)
 
-gateway.shutdown()
+gateway.close()

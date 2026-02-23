@@ -52,4 +52,4 @@ gs.setVisibility("element.orbits", True)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

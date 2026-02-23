@@ -36,4 +36,4 @@ print("Earth visibility: %s" % gs.getObjectVisibility("Earth"))
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

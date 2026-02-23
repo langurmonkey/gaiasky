@@ -44,4 +44,4 @@ else:
 gs.restoreSettings()
 # Exit
 gateway.close()
-gateway.shutdown()
+gateway.close()

@@ -616,4 +616,4 @@ gs.maximizeInterfaceWindow()
 gs.enableInput()
 
 # close connection
-gateway.shutdown()
+gateway.close()

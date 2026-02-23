@@ -33,4 +33,4 @@ input("Press enter to continue.")
 gs.restoreSettings()
 pprint("We have restored the settings. Good bye.")
 
-gateway.shutdown()
+gateway.close()

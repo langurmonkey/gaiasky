@@ -18,4 +18,4 @@ gs.sleep(2)
 gs.setStarBrightness(12.0)
 gs.sleep(2)
 
-gateway.shutdown()
+gateway.close()

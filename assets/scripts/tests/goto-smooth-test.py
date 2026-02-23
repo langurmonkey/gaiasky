@@ -32,4 +32,4 @@ gs.sleep(3.0)
 
 gs.setCinematicCamera(False)
 
-gateway.shutdown()
+gateway.close()

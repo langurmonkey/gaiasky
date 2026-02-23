@@ -10,6 +10,7 @@ base = apiv2.base
 # Camera module
 camera = apiv2.camera
 
-base.sleep(10)
+base.sleep(1)
+print("Connection successful")
 
-gateway.shutdown()
+gateway.close()

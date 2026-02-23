@@ -7,14 +7,10 @@
 
 package gaiasky.script;
 
-import gaiasky.GaiaSky;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import py4j.ClientServer;
 import py4j.DefaultGatewayServerListener;
-import py4j.GatewayServer;
-import py4j.GatewayServerListener;
 import py4j.Py4JServerConnection;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,13 +21,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ScriptingServer {
     private static final Logger.Log logger = Logger.getLogger(ScriptingServer.class);
     private static final AtomicInteger connections = new AtomicInteger(0);
-    private static GatewayServer gatewayServer;
-    private static GatewayServerListener listener;
+    private static ClientServer gatewayServer;
+    // We need to store this to re-initialize automatically
+    private static IScriptingInterface cachedInterface;
+
 
     public static void initialize(IScriptingInterface scriptingInterface) {
         initialize(scriptingInterface, false);
     }
-
 
     /**
      * Initializes the gateway server and the default listener. This method does not start the server, only initializes it.
@@ -40,85 +37,71 @@ public class ScriptingServer {
      * @param force              Force the initialization of the server.
      */
     public static void initialize(IScriptingInterface scriptingInterface, boolean force) {
-        if (!Settings.settings.program.net.slave.active) {
-            if (force && gatewayServer != null) {
-                // Shutdown
-                try {
-                    dispose();
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            }
-            if (gatewayServer == null) {
-                try {
-                    gatewayServer = new GatewayServer(scriptingInterface);
-                    listener = new DefaultGatewayServerListener() {
+        cachedInterface = scriptingInterface;
 
-                        @Override
-                        public void connectionStarted(Py4JServerConnection gatewayConnection) {
-                            logger.info("Connection started (" + connections.incrementAndGet() + "): " + gatewayConnection.getSocket().toString());
-                        }
+        if (Settings.settings.program.net.slave.active) return;
 
-                        @Override
-                        public void connectionStopped(Py4JServerConnection gatewayConnection) {
-                            // Enable input, just in case
-                            GaiaSky.postRunnable(() -> EventManager.publish(Event.INPUT_ENABLED_CMD, this, true));
-                            logger.info("Connection stopped (" + connections.decrementAndGet() + "): " + gatewayConnection.getSocket().toString());
-                        }
+        if (force || gatewayServer != null) {
+            dispose();
+        }
 
-                        @Override
-                        public void serverStarted() {
-                            logger.info("Server started on port " + gatewayServer.getListeningPort());
-                        }
+        if (gatewayServer == null) {
+            try {
+                // ClientServer starts its own internal server automatically
+                gatewayServer = new ClientServer(scriptingInterface);
+                gatewayServer.getJavaServer().addListener(new DefaultGatewayServerListener() {
 
-                        @Override
-                        public void serverStopped() {
-                            logger.info("Server stopped");
-                            initialize(scriptingInterface, true);
-                        }
+                    @Override
+                    public void connectionStopped(Py4JServerConnection gatewayConnection) {
+                        logger.info("Connection stopped. Remaining: " + connections.decrementAndGet());
 
-                        @Override
-                        public void connectionError(Exception e) {
-                            logger.error(e);
+                        // If no more scripts are connected, we "refresh" the server
+                        // to ensure it's ready for a fresh handshake.
+                        if (connections.get() <= 0) {
+                            logger.info("Last connection closed. Resetting server for next script...");
+                            restartAsync();
                         }
+                    }
 
-                        @Override
-                        public void serverError(Exception e) {
-                            logger.error(e);
-                            initialize(scriptingInterface, force);
-                        }
-                    };
-                    gatewayServer.addListener(listener);
-                } catch (Exception e) {
-                    logger.error(
-                            "Could not initialize the Py4J gateway server. Proceeding without scripting.", e);
-                }
+                    @Override
+                    public void connectionStarted(Py4JServerConnection gatewayConnection) {
+                        connections.incrementAndGet();
+                        logger.info("Connection started: " + gatewayConnection.getSocket().toString());
+                    }
+                });
+                logger.info("Py4J Server initialized and listening.");
+            } catch (Exception e) {
+                logger.error("Initialization failed: " + e.getMessage());
             }
         }
     }
 
     /**
-     * Actually starts the server. This must be called, or scripting won't work.
+     * Restart the server in a different thread.
      */
-    public static void startServer() {
-        if (gatewayServer != null) {
+    private static void restartAsync() {
+        new Thread(() -> {
             try {
-                gatewayServer.start();
-            } catch (Exception e) {
-                logger.error(
-                        "Could not start the scripting gateway server. Proceeding without scripting.", e);
-            }
-        }
+                // Wait for socket to clear.
+                Thread.sleep(500);
+                // Initialize.
+                initialize(cachedInterface, true);
+            } catch (InterruptedException ignored) {}
+        }).start();
     }
 
+    /**
+     * Disposes the current gateway server.
+     */
     public static void dispose() {
         if (gatewayServer != null) {
-            if (listener != null) {
-                gatewayServer.removeListener(listener);
-                listener = null;
+            try {
+                gatewayServer.shutdown();
+            } catch (Exception e) {
+                logger.error("Error during shutdown", e);
             }
-            gatewayServer.shutdown();
             gatewayServer = null;
         }
     }
+
 }

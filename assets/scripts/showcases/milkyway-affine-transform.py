@@ -92,4 +92,4 @@ gs.setDatasetTransformationMatrix("Milky Way", mat.getValues())
 # Exit
 gs.sleep(1.0)
 gateway.close()
-gateway.shutdown()
+gateway.close()

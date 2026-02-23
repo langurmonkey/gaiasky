@@ -110,4 +110,4 @@ gs.stopSimulationTime()
 gs.cameraStop()
 gs.setFrameOutput(False)
 
-gateway.shutdown()
+gateway.close()

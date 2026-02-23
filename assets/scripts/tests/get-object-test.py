@@ -40,4 +40,4 @@ gs.goToObject("Earth", math.degrees(anglerad))
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

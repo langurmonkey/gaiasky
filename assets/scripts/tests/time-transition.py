@@ -43,4 +43,4 @@ gs.timeTransition(2025,
 
 lprint("Script ended")
 
-gateway.shutdown()
+gateway.close()

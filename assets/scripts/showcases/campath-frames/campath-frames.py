@@ -94,4 +94,4 @@ gs.unparkRunnable("frame-counter")
 gs.setLimitFps(0)
 
 # close connection
-gateway.shutdown()
+gateway.close()

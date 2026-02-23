@@ -11,4 +11,4 @@ gs.cameraStop()
 # Jan 1st, 2017  14:23:58:000
 gs.setSimulationTime(2018, 1, 1, 14, 23, 58, 0)
 
-gateway.shutdown()
+gateway.close()

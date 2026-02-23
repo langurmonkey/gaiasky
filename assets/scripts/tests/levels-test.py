@@ -76,4 +76,4 @@ gs.setContrastLevel(1.0)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

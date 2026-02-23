@@ -20,4 +20,4 @@ gs.setStarSize(1.0)
 gs.sleep(2)
 gs.setStarSize(3.0)
 
-gateway.shutdown()
+gateway.close()

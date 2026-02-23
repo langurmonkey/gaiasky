@@ -67,4 +67,4 @@ gs.forceUpdateScene();
 
 
 gs.sleep(2)
-gateway.shutdown()
+gateway.close()

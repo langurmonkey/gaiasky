@@ -62,4 +62,4 @@ shutil.rmtree(outdir)
 
 pprint("Done")
 
-gateway.shutdown()
+gateway.close()

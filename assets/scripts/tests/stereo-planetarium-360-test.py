@@ -30,4 +30,4 @@ for i in range(5):
 
 gs.setStereoscopicMode(False)
 
-gateway.shutdown()
+gateway.close()

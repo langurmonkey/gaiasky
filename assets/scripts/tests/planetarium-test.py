@@ -22,4 +22,4 @@ gs.setPlanetariumMode(False)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

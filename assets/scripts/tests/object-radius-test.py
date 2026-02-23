@@ -19,4 +19,4 @@ gs.print("The radius of the Moon is %f Km" % radMoon)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

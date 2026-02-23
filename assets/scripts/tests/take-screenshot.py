@@ -9,4 +9,4 @@ gs = gateway.entry_point
 gs.setScreenshotsMode("ADVANCED")
 gs.takeScreenshot()
 
-gateway.shutdown()
+gateway.close()

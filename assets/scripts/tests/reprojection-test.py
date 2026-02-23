@@ -16,4 +16,4 @@ gs.setReprojectionMode("disabled")
 gs.setFov(55.0)
 
 
-gateway.shutdown()
+gateway.close()

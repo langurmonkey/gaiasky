@@ -48,4 +48,4 @@ gs.cameraTransition(pos,
 
 lprint("Script ended")
 
-gateway.shutdown()
+gateway.close()

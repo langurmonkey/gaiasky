@@ -42,4 +42,4 @@ lprint("Collapsing bookmarks")
 gs.collapseUIPane("Bookmarks")
 gs.sleep(1.0)
 
-gateway.shutdown()
+gateway.close()

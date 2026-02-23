@@ -32,4 +32,4 @@ gs.displayPopupNotification("Done!", 4.0)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

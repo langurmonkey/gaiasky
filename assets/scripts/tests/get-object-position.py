@@ -25,4 +25,4 @@ else:
 
 
 
-gateway.shutdown()
+gateway.close()

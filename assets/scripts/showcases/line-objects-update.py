@@ -108,4 +108,4 @@ for i in range(0, runnable.lines, 1):
 gs.cameraStop()
 
 # Gracefully close connection.
-gateway.shutdown()
+gateway.close()

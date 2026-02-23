@@ -40,4 +40,4 @@ gs.setVisibility("element.velocityvectors", False)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

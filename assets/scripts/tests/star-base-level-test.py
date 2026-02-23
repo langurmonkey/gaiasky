@@ -20,4 +20,4 @@ gs.setMinStarOpacity(0.2)
 gs.sleep(2)
 gs.setMinStarOpacity(0.0)
 
-gateway.shutdown()
+gateway.close()

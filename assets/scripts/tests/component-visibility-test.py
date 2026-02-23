@@ -15,4 +15,4 @@ gs.setVisibility("element.ecliptic", False)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

@@ -14,4 +14,4 @@ gs.sleep(5.0)
 gs.setBackBufferScale(1.0)
 
 
-gateway.shutdown()
+gateway.close()

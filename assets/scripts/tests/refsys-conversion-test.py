@@ -138,4 +138,4 @@ gs.sleep(1.5)
 # Restore
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

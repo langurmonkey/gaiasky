@@ -48,5 +48,5 @@ gs.unparkRunnable("frame_counter")
 
 lprint("Exiting script")
 
-gateway.shutdown()
+gateway.close()
 

@@ -31,4 +31,4 @@ gs.setFov(60.0)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

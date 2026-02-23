@@ -56,7 +56,6 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.ConsoleManager;
-import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
@@ -530,7 +529,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         new ScreenshotsManager(this, sceneRenderer, globalResources);
 
         // Load various assets.
-        assetManager.load("gaiasky-assets", GaiaSkyAssets.class, new GaiaSkyLoaderParameters(this, cliArgs.noScriptingServer));
+        assetManager.load("gaiasky-assets", GaiaSkyAssets.class, new GaiaSkyLoaderParameters(this));
 
         // Tell the asset manager to load all the assets.
         final var assets = AssetBean.getAssets();
@@ -898,7 +897,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
         // Start scripting server.
         if (!cliArgs.noScriptingServer) {
-            ScriptingServer.startServer();
+            ScriptingServer.initialize(gaiaSkyAssets.scriptingInterface);
         }
 
         // Initialized.

@@ -136,8 +136,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSliderReset pointerGuidesWidth;
     private OwnSliderReset lodTransitions;
     private OwnSliderReset velocityVectors;
-    private OwnSliderReset ipd;
-    private OwnSliderReset screenDistance;
     private OwnSliderReset screenshotQuality;
     private OwnSliderReset frameQuality;
     private OwnSliderReset pgResolution;
@@ -154,8 +152,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     // Backup values.
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak,
-            aberrationBak, lensFlareBak, filmGrainBak;
-    private double stereoKBak, stereoIpdBak, stereoSdBak;
+            aberrationBak, lensFlareBak, filmGrainBak, stereoKBak, stereoIpdBak, stereoSdBak;
     private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
     private float[] accentColorBak;
     private int FXAAQuality, FXAAQualityBak;
@@ -3141,7 +3138,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final var nf = new DecimalFormat("###0");
         // IPD
         var ipdLabel = new OwnLabel(I18n.msg("gui.stereo.ipd"), skin);
-        ipd = new OwnSliderReset("", Constants.MIN_STEREO_IPD, Constants.MAX_STEREO_IPD, Constants.SLIDER_STEP_TINY, 64f, skin);
+        OwnSliderReset ipd = new OwnSliderReset("", Constants.MIN_STEREO_IPD, Constants.MAX_STEREO_IPD, Constants.SLIDER_STEP_TINY, 64f, skin);
         ipd.setTooltip(I18n.msg("gui.stereo.ipd"));
         ipd.setName("stereo ipd");
         ipd.setWidth(sliderWidth);
@@ -3150,7 +3147,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ipd.connect(Event.STEREO_IPD_CMD);
         // Screen dist
         var screenDistLabel = new OwnLabel(I18n.msg("gui.stereo.screen"), skin);
-        screenDistance = new OwnSliderReset("", Constants.MIN_STEREO_SD, Constants.MAX_STEREO_SD, true, 600f, skin);
+        OwnSliderReset screenDistance = new OwnSliderReset("", Constants.MIN_STEREO_SD, Constants.MAX_STEREO_SD, true, 600f, skin);
         screenDistance.setTooltip(I18n.msg("gui.stereo.screen"));
         screenDistance.setLogarithmicExponent(3.0);
         screenDistance.setName("stereo screen dist");
@@ -3840,9 +3837,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         upscaleFilterBak = settings.postprocess.upscaleFilter;
         frameCoordinatesBak = settings.program.uvGrid.frameCoordinates;
         FXAAQualityBak = settings.postprocess.antialiasing.quality;
-        stereoKBak = settings.program.modeStereo.k;
-        stereoIpdBak = settings.program.modeStereo.ipd;
-        stereoSdBak = settings.program.modeStereo.screenDistance;
+        stereoKBak = (float) settings.program.modeStereo.k;
+        stereoIpdBak = (float) settings.program.modeStereo.ipd;
+        stereoSdBak = (float) settings.program.modeStereo.screenDistance;
         accentColorBak = Arrays.copyOf(settings.program.ui.accentColor, 3);
     }
 

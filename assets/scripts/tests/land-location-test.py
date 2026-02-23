@@ -8,4 +8,4 @@ gs = gateway.entry_point
 
 gs.landAtObjectLocation("Earth", 2.0, 45.0)
 
-gateway.shutdown()
+gateway.close()

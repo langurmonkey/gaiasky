@@ -50,4 +50,4 @@ gs.sleep(4)
 
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

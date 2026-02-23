@@ -58,4 +58,4 @@ gs.removeDataset("Coordinates test system")
 
 gs.sleep(2.0)
 
-gateway.shutdown()
+gateway.close()

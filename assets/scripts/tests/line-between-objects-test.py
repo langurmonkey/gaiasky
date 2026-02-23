@@ -50,4 +50,4 @@ gs.cameraStop()
 gs.maximizeInterfaceWindow()
 gs.enableInput()
 
-gateway.shutdown()
+gateway.close()

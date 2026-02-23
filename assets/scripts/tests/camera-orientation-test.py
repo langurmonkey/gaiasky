@@ -29,4 +29,4 @@ lprint("Restoring original orientation...")
 gs.setCameraOrientationQuaternion(ori)
 
 
-gateway.shutdown()
+gateway.close()

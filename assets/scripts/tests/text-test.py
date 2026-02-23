@@ -53,4 +53,4 @@ typewriter(2, text, 0.1, 0.4, 0.8, 0.25, 1.0, 1.0, 1.0, 1.0, 0.01)
 gs.sleep(2.0)
 wait_input(0.0, [1, 2])
 
-gateway.shutdown()
+gateway.close()

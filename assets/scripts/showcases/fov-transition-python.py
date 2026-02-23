@@ -68,4 +68,4 @@ print(f"Creating {duration}s transition between {fov0} and {fov1}")
 
 fov_transition(fov0, fov1, duration)
 
-gateway.shutdown()
+gateway.close()

@@ -46,4 +46,4 @@ if op == "y":
     print("Cleaning up...")
     remove_files_with_prefix(out, prefix)
 
-gateway.shutdown()
+gateway.close()
