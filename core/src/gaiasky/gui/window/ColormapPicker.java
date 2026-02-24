@@ -323,7 +323,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private void addColormapWidget(Table container) {
-            float sbWidth = 272f;
+            float sbWidth = 360f;
 
             // Color map
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.colormap"), skin)).left().padRight(pad18).padBottom(pad10).padTop(pad18 * 2);
@@ -366,6 +366,9 @@ public class ColormapPicker extends ColorPickerAbstract {
             cmapImageCell.colspan(3).center().padBottom(pad18 * 2).padTop(pad10).row();
             updateCmapImage(cmap.getSelected().value, catalogInfo.hlCmapAlpha);
 
+            var catalog = catalogInfo.entity;
+            view.setEntity(catalog);
+
             // Attribute
             ParticleType type;
             if (view.isOctree()) {
@@ -377,8 +380,6 @@ public class ColormapPicker extends ColorPickerAbstract {
             var attributes = type.attributes;
 
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.attribute"), skin)).left().padRight(pad18).padBottom(pad10);
-            var catalog = catalogInfo.entity;
-            view.setEntity(catalog);
 
             boolean stars = view.getStarSet() != null || view.isOctree();
             Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 15 : 10);

@@ -448,7 +448,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double pf = 0.0;
                             int nVari = 0;
                             if (ucdParser.hasVariability) {
-                                Pair<UCD, Double> period = getDoubleUcd(ucdParser.VARI_PERIOD, row);
+                                Pair<UCD, Double> period = getDoubleUcd(ucdParser.PERIOD, row);
                                 if (!ucdParser.hasPeriod || period == null || !Double.isFinite(period.getSecond())) {
                                     // Skip stars without period
                                     noPeriods++;
@@ -737,7 +737,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
                             prevEpoch = epoch;
 
-                            Pair<UCD, Double> periodPair = getDoubleUcd(ucdParser.VARI_PERIOD, row);
+                            Pair<UCD, Double> periodPair = getDoubleUcd(ucdParser.PERIOD, row);
                             double period = periodPair != null ? periodPair.getSecond() : 0.0;
 
                             long id;

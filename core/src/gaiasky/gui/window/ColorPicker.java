@@ -145,8 +145,8 @@ public class ColorPicker extends ColorPickerAbstract {
 
         @Override
         protected void build() {
-            float textfieldLen = 80f;
-            float sliderLen = 240f;
+            float textFieldLen = 140f;
+            float sliderLen = 200f;
             float colSize = 160f;
             content.clear();
 
@@ -193,16 +193,16 @@ public class ColorPicker extends ColorPickerAbstract {
             FloatValidator floatValidator = new FloatValidator(0f, 1f);
             OwnTextField tRed, tGreen, tBlue, tAlpha;
             tRed = new OwnTextField(nf.format(color[0]), skin, floatValidator);
-            tRed.setWidth(textfieldLen);
+            tRed.setWidth(textFieldLen);
             textfields[0] = tRed;
             tGreen = new OwnTextField(nf.format(color[1]), skin, floatValidator);
-            tGreen.setWidth(textfieldLen);
+            tGreen.setWidth(textFieldLen);
             textfields[1] = tGreen;
             tBlue = new OwnTextField(nf.format(color[2]), skin, floatValidator);
-            tBlue.setWidth(textfieldLen);
+            tBlue.setWidth(textFieldLen);
             textfields[2] = tBlue;
             tAlpha = new OwnTextField(nf.format(color[3]), skin, floatValidator);
-            tAlpha.setWidth(textfieldLen);
+            tAlpha.setWidth(textFieldLen);
             textfields[3] = tAlpha;
 
             /* Hex */

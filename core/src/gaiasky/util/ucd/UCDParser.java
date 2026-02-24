@@ -78,7 +78,7 @@ public class UCDParser {
     // VARIABILITY
     public boolean hasVariability = false;
     public boolean hasPeriod = false;
-    public Array<UCD> VARI_TIMES, VARI_MAGS, VARI_PERIOD;
+    public Array<UCD> VARI_TIMES, VARI_MAGS, PERIOD;
     // KEPLERIAN ELEMENTS
     public boolean hasKeplerElements = false;
     public Array<UCD> EPOCH, SMA, ECC, INC, ASCNODE, ARGPERI, MANOMALY;
@@ -102,7 +102,7 @@ public class UCDParser {
         TEFF = new Array<>();
         VARI_TIMES = new Array<>();
         VARI_MAGS = new Array<>();
-        VARI_PERIOD = new Array<>();
+        PERIOD = new Array<>();
         EPOCH = new Array<>();
         SMA = new Array<>();
         ECC = new Array<>();
@@ -432,10 +432,10 @@ public class UCDParser {
             this.VARI_MAGS = getByColNames(VARIMAGS_NAMES, "mag");
         }
         this.hasVariability = !this.VARI_MAGS.isEmpty();
-        if (this.VARI_PERIOD == null || this.VARI_PERIOD.isEmpty()) {
-            this.VARI_PERIOD = getByColNames(PERIOD_NAMES, "d");
+        if (this.PERIOD == null || this.PERIOD.isEmpty()) {
+            this.PERIOD = getByColNames(PERIOD_NAMES, "d");
         }
-        this.hasPeriod = !this.VARI_PERIOD.isEmpty();
+        this.hasPeriod = !this.PERIOD.isEmpty();
 
         // KEPLER ORBITAL ELEMENTS
         if (this.EPOCH == null || this.EPOCH.isEmpty()) {
