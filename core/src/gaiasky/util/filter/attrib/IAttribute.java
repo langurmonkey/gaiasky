@@ -12,7 +12,8 @@ import gaiasky.util.math.Vector3D;
 
 public sealed interface IAttribute permits AttributeAbsmag, AttributeAppmag, AttributeColorBlue, AttributeColorGreen, AttributeColorRed, AttributeDEC,
         AttributeDistance, AttributeEclLatitude, AttributeEclLongitude, AttributeGalLatitude, AttributeGalLongitude, AttributeMualpha, AttributeMudelta,
-        AttributeRA, AttributeRadvel, AttributeUCD {
+        AttributeRA, AttributeRadvel, AttributeUCD, AttributeX, AttributeY, AttributeZ, AttributePeriod, AttributeMeanAnomaly, AttributeArgPeri, AttributeAscNode,
+        AttributeInclination, AttributeEccentricity, AttributeSma {
     Vector3D aux1 = new Vector3D();
     Vector3D aux2 = new Vector3D();
 

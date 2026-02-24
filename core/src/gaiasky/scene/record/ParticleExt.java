@@ -12,13 +12,9 @@ import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.TLV3D;
 import gaiasky.util.TextUtils;
-import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
-import net.jafama.FastMath;
 
 
 /**
@@ -58,10 +54,6 @@ public record ParticleExt(long id,
                           float size,
                           ObjectMap<UCD, Object> extra) implements IParticleRecord {
 
-    // Aux vectors.
-    private static final TLV3D aux3d1 = new TLV3D();
-    private static final TLV3D aux3d2 = new TLV3D();
-
     public ParticleExt(long id,
                        String[] names,
                        double x,
@@ -86,38 +78,6 @@ public record ParticleExt(long id,
     @Override
     public ParticleType getType() {
         return ParticleType.PARTICLE_EXT;
-    }
-
-    @Override
-    public boolean isVariable() {
-        return false;
-    }
-
-    @Override
-    public int nVari() {
-        return -1;
-    }
-
-    @Override
-    public double period() {
-        return -1;
-    }
-
-    @Override
-    public float[] variMags() {
-        return new float[0];
-    }
-
-    @Override
-    public double[] variTimes() {
-        return new double[0];
-    }
-
-    @Override
-    public Vector3D pos(Vector3D aux) {
-        return aux.set(x(),
-                       y(),
-                       z());
     }
 
     @Override
@@ -192,115 +152,6 @@ public record ParticleExt(long id,
         return size() * Constants.STAR_SIZE_FACTOR;
     }
 
-
-    @Override
-    public long id() {
-        return id;
-    }
-
-    @Override
-    public int hip() {
-        return -1;
-    }
-
-    /**
-     * Distance in internal units. Beware, does the computation on the fly.
-     *
-     * @return The distance, in internal units
-     */
-    @Override
-    public double distance() {
-        return FastMath.sqrt(x() * x() + y() * y() + z() * z());
-    }
-
-    /**
-     * Parallax in mas.
-     *
-     * @return The parallax in mas.
-     */
-    @Override
-    public double parallax() {
-        return 1000d / (distance() * Constants.U_TO_PC);
-    }
-
-    /**
-     * Declination in degrees. Beware, does the conversion on the fly.
-     *
-     * @return The declination, in degrees
-     **/
-    @Override
-    public double ra() {
-        Vector3D cartPos = pos(aux3d1.get());
-        Vector3D sphPos = Coordinates.cartesianToSpherical(cartPos,
-                                                           aux3d2.get());
-        return MathUtilsDouble.radDeg * sphPos.x;
-    }
-
-    @Override
-    public double dec() {
-        Vector3D cartPos = pos(aux3d1.get());
-        Vector3D sphPos = Coordinates.cartesianToSpherical(cartPos,
-                                                           aux3d2.get());
-        return MathUtilsDouble.radDeg * sphPos.y;
-    }
-
-    /**
-     * Ecliptic longitude in degrees.
-     *
-     * @return The ecliptic longitude, in degrees
-     */
-    @Override
-    public double lambda() {
-        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
-        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
-                                                           aux3d2.get());
-        return MathUtilsDouble.radDeg * sphPos.x;
-    }
-
-    /**
-     * Ecliptic latitude in degrees.
-     *
-     * @return The ecliptic latitude, in degrees
-     */
-    @Override
-    public double beta() {
-        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
-        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
-                                                           aux3d2.get());
-        return MathUtilsDouble.radDeg * sphPos.y;
-    }
-
-    /**
-     * Galactic longitude in degrees.
-     *
-     * @return The galactic longitude, in degrees
-     */
-    @Override
-    public double l() {
-        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
-        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
-                                                           aux3d2.get());
-        return MathUtilsDouble.radDeg * sphPos.x;
-    }
-
-    /**
-     * Galactic latitude in degrees.
-     *
-     * @return The galactic latitude, in degrees
-     */
-    @Override
-    public double b() {
-        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
-        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
-                                                           aux3d2.get());
-        return MathUtilsDouble.radDeg * sphPos.y;
-    }
-
-    @Override
-    public float tEff() {
-        return -1;
-    }
-
     @Override
     public void setExtraAttributes(ObjectMap<UCD, Object> e) {
         extra.clear();
@@ -339,16 +190,7 @@ public record ParticleExt(long id,
 
     @Override
     public Object getExtra(String name) {
-        if (extra != null) {
-            ObjectMap.Keys<UCD> ucds = extra.keys();
-            for (UCD ucd : ucds) {
-                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(
-                        name))) {
-                    return extra.get(ucd);
-                }
-            }
-        }
-        return null;
+        return IParticleRecord.getExtraAttribute(name, extra);
     }
 
 

@@ -134,21 +134,6 @@ public record ParticleVector(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public float muAlpha() {
-        return 0;
-    }
-
-    @Override
-    public float muDelta() {
-        return 0;
-    }
-
-    @Override
-    public float radVel() {
-        return 0;
-    }
-
-    @Override
     public double[] rgb() {
         return data.length >= 7 ? new double[]{data[4], data[5], data[6]} : null;
     }
@@ -180,46 +165,6 @@ public record ParticleVector(double[] data) implements IParticleRecord {
     }
 
     @Override
-    public double distance() {
-        return 0;
-    }
-
-    @Override
-    public double parallax() {
-        return 0;
-    }
-
-    @Override
-    public double ra() {
-        return 0;
-    }
-
-    @Override
-    public double dec() {
-        return 0;
-    }
-
-    @Override
-    public double lambda() {
-        return 0;
-    }
-
-    @Override
-    public double beta() {
-        return 0;
-    }
-
-    @Override
-    public double l() {
-        return 0;
-    }
-
-    @Override
-    public double b() {
-        return 0;
-    }
-
-    @Override
     public float tEff() {
         return 0;
     }
@@ -242,31 +187,6 @@ public record ParticleVector(double[] data) implements IParticleRecord {
     @Override
     public ParticleType getType() {
         return ParticleType.VECTOR;
-    }
-
-    @Override
-    public boolean isVariable() {
-        return false;
-    }
-
-    @Override
-    public int nVari() {
-        return 0;
-    }
-
-    @Override
-    public double period() {
-        return 0;
-    }
-
-    @Override
-    public float[] variMags() {
-        return new float[0];
-    }
-
-    @Override
-    public double[] variTimes() {
-        return new double[0];
     }
 
     @Override

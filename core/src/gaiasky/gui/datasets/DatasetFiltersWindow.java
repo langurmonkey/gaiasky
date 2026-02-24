@@ -18,6 +18,9 @@ import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.component.ParticleSet;
+import gaiasky.scene.record.ParticleType;
+import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
@@ -121,7 +124,6 @@ public class DatasetFiltersWindow extends GenericDialog {
 
     }
 
-
     private void generateFilterTable(Filter filter) {
         float minSelectWidth = 160f;
         filterTable.clearChildren();
@@ -147,6 +149,15 @@ public class DatasetFiltersWindow extends GenericDialog {
             Table rulesTable = new Table(skin);
             filterTable.add(rulesTable).colspan(2);
 
+            ParticleType type;
+            if (Mapper.octree.has(ci.entity)) {
+                type = ParticleType.STAR;
+            } else {
+                var set = Mapper.particleSet.has(ci.entity) ? Mapper.particleSet.get(ci.entity) : Mapper.starSet.get(ci.entity);
+                type = ParticleType.type(set);
+            }
+            var attributes = type.attributes;
+
             for (FilterRule rule : rules) {
                 // UNIT
                 var unitStr = rule.getAttribute().getUnit();
@@ -159,28 +170,16 @@ public class DatasetFiltersWindow extends GenericDialog {
                 }
 
                 // ATTRIBUTE
-                boolean stars = Mapper.starSet.has(ci.entity) || Mapper.octree.has(ci.entity);
-                Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 12 : 7);
+                Array<AttributeComboBoxBean> attrs = new Array<>(false, 15);
                 // Add particle attributes (dist, alpha, delta)
-                attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
-                attrs.add(new AttributeComboBoxBean(new AttributeRA()));
-                attrs.add(new AttributeComboBoxBean(new AttributeDEC()));
-                attrs.add(new AttributeComboBoxBean(new AttributeEclLatitude()));
-                attrs.add(new AttributeComboBoxBean(new AttributeEclLongitude()));
-                attrs.add(new AttributeComboBoxBean(new AttributeGalLatitude()));
-                attrs.add(new AttributeComboBoxBean(new AttributeGalLongitude()));
-                if (stars) {
-                    // Star-only attributes (appmag, absmag, mualpha, mudelta, radvel)
-                    attrs.add(new AttributeComboBoxBean(new AttributeAppmag()));
-                    attrs.add(new AttributeComboBoxBean(new AttributeAbsmag()));
-                    attrs.add(new AttributeComboBoxBean(new AttributeMualpha()));
-                    attrs.add(new AttributeComboBoxBean(new AttributeMudelta()));
-                    attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
+                for (var attrClass : attributes) {
+                    try {
+                        var instance = (IAttribute) attrClass.getConstructors()[0].newInstance();
+                        attrs.add(new AttributeComboBoxBean(instance));
+                    } catch (Exception e) {
+                        logger.error("Error instantiating class: " + attrClass, e);
+                    }
                 }
-                // Colors
-                attrs.add(new AttributeComboBoxBean(new AttributeColorRed()));
-                attrs.add(new AttributeComboBoxBean(new AttributeColorGreen()));
-                attrs.add(new AttributeComboBoxBean(new AttributeColorBlue()));
                 // Extra attributes
                 if (Mapper.particleSet.has(ci.entity) || Mapper.starSet.has(ci.entity)) {
                     var set = Mapper.particleSet.has(ci.entity) ? Mapper.particleSet.get(ci.entity) : Mapper.starSet.get(ci.entity);
@@ -199,7 +198,9 @@ public class DatasetFiltersWindow extends GenericDialog {
                 FloatValidator colorValidator = new FloatValidator(0, 1);
                 boolean useColorVal = rule.getAttribute() instanceof AttributeColorRed || rule.getAttribute() instanceof AttributeColorBlue || rule.getAttribute() instanceof AttributeColorGreen;
                 boolean isNumberAttribute = rule.getAttribute().isNumberAttribute();
-                OwnTextField value = new OwnTextField(rule.getValue().toString(), skin, useColorVal ? colorValidator : (isNumberAttribute ? numberValidator : null));
+                OwnTextField value = new OwnTextField(rule.getValue().toString(),
+                                                      skin,
+                                                      useColorVal ? colorValidator : (isNumberAttribute ? numberValidator : null));
 
                 OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
                 attribute.setItems(attrs);
@@ -213,7 +214,7 @@ public class DatasetFiltersWindow extends GenericDialog {
                         if (newAttr instanceof AttributeColorRed || newAttr instanceof AttributeColorBlue || newAttr instanceof AttributeColorGreen) {
                             value.setValidator(colorValidator);
                         } else {
-                            if(isNum) {
+                            if (isNum) {
                                 value.setValidator(numberValidator);
                             } else {
                                 value.setValidator(null);

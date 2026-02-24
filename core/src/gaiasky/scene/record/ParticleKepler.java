@@ -8,25 +8,30 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.utils.ObjectMap;
+import gaiasky.GaiaSky;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.KeplerianElements;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 
 /**
  * Record class to store particles of all kinds.
  *
- * @param id             The particle identifier.
- * @param name           The name or designation.
- * @param epoch          The epoch in JD.
- * @param meanAnomaly    The mean anomaly, in degrees.
- * @param semiMajorAxis  The semi-major axis, in km.
- * @param eccentricity   The eccentricity.
+ * @param id              The particle identifier.
+ * @param name            The name or designation.
+ * @param epoch           The epoch in JD.
+ * @param meanAnomaly     The mean anomaly, in degrees.
+ * @param semiMajorAxis   The semi-major axis, in km.
+ * @param eccentricity    The eccentricity.
  * @param argOfPericenter The argument of pericenter, in degrees.
- * @param ascendingNode  The ascending node, in degrees.
- * @param inclination    The inclination, in degrees.
- * @param period         The orbital period, in days.
- * @param extra          Map with extra attributes.
+ * @param ascendingNode   The ascending node, in degrees.
+ * @param inclination     The inclination, in degrees.
+ * @param period          The orbital period, in days.
+ * @param extra           Map with extra attributes.
  */
 public record ParticleKepler(long id,
                              String name,
@@ -40,19 +45,42 @@ public record ParticleKepler(long id,
                              double period,
                              ObjectMap<UCD, Object> extra) implements IParticleRecord {
 
+
+    private double getCurrentDtDays() {
+        return AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), epoch);
+    }
+
+    private Vector3D getCurrentCartesianPosition() {
+        var dtDays = getCurrentDtDays();
+        KeplerianElements.keplerianToCartesianTime(aux3d2.get(),
+                                                   dtDays,
+                                                   period,
+                                                   inclination,
+                                                   eccentricity,
+                                                   ascendingNode,
+                                                   argOfPericenter,
+                                                   semiMajorAxis,
+                                                   meanAnomaly);
+        return aux3d2.get();
+    }
+
+    private Vector3D getCurrentSphericalPosition() {
+        return Coordinates.cartesianToSpherical(getCurrentCartesianPosition(), aux3d1.get());
+    }
+
     @Override
     public double x() {
-        return Double.NaN;
+        return getCurrentCartesianPosition().x;
     }
 
     @Override
     public double y() {
-        return Double.NaN;
+        return getCurrentCartesianPosition().y;
     }
 
     @Override
     public double z() {
-        return Double.NaN;
+        return getCurrentCartesianPosition().z;
     }
 
     @Override
@@ -61,37 +89,8 @@ public record ParticleKepler(long id,
     }
 
     @Override
-    public boolean isVariable() {
-        return false;
-    }
-
-    @Override
-    public int nVari() {
-        return -1;
-    }
-
-    /**
-     * Orbital period in days.
-     * @return The orbital period, in days.
-     */
-    @Override
-    public double period() {
-        return period;
-    }
-
-    @Override
-    public float[] variMags() {
-        return null;
-    }
-
-    @Override
-    public double[] variTimes() {
-        return null;
-    }
-
-    @Override
     public Vector3D pos(Vector3D aux) {
-        return aux;
+        return aux.set(getCurrentCartesianPosition());
     }
 
     @Override
@@ -101,17 +100,17 @@ public record ParticleKepler(long id,
 
     @Override
     public float vx() {
-        return Float.NaN;
+        return 0;
     }
 
     @Override
     public float vy() {
-        return Float.NaN;
+        return 0;
     }
 
     @Override
     public float vz() {
-        return Float.NaN;
+        return 0;
     }
 
     @Override
@@ -143,17 +142,7 @@ public record ParticleKepler(long id,
      */
     @Override
     public double distance() {
-        return Double.NaN;
-    }
-
-    /**
-     * Parallax in mas.
-     *
-     * @return The parallax in mas.
-     */
-    @Override
-    public double parallax() {
-        return Double.NaN;
+        return getCurrentCartesianPosition().len();
     }
 
     /**
@@ -163,52 +152,12 @@ public record ParticleKepler(long id,
      **/
     @Override
     public double ra() {
-        return Double.NaN;
+        return getCurrentSphericalPosition().x * MathUtilsDouble.radDeg;
     }
 
     @Override
     public double dec() {
-        return Double.NaN;
-    }
-
-    /**
-     * Ecliptic longitude in degrees.
-     *
-     * @return The ecliptic longitude, in degrees
-     */
-    @Override
-    public double lambda() {
-        return Double.NaN;
-    }
-
-    /**
-     * Ecliptic latitude in degrees.
-     *
-     * @return The ecliptic latitude, in degrees
-     */
-    @Override
-    public double beta() {
-        return Double.NaN;
-    }
-
-    /**
-     * Galactic longitude in degrees.
-     *
-     * @return The galactic longitude, in degrees
-     */
-    @Override
-    public double l() {
-        return Double.NaN;
-    }
-
-    /**
-     * Galactic latitude in degrees.
-     *
-     * @return The galactic latitude, in degrees
-     */
-    @Override
-    public double b() {
-        return Double.NaN;
+        return getCurrentSphericalPosition().y * MathUtilsDouble.radDeg;
     }
 
     @Override
@@ -248,15 +197,7 @@ public record ParticleKepler(long id,
 
     @Override
     public Object getExtra(String name) {
-        if (hasExtra()) {
-            ObjectMap.Keys<UCD> ucds = extra.keys();
-            for (UCD ucd : ucds) {
-                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(name))) {
-                    return extra.get(ucd);
-                }
-            }
-        }
-        return null;
+        return IParticleRecord.getExtraAttribute(name, extra);
     }
 
 
@@ -297,12 +238,12 @@ public record ParticleKepler(long id,
 
     @Override
     public float appMag() {
-        return Float.NaN;
+        return 0;
     }
 
     @Override
     public float absMag() {
-        return Float.NaN;
+        return 0;
     }
 
     @Override
@@ -312,7 +253,7 @@ public record ParticleKepler(long id,
 
     @Override
     public float color() {
-        return Float.NaN;
+        return 0;
     }
 
     @Override
@@ -338,31 +279,6 @@ public record ParticleKepler(long id,
     @Override
     public long id() {
         return id;
-    }
-
-    @Override
-    public int hip() {
-        return -1;
-    }
-
-    @Override
-    public float muAlpha() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float muDelta() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float radVel() {
-        return Float.NaN;
-    }
-
-    @Override
-    public float tEff() {
-        return Float.NaN;
     }
 
 }

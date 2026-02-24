@@ -25,6 +25,7 @@ import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.record.ParticleType;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.CatalogInfo;
@@ -366,31 +367,28 @@ public class ColormapPicker extends ColorPickerAbstract {
             updateCmapImage(cmap.getSelected().value, catalogInfo.hlCmapAlpha);
 
             // Attribute
+            ParticleType type;
+            if (view.isOctree()) {
+                type = ParticleType.STAR;
+            } else {
+                var set = view.getSet();
+                type = ParticleType.type(set);
+            }
+            var attributes = type.attributes;
+
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.attribute"), skin)).left().padRight(pad18).padBottom(pad10);
             var catalog = catalogInfo.entity;
             view.setEntity(catalog);
+
             boolean stars = view.getStarSet() != null || view.isOctree();
-            Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 12 : 7);
-            // Add particle attributes (dist, alpha, delta)
-            attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
-            attrs.add(new AttributeComboBoxBean(new AttributeRA()));
-            attrs.add(new AttributeComboBoxBean(new AttributeDEC()));
-            attrs.add(new AttributeComboBoxBean(new AttributeEclLatitude()));
-            attrs.add(new AttributeComboBoxBean(new AttributeEclLongitude()));
-            attrs.add(new AttributeComboBoxBean(new AttributeGalLatitude()));
-            attrs.add(new AttributeComboBoxBean(new AttributeGalLongitude()));
-            if (stars) {
-                // Star-only attributes (appmag, absmag, mualpha, mudelta, radvel)
-                attrs.add(new AttributeComboBoxBean(new AttributeAppmag()));
-                attrs.add(new AttributeComboBoxBean(new AttributeAbsmag()));
-                attrs.add(new AttributeComboBoxBean(new AttributeMualpha()));
-                attrs.add(new AttributeComboBoxBean(new AttributeMudelta()));
-                attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
+            Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 15 : 10);
+            for (var attrClass : attributes) {
+                try {
+                    var instance = (IAttribute) attrClass.getConstructors()[0].newInstance();
+                    attrs.add(new AttributeComboBoxBean(instance));
+                } catch (Exception ignored) {
+                }
             }
-            // Colors
-            attrs.add(new AttributeComboBoxBean(new AttributeColorRed()));
-            attrs.add(new AttributeComboBoxBean(new AttributeColorGreen()));
-            attrs.add(new AttributeComboBoxBean(new AttributeColorBlue()));
             // Extra attributes
             if (view.isSet()) {
                 var set = view.getSet();
@@ -404,18 +402,18 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
             }
 
-            OwnSelectBox<AttributeComboBoxBean> attributes = new OwnSelectBox<>(skin);
-            attributes.setItems(attrs);
-            attributes.setWidth(sbWidth);
-            attributes.addListener(event -> {
+            OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
+            attribute.setItems(attrs);
+            attribute.setWidth(sbWidth);
+            attribute.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    cmapAttrib = attributes.getSelected().attr;
+                    cmapAttrib = attribute.getSelected().attr;
                     recomputeAttributeMinMax(catalogInfo, cmapAttrib);
                     return true;
                 }
                 return false;
             });
-            container.add(attributes).colspan(2).left().padBottom(pad10).row();
+            container.add(attribute).colspan(2).left().padBottom(pad10).row();
 
             // Min mapping value
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.min"), skin)).left().padRight(pad18).padBottom(pad10);
@@ -460,10 +458,10 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Select
             cmap.setSelectedIndex(catalogInfo.hlCmapIndex);
             alphaSlider.setValue(catalogInfo.hlCmapAlpha);
-            attributes.setSelectedIndex(findIndex(catalogInfo.hlCmapAttribute, attrs));
+            attribute.setSelectedIndex(findIndex(catalogInfo.hlCmapAttribute, attrs));
 
             // Trigger first update
-            attributes.getSelection().fireChangeEvent();
+            attribute.getSelection().fireChangeEvent();
             cmap.getSelection().fireChangeEvent();
 
         }

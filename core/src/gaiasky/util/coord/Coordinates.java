@@ -480,9 +480,9 @@ public class Coordinates {
      * @return Output vector containing the spherical coordinates.
      * <ol>
      * <li>The longitude or right ascension (&alpha;), from the z
-     * direction to the x direction.</li>
-     * <li>The latitude or declination (&delta;).</li>
-     * <li>The radius or distance to the point.</li>
+     * direction to the x direction, in radians.</li>
+     * <li>The latitude or declination (&delta;), in radians.</li>
+     * <li>The radius or distance to the point, in the incoming distance units.</li>
      * </ol>
      */
     public static Vector3D cartesianToSpherical(Vector3D vec, Vector3D out) {

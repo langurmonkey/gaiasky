@@ -9,11 +9,19 @@ package gaiasky.scene.api;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.record.ParticleType;
+import gaiasky.util.Constants;
+import gaiasky.util.TLV3D;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 import uk.ac.bristol.star.cdf.Variable;
 
 public interface IParticleRecord {
+
+    // Aux vectors.
+    TLV3D aux3d1 = new TLV3D();
+    TLV3D aux3d2 = new TLV3D();
 
     double x();
 
@@ -21,7 +29,9 @@ public interface IParticleRecord {
 
     double z();
 
-    Vector3D pos(Vector3D aux);
+    default Vector3D pos(Vector3D aux) {
+        return aux.set(x(), y(), z());
+    }
 
     boolean hasProperMotion();
 
@@ -57,77 +67,131 @@ public interface IParticleRecord {
 
     long id();
 
-    int hip();
+    default int hip() {
+        return -1;
+    }
 
-    float muAlpha();
+    default float muAlpha() {
+        return 0;
+    }
 
-    float muDelta();
+    default float muDelta() {
+        return 0;
+    }
 
-
-    float radVel();
+    default float radVel() {
+        return 0;
+    }
 
     /**
-     * Distance in internal units. Beware, does the computation on the fly.
-     *
      * @return The distance, in internal units.
      */
-    double distance();
+    default double distance() {
+        return aux3d1.get().set(x(), y(), z()).len();
+    }
 
     /**
-     * Parallax in mas.
-     *
      * @return The parallax in mas.
      */
-    double parallax();
+    default double parallax() {
+        return 1000d / (distance() * Constants.U_TO_PC);
+    }
 
     /**
-     * Right ascension in degrees. Beware, does the conversion on the fly.
-     *
      * @return The right ascension, in degrees.
      **/
-    double ra();
+    default double ra() {
+        Vector3D cartPos = pos(aux3d1.get());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartPos,
+                                                           aux3d2.get());
+        return MathUtilsDouble.radDeg * sphPos.x;
+    }
 
     /**
-     * Declination in degrees. Beware, does the conversion on the fly.
-     *
      * @return The declination, in degrees.
      **/
-    double dec();
+    default double dec() {
+        Vector3D cartPos = pos(aux3d1.get());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartPos,
+                                                           aux3d2.get());
+        return MathUtilsDouble.radDeg * sphPos.y;
+    }
 
     /**
-     * Ecliptic longitude in degrees.
-     *
-     * @return The ecliptic longitude, in degrees.
+     * @return The ecliptic longitude, in degrees
      */
-    double lambda();
+    default double lambda() {
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+                                                           aux3d2.get());
+        return MathUtilsDouble.radDeg * sphPos.x;
+    }
 
     /**
-     * Ecliptic latitude in degrees.
-     *
-     * @return The ecliptic latitude, in degrees.
+     * @return The ecliptic latitude, in degrees
      */
-    double beta();
+    default double beta() {
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+                                                           aux3d2.get());
+        return MathUtilsDouble.radDeg * sphPos.y;
+    }
 
     /**
-     * Galactic longitude in degrees.
-     *
-     * @return The galactic longitude, in degrees.
+     * @return The galactic longitude, in degrees
      */
-    double l();
+    default double l() {
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+                                                           aux3d2.get());
+        return MathUtilsDouble.radDeg * sphPos.x;
+    }
 
     /**
-     * Galactic latitude in degrees.
-     *
-     * @return The galactic latitude, in degrees.
+     * @return The galactic latitude, in degrees
      */
-    double b();
+    default double b() {
+        Vector3D cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
+        Vector3D sphPos = Coordinates.cartesianToSpherical(cartEclPos,
+                                                           aux3d2.get());
+        return MathUtilsDouble.radDeg * sphPos.y;
+    }
 
     /**
-     * Returns the effective temperature, in K.
-     *
      * @return The effective temperature in K.
      */
-    float tEff();
+    default float tEff() {
+        return -1;
+    }
+
+    default double epoch() {
+        return 0;
+    }
+
+    default double semiMajorAxis() {
+        return 0;
+    }
+
+    default double argOfPericenter() {
+        return 0;
+    }
+
+    default double meanAnomaly() {
+        return 0;
+    }
+
+    default double eccentricity() {
+        return 0;
+    }
+
+    default double inclination() {
+        return 0;
+    }
+
+    default double ascendingNode() {
+        return 0;
+    }
+
 
     void setExtraAttributes(ObjectMap<UCD, Object> extra);
 
@@ -194,25 +258,57 @@ public interface IParticleRecord {
      *
      * @return True if this record is a variable star.
      */
-    boolean isVariable();
+    default boolean isVariable() {
+        return false;
+    }
 
     /**
      * @return The number of variable star samples
      */
-    int nVari();
+    default int nVari() {
+        return -1;
+    }
 
     /**
-     * @return The variability period in days.
+     * @return The variability period, or the Keplerian period, in days.
      */
-    double period();
+    default double period() {
+        return -1;
+    }
 
     /**
      * @return The vector with the variable star magnitudes.
      */
-    float[] variMags();
+    default float[] variMags() {
+        return null;
+    }
 
     /**
      * @return The vector with the variable star times corresponding to the magnitudes.
      */
-    double[] variTimes();
+    default double[] variTimes() {
+        return null;
+    }
+
+    /**
+     * Gets the attribute with the given name from the given extra map.
+     *
+     * @param name  The name.
+     * @param extra The object map.
+     *
+     * @return The attribute value.
+     */
+    static Object getExtraAttribute(String name, ObjectMap<UCD, Object> extra) {
+        if (extra != null) {
+            ObjectMap.Keys<UCD> ucds = extra.keys();
+            for (UCD ucd : ucds) {
+                if ((ucd.originalUCD != null && ucd.originalUCD.equals(name)) || (ucd.colName != null && ucd.colName.equals(
+                        name))) {
+                    return extra.get(ucd);
+                }
+            }
+        }
+        return null;
+    }
+
 }
