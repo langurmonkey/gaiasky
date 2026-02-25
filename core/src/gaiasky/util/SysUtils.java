@@ -766,7 +766,7 @@ public class SysUtils {
         var f = file;
         int i = 1;
         while (Files.exists(f) && Files.isRegularFile(f)) {
-            f = parent.resolve(fileName + "_" + i + ext);
+            f = parent.resolve(fileName + "_" + i + "." + ext);
             i++;
         }
         return f;

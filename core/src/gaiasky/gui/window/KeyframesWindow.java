@@ -1278,7 +1278,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
                 // In case we removed the first
                 if (!newKfs.isEmpty())
-                    newKfs.get(0).seconds = 0;
+                    newKfs.getFirst().seconds = 0;
 
                 reinitialiseKeyframes(newKfs, null);
                 logger.info(I18n.msg("gui.keyframes.removed", kf.name));

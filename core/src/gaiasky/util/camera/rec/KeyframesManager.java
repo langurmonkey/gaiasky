@@ -23,7 +23,6 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -154,25 +153,20 @@ public class KeyframesManager implements IObserver {
                 line = line.strip();
                 if (!line.startsWith("#")) {
                     String[] tokens = line.split(gkfFileSeparatorRegex);
+                    double secs = Parser.parseDouble(tokens[0]);
+                    Instant time = parseTime(tokens[1]);
+                    Vector3D pos = new Vector3D(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
+                    Vector3D dir = new Vector3D(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
+                    Vector3D up = new Vector3D(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
                     if (tokens.length == 13) {
                         // Keyframe has no target.
-                        double secs = Parser.parseDouble(tokens[0]);
-                        Instant time = parseTime(tokens[1]);
                         // Orientation.
-                        Vector3D pos = new Vector3D(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
-                        Vector3D dir = new Vector3D(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
-                        Vector3D up = new Vector3D(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
                         boolean seam = Parser.parseInt(tokens[11]) == 1;
                         String name = tokens[12];
                         Keyframe kf = new Keyframe(name, pos, dir, up, time, secs, seam);
                         result.add(kf);
                     } else if (tokens.length == 16) {
                         // Keyframe has target.
-                        double secs = Parser.parseDouble(tokens[0]);
-                        Instant time = parseTime(tokens[1]);
-                        Vector3D pos = new Vector3D(Parser.parseDouble(tokens[2]), Parser.parseDouble(tokens[3]), Parser.parseDouble(tokens[4]));
-                        Vector3D dir = new Vector3D(Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]), Parser.parseDouble(tokens[7]));
-                        Vector3D up = new Vector3D(Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]), Parser.parseDouble(tokens[10]));
                         Vector3D target = new Vector3D(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
                         boolean seam = Parser.parseInt(tokens[14]) == 1;
                         String name = tokens[15];
