@@ -41,9 +41,9 @@ On Windows, download Python 3 from the official [source](https://python.org/down
 
 If the environment is successfully installed, then Gaia Sky can access it. When exporting using the OptFlowCam option, Gaia Sky creates a process to install the dependencies, and then another to run the script. In it, Gaia Sky submits the desired arguments (input/output files, FPS) and waits for the process to finish. Once finished, it looks at the exit value. If it is 0, everything went fine and the camera file was generated. Otherwise, an error is issued and presented to the user.
 
-## Running off-line
+## Running standalone
 
-The OptFlowCam script is a standalone script that can be run directly. To do so, install the environment:
+OptFlowCam is a standalone script that can be run directly. To do so, you need to download the `optflowcam_convert.py` and `optlfowcam_interpolation.py` files above (or use the ones in your Gaia Sky installation). Then, install the environment:
 
 ```bash
 pipenv install numpy python-dateutil
