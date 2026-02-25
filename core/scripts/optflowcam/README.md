@@ -22,6 +22,8 @@ We have modified the original source in the following manner:
 
 Gaia Sky spawns a new process with the system Python 3 interpreter and manages dependencies with `pipenv`.
 
+Due to the large dependency tree needed, **OptFlowCam is not supported in the Flatpak**.
+
 ### Linux
 On Linux, you know how to install this. For instance, on Arch Linux, you do `pacman -S python python-pipenv`.
 
