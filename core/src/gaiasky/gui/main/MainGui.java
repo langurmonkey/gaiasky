@@ -739,7 +739,7 @@ public class MainGui extends AbstractGui {
     }
 
     public void addLoadProgressInterface() {
-        loadProgressInterface = new LoadProgressInterface(400f, skin);
+        loadProgressInterface = new LoadProgressInterface(600f, skin);
         loadProgressInterface.setFillParent(true);
         loadProgressInterface.center().bottom();
         loadProgressInterface.pad(0, 0, 0, 0);

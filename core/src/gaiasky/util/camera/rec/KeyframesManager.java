@@ -456,9 +456,13 @@ public class KeyframesManager implements IObserver {
     public void runOptFlowCamScript(Path loc, Path outputFile) {
         final var scriptName = "optflowcam_convert.py";
         final var inputFileName = "temp_keyframes.gkf";
+        final var progressName = "OptFlowCam export: " + outputFile.toString();
+
+        // Init progress bar.
+        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.01f);
 
         GaiaSky.instance.getExecutorService().execute(() -> {
-            // 1. Dependency Detection
+            // Dependency Detection.
             String pythonInterpreter = SysUtils.isWindows() ? "python.exe" : "python3";
             boolean hasPython = isCommandAvailable(pythonInterpreter);
             boolean hasPipenv = isCommandAvailable("pipenv");
@@ -466,15 +470,19 @@ public class KeyframesManager implements IObserver {
             if (!hasPython || !hasPipenv) {
                 String missing = (!hasPython && !hasPipenv) ? "Python 3 and Pipenv" : (!hasPython ? "Python 3" : "Pipenv");
                 GaiaSky.popupNotification(I18n.msg("error.process.run", "Missing: " + missing + ". Please install them to use OptFlowCam."), 15, this, Logger.LoggerLevel.ERROR, null);
+                // Cancel progress.
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
                 return;
             }
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.2f);
 
-            // 2. Prepare Input File
+            // Prepare input file.
             EventManager.publish(Event.KEYFRAMES_FILE_SAVE, this, keyframes, inputFileName, false);
             var inputFile = SysUtils.getDefaultCameraDir().resolve(inputFileName);
 
             try {
-                // 3. Install Dependencies
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.3f);
+                // Install dependencies.
                 GaiaSky.popupNotification("Installing dependencies with pipenv...", 5, this);
                 logger.info("OptFlowCam: Running 'pipenv install' in " + loc);
 
@@ -485,8 +493,11 @@ public class KeyframesManager implements IObserver {
 
                 if (installProcess.exitValue() != 0) {
                     GaiaSky.popupNotification(I18n.msg("error.process.run", "Pipenv install failed"), 10, this, Logger.LoggerLevel.ERROR, null);
+                    // Cancel progress.
+                    EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
                     return;
                 }
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.5f);
 
                 // 4. Run the Script
                 GaiaSky.popupNotification("Processing keyframes with OptFlowCam...", 5, this);
@@ -502,6 +513,8 @@ public class KeyframesManager implements IObserver {
 
                 var process = builder.start();
                 process.waitFor();
+
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.9f);
 
                 if (process.exitValue() == 0) {
                     // Success.
@@ -521,6 +534,8 @@ public class KeyframesManager implements IObserver {
                 }
                 process.destroy();
 
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.99f);
+
             } catch (IOException | InterruptedException e) {
                 GaiaSky.popupNotification(I18n.msg("error.process.run", e.getLocalizedMessage()), 10, this, Logger.LoggerLevel.ERROR, e);
                 Thread.currentThread().interrupt(); // Restore interrupted status
@@ -531,6 +546,9 @@ public class KeyframesManager implements IObserver {
                 } catch (IOException e) {
                     logger.error("Failed to delete temp file: " + inputFile, e);
                 }
+
+                // Remove progress bar.
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
             }
         });
     }

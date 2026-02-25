@@ -51,7 +51,7 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
             synchronized(lock) {
                 OwnProgressBar p = null;
                 // Create or get progress bar.
-                if (!progress.containsKey(name) && val < 1f) {
+                if (!progress.containsKey(name) && val >= 0f && val < 1f) {
                     if (progress.size < MAX_PROGRESS_BARS) {
                         p = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "small-horizontal");
                         p.setTitle(name, skin);
@@ -65,6 +65,7 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
 
                 if (p != null) {
                     p.setValue(val * 100f);
+                    // Deactivate if value is over 1.
                     if (val >= 1) {
                         p.setVisible(false);
                         progress.remove(name);
