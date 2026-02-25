@@ -447,12 +447,96 @@ public class KeyframesManager implements IObserver {
 
     /**
      * Runs the OptFlowCam script at the given location with the current keyframes, with the given output file.
+     * This version installs dependencies using pipenv before running the script.
      *
      * @param loc        The location of the OptFlowCam script. This location must contain a
      *                   <code>optflowcam_convert.py</code> file.
      * @param outputFile Path to the output camera path (.gsc) file.
      */
     public void runOptFlowCamScript(Path loc, Path outputFile) {
+        final var scriptName = "optflowcam_convert.py";
+        final var inputFileName = "temp_keyframes.gkf";
+
+        GaiaSky.instance.getExecutorService().execute(() -> {
+            // Input: generate keyframes file, no notification.
+            EventManager.publish(Event.KEYFRAMES_FILE_SAVE, this, keyframes, inputFileName, false);
+            var inputFile = SysUtils.getDefaultCameraDir().resolve(inputFileName);
+
+            try {
+                // Run pipenv install to install dependencies.
+                ProcessBuilder installBuilder = new ProcessBuilder("pipenv", "install");
+                installBuilder.directory(loc.toFile());  // Ensure this is the directory with the Pipfile
+                Process installProcess = installBuilder.start();
+                installProcess.waitFor();
+                if (installProcess.exitValue() != 0) {
+                    GaiaSky.popupNotification(I18n.msg("error.process.run", "Pipenv install failed"), 10, this, Logger.LoggerLevel.ERROR, null);
+                    return;
+                }
+
+                // Run the OptFlowCam script with pipenv.
+                // Determine the correct Python interpreter based on the platform
+                String pythonInterpreter = SysUtils.isWindows() ? "python.exe" : "python3";
+                ProcessBuilder builder = new ProcessBuilder(
+                        "pipenv", "run", pythonInterpreter, loc.resolve(scriptName).toString(),
+                        "-i", inputFile.toString(),
+                        "-o", outputFile.toString(),
+                        "--fps", Double.toString(Settings.settings.camrecorder.targetFps)
+                );
+                builder.directory(loc.toFile());
+
+                var process = builder.start();
+                process.waitFor();
+
+                if (process.exitValue() == 0) {
+                    // Output the result
+                    var output = process.getInputStream();
+                    var lines = new BufferedReader(new InputStreamReader(output, StandardCharsets.UTF_8))
+                            .lines()
+                            .toList();
+                    var outputFileLocation = outputFile.toAbsolutePath().toString();
+                    if (!lines.isEmpty()) {
+                        outputFileLocation = lines.getLast().substring(23);
+                    }
+                    // Popup notification for successful process
+                    GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFileLocation), 10, this);
+                } else {
+                    // Error case
+                    GaiaSky.popupNotification(I18n.msg("error.process.run", "exit value " + process.exitValue()), 10, this, Logger.LoggerLevel.ERROR, null);
+                    var err = process.getErrorStream();
+                    var out = process.getInputStream();
+                    String errStr = new BufferedReader(new InputStreamReader(err))
+                            .lines().collect(Collectors.joining("\n"));
+                    String outStr = new BufferedReader(new InputStreamReader(out))
+                            .lines().collect(Collectors.joining("\n"));
+
+                    logger.error("ERROR STREAM:");
+                    logger.error(errStr);
+                    logger.error("OUT STREAM:");
+                    logger.error(outStr);
+                }
+
+                process.destroy();
+
+            } catch (IOException | InterruptedException e) {
+                GaiaSky.popupNotification(I18n.msg("error.process.run", e.getLocalizedMessage()), 10, this, Logger.LoggerLevel.ERROR, e);
+            }
+
+            // Clean up the generated keyframes file
+            try {
+                Files.deleteIfExists(inputFile);
+            } catch (IOException e) {
+                GaiaSky.popupNotification(I18n.msg("error.loading.notexistent", inputFile.toString()), 10, this, Logger.LoggerLevel.ERROR, e);
+            }
+        });
+    }
+    /**
+     * Runs the OptFlowCam script at the given location with the current keyframes, with the given output file.
+     *
+     * @param loc        The location of the OptFlowCam script. This location must contain a
+     *                   <code>optflowcam_convert.py</code> file.
+     * @param outputFile Path to the output camera path (.gsc) file.
+     */
+    public void runOptFlowCamScriptDirect(Path loc, Path outputFile) {
         final var scriptName = "optflowcam_convert.py";
         final var inputFileName = "temp_keyframes.gkf";
 

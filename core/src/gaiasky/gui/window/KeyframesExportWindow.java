@@ -42,8 +42,8 @@ public class KeyframesExportWindow extends FileNameWindow {
         var ssLines = GlobalResources.countOccurrences(plInfoStr, '\n');
         TextArea plInfo = new OwnTextArea(plInfoStr, skin, "info");
         plInfo.setDisabled(true);
-        plInfo.setPrefRows(ssLines + 6);
-        plInfo.setWidth(600f);
+        plInfo.setPrefRows(ssLines + 8);
+        plInfo.setWidth(650f);
         plInfo.clearListeners();
 
         if (optFlowCamEnabled) {
