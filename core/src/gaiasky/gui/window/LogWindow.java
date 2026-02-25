@@ -62,7 +62,7 @@ public class LogWindow extends GenericDialog {
         pad = 16f;
 
         logs = new Table(skin);
-        List<MessageBean> list = ConsoleLogger.getHistorical();
+        List<MessageBean> list = ConsoleLogger.getHistory();
         for (MessageBean mb : list) {
             addMessage(mb);
         }
@@ -109,7 +109,7 @@ public class LogWindow extends GenericDialog {
 
     public void update() {
         if (logs != null) {
-            List<MessageBean> list = ConsoleLogger.getHistorical();
+            List<MessageBean> list = ConsoleLogger.getHistory();
             if (list.size() > numMessages) {
                 for (int i = numMessages; i < list.size(); i++) {
                     addMessage(list.get(i));
@@ -128,7 +128,7 @@ public class LogWindow extends GenericDialog {
         try {
             FileWriter fw = new FileWriter(log.toFile());
             BufferedWriter bw = new BufferedWriter(fw);
-            for (MessageBean mb : ConsoleLogger.getHistorical()) {
+            for (MessageBean mb : ConsoleLogger.getHistory()) {
                 fw.write(format.format(mb.date()) + " - " + mb.msg() + '\n');
             }
             bw.flush();

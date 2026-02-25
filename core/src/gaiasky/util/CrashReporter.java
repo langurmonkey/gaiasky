@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.gui.main.MessageBean;
 import gaiasky.util.Logger.Log;
@@ -123,7 +122,7 @@ public class CrashReporter {
     private static Path writeLog(Log logger, Path dir, String suffixString) {
         if (Files.exists(dir) && Files.isWritable(dir)) {
             // LOG FILE
-            List<MessageBean> logMessages = ConsoleLogger.getHistorical();
+            List<MessageBean> logMessages = ConsoleLogger.getHistory();
             Path logFile = dir.resolve("gaiasky_log_" + suffixString + ".txt");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile.toFile()))) {
                 try {

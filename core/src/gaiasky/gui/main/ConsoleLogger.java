@@ -35,10 +35,11 @@ public class ConsoleLogger implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
 
-    private static final LinkedList<MessageBean> historical = new LinkedList<>();
+    /** Holds the history of log messages. **/
+    private static final LinkedList<MessageBean> history = new LinkedList<>();
 
-    public static List<MessageBean> getHistorical() {
-        return historical;
+    public static List<MessageBean> getHistory() {
+        return history;
     }
 
     DateTimeFormatter df;
@@ -85,7 +86,7 @@ public class ConsoleLogger implements IObserver {
     private void addMessage(String msg) {
         Instant date = Instant.now();
         log(df.format(date), msg, LoggerLevel.INFO);
-        historical.add(new MessageBean(msg, date));
+        history.add(new MessageBean(msg, date));
     }
 
     /**
@@ -104,7 +105,7 @@ public class ConsoleLogger implements IObserver {
     private void addMessage(String msg, LoggerLevel level) {
         Instant date = Instant.now();
         log(tag(date, level), msg, level);
-        historical.add(new MessageBean(msg, date));
+        history.add(new MessageBean(msg, date));
     }
 
     private void log(String tag, String msg, LoggerLevel level) {
