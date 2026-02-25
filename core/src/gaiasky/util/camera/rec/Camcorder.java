@@ -22,6 +22,7 @@ import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -211,7 +212,7 @@ public class Camcorder implements IObserver {
                         OwnTextField textField = fnw.getFileNameField();
                         fnw.setAcceptListener(() -> {
                             if (textField.isValid()) {
-                                finishPlayback(textField.getText());
+                                finishPlayback(textField.getText(), fnw.overwrite.isChecked());
                             } else {
                                 EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("error.file.name.notvalid", textField.getText()), 10f);
                             }
@@ -222,7 +223,7 @@ public class Camcorder implements IObserver {
                         fnw.show(stage);
                     } else {
                         // Directly save file.
-                        finishPlayback(filename);
+                        finishPlayback(filename, true);
                     }
                 }
             }
@@ -329,15 +330,24 @@ public class Camcorder implements IObserver {
         IDLE
     }
 
-    private void finishPlayback(String filename) {
+    private void finishPlayback(String filename, boolean overwrite) {
         if (!filename.endsWith(".gsc")) {
             filename = filename + ".gsc";
         }
         // Annotate by date.
         Path f = SysUtils.getDefaultCameraDir().resolve(filename);
         if (Files.exists(f)) {
-            // Make unique.
-            f = SysUtils.uniqueFileName(f);
+            if (overwrite) {
+                // Delete.
+                try {
+                    Files.delete(f);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }else {
+                // Make unique.
+                f = SysUtils.uniqueFileName(f);
+            }
         }
 
         // Persist path.

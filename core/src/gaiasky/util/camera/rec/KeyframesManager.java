@@ -75,7 +75,11 @@ public class KeyframesManager implements IObserver {
 
         this.keyframes = Collections.synchronizedList(new ArrayList<>());
 
-        EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT, Event.UPDATE_CAM_RECORDER, Event.KEYFRAME_PLAY_FRAME);
+        EventManager.instance.subscribe(this,
+                                        Event.KEYFRAMES_FILE_SAVE,
+                                        Event.KEYFRAMES_EXPORT,
+                                        Event.UPDATE_CAM_RECORDER,
+                                        Event.KEYFRAME_PLAY_FRAME);
     }
 
     public static void initialize() {
@@ -102,9 +106,10 @@ public class KeyframesManager implements IObserver {
      * Gets the frame number of the given keyframe using the current target frame rate setting.
      *
      * @param kf The keyframe.
+     *
      * @return The frame number corresponding to exactly this keyframe if the keyframe is valid and in the keyframes
-     * list, otherwise -1.
-     * The frame number is in [0,n-1].
+     *         list, otherwise -1.
+     *         The frame number is in [0,n-1].
      */
     public long getFrameNumber(Keyframe kf) {
         if (kf == null || keyframes.isEmpty() || !keyframes.contains(kf)) {
@@ -167,7 +172,9 @@ public class KeyframesManager implements IObserver {
                         result.add(kf);
                     } else if (tokens.length == 16) {
                         // Keyframe has target.
-                        Vector3D target = new Vector3D(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
+                        Vector3D target = new Vector3D(Parser.parseDouble(tokens[11]),
+                                                       Parser.parseDouble(tokens[12]),
+                                                       Parser.parseDouble(tokens[13]));
                         boolean seam = Parser.parseInt(tokens[14]) == 1;
                         String name = tokens[15];
                         Keyframe kf = new Keyframe(name, pos, dir, up, target, time, secs, seam);
@@ -196,6 +203,7 @@ public class KeyframesManager implements IObserver {
 
     public void saveKeyframesFile(List<Keyframe> keyframes,
                                   String fileName,
+                                  boolean overwrite,
                                   boolean notification) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
@@ -280,13 +288,17 @@ public class KeyframesManager implements IObserver {
     }
 
     public void exportKeyframesFile(List<Keyframe> keyframes,
-                                    String fileName) {
+                                    String fileName, boolean overwrite) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
-            try {
-                Files.delete(f);
-            } catch (IOException e) {
-                logger.error(e);
+            if (overwrite) {
+                try {
+                    Files.delete(f);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            } else {
+                f = SysUtils.uniqueFileName(f);
             }
         }
         var cameraPath = new CameraPath(keyframes, positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position));
@@ -307,6 +319,7 @@ public class KeyframesManager implements IObserver {
      *
      * @param keyframes The array of keyframes.
      * @param pathType  The path type.
+     *
      * @return Array of path parts.
      */
     private PathPart[] positionsToPathParts(List<Keyframe> keyframes,
@@ -443,14 +456,28 @@ public class KeyframesManager implements IObserver {
      * Runs the OptFlowCam script at the given location with the current keyframes, with the given output file.
      * This version checks for Python/Pipenv, installs dependencies, and then runs the script.
      *
-     * @param loc        The location of the OptFlowCam script. This location must contain a
-     * <code>optflowcam_convert.py</code> file.
-     * @param outputFile Path to the output camera path (.gsc) file.
+     * @param scriptLocation The location of the OptFlowCam script. This location must contain a
+     *                       <code>optflowcam_convert.py</code> file.
+     * @param outputFile     Path to the output camera path (.gsc) file.
+     * @param overwrite      Whether to overwrite the output file if it exists. If false, a new file name will be created from the provided one.
      */
-    public void runOptFlowCamScript(Path loc, Path outputFile) {
+    public void runOptFlowCamScript(Path scriptLocation, Path outputFile, boolean overwrite) {
+        if (Files.exists(outputFile)) {
+            if (overwrite) {
+                try {
+                    Files.delete(outputFile);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            } else {
+                outputFile = SysUtils.uniqueFileName(outputFile);
+            }
+        }
+        final var output = outputFile;
+
         final var scriptName = "optflowcam_convert.py";
         final var inputFileName = "temp_keyframes.gkf";
-        final var progressName = "OptFlowCam export: " + outputFile.toString();
+        final var progressName = "OptFlowCam export: " + output.toString();
 
         // Init progress bar.
         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.01f);
@@ -463,7 +490,11 @@ public class KeyframesManager implements IObserver {
 
             if (!hasPython || !hasPipenv) {
                 String missing = (!hasPython && !hasPipenv) ? "Python 3 and Pipenv" : (!hasPython ? "Python 3" : "Pipenv");
-                GaiaSky.popupNotification(I18n.msg("error.process.run", "Missing: " + missing + ". Please install them to use OptFlowCam."), 15, this, Logger.LoggerLevel.ERROR, null);
+                GaiaSky.popupNotification(I18n.msg("error.process.run", "Missing: " + missing + ". Please install them to use OptFlowCam."),
+                                          15,
+                                          this,
+                                          Logger.LoggerLevel.ERROR,
+                                          null);
                 // Cancel progress.
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
                 return;
@@ -471,17 +502,17 @@ public class KeyframesManager implements IObserver {
             EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.2f);
 
             // Prepare input file.
-            EventManager.publish(Event.KEYFRAMES_FILE_SAVE, this, keyframes, inputFileName, false);
+            EventManager.publish(Event.KEYFRAMES_FILE_SAVE, this, keyframes, inputFileName, true, false);
             var inputFile = SysUtils.getDefaultCameraDir().resolve(inputFileName);
 
             try {
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.3f);
                 // Install dependencies.
                 GaiaSky.popupNotification("Installing dependencies with pipenv...", 5, this);
-                logger.info("OptFlowCam: Running 'pipenv install' in " + loc);
+                logger.info("OptFlowCam: Running 'pipenv install' in " + scriptLocation);
 
                 ProcessBuilder installBuilder = new ProcessBuilder("pipenv", "install", "numpy", "python-dateutil");
-                installBuilder.directory(loc.toFile());
+                installBuilder.directory(scriptLocation.toFile());
                 Process installProcess = installBuilder.start();
                 installProcess.waitFor();
 
@@ -498,12 +529,12 @@ public class KeyframesManager implements IObserver {
                 logger.info("OptFlowCam: Running script " + scriptName);
 
                 ProcessBuilder builder = new ProcessBuilder(
-                        "pipenv", "run", pythonInterpreter, loc.resolve(scriptName).toString(),
+                        "pipenv", "run", pythonInterpreter, scriptLocation.resolve(scriptName).toString(),
                         "-i", inputFile.toString(),
-                        "-o", outputFile.toString(),
+                        "-o", output.toString(),
                         "--fps", Double.toString(Settings.settings.camrecorder.targetFps)
                 );
-                builder.directory(loc.toFile());
+                builder.directory(scriptLocation.toFile());
 
                 var process = builder.start();
                 process.waitFor();
@@ -512,7 +543,7 @@ public class KeyframesManager implements IObserver {
 
                 if (process.exitValue() == 0) {
                     // Success.
-                    var outputFileLocation = outputFile.toAbsolutePath().toString();
+                    var outputFileLocation = output.toAbsolutePath().toString();
                     GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFileLocation), 10, this);
                 } else {
                     // Failure.
@@ -524,7 +555,11 @@ public class KeyframesManager implements IObserver {
                     logger.error("OptFlowCam Error (Exit " + process.exitValue() + "): " + errStr);
                     logger.error("OptFlowCam Output: " + outStr);
 
-                    GaiaSky.popupNotification(I18n.msg("error.process.run", "Script failed. Check logs for details."), 10, this, Logger.LoggerLevel.ERROR, null);
+                    GaiaSky.popupNotification(I18n.msg("error.process.run", "Script failed. Check logs for details."),
+                                              10,
+                                              this,
+                                              Logger.LoggerLevel.ERROR,
+                                              null);
                 }
                 process.destroy();
 
@@ -571,16 +606,15 @@ public class KeyframesManager implements IObserver {
             case KEYFRAMES_FILE_SAVE -> {
                 List<Keyframe> keyframes = (List<Keyframe>) data[0];
                 String fileName = (String) data[1];
-                Boolean notification = true;
-                if (data.length > 2) {
-                    notification = (Boolean) data[2];
-                }
-                saveKeyframesFile(keyframes, fileName, notification);
+                Boolean overwrite = (Boolean) data[2];
+                Boolean notification = (Boolean) data[3];
+                saveKeyframesFile(keyframes, fileName, overwrite, notification);
             }
             case KEYFRAMES_EXPORT -> {
                 var keyframes = (List<Keyframe>) data[0];
                 var fileName = (String) data[1];
-                exportKeyframesFile(keyframes, fileName);
+                var overwrite = (Boolean) data[2];
+                exportKeyframesFile(keyframes, fileName, overwrite);
             }
             case UPDATE_CAM_RECORDER -> {
                 synchronized (this) {

@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 
 /**
@@ -533,16 +534,7 @@ public class SysUtils {
                 return;
             }
 
-            int w = texture.getWidth();
-            int h = texture.getHeight();
-
-            Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
-
-            final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-            ByteBuffer pixels = pixmap.getPixels();
-
-            texture.bind();
-            GL30.glGetTexImage(texture.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
+            Pixmap pixmap = pixmapFromGLTexture(texture);
 
             GaiaSky.instance.getExecutorService().execute(() -> {
                 switch (format) {
@@ -578,17 +570,7 @@ public class SysUtils {
         for (int i = 0; i < textures.length; i++) {
             var t = textures[i];
             if (t != null) {
-                int w = t.getWidth();
-                int h = t.getHeight();
-
-                Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
-
-                final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-                ByteBuffer pixels = pixmap.getPixels();
-
-                t.bind();
-                GL30.glGetTexImage(t.glTarget, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, pixels);
-
+                Pixmap pixmap = pixmapFromGLTexture(t);
                 pixmaps.add(new Pair<>(pixmap, i));
             }
         }
@@ -616,6 +598,13 @@ public class SysUtils {
 
     }
 
+    /**
+     * Creates a {@link Pixmap} from a {@link Texture} for CPU access.
+     *
+     * @param t The Texture.
+     *
+     * @return The Pixmap.
+     */
     public static Pixmap pixmapFromGLTexture(Texture t) {
         int w = t.getWidth();
         int h = t.getHeight();
@@ -758,17 +747,42 @@ public class SysUtils {
     public static Path uniqueFileName(Path file) {
         if (!Files.isRegularFile(file)) {
             logger.error("Given path is not a file: " + file);
-            return null;
+            return file;
         }
+
         var parent = file.getParent();
         var fileName = FilenameUtils.getBaseName(file.toString());
         var ext = FilenameUtils.getExtension(file.toString());
-        var f = file;
-        int i = 1;
-        while (Files.exists(f) && Files.isRegularFile(f)) {
-            f = parent.resolve(fileName + "_" + i + "." + ext);
-            i++;
+
+        // Parse the base name to see if it already ends with a number pattern
+        var baseName = fileName;
+        var pattern = Pattern.compile("^(.*?)(_\\d+)?$");
+        var matcher = pattern.matcher(fileName);
+
+        if (matcher.matches()) {
+            baseName = matcher.group(1);  // Get the part before any _number
+            // If there was a number suffix, we'll start counting from that number
+            if (matcher.group(2) != null) {
+                var currentNum = Integer.parseInt(matcher.group(2).substring(1));
+                fileName = baseName + "_" + currentNum;
+            }
         }
+
+        var f = parent.resolve(fileName + "." + ext);
+        int i = 1;
+
+        // If the original file exists, find the next available number
+        if (Files.exists(f) && Files.isRegularFile(f)) {
+            // Look for existing files with pattern: baseName_X.ext
+            while (true) {
+                f = parent.resolve(baseName + "_" + i + "." + ext);
+                if (!Files.exists(f) || !Files.isRegularFile(f)) {
+                    break;
+                }
+                i++;
+            }
+        }
+
         return f;
     }
 

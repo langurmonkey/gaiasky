@@ -464,18 +464,18 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                             if (Files.exists(mainPath.resolve("core/scripts/optflowcam"))) {
                                 // Running from IDE.
                                 var loc = mainPath.resolve("core/scripts/optflowcam");
-                                manager.runOptFlowCamScript(loc, outputFile);
+                                manager.runOptFlowCamScript(loc, outputFile, fnw.overwrite.isChecked());
                             } else if (Files.exists(mainPath.resolve("../extra/optflowcam"))) {
                                 // Running from package.
                                 var loc = mainPath.resolve("../extra/optflowcam");
-                                manager.runOptFlowCamScript(loc, outputFile);
+                                manager.runOptFlowCamScript(loc, outputFile, fnw.overwrite.isChecked());
                             } else {
                                 String msg = I18n.msg("error.loading.notexistent", "OptFlowCam script: " + mainPath);
                                 GaiaSky.popupNotification(msg, 10, this, Logger.LoggerLevel.WARN, null);
                             }
 
                         } else {
-                            EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, manager.keyframes, textField.getText());
+                            EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, manager.keyframes, textField.getText(), fnw.overwrite.isChecked());
                             notice.clearActor();
                         }
                     } else {
@@ -565,7 +565,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         OwnTextField textField = fnw.getFileNameField();
         fnw.setAcceptListener(() -> {
             if (textField.isValid()) {
-                EventManager.publish(Event.KEYFRAMES_FILE_SAVE, fnw, manager.keyframes, textField.getText());
+                EventManager.publish(Event.KEYFRAMES_FILE_SAVE, fnw, manager.keyframes, textField.getText(), fnw.overwrite.isChecked(), true);
                 lastKeyframeFileName = textField.getText();
                 notice.clearActor();
             } else {

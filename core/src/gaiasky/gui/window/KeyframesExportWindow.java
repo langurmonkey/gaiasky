@@ -30,10 +30,9 @@ public class KeyframesExportWindow extends FileNameWindow {
 
         content.row();
 
+        // OptFlowCam checkbox.
         var optFlowCamEnabled = !SysUtils.isFlatpak();
-
-        // Add checkbox.
-        useOptFlowCam = new OwnCheckBox("Use OptFlowCam method to compute camera path", skin, 20f);
+        useOptFlowCam = new OwnCheckBox("Use OptFlowCam method to compute camera path", skin, pad18);
         useOptFlowCam.setChecked(false);
         useOptFlowCam.setDisabled(!optFlowCamEnabled);
 

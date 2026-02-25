@@ -10,6 +10,7 @@ package gaiasky.gui.window;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.LengthValidator;
@@ -19,6 +20,7 @@ public class FileNameWindow extends GenericDialog {
 
     private final String defaultName;
     private OwnTextField fileName;
+    public OwnCheckBox overwrite;
 
     public FileNameWindow(String defaultName, Stage stage, Skin skin) {
         super(I18n.msg("gui.filename.choose"), skin, stage);
@@ -41,8 +43,12 @@ public class FileNameWindow extends GenericDialog {
         fileName = new OwnTextField(defaultName, skin, nameValidator);
         fileName.setWidth(600f);
 
-        content.add(label).padRight(pad18).padBottom(pad18);
-        content.add(fileName).padBottom(pad18);
+        overwrite = new OwnCheckBox(I18n.msg("gui.overwrite"), skin, pad18);
+        overwrite.setChecked(true);
+
+        content.add(label).left().padRight(pad18).padBottom(pad18);
+        content.add(fileName).left().padBottom(pad18).row();
+        content.add(overwrite).left().colspan(2);
     }
 
     /**
