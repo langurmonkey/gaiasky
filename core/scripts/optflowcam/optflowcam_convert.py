@@ -50,11 +50,16 @@ def make_filepath_unique(filepath):
     The returned path is guaranteed to exist and being unique
     '''
     dir = os.path.dirname(filepath)
-    if not os.path.isdir(dir):
+    
+    # Only attempt makedirs if 'dir' is not an empty string
+    if dir and not os.path.isdir(dir):
         os.makedirs(dir)
 
     base_filename, ext = os.path.splitext(os.path.basename(filepath))
     file_num = 1
+    
+    # Ensure we use the correct directory for the join
+    # if dir is empty, os.path.join handles it, but being explicit is safer
     while os.path.isfile(filepath):
         filepath = os.path.join(dir, base_filename+"_"+str(file_num)+ext)
         file_num = file_num + 1

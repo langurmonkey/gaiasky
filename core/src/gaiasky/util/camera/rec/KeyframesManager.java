@@ -486,7 +486,9 @@ public class KeyframesManager implements IObserver {
             // Dependency Detection.
             String pythonInterpreter = SysUtils.isWindows() ? "python.exe" : "python3";
             boolean hasPython = isCommandAvailable(pythonInterpreter);
-            boolean hasPipenv = isCommandAvailable("pipenv");
+            // Replace your current hasPipenv logic with this:
+            boolean hasPipenv = isCommandAvailable("pipenv") ||
+                    isPythonModuleAvailable(pythonInterpreter, "pipenv");
 
             if (!hasPython || !hasPipenv) {
                 String missing = (!hasPython && !hasPipenv) ? "Python 3 and Pipenv" : (!hasPython ? "Python 3" : "Pipenv");
@@ -511,7 +513,7 @@ public class KeyframesManager implements IObserver {
                 GaiaSky.popupNotification("Installing dependencies with pipenv...", 5, this);
                 logger.info("OptFlowCam: Running 'pipenv install' in " + scriptLocation);
 
-                ProcessBuilder installBuilder = new ProcessBuilder("pipenv", "install", "numpy", "python-dateutil");
+                ProcessBuilder installBuilder = new ProcessBuilder(pythonInterpreter, "-m", "pipenv", "install", "numpy", "python-dateutil");
                 installBuilder.directory(scriptLocation.toFile());
                 Process installProcess = installBuilder.start();
                 installProcess.waitFor();
@@ -528,11 +530,18 @@ public class KeyframesManager implements IObserver {
                 GaiaSky.popupNotification("Processing keyframes with OptFlowCam...", 5, this);
                 logger.info("OptFlowCam: Running script " + scriptName);
 
-                ProcessBuilder builder = new ProcessBuilder(
-                        "pipenv", "run", pythonInterpreter, scriptLocation.resolve(scriptName).toString(),
-                        "-i", inputFile.toString(),
-                        "-o", output.toString(),
-                        "--fps", Double.toString(Settings.settings.camrecorder.targetFps)
+                ProcessBuilder builder = new ProcessBuilder(pythonInterpreter,
+                                                            "-m",
+                                                            "pipenv",
+                                                            "run",
+                                                            "python",
+                                                            scriptLocation.resolve(scriptName).toString(),
+                                                            "-i",
+                                                            inputFile.toString(),
+                                                            "-o",
+                                                            output.toString(),
+                                                            "--fps",
+                                                            Double.toString(Settings.settings.camrecorder.targetFps)
                 );
                 builder.directory(scriptLocation.toFile());
 
@@ -580,6 +589,19 @@ public class KeyframesManager implements IObserver {
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
             }
         });
+    }
+
+    /**
+     * Helper to check if a python module exists.
+     */
+    private boolean isPythonModuleAvailable(String pythonInterpreter, String moduleName) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(pythonInterpreter, "-m", moduleName, "--version");
+            Process p = pb.start();
+            return p.waitFor() == 0;
+        } catch (IOException | InterruptedException e) {
+            return false;
+        }
     }
 
     /**
