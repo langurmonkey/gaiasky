@@ -45,7 +45,6 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
@@ -146,7 +145,7 @@ public class MainGui extends AbstractGui {
         nf = new DecimalFormat("##0.##");
 
         // NOTIFICATIONS INTERFACE - BOTTOM LEFT
-        notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);
+        notificationsInterface = new NotificationsInterface(skin, lock, true, true, true);
         notificationsInterface.pad(pad5);
         ni = new Container<>(notificationsInterface);
         ni.setFillParent(true);

@@ -755,9 +755,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-        // Stop updating log list.
-        consoleLogger.setUseHistorical(false);
-
         // Init GUIs, step 2.
         reinitialiseGUI2();
 

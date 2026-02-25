@@ -12,7 +12,6 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
@@ -26,6 +25,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Gets notifications and other kinds of messages from the event manager and logs them to the console.
@@ -33,22 +34,21 @@ import java.time.format.FormatStyle;
 public class ConsoleLogger implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
-    DateTimeFormatter df;
-    long msTimeout;
-    boolean useHistorical;
 
-    public ConsoleLogger() {
-        this(true);
+    private static final LinkedList<MessageBean> historical = new LinkedList<>();
+
+    public static List<MessageBean> getHistorical() {
+        return historical;
     }
 
+    DateTimeFormatter df;
+    long msTimeout;
+
     /**
-     * Initializes the notifications interface.
-     *
-     * @param useHistorical Keep logs.
+     * Initializes the consoler logger.
      */
-    private ConsoleLogger(boolean useHistorical) {
+    public ConsoleLogger() {
         this.msTimeout = DEFAULT_TIMEOUT;
-        this.useHistorical = useHistorical;
 
         try {
             this.df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
@@ -58,9 +58,6 @@ public class ConsoleLogger implements IObserver {
         subscribe();
     }
 
-    public void setUseHistorical(boolean useHistorical) {
-        this.useHistorical = useHistorical;
-    }
 
     public void subscribe() {
         EventManager.instance.subscribe(this,
@@ -88,9 +85,7 @@ public class ConsoleLogger implements IObserver {
     private void addMessage(String msg) {
         Instant date = Instant.now();
         log(df.format(date), msg, LoggerLevel.INFO);
-        if (useHistorical) {
-            NotificationsInterface.historical.add(new MessageBean(msg, date));
-        }
+        historical.add(new MessageBean(msg, date));
     }
 
     /**
@@ -109,9 +104,7 @@ public class ConsoleLogger implements IObserver {
     private void addMessage(String msg, LoggerLevel level) {
         Instant date = Instant.now();
         log(tag(date, level), msg, level);
-        if (useHistorical) {
-            NotificationsInterface.historical.add(new MessageBean(msg, date));
-        }
+        historical.add(new MessageBean(msg, date));
     }
 
     private void log(String tag, String msg, LoggerLevel level) {

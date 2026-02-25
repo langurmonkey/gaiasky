@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.gui.iface.NotificationsInterface;
+import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.gui.main.MessageBean;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
@@ -47,6 +47,7 @@ public class LogWindow extends GenericDialog {
 
         this.format = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         this.setResizable(true);
+        this.setModal(false);
         setCancelText(I18n.msg("gui.close"));
 
         // Build
@@ -57,11 +58,11 @@ public class LogWindow extends GenericDialog {
     @Override
     protected void build() {
         w = FastMath.min(1200f, Gdx.graphics.getWidth() - 200);
-        h = FastMath.min(860f, Gdx.graphics.getHeight() - 150);
+        h = FastMath.min(750f, Gdx.graphics.getHeight() - 150);
         pad = 16f;
 
         logs = new Table(skin);
-        List<MessageBean> list = NotificationsInterface.historical;
+        List<MessageBean> list = ConsoleLogger.getHistorical();
         for (MessageBean mb : list) {
             addMessage(mb);
         }
@@ -108,7 +109,7 @@ public class LogWindow extends GenericDialog {
 
     public void update() {
         if (logs != null) {
-            List<MessageBean> list = NotificationsInterface.historical;
+            List<MessageBean> list = ConsoleLogger.getHistorical();
             if (list.size() > numMessages) {
                 for (int i = numMessages; i < list.size(); i++) {
                     addMessage(list.get(i));
@@ -127,7 +128,7 @@ public class LogWindow extends GenericDialog {
         try {
             FileWriter fw = new FileWriter(log.toFile());
             BufferedWriter bw = new BufferedWriter(fw);
-            for (MessageBean mb : NotificationsInterface.historical) {
+            for (MessageBean mb : ConsoleLogger.getHistorical()) {
                 fw.write(format.format(mb.date()) + " - " + mb.msg() + '\n');
             }
             bw.flush();

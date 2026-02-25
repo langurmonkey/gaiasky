@@ -35,7 +35,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -44,7 +43,6 @@ import java.util.List;
 public class NotificationsInterface extends TableGuiInterface implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
-    public static LinkedList<MessageBean> historical = new LinkedList<>();
     /**
      * Lock object for synchronization
      **/
@@ -54,7 +52,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     Label message1, message2;
     Cell<Label> c1, c2;
     boolean displaying = false;
-    boolean historicalLog = false;
     boolean permanent = false;
     boolean multiple;
     boolean writeDates = true;
@@ -75,22 +72,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean bg) {
         this(skin, lock, multiple, bg);
         this.writeDates = writeDates;
-    }
-
-    /**
-     * Initializes the notifications interface.
-     *
-     * @param skin          The skin.
-     * @param lock          The lock object.
-     * @param multiple      Allow multiple messages?
-     * @param writeDates    Write dates with messages?
-     * @param historicalLog Save logs to historical list
-     * @param bg            Apply background
-     */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean historicalLog,
-                                  boolean bg) {
-        this(skin, lock, multiple, writeDates, bg);
-        this.historicalLog = historicalLog;
     }
 
     /**
@@ -117,8 +98,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     public NotificationsInterface(List<MessageBean> logs, long msTimeout, Skin skin, boolean multiple, boolean bg, Object lock) {
         super(skin);
         this.lock = lock;
-        if (logs != null)
-            historical.addAll(logs);
         this.msTimeout = msTimeout;
         this.multiple = multiple;
 
@@ -164,10 +143,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         ignoreDisplaySetting = value;
     }
 
-    public static List<MessageBean> getHistorical() {
-        return historical;
-    }
-
     public void unsubscribe() {
         EventManager.instance.removeAllSubscriptions(this);
     }
@@ -186,19 +161,11 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 boolean add = !debug || Gdx.app.getLogLevel() >= Application.LOG_DEBUG;
 
                 if (add) {
-                    if (multiple && !historical.isEmpty() && !historical.getLast()
-                            .finished(msTimeout)) {
-                        // Move current up
-                        setText(message2, c2, message1.getText());
-                    }
                     // Set 1
                     setText(message1, c1, formatMessage(messageBean, level));
 
                     this.displaying = true;
                     this.permanent = permanent;
-
-                    if (historicalLog)
-                        historical.add(messageBean);
                 }
             });
     }
@@ -211,17 +178,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
 
     public void update() {
         if (displaying && !permanent) {
-            if (multiple && historical.size() > 1 && historical.get(historical.size() - 2)
-                    .finished(msTimeout)) {
-                clearText(message2, c2);
-            }
-
-            if (historical.getLast()
-                    .finished(msTimeout)) {
-                displaying = false;
-                clearText(message1, c1);
-            }
-
             if (!c1.hasActor() && !c2.hasActor()) {
                 setVisible(false);
             } else if (c1.hasActor() || c2.hasActor()) {
