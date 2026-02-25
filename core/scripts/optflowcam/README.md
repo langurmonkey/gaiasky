@@ -8,8 +8,7 @@ for Camera Paths in Scenes with Extreme Scale Variations", Computer Graphics For
 The Optical Flow Camera is used in Gaia Sky as an additional export method for keyframes. The technique produces very good results for keyframed camera paths with large scale variations. The script
  itself processes Gaia Sky keyframe files (``.gkf``) and converts them to camera path files (``.gsc``).
 
-The original code was provided by **L. Piotrowski**, and is licensed under the GPLv3, as is the
-code in this directory.
+The original code was provided by **L. Piotrowski**, and is licensed under the GPLv3, as is the code in this directory.
 
 ### Changes to original code
 
@@ -17,7 +16,7 @@ We have modified the original source in the following manner:
 
 - add target (point of interest) location parsing. Additionally, targets have been added to the Gaia Sky keyframes file format, so that a keyframe created when the camera is in focus mode, automatically gets the position of the focus as a target.
 - add frame rate as program argument.
-- global clean up code (remove ambiguous Unicode characters, remove unused functions, etc.).
+- global code clean-up (remove ambiguous Unicode characters, remove unused functions, etc.).
 
 ### Requirements
 
