@@ -121,9 +121,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      **/
     private OwnScrollPane rightScroll;
     /**
-     * Last loaded keyframe file name
+     * Last loaded/saved keyframe file name
      **/
     private String lastKeyframeFileName = null;
+    /**
+     * Last saved camera path file name
+     **/
+    private String lastCameraFileName = null;
     /**
      * Model object to represent the path
      **/
@@ -449,7 +453,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     GaiaSky.popupNotification(text, 10, this, Logger.LoggerLevel.WARN, null);
                     return true;
                 }
-                String suggestedName = df.format(new Date()) + ".gsc";
+                String suggestedName = lastCameraFileName != null ? lastCameraFileName : df.format(new Date()) + ".gsc";
                 KeyframesExportWindow fnw = new KeyframesExportWindow(suggestedName, stage, skin);
                 OwnTextField textField = fnw.getFileNameField();
                 fnw.setAcceptListener(() -> {
@@ -478,6 +482,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                             EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, manager.keyframes, textField.getText(), fnw.overwrite.isChecked());
                             notice.clearActor();
                         }
+                        lastCameraFileName = textField.getText();
                     } else {
                         Label warn = new OwnLabel(I18n.msg("error.file.name.notvalid", textField.getText()), skin);
                         warn.setColor(1f, .4f, .4f, 1f);
