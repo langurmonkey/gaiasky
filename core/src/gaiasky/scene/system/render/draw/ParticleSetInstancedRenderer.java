@@ -132,7 +132,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         var hl = Mapper.highlight.get(render.entity);
         var desc = Mapper.datasetDescription.get(render.entity);
 
-        float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
         if (!set.disposed) {
             var model = getModel(set, getOffset(render));
@@ -282,6 +281,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
                 int shadingType = preShadingType(hl, set.shadingType);
                 float meanDist = (float) (set.getMeanDistance());
+                float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                 shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, set.profileDecay));

@@ -175,7 +175,7 @@ public class Constants {
     public final static float MIN_MIN_SOLID_ANGLE = 0.0f;
     public final static float MAX_MIN_SOLID_ANGLE = 0.01f;
     public final static float MIN_MAX_SOLID_ANGLE = 0.01f;
-    public final static float MAX_MAX_SOLID_ANGLE = 0.1f;
+    public final static float MAX_MAX_SOLID_ANGLE = 0.44f;
     public final static int MIN_NUM_LABELS = 0;
     public final static int MAX_NUM_LABELS = 300;
     public final static float MIN_COLOR_NOISE = 0.0f;

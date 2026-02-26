@@ -50,7 +50,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     protected static final Log logger = Logger.getLogger(ElementsSetRenderer.class);
 
     private final Matrix4 aux, refSysTransformF;
-    private final double[] particleSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), FastMath.tan(Math.toRadians(9.6))};
+    private final double[] defaultSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), FastMath.tan(Math.toRadians(9.6))};
     private final Colormap cmap;
     private final Random rand;
 
@@ -120,7 +120,6 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                 var sizeNoise = set != null ? set.sizeNoise : eSet.sizeNoise;
                 var textureArray = set != null ? set.textureArray : eSet.textureArray;
                 var textureAttribute = set != null ? set.textureAttribute : eSet.textureAttribute;
-
 
                 rand.setSeed(123L);
                 // Check children nodes.
@@ -276,7 +275,6 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                         textureArray.bind(0);
                     }
 
-                    int shadingType = preShadingType(hl, shadingTyp);
 
                     ExtShaderProgram shaderProgram = getShaderProgram();
                     shaderProgram.begin();
@@ -284,11 +282,16 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getPos());
                     addCameraUpCubemapMode(shaderProgram, camera);
+
+                    int shadingType = preShadingType(hl, shadingTyp);
+                    float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
+                    var sizeLimits = set != null ? set.particleSizeLimits : defaultSizeLimits;
+
                     shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
                     shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, profileDecay));
-                    shaderProgram.setUniformf("u_sizeFactor",
-                                              Settings.settings.scene.star.pointSize * 0.1f * hl.pointscaling);
-                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
+                    shaderProgram.setUniformf("u_sizeLimits", (float) (sizeLimits[0] * sizeFactor),
+                                              (float) (sizeLimits[1] * sizeFactor));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (sizeFactor / Constants.DISTANCE_SCALE_FACTOR));
 
                     // Shading type.
                     setShadingTypeUniforms(shaderProgram, camera, shadingType, sphericalPower, 0f);
