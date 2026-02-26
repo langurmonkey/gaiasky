@@ -207,8 +207,16 @@ public class KeyframesManager implements IObserver {
                                   boolean notification) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
-            // Make file name unique.
-            f = SysUtils.uniqueFileName(f);
+            if (overwrite) {
+                try {
+                    Files.delete(f);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            } else {
+                // Make file name unique.
+                f = SysUtils.uniqueFileName(f);
+            }
         }
         try {
             assert f != null;
