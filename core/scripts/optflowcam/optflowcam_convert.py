@@ -204,7 +204,7 @@ def convert_optflow_to_gaia(path: list, keyframes: list, fps: float):
         curr_num_frames = int(fps * duration)
 
         # Work out interpolation variable.
-        t = partial_count / (curr_num_frames - 1)
+        t = partial_count / (curr_num_frames - 1) if curr_num_frames > 1 else 0.0
         # Clamp t.
         t = max(0.0, min(1.0, t))
 

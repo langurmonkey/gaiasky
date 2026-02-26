@@ -372,19 +372,60 @@ def interpolate_CatmullRom(t: float, control_points: list, knots: list,
 
     assert len(segment_control_points) == 4 and len(segment_knots) == 4, f"Should be 4 but is {len(segment_control_points)} and {len(segment_knots)}"
 
+    # Precompute R_f for each adjacent pair in the segment to avoid
+    # recomputing eigenvector decomposition on synthetic intermediate cameras,
+    # which can produce inconsistent rotation axes and cause visible jumps.
+    segment_R_fs = []
+    for i in range(len(segment_control_points) - 1):
+        cp0 = segment_control_points[i]
+        cp1 = segment_control_points[i + 1]
+        _, view0, up0, right0, _ = unpack_camera(cp0)
+        _, view1, up1, right1, _ = unpack_camera(cp1)
+        _, R_f = get_rotation(
+            {"view": view0, "up": up0, "right": right0},
+            {"view": view1, "up": up1, "right": right1}
+        )
+        segment_R_fs.append(R_f)
+
     # see
     # C. Yuksel, S. Schaefer, and J. Keyser, “On the parameterization of Catmull-Rom curves,” 
     # in 2009 SIAM/ACM Joint Conference on Geometric and Physical Modeling, 2009-10. 
     # doi: 10.1145/1629255.1629262.
     for j in range(3):
-        for i in range(len(segment_control_points)-j-1):
-            if j <= 1:
-                s = (t - segment_knots[i])/(segment_knots[i+1+j] - segment_knots[i])
-            else:
-                s = (t - segment_knots[1])/(segment_knots[2] - segment_knots[1])
+        # Recompute R_f for the reduced set of synthetic control points,
+        # except on the first pass where we use the precomputed ones.
+        if j > 0:
+            segment_R_fs = []
+            for i in range(len(segment_control_points) - 1):
+                cp0 = segment_control_points[i]
+                cp1 = segment_control_points[i + 1]
+                _, view0, up0, right0, _ = unpack_camera(cp0)
+                _, view1, up1, right1, _ = unpack_camera(cp1)
+                _, R_f = get_rotation(
+                    {"view": view0, "up": up0, "right": right0},
+                    {"view": view1, "up": up1, "right": right1}
+                )
+                segment_R_fs.append(R_f)
 
-            cam = interpolate_t(s, focal, metric, start=segment_control_points[i], end=segment_control_points[i+1], **kwargs)
-            segment_control_points[i] = cam
+        new_segment_control_points = []
+        for i in range(len(segment_control_points) - 1):
+            if j <= 1:
+                s = (t - segment_knots[i]) / (segment_knots[i+1+j] - segment_knots[i])
+            else:
+                s = (t - segment_knots[1]) / (segment_knots[2] - segment_knots[1])
+
+            # Clamp s to [0, 1] to avoid numerical issues at knot boundaries
+            # feeding out-of-range values into tanh/cosh/exp.
+            s = max(0.0, min(1.0, s))
+
+            cam = interpolate_t(s, focal, metric,
+                                start=segment_control_points[i],
+                                end=segment_control_points[i+1],
+                                R_f=segment_R_fs[i],
+                                **kwargs)
+            new_segment_control_points.append(cam)
+
+        segment_control_points = new_segment_control_points
 
     return segment_control_points[0]
 
@@ -453,8 +494,8 @@ def disambiguate_spline(control_points: list, knots: list, spline: list):
 
             new_segment_index = get_segment_index(t, new_knots)
         
-            new_control_points.insert(segment_index+1, cam)
-            new_knots = np.insert(new_knots, segment_index+1, t)
+            new_control_points.insert(new_segment_index+1, cam)
+            new_knots = np.insert(new_knots, new_segment_index+1, t)
 
             last_fixed_segment = segment_index
 
