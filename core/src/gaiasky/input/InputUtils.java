@@ -22,7 +22,7 @@ public class InputUtils {
 
     public static int physicalToLogicalKeyCode(final int physicalKeyCode) {
         var str = InputUtils.physicalKeyCodeToLogicalKeyString(physicalKeyCode);
-        return InputUtils.keyStringToKeyCode(str);
+        return str != null ? InputUtils.keyStringToKeyCode(str) : -1;
     }
 
     /**
