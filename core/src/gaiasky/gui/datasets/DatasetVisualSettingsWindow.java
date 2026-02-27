@@ -7,6 +7,7 @@
 
 package gaiasky.gui.datasets;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -39,7 +40,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
     private final CatalogInfo ci;
     private OwnTextField highlightSizeFactor, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
     private OwnCheckBox allVisible, fadeIn, fadeOut;
-    private OwnSliderPlus pointSize, minSolidAngle, maxSolidAngle;
+    private OwnSliderReset pointSize, minSolidAngle, maxSolidAngle;
     private final float taWidth, sliderWidth;
 
     private double backupMinSolidAngle, backupMaxSolidAngle;
@@ -68,22 +69,26 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         content.add(new OwnLabel(I18n.msg("gui.dataset.particleaspect"), skin, "hud-header")).left().colspan(2).padBottom(pad18).row();
 
         // Particle size
-        pointSize = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE,
-                Constants.SLIDER_STEP_TINY, skin);
-        pointSize.setWidth(sliderWidth);
+        float pointScaling = 1;
         if (ci.entity != null) {
             var graph = Mapper.graph.get(ci.entity);
             var hl = Mapper.highlight.get(ci.entity);
             if (hl != null) {
-                float pointScaling;
                 if (graph.parent != null && Mapper.octree.has(graph.parent)) {
                     pointScaling = Mapper.highlight.get(graph.parent).pointscaling * hl.pointscaling;
                 } else {
                     pointScaling = hl.pointscaling;
                 }
-                pointSize.setMappedValue(pointScaling);
             }
         }
+        pointSize = new OwnSliderReset(I18n.msg("gui.dataset.size"),
+                                       Constants.MIN_POINT_SIZE_SCALE,
+                                       Constants.MAX_POINT_SIZE_SCALE,
+                                       Constants.SLIDER_STEP_TINY,
+                                       pointScaling,
+                                       skin);
+        pointSize.setWidth(sliderWidth);
+        pointSize.setValue(pointScaling);
         pointSize.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 double val = pointSize.getMappedValue();
@@ -102,7 +107,12 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
 
         // HIGHLIGHT
         content.add(new OwnLabel(I18n.msg("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padTop(pad34).row();
-        content.add(new OwnLabel(I18n.msg("gui.dataset.highlight.info"), skin, "default-scblue")).left().colspan(2).padTop(pad20).padBottom(pad18 * 2f).row();
+        content.add(new OwnLabel(I18n.msg("gui.dataset.highlight.info"), skin, "default-scblue"))
+                .left()
+                .colspan(2)
+                .padTop(pad20)
+                .padBottom(pad18 * 2f)
+                .row();
 
         // Highlight size factor
         IValidator pointSizeValidator = new FloatValidator(Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR);
@@ -125,15 +135,21 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         backupMinSolidAngle = set.particleSizeLimits[0];
         backupMaxSolidAngle = set.particleSizeLimits[1];
 
+        var nf = new DecimalFormat("#0.##");
         // Min solid angle
-        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
+        minSolidAngle = new OwnSliderReset(I18n.msg("gui.dsload.solidangle.min"),
+                                           Constants.MIN_MIN_SOLID_ANGLE,
+                                           Constants.MAX_MIN_SOLID_ANGLE,
+                                           Constants.SLIDER_STEP_TINY,
+                                           (float) (set.particleSizeLimits[0] * MathUtils.radDeg),
+                                           skin);
         minSolidAngle.setName("min solid angle");
         minSolidAngle.setWidth(sliderWidth);
-        minSolidAngle.setValue((float) set.particleSizeLimits[0]);
-        minSolidAngle.setNumberFormatter(new DecimalFormat("####0.####"));
+        minSolidAngle.setValueLabelTransform((value) -> nf.format(value) + I18n.msg("gui.unit.deg"));
+        minSolidAngle.setValue((float) set.particleSizeLimits[0] * MathUtils.radDeg);
         minSolidAngle.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                set.particleSizeLimits[0] = minSolidAngle.getValue();
+                set.particleSizeLimits[0] = minSolidAngle.getValue() * MathUtils.degRad;
                 return true;
             }
             return false;
@@ -141,14 +157,19 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         container.add(minSolidAngle).top().left().colspan(2).left().padBottom(pad18).row();
 
         // Max solid angle
-        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
+        maxSolidAngle = new OwnSliderReset(I18n.msg("gui.dsload.solidangle.max"),
+                                           Constants.MIN_MAX_SOLID_ANGLE,
+                                           Constants.MAX_MAX_SOLID_ANGLE,
+                                           Constants.SLIDER_STEP_SMALL,
+                                           (float) (set.particleSizeLimits[1] * MathUtils.radDeg),
+                                           skin);
         maxSolidAngle.setName("max solid angle");
         maxSolidAngle.setWidth(sliderWidth);
-        maxSolidAngle.setValue((float) set.particleSizeLimits[1]);
-        maxSolidAngle.setNumberFormatter(new DecimalFormat("####0.####"));
+        maxSolidAngle.setValueLabelTransform((value) -> nf.format(value) + I18n.msg("gui.unit.deg"));
+        maxSolidAngle.setValue((float) set.particleSizeLimits[1] * MathUtils.radDeg);
         maxSolidAngle.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                set.particleSizeLimits[1] = maxSolidAngle.getValue();
+                set.particleSizeLimits[1] = maxSolidAngle.getValue() * MathUtils.degRad;
                 return true;
             }
             return false;
@@ -248,8 +269,12 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         // Validators
         FloatValidator fadeVal = new FloatValidator(0f, 1e10f);
         IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeInMax, fadeOutMin, fadeOutMax}, null);
-        IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeOutMin, fadeOutMax}, new OwnTextField[]{fadeInMin});
-        IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeOutMax}, new OwnTextField[]{fadeInMin, fadeInMax});
+        IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal,
+                                                                   new OwnTextField[]{fadeOutMin, fadeOutMax},
+                                                                   new OwnTextField[]{fadeInMin});
+        IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal,
+                                                                    new OwnTextField[]{fadeOutMax},
+                                                                    new OwnTextField[]{fadeInMin, fadeInMax});
         IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal, null, new OwnTextField[]{fadeInMin, fadeInMax, fadeOutMin});
 
         // Set them
@@ -317,7 +342,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
     public void notify(Event event, Object source, Object... data) {
         if (isVisible() && pointSize != null && source != pointSize && event == Event.CATALOG_POINT_SIZE_SCALING_CMD) {
             double val = (Double) data[1];
-            OwnSliderPlus slider = pointSize;
+            var slider = pointSize;
             slider.setProgrammaticChangeEvents(false);
             slider.setMappedValue(val);
             slider.setProgrammaticChangeEvents(true);

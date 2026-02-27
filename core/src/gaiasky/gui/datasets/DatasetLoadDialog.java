@@ -7,6 +7,7 @@
 
 package gaiasky.gui.datasets;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -176,7 +177,11 @@ public class DatasetLoadDialog extends GenericDialog {
         addParticleColor(container);
 
         // Color noise
-        colorNoise = new OwnSliderPlus(I18n.msg("gui.dsload.color.noise"), Constants.MIN_COLOR_NOISE, Constants.MAX_COLOR_NOISE, Constants.SLIDER_STEP_TINY, skin);
+        colorNoise = new OwnSliderPlus(I18n.msg("gui.dsload.color.noise"),
+                                       Constants.MIN_COLOR_NOISE,
+                                       Constants.MAX_COLOR_NOISE,
+                                       Constants.SLIDER_STEP_TINY,
+                                       skin);
         colorNoise.setName("color noise");
         colorNoise.setWidth(sliderWidth);
         colorNoise.setValue(0.2f);
@@ -193,7 +198,11 @@ public class DatasetLoadDialog extends GenericDialog {
         addLabelColor(container);
 
         // Particle size
-        particleSize = new OwnSliderPlus(I18n.msg("gui.dsload.size"), Constants.MIN_PARTICLE_SIZE, Constants.MAX_PARTICLE_SIZE, Constants.SLIDER_STEP_TINY, skin);
+        particleSize = new OwnSliderPlus(I18n.msg("gui.dsload.size"),
+                                         Constants.MIN_PARTICLE_SIZE,
+                                         Constants.MAX_PARTICLE_SIZE,
+                                         Constants.SLIDER_STEP_TINY,
+                                         skin);
         particleSize.setName("particle size");
         particleSize.setWidth(sliderWidth);
         particleSize.setValue(10f);
@@ -220,7 +229,7 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).left().padBottom(pad20).row();
 
         // Component type
-        ComponentTypeBean[] componentTypes = new ComponentTypeBean[] {
+        ComponentTypeBean[] componentTypes = new ComponentTypeBean[]{
                 new ComponentTypeBean(ComponentType.Others),
                 new ComponentTypeBean(ComponentType.Stars),
                 new ComponentTypeBean(ComponentType.Galaxies),
@@ -267,7 +276,7 @@ public class DatasetLoadDialog extends GenericDialog {
         addLabelColor(container);
 
         // Component type
-        ComponentTypeBean[] componentTypes = new ComponentTypeBean[] {
+        ComponentTypeBean[] componentTypes = new ComponentTypeBean[]{
                 new ComponentTypeBean(ComponentType.Others),
                 new ComponentTypeBean(ComponentType.Stars),
                 new ComponentTypeBean(ComponentType.Galaxies),
@@ -331,14 +340,14 @@ public class DatasetLoadDialog extends GenericDialog {
     }
 
     private void addParticleColor(Table container) {
-        particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
+        particleColor = new ColorPicker(new float[]{0.3f, 0.3f, 1f, 1f}, stage, skin);
         particleColor.setNewColorRunnable(this::updateFrameBuffer);
         container.add(new OwnLabel(I18n.msg("gui.dsload.color"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
         container.add(particleColor).size(cpSize).left().padBottom(pad10).row();
     }
 
     private void addLabelColor(Table container) {
-        labelColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
+        labelColor = new ColorPicker(new float[]{0.3f, 0.3f, 1f, 1f}, stage, skin);
         container.add(new OwnLabel(I18n.msg("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
         Table lc = new Table(skin);
         lc.add(labelColor).size(cpSize);
@@ -347,11 +356,15 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addNumberLabels(Table container) {
         // Number of labels
-        numLabels = new OwnSliderPlus(I18n.msg("gui.dsload.numlabels"), Constants.MIN_NUM_LABELS, Constants.MAX_NUM_LABELS, Constants.SLIDER_STEP, skin);
+        numLabels = new OwnSliderPlus(I18n.msg("gui.dsload.numlabels"),
+                                      Constants.MIN_NUM_LABELS,
+                                      Constants.MAX_NUM_LABELS,
+                                      Constants.SLIDER_STEP,
+                                      skin);
         numLabels.setName("number labels");
         numLabels.setWidth(sliderWidth);
         numLabels.setValue(80);
-        numLabels.setNumberFormatter( new DecimalFormat("####0"));
+        numLabels.setNumberFormatter(new DecimalFormat("####0"));
         numLabels.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 updateFrameBuffer();
@@ -363,12 +376,17 @@ public class DatasetLoadDialog extends GenericDialog {
     }
 
     private void addMinMaxSolidAngle(Table container) {
+        var nf = new DecimalFormat("#0.##");
         // Min solid angle
-        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"), Constants.MIN_MIN_SOLID_ANGLE, Constants.MAX_MIN_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
+        minSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.min"),
+                                          Constants.MIN_MIN_SOLID_ANGLE,
+                                          Constants.MAX_MIN_SOLID_ANGLE,
+                                          Constants.SLIDER_STEP_TINY,
+                                          skin);
         minSolidAngle.setName("min solid angle");
         minSolidAngle.setWidth(sliderWidth);
-        minSolidAngle.setValue(0.0015f);
-        minSolidAngle.setNumberFormatter( new DecimalFormat("####0.####"));
+        minSolidAngle.setValueLabelTransform((value) -> nf.format(value) + I18n.msg("gui.unit.deg"));
+        minSolidAngle.setValue(0.1f);
         minSolidAngle.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 updateFrameBuffer();
@@ -379,11 +397,15 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(minSolidAngle).colspan(2).left().padBottom(pad18).row();
 
         // Max solid angle
-        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"), Constants.MIN_MAX_SOLID_ANGLE, Constants.MAX_MAX_SOLID_ANGLE, Constants.SLIDER_STEP_WEENY, skin);
+        maxSolidAngle = new OwnSliderPlus(I18n.msg("gui.dsload.solidangle.max"),
+                                          Constants.MIN_MAX_SOLID_ANGLE,
+                                          Constants.MAX_MAX_SOLID_ANGLE,
+                                          Constants.SLIDER_STEP_SMALL,
+                                          skin);
         maxSolidAngle.setName("max solid angle");
         maxSolidAngle.setWidth(sliderWidth);
-        maxSolidAngle.setValue(0.02f);
-        maxSolidAngle.setNumberFormatter( new DecimalFormat("####0.####"));
+        maxSolidAngle.setValueLabelTransform((value) -> nf.format(value) + I18n.msg("gui.unit.deg"));
+        maxSolidAngle.setValue(10.0f);
         maxSolidAngle.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 updateFrameBuffer();
@@ -478,10 +500,14 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Validators
         FloatValidator fadeVal = new FloatValidator(0f, 1e10f);
-        IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeInMax, fadeOutMin, fadeOutMax }, null);
-        IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeOutMin, fadeOutMax }, new OwnTextField[] { fadeInMin });
-        IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeOutMax }, new OwnTextField[] { fadeInMin, fadeInMax });
-        IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal, null, new OwnTextField[] { fadeInMin, fadeInMax, fadeOutMin });
+        IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeInMax, fadeOutMin, fadeOutMax}, null);
+        IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal,
+                                                                   new OwnTextField[]{fadeOutMin, fadeOutMax},
+                                                                   new OwnTextField[]{fadeInMin});
+        IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal,
+                                                                    new OwnTextField[]{fadeOutMax},
+                                                                    new OwnTextField[]{fadeInMin, fadeInMax});
+        IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal, null, new OwnTextField[]{fadeInMin, fadeInMax, fadeOutMin});
 
         // Set them
         fadeInMin.setValidator(fadeInMinVal);
@@ -505,7 +531,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
             datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0);
-            datasetOptions.particleSizeLimits = new double[] { minSolidAngle.getValue(), maxSolidAngle.getValue() };
+            datasetOptions.particleSizeLimits = new double[]{minSolidAngle.getValue() * MathUtils.degRad, maxSolidAngle.getValue() * MathUtils.degRad};
             datasetOptions.numLabels = (int) numLabels.getValue();
         } else if (clusters.isChecked()) {
             datasetOptions.type = DatasetLoadType.PARTICLES_EXT;
@@ -514,7 +540,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise != null ? colorNoise.getValue() : 0.0;
             datasetOptions.particleSize = particleSize != null ? particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0) : 1.0;
-            datasetOptions.particleSizeLimits = new double[] { 0.0d, 1.57d };
+            datasetOptions.particleSizeLimits = new double[]{0.0d, 1.57d};
             datasetOptions.numLabels = 100;
             datasetOptions.modelType = "icosphere";
             datasetOptions.modelPrimitive = "GL_LINES";
@@ -532,10 +558,10 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addFadeInfo(DatasetOptions dops) {
         if (fadeIn.isChecked()) {
-            dops.fadeIn = new double[] { fadeInMin.getDoubleValue(0d), fadeInMax.getDoubleValue(0d) };
+            dops.fadeIn = new double[]{fadeInMin.getDoubleValue(0d), fadeInMax.getDoubleValue(0d)};
         }
         if (fadeOut.isChecked()) {
-            dops.fadeOut = new double[] { fadeOutMin.getDoubleValue(2000d), fadeOutMax.getDoubleValue(8000d) };
+            dops.fadeOut = new double[]{fadeOutMin.getDoubleValue(2000d), fadeOutMax.getDoubleValue(8000d)};
         }
     }
 

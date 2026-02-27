@@ -53,8 +53,8 @@ public class OwnSliderReset extends Table implements Disableable {
     }
 
     public OwnSliderReset(String title, float min, float max, float stepSize, float resetValue,
-                          Skin skin, String style) {
-        slider = new OwnSliderPlus(title, min, max, stepSize, skin, style);
+                          Skin skin, String sliderStyle) {
+        slider = new OwnSliderPlus(title, min, max, stepSize, skin, sliderStyle);
         this.skin = skin;
         initializeLayout();
         setResetValue(resetValue);

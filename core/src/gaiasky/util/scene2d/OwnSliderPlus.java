@@ -136,15 +136,15 @@ public class OwnSliderPlus extends Slider implements IObserver {
     /**
      * Creates a slider where the internal range and mapped range are identical.
      *
-     * @param title    The text displayed inside (left) the slider.
-     * @param min      The range minimum (both internal and display).
-     * @param max      The range maximum (both internal and display).
-     * @param stepSize The step increment.
-     * @param skin     The UI skin to use.
-     * @param style    The name of the slider style within the skin.
+     * @param title       The text displayed inside (left) the slider.
+     * @param min         The range minimum (both internal and display).
+     * @param max         The range maximum (both internal and display).
+     * @param stepSize    The step increment.
+     * @param skin        The UI skin to use.
+     * @param sliderStyle The name of the slider style within the skin.
      */
-    public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style) {
-        super(min, max, stepSize, false, skin.get(style, OwnSliderStyle.class));
+    public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String sliderStyle) {
+        super(min, max, stepSize, false, skin.get(sliderStyle, OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, false, "default");
     }
