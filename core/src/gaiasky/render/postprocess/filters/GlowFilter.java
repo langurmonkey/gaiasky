@@ -22,7 +22,7 @@ public final class GlowFilter extends Filter<GlowFilter> {
     private float textureScale = 1f;
     private float spiralScale = 1f;
     private float orientation = 0f;
-    private float backbufferScale = 1f;
+    private float backBufferScale = 1f;
 
     // Contains a pre pass texture which is used to compute occlusion.
     private Texture occlusionTexture;
@@ -34,8 +34,8 @@ public final class GlowFilter extends Filter<GlowFilter> {
         rebind();
     }
 
-    public void setBackbufferScale(float s) {
-        this.backbufferScale = s;
+    public void setBackBufferScale(float s) {
+        this.backBufferScale = s;
         setParam(Param.BackbufferScale, s);
     }
 
@@ -114,7 +114,7 @@ public final class GlowFilter extends Filter<GlowFilter> {
         setParams(Param.SpiralScale, spiralScale);
         setParams(Param.Orientation, orientation);
         setParams(Param.Viewport, viewport);
-        setParams(Param.BackbufferScale, backbufferScale);
+        setParams(Param.BackbufferScale, backBufferScale);
         setParams(Param.NLights, nLights);
         if (lightPositions != null)
             setParamsv(Param.LightPositions, lightPositions, 0, nLights * 2);

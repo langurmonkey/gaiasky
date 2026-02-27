@@ -194,6 +194,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         boolean vr = settings.runtime.openXr;
 
         ar = width / height;
+        if (settings.program.modeStereo.isStereoHalfWidth())
+            ar /= 2f;
 
         ppb.pp = new PostProcessor(rt, FastMath.round(width), FastMath.round(height), true, true, false, !safeMode, !safeMode, safeMode);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
