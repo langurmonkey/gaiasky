@@ -113,7 +113,7 @@ public class Constants {
     /** Minimum star glow factor. **/
     public static final float MIN_STAR_GLOW_FACTOR = 0.01f;
     /** Maximum star glow factor. **/
-    public static final float MAX_STAR_GLOW_FACTOR = 0.5f;
+    public static final float MAX_STAR_GLOW_FACTOR = 0.1f;
     /** Minimum star pixel size. **/
     public static final float MIN_STAR_POINT_SIZE = 0.1f;
     /** Maximum star pixel size. **/
