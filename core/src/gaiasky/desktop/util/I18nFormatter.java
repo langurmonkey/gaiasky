@@ -9,12 +9,12 @@ package gaiasky.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import gaiasky.gui.main.ConsoleLogger;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.properties.CommentedProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +27,7 @@ import java.util.*;
  */
 public class I18nFormatter {
 
-    private static final Logger log = LoggerFactory.getLogger(I18nFormatter.class);
+    private static final gaiasky.util.Logger.Log log = Logger.getLogger(I18nFormatter.class);
 
     public static void main(String[] args) {
         if (args.length != 2) {
@@ -42,6 +42,9 @@ public class I18nFormatter {
         String ASSETS_LOC = Settings.ASSETS_LOC;
         I18n.locale = Locale.getDefault();
         Gdx.files = new Lwjgl3Files();
+        // Add notification watch
+        new ConsoleLogger();
+
         Path i18nDir = Path.of(ASSETS_LOC, "i18n");
 
         Path p0 = i18nDir.resolve(args[0]);
@@ -86,7 +89,7 @@ public class I18nFormatter {
                     }
                 } else {
                     // Use default (English), commented
-                    log.error("Property not found: " + key);
+                    log.error("Property not found: ", key);
                     missing.put((String) key, TextUtils.escape(props0.getProperty((String) key)));
                 }
             }
@@ -100,7 +103,7 @@ public class I18nFormatter {
             outputProperties.store(ps, "\uFEFF", "UTF-8", missing);
             ps.close();
 
-            log.info("File written to " + outFile.getAbsolutePath());
+            log.info("File written to {}", outFile.getAbsolutePath());
         } catch (Exception e) {
             log.error("Error: ", e);
         }
@@ -108,15 +111,15 @@ public class I18nFormatter {
 
     private static boolean checkFile(File f) {
         if (!f.exists()) {
-            log.error("File does not exist: " + f);
+            log.error("File does not exist: ", f);
             return true;
         }
         if (!f.isFile()) {
-            log.error("Not a file: " + f);
+            log.error("Not a file: ", f);
             return true;
         }
         if (!f.canRead()) {
-            log.error("Can not read: " + f);
+            log.error("Can not read: ", f);
             return true;
         }
         return false;

@@ -143,9 +143,9 @@ tasks.register('run', GaiaSkyRun) {
     setup()
 }
 
-tasks.register('translationStatus', JavaExec) {
+def i18nStatusTask = {
     dependsOn jar
-    description = 'Runs the I18n status program, which generates statistics about the current status of the translation files.'
+    description = 'Runs the I18n status program, which prints out information of the status of each language.'
     systemProperties['assets.location'] = './assets/'
     classpath = project.ext.sourceSets.main.runtimeClasspath
     classpath += project.files(project.ext.assetsDir)
@@ -153,10 +153,9 @@ tasks.register('translationStatus', JavaExec) {
     workingDir = project.ext.workDir
     mainClass = "gaiasky.desktop.util.I18nStatus"
 }
-
-tasks.register('runI18nFormatter', JavaExec) {
+def i18nFormatterTask = {
     dependsOn jar
-    description = 'Runs the I18n formatter, which formats the i18n files with missing keys.'
+    description = 'Runs the I18n formatter program, which formats the i18n files with the missing keys.'
     systemProperties['assets.location'] = './assets/'
     classpath = project.ext.sourceSets.main.runtimeClasspath
     classpath += project.files(project.ext.assetsDir)
@@ -164,6 +163,12 @@ tasks.register('runI18nFormatter', JavaExec) {
     workingDir = project.ext.workDir
     mainClass = "gaiasky.desktop.util.I18nFormatter"
 }
+
+tasks.register('translationStatus', JavaExec, i18nStatusTask)
+tasks.register('i18nStatus', JavaExec, i18nStatusTask)
+
+tasks.register('i18nFormatter', JavaExec, i18nFormatterTask)
+tasks.register('runI18nFormatter', JavaExec, i18nFormatterTask)
 
 tasks.register('createDistDir') {
     description = 'Creates the dist/ directory.'

@@ -15,19 +15,15 @@ import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.nio.file.*;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Prints information on the translation status of Gaia Sky for each supported language.
@@ -68,7 +64,11 @@ public class I18nStatus {
             PathMatcher languageMatcher = FileSystems.getDefault().getPathMatcher("glob:" + cliArgs.bundleFile + "*_*.properties");
 
             Path i18nDir = Path.of(ASSETS_LOC, "i18n");
-            List<Path> candidatePaths = Files.list(i18nDir).toList();
+            List<Path> candidatePaths;
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(i18nDir)) {
+                candidatePaths = StreamSupport.stream(ds.spliterator(), false)
+                        .toList();
+            }
             List<Path> languagePaths = new ArrayList<>();
             Path main = null;
             for (Path p : candidatePaths) {
@@ -114,7 +114,7 @@ public class I18nStatus {
                     country = languageCode.substring(languageCode.indexOf("_") + 1);
                     languageCode = languageCode.substring(0, languageCode.indexOf("_"));
                 }
-                Locale locale = country == null ? new Locale(languageCode) : new Locale(languageCode, country);
+                Locale locale = country == null ? Locale.forLanguageTag(languageCode) : Locale.of(languageCode, country);
 
                 // Load path
                 is = new FileInputStream(p.toString());
@@ -123,25 +123,28 @@ public class I18nStatus {
                 is.close();
 
                 int translatedKeys = 0;
-                Set<Object> missingKeys = new HashSet<>();
+                List<String> missingKeys = new ArrayList<>();
                 Enumeration<Object> mainKeys = mainProps.keys();
                 Iterator<Object> it = mainKeys.asIterator();
                 while (it.hasNext()) {
-                    Object key = it.next();
+                    String key = (String) it.next();
                     if (lang.containsKey(key)) {
                         translatedKeys++;
                     } else {
                         missingKeys.add(key);
                     }
                 }
-                Set<Object> unknownKeys = new HashSet<>();
+                missingKeys.sort(Comparator.naturalOrder());
+
+                List<String> unknownKeys = new ArrayList<>();
                 it = lang.keys().asIterator();
                 while (it.hasNext()) {
-                    Object key = it.next();
+                    String key = (String) it.next();
                     if (!mainProps.containsKey(key)) {
                         unknownKeys.add(key);
                     }
                 }
+                unknownKeys.sort(Comparator.naturalOrder());
                 int extra = lang.size() - translatedKeys;
 
                 double percentage = 100.0 * ((double) (translatedKeys + extra) / (double) totalKeys);
@@ -152,24 +155,21 @@ public class I18nStatus {
                 logger.info(df.format(percentage) + "%");
                 if (cliArgs.showUnknown && translatedKeys < lang.size()) {
                     logger.info(unknownCount + " unknown keys:");
-                    StringBuilder sb = new StringBuilder();
                     for (Object key : unknownKeys) {
-                        sb.append(key).append(" ");
+                        logger.info("   " + key);
                     }
-                    String keyString = TextUtils.breakCharacters(sb.toString(), 100);
-                    logger.info(keyString);
                 }
-                if (cliArgs.showUntranslated && missingKeys.size() > 0) {
+                if (cliArgs.showUntranslated && !missingKeys.isEmpty()) {
                     logger.info(missingKeys.size() + " untranslated keys:");
-                    StringBuilder sb = new StringBuilder();
                     for (Object key : missingKeys) {
-                        sb.append(key).append(" ");
+                        logger.info("   " + key);
                     }
-                    String keyString = TextUtils.breakCharacters(sb.toString(), 100);
-                    logger.info(keyString);
+                    for (Object key : missingKeys) {
+                        System.out.println(key + "=" + mainProps.get(key));
+                    }
                 }
 
-                logger.info("");
+                logger.info("Done");
             }
         } catch (IOException e) {
             logger.error(e);
@@ -177,10 +177,14 @@ public class I18nStatus {
     }
 
     private static class CLIArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
-        @Parameter(names = { "-s", "--show-untranslated" }, description = "Show untranslated keys for each language.", order = 1) private boolean showUntranslated = false;
-        @Parameter(names = { "-u", "--show-unknown" }, description = "Show unknown keys for each language.", order = 2) private boolean showUnknown = false;
-        @Parameter(names = { "-f", "--file" }, description = "The name of the file to check, either 'gsbundle' or 'objects'.", order = 3) private String bundleFile = "gsbundle";
+        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
+        private boolean help = false;
+        @Parameter(names = {"-s", "--show-untranslated"}, description = "Show untranslated keys for each language.", order = 1)
+        private boolean showUntranslated = false;
+        @Parameter(names = {"-u", "--show-unknown"}, description = "Show unknown keys for each language.", order = 2)
+        private boolean showUnknown = false;
+        @Parameter(names = {"-f", "--file"}, description = "The name of the file to check, either 'gsbundle' or 'objects'.", order = 3)
+        private String bundleFile = "gsbundle";
 
     }
 }
