@@ -68,8 +68,8 @@ public class LoadingGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         interfaces = new Array<>();
-        float pad30 = 48f;
-        float pad10 = 16f;
+        float pad32 = 32f;
+        float pad10 = 10f;
         final var settings = Settings.settings;
         // User interface.
         Viewport vp;
@@ -107,9 +107,10 @@ public class LoadingGui extends AbstractGui {
 
         var centerContent = new Table(skin);
         centerContent.center();
-        centerContent.pad(pad30);
-        centerContent.padLeft(pad30 * 5f);
-        centerContent.padRight(pad30 * 5f);
+        centerContent.setBackground("bg-pane");
+        centerContent.pad(pad32);
+        centerContent.padLeft(pad32 * 5f);
+        centerContent.padRight(pad32 * 5f);
 
         // Logo and title.
         Table titleGroup = new Table(skin);
@@ -129,8 +130,8 @@ public class LoadingGui extends AbstractGui {
         title.add(gaiaSky).bottom().left().padBottom(pad10).row();
         title.add(version).bottom().left().padRight(pad10);
 
-        titleGroup.add(logo).center().padRight(pad30 * 2f);
-        titleGroup.add(new Separator(skin, "default")).fillY().padRight(pad30);
+        titleGroup.add(logo).center().padRight(pad32 * 2f);
+        titleGroup.add(new Separator(skin, "default")).fillY().padRight(pad32);
         titleGroup.add(title);
 
         // Funny text.
@@ -139,8 +140,8 @@ public class LoadingGui extends AbstractGui {
         spin = new OwnLabel("0", skin, "title-s");
         spin.setColor(skin.getColor("theme"));
 
-        centerContent.add(titleGroup).width(1300).center().padBottom(pad30 * 2f).row();
-        centerContent.add(spin).padBottom(pad30).row();
+        centerContent.add(titleGroup).width(1300).center().padBottom(pad32 * 2f).row();
+        centerContent.add(spin).padBottom(pad32).row();
 
         if (vr) {
             bottomMiddle = new VersionLineTable(skin, true);
@@ -156,7 +157,7 @@ public class LoadingGui extends AbstractGui {
             bottomMiddle = new Table(skin);
             bottomMiddle.setFillParent(true);
             bottomMiddle.center().bottom();
-            bottomMiddle.padBottom(pad30);
+            bottomMiddle.padBottom(pad32);
             bottomMiddle.add(tipContainer).fillX().expandX().height(90f);
         }
 
