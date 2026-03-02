@@ -110,6 +110,20 @@ gui.yes=Đúng
 
 Now you are ready to start translating! Once you are done, [create a pull request](https://codeberg.org/gaiasky/gaiasky/compare/master...master) and we'll merge your file into the main repository after making sure everything is alright. If you are not familiar with git repositories and pull requests, just send us the translation files [via email](https://gaiasky.space/contact).
 
+#### Object names
+
+Object names are translated in the `assets/i18n/objects[lang-code].properties` files. Since object names come from catalogs and data files, we do not have a fixed set of them. You can add as many as you want for your language. Planets, moons, stars, nebulae, galaxies, etc. will be show with the translated name if available, and fall back to English otherwise. To find out the key (remember the `key=value` format) for an object, you should find where it is defined (the source catalog). Then, take the first name in the list (if there are more than one), make it lower case, and then replace all whitespaces with underscores. Here are some examples:
+
+- `Helix Nebula` → Key: `helix_nebula`
+- `Betelgeuse` → Key: `betelgeuse`
+- `My SpeCIAL Star` → Key: `my_special_star`
+
+For example, to add the Helix Nebula in the Catalan file (`assets/i18n/objects_ca.properties`):
+
+```properties
+helix_nebula=Nebulosa de l'Hèlix
+```
+
 #### Tip strings
 
 The loading screen of Gaia Sky displays tips on the general working of the program at the bottom.
