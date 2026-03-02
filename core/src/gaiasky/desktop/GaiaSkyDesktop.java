@@ -189,9 +189,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Init global configuration.
             SettingsManager.initialize(cliArgs.vr);
 
-            // Initialize i18n (only for global config logging).
-            I18n.initialize(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"));
-
             // Safe mode active if specified in CLI arg, or in config.
             if (cliArgs.safeMode && !Settings.settings.program.safeMode) {
                 Settings.settings.program.safeMode = true;
@@ -203,7 +200,7 @@ public class GaiaSkyDesktop implements IObserver {
                 Settings.settings.program.safeMode = false;
             }
 
-            // Reinitialize with user-defined locale.
+            // Initialize I18n.
             I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"),
                             Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
 
