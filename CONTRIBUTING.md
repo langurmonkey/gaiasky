@@ -124,6 +124,8 @@ For example, to add the Helix Nebula in the Catalan file (`assets/i18n/objects_c
 helix_nebula=Nebulosa de l'Hèlix
 ```
 
+If you don't know where to find the source of a catalog, check out the repositories starting with `gsdata` in [codeberg.org/gaiasky](https://codeberg.org/gaiasky). You can also download the catalog with Gaia Sky and inspect it directly in the data directory.
+
 #### Tip strings
 
 The loading screen of Gaia Sky displays tips on the general working of the program at the bottom.
