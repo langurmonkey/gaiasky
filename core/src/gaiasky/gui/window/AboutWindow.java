@@ -31,6 +31,8 @@ import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
 import oshi.SystemInfo;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -203,29 +205,40 @@ public class AboutWindow extends GenericDialog {
 
         // Contributor
         var contribTitle = new OwnLabel(I18n.msg("gui.help.contributors"), skin);
-
         var contrib = new Table(skin);
-        contrib.left();
-        var contribName = new OwnLabel("Apl. Prof. Dr. Stefan Jordan", skin);
-        var contribMail = new Link("jordan@ari.uni-heidelberg.de", linkStyle, "mailto:jordan@ari.uni-heidelberg.de");
-        contrib.add(contribName).left().row();
-        contrib.add(contribMail).left().row();
+        try {
+            var contributors = Contributor.parseContributorsFile(Path.of("CONTRIBUTORS.md"));
+
+            contrib.left();
+            for (var contributor : contributors) {
+                var isMail =TextUtils.isValidEmailSimple(contributor.contact());
+                var name = new OwnLabel(contributor.name(), skin);
+                var contact = new Link(contributor.contact(), linkStyle, (isMail ? "mailto:" : "") + contributor.contact());
+                var contribution = new OwnLabel(contributor.contribution(), skin);
+                contrib.add(name).left().padRight(pad10);
+                contrib.add(contact).left().row();
+                contrib.add().padBottom(pad10);
+                contrib.add(contribution).left().padBottom(pad10).row();
+
+            }
+        }catch (IOException e) {
+            logger.error("Could not read CONTRIBUTORS.md file", e);
+        }
+        var contribScroll = new OwnScrollPane(contrib, skin, "minimalist-nobg");
+        contribScroll.setHeight(180f);
+        contribScroll.setFadeScrollBars(false);
+        contribScroll.setScrollingDisabled(true, false);
+        contribScroll.setOverscroll(false, false);
+        contribScroll.setSmoothScrolling(true);
+        scrolls.add(contribScroll);
 
         // License
-        var licenseHorizontal = new HorizontalGroup();
-        licenseHorizontal.space(pad18);
-
-        var licenseVertical = new VerticalGroup();
-        var licenseText = new OwnTextArea(I18n.msg("gui.help.license"), skin.get("regular", TextFieldStyle.class));
-        licenseText.setDisabled(true);
-        licenseText.setPrefRows(3);
-        licenseText.setWidth(taWidth2 / 2f);
+        var licenseTable = new Table(skin);
+        var licenseText = new OwnLabel(I18n.msg("gui.help.license"), skin);
         var licenseLink = new Link(Settings.LICENSE_URL, linkStyle, Settings.LICENSE_URL);
 
-        licenseVertical.addActor(licenseText);
-        licenseVertical.addActor(licenseLink);
-
-        licenseHorizontal.addActor(licenseVertical);
+        licenseTable.add(licenseText).center().row();
+        licenseTable.add(licenseLink).center();
 
         // Thanks
         HorizontalGroup thanks = new HorizontalGroup();
@@ -255,11 +268,11 @@ public class AboutWindow extends GenericDialog {
         contentAbout.add(author).left().padTop(pad10).padTop(pad18);
         contentAbout.row();
         contentAbout.add(contribTitle).left().padRight(pad18).padTop(pad18);
-        contentAbout.add(contrib).left().padTop(pad18);
+        contentAbout.add(contribScroll).left().padTop(pad18);
         contentAbout.row();
-        contentAbout.add(licenseHorizontal).colspan(2).center().padTop(pad18 * 4f);
+        contentAbout.add(licenseTable).colspan(2).center().padTop(pad18 * 4f);
         contentAbout.row();
-        contentAbout.add(thanksSc).colspan(2).center().padTop(pad18 * 6f);
+        contentAbout.add(thanksSc).colspan(2).center().padTop(pad18 * 3f);
         contentAbout.pack();
 
         /* CONTENT 3 - SYSTEM */
@@ -569,6 +582,7 @@ public class AboutWindow extends GenericDialog {
         systemScroll.setSmoothScrolling(true);
         systemScroll.setHeight(800f);
         systemScroll.pack();
+        scrolls.add(systemScroll);
 
 
         /* CONTENT 4 - UPDATES */

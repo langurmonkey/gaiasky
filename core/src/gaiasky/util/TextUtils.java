@@ -148,9 +148,10 @@ public class TextUtils {
      * Breaks a string by replacing every Nth space character with a newline.
      * This effectively wraps text at specified space intervals.
      *
-     * @param in The input string to process
+     * @param in          The input string to process
      * @param breakSpaces The number of spaces after which to insert a line break.
      *                    If &le; 0, returns the original string unchanged.
+     *
      * @return The processed string with spaces replaced by newlines at intervals,
      *         or the original string if breakSpaces &le; 0
      */
@@ -896,6 +897,20 @@ public class TextUtils {
         } catch (MalformedURLException | URISyntaxException e) {
             return false;
         }
+    }
+
+    /**
+     * Check if the given string represents an email address. Simplified version.
+     *
+     * @param email The string.
+     *
+     * @return True if the string is an e-mail address.
+     */
+    public static boolean isValidEmailSimple(String email) {
+        if (email == null) return false;
+        // Basic pattern: local@domain.tld
+        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        return email.matches(regex);
     }
 
     public static int hashFast(String str) {

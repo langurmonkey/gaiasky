@@ -329,7 +329,7 @@ tasks.register('copyExecutables', Copy) {
 tasks.register('copyRootFiles', Copy) {
     description = 'Copy root-level files (README, LICENSE, etc.) and icons to distribution directory.'
     from "$baseDir"
-    include "README.md", "VR.md", "LICENSE", "AUTHORS"
+    include "README.md", "LICENSE.md", "AUTHORS.md", "CONTRIBUTORS.md"
     into "$distDir"
 
     from "$baseDir/assets/icon"
