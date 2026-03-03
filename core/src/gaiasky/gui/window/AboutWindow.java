@@ -186,7 +186,17 @@ public class AboutWindow extends GenericDialog {
 
         // Dev news
         var devNewsTitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
-        var tw = new Link(Settings.SOCIAL_MEDIA_NAME, linkStyle, Settings.SOCIAL_MEDIA_URL);
+        var smMastoIcon = new OwnImage(skin.getDrawable("sm-masto"), false);
+        smMastoIcon.setScale(0.7f);
+        var smMasto = new Link(Settings.SOCIAL_MEDIA_MASTO_NAME, linkStyle, Settings.SOCIAL_MEDIA_MASTO_URL);
+        var smBskyIcon = new OwnImage(skin.getDrawable("sm-bsky"), false);
+        smBskyIcon.setScale(0.7f);
+        var smBsky = new Link(Settings.SOCIAL_MEDIA_BSKY_NAME, linkStyle, Settings.SOCIAL_MEDIA_BSKY_URL);
+        var sm = new Table(skin);
+        sm.add(smMastoIcon);
+        sm.add(smMasto).padRight(pad34);
+        sm.add(smBskyIcon);
+        sm.add(smBsky);
 
         // Author
         var authorTitle = new OwnLabel(I18n.msg("gui.help.author"), skin);
@@ -247,13 +257,17 @@ public class AboutWindow extends GenericDialog {
         thanksSc.setBackground(skin.getDrawable("bg-clear"));
 
         var zah = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/zah.png")), "https://zah.uni-heidelberg.de");
+        zah.setTooltip(Settings.AUTHOR_AFFILIATION, skin);
         var dlr = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/dlr.png")), "https://dlr.de");
-        var bwt = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/bmftr.png")), "https://www.bmftr.bund.de");
+        dlr.setTooltip(Settings.FUNDING_DLR, skin);
+        var bmftr = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/bmftr.png")), "https://www.bmftr.bund.de");
+        bmftr.setTooltip(Settings.FUNDING_BMFTR, skin);
         var dpac = new OwnImage(getSpriteDrawable(Gdx.files.internal("img/dpac.png")), "https://www.cosmos.esa.int/web/gaia/dpac/consortium");
+        dpac.setTooltip(Settings.FUNDING_DPAC, skin);
 
         thanks.addActor(zah);
         thanks.addActor(dlr);
-        thanks.addActor(bwt);
+        thanks.addActor(bmftr);
         thanks.addActor(dpac);
 
         contentAbout.add(intro).colspan(2).left().padTop(pad34);
@@ -262,7 +276,7 @@ public class AboutWindow extends GenericDialog {
         contentAbout.add(homepage).left().padTop(pad18);
         contentAbout.row();
         contentAbout.add(devNewsTitle).left().padRight(pad18).padTop(pad18);
-        contentAbout.add(tw).left().padTop(pad18);
+        contentAbout.add(sm).left().padTop(pad18);
         contentAbout.row();
         contentAbout.add(authorTitle).left().padRight(pad18).padTop(pad18);
         contentAbout.add(author).left().padTop(pad10).padTop(pad18);

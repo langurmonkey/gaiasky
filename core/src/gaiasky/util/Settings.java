@@ -83,8 +83,10 @@ public class Settings extends SettingsObject {
     public static final String HOMEPAGE_DOWNLOADS = "https://gaiasky.space/downloads";
     public static final String DOCUMENTATION = "http://docs.gaiasky.space";
     public static final String REPOSITORY = "https://codeberg.org/gaiasky/gaiasky";
-    public static final String SOCIAL_MEDIA_NAME = "#GaiaSky";
-    public static final String SOCIAL_MEDIA_URL = "https://mastodon.social/tags/GaiaSky";
+    public static final String SOCIAL_MEDIA_MASTO_NAME = "Tag: #GaiaSky";
+    public static final String SOCIAL_MEDIA_MASTO_URL = "https://mastodon.social/tags/GaiaSky";
+    public static final String SOCIAL_MEDIA_BSKY_NAME = "@gaiasky.bsky.social";
+    public static final String SOCIAL_MEDIA_BSKY_URL = "https://bsky.app/profile/gaiasky.bsky.social";
     public static final String ICON_URL;
     public static final String REPO_ISSUES = REPOSITORY + "/issues";
     public static final String AUTHOR_NAME = "Toni Sagristà Sellés";
@@ -94,6 +96,9 @@ public class Settings extends SettingsObject {
     public static final String AUTHOR_AFFILIATION_PLAIN = "Universitaet Heidelberg, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
     public static final String AUTHOR_WEBSITE_TEXT = "tonisagrista.com";
     public static final String AUTHOR_WEBSITE_FULL = "https://tonisagrista.com";
+    public static final String FUNDING_DLR = "Deutsches Zentrum für Luft- und Raumfahrt";
+    public static final String FUNDING_BMFTR = "Bundesministerium für Forschung, Technologie und Raumfahrt";
+    public static final String FUNDING_DPAC = "Gaia Data Processing and Analysis Consortium";
     /** License file. **/
     public static final String LICENSE_URL = "https://opensource.org/licenses/MPL-2.0";
     /** URL used to check for internet connection. **/

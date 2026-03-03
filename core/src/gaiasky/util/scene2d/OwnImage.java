@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
@@ -141,5 +142,9 @@ public class OwnImage extends Image {
             batch.flush();
             batch.getShader().setUniformi("u_applyAccent", 1);
         }
+    }
+
+    public void setTooltip(String tooltip, Skin skin) {
+        addListener(new OwnTextTooltip(tooltip, skin));
     }
 }
