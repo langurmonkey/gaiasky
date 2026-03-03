@@ -22,7 +22,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.api.IGamepadMappings;
 import gaiasky.gui.main.GamepadMappings;
-import gaiasky.input.WindowGamepadListener;
+import gaiasky.input.ScreenGamepadListener;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.Trio;
@@ -595,7 +595,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     /**
      * Listens to gamepad input events in order to configure the axes and buttons.
      */
-    private class GamepadConfigListener extends WindowGamepadListener {
+    private class GamepadConfigListener extends ScreenGamepadListener {
         boolean capturingAxis = false;
         long lastT = System.currentTimeMillis();
         long lastAxisT = System.currentTimeMillis();

@@ -23,6 +23,11 @@ import com.badlogic.gdx.utils.Align;
 import net.jafama.FastMath;
 
 public class OwnWindow extends Table {
+    protected static final float pad34 = 34f;
+    protected static final float pad20 = 20f;
+    protected static final float pad18 = 18f;
+    protected static final float pad10 = 10f;
+
     static private final Vector2 tmpPosition = new Vector2();
     static private final Vector2 tmpSize = new Vector2();
     static private final int MOVE = 1 << 5;

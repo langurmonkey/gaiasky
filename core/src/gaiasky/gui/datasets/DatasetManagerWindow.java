@@ -32,8 +32,8 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.window.GenericDialog;
-import gaiasky.input.WindowGamepadListener;
-import gaiasky.input.WindowKbdListener;
+import gaiasky.input.ScreenGamepadListener;
+import gaiasky.input.ScreenKbdListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -1790,7 +1790,7 @@ public class DatasetManagerWindow extends GenericDialog {
         INSTALLED
     }
 
-    private class DatasetManagerKbdListener extends WindowKbdListener {
+    private class DatasetManagerKbdListener extends ScreenKbdListener {
 
         public DatasetManagerKbdListener(GenericDialog dialog) {
             super(dialog);
@@ -1807,7 +1807,7 @@ public class DatasetManagerWindow extends GenericDialog {
         }
     }
 
-    private class DatasetManagerGamepadListener extends WindowGamepadListener {
+    private class DatasetManagerGamepadListener extends ScreenGamepadListener {
 
         public DatasetManagerGamepadListener(String mappingsFile) {
             super(mappingsFile, me);

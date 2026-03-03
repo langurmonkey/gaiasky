@@ -11,18 +11,19 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.api.IGamepadMappings;
+import gaiasky.gui.api.IScreen;
 import gaiasky.gui.window.GenericDialog;
 
-public class WindowGamepadListener extends GuiGamepadListener {
+public class ScreenGamepadListener extends GuiGamepadListener {
 
-    private final GenericDialog dialog;
+    private final IScreen dialog;
 
-    public WindowGamepadListener(String mappingsFile, GenericDialog dialog) {
+    public ScreenGamepadListener(String mappingsFile, IScreen dialog) {
         super(mappingsFile, dialog.getStage());
         this.dialog = dialog;
     }
 
-    public WindowGamepadListener(IGamepadMappings mappings, GenericDialog dialog) {
+    public ScreenGamepadListener(IGamepadMappings mappings, GenericDialog dialog) {
         super(mappings, dialog.getStage());
         this.dialog = dialog;
     }
@@ -39,7 +40,7 @@ public class WindowGamepadListener extends GuiGamepadListener {
     public Array<Group> getContentContainers() {
         var a = new Array<Group>(3);
         a.add(dialog.getCurrentContentContainer());
-        a.add(dialog.getBottmGroup());
+        a.add(dialog.getBottomGroup());
         a.add(dialog.getButtonsGroup());
         return a;
     }
@@ -47,10 +48,10 @@ public class WindowGamepadListener extends GuiGamepadListener {
     @Override
     public void select() {
         Actor target = stage.getKeyboardFocus();
-        if (target != dialog.acceptButton && dialog.acceptButton != null) {
-            stage.setKeyboardFocus(dialog.acceptButton);
-        } else if (target != dialog.cancelButton && dialog.cancelButton != null) {
-            stage.setKeyboardFocus(dialog.cancelButton);
+        if (target != dialog.acceptButton() && dialog.acceptButton() != null) {
+            stage.setKeyboardFocus(dialog.acceptButton());
+        } else if (target != dialog.cancelButton() && dialog.cancelButton() != null) {
+            stage.setKeyboardFocus(dialog.cancelButton());
         }
     }
 

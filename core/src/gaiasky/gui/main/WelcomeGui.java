@@ -1256,8 +1256,6 @@ public class WelcomeGui extends AbstractGui {
             case UI_RELOAD_CMD -> {
                 GaiaSky.postRunnable(() -> {
                     var globalResources = (GlobalResources) data[0];
-                    // Reinitialise GUI system
-                    GenericDialog.updatePads();
                     // UI theme reload broadcast
                     EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));

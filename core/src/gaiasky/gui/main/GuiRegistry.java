@@ -881,8 +881,6 @@ public class GuiRegistry implements IObserver {
     private void reloadUI(GlobalResources globalResources) {
         // Reinitialise user interface.
         GaiaSky.postRunnable(() -> {
-            // Reinitialise GUI system.
-            GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
             EventManager.publish(Event.SPACECRAFT_LOADED, this, scene.getEntity("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();

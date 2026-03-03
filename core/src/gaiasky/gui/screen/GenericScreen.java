@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui.window;
+package gaiasky.gui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -33,7 +33,7 @@ import gaiasky.input.ScreenKbdListener;
 import gaiasky.util.GuiUtils;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
-import gaiasky.util.scene2d.CollapsibleWindow;
+import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.Separator;
@@ -47,72 +47,71 @@ import java.util.Set;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
- * An abstract, extensible {@code GenericDialog} intended to be subclassed for creating
- * custom interactive dialog windows. It serves as a wrapper around a main content table and
- * a bottom row for action buttons (Accept/Cancel).
+ * Abstract base class for full-screen UI views within the application.
  *
- * <p>This class provides a layout manager that automatically arranges the main content area
- * and the footer button group. Subclasses must implement the {@code build()} method to
- * populate the content table before showing the dialog. It supports multiple tabs,
- * modal/non-modal behavior, and captures input (mouse, keyboard, gamepad) to prevent
- * interference with the rest of the application while the dialog is open.</p>
+ * <p>{@code GenericScreen} extends {@link Table} to provide a structured layout that occupies the entire
+ * application viewport. It handles common UI concerns such as managing modal overlays, input redirection,
+ * keyboard shortcuts (ESC, ENTER, TAB), gamepad listeners, and tabbed content interfaces.</p>
+ *
+ * <p>This class provides a consistent framework for creating dialogs, menus, or main screens. It
+ * automatically manages the focus hierarchy, input processors, and event listeners when the screen is
+ * shown or hidden.</p>
+ *
+ * <h3>Key Features</h3>
+ * <ul>
+ *   <li><b>Full-Viewport Layout:</b> Takes up the whole application viewport by default.</li>
+ *   <li><b>Modal Support:</b> Configurable modal behavior to capture and disable external input.</li>
+ *   <li><b>Input Management:</b> Automatically backs up and restores previous mouse/keyboard/gamepad
+ *     listeners when entering or leaving the screen.</li>
+ *   <li><b>Keyboard Shortcuts:</b> Built-in support for ESC (close/cancel), ENTER (accept), and TAB
+ *     (focus switching).</li>
+ *   <li><b>Tab System:</b> Integrated support for tabbed interfaces with automatic listener setup.</li>
+ *   <li><b>Animation:</b> Default fade-in/fade-out animations when showing/hiding.</li>
+ * </ul>
  *
  * <h3>Layout Structure</h3>
- * <ul>
- *   <li><strong>Content Table:</strong> Defined by the {@code build()} method implementation in the subclass.
- *   </li>
- *   <li><strong>Footer Table:</strong> Contains the action buttons (Accept/Cancel) if configured.
- *   </li>
- *   <li><strong>Tab System:</strong> Subclasses can add multiple tabs using {@link #addTabContent(Group)}.
- *   Tabs are managed via a stack and a button group that restricts selection to one tab at a time.
- *   </li>
- * </ul>
- *
- * <h3>Subclassing Guidelines</h3>
- * <p>To create a functional dialog, the subclass must:</p>
+ * <p>By default, the screen layout consists of four parts:</p>
  * <ol>
- *   <li>Implement the {@code build()} method to add UI actors to the content table.</li>
- *   <li>Implement the {@code accept()} method, which returns {@code true} if the dialog should close
- *       upon clicking the accept button.</li>
- *   <li>Implement the {@code cancel()} method, which is called upon clicking cancel or pressing Escape.</li>
- *   <li>(Optional) Override {@code dispose()} for cleanup resources.</li>
+ *   <li><b>Title:</b> A top bar displaying the screen title.</li>
+ *   <li><b>Content:</b> The main area for UI elements.</li>
+ *   <li><b>Buttons:</b> A horizontal group containing the Accept and Cancel buttons (right-aligned).</li>
+ *   <li><b>Tabs:</b> Optional tabs line to support content switching, managed by the subclass.</li>
  * </ol>
  *
- * <h3>Common Operations</h3>
- * <p>Subclasses typically override the following methods or use the provided helpers:</p>
- * <ul>
- *   <li>{@link #show(Stage)} or {@link #show(Stage, Action)} to display the dialog.</li>
- *   <li>{@link #setAcceptText(String)} and {@link #setCancelText(String)} to customize button labels.</li>
- *   <li>{@link #setModal(boolean)} to toggle modal behavior (blocking input).</li>
- *   <li>{@link #addSeparator()} to add horizontal dividers within the content area.</li>
- *   <li>{@link #tabRight()} and {@link #tabLeft()} for manual tab navigation.</li>
- * </ul>
+ * <h3>Subclassing</h3>
+ * <p>To create a new screen, extend {@code GenericScreen} and:</p>
+ * <ol>
+ *   <li>Override {@link #build()}: Populate the {@link #content} table with your UI actors.</li>
+ *   <li>Override {@link #accept()}: Define what happens when the Accept button is clicked.</li>
+ *   <li>Override {@link #cancel()}: Define what happens when the Cancel button is clicked.</li>
+ *   <li>(Optional) Override {@link #setKeyboardFocus()}: Set focus to a specific widget when the
+ *     screen is shown.</li>
+ * </ol>
  *
- * <p>The class handles internal logic for:</p>
- * <ul>
- *   <li>Input multiplexing (pausing other listeners when modal, restoring them on hide).</li>
- *   <li>Focus management (setting initial focus, tracking previous focus).</li>
- *   <li>Tab state persistence (remembering the last active tab per subclass type).</li>
- *   <li>Window positioning (centering or custom coordinates).</li>
- * </ul>
- *
- * @see CollapsibleWindow
+ * @see Table
+ * @see Actor
+ * @see Stage
  */
-public abstract class GenericDialog extends CollapsibleWindow implements IScreen {
+public abstract class GenericScreen extends Table implements IScreen {
+    protected static final float pad34 = 34f;
+    protected static final float pad20 = 20f;
+    protected static final float pad18 = 18f;
+    protected static final float pad10 = 10f;
+
     /**
      * Stores the last active tab for each subclass.
      */
-    private static final Map<Class<? extends GenericDialog>, Integer> lastActiveTab = new HashMap<>(20);
+    private static final Map<Class<? extends GenericScreen>, Integer> lastActiveTab = new HashMap<>(20);
 
     final protected Stage stage;
     final protected Skin skin;
-    protected TextButton acceptButton, cancelButton;
-    protected GenericDialog me;
+    public String title;
+    private final Table titleTable;
+    public TextButton acceptButton, cancelButton;
+    protected GenericScreen me;
     protected Table content, bottom;
-    protected boolean modal = true;
     protected boolean defaultMouseKbdListener = true;
     protected boolean defaultGamepadListener = true;
-    protected float lastPosX = -1, lastPosY = -1;
     protected HorizontalGroup buttonGroup;
     protected boolean enterExit = true, escExit = true;
     protected boolean keysListener = true;
@@ -145,14 +144,21 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
     private String acceptStyle = "default", cancelStyle = "default";
     private Actor previousKeyboardFocus, previousScrollFocus;
 
-    public GenericDialog(String title, Skin skin, Stage stage) {
-        super(title, skin);
+    public GenericScreen(String title, Skin skin, Stage stage) {
+        super(skin);
+        this.title = title;
         this.skin = skin;
         this.stage = stage;
         this.me = this;
+        this.titleTable = new Table(skin);
         this.content = new Table(skin);
         this.bottom = new Table(skin);
         this.scrolls = new Array<>(false, 5);
+
+        // Screen properties.
+        setBackground("dark-grey");
+        setFillParent(true);
+        align(Align.center);
     }
 
     public void setAcceptText(String acceptText) {
@@ -260,11 +266,6 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
         }
     }
 
-    public void setModal(boolean modal) {
-        this.modal = modal;
-        super.setModal(modal);
-    }
-
     protected void recalculateButtonSize() {
         // Width.
         float w = 128f;
@@ -317,13 +318,14 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
         }
         recalculateButtonSize();
 
-        add(content).left().pad(pad18).row();
+        // TITLE
+        titleTable.add(new OwnLabel(title, skin, "header"));
+
+        // Add to main table.
+        add(titleTable).left().pad(pad18).row();
+        add(content).center().pad(pad18).row();
         add(bottom).expandY().bottom().right().padRight(pad18).row();
         add(buttonGroup).pad(pad18).bottom().right();
-        getTitleTable().align(Align.left);
-
-        // Align top left
-        align(Align.top | Align.left);
 
         pack();
 
@@ -381,9 +383,6 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
 
         // Build actual content.
         build();
-
-        // Modal.
-        setModal(this.modal);
 
         // Add default mouse/kdb listener
         if (defaultMouseKbdListener) {
@@ -456,7 +455,7 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
      *
      * @return The generic dialog instance.
      */
-    public GenericDialog show(Stage stage, Action action) {
+    public GenericScreen show(Stage stage, Action action) {
         clearActions();
         removeCaptureListener(ignoreTouchDown);
 
@@ -484,10 +483,8 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
         focusFirstInputWidget();
         EventManager.publish(Event.CLEAN_PRESSED_KEYS, this);
 
-        if (this.modal) {
-            // Disable input
-            EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
-        }
+        // Disable input
+        EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
 
         return this;
     }
@@ -506,7 +503,7 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
         }
     }
 
-    public Group getBottomGroup() {
+    public Group getBottmGroup() {
         return bottom;
     }
 
@@ -518,15 +515,10 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
      * {@link #pack() Packs} the dialog and adds it to the stage, centered with
      * default fadeIn action.
      */
-    public GenericDialog show(Stage stage) {
+    public GenericScreen show(Stage stage) {
         show(stage, Actions.sequence(
                 Actions.alpha(0f),
                 Actions.fadeIn(0.6f, Interpolation.fade)));
-        if (lastPosX >= 0 && lastPosY >= 0) {
-            setPosition(Math.round(lastPosX), FastMath.round(lastPosY));
-        } else {
-            setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), FastMath.round((stage.getHeight() - getHeight()) / 2f));
-        }
         setKeyboardFocus();
         showDialogHook(stage);
         return this;
@@ -538,7 +530,7 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
     /**
      * {@link #pack() Packs} the dialog and adds it to the stage at the specified position.
      */
-    public GenericDialog show(Stage stage, float x, float y) {
+    public GenericScreen show(Stage stage, float x, float y) {
         show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds(), Interpolation.fade)));
         setPosition(Math.round(x), FastMath.round(y));
         setKeyboardFocus();
@@ -553,14 +545,15 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
 
     }
 
+    public Table getTitleTable() {
+        return titleTable;
+    }
+
     /**
      * Hides the dialog with the given action and then removes it from the
      * stage.
      */
     public void hide(Action action) {
-        lastPosX = this.getX();
-        lastPosY = this.getY();
-
         Stage stage = getStage();
         if (stage != null) {
             if (previousKeyboardFocus != null && previousKeyboardFocus.getStage() == null)
@@ -584,10 +577,8 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
         removeOwnListeners();
         EventManager.publish(Event.CLEAN_PRESSED_KEYS, this);
 
-        if (this.modal) {
-            // Enable input
-            EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
-        }
+        // Enable input
+        EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
     }
 
     /**
@@ -678,7 +669,7 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
             if (inputProcessor instanceof InputMultiplexer inputMultiplexer) {
                 for (var processor : inputMultiplexer.getProcessors()) {
                     if (processor instanceof AbstractMouseKbdListener abstractMouseKbdListener) {
-                        if (abstractMouseKbdListener.isActive() && isModal()) {
+                        if (abstractMouseKbdListener.isActive()) {
                             abstractMouseKbdListener.deactivate();
                             backupMouseKbdListeners.add(abstractMouseKbdListener);
                         }

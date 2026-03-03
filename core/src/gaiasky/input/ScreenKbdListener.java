@@ -9,13 +9,13 @@ package gaiasky.input;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.gui.window.GenericDialog;
+import gaiasky.gui.api.IScreen;
 
-public class WindowKbdListener extends GuiKbdListener {
+public class ScreenKbdListener extends GuiKbdListener {
 
-    private final GenericDialog dialog;
+    private final IScreen dialog;
 
-    public WindowKbdListener(GenericDialog dialog) {
+    public ScreenKbdListener(IScreen dialog) {
         super(dialog.getStage());
         this.dialog = dialog;
     }
@@ -24,7 +24,7 @@ public class WindowKbdListener extends GuiKbdListener {
     public Array<Group> getContentContainers() {
         var a = new Array<Group>(3);
         a.add(dialog.getCurrentContentContainer());
-        a.add(dialog.getBottmGroup());
+        a.add(dialog.getBottomGroup());
         a.add(dialog.getButtonsGroup());
         return a;
     }
@@ -42,11 +42,11 @@ public class WindowKbdListener extends GuiKbdListener {
     @Override
     public boolean select() {
         var target = stage.getKeyboardFocus();
-        if (target != dialog.acceptButton && dialog.acceptButton != null) {
-            stage.setKeyboardFocus(dialog.acceptButton);
+        if (target != dialog.acceptButton() && dialog.acceptButton() != null) {
+            stage.setKeyboardFocus(dialog.acceptButton());
             return true;
-        } else if (target != dialog.cancelButton && dialog.cancelButton != null) {
-            stage.setKeyboardFocus(dialog.cancelButton);
+        } else if (target != dialog.cancelButton() && dialog.cancelButton() != null) {
+            stage.setKeyboardFocus(dialog.cancelButton());
             return true;
         }
         return false;
