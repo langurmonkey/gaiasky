@@ -102,7 +102,7 @@ public class Settings extends SettingsObject {
     /** License file. **/
     public static final String LICENSE_URL = "https://opensource.org/licenses/MPL-2.0";
     /** URL used to check for internet connection. **/
-    public static final String INTERNET_CHECK_URL = "http://fedoraproject.org/static/hotspot.txt";
+    public static final String INTERNET_CHECK_URL = "https://fedoraproject.org/static/hotspot.txt";
     private static final Log logger = Logger.getLogger(Settings.class);
     // Static settings
     public static String APPLICATION_NAME = "Gaia Sky";
