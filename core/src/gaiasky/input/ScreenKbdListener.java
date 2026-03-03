@@ -11,6 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.api.IScreen;
 
+/**
+ * Listener that handles keyboard and mouse input events for UI screens and dialogs.
+ */
 public class ScreenKbdListener extends GuiKbdListener {
 
     private final IScreen dialog;

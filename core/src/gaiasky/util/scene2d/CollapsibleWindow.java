@@ -74,7 +74,7 @@ public class CollapsibleWindow extends OwnWindow {
 
         vec2 = new Vector2();
         addListener(new ClickListener() {
-            private float startx, starty;
+            private float startX, startY;
 
             @Override
             public boolean touchDown(InputEvent event,
@@ -82,8 +82,8 @@ public class CollapsibleWindow extends OwnWindow {
                                      float y,
                                      int pointer,
                                      int button) {
-                startx = x + getX();
-                starty = y + getY();
+                startX = x + getX();
+                startY = y + getY();
                 return super.touchDown(event, x, y, pointer, button);
             }
 
@@ -93,9 +93,9 @@ public class CollapsibleWindow extends OwnWindow {
                                 float y,
                                 int pointer,
                                 int button) {
-                float endx = x + getX();
-                float endy = y + getY();
-                vec2.set(endx - startx, endy - starty);
+                float endX = x + getX();
+                float endY = y + getY();
+                vec2.set(endX - startX, endY - startY);
                 // pixels of margin
                 if (vec2.len() < 3f) {
                     if (getHeight() - y <= getPadTop() && y < getHeight() && x > 0f && x < getWidth())

@@ -14,6 +14,9 @@ import gaiasky.gui.api.IGamepadMappings;
 import gaiasky.gui.api.IScreen;
 import gaiasky.gui.window.GenericDialog;
 
+/**
+ * Listener that handles gamepad and joystick input events for UI screens and dialogs.
+ */
 public class ScreenGamepadListener extends GuiGamepadListener {
 
     private final IScreen dialog;

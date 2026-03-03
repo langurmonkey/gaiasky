@@ -40,7 +40,22 @@ import java.time.format.FormatStyle;
 import java.util.Date;
 
 /**
- * The help and about window. Displays information on the program and how to get help.
+ * Displays comprehensive information about the Gaia Sky application.
+ *
+ * <p>This window extends {@code GenericDialog} and uses a tabbed layout to organize
+ * content into Help, About, System, and Updates (when applicable). It provides
+ * access to external resources such as the project homepage, documentation,
+ * source repository, and social media channels.</p>
+ *
+ * <p>Key features include:</p>
+ * <ul>
+ *   <li>Displaying the current version, build number, and runtime environment.</li>
+ *   <li>Listing credits and author contact information via {@code Link} components.</li>
+ *   <li>Conditionally showing an Updates tab based on the launch method.</li>
+ * </ul>
+ *
+ * @param stage The {@code Stage} for the dialog.
+ * @param skin The {@code Skin} for UI styling.
  */
 @SuppressWarnings("ALL")
 public class AboutWindow extends GenericDialog {
