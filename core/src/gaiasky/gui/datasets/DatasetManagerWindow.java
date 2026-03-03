@@ -392,7 +392,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         var filter = new OwnTextField("", skin, "big");
         filter.setMessageText(I18n.msg("gui.filter"));
-        filter.setWidth(400f);
+        filter.setWidth(width * 0.5f);
         filter.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -445,12 +445,17 @@ public class DatasetManagerWindow extends GenericDialog {
                                   String filter) {
         leftTable.clear();
         int added = 0;
+        int group = 0;
         for (DatasetType type : dataDescriptor.types) {
             List<DatasetDesc> datasets = type.datasets;
             List<DatasetDesc> filtered = datasets.stream()
                     .filter(d -> d.filter(filter) && (mode != DatasetMode.AVAILABLE || !d.exists))
                     .collect(Collectors.toList());
-            added += addDatasetTypeGroup(leftTable, mode, currentSetting, type, filtered, width, filter);
+            var a = addDatasetTypeGroup(leftTable, mode, currentSetting, type, filtered, width, filter, group);
+            added += a;
+            if (a > 0) {
+                group++;
+            }
         }
         leftTable.pack();
         return added;
@@ -462,7 +467,8 @@ public class DatasetManagerWindow extends GenericDialog {
                                     DatasetType type,
                                     List<DatasetDesc> filtered,
                                     float width,
-                                    String filter) {
+                                    String filter,
+                                    int i) {
         int added = 0;
         if (!filtered.isEmpty()) {
             final Array<CheckBox> groupCheckBoxes = new Array<>();
@@ -519,7 +525,7 @@ public class DatasetManagerWindow extends GenericDialog {
             CollapsiblePane groupPane = new CollapsiblePane(stage, paneImage, typeString,
                                                             contentTable, width * 0.5f, skin, "hud-header", "expand-collapse",
                                                             null, filter != null && !filter.isBlank(), null, buttons);
-            leftTable.add(groupPane).left().padTop(pad34 * 2f).row();
+            leftTable.add(groupPane).left().padTop(i == 0 ? 0 : pad34 * 2f).row();
             selectionOrder.add(new Pair<>(null, groupPane.getExpandCollapseActor()));
 
             // Add datasets to content table.
@@ -1010,7 +1016,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     replacedBy = new Table(skin);
                     replacedBy.setBackground("bg-pane-border");
                     var info = new OwnLabel(text, skin, "default-red");
-                    var buttonText = I18n.msg((local != null? "gui.download.enable.ds" : "gui.download.view.ds"), dd.name);
+                    var buttonText = I18n.msg((local != null ? "gui.download.enable.ds" : "gui.download.view.ds"), dd.name);
                     var buttonTextShort = TextUtils.capString(buttonText, 60);
                     var button = new OwnTextButton(buttonTextShort, skin);
                     button.setTooltip(buttonText);
@@ -1485,7 +1491,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * Enables a given dataset, so that it is loaded when Gaia Sky starts.
      *
      * @param dataset The dataset to enable.
-     * @param cb The checkbox to enable the dataset.
+     * @param cb      The checkbox to enable the dataset.
      */
     private void actionEnableDataset(DatasetDesc dataset, OwnCheckBox cb) {
         // Texture packs can't be enabled here.
