@@ -7,6 +7,7 @@
 
 package gaiasky.scene.system.render.extract;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
@@ -16,6 +17,9 @@ import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Label;
 import gaiasky.scene.component.SolidAngle;
 
+/**
+ * Deals with non-raymarching invisible objects.
+ */
 public class InvisibleExtractor extends AbstractExtractSystem {
 
     public InvisibleExtractor(Family family, int priority) {
@@ -34,6 +38,12 @@ public class InvisibleExtractor extends AbstractExtractSystem {
             // This is for label-only objects!
             addToRender(render, RenderGroup.FONT_LABEL);
         }
+    }
+    @Override
+    public void addedToEngine (Engine engine) {
+        int a = 43;
+        super.addedToEngine(engine);
+
     }
 
     private boolean renderText(Base base,

@@ -367,7 +367,7 @@ public class Scene {
             addExtractor(newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer));
             addExtractor(newExtractor(LocExtractor.class, families.locations, priority++, sceneRenderer));
             addExtractor(newExtractor(PerimeterExtractor.class, families.perimeters, priority++, sceneRenderer));
-            addExtractor(newExtractor(RaymarchingExtractor.class, families.raymarchings, priority, sceneRenderer));
+            addExtractor(newExtractor(RaymarchingExtractor.class, families.raymarchings, priority++, sceneRenderer));
             addExtractor(newExtractor(InvisibleExtractor.class, families.invisibles, priority, sceneRenderer));
 
             // Remove all remaining systems.

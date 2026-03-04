@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.component.Raymarching;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
@@ -38,15 +39,31 @@ public class InvisibleInitializer extends AbstractInitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
+        // Remove raymarching tag if needed.
+        var rm = Mapper.raymarching.get(entity);
+        boolean raymarching = true;
+        if (rm.raymarchingShader == null) {
+            entity.remove(Raymarching.class);
+            raymarching = false;
+        }
+
         // Set up label
         var label = Mapper.label.get(entity);
         var sa = Mapper.sa.get(entity);
+        if (raymarching) {
+            label.textScale = 0.2f;
+            label.labelMax = 1.8f;
+            if (label.labelFactor == 0)
+                label.labelFactor = 0.5e-3f;
+        } else {
+            label.textScale = 0.15f;
+            label.labelMax = 1.2f;
+            if (label.labelFactor == 0)
+                label.labelFactor = 0.3e-3f;
+        }
         sa.thresholdLabel = (Math.toRadians(1e-6) * Constants.DISTANCE_SCALE_FACTOR / Settings.settings.scene.label.number) * 60.0;
-        label.textScale = 0.2f;
-        label.labelMax = 1.8f;
-        if (label.labelFactor == 0)
-            label.labelFactor = 0.5e-3f;
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextBase;
+
     }
 }
