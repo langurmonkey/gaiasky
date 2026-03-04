@@ -11,6 +11,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 
+/**
+ * Updates entities defined by vertices, such as polylines or point sets.
+ */
 public class VertsUpdater extends AbstractUpdateSystem {
     public VertsUpdater(Family family, int priority) {
         super(family, priority);

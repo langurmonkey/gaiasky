@@ -13,6 +13,9 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for element set entities, such as orbits or trajectories.
+ */
 public class ElementsSetExtractor extends AbstractExtractSystem {
 
     private final TrajectoryExtractor trajectoryExtractor;

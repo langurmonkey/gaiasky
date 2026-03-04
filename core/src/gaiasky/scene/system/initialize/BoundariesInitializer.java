@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 
+/**
+ * Initializes constellation boundary entities.
+ */
 public class BoundariesInitializer extends AbstractInitSystem {
     public BoundariesInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

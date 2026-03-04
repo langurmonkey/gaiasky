@@ -21,6 +21,9 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
+/**
+ * Updates octree entities, managing their hierarchical structure.
+ */
 public class OctreeUpdater extends AbstractUpdateSystem {
 
     private final GraphUpdater graphUpdater;

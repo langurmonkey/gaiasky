@@ -19,6 +19,9 @@ import gaiasky.util.i18n.I18n;
 
 import java.util.Locale;
 
+/**
+ * Observer of the scene state, providing notifications for various scene events.
+ */
 public class SceneObserver implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(SceneObserver.class);
 

@@ -13,6 +13,9 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 
+/**
+ * Updates billboard set entities, including their procedural generation and movement.
+ */
 public class BillboardSetUpdater extends AbstractUpdateSystem {
 
     private final Matrix4 M41;

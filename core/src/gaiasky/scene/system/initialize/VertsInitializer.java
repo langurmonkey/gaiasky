@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 
+/**
+ * Initializes entities defined by vertices, such as polylines or point sets.
+ */
 public class VertsInitializer extends AbstractInitSystem {
     public VertsInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

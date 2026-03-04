@@ -11,6 +11,9 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.Settings;
 
+/**
+ * Stores information for raymarching-based rendering of bodies.
+ */
 public class Raymarching implements Component {
 
     public String raymarchingShader;

@@ -19,6 +19,9 @@ import gaiasky.scene.component.Perimeter;
 import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 
+/**
+ * Updates perimeter entities.
+ */
 public class PerimeterUpdater extends AbstractUpdateSystem {
 
     private final Vector3 aux3 = new Vector3();

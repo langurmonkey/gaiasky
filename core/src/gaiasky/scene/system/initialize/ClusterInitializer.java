@@ -40,6 +40,9 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import net.jafama.FastMath;
 
+/**
+ * Performs initialization for star cluster entities, including their visual components and focus behavior.
+ */
 public class ClusterInitializer extends AbstractInitSystem {
 
     public ClusterInitializer(boolean setUp, Family family, int priority) {

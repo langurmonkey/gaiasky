@@ -14,6 +14,9 @@ import com.badlogic.gdx.graphics.g3d.environment.ShadowMap;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.math.Matrix4;
 
+/**
+ * Implementation of a shadow map, containing the transformation matrix and texture descriptor.
+ */
 public class ShadowMapImpl implements ShadowMap {
 
     private final Matrix4 combined, combinedGlobal;

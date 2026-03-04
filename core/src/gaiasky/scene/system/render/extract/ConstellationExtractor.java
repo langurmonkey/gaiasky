@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for constellation entities.
+ */
 public class ConstellationExtractor extends AbstractExtractSystem {
 
     public ConstellationExtractor(Family family, int priority) {

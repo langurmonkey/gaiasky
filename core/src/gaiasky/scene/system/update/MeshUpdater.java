@@ -11,6 +11,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 
+/**
+ * Updates mesh entities, managing their transformations and animations.
+ */
 public class MeshUpdater extends AbstractUpdateSystem {
 
     private final float[] auxArray;

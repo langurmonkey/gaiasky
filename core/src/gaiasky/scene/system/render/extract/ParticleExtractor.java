@@ -17,6 +17,9 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Settings;
 
+/**
+ * Extracts data for particle set entities.
+ */
 public class ParticleExtractor extends AbstractExtractSystem {
 
     private final FocusView view;

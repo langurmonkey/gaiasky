@@ -17,6 +17,9 @@ import gaiasky.scene.view.VertsView;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
+/**
+ * Updates keyframe entities, managing their positions and visualization for camera paths.
+ */
 public class KeyframeUpdater extends AbstractUpdateSystem {
 
     private final Vector3D D31 = new Vector3D();

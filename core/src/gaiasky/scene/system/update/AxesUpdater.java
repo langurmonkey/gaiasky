@@ -13,6 +13,9 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import net.jafama.FastMath;
 
+/**
+ * Updates axis entities, managing their coordinate transformations.
+ */
 public class AxesUpdater extends AbstractUpdateSystem {
     public static final double LINE_SIZE_RAD = FastMath.tan(Math.toRadians(2.9));
 

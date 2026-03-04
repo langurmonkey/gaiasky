@@ -10,6 +10,9 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import gaiasky.scene.record.AtmosphereComponent;
 
+/**
+ * Stores information for atmospheric rendering.
+ */
 public class Atmosphere implements Component {
     public AtmosphereComponent atmosphere;
 

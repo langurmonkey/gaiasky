@@ -9,6 +9,9 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Stores information related to the Hipparcos catalog ID for an entity.
+ */
 public class Hip implements Component {
     public int hip;
 }

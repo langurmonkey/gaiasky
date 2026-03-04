@@ -19,6 +19,9 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
 
+/**
+ * Initializes axis entities, used for coordinate system visualization.
+ */
 public class AxesInitializer extends AbstractInitSystem {
 
     public AxesInitializer(boolean setUp, Family family, int priority) {

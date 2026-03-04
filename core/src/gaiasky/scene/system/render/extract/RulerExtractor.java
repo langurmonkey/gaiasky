@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for ruler entities.
+ */
 public class RulerExtractor extends AbstractExtractSystem {
     public RulerExtractor(Family family, int priority) {
         super(family, priority);

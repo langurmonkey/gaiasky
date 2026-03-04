@@ -22,6 +22,9 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 
+/**
+ * Initializes constellation entities, including their names and lines.
+ */
 public class ConstellationInitializer extends AbstractInitSystem {
 
     private final Scene scene;

@@ -16,6 +16,9 @@ import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Label;
 import gaiasky.scene.component.SolidAngle;
 
+/**
+ * Extracts data for raymarching entities.
+ */
 public class RaymarchingExtractor extends AbstractExtractSystem {
 
     public RaymarchingExtractor(Family family, int priority) {

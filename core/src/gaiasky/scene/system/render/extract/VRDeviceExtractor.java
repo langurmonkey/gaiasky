@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for VR device entities.
+ */
 public class VRDeviceExtractor extends AbstractExtractSystem {
 
     public VRDeviceExtractor(Family family, int priority) {

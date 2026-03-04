@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Initializes recursive grid entities, including their annotations.
+ */
 public class GridRecInitializer extends AbstractInitSystem {
     public GridRecInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

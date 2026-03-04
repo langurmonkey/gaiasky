@@ -26,6 +26,9 @@ import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import net.jafama.FastMath;
 
+/**
+ * Initializes shape entities, such as boxes, spheres, or cylinders.
+ */
 public class ShapeInitializer extends AbstractInitSystem {
     public ShapeInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

@@ -9,6 +9,9 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Entity;
 
+/**
+ * Interface for components that require manual resource disposal.
+ */
 public interface IDisposable {
 
     void dispose(Entity e);

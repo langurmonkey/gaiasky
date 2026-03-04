@@ -13,6 +13,9 @@ import gaiasky.scene.Mapper;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
 
+/**
+ * Updates VR device entities, including their poses and visual representations.
+ */
 public class VRDeviceUpdater extends AbstractUpdateSystem {
 
     public VRDeviceUpdater(Family family,

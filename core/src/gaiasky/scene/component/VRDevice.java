@@ -18,6 +18,9 @@ import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.math.Vector3D;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 
+/**
+ * Represents a VR device component.
+ */
 public class VRDevice implements Component, IObserver {
 
     public XrControllerDevice device;

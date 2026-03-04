@@ -28,6 +28,9 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
+/**
+ * Updates recursive grid entities, managing their hierarchical structure and annotations.
+ */
 public class GridRecUpdater extends AbstractUpdateSystem {
 
     private final Vector3D D33, D34;

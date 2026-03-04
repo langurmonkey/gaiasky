@@ -11,6 +11,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 
+/**
+ * Updates individual billboard entities.
+ */
 public class BillboardUpdater extends AbstractUpdateSystem {
     public BillboardUpdater(Family family, int priority) {
         super(family, priority);

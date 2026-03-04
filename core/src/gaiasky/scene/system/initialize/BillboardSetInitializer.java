@@ -33,6 +33,9 @@ import gaiasky.util.math.Vector3Q;
 
 import java.util.List;
 
+/**
+ * Initializes billboard set entities, including their procedural generation and texture management.
+ */
 public class BillboardSetInitializer extends AbstractInitSystem {
 
     private final Vector3D D31;

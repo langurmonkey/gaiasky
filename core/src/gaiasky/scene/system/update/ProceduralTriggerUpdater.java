@@ -17,6 +17,9 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.util.Logger;
 
+/**
+ * Updates procedural trigger entities.
+ */
 public class ProceduralTriggerUpdater extends AbstractUpdateSystem {
     protected static final Logger.Log logger = Logger.getLogger(ProceduralTriggerUpdater.class);
 

@@ -17,6 +17,9 @@ import gaiasky.scene.component.*;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 
+/**
+ * Extracts data for model entities.
+ */
 public class ModelExtractor extends AbstractExtractSystem {
 
     public ModelExtractor(Family family,

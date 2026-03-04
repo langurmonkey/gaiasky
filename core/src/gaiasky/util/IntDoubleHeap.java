@@ -7,6 +7,9 @@
 
 package gaiasky.util;
 
+/**
+ * A min-heap of integers with associated double keys.
+ */
 public class IntDoubleHeap {
     private int[] indices;
     private double[] values;

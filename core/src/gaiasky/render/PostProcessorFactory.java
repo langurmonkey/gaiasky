@@ -9,6 +9,9 @@ package gaiasky.render;
 
 import gaiasky.render.api.IPostProcessor;
 
+/**
+ * Factory for creating post-processor instances.
+ */
 public abstract class PostProcessorFactory {
     public static PostProcessorFactory instance;
 

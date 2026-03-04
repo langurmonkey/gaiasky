@@ -24,6 +24,9 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 import java.time.Instant;
 
+/**
+ * Updates trajectory entities, managing their points and paths.
+ */
 public class TrajectoryUpdater extends AbstractUpdateSystem {
 
     private final TrajectoryUtils utils;

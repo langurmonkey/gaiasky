@@ -14,6 +14,9 @@ import gaiasky.util.math.Vector3D;
 
 import java.util.List;
 
+/**
+ * Represents a recursive grid component used for visualization.
+ */
 public class GridRecursive implements Component {
     public final float[] ccEq = ColorUtils.gRed;
     public final float[] ccEcl = ColorUtils.gGreen;

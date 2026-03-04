@@ -15,6 +15,9 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.LocationMark;
 
+/**
+ * Updates location mark entities, managing their positions on celestial bodies.
+ */
 public class LocUpdater extends AbstractUpdateSystem {
 
     private final ModelUpdater updater;

@@ -9,5 +9,8 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Represents the root node of the scene graph.
+ */
 public class GraphRoot implements Component {
 }

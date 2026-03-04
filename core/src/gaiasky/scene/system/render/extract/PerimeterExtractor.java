@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for perimeter entities.
+ */
 public class PerimeterExtractor extends AbstractExtractSystem {
     public PerimeterExtractor(Family family, int priority) {
         super(family, priority);

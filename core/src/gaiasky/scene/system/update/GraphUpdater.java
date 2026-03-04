@@ -33,6 +33,9 @@ import net.jafama.FastMath;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Updates entities within the scene graph, managing their hierarchical transformations.
+ */
 public class GraphUpdater extends AbstractUpdateSystem {
     private static final Logger.Log logger = Logger.getLogger(GraphUpdater.class);
     private final ITimeFrameProvider time;

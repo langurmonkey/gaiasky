@@ -13,6 +13,9 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.LabelView;
 
+/**
+ * Extracts data for location mark entities.
+ */
 public class LocExtractor extends AbstractExtractSystem {
 
     private final LabelView view;

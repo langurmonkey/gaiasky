@@ -18,6 +18,9 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.tree.IPosition;
 
+/**
+ * Updates constellation entities, managing their positions and visibility.
+ */
 public class ConstellationUpdater extends AbstractUpdateSystem {
     private final Vector3D D31;
 

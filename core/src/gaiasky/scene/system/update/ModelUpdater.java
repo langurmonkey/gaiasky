@@ -29,6 +29,9 @@ import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 
+/**
+ * Updates model entities, including their hierarchical transformations, orientations, and LOD.
+ */
 public class ModelUpdater extends AbstractUpdateSystem {
 
     private final ICamera camera;

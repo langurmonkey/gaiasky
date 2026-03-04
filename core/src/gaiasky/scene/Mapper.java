@@ -58,8 +58,6 @@ public class Mapper {
     public static final ComponentMapper<LocationMark> loc = ComponentMapper.getFor(LocationMark.class);
     public static final ComponentMapper<Axis> axis = ComponentMapper.getFor(Axis.class);
     public static final ComponentMapper<Cluster> cluster = ComponentMapper.getFor(Cluster.class);
-    public static final ComponentMapper<SingleMatrix> matrix = ComponentMapper.getFor(SingleMatrix.class);
-    public static final ComponentMapper<SingleTexture> texture = ComponentMapper.getFor(SingleTexture.class);
     public static final ComponentMapper<Trajectory> trajectory = ComponentMapper.getFor(Trajectory.class);
     public static final ComponentMapper<TLESource> tle = ComponentMapper.getFor(TLESource.class);
     public static final ComponentMapper<Verts> verts = ComponentMapper.getFor(Verts.class);

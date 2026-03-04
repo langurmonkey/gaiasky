@@ -13,6 +13,9 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.tag.TagNoProcess;
 
+/**
+ * Updates dataset description entities.
+ */
 public class DatasetDescriptionUpdater extends AbstractUpdateSystem {
 
     public DatasetDescriptionUpdater(Family family, int priority) {

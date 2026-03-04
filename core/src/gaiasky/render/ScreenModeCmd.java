@@ -19,6 +19,9 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
+/**
+ * Command-line arguments for screen mode and resolution.
+ */
 public class ScreenModeCmd implements IObserver {
     private static final Log logger = Logger.getLogger(ScreenModeCmd.class);
 

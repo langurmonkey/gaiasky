@@ -10,6 +10,9 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 
+/**
+ * Interface for components that can provide a copy of themselves.
+ */
 public interface ICopy {
 
     Component getCopy(Engine engine);

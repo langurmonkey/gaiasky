@@ -20,6 +20,9 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.graphics.VolumeTexture;
 import gaiasky.util.gdx.loader.VolumeTextureLoader;
 
+/**
+ * Initializes volume entities, such as those used for volumetric rendering.
+ */
 public class VolumeInitializer extends AbstractInitSystem {
     public VolumeInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

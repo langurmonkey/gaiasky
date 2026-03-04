@@ -9,6 +9,9 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Stores the unique identifier for an entity.
+ */
 public class Id implements Component {
 
     public long id = -1;

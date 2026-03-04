@@ -15,6 +15,9 @@ import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.util.time.ITimeFrameProvider;
 
+/**
+ * Updates element set entities (e.g., orbits), managing their child entities and components.
+ */
 public class ElementsSetUpdater extends AbstractUpdateSystem {
 
     private final GraphUpdater graphUpdater;

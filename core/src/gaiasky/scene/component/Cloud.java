@@ -10,6 +10,9 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import gaiasky.scene.record.CloudComponent;
 
+/**
+ * Stores information for cloud rendering.
+ */
 public class Cloud implements Component {
 
     public CloudComponent cloud;

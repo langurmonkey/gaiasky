@@ -10,6 +10,9 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import gaiasky.util.math.Vector3D;
 
+/**
+ * Represents a set of axes for a coordinate system.
+ */
 public class Axis implements Component {
 
     public Vector3D o;

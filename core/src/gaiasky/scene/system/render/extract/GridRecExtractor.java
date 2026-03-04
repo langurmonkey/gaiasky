@@ -13,6 +13,9 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Settings;
 
+/**
+ * Extracts data for recursive grid entities.
+ */
 public class GridRecExtractor extends AbstractExtractSystem {
     public GridRecExtractor(Family family, int priority) {
         super(family, priority);

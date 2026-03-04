@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for star cluster entities.
+ */
 public class ClusterExtractor extends AbstractExtractSystem {
 
     public ClusterExtractor(Family family, int priority) {

@@ -17,6 +17,9 @@ import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 
+/**
+ * Initializes ruler entities for distance measurements, setting up their labels and lines.
+ */
 public class RulerInitializer extends AbstractInitSystem {
     public RulerInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

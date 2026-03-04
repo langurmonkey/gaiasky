@@ -17,6 +17,9 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.util.math.Vector3Q;
 
+/**
+ * Performs base initialization for all entities, setting up basic components and scene graph structures.
+ */
 public class BaseInitializer extends AbstractInitSystem {
 
     private final Scene scene;

@@ -16,6 +16,9 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
 
+/**
+ * Initializes perimeter entities, typically used for drawing boundaries on a sphere.
+ */
 public class PerimeterInitializer extends AbstractInitSystem {
     public PerimeterInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

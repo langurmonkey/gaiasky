@@ -23,6 +23,9 @@ import gaiasky.util.datadesc.DatasetDesc;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Initializes dataset description entities and handles catalog information management.
+ */
 public class DatasetDescriptionInitializer extends AbstractInitSystem {
 
     private final FocusView view;

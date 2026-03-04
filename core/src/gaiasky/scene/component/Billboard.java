@@ -15,6 +15,9 @@ import gaiasky.util.Consumers.Consumer6;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
+/**
+ * Represents a billboard object.
+ */
 public class Billboard implements Component {
 
     public Consumer6<BillboardEntityRenderSystem, BillboardView, Float, ExtShaderProgram, IntMesh, ICamera> renderConsumer;

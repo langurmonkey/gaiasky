@@ -34,6 +34,9 @@ import gaiasky.util.math.Vector3D;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Initializes VR device entities, including their visual models and beams.
+ */
 public class VRDeviceInitializer extends AbstractInitSystem {
     private static final Log logger = Logger.getLogger(VRDeviceInitializer.class);
 

@@ -9,6 +9,10 @@ package gaiasky.util.math;
 
 import net.jafama.FastMath;
 
+/**
+ * Implementation of linear interpolation between control points using double precision.
+ * @param <T> The type of the control points.
+ */
 public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
 
     public T[] controlPoints;

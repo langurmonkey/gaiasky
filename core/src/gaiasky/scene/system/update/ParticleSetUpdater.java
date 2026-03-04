@@ -25,6 +25,9 @@ import net.jafama.FastMath;
 import java.nio.file.Files;
 import java.util.Locale;
 
+/**
+ * Updates particle set entities, including their positions and visual properties.
+ */
 public class ParticleSetUpdater extends AbstractUpdateSystem {
 
     private final ParticleUtils utils;

@@ -11,6 +11,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for entities defined by vertices, such as polylines or point sets.
+ */
 public class VertsExtractor extends AbstractExtractSystem {
 
     public VertsExtractor(Family family, int priority) {

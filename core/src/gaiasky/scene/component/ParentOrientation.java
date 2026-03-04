@@ -9,6 +9,9 @@ package gaiasky.scene.component;
 
 import com.badlogic.gdx.math.Matrix4;
 
+/**
+ * Stores the orientation and rotation information of an entity's parent.
+ */
 public class ParentOrientation extends Orientation {
 
     public boolean parentOrientation = false;

@@ -14,6 +14,9 @@ import gaiasky.scene.Mapper;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.camera.rec.KeyframesManager;
 
+/**
+ * Extracts data for keyframe entities.
+ */
 public class KeyframeExtractor extends AbstractExtractSystem {
     public KeyframeExtractor(Family family,
                              int priority) {

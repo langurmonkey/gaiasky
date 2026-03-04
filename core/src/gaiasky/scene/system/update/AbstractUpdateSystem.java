@@ -10,6 +10,9 @@ package gaiasky.scene.system.update;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
+/**
+ * Base class for all update systems in the Gaia Sky scene graph.
+ */
 public abstract class AbstractUpdateSystem extends IteratingSystem implements EntityUpdater {
 
     protected AbstractUpdateSystem(Family family, int priority) {

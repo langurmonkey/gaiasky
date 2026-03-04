@@ -19,6 +19,9 @@ import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 
+/**
+ * Initializes mesh entities, setting up their visual models and labels.
+ */
 public class MeshInitializer extends AbstractInitSystem {
     public MeshInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

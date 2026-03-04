@@ -18,6 +18,9 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.color.ColorUtils;
 
+/**
+ * Initializes keyframe entities for animations, setting up their paths and visualization objects.
+ */
 public class KeyframeInitializer extends AbstractInitSystem {
 
     private final KeyframeUtils utils;

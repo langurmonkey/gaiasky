@@ -17,6 +17,9 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 
+/**
+ * Updates ruler entities, managing their endpoints and distance measurements.
+ */
 public class RulerUpdater extends AbstractUpdateSystem {
 
     public RulerUpdater(Family family, int priority) {

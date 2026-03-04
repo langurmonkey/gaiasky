@@ -10,6 +10,9 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 
+/**
+ * Provides initialization for procedural trigger entities.
+ */
 public class ProceduralTriggerInitializer extends AbstractInitSystem {
     public ProceduralTriggerInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

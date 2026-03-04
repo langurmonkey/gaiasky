@@ -9,6 +9,9 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Represents distance information, including various units.
+ */
 public class Distance implements Component {
     public double distance;
 }

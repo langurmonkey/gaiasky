@@ -13,6 +13,9 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
 import gaiasky.util.math.MathUtilsDouble;
 
+/**
+ * Updates star cluster entities.
+ */
 public class ClusterUpdater extends AbstractUpdateSystem {
 
     private final Vector3 F31;

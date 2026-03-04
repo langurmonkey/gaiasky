@@ -12,6 +12,9 @@ import com.badlogic.gdx.math.Matrix4;
 
 import java.util.Locale;
 
+/**
+ * Represents an arbitrary mesh object, including its visual model data.
+ */
 public class Mesh implements Component {
     // Shading mode
     public MeshShading shading = MeshShading.ADDITIVE;

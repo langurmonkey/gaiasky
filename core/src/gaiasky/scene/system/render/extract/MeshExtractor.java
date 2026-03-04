@@ -13,6 +13,9 @@ import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for mesh entities.
+ */
 public class MeshExtractor extends AbstractExtractSystem {
 
     public MeshExtractor(Family family, int priority) {

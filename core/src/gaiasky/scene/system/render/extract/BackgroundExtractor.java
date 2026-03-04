@@ -13,6 +13,9 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 
+/**
+ * Extracts data for background model entities, such as skyboxes or UV grids.
+ */
 public class BackgroundExtractor extends AbstractExtractSystem {
     public BackgroundExtractor(Family family, int priority) {
         super(family, priority);

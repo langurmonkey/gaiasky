@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data for constellation boundary entities.
+ */
 public class BoundariesExtractor extends AbstractExtractSystem {
     public BoundariesExtractor(Family family, int priority) {
         super(family, priority);

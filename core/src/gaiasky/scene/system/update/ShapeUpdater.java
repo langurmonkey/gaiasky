@@ -14,6 +14,9 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.LightingUtils;
 
+/**
+ * Updates shape entities, managing their transformations and visualization.
+ */
 public class ShapeUpdater extends AbstractUpdateSystem {
 
     private final Vector3 F31 = new Vector3();

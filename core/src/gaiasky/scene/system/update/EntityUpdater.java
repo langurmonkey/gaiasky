@@ -10,6 +10,9 @@ package gaiasky.scene.system.update;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 
+/**
+ * Interface for systems that update entities in the scene graph.
+ */
 public interface EntityUpdater {
 
     /**

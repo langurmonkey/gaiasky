@@ -17,6 +17,9 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3Q;
 
+/**
+ * Performs initialization for location mark entities, setting up their labels and types.
+ */
 public class LocInitializer extends AbstractInitSystem {
 
     public LocInitializer(boolean setUp, Family family, int priority) {

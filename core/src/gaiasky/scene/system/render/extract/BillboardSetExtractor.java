@@ -13,6 +13,9 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Settings;
 
+/**
+ * Extracts data for billboard set entities.
+ */
 public class BillboardSetExtractor extends AbstractExtractSystem {
 
     public BillboardSetExtractor(Family family, int priority) {

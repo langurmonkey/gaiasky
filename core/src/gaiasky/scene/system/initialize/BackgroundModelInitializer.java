@@ -29,6 +29,9 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.math.Matrix4D;
 
+/**
+ * Performs the initialization for background models, often used for skyboxes or UV grids.
+ */
 public class BackgroundModelInitializer extends AbstractInitSystem {
 
     public BackgroundModelInitializer(boolean setUp, Family family, int priority) {

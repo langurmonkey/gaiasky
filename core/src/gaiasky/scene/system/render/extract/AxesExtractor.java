@@ -12,6 +12,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
+/**
+ * Extracts data from axis entities for rendering coordinate systems.
+ */
 public class AxesExtractor extends AbstractExtractSystem {
     public AxesExtractor(Family family, int priority) {
         super(family, priority);

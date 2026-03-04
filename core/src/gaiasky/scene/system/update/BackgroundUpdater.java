@@ -20,6 +20,9 @@ import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4D;
 
+/**
+ * Updates background model entities, such as skyboxes or grids.
+ */
 public class BackgroundUpdater extends AbstractUpdateSystem {
 
     public BackgroundUpdater(Family family, int priority) {

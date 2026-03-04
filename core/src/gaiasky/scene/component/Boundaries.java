@@ -16,6 +16,9 @@ import net.jafama.FastMath;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stores constellation boundaries.
+ */
 public class Boundaries implements Component {
 
     public List<List<Vector3D>> boundaries;
