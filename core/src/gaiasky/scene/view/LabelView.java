@@ -33,6 +33,9 @@ import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
+/**
+ * Contains the actual implementation of label rendering for different object types.
+ */
 public class LabelView extends RenderView implements I3DTextRenderable {
 
     private final Vector3D D31 = new Vector3D();

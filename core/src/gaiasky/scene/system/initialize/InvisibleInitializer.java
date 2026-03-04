@@ -18,6 +18,10 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 
+/**
+ * Performs the initialization of objects of the Invisible archetype. It initializes their components
+ * (graph, focus, label, etc.).
+ */
 public class InvisibleInitializer extends AbstractInitSystem {
 
     public InvisibleInitializer(boolean setUp, Family family, int priority) {
