@@ -144,5 +144,5 @@ This software is published and distributed under the **Mozilla Public License 2.
 Find information about contributing in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Acknowledgements
-See [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md) and [AUTHORS.md](AUTHORS.md).
+See [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md), [AUTHORS.md](AUTHORS.md), and [CONTRIBUTORS.md](CONTRIBUTORS.md).
 

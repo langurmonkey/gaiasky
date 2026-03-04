@@ -51,7 +51,7 @@
 
 ## Translations
 
-See the CONTRIBUTORS.md file for a full list of contributors.
+See the [CONTRIBUTORS.md](CONTRIBUTORS.md) file for a full list of contributors.
 
 ## Open source licenses
 
