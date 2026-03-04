@@ -189,6 +189,24 @@ public class Base implements Component, ICopy {
         }
     }
 
+    /**
+     * Removes the localized name from the array if it exists and can be removed.
+     */
+    public void removeLocalizedName() {
+        if (names != null && localizedNameIndex > 0 && names.length > 1 && names.length > localizedNameIndex) {
+            // Reduce array
+            String[] newNames = new String[names.length - 1];
+            int j = 0;
+            for (int i = 0; i < names.length; i++) {
+                if (i != localizedNameIndex) {
+                    newNames[j++] = names[i];
+                }
+            }
+            localizedNameIndex = 0;
+            names = newNames;
+        }
+    }
+
     public String getLocalizedName() {
         if (localizedNameIndex >= 0 && names.length > localizedNameIndex) {
             return names[localizedNameIndex];
@@ -201,6 +219,7 @@ public class Base implements Component, ICopy {
         if (names != null && names.length > 0) {
             String base = names[0].toLowerCase(Locale.ROOT).replace(' ', '_');
             if (I18n.hasObject(base)) {
+                // Update it.
                 String localizedName = I18n.obj(base);
                 if (!localizedName.equalsIgnoreCase(names[localizedNameIndex])) {
                     if (localizedNameIndex == 0) {
@@ -211,6 +230,9 @@ public class Base implements Component, ICopy {
                         setName(localizedName, localizedNameIndex);
                     }
                 }
+            } else {
+                // Revert back to default.
+                removeLocalizedName();
             }
         }
     }
