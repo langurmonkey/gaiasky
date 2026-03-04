@@ -10,3 +10,4 @@
 | Georgi Georgiev       | g.georgiev.shumen@gmail.com      | Bulgarian translation, cleanup         |
 | Svetlin Tassev        | stassev.AT.alum. .mit. .edu      | Showcase scripts, reprojection shaders |
 | Erdem Uygun           | uygun.erdem@gmail.com            | Turkish translation                    |
+| Roberto Zacco         | zackroberto@gmail.com            | Italian translation                    |
