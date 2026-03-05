@@ -14,6 +14,9 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
+/**
+ * Helper class for rendering star sets as quads. It manages shader uniforms for star appearance such as brightness and point size.
+ */
 public class StarSetQuadComponent {
 
     protected float[] alphaSizeBr, opacityLimits, opacityLimitsHlShowAll;

@@ -22,6 +22,9 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 
+/**
+ * Render system for text labels. It uses a BitmapFont and a SpriteBatch to render labels in 3D space.
+ */
 public class TextRenderer extends AbstractRenderSystem {
 
     private final ExtSpriteBatch batch;

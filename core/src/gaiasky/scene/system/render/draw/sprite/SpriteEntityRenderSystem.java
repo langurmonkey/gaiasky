@@ -27,6 +27,9 @@ import gaiasky.util.math.Vector3D;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Handles the logic for rendering individual sprite entities. It manages sprite textures and textures loading.
+ */
 public class SpriteEntityRenderSystem {
     protected static final Logger.Log logger = Logger.getLogger(SpriteEntityRenderSystem.class);
 

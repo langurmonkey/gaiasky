@@ -9,5 +9,8 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Tag component indicating that the entity is invisible.
+ */
 public class TagInvisible implements Component {
 }

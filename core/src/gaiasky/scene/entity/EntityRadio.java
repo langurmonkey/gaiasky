@@ -10,6 +10,9 @@ package gaiasky.scene.entity;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.event.IObserver;
 
+/**
+ * Base class for radio entities that hold an Ashley Entity and implement IObserver.
+ */
 public abstract class EntityRadio implements IObserver {
     protected Entity entity;
 

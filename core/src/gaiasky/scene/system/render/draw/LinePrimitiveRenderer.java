@@ -26,6 +26,9 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.List;
 
+/**
+ * Render system for line primitive entities. It uses basic OpenGL line primitives for rendering.
+ */
 public class LinePrimitiveRenderer extends LineRenderSystem {
     protected static final Log logger = Logger.getLogger(LinePrimitiveRenderer.class);
 

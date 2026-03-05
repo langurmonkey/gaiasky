@@ -40,6 +40,9 @@ import net.jafama.FastMath;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Render system for orbital elements and other line-based trajectories.
+ */
 public class ElementsRenderer extends PointCloudTriRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ElementsRenderer.class);
 

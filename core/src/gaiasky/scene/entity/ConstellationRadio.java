@@ -14,6 +14,9 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.util.tree.IPosition;
 
+/**
+ * EntityRadio implementation for constellation entities.
+ */
 public class ConstellationRadio extends EntityRadio {
 
     public ConstellationRadio(Entity entity) {

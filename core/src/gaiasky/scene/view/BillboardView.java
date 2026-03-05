@@ -13,6 +13,9 @@ import gaiasky.scene.component.Billboard;
 import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.GraphNode;
 
+/**
+ * View class for billboard entities. It maps and exposes components relevant for billboard rendering, such as Billboard, GraphNode, and Celestial.
+ */
 public class BillboardView extends BaseView {
 
     public Billboard billboard;

@@ -19,6 +19,9 @@ import gaiasky.scene.system.render.draw.sprite.SpriteEntityRenderSystem;
 
 import java.util.List;
 
+/**
+ * Render system for sprite entities. This system handles the rendering of simple sprites like location markers.
+ */
 public class SpriteRenderer extends AbstractRenderSystem {
 
     private final SpriteEntityRenderSystem renderer;
