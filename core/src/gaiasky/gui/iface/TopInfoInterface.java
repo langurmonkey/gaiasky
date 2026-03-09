@@ -198,7 +198,6 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         default -> {
         }
         }
-        pack();
     }
 
     public void programmaticUpdate() {
