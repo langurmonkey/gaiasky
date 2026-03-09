@@ -13,11 +13,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.TextUtils;
-import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
-import net.jafama.FastMath;
 
 
 /**
@@ -43,6 +39,7 @@ import net.jafama.FastMath;
  * @param nVari     Number of variable star samples.
  * @param period    Period in days.
  * @param variMags  Vector with magnitudes.
+ * @param variCols  Vector with packed RGBA colors. May be null. If present, it must have the same length as {@link #variMags} and {@link #variTimes}.
  * @param variTimes Vector with times corresponding to magnitudes, in Julian days.
  * @param extra     Map with extra attributes.
  */
@@ -66,6 +63,7 @@ public record ParticleVariable(long id,
                                int nVari,
                                double period,
                                float[] variMags,
+                               float[] variCols,
                                double[] variTimes,
                                ObjectMap<UCD, Object> extra) implements IParticleRecord {
 
@@ -93,7 +91,35 @@ public record ParticleVariable(long id,
                             ObjectMap<UCD, Object> extra) {
         this(id, names, x, y, z, Float.floatToFloat16(muAlpha), Float.floatToFloat16(muDelta), Float.floatToFloat16(radVel),
              vx, vy, vz, Float.floatToFloat16(appMag), Float.floatToFloat16(absMag), color, size, hip,
-             Float.floatToFloat16(tEff), nVari, period, variMags, variTimes, extra);
+             Float.floatToFloat16(tEff), nVari, period, variMags, null, variTimes, extra);
+    }
+
+    public ParticleVariable(long id,
+                            String[] names,
+                            double x,
+                            double y,
+                            double z,
+                            float muAlpha,
+                            float muDelta,
+                            float radVel,
+                            float vx,
+                            float vy,
+                            float vz,
+                            float appMag,
+                            float absMag,
+                            float color,
+                            float size,
+                            int hip,
+                            float tEff,
+                            int nVari,
+                            double period,
+                            float[] variMags,
+                            float[] variCols,
+                            double[] variTimes,
+                            ObjectMap<UCD, Object> extra) {
+        this(id, names, x, y, z, Float.floatToFloat16(muAlpha), Float.floatToFloat16(muDelta), Float.floatToFloat16(radVel),
+             vx, vy, vz, Float.floatToFloat16(appMag), Float.floatToFloat16(absMag), color, size, hip,
+             Float.floatToFloat16(tEff), nVari, period, variMags, variCols, variTimes, extra);
     }
 
     @Override
@@ -282,5 +308,15 @@ public record ParticleVariable(long id,
     public double variTime(int i) {
         assert i < nVari : "Size out of bounds";
         return variTimes[i];
+    }
+
+    public float variColor(int i) {
+        assert variCols != null : "Star has no variable colors";
+        assert i < nVari : "Size out of bounds";
+        return variCols[i];
+    }
+
+    public boolean hasVariColors() {
+        return variCols != null && variCols.length > 0 && Float.isFinite(variCols[0]);
     }
 }

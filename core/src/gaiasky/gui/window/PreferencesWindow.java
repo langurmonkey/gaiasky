@@ -110,7 +110,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
+    private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias,  lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect, textureIndex;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
@@ -369,8 +369,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     // No anti-aliasing.
                     antiAlias.setSelectedIndex(idxAa(AntialiasType.NONE));
                     FXAAQuality = 0;
-                    // Legacy point style.
-                    pointCloudRenderer.setSelectedIndex(PointCloudMode.POINTS.ordinal());
                     // Legacy line style.
                     lineRenderer.setSelectedIndex(LineMode.GL_LINES.ordinal());
                     // Lens flare.
@@ -410,8 +408,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     // FXAA anti-aliasing.
                     antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
                     FXAAQuality = 1;
-                    // Triangles as point style.
-                    pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
                     // Polyline quadstrip line style.
                     lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
                     // Simple lens flare.
@@ -443,8 +439,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     // FXAA anti-aliasing.
                     antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
                     FXAAQuality = 2;
-                    // Triangles as point style.
-                    pointCloudRenderer.setSelectedIndex(PointCloudMode.TRIANGLES.ordinal());
                     // Polyline quadstrip line style.
                     lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
                     // Complex lens flare.
@@ -774,16 +768,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
             aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
-            // Only if not VR, the triangles break in VR
-            // POINT CLOUD
-            ComboBoxBean[] pointCloudItems = new ComboBoxBean[]{
-                    new ComboBoxBean(I18n.msg("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()),
-                    new ComboBoxBean(I18n.msg("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal())};
-            pointCloudRenderer = new OwnSelectBox<>(skin);
-            pointCloudRenderer.setItems(pointCloudItems);
-            pointCloudRenderer.setWidth(selectWidth);
-            pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
-
             // LINE RENDERER
             OwnLabel lrLabel = new OwnLabel(I18n.msg("gui.linerenderer"), skin);
             ComboBoxBean[] lineRenderers = new ComboBoxBean[]{
@@ -892,24 +876,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     .padBottom(pad10);
             graphics.add(aaTooltip)
                     .colspan(2)
-                    .left()
-                    .padBottom(pad10)
-                    .row();
-            OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
-            OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
-            pointCloudTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.pointcloud.info"), skin));
-            graphics.add(pointCloudLabel)
-                    .left()
-                    .padRight(pad34)
-                    .padBottom(pad10);
-            graphics.add(pointCloudRenderer)
-                    .left()
-                    .padBottom(pad10);
-            graphics.add(pointCloudTooltip)
-                    .left()
-                    .padRight(pad10)
-                    .padBottom(pad10);
-            graphics.add(getRequiresRestartLabel())
                     .left()
                     .padBottom(pad10)
                     .row();
@@ -4044,11 +4010,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         } else {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, 0.0);
         }
-
-        // Point cloud renderer
-        PointCloudMode newPointCloudMode = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
-        restartDialog = restartDialog || newPointCloudMode != settings.scene.renderer.pointCloud;
-        settings.scene.renderer.pointCloud = newPointCloudMode;
 
         restartDialog = restartDialog || Settings.settings.data.realGaiaAttitude != real.isChecked();
 

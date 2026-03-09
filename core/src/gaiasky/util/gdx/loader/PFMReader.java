@@ -50,7 +50,6 @@ public class PFMReader {
             return td;
         } catch (Exception e) {
             throw new GdxRuntimeException("Couldn't read PFM file '" + file + "'", e);
-        } finally {
         }
     }
 

@@ -21,7 +21,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.GuiUtils;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
@@ -530,7 +529,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
-            datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0);
+            datasetOptions.particleSize = particleSize.getValue() * 1e-13;
             datasetOptions.particleSizeLimits = new double[]{minSolidAngle.getValue() * MathUtils.degRad, maxSolidAngle.getValue() * MathUtils.degRad};
             datasetOptions.numLabels = (int) numLabels.getValue();
         } else if (clusters.isChecked()) {
@@ -539,7 +538,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.profileDecay = profileDecay != null ? profileDecay.getDoubleValue(5.0) : 5.0;
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise != null ? colorNoise.getValue() : 0.0;
-            datasetOptions.particleSize = particleSize != null ? particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? 1e-13 : 1.0) : 1.0;
+            datasetOptions.particleSize = particleSize != null ? particleSize.getValue() * 1e-13 : 1.0;
             datasetOptions.particleSizeLimits = new double[]{0.0d, 1.57d};
             datasetOptions.numLabels = 100;
             datasetOptions.modelType = "icosphere";

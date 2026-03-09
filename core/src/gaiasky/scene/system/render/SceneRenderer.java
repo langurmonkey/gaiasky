@@ -41,13 +41,15 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.draw.*;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.scene.system.render.pass.*;
+import gaiasky.scene.system.render.pass.CascadedShadowMapRenderPass;
+import gaiasky.scene.system.render.pass.RenderPass;
+import gaiasky.scene.system.render.pass.SVTRenderPass;
+import gaiasky.scene.system.render.pass.ShadowMapRenderPass;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -313,17 +315,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                                                                alphas,
                                                                                                renderAssets.billboardProceduralCpuShaders);
             case PARTICLE_GROUP -> {
-                final PointCloudMode pointCloudModeParticles = Settings.settings.scene.renderer.pointCloud;
-                system = switch (pointCloudModeParticles) {
-                    case TRIANGLES -> new ParticleSetInstancedRenderer(this,
-                                                                       PARTICLE_GROUP,
-                                                                       alphas,
-                                                                       renderAssets.particleGroupShaders);
-                    case POINTS -> new ParticleSetPointRenderer(this,
-                                                                PARTICLE_GROUP,
-                                                                alphas,
-                                                                renderAssets.particleGroupShaders);
-                };
+                system = new ParticleSetInstancedRenderer(this,
+                                                          PARTICLE_GROUP,
+                                                          alphas,
+                                                          renderAssets.particleGroupShaders);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
@@ -344,21 +339,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case STAR_GROUP -> {
-                final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
-                system = switch (pointCloudMode) {
-                    case TRIANGLES -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
-                    case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
-                };
+                system = new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }
             case VARIABLE_GROUP -> {
-                final PointCloudMode pointCloudMode = Settings.settings.scene.renderer.pointCloud;
-                system = switch (pointCloudMode) {
-                    case TRIANGLES ->
-                            new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-                    case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-                };
+                system = new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(regularBlendR, depthWritesR);
             }

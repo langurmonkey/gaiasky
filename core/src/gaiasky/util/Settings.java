@@ -2056,7 +2056,8 @@ public class Settings extends SettingsObject {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings extends SettingsObject implements IObserver {
-            public PointCloudMode pointCloud = PointCloudMode.POINTS;
+            @Deprecated
+            public final PointCloudMode pointCloud = PointCloudMode.TRIANGLES;
             public double ambient;
             public LineSettings line;
             public ShadowSettings shadow;
@@ -2069,17 +2070,7 @@ public class Settings extends SettingsObject {
 
             @JsonProperty("pointCloud")
             public void setPointCloud(String pointCloud) {
-                if (pointCloud == null || pointCloud.isEmpty()) {
-                    // Default
-                    pointCloud = "POINTS";
-                }
-                if (pointCloud.startsWith("GL_")) {
-                    pointCloud = pointCloud.substring(3);
-                }
-                if (pointCloud.equalsIgnoreCase("TRIANGLES_INSTANCED")) {
-                    pointCloud = "TRIANGLES";
-                }
-                this.pointCloud = PointCloudMode.valueOf(pointCloud.toUpperCase(Locale.ROOT));
+                // Empty
             }
 
             @Override
@@ -2521,9 +2512,6 @@ public class Settings extends SettingsObject {
                                 mpi.header = I18n.msg("gui.360.notice.header");
                                 mpi.addMapping(I18n.msg("gui.360.notice.back"), keysStrToggle);
                                 mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
-                                if (settings.scene.renderer.pointCloud.isPoints()) {
-                                    mpi.warn = I18n.msg("gui.360.notice.renderer");
-                                }
                             } else if (modeCubemap.projection.isPlanetarium()) {
                                 String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
                                 String[] keysStrProj = KeyBindings.instance.getStringArrayKeys(
@@ -2532,9 +2520,6 @@ public class Settings extends SettingsObject {
                                 mpi.header = I18n.msg("gui.planetarium.notice.header");
                                 mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
                                 mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
-                                if (settings.scene.renderer.pointCloud.isPoints()) {
-                                    mpi.warn = I18n.msg("gui.360.notice.renderer");
-                                }
                             } else if (modeCubemap.projection.isOrthosphere()) {
                                 String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys(
                                         "action.toggle/element.orthosphere");

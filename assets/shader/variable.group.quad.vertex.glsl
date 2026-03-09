@@ -1,11 +1,10 @@
 #version 330 core
 
-#define N_VECS 5
-
 #include <shader/lib/math.glsl>
 #include <shader/lib/geometry.glsl>
 #include <shader/lib/doublefloat.glsl>
 #include <shader/lib/angles.glsl>
+#include <shader/lib/colors.glsl>
 
 // UNIFORMS
 // time in julian days since epoch, as a 64-bit double encoded with two floats
@@ -35,6 +34,10 @@ uniform float u_fixedAngularSize;
 // Arbitrary affine transformation(s)
 uniform bool u_transformFlag = false;
 uniform mat4 u_transform;
+// Variability data texture RGBA:(mag, time, color, 1)
+uniform sampler2D u_variabilityTex;
+// Width of variability texture
+uniform int u_varTexWidth;
 
 // INPUT
 // Regular attributes
@@ -45,18 +48,7 @@ layout(location = 2) in vec3 a_starPos;
 layout(location = 3) in vec3 a_pm;
 layout(location = 4) in vec4 a_color;
 layout(location = 5) in float a_nVari;
-// Magnitudes
-layout(location = 6) in vec4 a_vmags1;
-layout(location = 7) in vec4 a_vmags2;
-layout(location = 8) in vec4 a_vmags3;
-layout(location = 9) in vec4 a_vmags4;
-layout(location = 10) in vec4 a_vmags5;
-// Times
-layout(location = 11) in vec4 a_vtimes1;
-layout(location = 12) in vec4 a_vtimes2;
-layout(location = 13) in vec4 a_vtimes3;
-layout(location = 14) in vec4 a_vtimes4;
-layout(location = 15) in vec4 a_vtimes5;
+layout(location = 6) in float a_varIndex;
 
 // OUTPUT
 out vec4 v_col;
@@ -73,11 +65,24 @@ out vec2 v_uv;
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
 
-float idx(vec4[N_VECS] v, int i) {
-    int a = int(i / 4);
-    int b = i - a * 4;
-    return v[a][b];
+// Convert linear entry index to 2D texture coordinate
+ivec2 indexToCoord(int linearIndex) {
+    return ivec2(linearIndex % u_varTexWidth, linearIndex / u_varTexWidth);
 }
+// Fetch one variability sample: returns vec3(mag, time, packedColor)
+// 1 sample = 1 texel, offset is in texels
+vec3 fetchVariSample(int starBufferOffset, int sampleIdx) {
+    int texelIdx = starBufferOffset + sampleIdx; // Direct texel index
+    ivec2 coord = indexToCoord(texelIdx);
+    vec4 texel = texelFetch(u_variabilityTex, coord, 0);
+    return texel.rgb; // .r=mag, .g=time, .b=packedColor
+}
+// Recover integer star index from float bits
+int getVariIndex() {
+    return int(a_varIndex);
+}
+
+#define SENTINEL -9999.0
 
 void main() {
     // Lengths
@@ -114,31 +119,32 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    vec4[N_VECS] mags;
-    mags[0] = a_vmags1;
-    mags[1] = a_vmags2;
-    mags[2] = a_vmags3;
-    mags[3] = a_vmags4;
-    mags[4] = a_vmags5;
-    vec4[N_VECS] times;
-    times[0] = a_vtimes1;
-    times[1] = a_vtimes2;
-    times[2] = a_vtimes3;
-    times[3] = a_vtimes4;
-    times[4] = a_vtimes5;
-
-    // Linear interpolation of time in light curve
+    // Variability
+    int variIndex = getVariIndex();
     int nVari = int(a_nVari);
-    float t0 = idx(times, 0);
-    float t1 = idx(times, nVari - 1);
+
+    // Get first entry to initialize
+    vec3 first = fetchVariSample(variIndex, 0);
+    vec3 last = fetchVariSample(variIndex, nVari - 1);
+    float size = first.x;
+    float colPacked = first.z;
+    bool hasVariColors = colPacked > SENTINEL + 10.0;
+    float t0 = first.g;
+    float t1 = last.g;
     float period = t1 - t0;
     float t = mod(u_s, period);
-    float size = idx(mags, 0);
+
     for (int i = 0; i < nVari - 1; i++) {
-        float x0 = idx(times, i) - t0;
-        float x1 = idx(times, i + 1) - t0;
+        vec3 curr = fetchVariSample(variIndex, i);
+        vec3 next = fetchVariSample(variIndex, i + 1);
+        float x0 = curr.g - t0;
+        float x1 = next.g - t0;
         if (t >= x0 && t <= x1) {
-            size = lint(t, x0, x1, idx(mags, i), idx(mags, i + 1));
+            size = lint(t, x0, x1, curr.x, next.x);
+            if (hasVariColors) {
+                // Do not interpolate here, col is a packed RGBA!
+                colPacked = curr.z;
+            }
             break;
         } else {
             // Next
@@ -165,7 +171,13 @@ void main() {
     float boundaryFade = smoothstep(l0, l1, dist);
 
     // Color computation.
-    v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
+    float alpha = clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0);
+    if (hasVariColors) {
+        vec4 c = unpack(colPacked);
+        v_col = vec4(c.rgb * u_alphaSizeBr.z, alpha);
+    } else {
+        v_col = vec4(a_color.rgb * u_alphaSizeBr.z, alpha);
+    }
 
     // Performance trick: If the star is invisible, set it very small so that there is only one fragment, and
     // set the color to 0 to discard it in the fragment shader.

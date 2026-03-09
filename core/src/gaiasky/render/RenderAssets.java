@@ -62,7 +62,7 @@ public class RenderAssets {
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
             variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
-            billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, starPointDesc, galDesc, spriteDesc, billboardDesc;
+            billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, galDesc, spriteDesc, billboardDesc;
 
     private final boolean compute;
 
@@ -160,12 +160,10 @@ public class RenderAssets {
                                       "shader/particle.group.quad.fragment.glsl",
                                       TextUtils.concatAll("orbitelem", names),
                                       defines);
-        // Initialize point cloud shaders - depends on point cloud mode
-        final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
-        final String pointTriSuffixParticles = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : ".point";
+        // Initialize point cloud shaders
         particleGroupDesc = loadShaderExt(manager,
-                                          "shader/particle.group" + pointTriSuffixParticles + ".vertex.glsl",
-                                          "shader/particle.group" + pointTriSuffixParticles + ".fragment.glsl",
+                                          "shader/particle.group.quad.vertex.glsl",
+                                          "shader/particle.group.quad.fragment.glsl",
                                           TextUtils.concatAll("particle.group", namesColMap),
                                           definesColMap);
         particleGroupExtBillboardDesc = loadShaderExt(manager,
@@ -181,21 +179,15 @@ public class RenderAssets {
                                                   definesColMap,
                                                   "#define extendedParticlesFlag");
         starGroupDesc = loadShaderExt(manager,
-                                      "shader/star.group" + pointTriSuffix + ".vertex.glsl",
-                                      "shader/star.group" + pointTriSuffix + ".fragment.glsl",
+                                      "shader/star.group.quad.vertex.glsl",
+                                      "shader/star.group.quad.fragment.glsl",
                                       TextUtils.concatAll("star.group", namesColMap),
                                       definesColMap);
         variableGroupDesc = loadShaderExt(manager,
-                                          "shader/variable.group" + pointTriSuffix + ".vertex.glsl",
-                                          "shader/star.group" + pointTriSuffix + ".fragment.glsl",
+                                          "shader/variable.group.quad.vertex.glsl",
+                                          "shader/star.group.quad.fragment.glsl",
                                           TextUtils.concatAll("variable.group", namesColMap),
                                           definesColMap);
-        // Regular stars
-        starPointDesc = loadShaderExt(manager,
-                                      "shader/star.group.point.vertex.glsl",
-                                      "shader/star.group.point.fragment.glsl",
-                                      TextUtils.concatAll("star.point", names),
-                                      defines);
 
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting",
@@ -377,11 +369,6 @@ public class RenderAssets {
          * VARIABLE GROUP - default and relativistic
          */
         variableGroupShaders = fetchShaderProgramExt(manager, variableGroupDesc, TextUtils.concatAll("variable.group", names));
-
-        /*
-         * STAR POINT
-         */
-        starPointShaders = fetchShaderProgramExt(manager, starPointDesc, TextUtils.concatAll("star.point", names));
 
         /*
          * ORBITAL ELEMENTS PARTICLES - default and relativistic

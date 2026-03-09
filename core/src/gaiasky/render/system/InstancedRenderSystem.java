@@ -57,7 +57,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     public static class InstancedModel {
         // Attribute offsets.
         public int sizeOffset, particlePosOffset, properMotionOffset, textureIndexOffset, additionalOffset,
-                nVariOffset, variMagsOffset, variTimesOffset, elems01Offset, elems02Offset;
+                nVariOffset, varIndexOffset, elems01Offset, elems02Offset;
         /** Number of vertices. **/
         public int numVertices;
         /** Vertex size in floats (4-bytes). **/

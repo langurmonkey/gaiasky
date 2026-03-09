@@ -41,7 +41,8 @@ public class UCDParser {
     public static String[] RADIUS_NAMES = new String[] { "radius", "rcluster", "radi", "core_radius", "tidal_radius", "total_radius" };
     public static String[] SIZE_NAMES = new String[] { "diameter", "size", "linear_diameter" };
     public static String[] NSTARS_NAMES = new String[] { "n", "nstars", "n_stars", "n_star" };
-    public static String[] VARIMAGS_NAMES = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
+    public static String[] VARIMAGS_NAMES = new String[] { "g_transit_mag", "g_transit_magnitudes", "g_mag_list", "g_magnitude_list", "g_mag_series", "magnitudes" };
+    public static String[] VARICOLS_NAMES = new String[] { "g_transit_col", "g_transit_colors", "g_col_list", "g_color_list", "g_col_series", "g_color_series", "colors" };
     public static String[] VARITIMES_NAMES = new String[] { "g_transit_time", "time_list", "time_series" };
     public static String[] PERIOD_NAMES = new String[] { "pf", "period" };
     public static String[] EPOCH_NAMES = new String[] { "epoch", "epoch_state_vector", "epoch_jd", "epochjd" };
@@ -78,7 +79,7 @@ public class UCDParser {
     // VARIABILITY
     public boolean hasVariability = false;
     public boolean hasPeriod = false;
-    public Array<UCD> VARI_TIMES, VARI_MAGS, PERIOD;
+    public Array<UCD> VARI_TIMES, VARI_MAGS, VARI_COLS, PERIOD;
     // KEPLERIAN ELEMENTS
     public boolean hasKeplerElements = false;
     public Array<UCD> EPOCH, SMA, ECC, INC, ASCNODE, ARGPERI, MANOMALY;
@@ -185,11 +186,15 @@ public class UCDParser {
         return TextUtils.contains(NSTARS_NAMES, colName, true);
     }
 
-    public static boolean isGVariMags(String colName) {
+    public static boolean isVariMags(String colName) {
         return TextUtils.contains(VARIMAGS_NAMES, colName, true);
     }
 
-    public static boolean isGVariTimes(String colName) {
+    public static boolean isVariColors(String colName) {
+        return TextUtils.contains(VARICOLS_NAMES, colName, true);
+    }
+
+    public static boolean isVariTimes(String colName) {
         return TextUtils.contains(VARITIMES_NAMES, colName, true);
     }
 
@@ -431,7 +436,10 @@ public class UCDParser {
         if (this.VARI_MAGS == null || this.VARI_MAGS.isEmpty()) {
             this.VARI_MAGS = getByColNames(VARIMAGS_NAMES, "mag");
         }
-        this.hasVariability = !this.VARI_MAGS.isEmpty();
+        if (this.VARI_COLS == null || this.VARI_COLS.isEmpty()) {
+            this.VARI_COLS = getByColNames(VARICOLS_NAMES, "mag");
+        }
+        this.hasVariability = !this.VARI_MAGS.isEmpty() || !this.VARI_COLS.isEmpty();
         if (this.PERIOD == null || this.PERIOD.isEmpty()) {
             this.PERIOD = getByColNames(PERIOD_NAMES, "d");
         }
@@ -528,15 +536,10 @@ public class UCDParser {
     }
 
     private Array<UCD> getByColNames(String[]... ColNames) {
-        return getByColNames(ColNames, null);
+        return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, ColNames);
     }
 
     private Array<UCD> getByColNames(String[] ColNames,
-                                     String defaultUnit) {
-        return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, ColNames, defaultUnit);
-    }
-
-    private Array<UCD> getByColNames(String[][] ColNames,
                                      String defaultUnit) {
         return getByColNames(new UCDType[] { UCDType.UNKNOWN, UCDType.MISSING }, ColNames, defaultUnit);
     }
@@ -564,8 +567,7 @@ public class UCDParser {
     }
 
     private Array<UCD> getByColNames(UCDType[] types,
-                                     String[][] ColNames,
-                                     String defaultUnit) {
+                                     String[][] ColNames) {
         Array<UCD> candidates = new Array<>();
         for (UCDType type : types) {
             // Get all unknown and missing
@@ -574,8 +576,6 @@ public class UCDParser {
                 // Check column names
                 for (UCD candidate : set) {
                     if (TextUtils.containsOrMatches(ColNames, candidate.colName, true)) {
-                        if (defaultUnit != null && (candidate.unit == null || candidate.unit.isEmpty()))
-                            candidate.unit = defaultUnit;
                         candidates.add(candidate);
                     }
                 }

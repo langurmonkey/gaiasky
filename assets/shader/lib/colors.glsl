@@ -16,4 +16,16 @@ vec3 hsv2rgb(vec3 c) {
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
+// Unpack a float into a RGBA color.
+vec4 unpack(float col) {
+    // Reinterpret the float bits as an unsigned integer
+    uint bits = floatBitsToUint(col);
+
+    float r = float(bits & 0xFFu) / 255.0;
+    float g = float((bits >> 8) & 0xFFu) / 255.0;
+    float b = float((bits >> 16) & 0xFFu) / 255.0;
+    float a = float((bits >> 24) & 0xFFu) / 255.0;
+
+    return vec4(r, g, b, a);
+}
 #endif

@@ -9,8 +9,10 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.glutils.FloatTextureData;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -20,7 +22,10 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.Highlight;
+import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.ParticleVariable;
 import gaiasky.scene.system.render.SceneRenderer;
@@ -31,6 +36,12 @@ import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import org.lwjgl.opengl.GL30;
+
+import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Renders variable star sets as instanced triangles.
@@ -42,6 +53,9 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     private final Colormap cmap;
     private StarSetQuadComponent triComponent;
 
+    private static final int FLOATS_PER_VARI_ENTRY = 3; // mag, time, col (packed float)
+    private final Map<Render, Texture> variabilityTextures = new HashMap<>();
+
     public VariableSetInstancedRenderer(SceneRenderer sceneRenderer,
                                         RenderGroup rg,
                                         float[] alphas,
@@ -52,9 +66,10 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD,
-                Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CMD,
-                Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+                                        Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CMD,
+                                        Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
+
 
     @Override
     protected void addAttributesDivisor1(Array<VertexAttribute> attributes,
@@ -63,18 +78,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
-
         attributes.add(new VertexAttribute(OwnUsage.NumVariablePoints, 1, "a_nVari"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes, 4, "a_vmags1"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 1, 4, "a_vmags2"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 2, 4, "a_vmags3"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 3, 4, "a_vmags4"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 4, 4, "a_vmags5"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableTimes, 4, "a_vtimes1"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 1, 4, "a_vtimes2"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 2, 4, "a_vtimes3"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 3, 4, "a_vtimes4"));
-        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 4, 4, "a_vtimes5"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableIndex, 1, "a_varIndex"));
     }
 
     @Override
@@ -88,9 +93,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         model.properMotionOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
         model.particlePosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
         model.nVariOffset = curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
-        model.variMagsOffset =
-                curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
-        model.variTimesOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
+        model.varIndexOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableIndex) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableIndex).offset / 4 : 0;
     }
 
     @Override
@@ -133,6 +136,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 model.ensureInstanceAttribsSize(n * curr.instanceSize);
                 int numStarsAdded = 0;
 
+
                 for (int i = 0; i < n; i++) {
                     if (utils.filter(i, set, desc) && set.isVisible(i)) {
                         var particle = (ParticleVariable) set.get(i);
@@ -145,23 +149,24 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                         if (hlCmap) {
                             // Color map
                             double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().getNumber(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], hl.getHlcmAlpha());
+                            model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0],
+                                                                                                              (float) color[1],
+                                                                                                              (float) color[2],
+                                                                                                              hl.getHlcmAlpha());
                         } else {
                             // Plain
                             model.instanceAttributes[curr.instanceIdx + curr.colorOffset] = utils.saturateColor(i, set, hl);
                         }
 
-                        // VARIABLE STARS (magnitudes and times)
+                        // VARIABLE STARS (TBO index and number)
                         model.instanceAttributes[curr.instanceIdx + model.nVariOffset] = particle.nVari();
-                        for (int k = 0; k < particle.nVari(); k++) {
-                            model.instanceAttributes[curr.instanceIdx + model.variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
-                            model.instanceAttributes[curr.instanceIdx + model.variTimesOffset + k] = (float) particle.variTime(k);
-                        }
+                        int fixedOffset = i * MAX_VARI;
+                        model.instanceAttributes[curr.instanceIdx + model.varIndexOffset] = (float) fixedOffset;
 
                         // PROPER MOTION [u/yr]
-                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = (float) particle.vx();
-                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = (float) particle.vy();
-                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = (float) particle.vz();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset] = particle.vx();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 1] = particle.vy();
+                        model.instanceAttributes[curr.instanceIdx + model.properMotionOffset + 2] = particle.vz();
 
                         // STAR POSITION [u]
                         model.instanceAttributes[curr.instanceIdx + model.particlePosOffset] = (float) particle.x();
@@ -173,6 +178,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                         numStarsAdded++;
                     }
                 }
+                uploadVariabilityTexture(render, hl, set, sizeFactor, set.data());
                 // Global (divisor=0) vertices (position, uv)
                 curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
                 // Per instance (divisor=1) vertices
@@ -191,6 +197,16 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 if (hl.dirty) {
                     triComponent.updatePointScale(utils.getDatasetSizeFactor(render.entity, hl, desc));
                     hl.dirty = false;
+                }
+
+                // Bind data texture (variability)
+                Texture varTex = variabilityTextures.get(render);
+                if (varTex != null) {
+                    varTex.bind(1); // Bind to texture unit 1
+                    shaderProgram.setUniformi("u_variabilityTex", 1);
+
+                    // Pass width for linear→2D coordinate conversion
+                    shaderProgram.setUniformi("u_varTexWidth", varTex.getWidth());
                 }
 
                 if (triComponent.starTex != null) {
@@ -220,12 +236,12 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
                 // Override streak if needed.
-                if(!set.allowStreaks) {
+                if (!set.allowStreaks) {
                     shaderProgram.setUniformf("u_camVel", 0, 0, 0);
                 }
 
                 try {
-                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, model.numVertices, getCount(render));
+                    curr.mesh.render(shaderProgram, GL30.GL_TRIANGLES, 0, model.numVertices, getCount(render));
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }
@@ -247,6 +263,90 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 inGpu.remove(renderable);
             }
         }
+    }
+
+
+    private Texture initVariabilityTexture(Render render, int nStars) {
+        // Calculate total entries needed: mag/time/col per sample × MAX_VARI × nStars
+        int totalTexels = nStars * MAX_VARI;
+
+        // Query hardware limit
+        int maxSize = GL30.glGetInteger(GL30.GL_MAX_TEXTURE_SIZE);
+
+        // Compute optimal dimensions: pack linearly, width up to maxSize
+        int texWidth = Math.min(maxSize, Math.max(1, totalTexels));
+        int texHeight = Math.max(1, (totalTexels + texWidth - 1) / texWidth);
+
+        // Check if we already have a correctly-sized texture
+        Texture tex = variabilityTextures.get(render);
+        if (tex != null && tex.getWidth() == texWidth && tex.getHeight() == texHeight) {
+            return tex;
+        }
+
+        // Dispose old texture if dimensions changed
+        if (tex != null) {
+            tex.dispose();
+            variabilityTextures.remove(render);
+        }
+
+        // Create new texture
+        var td = new FloatTextureData(texWidth, texHeight, GL30.GL_RGBA32F, GL20.GL_RGBA, GL30.GL_FLOAT, false);
+        tex = new Texture(td);
+        tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        tex.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+
+        variabilityTextures.put(render, tex);
+
+        return tex;
+    }
+
+
+    private static final float SENTINEL = -9999f;
+    private void uploadVariabilityTexture(Render render, Highlight hl, ParticleSet set, float sizeFactor, List<IParticleRecord> particles) {
+        var tex = initVariabilityTexture(render, particles.size());
+
+        // Create buffer
+        var texData = ((FloatTextureData)tex.getTextureData());
+
+        // Use FloatBuffer for RGBA32F
+        FloatBuffer buffer = texData.getBuffer();
+        // Fill with sentinel (-9999.0)
+        for (int i = 0; i < buffer.capacity(); i++) {
+            buffer.put(SENTINEL);
+        }
+        buffer.rewind();
+
+        for (int starIdx = 0; starIdx < particles.size(); starIdx++) {
+            ParticleVariable p = (ParticleVariable) particles.get(starIdx);
+            int nVari = p.nVari();
+            boolean hasColors = p.hasVariColors();
+            float fallbackColor = hasColors ? utils.saturateColor(starIdx, set, hl) : SENTINEL;
+
+            for (int sample = 0; sample < MAX_VARI; sample++) {
+                if (sample < nVari) {
+                    float mag = (float) (p.variMag(sample) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
+                    float time = (float) p.variTime(sample);
+                    float col = hasColors ? p.variColor(sample) : fallbackColor;
+
+                    // Store in .r, .g, .b channels; .a unused or for flags
+                    buffer.put(mag);    // R
+                    buffer.put(time);   // G
+                    buffer.put(col);    // B
+                    buffer.put(0f); // A (padding)
+                } else {
+                    // Pad unused samples with sentinel values
+                    buffer.put(SENTINEL); // mag
+                    buffer.put(SENTINEL); // time
+                    buffer.put(SENTINEL); // col
+                    buffer.put(SENTINEL);
+                }
+            }
+        }
+
+        buffer.flip();
+
+        // Upload to texture
+        tex.load(texData);
     }
 
     @Override
@@ -282,9 +382,12 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                     models.set(offset, null);
                     inGpu.remove(renderable);
                 }
+                if (variabilityTextures.containsKey((Render) renderable)) {
+                    variabilityTextures.get((Render) renderable).dispose();
+                    variabilityTextures.remove((Render) renderable);
+                }
             }
-            case BILLBOARD_TEXTURE_IDX_CMD ->
-                    GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
+            case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
             default -> {
             }
         }

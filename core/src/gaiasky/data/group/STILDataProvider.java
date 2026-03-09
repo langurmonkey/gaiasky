@@ -25,7 +25,6 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.LinearInterpolator;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCD;
@@ -444,6 +443,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             // VARIABILITY
                             float[] variMags = null;
+                            float[] variCols = null;
                             double[] variTimes = null;
                             double pf = 0.0;
                             int nVari = 0;
@@ -456,29 +456,43 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 } else {
                                     pf = period.getSecond();
                                 }
+                                // Magnitudes list
                                 Pair<UCD, double[]> variMagsPair = getDoubleArrayUcd(ucdParser.VARI_MAGS, row);
                                 assert variMagsPair != null;
                                 double[] variMagsDouble = variMagsPair.getSecond();
-                                nVari = variMagsDouble.length;
+                                nVari = variMagsDouble != null ? variMagsDouble.length : 0;
                                 variMags = new float[nVari];
 
+                                // Times list
                                 Pair<UCD, double[]> variTimesPair = getDoubleArrayUcd(ucdParser.VARI_TIMES, row);
                                 assert variTimesPair != null;
                                 variTimes = variTimesPair.getSecond();
 
+                                // Colors list (may not be present!)
+                                Pair<UCD, double[]> variColorsPair = getDoubleArrayUcd(ucdParser.VARI_COLS, row);
+                                var hasVariColors = variColorsPair != null;
+                                double[] variColorsDouble = hasVariColors ? variColorsPair.getSecond() : null;
+                                variCols = hasVariColors ? new float[nVari] : null;
+
                                 double[] auxMags = variMagsDouble;
                                 double[] auxTimes = variTimes;
+                                double[] auxColors = variColorsDouble;
 
                                 // SANITIZE (no NaNs)
                                 List<Double> magnitudesList = new ArrayList<>();
                                 List<Double> timesList = new ArrayList<>();
-                                int idx = 0;
-                                for (double mag : auxMags) {
-                                    if (Double.isFinite(mag)) {
-                                        magnitudesList.add(mag - magScl);
+                                List<Double> colorsList = hasVariColors ? new ArrayList<>() : null;
+                                int n = Math.max(auxMags.length, hasVariColors ? auxColors.length : 0);
+                                for (int idx = 0; idx < n; idx++) {
+                                    var mag = auxMags != null && auxMags.length > idx ? auxMags[idx] : Double.NaN;
+                                    var col = hasVariColors && auxColors.length > idx ? auxColors[idx] : Double.NaN;
+                                    if (Double.isFinite(mag) || Double.isFinite(col)) {
+                                        magnitudesList.add(Double.isFinite(mag) ? mag - magScl : mag);
                                         timesList.add(auxTimes[idx]);
+                                        if (hasVariColors)
+                                            colorsList.add(col);
                                     }
-                                    idx++;
+
                                 }
                                 variMagsDouble = magnitudesList.stream()
                                         .mapToDouble(Double::doubleValue)
@@ -486,39 +500,52 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 variTimes = timesList.stream()
                                         .mapToDouble(Double::doubleValue)
                                         .toArray();
-                                nVari = variMagsDouble.length;
+                                if (hasVariColors)
+                                    variColorsDouble = colorsList.stream()
+                                            .mapToDouble(Double::doubleValue)
+                                            .toArray();
+                                nVari = variTimes.length;
 
                                 // FOLD
-                                List<Vector2D> list = new ArrayList<>(nVari);
+                                // x:time, y:mag, z:color, can be NaN
+                                List<Vector3D> list = new ArrayList<>(nVari);
                                 for (int k = 0; k < nVari; k++) {
                                     double phase = ((variTimes[k] - variTimes[0]) % pf);
-                                    list.add(new Vector2D(phase, variMagsDouble[k]));
+                                    double mag = variMagsDouble.length > k ? variMagsDouble[k] : Double.NaN;
+                                    double col = hasVariColors && variColorsDouble.length > k ? variColorsDouble[k] : Double.NaN;
+                                    list.add(new Vector3D(phase, mag, col));
                                 }
                                 list.sort(Comparator.comparingDouble(o -> o.x));
 
                                 for (int k = 0; k < nVari; k++) {
-                                    Vector2D point = list.get(k);
+                                    Vector3D point = list.get(k);
                                     variTimes[k] = point.x + variTimes[0];
                                     variMagsDouble[k] = point.y;
+                                    if (hasVariColors)
+                                        variColorsDouble[k] = point.z;
                                 }
 
                                 // RESAMPLE (only if too many samples)
                                 final int MAX_VARI = VariableSetInstancedRenderer.MAX_VARI;
-                                if (variMagsDouble.length > MAX_VARI) {
+                                if (nVari > MAX_VARI) {
                                     nVari = MAX_VARI;
                                     double t0 = variTimes[0];
                                     double tn = variTimes[variTimes.length - 1];
                                     double tStep = (tn - t0) / (nVari - 1);
 
-                                    var linearInterpolator = new LinearInterpolator(variTimes, variMagsDouble);
+                                    var lintMags = new LinearInterpolator(variTimes, variMagsDouble);
+                                    var lintColors = hasVariColors ? new LinearInterpolator(variTimes, variColorsDouble) : null;
 
                                     variMagsDouble = new double[nVari];
                                     variTimes = new double[nVari];
+                                    variColorsDouble = hasVariColors ? new double[nVari] : null;
 
-                                    for (idx = 0; idx < nVari; idx++) {
+                                    for (int idx = 0; idx < nVari; idx++) {
                                         double t = t0 + tStep * idx;
                                         variTimes[idx] = t;
-                                        variMagsDouble[idx] = linearInterpolator.value(t);
+                                        variMagsDouble[idx] = lintMags.value(t);
+                                        if (hasVariColors)
+                                            variColorsDouble[idx] = lintColors.value(t);
                                     }
                                     resampledLightCurves++;
                                 }
@@ -528,6 +555,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 for (int j = 0; j < variMagsDouble.length; j++) {
                                     double variAbsoluteMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, variMagsDouble[j]);
                                     variMags[j] = (float) AstroUtils.absoluteMagnitudeToPseudoSize(variAbsoluteMag);
+                                }
+                                // Convert B-V colors to packed RGB
+                                if (hasVariColors) {
+                                    for (int j = 0; j < variColorsDouble.length; j++) {
+                                        var bvColor = variColorsDouble[j];
+                                        var rgb = ColorUtils.BVtoRGB(bvColor);
+                                        variCols[j] = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1f);
+                                    }
                                 }
                             }
 
@@ -650,11 +685,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                                 // Construct record.
                                 IParticleRecord pr;
-                                if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
+                                if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null || variCols != null) {
                                     pr = new ParticleVariable(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
                                                               (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z,
                                                               (float) appMag, (float) absMag, colorPacked, (float) sizePc, hip, tEff, nVari, pf,
-                                                              variMags, variTimes, extraAttributes);
+                                                              variMags, variCols, variTimes, extraAttributes);
                                 } else {
                                     pr = new ParticleStar(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
                                                           (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
