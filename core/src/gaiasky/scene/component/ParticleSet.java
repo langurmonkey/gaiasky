@@ -1048,11 +1048,13 @@ public class ParticleSet implements Component, IDisposable {
                            pb.vy(),
                            pb.vz())
                             .scl(deltaYears);
+                } else {
+                    pm.set(0, 0, 0);
                 }
                 out.set(pb.x(), pb.y(), pb.z());
             }
             // Apply affine transformations, if any.
-            if (entity != null) {
+            if (entity != null && Mapper.affine.has(entity)) {
                 var affine = Mapper.affine.get(entity);
                 if (affine != null && !affine.isEmpty()) {
                     synchronized (mat) {
@@ -1215,11 +1217,12 @@ public class ParticleSet implements Component, IDisposable {
 
     public double getSolidAngleApparent(int idx) {
         if (idx >= 0 && idx < pointData.size()) {
-            IParticleRecord candidate = pointData.get(idx);
             ICamera camera = GaiaSky.instance.getICamera();
+            IParticleRecord candidate = pointData.get(idx);
             float size = candidate.hasSize() ? candidate.size() : 0.5e2f;
-            var pos = fetchPositionDouble(candidate, camera.getPos(), D31, currDeltaYears);
-            return (float) ((size / pos.len2()) / camera.getFovFactor());
+            Vector3Q pos = this.fetchPosition(candidate, cPosD, B31, currDeltaYears);
+            var distance = pos.lenDouble() - size;
+            return (float) ((size / distance) / camera.getFovFactor());
         } else {
             return -1;
         }
