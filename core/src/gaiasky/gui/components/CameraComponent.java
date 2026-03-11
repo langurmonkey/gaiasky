@@ -334,6 +334,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                                         Constants.MAX_CAM_SPEED, 10f, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(componentWidth);
+        cameraSpeed.setDisplayValueMapped(false);
         cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
@@ -348,6 +349,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                                         Constants.MAX_ROT_SPEED, 5000f, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(componentWidth);
+        rotateSpeed.setDisplayValueMapped(false);
         rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
@@ -362,6 +364,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                                       Constants.MAX_TURN_SPEED, 1060f, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(componentWidth);
+        turnSpeed.setDisplayValueMapped(false);
         turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {

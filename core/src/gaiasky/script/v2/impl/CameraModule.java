@@ -644,13 +644,9 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         var camUp = api.aux3b3.set(GaiaSky.instance.cameraManager.getUp());
 
         if (objectPos != null && camPos != null) {
-            var o = objectPos;
-            var c = camPos;
-            var u = camUp;
-
 
             // Camera to object vector.
-            var camObj = api.aux3b4.set(o).sub(c);
+            var camObj = api.aux3b4.set(objectPos).sub(camPos);
             // Direction is object - camera.
             var dir = api.aux3b5.set(camObj).nor();
             // Up vector from current camera up.
@@ -674,7 +670,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             var targetDistance = radius / FastMath.tan(targetAngle * 0.5);
             var len = camObj.len().subtract(new Quadruple(targetDistance));
             // Final position.
-            var pos = camObj.nor().scl(len).add(c);
+            var pos = camObj.nor().scl(len).add(camPos);
 
 
             transition(pos.valuesD(),
