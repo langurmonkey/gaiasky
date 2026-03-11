@@ -20,22 +20,26 @@ We have modified the original source in the following manner:
 
 ### Requirements
 
-Gaia Sky spawns a new process with the system Python 3 interpreter and manages dependencies with `pipenv`.
+Gaia Sky spawns a new process with the system Python 3 interpreter and manages dependencies with [`uv`](https://docs.astral.sh/uv/).
 
 Due to the large dependency tree needed, **OptFlowCam is not supported in the Flatpak**.
 
 ### Linux
-On Linux, you know how to install this. For instance, on Arch Linux, you do `pacman -S python python-pipenv`.
+On Linux, you know how to install this. For instance, on Arch Linux, you do `pacman -S python python-uv`.
 
 ### macOS
-On macOS, you can use `brew` to install `python3` and `pipenv`:
+On macOS, you can use `brew` to install `python3` and `uv`:
 
 ```console
-brew install python3 pipenv
+brew install python3 uv
 ```
 
+You can also follow the [official instructions](https://docs.astral.sh/uv/getting-started/installation/#__tabbed_1_1) and install it with `curl` or `wget`.
+
 ### Windows
-On Windows, download Python 3 from the official [source](https://python.org/downloads), and install it. During installation, check the box that says "Add Python to PATH". Then, open a command prompt (`Win + R`, type `cmd`), and type in `pip install pipenv` to install `pipenv`. After that, you may need to add `pipenv` to your PATH. More info [here](https://pipenv.pypa.io/en/latest/installation.html).
+On Windows, download Python 3 from the official [source](https://python.org/downloads), and install it. During installation, check the box that says "Add Python to PATH".
+
+Then, open a command prompt (`Win + R`, type `cmd`), and type in `pip install uv` to install `uv`. Alternatively, follow the [official instructions](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). 
 
 ## Running
 
@@ -46,13 +50,14 @@ If the environment is successfully installed, then Gaia Sky can access it. When 
 OptFlowCam is a standalone script that can be run directly. To do so, you need to download the `optflowcam_convert.py` and `optlfowcam_interpolation.py` files above (or use the ones in your Gaia Sky installation). Then, install the environment:
 
 ```bash
-pipenv install numpy python-dateutil
+uv init
+uv add numpy python-dateutil
 ```
 
 Then run the script with your keyframes file. This will produce a camera path file.
 
 ```bash
-pipenv run python3 optflowcam_convert.py -i $INPUT -o $OUTPUT -f $FPS
+uv run optflowcam_convert.py -i $INPUT -o $OUTPUT -f $FPS
 ```
 
 where

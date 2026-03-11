@@ -32,6 +32,28 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+/**
+ * Manages the camera keyframes in Gaia Sky, providing functionality for creating, loading, saving, and exporting
+ * camera paths. This class acts as a central hub for camera recording and playback operations, coordinating
+ * between the user interface, the camera system, and external processing scripts.
+ * <p>
+ * Key responsibilities include:
+ * <ul>
+ *     <li><b>Keyframe Management:</b> Maintaining a synchronized list of {@link Keyframe} objects that define
+ *     camera position, orientation, and timing.</li>
+ *     <li><b>Persistence:</b> Loading from and saving to {@code .gkf} (Gaia Sky Keyframes) files.</li>
+ *     <li><b>Path Generation:</b> Converting keyframes into smooth camera paths using different interpolation
+ *     methods such as Linear, Catmull-Rom Spline, or B-Spline.</li>
+ *     <li><b>Playback Control:</b> Managing the {@link RecorderState} (IDLE, PLAYING, STEPPING) and advancing
+ *     the camera along the path frame by frame.</li>
+ *     <li><b>External Integration:</b> Providing an interface to run the {@code OptFlowCam} Python script
+ *     for advanced camera path optimization and conversion.</li>
+ *     <li><b>Event Handling:</b> Implementing {@link IObserver} to respond to system-wide events like
+ *     saving, exporting, or frame updates.</li>
+ * </ul>
+ * <p>
+ * This class follows the Singleton pattern, accessible via the {@link #instance} field.
+ */
 public class KeyframesManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesManager.class);
     /**
@@ -75,11 +97,7 @@ public class KeyframesManager implements IObserver {
 
         this.keyframes = Collections.synchronizedList(new ArrayList<>());
 
-        EventManager.instance.subscribe(this,
-                                        Event.KEYFRAMES_FILE_SAVE,
-                                        Event.KEYFRAMES_EXPORT,
-                                        Event.UPDATE_CAM_RECORDER,
-                                        Event.KEYFRAME_PLAY_FRAME);
+        EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT, Event.UPDATE_CAM_RECORDER, Event.KEYFRAME_PLAY_FRAME);
     }
 
     public static void initialize() {
@@ -106,10 +124,9 @@ public class KeyframesManager implements IObserver {
      * Gets the frame number of the given keyframe using the current target frame rate setting.
      *
      * @param kf The keyframe.
-     *
      * @return The frame number corresponding to exactly this keyframe if the keyframe is valid and in the keyframes
-     *         list, otherwise -1.
-     *         The frame number is in [0,n-1].
+     * list, otherwise -1.
+     * The frame number is in [0,n-1].
      */
     public long getFrameNumber(Keyframe kf) {
         if (kf == null || keyframes.isEmpty() || !keyframes.contains(kf)) {
@@ -127,8 +144,7 @@ public class KeyframesManager implements IObserver {
         return (long) (t * Settings.settings.camrecorder.targetFps);
     }
 
-    private PathDouble<Vector3D> getPath(Vector3D[] data,
-                                         PathType pathType) {
+    private PathDouble<Vector3D> getPath(Vector3D[] data, PathType pathType) {
         if (pathType == PathType.LINEAR) {
             return new LinearDouble<>(data);
         } else if (pathType == PathType.CATMULL_ROM_SPLINE) {
@@ -172,9 +188,7 @@ public class KeyframesManager implements IObserver {
                         result.add(kf);
                     } else if (tokens.length == 16) {
                         // Keyframe has target.
-                        Vector3D target = new Vector3D(Parser.parseDouble(tokens[11]),
-                                                       Parser.parseDouble(tokens[12]),
-                                                       Parser.parseDouble(tokens[13]));
+                        Vector3D target = new Vector3D(Parser.parseDouble(tokens[11]), Parser.parseDouble(tokens[12]), Parser.parseDouble(tokens[13]));
                         boolean seam = Parser.parseInt(tokens[14]) == 1;
                         String name = tokens[15];
                         Keyframe kf = new Keyframe(name, pos, dir, up, target, time, secs, seam);
@@ -201,10 +215,7 @@ public class KeyframesManager implements IObserver {
         return time;
     }
 
-    public void saveKeyframesFile(List<Keyframe> keyframes,
-                                  String fileName,
-                                  boolean overwrite,
-                                  boolean notification) {
+    public void saveKeyframesFile(List<Keyframe> keyframes, String fileName, boolean overwrite, boolean notification) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
             if (overwrite) {
@@ -223,15 +234,11 @@ public class KeyframesManager implements IObserver {
             try (BufferedWriter os = new BufferedWriter(new FileWriter(f.toFile()))) {
                 for (Keyframe kf : keyframes) {
                     os.append(Double.toString(kf.seconds)).append(sep).append(kf.time.toString()).append(sep);
-                    os.append(Double.toString(kf.pos.x)).append(sep).append(Double.toString(kf.pos.y)).append(sep).append(
-                            Double.toString(kf.pos.z)).append(sep);
-                    os.append(Double.toString(kf.dir.x)).append(sep).append(Double.toString(kf.dir.y)).append(sep).append(
-                            Double.toString(kf.dir.z)).append(sep);
-                    os.append(Double.toString(kf.up.x)).append(sep).append(Double.toString(kf.up.y)).append(sep).append(
-                            Double.toString(kf.up.z)).append(sep);
+                    os.append(Double.toString(kf.pos.x)).append(sep).append(Double.toString(kf.pos.y)).append(sep).append(Double.toString(kf.pos.z)).append(sep);
+                    os.append(Double.toString(kf.dir.x)).append(sep).append(Double.toString(kf.dir.y)).append(sep).append(Double.toString(kf.dir.z)).append(sep);
+                    os.append(Double.toString(kf.up.x)).append(sep).append(Double.toString(kf.up.y)).append(sep).append(Double.toString(kf.up.z)).append(sep);
                     if (kf.target != null) {
-                        os.append(Double.toString(kf.target.x)).append(sep).append(Double.toString(kf.target.y)).append(sep).append(
-                                Double.toString(kf.target.z)).append(sep);
+                        os.append(Double.toString(kf.target.x)).append(sep).append(Double.toString(kf.target.y)).append(sep).append(Double.toString(kf.target.z)).append(sep);
                     }
                     os.append(Integer.toString(kf.seam ? 1 : 0)).append(sep);
                     os.append(kf.name).append("\n");
@@ -248,10 +255,7 @@ public class KeyframesManager implements IObserver {
         }
     }
 
-    public double[] samplePaths(Array<Array<Vector3D>> pointsSep,
-                                double[] points,
-                                int samplesPerSegment,
-                                PathType pathType) {
+    public double[] samplePaths(Array<Array<Vector3D>> pointsSep, double[] points, int samplesPerSegment, PathType pathType) {
         if (pathType == PathType.LINEAR) {
             // No need to sample a linear interpolation
             double[] result = new double[points.length];
@@ -259,7 +263,7 @@ public class KeyframesManager implements IObserver {
             return result;
         } else {
             Array<Double> res = new Array<>();
-            for (Array<Vector3D> vec : pointsSep) {
+            for (Array<Vector3D> vec : new Array.ArrayIterator<>(pointsSep)) {
                 int nSamples = (vec.size - 1) * samplesPerSegment + 1;
                 int nChunks = nSamples - 1;
 
@@ -279,7 +283,7 @@ public class KeyframesManager implements IObserver {
 
             double[] result = new double[res.size];
             int i = 0;
-            for (Double d : res) {
+            for (Double d : new Array.ArrayIterator<>(res)) {
                 result[i] = d;
                 i++;
             }
@@ -295,8 +299,7 @@ public class KeyframesManager implements IObserver {
         return out;
     }
 
-    public void exportKeyframesFile(List<Keyframe> keyframes,
-                                    String fileName, boolean overwrite) {
+    public void exportKeyframesFile(List<Keyframe> keyframes, String fileName, boolean overwrite) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
             if (overwrite) {
@@ -327,11 +330,9 @@ public class KeyframesManager implements IObserver {
      *
      * @param keyframes The array of keyframes.
      * @param pathType  The path type.
-     *
      * @return Array of path parts.
      */
-    private PathPart[] positionsToPathParts(List<Keyframe> keyframes,
-                                            PathType pathType) {
+    private PathPart[] positionsToPathParts(List<Keyframe> keyframes, PathType pathType) {
         double frameRate = Settings.settings.camrecorder.targetFps;
         Array<Array<Vector3D>> positionsSep = new Array<>();
         Array<Vector3D> current = new Array<>();
@@ -360,7 +361,7 @@ public class KeyframesManager implements IObserver {
 
         PathPart[] res = new PathPart[positionsSep.size];
         int j = 0;
-        for (Array<Vector3D> part : positionsSep) {
+        for (Array<Vector3D> part : new Array.ArrayIterator<>(positionsSep)) {
             double elapsed = times.get(j);
             PathPart pp = new PathPart(getPath(toArray(part), pathType), part.size, (long) (frameRate * elapsed));
             res[j] = pp;
@@ -495,16 +496,11 @@ public class KeyframesManager implements IObserver {
             String pythonInterpreter = SysUtils.isWindows() ? "python.exe" : "python3";
             boolean hasPython = isCommandAvailable(pythonInterpreter);
             // Replace your current hasPipenv logic with this:
-            boolean hasPipenv = isCommandAvailable("pipenv") ||
-                    isPythonModuleAvailable(pythonInterpreter, "pipenv");
+            boolean hasUv = isCommandAvailable("uv") || isPythonModuleAvailable(pythonInterpreter, "uv");
 
-            if (!hasPython || !hasPipenv) {
-                String missing = (!hasPython && !hasPipenv) ? "Python 3 and Pipenv" : (!hasPython ? "Python 3" : "Pipenv");
-                GaiaSky.popupNotification(I18n.msg("error.process.run", "Missing: " + missing + ". Please install them to use OptFlowCam."),
-                                          15,
-                                          this,
-                                          Logger.LoggerLevel.ERROR,
-                                          null);
+            if (!hasPython || !hasUv) {
+                String missing = (!hasPython && !hasUv) ? "Python 3 and uv" : (!hasPython ? "Python 3" : "uv");
+                GaiaSky.popupNotification(I18n.msg("error.process.run", "Missing " + missing + ": Install to use OptFlowCam."), 15, this, Logger.LoggerLevel.ERROR, null);
                 // Cancel progress.
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
                 return;
@@ -518,16 +514,20 @@ public class KeyframesManager implements IObserver {
             try {
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.3f);
                 // Install dependencies.
-                GaiaSky.popupNotification("Installing dependencies with pipenv...", 5, this);
-                logger.info("OptFlowCam: Running 'pipenv install' in " + scriptLocation);
+                GaiaSky.popupNotification("Installing dependencies with uv...", 5, this);
+                logger.info("OptFlowCam: Running 'uv install' in " + scriptLocation);
 
-                ProcessBuilder installBuilder = new ProcessBuilder(pythonInterpreter, "-m", "pipenv", "install", "numpy", "python-dateutil");
+                ProcessBuilder initBuilder = new ProcessBuilder(pythonInterpreter, "-m", "uv", "init", "-q");
+                initBuilder.directory(scriptLocation.toFile());
+                Process initProcess = initBuilder.start();
+                initProcess.waitFor();
+                ProcessBuilder installBuilder = new ProcessBuilder(pythonInterpreter, "-m", "uv", "add", "numpy", "python-dateutil");
                 installBuilder.directory(scriptLocation.toFile());
                 Process installProcess = installBuilder.start();
                 installProcess.waitFor();
 
                 if (installProcess.exitValue() != 0) {
-                    GaiaSky.popupNotification(I18n.msg("error.process.run", "Pipenv install failed"), 10, this, Logger.LoggerLevel.ERROR, null);
+                    GaiaSky.popupNotification(I18n.msg("error.process.run", "'uv add' process failed"), 10, this, Logger.LoggerLevel.ERROR, null);
                     // Cancel progress.
                     EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
                     return;
@@ -538,19 +538,7 @@ public class KeyframesManager implements IObserver {
                 GaiaSky.popupNotification("Processing keyframes with OptFlowCam...", 5, this);
                 logger.info("OptFlowCam: Running script " + scriptName);
 
-                ProcessBuilder builder = new ProcessBuilder(pythonInterpreter,
-                                                            "-m",
-                                                            "pipenv",
-                                                            "run",
-                                                            "python",
-                                                            scriptLocation.resolve(scriptName).toString(),
-                                                            "-i",
-                                                            inputFile.toString(),
-                                                            "-o",
-                                                            output.toString(),
-                                                            "--fps",
-                                                            Double.toString(Settings.settings.camrecorder.targetFps)
-                );
+                ProcessBuilder builder = new ProcessBuilder(pythonInterpreter, "-m", "uv", "run", scriptLocation.resolve(scriptName).toString(), "-i", inputFile.toString(), "-o", output.toString(), "--fps", Double.toString(Settings.settings.camrecorder.targetFps));
                 builder.directory(scriptLocation.toFile());
 
                 var process = builder.start();
@@ -564,19 +552,13 @@ public class KeyframesManager implements IObserver {
                     GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFileLocation), 10, this);
                 } else {
                     // Failure.
-                    String errStr = new BufferedReader(new InputStreamReader(process.getErrorStream()))
-                            .lines().collect(Collectors.joining("\n"));
-                    String outStr = new BufferedReader(new InputStreamReader(process.getInputStream()))
-                            .lines().collect(Collectors.joining("\n"));
+                    String errStr = new BufferedReader(new InputStreamReader(process.getErrorStream())).lines().collect(Collectors.joining("\n"));
+                    String outStr = new BufferedReader(new InputStreamReader(process.getInputStream())).lines().collect(Collectors.joining("\n"));
 
                     logger.error("OptFlowCam Error (Exit " + process.exitValue() + "): " + errStr);
                     logger.error("OptFlowCam Output: " + outStr);
 
-                    GaiaSky.popupNotification(I18n.msg("error.process.run", "Script failed. Check logs for details."),
-                                              10,
-                                              this,
-                                              Logger.LoggerLevel.ERROR,
-                                              null);
+                    GaiaSky.popupNotification(I18n.msg("error.process.run", "Script failed. Check logs for details."), 10, this, Logger.LoggerLevel.ERROR, null);
                 }
                 process.destroy();
 
@@ -617,9 +599,7 @@ public class KeyframesManager implements IObserver {
      */
     private boolean isCommandAvailable(String cmd) {
         try {
-            ProcessBuilder pb = SysUtils.isWindows()
-                    ? new ProcessBuilder("where", cmd)
-                    : new ProcessBuilder("which", cmd);
+            ProcessBuilder pb = SysUtils.isWindows() ? new ProcessBuilder("where", cmd) : new ProcessBuilder("which", cmd);
             Process p = pb.start();
             return p.waitFor() == 0;
         } catch (IOException | InterruptedException e) {
@@ -627,68 +607,67 @@ public class KeyframesManager implements IObserver {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void notify(final Event event,
-                       Object source,
-                       final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
 
         switch (event) {
-            case KEYFRAMES_FILE_SAVE -> {
-                List<Keyframe> keyframes = (List<Keyframe>) data[0];
-                String fileName = (String) data[1];
-                Boolean overwrite = (Boolean) data[2];
-                Boolean notification = (Boolean) data[3];
-                saveKeyframesFile(keyframes, fileName, overwrite, notification);
+        case KEYFRAMES_FILE_SAVE -> {
+            List<Keyframe> keyframes = (List<Keyframe>) data[0];
+            String fileName = (String) data[1];
+            Boolean overwrite = (Boolean) data[2];
+            Boolean notification = (Boolean) data[3];
+            saveKeyframesFile(keyframes, fileName, overwrite, notification);
+        }
+        case KEYFRAMES_EXPORT -> {
+            var keyframes = (List<Keyframe>) data[0];
+            var fileName = (String) data[1];
+            var overwrite = (Boolean) data[2];
+            exportKeyframesFile(keyframes, fileName, overwrite);
+        }
+        case UPDATE_CAM_RECORDER -> {
+            synchronized (this) {
+                t = (ITimeFrameProvider) data[0];
+                pos = (Vector3Q) data[1];
+                dir = (Vector3D) data[2];
+                up = (Vector3D) data[3];
             }
-            case KEYFRAMES_EXPORT -> {
-                var keyframes = (List<Keyframe>) data[0];
-                var fileName = (String) data[1];
-                var overwrite = (Boolean) data[2];
-                exportKeyframesFile(keyframes, fileName, overwrite);
-            }
-            case UPDATE_CAM_RECORDER -> {
-                synchronized (this) {
-                    t = (ITimeFrameProvider) data[0];
-                    pos = (Vector3Q) data[1];
-                    dir = (Vector3D) data[2];
-                    up = (Vector3D) data[3];
-                }
-                if (state.get() == RecorderState.PLAYING && currentPath != null) {
-                    // In playing mode, we set the frame and then advance to the next.
+            if (state.get() == RecorderState.PLAYING && currentPath != null) {
+                // In playing mode, we set the frame and then advance to the next.
 
-                    // Set frame.
-                    setFrame();
+                // Set frame.
+                setFrame();
 
-                    // Advance step.
-                    currentPath.i = (currentPath.i + 1) % currentPath.n;
+                // Advance step.
+                currentPath.i = (currentPath.i + 1) % currentPath.n;
 
-                    // Check end.
-                    if (currentPath.i == 0) {
-                        pause();
-                    }
-
-                    EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
-                } else if (state.get() == RecorderState.STEPPING && currentPath != null) {
-                    // In stepping mode, we set the frame and pause.
-
-                    // Set frame.
-                    setFrame();
-
-                    // Pause.
+                // Check end.
+                if (currentPath.i == 0) {
                     pause();
+                }
 
-                    EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
-                }
+                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
+            } else if (state.get() == RecorderState.STEPPING && currentPath != null) {
+                // In stepping mode, we set the frame and pause.
+
+                // Set frame.
+                setFrame();
+
+                // Pause.
+                pause();
+
+                EventManager.publish(Event.KEYFRAME_PLAY_FRAME, this, currentPath.i);
             }
-            case KEYFRAME_PLAY_FRAME -> {
-                if (source != this && currentPath != null) {
-                    // Actually play frame.
-                    long frame = (Long) data[0];
-                    skip(frame);
-                }
+        }
+        case KEYFRAME_PLAY_FRAME -> {
+            if (source != this && currentPath != null) {
+                // Actually play frame.
+                long frame = (Long) data[0];
+                skip(frame);
             }
-            default -> {
-            }
+        }
+        default -> {
+        }
         }
     }
 
@@ -703,9 +682,7 @@ public class KeyframesManager implements IObserver {
         int nPoints, nChunks;
         long nFrames;
 
-        public PathPart(PathDouble<Vector3D> path,
-                        int nPoints,
-                        long nFrames) {
+        public PathPart(PathDouble<Vector3D> path, int nPoints, long nFrames) {
             this.path = path;
             this.nPoints = nPoints;
             this.nChunks = nPoints - 1;
