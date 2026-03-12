@@ -524,11 +524,19 @@ public class KeyframesManager implements IObserver {
 
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.5f);
 
-                // 4. Run the Script
+                // Run the Script
                 GaiaSky.popupNotification("Processing keyframes with OptFlowCam...", 5, this);
                 logger.info("OptFlowCam: Running script " + scriptName);
 
-                ProcessBuilder builder = new ProcessBuilder(pythonInterpreter, "-m", "uv", "run", scriptLocation.resolve(scriptName).toString(), "-i", inputFile.toString(), "-o", output.toString(), "--fps", Double.toString(Settings.settings.camrecorder.targetFps));
+                var args = new Array<String>();
+                if (SysUtils.isWindows()) {
+                    args.add(pythonInterpreter, "-m");
+                }
+                args.add("uv", "run", scriptLocation.resolve(scriptName).toString(), "-i");
+                args.add(inputFile.toString(), "-o", output.toString(), "--fps");
+                args.add(Double.toString(Settings.settings.camrecorder.targetFps));
+
+                ProcessBuilder builder = new ProcessBuilder(args.toArray());
                 builder.directory(scriptLocation.toFile());
 
                 var process = builder.start();
@@ -572,16 +580,24 @@ public class KeyframesManager implements IObserver {
     }
 
     private static boolean prepareUVEnvironment(Path scriptLocation, String pythonInterpreter, String progressName, Object me) throws IOException, InterruptedException {
-        var args1 = SysUtils.isWindows() ? new String[] { pythonInterpreter, "-m", "uv", "init", "-q" } : new String[] { "uv", "init", "-q" };
+        var args1 = new Array<String>();
+        if (SysUtils.isWindows()) {
+            args1.add(pythonInterpreter, "-m");
+        }
+        args1.add("uv", "init", "-q");
 
-        ProcessBuilder initBuilder = new ProcessBuilder(args1);
+        ProcessBuilder initBuilder = new ProcessBuilder(args1.toArray());
         initBuilder.directory(scriptLocation.toFile());
         Process initProcess = initBuilder.start();
         initProcess.waitFor();
 
-        var args2 = SysUtils.isWindows() ? new String[] { pythonInterpreter, "-m", "uv", "add", "numpy", "python-dateutil" } : new String[] { "uv", "add", "numpy", "python-dateutil" };
+        var args2 = new Array<String>();
+        if (SysUtils.isWindows()) {
+            args1.add(pythonInterpreter, "-m");
+        }
+        args2.add("uv", "add", "numpy", "python-dateutil");
 
-        ProcessBuilder installBuilder = new ProcessBuilder(args2);
+        ProcessBuilder installBuilder = new ProcessBuilder(args2.toArray());
         installBuilder.directory(scriptLocation.toFile());
         Process installProcess = installBuilder.start();
         installProcess.waitFor();
