@@ -49,22 +49,25 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         if (body.size == 0) {
             body.setSizeM(500.0);
         }
-        if (base.ct == null || base.ct.allSetLike(new ComponentTypes(ComponentType.Others))) {
-            base.ct = new ComponentTypes(ComponentType.Invisible);
-        }
+        if (rm != null) {
+            if (rm.raymarchingShader != null
+                    && (base.ct == null || base.ct.allSetLike(new ComponentTypes(ComponentType.Others)))) {
+                // We are a raymarching object.
+                base.ct = new ComponentTypes(ComponentType.Invisible);
+            }
 
-        if (rm.additionalTexture != null) {
-            var tp = new OwnTextureLoader.OwnTextureParameter();
-            tp.genMipMaps = false;
-            tp.minFilter = TextureFilter.Linear;
-            tp.magFilter = TextureFilter.Linear;
-            tp.wrapU = Texture.TextureWrap.Repeat;
-            tp.wrapV = Texture.TextureWrap.Repeat;
-            rm.additionalTextureUnpacked = addToLoad(rm.additionalTexture, tp);
-        } else {
-            rm.additionalTextureUnpacked = null;
+            if (rm.raymarchingShader != null && rm.additionalTexture != null) {
+                var tp = new OwnTextureLoader.OwnTextureParameter();
+                tp.genMipMaps = false;
+                tp.minFilter = TextureFilter.Linear;
+                tp.magFilter = TextureFilter.Linear;
+                tp.wrapU = Texture.TextureWrap.Repeat;
+                tp.wrapV = Texture.TextureWrap.Repeat;
+                rm.additionalTextureUnpacked = addToLoad(rm.additionalTexture, tp);
+            } else {
+                rm.additionalTextureUnpacked = null;
+            }
         }
-
     }
 
     /**
