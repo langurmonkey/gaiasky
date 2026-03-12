@@ -517,21 +517,11 @@ public class KeyframesManager implements IObserver {
                 GaiaSky.popupNotification("Installing dependencies with uv...", 5, this);
                 logger.info("OptFlowCam: Running 'uv install' in " + scriptLocation);
 
-                ProcessBuilder initBuilder = new ProcessBuilder(pythonInterpreter, "-m", "uv", "init", "-q");
-                initBuilder.directory(scriptLocation.toFile());
-                Process initProcess = initBuilder.start();
-                initProcess.waitFor();
-                ProcessBuilder installBuilder = new ProcessBuilder(pythonInterpreter, "-m", "uv", "add", "numpy", "python-dateutil");
-                installBuilder.directory(scriptLocation.toFile());
-                Process installProcess = installBuilder.start();
-                installProcess.waitFor();
-
-                if (installProcess.exitValue() != 0) {
-                    GaiaSky.popupNotification(I18n.msg("error.process.run", "'uv add' process failed"), 10, this, Logger.LoggerLevel.ERROR, null);
-                    // Cancel progress.
-                    EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
+                // Prepare environment.
+                if (!prepareUVEnvironment(scriptLocation, pythonInterpreter, progressName, this)) {
                     return;
                 }
+
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.5f);
 
                 // 4. Run the Script
@@ -579,6 +569,31 @@ public class KeyframesManager implements IObserver {
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
             }
         });
+    }
+
+    private static boolean prepareUVEnvironment(Path scriptLocation, String pythonInterpreter, String progressName, Object me) throws IOException, InterruptedException {
+        var args1 = SysUtils.isWindows() ? new String[] { pythonInterpreter, "-m", "uv", "init", "-q" } : new String[] { "uv", "init", "-q" };
+
+        ProcessBuilder initBuilder = new ProcessBuilder(args1);
+        initBuilder.directory(scriptLocation.toFile());
+        Process initProcess = initBuilder.start();
+        initProcess.waitFor();
+
+        var args2 = SysUtils.isWindows() ? new String[] { pythonInterpreter, "-m", "uv", "add", "numpy", "python-dateutil" } : new String[] { "uv", "add", "numpy", "python-dateutil" };
+
+        ProcessBuilder installBuilder = new ProcessBuilder(args2);
+        installBuilder.directory(scriptLocation.toFile());
+        Process installProcess = installBuilder.start();
+        installProcess.waitFor();
+
+        if (installProcess.exitValue() != 0) {
+            GaiaSky.popupNotification(I18n.msg("error.process.run", "'uv add' process failed"), 10, me, Logger.LoggerLevel.ERROR, null);
+            // Cancel progress.
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, me, progressName, 2f);
+            return false;
+        }
+
+        return true;
     }
 
     /**
