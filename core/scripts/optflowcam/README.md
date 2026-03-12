@@ -39,7 +39,13 @@ You can also follow the [official instructions](https://docs.astral.sh/uv/gettin
 ### Windows
 On Windows, download Python 3 from the official [source](https://python.org/downloads), and install it. During installation, check the box that says "Add Python to PATH".
 
-Then, open a command prompt (`Win + R`, type `cmd`), and type in `pip install uv` to install `uv`. Alternatively, follow the [official instructions](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). 
+Then, open a Power Shell (`Win + R`, type `powershell`), and type:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Alternatively, follow the [official instructions](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). 
 
 ## Running
 

@@ -492,51 +492,44 @@ public class KeyframesManager implements IObserver {
         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.01f);
 
         GaiaSky.instance.getExecutorService().execute(() -> {
-            // Dependency Detection.
-            String pythonInterpreter = SysUtils.isWindows() ? "python.exe" : "python3";
+            // Dependency detection.
+            String pythonInterpreter = isCommandAvailable("python3") ? "python3" : "python";
             boolean hasPython = isCommandAvailable(pythonInterpreter);
-            // Replace your current hasPipenv logic with this:
             boolean hasUv = isCommandAvailable("uv") || isPythonModuleAvailable(pythonInterpreter, "uv");
 
             if (!hasPython || !hasUv) {
                 String missing = (!hasPython && !hasUv) ? "Python 3 and uv" : (!hasPython ? "Python 3" : "uv");
                 GaiaSky.popupNotification(I18n.msg("error.process.run", "Missing " + missing + ": Install to use OptFlowCam."), 15, this, Logger.LoggerLevel.ERROR, null);
-                // Cancel progress.
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
                 return;
             }
             EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.2f);
 
-            // Prepare input file.
             EventManager.publish(Event.KEYFRAMES_FILE_SAVE, this, keyframes, inputFileName, true, false);
             var inputFile = SysUtils.getDefaultCameraDir().resolve(inputFileName);
 
             try {
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.3f);
-                // Install dependencies.
                 GaiaSky.popupNotification("Installing dependencies with uv...", 5, this);
                 logger.info("OptFlowCam: Running 'uv install' in " + scriptLocation);
 
-                // Prepare environment.
                 if (!prepareUVEnvironment(scriptLocation, pythonInterpreter, progressName, this)) {
                     return;
                 }
 
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.5f);
 
-                // Run the Script
                 GaiaSky.popupNotification("Processing keyframes with OptFlowCam...", 5, this);
                 logger.info("OptFlowCam: Running script " + scriptName);
 
-                var args = new Array<String>();
-                if (SysUtils.isWindows()) {
-                    args.add(pythonInterpreter, "-m");
-                }
-                args.add("uv", "run", scriptLocation.resolve(scriptName).toString(), "-i");
-                args.add(inputFile.toString(), "-o", output.toString(), "--fps");
-                args.add(Double.toString(Settings.settings.camrecorder.targetFps));
+                // Build uv command, preferring system uv, falling back to python -m uv.
+                var args = buildUvCommand(pythonInterpreter,
+                        "run", scriptLocation.resolve(scriptName).toString(),
+                        "-i", inputFile.toString(),
+                        "-o", output.toString(),
+                        "--fps", Double.toString(Settings.settings.camrecorder.targetFps));
 
-                ProcessBuilder builder = new ProcessBuilder(args.toArray(String[]::new));
+                ProcessBuilder builder = new ProcessBuilder(args);
                 builder.directory(scriptLocation.toFile());
 
                 var process = builder.start();
@@ -545,11 +538,9 @@ public class KeyframesManager implements IObserver {
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.9f);
 
                 if (process.exitValue() == 0) {
-                    // Success.
                     var outputFileLocation = output.toAbsolutePath().toString();
                     GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok.short", keyframes.size(), outputFileLocation), 10, this);
                 } else {
-                    // Failure.
                     String errStr = new BufferedReader(new InputStreamReader(process.getErrorStream())).lines().collect(Collectors.joining("\n"));
                     String outStr = new BufferedReader(new InputStreamReader(process.getInputStream())).lines().collect(Collectors.joining("\n"));
 
@@ -564,52 +555,58 @@ public class KeyframesManager implements IObserver {
 
             } catch (IOException | InterruptedException e) {
                 GaiaSky.popupNotification(I18n.msg("error.process.run", e.getLocalizedMessage()), 10, this, Logger.LoggerLevel.ERROR, e);
-                Thread.currentThread().interrupt(); // Restore interrupted status
+                Thread.currentThread().interrupt();
             } finally {
-                // 5. Cleanup
                 try {
                     Files.deleteIfExists(inputFile);
                 } catch (IOException e) {
                     logger.error("Failed to delete temp file: " + inputFile, e);
                 }
-
-                // Remove progress bar.
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
             }
         });
     }
 
     private static boolean prepareUVEnvironment(Path scriptLocation, String pythonInterpreter, String progressName, Object me) throws IOException, InterruptedException {
-        var args1 = new Array<String>();
-        if (SysUtils.isWindows()) {
-            args1.add(pythonInterpreter, "-m");
-        }
-        args1.add("uv", "init", "-q");
-
-        ProcessBuilder initBuilder = new ProcessBuilder(args1.toArray(String[]::new));
-        initBuilder.directory(scriptLocation.toFile());
-        Process initProcess = initBuilder.start();
+        Process initProcess = new ProcessBuilder(buildUvCommand(pythonInterpreter, "init", "-q"))
+                .directory(scriptLocation.toFile())
+                .start();
         initProcess.waitFor();
 
-        var args2 = new Array<String>();
-        if (SysUtils.isWindows()) {
-            args1.add(pythonInterpreter, "-m");
-        }
-        args2.add("uv", "add", "numpy", "python-dateutil");
-
-        ProcessBuilder installBuilder = new ProcessBuilder(args2.toArray(String[]::new));
-        installBuilder.directory(scriptLocation.toFile());
-        Process installProcess = installBuilder.start();
+        Process installProcess = new ProcessBuilder(buildUvCommand(pythonInterpreter, "add", "numpy", "python-dateutil"))
+                .directory(scriptLocation.toFile())
+                .start();
         installProcess.waitFor();
 
         if (installProcess.exitValue() != 0) {
             GaiaSky.popupNotification(I18n.msg("error.process.run", "'uv add' process failed"), 10, me, Logger.LoggerLevel.ERROR, null);
-            // Cancel progress.
             EventManager.publish(Event.UPDATE_LOAD_PROGRESS, me, progressName, 2f);
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Builds a uv command, preferring system-level uv and falling back to
+     * running it as a Python module if the system uv is not available.
+     */
+    private static String[] buildUvCommand(String pythonInterpreter, String... uvArgs) {
+        if (isCommandAvailable("uv")) {
+            // System uv: just ["uv", arg1, arg2, ...]
+            var cmd = new String[1 + uvArgs.length];
+            cmd[0] = "uv";
+            System.arraycopy(uvArgs, 0, cmd, 1, uvArgs.length);
+            return cmd;
+        } else {
+            // Module fallback: ["python3", "-m", "uv", arg1, arg2, ...]
+            var cmd = new String[3 + uvArgs.length];
+            cmd[0] = pythonInterpreter;
+            cmd[1] = "-m";
+            cmd[2] = "uv";
+            System.arraycopy(uvArgs, 0, cmd, 3, uvArgs.length);
+            return cmd;
+        }
     }
 
     /**
@@ -628,9 +625,11 @@ public class KeyframesManager implements IObserver {
     /**
      * Helper to check if a command exists in the system PATH.
      */
-    private boolean isCommandAvailable(String cmd) {
+    private static boolean isCommandAvailable(String cmd) {
         try {
-            ProcessBuilder pb = SysUtils.isWindows() ? new ProcessBuilder("where", cmd) : new ProcessBuilder("which", cmd);
+            // "uv --version" is safer than which/where, as it works cross-platform.
+            ProcessBuilder pb = new ProcessBuilder(cmd, "--version");
+            pb.redirectErrorStream(true);
             Process p = pb.start();
             return p.waitFor() == 0;
         } catch (IOException | InterruptedException e) {
