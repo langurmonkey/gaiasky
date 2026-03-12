@@ -536,7 +536,7 @@ public class KeyframesManager implements IObserver {
                 args.add(inputFile.toString(), "-o", output.toString(), "--fps");
                 args.add(Double.toString(Settings.settings.camrecorder.targetFps));
 
-                ProcessBuilder builder = new ProcessBuilder(args.toArray());
+                ProcessBuilder builder = new ProcessBuilder(args.toArray(String[]::new));
                 builder.directory(scriptLocation.toFile());
 
                 var process = builder.start();
@@ -586,7 +586,7 @@ public class KeyframesManager implements IObserver {
         }
         args1.add("uv", "init", "-q");
 
-        ProcessBuilder initBuilder = new ProcessBuilder(args1.toArray());
+        ProcessBuilder initBuilder = new ProcessBuilder(args1.toArray(String[]::new));
         initBuilder.directory(scriptLocation.toFile());
         Process initProcess = initBuilder.start();
         initProcess.waitFor();
@@ -597,7 +597,7 @@ public class KeyframesManager implements IObserver {
         }
         args2.add("uv", "add", "numpy", "python-dateutil");
 
-        ProcessBuilder installBuilder = new ProcessBuilder(args2.toArray());
+        ProcessBuilder installBuilder = new ProcessBuilder(args2.toArray(String[]::new));
         installBuilder.directory(scriptLocation.toFile());
         Process installProcess = installBuilder.start();
         installProcess.waitFor();
