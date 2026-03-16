@@ -58,16 +58,19 @@ void main() {
         float t = 0;
         float dt = 3.0 * 3.14159 / u_nSamples;
 
+        // This is the luma threshold for stars. If the luma is over this threshold, we find a star. Otherwise, no star.
+        float th = 0.97;
+
         float lum = 0.0;
         for (int idx = 0; idx < u_nSamples; idx++){
             vec2 curr_coord = clamp(u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
             float value = luma((texture(u_texture2, curr_coord)).rgb);
-            lum += step(0.99, value) * value;
+            lum += step(th, value) * value;
             t += dt;
         }
         // Threshold the incoming texture at 0.9 so that only the brightest pixels pass.
         float value = luma((texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar))).rgb);
-        lum += step(0.99, value) * value;
+        lum += step(th, value) * value;
         lum /= u_nSamples;
 
         v_lums[li] = saturate(lum);

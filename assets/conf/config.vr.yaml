@@ -123,10 +123,10 @@ scene:
     fov: 60.0
     # Cinematic camera
     cinematic: false
-    # Use distance to closest star to compute camera velocity scaling
+    # Use distance to nearest star to compute camera velocity scaling
     starDistanceScaling: true
     # Target on in free mode. This scales the velocity of the camera according
-    # to the distance to the closest object.
+    # to the distance to the nearest object.
     targetMode: true
     # Focus lock configuration, when camera is in focus mode.
     focusLock:
@@ -280,7 +280,7 @@ scene:
   crosshair:
     # Show crosshair on focus object.
     focus: true
-    # Show crosshair on closest object.
+    # Show crosshair on nearest object.
     closest: true
     # Show crosshair on home object.
     home: true

@@ -72,8 +72,8 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         var starGlowFactor = new OwnSliderReset(I18n.msg("gui.star.glowfactor"),
                                                            Constants.MIN_STAR_GLOW_FACTOR,
                                                            Constants.MAX_STAR_GLOW_FACTOR,
-                                                           Constants.SLIDER_STEP_TINY * 0.1f,
-                                                           0.075f,
+                                                           Constants.SLIDER_STEP_WEENY,
+                                                           0.035f,
                                                            skin);
         starGlowFactor.setTooltip(I18n.msg("gui.star.glowfactor.info"));
         starGlowFactor.setWidth(componentWidth);
