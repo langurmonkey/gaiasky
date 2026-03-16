@@ -14,8 +14,10 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
+import gaiasky.script.v2.impl.APIv2;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,76 +53,76 @@ public class HiddenHelperUser implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-            case SCENE_LOADED -> this.scene = (Scene) data[0];
-            case NAVIGATE_TO_OBJECT -> {
-                final FocusView body;
-                if (data[0] instanceof String) {
-                    var entity = scene.findFocus((String) data[0]);
-                    view.setEntity(entity);
-                    body = view;
-                } else {
-                    body = ((FocusView) data[0]);
-                }
-                GoToObjectTask gotoTask = new GoToObjectTask(body.getEntity(), currentTasks);
-                Thread gotoT = new Thread(gotoTask);
-                gotoT.start();
-                currentTasks.add(gotoTask);
-                lastCommandTime = TimeUtils.millis();
+        case SCENE_LOADED -> this.scene = (Scene) data[0];
+        case NAVIGATE_TO_OBJECT -> {
+            final FocusView body;
+            if (data[0] instanceof String) {
+                var entity = scene.findFocus((String) data[0]);
+                view.setEntity(entity);
+                body = view;
+            } else {
+                body = ((FocusView) data[0]);
             }
-            case LAND_ON_OBJECT -> {
-                final FocusView body;
-                if (data[0] instanceof String) {
-                    var entity = scene.findFocus((String) data[0]);
-                    view.setEntity(entity);
-                    body = view;
-                } else {
-                    body = ((FocusView) data[0]);
-                }
-                LandOnObjectTask landOnTask = new LandOnObjectTask(body.getEntity(), currentTasks);
-                Thread landonT = new Thread(landOnTask);
-                landonT.start();
-                currentTasks.add(landOnTask);
-                lastCommandTime = TimeUtils.millis();
+            GoToObjectTask gotoTask = new GoToObjectTask(body.getEntity(), currentTasks);
+            Thread gotoT = new Thread(gotoTask);
+            gotoT.start();
+            currentTasks.add(gotoTask);
+            lastCommandTime = TimeUtils.millis();
+        }
+        case LAND_ON_OBJECT -> {
+            final FocusView body;
+            if (data[0] instanceof String) {
+                var entity = scene.findFocus((String) data[0]);
+                view.setEntity(entity);
+                body = view;
+            } else {
+                body = ((FocusView) data[0]);
             }
-            case LAND_AT_LOCATION_OF_OBJECT -> {
-                final FocusView body;
-                if (data[0] instanceof String) {
-                    var entity = scene.findFocus((String) data[0]);
-                    view.setEntity(entity);
-                    body = view;
-                } else if (data[0] instanceof Entity) {
-                    view.setEntity((Entity) data[0]);
-                    body = view;
-                } else {
-                    body = ((FocusView) data[0]);
-                }
-                HelperTask landAtTask;
-                if (data[1] instanceof String locName) {
-                    landAtTask = new LandAtLocationTask(body.getEntity(), locName, currentTasks);
-                } else {
-                    Double lon = (Double) data[1];
-                    Double lat = (Double) data[2];
-                    landAtTask = new LandAtLocationTask(body.getEntity(), lon, lat, currentTasks);
-                }
-                Thread landAtLoc = new Thread(landAtTask);
-                landAtLoc.start();
-                currentTasks.add(landAtTask);
-                lastCommandTime = TimeUtils.millis();
+            LandOnObjectTask landOnTask = new LandOnObjectTask(body.getEntity(), currentTasks);
+            Thread landonT = new Thread(landOnTask);
+            landonT.start();
+            currentTasks.add(landOnTask);
+            lastCommandTime = TimeUtils.millis();
+        }
+        case LAND_AT_LOCATION_OF_OBJECT -> {
+            final FocusView body;
+            if (data[0] instanceof String) {
+                var entity = scene.findFocus((String) data[0]);
+                view.setEntity(entity);
+                body = view;
+            } else if (data[0] instanceof Entity) {
+                view.setEntity((Entity) data[0]);
+                body = view;
+            } else {
+                body = ((FocusView) data[0]);
             }
-            case INPUT_EVENT -> {
-                // More than one second after the command is given to be able to
-                // stop
-                if (TimeUtils.millis() - lastCommandTime > 1000) {
+            HelperTask landAtTask;
+            if (data[1] instanceof String locName) {
+                landAtTask = new LandAtLocationTask(body.getEntity(), locName, currentTasks);
+            } else {
+                Double lon = (Double) data[1];
+                Double lat = (Double) data[2];
+                landAtTask = new LandAtLocationTask(body.getEntity(), lon, lat, currentTasks);
+            }
+            Thread landAtLoc = new Thread(landAtTask);
+            landAtLoc.start();
+            currentTasks.add(landAtTask);
+            lastCommandTime = TimeUtils.millis();
+        }
+        case INPUT_EVENT -> {
+            // More than one second after the command is given to be able to
+            // stop
+            if (TimeUtils.millis() - lastCommandTime > 1000) {
 
-                    // Stop all current threads
-                    for (HelperTask tsk : currentTasks) {
-                        tsk.stop();
-                    }
-                    currentTasks.clear();
+                // Stop all current threads
+                for (HelperTask tsk : currentTasks) {
+                    tsk.stop();
                 }
+                currentTasks.clear();
             }
-            default -> {
-            }
+        }
+        default -> {
+        }
         }
 
     }
@@ -141,18 +143,25 @@ public class HiddenHelperUser implements IObserver {
 
     private static class GoToObjectTask extends HelperTask {
         private final Entity body;
-        private final EventScriptingInterface scripting;
+        private final APIv2 apiv2;
 
         GoToObjectTask(Entity entity, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = entity;
-            this.scripting = (EventScriptingInterface) GaiaSky.instance.scripting();
+            this.apiv2 = GaiaSky.instance.scripting().apiv2();
         }
 
         @Override
         public void run() {
-            scripting.goToObjectSmooth(body, -1, 10.0, 4.0, true, stop);
-            scripting.setCameraFocus(body, -1f);
+            if (Mapper.particleSet.has(body)) {
+                var set = Mapper.particleSet.get(body);
+                var name = set.getCandidateName();
+                apiv2.camera.interactive.go_to_object(name);
+
+            } else {
+                apiv2.camera.go_to_object(body, -1, 10.0, 4.0, true, stop);
+                apiv2.camera.focus_mode(body, -1f);
+            }
             currentTasks.removeValue(this, true);
         }
 

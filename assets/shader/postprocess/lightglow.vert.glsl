@@ -59,7 +59,7 @@ void main() {
         float dt = 3.0 * 3.14159 / u_nSamples;
 
         // This is the luma threshold for stars. If the luma is over this threshold, we find a star. Otherwise, no star.
-        float th = 0.97;
+        float th = 0.95;
 
         float lum = 0.0;
         for (int idx = 0; idx < u_nSamples; idx++){
