@@ -32,6 +32,14 @@ import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Base abstract class for star group data providers.
+ * <p>
+ * This class implements basic loading and processing of star catalog data.
+ * It provides common parameters like distance caps, RUWE caps, and parallax error
+ * factors, which can be configured to filter out stars during loading.
+ * Providers can also handle additional data files and perform coordinate transformations.
+ */
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
     protected static Log logger;
     /**

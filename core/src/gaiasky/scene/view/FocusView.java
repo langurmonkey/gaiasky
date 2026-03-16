@@ -36,6 +36,15 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
+/**
+ * A view of a focusable entity in the Gaia Sky scene.
+ * <p>
+ * This class provides a way to interact with and retrieve information from entities that
+ * can be focused on by the camera. It implements the {@link IFocus} and {@link IVisibilitySwitch}
+ * interfaces, allowing for operations like getting the entity's position, name, and
+ * controlling its visibility. It acts as a wrapper around the Ashley {@link Entity} and
+ * its components.
+ */
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     private final Vector3D D31 = new Vector3D();

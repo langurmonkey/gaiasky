@@ -32,6 +32,14 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * GUI component that allows to change various visual settings in Gaia Sky, such as star brightness,
+ * magnitude multiplier, glow factor, label sizes, and line widths.
+ * <p>
+ * This component provides sliders and buttons that interact with the {@link gaiasky.event.EventManager}
+ * to publish commands to the rest of the application. It also supports resetting these values
+ * to their defaults by reading from the internal configuration file.
+ */
 public class VisualSettingsComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(VisualSettingsComponent.class);
 

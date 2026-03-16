@@ -10,6 +10,14 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 
+/**
+ * Component that holds extra information for particles, which are not
+ * present in the {@link gaiasky.scene.record.Particle} record.
+ * <p>
+ * This component includes information such as the radius, effective temperature,
+ * and primitive render scale for the particle. This information is often
+ * used during rendering or for information display in the GUI.
+ */
 public class ParticleExtra implements Component, ICopy {
 
     public double computedSize;

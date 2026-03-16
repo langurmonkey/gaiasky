@@ -11,6 +11,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.render.util.ShaderLoader;
 
+/**
+ * A filter that implements a glow effect using a shader.
+ * <p>
+ * This filter takes light sources (positions, sizes, and colors) and an optional
+ * occlusion texture to render a glow effect. It is used as a sub-component
+ * of the {@link gaiasky.render.postprocess.effects.LightGlow} effect.
+ */
 public final class GlowFilter extends Filter<GlowFilter> {
     private final Vector2 viewport;
 

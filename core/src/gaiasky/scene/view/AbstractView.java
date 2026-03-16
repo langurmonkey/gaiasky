@@ -11,6 +11,14 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 
+/**
+ * Base abstract class for all views in Gaia Sky.
+ * <p>
+ * A view is a wrapper around an Ashley {@link Entity} that provides a higher-level,
+ * domain-specific API to interact with the entity's components. This class
+ * manages the lifecycle of the entity reference within the view, including
+ * setting, clearing, and validating the entity based on the required components.
+ */
 public sealed abstract class AbstractView permits BaseView, PositionView {
 
     /** A reference to the entity. **/

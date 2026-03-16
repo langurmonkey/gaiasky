@@ -13,6 +13,13 @@ import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.GlowFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
+/**
+ * A post-processor effect that renders a glow around light sources like stars and planets.
+ * <p>
+ * It uses a {@link GlowFilter} to compute the glow texture based on the light positions,
+ * sizes, and colors. This effect can be configured with various parameters like blending mode,
+ * texture scale, and the number of samples for the glow calculation.
+ */
 public final class LightGlow extends PostProcessorEffect {
     private final GlowFilter glow;
     private Settings settings;
