@@ -657,12 +657,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             if (targetAngle < 0.0) {
                 // Particles have different sizes to the rest.
                 if (focusView.isParticleSet()) {
-                    var rx0 = 1.31; // pc
-                    var rx1 = 2805.0; // pc
-                    var y0 = 1.0;
-                    var y1 = 0.001;
-                    targetAngle = FastMath.toRadians(y0 + (y1 - y0) * (focusView.getAbsolutePosition(api.aux3b1)
-                            .lenDouble() * Constants.U_TO_PC - rx0) / (rx1 - rx0));
+                    targetAngle = FastMath.toRadians(8.0);
                 } else {
                     targetAngle = FastMath.toRadians(20.0);
                 }

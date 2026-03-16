@@ -153,13 +153,9 @@ public class HiddenHelperUser implements IObserver {
 
         @Override
         public void run() {
-            if (Mapper.particleSet.has(body)) {
-                var set = Mapper.particleSet.get(body);
-                var name = set.getCandidateName();
-                apiv2.camera.interactive.go_to_object(name);
-
-            } else {
-                apiv2.camera.go_to_object(body, -1, 10.0, 4.0, true, stop);
+            apiv2.camera.go_to_object(body, -1, 10.0, 4.0, true, stop);
+            if (!Mapper.particleSet.has(body) || !Mapper.particleSet.get(body).proximityLoadingFlag) {
+                // Only change focus when if there is no proximity loading.
                 apiv2.camera.focus_mode(body, -1f);
             }
             currentTasks.removeValue(this, true);
