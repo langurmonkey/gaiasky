@@ -1127,7 +1127,7 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Sets the epoch to use for the stars in this set.
      *
-     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE).
+     * @param epochJd The epoch in julian days (days since January 1, 4713, BCE).
      */
     public void setEpoch(Double epochJd) {
         setEpochJd(epochJd);
