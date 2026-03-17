@@ -60,8 +60,8 @@
  *
  * [...]
  *
- * # Remember to shut down the connection before exiting
- * gateway.shutdown()
+ * # Remember to close the connection before exiting
+ * gateway.close()
  * }
  * </pre>
  */
