@@ -143,16 +143,20 @@ public class ComponentTypes extends Bits {
         }
 
         public String getName() {
-            try {
-                return I18n.msg(key);
-            } catch (MissingResourceException e) {
-                return null;
-            }
+            return toLocalizedString();
         }
 
         @Override
         public String toString() {
             return super.toString();
+        }
+
+        public String toLocalizedString() {
+            try {
+                return I18n.msg(key);
+            } catch (MissingResourceException e) {
+                return toString();
+            }
         }
     }
 

@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager.CameraMode;
@@ -34,6 +35,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
@@ -264,10 +266,36 @@ public class SearchDialog extends GenericDialog {
         scene.matchingFocusableNodes(text, matching, 10, null);
     }
 
+    private Array<ComponentTypes.ComponentType> getInvisible(ComponentTypes ct) {
+        Array<ComponentTypes.ComponentType> invisible = new Array<>();
+        var values = ComponentTypes.ComponentType.values();
+        for (int i = ct.nextSetBit(0); i >= 0; i = ct.nextSetBit(i + 1)) {
+            if (!GaiaSky.instance.isOn(i)) {
+                invisible.add(values[i]);
+            }
+        }
+        return invisible;
+    }
+
+    private String toString(Array<ComponentTypes.ComponentType> cts) {
+        var sb = new StringBuilder();
+        int n = cts.size;
+        int i = 0;
+        for (var ct : cts) {
+            sb.append(TextUtils.capitalise(ct.toLocalizedString()));
+            if (i < n - 1) {
+                sb.append(" ");
+            }
+            i++;
+        }
+        return sb.toString();
+    }
+
     /**
      * Consults the scene index with the given search string and selects the object and returns true if the
      * object exists and is focusable, and returns false otherwise.
-     * @param text The text to look up.
+     *
+     * @param text  The text to look up.
      * @param scene The scene object.
      * @return True if the object exists and is focusable, false otherwise.
      */
@@ -298,7 +326,8 @@ public class SearchDialog extends GenericDialog {
                     } else if (!datasetVisible) {
                         info(I18n.msg("gui.objects.search.dataset.invisible", text, ci.get().name));
                     } else {
-                        info(I18n.msg("gui.objects.search.invisible", text, Mapper.base.get(entity).ct.toString()));
+                        var l = getInvisible(Mapper.base.get(entity).ct);
+                        info(I18n.msg("gui.objects.search.invisible", text, toString(l)));
                     }
                     return true;
                 }
