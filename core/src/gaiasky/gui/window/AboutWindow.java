@@ -53,9 +53,6 @@ import java.util.Date;
  *   <li>Listing credits and author contact information via {@code Link} components.</li>
  *   <li>Conditionally showing an Updates tab based on the launch method.</li>
  * </ul>
- *
- * @param stage The {@code Stage} for the dialog.
- * @param skin The {@code Skin} for UI styling.
  */
 @SuppressWarnings("ALL")
 public class AboutWindow extends GenericDialog {

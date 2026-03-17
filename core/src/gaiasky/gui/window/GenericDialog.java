@@ -57,7 +57,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * modal/non-modal behavior, and captures input (mouse, keyboard, gamepad) to prevent
  * interference with the rest of the application while the dialog is open.</p>
  *
- * <h3>Layout Structure</h3>
+ * <h2>Layout Structure</h2>
  * <ul>
  *   <li><strong>Content Table:</strong> Defined by the {@code build()} method implementation in the subclass.
  *   </li>
@@ -68,7 +68,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  *   </li>
  * </ul>
  *
- * <h3>Subclassing Guidelines</h3>
+ * <h2>Subclassing Guidelines</h2>
  * <p>To create a functional dialog, the subclass must:</p>
  * <ol>
  *   <li>Implement the {@code build()} method to add UI actors to the content table.</li>
@@ -78,7 +78,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  *   <li>(Optional) Override {@code dispose()} for cleanup resources.</li>
  * </ol>
  *
- * <h3>Common Operations</h3>
+ * <h2>Common Operations</h2>
  * <p>Subclasses typically override the following methods or use the provided helpers:</p>
  * <ul>
  *   <li>{@link #show(Stage)} or {@link #show(Stage, Action)} to display the dialog.</li>

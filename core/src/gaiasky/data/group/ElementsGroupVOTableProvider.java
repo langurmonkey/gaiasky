@@ -51,6 +51,7 @@ import java.util.logging.Level;
  * <tr><td>10</td><td>argOfPericenter</td><td>double</td><td>Argument of perihelion ω (degrees)</td></tr>
  * <tr><td>11</td><td>meanAnomaly</td><td>double</td><td>Mean anomaly M at epoch (degrees)</td></tr>
  * <tr><td>12</td><td>period</td><td>double</td><td>Orbital period in Days</td></tr>
+ * <caption>Source table format for this loader.</caption>
  * </table>
  * * <p><b>Data Processing:</b></p>
  * <ul>

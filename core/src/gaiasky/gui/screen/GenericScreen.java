@@ -57,7 +57,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * automatically manages the focus hierarchy, input processors, and event listeners when the screen is
  * shown or hidden.</p>
  *
- * <h3>Key Features</h3>
+ * <h2>Key Features</h2>
  * <ul>
  *   <li><b>Full-Viewport Layout:</b> Takes up the whole application viewport by default.</li>
  *   <li><b>Modal Support:</b> Configurable modal behavior to capture and disable external input.</li>
@@ -69,7 +69,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  *   <li><b>Animation:</b> Default fade-in/fade-out animations when showing/hiding.</li>
  * </ul>
  *
- * <h3>Layout Structure</h3>
+ * <h2>Layout Structure</h2>
  * <p>By default, the screen layout consists of four parts:</p>
  * <ol>
  *   <li><b>Title:</b> A top bar displaying the screen title.</li>
@@ -78,7 +78,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  *   <li><b>Tabs:</b> Optional tabs line to support content switching, managed by the subclass.</li>
  * </ol>
  *
- * <h3>Subclassing</h3>
+ * <h2>Subclassing</h2>
  * <p>To create a new screen, extend {@code GenericScreen} and:</p>
  * <ol>
  *   <li>Override {@link #build()}: Populate the {@link #content} table with your UI actors.</li>

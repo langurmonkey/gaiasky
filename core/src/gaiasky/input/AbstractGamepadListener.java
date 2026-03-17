@@ -83,13 +83,17 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         return mappings;
     }
 
+    /**
+     * Sets the mappings.
+     *
+     * @param mappings The new mappings instance.
+     */
     public void setMappings(IGamepadMappings mappings) {
         this.mappings = mappings;
     }
 
     @Override
-    public boolean buttonDown(Controller controller,
-                              int buttonCode) {
+    public boolean buttonDown(Controller controller, int buttonCode) {
         if (isActive()) {
             lastControllerUsed = controller;
             if (cliArgs.debugInput) {
@@ -100,8 +104,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     @Override
-    public boolean buttonUp(Controller controller,
-                            int buttonCode) {
+    public boolean buttonUp(Controller controller, int buttonCode) {
         if (isActive()) {
             lastControllerUsed = controller;
             if (cliArgs.debugInput) {
@@ -112,9 +115,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     @Override
-    public boolean axisMoved(Controller controller,
-                             int axisCode,
-                             float value) {
+    public boolean axisMoved(Controller controller, int axisCode, float value) {
         if (isActive()) {
             lastControllerUsed = controller;
             if (cliArgs.debugInput) {
@@ -128,15 +129,20 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
      * Checks whether the button with the given code is pressed in the last controller used.
      *
      * @param buttonCode The button code.
-     *
      * @return Whether the button is pressed in the last controller used.
      */
     public boolean isKeyPressed(int buttonCode) {
         return isKeyPressed(lastControllerUsed, buttonCode);
     }
 
-    public boolean isKeyPressed(Controller controller,
-                                int buttonCode) {
+    /**
+     * Returns if the given button in the given controller is pressed.
+     *
+     * @param controller The controller.
+     * @param buttonCode The button code.
+     * @return Whether the button is pressed.
+     */
+    public boolean isKeyPressed(Controller controller, int buttonCode) {
         return controller != null && controller.getButton(buttonCode);
     }
 
@@ -144,7 +150,6 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
      * Returns true if any of the buttons are pressed in the last controller used.
      *
      * @param buttonCodes The buttons to test.
-     *
      * @return True if any of the given buttons is pressed.
      */
     public boolean anyPressed(int... buttonCodes) {
@@ -156,11 +161,9 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
      *
      * @param controller  The controller.
      * @param buttonCodes The buttons to test.
-     *
      * @return True if any of the given buttons is pressed.
      */
-    public boolean anyPressed(Controller controller,
-                              int... buttonCodes) {
+    public boolean anyPressed(Controller controller, int... buttonCodes) {
         if (controller == null) {
             return false;
         }
@@ -184,8 +187,18 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         em.post(Event.CONTROLLER_DISCONNECTED_INFO, this, controller.getName());
     }
 
+    /**
+     * Polls the axes.
+     *
+     * @return True if the axes were processed, false otherwise.
+     */
     public abstract boolean pollAxes();
 
+    /**
+     * Polls the buttons.
+     *
+     * @return True if the buttons were processed, false otherwise.
+     */
     public abstract boolean pollButtons();
 
     @Override
@@ -228,9 +241,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     @Override
-    public void notify(final Event event,
-                       Object source,
-                       final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.RELOAD_CONTROLLER_MAPPINGS) {
             mappings = AbstractGamepadMappings.readGamepadMappings((String) data[0]);
         }

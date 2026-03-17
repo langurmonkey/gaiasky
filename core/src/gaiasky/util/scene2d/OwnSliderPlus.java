@@ -27,7 +27,7 @@ import java.util.function.Function;
 
 /**
  * An extended {@link Slider} designed for complex data input in Gaia Sky.
- * <h3>Key Features:</h3>
+ * <h2>Key Features:</h2>
  * <ul>
  * <li><b>Integrated Labels:</b> Draws a title (left-aligned) and a dynamic value (right-aligned)
  * directly above the slider track.</li>
@@ -41,7 +41,7 @@ import java.util.function.Function;
  * the widget gains keyboard/controller focus.</li>
  * <li><b>Event Integration:</b> Built-in support for the {@link EventManager} system.</li>
  * </ul>
- * <h3>Mapping Logic:</h3>
+ * <h2>Mapping Logic:</h2>
  * <p>
  * The slider maintains an <b>Internal Range</b> defined by {@code [min, max]}.
  * The <b>Mapped Range</b> is defined by {@code [mapMin, mapMax]}.
@@ -51,8 +51,8 @@ import java.util.function.Function;
  * <li><b>Linear:</b> If {@code logarithmic} is false, the value is interpolated
  * linearly between the two ranges.</li>
  * <li><b>Logarithmic/Power:</b> If true, the normalized slider position $t \in [0,1]$
- * is raised to {@link #logExponent}. If $k < 1$, the high-end resolution is expanded;
- * if $k > 1$, the low-end resolution is expanded.</li>
+ * is raised to {@link #logExponent}. If $k &lt; 1$, the high-end resolution is expanded;
+ * if $k &gt; 1$, the low-end resolution is expanded.</li>
  * </ul>
  */
 public class OwnSliderPlus extends Slider implements IObserver {

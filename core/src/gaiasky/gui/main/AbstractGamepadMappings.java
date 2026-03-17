@@ -25,12 +25,16 @@ public abstract class AbstractGamepadMappings implements IGamepadMappings {
 
     public double ZERO_POINT = 0.2;
 
+    /** Left stick horizontal code. **/
     public int AXIS_LSTICK_H = -1;
     public double AXIS_LSTICK_H_SENS = 1d;
+    /** Right stick horizontal code. **/
     public int AXIS_RSTICK_H = -1;
     public double AXIS_RSTICK_H_SENS = 1d;
+    /** Right stick vertical code. **/
     public int AXIS_RSTICK_V = -1;
     public double AXIS_RSTICK_V_SENS = 1d;
+    /** Left stick vertical code. **/
     public int AXIS_LSTICK_V = -1;
     public double AXIS_LSTICK_V_SENS = 1d;
 

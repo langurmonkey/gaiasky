@@ -75,7 +75,9 @@ public interface IGamepadMappings {
     int getAxisRstickV();
 
     /**
-     * Sensitivity of right stick vertical axis
+     * Sensitivity of right stick vertical axis.
+     *
+     * @return The sensitivity of the right stick.
      **/
     double getAxisRstickVSensitivity();
 
@@ -117,7 +119,9 @@ public interface IGamepadMappings {
     int getAxisRT();
 
     /**
-     * Sensitivity of right trigger axis
+     * Gets the sensitivity of the right trigger.
+     *
+     * @return The sensitivity of the right trigger (RT) axis.
      **/
     double getAxisRTSensitivity();
 
@@ -130,7 +134,9 @@ public interface IGamepadMappings {
     int getAxisLT();
 
     /**
-     * Sensitivity of left trigger axis
+     * Gets the sensitivity of the left trigger.
+     *
+     * @return The sensitivity of the left trigger (LT) axis.
      **/
     double getAxisLTSensitivity();
 
