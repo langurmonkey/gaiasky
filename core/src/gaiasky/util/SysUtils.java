@@ -21,6 +21,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.JPGWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL30;
@@ -34,13 +35,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.regex.Pattern;
-
 
 /**
  * Some handy system utilities and constants.
@@ -73,7 +74,6 @@ public class SysUtils {
     public static final String TMP_DIR_NAME = "tmp";
     public static final String CACHE_DIR_NAME = "cache";
     public static final String PROCEDURAL_TEX_DIR_NAME = "procedural-planet-textures";
-
 
     static {
         OS = System.getProperty("os.name").toLowerCase(Locale.ROOT);
@@ -183,11 +183,16 @@ public class SysUtils {
     }
 
     public static String getOSFamily() {
-        if (isLinux()) return "linux";
-        if (isWindows()) return "win";
-        if (isMac()) return "macos";
-        if (isUnix()) return "unix";
-        if (isSolaris()) return "solaris";
+        if (isLinux())
+            return "linux";
+        if (isWindows())
+            return "win";
+        if (isMac())
+            return "macos";
+        if (isUnix())
+            return "unix";
+        if (isSolaris())
+            return "solaris";
 
         return "unknown";
     }
@@ -360,7 +365,6 @@ public class SysUtils {
      * The temp directory is used to store partial dataset downloads and data descriptors.
      *
      * @param dataLocation The user-defined data location.
-     *
      * @return A path that points to the temporary directory.
      */
     public static Path getDataTempDir(String dataLocation) {
@@ -374,7 +378,6 @@ public class SysUtils {
      * The cache directory is used to store TLE and other time-changing data.
      *
      * @param dataLocation The user-defined data location.
-     *
      * @return A path that points to the cache directory.
      */
     public static Path getDataCacheDir(String dataLocation) {
@@ -538,8 +541,8 @@ public class SysUtils {
 
             GaiaSky.instance.getExecutorService().execute(() -> {
                 switch (format) {
-                    case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
-                    case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
                 }
                 logger.info(I18n.msg("gui.procedural.info.savetextures.ok", TextUtils.capitalise(name), file));
                 pixmap.dispose();
@@ -582,19 +585,16 @@ public class SysUtils {
                 var name = names[pair.getSecond()];
                 Path file = proceduralDir.resolve(name + "." + format.extension);
                 switch (format) {
-                    case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
-                    case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
                 }
                 logger.info(I18n.msg("gui.procedural.info.savetextures.ok", TextUtils.capitalise(name), file));
                 pixmap.dispose();
             }
             // Post popup.
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
-                                 pixmaps,
-                                 I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, pixmaps, I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()));
 
         });
-
 
     }
 
@@ -602,7 +602,6 @@ public class SysUtils {
      * Creates a {@link Pixmap} from a {@link Texture} for CPU access.
      *
      * @param t The Texture.
-     *
      * @return The Pixmap.
      */
     public static Pixmap pixmapFromGLTexture(Texture t) {
@@ -624,7 +623,6 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
-     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -645,7 +643,7 @@ public class SysUtils {
      * Gets the current display resolution.
      *
      * @return The display resolution in an array with [width, height], or null if the resolution could not be
-     *         determined.
+     * determined.
      */
     public static int[] getDisplayResolution() {
         int w, h;
@@ -653,7 +651,7 @@ public class SysUtils {
         // MacOS seems to be "special", only likes headless mode.
         // If we access any of the AWT classes we get a nice black screen.
         if (isMac()) {
-            return new int[]{Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT};
+            return new int[] { Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT };
         }
 
         // Graphics device method, screen device.
@@ -666,7 +664,7 @@ public class SysUtils {
             w = (int) (gc.getBounds().getWidth() * scaleX);
             h = (int) (gc.getBounds().getHeight() * scaleY);
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             } else {
                 logger.warn(I18n.msg("error.screensize.gd"));
             }
@@ -683,7 +681,7 @@ public class SysUtils {
             w = (int) (rect.width * scale);
             h = (int) (rect.height * scale);
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             } else {
                 logger.warn(I18n.msg("error.screensize.gd.windowbounds"));
             }
@@ -700,7 +698,7 @@ public class SysUtils {
             w = (int) (screenSize.getWidth() * scale);
             h = (int) (screenSize.getHeight() * scale);
             if (w > 0 && h > 0) {
-                return new int[]{w, h};
+                return new int[] { w, h };
             } else {
                 logger.warn(I18n.msg("error.screensize.toolkit"));
             }
@@ -735,8 +733,7 @@ public class SysUtils {
 
     private static Path getCurrentJARDirectory() {
         try {
-            return Path.of(new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent())
-                    .toAbsolutePath();
+            return Path.of(new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent()).toAbsolutePath();
         } catch (URISyntaxException exception) {
             logger.error(exception);
         }
@@ -830,17 +827,24 @@ public class SysUtils {
             if (!silent)
                 logger.error("OpenGL error at " + location + ": " + error);
             // Optionally clear the error so it doesn't affect future operations
-            while (GL43.glGetError() != GL43.GL_NO_ERROR) ;
+            while (GL43.glGetError() != GL43.GL_NO_ERROR)
+                ;
         }
     }
 
     /**
      * Checks if compute shaders (OpenGL 4.3) are supported. This method <strong>must</strong> run on the main thread. Otherwise, it will crash.
+     * <p>
+     * This method also checks that at least one vertex storage block is supported. This is needed to pass the results of the
+     * compute shader to the next shader stages.
      *
      * @return True if compute shaders are supported, false otherwise.
      */
     public static boolean isComputeShaderSupported() {
-        return GL.getCapabilities().OpenGL43 || GL.getCapabilities().GL_ARB_compute_shader;
+        IntBuffer params = BufferUtils.createIntBuffer(1);
+        GL30.glGetIntegerv(GL43.GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, params);
+        int maxBlocks = params.get(0);
+        return (GL.getCapabilities().OpenGL43 || GL.getCapabilities().GL_ARB_compute_shader) && maxBlocks > 0;
     }
 }
 

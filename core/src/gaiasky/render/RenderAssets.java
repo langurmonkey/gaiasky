@@ -52,7 +52,7 @@ public class RenderAssets {
     public ExtShaderProgram distanceFieldFontShader;
     public ExtShaderProgram[] billboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders,
             primitiveGpuShaders, billboardGroupShaders, billboardProceduralShaders, billboardProceduralCpuShaders, particleEffectShaders, particleGroupShaders,
-            particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, starPointShaders, orbitElemShaders;
+            particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, orbitElemShaders;
     public IntModelBatch mbVertexLighting, mbVertexLightingAdditive, mbVertexDiffuse, mbVertexLightingStarSurface, mbVertexLightingThruster,
             mbVertexLightingGrid, mbVertexLightingRecGrid, mbPixelLighting, mbPixelLightingDust, mbPixelLightingDepth, mbPixelLightingOpaque,
             mbPixelLightingSvtDetection, mbPixelLightingTessellation, mbPixelLightingOpaqueTessellation, mbPixelLightingSvtDetectionTessellation,
