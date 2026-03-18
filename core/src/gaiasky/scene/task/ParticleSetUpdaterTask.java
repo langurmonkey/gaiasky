@@ -188,7 +188,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 var totalCount = particleSet.pointData.size();
                 var metadata = particleSet.metadata;
 
-                int n = totalCount / 2 + 1;
+                int n = totalCount / 2;
                 for (int i = n; i < totalCount; i++) {
                     buffer.add(i, metadata[i]);
                 }
