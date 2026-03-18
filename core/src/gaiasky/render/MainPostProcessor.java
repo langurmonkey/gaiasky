@@ -848,13 +848,15 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
                     // Actually load the effect if we are running (dynamic load).
                     var loaded = false;
-                    if (pps != null && pps.length > 0 && pps[0] != null) {
-                        var ppb = pps[0];
-                        if (!ppb.has(name, RaymarchObject.class)) {
-                            // Add it.
-                            createRayMarchingEffect(pps[0], name, l);
-                            loaded = true;
-                            logger.debug("Ray marching effect definition added and loaded: [" + name + " | " + shader + " | " + entity + "]");
+                    if (pps != null && pps.length > 0) {
+                    for (int i = 0; i < RenderType.values().length; i++) {
+                            var ppb = pps[i];
+                            if (ppb != null && !ppb.has(name, RaymarchObject.class)) {
+                                // Add it.
+                                createRayMarchingEffect(pps[i], name, l);
+                                loaded = true;
+                                logger.debug("Ray marching effect definition added and loaded: [" + name + " | " + shader + " | " + entity + "]");
+                            }
                         }
                     }
                     if (!loaded) {
