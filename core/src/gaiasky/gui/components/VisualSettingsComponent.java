@@ -61,20 +61,24 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                            skin);
         starBrightness.setTooltip(I18n.msg("gui.star.brightness.info"));
         starBrightness.setWidth(componentWidth);
+        starBrightness.setDisplayValueMapped(false);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
         starBrightness.connect(Event.STAR_BRIGHTNESS_CMD);
 
         /* Star brightness power */
-        var magnitudeMultiplier = new OwnSliderReset(I18n.msg("gui.star.brightness.pow"),
+        var starBrightnessPow = new OwnSliderReset(I18n.msg("gui.star.brightness.pow"),
+                                                                Constants.MIN_SLIDER,
+                                                                Constants.MAX_SLIDER,
+                                                                Constants.SLIDER_STEP_TINY,
                                                                 Constants.MIN_STAR_BRIGHTNESS_POW,
                                                                 Constants.MAX_STAR_BRIGHTNESS_POW,
-                                                                Constants.SLIDER_STEP_WEENY,
                                                                 1f,
                                                                 skin);
-        magnitudeMultiplier.setTooltip(I18n.msg("gui.star.brightness.pow.info"));
-        magnitudeMultiplier.setWidth(componentWidth);
-        magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
-        magnitudeMultiplier.connect(Event.STAR_BRIGHTNESS_POW_CMD);
+        starBrightnessPow.setTooltip(I18n.msg("gui.star.brightness.pow.info"));
+        starBrightnessPow.setWidth(componentWidth);
+        starBrightnessPow.setDisplayValueMapped(false);
+        starBrightnessPow.setMappedValue(Settings.settings.scene.star.power);
+        starBrightnessPow.connect(Event.STAR_BRIGHTNESS_POW_CMD);
 
         /* Star glow factor */
         var starGlowFactor = new OwnSliderReset(I18n.msg("gui.star.glowfactor"),
@@ -176,7 +180,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         VerticalGroup lightingGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         lightingGroup.space(pad9);
         lightingGroup.addActor(starBrightness);
-        lightingGroup.addActor(magnitudeMultiplier);
+        lightingGroup.addActor(starBrightnessPow);
         lightingGroup.addActor(starGlowFactor);
         lightingGroup.addActor(pointSize);
         lightingGroup.addActor(starBaseLevel);

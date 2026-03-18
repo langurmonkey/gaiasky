@@ -302,6 +302,7 @@ public interface GraphicsAPI {
      * Set the star glow factor level value. This controls the amount of glow light
      * when the camera is close to stars. Must be between {@link Constants#MIN_STAR_GLOW_FACTOR} and
      * {@link Constants#MAX_STAR_GLOW_FACTOR}.
+     * <p>
      * Default is 0.06.
      *
      * @param value The new glow factor value.
