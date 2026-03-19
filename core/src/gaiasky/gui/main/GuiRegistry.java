@@ -499,8 +499,8 @@ public class GuiRegistry implements IObserver {
                                         Runnable doLoad = () -> GaiaSky.instance.getExecutorService().execute(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
                                             // Load dataset.
-                                            GaiaSky.instance.scripting()
-                                                    .loadDataset(datasetOptions.catalogName,
+                                            GaiaSky.instance.scripting().apiv2().data
+                                                    .load_dataset(datasetOptions.catalogName,
                                                                  result.toAbsolutePath().toString(),
                                                                  CatalogInfoSource.UI,
                                                                  datasetOptions,

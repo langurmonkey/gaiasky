@@ -420,7 +420,9 @@ public class ModelEntityRenderSystem {
                                            boolean shadow,
                                            boolean relativistic) {
         var set = Mapper.starSet.get(entity);
-
+        if (set.indices == null) {
+            return;
+        }
         var mc = model.model;
 
         if (mc != null && mc.isModelInitialised()) {

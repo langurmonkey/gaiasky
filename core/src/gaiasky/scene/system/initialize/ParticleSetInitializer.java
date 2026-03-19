@@ -376,12 +376,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         }
     }
 
-    private double len(double x,
-                       double y,
-                       double z) {
-        return FastMath.sqrt(x * x + y * y + z * z);
-    }
-
     private void initSortingData(Entity entity,
                                  ParticleSet particleSet) {
         var pointData = particleSet.pointData;

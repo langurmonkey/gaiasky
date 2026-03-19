@@ -351,13 +351,15 @@ public class LabelEntityRenderSystem {
                                   ICamera camera) {
 
         var set = view.particleSet;
-
         // Dataset label.
         if (view.particleSet.renderSetLabel) {
             renderSetLabel(view, batch, shader, sys, rc, camera);
         }
 
         // Particle labels.
+        if (set.indices == null) {
+            return;
+        }
         var active = view.particleSet.indices;
         if (view.particleSet.renderParticleLabels && active != null) {
             float thresholdLabel = 1f / view.label.labelBias;
@@ -458,6 +460,10 @@ public class LabelEntityRenderSystem {
             renderSetLabel(view, batch, shader, sys, rc, camera);
         }
 
+        // Particles.
+        if (set.indices == null) {
+            return;
+        }
         if (view.starSet.renderParticleLabels) {
             float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
             thresholdLabel /= view.label.labelBias;

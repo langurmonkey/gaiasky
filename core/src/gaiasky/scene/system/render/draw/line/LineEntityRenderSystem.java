@@ -29,8 +29,8 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.tree.IPosition;
 import net.jafama.FastMath;
 
@@ -70,8 +70,36 @@ public class LineEntityRenderSystem {
         var p0c = vr.colorP0;
         var p1c = vr.colorP1;
         var p2c = vr.colorP2;
-        renderer.addLine(lineView, vr.beamP0.x, vr.beamP0.y, vr.beamP0.z, vr.beamP1.x, vr.beamP1.y, vr.beamP1.z, p0c[0], p0c[1], p0c[2], p0c[3], p1c[0], p1c[1], p1c[2], p1c[3]);
-        renderer.addLine(lineView, vr.beamP1.x, vr.beamP1.y, vr.beamP1.z, vr.beamP2.x, vr.beamP2.y, vr.beamP2.z, p1c[0], p1c[1], p1c[2], p1c[3], p2c[0], p2c[1], p2c[2], p2c[3]);
+        renderer.addLine(lineView,
+                         vr.beamP0.x,
+                         vr.beamP0.y,
+                         vr.beamP0.z,
+                         vr.beamP1.x,
+                         vr.beamP1.y,
+                         vr.beamP1.z,
+                         p0c[0],
+                         p0c[1],
+                         p0c[2],
+                         p0c[3],
+                         p1c[0],
+                         p1c[1],
+                         p1c[2],
+                         p1c[3]);
+        renderer.addLine(lineView,
+                         vr.beamP1.x,
+                         vr.beamP1.y,
+                         vr.beamP1.z,
+                         vr.beamP2.x,
+                         vr.beamP2.y,
+                         vr.beamP2.z,
+                         p1c[0],
+                         p1c[1],
+                         p1c[2],
+                         p1c[3],
+                         p2c[0],
+                         p2c[1],
+                         p2c[2],
+                         p2c[3]);
     }
 
     public void renderPolyline(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
@@ -125,10 +153,30 @@ public class LineEntityRenderSystem {
         for (float[][] linePoints : perimeter.loc3d) {
             int m = linePoints.length;
             for (int pointIndex = 1; pointIndex < m; pointIndex++) {
-                renderer.addLine(lineView, linePoints[pointIndex - 1][0], linePoints[pointIndex - 1][1], linePoints[pointIndex - 1][2], linePoints[pointIndex][0], linePoints[pointIndex][1], linePoints[pointIndex][2], cc[0], cc[1], cc[2], alpha * lineView.base.opacity);
+                renderer.addLine(lineView,
+                                 linePoints[pointIndex - 1][0],
+                                 linePoints[pointIndex - 1][1],
+                                 linePoints[pointIndex - 1][2],
+                                 linePoints[pointIndex][0],
+                                 linePoints[pointIndex][1],
+                                 linePoints[pointIndex][2],
+                                 cc[0],
+                                 cc[1],
+                                 cc[2],
+                                 alpha * lineView.base.opacity);
             }
             // Close line
-            renderer.addLine(lineView, linePoints[m - 1][0], linePoints[m - 1][1], linePoints[m - 1][2], linePoints[0][0], linePoints[0][1], linePoints[0][2], cc[0], cc[1], cc[2], alpha * lineView.base.opacity);
+            renderer.addLine(lineView,
+                             linePoints[m - 1][0],
+                             linePoints[m - 1][1],
+                             linePoints[m - 1][2],
+                             linePoints[0][0],
+                             linePoints[0][1],
+                             linePoints[0][2],
+                             cc[0],
+                             cc[1],
+                             cc[2],
+                             alpha * lineView.base.opacity);
         }
     }
 
@@ -160,7 +208,17 @@ public class LineEntityRenderSystem {
         double va = 0.01 * camera.getFovFactor();
 
         // Main line.
-        renderer.addLine(lineView, ruler.p0.x, ruler.p0.y, ruler.p0.z, ruler.p1.x, ruler.p1.y, ruler.p1.z, body.color[0], body.color[1], body.color[2], body.color[3] * alpha);
+        renderer.addLine(lineView,
+                         ruler.p0.x,
+                         ruler.p0.y,
+                         ruler.p0.z,
+                         ruler.p1.x,
+                         ruler.p1.y,
+                         ruler.p1.z,
+                         body.color[0],
+                         body.color[1],
+                         body.color[2],
+                         body.color[3] * alpha);
         // Cap 1.
         addCap(body, ruler.p0, ruler.p1, va, renderer, alpha);
         // Cap 2.
@@ -191,9 +249,29 @@ public class LineEntityRenderSystem {
         // A focus object is needed in order to render the projection lines.
         if (camera.hasFocus()) {
             // Line in ZX.
-            renderer.addLine(lineView, gr.a.x, gr.a.y, gr.a.z, gr.b.x, gr.b.y, gr.b.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
+            renderer.addLine(lineView,
+                             gr.a.x,
+                             gr.a.y,
+                             gr.a.z,
+                             gr.b.x,
+                             gr.b.y,
+                             gr.b.z,
+                             gr.ccL[0],
+                             gr.ccL[1],
+                             gr.ccL[2],
+                             gr.ccL[3] * alpha * base.opacity);
             // Line in Y.
-            renderer.addLine(lineView, gr.c.x, gr.c.y, gr.c.z, gr.d.x, gr.d.y, gr.d.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
+            renderer.addLine(lineView,
+                             gr.c.x,
+                             gr.c.y,
+                             gr.c.z,
+                             gr.d.x,
+                             gr.d.y,
+                             gr.d.z,
+                             gr.ccL[0],
+                             gr.ccL[1],
+                             gr.ccL[2],
+                             gr.ccL[3] * alpha * base.opacity);
         }
     }
 
@@ -210,13 +288,35 @@ public class LineEntityRenderSystem {
             Vector3D previous = null;
             for (Vector3D point : points) {
                 if (previous != null) {
-                    renderer.addLine(lineView, (float) previous.x, (float) previous.y, (float) previous.z, (float) point.x, (float) point.y, (float) point.z, body.color[0], body.color[1], body.color[2], alpha * base.opacity);
+                    renderer.addLine(lineView,
+                                     (float) previous.x,
+                                     (float) previous.y,
+                                     (float) previous.z,
+                                     (float) point.x,
+                                     (float) point.y,
+                                     (float) point.z,
+                                     body.color[0],
+                                     body.color[1],
+                                     body.color[2],
+                                     alpha * base.opacity);
                 }
                 previous = point;
             }
             // Join last to first.
-            Vector3D first = points.getFirst();
-            renderer.addLine(lineView, (float) first.x, (float) first.y, (float) first.z, (float) previous.x, (float) previous.y, (float) previous.z, body.color[0], body.color[1], body.color[2], alpha * base.opacity);
+            if (previous != null) {
+                Vector3D first = points.getFirst();
+                renderer.addLine(lineView,
+                                 (float) first.x,
+                                 (float) first.y,
+                                 (float) first.z,
+                                 (float) previous.x,
+                                 (float) previous.y,
+                                 (float) previous.z,
+                                 body.color[0],
+                                 body.color[1],
+                                 body.color[2],
+                                 alpha * base.opacity);
+            }
         }
     }
 
@@ -321,7 +421,17 @@ public class LineEntityRenderSystem {
                     }
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
-                    renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3] * baseOpacity);
+                    renderer.addLine(lineView,
+                                     (float) prev.x,
+                                     (float) prev.y,
+                                     (float) prev.z,
+                                     (float) curr.x,
+                                     (float) curr.y,
+                                     (float) curr.z,
+                                     cc[0],
+                                     cc[1],
+                                     cc[2],
+                                     alpha * cc[3] * baseOpacity);
                 }
 
             } else if (oc != null && oc.period > 0) {
@@ -349,9 +459,37 @@ public class LineEntityRenderSystem {
                     // Only render visible chunks.
                     if (p0Alpha > 0.0 || p1Alpha > 0.0) {
                         if (orbitTrail && n == nPoints - 2) {
-                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], p1Alpha * cc[3] * baseOpacity, cc[0], cc[1], cc[2], p0Alpha * cc[3] * baseOpacity);
+                            renderer.addLine(lineView,
+                                             (float) curr.x,
+                                             (float) curr.y,
+                                             (float) curr.z,
+                                             (float) bodyPos.x,
+                                             (float) bodyPos.y,
+                                             (float) bodyPos.z,
+                                             cc[0],
+                                             cc[1],
+                                             cc[2],
+                                             p1Alpha * cc[3] * baseOpacity,
+                                             cc[0],
+                                             cc[1],
+                                             cc[2],
+                                             p0Alpha * cc[3] * baseOpacity);
                         } else {
-                            renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], p0Alpha * cc[3] * baseOpacity, cc[0], cc[1], cc[2], p1Alpha * cc[3] * baseOpacity);
+                            renderer.addLine(lineView,
+                                             (float) prev.x,
+                                             (float) prev.y,
+                                             (float) prev.z,
+                                             (float) curr.x,
+                                             (float) curr.y,
+                                             (float) curr.z,
+                                             cc[0],
+                                             cc[1],
+                                             cc[2],
+                                             p0Alpha * cc[3] * baseOpacity,
+                                             cc[0],
+                                             cc[1],
+                                             cc[2],
+                                             p1Alpha * cc[3] * baseOpacity);
                         }
                     }
 
@@ -380,11 +518,35 @@ public class LineEntityRenderSystem {
                     float p1Alpha = getCurrentAlpha(topAlpha - dAlpha, trajectory);
 
                     if (p0Alpha > 0.0 || p1Alpha > 0.0) {
-                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], baseOpacity * p0Alpha * cc[3], cc[0], cc[1], cc[2], baseOpacity * p1Alpha * cc[3]);
+                        renderer.addLine(lineView,
+                                         (float) prev.x,
+                                         (float) prev.y,
+                                         (float) prev.z,
+                                         (float) curr.x,
+                                         (float) curr.y,
+                                         (float) curr.z,
+                                         cc[0],
+                                         cc[1],
+                                         cc[2],
+                                         baseOpacity * p0Alpha * cc[3],
+                                         cc[0],
+                                         cc[1],
+                                         cc[2],
+                                         baseOpacity * p1Alpha * cc[3]);
                     }
                     topAlpha -= dAlpha;
                 }
-                renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], baseOpacity * topAlpha * cc[3]);
+                renderer.addLine(lineView,
+                                 (float) curr.x,
+                                 (float) curr.y,
+                                 (float) curr.z,
+                                 (float) bodyPos.x,
+                                 (float) bodyPos.y,
+                                 (float) bodyPos.z,
+                                 cc[0],
+                                 cc[1],
+                                 cc[2],
+                                 baseOpacity * topAlpha * cc[3]);
 
             } else {
                 // Non-periodic orbits with trail and no time.
@@ -404,7 +566,21 @@ public class LineEntityRenderSystem {
                     float p1Alpha = MathUtils.clamp(topAlpha - dAlpha, 0f, 1f);
 
                     if (p0Alpha > 0.001) {
-                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3] * p0Alpha * baseOpacity, cc[0], cc[1], cc[2], alpha * cc[3] * p1Alpha * baseOpacity);
+                        renderer.addLine(lineView,
+                                         (float) prev.x,
+                                         (float) prev.y,
+                                         (float) prev.z,
+                                         (float) curr.x,
+                                         (float) curr.y,
+                                         (float) curr.z,
+                                         cc[0],
+                                         cc[1],
+                                         cc[2],
+                                         alpha * cc[3] * p0Alpha * baseOpacity,
+                                         cc[0],
+                                         cc[1],
+                                         cc[2],
+                                         alpha * cc[3] * p1Alpha * baseOpacity);
                     }
                     topAlpha -= dAlpha;
                 }
@@ -419,11 +595,18 @@ public class LineEntityRenderSystem {
         var base = lineView.base;
         var set = Mapper.starSet.get(entity);
 
+        // Ensure indices is initialized.
+        if (set.indices == null) {
+            return;
+        }
+
         lineView.setEntity(entity);
 
         alpha *= GaiaSky.instance.sceneRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
         int n = (int) (getMaxVelocityVectors(entity, set) * (Settings.settings.scene.properMotion.number * 0.1));
+
+
         for (int i = n - 1; i >= 0; i--) {
             if (set.indices[i] < 0) {
                 // We are done.

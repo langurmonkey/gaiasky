@@ -61,7 +61,7 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
 
     private void updateCommon(ICamera camera, ParticleSet set) {
         // Update proximity loading.
-        if (set.proximityLoadingFlag) {
+        if (set.proximityLoadingFlag && set.indices != null) {
             int idxNearest = set.indices[0];
             IParticleRecord bean;
             if (idxNearest >= 0 && (bean = set.pointData.get(idxNearest)) != null) {

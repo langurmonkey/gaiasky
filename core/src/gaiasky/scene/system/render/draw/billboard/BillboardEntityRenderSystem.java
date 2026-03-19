@@ -170,8 +170,13 @@ public class BillboardEntityRenderSystem implements IObserver {
                                        IntMesh mesh,
                                        ICamera camera) {
         var entity = view.getEntity();
-        var base = view.base;
         var set = Mapper.starSet.get(entity);
+        // Ensure indices is initialized.
+        if (set.indices == null) {
+            return;
+        }
+
+        var base = view.base;
         var desc = Mapper.datasetDescription.get(entity);
         var highlight = Mapper.highlight.get(entity);
 
@@ -191,6 +196,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_inner_rad", (float) innerRad);
 
         // RENDER ACTUAL STARS
+
         boolean focusRendered = false;
         int n = FastMath.min(set.numBillboards, set.indices.length);
         for (int i = 0; i < n; i++) {
