@@ -45,7 +45,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public void set_image_brightness(double level) {
-        if (api.validator.checkNum(level, -1d, 1d, "brightness")) api.base.post_runnable(() -> em.post(Event.BRIGHTNESS_CMD, this, (float) level));
+        if (api.validator.checkNum(level, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, "brightness")) api.base.post_runnable(() -> em.post(Event.BRIGHTNESS_CMD, this, (float) level));
     }
 
     public void set_image_brightness(long level) {
@@ -54,7 +54,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public void set_image_contrast(double level) {
-        if (api.validator.checkNum(level, 0d, 2d, "contrast")) api.base.post_runnable(() -> em.post(Event.CONTRAST_CMD, this, (float) level));
+        if (api.validator.checkNum(level, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST, "contrast")) api.base.post_runnable(() -> em.post(Event.CONTRAST_CMD, this, (float) level));
     }
 
     public void set_image_contrast(long level) {
@@ -63,7 +63,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public void set_image_hue(double level) {
-        if (api.validator.checkNum(level, 0d, 2d, "hue")) api.base.post_runnable(() -> em.post(Event.HUE_CMD, this, (float) level));
+        if (api.validator.checkNum(level, Constants.MIN_HUE, Constants.MAX_HUE, "hue")) api.base.post_runnable(() -> em.post(Event.HUE_CMD, this, (float) level));
     }
 
     public void set_image_hue(long level) {
@@ -72,7 +72,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public void set_image_saturation(double level) {
-        if (api.validator.checkNum(level, 0d, 2d, "saturation")) api.base.post_runnable(() -> em.post(Event.SATURATION_CMD, this, (float) level));
+        if (api.validator.checkNum(level, Constants.MIN_SATURATION, Constants.MAX_SATURATION, "saturation")) api.base.post_runnable(() -> em.post(Event.SATURATION_CMD, this, (float) level));
     }
 
     public void set_image_saturation(long level) {
@@ -81,7 +81,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public void set_gamma_correction(double level) {
-        if (api.validator.checkNum(level, 0d, 3d, "gamma correction")) api.base.post_runnable(() -> em.post(Event.GAMMA_CMD, this, (float) level));
+        if (api.validator.checkNum(level, Constants.MIN_GAMMA, Constants.MAX_GAMMA, "gamma correction")) api.base.post_runnable(() -> em.post(Event.GAMMA_CMD, this, (float) level));
     }
 
     public void set_gamma_correction(long level) {
