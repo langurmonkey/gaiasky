@@ -383,7 +383,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Metadata array.
         particleSet.metadata = new double[pointData.size()];
 
-        // Initialise indices list with natural order.
+        // Initialize indices list with natural order.
         var numFromGroupSettings = particleSet instanceof StarSet ?
                 Settings.settings.scene.star.group.getMaxNumIndices()
                 : Settings.settings.scene.particleGroups.numLabels;
