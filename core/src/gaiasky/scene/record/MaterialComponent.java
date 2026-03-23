@@ -64,7 +64,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 for (Path p : l) {
                     String name = p.toString();
                     lookUpTables.add(Constants.DATA_LOCATION_TOKEN
-                                             + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep)));
+                                             + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep)).replaceAll("\\\\", "/"));
                 }
             } catch (Exception ignored) {
             }
