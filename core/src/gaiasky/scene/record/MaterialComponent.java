@@ -44,17 +44,23 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Contains the material of a model or part of a model.
+ */
 public final class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
+    private static final Log logger = Logger.getLogger(MaterialComponent.class);
     /**
      * Default texture parameters
      **/
     private static final OwnTextureParameter textureParamsMipMap, textureParams;
     private static final PFMTextureParameter pfmTextureParams;
-    private static final Array<String> lookUpTables = new Array<>();
-    private static final Log logger = Logger.getLogger(MaterialComponent.class);
+    /** Biome look-up texture list. **/
+    private static final Array<String> lookUpTextures = new Array<>();
+    /** Default reflection cubemap for all materials. **/
+    public static CubemapComponent reflectionCubemap = new CubemapComponent();
 
     private void initializeLookUpTables() {
-        if (lookUpTables.isEmpty()) {
+        if (lookUpTextures.isEmpty()) {
             var dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
             var sep = File.separatorChar;
             try (var paths = Files.list(dataPath)) {
@@ -63,16 +69,17 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 ).toList();
                 for (Path p : l) {
                     String name = p.toString();
-                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN
-                                             + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep)).replaceAll("\\\\", "/"));
+                    lookUpTextures.add(Constants.DATA_LOCATION_TOKEN
+                                               + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep))
+                            .replaceAll("\\\\", "/"));
                 }
             } catch (Exception ignored) {
             }
-            if (lookUpTables.isEmpty()) {
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.jpg");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow1-lut.jpg");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow2-lut.jpg");
+            if (lookUpTextures.isEmpty()) {
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow1-lut.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-snow2-lut.jpg");
             }
         }
     }
@@ -80,8 +87,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     // Default height scale is 4 km.
     private static final float DEFAULT_HEIGHT_SCALE = (float) (4.0 * Constants.KM_TO_U);
 
-    // Default reflection cubemap for all materials.
-    public static CubemapComponent reflectionCubemap;
 
     static {
         textureParamsMipMap = new OwnTextureParameter();
@@ -97,10 +102,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         pfmTextureParams = new PFMTextureParameter(textureParams);
         pfmTextureParams.invert = false;
         pfmTextureParams.internalFormat = GL20.GL_RGB;
-    }
-
-    static {
-        reflectionCubemap = new CubemapComponent();
     }
 
     // Texture location strings.
@@ -1495,7 +1496,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setEmissive("generate");
 
         // Biome LUT.
-        setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
+        setBiomelut(lookUpTextures.get(rand.nextInt(lookUpTextures.size)));
         if (rand.nextBoolean()) {
             // Actually roll the dice for hue shift.
             setBiomeHueShift(rand.nextDouble() * 360.0);
@@ -1525,7 +1526,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         Array<String> candidates = new Array<>(names.length);
 
         for (var name : names) {
-            for (var lut : lookUpTables) {
+            for (var lut : lookUpTextures) {
                 if (lut.contains(name)) {
                     candidates.add(lut);
                     break;
@@ -1632,7 +1633,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
+        setBiomelut(lookUpTextures.get(rand.nextInt(lookUpTextures.size)));
         // Actually roll the dice for hue shift.
         setBiomehueshift(rand.nextDouble() * 360.0);
         // Saturation.
