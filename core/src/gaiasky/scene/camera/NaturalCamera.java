@@ -1424,6 +1424,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         var closestStarDistance = getClosestStarDistance();
 
         double dist = FastMath.min(closestStarDistance, FastMath.min(closestBodyDistance, focusDistance));
+        if (!Double.isFinite(smoothedDistance)) {
+            smoothedDistance = 0;
+        }
         smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, 5.0);
         final var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 

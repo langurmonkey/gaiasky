@@ -11,7 +11,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.utils.PoolManager;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop.CLIArgs;
@@ -29,8 +28,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
 
     protected final AtomicBoolean active;
     protected ICamera iCamera;
-    // Minimum time after key press before polling starts.
-    protected long minPollTime = 150;
+    /** Minimum time after key press before polling starts. **/
     protected long minPollInterval = 0;
     protected long lastPollTime = 0;
     private final CLIArgs cliArgs;
