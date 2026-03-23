@@ -57,7 +57,7 @@ public class FontFactory implements Disposable {
         // Generate bold Fonts.
         int[] boldSizes = {17, 20, 21, 23, 25, 27, 30, 40};
         for (int size : boldSizes) {
-            skin.add("bold-" + size,boldGen.generateFont(fontParams(size)));
+            skin.add("bold-" + size, boldGen.generateFont(fontParams(size)));
         }
 
         // Generate title fonts
@@ -72,7 +72,9 @@ public class FontFactory implements Disposable {
     /**
      * Gets the font parameters instance for the given size. It is important that the parameters
      * are recreated for each size because we use {@link FreeTypeFontParameter#incremental}.
+     *
      * @param size The font size.
+     *
      * @return The parameters instance.
      */
     private FreeTypeFontParameter fontParams(int size) {

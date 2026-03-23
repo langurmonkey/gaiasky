@@ -511,8 +511,9 @@ public class GaiaSkyDesktop implements IObserver {
                 setSafeMode(cfg);
             }
             consoleLogger.unsubscribe();
+            throw new RuntimeException();
 
-            runGaiaSky(cfg);
+            //runGaiaSky(cfg);
         } catch (Exception e) {
             checkLogger(consoleLogger);
             logger.error(e);

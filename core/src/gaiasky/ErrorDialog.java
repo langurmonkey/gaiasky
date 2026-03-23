@@ -9,11 +9,11 @@ package gaiasky;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -23,9 +23,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.util.FontFactory;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.TextUtils;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
@@ -48,6 +50,20 @@ public class ErrorDialog implements ApplicationListener {
         this.exception = exception;
     }
 
+    private Skin createSkin() {
+        var skin = new Skin();
+        skin.addRegions(new TextureAtlas(Gdx.files.internal("skins/default/default.atlas")));
+
+        // Inject fonts programmatically.
+        String locale = I18n.locale.getLanguage();
+        var fontFactory = new FontFactory();
+        fontFactory.generateFonts(skin, locale);
+
+        // Load the JSON (now it finds the injected fonts by name)
+        skin.load(Gdx.files.internal("skins/default/default.json"));
+        return skin;
+    }
+
     @Override
     public void create() {
         var height = Gdx.graphics.getHeight();
@@ -57,11 +73,7 @@ public class ErrorDialog implements ApplicationListener {
         this.vp = vp;
         this.sb = initializeSpriteBatch();
         ui = new Stage(this.vp, this.sb);
-        FileHandle fh = Gdx.files.internal("skins/default/default.json");
-        if (!fh.exists()) {
-            fh = Gdx.files.internal("skins/default/default.json");
-        }
-        skin = new Skin(fh);
+        skin = createSkin();
         // Linear filtering.
         ObjectMap<String, BitmapFont> fonts = skin.getAll(BitmapFont.class);
         for (String key : fonts.keys()) {
@@ -219,8 +231,9 @@ public class ErrorDialog implements ApplicationListener {
     }
 
     private SpriteBatch initializeSpriteBatch() {
-        var spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"),
-                                             Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        var spriteShader = new ShaderProgram(
+                ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl")),
+                ShaderTemplatingLoader.load(Gdx.files.internal("shader/2d/spritebatch.accent.fragment.glsl")));
         // Sprite batch - uses screen resolution
         return new SpriteBatch(100, spriteShader);
     }
@@ -238,7 +251,12 @@ public class ErrorDialog implements ApplicationListener {
     public void render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        // Update.
         ui.act(Gdx.graphics.getDeltaTime());
+
+        // Render.
+        var accent = Settings.settings.program.ui.accentColor;
+        ui.getBatch().getShader().setUniform3fv("u_accentColor", accent, 0, 3);
         ui.draw();
     }
 
