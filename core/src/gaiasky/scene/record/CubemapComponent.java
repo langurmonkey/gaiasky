@@ -145,4 +145,9 @@ public class CubemapComponent implements Disposable {
         }
         loaded = false;
     }
+
+    public void reset() {
+        loaded = false;
+        prepared = false;
+    }
 }

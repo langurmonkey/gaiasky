@@ -56,8 +56,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     private static final PFMTextureParameter pfmTextureParams;
     /** Biome look-up texture list. **/
     private static final Array<String> lookUpTextures = new Array<>();
-    /** Default reflection cubemap for all materials. **/
-    public static CubemapComponent reflectionCubemap = new CubemapComponent();
+
+    /** Reflection cubemap for all materials. **/
+    @SuppressWarnings("GDXJavaStaticResource")
+    public static final CubemapComponent sharedReflectionCubemap = new CubemapComponent();
 
     private void initializeLookUpTables() {
         if (lookUpTextures.isEmpty()) {
@@ -394,7 +396,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                              Material ring,
                              float[] diffuseCol,
                              boolean culling) {
-        reflectionCubemap.initialize();
+        sharedReflectionCubemap.initialize();
         this.material = mat;
         assert material != null;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
@@ -482,8 +484,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         }
         // Add reflection cubemap if SSR is off and this material has metallic attributes
         if (metallic != null || metallicColor != null) {
-            reflectionCubemap.prepareCubemap(manager);
-            material.set(new CubemapAttribute(CubemapAttribute.ReflectionCubemap, reflectionCubemap.cubemap));
+            sharedReflectionCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.ReflectionCubemap, sharedReflectionCubemap.cubemap));
         }
         if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD)) {
             if (material.get(TextureAttribute.Metallic) == null) {
@@ -1173,8 +1175,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setReflectionCubemap(String reflectionCubemap) {
-        MaterialComponent.reflectionCubemap = new CubemapComponent();
-        MaterialComponent.reflectionCubemap.setLocation(reflectionCubemap);
+        MaterialComponent.sharedReflectionCubemap.setLocation(reflectionCubemap);
+        MaterialComponent.sharedReflectionCubemap.reset();
     }
 
     public void setAmbientOcclusionCubemap(String cubemap) {
@@ -1336,6 +1338,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         disposeCubemap(manager, material, CubemapAttribute.MetallicCubemap, metallicCubemap);
         disposeCubemap(manager, material, CubemapAttribute.HeightCubemap, heightCubemap);
         disposeCubemap(manager, material, CubemapAttribute.AmbientOcclusionCubemap, aoCubemap);
+        disposeCubemap(manager,material, CubemapAttribute.ReflectionCubemap, sharedReflectionCubemap);
         texLoading = false;
         texInitialised = false;
     }

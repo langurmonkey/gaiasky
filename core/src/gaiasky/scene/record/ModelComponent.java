@@ -220,7 +220,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
 
         rec = new RelativisticEffectsComponent();
 
-        MaterialComponent.reflectionCubemap.initialize();
+        MaterialComponent.sharedReflectionCubemap.initialize();
     }
 
     public void initializeEnvironment() {
@@ -956,8 +956,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public void addReflectionCubemapAttribute(Array<Material> materials) {
         for (Material mat : materials) {
             if (mat.has(ColorAttribute.Metallic) || mat.has(TextureAttribute.Metallic)) {
-                MaterialComponent.reflectionCubemap.prepareCubemap(manager);
-                mat.set(new CubemapAttribute(CubemapAttribute.ReflectionCubemap, MaterialComponent.reflectionCubemap.cubemap));
+                MaterialComponent.sharedReflectionCubemap.prepareCubemap(manager);
+                mat.set(new CubemapAttribute(CubemapAttribute.ReflectionCubemap, MaterialComponent.sharedReflectionCubemap.cubemap));
             }
         }
     }
