@@ -326,7 +326,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         bloom.setBlurPasses(10);
         bloom.setBlurAmount(0);
         bloom.setBloomSaturation(0.7f);
-        bloom.setThreshold(0.3f);
+        bloom.setThreshold(0.0f);
         bloom.setEnabled(settings.postprocess.bloom.intensity > 0);
         ppb.add(bloom);
 
