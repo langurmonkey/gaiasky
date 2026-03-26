@@ -1765,6 +1765,14 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     }
 
     /**
+     * Get the scene start time of this Gaia Sky instance, in milliseconds, since midnight, January 1, 1970 UTC.
+     * @return Scene start time, in milliseconds, since midnight, January 1, 1970 UTC.
+     */
+    public double getStartTimeScene() {
+        return startTimeScene;
+    }
+
+    /**
      * Is this instance of Gaia Sky using VR?
      *
      * @return The state of VR for this instance.

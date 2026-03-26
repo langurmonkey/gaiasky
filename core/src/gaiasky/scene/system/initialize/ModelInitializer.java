@@ -14,12 +14,12 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.FocusActive;
@@ -207,6 +207,16 @@ public class ModelInitializer extends AbstractInitSystem {
                     mat.set(new DepthTestAttribute(false));
                 }
             }
+        }
+
+        // Ringed models with dataset -> Fade out the ring.
+        if (model != null
+                && model.model != null
+                && model.model.type != null
+                && model.model.type.equalsIgnoreCase("ring")) {
+            model.model.ringDataset = graph.numChildren > 0
+                    && graph.getFirstChildOfType(GaiaSky.instance.scene.archetypes()
+                                                         .get("ParticleGroup")) != null;
 
         }
     }

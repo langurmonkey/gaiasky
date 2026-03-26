@@ -49,15 +49,15 @@ public enum RenderGroup {
     /**
      * Group of billboard datasets.
      **/
-    BILLBOARD_GROUP(800),
+    BILLBOARD_GROUP(900),
     /**
      * Group of billboard datasets, using procedural generation.
      **/
-    BILLBOARD_GROUP_PROCEDURAL(801),
+    BILLBOARD_GROUP_PROCEDURAL(901),
     /**
      * Fallback to procedural generation in the CPU.
      */
-    BILLBOARD_GROUP_PROCEDURAL_CPU(802),
+    BILLBOARD_GROUP_PROCEDURAL_CPU(902),
     /**
      * Particle group.
      **/
@@ -83,10 +83,6 @@ public enum RenderGroup {
      **/
     ORBITAL_ELEMENTS_PARTICLE(1500),
     /**
-     * A particle group defined by orbital elements.
-     **/
-    ORBITAL_ELEMENTS_GROUP(1600),
-    /**
      * Models with only diffuse lighting.
      **/
     MODEL_DIFFUSE(1700),
@@ -102,6 +98,10 @@ public enum RenderGroup {
      * Model star.
      **/
     MODEL_VERT_STAR(2100),
+    /**
+     * A particle group defined by orbital elements.
+     **/
+    ORBITAL_ELEMENTS_GROUP(2105),
     /**
      * Volume models.
      **/

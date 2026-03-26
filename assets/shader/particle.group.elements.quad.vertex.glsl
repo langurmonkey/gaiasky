@@ -5,14 +5,17 @@
 
 // UNIFORMS
 uniform mat4 u_projView;
-uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform float u_alpha;
+// Base dataset position (comes from parent position)
+uniform vec3 u_datasetPos;
 uniform float u_sizeFactor;
 uniform mat4 u_refSysTransform;
 uniform vec2 u_sizeLimits;
 // Current julian date, in days, emulates a double in vec2
 uniform vec2 u_t;
+// Is the time already in seconds? (optimization)
+uniform int u_tInSecs;
 // VR scale factor
 uniform float u_vrScale;
 // Arbitrary affine transformation(s)
@@ -69,9 +72,17 @@ vec4 keplerToCartesian() {
     float M0 = a_orbitelems02.w;
 
     // Time since epoch in seconds
-    vec2 epoch_d = ds_set(epoch);
-    vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(D_TO_S));
-    float deltat = deltat_d.x;
+    float deltat = 0.0;
+    if (u_tInSecs == 1) {
+        // Here we use the optimization for ring particles.
+        // Time is in seconds, epoch is 0.
+        deltat = u_t.x;
+    } else {
+        // Here time is physical in days.
+        vec2 epoch_d = ds_set(epoch);
+        vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(D_TO_S));
+        deltat = deltat_d.x;
+    }
 
     // Mean motion (rad/s)
     float n = PI2 / (period * D_TO_S);
@@ -134,8 +145,8 @@ void main() {
     } else {
         pos4 = keplerToCartesian() * u_refSysTransform;
     }
-    // Position relative to camera.
-    vec3 pos = pos4.xyz - u_camPos;
+    // Particle position relative to camera.
+    vec3 pos = pos4.xyz + u_datasetPos;
 
     // Distance to point.
     float dist = length(pos);
@@ -162,6 +173,7 @@ void main() {
     gl_Position = gpos;
 
     computeShadingTypeOutputs(pos, s_up, s_right);
+    computeShadingTypeColor(pos, u_datasetPos, v_col);
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;

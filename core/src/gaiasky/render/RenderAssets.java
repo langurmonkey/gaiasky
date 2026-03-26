@@ -156,7 +156,7 @@ public class RenderAssets {
         particleEffectDesc = loadShaderExt(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl",
                                            TextUtils.concatAll("particle.effect", names), defines);
         orbitElemDesc = loadShaderExt(manager,
-                                      "shader/orbitelem.vertex.glsl",
+                                      "shader/particle.group.elements.quad.vertex.glsl",
                                       "shader/particle.group.quad.fragment.glsl",
                                       TextUtils.concatAll("orbitelem", names),
                                       defines);

@@ -18,8 +18,10 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Highlight;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.entity.ParticleUtils;
@@ -621,7 +623,12 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param shadingType    The shading type ordinal.
      * @param sphericalPower The spherical power value.
      */
-    protected void setShadingTypeUniforms(ExtShaderProgram shaderProgram, ICamera camera, int shadingType, float sphericalPower, float ambient) {
+    protected void setShadingTypeUniforms(ExtShaderProgram shaderProgram,
+                                          ICamera camera,
+                                          int shadingType,
+                                          float sphericalPower,
+                                          float ambient,
+                                          GraphNode graph) {
         // Get nearest light source (our star).
         var light = (Proximity.NearbyRecord) camera.getCloseLightSource(0);
         shaderProgram.setUniformf("u_lightPos", light.pos);
@@ -631,6 +638,16 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         shaderProgram.setUniformi("u_shadingType", shadingType);
         shaderProgram.setUniformf("u_lightIntensity", 1f);
         shaderProgram.setUniformf("u_sphericalPower", sphericalPower);
+
+        // Occlusion in ringed planets.
+        if (graph != null && graph.parent != null && Mapper.model.has(graph.parent)) {
+            shaderProgram.setUniformi("u_occlusion", 1);
+            var parentBody = Mapper.body.get(graph.parent);
+            shaderProgram.setUniformf("u_planetRadius", parentBody.size / 2f);
+        } else {
+            shaderProgram.setUniformi("u_occlusion", 0);
+        }
+
     }
 
     /**

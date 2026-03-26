@@ -509,8 +509,16 @@
         "description": "The starting and ending fade-out distances, in parsecs, from the reference system origin (unless 'fadeObjectName' or 'fadePosition' are defined, in which case the distances are relative to the given object or position), where the object starts and ends its fade-out transition. ",
         "unit": "Double[2]",
         "aliases": [
-          "fadeout"
+          "fadeout", "fadeOutPc"
         ]
+      },
+      "fadeOutAU": {
+        "description": "Same as ``fadeOut``, but in AU (Astronomical Units).",
+        "unit": "Double[2]"
+      },
+      "fadeOutKm": {
+        "description": "Same as ``fadeOut``, but in km.",
+        "unit": "Double[2]"
       },
       "fadeOutMap": {
         "description": "The alpha/opacity values to which the fade-out starting and ending distances are mapped. They default to [1,0].",

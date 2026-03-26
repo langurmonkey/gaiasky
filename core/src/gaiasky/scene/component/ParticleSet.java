@@ -192,11 +192,6 @@ public class ParticleSet implements Component, IDisposable {
     public double fixedAngularSize = -1;
 
     /**
-     * Particle size limits. Applies to legacy point render (using GL_POINTS).
-     */
-    public double[] particleSizeLimitsPoint = new double[]{2d, 50d};
-
-    /**
      * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>.
      */
@@ -299,7 +294,7 @@ public class ParticleSet implements Component, IDisposable {
     /**
      * Epoch for positions/proper motions in julian days.
      **/
-    public double epochJd;
+    public double epochJd = AstroUtils.JD_J2015;
 
     /**
      * Flag indicating if all particles in the group share the same epoch.

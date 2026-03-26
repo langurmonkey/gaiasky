@@ -79,6 +79,10 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public double scale = 1d;
     public boolean culling = true;
     public boolean tessellated = false;
+    /** True if this is a ringed planet, and has a child particle dataset. In this case, the ring must fade on approach. **/
+    public boolean ringDataset = false;
+    /** The ring alpha, if ringDataset is true. **/
+    public float ringAlpha = 1f;
 
     /**
      * COMPONENTS
@@ -541,6 +545,14 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
                         c.color.a = alpha;
                 }
             }
+        }
+
+        // If we are a ringed planet, and have a particle dataset children, we need to apply ringAlpha to the ring material.
+        if (ringDataset && mtc != null && mtc.getRingMaterial() != null) {
+            var mat = mtc.getRingMaterial();
+            var ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
+            if (ba != null)
+                ba.opacity = ringAlpha;
         }
     }
 

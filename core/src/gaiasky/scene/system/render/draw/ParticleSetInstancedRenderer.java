@@ -170,7 +170,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                         if (extended && particle.hasSize()) {
                             model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = particle.size();
                         } else {
-                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = Math.max(body.size + (float) (rand.nextGaussian() * body.size * set.sizeNoise), 0.01f);
+                            model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = Math.max(body.size + (float) (rand.nextGaussian() * body.size * set.sizeNoise),
+                                                                                                     0.01f);
                         }
 
                         // TEXTURE INDEX
@@ -297,7 +298,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 
                 // Shading type.
-                setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower, set.ambientLight);
+                setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower, set.ambientLight, Mapper.graph.get(render.entity));
 
                 // Shading style.
                 shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
@@ -307,7 +308,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 
                 // Override streak if needed.
-                if(!set.allowStreaks) {
+                if (!set.allowStreaks) {
                     shaderProgram.setUniformf("u_camVel", 0, 0, 0);
                 }
 

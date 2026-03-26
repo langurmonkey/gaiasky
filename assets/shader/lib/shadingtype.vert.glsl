@@ -4,6 +4,8 @@
 // Uniforms
 uniform int u_shadingType = 0;
 uniform vec3 u_lightPos;
+uniform int u_occlusion = 0;
+uniform float u_planetRadius = 0.0;
 
 // Outputs
 out vec3 v_lightDir;
@@ -42,6 +44,37 @@ vec2 rotateUV(vec2 uv, float angle) {
     float c = cos(angle);
     mat2 r = mat2(c, -s, s, c);
     return r * (uv - 0.5) + 0.5;
+}
+
+void computeShadingTypeColor(vec3 pos, vec3 datasetPos, inout vec4 col) {
+    if (u_shadingType != 0 && u_occlusion != 0) {
+        // Light Direction (Directional light for parallel rays)
+        // If u_lightPos is a position, normalize the vector from planet to light
+        vec3 L = normalize(u_lightPos - datasetPos);
+
+        // Vector from planet center to the current particle
+        vec3 P = pos - datasetPos;
+
+        // Project P onto the light vector L
+        // This tells us how far "forward" or "backward" the particle is along the light axis
+        float distAlongRay = dot(P, L);
+
+        // Calculate the squared perpendicular distance from the particle to the ray
+        // Using Pythagoras: perpendicular^2 = hypotenuse^2 - base^2
+        float distSq = dot(P, P) - (distAlongRay * distAlongRay);
+
+        // Shadow logic
+        float rSq = u_planetRadius * u_planetRadius;
+        // Is it inside the cylinder (distSq < rSq) and behind the planet (distAlongRay < 0)?
+        // step returns 0.0 if x < edge, 1.0 otherwise.
+        float outsideCylinder = step(rSq, distSq);
+        float inFrontOfPlanet = step(0.0, distAlongRay);
+
+        // The particle is LIT if it is outside the cylinder OR in front of the planet
+        float lightIntensity = max(outsideCylinder, inFrontOfPlanet);
+
+        col.rgb *= lightIntensity;
+    }
 }
 
 #endif //GLSL_LIB_SHADINGTYPE_VERT

@@ -16,14 +16,13 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.ModelScaffolding;
-import gaiasky.scene.component.MotorEngine;
+import gaiasky.scene.component.*;
 import gaiasky.scene.entity.LightingUtils;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.math.Vector3D;
@@ -70,18 +69,40 @@ public class ModelUpdater extends AbstractUpdateSystem {
         // Update light with global position.
         LightingUtils.updateLights(model, body, camera);
         updateLocalTransform(entity, body, graph, scaffolding);
+        updateRing(entity, body, model);
 
-        // Atmosphere and cloud.
+        // Atmosphere.
         if (atmosphere != null && atmosphere.atmosphere != null) {
             atmosphere.atmosphere.update(graph.translation);
         }
+        // Clouds layer.
         if (cloud != null && cloud.cloud != null) {
             cloud.cloud.update(graph.translation);
             setToLocalTransform(entity, body, graph, cloud.cloud.size, 1, cloud.cloud.localTransform, true);
         }
+        // Spacecraft.
         if (engine != null && engine.render) {
-            EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(),
-                    MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
+            EventManager.publish(Event.SPACECRAFT_INFO,
+                                 this,
+                                 engine.yaw % 360,
+                                 engine.pitch % 360,
+                                 engine.roll % 360,
+                                 engine.vel.len(),
+                                 MotorEngine.thrustFactor[engine.thrustFactorIndex],
+                                 engine.currentEnginePower,
+                                 engine.yawp,
+                                 engine.pitchp,
+                                 engine.rollp);
+        }
+    }
+
+    protected void updateRing(Entity entity, Body body, Model model) {
+        if (model.model != null && model.model.ringDataset) {
+            // Compute alpha.
+            var d = body.distToCamera;
+            var r = body.size / 2.0;
+            // Map distance to camera to alpha using radius. Radius factors are arbitrary.
+            model.model.ringAlpha = 1f - (float) MathUtilsDouble.lint(d, r * 3.0, r * 10.0, 1.0, 0.0);
         }
     }
 

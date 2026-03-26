@@ -155,11 +155,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.focusPositionSph = new Vector2D();
         set.entity = entity;
 
-        // Default epochs, if not set
-        if (set.epochJd <= 0) {
-            set.epochJd = AstroUtils.JD_J2015_5;
-        }
-
         // Maps.
         set.labelDisplayAlways = new IntSet();
         set.labelDisplayNever = new IntSet();

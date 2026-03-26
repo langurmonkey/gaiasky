@@ -74,8 +74,26 @@ public class Fade implements Component {
     }
 
     public void setFadeOut(double[] fadeOut) {
+        setFadeOutPc(fadeOut);
+    }
+
+    public void setFadeOutPc(double[] fadeOut) {
         if (fadeOut != null)
             this.fadeOut = new Vector2D(fadeOut[0] * Constants.PC_TO_U, fadeOut[1] * Constants.PC_TO_U);
+        else
+            this.fadeOut = null;
+    }
+
+    public void setFadeOutAU(double[] fadeOut) {
+        if (fadeOut != null)
+            this.fadeOut = new Vector2D(fadeOut[0] * Constants.AU_TO_U, fadeOut[1] * Constants.AU_TO_U);
+        else
+            this.fadeOut = null;
+    }
+
+    public void setFadeOutKm(double[] fadeOut) {
+        if (fadeOut != null)
+            this.fadeOut = new Vector2D(fadeOut[0] * Constants.KM_TO_U, fadeOut[1] * Constants.KM_TO_U);
         else
             this.fadeOut = null;
     }

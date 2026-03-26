@@ -34,7 +34,7 @@ import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
+import gaiasky.util.Nature;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -103,7 +103,6 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
         for (IRenderable renderable : renderables) {
             Render render = (Render) renderable;
             var graph = Mapper.graph.get(render.entity);
-
             var model = getModelQuad(primitive,
                                      getOffset(render));
             var desc = Mapper.datasetDescription.get(render.entity);
@@ -229,7 +228,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                             model.instanceAttributes[curr.instanceIdx + model.elems02Offset + 3] = (float) (k.meanAnomaly() * MathUtilsDouble.degRad);
 
                             // SIZE
-                            var size = Math.max((body.size + (float) (rand.nextGaussian() * body.size * sizeNoise)), 0.1f);
+                            var size = Math.max((body.size + (float) (rand.nextGaussian() * body.size * sizeNoise)), 1e-10f);
                             model.instanceAttributes[curr.instanceIdx + model.sizeOffset] = (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : size);
 
                             // TEXTURE INDEX
@@ -259,13 +258,13 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
             /*
              * RENDER
              */
-
             if (set != null || eSet != null) {
                 // Fetch parameters from particle or elements set.
                 var textureArray = set != null ? set.textureArray : eSet.textureArray;
                 var sphericalPower = set != null ? set.sphericalPower : eSet.sphericalPower;
                 var profileDecay = set != null ? set.profileDecay : eSet.profileDecay;
                 var shadingTyp = set != null ? set.shadingType : eSet.shadingType;
+                var diffuseScattering = set != null ? set.ambientLight : 0f;
 
                 var offset = getOffset(render);
                 if (offset < 0) return;
@@ -275,12 +274,10 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                         textureArray.bind(0);
                     }
 
-
                     ExtShaderProgram shaderProgram = getShaderProgram();
                     shaderProgram.begin();
 
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-                    shaderProgram.setUniformf("u_camPos", camera.getPos());
                     addCameraUpCubemapMode(shaderProgram, camera);
 
                     int shadingType = preShadingType(hl, shadingTyp);
@@ -294,36 +291,66 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     shaderProgram.setUniformf("u_sizeFactor", (float) (sizeFactor / Constants.DISTANCE_SCALE_FACTOR));
 
                     // Shading type.
-                    setShadingTypeUniforms(shaderProgram, camera, shadingType, sphericalPower, 0f);
+                    setShadingTypeUniforms(shaderProgram, camera, shadingType, sphericalPower, diffuseScattering, graph);
 
-                    // VR scale
+                    // VR scale.
                     shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
 
-                    // Emulate double, for compatibility
-                    double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
-                    float curRt1 = (float) curRt;
-                    float curRt2 = (float) (curRt - (double) curRt1);
-                    shaderProgram.setUniformf("u_t", curRt1, curRt2);
+                    // Time computation. We emulate double with vec2.
+                    if (set != null && set.epochJd == 0) {
+                        // Hack for precision in rings.
+                        // Since the seconds are paramount in rings (time scales are much smaller than asteroids for instance), we just wrap it
+                        // after a year.
+                        var startTimeSecs = GaiaSky.instance.getStartTimeScene() / 1000.0;
+                        double currSeconds = (GaiaSky.instance.time.getTimeSeconds() - startTimeSecs) % Nature.Y_TO_S;
+
+                        float curRt1 = (float) currSeconds;
+                        float curRt2 = (float) (currSeconds - (double) curRt1);
+                        shaderProgram.setUniformf("u_t", curRt1, curRt2);
+                        shaderProgram.setUniformi("u_tInSecs", 1);
+                    } else {
+                        double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
+                        float curRt1 = (float) curRt;
+                        float curRt2 = (float) (curRt - (double) curRt1);
+                        shaderProgram.setUniformf("u_t", curRt1, curRt2);
+                        shaderProgram.setUniformi("u_tInSecs", 0);
+                    }
 
                     // Reference system transform
-                    Matrix4D refSysTransform = null;
                     if (graph.children != null && graph.children.size > 0) {
+                        // USING CHILDREN OBJECTS.
+                        Matrix4D refSysTransform = null;
                         if (Mapper.transform.has(graph.children.get(0))) {
+                            // Use transform matrix of first children.
                             refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
                         }
-                    }
-                    if (refSysTransform != null
-                            && graph.children != null && graph.children.size > 0
-                            && Mapper.trajectory.has(graph.children.get(0))
-                            && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
-                        refSysTransform.putIn(aux).inv();
-                        refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
-                    } else if (refSysTransform != null) {
-                        refSysTransform.putIn(refSysTransformF).inv();
+                        if (refSysTransform != null
+                                && Mapper.trajectory.has(graph.children.get(0))
+                                && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
+                            // Extrasolar elements require phase around Y.
+                            refSysTransform.putIn(aux).inv();
+                            refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
+                        } else if (refSysTransform != null) {
+                            refSysTransform.putIn(refSysTransformF).inv();
+                        }
+                    } else if (set != null && set.pointData != null && !set.pointData.isEmpty() && graph.parent != null) {
+                        // USING DATASET.
+                        var pOri = Mapper.graph.get(graph.parent);
+                        if (pOri != null) {
+                            var refSysTransform = pOri.orientation;
+                            refSysTransform.putIn(refSysTransformF).inv();
+                        } else {
+                            refSysTransformF.idt();
+                        }
                     } else {
                         refSysTransformF.idt();
                     }
                     shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
+
+                    // Dataset position (in camera refsys).
+                    var dsPos = graph.translation.put(aux3f);
+                    shaderProgram.setUniformf("u_datasetPos", dsPos);
+
 
 
                     // Affine transformations.
