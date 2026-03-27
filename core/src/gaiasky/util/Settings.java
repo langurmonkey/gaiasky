@@ -169,7 +169,7 @@ public class Settings extends SettingsObject {
     @JsonInclude(Include.NON_NULL)
     public ScreenshotSettings screenshot;
     @JsonInclude(Include.NON_NULL)
-    public CamrecorderSettings camrecorder;
+    public CamcorderSettings camrecorder;
     @JsonInclude(Include.NON_NULL)
     public PostprocessSettings postprocess;
     @JsonInclude(Include.NON_NULL)
@@ -3844,10 +3844,11 @@ public class Settings extends SettingsObject {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class CamrecorderSettings extends SettingsObject implements IObserver {
-        public double targetFps;
+    public static class CamcorderSettings extends SettingsObject implements IObserver {
+        public double targetFps = 60.0;
         public KeyframeSettings keyframe;
-        public boolean auto;
+        public boolean frameOutput = false;
+        public boolean hideUI = false;
 
         @Override
         public void notify(Event event,
@@ -3861,8 +3862,8 @@ public class Settings extends SettingsObject {
         }
 
         @Override
-        public CamrecorderSettings clone() {
-            var c = (CamrecorderSettings) super.clone();
+        public CamcorderSettings clone() {
+            var c = (CamcorderSettings) super.clone();
             c.keyframe = this.keyframe.clone();
             return c;
         }
@@ -3893,16 +3894,7 @@ public class Settings extends SettingsObject {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class KeyframeSettings extends SettingsObject {
-            public KeyframesManager.PathType position;
-
-            /**
-             * Since we started using quaternion spherical linear interpolation, this property is not used.
-             *
-             * @deprecated Not used anymore.
-             */
-            @Deprecated
-            public KeyframesManager.PathType orientation;
-
+            public KeyframesManager.PathType position = KeyframesManager.PathType.CATMULL_ROM_SPLINE;
 
             @Override
             public KeyframeSettings clone() {
@@ -3919,10 +3911,6 @@ public class Settings extends SettingsObject {
 
             public void setPosition(final String positionString) {
                 position = getPathType(positionString);
-            }
-
-            public void setOrientation(final String orientationString) {
-                orientation = getPathType(orientationString);
             }
 
             private KeyframesManager.PathType getPathType(String str) {

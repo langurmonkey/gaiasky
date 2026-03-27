@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import gaiasky.util.Settings.*;
-import gaiasky.util.Settings.CamrecorderSettings.KeyframeSettings;
+import gaiasky.util.Settings.CamcorderSettings.KeyframeSettings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.Settings.GraphicsSettings.FullscreenSettings;
 import gaiasky.util.Settings.PostprocessSettings.*;
@@ -120,13 +120,12 @@ public class SettingsMorph {
         s.screenshot = screenshot;
 
         // Camrecorder
-        var camrec = new CamrecorderSettings();
+        var camrec = new CamcorderSettings();
         var keyframe = new KeyframeSettings();
         keyframe.position = PathType.valueOf(str("graphics.camera.keyframe.path.position", p));
-        keyframe.orientation = PathType.valueOf(str("graphics.camera.keyframe.path.orientation", p));
         camrec.keyframe = keyframe;
         camrec.targetFps = f64("graphics.camera.recording.targetfps", p);
-        camrec.auto = bool("graphics.camera.recording.frameoutputatuo", p);
+        camrec.frameOutput = bool("graphics.camera.recording.frameoutputatuo", p);
         s.camrecorder = camrec;
 
         // Data

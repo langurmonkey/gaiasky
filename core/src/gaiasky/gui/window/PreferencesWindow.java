@@ -80,7 +80,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox maxFps;
     private OwnCheckBox multithreadCb;
     private OwnCheckBox lodFadeCb;
-    private OwnCheckBox cbAutoCamRec;
+    private OwnCheckBox cbAutoFrameOutput;
+    private OwnCheckBox cbAutoHideUI;
     private OwnCheckBox real;
     private OwnCheckBox invertX;
     private OwnCheckBox invertY;
@@ -2150,24 +2151,35 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // Activate automatically
-        OwnLabel autoCamrecLabel = new OwnLabel(I18n.msg("gui.camerarec.frameoutput"), skin);
-        cbAutoCamRec = new OwnCheckBox("", skin);
-        cbAutoCamRec.setChecked(settings.camrecorder.auto);
-        cbAutoCamRec.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera.frameoutput"), skin));
-        OwnImageButton camrecAutoTooltip = new OwnImageButton(skin, "tooltip");
-        camrecAutoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera.frameoutput"), skin));
+        // Activate frame output automatically
+        OwnLabel autoFrameOutputLabel = new OwnLabel(I18n.msg("gui.camerarec.frameoutput"), skin);
+        cbAutoFrameOutput = new OwnCheckBox("", skin);
+        cbAutoFrameOutput.setChecked(settings.camrecorder.frameOutput);
+        cbAutoFrameOutput.addListener(new OwnTextTooltip(I18n.msg("gui.camerarec.frameoutput.tooltip"), skin));
+        var autoFrameOutputTooltip = new OwnImageButton(skin, "tooltip");
+        autoFrameOutputTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.camerarec.frameoutput.tooltip"), skin));
+
+        // Hide UI automatically
+        OwnLabel autoHideUILabel = new OwnLabel(I18n.msg("gui.camerarec.hideui"), skin);
+        cbAutoHideUI = new OwnCheckBox("", skin);
+        cbAutoHideUI.setChecked(settings.camrecorder.hideUI);
+        cbAutoHideUI.addListener(new OwnTextTooltip(I18n.msg("gui.camerarec.hideui.tooltip"), skin));
+        var autoHideUITooltip = new OwnImageButton(skin, "tooltip");
+        autoHideUITooltip.addListener(new OwnTextTooltip(I18n.msg("gui.camerarec.hideui.tooltip"), skin));
 
         // LABELS
-        labels.add(autoCamrecLabel);
+        labels.add(autoFrameOutputLabel, autoHideUILabel);
 
         // Add to table
         camrec.add(camfpsLabel).left().padRight(pad34).padBottom(pad10);
         camrec.add(camRecFps).left().fillX().padBottom(pad10);
         camrec.add(camrecFpsTooltip).left().padLeft(pad10).padBottom(pad10).row();
-        camrec.add(autoCamrecLabel).left().padRight(pad34).padBottom(pad10);
-        camrec.add(cbAutoCamRec).left().padBottom(pad10);
-        camrec.add(camrecAutoTooltip).left().padLeft(pad10).padBottom(pad10).row();
+        camrec.add(autoFrameOutputLabel).left().padRight(pad34).padBottom(pad10);
+        camrec.add(cbAutoFrameOutput).left().padBottom(pad10);
+        camrec.add(autoFrameOutputTooltip).left().padLeft(pad10).padBottom(pad10).row();
+        camrec.add(autoHideUILabel).left().padRight(pad34).padBottom(pad10);
+        camrec.add(cbAutoHideUI).left().padBottom(pad10);
+        camrec.add(autoHideUITooltip).left().padLeft(pad10).padBottom(pad10).row();
         camrec.add(keyframePrefs).colspan(3).left().padTop(pad34 * 2f).row();
 
         // Add to content
@@ -3127,7 +3139,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Camera recording
         EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camRecFps.getText()));
-        settings.camrecorder.auto = cbAutoCamRec.isChecked();
+        settings.camrecorder.frameOutput = cbAutoFrameOutput.isChecked();
+        settings.camrecorder.hideUI = cbAutoHideUI.isChecked();
 
         // Cubemap resolution (same as plResolution)
         int newResolution = (int) cmResolution.getValue();

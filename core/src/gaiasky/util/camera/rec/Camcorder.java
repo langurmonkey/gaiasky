@@ -264,9 +264,14 @@ public class Camcorder implements IObserver {
                         EventManager.publish(Event.CAMERA_PLAY_INFO, this, true);
 
                         // Enable frame output if option is on.
-                        if (Settings.settings.camrecorder.auto) {
+                        if (Settings.settings.camrecorder.frameOutput) {
                             // Stop frame output if it is on!
                             EventManager.publish(Event.FRAME_OUTPUT_CMD, this, true);
+                        }
+
+                        // Hide UI if necessary.
+                        if (Settings.settings.camrecorder.hideUI) {
+                            EventManager.publish(Event.DISPLAY_GUI_CMD, this, false, I18n.msg("notif.cleanmode"));
                         }
                     } catch (Exception e) {
                         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("error.file.parse", file));
@@ -296,6 +301,11 @@ public class Camcorder implements IObserver {
 
                     // Stop frame output if it is on!
                     EventManager.publish(Event.FRAME_OUTPUT_CMD, this, false);
+
+                    // Re-show UI.
+                    if (Settings.settings.camrecorder.hideUI) {
+                        EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
+                    }
                 }
             }
             case UPDATE_CAM_RECORDER -> {
