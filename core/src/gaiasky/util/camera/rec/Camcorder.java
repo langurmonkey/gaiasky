@@ -117,6 +117,11 @@ public class Camcorder implements IObserver {
 
                         // Stop frame output if it is on!
                         EventManager.publish(Event.FRAME_OUTPUT_CMD, this, false);
+
+                        // Re-show UI.
+                        if (Settings.settings.camrecorder.hideUI) {
+                            EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
+                        }
                         break;
                     }
                 }
