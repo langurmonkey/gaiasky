@@ -86,44 +86,39 @@ public class Index {
     }
 
     /**
-     * Adds the given node to the index. Returns false if it was not added due to a naming conflict (name already exists)
-     * with the same object (same class and same names).
+     * Adds the given node to the index.
      *
      * @param entity The entity to add.
      *
-     * @return False if the object already exists.
+     * @return True if at least one entry has been added to the index for this entity, false otherwise.
      */
     public boolean addToIndex(Entity entity) {
-        boolean ok = true;
         Base base;
+        boolean added = false;
         if ((base = Mapper.base.get(entity)) != null) {
             if (base.names != null) {
                 if (mustAddToIndex(entity)) {
+                    // Base catalog info.
+                    var bci = Mapper.graph.get(entity);
+                    String baseParent = bci.parentName != null ? bci.parentName : "-";
+
                     for (String name : base.names) {
                         String nameLowerCase = name.toLowerCase(Locale.ROOT)
                                 .trim();
                         if (!index.containsKey(nameLowerCase)) {
                             index.put(nameLowerCase, entity);
+                            added = true;
                         } else if (!nameLowerCase.isEmpty()) {
                             Entity conflict = index.get(nameLowerCase);
+                            var conflictGraph = Mapper.graph.get(conflict);
                             var conflictBase = Mapper.base.get(conflict);
-                            var entityArchetype = conflictBase.archetype;
-                            var conflictArchetype = Mapper.base.get(conflict).archetype;
-                            logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName()
-                                    .toLowerCase(Locale.ROOT) + ")", conflictBase.getName() + " (" + conflictArchetype.getName()
-                                    .toLowerCase(Locale.ROOT) + ")"));
-                            String[] names1 = base.names;
-                            String[] names2 = conflictBase.names;
-                            boolean same = names1.length == names2.length;
-                            if (same) {
-                                for (int i = 0; i < names1.length; i++) {
-                                    same = same && names1[i].equals(names2[i]);
-                                }
-                            }
-                            if (same) {
-                                same = entityArchetype == conflictArchetype;
-                            }
-                            ok = !same;
+                            var conflictArchetype = conflictBase.archetype;
+                            // Conflict catalog info.
+                            String conflictParent = conflictGraph.parentName != null ? conflictGraph.parentName : "-";
+                            logger.warn(I18n.msg("error.name.conflict",
+                                                 conflictBase.getName() + " [" + conflictArchetype.getName()
+                                                         .toLowerCase(Locale.ROOT) + ", " + conflictParent + "]",
+                                                 name + " [" + base.archetype.getName().toLowerCase(Locale.ROOT) + ", " + baseParent + "]"));
                         }
                     }
 
@@ -132,10 +127,11 @@ public class Index {
                     if (id != null && id.id > 0) {
                         String idString = String.valueOf(id.id);
                         index.put(idString, entity);
+                        added = true;
                     }
                 }
 
-                // Special cases
+                // Special cases: Stars, PG and SG.
 
                 // HIP stars add "HIP + hipID"
                 Archetype starArchetype = archetypes.get("gaiasky.scenegraph.Star");
@@ -143,33 +139,55 @@ public class Index {
                     // Hip
                     Hip hip = Mapper.hip.get(entity);
                     if (hip.hip > 0) {
-                        String hipid = "hip " + hip.hip;
-                        index.put(hipid, entity);
+                        String hipID = "hip " + hip.hip;
+                        index.put(hipID, entity);
+                        added = true;
                     }
                 }
 
                 // Particle/star sets add names of each contained particle.
-                addParticleSet(entity, Mapper.particleSet.get(entity));
-                addParticleSet(entity, Mapper.starSet.get(entity));
+                added |= addParticleSet(entity, Mapper.particleSet.get(entity));
+                added |= addParticleSet(entity, Mapper.starSet.get(entity));
             }
         }
-        if (!ok) {
-            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity)
-                    .getName() + ")"));
-        }
-        return ok;
+        return added;
     }
 
-    private void addParticleSet(Entity entity, ParticleSet particleSet) {
-        if (particleSet != null) {
-            if (particleSet.index != null) {
-                String[] keys = particleSet.index.keys();
-                for (String key : keys) {
-                    if (key != null)
+    /**
+     * Adds a particle set to the index.
+     *
+     * @param entity The particle set entity.
+     * @param set    The particle set component.
+     *
+     * @return True if at least one entry has been added to the index. False otherwise.
+     */
+    private boolean addParticleSet(Entity entity, ParticleSet set) {
+        boolean added = false;
+        if (set != null && set.index != null) {
+            var pgBase = Mapper.base.get(entity);
+            var pgName = pgBase.getName();
+            var pgArchetype = pgBase.archetype;
+            String[] keys = set.index.keys();
+            for (String key : keys) {
+                if (key != null) {
+                    if (index.containsKey(key)) {
+                        Entity conflict = index.get(key);
+                        var conflictBase = Mapper.base.get(conflict);
+                        var conflictArchetype = conflictBase.archetype;
+                        var conflictParent = Mapper.graph.has(conflict) ? Mapper.graph.get(conflict).parentName : "-";
+                        logger.warn(I18n.msg("error.name.conflict",
+                                             conflictBase.getName() + " [" + conflictArchetype.getName()
+                                                     .toLowerCase(Locale.ROOT) + ", " + conflictParent + "]",
+                                             key + " [" + pgArchetype.getName().toLowerCase(Locale.ROOT) + ", " + pgName + "]"));
+                    } else {
+                        // Add to main index.
                         index.put(key, entity);
+                        added = true;
+                    }
                 }
             }
         }
+        return added;
     }
 
     public IntMap<IPosition> getHipMap() {
@@ -209,7 +227,7 @@ public class Index {
     }
 
     private boolean mustAddToIndex(Entity entity) {
-        // All entities except the ones who have perimeter, location mark, particle or star set.
+        // All entities except perimeters, location marks, and particle/star sets.
         return entity.getComponent(Perimeter.class) == null
                 && entity.getComponent(LocationMark.class) == null
                 && entity.getComponent(ParticleSet.class) == null

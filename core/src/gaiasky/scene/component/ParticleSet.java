@@ -440,7 +440,7 @@ public class ParticleSet implements Component, IDisposable {
      *
      * @param pointData The data
      *
-     * @return An map{string,int} mapping names to indices
+     * @return A map{string,int} mapping names to indices
      */
     public FastObjectIntMap<String> generateIndex(List<IParticleRecord> pointData) {
         FastObjectIntMap<String> index = new FastObjectIntMap<>((int) (pointData.size() * 1.25f), String.class);

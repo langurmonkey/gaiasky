@@ -16,6 +16,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.update.GraphUpdater;
+import gaiasky.util.CatalogInfo;
 import gaiasky.util.Consumers.Consumer4;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.math.Matrix4D;
@@ -224,5 +225,30 @@ public class GraphNode implements Component, ICopy {
         } else {
             return Mapper.graph.get(parent).getFirstAncestorOfType(ct);
         }
+    }
+
+    /**
+     * Gets the {@link CatalogInfo} of this node's ancestors, if it exists. Essentially,
+     * this method returns the catalog info object that contains this entity.
+     *
+     * @return The {@link CatalogInfo} that contains this entity, if any.
+     */
+    public CatalogInfo getCatalogInfo() {
+        return getCatalogInfo(this.parent);
+    }
+
+    public CatalogInfo getCatalogInfo(Entity e) {
+        if (e != null) {
+            if (Mapper.datasetDescription.has(e)) {
+                return Mapper.datasetDescription.get(e).catalogInfo;
+            } else {
+                var graph = Mapper.graph.get(e);
+                if (graph != null) {
+                    return getCatalogInfo(graph.parent);
+                }
+            }
+        }
+
+        return null;
     }
 }
