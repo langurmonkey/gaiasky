@@ -79,7 +79,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         this.manager = manager;
 
         close = new OwnTextIconButton("", skin, "quit");
-        close.setSize(39, 35);
+        close.setSize(45, 35);
         close.addListener(event -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 closeConsole();

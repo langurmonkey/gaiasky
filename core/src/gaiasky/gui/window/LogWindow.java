@@ -10,6 +10,7 @@ package gaiasky.gui.window;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
@@ -80,10 +81,14 @@ public class LogWindow extends GenericDialog {
         buttons.pad(pad);
         buttons.space(pad);
 
-        Button reload = new OwnTextIconButton("", skin, "reload");
+        var bw = 320;
+        var bh = 50;
+
+        var reload = new OwnTextIconButton(I18n.msg("gui.log.update"), skin, "reload");
         reload.setName("update log");
+        reload.setSize(bw, bh);
         reload.pad(pad10);
-        reload.addListener(new OwnTextTooltip(I18n.msg("gui.log.update"), skin));
+        reload.setTooltip(I18n.msg("gui.log.update"));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 update();
@@ -92,9 +97,25 @@ public class LogWindow extends GenericDialog {
         });
         buttons.addActor(reload);
 
-        Button export = new OwnTextButton(I18n.msg("gui.log.export"), skin);
+        var copy = new OwnTextIconButton(I18n.msg("gui.clipboard.copy"), skin, "clipboard");
+        copy.setName("copy to clipboard");
+        copy.setSize(bw, bh);
+        copy.pad(pad10);
+        copy.setTooltip(I18n.msg("gui.clipboard.copy"));
+        copy.addListener(event -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                copyToClipboard();
+
+            }
+            return false;
+        });
+        buttons.addActor(copy);
+
+        var export = new OwnTextIconButton(I18n.msg("gui.log.export"), skin, "export");
         export.setName("export log");
+        export.setSize(bw, bh);
         export.pad(pad10);
+        export.setTooltip(I18n.msg("gui.log.export"));
         export.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 export();
@@ -119,7 +140,22 @@ public class LogWindow extends GenericDialog {
         }
     }
 
-    public void export() {
+    /**
+     * Puts the current log contents in the system clipboard.
+     */
+    private void copyToClipboard() {
+        var clipboard = Gdx.app.getClipboard();
+        var sb = new StringBuilder();
+        for (MessageBean mb : ConsoleLogger.getHistory()) {
+            sb.append(format.format(mb.date())).append(" - ").append(mb.msg()).append('\n');
+        }
+        clipboard.setContents(sb.toString());
+    }
+
+    /**
+     * Exports the log to a file in the data directory.
+     */
+    private void export() {
         String filename = Instant.now().toString() + "_gaiasky.log";
         filename = filename.replace(":", "-");
         Path gsHome = SysUtils.getDataDir();
