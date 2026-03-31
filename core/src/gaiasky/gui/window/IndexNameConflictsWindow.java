@@ -71,7 +71,11 @@ public class IndexNameConflictsWindow extends GenericDialog {
             var index = scene.index();
             var conflicts = index.getConflicts();
             for (var c : conflicts) {
-                var name = new OwnLabel("\"" + TextUtils.capitalise(c.name()) + "\"", skin, "header-raw");
+                var nameStr = TextUtils.capitalise(c.name());
+                var nameCapped = TextUtils.capString(nameStr, 15);
+                var name = new OwnLabel("\"" + nameCapped + "\"", skin, "header-raw");
+                name.setTooltip(nameStr);
+                name.setWidth(Math.max(250f, name.getWidth()));
                 name.setColor(ColorUtils.gRedC);
                 t.add(name).left().padRight(pad20);
                 addEntity(t, c.e1(), c.e1Archetype(), c.e1Parent());
