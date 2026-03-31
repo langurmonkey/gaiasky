@@ -3093,7 +3093,8 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * Enable and disables the cubemap mode.
      *
      * @param state      The boolean state. True to activate, false to deactivate.
-     * @param projection The projection as a string.
+     * @param projection The projection to use as a string.
+     *                   Accepted values are ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"orthosphere_crossye"|"azimuthal_equidistant"].
      */
     void setCubemapMode(boolean state,
                         String projection);

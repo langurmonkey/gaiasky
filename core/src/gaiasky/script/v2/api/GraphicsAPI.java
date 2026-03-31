@@ -90,7 +90,8 @@ public interface GraphicsAPI {
      * Enable and disable the cubemap mode.
      *
      * @param state      The boolean state. True to activate, false to deactivate.
-     * @param projection The projection as a string.
+     * @param projection The projection to use as a string.
+     *                   Accepted values are ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"orthosphere_crossye"|"azimuthal_equidistant"].
      */
     void mode_cubemap(boolean state,
                       String projection);
