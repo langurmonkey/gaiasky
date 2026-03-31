@@ -142,7 +142,7 @@ public class OwnCheckBox extends CheckBox implements IObserver {
         // From Button
         validate();
 
-        float offsetX = 0, offsetY = 0;
+        float offsetX, offsetY;
         if (isPressed() && !isDisabled()) {
             offsetX = getStyle().pressedOffsetX;
             offsetY = getStyle().pressedOffsetY;

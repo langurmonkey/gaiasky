@@ -798,7 +798,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         frames = 0;
 
         // Debug info scheduler.
-        final Task debugTask1 = new Task() {
+        final Task debugInfoTask = new Task() {
             @Override
             public void run() {
                 // FPS.
@@ -827,7 +827,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             }
         };
 
-        final var debugTask10 = new Task() {
+        // SAMP status.
+        final var sampInfoTask = new Task() {
             @Override
             public void run() {
                 EventManager.publish(Event.SAMP_INFO, this, gaiaSkyAssets.sampClient.getStatus());
@@ -835,9 +836,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         };
 
         // Every second.
-        Timer.schedule(debugTask1, 2, 1);
+        Timer.schedule(debugInfoTask, 2, 1);
         // Every 10 seconds.
-        Timer.schedule(debugTask10, 2, 10);
+        Timer.schedule(sampInfoTask, 2, 10);
 
         // Start capturing locations.
         final var startCapturing = new Task() {
@@ -848,6 +849,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             }
         };
         Timer.schedule(startCapturing, 1f);
+
+        // Show index name conflicts.
+        EventManager.publishDelayed(Event.SHOW_INDEX_NAME_CONFLICTS_ACTION, this, 6_000L, scene);
 
         // Release notes.
         guiRegistry.publishReleaseNotes();

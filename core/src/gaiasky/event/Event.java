@@ -136,7 +136,10 @@ public enum Event {
     /** Shows the bookmark information dialog for the given bookmark node. **/
     SHOW_BOOKMARK_INFO_ACTION,
 
-    /** Shows and hides the console. Contains a boolean with the state, which is optional. Otherwise we toggle the console. **/
+    /** Shows the index name conflicts window. Contains the {@link gaiasky.scene.Scene} instance. **/
+    SHOW_INDEX_NAME_CONFLICTS_ACTION,
+
+    /** Shows and hides the console. Contains a boolean with the state, which is optional. Otherwise, we toggle the console. **/
     CONSOLE_CMD,
 
     /**
@@ -577,10 +580,14 @@ public enum Event {
      */
     HIDE_UNCERTAINTIES,
     /**
-     * Issues the command to change the high accuracy setting. Contains a
-     * boolean with the setting.
+     * Command to change the {@link DataSettings#highAccuracy} setting. Contains a
+     * boolean with the value.
      */
     HIGH_ACCURACY_CMD,
+    /**
+     * Command to change the {@link ProgramSettings#showNameConflicts} setting. Contains a boolean with the value.
+     */
+    NAME_CONFLICTS_STARTUP_CMD,
     /**
      * Runs the 'Go home' action.
      */

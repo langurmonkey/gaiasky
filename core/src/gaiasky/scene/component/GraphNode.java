@@ -231,12 +231,10 @@ public class GraphNode implements Component, ICopy {
      * Gets the {@link CatalogInfo} of this node's ancestors, if it exists. Essentially,
      * this method returns the catalog info object that contains this entity.
      *
+     * @param e The entity for which to get the catalog info.
+     *
      * @return The {@link CatalogInfo} that contains this entity, if any.
      */
-    public CatalogInfo getCatalogInfo() {
-        return getCatalogInfo(this.parent);
-    }
-
     public CatalogInfo getCatalogInfo(Entity e) {
         if (e != null) {
             if (Mapper.datasetDescription.has(e)) {

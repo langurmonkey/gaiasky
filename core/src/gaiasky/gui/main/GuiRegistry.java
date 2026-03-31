@@ -97,6 +97,7 @@ public class GuiRegistry implements IObserver {
     private BookmarkNameDialog locationBookmarkDialog;
     private BookmarkInfoDialog bookmarkInfoDialog;
     private ObjectDebugWindow objectDebugWindow;
+    private IndexNameConflictsWindow indexNameConflictsWindow;
     /**
      * Keyframes window.
      **/
@@ -154,7 +155,8 @@ public class GuiRegistry implements IObserver {
                                         Event.SHOW_DATE_TIME_EDIT_ACTION,
                                         Event.SHOW_ADD_POSITION_BOOKMARK_ACTION,
                                         Event.SHOW_BOOKMARK_INFO_ACTION,
-                                        Event.SHOW_OBJECT_DEBUG_ACTION);
+                                        Event.SHOW_OBJECT_DEBUG_ACTION,
+                                        Event.SHOW_INDEX_NAME_CONFLICTS_ACTION);
     }
 
     public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
@@ -501,10 +503,10 @@ public class GuiRegistry implements IObserver {
                                             // Load dataset.
                                             GaiaSky.instance.scripting().apiv2().data
                                                     .load_dataset(datasetOptions.catalogName,
-                                                                 result.toAbsolutePath().toString(),
-                                                                 CatalogInfoSource.UI,
-                                                                 datasetOptions,
-                                                                 true);
+                                                                  result.toAbsolutePath().toString(),
+                                                                  CatalogInfoSource.UI,
+                                                                  datasetOptions,
+                                                                  true);
                                             // Select first.
                                             CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
                                             if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
@@ -603,6 +605,16 @@ public class GuiRegistry implements IObserver {
                     bookmarkInfoDialog.show(stage);
 
                 }
+                case SHOW_INDEX_NAME_CONFLICTS_ACTION -> {
+                    var scene = (Scene) data[0];
+                    if (Settings.settings.program.showNameConflicts && scene.index().getConflicts().size > 0) {
+                        if (indexNameConflictsWindow == null) {
+                            indexNameConflictsWindow = new IndexNameConflictsWindow(stage, skin, scene);
+                        }
+                        indexNameConflictsWindow.show(stage);
+                    }
+                }
+
                 case UI_THEME_RELOAD_INFO -> {
                     if (keyframesWindow != null) {
                         keyframesWindow.dispose();

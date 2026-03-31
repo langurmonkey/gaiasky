@@ -8,6 +8,7 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
@@ -34,6 +35,11 @@ public class Index {
     protected final FastStringObjectMap<Entity> index;
 
     /**
+     * Index name conflicts for the current session, stored as pairs of entities with additional metadata.
+     */
+    protected final Array<NameConflict> conflicts;
+
+    /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations.
      **/
@@ -57,6 +63,9 @@ public class Index {
 
         // HIP map with 121k * 1.25
         hipMap = new IntMap<>(151250, 0.9f);
+
+        // Conflicts array.
+        conflicts = new Array<>();
     }
 
     /**
@@ -100,21 +109,34 @@ public class Index {
                 if (mustAddToIndex(entity)) {
                     // Base catalog info.
                     var bci = Mapper.graph.get(entity);
-                    String baseParent = bci.parentName != null ? bci.parentName : "-";
+                    var baseParent = bci.parentName != null ? bci.parentName : "-";
 
                     for (String name : base.names) {
                         String nameLowerCase = name.toLowerCase(Locale.ROOT)
                                 .trim();
                         if (!index.containsKey(nameLowerCase)) {
+                            // Add to index.
                             index.put(nameLowerCase, entity);
                             added = true;
+
                         } else if (!nameLowerCase.isEmpty()) {
+                            // Conflict!
                             Entity conflict = index.get(nameLowerCase);
-                            var conflictGraph = Mapper.graph.get(conflict);
                             var conflictBase = Mapper.base.get(conflict);
                             var conflictArchetype = conflictBase.archetype;
-                            // Conflict catalog info.
-                            String conflictParent = conflictGraph.parentName != null ? conflictGraph.parentName : "-";
+                            var conflictParent = Mapper.graph.has(conflict) ? Mapper.graph.get(conflict).parentName : "-";
+
+                            // Add conflict to list.
+                            var nc = new NameConflict(nameLowerCase,
+                                                      conflict,
+                                                      conflictParent,
+                                                      conflictArchetype,
+                                                      entity,
+                                                      baseParent,
+                                                      base.archetype);
+                            conflicts.add(nc);
+
+                            // Log.
                             logger.warn(I18n.msg("error.name.conflict",
                                                  conflictBase.getName() + " [" + conflictArchetype.getName()
                                                          .toLowerCase(Locale.ROOT) + ", " + conflictParent + "]",
@@ -167,14 +189,28 @@ public class Index {
             var pgBase = Mapper.base.get(entity);
             var pgName = pgBase.getName();
             var pgArchetype = pgBase.archetype;
+            var pgParent = Mapper.graph.get(entity).parentName;
             String[] keys = set.index.keys();
             for (String key : keys) {
                 if (key != null) {
                     if (index.containsKey(key)) {
+                        // Conflict!
                         Entity conflict = index.get(key);
                         var conflictBase = Mapper.base.get(conflict);
                         var conflictArchetype = conflictBase.archetype;
                         var conflictParent = Mapper.graph.has(conflict) ? Mapper.graph.get(conflict).parentName : "-";
+
+                        // Add conflict to list.
+                        var nc = new NameConflict(key,
+                                                  conflict,
+                                                  conflictParent,
+                                                  conflictArchetype,
+                                                  entity,
+                                                  pgParent,
+                                                  pgArchetype);
+                        conflicts.add(nc);
+
+                        // Log.
                         logger.warn(I18n.msg("error.name.conflict",
                                              conflictBase.getName() + " [" + conflictArchetype.getName()
                                                      .toLowerCase(Locale.ROOT) + ", " + conflictParent + "]",
@@ -357,4 +393,29 @@ public class Index {
             }
         }
     }
+
+    /**
+     * Gets the name conflicts list for this session.
+     *
+     * @return The name conflicts.
+     */
+    public Array<NameConflict> getConflicts() {
+        return conflicts;
+    }
+
+    /**
+     * Represents a name conflict.
+     */
+    public record NameConflict(String name,
+                               Entity e1,
+                               String e1Parent,
+                               Archetype e1Archetype,
+                               Entity e2,
+                               String e2Parent,
+                               Archetype e2Archetype
+    ) {
+
+    }
+
+
 }

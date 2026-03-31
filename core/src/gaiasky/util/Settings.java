@@ -107,7 +107,7 @@ public class Settings extends SettingsObject {
     // Static settings
     public static String APPLICATION_NAME = "Gaia Sky";
     public static String APPLICATION_NAME_TITLE = "G a i a  S k y";
-    // The settings instance
+    /** The settings instance. **/
     public static Settings settings;
 
     static {
@@ -2435,7 +2435,10 @@ public class Settings extends SettingsObject {
         public ModeCubemapSettings modeCubemap;
         public NetSettings net;
         public UiSettings ui;
-        public boolean exitConfirmation;
+        /** Ask confirmation on exit. **/
+        public boolean exitConfirmation = true;
+        /** Show name conflicts at startup, if any. **/
+        public boolean showNameConflicts = true;
         public String locale;
         public UpdateSettings update;
         public UrlSettings url;
@@ -2579,6 +2582,7 @@ public class Settings extends SettingsObject {
                     case PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD -> {
                         saveProceduralTextures = (Boolean) data[0];
                     }
+                    case NAME_CONFLICTS_STARTUP_CMD -> showNameConflicts = (Boolean) data[0];
                     default -> {
                     }
                 }
@@ -2635,6 +2639,7 @@ public class Settings extends SettingsObject {
                                             Event.UI_SCALE_FACTOR_CMD,
                                             Event.UV_GRID_FRAME_COORDINATES_CMD,
                                             Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD,
+                                            Event.NAME_CONFLICTS_STARTUP_CMD,
                                             Event.SHOW_NOTIFICATIONS_CMD);
 
             minimap.setupListeners();
@@ -2671,6 +2676,7 @@ public class Settings extends SettingsObject {
             EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, modeCubemap.planetarium.angle);
             EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointer.guides.active, pointer.guides.color,
                                  pointer.guides.width);
+            EventManager.publish(Event.NAME_CONFLICTS_STARTUP_CMD, this, showNameConflicts);
 
             // Those need to run in the main thread, as they may need the OpenGL context.
             GaiaSky.postRunnable(() -> {

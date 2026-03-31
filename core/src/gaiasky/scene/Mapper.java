@@ -8,6 +8,7 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.*;
 
@@ -86,5 +87,16 @@ public class Mapper {
     public static final ComponentMapper<TagNoClosest> tagNoClosest = ComponentMapper.getFor(TagNoClosest.class);
     public static final ComponentMapper<TagVRUI> tagVRUI = ComponentMapper.getFor(TagVRUI.class);
     public static final ComponentMapper<TagOctreeObject> tagOctreeObject = ComponentMapper.getFor(TagOctreeObject.class);
+
+    /**
+     * Checks if the given {@link Entity} e is a set.
+     *
+     * @param e The entity.
+     *
+     * @return True if it is a particle, star, or elements set.
+     */
+    public static boolean isSet(Entity e) {
+        return particleSet.has(e) || starSet.has(e) || orbitElementsSet.has(e);
+    }
 
 }
