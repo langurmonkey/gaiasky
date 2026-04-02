@@ -9,6 +9,7 @@ package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import gaiasky.GaiaSky;
 import gaiasky.render.util.ShaderLoader;
 
 /**
@@ -139,6 +140,7 @@ public final class GlowFilter extends Filter<GlowFilter> {
         if (occlusionTexture != null)
             occlusionTexture.bind(u_texture2);
         inputTexture.bind(u_texture0);
+        setParam(FilmGrainFilter.Param.Time, (float) GaiaSky.instance.getRunTimeSeconds());
     }
 
     public enum Param implements Parameter {
@@ -155,6 +157,7 @@ public final class GlowFilter extends Filter<GlowFilter> {
         Orientation("u_orientation", 0),
         SpiralScale("u_spiralScale", 0),
         BackbufferScale("u_backbufferScale", 0),
+        Time("u_time", 0),
         TextureScale("u_textureScale", 0);
         // @formatter:on
 

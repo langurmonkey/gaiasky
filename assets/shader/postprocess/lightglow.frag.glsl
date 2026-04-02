@@ -5,9 +5,10 @@
 
 // Current frame.
 uniform sampler2D u_texture0;
-// Star texture.
+// Glow texture.
 uniform sampler2D u_texture1;
 
+uniform float u_time;
 uniform vec2 u_viewport;
 uniform float u_textureScale;
 uniform vec2 u_lightPositions[MAX_LIGHTS];
@@ -42,6 +43,31 @@ vec4 starImage(vec2 tc) {
     return texture(u_texture1, tc);
 }
 
+float polarMask(vec2 uv, float time) {
+    // center coordinates [-1,1]
+    vec2 p = uv * 2.0 - 1.0;
+    float r = length(p);        // distance from center
+    vec2 d = normalize(p);      // direction for angular mask
+
+    // angular modulation
+    float angularMask = 0.5
+    + 0.25 * sin(d.x * 12.0 + time * 2.0)
+    + 0.20 * cos(d.y * 37.0 - time * 1.3)
+    + 0.10 * sin((d.x + d.y) * 59.0 + time * 1.6);
+
+    // In [0,1]
+    angularMask = (angularMask + 1.0) * 0.5;
+    // In [minVal,1]
+    float minVal = 0.55;
+    angularMask = minVal + (1.0 - minVal) * angularMask;
+
+    // Keep the center
+    float center = smoothstep(0.85, 1.0, 1.0 - r);
+
+    // Combine radial decay with angular modulation
+    return clamp(angularMask + center, minVal, 1.0);
+}
+
 
 void main() {
     float ar = u_viewport.x / u_viewport.y;
@@ -61,9 +87,12 @@ void main() {
         glow_tc /= size;
         glow_tc += 0.5;
 
-        float color_glow = brightness(starImage(glow_tc));
-        float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
-        effectColor += vec3(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc);
+        float mask = polarMask(glow_tc, u_time);
+        vec4 glow = starImage(glow_tc);
+        glow.rgb *= mask;
+        float glow_value = brightness(glow);
+        float core_inc = (0.1 - min(0.1, dist_center)) * glow_value;
+        effectColor += vec3(glow_value * lightColor.r + core_inc, glow_value * lightColor.g + core_inc, glow_value * lightColor.b + core_inc);
     }
     fragColor.rgb = saturate(effectColor + texture(u_texture0, v_texCoords).rgb);
     fragColor.a = 1.0;

@@ -155,14 +155,15 @@ scene:
     # Saturate star colors by this amount.
     saturate: 0.16
     # Control the glow amount when close to stars.
-    # Should be set rather low, i.e., in [0.01, 0.5].
-    glowFactor: 0.035
+    # Should be set rather low, i.e., in [0.01, 0.7].
+    glowFactor: 0.055
     # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png.
     # 1 - horizontal spike.
     # 2 - god rays.
     # 3 - horizontal and vertical spikes.
     # 4 - simple radial profile.
-    textureIndex: 5
+    # 5 - diagonal spikes.
+    textureIndex: 4
     # Same as textureIndex, but used for close-by stars with glow effect.
     textureIndexLens: 3
     # Star opacity mapping, as in [min, max].
