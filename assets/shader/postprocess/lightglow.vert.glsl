@@ -21,8 +21,6 @@
 uniform sampler2D u_texture0;
 // Star texture.
 uniform sampler2D u_texture1;
-// Occlusion pass.
-uniform sampler2D u_texture2;
 
 uniform vec2 u_viewport;
 uniform int u_nLights;
@@ -64,12 +62,12 @@ void main() {
         float lum = 0.0;
         for (int idx = 0; idx < u_nSamples; idx++){
             vec2 curr_coord = clamp(u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
-            float value = luma((texture(u_texture2, curr_coord)).rgb);
+            float value = luma((texture(u_texture0, curr_coord)).rgb);
             lum += step(th, value) * value;
             t += dt;
         }
         // Threshold the incoming texture at 0.9 so that only the brightest pixels pass.
-        float value = luma((texture(u_texture2, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar))).rgb);
+        float value = luma((texture(u_texture0, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar))).rgb);
         lum += step(th, value) * value;
         lum /= u_nSamples;
 

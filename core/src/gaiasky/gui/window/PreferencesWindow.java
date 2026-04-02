@@ -3103,8 +3103,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                                 Constants.MAX_FADE_TIME_MS);
 
         // Dynamic resolution
+        var prevDynRes = settings.graphics.dynamicResolution;
         settings.graphics.dynamicResolution = !settings.runtime.openXr && dynamicResolution.isChecked();
-        if (!settings.graphics.dynamicResolution) {
+        if (prevDynRes != settings.graphics.dynamicResolution) {
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
         }
 

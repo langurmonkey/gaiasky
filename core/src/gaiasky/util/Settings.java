@@ -1639,7 +1639,7 @@ public class Settings extends SettingsObject {
              **/
             public int textureIndex = 4;
             /**
-             * Texture index to use for the light glow effect. Usually includes a lens artifact.
+             * Texture index to use for the light glow effect.
              **/
             public int textureIndexLens = 1;
             public GroupSettings group;
@@ -1723,7 +1723,7 @@ public class Settings extends SettingsObject {
             }
 
             @JsonIgnore
-            public String getStarLensTexture() {
+            public String getStarGlowTexture() {
                 return getStarTexture(textureIndexLens);
             }
 
@@ -1754,7 +1754,10 @@ public class Settings extends SettingsObject {
                             group.numLabels = (int) data[0];
                             group.numVelocityVector = (int) data[0];
                         }
-                        case BILLBOARD_TEXTURE_IDX_CMD -> textureIndex = (int) data[0];
+                        case BILLBOARD_TEXTURE_IDX_CMD -> {
+                            textureIndex = (int) data[0];
+                            textureIndexLens = (int) data[0];
+                        }
                         case STAR_BRIGHTNESS_CMD ->
                                 brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS,
                                                                    Constants.MAX_STAR_BRIGHTNESS);

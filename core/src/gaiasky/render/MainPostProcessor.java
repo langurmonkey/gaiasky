@@ -36,7 +36,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
 import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
-import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
@@ -81,7 +80,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
      * Reference to the scene.
      **/
     private Scene scene;
-    private String starLensTextureName, lensDirtName, lensColorName, lensStarburstName;
+    private String starGlowTextureName, lensDirtName, lensColorName, lensStarburstName;
 
     final Vector3Q v3b1 = new Vector3Q(), v3b2 = new Vector3Q();
     final Vector3 v3f1 = new Vector3();
@@ -113,8 +112,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lensColorName = Settings.settings.data.dataFile(settings.texLensColor);
         lensStarburstName = Settings.settings.data.dataFile(settings.texLensStarburst);
 
-        starLensTextureName = Settings.settings.scene.star.getStarLensTexture();
-        manager.load(starLensTextureName, Texture.class);
+        starGlowTextureName = Settings.settings.scene.star.getStarGlowTexture();
+        manager.load(starGlowTextureName, Texture.class);
         manager.load(lensDirtName, Texture.class);
         manager.load(lensColorName, Texture.class);
         manager.load(lensStarburstName, Texture.class);
@@ -201,15 +200,15 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // BLEND FULL- and HALF-RES TARGETS in the main pipeline
-        BlendFullHalfRes blendFullHalfRes = new BlendFullHalfRes();
+        var blendFullHalfRes = new BlendFullHalfRes();
         ppb.add(blendFullHalfRes);
 
         // LIGHT GLOW
-        LightGlowSettings glowSettings = Settings.settings.postprocess.lightGlow;
-        Texture glow = manager.get(starLensTextureName);
-        glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        LightGlow lightGlow = new LightGlow((int) width, (int) height);
-        lightGlow.setLightGlowTexture(glow);
+        var glowSettings = Settings.settings.postprocess.lightGlow;
+        var glowTexture = manager.get(starGlowTextureName, Texture.class);
+        glowTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        var lightGlow = new LightGlow((int) width, (int) height);
+        lightGlow.setLightGlowTexture(glowTexture);
         lightGlow.setTextureScale(getGlowTextureScale(ss.brightness,
                                                       ss.glowFactor,
                                                       ss.pointSize,
@@ -228,13 +227,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         });
 
         // SSR
-        SSR ssrEffect = new SSR();
+        var ssrEffect = new SSR();
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
         ssrEffect.setEnabled(settings.postprocess.ssr.active && !vr && !safeMode);
         ppb.add(ssrEffect);
 
         // CAMERA MOTION BLUR
-        CameraMotionBlur cameraMotionBlur = new CameraMotionBlur(width, height);
+        var cameraMotionBlur = new CameraMotionBlur(width, height);
         cameraMotionBlur.setBlurScale(Settings.settings.postprocess.motionBlur.strength);
         cameraMotionBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
         cameraMotionBlur.setEnabledOptions(false, false);
@@ -260,18 +259,18 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
 
         // LENS FLARE
-        LensFlareSettings lensFlareSettings = settings.postprocess.lensFlare;
+        var lensFlareSettings = settings.postprocess.lensFlare;
         if (lensFlareSettings.type.isPseudoLensFlare()) {
             // PSEUDO LENS FLARE
             // Get resources.
-            Texture lensColor = manager.get(lensColorName);
+            var lensColor = manager.get(lensColorName, Texture.class);
             lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-            Texture lensDirt = manager.get(lensDirtName);
+            var lensDirt = manager.get(lensDirtName, Texture.class);
             lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-            Texture lensStarBurst = manager.get(lensStarburstName);
+            var lensStarBurst = manager.get(lensStarburstName, Texture.class);
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
-            PseudoLensFlare pseudoLensFlare = new PseudoLensFlare((int) (width * lensFlareSettings.fboScale),
+            var pseudoLensFlare = new PseudoLensFlare((int) (width * lensFlareSettings.fboScale),
                                                                   (int) (height * lensFlareSettings.fboScale));
             pseudoLensFlare.setGhosts(lensFlareSettings.numGhosts);
             pseudoLensFlare.setHaloWidth(lensFlareSettings.haloWidth);
@@ -288,9 +287,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         } else {
             // TRUE LENS FLARE
             // Get resources.
-            Texture lensDirt = manager.get(lensDirtName);
+            var lensDirt = manager.get(lensDirtName, Texture.class);
             lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-            Texture lensStarBurst = manager.get(lensStarburstName);
+            var lensStarBurst = manager.get(lensStarburstName, Texture.class);
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
             LensFlare lensFlare = new LensFlare((int) (width * lensFlareSettings.fboScale),
@@ -307,12 +306,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
 
         // BLEND - color + layers (labels, lines, grids)
-        Blend3 blend = new Blend3();
+        var blend = new Blend3();
         blend.setEnabled(true);
         ppb.add(blend);
 
         // UNSHARP MASK
-        UnsharpMask unsharp = new UnsharpMask();
+        var unsharp = new UnsharpMask();
         unsharp.setSharpenFactor(settings.postprocess.unsharpMask.factor);
         unsharp.setEnabled(settings.postprocess.unsharpMask.factor > 0);
         ppb.add(unsharp);
@@ -321,7 +320,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         initAntiAliasing(settings.postprocess.antialiasing.type, width, height, ppb);
 
         // BLOOM
-        Bloom bloom = new Bloom((int) (width * settings.postprocess.bloom.fboScale), (int) (height * settings.postprocess.bloom.fboScale));
+        var bloom = new Bloom((int) (width * settings.postprocess.bloom.fboScale), (int) (height * settings.postprocess.bloom.fboScale));
         bloom.setBloomIntesnity(settings.postprocess.bloom.intensity);
         bloom.setBlurPasses(10);
         bloom.setBlurAmount(0);
@@ -331,7 +330,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.add(bloom);
 
         // DISTORTION (STEREOSCOPIC MODE)
-        Curvature curvature = new Curvature();
+        var curvature = new Curvature();
         curvature.setDistortion(1.2f);
         curvature.setZoom(0.75f);
         curvature.setEnabled(settings.program.modeStereo.active && settings.program.modeStereo.profile == StereoProfile.VR_HEADSET);
@@ -339,7 +338,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.add(curvature);
 
         // RE-PROJECTION
-        Reprojection reprojection = new Reprojection(width, height);
+        var reprojection = new Reprojection(width, height);
         reprojection.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
         reprojection.setMode(settings.postprocess.reprojection.mode.mode);
         reprojection.setEnabled(settings.postprocess.reprojection.active);
@@ -347,14 +346,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.add(reprojection);
 
         // FILM GRAIN
-        FilmGrain grain = new FilmGrain(settings.postprocess.filmGrain.intensity);
+        var grain = new FilmGrain(settings.postprocess.filmGrain.intensity);
         grain.setEnabledOptions(false, false);
         grain.setEnabled(settings.postprocess.filmGrain.intensity != 0f);
         ppb.add(grain);
 
         // CHROMATIC ABERRATION
         float amount = Settings.settings.postprocess.chromaticAberration.amount * GaiaSky.instance.cameraManager.getFovFactor();
-        ChromaticAberration aberration = new ChromaticAberration(amount);
+        var aberration = new ChromaticAberration(amount);
         aberration.setEnabledOptions(false, false);
         aberration.setEnabled(amount > 0);
         ppb.add(aberration);
@@ -631,8 +630,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 var angles = (float[]) data[2];
                 var colors = (float[]) data[3];
                 var alphas = new float[nLights];
-                // Use source texture as occlusion texture, it is enough for us.
-                var occlusionTexture = this.pps[0].pp.getCombinedBuffer().getSouceTexture();
                 var lensFlareSettings = Settings.settings.postprocess.lensFlare;
                 var nLightsFlare = 0;
                 int i = 0;
@@ -659,9 +656,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             lightGlow.setLightPositions(nLights, lightPos);
                             lightGlow.setLightSolidAngles(angles);
                             lightGlow.setLightColors(colors);
-                            if (occlusionTexture != null) {
-                                lightGlow.setOcclusionTexture(occlusionTexture);
-                            }
                         }
                         if (!lensFlareSettings.type.isPseudoLensFlare()) {
                             LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
@@ -1166,12 +1160,16 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> {
-                var starTex = new Texture(Settings.settings.data.dataFileHandle(Settings.settings.scene.star.getStarTexture()), true);
+                starGlowTextureName = Settings.settings.scene.star.getStarGlowTexture();
+                var starTex = new Texture(Settings.settings.data.dataFileHandle(starGlowTextureName), true);
                 starTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ((LightGlow) ppb.get(LightGlow.class)).setLightGlowTexture(starTex);
+                        var glow = ppb.get(LightGlow.class);
+                        if (glow instanceof LightGlow gl) {
+                            gl.setLightGlowTexture(starTex);
+                        }
                     }
                 }
             });
