@@ -589,6 +589,10 @@ public enum Event {
      */
     NAME_CONFLICTS_STARTUP_CMD,
     /**
+     * Command to change the {@link DataSettings#pullCloudData} setting. Contains a boolean with the value.
+     */
+    PULL_CLOUD_DATA_CMD,
+    /**
      * Runs the 'Go home' action.
      */
     HOME_CMD,

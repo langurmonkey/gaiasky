@@ -871,13 +871,15 @@ public class Settings extends SettingsObject {
      * Holds configuration options related to the data files.
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DataSettings extends SettingsObject {
+    public static class DataSettings extends SettingsObject implements IObserver {
         /** Location of the data directory. **/
         public String location;
         /** A list of all the enabled data files. These will be loaded at startup. **/
         public List<String> dataFiles;
         /** Location of the default reflection skybox (cubemap). **/
         public String reflectionSkyboxLocation;
+        /** Pull current cloud data for supported objects. **/
+        public boolean pullCloudData = false;
         /** Whether to use high accuracy mode in the calculations. Results in more precise locations for some objects. **/
         public boolean highAccuracy;
         /** Whether to use the real attitude of Gaia, or the analytical one (NSL). **/
@@ -1019,14 +1021,24 @@ public class Settings extends SettingsObject {
 
         @Override
         protected void setupListeners() {
+            EventManager.instance.subscribe(this, Event.PULL_CLOUD_DATA_CMD);
         }
 
         @Override
         public void dispose() {
+            EventManager.instance.removeAllSubscriptions(this);
         }
 
         @Override
         public void apply() {
+            EventManager.publish(Event.PULL_CLOUD_DATA_CMD, this, pullCloudData);
+        }
+
+        @Override
+        public void notify(Event event, Object source, Object... data) {
+            if (event == Event.PULL_CLOUD_DATA_CMD && source != this) {
+                pullCloudData = (Boolean) data[0];
+            }
         }
     }
 

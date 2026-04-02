@@ -89,6 +89,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox invertY;
     private OwnCheckBox highAccuracyPositions;
     private OwnCheckBox showNameConflicts;
+    private OwnCheckBox pullCloudData;
     private OwnCheckBox shadowsCb;
     private OwnCheckBox displayNotifications;
     private OwnCheckBox displayTimeNoUi;
@@ -2537,12 +2538,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         var highAccTooltip = new OwnImageButton(skin, "tooltip");
         highAccTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.data.highaccuracy"), skin));
 
+        // Pull cloud data
+        var pullCloudDataLabel = new OwnLabel(I18n.msg("gui.data.clouds.pull"), skin);
+        pullCloudData = new OwnCheckBox("", skin);
+        pullCloudData.setChecked(settings.data.pullCloudData);
+
         // Name conflicts
         var nameConflictsLabel = new OwnLabel(I18n.msg("gui.conflicts.confirmation"), skin);
         showNameConflicts = new OwnCheckBox("", skin);
         showNameConflicts.setChecked(settings.program.showNameConflicts);
 
-        labels.add(highAccuracyPositionsLabel, nameConflictsLabel);
+        labels.add(highAccuracyPositionsLabel, pullCloudDataLabel, nameConflictsLabel);
 
         // DATA SOURCE
         final OwnLabel titleData = new OwnLabel(I18n.msg("gui.data.source"), skin, "header");
@@ -2634,6 +2640,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         generalData.add(highAccuracyPositionsLabel).left().padBottom(pad10);
         generalData.add(highAccuracyPositions).left().padRight(pad34).padBottom(pad10);
         generalData.add(highAccTooltip).left().padBottom(pad10).row();
+        generalData.add(pullCloudDataLabel).left().padBottom(pad34);
+        generalData.add(pullCloudData).left().padRight(pad34).padBottom(pad34).row();
         generalData.add(nameConflictsLabel).left().padBottom(pad34);
         generalData.add(showNameConflicts).left().padRight(pad34).padBottom(pad34).row();
 
@@ -3278,6 +3286,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (highAccuracy != settings.data.highAccuracy) {
             // Event
             EventManager.publish(Event.HIGH_ACCURACY_CMD, this, settings.data.highAccuracy);
+        }
+        // Pull current cloud data.
+        boolean pullCloud = pullCloudData.isChecked();
+        if (pullCloud != settings.data.pullCloudData) {
+            EventManager.publish(Event.PULL_CLOUD_DATA_CMD, this, pullCloud);
         }
         // Show name conflicts.
         boolean nameConflicts = showNameConflicts.isChecked();

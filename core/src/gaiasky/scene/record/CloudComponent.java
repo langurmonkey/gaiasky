@@ -108,7 +108,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     private final AtomicBoolean generated = new AtomicBoolean(false);
     private Texture cloudTex;
     private Material material;
-    private boolean texInitialised, texLoading;
+    private boolean texLoading;
 
     public CloudComponent() {
         localTransform = new Matrix4();
@@ -127,7 +127,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     private void initialize(boolean force) {
         if (!Settings.settings.scene.initialization.lazyTexture || force) {
             this.generated.set(false);
-            if (TextUtils.isValidURL(url)) {
+            if (TextUtils.isValidURL(url) && Settings.settings.data.pullCloudData) {
                 try {
                     urlObject = new URI(url).toURL();
                     // Pull from URL, later.
@@ -140,16 +140,15 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                 diffuseSvt = null;
                 return;
             }
-            if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD)) {
+            if (diffuse != null
+                    && !diffuse.endsWith(Constants.GEN_KEYWORD)
+                    && !isLoaded(diffuse)) {
                 // Add textures to load
                 diffuseUnpacked = addToLoad(diffuse);
-                if (diffuseUnpacked != null)
-                    logger.info(I18n.msg("notif.loading", diffuseUnpacked));
+                if (diffuseUnpacked != null) logger.info(I18n.msg("notif.loading", diffuseUnpacked));
             }
-            if (diffuseCubemap != null)
-                diffuseCubemap.initialize(manager);
-            if (diffuseSvt != null)
-                diffuseSvt.initialize("diffuseSvt", this, TextureAttribute.SvtIndirectionDiffuse);
+            if (diffuseCubemap != null) diffuseCubemap.initialize(manager);
+            if (diffuseSvt != null) diffuseSvt.initialize("diffuseSvt", this, TextureAttribute.SvtIndirectionDiffuse);
         }
     }
 
@@ -162,11 +161,16 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
      * quality setting.
      */
     private String addToLoad(String tex) {
-        if (tex == null)
-            return null;
+        if (tex == null) return null;
         tex = GlobalResources.unpackAssetPath(tex);
         AssetBean.addAsset(tex, Texture.class, textureParams);
         return tex;
+    }
+
+    private boolean isLoaded(String tex) {
+        if (tex == null) return true;
+        tex = GlobalResources.unpackAssetPath(tex);
+        return AssetBean.manager().isLoaded(tex);
     }
 
     public void doneLoading(AssetManager manager) {
@@ -190,58 +194,52 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             initMaterial(null);
         }
 
-        // Initialised
-        texInitialised = !Settings.settings.scene.initialization.lazyTexture;
         // Loading
         texLoading = false;
     }
 
     public void touch(Model model) {
-        if (Settings.settings.scene.initialization.lazyTexture && !texInitialised) {
+        if (Settings.settings.scene.initialization.lazyTexture) {
 
             if (!texLoading) {
                 initialize(true);
                 // Set to loading
                 texLoading = true;
-            } else if (urlValid && !downloadTriggered) {
-                // Send request.
-                var fileName = FilenameUtils.getName(urlObject.getPath());
-                fileName = TextUtils.sanitizeFilename(name + "-" + fileName);
-                final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
-                var ignored = cacheDir.toFile().mkdirs();
-                final var filePath = cacheDir.resolve(fileName);
-                var f = new FileHandle(filePath.toFile());
+            } else if (Settings.settings.data.pullCloudData && urlValid) {
+                if (!downloadTriggered) {
+                    // Send request.
+                    var fileName = FilenameUtils.getName(urlObject.getPath());
+                    fileName = TextUtils.sanitizeFilename(name + "-" + fileName);
+                    final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
+                    var ignored = cacheDir.toFile().mkdirs();
+                    final var filePath = cacheDir.resolve(fileName);
+                    var f = new FileHandle(filePath.toFile());
 
-                DownloadHelper.downloadFile(url,
-                                            f,
-                                            Settings.settings.program.offlineMode,
-                                            null,
-                                            null,
-                                            (digest) -> {
-                                                // Download successful.
-                                                diffuse = f.path();
-                                                diffuseUnpacked = f.path();
-                                                urlUnpacked = f.path();
-                                                addToLoad(diffuse);
-                                                downloadFinished = true;
-                                            },
-                                            () -> {
-                                                // Fail, revert to local file.
-                                                downloadFinished = true;
-                                            },
-                                            null);
-                downloadTriggered = true;
+                    DownloadHelper.downloadFile(url, f, Settings.settings.program.offlineMode, null, null, (digest) -> {
+                        // Download successful.
+                        diffuse = f.path();
+                        diffuseUnpacked = f.path();
+                        urlUnpacked = f.path();
+                        addToLoad(diffuse);
+                        downloadFinished = true;
+                    }, () -> {
+                        // Fail, revert to local file.
+                        downloadFinished = true;
+                    }, null);
+                    downloadTriggered = true;
 
-            } else //noinspection StatementWithEmptyBody
-                if (urlValid && !downloadFinished) {
-                // Wait, do nothing now.
+                } else if (downloadFinished && isFinishedLoading(manager)) {
+                    // Update material.
+                    GaiaSky.postRunnable(() -> this.initMaterial(model));
+                }
             } else if (isFinishedLoading(manager)) {
+                // Update material.
                 GaiaSky.postRunnable(() -> this.initMaterial(model));
 
-                // Set to initialised
-                texInitialised = true;
+                // Not loading anymore
                 texLoading = false;
             }
+
         }
 
     }
@@ -277,8 +275,9 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
                 // Add occlusion clouds attributes if we pulled the texture from URL.
                 if (urlValid && downloadFinished) {
-                    if (model != null && model.model != null && model.model.mtc != null &&
-                            GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+                    // If we just downloaded current cloud data, remove diffuse cubemap if it is there.
+                    material.remove(CubemapAttribute.DiffuseCubemap);
+                    if (model != null && model.model != null && model.model.mtc != null && GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
                         var mat = model.model.mtc.getMaterial();
                         mat.remove(OcclusionCloudsAttribute.Type);
                         mat.remove(TextureAttribute.AO);
@@ -356,15 +355,13 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                 FrameBuffer cloudFb = nc.generateNoise(N, M, 1, 1, color);
                 // Write to disk if necessary.
                 if (Settings.settings.program.saveProceduralTextures) {
-                    SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud",
-                                                     Settings.ImageFormat.JPG);
+                    SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud", Settings.ImageFormat.JPG);
                 }
                 if (cloudFb != null) {
                     cloudTex = cloudFb.getColorBufferTexture();
                     material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
                     // Add to material of main body as ambient occlusion.
-                    if (model != null && model.model != null && model.model.mtc != null &&
-                            GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+                    if (model != null && model.model != null && model.model.mtc != null && GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
                         // Add occlusion clouds attributes.
                         model.model.mtc.getMaterial().remove(OcclusionCloudsAttribute.Type);
                         model.model.mtc.getMaterial().remove(TextureAttribute.AO);
@@ -414,7 +411,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         disposeTexture(manager, material, diffuse, diffuseUnpacked, TextureAttribute.Diffuse, cloudTex);
         disposeCubemap(manager, material, CubemapAttribute.DiffuseCubemap, diffuseCubemap);
         texLoading = false;
-        texInitialised = false;
     }
 
     public void disposeNoiseBuffers() {
@@ -548,10 +544,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         if (other.color != null) {
             this.color = Arrays.copyOf(other.color, other.color.length);
         }
-        if (other.nc != null)
-            this.nc.copyFrom(other.nc);
-        else
-            this.nc.randomizeAll(new Random());
+        if (other.nc != null) this.nc.copyFrom(other.nc);
+        else this.nc.randomizeAll(new Random());
     }
 
     public void print(Log log) {
