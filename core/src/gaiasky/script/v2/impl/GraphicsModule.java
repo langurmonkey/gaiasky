@@ -325,8 +325,14 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public void set_star_texture_index(int index) {
-        if (api.validator.checkNum(index, 1, 4, "index")) {
+        if (api.validator.checkNum(index, 1, 6, "index")) {
             EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, index);
+        }
+    }
+    @Override
+    public void set_glow_texture_index(int index) {
+        if (api.validator.checkNum(index, 1, 6, "index")) {
+            EventManager.publish(Event.GLOW_TEXTURE_IDX_CMD, this, index);
         }
     }
 

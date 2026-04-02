@@ -1365,6 +1365,11 @@ public enum Event {
     BILLBOARD_TEXTURE_IDX_CMD,
 
     /**
+     * Sets the star glow effect texture index. See {@link gaiasky.render.postprocess.effects.LightGlow}.
+     */
+    GLOW_TEXTURE_IDX_CMD,
+
+    /**
      * Stereoscopic vision, side by side rendering. Contains the state boolean.
      **/
     STEREOSCOPIC_CMD,

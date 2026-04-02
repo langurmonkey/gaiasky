@@ -112,7 +112,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lensColorName = Settings.settings.data.dataFile(settings.texLensColor);
         lensStarburstName = Settings.settings.data.dataFile(settings.texLensStarburst);
 
-        starGlowTextureName = Settings.settings.scene.star.getStarGlowTexture();
+        starGlowTextureName = Settings.settings.scene.star.getGlowTexture();
         manager.load(starGlowTextureName, Texture.class);
         manager.load(lensDirtName, Texture.class);
         manager.load(lensColorName, Texture.class);
@@ -149,7 +149,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                         Event.STAR_POINT_SIZE_CMD,
                                         Event.CAMERA_MOTION_UPDATE,
                                         Event.CAMERA_ORIENTATION_UPDATE,
-                                        Event.BILLBOARD_TEXTURE_IDX_CMD,
+                                        Event.GLOW_TEXTURE_IDX_CMD,
                                         Event.SCENE_LOADED,
                                         Event.INDEXOFREFRACTION_CMD,
                                         Event.BACKBUFFER_SCALE_CMD,
@@ -1159,8 +1159,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> {
-                starGlowTextureName = Settings.settings.scene.star.getStarGlowTexture();
+            case GLOW_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> {
+                starGlowTextureName = Settings.settings.scene.star.getGlowTexture();
                 var starTex = new Texture(Settings.settings.data.dataFileHandle(starGlowTextureName), true);
                 starTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
                 for (int i = 0; i < RenderType.values().length; i++) {

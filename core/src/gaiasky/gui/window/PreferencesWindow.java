@@ -14,6 +14,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -111,7 +113,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, lineRenderer, numThreads, screenshotMode, screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect, textureIndex;
+    private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, lineRenderer, numThreads, screenshotMode,
+            screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect,
+            starTexIndex, glowTexIndex;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin, recGridStyle;
@@ -1158,30 +1162,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             OwnLabel titleStars = new OwnLabel(I18n.msg("gui.ui.scene.stars"), skin, "header");
             Table starsTable = new Table();
 
-            // Texture index
-            OwnLabel textureIndexLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.texture"), skin);
-            var indexList = settings.scene.star.getStarTextureIndices();
-            var indices = new Array<ComboBoxBean<Integer>>(indexList.size);
-            ComboBoxBean selected = null;
-            for (int y = 0; y < indexList.size; y++) {
-                var idx = indexList.get(y);
-                var cbb = new ComboBoxBean(Integer.toString(idx), idx);
-                indices.add(cbb);
-                if (idx == settings.scene.star.textureIndex) {
-                    selected = cbb;
-                }
+
+            // Star texture index
+            var starIndexLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.texture"), skin);
+            var p1 = getTextureWidget(settings.scene.star.textureIndex);
+            if (p1 != null) {
+                starTexIndex = p1.getSecond();
             }
-            // Do not show texture index if we did not find any texture (i.e. the base data package is not downloaded yet).
-            if (!indexList.isEmpty()) {
-                textureIndex = new OwnSelectBox<>(skin);
-                textureIndex.setWidth(selectWidth);
-                textureIndex.setItems(indices);
-                if (selected != null)
-                    textureIndex.setSelected(selected);
+
+            // Glow texture index
+            var glowIndexLabel = new OwnLabel(I18n.msg("gui.ui.scene.glow.texture"), skin);
+            var p2 = getTextureWidget(settings.scene.star.textureIndexLens);
+            if (p2 != null) {
+                glowTexIndex = p2.getSecond();
             }
 
             // Render stars as spheres
-            OwnLabel starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.spheres"), skin);
+            var starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.spheres"), skin);
             starSpheres = new OwnCheckBox("", skin);
             starSpheres.setChecked(settings.scene.star.renderStarSpheres);
 
@@ -1203,16 +1200,21 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             starDistanceScaling.setChecked(settings.scene.camera.starDistanceScaling);
 
             // Add labels
-            labels.add(textureIndexLabel, starSpheresLabel, starDistanceScalingLabel, glowOverObjectsLabel);
+            labels.add(starIndexLabel, glowIndexLabel);
+            labels.add(starSpheresLabel, starDistanceScalingLabel, glowOverObjectsLabel);
 
             // Add to table
             starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(glowOverObjects).left().padRight(pad18).padBottom(pad10).row();
             starsTable.add(motionTrailsLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(motionTrails).left().padRight(pad18).padBottom(pad10).row();
-            if (textureIndex != null) {
-                starsTable.add(textureIndexLabel).left().padRight(pad34).padBottom(pad10);
-                starsTable.add(textureIndex).left().padRight(pad18).padBottom(pad10).row();
+            if (p1 != null) {
+                starsTable.add(starIndexLabel).left().padRight(pad34).padBottom(pad10);
+                starsTable.add(p1.getFirst()).left().padRight(pad18).padBottom(pad10).row();
+            }
+            if (p2 != null) {
+                starsTable.add(glowIndexLabel).left().padRight(pad34).padBottom(pad10);
+                starsTable.add(p2.getFirst()).left().padRight(pad18).padBottom(pad10).row();
             }
             starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
@@ -2770,6 +2772,65 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         setUpTabListeners();
     }
 
+    Array<Texture> starTextures;
+
+    private void initStarTextures(IntArray indices) {
+        if (starTextures == null) {
+            starTextures = new Array<>(indices.size);
+            var ss = Settings.settings.scene.star;
+
+            for (int i = 0; i < indices.size; i++) {
+                var path = ss.getStarTexture(indices.get(i));
+                var tex = new Texture(Settings.settings.data.dataFileHandle(path), true);
+                tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+                starTextures.add(tex);
+            }
+        }
+    }
+
+    private Pair<WidgetGroup, OwnSelectBox> getTextureWidget(int selectedIndex) {
+        var indexList = Settings.settings.scene.star.getStarTextureIndices();
+        initStarTextures(indexList);
+
+        Array<ComboBoxBean<Integer>> indices = new Array<>(indexList.size);
+
+        ComboBoxBean<Integer> selectedStar = null;
+        for (int i = 0; i < indexList.size; i++) {
+            var idx = indexList.get(i);
+            var cbb = new ComboBoxBean(Integer.toString(idx), idx);
+            indices.add(cbb);
+            if (idx == selectedIndex) {
+                selectedStar = cbb;
+            }
+        }
+        // Do not show texture index if we did not find any texture (i.e. the base data package is not downloaded yet).
+        if (!indexList.isEmpty()) {
+            OwnSelectBox<ComboBoxBean<Integer>> selectBox = new OwnSelectBox<>(skin);
+            selectBox.setWidth(300f);
+            selectBox.setItems(indices);
+
+            OwnImage texImg = new OwnImage(starTextures.get(selectedIndex - 1), false);
+            texImg.setSize(160f, 160f);
+
+            selectBox.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    var idx = selectBox.getSelected().value;
+                    texImg.setTexture(starTextures.get(idx - 1));
+                }
+                return false;
+            });
+
+            if (selectedStar != null)
+                selectBox.setSelected(selectedStar);
+
+            Table t = new Table(skin);
+            t.add(selectBox).padRight(pad18);
+            t.add(texImg);
+            return new Pair<>(t, selectBox);
+        }
+        return null;
+    }
+
     private void populateWidthHeight(boolean force) {
         populateWidthHeight(force, widthField, heightField, Gdx.graphics);
     }
@@ -3093,8 +3154,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.scene.camera.starDistanceScaling = starDistanceScaling.isChecked();
 
         // Star texture index
-        if (textureIndex != null && settings.scene.star.textureIndex != textureIndex.getSelected().value) {
-            EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, textureIndex.getSelected().value);
+        if (starTexIndex != null && settings.scene.star.textureIndex != starTexIndex.getSelected().value) {
+            EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, starTexIndex.getSelected().value);
+        }
+        // Glow texture index
+        if (glowTexIndex != null && settings.scene.star.textureIndexLens != glowTexIndex.getSelected().value) {
+            EventManager.publish(Event.GLOW_TEXTURE_IDX_CMD, this, glowTexIndex.getSelected().value);
         }
 
         // Fade time

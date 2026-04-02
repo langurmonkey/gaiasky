@@ -12,11 +12,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
  * An image that keeps track of the given width and height.
@@ -146,5 +148,9 @@ public class OwnImage extends Image {
 
     public void setTooltip(String tooltip, Skin skin) {
         addListener(new OwnTextTooltip(tooltip, skin));
+    }
+
+    public void setTexture(Texture tex) {
+        setDrawable(new TextureRegionDrawable(new TextureRegion(tex)));
     }
 }

@@ -341,7 +341,7 @@ public interface GraphicsAPI {
     void set_star_base_opacity(float opacity);
 
     /**
-     * Set the star texture index, in [1, 5].
+     * Set the texture index for star groups, in [1, 6].
      * <p>
      * <ol>
      *     <li>horizontal spike</li>
@@ -349,11 +349,28 @@ public interface GraphicsAPI {
      *     <li>horizontal and vertical spikes</li>
      *     <li>simple radial profile</li>
      *     <li>diagonal spikes</li>
+     *     <li>detailed glow</li>
      * </ol>
      *
      * @param index The new star texture index.
      */
     void set_star_texture_index(int index);
+
+    /**
+     * Set the texture index for the light glow effect, in [1, 6].
+     * <p>
+     * <ol>
+     *     <li>horizontal spike</li>
+     *     <li>god rays</li>
+     *     <li>horizontal and vertical spikes</li>
+     *     <li>simple radial profile</li>
+     *     <li>diagonal spikes</li>
+     *     <li>detailed glow</li>
+     * </ol>
+     *
+     * @param index The new glow effect texture index.
+     */
+    void set_glow_texture_index(int index);
 
     /**
      * Set the number of nearest stars to be processed for each

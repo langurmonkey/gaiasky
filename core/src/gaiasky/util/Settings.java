@@ -1723,7 +1723,7 @@ public class Settings extends SettingsObject {
             }
 
             @JsonIgnore
-            public String getStarGlowTexture() {
+            public String getGlowTexture() {
                 return getStarTexture(textureIndexLens);
             }
 
@@ -1754,13 +1754,12 @@ public class Settings extends SettingsObject {
                             group.numLabels = (int) data[0];
                             group.numVelocityVector = (int) data[0];
                         }
-                        case BILLBOARD_TEXTURE_IDX_CMD -> {
-                            textureIndex = (int) data[0];
-                            textureIndexLens = (int) data[0];
-                        }
-                        case STAR_BRIGHTNESS_CMD ->
-                                brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS,
-                                                                   Constants.MAX_STAR_BRIGHTNESS);
+                        case BILLBOARD_TEXTURE_IDX_CMD -> textureIndex = (int) data[0];
+
+                        case GLOW_TEXTURE_IDX_CMD -> textureIndexLens = (int) data[0];
+
+                        case STAR_BRIGHTNESS_CMD -> brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS,
+                                                                                       Constants.MAX_STAR_BRIGHTNESS);
                         case STAR_BRIGHTNESS_POW_CMD -> power = (float) data[0];
                         case STAR_GLOW_FACTOR_CMD -> glowFactor = (float) data[0];
                     }
@@ -1795,7 +1794,8 @@ public class Settings extends SettingsObject {
                                                 Event.STAR_BASE_LEVEL_CMD,
                                                 Event.STAR_GROUP_BILLBOARD_CMD,
                                                 Event.STAR_GROUP_NEAREST_CMD,
-                                                Event.BILLBOARD_TEXTURE_IDX_CMD);
+                                                Event.BILLBOARD_TEXTURE_IDX_CMD,
+                                                Event.GLOW_TEXTURE_IDX_CMD);
 
                 group.setupListeners();
                 threshold.setupListeners();
@@ -1814,6 +1814,7 @@ public class Settings extends SettingsObject {
                 EventManager.publish(Event.STAR_BASE_LEVEL_CMD, this, opacity[0]);
                 EventManager.publish(Event.STAR_GROUP_BILLBOARD_CMD, this, group.billboard);
                 EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, textureIndex);
+                EventManager.publish(Event.GLOW_TEXTURE_IDX_CMD, this, textureIndexLens);
                 EventManager.publish(Event.STAR_BRIGHTNESS_CMD, this, brightness);
                 EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, this, power);
                 EventManager.publish(Event.STAR_GLOW_FACTOR_CMD, this, (float) glowFactor);
@@ -4005,8 +4006,7 @@ public class Settings extends SettingsObject {
                     }
                     case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS,
                                                                                Constants.MAX_BRIGHTNESS);
-                    case CONTRAST_CMD ->
-                            levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
+                    case CONTRAST_CMD -> levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
                     case HUE_CMD -> levels.hue = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
                     case SATURATION_CMD -> levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION,
                                                                                Constants.MAX_SATURATION);
