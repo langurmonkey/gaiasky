@@ -240,9 +240,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table tabsTable = new Table(skin);
         tabsTable.align(Align.left | Align.top);
 
-        final OwnTextIconButton tabGraphics = createTab(I18n.msg("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin);
+        final OwnTextIconButton tabGraphics = createTab(I18n.msg("gui.graphics"), new Image(skin.getDrawable("iconic-bolt")), skin);
         final OwnTextIconButton tabScene = createTab(I18n.msg("gui.ui.scene.settings"), new Image(skin.getDrawable("iconic-compass")), skin);
-        final OwnTextIconButton tabUI = createTab(I18n.msg("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin);
+        final OwnTextIconButton tabUI = createTab(I18n.msg("gui.ui.interface"), new Image(skin.getDrawable("iconic-browser")), skin);
         final OwnTextIconButton tabPerformance = createTab(I18n.msg("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin);
         final OwnTextIconButton tabControls = createTab(I18n.msg("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin);
         final OwnTextIconButton tabScreenshots = createTab(I18n.msg("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin);
@@ -1349,7 +1349,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentUI.setFadeScrollBars(false);
         contentUITable.align(Align.top | Align.left);
 
-        OwnLabel titleUI = new OwnLabel(I18n.msg("gui.ui.interfacesettings"), skin, "header");
+        OwnLabel titleUI = new OwnLabel(I18n.msg("gui.ui.interface.settings"), skin, "header");
 
         Table ui = new Table();
 
