@@ -45,6 +45,8 @@ public final class VirtualTextureComponent extends NamedComponent {
     public int tileSize;
 
     public SVTQuadtree<Path> tree;
+    /** Has this been loaded (initialized) already? **/
+    private boolean loaded = false;
 
     private IMaterialProvider materialProvider;
 
@@ -55,10 +57,13 @@ public final class VirtualTextureComponent extends NamedComponent {
     }
 
     public void initialize(String name, IMaterialProvider materialProvider, int indirectionAttributeId) {
-        super.initialize(name);
-        this.materialProvider = materialProvider;
-        this.indirectionAttributeId = indirectionAttributeId;
-        buildTree();
+        if (!loaded) {
+            super.initialize(name);
+            this.materialProvider = materialProvider;
+            this.indirectionAttributeId = indirectionAttributeId;
+            buildTree();
+            loaded = true;
+        }
     }
 
     public void doneLoading(AssetManager manager) {

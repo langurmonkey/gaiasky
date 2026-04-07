@@ -361,7 +361,10 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                     cloudTex = cloudFb.getColorBufferTexture();
                     material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
                     // Add to material of main body as ambient occlusion.
-                    if (model != null && model.model != null && model.model.mtc != null && GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
+                    if (model != null
+                            && model.model != null
+                            && model.model.mtc != null
+                            && GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
                         // Add occlusion clouds attributes.
                         model.model.mtc.getMaterial().remove(OcclusionCloudsAttribute.Type);
                         model.model.mtc.getMaterial().remove(TextureAttribute.AO);
@@ -544,8 +547,10 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         if (other.color != null) {
             this.color = Arrays.copyOf(other.color, other.color.length);
         }
-        if (other.nc != null) this.nc.copyFrom(other.nc);
-        else this.nc.randomizeAll(new Random());
+        if (other.nc != null)
+            this.nc.copyFrom(other.nc);
+        else
+            this.nc.randomizeAll(new Random());
     }
 
     public void print(Log log) {
