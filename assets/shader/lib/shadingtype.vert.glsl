@@ -6,6 +6,7 @@ uniform int u_shadingType = 0;
 uniform vec3 u_lightPos;
 uniform int u_occlusion = 0;
 uniform float u_planetRadius = 0.0;
+uniform float u_ambientLight;
 
 // Outputs
 out vec3 v_lightDir;
@@ -71,7 +72,7 @@ void computeShadingTypeColor(vec3 pos, vec3 datasetPos, inout vec4 col) {
         float inFrontOfPlanet = step(0.0, distAlongRay);
 
         // The particle is LIT if it is outside the cylinder OR in front of the planet
-        float lightIntensity = max(outsideCylinder, inFrontOfPlanet);
+        float lightIntensity = clamp(max(outsideCylinder, inFrontOfPlanet) + u_ambientLight, 0.0, 1.0);
 
         col.rgb *= lightIntensity;
     }

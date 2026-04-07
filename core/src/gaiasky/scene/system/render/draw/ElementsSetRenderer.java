@@ -49,7 +49,6 @@ import java.util.Random;
 public class ElementsSetRenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ElementsSetRenderer.class);
 
-    private final Matrix4 aux, refSysTransformF;
     private final double[] defaultSizeLimits = new double[]{Math.tan(Math.toRadians(0.05)), FastMath.tan(Math.toRadians(9.6))};
     private final Colormap cmap;
     private final Random rand;
@@ -60,9 +59,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         cmap = new Colormap();
-        aux = new Matrix4();
         rand = new Random(123L);
-        refSysTransformF = new Matrix4();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
@@ -316,42 +313,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                         shaderProgram.setUniformi("u_tInSecs", 0);
                     }
 
-                    // Reference system transform
-                    if (graph.children != null && graph.children.size > 0) {
-                        // USING CHILDREN OBJECTS.
-                        Matrix4D refSysTransform = null;
-                        if (Mapper.transform.has(graph.children.get(0))) {
-                            // Use transform matrix of first children.
-                            refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
-                        }
-                        if (refSysTransform != null
-                                && Mapper.trajectory.has(graph.children.get(0))
-                                && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
-                            // Extrasolar elements require phase around Y.
-                            refSysTransform.putIn(aux).inv();
-                            refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
-                        } else if (refSysTransform != null) {
-                            refSysTransform.putIn(refSysTransformF).inv();
-                        }
-                    } else if (set != null && set.pointData != null && !set.pointData.isEmpty() && graph.parent != null) {
-                        // USING DATASET.
-                        var pOri = Mapper.graph.get(graph.parent);
-                        if (pOri != null) {
-                            var refSysTransform = pOri.orientation;
-                            refSysTransform.putIn(refSysTransformF).inv();
-                        } else {
-                            refSysTransformF.idt();
-                        }
-                    } else {
-                        refSysTransformF.idt();
-                    }
-                    shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
-
-                    // Dataset position (in camera refsys).
-                    var dsPos = graph.translation.put(aux3f);
-                    shaderProgram.setUniformf("u_datasetPos", dsPos);
-
-
+                    // Ref-sys transform and dataset position.
+                    setRefSysTransformAndDatasetPosUniforms(shaderProgram, graph, set);
 
                     // Affine transformations.
                     addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));

@@ -8,6 +8,7 @@ uniform float u_zfar;
 uniform float u_k;
 uniform sampler2DArray u_textures;
 uniform float u_ambientLight;
+uniform float u_diffuseScattering = 0.0;
 uniform float u_lightIntensity;
 // 0-off, 1-billboard lighting, 2-spherical lighting
 uniform int u_shadingType = 0;
@@ -115,7 +116,7 @@ float calculateLighting(vec3 normal, bool isBillboard) {
     }
 
     // Combine ambient and diffuse.
-    float lighting = u_ambientLight + u_lightIntensity * diffuse;
+    float lighting = u_ambientLight + u_diffuseScattering + u_lightIntensity * diffuse;
 
     // Clamp to prevent over-brightening.
     return min(lighting, 1.0);

@@ -8,13 +8,15 @@
 
 // UNIFORMS
 uniform mat4 u_projView;
-uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform vec3 u_camVel;
 uniform float u_dt;
 uniform float u_uToMpc;
 uniform float u_alpha;
+// Base dataset position (comes from parent position)
+uniform vec3 u_datasetPos;
 uniform float u_sizeFactor;
+uniform mat4 u_refSysTransform;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
 uniform float u_proximityThreshold;
@@ -70,9 +72,13 @@ out float v_textureIndex;
 void main() {
     vec3 particlePos = a_particlePos.xyz;
     if (u_transformFlag) {
-        vec4 aux = u_transform * vec4(particlePos, 1.0);
+        vec4 aux = u_transform * vec4(particlePos, 1.0) * u_refSysTransform;
+        particlePos.xyz = aux.xyz;
+    } else {
+        vec4 aux = vec4(particlePos, 1.0) * u_refSysTransform;
         particlePos.xyz = aux.xyz;
     }
+
     // Only apply VR scale to far away positions to prevent overflow in VR mode.
     float d = dot(particlePos, particlePos);
     float vrScale;
@@ -82,7 +88,7 @@ void main() {
         vrScale = u_vrScale;
     }
 
-    vec3 pos = (particlePos - u_camPos) / vrScale;
+    vec3 pos = (particlePos + u_datasetPos) / vrScale;
 
     #ifdef extendedParticlesFlag
     // Apply proper motion if it is not zero.

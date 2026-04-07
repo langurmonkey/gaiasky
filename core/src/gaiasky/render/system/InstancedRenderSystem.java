@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
@@ -35,6 +36,7 @@ import gaiasky.util.gdx.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.parse.Parser;
 import org.lwjgl.opengl.GL40;
@@ -52,6 +54,10 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     protected Array<InstancedModel> models = new Array<>(50);
     /** Particle utils instance. **/
     protected final ParticleUtils utils;
+    /** Auxiliary matrix. **/
+    protected final Matrix4 aux;
+    /** Auxiliary reference system transform matrix. **/
+    protected final Matrix4 refSysTransformF;
 
     /**
      * Holds temporary instanced model data.
@@ -118,6 +124,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         super(sceneRenderer, rg, alphas, shaders);
         meshes = new Array<>(20);
         utils = new ParticleUtils();
+        aux = new Matrix4();
+        refSysTransformF = new Matrix4();
     }
 
     @Override
@@ -633,8 +641,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         var light = (Proximity.NearbyRecord) camera.getCloseLightSource(0);
         shaderProgram.setUniformf("u_lightPos", light.pos);
 
-        var finalAmbient = (float) MathUtils.clamp(Settings.settings.scene.renderer.ambient + Math.max(ambient, 0f), 0f, 1f);
-        shaderProgram.setUniformf("u_ambientLight", finalAmbient);
+        shaderProgram.setUniformf("u_ambientLight", (float) Settings.settings.scene.renderer.ambient);
+        shaderProgram.setUniformf("u_diffuseScattering", MathUtils.clamp(ambient, 0, 1));
         shaderProgram.setUniformi("u_shadingType", shadingType);
         shaderProgram.setUniformf("u_lightIntensity", 1f);
         shaderProgram.setUniformf("u_sphericalPower", sphericalPower);
@@ -648,6 +656,43 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             shaderProgram.setUniformi("u_occlusion", 0);
         }
 
+    }
+
+    protected void setRefSysTransformAndDatasetPosUniforms(ExtShaderProgram shaderProgram, GraphNode graph, ParticleSet set) {
+        // Reference system transform
+        if (graph.children != null && graph.children.size > 0) {
+            // USING CHILDREN OBJECTS.
+            Matrix4D refSysTransform = null;
+            if (Mapper.transform.has(graph.children.get(0))) {
+                // Use transform matrix of first children.
+                refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
+            }
+            if (refSysTransform != null
+                    && Mapper.trajectory.has(graph.children.get(0))
+                    && Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
+                // Extrasolar elements require phase around Y.
+                refSysTransform.putIn(aux).inv();
+                refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
+            } else if (refSysTransform != null) {
+                refSysTransform.putIn(refSysTransformF).inv();
+            }
+        } else if (set != null && set.pointData != null && !set.pointData.isEmpty() && graph.parent != null) {
+            // USING DATASET.
+            var pOri = Mapper.graph.get(graph.parent);
+            if (pOri != null && pOri.orientation != null) {
+                var refSysTransform = pOri.orientation;
+                refSysTransform.putIn(refSysTransformF).inv();
+            } else {
+                refSysTransformF.idt();
+            }
+        } else {
+            refSysTransformF.idt();
+        }
+        shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
+
+        // Dataset position (in camera refsys).
+        var dsPos = graph.translation.put(aux3f);
+        shaderProgram.setUniformf("u_datasetPos", dsPos);
     }
 
     /**

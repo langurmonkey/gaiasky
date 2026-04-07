@@ -115,7 +115,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     protected void preRenderObjects(ExtShaderProgram shaderProgram,
                                     ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-        shaderProgram.setUniformf("u_camPos", camera.getPos());
         addMotionTrailsUniforms(shaderProgram, camera);
         addCameraUpCubemapMode(shaderProgram, camera);
         addEffectsUniforms(shaderProgram, camera);
@@ -128,6 +127,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
         final var render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
         var body = Mapper.body.get(render.entity);
+        var graph = Mapper.graph.get(render.entity);
         var set = Mapper.particleSet.get(render.entity);
         var hl = Mapper.highlight.get(render.entity);
         var desc = Mapper.datasetDescription.get(render.entity);
@@ -306,6 +306,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
                 // Affine transformations.
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
+
+                // Ref-sys transform and dataset position.
+                setRefSysTransformAndDatasetPosUniforms(shaderProgram, graph, set);
 
                 // Override streak if needed.
                 if (!set.allowStreaks) {
