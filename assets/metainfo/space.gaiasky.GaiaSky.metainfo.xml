@@ -39,26 +39,25 @@
 
   <releases>
 
-    <release version="3.7.1" date="2026-02-04" urgency="high">
-      <url>https://gaiasky.space/news/2026/gaiasky_3.7.1</url>
+    <release version="3.7.2" date="2026-04-13" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.7.2</url>
       <description>
-        <p>This release introduces significant rendering improvements and engine optimizations:</p>
+        <p>This release contains many new features:</p>
         <ul>
-          <li>Procedural galaxy generation system.</li>
-          <li>Infrastructure for volume rendering.</li>
-          <li>Major rendering overhaul: New PBR pipeline with Cook-Torrance BRDF, true 3D volume rendering, and improved atmospheric scattering.</li>
-          <li>Virtual Reality: Enhanced OpenXR performance, new VR demo mode, and desktop mirroring optimizations.</li>
-          <li>Anaglyph and Stereo: Added new Dubois-style modes and adaptive stereo separation controls.</li>
-          <li>UI/UX: New dynamic accent color system, improved visibility panels, and updated translations for multiple languages.</li>
-          <li>Engine: Performance gains via instanced rendering for orbits and a more robust multi-mirror data download system.</li>
+          <li>New shading types for particle groups: PLAIN, BILLBOARD SHADING, SPHERICAL SHADING.</li>
+          <li>Orbital element groups merged with particle groups.</li>
+          <li>New astroids/SSO FPR dataset with realistic shading and textures.</li>
+          <li>New Saturn rings dataset with 1.5 million rock and dust particles.</li>
+          <li>Customizable anaglyph 3D colors.</li>
+          <li>Initial attempt to handle name conflicts transparently.</li>
+          <li>New translations: Simplified Chinese, Italian, Japanese.</li>
+          <li>Migration to GDX-Freetype library for font rendering.</li>
+          <li>Logarithmic sliders.</li>
+          <li>OptFlowCam improvements all-around.</li>
+          <li>Separate star and light glow textures. Add visual feedback to setting in preferences window.</li>
+          <li>Polar mask to star glow effect.</li>
         </ul>
-        <p>Bug fixes:</p>
-        <ul>
-          <li>Resolved several VR-related crashes on Linux and improved shutdown sequences.</li>
-          <li>Fixed atmospheric diffraction effects and cloud projection during eclipses.</li>
-          <li>Corrected FOV scaling calculations to improve label and visibility accuracy across zoom levels.</li>
-          <li>Fixed various procedural generation glitches and UI layout inconsistencies.</li>
-        </ul>
+        <p>The release also contains many new features. Check out official release notes for more info.</p>
       </description>
       </release>
     </releases>
