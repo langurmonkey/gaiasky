@@ -305,12 +305,14 @@ tasks.register('copyScripts', Copy) {
     description = 'Copy script files to distribution directory.'
     from "$baseDir/assets/scripts"
     into "$distDir/scripts"
+    exclude "**/.venv", "**/__pycache__"
 }
 
 tasks.register('copyOptFlowCam', Copy) {
     description = 'Copy OptFlowCam scripts to distribution directory.'
     from "$baseDir/core/scripts/optflowcam"
     into "$distDir/extra/optflowcam"
+    exclude "**/.venv", "**/__pycache__"
 }
 
 tasks.register('copyExecutables', Copy) {
