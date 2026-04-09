@@ -19,6 +19,7 @@ import gaiasky.util.update.VersionChecker;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -71,8 +72,9 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
 
         // Check if we have it.
         if (source.has("check")) {
-            this.checkStr = source.getString("check");
-            if (!this.checkStr.startsWith(Constants.DATA_LOCATION_TOKEN)) {
+            this.checkStr = getString("check");
+            if (this.checkStr != null
+                    && !this.checkStr.startsWith(Constants.DATA_LOCATION_TOKEN)) {
                 this.checkStr = Constants.DATA_LOCATION_TOKEN + this.checkStr;
             }
             this.checkPath = Settings.settings.data.dataPath(checkStr);
@@ -112,26 +114,28 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
             this.myVersion = source.getInt("version");
 
         // Mingsversion
-        if (source.has("mingsversion"))
-            this.minGsVersion = VersionChecker.correctVersionNumber(source.getInt("mingsversion"));
+        var minGsVersion = getInt("mingsversion", "minGsVersion", "minGaiaSkyVersion");
+        if (minGsVersion > 0)
+            this.minGsVersion = VersionChecker.correctVersionNumber(minGsVersion);
 
         // File
         this.file = getString("file");
 
         // Description
-        if (source.has("description")) {
-            this.description = source.getString("description");
+        var description = getString("description", "desc");
+        if (description != null) {
+            this.description = description;
 
-            if (!hasKey && description.contains("-")) {
+            if (!hasKey && this.description.contains("-")) {
                 // Old format, description=name - desc; name=key
-                this.name = description.substring(0, description.indexOf("-")).trim();
-                this.description = description.substring(description.indexOf("-") + 1).trim();
+                this.name = this.description.substring(0, this.description.indexOf("-")).trim();
+                this.description = this.description.substring(this.description.indexOf("-") + 1).trim();
             }
             this.description = TextUtils.unescape(this.description);
         }
 
         // Release notes
-        var releaseNotes = source.get("releasenotes");
+        var releaseNotes = get("releasenotes", "releaseNotes");
         if (releaseNotes != null) {
             if (releaseNotes.isString()) {
                 this.releaseNotes = releaseNotes.asString().split("\\r?\\n");
@@ -162,7 +166,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
 
         // Size
         try {
-            sizeBytes = source.getLong("size");
+            sizeBytes = getLong("size", "sizeBytes");
             size = GlobalResources.humanReadableByteCount(sizeBytes, true);
         } catch (IllegalArgumentException e) {
             sizeBytes = -1;
@@ -171,7 +175,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
 
         // Number objects
         try {
-            nObjects = source.getLong("nobjects");
+            nObjects = getLong("nobjects", "nObjects", "numObjects");
             nObjectsStr = I18n.msg("gui.dataset.nobjects", GlobalResources.nObjectsToString(nObjects));
         } catch (IllegalArgumentException e) {
             nObjects = -1;
@@ -190,9 +194,9 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         // Data
         JsonValue dataFiles = null;
         if (source.has("files")) {
-            dataFiles = source.get("files");
-        } else if (source.has("data") && source.get("data").isArray()) {
-            dataFiles = source.get("data");
+            dataFiles = get("files");
+        } else if (source.has("data") && get("data").isArray()) {
+            dataFiles = get("data");
         }
         if (dataFiles != null) {
             try {
@@ -205,6 +209,60 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         } else {
             this.files = null;
         }
+    }
+
+    /**
+     * Gets the JSON value attribute with one of the given names from the current source JSON value object.
+     *
+     * @param names The possible names of the attribute. The method does a linear search until one of them is present.
+     *
+     * @return The JSON value, or null if no attributes with the given names exist.
+     */
+    private JsonValue get(String... names) {
+        if (names == null) {
+            return null;
+        }
+        return Arrays.stream(names)
+                .filter(source::has)
+                .map(source::get)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Gets the attribute with one of the given names from the current source JSON value object as an integer.
+     *
+     * @param names The possible names of the attribute. The method does a linear search until one of them is present.
+     *
+     * @return The integer attribute, or -1 if none of the names exist.
+     */
+    private int getInt(String... names) {
+        if (names == null) {
+            return -1;
+        }
+        return Arrays.stream(names)
+                .filter(source::has)
+                .map(source::getInt)
+                .findFirst()
+                .orElse(-1);
+    }
+
+    /**
+     * Gets the attribute with one of the given names from the current source JSON value object as a long integer.
+     *
+     * @param names The possible names of the attribute. The method does a linear search until one of them is present.
+     *
+     * @return The long integer attribute, or -1 if none of the names exist.
+     */
+    private long getLong(String... names) {
+        if (names == null) {
+            return -1L;
+        }
+        return Arrays.stream(names)
+                .filter(source::has)
+                .map(source::getLong)
+                .findFirst()
+                .orElse(-1L);
     }
 
     @Override
@@ -225,7 +283,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
 
     private String getString(String attrName) {
         if (source.has(attrName)) {
-            var c = source.get(attrName);
+            var c = get(attrName);
             if (c.isString()) {
                 return c.asString();
             } else {
