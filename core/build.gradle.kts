@@ -4,7 +4,6 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.gradle.kotlin.dsl.support.serviceOf
 import org.gradle.process.ExecOperations
 import de.undercouch.gradle.tasks.download.Download
-import com.install4j.gradle.Install4jTask
 
 plugins {
     id("java")
