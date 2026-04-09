@@ -268,14 +268,26 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
 
         // Validators
         FloatValidator fadeVal = new FloatValidator(0f, 1e10f);
-        IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[]{fadeInMax, fadeOutMin, fadeOutMax}, null);
+        IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal,
+                                                                   fadeOut,
+                                                                   new OwnTextField[]{fadeInMax, fadeOutMin, fadeOutMax},
+                                                                   null,
+                                                                   null);
         IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal,
+                                                                   fadeOut,
                                                                    new OwnTextField[]{fadeOutMin, fadeOutMax},
+                                                                   null,
                                                                    new OwnTextField[]{fadeInMin});
         IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal,
+                                                                    null,
                                                                     new OwnTextField[]{fadeOutMax},
+                                                                    fadeIn,
                                                                     new OwnTextField[]{fadeInMin, fadeInMax});
-        IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal, null, new OwnTextField[]{fadeInMin, fadeInMax, fadeOutMin});
+        IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal,
+                                                                    null,
+                                                                    null,
+                                                                    fadeIn,
+                                                                    new OwnTextField[]{fadeInMin, fadeInMax, fadeOutMin});
 
         // Set them
         fadeInMin.setValidator(fadeInMinVal);
