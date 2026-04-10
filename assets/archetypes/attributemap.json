@@ -105,7 +105,7 @@
     "Orientation": {
       "description": "Defines the orientation model of objects. Can be defined as a rigid rotation (given parameters like rotation period, axial tilt, etc.) or via quaternion-based orientations.",
       "rotation": {
-        "description": "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes: |brsp| |ul| |li| ``angularVelocity`` -- in :math:`deg/h`. |eli| |li| ``period`` -- in days. |eli| |li| ``axialTilt`` -- in degrees. |eli| |li| ``inclination`` -- in degrees. |eli| |li| ``ascendingNode`` -- in degrees. |eli| |li| ``meridianAngle`` -- in degrees. |eli| |eul| |br| See :ref:`rotation` for more information.",
+        "description": "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes: |brsp| |ul| |li| ``angularVelocity`` -- in :math:`deg/h`. Overwrites ``period``, if set. |eli| |li| ``period`` -- in ``hours``. Overrides ``angularVelocity``, if set. |eli| |li| ``axialTilt`` -- in degrees. |eli| |li| ``inclination`` -- in degrees. |eli| |li| ``ascendingNode`` -- in degrees. |eli| |li| ``meridianAngle`` -- in degrees. |eli| |eul| |br| See :ref:`rotation` for more information.",
         "unit": "Map",
         "aliases": [
           "rigidRotation"

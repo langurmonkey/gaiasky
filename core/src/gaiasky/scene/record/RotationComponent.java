@@ -48,13 +48,22 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
     }
 
     /**
-     * Sets the rotation period.
+     * Sets the rotation period in hours. Overwrites the angular velocity.
      *
      * @param rotationPeriod The rotation period in hours.
      */
     public void setPeriod(Double rotationPeriod) {
         this.period = rotationPeriod;
         angularVelocity = 360.0 / rotationPeriod;
+    }
+
+    /**
+     * Set rotation angular velocity in degrees/hour. Overwrites the rotation period.
+     * @param av The angular velocity in deg/h.
+     */
+    public void setAngularVelocity(Double av) {
+        angularVelocity = av;
+        this.period = 360.0 / angularVelocity;
     }
 
     public void update(ITimeFrameProvider time) {

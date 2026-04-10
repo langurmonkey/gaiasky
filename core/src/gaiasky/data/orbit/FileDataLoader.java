@@ -19,6 +19,36 @@ import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+/**
+ * Loads orbit data from an ASCII text file.
+ * <p>
+ * This loader parses files where each line represents a single data point in an orbit.
+ * The loader ignores blank lines and lines starting with the comment character {@code #}.
+ * </p>
+ * <h3>Data Format</h3>
+ * Each data line must contain at least 4 tokens separated by whitespace:
+ * <ol>
+ *     <li><b>Time:</b> The time of the observation. This can be in two formats:
+ *         <ul>
+ *             <li>A timestamp string compatible with {@link java.sql.Timestamp#valueOf(String)},
+ *             where underscores {@code _} are treated as spaces (e.g., {@code 2023-10-27_12:00:00}).</li>
+ *             <li>A Julian Date as a double-precision floating-point number.</li>
+ *         </ul>
+ *     </li>
+ *     <li><b>X coordinate:</b> The X position in kilometers.</li>
+ *     <li><b>Y coordinate:</b> The Y position in kilometers.</li>
+ *     <li><b>Z coordinate:</b> The Z position in kilometers.</li>
+ * </ol>
+ * <p>
+ * Coordinates are automatically converted from kilometers to Gaia Sky's internal units
+ * using {@link gaiasky.util.Constants#KM_TO_U}.
+ * </p>
+ * <p>
+ * If multiple consecutive lines have the same timestamp, only the first one is processed,
+ * and subsequent ones are ignored to prevent duplicate data points at the same time.
+ * Any additional tokens beyond the first four in a line are ignored.
+ * </p>
+ */
 public class FileDataLoader {
 
     public FileDataLoader() {

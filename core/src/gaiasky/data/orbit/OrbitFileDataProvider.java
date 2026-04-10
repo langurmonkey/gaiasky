@@ -22,6 +22,10 @@ import gaiasky.util.io.GzipUtils;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Orbit data provider that loads orbit/trajectory data from a file as a sequence of points.
+ * The actual loading of data is implemented in {@link FileDataLoader}.
+ */
 public class OrbitFileDataProvider implements IOrbitDataProvider {
     private PointCloudData data;
 

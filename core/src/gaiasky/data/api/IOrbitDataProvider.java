@@ -12,6 +12,9 @@ import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.component.Trajectory;
 
+/**
+ * Interface implemented by all loaders that provide orbit/trajectory data.
+ */
 public interface IOrbitDataProvider {
 
     /**
