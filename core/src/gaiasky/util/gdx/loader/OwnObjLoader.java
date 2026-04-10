@@ -8,7 +8,6 @@
 package gaiasky.util.gdx.loader;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,9 +20,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
+import gaiasky.util.Logger;
 import gaiasky.util.gdx.loader.is.InputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
-import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.data.*;
 
 import java.io.BufferedReader;
@@ -32,6 +31,8 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 
 public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameters> {
+    private static final Logger.Log logger = Logger.getLogger(OwnObjLoader.class);
+
     public static boolean logWarning = false;
     final FloatArray verts = new FloatArray(300);
     final FloatArray norms = new FloatArray(300);
@@ -46,14 +47,6 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
     public OwnObjLoader(InputStreamProvider isp, FileHandleResolver resolver) {
         super(resolver);
         this.isp = isp;
-    }
-
-    /**
-     * Directly load the model on the calling thread. The model with not be
-     * managed by an {@link AssetManager}.
-     */
-    public IntModel loadModel(final FileHandle fileHandle, boolean flipV) {
-        return loadModel(fileHandle, new ObjLoaderParameters(flipV));
     }
 
     @Override
@@ -150,6 +143,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             }
             reader.close();
         } catch (IOException e) {
+            logger.error(e);
             return null;
         }
 
@@ -200,7 +194,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
 
             final int numIndices = numFaces * 3 >= Integer.MAX_VALUE ? 0 : numFaces * 3;
             final int[] finalIndices = new int[numIndices];
-            // if there are too many vertices in a mesh, we can't use indices
+            // If there are too many vertices in a mesh, we can't use indices.
             if (numIndices > 0) {
                 for (int i = 0; i < numIndices; i++) {
                     finalIndices[i] = i;
@@ -234,7 +228,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             part.primitiveType = GL20.GL_TRIANGLES;
             IntModelMesh mesh = new IntModelMesh();
             mesh.id = meshId;
-            mesh.attributes = attributes.toArray(VertexAttribute.class);
+            mesh.attributes = attributes.toArray(VertexAttribute[]::new);
             mesh.vertices = finalVerts;
             mesh.parts = new IntModelMeshPart[] { part };
             data.nodes.add(node);
@@ -281,9 +275,6 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
 
     public static class ObjLoaderParameters extends IntModelLoader.IntModelParameters {
         public boolean flipV;
-
-        public ObjLoaderParameters() {
-        }
 
         public ObjLoaderParameters(boolean flipV) {
             this.flipV = flipV;

@@ -23,6 +23,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.data.*;
 import gaiasky.util.gdx.shader.Material;
@@ -252,24 +253,43 @@ public class IntModel implements Disposable {
     protected Material convertMaterial(OwnModelMaterial mtl, TextureProvider textureProvider) {
         Material result = new Material();
         result.id = mtl.id;
-        if (mtl.ambient != null)
-            result.set(new ColorAttribute(ColorAttribute.Ambient, mtl.ambient));
-        if (mtl.diffuse != null)
-            result.set(new ColorAttribute(ColorAttribute.Diffuse, mtl.diffuse));
-        if (mtl.specular != null)
-            result.set(new ColorAttribute(ColorAttribute.Specular, mtl.specular));
-        if (mtl.emissive != null)
-            result.set(new ColorAttribute(ColorAttribute.Emissive, mtl.emissive));
-        if (mtl.metallic != null)
-            result.set(new ColorAttribute(ColorAttribute.Metallic, mtl.metallic));
-        if (mtl.reflection != null && mtl.metallic == null)
-            result.set(new ColorAttribute(ColorAttribute.Metallic, mtl.reflection));
+        if (mtl.ambientColor != null)
+            result.set(new ColorAttribute(ColorAttribute.Ambient, mtl.ambientColor));
+        if (mtl.diffuseColor != null)
+            result.set(new ColorAttribute(ColorAttribute.Diffuse, mtl.diffuseColor));
+        if (mtl.specularColor != null)
+            result.set(new ColorAttribute(ColorAttribute.Specular, mtl.specularColor));
+        if (mtl.emissiveColor != null)
+            result.set(new ColorAttribute(ColorAttribute.Emissive, mtl.emissiveColor));
+
+        if (mtl.roughnessColor != null) {
+            result.set(new ColorAttribute(ColorAttribute.Roughness, mtl.roughnessColor));
+        } else if (mtl.roughness > 0f) {
+            result.set(new ColorAttribute(ColorAttribute.Roughness, ColorUtils.of(mtl.roughness)));
+        }
+
+        if (mtl.metallicColor != null) {
+            result.set(new ColorAttribute(ColorAttribute.Metallic, mtl.metallicColor));
+        } else if (mtl.reflectionColor != null) {
+            result.set(new ColorAttribute(ColorAttribute.Metallic, mtl.reflectionColor));
+        } else if (mtl.metallic > 0f) {
+            result.set(new ColorAttribute(ColorAttribute.Metallic, ColorUtils.of(mtl.metallic)));
+        }
+
+        // IOR not supported yet
+        //if (mtl.ior > 0f)
+        //    result.set(new FloatAttribute(FloatAttribute.IoR, 1f));
+
+        // Roughness is 1 - shininess
         if (mtl.shininess > 0f)
             result.set(new FloatAttribute(FloatAttribute.Shininess, mtl.shininess));
-        if (mtl.opacity != 1.f)
-            result.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, mtl.opacity));
 
-        ObjectMap<String, Texture> textures = new ObjectMap<String, Texture>();
+        if (mtl.opacity != 1.0f) {
+            result.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1.0f));
+            result.set(new FloatAttribute(FloatAttribute.Opacity, mtl.opacity));
+        }
+
+        ObjectMap<String, Texture> textures = new ObjectMap<>();
 
         // FIXME uvScaling/uvTranslation totally ignored
         if (mtl.textures != null) {
@@ -369,6 +389,7 @@ public class IntModel implements Disposable {
      * result.
      *
      * @param out the {@link BoundingBox} that will be set with the bounds.
+     *
      * @return the out parameter for chaining
      */
     public BoundingBox calculateBoundingBox(final BoundingBox out) {
@@ -382,6 +403,7 @@ public class IntModel implements Disposable {
      * the result.
      *
      * @param out the {@link BoundingBox} that will be extended with the bounds.
+     *
      * @return the out parameter for chaining
      */
     public BoundingBox extendBoundingBox(final BoundingBox out) {
@@ -393,6 +415,7 @@ public class IntModel implements Disposable {
 
     /**
      * @param id The ID of the animation to fetch (case sensitive).
+     *
      * @return The {@link Animation} with the specified id, or null if not available.
      */
     public IntAnimation getAnimation(final String id) {
@@ -402,6 +425,7 @@ public class IntModel implements Disposable {
     /**
      * @param id         The ID of the animation to fetch.
      * @param ignoreCase whether to use case sensitivity when comparing the animation id.
+     *
      * @return The {@link Animation} with the specified id, or null if not available.
      */
     public IntAnimation getAnimation(final String id, boolean ignoreCase) {
@@ -421,6 +445,7 @@ public class IntModel implements Disposable {
 
     /**
      * @param id The ID of the material to fetch.
+     *
      * @return The {@link Material} with the specified id, or null if not available.
      */
     public Material getMaterial(final String id) {
@@ -430,6 +455,7 @@ public class IntModel implements Disposable {
     /**
      * @param id         The ID of the material to fetch.
      * @param ignoreCase whether to use case sensitivity when comparing the material id.
+     *
      * @return The {@link Material} with the specified id, or null if not available.
      */
     public Material getMaterial(final String id, boolean ignoreCase) {
@@ -449,6 +475,7 @@ public class IntModel implements Disposable {
 
     /**
      * @param id The ID of the node to fetch.
+     *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
     public IntNode getNode(final String id) {
@@ -458,6 +485,7 @@ public class IntModel implements Disposable {
     /**
      * @param id        The ID of the node to fetch.
      * @param recursive false to fetch a root node only, true to search the entire node tree for the specified node.
+     *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
     public IntNode getNode(final String id, boolean recursive) {
@@ -468,6 +496,7 @@ public class IntModel implements Disposable {
      * @param id         The ID of the node to fetch.
      * @param recursive  false to fetch a root node only, true to search the entire node tree for the specified node.
      * @param ignoreCase whether to use case sensitivity when comparing the node id.
+     *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
     public IntNode getNode(final String id, boolean recursive, boolean ignoreCase) {

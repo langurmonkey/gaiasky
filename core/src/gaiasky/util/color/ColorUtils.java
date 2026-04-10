@@ -24,47 +24,43 @@ import java.util.zip.GZIPInputStream;
  */
 public class ColorUtils {
 
-    /*
-     * LETS DEFINE SOME COLORS
-     */
-
     // Google colors
-    public static float[] gGreen = new float[] { 15f / 255f, 157f / 255f, 88f / 255f, 1f };
+    public static float[] gGreen = new float[]{15f / 255f, 157f / 255f, 88f / 255f, 1f};
     public static Color gGreenC = getCol(gGreen);
-    public static float[] gBlue = new float[] { 66f / 255f, 133f / 255f, 244f / 255f, 1f };
+    public static float[] gBlue = new float[]{66f / 255f, 133f / 255f, 244f / 255f, 1f};
     public static Color gBlueC = getCol(gBlue);
-    public static float[] gRed = new float[] { 219f / 255f, 68f / 255f, 55f / 255f, 1f };
+    public static float[] gRed = new float[]{219f / 255f, 68f / 255f, 55f / 255f, 1f};
     public static Color gRedC = getCol(gRed);
-    public static float[] gYellow = new float[] { 244f / 255f, 160f / 255f, 0f / 255f, 1f };
+    public static float[] gYellow = new float[]{244f / 255f, 160f / 255f, 0f / 255f, 1f};
     public static Color gYellowC = getCol(gYellow);
-    public static float[] gWhite = new float[] { 1.0f, 1.0f, 1.0f, 1f };
+    public static float[] gWhite = new float[]{1.0f, 1.0f, 1.0f, 1f};
     public static Color gWhiteC = getCol(gWhite);
-    public static float[] gPink = new float[] { 1.0f, 102f / 255f, 1.0f, 1f };
+    public static float[] gPink = new float[]{1.0f, 102f / 255f, 1.0f, 1f};
     public static Color gPinkC = getCol(gPink);
     // Amazon orange
-    public static float[] aOrange = new float[] { 1.0f, 153f / 255f, 0f / 255f, 1f };
+    public static float[] aOrange = new float[]{1.0f, 153f / 255f, 0f / 255f, 1f};
     public static Color aOrangeC = getCol(aOrange);
     // Taco Bell purple
-    public static float[] tPurple = new float[] { 12f / 255f, 32f / 255f, 130f / 255f, 1f };
+    public static float[] tPurple = new float[]{12f / 255f, 32f / 255f, 130f / 255f, 1f};
     public static Color tPurpleC = getCol(tPurple);
     // DunkinDonuts
-    public static float[] ddMagenta = new float[] { 218f / 255f, 24f / 255f, 132f / 255f, 1f };
+    public static float[] ddMagenta = new float[]{218f / 255f, 24f / 255f, 132f / 255f, 1f};
     public static Color ddMagentaC = getCol(ddMagenta);
-    public static float[] ddBrown = new float[] { 101f / 255f, 56f / 255f, 25f / 255f, 1f };
+    public static float[] ddBrown = new float[]{101f / 255f, 56f / 255f, 25f / 255f, 1f};
     public static Color ddBrownC = getCol(ddBrown);
     // Others
-    public static float[] oLighterGray = new float[] { 0.85f, 0.85f, 0.85f, 1f };
+    public static float[] oLighterGray = new float[]{0.85f, 0.85f, 0.85f, 1f};
     public static Color oLighterGrayC = getCol(oLighterGray);
-    public static float[] oLightGray = new float[] { 0.85f, 0.85f, 0.85f, 1f };
+    public static float[] oLightGray = new float[]{0.85f, 0.85f, 0.85f, 1f};
     public static Color oLightGrayC = getCol(oLightGray);
-    public static float[] oDarkGray = new float[] { 0.3f, 0.3f, 0.3f, 1f };
+    public static float[] oDarkGray = new float[]{0.3f, 0.3f, 0.3f, 1f};
     public static Color oDarkGrayC = getCol(oDarkGray);
-    public static float[] oCyan = new float[] { 0f, 230f / 255f, 1f, 1f };
+    public static float[] oCyan = new float[]{0f, 230f / 255f, 1f, 1f};
     public static Color oCyanC = getCol(ddMagenta);
     /**
      * Highlight color array for datasets
      **/
-    public static float[][] colorArray = new float[][] { gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta, oCyan };
+    public static float[][] colorArray = new float[][]{gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta, oCyan};
     private static float[][] teffToRGB_harre;
 
     private static Color getCol(float[] c) {
@@ -80,7 +76,7 @@ public class ColorUtils {
         float hue = hsb[0] * 360f;
         hsb[0] = ((hue + 180f) % 360f) / 360f;
         float[] rgb = hsbToRgb(hsb);
-        return new float[] { rgb[0], rgb[1], rgb[2], rgba[3] };
+        return new float[]{rgb[0], rgb[1], rgb[2], rgba[3]};
     }
 
     public static float[] getRgbComplimentary(float[] rgb) {
@@ -100,7 +96,7 @@ public class ColorUtils {
 
     public static float[] hsbToRgb(float[] hsb) {
         java.awt.Color c = new java.awt.Color(java.awt.Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
-        return new float[] { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f };
+        return new float[]{c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f};
 
     }
 
@@ -120,11 +116,17 @@ public class ColorUtils {
     }
 
     public static float[] hexToRgba(String hex) {
-        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f, Integer.valueOf(hex.substring(7, 9), 16) / 255f };
+        return new float[]{Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5),
+                                                                                            16) / 255f, Integer.valueOf(hex.substring(5, 7),
+                                                                                                                        16) / 255f, Integer.valueOf(
+                hex.substring(7, 9),
+                16) / 255f};
     }
 
     public static float[] hexToRgb(String hex) {
-        return new float[] { Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5), 16) / 255f, Integer.valueOf(hex.substring(5, 7), 16) / 255f };
+        return new float[]{Integer.valueOf(hex.substring(1, 3), 16) / 255f, Integer.valueOf(hex.substring(3, 5),
+                                                                                            16) / 255f, Integer.valueOf(hex.substring(5, 7),
+                                                                                                                        16) / 255f};
 
     }
 
@@ -141,7 +143,7 @@ public class ColorUtils {
      * color vector rgba. See: {@see http://www.particleincell.com/blog/2014/colormap/}.
      *
      * @param value The grayscale value to set to the color.
-     * @param rgba The out parameter containing the color.
+     * @param rgba  The out parameter containing the color.
      */
     public static void grayscale(float value, float[] rgba) {
         rgba[0] = value;
@@ -185,31 +187,31 @@ public class ColorUtils {
         rgba[3] = 1;
 
         switch (X) {
-        case 0:
-            rgba[0] = 1;
-            rgba[1] = Y;
-            rgba[2] = 0;
-            break;
-        case 1:
-            rgba[0] = 1 - Y;
-            rgba[1] = 1;
-            rgba[2] = 0;
-            break;
-        case 2:
-            rgba[0] = 0;
-            rgba[1] = 1;
-            rgba[2] = Y;
-            break;
-        case 3:
-            rgba[0] = 0;
-            rgba[1] = 1 - Y;
-            rgba[2] = 1;
-            break;
-        case 4:
-            rgba[0] = 0;
-            rgba[1] = 0;
-            rgba[2] = 1;
-            break;
+            case 0:
+                rgba[0] = 1;
+                rgba[1] = Y;
+                rgba[2] = 0;
+                break;
+            case 1:
+                rgba[0] = 1 - Y;
+                rgba[1] = 1;
+                rgba[2] = 0;
+                break;
+            case 2:
+                rgba[0] = 0;
+                rgba[1] = 1;
+                rgba[2] = Y;
+                break;
+            case 3:
+                rgba[0] = 0;
+                rgba[1] = 1 - Y;
+                rgba[2] = 1;
+                break;
+            case 4:
+                rgba[0] = 0;
+                rgba[1] = 0;
+                rgba[2] = 1;
+                break;
         }
     }
 
@@ -231,36 +233,36 @@ public class ColorUtils {
         rgba[3] = 1;
 
         switch (X) {
-        case 0:
-            rgba[0] = 1;
-            rgba[1] = Y;
-            rgba[2] = 0;
-            break;
-        case 1:
-            rgba[0] = 1 - Y;
-            rgba[1] = 1;
-            rgba[2] = 0;
-            break;
-        case 2:
-            rgba[0] = 0;
-            rgba[1] = 1;
-            rgba[2] = Y;
-            break;
-        case 3:
-            rgba[0] = 0;
-            rgba[1] = 1 - Y;
-            rgba[2] = 1;
-            break;
-        case 4:
-            rgba[0] = Y;
-            rgba[1] = 0;
-            rgba[2] = 1;
-            break;
-        case 5:
-            rgba[0] = 1;
-            rgba[1] = 0;
-            rgba[2] = 1;
-            break;
+            case 0:
+                rgba[0] = 1;
+                rgba[1] = Y;
+                rgba[2] = 0;
+                break;
+            case 1:
+                rgba[0] = 1 - Y;
+                rgba[1] = 1;
+                rgba[2] = 0;
+                break;
+            case 2:
+                rgba[0] = 0;
+                rgba[1] = 1;
+                rgba[2] = Y;
+                break;
+            case 3:
+                rgba[0] = 0;
+                rgba[1] = 1 - Y;
+                rgba[2] = 1;
+                break;
+            case 4:
+                rgba[0] = Y;
+                rgba[1] = 0;
+                rgba[2] = 1;
+                break;
+            case 5:
+                rgba[0] = 1;
+                rgba[1] = 0;
+                rgba[2] = 1;
+                break;
         }
     }
 
@@ -291,7 +293,7 @@ public class ColorUtils {
             teffToRGB_harre = new float[105][];
             FileHandle fh = Gdx.files.internal("data/teff-rgb.csv.gz");
             try (var gzipStream = new GZIPInputStream(fh.read());
-                    var reader = new BufferedReader(new InputStreamReader(gzipStream))) {
+                 var reader = new BufferedReader(new InputStreamReader(gzipStream))) {
                 // Skip header
                 reader.readLine();
                 int i = 0;
@@ -400,7 +402,7 @@ public class ColorUtils {
             }
         }
 
-        return new float[] { (float) (r / 255d), (float) (g / 255d), (float) (b / 255d) };
+        return new float[]{(float) (r / 255d), (float) (g / 255d), (float) (b / 255d)};
     }
 
     /**
@@ -408,6 +410,7 @@ public class ColorUtils {
      * "http://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color">here</a>
      *
      * @param bv The B-V color index
+     *
      * @return The RGB as a float array in [0..1]
      */
     public static float[] BVtoRGB(double bv) {
@@ -416,9 +419,15 @@ public class ColorUtils {
         double x = 0, y = 0;
 
         if (t >= 1667 && t <= 4000) {
-            x = ((-0.2661239 * FastMath.pow(10, 9)) / FastMath.pow(t, 3)) + ((-0.2343580 * FastMath.pow(10, 6)) / FastMath.pow(t, 2)) + ((0.8776956 * FastMath.pow(10, 3)) / t) + 0.179910;
+            x = ((-0.2661239 * FastMath.pow(10, 9)) / FastMath.pow(t, 3)) + ((-0.2343580 * FastMath.pow(10, 6)) / FastMath.pow(t,
+                                                                                                                               2)) + ((0.8776956 * FastMath.pow(
+                    10,
+                    3)) / t) + 0.179910;
         } else if (t > 4000 && t <= 25000) {
-            x = ((-3.0258469 * FastMath.pow(10, 9)) / FastMath.pow(t, 3)) + ((2.1070379 * FastMath.pow(10, 6)) / FastMath.pow(t, 2)) + ((0.2226347 * FastMath.pow(10, 3)) / t) + 0.240390;
+            x = ((-3.0258469 * FastMath.pow(10, 9)) / FastMath.pow(t, 3)) + ((2.1070379 * FastMath.pow(10, 6)) / FastMath.pow(t,
+                                                                                                                              2)) + ((0.2226347 * FastMath.pow(
+                    10,
+                    3)) / t) + 0.240390;
         }
 
         if (t >= 1667 && t <= 2222) {
@@ -466,6 +475,7 @@ public class ColorUtils {
      *
      * @param rgb        The RGB color
      * @param luminosity The new luminosity amount in [0..1]
+     *
      * @return The new RGB array
      */
     public static float[] brighten(float[] rgb, float luminosity) {
@@ -480,6 +490,7 @@ public class ColorUtils {
      * contained in the set [0..255] and returns h, s, and l in the set [0..1]
      *
      * @param rgb Float array with the RGB values
+     *
      * @return Array The HSL representation
      */
     public static float[] rgbToHsl(float[] rgb) {
@@ -507,7 +518,7 @@ public class ColorUtils {
             h /= 6;
         }
 
-        return new float[] { h, s, avg};
+        return new float[]{h, s, avg};
     }
 
     /**
@@ -516,6 +527,7 @@ public class ColorUtils {
      * contained in the set [0..1] and returns r, g, and b in the set [0..255].
      *
      * @param hsl Float array with the HSL values
+     *
      * @return Array The RGB representation
      */
     public static float[] hslToRgb(float[] hsl) {
@@ -536,7 +548,7 @@ public class ColorUtils {
             b = hue2rgb(p, q, h - 1 / 3);
         }
 
-        return new float[] { r, g, b };
+        return new float[]{r, g, b};
     }
 
     private static float hue2rgb(float p, float q, float t) {
@@ -564,36 +576,36 @@ public class ColorUtils {
             float q = brightness * (1.0f - saturation * f);
             float t = brightness * (1.0f - (saturation * (1.0f - f)));
             switch ((int) h) {
-            case 0:
-                r = (int) (brightness * 255.0f + 0.5f);
-                g = (int) (t * 255.0f + 0.5f);
-                b = (int) (p * 255.0f + 0.5f);
-                break;
-            case 1:
-                r = (int) (q * 255.0f + 0.5f);
-                g = (int) (brightness * 255.0f + 0.5f);
-                b = (int) (p * 255.0f + 0.5f);
-                break;
-            case 2:
-                r = (int) (p * 255.0f + 0.5f);
-                g = (int) (brightness * 255.0f + 0.5f);
-                b = (int) (t * 255.0f + 0.5f);
-                break;
-            case 3:
-                r = (int) (p * 255.0f + 0.5f);
-                g = (int) (q * 255.0f + 0.5f);
-                b = (int) (brightness * 255.0f + 0.5f);
-                break;
-            case 4:
-                r = (int) (t * 255.0f + 0.5f);
-                g = (int) (p * 255.0f + 0.5f);
-                b = (int) (brightness * 255.0f + 0.5f);
-                break;
-            case 5:
-                r = (int) (brightness * 255.0f + 0.5f);
-                g = (int) (p * 255.0f + 0.5f);
-                b = (int) (q * 255.0f + 0.5f);
-                break;
+                case 0:
+                    r = (int) (brightness * 255.0f + 0.5f);
+                    g = (int) (t * 255.0f + 0.5f);
+                    b = (int) (p * 255.0f + 0.5f);
+                    break;
+                case 1:
+                    r = (int) (q * 255.0f + 0.5f);
+                    g = (int) (brightness * 255.0f + 0.5f);
+                    b = (int) (p * 255.0f + 0.5f);
+                    break;
+                case 2:
+                    r = (int) (p * 255.0f + 0.5f);
+                    g = (int) (brightness * 255.0f + 0.5f);
+                    b = (int) (t * 255.0f + 0.5f);
+                    break;
+                case 3:
+                    r = (int) (p * 255.0f + 0.5f);
+                    g = (int) (q * 255.0f + 0.5f);
+                    b = (int) (brightness * 255.0f + 0.5f);
+                    break;
+                case 4:
+                    r = (int) (t * 255.0f + 0.5f);
+                    g = (int) (p * 255.0f + 0.5f);
+                    b = (int) (brightness * 255.0f + 0.5f);
+                    break;
+                case 5:
+                    r = (int) (brightness * 255.0f + 0.5f);
+                    g = (int) (p * 255.0f + 0.5f);
+                    b = (int) (q * 255.0f + 0.5f);
+                    break;
             }
         }
         return 0xff000000 | (r << 16) | (g << 8) | (b);
@@ -613,6 +625,10 @@ public class ColorUtils {
 
     public static boolean isZero(Color c) {
         return c.r == 0 && c.g == 0 && c.b == 0;
+    }
+
+    public static Color of(float value) {
+        return new Color(value, value, value, 1.0f);
     }
 
 }

@@ -21,16 +21,19 @@ public class OwnModelMaterial {
 
     public MaterialType type;
 
-    public Color ambient;
-    public Color diffuse;
-    public Color specular;
-    public Color emissive;
-    public Color reflection;
-    public Color metallic;
-    public Color roughness;
+    public Color ambientColor;
+    public Color diffuseColor;
+    public Color specularColor;
+    public Color emissiveColor;
+    public Color metallicColor;
+    public Color roughnessColor;
+    public Color reflectionColor;
 
+    public float metallic;
+    public float roughness;
+    public float ior;
     public float shininess;
-    public float opacity = 1.f;
+    public float opacity = 1.0f;
 
     public Array<OwnModelTexture> textures;
 }

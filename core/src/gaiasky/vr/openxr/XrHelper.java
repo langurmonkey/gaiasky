@@ -196,7 +196,7 @@ public final class XrHelper {
     }
 
     public static IntModel loadRenderModel(XrDriver driver, XrControllerDevice controllerDevice) {
-        IntModel model = null;
+        IntModel model;
         OwnObjLoader ol = new OwnObjLoader();
         
         if (driver != null && (driver.hmdName.contains("oculus") || driver.hmdName.contains("Oculus") || driver.hmdName.contains("Rift") )) {

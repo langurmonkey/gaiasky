@@ -96,27 +96,22 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                     jsonPart.indices = meshPart.require("indices").asIntArray();
                     parts.add(jsonPart);
                 }
-                jsonMesh.parts = parts.toArray(IntModelMeshPart.class);
+                jsonMesh.parts = parts.toArray(IntModelMeshPart[]::new);
                 model.meshes.add(jsonMesh);
             }
         }
     }
 
     private int parseType(String type) {
-        if (type.equals("TRIANGLES")) {
-            return GL20.GL_TRIANGLES;
-        } else if (type.equals("LINES")) {
-            return GL20.GL_LINES;
-        } else if (type.equals("POINTS")) {
-            return GL20.GL_POINTS;
-        } else if (type.equals("TRIANGLE_STRIP")) {
-            return GL20.GL_TRIANGLE_STRIP;
-        } else if (type.equals("LINE_STRIP")) {
-            return GL20.GL_LINE_STRIP;
-        } else {
-            throw new GdxRuntimeException("Unknown primitive type '" + type
-                    + "', should be one of triangle, trianglestrip, line, linestrip, lineloop or point");
-        }
+        return switch (type) {
+            case "TRIANGLES" -> GL20.GL_TRIANGLES;
+            case "LINES" -> GL20.GL_LINES;
+            case "POINTS" -> GL20.GL_POINTS;
+            case "TRIANGLE_STRIP" -> GL20.GL_TRIANGLE_STRIP;
+            case "LINE_STRIP" -> GL20.GL_LINE_STRIP;
+            default -> throw new GdxRuntimeException("Unknown primitive type '" + type
+                                                             + "', should be one of triangle, trianglestrip, line, linestrip, lineloop or point");
+        };
     }
 
     private VertexAttribute[] parseAttributes(JsonValue attributes) {
@@ -147,7 +142,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                         + "', should be one of position, normal, uv, tangent or binormal");
             }
         }
-        return vertexAttributes.toArray(VertexAttribute.class);
+        return vertexAttributes.toArray(VertexAttribute[]::new);
     }
 
     private void parseMaterials(IntModelData model, JsonValue json, String materialDir) {
@@ -168,22 +163,22 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                 // Read material colors
                 final JsonValue diffuse = material.get("diffuse");
                 if (diffuse != null)
-                    jsonMaterial.diffuse = parseColor(diffuse);
+                    jsonMaterial.diffuseColor = parseColor(diffuse);
                 final JsonValue ambient = material.get("ambient");
                 if (ambient != null)
-                    jsonMaterial.ambient = parseColor(ambient);
+                    jsonMaterial.ambientColor = parseColor(ambient);
                 final JsonValue emissive = material.get("emissive");
                 if (emissive != null)
-                    jsonMaterial.emissive = parseColor(emissive);
+                    jsonMaterial.emissiveColor = parseColor(emissive);
                 final JsonValue specular = material.get("specular");
                 if (specular != null)
-                    jsonMaterial.specular = parseColor(specular);
+                    jsonMaterial.specularColor = parseColor(specular);
                 final JsonValue reflection = material.get("reflection");
                 if (reflection != null)
-                    jsonMaterial.reflection = parseColor(reflection);
+                    jsonMaterial.reflectionColor = parseColor(reflection);
                 final JsonValue metallic = material.get("metallic");
                 if (metallic != null)
-                    jsonMaterial.metallic = parseColor(metallic);
+                    jsonMaterial.metallicColor = parseColor(metallic);
                 // Read shininess
                 jsonMaterial.shininess = material.getFloat("shininess", 0.0f);
                 // Read opacity
@@ -266,7 +261,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
             throw new GdxRuntimeException("Expected Vector2 values <> than two.");
     }
 
-    private Array<IntModelNode> parseNodes(IntModelData model, JsonValue json) {
+    private void parseNodes(IntModelData model, JsonValue json) {
         JsonValue nodes = json.get("nodes");
         if (nodes != null) {
             model.nodes.ensureCapacity(nodes.size);
@@ -275,7 +270,6 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
             }
         }
 
-        return model.nodes;
     }
 
     private IntModelNode parseNodesRecursively(JsonValue json) {
@@ -324,7 +318,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
 
                 JsonValue bones = material.get("bones");
                 if (bones != null) {
-                    nodePart.bones = new ArrayMap<String, Matrix4>(true, bones.size, String.class, Matrix4.class);
+                    nodePart.bones = new ArrayMap<>(true, bones.size, String[]::new, Matrix4[]::new);
                     int j = 0;
                     for (JsonValue bone = bones.child; bone != null; bone = bone.next, j++) {
                         String nodeId = bone.getString("node", null);
