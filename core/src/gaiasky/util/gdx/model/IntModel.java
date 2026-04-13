@@ -285,8 +285,7 @@ public class IntModel implements Disposable {
             result.set(new FloatAttribute(FloatAttribute.Shininess, mtl.shininess));
 
         if (mtl.opacity != 1.0f) {
-            result.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1.0f));
-            result.set(new FloatAttribute(FloatAttribute.Opacity, mtl.opacity));
+            result.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, mtl.opacity));
         }
 
         ObjectMap<String, Texture> textures = new ObjectMap<>();

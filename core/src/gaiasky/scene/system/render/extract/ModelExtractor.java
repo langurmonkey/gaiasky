@@ -146,7 +146,8 @@ public class ModelExtractor extends AbstractExtractSystem {
         if (rt != null && rt.renderGroup != null) {
             rg = rt.renderGroup;
         } else {
-            rg = needsTessellation(model) ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
+            var transparency = model.model.hasIntrinsicTransparency();
+            rg = needsTessellation(model) ? RenderGroup.MODEL_PIX_TESS : (transparency ? RenderGroup.MODEL_PIX_TRANSPARENT : RenderGroup.MODEL_PIX);
         }
         addToRender(render, rg);
     }

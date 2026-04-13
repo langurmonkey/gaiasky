@@ -535,7 +535,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
                 mat.set(ba);
             }
             ba.blended = blendEnabled;
-            ba.opacity = alpha;
+            ba.opacity = ba.intrinsicOpacity * alpha;
 
             // Color.
             if (isAdditive) {
@@ -710,6 +710,26 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
                 ((ColorAttribute) Objects.requireNonNull(instance.materials.get(i).get(ColorAttribute.Diffuse))).color.a = alpha;
             }
         }
+    }
+
+    /**
+     * Checks if the model has at least one material with intrinsic transparency 0 < t < 1.
+     *
+     * @return True if the model has a material with intrinsic transparency.
+     */
+    public boolean hasIntrinsicTransparency() {
+        if (instance != null) {
+            int n = instance.materials.size;
+            for (int i = 0; i < n; i++) {
+                var hasBlend = instance.materials.get(i).has(BlendingAttribute.Type);
+                if (hasBlend) {
+                    var ba = (BlendingAttribute) instance.materials.get(i).get(BlendingAttribute.Type);
+                    if (ba != null && ba.intrinsicOpacity < 1f && ba.intrinsicOpacity > 0f)
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void setFloatExtAttribute(int attrib,

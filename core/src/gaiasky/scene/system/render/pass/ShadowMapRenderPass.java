@@ -40,6 +40,7 @@ import net.jafama.FastMath;
 import java.util.*;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
+import static gaiasky.render.RenderGroup.MODEL_PIX_TRANSPARENT;
 
 public class ShadowMapRenderPass extends RenderPass {
     /** Number of *shadow casting* lights supported. */
@@ -136,7 +137,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 prevCandidates = candidates.size();
             }
             var renderAssets = sceneRenderer.getRenderAssets();
-            var first = ((Render) candidates.get(0)).entity;
+            var first = ((Render) candidates.getFirst()).entity;
             var model = Mapper.model.get(first);
 
             // Find bounding box in world space.
@@ -159,9 +160,9 @@ public class ShadowMapRenderPass extends RenderPass {
             // Light direction depends on light.
             Vector3 lightDir = aux1;
             if (model.model.hasDirLight(0)) {
-                lightDir.set(model.model.dirLight(0).direction);
+                lightDir.set(Objects.requireNonNull(model.model.dirLight(0)).direction);
             } else if (model.model.hasPointLight(0)) {
-                lightDir.set(model.model.pointLight(0).position);
+                lightDir.set(Objects.requireNonNull(model.model.pointLight(0)).position);
                 aux2b.set(boxCenterAbsPos).sub(lightDir).nor().put(lightDir);
             }
             // Find distance given fov and box side.
@@ -253,9 +254,9 @@ public class ShadowMapRenderPass extends RenderPass {
                 // Light direction depends on light.
                 Vector3 lightDir = aux1;
                 if (model.model.hasDirLight(j)) {
-                    lightDir.set(model.model.dirLight(j).direction);
+                    lightDir.set(Objects.requireNonNull(model.model.dirLight(j)).direction);
                 } else if (model.model.hasPointLight(j)) {
-                    lightDir.set(model.model.pointLight(j).position);
+                    lightDir.set(Objects.requireNonNull(model.model.pointLight(j)).position);
                     aux2b.set(objPos).sub(lightDir).nor().put(lightDir);
                 }
                 // Direction is that of the light
@@ -358,12 +359,12 @@ public class ShadowMapRenderPass extends RenderPass {
             if (body.distToCamera < radius * 1.1) {
                 scaffolding.shadow = shadowNRender;
 
-                Vector3 shadowCameraDir = aux1.set(model.model.dirLight(0).direction);
+                Vector3 shadowCameraDir = aux1.set(Objects.requireNonNull(model.model.dirLight(0)).direction);
 
                 // Shadow camera direction is that of the light
                 cameraLightIndividual.direction.set(shadowCameraDir);
 
-                Vector3 shadowCamDir = aux1.set(model.model.dirLight(0).direction);
+                Vector3 shadowCamDir = aux1.set(Objects.requireNonNull(model.model.dirLight(0)).direction);
                 // Direction is that of the light
                 cameraLightIndividual.direction.set(shadowCamDir);
 
@@ -431,8 +432,14 @@ public class ShadowMapRenderPass extends RenderPass {
          * shadow if different</li>
          * </ul>
          */
-        List<IRenderable> models = sceneRenderer.getRenderListsFull().get(MODEL_PIX.ordinal());
+        // Normal models: PIX and PIX_TRANSPARENT.
+        var renderListsFull = sceneRenderer.getRenderListsFull();
+        List<IRenderable> models = renderListsFull.get(MODEL_PIX.ordinal());
+        //models.addAll(renderListsFull.get(MODEL_PIX_TRANSPARENT.ordinal()));
+
+        // TESSELLATED MODELS.
         //List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
+
         models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 
         // Global shadow map.

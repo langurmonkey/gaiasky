@@ -38,10 +38,24 @@ public class DefaultIntRenderableSorter implements IntRenderableSorter, Comparat
 
     @Override
     public int compare(final IntRenderable o1, final IntRenderable o2) {
-        final boolean b1 = o1.material.has(BlendingAttribute.Type) && ((BlendingAttribute) Objects.requireNonNull(o1.material.get(BlendingAttribute.Type))).blended;
-        final boolean b2 = o2.material.has(BlendingAttribute.Type) && ((BlendingAttribute) Objects.requireNonNull(o2.material.get(BlendingAttribute.Type))).blended;
-        if (b1 != b2)
+        var ba1 = o1.material.has(BlendingAttribute.Type) ? ((BlendingAttribute) Objects.requireNonNull(o1.material.get(BlendingAttribute.Type))) : null;
+        var ba2 =  o2.material.has(BlendingAttribute.Type) ? ((BlendingAttribute) Objects.requireNonNull(o2.material.get(BlendingAttribute.Type))) : null;
+
+        // Compare blended attributes.
+        final boolean b1 = ba1 != null && ba1.blended;
+        final boolean b2 = ba2 != null && ba2.blended;
+        if (b1 != b2) {
             return b1 ? 1 : -1;
+        }
+
+        // Compare intrinsic opacities.
+        var t1 = ba1 != null ? ba1.intrinsicOpacity : 1f;
+        var t2 = ba2 != null ? ba2.intrinsicOpacity : 1f;
+        if (t1 != t2) {
+            return t1 < t2 ? 1 : -1;
+        }
+
+        // Local transform.
         getTranslation(o1.worldTransform, o1.meshPart.center, tmpV1);
         getTranslation(o2.worldTransform, o2.meshPart.center, tmpV2);
         final float dst = (int) (1000f * camera.position.dst2(tmpV1)) - (int) (1000f * camera.position.dst2(tmpV2));

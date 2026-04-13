@@ -11,9 +11,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class FloatAttribute extends Attribute {
-    public static final String OpacityAlias = "opacity";
-    public static final int Opacity = register(OpacityAlias);
-
     public static final String ShininessAlias = "shininess";
     public static final int Shininess = register(ShininessAlias);
 

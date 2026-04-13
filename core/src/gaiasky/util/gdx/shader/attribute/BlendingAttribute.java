@@ -26,8 +26,14 @@ public class BlendingAttribute extends Attribute {
      * GL_ONE_MINUS_SRC_ALPHA)
      */
     public int destFunction;
-    /** The opacity used as source alpha value, ranging from 0 (fully transparent) to 1 (fully opaque), (default: 1). */
+    /**
+     * The opacity used as source alpha value, ranging from 0 (fully transparent) to 1 (fully opaque), (default: 1).
+     * This contains the final opacity.
+     */
     public float opacity;
+    /** Intrinsic opacity of the material. **/
+    public float intrinsicOpacity;
+
     public BlendingAttribute() {
         this((BlendingAttribute) null);
     }
@@ -38,6 +44,7 @@ public class BlendingAttribute extends Attribute {
         this.sourceFunction = other.sourceFunction;
         this.destFunction = other.destFunction;
         this.opacity = other.opacity;
+        this.intrinsicOpacity = other.opacity;
     }
 
     public BlendingAttribute(final boolean blended, final int sourceFunc, final int destFunc, final float opacity) {
@@ -46,6 +53,7 @@ public class BlendingAttribute extends Attribute {
         this.sourceFunction = sourceFunc;
         this.destFunction = destFunc;
         this.opacity = opacity;
+        this.intrinsicOpacity = opacity;
     }
 
     public BlendingAttribute(final int sourceFunc, final int destFunc, final float opacity) {
@@ -66,10 +74,10 @@ public class BlendingAttribute extends Attribute {
 
     public BlendingAttribute(final BlendingAttribute copyFrom) {
         this(copyFrom == null || copyFrom.blended, copyFrom == null ? GL20.GL_SRC_ALPHA : copyFrom.sourceFunction,
-                copyFrom == null ? GL20.GL_ONE_MINUS_SRC_ALPHA : copyFrom.destFunction, copyFrom == null ? 1.f : copyFrom.opacity);
+             copyFrom == null ? GL20.GL_ONE_MINUS_SRC_ALPHA : copyFrom.destFunction, copyFrom == null ? 1.f : copyFrom.opacity);
     }
 
-    public final static boolean is(final int index) {
+    public static boolean is(final int index) {
         return index == Type;
     }
 
