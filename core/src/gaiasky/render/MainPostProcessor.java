@@ -204,8 +204,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.add(blendFullHalfRes);
 
         // LIGHT GLOW
+        Texture glowTexture;
+        // In some cases (like properties bookmarks), the texture may not have been initialized
+        if (!manager.isLoaded(starGlowTextureName)) {
+            glowTexture = new Texture(starGlowTextureName);
+        } else {
+            glowTexture = manager.get(starGlowTextureName, Texture.class);
+        }
         var glowSettings = Settings.settings.postprocess.lightGlow;
-        var glowTexture = manager.get(starGlowTextureName, Texture.class);
         glowTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         var lightGlow = new LightGlow((int) width, (int) height);
         lightGlow.setLightGlowTexture(glowTexture);
