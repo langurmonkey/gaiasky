@@ -131,9 +131,8 @@ public class ShaderCache {
         GL41.glGetIntegerv(GL41.GL_NUM_PROGRAM_BINARY_FORMATS, intBuffer);
 
         String pattern = name + "_" + hash + "_*.bin";
-        var fullPattern = cacheLocation.resolve(pattern);
-        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:" + fullPattern);
-        try (var paths = Files.find(cacheLocation, 1, (path, f) -> pathMatcher.matches(path))) {
+        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+        try (var paths = Files.find(cacheLocation, 1, (path, f) -> pathMatcher.matches(path.getFileName()))) {
             var l = paths.toList();
             for (var cacheFile : l) {
                 if (Files.exists(cacheFile) && Files.isReadable(cacheFile)) {
