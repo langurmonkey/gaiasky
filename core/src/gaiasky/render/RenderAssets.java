@@ -87,11 +87,19 @@ public class RenderAssets {
         // Build arrays of names and defines.
         var namesSource = new Array<>(String[]::new);
         var definesSource = new Array<>(String[]::new);
+
+        // SSR.
         namesSource.add(SUFFIX_SSR);
         definesSource.add("#define ssrFlag\n");
-        if (Settings.settings.runtime.relativisticAberration && Settings.settings.runtime.gravitationalWaves) {
-            namesSource.add(SUFFIX_REL, SUFFIX_GRAV);
-            definesSource.add("#define relativisticEffects\n", "#define gravitationalWaves\n");
+        // Relativistic aberration.
+        if (Settings.settings.runtime.relativisticAberration) {
+            namesSource.add(SUFFIX_REL);
+            definesSource.add("#define relativisticEffects\n");
+        }
+        // Gravitational waves.
+        if (Settings.settings.runtime.gravitationalWaves) {
+            namesSource.add(SUFFIX_GRAV);
+            definesSource.add("#define gravitationalWaves\n");
         }
         String[] defines = GlobalResources.combinations(definesSource.toArray());
         String[] names = GlobalResources.combinations(namesSource.toArray());
