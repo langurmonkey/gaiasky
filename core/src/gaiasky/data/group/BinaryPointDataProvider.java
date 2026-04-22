@@ -7,6 +7,7 @@
 
 package gaiasky.data.group;
 
+import gaiasky.GaiaSky;
 import gaiasky.data.api.BinaryIO;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.group.reader.IDataReader;
@@ -18,7 +19,6 @@ import gaiasky.scene.record.ParticleExt;
 import gaiasky.scene.record.ParticleType;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
@@ -135,7 +135,7 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
     @Override
     public List<IParticleRecord> loadDataMapped(String file, double factor) {
-        try (var raf = new RandomAccessFile(Settings.settings.data.dataFile(file), "r")) {
+        try (var raf = new RandomAccessFile(GaiaSky.settings().data.dataFile(file), "r")) {
             FileChannel fc = raf.getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());

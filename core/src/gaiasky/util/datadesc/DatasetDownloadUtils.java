@@ -12,7 +12,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
@@ -87,7 +86,7 @@ public class DatasetDownloadUtils {
     public static void cleanupTempFiles(final boolean dataDownloads,
                                         final boolean dataDescriptor) {
         if (dataDownloads) {
-            final Path tempDir = SysUtils.getDataTempDir(Settings.settings.data.location);
+            final Path tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
             // Clean up partial downloads.
             try (final Stream<Path> stream = Files.find(tempDir, 2, (path, basicFileAttributes) -> {
                 final File file = path.toFile();
@@ -101,7 +100,7 @@ public class DatasetDownloadUtils {
 
         if (dataDescriptor) {
             // Clean up data descriptor.
-            Path gsDownload = SysUtils.getDataTempDir(Settings.settings.data.location).resolve("gaiasky-data.json");
+            Path gsDownload = SysUtils.getDataTempDir(GaiaSky.settings().data.location).resolve("gaiasky-data.json");
             deleteFile(gsDownload);
         }
     }
@@ -184,12 +183,12 @@ public class DatasetDownloadUtils {
     }
 
     public static  boolean isEnabled(final DatasetDesc dataset) {
-        return isPathIn(Settings.settings.data.dataFile(dataset.checkStr), Settings.settings.data.dataFiles);
+        return isPathIn(GaiaSky.settings().data.dataFile(dataset.checkStr), GaiaSky.settings().data.dataFiles);
     }
 
     public static boolean isPathIn(String path, List<String> setting) {
         for (String candidate : setting) {
-            var candidatePath = Settings.settings.data.dataPath(candidate);
+            var candidatePath = GaiaSky.settings().data.dataPath(candidate);
             try {
                 if (Path.of(path).toRealPath().equals(candidatePath.toRealPath())) {
                     return true;

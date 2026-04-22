@@ -277,7 +277,7 @@ public class GuiRegistry implements IObserver {
      */
     public void render(int rw,
                        int rh) {
-        if (Settings.settings.runtime.displayGui) {
+        if (GaiaSky.settings().runtime.displayGui) {
             synchronized (renderLock) {
                 for (int i = 0; i < guis.size; i++) {
                     guis.get(i).getGuiStage().getViewport().apply();
@@ -287,7 +287,7 @@ public class GuiRegistry implements IObserver {
                     }
                 }
             }
-        } else if (Settings.settings.program.displayTimeNoUi) {
+        } else if (GaiaSky.settings().program.displayTimeNoUi) {
             synchronized (renderLock) {
                 for (int i = 0; i < specialGuis.size; i++) {
                     specialGuis.get(i).getGuiStage().getViewport().apply();
@@ -326,7 +326,7 @@ public class GuiRegistry implements IObserver {
             gui.update(dt);
         }
         // Only update special when needed.
-        if (!Settings.settings.runtime.displayGui && Settings.settings.program.displayTimeNoUi) {
+        if (!GaiaSky.settings().runtime.displayGui && GaiaSky.settings().program.displayTimeNoUi) {
             for (IGui gui : specialGuis) {
                 gui.update(dt);
             }
@@ -346,7 +346,7 @@ public class GuiRegistry implements IObserver {
             }
         }
 
-        if (releaseNotesVersion < Settings.settings.version.versionNumber) {
+        if (releaseNotesVersion < GaiaSky.settings().version.versionNumber) {
             Path releaseNotesFile = SysUtils.getReleaseNotesFile();
             if (Files.exists(releaseNotesFile)) {
                 final Task releaseNotesTask = new Task() {
@@ -395,7 +395,7 @@ public class GuiRegistry implements IObserver {
                                                   GLFW.GLFW_CURSOR_NORMAL);
                         } else {
                             Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
-                            if (Settings.settings.program.exitConfirmation) {
+                            if (GaiaSky.settings().program.exitConfirmation) {
                                 QuitWindow quit = new QuitWindow(stage, skin);
                                 if (data.length > 0) {
                                     quit.setAcceptListener(quitRunnable);
@@ -457,10 +457,10 @@ public class GuiRegistry implements IObserver {
                     }
                 }
                 case SHOW_LOAD_CATALOG_ACTION -> {
-                    if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null
-                            && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
+                    if (lastOpenLocation == null && GaiaSky.settings().program.fileChooser.lastLocation != null
+                            && !GaiaSky.settings().program.fileChooser.lastLocation.isEmpty()) {
                         try {
-                            lastOpenLocation = Paths.get(Settings.settings.program.fileChooser.lastLocation);
+                            lastOpenLocation = Paths.get(GaiaSky.settings().program.fileChooser.lastLocation);
                         } catch (Exception e) {
                             lastOpenLocation = null;
                         }
@@ -471,8 +471,8 @@ public class GuiRegistry implements IObserver {
                         lastOpenLocation = SysUtils.getHomeDir();
                     }
                     FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
-                    fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                    fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
+                    fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
+                    fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                     fc.setAcceptText(I18n.msg("gui.loadcatalog"));
                     fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName()
                             .toString()
@@ -535,7 +535,7 @@ public class GuiRegistry implements IObserver {
                                     }
 
                                     lastOpenLocation = result.getParent();
-                                    Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
+                                    GaiaSky.settings().program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
                                     return true;
                                 } catch (Exception e) {
                                     logger.error(I18n.msg("notif.error", result.getFileName()), e);
@@ -553,7 +553,7 @@ public class GuiRegistry implements IObserver {
                             } else {
                                 lastOpenLocation = result;
                             }
-                            Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
+                            GaiaSky.settings().program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
                         }
                         return false;
                     });
@@ -580,7 +580,7 @@ public class GuiRegistry implements IObserver {
                     if (dateDialog == null) {
                         dateDialog = new DateDialog(stage, skin);
                     }
-                    dateDialog.updateTime(GaiaSky.instance.time.getTime(), Settings.settings.program.timeZone.getTimeZone());
+                    dateDialog.updateTime(GaiaSky.instance.time.getTime(), GaiaSky.settings().program.timeZone.getTimeZone());
                     dateDialog.show(stage);
                 }
                 case SHOW_OBJECT_DEBUG_ACTION -> {
@@ -607,7 +607,7 @@ public class GuiRegistry implements IObserver {
                 }
                 case SHOW_INDEX_NAME_CONFLICTS_ACTION -> {
                     var scene = (Scene) data[0];
-                    if (Settings.settings.program.showNameConflicts && scene.index().getConflicts().size > 0) {
+                    if (GaiaSky.settings().program.showNameConflicts && scene.index().getConflicts().size > 0) {
                         if (indexNameConflictsWindow == null) {
                             indexNameConflictsWindow = new IndexNameConflictsWindow(stage, skin, scene);
                         }
@@ -623,7 +623,7 @@ public class GuiRegistry implements IObserver {
                     this.skin = (Skin) data[0];
                 }
                 case MODE_POPUP_CMD -> {
-                    if (Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
+                    if (GaiaSky.settings().runtime.displayGui && GaiaSky.settings().program.ui.modeChangeInfo) {
                         ModePopupInfo mpi = (ModePopupInfo) data[0];
                         String name = (String) data[1];
 

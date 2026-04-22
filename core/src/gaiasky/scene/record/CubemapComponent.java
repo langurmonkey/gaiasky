@@ -12,11 +12,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.utils.Disposable;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.OwnCubemap;
 import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.i18n.I18n;
@@ -45,8 +45,8 @@ public class CubemapComponent implements Disposable {
             textureParams.minFilter = TextureFilter.MipMapLinearLinear;
             loaded = true;
             try {
-                String cubemapLocation = location == null ? Settings.settings.data.reflectionSkyboxLocation : location;
-                String cubemapLocationUnpacked = Settings.settings.data.dataFile(cubemapLocation);
+                String cubemapLocation = location == null ? GaiaSky.settings().data.reflectionSkyboxLocation : location;
+                String cubemapLocationUnpacked = GaiaSky.settings().data.dataFile(cubemapLocation);
                 cubemapLocationUnpacked = GlobalResources.unpackAssetPath(cubemapLocationUnpacked);
                 logger.info(I18n.msg("notif.loading", "cubemap: " + cubemapLocationUnpacked));
                 cmBack = GlobalResources.resolveCubemapSide(cubemapLocationUnpacked, "bk", "back", "b");
@@ -63,7 +63,7 @@ public class CubemapComponent implements Disposable {
                 addToLoad(cmRight, textureParams, manager);
                 addToLoad(cmLeft, textureParams, manager);
             } catch (RuntimeException e) {
-                logger.error(e, "Error loading skybox: " + Settings.settings.data.reflectionSkyboxLocation);
+                logger.error(e, "Error loading skybox: " + GaiaSky.settings().data.reflectionSkyboxLocation);
             }
         }
     }

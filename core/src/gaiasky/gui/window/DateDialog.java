@@ -13,11 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.i18n.I18n;
@@ -57,7 +57,7 @@ public class DateDialog extends GenericDialog {
 
     public DateDialog(Stage stage, Skin skin) {
         super(I18n.msg("gui.pickdate"), skin, stage);
-        this.timeZone = Settings.settings.program.timeZone.getTimeZone();
+        this.timeZone = GaiaSky.settings().program.timeZone.getTimeZone();
         this.initialized = new AtomicBoolean(false);
         this.current = Instant.now();
 
@@ -186,8 +186,8 @@ public class DateDialog extends GenericDialog {
                        I18n.msg("gui.date.sep"), I18n.msg("gui.date.oct"), I18n.msg("gui.date.nov"), I18n.msg("gui.date.dec"));
         month.setWidth(inputWidth);
 
-        var yearValidator = new IntValidator((int) (Settings.settings.runtime.minTimeMs * Nature.MS_TO_Y),
-                                             (int) (Settings.settings.runtime.maxTimeMs * Nature.MS_TO_Y));
+        var yearValidator = new IntValidator((int) (GaiaSky.settings().runtime.minTimeMs * Nature.MS_TO_Y),
+                                             (int) (GaiaSky.settings().runtime.maxTimeMs * Nature.MS_TO_Y));
         year = new OwnTextField("", skin, yearValidator);
         year.setMaxLength(8);
         year.setWidth(inputWidth);
@@ -308,8 +308,8 @@ public class DateDialog extends GenericDialog {
         content.clear();
 
         // Julian date
-        var jdMin = AstroUtils.getJulianDateUTC((int) (Settings.settings.runtime.minTimeMs * Nature.MS_TO_Y), 1, 1, 0, 0, 0, 0);
-        var jdMax = AstroUtils.getJulianDateUTC((int) (Settings.settings.runtime.maxTimeMs * Nature.MS_TO_Y), 1, 1, 0, 0, 0, 0);
+        var jdMin = AstroUtils.getJulianDateUTC((int) (GaiaSky.settings().runtime.minTimeMs * Nature.MS_TO_Y), 1, 1, 0, 0, 0, 0);
+        var jdMax = AstroUtils.getJulianDateUTC((int) (GaiaSky.settings().runtime.maxTimeMs * Nature.MS_TO_Y), 1, 1, 0, 0, 0, 0);
         var jdValidator = new DoubleValidator(jdMin, jdMax);
         jd = new OwnTextField("", skin, jdValidator);
         jd.setWidth(inputWidth);

@@ -9,6 +9,7 @@ package gaiasky.util.tree;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.data.api.IOctantLoader;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -18,11 +19,10 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
 
@@ -632,8 +632,8 @@ public class OctreeNode implements ILineRenderable {
         viewAngle = FastMath.atan(radius / distToCamera) * 2;
 
         float cf = MathUtilsDouble.clamp(cam.getFovFactor() * 2.5f, 0.15f, 1f);
-        float th0 = Settings.settings.scene.octree.threshold[0] * cf;
-        float th1 = Settings.settings.scene.octree.threshold[1] * cf;
+        float th0 = GaiaSky.settings().scene.octree.threshold[0] * cf;
+        float th1 = GaiaSky.settings().scene.octree.threshold[1] * cf;
 
         var isCameraFocus = hasFocusObject(cam);
         if (viewAngle < th0 && !isCameraFocus) {
@@ -644,7 +644,7 @@ public class OctreeNode implements ILineRenderable {
             /*
              * Load lists of pages
              */
-            if (status == LoadStatus.NOT_LOADED && Settings.settings.runtime.octreeLoadActive) {
+            if (status == LoadStatus.NOT_LOADED && GaiaSky.settings().runtime.octreeLoadActive) {
                 // Add to load and go on
                 assert loader != null : "Octant loader is null!";
                 loader.queue(this);
@@ -662,7 +662,7 @@ public class OctreeNode implements ILineRenderable {
             }  // What do? Move first in queue?
 
             double alpha = 1;
-            if (Settings.settings.scene.octree.fade && viewAngle < th1) {
+            if (GaiaSky.settings().scene.octree.fade && viewAngle < th1) {
                 // Compute smooth interpolation for octant alpha.
                 // Transition stage.
                 alpha = MathUtilsDouble.clamp(MathUtilsDouble.flint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
@@ -713,8 +713,8 @@ public class OctreeNode implements ILineRenderable {
                 octantFactor = MathUtilsDouble.flint(viewAngle, threshold, 2.9, 0.0, 0.6);
             }
 
-            int newNumLabels = (int) (Settings.settings.scene.star.group.numLabels * octantFactor);
-            int newNumBillboard = (int) (Settings.settings.scene.star.group.numBillboard * octantFactor);
+            int newNumLabels = (int) (GaiaSky.settings().scene.star.group.numLabels * octantFactor);
+            int newNumBillboard = (int) (GaiaSky.settings().scene.star.group.numBillboard * octantFactor);
             for (IOctreeObject obj : objects) {
                 if (obj instanceof OctreeObjectView oov) {
                     if (oov.set != null) {

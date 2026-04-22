@@ -12,8 +12,8 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Disposable;
+import gaiasky.GaiaSky;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
-import gaiasky.util.Settings;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
@@ -130,10 +130,10 @@ public final class PingPongBuffer implements Disposable {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
             if (pixmapFormat == Format.RGBA8888 || pixmapFormat == Format.RGBA4444) {
                 // Use alpha.
-                addFloatRenderTarget(builder, Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGBA16F);
+                addFloatRenderTarget(builder, GaiaSky.settings().graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGBA16F);
             } else {
                 // Skip alpha.
-                addFloatRenderTarget(builder, Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8 : GL30.GL_RGB16F);
+                addFloatRenderTarget(builder, GaiaSky.settings().graphics.useSRGB ? GL30.GL_SRGB8 : GL30.GL_RGB16F);
             }
         } else {
             addColorRenderTarget(builder, pixmapFormat);

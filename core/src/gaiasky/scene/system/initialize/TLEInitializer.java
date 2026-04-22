@@ -17,7 +17,6 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.TLESource;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.TLEParser;
@@ -62,7 +61,7 @@ public class TLEInitializer extends AbstractInitSystem {
                 final var now = Instant.now();
                 final var tle = Mapper.tle.get(entity);
                 final var fileName = TextUtils.sanitizeFilename(tle.nameTLE + "-TLE.json");
-                final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
+                final var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
                 var ignored = cacheDir.toFile().mkdirs();
                 final var filePath = cacheDir.resolve(fileName);
                 var mustUpdate = false;

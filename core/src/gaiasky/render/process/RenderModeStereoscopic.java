@@ -31,7 +31,6 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
@@ -85,7 +84,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
                  new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), true));
 
         // Init anaglyph 3D effect
-        anaglyphEffect = new AnaglyphEffect(Settings.settings.program.modeStereo.customColorLeft, Settings.settings.program.modeStereo.customColorRight);
+        anaglyphEffect = new AnaglyphEffect(GaiaSky.settings().program.modeStereo.customColorLeft, GaiaSky.settings().program.modeStereo.customColorRight);
         updateAnaglyphMode();
 
         // Copy
@@ -108,7 +107,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
     public void updateAnaglyphMode() {
         if (anaglyphEffect != null) {
-            anaglyphEffect.setAnaglyphMode(Settings.settings.program.modeStereo.profile.getAnaglyphModeInteger());
+            anaglyphEffect.setAnaglyphMode(GaiaSky.settings().program.modeStereo.profile.getAnaglyphModeInteger());
         }
     }
 
@@ -134,9 +133,9 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
         // Compute distance to focus or closest body object.
         double closestDist = getObjectDistance(camera);
-        double k = Settings.settings.program.modeStereo.k;
-        double ipd = Settings.settings.program.modeStereo.ipd;
-        double screenDist = Settings.settings.program.modeStereo.screenDistance;
+        double k = GaiaSky.settings().program.modeStereo.k;
+        double ipd = GaiaSky.settings().program.modeStereo.ipd;
+        double screenDist = GaiaSky.settings().program.modeStereo.screenDistance;
         double maxSep = 1.6e8 * Constants.KM_TO_U;
         // The magic formula.
         double eyeSep = k * (closestDist * ipd / screenDist) * camera.getFovFactor();
@@ -160,7 +159,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         Vector3 backupDir = aux3.set(perspectiveCam.direction);
         Vector3D backupPosD = aux1d.set(camera.getPos());
 
-        if (Settings.settings.program.modeStereo.profile.isAnaglyph()) {
+        if (GaiaSky.settings().program.modeStereo.profile.isAnaglyph()) {
             // Update viewport.
             extendViewport.setCamera(camera.getCamera());
             extendViewport.setWorldSize(rw, rh);
@@ -220,10 +219,10 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             double srw, srh, boundsw, boundsh, start2w, start2h;
 
             float unitsPerPixel = GaiaSky.instance.getUnitsPerPixel();
-            boolean stretch = Settings.settings.program.modeStereo.profile == StereoProfile.HORIZONTAL_3DTV || Settings.settings.program.modeStereo.profile == StereoProfile.VERTICAL_3DTV;
-            boolean changeSides = Settings.settings.program.modeStereo.profile == StereoProfile.CROSS_EYE;
+            boolean stretch = GaiaSky.settings().program.modeStereo.profile == StereoProfile.HORIZONTAL_3DTV || GaiaSky.settings().program.modeStereo.profile == StereoProfile.VERTICAL_3DTV;
+            boolean changeSides = GaiaSky.settings().program.modeStereo.profile == StereoProfile.CROSS_EYE;
 
-            if (Settings.settings.program.modeStereo.profile.isHorizontal()) {
+            if (GaiaSky.settings().program.modeStereo.profile.isHorizontal()) {
                 if (stretch) {
                     srw = rw;
                 } else {
@@ -251,10 +250,10 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             start2w *= unitsPerPixel;
             start2h *= unitsPerPixel;
 
-            boundsw /= Settings.settings.graphics.backBufferScale;
-            boundsh /= Settings.settings.graphics.backBufferScale;
-            start2w /= Settings.settings.graphics.backBufferScale;
-            start2h /= Settings.settings.graphics.backBufferScale;
+            boundsw /= GaiaSky.settings().graphics.backBufferScale;
+            boundsh /= GaiaSky.settings().graphics.backBufferScale;
+            start2w /= GaiaSky.settings().graphics.backBufferScale;
+            start2h /= GaiaSky.settings().graphics.backBufferScale;
 
             // Side by side rendering
             Viewport viewport = stretch ? stretchViewport : extendViewport;
@@ -412,7 +411,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     }
 
     public void resize(int rw, int rh, int tw, int th) {
-        if (Settings.settings.program.modeStereo.active) {
+        if (GaiaSky.settings().program.modeStereo.active) {
             extendViewport.update(tw, th);
             stretchViewport.update(tw, th);
 

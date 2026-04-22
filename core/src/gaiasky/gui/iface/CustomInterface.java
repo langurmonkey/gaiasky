@@ -23,7 +23,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.api.IGuiInterface;
-import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnLabel;
 

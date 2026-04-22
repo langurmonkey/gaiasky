@@ -20,7 +20,6 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.RuntimeSettings;
 import gaiasky.util.comp.ViewAngleComparator;
 import gaiasky.util.math.Vector3D;
@@ -65,7 +64,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
         this.p0 = new Vector3D();
         this.p1 = new Vector3D();
         this.focusView = new FocusView();
-        this.runtime = Settings.settings.runtime;
+        this.runtime = GaiaSky.settings().runtime;
 
         EventManager.instance.subscribe(this, Event.VR_DRIVER_LOADED);
     }

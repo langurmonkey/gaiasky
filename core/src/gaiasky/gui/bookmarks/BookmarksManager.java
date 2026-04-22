@@ -8,13 +8,14 @@
 package gaiasky.gui.bookmarks;
 
 import com.badlogic.gdx.utils.Null;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.parse.Parser;
 
 import java.io.IOException;
@@ -448,7 +449,8 @@ public class BookmarksManager implements IObserver {
                         } catch (IOException e) {
                             logger.error(I18n.msg("error.directory.create", parent.toAbsolutePath().toString()), e);
                         }
-                        SettingsManager.persistSettings(s, settingsFile.toFile());
+                        var settingsManager = new SettingsManager();
+                        settingsManager.persist(s, settingsFile.toFile());
                     }
                     String text = String.format("{%s|%s|%s|%s|%s|%s|%s}", str(pos), str(dir), str(up), str(t), name, str(id), str(focus));
                     if (addBookmark(text, folder)) {
@@ -686,10 +688,11 @@ public class BookmarksManager implements IObserver {
                 Path parent = SysUtils.getDefaultBookmarksDir().resolve("settings");
                 Path settingsFile = parent.resolve(this.uuid);
                 try {
-                    var settings = SettingsManager.instance.loadSettings(settingsFile.toFile());
+                    var settingsManager = new SettingsManager();
+                    var settings = settingsManager.loadSettings(settingsFile.toFile());
                     settings.setParent(settings);
                     // Runtime.
-                    settings.runtime = Settings.settings.runtime.clone();
+                    settings.runtime = GaiaSky.settings().runtime.clone();
                     settings.runtime.inputEnabled = true;
                     settings.runtime.setParent(settings);
                     return settings;

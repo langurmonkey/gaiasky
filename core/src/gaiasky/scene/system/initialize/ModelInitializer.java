@@ -34,7 +34,10 @@ import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Pair;
+import gaiasky.util.TextUtils;
 import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
@@ -159,7 +162,7 @@ public class ModelInitializer extends AbstractInitSystem {
             // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
             // Initialize tessellated.
-            model.model.tessellated = Settings.settings.scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
+            model.model.tessellated = GaiaSky.settings().scene.renderer.elevation.type.isTessellation() && body.size > 500.0 * Constants.KM_TO_U;
             // Set units.
             model.model.setUnits(Constants.KM_TO_U);
         }
@@ -319,7 +322,7 @@ public class ModelInitializer extends AbstractInitSystem {
         scaffolding.locVaMultiplier = 2.8f;
 
         sa.thresholdPoint = FastMath.toRadians(0.30);
-        sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
+        sa.thresholdLabel = (Math.toRadians(1e-6) / GaiaSky.settings().scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
         if (isBillboardGal) {
             sa.thresholdQuad = FastMath.toRadians(0.3);
         }
@@ -333,7 +336,7 @@ public class ModelInitializer extends AbstractInitSystem {
             // ignore current model component (if any) and create a random one
             model.model = new ModelComponent(true);
             model.model.randomizeAll(scaffolding.getSeed("model"), body.size);
-            if (Settings.settings.program.debugInfo) {
+            if (GaiaSky.settings().program.debugInfo) {
                 logger.debug("::" + base.getName() + "::");
                 logger.debug("============model===========");
                 model.model.print(logger);
@@ -422,7 +425,7 @@ public class ModelInitializer extends AbstractInitSystem {
         sa.thresholdNone = thPoint / 1e18;
         sa.thresholdPoint = thPoint / 3.3e10;
         sa.thresholdQuad = thPoint / 8.0;
-        sa.thresholdLabel = (Math.toRadians(1e-7) / Settings.settings.scene.label.number);
+        sa.thresholdLabel = (Math.toRadians(1e-7) / GaiaSky.settings().scene.label.number);
         label.labelFactor = (float) (0.5e1 * Constants.DISTANCE_SCALE_FACTOR);
         label.labelMax = label.labelMax * 2f;
 

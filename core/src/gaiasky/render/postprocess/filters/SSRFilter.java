@@ -10,7 +10,6 @@ package gaiasky.render.postprocess.filters;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import gaiasky.render.util.ShaderLoader;
 
 public class SSRFilter extends Filter3<SSRFilter> {
 

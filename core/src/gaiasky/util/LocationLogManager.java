@@ -15,8 +15,8 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 

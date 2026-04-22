@@ -14,8 +14,8 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderAssets;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
@@ -117,7 +117,7 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
         boolean lazyLoad = parameter != null && parameter.name != null
                 && (parameter.name.contains(RenderAssets.SUFFIX_REL)
                 || parameter.name.contains(RenderAssets.SUFFIX_GRAV)
-                || (parameter.name.contains(RenderAssets.SUFFIX_SSR) && !Settings.settings.postprocess.ssr.active)
+                || (parameter.name.contains(RenderAssets.SUFFIX_SSR) && !GaiaSky.settings().postprocess.ssr.active)
         );
 
         ExtShaderProgram shaderProgram;

@@ -8,11 +8,11 @@
 package gaiasky.input;
 
 import com.badlogic.gdx.Input.Keys;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.camera.SpacecraftCamera;
 import gaiasky.scene.view.SpacecraftView;
-import gaiasky.util.Settings;
 
 public class SpacecraftMouseKbdListener extends AbstractMouseKbdListener {
 
@@ -27,7 +27,7 @@ public class SpacecraftMouseKbdListener extends AbstractMouseKbdListener {
     public boolean keyDown(int keyCode) {
         if (isActive()) {
             SpacecraftView sc = cam.getSpacecraftView();
-            if (sc != null && Settings.settings.runtime.inputEnabled) {
+            if (sc != null && GaiaSky.settings().runtime.inputEnabled) {
                 double step = 0.01;
                 switch (keyCode) {
                     case Keys.W -> {
@@ -83,7 +83,7 @@ public class SpacecraftMouseKbdListener extends AbstractMouseKbdListener {
     public boolean keyUp(int keycode) {
         if (isActive()) {
             SpacecraftView sc = cam.getSpacecraftView();
-            if (sc != null && sc.getEntity() != null && Settings.settings.runtime.inputEnabled) {
+            if (sc != null && sc.getEntity() != null && GaiaSky.settings().runtime.inputEnabled) {
                 switch (keycode) {
                     case Keys.W, Keys.S ->
                         // power 0

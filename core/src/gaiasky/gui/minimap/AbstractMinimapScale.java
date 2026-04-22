@@ -19,8 +19,8 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 public abstract class AbstractMinimapScale implements IMinimapScale {
     protected OrthographicCamera ortho;

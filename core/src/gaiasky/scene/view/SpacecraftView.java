@@ -22,8 +22,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.IBodyCoordinates;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 public class SpacecraftView extends BaseView implements ISpacecraft {
     private static final Log logger = Logger.getLogger(SpacecraftView.class);

@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
+import gaiasky.GaiaSky;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.DistanceUnits;
@@ -128,7 +129,7 @@ public class GlobalResources implements Disposable {
         manager.load("img/markers/loc-marker-city.png", Texture.class, params);
         manager.load("img/markers/loc-marker-town.png", Texture.class, params);
         manager.load("img/markers/loc-marker-landmark.png", Texture.class, params);
-        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class, params);
+        manager.load(GaiaSky.settings().data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class, params);
     }
 
     public void doneLoading(AssetManager manager) {
@@ -148,7 +149,7 @@ public class GlobalResources implements Disposable {
         textures.put("loc-marker-town", manager.get("img/markers/loc-marker-town.png"));
         textures.put("loc-marker-landmark", manager.get("img/markers/loc-marker-landmark.png"));
         textures.put("attitude-indicator",
-                     manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class));
+                     manager.get(GaiaSky.settings().data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class));
 
     }
 
@@ -449,7 +450,7 @@ public class GlobalResources implements Disposable {
 
     public static synchronized void applyRelativisticAberration(Vector3D pos, ICamera cam) {
         // Relativistic aberration
-        if (Settings.settings.runtime.relativisticAberration) {
+        if (GaiaSky.settings().runtime.relativisticAberration) {
             Vector3D camDir = aux;
             if (cam.getVelocity() != null)
                 camDir.set(cam.getVelocity()).nor();
@@ -597,13 +598,13 @@ public class GlobalResources implements Disposable {
                 String suffix = quality.suffix;
 
                 String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
-                if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
+                if (GaiaSky.settings().data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }
             }
             // Try with no suffix
             String texNoSuffix = path.replace(Constants.STAR_SUBSTITUTE, "");
-            if (Settings.settings.data.dataFileHandle(texNoSuffix).exists()) {
+            if (GaiaSky.settings().data.dataFileHandle(texNoSuffix).exists()) {
                 return texNoSuffix;
             }
             // Try higher qualities
@@ -613,7 +614,7 @@ public class GlobalResources implements Disposable {
                 String suffix = quality.suffix;
 
                 String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
-                if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
+                if (GaiaSky.settings().data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }
             }
@@ -628,7 +629,7 @@ public class GlobalResources implements Disposable {
         if (!path.contains(Constants.STAR_SUBSTITUTE)) {
             for (String extension : extensions) {
                 String tex = path + extension;
-                if (Settings.settings.data.dataFileHandle(tex).exists()) {
+                if (GaiaSky.settings().data.dataFileHandle(tex).exists()) {
                     return tex;
                 }
             }
@@ -640,7 +641,7 @@ public class GlobalResources implements Disposable {
                     String suffix = quality.suffix;
 
                     String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix) + extension;
-                    if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
+                    if (GaiaSky.settings().data.dataFileHandle(texSuffix).exists()) {
                         return texSuffix;
                     }
                 }
@@ -648,7 +649,7 @@ public class GlobalResources implements Disposable {
             // Try with no suffix.
             for (String extension : extensions) {
                 String texNoSuffix = path.replace(Constants.STAR_SUBSTITUTE, "") + extension;
-                if (Settings.settings.data.dataFileHandle(texNoSuffix).exists()) {
+                if (GaiaSky.settings().data.dataFileHandle(texNoSuffix).exists()) {
                     return texNoSuffix;
                 }
             }
@@ -660,7 +661,7 @@ public class GlobalResources implements Disposable {
                     String suffix = quality.suffix;
 
                     String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix) + extension;
-                    if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
+                    if (GaiaSky.settings().data.dataFileHandle(texSuffix).exists()) {
                         return texSuffix;
                     }
                 }
@@ -670,11 +671,11 @@ public class GlobalResources implements Disposable {
     }
 
     public static String unpackAssetPath(String tex) {
-        return GlobalResources.unpackAssetPath(tex, Settings.settings.graphics.quality);
+        return GlobalResources.unpackAssetPath(tex, GaiaSky.settings().graphics.quality);
     }
 
     public static String unpackAssetPathExtensions(String tex, String... extensions) {
-        return GlobalResources.unpackAssetPath(tex, Settings.settings.graphics.quality, extensions);
+        return GlobalResources.unpackAssetPath(tex, GaiaSky.settings().graphics.quality, extensions);
     }
 
     public static String resolveCubemapSide(String baseLocation, String... sideSuffixes) throws RuntimeException {

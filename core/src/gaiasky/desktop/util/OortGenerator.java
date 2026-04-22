@@ -11,6 +11,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;
@@ -35,10 +37,12 @@ public class OortGenerator {
         try {
             Gdx.files = new Lwjgl3Files();
 
-            SettingsManager.initialize(new FileInputStream("../assets/conf/config.yaml"), new FileInputStream("../assets/data/dummyversion"));
+            var manager = new SettingsManager();
+            var settings = manager.loadSettings(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
+            new GaiaSky(new GaiaSkyDesktop.CLIArgs(), settings);
 
             I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/gsbundle"),
-                    new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/objects"));
+                            new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/objects"));
 
             // Add notif watch
             new ConsoleLogger();
@@ -60,7 +64,7 @@ public class OortGenerator {
      * Generates random Oort cloud particles
      */
     private static Array<double[]> generateOort() throws RuntimeException {
-        StdRandom.setSeed(100l);
+        StdRandom.setSeed(100L);
 
         Array<double[]> particles = new Array<>(false, N);
 
@@ -84,7 +88,7 @@ public class OortGenerator {
             // double yAngle = StdRandom.uniform() * 180 - 90;
             // particle.rotate(yAxis, yAngle);
 
-            particles.add(new double[] { particle.x, particle.y, particle.z });
+            particles.add(new double[]{particle.x, particle.y, particle.z});
             n++;
             // }
         }

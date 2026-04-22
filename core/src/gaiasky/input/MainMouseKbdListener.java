@@ -27,7 +27,6 @@ import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.KeyframesView;
-import gaiasky.util.Settings;
 import gaiasky.util.comp.ViewAngleComparator;
 import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
@@ -257,7 +256,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                              final int pointer,
                              final int button) {
         if (isActive()) {
-            if (Settings.settings.runtime.inputEnabled) {
+            if (GaiaSky.settings().runtime.inputEnabled) {
                 touched |= (1 << pointer);
                 multiTouch = !MathUtils.isPowerOfTwo(touched);
                 if (multiTouch)
@@ -296,7 +295,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                            final int button) {
         if (isActive()) {
             EventManager.publish(Event.INPUT_EVENT, this, button);
-            if (Settings.settings.runtime.inputEnabled) {
+            if (GaiaSky.settings().runtime.inputEnabled) {
                 touched &= ~(1 << pointer);
                 multiTouch = !MathUtils.isPowerOfTwo(touched);
                 if (button == this.button && button == leftMouseButton) {
@@ -305,7 +304,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
                     GaiaSky.postRunnable(() -> {
                         // 5% of width pixels distance.
-                        if (!Settings.settings.scene.camera.cinematic || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
+                        if (!GaiaSky.settings().scene.camera.cinematic || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
                             boolean stopped = camera.stopMovement();
                             boolean focusRemoved = GaiaSky.instance.mainGui != null && GaiaSky.instance.mainGui.cancelTouchFocus();
                             boolean doubleClick = currentTime - lastLeftTime < doubleClickTime;
@@ -336,7 +335,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                         // Ensure Octants observed property is computed
                         GaiaSky.postRunnable(() -> {
                             // 5% of width pixels distance
-                            if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && !Settings.settings.program.modeStereo.active) {
+                            if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && !GaiaSky.settings().program.modeStereo.active) {
                                 // Stop
                                 camera.setYaw(0);
                                 camera.setPitch(0);
@@ -369,7 +368,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                                   int button) {
         if (isActive()) {
 
-            boolean accel = Settings.settings.scene.camera.cinematic;
+            boolean accel = GaiaSky.settings().scene.camera.cinematic;
             if (accel) {
                 dragDx = deltaX;
                 dragDy = deltaY;
@@ -428,7 +427,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                                 int screenY,
                                 int pointer) {
         if (isActive()) {
-            if (Settings.settings.runtime.inputEnabled) {
+            if (GaiaSky.settings().runtime.inputEnabled) {
                 boolean result = super.touchDragged(screenX, screenY, pointer);
                 if (result || this.button < 0)
                     return result;
@@ -453,7 +452,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             amountX *= fpsScale;
             amountY *= fpsScale;
             super.scrolled(amountX, amountY);
-            if (Settings.settings.runtime.inputEnabled) {
+            if (GaiaSky.settings().runtime.inputEnabled) {
                 return zoom(amountY * scrollFactor);
             }
         }
@@ -473,7 +472,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             // Convert to logical.
             keyCode = InputUtils.physicalToLogicalKeyCode(keyCode);
 
-            if (Settings.settings.runtime.inputEnabled) {
+            if (GaiaSky.settings().runtime.inputEnabled) {
                 register.registerKeyDownTime(keyCode, TimeUtils.millis());
             }
             return super.keyDown(keyCode);
@@ -493,7 +492,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         var modifier = isKeyPressed(Keys.SHIFT_LEFT) || isKeyPressed(Keys.CONTROL_LEFT);
         var keyboardFocus = GaiaSky.instance.mainGui.getGuiStage().getKeyboardFocus();
         if (!(keyboardFocus instanceof TextField)) {
-            float scaling = Settings.settings.scene.camera.cinematic ? 0.01f : 1f;
+            float scaling = GaiaSky.settings().scene.camera.cinematic ? 0.01f : 1f;
             if (isKeyPressed(Keys.UP)) {
                 if (!modifier) {
                     camera.addForwardForce(1.0f);
@@ -576,7 +575,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 } else if (t > -0.1 && t < 0) {
                     t = 0;
                 }
-                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                double inc = GaiaSky.settings().scene.camera.cinematic ? 0.01 : 0.05;
                 EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + FastMath.abs(t * inc) : t + t * inc);
             }
         } else if (allPressed(slowTimeKeys)) {
@@ -588,7 +587,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 } else if (t < 0.1 && t > 0) {
                     t = 0;
                 }
-                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                double inc = GaiaSky.settings().scene.camera.cinematic ? 0.01 : 0.05;
                 EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - FastMath.abs(t * inc) : t - t * inc);
             }
         }

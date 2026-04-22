@@ -26,7 +26,6 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.ModelView;
 import gaiasky.util.GaiaSkyAssets;
-import gaiasky.util.Settings;
 import gaiasky.util.svt.SVTManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
@@ -49,7 +48,7 @@ public class SVTRenderPass extends RenderPass {
      * Should match the constant with the same name in svt.detection.fragment.glsl
      * and tess.svt.detection.fragment.glsl.
      **/
-    public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor;
+    public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = (float) GaiaSky.settings().scene.renderer.virtualTextures.detectionBufferFactor;
 
     /** The model view object. **/
     private final ModelView view;

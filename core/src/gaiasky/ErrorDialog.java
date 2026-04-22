@@ -67,7 +67,7 @@ public class ErrorDialog implements ApplicationListener {
     @Override
     public void create() {
         var height = Gdx.graphics.getHeight();
-        var unitsPerPixel = 1f / ((float) height / 1000f) * Settings.settings.program.ui.scale;
+        var unitsPerPixel = 1f / ((float) height / 1000f) * GaiaSky.settings().program.ui.scale;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         this.vp = vp;
@@ -240,7 +240,7 @@ public class ErrorDialog implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        var unitsPerPixel = 1f / ((float) height / 1000f) * Settings.settings.program.ui.scale;
+        var unitsPerPixel = 1f / ((float) height / 1000f) * GaiaSky.settings().program.ui.scale;
         vp.setUnitsPerPixel(unitsPerPixel);
         vp.update(width, height, true);
         sb.getProjectionMatrix()
@@ -255,7 +255,7 @@ public class ErrorDialog implements ApplicationListener {
         ui.act(Gdx.graphics.getDeltaTime());
 
         // Render.
-        var accent = Settings.settings.program.ui.accentColor;
+        var accent = GaiaSky.settings().program.ui.accentColor;
         ui.getBatch().getShader().setUniform3fv("u_accentColor", accent, 0, 3);
         ui.draw();
     }

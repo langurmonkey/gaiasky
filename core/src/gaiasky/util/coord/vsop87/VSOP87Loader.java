@@ -14,8 +14,8 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 
 /**
  * Loads the VSOP87 binary files and initializes the main class.
@@ -32,7 +32,7 @@ public class VSOP87Loader extends AsynchronousAssetLoader<VSOP87Binary, VSOP87Lo
     @Override
     public void loadAsync(AssetManager assetManager, String s, FileHandle fileHandle, VSOP87LoaderParameters vsop87LoaderParameters) {
         try {
-            var fullPath = Settings.settings.data.dataFile(s);
+            var fullPath = GaiaSky.settings().data.dataFile(s);
             vsop87 = new VSOP87Binary(fullPath, vsop87LoaderParameters.percentSkipped);
         } catch (Exception e) {
             logger.error(e);

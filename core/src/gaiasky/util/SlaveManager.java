@@ -12,6 +12,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.loader.PFMData;
@@ -47,7 +48,7 @@ public class SlaveManager {
 
     public SlaveManager() {
         super();
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         if (settings.program.net.slave.active && settings.program.net.master.active) {
             logger.error("Can't be master and slave at the same time!");
             return;
@@ -93,8 +94,8 @@ public class SlaveManager {
         }
     }
 
-    public static void initialize() {
-        if (instance == null && Settings.settings.program.net.slave.active) {
+    public static void initialize(Settings settings) {
+        if (instance == null && settings.program.net.slave.active) {
             instance = new SlaveManager();
         }
     }
@@ -136,7 +137,7 @@ public class SlaveManager {
             logger.info(I18n.msg("notif.loading", mpcdiPath));
 
             String unpackDirName = "mpcdi_" + System.nanoTime();
-            Path unzipLocation = SysUtils.getDataTempDir(Settings.settings.data.location).resolve(unpackDirName);
+            Path unzipLocation = SysUtils.getDataTempDir(GaiaSky.settings().data.location).resolve(unpackDirName);
             Files.createDirectories(unzipLocation);
             ZipUtils.unzip(mpcdiPath.toString(), unzipLocation.toAbsolutePath().toString());
 
@@ -286,21 +287,21 @@ public class SlaveManager {
 
     private void pushToConf() {
         if (initialized) {
-            Settings.settings.graphics.fullScreen.resolution[0] = Settings.settings.graphics.resolution[0] = xResolution;
-            Settings.settings.graphics.fullScreen.resolution[1] = Settings.settings.graphics.resolution[1] = yResolution;
-            Settings.settings.graphics.fullScreen.active = true;
-            Settings.settings.scene.camera.fov = cameraFov;
+            GaiaSky.settings().graphics.fullScreen.resolution[0] = GaiaSky.settings().graphics.resolution[0] = xResolution;
+            GaiaSky.settings().graphics.fullScreen.resolution[1] = GaiaSky.settings().graphics.resolution[1] = yResolution;
+            GaiaSky.settings().graphics.fullScreen.active = true;
+            GaiaSky.settings().scene.camera.fov = cameraFov;
 
             setDefaultConf();
         }
     }
 
     private void setDefaultConf() {
-        Settings.settings.runtime.displayGui = false;
-        Settings.settings.runtime.inputEnabled = false;
-        Settings.settings.scene.crosshair.focus = false;
-        Settings.settings.scene.crosshair.home = false;
-        Settings.settings.scene.crosshair.closest = false;
+        GaiaSky.settings().runtime.displayGui = false;
+        GaiaSky.settings().runtime.inputEnabled = false;
+        GaiaSky.settings().scene.crosshair.focus = false;
+        GaiaSky.settings().scene.crosshair.home = false;
+        GaiaSky.settings().scene.crosshair.closest = false;
     }
 
     private void printInfo() {

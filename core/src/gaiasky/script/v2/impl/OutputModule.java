@@ -7,6 +7,7 @@
 
 package gaiasky.script.v2.impl;
 
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.script.v2.api.OutputAPI;
@@ -45,7 +46,7 @@ public class OutputModule extends APIModule implements OutputAPI {
 
     @Override
     public String get_current_screenshots_dir() {
-        return Settings.settings.screenshot.location;
+        return GaiaSky.settings().screenshot.location;
     }
 
     @Override
@@ -58,14 +59,14 @@ public class OutputModule extends APIModule implements OutputAPI {
             em.post(Event.SCREENSHOT_MODE_CMD, this, mode);
             api.base.post_runnable(() -> em.post(Event.SCREENSHOT_SIZE_UPDATE,
                                                  this,
-                                                 Settings.settings.screenshot.resolution[0],
-                                                 Settings.settings.screenshot.resolution[1]));
+                                                 GaiaSky.settings().screenshot.resolution[0],
+                                                 GaiaSky.settings().screenshot.resolution[1]));
         }
     }
 
     @Override
     public void screenshot() {
-        Settings.ScreenshotSettings ss = Settings.settings.screenshot;
+        Settings.ScreenshotSettings ss = GaiaSky.settings().screenshot;
         em.post(Event.SCREENSHOT_CMD, this, ss.resolution[0], ss.resolution[1], ss.location);
     }
 
@@ -77,7 +78,7 @@ public class OutputModule extends APIModule implements OutputAPI {
 
     @Override
     public String get_current_frame_output_dir() {
-        return Settings.settings.frame.location;
+        return GaiaSky.settings().frame.location;
     }
 
     @Override
@@ -110,12 +111,12 @@ public class OutputModule extends APIModule implements OutputAPI {
 
     @Override
     public boolean is_frame_output_active() {
-        return Settings.settings.frame.active;
+        return GaiaSky.settings().frame.active;
     }
 
     @Override
     public double get_frame_output_fps() {
-        return Settings.settings.frame.targetFps;
+        return GaiaSky.settings().frame.targetFps;
     }
 
     @Override

@@ -24,7 +24,6 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -134,7 +133,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextTitle() {
-        return !Settings.settings.program.modeCubemap.active;
+        return !GaiaSky.settings().program.modeCubemap.active;
     }
 
     public boolean renderTextTrajectory() {
@@ -181,9 +180,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     public float textScale() {
         if (starSet != null || particleSet != null) {
             // Star and particle sets
-            return label.textScale / Settings.settings.scene.label.size;
+            return label.textScale / GaiaSky.settings().scene.label.size;
         } else if (constel != null) {
-            return .2f / Settings.settings.scene.label.size;
+            return .2f / GaiaSky.settings().scene.label.size;
         } else if (loc != null) {
             return loc.sizeKm * label.textScale / textSize() * (float) Constants.DISTANCE_SCALE_FACTOR;
         } else {
@@ -304,11 +303,11 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3D pos, double distToCamera, float scale, double size, double radius, float minSizeDegrees, float maxSizeDegrees, boolean forceLabel) {
         // The smoothing scale must be set according to the distance
-        shader.setUniformf("u_scale", Settings.settings.scene.label.size * scale / camera.getFovFactor());
+        shader.setUniformf("u_scale", GaiaSky.settings().scene.label.size * scale / camera.getFovFactor());
 
         if (forceLabel || radius == 0 || distToCamera > radius * 2d) {
 
-            size *= Settings.settings.scene.label.size;
+            size *= GaiaSky.settings().scene.label.size;
 
             float rot = 0;
             if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {

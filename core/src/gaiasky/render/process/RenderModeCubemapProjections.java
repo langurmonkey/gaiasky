@@ -23,7 +23,6 @@ import gaiasky.render.postprocess.filters.CopyFilter;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.ImageRenderer;
@@ -48,15 +47,15 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         super();
 
         // Geometry warp, if needed.
-        var cubemapSettings = Settings.settings.program.modeCubemap;
+        var cubemapSettings = GaiaSky.settings().program.modeCubemap;
         initializeGeometryWarp(cubemapSettings.planetarium.sphericalMirrorWarp);
 
         // Cubemap projection.
         cubemapProjection = new CubmeapProjectionEffect(0, 0);
-        setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
-        setPlanetariumAperture(Settings.settings.program.modeCubemap.planetarium.aperture);
-        setProjection(Settings.settings.program.modeCubemap.projection);
-        setCelestialSphereIndexOfRefraction(Settings.settings.program.modeCubemap.celestialSphereIndexOfRefraction);
+        setPlanetariumAngle(GaiaSky.settings().program.modeCubemap.planetarium.angle);
+        setPlanetariumAperture(GaiaSky.settings().program.modeCubemap.planetarium.aperture);
+        setProjection(GaiaSky.settings().program.modeCubemap.projection);
+        setCelestialSphereIndexOfRefraction(GaiaSky.settings().program.modeCubemap.celestialSphereIndexOfRefraction);
         copyFilter = new CopyFilter();
 
         EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
@@ -76,7 +75,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
             zPosFlag = true;
             assert cubemapProjection != null;
             zNegFlag = cubemapProjection.getPlanetariumAperture() > 180f;
-            setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
+            setPlanetariumAngle(GaiaSky.settings().program.modeCubemap.planetarium.angle);
         } else {// In 360 mode we always need all sides
             xPosFlag = true;
             xNegFlag = true;
@@ -156,7 +155,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (!Settings.settings.runtime.openXr) {
+        if (!GaiaSky.settings().runtime.openXr) {
             switch (event) {
             case CUBEMAP_CMD -> {
                 CubemapProjection projection = (CubemapProjection) data[1];
@@ -181,7 +180,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
                 // Update projection, we may not need -Z anymore!
                 GaiaSky.postRunnable(() -> {
                     setPlanetariumAperture((float) data[0]);
-                    setProjection(Settings.settings.program.modeCubemap.projection);
+                    setProjection(GaiaSky.settings().program.modeCubemap.projection);
                 });
             }
             case PLANETARIUM_ANGLE_CMD -> setPlanetariumAngle((float) data[0]);
@@ -226,7 +225,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     }
 
     private void saveFrameBufferToImage(FrameBuffer fb, Path location, String filename) {
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         fb.begin();
         ImageRenderer.renderToImageGl20(location.toString(), filename, fb.getWidth(), fb.getHeight(), settings.screenshot.format, settings.screenshot.quality);
         fb.end();

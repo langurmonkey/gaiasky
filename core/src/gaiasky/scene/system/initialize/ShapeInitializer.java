@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -21,7 +22,6 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import net.jafama.FastMath;
@@ -114,10 +114,10 @@ public class ShapeInitializer extends AbstractInitSystem {
             }
 
             // Relativistic effects
-            if (Settings.settings.runtime.relativisticAberration)
+            if (GaiaSky.settings().runtime.relativisticAberration)
                 mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
             // Gravitational waves
-            if (Settings.settings.runtime.gravitationalWaves)
+            if (GaiaSky.settings().runtime.gravitationalWaves)
                 mc.rec.setUpGravitationalWavesMaterial(mc.instance.materials);
 
             // Model size. Used to compute an accurate solid angle.

@@ -22,11 +22,10 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -179,7 +178,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             if (Mapper.extra.has(entity)) {
                 // Particles have a special algorithm for the solid angles.
                 body.solidAngle = (Mapper.extra.get(entity).radius / body.distToCamera);
-                body.solidAngleApparent = body.solidAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
+                body.solidAngleApparent = body.solidAngle * GaiaSky.settings().scene.star.brightness / camera.getFovFactor();
             } else {
                 // Regular objects.
                 // Take into account size of model objects.
@@ -245,11 +244,11 @@ public class GraphUpdater extends AbstractUpdateSystem {
         long msSinceStateChange = msSinceStateChange(base);
 
         // Fast track
-        if (msSinceStateChange > Settings.settings.scene.fadeMs)
+        if (msSinceStateChange > GaiaSky.settings().scene.fadeMs)
             return base.visible ? 1 : 0;
 
         // Fading
-        float fadeOpacity = MathUtilsDouble.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
+        float fadeOpacity = MathUtilsDouble.lint(msSinceStateChange, 0, GaiaSky.settings().scene.fadeMs, 0, 1);
         if (!base.visible) {
             fadeOpacity = 1 - fadeOpacity;
         }

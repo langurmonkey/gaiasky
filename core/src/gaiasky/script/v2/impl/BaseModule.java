@@ -14,7 +14,6 @@ import gaiasky.event.EventManager;
 import gaiasky.script.v2.api.BaseAPI;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.SettingsManager;
 import gaiasky.util.SysUtils;
 import gaiasky.util.camera.rec.Camcorder;
 import net.jafama.FastMath;
@@ -45,17 +44,17 @@ public class BaseModule extends APIModule implements BaseAPI {
 
     @Override
     public String get_version() {
-        return Settings.settings.version.version + '\n' + Settings.settings.version.build + '\n' + Settings.settings.version.system + '\n' + Settings.settings.version.builder + '\n' + Settings.settings.version.buildTime;
+        return GaiaSky.settings().version.version + '\n' + GaiaSky.settings().version.build + '\n' + GaiaSky.settings().version.system + '\n' + GaiaSky.settings().version.builder + '\n' + GaiaSky.settings().version.buildTime;
     }
 
     @Override
     public String get_version_number() {
-        return Settings.settings.version.version;
+        return GaiaSky.settings().version.version;
     }
 
     @Override
     public String get_build_string() {
-        return Settings.settings.version.build;
+        return GaiaSky.settings().version.build;
     }
 
     @Override
@@ -174,7 +173,7 @@ public class BaseModule extends APIModule implements BaseAPI {
 
     @Override
     public void settings_backup() {
-        settingsStack.push(Settings.settings.clone());
+        settingsStack.push(GaiaSky.settings().clone());
     }
 
     @Override
@@ -183,9 +182,9 @@ public class BaseModule extends APIModule implements BaseAPI {
             return false;
         }
 
-        if (SettingsManager.setSettingsInstance(settingsStack.pop())) {
+        if (GaiaSky.instance.setSettingsReference(settingsStack.pop())) {
             // Apply settings.
-            Settings.settings.apply();
+            GaiaSky.settings().apply();
             // Reload UI.
             // postRunnable(()->{
             // em.post(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources());

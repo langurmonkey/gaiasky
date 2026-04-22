@@ -14,7 +14,6 @@ import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Archetype;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 
@@ -281,7 +280,7 @@ public class Base implements Component, ICopy {
     }
 
     public boolean isVisible() {
-        return this.visible || msSinceStateChange() <= Settings.settings.scene.fadeMs;
+        return this.visible || msSinceStateChange() <= GaiaSky.settings().scene.fadeMs;
     }
 
     /**
@@ -303,11 +302,11 @@ public class Base implements Component, ICopy {
         long msSinceStateChange = msSinceStateChange();
 
         // Fast track
-        if (msSinceStateChange > Settings.settings.scene.fadeMs)
+        if (msSinceStateChange > GaiaSky.settings().scene.fadeMs)
             return visible ? 1 : 0;
 
         // Fading
-        float opacity = MathUtilsDouble.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
+        float opacity = MathUtilsDouble.lint(msSinceStateChange, 0, GaiaSky.settings().scene.fadeMs, 0, 1);
         if (!visible) {
             opacity = 1 - opacity;
         }

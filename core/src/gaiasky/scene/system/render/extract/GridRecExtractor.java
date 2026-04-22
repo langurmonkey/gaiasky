@@ -9,9 +9,9 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.util.Settings;
 
 /**
  * Extracts data for recursive grid entities.
@@ -32,7 +32,7 @@ public class GridRecExtractor extends AbstractExtractSystem {
             if (label.label && label.renderLabel()) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
-            if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
+            if (GaiaSky.settings().program.recursiveGrid.origin.isRefSys() && GaiaSky.settings().program.recursiveGrid.projectionLines && camera.hasFocus()) {
                 addToRender(render, RenderGroup.LINE);
             }
         }

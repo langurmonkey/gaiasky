@@ -11,9 +11,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import gaiasky.GaiaSky;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
-import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -32,7 +32,7 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     private void initialize(AssetManager manager) {
-        camera = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera = new PerspectiveCamera(GaiaSky.settings().scene.camera.fov, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
 

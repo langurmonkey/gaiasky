@@ -20,7 +20,9 @@ import gaiasky.gui.main.MessageBean;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnScrollPane;
+import gaiasky.util.scene2d.OwnTextIconButton;
 import net.jafama.FastMath;
 
 import java.io.BufferedWriter;

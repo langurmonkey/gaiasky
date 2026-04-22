@@ -18,7 +18,6 @@ import gaiasky.gui.api.IInputListener;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,7 +44,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     public boolean keyDown(int keyCode) {
         if (isActive()) {
             // Input-enabled setting only for non-GUI listeners.
-            if (GuiKbdListener.class.isAssignableFrom(this.getClass()) || Settings.settings.runtime.inputEnabled) {
+            if (GuiKbdListener.class.isAssignableFrom(this.getClass()) || GaiaSky.settings().runtime.inputEnabled) {
                 if (iCamera != null) {
                     iCamera.setGamepadInput(false);
                 }

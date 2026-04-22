@@ -38,7 +38,10 @@ import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.component.MotorEngine;
 import gaiasky.scene.record.MachineDefinition;
 import gaiasky.scene.view.SpacecraftView;
-import gaiasky.util.*;
+import gaiasky.util.Bits;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Pair;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntModelBuilder;
 import gaiasky.util.gdx.g3d.decals.CameraGroupStrategy;
@@ -121,7 +124,7 @@ public class SpacecraftGui extends AbstractGui {
         indicatory = -20f;
 
         // init gui camera
-        aiCam = new PerspectiveCamera(30, indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale);
+        aiCam = new PerspectiveCamera(30, indicatorw * GaiaSky.settings().program.ui.scale, indicatorh * GaiaSky.settings().program.ui.scale);
         aiCam.near = (float) (1e5 * Constants.KM_TO_U);
         aiCam.far = (float) (1e8 * Constants.KM_TO_U);
         aiCam.up.set(0, 1, 0);
@@ -159,7 +162,7 @@ public class SpacecraftGui extends AbstractGui {
         IntModel aiModel = new IntModelBuilder().createSphere(1.6f, 30, 30, false, mat, Bits.indices(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates));
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
-        aiViewport = new ExtendViewport(indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale, aiCam);
+        aiViewport = new ExtendViewport(indicatorw * GaiaSky.settings().program.ui.scale, indicatorh * GaiaSky.settings().program.ui.scale, aiCam);
 
         EventManager.instance.subscribe(this, gaiasky.event.Event.SPACECRAFT_STABILISE_CMD, gaiasky.event.Event.SPACECRAFT_STOP_CMD, gaiasky.event.Event.SPACECRAFT_INFO, gaiasky.event.Event.SPACECRAFT_NEAREST_INFO, gaiasky.event.Event.SPACECRAFT_THRUST_INFO);
         EventManager.instance.unsubscribe(this, gaiasky.event.Event.SPACECRAFT_LOADED);
@@ -305,10 +308,10 @@ public class SpacecraftGui extends AbstractGui {
         // Whether to keep the velocity pointing in the direction vector
         velToDir = new OwnCheckBox(I18n.msg("gui.sc.veltodir"), skin, 16f);
         velToDir.setName("sc veltodir");
-        velToDir.setChecked(Settings.settings.spacecraft.velocityDirection);
+        velToDir.setChecked(GaiaSky.settings().spacecraft.velocityDirection);
         velToDir.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                Settings.settings.spacecraft.velocityDirection = velToDir.isChecked();
+                GaiaSky.settings().spacecraft.velocityDirection = velToDir.isChecked();
             }
             return false;
         });
@@ -615,7 +618,7 @@ public class SpacecraftGui extends AbstractGui {
                 yawvel.setText(nf.format(y) + "°");
                 pitchvel.setText(nf.format(p) + "°");
                 rollvel.setText(nf.format(r) + "°");
-                Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v, Settings.settings.program.ui.distanceUnits);
+                Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v, GaiaSky.settings().program.ui.distanceUnits);
                 mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
                 thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
                 setPowerValuesSlider(thrustv, thrustvm, epow);
@@ -626,7 +629,7 @@ public class SpacecraftGui extends AbstractGui {
             case SPACECRAFT_NEAREST_INFO -> {
                 if (data[0] != null) {
                     closestname.setText((String) data[0]);
-                    Pair<Double, String> closestDistance = GlobalResources.doubleToDistanceString((Double) data[1], Settings.settings.program.ui.distanceUnits);
+                    Pair<Double, String> closestDistance = GlobalResources.doubleToDistanceString((Double) data[1], GaiaSky.settings().program.ui.distanceUnits);
                     closestdist.setText(sf.format(closestDistance.getFirst()) + " " + closestDistance.getSecond());
                 } else {
                     closestname.setText("");

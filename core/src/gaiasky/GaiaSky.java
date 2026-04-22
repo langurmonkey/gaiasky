@@ -120,6 +120,10 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      */
     private final CLIArgs cliArgs;
     /**
+     * Reference to the settings object.
+     */
+    private Settings settings;
+    /**
      * Parked update runnables. Run after the update-scene stage.
      */
     private final Array<Runnable> parkedUpdateRunnables = new Array<>(10);
@@ -256,7 +260,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * Displays the initial GUI.
      **/
     private final Runnable runnableInitialGui = () -> {
-        if (Settings.settings.runtime.openXr) {
+        if (settings.runtime.openXr) {
             // Render to UI to frame buffer.
             renderGui(welcomeGuiVR);
         }
@@ -268,8 +272,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * Updates and renders the scene.
      **/
     private final Runnable mainUpdaterRenderer = () -> {
-
-        final var settings = Settings.settings;
 
         // Asynchronous load of textures and resources.
         assetManager.update();
@@ -368,7 +370,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             doneLoading();
             updateRenderProcess = mainUpdaterRenderer;
         } else {
-            if (Settings.settings.runtime.openXr) {
+            if (settings.runtime.openXr) {
                 // Render to UI to frame buffer.
                 renderGui(loadingGuiVR);
             }
@@ -381,17 +383,21 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     /**
      * Creates an instance of Gaia Sky.
      *
-     * @param cliArgs The command line arguments for this run.
+     * @param cliArgs         The command line arguments for this run.
+     * @param settings        The {@link Settings} instance.
      */
-    public GaiaSky(final CLIArgs cliArgs) {
+    public GaiaSky(final CLIArgs cliArgs, Settings settings) {
         super();
         assert cliArgs != null : "CLI arguments can't be null";
 
-        // Instance and settings.
+        // Instance.
         instance = this;
 
         // Set CLI arguments.
         this.cliArgs = cliArgs;
+
+        // Set settings.
+        this.settings = settings;
 
         // Set update-render process to initial GUI.
         this.updateRenderProcess = runnableInitialGui;
@@ -411,7 +417,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     @Override
     public void create() {
         startTime = TimeUtils.millis();
-        final var settings = Settings.settings;
         // Set log level.
         Gdx.app.setLogLevel(cliArgs.debug ? Application.LOG_DEBUG : Application.LOG_INFO);
         Logger.level = cliArgs.debug ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
@@ -607,9 +612,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
     private void initializeConstants() {
         if (cliArgs.vr) {
-            Constants.initialize(Settings.settings.scene.distanceScaleVr);
+            Constants.initialize(settings.scene.distanceScaleVr);
         } else {
-            Constants.initialize(Settings.settings.scene.distanceScaleDesktop);
+            Constants.initialize(settings.scene.distanceScaleDesktop);
         }
     }
 
@@ -622,7 +627,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * </ul>
      **/
     private XrLoadStatus createVR() {
-        final var settings = Settings.settings;
         if (cliArgs.vr) {
             // Initializing the VRContext may fail if no HMD is connected or no OpenXR runtime is found.
             try {
@@ -684,7 +688,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * to their classes and removes the Loading message.
      */
     private void doneLoading() {
-        final var settings = Settings.settings;
         // Get assets.
         final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
         // Global resources.
@@ -864,7 +867,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             @Override
             public void run() {
                 logger.info("Total number of attributes registered: " + Attribute.getNumAttributes());
-                if (Settings.settings.program.debugInfo) {
+                if (settings.program.debugInfo) {
                     logger.debug("Registered attributes:");
                     Array<String> attributes = Attribute.getTypes();
                     for (int i = 0; i < attributes.size; i++) {
@@ -915,7 +918,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * the re-computation of all entities.
      */
     public void touchSceneGraph() {
-        final var settings = Settings.settings;
         // Update whole tree to initialize positions.
         settings.runtime.octreeLoadActive = false;
         var timeOnBak = settings.runtime.timeOn;
@@ -937,7 +939,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun.
      */
     private void goHome() {
-        final var settings = Settings.settings;
         final var homeObject = scene.findFocus(settings.scene.homeObject);
         var isOn = true;
         if (homeObject != null && (isOn = isOn(Mapper.base.get(homeObject).ct)) && !settings.program.net.slave.active) {
@@ -973,7 +974,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * Re-initialises all the GUI (step 1).
      */
     public void reinitialiseGUI1() {
-        final var settings = Settings.settings;
         if (guis != null && !guis.isEmpty()) {
             for (IGui gui : guis)
                 gui.dispose();
@@ -1015,7 +1015,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * Second step in GUI initialisation.
      */
     public void reinitialiseGUI2() {
-        final var settings = Settings.settings;
         // Reinitialise registry to listen to relevant events.
         if (guiRegistry != null) guiRegistry.dispose();
         guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, gaiaSkyAssets.catalogManager);
@@ -1058,7 +1057,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
     @Override
     public void dispose() {
-        final var settings = Settings.settings;
         // Stop
         running.set(false);
 
@@ -1070,7 +1068,10 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
         // Persist settings and bookmarks.
         if (saveState && !crashed.get()) {
-            SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
+            if (settings != null) {
+                var settingsManager = new SettingsManager();
+                settingsManager.persist(settings, new File(System.getProperty("properties.file")));
+            }
             if (gaiaSkyAssets != null && gaiaSkyAssets.bookmarksManager != null) gaiaSkyAssets.bookmarksManager.persistBookmarks();
         }
 
@@ -1136,9 +1137,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     }
 
     public void resetDynamicResolution() {
-        if (Settings.settings.graphics.dynamicResolution) {
-            Settings.settings.graphics.dynamicResolution = false;
-            Settings.settings.graphics.backBufferScale = 1f;
+        if (settings.graphics.dynamicResolution) {
+            settings.graphics.dynamicResolution = false;
+            settings.graphics.backBufferScale = 1f;
             dynamicResolutionLevel = 0;
             lastDynamicResolutionChange = 0;
         }
@@ -1274,7 +1275,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      */
     private double getDtGs(double dt) {
         double dtGs;
-        final var settings = Settings.settings;
         if (settings.frame.active) {
             // If frame output is active, we need to set our delta t according to
             // the configured frame rate of the frame output system.
@@ -1331,15 +1331,14 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             resizeHeight = height;
             lastResizeTime = System.currentTimeMillis();
 
-            Settings.settings.graphics.resolution[0] = width;
-            Settings.settings.graphics.resolution[1] = height;
+            settings.graphics.resolution[0] = width;
+            settings.graphics.resolution[1] = height;
         }
     }
 
     private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
         if (currResizeTime - lastResizeTime > 100L) {
-            final var settings = Settings.settings;
             resizeImmediate(resizeWidth, resizeHeight, !settings.runtime.openXr, !settings.runtime.openXr, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
@@ -1348,7 +1347,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis,
                                 boolean resizeScreenConf) {
         try {
-            final var settings = Settings.settings;
             final var renderWidth = (int) FastMath.round(width * settings.graphics.backBufferScale);
             final var renderHeight = (int) FastMath.round(height * settings.graphics.backBufferScale);
 
@@ -1401,6 +1399,37 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      */
     public IScriptingInterface scripting() {
         return gaiaSkyAssets.scriptingInterface;
+    }
+
+    /**
+     * Returns a reference to the current settings object.
+     * @return Reference to the settings object.
+     */
+    public static Settings settings() {
+        return instance.settings;
+    }
+
+    /**
+     * Set the static reference to {@link Settings} to the given object.
+     * This method deactivates and disposes the old settings object, and activates the new one.
+     *
+     * @param s The settings object.
+     *
+     * @return True if the given object is not null, false otherwise.
+     */
+    public boolean setSettingsReference(Settings s) {
+        if (s != null) {
+            // Dispose old settings.
+            if (settings != null) {
+                settings.setEnabled(false);
+                settings.dispose();
+            }
+            // Set new settings.
+            settings = s;
+            settings.setEnabled(true);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1465,7 +1494,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        final var settings = Settings.settings;
         switch (event) {
             case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
                 reinitialiseGUI1();
@@ -1649,7 +1677,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     }
 
     private float getUIScale(int height) {
-        return ((float) height / 1600f) * Settings.settings.program.ui.scale;
+        return ((float) height / 1600f) * settings.program.ui.scale;
 
     }
 
@@ -1770,6 +1798,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
     /**
      * Get the scene start time of this Gaia Sky instance, in milliseconds, since midnight, January 1, 1970 UTC.
+     *
      * @return Scene start time, in milliseconds, since midnight, January 1, 1970 UTC.
      */
     public double getStartTimeScene() {

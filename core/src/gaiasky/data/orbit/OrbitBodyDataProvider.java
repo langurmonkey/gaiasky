@@ -18,8 +18,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.io.IOException;

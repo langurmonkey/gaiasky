@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IRenderable;
@@ -20,7 +21,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
@@ -102,7 +102,7 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
             ILineRenderable renderable = (ILineRenderable) r;
             renderable.render(this, camera, getAlpha(renderable));
 
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * Settings.settings.scene.renderer.line.width + Settings.settings.scene.renderer.line.glWidthBias);
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * GaiaSky.settings().scene.renderer.line.width + GaiaSky.settings().scene.renderer.line.glWidthBias);
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);

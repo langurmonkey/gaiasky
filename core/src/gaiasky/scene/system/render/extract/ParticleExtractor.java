@@ -9,13 +9,13 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.Settings;
 
 /**
  * Extracts data for particle set entities.
@@ -57,7 +57,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
         addToRender(render, render.renderGroup);
 
         boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
-        if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number && hasPm) {
+        if (body.solidAngleApparent >= GaiaSky.settings().scene.star.threshold.point / GaiaSky.settings().scene.properMotion.number && hasPm) {
             addToRender(render, RenderGroup.LINE);
         }
         if (renderText(body, Mapper.sa.get(entity), Mapper.label.get(entity), Mapper.extra.get(entity))) {
@@ -68,15 +68,15 @@ public class ParticleExtractor extends AbstractExtractSystem {
     private void addToRenderStar(ICamera camera, Entity entity, Body body, Render render) {
         addToRender(render, RenderGroup.POINT_STAR);
 
-        if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point) {
+        if (body.solidAngleApparent >= GaiaSky.settings().scene.star.threshold.point) {
             addToRender(render, RenderGroup.BILLBOARD_STAR);
-            if (Settings.settings.scene.star.renderStarSpheres && body.distToCamera < Mapper.distance.get(entity).distance * Mapper.modelScaffolding.get(entity).sizeScaleFactor) {
+            if (GaiaSky.settings().scene.star.renderStarSpheres && body.distToCamera < Mapper.distance.get(entity).distance * Mapper.modelScaffolding.get(entity).sizeScaleFactor) {
                 camera.checkClosestBody(entity);
                 addToRender(render, RenderGroup.MODEL_VERT_STAR);
             }
         }
         boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
-        if (hasPm && body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number) {
+        if (hasPm && body.solidAngleApparent >= GaiaSky.settings().scene.star.threshold.point / GaiaSky.settings().scene.properMotion.number) {
             addToRender(render, RenderGroup.LINE);
         }
 

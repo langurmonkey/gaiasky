@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
@@ -19,7 +20,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
@@ -156,7 +156,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
                                            ICamera camera) {
         shaderProgram.setUniformf("u_uToMpc", (float) Constants.U_TO_MPC);
         updateCameraVelocity(camera.getVelocity(), Gdx.graphics.getDeltaTime());
-        if (Settings.settings.scene.particleGroups.motionTrails && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
+        if (GaiaSky.settings().scene.particleGroups.motionTrails && !camera.isRotating() && smoothedCamVel.len() > 1e-6) {
             shaderProgram.setUniformf("u_camVel", smoothedCamVel);
         } else {
             shaderProgram.setUniformf("u_camVel", 0, 0, 0);
@@ -171,7 +171,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
 
     protected void addRelativisticUniforms(ExtShaderProgram shaderProgram,
                                            ICamera camera) {
-        if (Settings.settings.runtime.relativisticAberration) {
+        if (GaiaSky.settings().runtime.relativisticAberration) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             shaderProgram.setUniformf("u_velDir", rem.velDir);
             shaderProgram.setUniformf("u_vc", rem.vc);
@@ -179,7 +179,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     }
 
     protected void addGravWaveUniforms(ExtShaderProgram shaderProgram) {
-        if (Settings.settings.runtime.gravitationalWaves) {
+        if (GaiaSky.settings().runtime.gravitationalWaves) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             // Time in seconds - use simulation time
             shaderProgram.setUniformf("u_ts", rem.gwtime);
@@ -217,7 +217,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
     protected void addCameraUpCubemapMode(ExtShaderProgram shaderProgram,
                                           ICamera camera) {
         // TODO deactivate for now.
-        if (Settings.settings.program.modeCubemap.active) {
+        if (GaiaSky.settings().program.modeCubemap.active) {
             // Set NaN to first component.
             shaderProgram.setUniformf("u_camUp", aux3f.set(Float.NaN, 0, 0));
         } else {
@@ -232,9 +232,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
 
     protected ExtShaderProgram getShaderProgram(ExtShaderProgram[] programs) {
         if (programs == null) return null;
-        boolean gw = Settings.settings.runtime.gravitationalWaves;
-        boolean ra = Settings.settings.runtime.relativisticAberration;
-        boolean ssr = Settings.settings.postprocess.ssr.active;
+        boolean gw = GaiaSky.settings().runtime.gravitationalWaves;
+        boolean ra = GaiaSky.settings().runtime.relativisticAberration;
+        boolean ssr = GaiaSky.settings().postprocess.ssr.active;
         int num = (gw ? 4 : 0) + (ra ? 2 : 0) + (ssr ? 1 : 0);
         var program = programs[num];
         if (!program.isCompiled()) {

@@ -14,11 +14,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.render.util.ShaderLoader;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -68,7 +68,7 @@ public class RenderAssets {
 
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
-        this.compute = Settings.settings.runtime.compute;
+        this.compute = GaiaSky.settings().runtime.compute;
     }
 
     /**
@@ -77,7 +77,7 @@ public class RenderAssets {
      * @param manager The asset manager.
      */
     public void initialize(AssetManager manager) {
-        var safeMode = Settings.settings.program.safeMode;
+        var safeMode = GaiaSky.settings().program.safeMode;
 
         ShaderLoader.Pedantic = false;
         ExtShaderProgram.pedantic = false;
@@ -92,12 +92,12 @@ public class RenderAssets {
         namesSource.add(SUFFIX_SSR);
         definesSource.add("#define ssrFlag\n");
         // Relativistic aberration.
-        if (Settings.settings.runtime.relativisticAberration) {
+        if (GaiaSky.settings().runtime.relativisticAberration) {
             namesSource.add(SUFFIX_REL);
             definesSource.add("#define relativisticEffects\n");
         }
         // Gravitational waves.
-        if (Settings.settings.runtime.gravitationalWaves) {
+        if (GaiaSky.settings().runtime.gravitationalWaves) {
             namesSource.add(SUFFIX_GRAV);
             definesSource.add("#define gravitationalWaves\n");
         }
@@ -311,7 +311,7 @@ public class RenderAssets {
          */
         lineCpuShaders = fetchShaderProgramExt(manager, lineCpuDesc, TextUtils.concatAll("line.cpu", names));
 
-        if (!Settings.settings.program.safeMode) {
+        if (!GaiaSky.settings().program.safeMode) {
             /*
              * LINE QUAD CPU
              */

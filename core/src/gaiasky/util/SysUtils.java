@@ -516,7 +516,7 @@ public class SysUtils {
     }
 
     public static Path getProceduralPixmapDir() {
-        return Settings.settings.data.dataPath("$data/", null).resolve(PROCEDURAL_TEX_DIR_NAME);
+        return GaiaSky.settings().data.dataPath("$data/", null).resolve(PROCEDURAL_TEX_DIR_NAME);
     }
 
     /**
@@ -795,7 +795,7 @@ public class SysUtils {
             return actualFilePaths;
         }
         for (String textureFile : files) {
-            String unpackedFile = Settings.settings.data.dataFile(textureFile);
+            String unpackedFile = GaiaSky.settings().data.dataFile(textureFile);
             Path galLocationPath = Path.of(unpackedFile);
             if (Files.exists(galLocationPath)) {
                 if (Files.isDirectory(galLocationPath)) {

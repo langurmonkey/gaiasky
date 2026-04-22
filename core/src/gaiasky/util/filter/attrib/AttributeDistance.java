@@ -10,7 +10,6 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.i18n.I18n;
-import net.jafama.FastMath;
 
 public final class AttributeDistance extends AttributeAbstract implements IAttribute {
     @Override

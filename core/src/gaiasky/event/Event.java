@@ -865,11 +865,6 @@ public enum Event {
      **/
     POST_SUBHEAD_MESSAGE,
     /**
-     * Sent when the properties in GlobalConf have been modified, usually after
-     * a configuration dialog. Contains no data.
-     **/
-    PROPERTIES_WRITTEN,
-    /**
      * Updates the position of the pointer and the view in equatorial coordinates.
      * <ol start='0'>
      * <li>pointer ra  [deg]</li>

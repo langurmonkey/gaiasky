@@ -10,6 +10,7 @@ package gaiasky.script;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -24,7 +25,6 @@ import gaiasky.util.CatalogManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.LruCache;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.IPythonCoordinatesProvider;
 import uk.ac.starlink.util.DataSource;
 
@@ -1259,7 +1259,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     @Override
     public float getGuiScaleFactor() {
-        return Settings.settings.program.ui.scale;
+        return GaiaSky.settings().program.ui.scale;
     }
 
     @Override
@@ -1465,7 +1465,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     @Override
     public String getVersionNumber() {
-        return Settings.settings.version.version;
+        return GaiaSky.settings().version.version;
     }
 
     @Override

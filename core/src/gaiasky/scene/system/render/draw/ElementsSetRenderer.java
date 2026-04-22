@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -39,7 +38,6 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Matrix4D;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL41;
 

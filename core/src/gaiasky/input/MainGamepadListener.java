@@ -15,7 +15,6 @@ import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 /**
@@ -147,7 +146,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
                 treated = true;
             } else if (axisCode == mappings.getAxisRstickH()) {
-                double valMapped = (Settings.settings.controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
+                double valMapped = (GaiaSky.settings().controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
                 if (cam.getMode().isFocus()) {
                     cam.setHorizontal(valMapped * 2.0e-2);
                 } else {
@@ -155,7 +154,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 }
                 treated = true;
             } else if (axisCode == mappings.getAxisRstickV()) {
-                double valMapped = (Settings.settings.controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
+                double valMapped = (GaiaSky.settings().controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
                 if (cam.getMode().isFocus()) {
                     cam.setVertical(valMapped * 2.0e-2);
                 } else {
@@ -197,7 +196,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 } else if (t > -0.1 && t < 0) {
                     t = 0;
                 }
-                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                double inc = GaiaSky.settings().scene.camera.cinematic ? 0.01 : 0.05;
                 EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t + FastMath.abs(t * inc) : t + t * inc);
             } else if (lastControllerUsed.getButton(mappings.getButtonDpadDown())) {
                 var t = GaiaSky.instance.time.getWarpFactor();
@@ -207,7 +206,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 } else if (t < 0.1 && t > 0) {
                     t = 0;
                 }
-                double inc = Settings.settings.scene.camera.cinematic ? 0.01 : 0.05;
+                double inc = GaiaSky.settings().scene.camera.cinematic ? 0.01 : 0.05;
                 EventManager.instance.post(Event.TIME_WARP_CMD, this, t < 0 ? t - FastMath.abs(t * inc) : t - t * inc);
             }
             return true;

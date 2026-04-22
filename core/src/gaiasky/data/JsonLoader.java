@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.AttributeMap;
@@ -28,7 +29,6 @@ import gaiasky.scene.record.RotateTransform;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.i18n.I18n;
@@ -95,7 +95,7 @@ public class JsonLoader extends AbstractSceneLoader {
         // Actually load the files.
         JsonReader json = new JsonReader();
         for (String filePath : filePaths) {
-            FileHandle file = Settings.settings.data.dataFileHandle(filePath, datasetDirectory);
+            FileHandle file = GaiaSky.settings().data.dataFileHandle(filePath, datasetDirectory);
             JsonValue root = json.parse(file.read());
             if (root.has("objects")) {
                 // If the top element is 'objects', we have a list of new objects.

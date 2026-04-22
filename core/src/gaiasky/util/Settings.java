@@ -107,8 +107,6 @@ public class Settings extends SettingsObject {
     // Static settings
     public static String APPLICATION_NAME = "Gaia Sky";
     public static String APPLICATION_NAME_TITLE = "G a i a  S k y";
-    /** The settings instance. **/
-    public static Settings settings;
 
     static {
         // Initialize icon: if running from source, use icon in assets/icon, otherwise, use global icon
@@ -120,29 +118,6 @@ public class Settings extends SettingsObject {
             logger.debug("Icon not found: " + iconPath + ", using: " + ASSETS_LOC + "/gs_icon_256.png");
             ICON_URL = "file://" + ASSETS_LOC + "/gs_icon_128.png";
         }
-    }
-
-    /**
-     * Set the static reference to {@link Settings} to the given object.
-     * This method deactivates and disposes the old settings object, and activates the new one.
-     *
-     * @param s The settings object.
-     *
-     * @return True if the given object is not null, false otherwise.
-     */
-    public static boolean setSettingsReference(Settings s) {
-        if (s != null) {
-            // Dispose old settings.
-            if (settings != null) {
-                settings.setEnabled(false);
-                settings.dispose();
-            }
-            // Set new settings.
-            settings = s;
-            settings.setEnabled(true);
-            return true;
-        }
-        return false;
     }
 
     /** Version of the currently loaded configuration file. **/
@@ -213,19 +188,23 @@ public class Settings extends SettingsObject {
         return assetsPath(relativeAssetsLoc).toString();
     }
 
-    public static String getApplicationTitle(boolean vr) {
+    @JsonIgnore
+    public String getApplicationTitle(boolean vr) {
         return APPLICATION_NAME_TITLE + (vr ? "\nVR" : "");
     }
 
-    public static String getShortApplicationName() {
-        return APPLICATION_SHORT_NAME + settings.program.net.getNetName() + " " + settings.version.version + " (build " + settings.version.build + ")";
+    @JsonIgnore
+    public String getShortApplicationName() {
+        return APPLICATION_SHORT_NAME + program.net.getNetName() + " " + version.version + " (build " + version.build + ")";
     }
 
-    public static String getSuperShortApplicationName() {
-        return APPLICATION_NAME + " " + settings.version.version;
+    @JsonIgnore
+    public String getSuperShortApplicationName() {
+        return APPLICATION_NAME + " " + version.version;
     }
 
-    public static String getApplicationName(boolean vr) {
+    @JsonIgnore
+    public String getApplicationName(boolean vr) {
         return APPLICATION_NAME + (vr ? " VR" : "");
     }
 
@@ -1135,7 +1114,7 @@ public class Settings extends SettingsObject {
             if (backBufferResolution == null) {
                 backBufferResolution = new int[2];
             }
-            if (Gdx.graphics != null && settings != null && (backBufferResolution[0] <= 0 || backBufferResolution[1] <= 0)) {
+            if (Gdx.graphics != null && (backBufferResolution[0] <= 0 || backBufferResolution[1] <= 0)) {
                 backBufferResolution[0] = (int) (Gdx.graphics.getWidth() * backBufferScale);
                 backBufferResolution[1] = (int) (Gdx.graphics.getWidth() * backBufferScale);
             }
@@ -1664,7 +1643,9 @@ public class Settings extends SettingsObject {
              *
              * @return The point size in pixels
              */
-            public static float getStarPointSize() {
+            @JsonIgnore
+            public float getStarPointSize() {
+                var settings = getRoot();
                 if (settings.program.modeCubemap.active) {
                     float screenArea = settings.graphics.getApplicationHeight() * settings.graphics.getApplicationWidth();
                     float cubemapRes = settings.program.modeCubemap.faceResolution;
@@ -1684,6 +1665,8 @@ public class Settings extends SettingsObject {
             @JsonIgnore
             public String getStarTexture(int textureIndex) {
                 String starTexIdx = String.format("%02d", textureIndex);
+
+                var settings = getRoot();
                 String texture = settings.data.dataFile(
                         GlobalResources.unpackAssetPathExtensions(
                                 Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
@@ -2517,7 +2500,7 @@ public class Settings extends SettingsObject {
                     }
                     case STEREO_PROFILE_CMD -> modeStereo.profile = (StereoProfile) data[0];
                     case CUBEMAP_CMD -> {
-                        modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openXr;
+                        modeCubemap.active = (Boolean) data[0] && !getRoot().runtime.openXr;
                         if (modeCubemap.active) {
                             modeCubemap.projection = (CubemapProjection) data[1];
 
@@ -4666,7 +4649,7 @@ public class Settings extends SettingsObject {
                         EventManager.publish(Event.UPDATEPAUSE_CHANGED, this, updatePause);
                     }
                     case TIME_STATE_CMD -> toggleTimeOn((Boolean) data[0]);
-                    case RECORD_CAMERA_CMD -> toggleRecord((Boolean) data[0], settings);
+                    case RECORD_CAMERA_CMD -> toggleRecord((Boolean) data[0], getRoot());
                     case RELATIVISTIC_ABERRATION_CMD -> relativisticAberration = (Boolean) data[0];
                     case GRAV_WAVE_START -> gravitationalWaves = true;
                     case GRAV_WAVE_STOP -> gravitationalWaves = false;

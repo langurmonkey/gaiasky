@@ -135,7 +135,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if (ignoreDisplaySetting || Settings.settings.program.ui.notifications)
+        if (ignoreDisplaySetting || GaiaSky.settings().program.ui.notifications)
             super.draw(batch, parentAlpha);
     }
 
@@ -153,7 +153,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
 
 
     private void addMessage(String msg, boolean permanent, LoggerLevel level) {
-        if (ignoreDisplaySetting || Settings.settings.program.ui.notifications)
+        if (ignoreDisplaySetting || GaiaSky.settings().program.ui.notifications)
             GaiaSky.postRunnable(() -> {
                 MessageBean messageBean = new MessageBean(msg);
 
@@ -298,7 +298,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                                                      LoggerLevel.DEBUG);
                 case SCREENSHOT_INFO -> addMessage(I18n.msg("notif.screenshot", data[0]));
                 case STEREOSCOPIC_CMD -> {
-                    if (!Settings.settings.runtime.openXr)
+                    if (!GaiaSky.settings().runtime.openXr)
                         addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
                 }
                 case DISPLAY_GUI_CMD -> {
@@ -325,7 +325,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 }
                 case MODE_POPUP_CMD -> {
                     ModePopupInfo mpi = (ModePopupInfo) data[0];
-                    if (mpi != null && Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
+                    if (mpi != null && GaiaSky.settings().runtime.displayGui && GaiaSky.settings().program.ui.modeChangeInfo) {
                         addMessage(mpi.title);
                         addMessage(mpi.header);
                         for (Pair<String[], String> p : mpi.mappings) {

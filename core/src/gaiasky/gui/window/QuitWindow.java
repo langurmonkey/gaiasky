@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
@@ -54,7 +53,7 @@ public class QuitWindow extends GenericDialog {
     @Override
     protected boolean accept() {
         // Update exit confirmation
-        Settings.settings.program.exitConfirmation = !doNotAsk.isChecked();
+        GaiaSky.settings().program.exitConfirmation = !doNotAsk.isChecked();
         // Only run if it does not have an accept runnable already.
         // Otherwise, it comes from the exit hook.
         GaiaSky.postRunnable(() -> {

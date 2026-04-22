@@ -7,8 +7,8 @@
 
 package gaiasky.scene.record;
 
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.tree.IPosition;
 
 public class Position implements IPosition {

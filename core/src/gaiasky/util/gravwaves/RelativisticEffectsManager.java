@@ -16,7 +16,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -104,11 +103,11 @@ public class RelativisticEffectsManager implements IObserver {
     }
 
     public boolean relAberrationOn() {
-        return Settings.settings.runtime.relativisticAberration;
+        return GaiaSky.settings().runtime.relativisticAberration;
     }
 
     public boolean gravWavesOn() {
-        return Settings.settings.runtime.gravitationalWaves;
+        return GaiaSky.settings().runtime.gravitationalWaves;
     }
 
     /**
@@ -122,7 +121,7 @@ public class RelativisticEffectsManager implements IObserver {
         /*
          * RELATIVISTIC ABERRATION
          */
-        if (Settings.settings.runtime.relativisticAberration) {
+        if (GaiaSky.settings().runtime.relativisticAberration) {
             vc = (float) (camera.getSpeed() / Constants.C_KMH);
             if (camera.getVelocity() == null || camera.getVelocity().len() == 0) {
                 velDir.set(1, 0, 0);
@@ -134,7 +133,7 @@ public class RelativisticEffectsManager implements IObserver {
         /*
          * GRAVITATIONAL WAVES
          */
-        if (Settings.settings.runtime.gravitationalWaves) {
+        if (GaiaSky.settings().runtime.gravitationalWaves) {
             // Time
             gwtime = (float) ((time.getTime().toEpochMilli() - initime) / 1000d);
 
@@ -159,7 +158,7 @@ public class RelativisticEffectsManager implements IObserver {
      * @param pos The position for chaining
      */
     public Vector3D gravitationalWavePos(Vector3D pos) {
-        if (Settings.settings.runtime.gravitationalWaves) {
+        if (GaiaSky.settings().runtime.gravitationalWaves) {
             float hpluscos = hterms[0];
             float hplussin = hterms[1];
             float htimescos = hterms[2];

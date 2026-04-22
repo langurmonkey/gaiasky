@@ -17,8 +17,8 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
 import java.util.Date;

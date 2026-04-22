@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
@@ -23,7 +24,6 @@ import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
-    private static final int N_PARTICLES = (Settings.settings.graphics.quality.ordinal() + 1) * 100;
+    private static final int N_PARTICLES = (GaiaSky.settings().graphics.quality.ordinal() + 1) * 100;
 
     private final Random rand;
     private final Vector3D aux1, aux2, aux5;
@@ -111,7 +111,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
 
     private void updatePositions(ICamera cam) {
         double tu = cam.getCurrent().speedScaling();
-        double distLimit = 3500000 * tu * Constants.KM_TO_U * getFactor(Settings.settings.scene.camera.speed);
+        double distLimit = 3500000 * tu * Constants.KM_TO_U * getFactor(GaiaSky.settings().scene.camera.speed);
         double dist = distLimit * 0.8;
         distLimit *= distLimit;
 
@@ -202,7 +202,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
             updatePositions(camera);
 
             // Regular
-            Gdx.gl.glLineWidth(2f + Settings.settings.scene.renderer.line.glWidthBias);
+            Gdx.gl.glLineWidth(2f + GaiaSky.settings().scene.renderer.line.glWidthBias);
 
             if (curr != null) {
                 curr.vertexIdx = 0;

@@ -125,9 +125,9 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     private void initialize(boolean force) {
-        if (!Settings.settings.scene.initialization.lazyTexture || force) {
+        if (!GaiaSky.settings().scene.initialization.lazyTexture || force) {
             this.generated.set(false);
-            if (TextUtils.isValidURL(url) && Settings.settings.data.pullCloudData) {
+            if (TextUtils.isValidURL(url) && GaiaSky.settings().data.pullCloudData) {
                 try {
                     urlObject = new URI(url).toURL();
                     // Pull from URL, later.
@@ -190,7 +190,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         // CREATE CLOUD MODEL
         mc.instance = new IntModelInstance(cloudModel, this.localTransform);
 
-        if (!Settings.settings.scene.initialization.lazyTexture) {
+        if (!GaiaSky.settings().scene.initialization.lazyTexture) {
             initMaterial(null);
         }
 
@@ -199,23 +199,23 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     public void touch(Model model) {
-        if (Settings.settings.scene.initialization.lazyTexture) {
+        if (GaiaSky.settings().scene.initialization.lazyTexture) {
 
             if (!texLoading) {
                 initialize(true);
                 // Set to loading
                 texLoading = true;
-            } else if (Settings.settings.data.pullCloudData && urlValid) {
+            } else if (GaiaSky.settings().data.pullCloudData && urlValid) {
                 if (!downloadTriggered) {
                     // Send request.
                     var fileName = FilenameUtils.getName(urlObject.getPath());
                     fileName = TextUtils.sanitizeFilename(name + "-" + fileName);
-                    final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
+                    final var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
                     var ignored = cacheDir.toFile().mkdirs();
                     final var filePath = cacheDir.resolve(fileName);
                     var f = new FileHandle(filePath.toFile());
 
-                    DownloadHelper.downloadFile(url, f, Settings.settings.program.offlineMode, null, null, (digest) -> {
+                    DownloadHelper.downloadFile(url, f, GaiaSky.settings().program.offlineMode, null, null, (digest) -> {
                         // Download successful.
                         diffuse = f.path();
                         diffuseUnpacked = f.path();
@@ -330,7 +330,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
         material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
         material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor,
-                                        (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
+                                        (float) GaiaSky.settings().scene.renderer.virtualTextures.detectionBufferFactor));
     }
 
     public void setGenerated(boolean generated) {
@@ -342,8 +342,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             generated.set(true);
             GaiaSky.postRunnable(() -> {
 
-                final int N = Settings.settings.graphics.proceduralGenerationResolution[0];
-                final int M = Settings.settings.graphics.proceduralGenerationResolution[1];
+                final int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
+                final int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
                 long start = TimeUtils.millis();
                 logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.cloud"), N, M));
 
@@ -354,7 +354,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                 }
                 FrameBuffer cloudFb = nc.generateNoise(N, M, 1, 1, color);
                 // Write to disk if necessary.
-                if (Settings.settings.program.saveProceduralTextures) {
+                if (GaiaSky.settings().program.saveProceduralTextures) {
                     SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud", Settings.ImageFormat.JPG);
                 }
                 if (cloudFb != null) {
@@ -462,7 +462,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     public void setDiffuse(String diffuse) {
-        this.diffuse = Settings.settings.data.dataFile(diffuse);
+        this.diffuse = GaiaSky.settings().data.dataFile(diffuse);
     }
 
     public void setUrl(String url) {

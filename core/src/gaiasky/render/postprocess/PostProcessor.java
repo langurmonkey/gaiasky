@@ -18,11 +18,11 @@ import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import gaiasky.GaiaSky;
 import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 import gaiasky.render.util.ItemsManager;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.UpscaleFilter;
 import org.lwjgl.opengl.GL30;
 
@@ -84,7 +84,7 @@ public final class PostProcessor implements Disposable {
         composite = newPingPongBuffer(fboWidth, fboHeight, pixmapFormat, useDepth, hasNormal, hasReflectionMask, preventFloatBuffer);
         setBufferTextureWrap(u, v);
         if (rt == RenderType.screen) {
-            UpscaleFilter upscaleFilter = Settings.settings.postprocess.upscaleFilter;
+            UpscaleFilter upscaleFilter = GaiaSky.settings().postprocess.upscaleFilter;
             setBufferTextureFilter(upscaleFilter.minification, upscaleFilter.magnification);
         }
 

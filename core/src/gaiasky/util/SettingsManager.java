@@ -46,167 +46,12 @@ import java.util.Properties;
 public class SettingsManager {
     private static final Logger.Log logger = Logger.getLogger(SettingsManager.class);
 
-    public static SettingsManager instance;
-    private Settings settings;
-    private Properties vp;
-    private ObjectMapper mapper;
-
-    public SettingsManager(boolean vr) {
-        super();
-        try {
-
-
-            // This should work for the normal execution
-            InputStream vis = GaiaSkyDesktop.class.getResourceAsStream("/version");
-            if (vis == null) {
-                // In case of running in 'developer' mode
-                vis = new FileInputStream(Settings.ASSETS_LOC + File.separator + "dummyversion");
-            }
-            vp = new Properties();
-            vp.load(vis);
-
-            initializeMapper();
-
-            // Initialize settings object.
-            String propsFileProperty = System.getProperty("properties.file");
-            if (propsFileProperty == null || propsFileProperty.isEmpty()) {
-                propsFileProperty = initConfigFile(vr);
-            }
-            File confFile = new File(propsFileProperty);
-            settings = loadSettings(confFile);
-
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
-
-    public SettingsManager(InputStream fis,
-                           InputStream vis) {
-        super();
-        try {
-            vp = new Properties();
-            vp.load(vis);
-
-            initializeMapper();
-            settings = mapper.readValue(fis, Settings.class);
-
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
-
     /**
-     * Loads a {@link Settings} object from a YAML configuration file and returns it.
-     *
-     * @param configFile The YAML configuration file.
-     *
-     * @return The {@link Settings} object.
+     * YAML object mapper.
      */
-    public Settings loadSettings(File configFile) throws IOException {
-        var fis = new FileInputStream(configFile);
-        return mapper.readValue(fis, Settings.class);
-    }
-
-    public static void initialize(boolean vr) throws Exception {
-        SettingsManager.instance = new SettingsManager(vr);
-        instance.initSettings();
-    }
-
-    public static void initialize(FileInputStream fis,
-                                  FileInputStream vis) {
-        SettingsManager.instance = new SettingsManager(fis, vis);
-        instance.initSettings();
-    }
-
-    private static void setProxySettings(ProxyBean proxy,
-                                         String protocol) {
-        setProxySettings(proxy, protocol, protocol);
-    }
-
-    private static void setProxySettings(ProxyBean proxy,
-                                         String protocol,
-                                         String nonProxyHostsProtocol) {
-        if (proxy.host != null)
-            System.setProperty(protocol + ".proxyHost", proxy.host);
-        if (proxy.port != null)
-            System.setProperty(protocol + ".proxyPort", Integer.toString(proxy.port));
-        if (proxy.nonProxyHosts != null)
-            System.setProperty(nonProxyHostsProtocol + ".nonProxyHosts", proxy.password);
-
-        if (proxy.username != null)
-            System.setProperty(protocol + ".proxyUser", proxy.username);
-        if (proxy.password != null)
-            System.setProperty(protocol + ".proxyPassword", proxy.password);
-    }
-
-    private static void setSocksProxySettings(ProxyBean proxy) {
-        if (proxy.version != null)
-            System.setProperty("socks" + "ProxyVersion", Integer.toString(proxy.version));
-        if (proxy.host != null)
-            System.setProperty("socks" + "ProxyHost", proxy.host);
-        if (proxy.port != null)
-            System.setProperty("socks" + "ProxyPort", Integer.toString(proxy.port));
-        if (proxy.username != null)
-            System.setProperty("java.net.socks.username", proxy.username);
-        if (proxy.password != null)
-            System.setProperty("java.net.socks.password", proxy.password);
-    }
-
-    public static void initializeProxyAuthenticator() {
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                if (getRequestorType() == RequestorType.PROXY) {
-                    String protocol = getRequestingProtocol().toLowerCase(Locale.ROOT);
-                    String host = System.getProperty(protocol + ".proxyHost", "");
-                    String port = System.getProperty(protocol + ".proxyPort", "80");
-                    String user = System.getProperty(protocol + ".proxyUser", "");
-                    String password = System.getProperty(protocol + ".proxyPassword", "");
-                    if (getRequestingHost().equalsIgnoreCase(host)) {
-                        if (Integer.parseInt(port) == getRequestingPort()) {
-                            return new PasswordAuthentication(user, password.toCharArray());
-                        }
-                    }
-                }
-                return null;
-            }
-        });
-        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
-    }
-
-    /**
-     * Persists the given settings object to the given file.
-     *
-     * @param settings     The settings object to persist.
-     * @param settingsFile The file to save the settings to.
-     */
-    public static void persistSettings(final Settings settings, final File settingsFile) {
-        if (instance != null)
-            instance.persist(settings, settingsFile);
-    }
-
-    /**
-     * Persists the current settings object of the singleton to the given file.
-     *
-     * @param settingsFile The file to save the settings to.
-     */
-    public static void persistSettings(final File settingsFile) {
-        if (instance != null)
-            instance.persist(instance.settings, settingsFile);
-    }
-
-    public static String getConfigFileName(boolean vr) {
-        if (vr)
-            return "config.vr.yaml";
-        else
-            return "config.yaml";
-    }
-
-    public static boolean setSettingsInstance(Settings settings) {
-        return Settings.setSettingsReference(settings);
-    }
-
-    private void initializeMapper() {
+    private static final ObjectMapper mapper;
+    static {
+        // Initialize mapper object.
         YAMLFactory yaml = new YAMLFactory();
         yaml.disable(Feature.WRITE_DOC_START_MARKER).enable(Feature.MINIMIZE_QUOTES).enable(Feature.INDENT_ARRAYS);
         mapper = new ObjectMapper(yaml);
@@ -214,8 +59,79 @@ public class SettingsManager {
         mapper.findAndRegisterModules();
     }
 
-    public void initSettings() {
+    /**
+     * Creates a new empty settings manager object.
+     */
+    public SettingsManager() {
+    }
 
+    /**
+     * Loads the given settings and version files into a {@link Settings} object and returns it.
+     *
+     * @param settingsStream Input stream to the settings file (config.yaml).
+     * @param versionStream  Input stream to the version file.
+     *
+     * @return The loaded {@link Settings} object.
+     */
+    public Settings loadSettings(InputStream settingsStream,
+                                 InputStream versionStream) {
+        try {
+            var vp = new Properties();
+            vp.load(versionStream);
+
+            var settings = mapper.readValue(settingsStream, Settings.class);
+            initializeInternal(settings, vp);
+            return settings;
+
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return null;
+    }
+
+    /**
+     * Loads the default settings file into a {@link Settings} object and returns it.
+     *
+     * @param vrFlag Whether we are in VR mode.
+     *
+     * @return The loaded {@link Settings} object.
+     */
+    public Settings loadSettings(boolean vrFlag) {
+        try {
+            // This should work for the normal execution
+            InputStream versionStream = GaiaSkyDesktop.class.getResourceAsStream("/version");
+            if (versionStream == null) {
+                // In case of running in 'developer' mode
+                versionStream = new FileInputStream(Settings.ASSETS_LOC + File.separator + "dummyversion");
+            }
+            var versionProperties = new Properties();
+            versionProperties.load(versionStream);
+
+
+            // Initialize settings object.
+            String propsFileProperty = System.getProperty("properties.file");
+            if (propsFileProperty == null || propsFileProperty.isEmpty()) {
+                propsFileProperty = initConfigFile(vrFlag);
+            }
+            File confFile = new File(propsFileProperty);
+            var settings = loadSettings(confFile);
+            initializeInternal(settings, versionProperties);
+
+            return settings;
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return null;
+
+    }
+
+    /**
+     * Initializes the given settings object with sane defaults for missing properties, if needed.
+     *
+     * @param settings The object to initialize.
+     * @param vp       The properties with the version information.
+     */
+    private void initializeInternal(Settings settings, Properties vp) {
         // Initialize version.
         VersionSettings versionSettings = new VersionSettings();
         String versionStr = vp.getProperty("version");
@@ -237,7 +153,6 @@ public class SettingsManager {
         settings.runtime = new Settings.RuntimeSettings();
 
         settings.version = versionSettings;
-        Settings.settings = settings;
 
         String arch = System.getProperty("sun.arch.data.model");
 
@@ -386,9 +301,99 @@ public class SettingsManager {
         }
 
         settings.initialize();
+
     }
 
-    private void persist(final Settings settings, final File settingsFile) {
+    /**
+     * Loads a {@link Settings} object from a YAML configuration file and returns it.
+     *
+     * @param configFile The YAML configuration file.
+     *
+     * @return The {@link Settings} object.
+     */
+    public Settings loadSettings(File configFile) throws IOException {
+        var fis = new FileInputStream(configFile);
+        return mapper.readValue(fis, Settings.class);
+    }
+
+
+    private static void setProxySettings(ProxyBean proxy,
+                                         String protocol) {
+        setProxySettings(proxy, protocol, protocol);
+    }
+
+    private static void setProxySettings(ProxyBean proxy,
+                                         String protocol,
+                                         String nonProxyHostsProtocol) {
+        if (proxy.host != null)
+            System.setProperty(protocol + ".proxyHost", proxy.host);
+        if (proxy.port != null)
+            System.setProperty(protocol + ".proxyPort", Integer.toString(proxy.port));
+        if (proxy.nonProxyHosts != null)
+            System.setProperty(nonProxyHostsProtocol + ".nonProxyHosts", proxy.password);
+
+        if (proxy.username != null)
+            System.setProperty(protocol + ".proxyUser", proxy.username);
+        if (proxy.password != null)
+            System.setProperty(protocol + ".proxyPassword", proxy.password);
+    }
+
+    private static void setSocksProxySettings(ProxyBean proxy) {
+        if (proxy.version != null)
+            System.setProperty("socks" + "ProxyVersion", Integer.toString(proxy.version));
+        if (proxy.host != null)
+            System.setProperty("socks" + "ProxyHost", proxy.host);
+        if (proxy.port != null)
+            System.setProperty("socks" + "ProxyPort", Integer.toString(proxy.port));
+        if (proxy.username != null)
+            System.setProperty("java.net.socks.username", proxy.username);
+        if (proxy.password != null)
+            System.setProperty("java.net.socks.password", proxy.password);
+    }
+
+    private void initializeProxyAuthenticator() {
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                if (getRequestorType() == RequestorType.PROXY) {
+                    String protocol = getRequestingProtocol().toLowerCase(Locale.ROOT);
+                    String host = System.getProperty(protocol + ".proxyHost", "");
+                    String port = System.getProperty(protocol + ".proxyPort", "80");
+                    String user = System.getProperty(protocol + ".proxyUser", "");
+                    String password = System.getProperty(protocol + ".proxyPassword", "");
+                    if (getRequestingHost().equalsIgnoreCase(host)) {
+                        if (Integer.parseInt(port) == getRequestingPort()) {
+                            return new PasswordAuthentication(user, password.toCharArray());
+                        }
+                    }
+                }
+                return null;
+            }
+        });
+        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+    }
+
+    public static String getConfigFileName(boolean vr) {
+        if (vr)
+            return "config.vr.yaml";
+        else
+            return "config.yaml";
+    }
+
+    /**
+     * Persists the given settings object to the default settings file path.
+     */
+    public void persist(Settings settings) {
+        persist(settings, new File(System.getProperty("properties.file")));
+    }
+
+    /**
+     * Persists the given settings object to the given file.
+     *
+     * @param settings     The settings object to persist.
+     * @param settingsFile The file to save the settings to.
+     */
+    public void persist(final Settings settings, final File settingsFile) {
         try {
             boolean backup = settings.program.safeMode;
             if (settings.program.safeModeFlag) {

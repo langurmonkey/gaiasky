@@ -20,7 +20,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3D;
 
@@ -65,7 +64,7 @@ public class SpriteEntityRenderSystem {
         var s = spriteMap.get(name);
         if (s == null) {
             try {
-                Texture t = new Texture(Settings.settings.data.dataFile(name));
+                Texture t = new Texture(GaiaSky.settings().data.dataFile(name));
                 t.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
                 s = new Sprite(t);
                 spriteMap.put(name, s);

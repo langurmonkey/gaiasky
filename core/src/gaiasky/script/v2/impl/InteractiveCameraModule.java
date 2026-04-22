@@ -20,7 +20,6 @@ import gaiasky.script.v2.api.CamcorderAPI;
 import gaiasky.script.v2.api.CameraAPI;
 import gaiasky.script.v2.api.InteractiveCameraAPI;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
@@ -375,11 +374,11 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                      */
 
                     // Save speed, set it to 50
-                    double speed = Settings.settings.scene.camera.speed;
+                    double speed = GaiaSky.settings().scene.camera.speed;
                     em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f);
 
                     // Save turn speed, set it to 50
-                    double turnSpeedBak = Settings.settings.scene.camera.turn;
+                    double turnSpeedBak = GaiaSky.settings().scene.camera.turn;
                     em.post(Event.TURNING_SPEED_CMD,
                             this,
                             (float) MathUtilsDouble.flint(20d,
@@ -390,8 +389,8 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                             false);
 
                     // Save cinematic
-                    boolean cinematic = Settings.settings.scene.camera.cinematic;
-                    Settings.settings.scene.camera.cinematic = true;
+                    boolean cinematic = GaiaSky.settings().scene.camera.cinematic;
+                    GaiaSky.settings().scene.camera.cinematic = true;
 
                     /*
                      * FOCUS
@@ -469,7 +468,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                     em.post(Event.CAMERA_STOP, this);
 
                     // Restore cinematic
-                    Settings.settings.scene.camera.cinematic = cinematic;
+                    GaiaSky.settings().scene.camera.cinematic = cinematic;
 
                     // Restore speed
                     em.post(Event.CAMERA_SPEED_CMD, this, (float) speed);
@@ -592,11 +591,11 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                     go_to_object(focusView.getEntity(), 15, -1, stop);
 
                     // Save speed, set it to 50
-                    double speed = Settings.settings.scene.camera.speed;
+                    double speed = GaiaSky.settings().scene.camera.speed;
                     em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f);
 
                     // Save turn speed, set it to 50
-                    double turnSpeedBak = Settings.settings.scene.camera.turn;
+                    double turnSpeedBak = GaiaSky.settings().scene.camera.turn;
                     em.post(Event.TURNING_SPEED_CMD,
                             this,
                             (float) MathUtilsDouble.flint(50d,
@@ -606,7 +605,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                                                           Constants.MAX_TURN_SPEED));
 
                     // Save rotation speed, set it to 20
-                    double rotationSpeedBak = Settings.settings.scene.camera.rotate;
+                    double rotationSpeedBak = GaiaSky.settings().scene.camera.rotate;
                     em.post(Event.ROTATION_SPEED_CMD,
                             this,
                             (float) MathUtilsDouble.flint(20d,
@@ -616,12 +615,12 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                                                           Constants.MAX_ROT_SPEED));
 
                     // Save cinematic
-                    boolean cinematic = Settings.settings.scene.camera.cinematic;
-                    Settings.settings.scene.camera.cinematic = true;
+                    boolean cinematic = GaiaSky.settings().scene.camera.cinematic;
+                    GaiaSky.settings().scene.camera.cinematic = true;
 
                     // Save crosshair
-                    boolean crosshair = Settings.settings.scene.crosshair.focus;
-                    Settings.settings.scene.crosshair.focus = false;
+                    boolean crosshair = GaiaSky.settings().scene.crosshair.focus;
+                    GaiaSky.settings().scene.crosshair.focus = false;
 
                     // Get target position
                     Vector3Q target = api.aux3b1;
@@ -659,7 +658,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                     go_to_object(nameStub, 20, 0, stop);
 
                     // Restore cinematic
-                    Settings.settings.scene.camera.cinematic = cinematic;
+                    GaiaSky.settings().scene.camera.cinematic = cinematic;
 
                     // Restore speed
                     em.post(Event.CAMERA_SPEED_CMD, this, (float) speed);
@@ -671,7 +670,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                     em.post(Event.ROTATION_SPEED_CMD, this, (float) rotationSpeedBak);
 
                     // Restore crosshair
-                    Settings.settings.scene.crosshair.focus = crosshair;
+                    GaiaSky.settings().scene.crosshair.focus = crosshair;
 
                     // Land
                     land_on(focusView.getEntity(), stop);

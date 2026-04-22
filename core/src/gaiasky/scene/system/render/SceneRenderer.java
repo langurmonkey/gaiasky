@@ -49,7 +49,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -134,8 +133,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         CascadedShadowMapRenderPass cascadedShadowMapRenderPass = new CascadedShadowMapRenderPass(this);
         SVTRenderPass svtPass = new SVTRenderPass(this);
 
-        this.shadowMapPass.setCondition(() -> Settings.settings.scene.renderer.shadow.active);
-        cascadedShadowMapRenderPass.setCondition(() -> Settings.settings.scene.renderer.shadow.active);
+        this.shadowMapPass.setCondition(() -> GaiaSky.settings().scene.renderer.shadow.active);
+        cascadedShadowMapRenderPass.setCondition(() -> GaiaSky.settings().scene.renderer.shadow.active);
 
         cascadedShadowMapRenderPass.setEnabled(false);
 
@@ -215,8 +214,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Set reference
         visible = new ComponentTypes();
         final ComponentType[] types = ComponentType.values();
-        for (int i = 0; i < Settings.settings.scene.visibility.size(); i++) {
-            if (Settings.settings.scene.visibility.get(types[i].toString())) {
+        for (int i = 0; i < GaiaSky.settings().scene.visibility.size(); i++) {
+            if (GaiaSky.settings().scene.visibility.get(types[i].toString())) {
                 visible.set(ComponentType.values()[i].ordinal());
             }
         }
@@ -381,7 +380,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                BILLBOARD_STAR,
                                                alphas,
                                                renderAssets.billboardShaders,
-                                               Settings.settings.scene.star.getStarTexture(),
+                                               GaiaSky.settings().scene.star.getStarTexture(),
                                                true);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
                 system.addPostRunnables(lpu);
@@ -466,13 +465,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     private void initRenderMode(ICamera camera) {
-        if (Settings.settings.runtime.openXr) {
+        if (GaiaSky.settings().runtime.openXr) {
             // Using Steam OpenVR renderer
             renderMode = sgrList[SGR_OPENXR_IDX];
-        } else if (Settings.settings.program.modeStereo.active) {
+        } else if (GaiaSky.settings().program.modeStereo.active) {
             // Stereoscopic mode
             renderMode = sgrList[SGR_STEREO_IDX];
-        } else if (Settings.settings.program.modeCubemap.active) {
+        } else if (GaiaSky.settings().program.modeCubemap.active) {
             // 360 mode: cube map -> equi-rectangular map
             renderMode = sgrList[SGR_CUBEMAP_IDX];
         } else {
@@ -740,25 +739,25 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     boolean stereo = (Boolean) data[0];
                     if (stereo) renderMode = sgrList[SGR_STEREO_IDX];
                     else {
-                        if (Settings.settings.runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
+                        if (GaiaSky.settings().runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
                         else renderMode = sgrList[SGR_DEFAULT_IDX];
                     }
                 }
             }
             case CUBEMAP_CMD -> {
-                boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openXr;
+                boolean cubemap = (Boolean) data[0] && !GaiaSky.settings().runtime.openXr;
                 if (cubemap) {
                     renderMode = sgrList[SGR_CUBEMAP_IDX];
                 } else {
-                    if (Settings.settings.runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
+                    if (GaiaSky.settings().runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
                     else renderMode = sgrList[SGR_DEFAULT_IDX];
                 }
             }
             case CAMERA_MODE_CMD -> {
                 CameraMode cm = (CameraMode) data[0];
-                if (Settings.settings.runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
-                else if (Settings.settings.program.modeStereo.active) renderMode = sgrList[SGR_STEREO_IDX];
-                else if (Settings.settings.program.modeCubemap.active) renderMode = sgrList[SGR_CUBEMAP_IDX];
+                if (GaiaSky.settings().runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
+                else if (GaiaSky.settings().program.modeStereo.active) renderMode = sgrList[SGR_STEREO_IDX];
+                else if (GaiaSky.settings().program.modeCubemap.active) renderMode = sgrList[SGR_CUBEMAP_IDX];
                 else renderMode = sgrList[SGR_DEFAULT_IDX];
 
             }
@@ -783,7 +782,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private float calculateAlpha(ComponentType type, double t) {
         int ordinal = type.ordinal();
         long diff = (long) (t * 1000f) - times[ordinal];
-        if (diff > Settings.settings.scene.fadeMs) {
+        if (diff > GaiaSky.settings().scene.fadeMs) {
             if (visible.get(ordinal)) {
                 alphas[ordinal] = 1;
             } else {
@@ -791,10 +790,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             return alphas[ordinal];
         } else {
-            return visible.get(ordinal) ? MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 0,
+            return visible.get(ordinal) ? MathUtilsDouble.lint(diff, 0, GaiaSky.settings().scene.fadeMs, 0,
                                                                1) : MathUtilsDouble.lint(diff,
                                                                                          0,
-                                                                                         Settings.settings.scene.fadeMs,
+                                                                                         GaiaSky.settings().scene.fadeMs,
                                                                                          1,
                                                                                          0);
         }
@@ -891,8 +890,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem sys;
         // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
         ExtShaderProgram[] lineGpuShaders;
-        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion()
-                .getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+        if (GaiaSky.settings().scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion()
+                .getMajorVersion() < 4 || GaiaSky.settings().program.safeMode) {
             lineGpuShaders = renderAssets.primitiveGpuShaders;
         } else {
             lineGpuShaders = renderAssets.lineQuadGpuShaders;
@@ -905,8 +904,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private AbstractRenderSystem getLineCPURenderSystem() {
         AbstractRenderSystem sys;
         // We need OpenGL 4.x for the geometry shader (uses double-precision) in the polyline quad-strip renderer.
-        if (Settings.settings.scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion()
-                .getMajorVersion() < 4 || Settings.settings.program.safeMode) {
+        if (GaiaSky.settings().scene.renderer.line.isNormalLineRenderer() || Gdx.graphics.getGLVersion()
+                .getMajorVersion() < 4 || GaiaSky.settings().program.safeMode) {
             // Normal line renderer.
             sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineCpuShaders);
             sys.addPreRunnables(regularBlendR, depthTestNoWritesR);

@@ -7,9 +7,9 @@
 
 package gaiasky.util.coord.vsop87;
 
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -32,7 +32,7 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
         if (vsop87 == null) {
             AssetBean.addAsset(dataFile,
                     VSOP87Binary.class,
-                    new VSOP87Loader.VSOP87LoaderParameters(Settings.settings.data.highAccuracy ? 0 : 0.6));
+                    new VSOP87Loader.VSOP87LoaderParameters(GaiaSky.settings().data.highAccuracy ? 0 : 0.6));
         }
         versionA = dataFile.contains("vsop87a");
     }

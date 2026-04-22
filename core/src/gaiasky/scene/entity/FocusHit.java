@@ -20,7 +20,6 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Functions.Function2;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
@@ -96,7 +95,7 @@ public class FocusHit {
                 double angle = solidAngleFunction.apply(view, camera.fovFactor) * solidAngleFactor;
 
                 PerspectiveCamera perspectiveCamera;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     if (screenX < w / 2f) {
                         perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
@@ -107,7 +106,7 @@ public class FocusHit {
                     perspectiveCamera = camera.camera;
                 }
 
-                float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                float backBufferScale = (float) GaiaSky.settings().graphics.backBufferScale;
                 float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                 float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
@@ -115,7 +114,7 @@ public class FocusHit {
                 double pixelSize = FastMath.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                 perspectiveCamera.project(pos);
                 pos.y = viewportHeight - pos.y;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance
@@ -254,7 +253,7 @@ public class FocusHit {
                                   w,
                                   h,
                                   pixelDist,
-                                  Settings.settings.scene.star.brightness,
+                                  GaiaSky.settings().scene.star.brightness,
                                   this::computeHitSolidAngleStar,
                                   camera,
                                   hits);
@@ -299,7 +298,7 @@ public class FocusHit {
                         }
 
                         PerspectiveCamera perspectiveCamera;
-                        if (Settings.settings.program.modeStereo.active) {
+                        if (GaiaSky.settings().program.modeStereo.active) {
                             if (screenX < w / 2f) {
                                 perspectiveCamera = camera.getCameraStereoLeft();
                             } else {
@@ -310,7 +309,7 @@ public class FocusHit {
                             perspectiveCamera = camera.camera;
                         }
 
-                        float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                        float backBufferScale = (float) GaiaSky.settings().graphics.backBufferScale;
                         float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                         float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
@@ -318,7 +317,7 @@ public class FocusHit {
                         double pixelSize = FastMath.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                         perspectiveCamera.project(posFloat);
                         posFloat.y = viewportHeight - posFloat.y;
-                        if (Settings.settings.program.modeStereo.active) {
+                        if (GaiaSky.settings().program.modeStereo.active) {
                             posFloat.x /= 2;
                         }
 
@@ -430,7 +429,7 @@ public class FocusHit {
                 double angle = view.getSolidAngle();
 
                 PerspectiveCamera perspectiveCamera;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     if (screenX < w / 2f) {
                         perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
@@ -441,7 +440,7 @@ public class FocusHit {
                     perspectiveCamera = camera.camera;
                 }
 
-                float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                float backBufferScale = (float) GaiaSky.settings().graphics.backBufferScale;
                 float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                 float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
@@ -449,7 +448,7 @@ public class FocusHit {
                 double pixelSize = ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2;
                 perspectiveCamera.project(pos);
                 pos.y = viewportHeight - pos.y;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance
@@ -518,7 +517,7 @@ public class FocusHit {
                 double angle = view.getSolidAngle() * 0.4f;
 
                 PerspectiveCamera perspectiveCamera;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     if (screenX < w / 2f) {
                         perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
@@ -529,7 +528,7 @@ public class FocusHit {
                     perspectiveCamera = camera.camera;
                 }
 
-                float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                float backBufferScale = (float) GaiaSky.settings().graphics.backBufferScale;
                 float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                 float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
@@ -537,7 +536,7 @@ public class FocusHit {
                 double pixelSize = ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2;
                 perspectiveCamera.project(pos);
                 pos.y = viewportHeight - pos.y;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     pos.x /= 2;
                 }
 
@@ -582,7 +581,7 @@ public class FocusHit {
                         double angle = set.getRadius(i) / dist / camera.getFovFactor();
 
                         PerspectiveCamera perspectiveCamera;
-                        if (Settings.settings.program.modeStereo.active) {
+                        if (GaiaSky.settings().program.modeStereo.active) {
                             if (screenX < w / 2f) {
                                 perspectiveCamera = camera.getCameraStereoLeft();
                             } else {
@@ -593,7 +592,7 @@ public class FocusHit {
                             perspectiveCamera = camera.camera;
                         }
 
-                        float backBufferScale = (float) Settings.settings.graphics.backBufferScale;
+                        float backBufferScale = (float) GaiaSky.settings().graphics.backBufferScale;
                         float viewportHeight = perspectiveCamera.viewportHeight / backBufferScale;
                         float viewportWidth = perspectiveCamera.viewportWidth / backBufferScale;
 
@@ -601,7 +600,7 @@ public class FocusHit {
                         double pixelSize = FastMath.max(pixelDist, ((angle * viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                         perspectiveCamera.project(posFloat);
                         posFloat.y = viewportHeight - posFloat.y;
-                        if (Settings.settings.program.modeStereo.active) {
+                        if (GaiaSky.settings().program.modeStereo.active) {
                             posFloat.x /= 2;
                         }
 

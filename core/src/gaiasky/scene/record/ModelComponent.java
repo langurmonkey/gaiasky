@@ -55,8 +55,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     private static final ColorAttribute globalAmbient;
 
     static {
-        globalAmbient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient,
-                                           (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
+        globalAmbient = new ColorAttribute(ColorAttribute.AmbientLight, (float) GaiaSky.settings().scene.renderer.ambient,
+                                           (float) GaiaSky.settings().scene.renderer.ambient, (float) GaiaSky.settings().scene.renderer.ambient, 1f);
         // Ambient light watcher.
         var observer = new Observer() {
             @Override
@@ -204,18 +204,18 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     public void initialize(boolean mesh) {
-        FileHandle model = modelFile != null ? Settings.settings.data.dataFileHandle(modelFile) : null;
+        FileHandle model = modelFile != null ? GaiaSky.settings().data.dataFileHandle(modelFile) : null;
         if (mesh) {
-            if (!Settings.settings.scene.initialization.lazyMesh && modelFile != null && model.exists()) {
-                AssetBean.addAsset(Settings.settings.data.dataFile(modelFile), IntModel.class);
+            if (!GaiaSky.settings().scene.initialization.lazyMesh && modelFile != null && model.exists()) {
+                AssetBean.addAsset(GaiaSky.settings().data.dataFile(modelFile), IntModel.class);
             }
         } else {
             if (modelFile != null && model.exists()) {
-                AssetBean.addAsset(Settings.settings.data.dataFile(modelFile), IntModel.class);
+                AssetBean.addAsset(GaiaSky.settings().data.dataFile(modelFile), IntModel.class);
             }
         }
 
-        if ((forceInit || !Settings.settings.scene.initialization.lazyTexture) && mtc != null) {
+        if ((forceInit || !GaiaSky.settings().scene.initialization.lazyTexture) && mtc != null) {
             mtc.initialize(name);
             mtc.texLoading = true;
         }
@@ -274,7 +274,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         IntModel model;
 
         // CREATE MAIN MODEL INSTANCE
-        if (!mesh || !Settings.settings.scene.initialization.lazyMesh) {
+        if (!mesh || !GaiaSky.settings().scene.initialization.lazyMesh) {
             Pair<IntModel, Map<String, Material>> modelMaterial = initModelFile();
             if (modelMaterial != null) {
                 model = modelMaterial.getFirst();
@@ -288,7 +288,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
 
         // INITIALIZE MATERIAL
-        if ((forceInit || !Settings.settings.scene.initialization.lazyTexture) && mtc != null) {
+        if ((forceInit || !GaiaSky.settings().scene.initialization.lazyTexture) && mtc != null) {
             mtc.initMaterial(manager, instance, cc, culling);
             mtc.texLoading = false;
             mtc.texInitialised = true;
@@ -302,16 +302,16 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Event.ECLIPSES_CMD);
 
-        this.modelInitialised = this.modelInitialised || !Settings.settings.scene.initialization.lazyMesh;
+        this.modelInitialised = this.modelInitialised || !GaiaSky.settings().scene.initialization.lazyMesh;
         this.modelLoading = false;
     }
 
     private Pair<IntModel, Map<String, Material>> initModelFile() {
         IntModel model = null;
         Map<String, Material> materials = null;
-        if (modelFile != null && manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
+        if (modelFile != null && manager.isLoaded(GaiaSky.settings().data.dataFile(modelFile))) {
             // Model comes from file (probably .obj or .g3db)
-            model = manager.get(Settings.settings.data.dataFile(modelFile), IntModel.class);
+            model = manager.get(GaiaSky.settings().data.dataFile(modelFile), IntModel.class);
             materials = new HashMap<>();
             if (model.materials.size == 0) {
                 Material material = new Material();
@@ -370,7 +370,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         if (manager == null) {
             manager = AssetBean.manager();
         }
-        if (manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
+        if (manager.isLoaded(GaiaSky.settings().data.dataFile(modelFile))) {
             this.doneLoading(manager, localTransform, null);
             this.modelLoading = false;
             this.modelInitialised = true;
@@ -434,7 +434,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
      * Initialises the model or texture if LAZY_X_INIT is on
      */
     public void touch(Matrix4 localTransform) {
-        if (Settings.settings.scene.initialization.lazyTexture && mtc != null && !mtc.texInitialised) {
+        if (GaiaSky.settings().scene.initialization.lazyTexture && mtc != null && !mtc.texInitialised) {
             if (!mtc.texLoading) {
                 mtc.initialize(name, manager);
                 mtc.texLoading = true;
@@ -447,13 +447,13 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             }
         }
 
-        if (localTransform != null && Settings.settings.scene.initialization.lazyMesh && !modelInitialised) {
+        if (localTransform != null && GaiaSky.settings().scene.initialization.lazyMesh && !modelInitialised) {
             if (!modelLoading) {
-                String mf = Settings.settings.data.dataFile(modelFile);
+                String mf = GaiaSky.settings().data.dataFile(modelFile);
                 logger.info(I18n.msg("notif.loading", mf));
                 AssetBean.addAsset(mf, IntModel.class);
                 modelLoading = true;
-            } else if (manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
+            } else if (manager.isLoaded(GaiaSky.settings().data.dataFile(modelFile))) {
                 IntModel model;
                 Pair<IntModel, Map<String, Material>> modMat = initModelFile();
                 assert modMat != null;
@@ -500,7 +500,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     public void setVROffset(NaturalCamera cam) {
-        if (Settings.settings.runtime.openXr && cam.vrOffset != null) {
+        if (GaiaSky.settings().runtime.openXr && cam.vrOffset != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
@@ -891,7 +891,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     Array<Entity> eclipsingBodies = new Array<>();
 
     public void updateEclipsingBodyUniforms(Entity entity) {
-        if (!Settings.settings.scene.renderer.eclipses.active) {
+        if (!GaiaSky.settings().scene.renderer.eclipses.active) {
             return;
         }
         var graph = Mapper.graph.get(entity);
@@ -934,7 +934,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
 
         setVector3Attribute(mat, Vector3Attribute.EclipsingBodyPos, graph.translation.put(aux));
         setFloatAttribute(mat, FloatAttribute.EclipsingBodyRadius, (float) (body.size * 0.5));
-        if (Settings.settings.scene.renderer.eclipses.outlines) {
+        if (GaiaSky.settings().scene.renderer.eclipses.outlines) {
             setIntAttribute(mat, IntAttribute.EclipseOutlines, 1);
         } else {
             mat.remove(IntAttribute.EclipseOutlines);
@@ -972,13 +972,13 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public void updateRelativisticEffects(Material mat,
                                           ICamera camera,
                                           float vc) {
-        if (Settings.settings.runtime.relativisticAberration) {
+        if (GaiaSky.settings().runtime.relativisticAberration) {
             rec.updateRelativisticEffectsMaterial(mat, camera, vc);
         } else if (rec.hasRelativisticEffects(mat)) {
             rec.removeRelativisticEffectsMaterial(mat);
         }
 
-        if (Settings.settings.runtime.gravitationalWaves) {
+        if (GaiaSky.settings().runtime.gravitationalWaves) {
             rec.updateGravitationalWavesMaterial(mat);
         } else if (rec.hasGravitationalWaves(mat)) {
             rec.removeGravitationalWavesMaterial(mat);

@@ -15,7 +15,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.window.GenericDialog;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
@@ -143,7 +142,7 @@ public class BookmarkNameDialog extends GenericDialog implements IObserver {
         var up = orientationCb.isChecked() ? cam.getUp() : null;
         var time = timeCb.isChecked() ? GaiaSky.instance.time.getTime() : null;
         var focus = focusCb.isChecked() ? GaiaSky.instance.getCameraManager().getFocus().getName() : null;
-        var settings = settingsCb.isChecked() ? Settings.settings.clone() : null;
+        var settings = settingsCb.isChecked() ? GaiaSky.settings().clone() : null;
 
         if (check()) {
             EventManager.publish(Event.BOOKMARKS_ADD, this, pos, dir, up, time, focus, settings, bookmarkName.getText(), false);

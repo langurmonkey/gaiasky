@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.beans.ComboBoxBean;
@@ -25,10 +26,12 @@ import gaiasky.gui.iface.CustomInterface;
 import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.OwnSelectBox;
+import gaiasky.util.scene2d.OwnSliderReset;
+import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
+import gaiasky.util.scene2d.OwnTextIconButton;
 
 import java.text.DecimalFormat;
 
@@ -101,7 +104,7 @@ public class StereoGui extends AbstractGui {
         profile = new OwnSelectBox<>(skin);
 
         profile.setItems(ComboBoxBean.getValues(StereoProfile.class));
-        profile.setSelectedIndex(Settings.settings.program.modeStereo.profile.ordinal());
+        profile.setSelectedIndex(GaiaSky.settings().program.modeStereo.profile.ordinal());
         profile.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.STEREO_PROFILE_CMD, profile, profile.getSelected().value);
@@ -113,7 +116,7 @@ public class StereoGui extends AbstractGui {
         k = new OwnSliderReset(I18n.msg("gui.stereo.k"), Constants.MIN_STEREO_K, Constants.MAX_STEREO_K, Constants.SLIDER_STEP_TINY, 0.2f, skin);
         k.setName("stereo k");
         k.setWidth(1000);
-        k.setValue((float) Settings.settings.program.modeStereo.k);
+        k.setValue((float) GaiaSky.settings().program.modeStereo.k);
         k.connect(Event.STEREO_K_CMD);
 
         // Go back button
@@ -124,7 +127,7 @@ public class StereoGui extends AbstractGui {
                                                         skin));
         backButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active);
+                EventManager.publish(Event.STEREOSCOPIC_CMD, this, !GaiaSky.settings().program.modeStereo.active);
             }
             return false;
         });

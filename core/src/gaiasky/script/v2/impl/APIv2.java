@@ -8,7 +8,6 @@
 package gaiasky.script.v2.impl;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;

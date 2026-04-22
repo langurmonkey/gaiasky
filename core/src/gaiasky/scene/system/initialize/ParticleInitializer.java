@@ -32,12 +32,11 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 public class ParticleInitializer extends AbstractInitSystem implements IObserver {
@@ -132,9 +131,9 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         }
 
         // Defaults.
-        sa.thresholdNone = Settings.settings.scene.star.threshold.none;
-        sa.thresholdPoint = Settings.settings.scene.star.threshold.point;
-        sa.thresholdQuad = Settings.settings.scene.star.threshold.quad;
+        sa.thresholdNone = GaiaSky.settings().scene.star.threshold.none;
+        sa.thresholdPoint = GaiaSky.settings().scene.star.threshold.point;
+        sa.thresholdQuad = GaiaSky.settings().scene.star.threshold.quad;
 
         if (render.renderGroup == null) {
             render.renderGroup = RenderGroup.BILLBOARD_STAR;
@@ -143,7 +142,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         if (extra.primitiveRenderScale <= 0) {
             extra.primitiveRenderScale = 1;
         }
-        float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
+        float pSize = GaiaSky.settings().scene.star.pointSize < 0 ? 8 : GaiaSky.settings().scene.star.pointSize;
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
 
     }
@@ -151,7 +150,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     private void initializeParticle(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, Render render, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, render);
 
-        sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
+        sa.thresholdLabel = sa.thresholdPoint * 1e-2f / GaiaSky.settings().scene.label.number;
         label.textScale = 0.1f;
         label.labelFactor = 1.3e-1f;
         label.labelMax = 0.005f;
@@ -178,7 +177,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     private void initializeStar(Base base, Celestial celestial, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, Render render, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, render);
 
-        sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;
+        sa.thresholdLabel = sa.thresholdPoint / GaiaSky.settings().scene.label.number;
 
         label.label = true;
         label.textScale = 0.2f;

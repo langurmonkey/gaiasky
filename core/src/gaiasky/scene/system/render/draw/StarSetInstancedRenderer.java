@@ -26,7 +26,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -47,7 +46,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         super(sceneRenderer, rg, alphas, shaders);
         cmap = new Colormap();
 
-        triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
+        triComponent.setStarTexture(GaiaSky.settings().scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD,
                                         Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.BACKBUFFER_SCALE_CMD, Event.FOV_CMD,
@@ -236,7 +235,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                        final Object... data) {
         switch (event) {
             case STAR_BASE_LEVEL_CMD -> {
-                triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);
+                triComponent.updateStarOpacityLimits((float) data[0], GaiaSky.settings().scene.star.opacity[1]);
                 triComponent.touchStarParameters(getShaderProgram());
             }
             case STAR_BRIGHTNESS_CMD -> {
@@ -252,7 +251,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                 triComponent.touchStarParameters(getShaderProgram());
             }
             case BACKBUFFER_SCALE_CMD, FOV_CMD -> {
-                triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
+                triComponent.updateMinQuadSolidAngle(GaiaSky.settings().graphics.backBufferResolution);
                 triComponent.touchStarParameters(getShaderProgram());
             }
             case GPU_DISPOSE_STAR_GROUP -> {
@@ -264,7 +263,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     inGpu.remove(renderable);
                 }
             }
-            case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
+            case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(GaiaSky.settings().scene.star.getStarTexture()));
             default -> {
             }
         }
@@ -272,7 +271,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
     @Override
     public void resize(int w, int h) {
-        triComponent.updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
+        triComponent.updateMinQuadSolidAngle(GaiaSky.settings().graphics.backBufferResolution);
         triComponent.touchStarParameters(getShaderProgram());
     }
 }

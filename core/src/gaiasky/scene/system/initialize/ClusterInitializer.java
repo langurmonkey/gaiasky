@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.GaiaSky;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -29,7 +30,6 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.ModelCache;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntMeshPartBuilder;
 import gaiasky.util.gdx.IntModelBuilder;
 import gaiasky.util.gdx.model.IntModelInstance;
@@ -95,7 +95,7 @@ public class ClusterInitializer extends AbstractInitSystem {
         var bb = Mapper.billboard.get(entity);
 
         if (cluster.clusterTex == null) {
-            cluster.clusterTex = new Texture(Settings.settings.data.dataFileHandle(Constants.DATA_LOCATION_TOKEN + "tex/base/cluster-tex.png"), true);
+            cluster.clusterTex = new Texture(GaiaSky.settings().data.dataFileHandle(Constants.DATA_LOCATION_TOKEN + "tex/base/cluster-tex.png"), true);
             cluster.clusterTex.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear);
         }
         if (cluster.model == null) {
@@ -128,10 +128,10 @@ public class ClusterInitializer extends AbstractInitSystem {
         model.model.instance = new IntModelInstance(cluster.model, cluster.modelTransform);
 
         // Relativistic effects
-        if (Settings.settings.runtime.relativisticAberration)
+        if (GaiaSky.settings().runtime.relativisticAberration)
             model.model.rec.setUpRelativisticEffectsMaterial(model.model.instance.materials);
         // Gravitational waves
-        if (Settings.settings.runtime.gravitationalWaves)
+        if (GaiaSky.settings().runtime.gravitationalWaves)
             model.model.rec.setUpGravitationalWavesMaterial(model.model.instance.materials);
 
     }

@@ -10,8 +10,8 @@ package gaiasky.util.gdx.shader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.BufferUtils;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL32;
@@ -80,8 +80,8 @@ public class ShaderCache {
     public ShaderCache() {
         // Cache is enabled if we use OpenGL 4.1+, for we need to access the binary format of shaders.
         cacheEnabled = Gdx.graphics.getGLVersion().isVersionEqualToOrHigher(4, 1) &&
-                Settings.settings.program.shaderCache &&
-                !Settings.settings.program.safeMode;
+                GaiaSky.settings().program.shaderCache &&
+                !GaiaSky.settings().program.safeMode;
     }
 
     public String getLog() {

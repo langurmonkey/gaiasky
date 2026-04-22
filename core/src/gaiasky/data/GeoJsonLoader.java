@@ -12,12 +12,12 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Perimeter;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
 import java.io.FileNotFoundException;
@@ -35,7 +35,7 @@ public class GeoJsonLoader extends AbstractSceneLoader {
         try {
             JsonReader json = new JsonReader();
             for (String filePath : filePaths) {
-                FileHandle file = Settings.settings.data.dataFileHandle(filePath);
+                FileHandle file = GaiaSky.settings().data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
                 JsonValue child = model.get("features").child;
                 int size = 0;

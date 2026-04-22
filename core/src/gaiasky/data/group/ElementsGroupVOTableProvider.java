@@ -8,12 +8,12 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.utils.ObjectMap;
+import gaiasky.GaiaSky;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleKepler;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.ucd.UCD;
@@ -105,7 +105,7 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
         logger.info(I18n.msg("notif.datafile", file));
         List<IParticleRecord> list = null;
         try {
-            list = loadData(new FileDataSource(Settings.settings.data.dataFile(file)), factor);
+            list = loadData(new FileDataSource(GaiaSky.settings().data.dataFile(file)), factor);
         } catch (Exception e1) {
             try {
                 logger.info("File " + file + " not found in data folder, trying relative path");

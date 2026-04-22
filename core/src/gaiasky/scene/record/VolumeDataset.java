@@ -7,10 +7,10 @@
 
 package gaiasky.scene.record;
 
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.render.BlendMode;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.graphics.VolumeTexture;
 import gaiasky.util.gdx.loader.VolumeTextureLoader;
 
@@ -41,7 +41,7 @@ public class VolumeDataset {
 
     public boolean initialize() {
         if (file != null && !file.isBlank()) {
-            fileUnpack = GlobalResources.unpackAssetPath(Settings.settings.data.dataFile(file));
+            fileUnpack = GlobalResources.unpackAssetPath(GaiaSky.settings().data.dataFile(file));
             var param = new VolumeTextureLoader.VolumeTextureParameter();
             AssetBean.addAsset(fileUnpack, VolumeTexture.class, param);
             return true;

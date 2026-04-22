@@ -15,13 +15,13 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.util.Settings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +90,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         EventManager.publish(Event.FOV_CMD, this, 90f);
 
         // The sides of the cubemap must be square. We use the max of our resolution
-        int wh = Settings.settings.program.modeCubemap.faceResolution;
+        int wh = GaiaSky.settings().program.modeCubemap.faceResolution;
         zPosFb = getFrameBuffer(wh, wh, 0);
         zNegFb = getFrameBuffer(wh, wh, 1);
         xPosFb = getFrameBuffer(wh, wh, 2);

@@ -9,6 +9,7 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.main.WelcomeGui;
@@ -17,7 +18,6 @@ import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
-import gaiasky.util.Settings;
 import gaiasky.util.datadesc.DatasetDesc;
 
 import java.nio.file.Files;
@@ -91,7 +91,7 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
             if (dd.catalogInfo.sizeBytes <= 0 && dataFile != null && !dataFile.isBlank()) {
                 Path df = Path.of(dataFile);
                 if (!Files.isRegularFile(df) || !Files.exists(df)) {
-                    df = Path.of(Settings.settings.data.dataFile(dataFile));
+                    df = Path.of(GaiaSky.settings().data.dataFile(dataFile));
                 }
                 dd.catalogInfo.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
             }

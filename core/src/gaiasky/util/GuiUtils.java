@@ -68,7 +68,7 @@ public class GuiUtils {
 
     public static void addNoConnectionWindow(Skin skin, Stage stage, Runnable ok) {
         String title = I18n.msg("notif.error", I18n.msg("gui.download.noconnection.title"));
-        if (Settings.settings.program.offlineMode) {
+        if (GaiaSky.settings().program.offlineMode) {
             title = I18n.msg("gui.system.offlinemode");
         }
         GenericDialog dialog = new GenericDialog(title, skin, stage) {
@@ -76,7 +76,7 @@ public class GuiUtils {
             @Override
             protected void build() {
                 String text;
-                if (Settings.settings.program.offlineMode) {
+                if (GaiaSky.settings().program.offlineMode) {
                     OwnLabel info = new OwnLabel(I18n.msg("gui.download.offlinemode.continue"), skin);
                     content.add(info).pad(pad18).row();
                     Link docs = new Link(I18n.msg("gui.wiki.moreinfo"), skin, Settings.DOCUMENTATION + "/Config-file.html");
@@ -84,7 +84,7 @@ public class GuiUtils {
                 } else {
                     OwnLabel info = new OwnLabel(I18n.msg("gui.download.noconnection.continue"), skin);
                     content.add(info).pad(pad18).row();
-                    Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.getCurrentDataMirror());
+                    Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", GaiaSky.settings().program.url.getCurrentDataMirror());
                     content.add(manualDownload).pad(pad18);
                 }
 
@@ -120,7 +120,7 @@ public class GuiUtils {
             @Override
             protected void build() {
                 String text;
-                if (Settings.settings.program.offlineMode) {
+                if (GaiaSky.settings().program.offlineMode) {
                     text = I18n.msg("gui.download.offlinemode");
                 } else {
                     text = I18n.msg("gui.download.noconnection");
@@ -156,7 +156,7 @@ public class GuiUtils {
                 content.add(new Link(I18n.msg("gui.connection.fix.manual"),
                                      skin,
                                      "link",
-                                     Settings.settings.program.url.getCurrentDataMirror())).pad(pad10).row();
+                                     GaiaSky.settings().program.url.getCurrentDataMirror())).pad(pad10).row();
                 content.add(new Link(I18n.msg("gui.connection.fix.report"), skin, "link", Settings.REPO_ISSUES)).pad(pad10);
             }
 

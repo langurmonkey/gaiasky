@@ -1,9 +1,9 @@
 package gaiasky.data.orientation;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.data.api.OrientationServer;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.QuaternionDouble;
 import gaiasky.util.parse.Parser;
@@ -32,7 +32,7 @@ public abstract class QuaternionInterpolationOrientationServer implements Orient
     public QuaternionInterpolationOrientationServer(String dataFile) {
         super();
         lastOrientation = new QuaternionDouble();
-        var path = Paths.get(Settings.settings.data.dataFile(dataFile));
+        var path = Paths.get(GaiaSky.settings().data.dataFile(dataFile));
         data = initialize(path);
     }
 

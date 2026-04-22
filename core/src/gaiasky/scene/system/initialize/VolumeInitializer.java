@@ -9,16 +9,12 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.data.AssetBean;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Settings;
-import gaiasky.util.gdx.graphics.VolumeTexture;
-import gaiasky.util.gdx.loader.VolumeTextureLoader;
 
 /**
  * Initializes volume entities, such as those used for volumetric rendering.
@@ -54,7 +50,7 @@ public class VolumeInitializer extends AbstractInitSystem {
         model.model.updateSize(body.size);
 
         // Set up label
-        sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * 5000.0;
+        sa.thresholdLabel = (Math.toRadians(1e-6) / GaiaSky.settings().scene.label.number) * 5000.0;
         label.textScale = 0.2f;
         label.labelMax = 0.0006f;
         if (label.labelFactor == 0)

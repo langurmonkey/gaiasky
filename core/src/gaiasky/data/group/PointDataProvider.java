@@ -7,12 +7,12 @@
 
 package gaiasky.data.group;
 
+import gaiasky.GaiaSky;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
@@ -43,11 +43,11 @@ public class PointDataProvider implements IParticleGroupDataProvider {
 
     public List<IParticleRecord> loadData(String file,
                                           double factor) {
-        InputStream is = Settings.settings.data.dataFileHandle(file).read();
+        InputStream is = GaiaSky.settings().data.dataFileHandle(file).read();
 
         if (file.endsWith(".gz")) {
             try {
-                is = new GZIPInputStream(Settings.settings.data.dataFileHandle(file).read());
+                is = new GZIPInputStream(GaiaSky.settings().data.dataFileHandle(file).read());
             } catch (IOException e) {
                 logger.error("File ends with '.gz' (" + file + ") but is not a Gzipped file!", e);
             }

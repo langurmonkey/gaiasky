@@ -33,7 +33,6 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
@@ -121,9 +120,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             }
 
             // Model.
-            if (particleSet.modelFile != null && manager.isLoaded(Settings.settings.data.dataFile(particleSet.modelFile))) {
+            if (particleSet.modelFile != null && manager.isLoaded(GaiaSky.settings().data.dataFile(particleSet.modelFile))) {
                 // Model comes from file (probably .obj or .g3db)
-                particleSet.model = manager.get(Settings.settings.data.dataFile(particleSet.modelFile), IntModel.class);
+                particleSet.model = manager.get(GaiaSky.settings().data.dataFile(particleSet.modelFile), IntModel.class);
             }
 
         }
@@ -176,7 +175,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Proximity descriptors.
         if (set.proximityDescriptorsLocation != null && !set.proximityDescriptorsLocation.isEmpty()) {
             set.proximityLoadingFlag = true;
-            set.proximityDescriptorsPath = Settings.settings.data.dataPath(set.proximityDescriptorsLocation);
+            set.proximityDescriptorsPath = GaiaSky.settings().data.dataPath(set.proximityDescriptorsLocation);
             set.proximityLoaded = new IntSet(10);
             set.proximityMissing = new IntSet(10);
         } else {
@@ -245,11 +244,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         label.labelMax = 1;
         label.labelFactor = 1e-3f;
         label.renderConsumer = LabelEntityRenderSystem::renderParticleSet;
-        set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.particleGroups.numLabels;
+        set.numLabels = set.numLabels >= 0 ? set.numLabels : GaiaSky.settings().scene.particleGroups.numLabels;
 
         // Model.
         if (set.modelFile != null && !set.modelFile.isBlank()) {
-            AssetBean.addAsset(Settings.settings.data.dataFile(set.modelFile), IntModel.class);
+            AssetBean.addAsset(GaiaSky.settings().data.dataFile(set.modelFile), IntModel.class);
         }
     }
 
@@ -301,7 +300,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Labels.
         label.renderConsumer = LabelEntityRenderSystem::renderStarSet;
         label.renderFunction = LabelView::renderTextBase;
-        set.numLabels = set.numLabels >= 0 ? set.numLabels : Settings.settings.scene.star.group.numLabels;
+        set.numLabels = set.numLabels >= 0 ? set.numLabels : GaiaSky.settings().scene.star.group.numLabels;
 
         // Lines.
         var line = Mapper.line.get(entity);
@@ -311,7 +310,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Billboard.
         var bb = Mapper.billboard.get(entity);
         bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardStarSet;
-        set.numBillboards = set.numBillboards > 0 ? set.numBillboards : Settings.settings.scene.star.group.numBillboard;
+        set.numBillboards = set.numBillboards > 0 ? set.numBillboards : GaiaSky.settings().scene.star.group.numBillboard;
 
     }
 
@@ -380,8 +379,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
         // Initialize indices list with natural order.
         var numFromGroupSettings = particleSet instanceof StarSet ?
-                Settings.settings.scene.star.group.getMaxNumIndices()
-                : Settings.settings.scene.particleGroups.numLabels;
+                GaiaSky.settings().scene.star.group.getMaxNumIndices()
+                : GaiaSky.settings().scene.particleGroups.numLabels;
         var K = FastMath.max(particleSet.numLabels,
                              numFromGroupSettings);
         K = FastMath.min(pointData.size(), K);

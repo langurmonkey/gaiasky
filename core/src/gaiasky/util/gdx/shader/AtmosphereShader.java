@@ -14,9 +14,9 @@ import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import gaiasky.GaiaSky;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
@@ -214,7 +214,7 @@ public class AtmosphereShader extends BaseIntShader {
         if (attributes.has(Vector3Attribute.EclipsingBodyPos)) {
             prefix.append("#define eclipsingBodyFlag\n");
         }
-        if (Settings.settings.postprocess.ssr.active) {
+        if (GaiaSky.settings().postprocess.ssr.active) {
             prefix.append("#define ssrFlag\n");
         }
         return prefix.toString();

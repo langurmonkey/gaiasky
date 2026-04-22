@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -28,7 +29,6 @@ import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
@@ -113,7 +113,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
         // Particle count after applying completion factor.
         int count = 0;
         // Compute what particles are in based on completion.
-        float completion = bd.completion == null ? 1f : bd.completion[Settings.settings.graphics.quality.ordinal()];
+        float completion = bd.completion == null ? 1f : bd.completion[GaiaSky.settings().graphics.quality.ordinal()];
         StdRandom.setSeed(11447799L);
         byte[] in = new byte[totalCount];
         for (int i = 0; i < totalCount; i++) {
@@ -223,7 +223,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
-            int qualityIndex = Settings.settings.graphics.quality.ordinal();
+            int qualityIndex = GaiaSky.settings().graphics.quality.ordinal();
 
             // Disable depth test because we are rendering to empty half-res buffer.
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);

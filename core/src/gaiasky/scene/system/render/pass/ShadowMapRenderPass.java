@@ -30,17 +30,15 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.math.BoundingBoxDouble;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.util.*;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
-import static gaiasky.render.RenderGroup.MODEL_PIX_TRANSPARENT;
 
 public class ShadowMapRenderPass extends RenderPass {
     /** Number of *shadow casting* lights supported. */
@@ -77,8 +75,8 @@ public class ShadowMapRenderPass extends RenderPass {
 
     protected void initializeRenderPass() {
         // Shadow map camera
-        cameraLightIndividual = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
-        cameraLightGlobal = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
+        cameraLightIndividual = new PerspectiveCamera(0.5f, GaiaSky.settings().scene.renderer.shadow.resolution, GaiaSky.settings().scene.renderer.shadow.resolution);
+        cameraLightGlobal = new PerspectiveCamera(0.5f, GaiaSky.settings().scene.renderer.shadow.resolution, GaiaSky.settings().scene.renderer.shadow.resolution);
         shadowMapEntities = new HashSet<>();
 
         // Aux vectors
@@ -108,8 +106,8 @@ public class ShadowMapRenderPass extends RenderPass {
         shadowMapEntities.clear();
 
         if (shadowCandidates == null) {
-            shadowCandidates = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
-            //shadowCandidatesTess = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
+            shadowCandidates = new ArrayList<>(GaiaSky.settings().scene.renderer.shadow.number);
+            //shadowCandidatesTess = new ArrayList<>(GaiaSky.settings().scene.renderer.shadow.number);
         }
         shadowCandidates.clear();
         //shadowCandidatesTess.clear();
@@ -122,8 +120,8 @@ public class ShadowMapRenderPass extends RenderPass {
         }
         // Create frame buffer.
         return new FrameBuffer(Pixmap.Format.RGBA8888,
-                Settings.settings.scene.renderer.shadow.resolution,
-                Settings.settings.scene.renderer.shadow.resolution,
+                GaiaSky.settings().scene.renderer.shadow.resolution,
+                GaiaSky.settings().scene.renderer.shadow.resolution,
                 true);
     }
 
@@ -240,7 +238,7 @@ public class ShadowMapRenderPass extends RenderPass {
                                            int shadowNRender,
                                            ICamera camera) {
         var renderAssets = sceneRenderer.getRenderAssets();
-        int nShadows = FastMath.min(candidates.size(), Settings.settings.scene.renderer.shadow.number);
+        int nShadows = FastMath.min(candidates.size(), GaiaSky.settings().scene.renderer.shadow.number);
         for (int i = 0; i < nShadows; i++) {
             var candidate = candidates.get(i);
             var model = Mapper.model.get(candidate);
@@ -332,7 +330,7 @@ public class ShadowMapRenderPass extends RenderPass {
                         candidates.add(num, render.entity);
                         scaffolding.shadow = 0;
                         num++;
-                        if (num == Settings.settings.scene.renderer.shadow.number)
+                        if (num == GaiaSky.settings().scene.renderer.shadow.number)
                             break;
                     }
                 }
@@ -447,9 +445,9 @@ public class ShadowMapRenderPass extends RenderPass {
             renderShadowMapGlobal(models, camera);
         }
 
-        final int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openXr) ?
+        final int shadowNRender = (GaiaSky.settings().program.modeStereo.active || GaiaSky.settings().runtime.openXr) ?
                 2 :
-                Settings.settings.program.modeCubemap.active ? 6 : 1;
+                GaiaSky.settings().program.modeCubemap.active ? 6 : 1;
 
         // Shadow candidates.
         addCandidates(models, shadowCandidates);

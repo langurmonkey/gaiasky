@@ -366,7 +366,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 if (maximized) {
                     // Minimize.
                     maximized = false;
-                    content.addAction(Actions.sequence(Actions.alpha(1f), Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()), Actions.run(() -> {
+                    content.addAction(Actions.sequence(Actions.alpha(1f), Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()), Actions.run(() -> {
                         contentCell.setActor(null);
                         toggleSize.setText("(+)");
                         toggleSizeTooltip.setText(I18n.msg("gui.maximize.pane"));
@@ -375,7 +375,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     // Maximize.
                     maximized = true;
                     contentCell.setActor(content);
-                    content.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()), Actions.run(() -> {
+                    content.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds()), Actions.run(() -> {
                         toggleSize.setText("(-)");
                         toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
                     })));
@@ -427,7 +427,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         final String deg = I18n.msg("gui.unit.deg");
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         switch (event) {
         case FOCUS_CHANGED -> {
             if (data[0] instanceof String) {
@@ -700,7 +700,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         case CAMERA_MOTION_UPDATE -> {
             final Vector3Q campos = (Vector3Q) data[0];
             double velInternalPerSecond = (double) data[1] * Constants.KM_TO_U * Nature.S_TO_H;
-            Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond, Settings.settings.program.ui.distanceUnits);
+            Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond, GaiaSky.settings().program.ui.distanceUnits);
             camVel.setText(GlobalResources.formatNumber(velStr.getFirst()) + " " + velStr.getSecond());
             Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), settings.program.ui.distanceUnits);
             camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());

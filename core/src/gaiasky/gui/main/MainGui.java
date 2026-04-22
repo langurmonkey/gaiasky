@@ -153,7 +153,7 @@ public class MainGui extends AbstractGui {
         ni.pad(0, pad, pad, 0);
         interfaces.add(notificationsInterface);
 
-        if (Settings.settings.program.ui.newUI) {
+        if (GaiaSky.settings().program.ui.newUI) {
             // CONTROLS INTERFACE - TOP LEFT
             controlsInterface = new ControlsInterface(skin, stage, scene, catalogManager, visibilityEntities, visible);
             controlsInterface.setFillParent(true);
@@ -225,18 +225,18 @@ public class MainGui extends AbstractGui {
         // MOUSE X/Y COORDINATES
         pointerXCoord = new OwnLabel("", skin, "default");
         pointerXCoord.setAlignment(Align.bottom);
-        pointerXCoord.setVisible(Settings.settings.program.pointer.coordinates);
+        pointerXCoord.setVisible(GaiaSky.settings().program.pointer.coordinates);
         pointerYCoord = new OwnLabel("", skin, "default");
         pointerYCoord.setAlignment(Align.right | Align.center);
-        pointerYCoord.setVisible(Settings.settings.program.pointer.coordinates);
+        pointerYCoord.setVisible(GaiaSky.settings().program.pointer.coordinates);
 
         /* ADD TO UI */
         rebuildGui();
 
         /* VERSION CHECK */
-        if (Settings.settings.program.update.lastCheck == null
+        if (GaiaSky.settings().program.update.lastCheck == null
                 || (Instant.now().toEpochMilli() -
-                Settings.settings.program.update.lastCheck.toEpochMilli() > UpdateSettings.VERSION_CHECK_INTERVAL_MS)) {
+                GaiaSky.settings().program.update.lastCheck.toEpochMilli() > UpdateSettings.VERSION_CHECK_INTERVAL_MS)) {
             // Start check for new versions.
             final Timer.Task t = getVersionCheckTask();
             Timer.schedule(t, 10);
@@ -245,7 +245,7 @@ public class MainGui extends AbstractGui {
     }
 
     private Timer.Task getVersionCheckTask() {
-        VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
+        VersionChecker vc = new VersionChecker(GaiaSky.settings().program.url.versionCheck);
         vc.setListener(event -> {
             if (event instanceof VersionCheckEvent vce) {
                 if (!vce.isFailed()) {
@@ -253,10 +253,10 @@ public class MainGui extends AbstractGui {
                     String tagVersion = vce.getTag();
                     Integer versionNumber = vce.getVersionNumber();
 
-                    Settings.settings.program.update.lastCheck = Instant.now();
+                    GaiaSky.settings().program.update.lastCheck = Instant.now();
 
-                    if (versionNumber > Settings.settings.version.versionNumber) {
-                        logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion));
+                    if (versionNumber > GaiaSky.settings().version.versionNumber) {
+                        logger.info(I18n.msg("gui.newversion.available", GaiaSky.settings().version.version, tagVersion));
                         // There's a new version!
                         UpdatePopup newVersion = new UpdatePopup(tagVersion, stage, skin);
                         newVersion.pack();
@@ -266,7 +266,7 @@ public class MainGui extends AbstractGui {
                         stage.addActor(newVersion);
                     } else {
                         // No new version
-                        logger.info(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
+                        logger.info(I18n.msg("gui.newversion.nonew", GaiaSky.settings().program.update.getLastCheckedString()));
                     }
 
                 } else {
@@ -492,8 +492,8 @@ public class MainGui extends AbstractGui {
                                          stage,
                                          SysUtils.getDefaultCameraDir(),
                                          FileChooser.FileChooserTarget.FILES);
-                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
+                fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.camera.run"));
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName()
                         .toString()
@@ -575,9 +575,9 @@ public class MainGui extends AbstractGui {
                 rebuildGui();
             }
             case RA_DEC_UPDATED -> {
-                if (Settings.settings.program.pointer.coordinates) {
+                if (GaiaSky.settings().program.pointer.coordinates) {
                     Stage ui = pointerYCoord.getStage();
-                    float uiScale = Settings.settings.program.ui.scale;
+                    float uiScale = GaiaSky.settings().program.ui.scale;
                     var ra = (Double) data[0];
                     var dec = (Double) data[1];
                     var x = (Integer) data[4];
@@ -590,9 +590,9 @@ public class MainGui extends AbstractGui {
                 }
             }
             case LON_LAT_UPDATED -> {
-                if (Settings.settings.program.pointer.coordinates) {
+                if (GaiaSky.settings().program.pointer.coordinates) {
                     var ui = pointerYCoord.getStage();
-                    var uiScale = Settings.settings.program.ui.scale;
+                    var uiScale = GaiaSky.settings().program.ui.scale;
                     var lon = (Double) data[0];
                     var lat = (Double) data[1];
                     var x = (Integer) data[2];
@@ -625,7 +625,7 @@ public class MainGui extends AbstractGui {
                 popup.showMenu(stage, px, py);
             }
             case MINIMAP_TOGGLE_CMD -> {
-                if (Settings.settings.program.minimap.inWindow) {
+                if (GaiaSky.settings().program.minimap.inWindow) {
                     toggleMinimapWindow(stage);
                 } else {
                     toggleMinimapInterface(stage);
@@ -633,7 +633,7 @@ public class MainGui extends AbstractGui {
             }
             case MINIMAP_DISPLAY_CMD -> {
                 var show = (Boolean) data[0];
-                if (Settings.settings.program.minimap.inWindow) {
+                if (GaiaSky.settings().program.minimap.inWindow) {
                     showMinimapWindow(stage, show);
                 } else {
                     showMinimapInterface(stage, show);
@@ -679,7 +679,7 @@ public class MainGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(Settings.getSuperShortApplicationName(), skin, stage, catalogManager);
+        controlsWindow = new ControlsWindow(GaiaSky.settings().getSuperShortApplicationName(), skin, stage, catalogManager);
         controlsWindow.setScene(scene);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();
@@ -695,8 +695,8 @@ public class MainGui extends AbstractGui {
     }
 
     public void initializeMinimap(Stage ui) {
-        if (Settings.settings.program.minimap.active) {
-            if (Settings.settings.program.minimap.inWindow) {
+        if (GaiaSky.settings().program.minimap.active) {
+            if (GaiaSky.settings().program.minimap.inWindow) {
                 showMinimapWindow(ui, true);
             } else {
                 if (minimapInterface == null) {
@@ -725,7 +725,7 @@ public class MainGui extends AbstractGui {
                 minimapInterface.addAction(
                         Actions.sequence(
                                 Actions.alpha(0f),
-                                Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())));
+                                Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds())));
 
             }
         } else if (minimapInterface != null) {
@@ -733,7 +733,7 @@ public class MainGui extends AbstractGui {
             minimapInterface.addAction(
                     Actions.sequence(
                             Actions.alpha(1f),
-                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()),
                             Actions.run(() -> minimapInterface.remove())));
         }
     }

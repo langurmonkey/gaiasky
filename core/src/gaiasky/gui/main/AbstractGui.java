@@ -26,7 +26,6 @@ import gaiasky.gui.api.IGui;
 import gaiasky.gui.api.IGuiInterface;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.util.Settings;
 import org.lwjgl.opengl.GL32;
 
 /**
@@ -88,7 +87,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     @Override
     public void render(int rw, int rh) {
         synchronized (lock) {
-            var accent = Settings.settings.program.ui.accentColor;
+            var accent = GaiaSky.settings().program.ui.accentColor;
             stage.getBatch().getShader().setUniform3fv("u_accentColor", accent, 0, 3);
             stage.draw();
         }

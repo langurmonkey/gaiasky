@@ -11,7 +11,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.script.v2.api.TimeAPI;
-import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -135,7 +134,7 @@ public class TimeModule extends APIModule implements TimeAPI {
     @Override
     public void set_max_simulation_time(long yr) {
         if (api.validator.checkFinite(yr, "years")) {
-            Settings.settings.runtime.setMaxTime(Math.abs(yr));
+            GaiaSky.settings().runtime.setMaxTime(Math.abs(yr));
         }
     }
 

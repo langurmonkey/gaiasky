@@ -16,7 +16,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
 /**
@@ -38,7 +37,7 @@ public class ScreenModeCmd implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.SCREEN_MODE_CMD) {
-            boolean toFullScreen = Settings.settings.graphics.fullScreen.active;
+            boolean toFullScreen = GaiaSky.settings().graphics.fullScreen.active;
             if (toFullScreen) {
                 Monitor m = Gdx.graphics.getMonitor();
                 // Available modes for this monitor
@@ -46,10 +45,10 @@ public class ScreenModeCmd implements IObserver {
                 // Find best mode
                 DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
-                    if (mode.height == Settings.settings.graphics.fullScreen.resolution[1]
-                            && mode.width == Settings.settings.graphics.fullScreen.resolution[0]
-                            && mode.refreshRate == Settings.settings.graphics.fullScreen.refreshRate
-                            && mode.bitsPerPixel == Settings.settings.graphics.fullScreen.bitDepth) {
+                    if (mode.height == GaiaSky.settings().graphics.fullScreen.resolution[1]
+                            && mode.width == GaiaSky.settings().graphics.fullScreen.resolution[0]
+                            && mode.refreshRate == GaiaSky.settings().graphics.fullScreen.refreshRate
+                            && mode.bitsPerPixel == GaiaSky.settings().graphics.fullScreen.bitDepth) {
                         myMode = mode;
                         break;
                     }
@@ -57,10 +56,10 @@ public class ScreenModeCmd implements IObserver {
                 // If no mode found, get default
                 if (myMode == null) {
                     myMode = Gdx.graphics.getDisplayMode(m);
-                    Settings.settings.graphics.fullScreen.resolution[0] = myMode.width;
-                    Settings.settings.graphics.fullScreen.resolution[1] = myMode.height;
-                    Settings.settings.graphics.fullScreen.refreshRate = myMode.refreshRate;
-                    Settings.settings.graphics.fullScreen.bitDepth = myMode.bitsPerPixel;
+                    GaiaSky.settings().graphics.fullScreen.resolution[0] = myMode.width;
+                    GaiaSky.settings().graphics.fullScreen.resolution[1] = myMode.height;
+                    GaiaSky.settings().graphics.fullScreen.refreshRate = myMode.refreshRate;
+                    GaiaSky.settings().graphics.fullScreen.bitDepth = myMode.bitsPerPixel;
                 }
 
                 // set the window to full screen mode
@@ -70,8 +69,8 @@ public class ScreenModeCmd implements IObserver {
                 }
 
             } else {
-                int width = Settings.settings.graphics.resolution[0];
-                int height = Settings.settings.graphics.resolution[1];
+                int width = GaiaSky.settings().graphics.resolution[0];
+                int height = GaiaSky.settings().graphics.resolution[1];
 
                 boolean good = Gdx.graphics.setWindowedMode(width, height);
                 if (!good) {
@@ -80,7 +79,7 @@ public class ScreenModeCmd implements IObserver {
 
             }
             if (!GaiaSky.instance.isHeadless())
-                Gdx.graphics.setVSync(Settings.settings.graphics.vsync);
+                Gdx.graphics.setVSync(GaiaSky.settings().graphics.vsync);
         }
     }
 }

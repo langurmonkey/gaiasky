@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.*;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -27,7 +28,6 @@ import gaiasky.gui.main.KeyBindings;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Scene;
 import gaiasky.util.CatalogManager;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
@@ -132,7 +132,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonMinimap = new OwnTextIconButton("", skin, "menu-map");
         buttonMinimap.setSize(buttonWidth, buttonHeight);
         buttonMinimap.setName("map");
-        buttonMinimap.setChecked(Settings.settings.program.minimap.active);
+        buttonMinimap.setChecked(GaiaSky.settings().program.minimap.active);
         String[] minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title", true);
         buttonMinimap.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
         buttonMinimap.addListener(event -> {
@@ -236,7 +236,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         pane.clearActions();
         pane.addAction(Actions.sequence(
                 Actions.alpha(1f),
-                Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds() * 0.5f),
+                Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds() * 0.5f),
                 Actions.run(activeComponentCell::clearActor)
         ));
     }
@@ -252,7 +252,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         tableComponentButtons.add(button).left().top().padBottom((float) 10.0).row();
 
         ContainerPane pane = new ContainerPane(skin, title, component.getActor());
-        if (Settings.settings.program.ui.expandOnMouseOver) {
+        if (GaiaSky.settings().program.ui.expandOnMouseOver) {
             pane.addListener(new InputListener() {
                 @Override
                 public boolean mouseMoved(InputEvent event, float x, float y) {
@@ -278,7 +278,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         paneMap.put(key, pane);
         buttonMap.put(key, button);
 
-        if (!Settings.settings.program.ui.expandOnMouseOver) {
+        if (!GaiaSky.settings().program.ui.expandOnMouseOver) {
             // Add button tooltip.
             if (action != null && !action.isBlank()) {
                 String[] shortcutKeys = KeyBindings.instance.getStringKeys(action, true);
@@ -302,13 +302,13 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                         activeComponentCell.setActor(pane);
                         pane.addAction(Actions.sequence(
                                 Actions.alpha(0f),
-                                Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds() * 0.5f)));
+                                Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds() * 0.5f)));
                     } else {
                         // Remove pane.
                         pane.clearActions();
                         pane.addAction(Actions.sequence(
                                 Actions.alpha(1f),
-                                Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds() * 0.5f),
+                                Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds() * 0.5f),
                                 Actions.run(activeComponentCell::clearActor)
                         ));
                     }
@@ -330,7 +330,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                     activeComponentCell.setActor(pane);
                     pane.addAction(Actions.sequence(
                             Actions.alpha(0f),
-                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds() * 0.5f)));
+                            Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds() * 0.5f)));
 
                     // Add automatic close task.
                     if (closeTask != null) {

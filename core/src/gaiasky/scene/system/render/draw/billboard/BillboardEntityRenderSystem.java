@@ -23,7 +23,6 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.BillboardView;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -63,7 +62,7 @@ public class BillboardEntityRenderSystem implements IObserver {
     public float getRenderSizeBillboardGalaxy(ICamera camera,
                                               Body body,
                                               ModelScaffolding scaffolding) {
-        return body.size * Settings.settings.scene.star.brightness * scaffolding.billboardSizeFactor;
+        return body.size * GaiaSky.settings().scene.star.brightness * scaffolding.billboardSizeFactor;
     }
 
     public void renderBillboardGalaxy(BillboardView view,
@@ -135,7 +134,7 @@ public class BillboardEntityRenderSystem implements IObserver {
 
                 shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
                 shader.setUniformf("u_distance", (float) distToCamera);
-                shader.setUniformf("u_apparent_angle", (float) (solidAngle * Settings.settings.scene.star.pointSize));
+                shader.setUniformf("u_apparent_angle", (float) (solidAngle * GaiaSky.settings().scene.star.pointSize));
                 shader.setUniformf("u_radius", (float) radius);
 
                 // Sprite.render
@@ -159,7 +158,7 @@ public class BillboardEntityRenderSystem implements IObserver {
             }
             computedSize = (size * (dist / radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM);
         }
-        computedSize *= Settings.settings.scene.star.pointSize * Settings.settings.scene.star.glowFactor;
+        computedSize *= GaiaSky.settings().scene.star.pointSize * GaiaSky.settings().scene.star.glowFactor;
 
         return computedSize;
     }
@@ -185,8 +184,8 @@ public class BillboardEntityRenderSystem implements IObserver {
          */
 
         // Star set
-        double thPointTimesFovFactor = Settings.settings.scene.star.threshold.point * fovFactor;
-        double innerRad = 0.006 + Settings.settings.scene.star.pointSize * 0.008;
+        double thPointTimesFovFactor = GaiaSky.settings().scene.star.threshold.point * fovFactor;
+        double innerRad = 0.006 + GaiaSky.settings().scene.star.pointSize * 0.008;
         alpha = alpha * base.opacity;
 
         // GENERAL UNIFORMS
@@ -233,9 +232,9 @@ public class BillboardEntityRenderSystem implements IObserver {
                 extra.computedSize *= (dist / extra.radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM;
             }
 
-            extra.computedSize *= Settings.settings.scene.star.pointSize
+            extra.computedSize *= GaiaSky.settings().scene.star.pointSize
                     * (star ?
-                    Settings.settings.scene.star.glowFactor
+                    GaiaSky.settings().scene.star.glowFactor
                     : 0.2 / (Constants.DISTANCE_SCALE_FACTOR != 1 ? 200.0 : 1.0));
             return (float) (extra.computedSize * extra.primitiveRenderScale);
         } else if (Mapper.fade.has(entity)) {

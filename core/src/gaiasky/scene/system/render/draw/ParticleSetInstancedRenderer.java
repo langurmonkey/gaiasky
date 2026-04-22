@@ -30,7 +30,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
-import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -293,7 +292,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 } else {
                     double s = .3e-4f;
                     shaderProgram.setUniformf("u_sizeFactor",
-                                              (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                                              (float) (((GaiaSky.settings().scene.star.getStarPointSize() * s))
+                                                      * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                 }
                 shaderProgram.setUniformf("u_proximityThreshold", (float) set.proximityThreshold);
 

@@ -9,7 +9,6 @@ package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import gaiasky.render.util.ShaderLoader;
 
 public final class AnaglyphFilter extends Filter<AnaglyphFilter> {
 

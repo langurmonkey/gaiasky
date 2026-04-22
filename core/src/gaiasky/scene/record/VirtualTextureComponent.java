@@ -11,8 +11,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.graphics.FloatTextureDataExt;
 import gaiasky.util.gdx.graphics.TextureExt;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
@@ -86,7 +86,7 @@ public final class VirtualTextureComponent extends NamedComponent {
 
     public void buildTree() {
         var builder = new SVTQuadtreeBuilder();
-        locationUnpacked = Settings.settings.data.dataFile(location);
+        locationUnpacked = GaiaSky.settings().data.dataFile(location);
         tree = builder.build(name, Path.of(locationUnpacked), tileSize);
         // In our implementation, we keep a reference to the component in the auxiliary data of the tree.
         tree.aux = this;
@@ -112,9 +112,9 @@ public final class VirtualTextureComponent extends NamedComponent {
                         if (materialProvider != null && materialProvider instanceof MaterialComponent mc) {
                             int[] resolution = tree.getResolution();
                             mc.heightSize.set(resolution[0], resolution[1]);
-                            material.set(new FloatAttribute(FloatAttribute.HeightScale, mc.heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
+                            material.set(new FloatAttribute(FloatAttribute.HeightScale, mc.heightScale * (float) GaiaSky.settings().scene.renderer.elevation.multiplier));
                             material.set(new Vector2Attribute(Vector2Attribute.HeightSize, mc.heightSize));
-                            material.set(new FloatAttribute(FloatAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
+                            material.set(new FloatAttribute(FloatAttribute.TessQuality, (float) GaiaSky.settings().scene.renderer.elevation.quality));
                         }
                     }
                 }

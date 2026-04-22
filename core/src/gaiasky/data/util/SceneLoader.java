@@ -22,7 +22,6 @@ import gaiasky.scene.Scene;
 import gaiasky.util.CrashReporter;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
 import java.io.File;
@@ -43,7 +42,7 @@ public class SceneLoader extends AsynchronousAssetLoader<Scene, SceneLoaderParam
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, SceneLoaderParameters parameter) {
         // Add autoload files to the mix
         Array<String> filePaths = new Array<>(parameter.files);
-        Path dataFolder = Paths.get(Settings.settings.data.location);
+        Path dataFolder = Paths.get(GaiaSky.settings().data.location);
         File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> name != null && name.startsWith("autoload-") && name.endsWith(".json"));
         Objects.requireNonNull(autoloadFiles, "Your data folder does not point to a valid directory: " + dataFolder);
         for (File autoloadFile : autoloadFiles) {

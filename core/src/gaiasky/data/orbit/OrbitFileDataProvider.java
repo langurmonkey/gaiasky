@@ -9,6 +9,7 @@ package gaiasky.data.orbit;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.GaiaSky;
 import gaiasky.data.api.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
@@ -16,7 +17,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.io.GzipUtils;
 
 import java.io.InputStream;
@@ -40,7 +40,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
                      OrbitDataLoaderParameters parameter) {
         if (file != null) {
             FileDataLoader odl = new FileDataLoader();
-            FileHandle f = Settings.settings.data.dataFileHandle(file);
+            FileHandle f = GaiaSky.settings().data.dataFileHandle(file);
             try {
                 final InputStream is;
                 var isGzip = false;

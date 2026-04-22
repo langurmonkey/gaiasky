@@ -6,7 +6,7 @@
  */
 package gaiasky.vr.openxr;
 
-import gaiasky.util.Settings;
+import gaiasky.GaiaSky;
 import gaiasky.util.gdx.loader.OwnObjLoader;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.vr.openxr.input.XrControllerDevice;
@@ -202,23 +202,23 @@ public final class XrHelper {
         if (driver != null && (driver.hmdName.contains("oculus") || driver.hmdName.contains("Oculus") || driver.hmdName.contains("Rift") )) {
             // Oculus Rift CV1.
             if (controllerDevice.deviceType.isLeft()) {
-                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
+                model = ol.loadModel(GaiaSky.settings().data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
             } else {
-                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-right.obj"));
+                model = ol.loadModel(GaiaSky.settings().data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-right.obj"));
             }
         }else if (driver != null && (driver.hmdName.contains("SteamVR") || driver.hmdName.contains("Index") || driver.hmdName.contains("index"))) {
             // Valve index.
             if (controllerDevice.deviceType.isLeft()) {
-                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/index/index-left.obj"));
+                model = ol.loadModel(GaiaSky.settings().data.dataFileHandle("$data/default-data/models/controllers/index/index-left.obj"));
             } else {
-                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/index/index-right.obj"));
+                model = ol.loadModel(GaiaSky.settings().data.dataFileHandle("$data/default-data/models/controllers/index/index-right.obj"));
             }
         } else if (driver != null && (driver.hmdName.contains("HTC") ||driver.hmdName.contains("htc") || driver.hmdName.contains("vive")|| driver.hmdName.contains("Vive"))) {
             // HTC vive controller model.
-            model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
+            model = ol.loadModel(GaiaSky.settings().data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
         } else {
             // Load the default model.
-            model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/generic/generic_vr_controller.obj"));
+            model = ol.loadModel(GaiaSky.settings().data.dataFileHandle("$data/default-data/models/controllers/generic/generic_vr_controller.obj"));
         }
 
         return model;

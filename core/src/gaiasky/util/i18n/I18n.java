@@ -10,9 +10,9 @@ package gaiasky.util.i18n;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -53,11 +53,15 @@ public class I18n {
     }
 
     public static boolean forceInit(FileHandle main, FileHandle objects) {
-        if (Settings.settings.program == null || Settings.settings.program.locale == null || Settings.settings.program.locale.isEmpty()) {
+        if (GaiaSky.instance == null
+                || GaiaSky.settings() == null
+                || GaiaSky.settings().program == null
+                || GaiaSky.settings().program.locale == null
+                || GaiaSky.settings().program.locale.isEmpty()) {
             // Use system default
             locale = Locale.getDefault();
         } else {
-            locale = getLocaleFromLanguageTag(Settings.settings.program.locale);
+            locale = getLocaleFromLanguageTag(GaiaSky.settings().program.locale);
             // Set as default locale
             Locale.setDefault(locale);
         }

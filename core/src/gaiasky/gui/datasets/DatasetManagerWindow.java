@@ -133,7 +133,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Use our own gamepad listener.
         this.defaultGamepadListener = false;
-        this.gamepadListener = new DatasetManagerGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
+        this.gamepadListener = new DatasetManagerGamepadListener(GaiaSky.settings().controls.gamepad.mappingsFile);
 
         setAcceptText(acceptText);
 
@@ -273,7 +273,7 @@ public class DatasetManagerWindow extends GenericDialog {
             addDataLocation(content);
 
         // Add manual download
-        Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", Settings.settings.program.url.getCurrentDataMirror());
+        Link manualDownload = new Link(I18n.msg("gui.connection.fix.manual"), skin, "link", GaiaSky.settings().program.url.getCurrentDataMirror());
         content.add(manualDownload).center();
 
         initialized.set(true);
@@ -281,7 +281,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private void addDataLocation(Table content) {
         float buttonPad = 1.6f;
-        String catLoc = Settings.settings.data.location;
+        String catLoc = GaiaSky.settings().data.location;
 
         Table dataLocTable = new Table(skin);
 
@@ -311,23 +311,23 @@ public class DatasetManagerWindow extends GenericDialog {
                 FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"),
                                                  skin,
                                                  stage,
-                                                 Path.of(Settings.settings.data.location),
+                                                 Path.of(GaiaSky.settings().data.location),
                                                  FileChooser.FileChooserTarget.DIRECTORIES);
-                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
+                fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.isReadable(result) && Files.isWritable(result)) {
                             // Set data location.
                             dataLocationButton.setText(result.toAbsolutePath().toString());
                             // Change data location.
-                            Settings.settings.data.location = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
+                            GaiaSky.settings().data.location = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
                             // Create temp dir.
-                            SysUtils.mkdir(SysUtils.getDataTempDir(Settings.settings.data.location));
+                            SysUtils.mkdir(SysUtils.getDataTempDir(GaiaSky.settings().data.location));
                             me.pack();
                             GaiaSky.postRunnable(() -> {
                                 // Reset datasets.
-                                Settings.settings.data.dataFiles.clear();
+                                GaiaSky.settings().data.dataFiles.clear();
                                 reloadAll();
                             });
                         } else {
@@ -396,7 +396,7 @@ public class DatasetManagerWindow extends GenericDialog {
         filter.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                populateLeftTable(leftTable, mode, dataDescriptor, Settings.settings.data.dataFiles, width, filter.getText());
+                populateLeftTable(leftTable, mode, dataDescriptor, GaiaSky.settings().data.dataFiles, width, filter.getText());
             }
         });
         leftTable.align(Align.topRight);
@@ -420,7 +420,7 @@ public class DatasetManagerWindow extends GenericDialog {
         selectedIndex = 0;
 
         // Add datasets to table.
-        var added = populateLeftTable(leftTable, mode, dataDescriptor, Settings.settings.data.dataFiles, width, "");
+        var added = populateLeftTable(leftTable, mode, dataDescriptor, GaiaSky.settings().data.dataFiles, width, "");
 
         final var maxScrollHeight = stage.getHeight() * 0.65f;
         leftScroll.setFadeScrollBars(false);
@@ -594,15 +594,15 @@ public class DatasetManagerWindow extends GenericDialog {
 
                         // Remove from selected, if it is.
                         String filePath = dataset.catalogFile.path();
-                        if (Settings.settings.data.dataFiles.contains(filePath)) {
-                            Settings.settings.data.dataFiles.remove(filePath);
+                        if (GaiaSky.settings().data.dataFiles.contains(filePath)) {
+                            GaiaSky.settings().data.dataFiles.remove(filePath);
                             logger.info(I18n.msg("gui.download.disabled.version",
                                                  dataset.name,
                                                  Integer.toString(dataset.minGsVersion),
                                                  Integer.toString(Settings.SOURCE_VERSION)));
                         }
                     } else {
-                        select.setChecked(DatasetDownloadUtils.isPathIn(Settings.settings.data.dataFile(dataset.checkStr), currentSetting));
+                        select.setChecked(DatasetDownloadUtils.isPathIn(GaiaSky.settings().data.dataFile(dataset.checkStr), currentSetting));
                         select.addListener(new OwnTextTooltip(dataset.checkPath.toString(), skin));
                     }
                     select.setSize(installOrSelectSize, installOrSelectSize);
@@ -849,7 +849,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     status.setColor(ColorUtils.gRedC);
                 } else {
                     // Notify status.
-                    List<String> currentSetting = Settings.settings.data.dataFiles;
+                    List<String> currentSetting = GaiaSky.settings().data.dataFiles;
                     boolean enabled = DatasetDownloadUtils.isPathIn(dataset.catalogFile.path(), currentSetting);
                     status = new OwnLabel(I18n.msg(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "default");
                 }
@@ -903,7 +903,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 int i = 0;
                 for (var link : dataset.links) {
                     if (!link.isBlank()) {
-                        String linkStr = link.replace("@mirror-url@", Settings.settings.program.url.getCurrentDataMirror());
+                        String linkStr = link.replace("@mirror-url@", GaiaSky.settings().program.url.getCurrentDataMirror());
                         var linkActor = new Link(TextUtils.breakCharacters(linkStr, 70, true), skin, link);
                         if (i > 0)
                             linksGroup.row();
@@ -958,7 +958,7 @@ public class DatasetManagerWindow extends GenericDialog {
             } else {
                 filesString = TextUtils.arrayToStr(dataset.files, "", "", "\n");
                 // Use data location token to keep from overflowing horizontally.
-                var dataLocation = Settings.settings.data.location;
+                var dataLocation = GaiaSky.settings().data.location;
                 if (!dataLocation.endsWith(File.separator) && !dataLocation.endsWith("/")) {
                     dataLocation += "/";
                 }
@@ -967,7 +967,7 @@ public class DatasetManagerWindow extends GenericDialog {
             var files = new OwnLabel(filesString, skin, "default");
 
             // Data location.
-            var dataLocationNoteString = Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location;
+            var dataLocationNoteString = Constants.DATA_LOCATION_TOKEN + "  =  " + GaiaSky.settings().data.location;
             var dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin, "default-pink");
             dataLocationNote.addListener(new OwnTextTooltip(dataLocationNoteString, skin, 10));
 
@@ -1149,7 +1149,7 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void downloadDataset(DatasetDesc dataset, Runnable successRunnable) {
-        var tempDir = SysUtils.getDataTempDir(Settings.settings.data.location);
+        var tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
 
         try {
             var fileStore = Files.getFileStore(tempDir);
@@ -1168,7 +1168,7 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
         String name = dataset.name;
-        String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.getCurrentDataMirror());
+        String url = dataset.file.replace("@mirror-url@", GaiaSky.settings().program.url.getCurrentDataMirror());
 
         String filename = FilenameUtils.getName(url);
         FileHandle tempDownload = Gdx.files.absolute(tempDir + "/" + filename + ".part");
@@ -1211,7 +1211,7 @@ public class DatasetManagerWindow extends GenericDialog {
             // Unpack.
             int errors = 0;
             logger.info(I18n.msg("gui.download.extracting", tempDownload.path()));
-            String dataLocation = Settings.settings.data.location + File.separatorChar;
+            String dataLocation = GaiaSky.settings().data.location + File.separatorChar;
             // Checksum.
             if (digest != null && dataset.sha256 != null) {
                 String serverDigest = dataset.sha256;
@@ -1322,7 +1322,7 @@ public class DatasetManagerWindow extends GenericDialog {
         // Download.
         final Net.HttpRequest request = DownloadHelper.downloadFile(url,
                                                                     tempDownload,
-                                                                    Settings.settings.program.offlineMode,
+                                                                    GaiaSky.settings().program.offlineMode,
                                                                     progressDownload,
                                                                     progressHashResume,
                                                                     finish,
@@ -1503,10 +1503,10 @@ public class DatasetManagerWindow extends GenericDialog {
             filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
         }
         if (filePath != null && !filePath.isBlank()) {
-            if (!Settings.settings.data.dataFiles.contains(filePath)) {
+            if (!GaiaSky.settings().data.dataFiles.contains(filePath)) {
                 var opt = checkDatasetIncompatibilities(dataset);
                 if (opt.isEmpty()) {
-                    Settings.settings.data.dataFiles.add(filePath);
+                    GaiaSky.settings().data.dataFiles.add(filePath);
                 } else {
                     if (cb != null) {
                         // Uncheck check box until user takes action.
@@ -1535,7 +1535,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         @Override
                         protected boolean accept() {
                             // Add to selected.
-                            Settings.settings.data.dataFiles.add(path);
+                            GaiaSky.settings().data.dataFiles.add(path);
                             if (cb != null) {
                                 cb.setProgrammaticChangeEvents(false);
                                 cb.setChecked(true);
@@ -1608,7 +1608,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * @param dataset The dataset to disable.
      */
     private void actionDisableDataset(DatasetDesc dataset) {
-        Settings.settings.data.disableDataset(dataset);
+        GaiaSky.settings().data.disableDataset(dataset);
     }
 
     /**
@@ -1678,7 +1678,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     Path dataPath;
                     Path basePath = Path.of(baseParent);
                     if (!basePath.isAbsolute()) {
-                        dataPath = Paths.get(Settings.settings.data.location).resolve(baseParent);
+                        dataPath = Paths.get(GaiaSky.settings().data.location).resolve(baseParent);
                     } else {
                         dataPath = basePath;
                     }

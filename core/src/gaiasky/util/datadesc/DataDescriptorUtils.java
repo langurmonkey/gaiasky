@@ -12,6 +12,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.datasets.DatasetManagerWindow;
@@ -58,7 +59,7 @@ public class DataDescriptorUtils {
      * @return True if the data location contains old datasets.
      */
     public static boolean dataLocationOldVersionDatasetsCheck() {
-        final var dataLocation = Path.of(Settings.settings.data.location);
+        final var dataLocation = Path.of(GaiaSky.settings().data.location);
 
         // Check presence of data-main.json
         if (Files.exists(dataLocation.resolve("data-main.json"))) {
@@ -85,7 +86,7 @@ public class DataDescriptorUtils {
     }
 
     public static void cleanDataLocationOldDatasets() {
-        final var dataLocation = Path.of(Settings.settings.data.location);
+        final var dataLocation = Path.of(GaiaSky.settings().data.location);
         try (Stream<Path> stream = Files.list(dataLocation)) {
             var toDelete = stream.filter(p -> {
                 if (p.toFile().isFile() && p.getFileName().toString().endsWith(".json")) {
@@ -265,7 +266,7 @@ public class DataDescriptorUtils {
 
         // Get all local catalogs
         Array<FileHandle> catalogLocations = new Array<>();
-        catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
+        catalogLocations.add(Gdx.files.absolute(GaiaSky.settings().data.location));
 
         Array<FileHandle> catalogFiles = new Array<>();
 

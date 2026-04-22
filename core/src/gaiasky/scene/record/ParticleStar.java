@@ -17,7 +17,6 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
-import net.jafama.FastMath;
 
 
 /**

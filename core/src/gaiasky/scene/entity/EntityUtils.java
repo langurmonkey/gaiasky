@@ -11,20 +11,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import gaiasky.GaiaSky;
-import gaiasky.data.group.DatasetOptions;
-import gaiasky.data.group.DatasetOptions.DatasetLoadType;
-import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.Scene;
-import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
-import uk.ac.starlink.table.ColumnInfo;
-
-import java.util.List;
+import gaiasky.util.math.Vector3Q;
 
 public class EntityUtils {
 

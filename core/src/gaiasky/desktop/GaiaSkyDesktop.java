@@ -67,10 +67,6 @@ public class GaiaSkyDesktop implements IObserver {
      **/
     private static final int XR_OPENGL_MINOR = 5;
     /**
-     * Full default OpenGL version string (with OpenXR).
-     **/
-    private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
-    /**
      * Minimum required OpenGL major version for Gaia Sky to run.
      **/
     private static final int MIN_OPENGL_MAJOR = 3;
@@ -102,6 +98,10 @@ public class GaiaSkyDesktop implements IObserver {
      * CLI arguments.
      **/
     private static CLIArgs cliArgs;
+    /**
+     * Settings object.
+     */
+    private Settings settings;
     /**
      * UTF-8 output stream printer.
      **/
@@ -158,6 +158,8 @@ public class GaiaSkyDesktop implements IObserver {
             // Experimental features.
             experimentalCheck();
 
+            GaiaSkyDesktop gsd = new GaiaSkyDesktop();
+
             // Set properties file from arguments to VM params if needed.
             if (cliArgs.propertiesFile != null && !cliArgs.propertiesFile.isEmpty()) {
                 System.setProperty("properties.file", cliArgs.propertiesFile);
@@ -172,8 +174,6 @@ public class GaiaSkyDesktop implements IObserver {
                 Settings.APPLICATION_NAME += " VR";
             }
 
-            GaiaSkyDesktop gaiaSkyDesktop = new GaiaSkyDesktop();
-
             Gdx.files = new Lwjgl3Files();
 
             // Init Gaia Sky directories.
@@ -187,17 +187,18 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Init global configuration.
-            SettingsManager.initialize(cliArgs.vr);
+            var settingsManager = new SettingsManager();
+            gsd.settings = settingsManager.loadSettings(cliArgs.vr);
 
             // Safe mode active if specified in CLI arg, or in config.
-            if (cliArgs.safeMode && !Settings.settings.program.safeMode) {
-                Settings.settings.program.safeMode = true;
-                Settings.settings.program.safeModeFlag = true;
+            if (cliArgs.safeMode && !gsd.settings.program.safeMode) {
+                gsd.settings.program.safeMode = true;
+                gsd.settings.program.safeModeFlag = true;
             }
 
             // Force deactivation of safe graphics mode.
             if (cliArgs.noSafeMode) {
-                Settings.settings.program.safeMode = false;
+                gsd.settings.program.safeMode = false;
             }
 
             // Initialize I18n.
@@ -206,7 +207,7 @@ public class GaiaSkyDesktop implements IObserver {
 
             // -v or --version
             if (cliArgs.version) {
-                out.println(Settings.getShortApplicationName());
+                out.println(gsd.settings.getShortApplicationName());
                 if (cliArgs.asciiArt) {
                     BufferedReader ascii = new BufferedReader(new InputStreamReader(Gdx.files.internal("icon/gsascii.txt").read()));
                     out.println();
@@ -235,7 +236,7 @@ public class GaiaSkyDesktop implements IObserver {
             ConsoleLogger consoleLogger = new ConsoleLogger();
 
             // Slave manager.
-            SlaveManager.initialize();
+            SlaveManager.initialize(gsd.settings);
 
             // Full screen command.
             ScreenModeCmd.initialize();
@@ -247,15 +248,14 @@ public class GaiaSkyDesktop implements IObserver {
             KeyBindings.initialize();
 
             // REST API server.
-            REST_ENABLED = Settings.settings.program.net.restPort >= 0;
+            REST_ENABLED = gsd.settings.program.net.restPort >= 0;
             if (REST_ENABLED) {
-                RESTServer.initialize(Settings.settings.program.net.restPort);
+                RESTServer.initialize(gsd.settings.program.net.restPort);
             }
 
             consoleLogger.dispose();
 
-
-            gaiaSkyDesktop.init();
+            gsd.init();
 
             // Write session log.
             CrashReporter.writeLastSessionLog(logger);
@@ -281,7 +281,7 @@ public class GaiaSkyDesktop implements IObserver {
      * to determine whether the config file must be overwritten.
      *
      * @return True if the configuration file has been initialized or
-     *         overwritten with the default one, false otherwise.
+     * overwritten with the default one, false otherwise.
      *
      * @throws IOException If the file fails to be written successfully.
      */
@@ -387,7 +387,6 @@ public class GaiaSkyDesktop implements IObserver {
     public void launchMainApp() {
         ConsoleLogger consoleLogger = new ConsoleLogger();
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
-        final var s = Settings.settings;
         cfg.setTitle(Settings.APPLICATION_NAME);
         cfg.setPauseWhenMinimized(false);
         cfg.disableAudio(true);
@@ -405,14 +404,14 @@ public class GaiaSkyDesktop implements IObserver {
                 double screenDiagonalPixels = FastMath.sqrt(Math.pow(resolution[0], 2) + FastMath.pow(resolution[1], 2));
                 if (screenDiagonalPixels < 1600) {
                     // Set full screen.
-                    s.graphics.fullScreen.active = true;
-                    s.graphics.fullScreen.resolution[0] = resolution[0];
-                    s.graphics.fullScreen.resolution[1] = resolution[1];
+                    settings.graphics.fullScreen.active = true;
+                    settings.graphics.fullScreen.resolution[0] = resolution[0];
+                    settings.graphics.fullScreen.resolution[1] = resolution[1];
                 }
             }
 
-            if (s.graphics.fullScreen.active) {
-                int[] fullScreenResolution = s.graphics.fullScreen.resolution;
+            if (settings.graphics.fullScreen.active) {
+                int[] fullScreenResolution = settings.graphics.fullScreen.resolution;
                 // Full screen mode.
                 DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
                 if (cliArgs.debug) {
@@ -441,10 +440,10 @@ public class GaiaSkyDesktop implements IObserver {
                         if (myMode == null) {
                             myMode = fittingMode;
                         } else {
-                            if (s.graphics.fullScreen.bitDepth > 0
-                                    && fittingMode.bitsPerPixel == s.graphics.fullScreen.bitDepth
-                                    && s.graphics.fullScreen.refreshRate > 0
-                                    && fittingMode.refreshRate == s.graphics.fullScreen.refreshRate) {
+                            if (settings.graphics.fullScreen.bitDepth > 0
+                                    && fittingMode.bitsPerPixel == settings.graphics.fullScreen.bitDepth
+                                    && settings.graphics.fullScreen.refreshRate > 0
+                                    && fittingMode.refreshRate == settings.graphics.fullScreen.refreshRate) {
                                 myMode = fittingMode;
                                 break;
                             } else {
@@ -461,21 +460,21 @@ public class GaiaSkyDesktop implements IObserver {
                 if (myMode == null) {
                     // Fall back to windowed mode.
                     logger.warn(I18n.msg("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
-                    cfg.setWindowedMode(s.graphics.getApplicationWidth(), s.graphics.getApplicationHeight());
-                    cfg.setResizable(s.graphics.resizable);
+                    cfg.setWindowedMode(settings.graphics.getApplicationWidth(), settings.graphics.getApplicationHeight());
+                    cfg.setResizable(settings.graphics.resizable);
                 } else {
                     cfg.setFullscreenMode(myMode);
-                    s.graphics.fullScreen.resolution[0] = myMode.width;
-                    s.graphics.fullScreen.resolution[1] = myMode.height;
-                    s.graphics.fullScreen.bitDepth = myMode.bitsPerPixel;
-                    s.graphics.fullScreen.refreshRate = myMode.refreshRate;
+                    settings.graphics.fullScreen.resolution[0] = myMode.width;
+                    settings.graphics.fullScreen.resolution[1] = myMode.height;
+                    settings.graphics.fullScreen.bitDepth = myMode.bitsPerPixel;
+                    settings.graphics.fullScreen.refreshRate = myMode.refreshRate;
                 }
             } else {
                 // Windowed mode. Compute window size.
                 configureWindowSize(cfg);
-                cfg.setResizable(s.graphics.resizable);
+                cfg.setResizable(settings.graphics.resizable);
             }
-            cfg.useVsync(s.graphics.vsync);
+            cfg.useVsync(settings.graphics.vsync);
         } else {
             // Note that we disable VSync! The VRContext manages vsync with respect to the HMD.
             cfg.useVsync(false);
@@ -507,7 +506,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         // Launch app.
         try {
-            if (s.program.safeMode) {
+            if (settings.program.safeMode) {
                 setSafeMode(cfg);
             }
             consoleLogger.unsubscribe();
@@ -535,8 +534,8 @@ public class GaiaSkyDesktop implements IObserver {
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg,
                                      float widthFactor,
                                      float heightFactor) {
-        int w = Settings.settings.graphics.getApplicationWidth();
-        int h = Settings.settings.graphics.getApplicationHeight();
+        int w = settings.graphics.getApplicationWidth();
+        int h = settings.graphics.getApplicationHeight();
         int[] displayResolution = SysUtils.getDisplayResolution();
         if (w <= 0 || h <= 0) {
             // Default values.
@@ -550,13 +549,13 @@ public class GaiaSkyDesktop implements IObserver {
                 // Default.
                 logger.warn(I18n.msg("error.screensize.default", w, h));
             }
-            Settings.settings.graphics.resolution[0] = w;
-            Settings.settings.graphics.resolution[1] = h;
+            settings.graphics.resolution[0] = w;
+            settings.graphics.resolution[1] = h;
         }
 
         // Apply factors.
-        Settings.settings.graphics.resolution[0] = (int) (Settings.settings.graphics.resolution[0] * widthFactor);
-        Settings.settings.graphics.resolution[1] = (int) (Settings.settings.graphics.resolution[1] * heightFactor);
+        settings.graphics.resolution[0] = (int) (settings.graphics.resolution[0] * widthFactor);
+        settings.graphics.resolution[1] = (int) (settings.graphics.resolution[1] * heightFactor);
         w = (int) (w * widthFactor);
         h = (int) (h * heightFactor);
 
@@ -567,14 +566,14 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
-        gs = new GaiaSky(cliArgs);
+        gs = new GaiaSky(cliArgs,  settings);
         new Lwjgl3Application(gs, cfg);
     }
 
     private void setSafeMode(final Lwjgl3ApplicationConfiguration cfg) {
         logger.info(I18n.msg("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
-        Settings.settings.scene.renderer.elevation.type = ElevationType.NONE;
-        Settings.settings.program.safeMode = true;
+        settings.scene.renderer.elevation.type = ElevationType.NONE;
+        settings.program.safeMode = true;
         cfg.setOpenGLEmulation(GLEmulation.GL30, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 

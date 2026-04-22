@@ -11,6 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.scene.Mapper;
@@ -218,8 +219,8 @@ public class LabelEntityRenderSystem {
         }
 
         // Projection lines labels
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && camera.hasFocus() && gr.d01 > 0 && gr.d02 > 0) {
-            DistanceUnits du = Settings.settings.program.ui.distanceUnits;
+        if (GaiaSky.settings().program.recursiveGrid.origin.isRefSys() && camera.hasFocus() && gr.d01 > 0 && gr.d02 > 0) {
+            DistanceUnits du = GaiaSky.settings().program.ui.distanceUnits;
             shader.setUniform4fv("u_color", gr.ccL, 0, 4);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(gr.d01, du);
             float ff = camera.getFovFactor();
@@ -246,7 +247,7 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_thLabel", 1);
 
         Vector3Q v = B31.setZero();
-        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
+        if (GaiaSky.settings().program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
             IFocus focus = camera.getFocus();
             focus.getAbsolutePosition(v);
         }
@@ -465,7 +466,7 @@ public class LabelEntityRenderSystem {
             return;
         }
         if (view.starSet.renderParticleLabels) {
-            float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
+            float thresholdLabel = (float) (GaiaSky.settings().scene.star.threshold.point / GaiaSky.settings().scene.label.number / camera.getFovFactor());
             thresholdLabel /= view.label.labelBias;
 
             var active = set.indices;
@@ -504,7 +505,7 @@ public class LabelEntityRenderSystem {
         if (forceLabel) {
             radius = FastMath.max(radius, 1e4f);
         }
-        float solidAngle = (float) ((radius / distToCamera) * Settings.settings.scene.star.brightness * 100f);
+        float solidAngle = (float) ((radius / distToCamera) * GaiaSky.settings().scene.star.brightness * 100f);
 
         var visibleCamera = camera.isVisible(solidAngle, starPosition.put(D32), distToCamera);
         if (visibleCamera && (forceLabel || solidAngle > thresholdLabel)) {
@@ -561,7 +562,7 @@ public class LabelEntityRenderSystem {
 
         // Labels at 1 parsec.
         float distToCamera = (float) (1 * Constants.PC_TO_U);
-        float textSize = (float) ((Settings.settings.runtime.openXr ? 2e12 : 2e4) * Constants.DISTANCE_SCALE_FACTOR);
+        float textSize = (float) ((GaiaSky.settings().runtime.openXr ? 2e12 : 2e4) * Constants.DISTANCE_SCALE_FACTOR);
 
         shader.setUniformf("u_viewAngle", 1f);
         shader.setUniformf("u_viewAnglePow", 1f);
@@ -608,8 +609,8 @@ public class LabelEntityRenderSystem {
         }
 
 
-        var paintProjectedLabels = !Settings.settings.program.modeCubemap.active && !Settings.settings.program.modeStereo.active;
-        if (Settings.settings.program.uvGrid.frameCoordinates && paintProjectedLabels) {
+        var paintProjectedLabels = !GaiaSky.settings().program.modeCubemap.active && !GaiaSky.settings().program.modeStereo.active;
+        if (GaiaSky.settings().program.uvGrid.frameCoordinates && paintProjectedLabels) {
             var vec = F31;
             var vecDouble = D31;
             var out = D32;
@@ -618,7 +619,7 @@ public class LabelEntityRenderSystem {
             var h = Gdx.graphics.getHeight();
             // Manual scaling to correct for screen size.
             var scale = (float) Math.sqrt(w * w + h * h) / 2200f;
-            var labelSize = Settings.settings.scene.label.size * scale;
+            var labelSize = GaiaSky.settings().scene.label.size * scale;
             var offsetY = verticalOffset++ * 16 * labelSize;
             Matrix4 trf = view.base.getName()
                     .contains("Ecliptic") ? Coordinates.equatorialToEclipticF() : view.base.getName()
@@ -692,7 +693,7 @@ public class LabelEntityRenderSystem {
     }
 
     private void relativisticPos(Vector3 auxf, ICamera camera) {
-        if (Settings.settings.runtime.relativisticAberration) {
+        if (GaiaSky.settings().runtime.relativisticAberration) {
             D31.set(auxf);
             GlobalResources.applyRelativisticAberration(D31, camera);
             D31.put(auxf);
@@ -700,7 +701,7 @@ public class LabelEntityRenderSystem {
     }
 
     private void gravwavePos(Vector3 auxf) {
-        if (Settings.settings.runtime.gravitationalWaves) {
+        if (GaiaSky.settings().runtime.gravitationalWaves) {
             D31.set(auxf);
             RelativisticEffectsManager.getInstance()
                     .gravitationalWavePos(D31);
@@ -825,11 +826,11 @@ public class LabelEntityRenderSystem {
         }
 
         // The smoothing scale must be set according to the distance
-        shader.setUniformf("u_scale", Settings.settings.scene.label.size * scale / camera.getFovFactor());
+        shader.setUniformf("u_scale", GaiaSky.settings().scene.label.size * scale / camera.getFovFactor());
 
         if (forceLabel || radius == 0 || distToCamera > radius * 1.3) {
 
-            size *= Settings.settings.scene.label.size;
+            size *= GaiaSky.settings().scene.label.size;
 
             float rot = 0;
             if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {

@@ -357,7 +357,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
             return false;
         } else {
             ComponentTypes.ComponentType ct = ComponentTypes.ComponentType.getFromKey(key);
-            return Settings.settings.scene.visibility.get(ct.key);
+            return GaiaSky.settings().scene.visibility.get(ct.key);
         }
     }
 
@@ -679,7 +679,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
      * @param factor The factor to set.
      */
     public void set_unfiltered_velocity_vectors_number_factor(float factor) {
-        Settings.settings.scene.properMotion.number = factor;
+        GaiaSky.settings().scene.properMotion.number = factor;
     }
 
     @Override
@@ -706,12 +706,12 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     @Override
     public long get_velocity_vector_max_number() {
-        return Settings.settings.scene.star.group.numVelocityVector;
+        return GaiaSky.settings().scene.star.group.numVelocityVector;
     }
 
     @Override
     public void set_velocity_vector_max_number(long num) {
-        Settings.settings.scene.star.group.numVelocityVector = (int) num;
+        GaiaSky.settings().scene.star.group.numVelocityVector = (int) num;
     }
 
     @Override

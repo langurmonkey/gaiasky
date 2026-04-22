@@ -46,14 +46,13 @@ import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.component.tag.TagNoClosest;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.FixedStage;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
@@ -118,7 +117,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
     public void initialize(AssetManager manager,
                            SpriteBatch batch) {
-        setVR(Settings.settings.runtime.openXr);
+        setVR(GaiaSky.settings().runtime.openXr);
         this.batch = new SpriteBatch(20, GaiaSky.instance.getGlobalResources().getSpriteShader());
         this.shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
         this.shapeRenderer.setAutoShapeType(true);
@@ -302,7 +301,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
             gamepadGui.getContent().addAction(
                     Actions.sequence(
                             Actions.visible(true),
-                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())
+                            Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds())
                     )
             );
             if (!vr) {
@@ -319,7 +318,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
             gamepadGui.getContent().getColor().a = 1;
             gamepadGui.getContent().addAction(
                     Actions.sequence(
-                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()),
                             Actions.run(() -> {
                                 base.visible = false;
                                 visible = false;
@@ -365,7 +364,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     public void render(int rw,
                        int rh) {
         if (stage != null) {
-            var accent = Settings.settings.program.ui.accentColor;
+            var accent = GaiaSky.settings().program.ui.accentColor;
             stage.getBatch().getShader().setUniform3fv("u_accentColor", accent, 0, 3);
             buffer.begin();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);

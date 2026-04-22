@@ -8,6 +8,7 @@
 package gaiasky.gui.main;
 
 import com.badlogic.gdx.Gdx;
+import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -210,7 +211,7 @@ public class ConsoleLogger implements IObserver {
                     addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), LoggerLevel.DEBUG);
             case SCREENSHOT_INFO -> addMessage(I18n.msg("notif.screenshot", data[0]));
             case STEREOSCOPIC_CMD -> {
-                if (!Settings.settings.runtime.openXr)
+                if (!GaiaSky.settings().runtime.openXr)
                     addMessage(I18n.msg("notif.toggle", I18n.msg("notif.stereoscopic")));
             }
             case DISPLAY_GUI_CMD -> {

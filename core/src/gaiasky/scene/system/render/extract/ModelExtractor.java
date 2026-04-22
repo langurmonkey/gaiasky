@@ -9,12 +9,12 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
-import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 
 /**
@@ -153,7 +153,7 @@ public class ModelExtractor extends AbstractExtractSystem {
     }
 
     private boolean needsTessellation(Model model) {
-        return Settings.settings.scene.renderer.elevation.type.isTessellation() && model.model.isTessellated();
+        return GaiaSky.settings().scene.renderer.elevation.type.isTessellation() && model.model.isTessellated();
     }
 
     private boolean renderText(Base base,

@@ -22,8 +22,31 @@ public abstract class SettingsObject implements Cloneable, Disposable {
     protected SettingsObject parent;
 
     @JsonIgnore
-    public boolean isEnabled(){
+    public boolean isEnabled() {
         return parent != null && parent.isEnabled();
+    }
+
+    /**
+     * Gets the root {@link Settings} object for this instance.
+     * @return The root settings object.
+     */
+    protected Settings getRoot() {
+        SettingsObject p = this;
+        while(p.parent != null) {
+            if (p instanceof Settings s) {
+                return s;
+            }
+            if (p == p.parent) {
+                // Error!
+                return null;
+            }
+            p = p.parent;
+        }
+        if (p instanceof Settings s) {
+            return s;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -42,7 +65,7 @@ public abstract class SettingsObject implements Cloneable, Disposable {
     }
 
     @JsonIgnore
-    public void setParent(SettingsObject s){
+    public void setParent(SettingsObject s) {
         this.parent = s;
         this.setParentRecursive(s);
     }

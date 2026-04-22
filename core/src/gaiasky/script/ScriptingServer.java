@@ -7,8 +7,8 @@
 
 package gaiasky.script;
 
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import py4j.ClientServer;
 import py4j.DefaultGatewayServerListener;
 import py4j.Py4JServerConnection;
@@ -39,7 +39,7 @@ public class ScriptingServer {
     public static void initialize(IScriptingInterface scriptingInterface, boolean force) {
         cachedInterface = scriptingInterface;
 
-        if (Settings.settings.program.net.slave.active) return;
+        if (GaiaSky.settings().program.net.slave.active) return;
 
         if (force || gatewayServer != null) {
             dispose();

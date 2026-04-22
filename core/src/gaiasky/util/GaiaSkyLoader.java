@@ -22,7 +22,6 @@ import gaiasky.render.MainPostProcessor;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
-import gaiasky.script.ScriptingServer;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;

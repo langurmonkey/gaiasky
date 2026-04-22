@@ -26,7 +26,6 @@ import gaiasky.scene.record.AtmosphereComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
@@ -177,7 +176,7 @@ public class ModelEntityRenderSystem {
             if (Mapper.grid.has(entity)) {
                 // Line width and fov factor.
                 ICamera cam = GaiaSky.instance.getICamera();
-                mc.setFloatExtAttribute(FloatAttribute.Generic1, Settings.settings.scene.renderer.line.width);
+                mc.setFloatExtAttribute(FloatAttribute.Generic1, GaiaSky.settings().scene.renderer.line.width);
                 mc.setFloatExtAttribute(FloatAttribute.Generic2, cam.getFovFactor());
             }
 
@@ -267,7 +266,7 @@ public class ModelEntityRenderSystem {
 
         mc.update(relativistic, graph.localTransform, alpha * base.opacity * body.color[3]);
         mc.updateDepthTest();
-        Gdx.gl20.glLineWidth(1.5f + Settings.settings.scene.renderer.line.glWidthBias);
+        Gdx.gl20.glLineWidth(1.5f + GaiaSky.settings().scene.renderer.line.glWidthBias);
         batch.render(mc.instance, mc.env);
 
         batch.render(model.model.instance, model.model.env);
@@ -312,9 +311,9 @@ public class ModelEntityRenderSystem {
         // Fading in u_heightScale.
         mc.setFloatExtAttribute(FloatAttribute.HeightScale, gr.scalingFading.getSecond().floatValue());
         // Grid style in u_elevationMultiplier.
-        mc.setFloatExtAttribute(FloatAttribute.ElevationMultiplier, (float) Settings.settings.program.recursiveGrid.style.ordinal());
+        mc.setFloatExtAttribute(FloatAttribute.ElevationMultiplier, (float) GaiaSky.settings().program.recursiveGrid.style.ordinal());
         // Line width.
-        mc.setFloatExtAttribute(FloatAttribute.Ts, Settings.settings.scene.renderer.line.width * 1.4f);
+        mc.setFloatExtAttribute(FloatAttribute.Ts, GaiaSky.settings().scene.renderer.line.width * 1.4f);
 
         // Render.
         modelBatch.render(mc.instance, mc.env);
@@ -576,7 +575,7 @@ public class ModelEntityRenderSystem {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
                 float atmOpacity = (float) MathUtilsDouble.flint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
-                if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0 && rc != null) {
+                if (GaiaSky.settings().scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0 && rc != null) {
                     var graph = Mapper.graph.get(entity);
                     var rotation = Mapper.orientation.get(entity).rotationComponent;
                     atmosphere.atmosphere.updateAtmosphericScatteringParams(model.model.instance.materials.first(), alpha * atmOpacity, true, graph,
@@ -652,7 +651,7 @@ public class ModelEntityRenderSystem {
         if (!model.model.env.has(CascadeShadowMapAttribute.Type)) {
             var env = model.model.env;
             // Only for regular shadow maps (no CSM!).
-            if (Settings.settings.scene.renderer.shadow.active && scaffolding.isSelfShadow()) {
+            if (GaiaSky.settings().scene.renderer.shadow.active && scaffolding.isSelfShadow()) {
                 if (scaffolding.shadow > 0
                         && scaffolding.shadowMapFb != null
                         && scaffolding.shadowMapCombined != null) {

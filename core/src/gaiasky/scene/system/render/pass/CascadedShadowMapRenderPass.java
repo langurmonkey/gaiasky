@@ -21,7 +21,6 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
 import gaiasky.util.gdx.model.gltf.scene3d.scene.CascadeShadowMap;
@@ -68,8 +67,8 @@ public class CascadedShadowMapRenderPass extends RenderPass {
 
     protected void initializeRenderPass() {
         this.baseLight = new DirectionalShadowLight(
-                Settings.settings.scene.renderer.shadow.resolution,
-                Settings.settings.scene.renderer.shadow.resolution);
+                GaiaSky.settings().scene.renderer.shadow.resolution,
+                GaiaSky.settings().scene.renderer.shadow.resolution);
     }
 
     protected void renderPass(ICamera camera, Object... params) {

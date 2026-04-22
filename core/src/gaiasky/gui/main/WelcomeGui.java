@@ -102,7 +102,7 @@ public class WelcomeGui extends AbstractGui {
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
         this.vr = vrStatus.vrInitOk();
-        this.gamepadListener = new WelcomeGuiGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
+        this.gamepadListener = new WelcomeGuiGamepadListener(GaiaSky.settings().controls.gamepad.mappingsFile);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class WelcomeGui extends AbstractGui {
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, stage));
             else if (vrStatus.equals(XrLoadStatus.ERROR_RENDERMODEL))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, stage));
-        } else if (Settings.settings.program.net.slave.active || GaiaSky.instance.isHeadless()) {
+        } else if (GaiaSky.settings().program.net.slave.active || GaiaSky.instance.isHeadless()) {
             // If we are a slave or running headless, data load can start
             startLoading();
         } else {
@@ -178,14 +178,14 @@ public class WelcomeGui extends AbstractGui {
 
     private void checkDataMirror(){
         // If no data mirror was selected, choose first.
-        if (Settings.settings.program.url.currentMirror == null) {
-            Settings.settings.program.url.currentMirror = Settings.settings.program.url.dataMirrors[0];
+        if (GaiaSky.settings().program.url.currentMirror == null) {
+            GaiaSky.settings().program.url.currentMirror = GaiaSky.settings().program.url.dataMirrors[0];
         }
     }
     private void checkDescriptorMirror() {
         // If no descriptor mirror was selected, choose first.
-        if (Settings.settings.program.url.currentDescriptor == null) {
-            Settings.settings.program.url.currentDescriptor = Settings.settings.program.url.dataDescriptors[0];
+        if (GaiaSky.settings().program.url.currentDescriptor == null) {
+            GaiaSky.settings().program.url.currentDescriptor = GaiaSky.settings().program.url.dataDescriptors[0];
         }
     }
 
@@ -207,10 +207,10 @@ public class WelcomeGui extends AbstractGui {
     private void continueWelcomeGui03() {
         checkDescriptorMirror();
         // Fetch descriptor file.
-        dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
-        DownloadHelper.downloadFile(Settings.settings.program.url.getCurrentDataDescriptor(),
+        dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(GaiaSky.settings().data.location) + "/gaiasky-data.json.gz");
+        DownloadHelper.downloadFile(GaiaSky.settings().program.url.getCurrentDataDescriptor(),
                                     dataDescriptor,
-                                    Settings.settings.program.offlineMode,
+                                    GaiaSky.settings().program.offlineMode,
                                     null,
                                     null,
                                     (digest) -> GaiaSky.postRunnable(() -> {
@@ -246,7 +246,7 @@ public class WelcomeGui extends AbstractGui {
     private void connectionError() {
         // Fail?
         downloadError = true;
-        if (Settings.settings.program.offlineMode) {
+        if (GaiaSky.settings().program.offlineMode) {
             logger.warn(I18n.msg("gui.welcome.error.offlinemode"));
         } else {
             logger.error(I18n.msg("gui.welcome.error.nointernet"));
@@ -255,7 +255,7 @@ public class WelcomeGui extends AbstractGui {
             // Just post a tooltip and go on.
             GaiaSky.postRunnable(() -> {
                 var title = I18n.msg("gui.download.noconnection.continue");
-                if (Settings.settings.program.offlineMode) {
+                if (GaiaSky.settings().program.offlineMode) {
                     title = I18n.msg("gui.system.offlinemode.tooltip");
                 }
                 EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, title, 10f);
@@ -271,12 +271,12 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void testMirrorConnectionChain(final int index, Runnable success, Runnable fail) {
-        var mirrors = Settings.settings.program.url.dataMirrors;
+        var mirrors = GaiaSky.settings().program.url.dataMirrors;
         final var n = mirrors.length;
         DownloadHelper.testConnection(mirrors[index] + "index.html",
                                       (url) -> {
                                           logger.info("Selected data mirror: " + url);
-                                          Settings.settings.program.url.currentMirror = mirrors[index];
+                                          GaiaSky.settings().program.url.currentMirror = mirrors[index];
                                           success.run();
                                       },
                                       () -> {
@@ -290,12 +290,12 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void testDataDescMirrorConnectionChain(final int index, Runnable success, Runnable fail) {
-        var mirrors = Settings.settings.program.url.dataDescriptors;
+        var mirrors = GaiaSky.settings().program.url.dataDescriptors;
         final var n = mirrors.length;
         DownloadHelper.testConnection(mirrors[index],
                                       (url) -> {
                                           logger.info("Selected data descriptor mirror: " + url);
-                                          Settings.settings.program.url.currentDescriptor = mirrors[index];
+                                          GaiaSky.settings().program.url.currentDescriptor = mirrors[index];
                                           success.run();
                                       },
                                       () -> {
@@ -309,7 +309,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWaitingUI() {
-        if (!Settings.settings.program.offlineMode) {
+        if (!GaiaSky.settings().program.offlineMode) {
             this.updateUnitsPerPixel(1.6f);
 
             // Prepare the background image.
@@ -326,7 +326,7 @@ public class WelcomeGui extends AbstractGui {
             centerContainer.bottom().right();
 
             var table = new Table(skin);
-            var gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+            var gaiaSky = new OwnLabel(GaiaSky.settings().getApplicationTitle(GaiaSky.settings().runtime.openXr), skin, "main-title");
             table.add(gaiaSky).row();
             var msg = new OwnLabel(I18n.msg("gui.welcome.datasets.updates"), skin);
             table.add(msg);
@@ -423,9 +423,9 @@ public class WelcomeGui extends AbstractGui {
         logo.setScale(0.9f);
         logo.setOrigin(Align.center);
 
-        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+        OwnLabel gaiaSky = new OwnLabel(GaiaSky.settings().getApplicationTitle(GaiaSky.settings().runtime.openXr), skin, "main-title");
         gaiaSky.setFontScale(1.5f);
-        OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
+        OwnLabel version = new OwnLabel(GaiaSky.settings().version.version, skin, "main-title");
         version.setColor(skin.getColor("theme"));
         Table title = new Table(skin);
         title.add(gaiaSky)
@@ -601,13 +601,13 @@ public class WelcomeGui extends AbstractGui {
                 vrOptionsTable = new Table(skin);
                 // VR demo mode.
                 var vrDemo = new OwnCheckBox(I18n.msg("gui.vr.demo"), skin, 10f);
-                vrDemo.setChecked(Settings.settings.runtime.vrDemoMode);
+                vrDemo.setChecked(GaiaSky.settings().runtime.vrDemoMode);
                 vrDemo.connect(Event.VR_DEMO_MODE_CMD);
                 OwnImageButton vrDemoTooltip = new OwnImageButton(skin, "tooltip");
                 vrDemoTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.demo.info"), skin));
                 // VR desktop mirror.
                 var vrMirror = new OwnCheckBox(I18n.msg("gui.vr.mirror"), skin, 10f);
-                vrMirror.setChecked(Settings.settings.runtime.vrDesktopMirror);
+                vrMirror.setChecked(GaiaSky.settings().runtime.vrDesktopMirror);
                 vrMirror.connect(Event.VR_DESKTOP_MIRROR_CMD);
                 OwnImageButton vrMirrorTooltip = new OwnImageButton(skin, "tooltip");
                 vrMirrorTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mirror.info"), skin));
@@ -706,7 +706,7 @@ public class WelcomeGui extends AbstractGui {
                     if (serverDatasets.recommended != null && serverDatasets.recommended.length > 0) {
                         recommendedDatasets = Set.of(serverDatasets.recommended);
                     } else {
-                        recommendedDatasets = Settings.settings.program.recommendedDatasets;
+                        recommendedDatasets = GaiaSky.settings().program.recommendedDatasets;
                     }
                     var recommended = serverDatasets.datasets.stream()
                             .filter(ds -> recommendedDatasets.contains(ds.key))
@@ -803,7 +803,7 @@ public class WelcomeGui extends AbstractGui {
                         disable.addListener(new ChangeListener() {
                             @Override
                             public void changed(ChangeEvent event, Actor actor) {
-                                Settings.settings.data.disableDataset(ds);
+                                GaiaSky.settings().data.disableDataset(ds);
                                 reloadView();
                             }
                         });
@@ -852,7 +852,7 @@ public class WelcomeGui extends AbstractGui {
         screenModeButton.addListener(new OwnTextTooltip(I18n.msg("gui.fullscreen"), skin, 10));
         screenModeButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                Settings.settings.graphics.fullScreen.active = !Settings.settings.graphics.fullScreen.active;
+                GaiaSky.settings().graphics.fullScreen.active = !GaiaSky.settings().graphics.fullScreen.active;
                 EventManager.publish(Event.SCREEN_MODE_CMD, screenModeButton);
                 return true;
             }
@@ -1030,8 +1030,8 @@ public class WelcomeGui extends AbstractGui {
                 }
             }
             if (base != null) {
-                if (!Settings.settings.data.dataFiles.contains(base.checkStr)) {
-                    Settings.settings.data.dataFiles.addFirst(base.checkStr);
+                if (!GaiaSky.settings().data.dataFiles.contains(base.checkStr)) {
+                    GaiaSky.settings().data.dataFiles.addFirst(base.checkStr);
                 }
             }
         }
@@ -1044,6 +1044,9 @@ public class WelcomeGui extends AbstractGui {
         EventManager.instance.removeAllSubscriptions(this);
         removeOwnListeners();
         ensureBaseDataEnabled(serverDatasets);
+        // Persist current settings (and datasets).
+        var settingsManager = new SettingsManager();
+        settingsManager.persist(GaiaSky.settings());
 
         if (popupInterface != null) {
             popupInterface.remove();
@@ -1073,13 +1076,13 @@ public class WelcomeGui extends AbstractGui {
 
     private int numTotalDatasetsEnabled() {
         return localDatasets.get() != null ? (int) localDatasets.get().datasets.stream()
-                .filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr))
+                .filter(ds -> GaiaSky.settings().data.dataFiles.contains(ds.checkStr))
                 .count() : 0;
     }
 
     private Collection<DatasetDesc> getEnabledDatasets() {
         return localDatasets.get() != null ? localDatasets.get().datasets.stream()
-                .filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr))
+                .filter(ds -> GaiaSky.settings().data.dataFiles.contains(ds.checkStr))
                 .sorted(Comparator.comparing(a -> a.type))
                 .collect(Collectors.toList()) : null;
     }
@@ -1090,8 +1093,8 @@ public class WelcomeGui extends AbstractGui {
 
     private int numGaiaDRCatalogsEnabled() {
         int matches = 0;
-        for (String f : Settings.settings.data.dataFiles) {
-            String path = Settings.settings.data.dataFile(f);
+        for (String f : GaiaSky.settings().data.dataFiles) {
+            String path = GaiaSky.settings().data.dataFile(f);
             if (isGaiaDRCatalogFile(path)) {
                 matches++;
             }
@@ -1109,9 +1112,9 @@ public class WelcomeGui extends AbstractGui {
             return 0;
         }
 
-        for (String f : Settings.settings.data.dataFiles) {
+        for (String f : GaiaSky.settings().data.dataFiles) {
             // File name with no extension
-            Path path = Settings.settings.data.dataPath(f);
+            Path path = GaiaSky.settings().data.dataPath(f);
             String filenameExt = path.getFileName()
                     .toString();
             try {
@@ -1138,8 +1141,8 @@ public class WelcomeGui extends AbstractGui {
 
     private Set<String> removeNonExistent() {
         Set<String> toRemove = new HashSet<>();
-        final FileHandleResolver dataResolver = fileName -> Settings.settings.data.dataFileHandle(fileName);
-        for (String f : Settings.settings.data.dataFiles) {
+        final FileHandleResolver dataResolver = fileName -> GaiaSky.settings().data.dataFileHandle(fileName);
+        for (String f : GaiaSky.settings().data.dataFiles) {
             // File name with no extension
             FileHandle fh = dataResolver.resolve(f);
             if (!fh.exists()) {
@@ -1150,7 +1153,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Remove non-existent files
         for (String out : toRemove) {
-            Settings.settings.data.dataFiles.remove(out);
+            GaiaSky.settings().data.dataFiles.remove(out);
         }
 
         return toRemove;
@@ -1178,7 +1181,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void fillDefaultDatasetFiles(Array<Path> newFiles) {
         // Fill in new data format.
-        Path location = Paths.get(Settings.settings.data.location)
+        Path location = Paths.get(GaiaSky.settings().data.location)
                 .normalize();
         newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY));
         newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY)
@@ -1285,7 +1288,7 @@ public class WelcomeGui extends AbstractGui {
         }
 
         if (gamepadListener != null) {
-            Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
+            GaiaSky.settings().controls.gamepad.addControllerListener(gamepadListener);
             gamepadListener.activate();
         }
     }
@@ -1299,7 +1302,7 @@ public class WelcomeGui extends AbstractGui {
         }
 
         if (gamepadListener != null) {
-            Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
+            GaiaSky.settings().controls.gamepad.removeControllerListener(gamepadListener);
             gamepadListener.deactivate();
         }
     }

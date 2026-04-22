@@ -7,6 +7,7 @@
 
 package gaiasky.gui.main;
 
+import gaiasky.GaiaSky;
 import gaiasky.gui.api.IGamepadMappings;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -86,7 +87,7 @@ public abstract class AbstractGamepadMappings implements IGamepadMappings {
                 if (Files.exists(defaultPath)) {
                     mappings = new GamepadMappings(null, defaultPath);
                     // Update mappings path.
-                    Settings.settings.controls.gamepad.mappingsFile = defaultPath.toAbsolutePath().toString();                }
+                    GaiaSky.settings().controls.gamepad.mappingsFile = defaultPath.toAbsolutePath().toString();                }
             }
         }
         return mappings;

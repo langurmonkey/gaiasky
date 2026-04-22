@@ -12,7 +12,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
@@ -39,7 +38,7 @@ public class TimeGuiInterface extends TableGuiInterface implements IObserver {
     public TimeGuiInterface(final Skin skin) {
         super(skin);
 
-        timeZone = Settings.settings.program.timeZone.getTimeZone();
+        timeZone = GaiaSky.settings().program.timeZone.getTimeZone();
         dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);

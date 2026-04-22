@@ -12,6 +12,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.util.Logger;
@@ -106,7 +108,10 @@ public class GalaxyDataGenerator {
                 return;
             }
 
-            SettingsManager.initialize(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
+            // Initialize settings
+            var manager = new SettingsManager();
+            var settings = manager.loadSettings(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
+            new GaiaSky(new GaiaSkyDesktop.CLIArgs(), settings);
 
             I18n.initialize(new FileHandle("assets/i18n/gsbundle"), new FileHandle("assets/i18n/objects"));
 

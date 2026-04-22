@@ -316,14 +316,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void initialize(ShaderProgram spriteShader,
                            ShaderProgram shapeShader) {
         if (vr) {
-            camera = new PerspectiveCamera(Settings.settings.scene.camera.fov, Settings.settings.graphics.backBufferResolution[0],
-                                           Settings.settings.graphics.backBufferResolution[1]);
+            camera = new PerspectiveCamera(GaiaSky.settings().scene.camera.fov, GaiaSky.settings().graphics.backBufferResolution[0],
+                                           GaiaSky.settings().graphics.backBufferResolution[1]);
         } else {
-            camera = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            camera = new PerspectiveCamera(GaiaSky.settings().scene.camera.fov, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
-        fovBackup = Settings.settings.scene.camera.fov;
+        fovBackup = GaiaSky.settings().scene.camera.fov;
 
         // init cameras vector.
         cameras = new PerspectiveCamera[]{camera, camLeft, camRight};
@@ -352,7 +352,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         gameMouseKbdListener = new GameMouseKbdListener(this);
         currentMouseKbdListener = null;
         // Controller listeners.
-        gamepadListener = new MainGamepadListener(this, Settings.settings.controls.gamepad.mappingsFile);
+        gamepadListener = new MainGamepadListener(this, GaiaSky.settings().controls.gamepad.mappingsFile);
         ControllerConnectionListener controllerConnectionListener = new ControllerConnectionListener();
         Controllers.addListener(controllerConnectionListener);
         if (vr) {
@@ -460,13 +460,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         }
                         dx.set(0, 0, 0);
 
-                        if (Settings.settings.scene.camera.focusLock.position) {
+                        if (GaiaSky.settings().scene.camera.focusLock.position) {
                             // Get focus dx.
                             dx.set(nextFocusPosition)
                                     .sub(focusPos);
 
                             // Lock orientation.
-                            if (Settings.settings.scene.camera.focusLock.orientation && time.getHdiff() != 0 && focus.getOrientation() != null) {
+                            if (GaiaSky.settings().scene.camera.focusLock.orientation && time.getHdiff() != 0 && focus.getOrientation() != null) {
                                 if (focus.getRotationComponent() != null) {
                                     var rc = focus.getRotationComponent();
                                     // Rotation component present - planets, etc.
@@ -530,11 +530,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                             if (!diverted && !surfaceModeFlag.get()) {
                                 directionToTarget(dt,
                                                   aux4b,
-                                                  Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3f : 1e2f));
+                                                  GaiaSky.settings().scene.camera.turn / (GaiaSky.settings().scene.camera.cinematic ? 1e3f : 1e2f));
                             } else {
-                                updateRotationFree(dt, Settings.settings.scene.camera.turn);
+                                updateRotationFree(dt, GaiaSky.settings().scene.camera.turn);
                             }
-                            updateRoll(dt, Settings.settings.scene.camera.turn);
+                            updateRoll(dt, GaiaSky.settings().scene.camera.turn);
                         }
 
                         updatePosition(dt, speedScalingCapped, speedScaling);
@@ -618,21 +618,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 }
             case FREE_MODE:
                 synchronized (updateLock) {
-                    updatePosition(dt, speedScalingCapped, Settings.settings.scene.camera.targetMode ? speedScaling : 1);
+                    updatePosition(dt, speedScalingCapped, GaiaSky.settings().scene.camera.targetMode ? speedScaling : 1);
                     if (!vr) {
                         // If target is present, update direction
                         if (freeTargetOn) {
                             directionToTarget(dt,
                                               freeTargetPos,
-                                              Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3d : 1e2d));
+                                              GaiaSky.settings().scene.camera.turn / (GaiaSky.settings().scene.camera.cinematic ? 1e3d : 1e2d));
                             if (facingFocus) {
                                 freeTargetOn = false;
                             }
                         }
 
                         // Update direction with pitch, yaw, roll
-                        updateRotationFree(dt, Settings.settings.scene.camera.turn);
-                        updateRoll(dt, Settings.settings.scene.camera.turn);
+                        updateRotationFree(dt, GaiaSky.settings().scene.camera.turn);
+                        updateRoll(dt, GaiaSky.settings().scene.camera.turn);
                     }
                     updateLateral(dt, speedScalingCapped);
                 }
@@ -963,7 +963,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     protected void updateVelocity(double dt, double multiplier, double speedScaling) {
 
-        boolean cinematic = Settings.settings.scene.camera.cinematic;
+        boolean cinematic = GaiaSky.settings().scene.camera.cinematic;
         // Calculate velocity if coming from gamepad
         if (velocityGamepad != 0) {
             vel.set(direction)
@@ -1025,8 +1025,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     .scl(speedMultiplier);
 
             // Clamp to top speed
-            if (Settings.settings.scene.camera.speedLimit > 0 && vel.len() > Settings.settings.scene.camera.speedLimit) {
-                vel.clamp(0, Settings.settings.scene.camera.speedLimit);
+            if (GaiaSky.settings().scene.camera.speedLimit > 0 && vel.len() > GaiaSky.settings().scene.camera.speedLimit) {
+                vel.clamp(0, GaiaSky.settings().scene.camera.speedLimit);
             }
 
             // Velocity changed direction
@@ -1084,7 +1084,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             double elevation =
                     closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / FastMath.max(4.0,
-                                                                                                         20.0 - Settings.settings.scene.renderer.elevation.multiplier);
+                                                                                                         20.0 - GaiaSky.settings().scene.renderer.elevation.multiplier);
             double newDist = aux5b.scl(-1)
                     .add(pos)
                     .lenDouble();
@@ -1123,8 +1123,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             rotate(up, -yaw.z * rotateSpeed * movementMultiplier);
         }
 
-        defaultState(pitch, !Settings.settings.scene.camera.cinematic && !gamepadInput);
-        defaultState(yaw, !Settings.settings.scene.camera.cinematic && !gamepadInput);
+        defaultState(pitch, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
+        defaultState(yaw, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
     }
 
     private void updateRoll(double dt,
@@ -1133,7 +1133,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // Roll
             rotate(direction, -roll.z * rotateSpeed * movementMultiplier);
         }
-        defaultState(roll, !Settings.settings.scene.camera.cinematic && !gamepadInput);
+        defaultState(roll, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
     }
 
     /**
@@ -1148,15 +1148,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             aux1.set(direction)
                     .crs(up)
                     .nor();
-            rotateAround(rotationCenter, aux1, vertical.z * Settings.settings.scene.camera.rotate * movementMultiplier);
+            rotateAround(rotationCenter, aux1, vertical.z * GaiaSky.settings().scene.camera.rotate * movementMultiplier);
         }
         if (updatePosition(horizontal, dt)) {
             // Yaw
-            rotateAround(rotationCenter, up, -horizontal.z * Settings.settings.scene.camera.rotate * movementMultiplier);
+            rotateAround(rotationCenter, up, -horizontal.z * GaiaSky.settings().scene.camera.rotate * movementMultiplier);
         }
 
-        defaultState(vertical, !Settings.settings.scene.camera.cinematic && !gamepadInput);
-        defaultState(horizontal, !Settings.settings.scene.camera.cinematic && !gamepadInput);
+        defaultState(vertical, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
+        defaultState(horizontal, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
 
     }
 
@@ -1181,8 +1181,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 .nor()
                 .scl(vertical.y * translateUnits * movementMultiplier);
         aux1.add(aux2);
-        if (Settings.settings.scene.camera.speedLimit > 0 && aux1.len() > Settings.settings.scene.camera.speedLimit) {
-            aux1.clamp(0, Settings.settings.scene.camera.speedLimit);
+        if (GaiaSky.settings().scene.camera.speedLimit > 0 && aux1.len() > GaiaSky.settings().scene.camera.speedLimit) {
+            aux1.clamp(0, GaiaSky.settings().scene.camera.speedLimit);
         }
 
         if (dt > 0) {
@@ -1321,11 +1321,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void addGamepadListener() {
-        Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
+        GaiaSky.settings().controls.gamepad.addControllerListener(gamepadListener);
     }
 
     public void removeGamepadListener() {
-        Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
+        GaiaSky.settings().controls.gamepad.removeControllerListener(gamepadListener);
     }
 
     public void setFocus(String focusName,
@@ -1388,7 +1388,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     private double getClosestStarDistance() {
         if (GaiaSky.instance.cameraManager.getMode()
-                .isFocus() || !Settings.settings.scene.camera.starDistanceScaling) {
+                .isFocus() || !GaiaSky.settings().scene.camera.starDistanceScaling) {
             // Do not use star distance to compute velocity scaling.
             // Occasionally, traversing the star field with speed scaling depending on the closest star is actually not good.
             // Speed jumps after metadata updates are too noticeable.
@@ -1431,7 +1431,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         final var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 
         return smoothedDistance >= 0 ? (Math.max(distanceMap,
-                                                 min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
+                                                 min) * GaiaSky.settings().scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
     }
 
     /**
@@ -1547,7 +1547,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             case CAMERA_ROLL -> {
                 synchronized (updateLock) {
-                    addRoll((double) data[0], Settings.settings.scene.camera.cinematic);
+                    addRoll((double) data[0], GaiaSky.settings().scene.camera.cinematic);
                 }
             }
             case CAMERA_STOP -> {
@@ -1645,7 +1645,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 }
             }
             case CONTROLLER_CONNECTED_INFO ->
-                    Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
+                    GaiaSky.settings().controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
             case CONTROLLER_DISCONNECTED_INFO -> {
                 // Empty.
             }
@@ -1921,10 +1921,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void render(int rw,
                        int rh) {
 
-        boolean modeStereo = Settings.settings.program.modeStereo.active;
-        boolean modeStereoVR = modeStereo && Settings.settings.program.modeStereo.isStereoVR();
-        boolean modeCubemap = Settings.settings.program.modeCubemap.active;
-        boolean modeReprojection = Settings.settings.postprocess.reprojection.active;
+        boolean modeStereo = GaiaSky.settings().program.modeStereo.active;
+        boolean modeStereoVR = modeStereo && GaiaSky.settings().program.modeStereo.isStereoVR();
+        boolean modeCubemap = GaiaSky.settings().program.modeCubemap.active;
+        boolean modeReprojection = GaiaSky.settings().postprocess.reprojection.active;
 
         if (modeStereoVR || modeReprojection) {
             // No pointer guides or cross-hairs
@@ -1932,13 +1932,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // Pointer guides
-        if (Settings.settings.program.pointer.guides.active && !modeStereo && !modeCubemap && !vr) {
+        if (GaiaSky.settings().program.pointer.guides.active && !modeStereo && !modeCubemap && !vr) {
             int mouseX = Gdx.input.getX();
             int mouseY = rh - Gdx.input.getY();
             shapeRenderer.begin(ShapeType.Line);
             Gdx.gl.glEnable(GL30.GL_BLEND);
-            Gdx.gl.glLineWidth(Settings.settings.program.pointer.guides.width);
-            float[] pc = Settings.settings.program.pointer.guides.color;
+            Gdx.gl.glLineWidth(GaiaSky.settings().program.pointer.guides.width);
+            float[] pc = GaiaSky.settings().program.pointer.guides.color;
             shapeRenderer.setColor(pc[0], pc[1], pc[2], pc[3]);
             shapeRenderer.line(0, mouseY, rw, mouseY);
             shapeRenderer.line(mouseX, 0, mouseX, rh);
@@ -1953,9 +1953,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             chScale = 4f;
         }
         // Mark home in ORANGE
-        if (Settings.settings.scene.crosshair.home) {
+        if (GaiaSky.settings().scene.crosshair.home) {
             if (home == null && scene != null) {
-                var homeEntity = scene.findFocus(Settings.settings.scene.homeObject);
+                var homeEntity = scene.findFocus(GaiaSky.settings().scene.homeObject);
                 home = new FocusView(homeEntity);
             }
             if (home != null) {
@@ -1964,19 +1964,19 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // Mark closest object in BLUE
-        if (Settings.settings.scene.crosshair.closest && closest != null) {
+        if (GaiaSky.settings().scene.crosshair.closest && closest != null) {
             drawCrossHair(spriteBatch, closest, decal, false, spriteClosest, crosshairArrow, chScale, rw, rh, 0.3f, 0.5f, 1f,
                           0.6f);
         }
 
         // Mark the focus in GREEN
-        if (Settings.settings.scene.crosshair.focus && getMode().isFocus()) {
+        if (GaiaSky.settings().scene.crosshair.focus && getMode().isFocus()) {
             // Green, focus mode
             drawCrossHair(spriteBatch, focus, decal, true, spriteFocus, crosshairArrow, chScale, rw, rh, 0.2f, 1f, 0.4f, 1f);
         }
 
         // Gravitational waves crosshair
-        if (Settings.settings.runtime.gravitationalWaves) {
+        if (GaiaSky.settings().runtime.gravitationalWaves) {
             RelativisticEffectsManager gw = RelativisticEffectsManager.getInstance();
 
             float chw = crosshairGravWaves.getWidth();

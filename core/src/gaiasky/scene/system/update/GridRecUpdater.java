@@ -21,11 +21,10 @@ import gaiasky.scene.component.GridRecursive;
 import gaiasky.scene.component.RefSysTransform;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 /**
@@ -69,7 +68,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         body.distToCamera = getDistanceToOrigin(camera) * camera.getFovFactor();
         fade.currentDistance = body.distToCamera;
         gr.regime = body.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
-        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
+        if (GaiaSky.settings().program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
             // Baked fade-in as we get close to focus.
             IFocus focus = camera.getFocus();
             base.opacity *= (float) MathUtilsDouble.flint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
@@ -82,7 +81,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         getGridScaling(body.distToCamera, gr.scalingFading);
 
         // Compute projection lines to reference system.
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
+        if (GaiaSky.settings().program.recursiveGrid.origin.isRefSys() && GaiaSky.settings().program.recursiveGrid.projectionLines && camera.hasFocus()) {
             IFocus focus = camera.getFocus();
             Vector3D cPos = D33;
             Vector3D fPos = D34;
@@ -110,7 +109,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
 
         Vector3 vrOffset = F34;
         float vrScl = 1f;
-        if (Settings.settings.runtime.openXr) {
+        if (GaiaSky.settings().runtime.openXr) {
             vrScl = 100f;
             if (camera.getCurrent() instanceof NaturalCamera) {
                 ((NaturalCamera) camera.getCurrent()).vrOffset.put(vrOffset);
@@ -120,7 +119,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
             vrOffset.set(0, 0, 0);
         }
 
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || focus == null) {
+        if (GaiaSky.settings().program.recursiveGrid.origin.isRefSys() || focus == null) {
             // Coordinate origin - Sun.
             if (gr.regime == 1)
                 graph.localTransform.translate(camera.getInversePos().put(F31));
@@ -161,7 +160,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
     }
 
     private double getDistanceToOrigin(ICamera camera) {
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || !camera.hasFocus()) {
+        if (GaiaSky.settings().program.recursiveGrid.origin.isRefSys() || !camera.hasFocus()) {
             return camera.getPos().lenDouble();
         } else {
             IFocus focus = camera.getFocus();

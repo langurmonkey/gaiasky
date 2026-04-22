@@ -9,7 +9,6 @@ package gaiasky.gui.window;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.util.scene2d.OwnImage;
 

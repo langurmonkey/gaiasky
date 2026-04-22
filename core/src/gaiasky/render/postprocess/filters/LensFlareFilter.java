@@ -9,7 +9,6 @@ package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.render.util.ShaderLoader;
 
 public final class LensFlareFilter extends Filter<LensFlareFilter> {
     private final Vector2 viewport;

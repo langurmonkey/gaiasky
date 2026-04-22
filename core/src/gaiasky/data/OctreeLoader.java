@@ -152,7 +152,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         // We assume 1Gb of graphics memory.
         // GPU ~ 32 byte/star
         // CPU ~ 136 byte/star
-        maxLoadedStars = Settings.settings.scene.octree.maxStars;
+        maxLoadedStars = GaiaSky.settings().scene.octree.maxStars;
         logger.info("Maximum loaded stars setting: " + maxLoadedStars);
 
         Comparator<OctreeNode> depthComparator = Comparator.comparingInt((OctreeNode o) -> o.depth);
@@ -256,8 +256,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             root.octant.updateCounts();
 
             // Override number of labels in case we have a compact octree (~3 octants tops).
-            if (root.octant.numChildrenRec + 1 < 4 && Settings.settings.scene.star.group.numLabels <= 50) {
-                long numLabels = FastMath.max(Settings.settings.scene.star.group.getMaxNumIndices(),
+            if (root.octant.numChildrenRec + 1 < 4 && GaiaSky.settings().scene.star.group.numLabels <= 50) {
+                long numLabels = FastMath.max(GaiaSky.settings().scene.star.group.getMaxNumIndices(),
                                               (long) (50.0 / (root.octant.numChildrenRec + 1)));
                 updateNumLabelsRecursive(root.octant, numLabels);
             }
@@ -538,7 +538,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @return True if the octant was loaded, false otherwise
      */
     public boolean loadOctant(final OctreeNode octant, final Entity octreeWrapper, final boolean fullInit, final boolean immediate) {
-        FileHandle octantFile = Settings.settings.data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
+        FileHandle octantFile = GaiaSky.settings().data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
         }

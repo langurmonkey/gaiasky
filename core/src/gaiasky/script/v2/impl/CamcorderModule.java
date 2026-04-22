@@ -7,12 +7,12 @@
 
 package gaiasky.script.v2.impl;
 
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.script.v2.api.CamcorderAPI;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -41,7 +41,7 @@ public class CamcorderModule extends APIModule implements CamcorderAPI {
 
     @Override
     public double get_fps() {
-        return Settings.settings.camrecorder.targetFps;
+        return GaiaSky.settings().camrecorder.targetFps;
     }
 
     @Override

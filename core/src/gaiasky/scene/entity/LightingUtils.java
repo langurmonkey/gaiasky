@@ -9,7 +9,6 @@ package gaiasky.scene.entity;
 
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Body;
-import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Model;
 import gaiasky.util.Constants;
 import gaiasky.util.TLV3;

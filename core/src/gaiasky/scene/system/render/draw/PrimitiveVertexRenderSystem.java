@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -28,7 +29,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.VertsView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3D;
@@ -194,7 +194,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
 
             // Regular.
             if (isLine()) {
-                float lw = vertsView.getPrimitiveSize() * Settings.settings.scene.renderer.line.width * camera.getFovFactor() + Settings.settings.scene.renderer.line.glWidthBias;
+                float lw = vertsView.getPrimitiveSize() * GaiaSky.settings().scene.renderer.line.width * camera.getFovFactor() + GaiaSky.settings().scene.renderer.line.glWidthBias;
                 shaderProgram.setUniformf("u_lineWidthTan", (float) (lw * 0.8f * baseWidthAngleTan));
                 Gdx.gl.glLineWidth(lw * 1.5f);
             } else {

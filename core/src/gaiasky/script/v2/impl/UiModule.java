@@ -17,7 +17,6 @@ import gaiasky.event.EventManager;
 import gaiasky.gui.api.IGui;
 import gaiasky.script.v2.api.UiAPI;
 import gaiasky.util.LruCache;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
 import java.util.List;
@@ -219,7 +218,7 @@ public class UiModule extends APIModule implements UiAPI {
 
     @Override
     public float get_ui_scale_factor() {
-        return Settings.settings.program.ui.scale;
+        return GaiaSky.settings().program.ui.scale;
     }
 
     @Override

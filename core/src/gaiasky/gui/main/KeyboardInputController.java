@@ -11,13 +11,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.TimeUtils;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.main.KeyBindings.ProgramAction;
 import gaiasky.input.InputUtils;
 import gaiasky.input.KeyRegister;
-import gaiasky.util.Settings;
 
 import java.util.Objects;
 import java.util.TreeSet;
@@ -52,7 +52,7 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
 
         cleanSpecial();
 
-        if (Settings.settings.runtime.inputEnabled) {
+        if (GaiaSky.settings().runtime.inputEnabled) {
             pressedKeys.add(keyCode);
             register.registerKeyDownTime(keyCode, TimeUtils.millis());
         }
@@ -70,7 +70,7 @@ public class KeyboardInputController extends InputAdapter implements IObserver {
         cleanSpecial();
         long now = System.currentTimeMillis();
 
-        if (Settings.settings.runtime.inputEnabled) {
+        if (GaiaSky.settings().runtime.inputEnabled) {
             // Use key mappings
             ProgramAction action = mappings.getMappings().get(pressedKeys);
             if (action != null && (now - register.lastKeyDownTime(pressedKeys) < action.maxKeyDownTimeMs)) {

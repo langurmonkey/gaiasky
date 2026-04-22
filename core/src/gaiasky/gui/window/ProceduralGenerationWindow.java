@@ -30,7 +30,6 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -251,7 +250,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
                                                        skin);
         pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
         pgResolution.setWidth(fieldWidthTotal + 50f);
-        pgResolution.setValue(Settings.settings.graphics.proceduralGenerationResolution[1]);
+        pgResolution.setValue(GaiaSky.settings().graphics.proceduralGenerationResolution[1]);
         pgResolution.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -265,7 +264,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         // Save textures
         OwnCheckBox saveTextures = new OwnCheckBox(I18n.msg("gui.procedural.savetextures"), skin, pad10);
-        saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
+        saveTextures.setChecked(GaiaSky.settings().program.saveProceduralTextures);
         saveTextures.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -712,7 +711,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     private void updateLutImage(Array<String> luts) {
         if (lutImageCell != null) {
             lutImageCell.clearActor();
-            Pixmap p = new Pixmap(Settings.settings.data.dataFileHandle(luts.get(luts.indexOf(mtc.biomeLUT, false))));
+            Pixmap p = new Pixmap(GaiaSky.settings().data.dataFileHandle(luts.get(luts.indexOf(mtc.biomeLUT, false))));
             int w = p.getWidth();
             int h = p.getHeight();
             if (hueShift != null) {
@@ -775,7 +774,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             Table scrollContent = new Table(skin);
 
             // LUT
-            Path dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
+            Path dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
             Array<String> lookUpTables = new Array<>();
             try (var stream = Files.list(dataPath)) {
                 java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png") || f.toString().endsWith("-lut.jpg")).toList();

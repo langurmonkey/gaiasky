@@ -9,6 +9,7 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Raymarching;
@@ -16,7 +17,6 @@ import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 
 /**
  * Performs the initialization of objects of the Invisible archetype. It initializes their components
@@ -65,7 +65,7 @@ public class InvisibleInitializer extends AbstractInitSystem {
             if (label.labelFactor == 0)
                 label.labelFactor = 0.3e-3f;
         }
-        sa.thresholdLabel = (Math.toRadians(1e-6) * Constants.DISTANCE_SCALE_FACTOR / Settings.settings.scene.label.number) * 60.0;
+        sa.thresholdLabel = (Math.toRadians(1e-6) * Constants.DISTANCE_SCALE_FACTOR / GaiaSky.settings().scene.label.number) * 60.0;
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextBase;
 

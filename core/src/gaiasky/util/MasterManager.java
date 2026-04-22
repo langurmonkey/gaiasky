@@ -8,14 +8,15 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.net.HttpStatus;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.net.URI;
@@ -63,7 +64,7 @@ public class MasterManager implements IObserver {
         super();
 
         // Slave objects
-        slaves = Settings.settings.program.net.master.slaves;
+        slaves = GaiaSky.settings().program.net.master.slaves;
         if (slaves != null && !slaves.isEmpty()) {
             slaveStates = new byte[slaves.size()];
             slaveFlags = new byte[slaves.size()];
@@ -92,11 +93,11 @@ public class MasterManager implements IObserver {
     }
 
     public static void initialize() {
-        if (Settings.settings.program.net.slave.active && Settings.settings.program.net.master.active) {
+        if (GaiaSky.settings().program.net.slave.active && GaiaSky.settings().program.net.master.active) {
             logger.error("Can't be master and slave at the same time!");
             return;
         }
-        if (Settings.settings.program.net.master.active) {
+        if (GaiaSky.settings().program.net.master.active) {
             MasterManager.instance = new MasterManager();
         }
     }
@@ -250,7 +251,7 @@ public class MasterManager implements IObserver {
                 state = (Boolean) data[1];
             } else {
                 ComponentType ct = ComponentType.getFromKey(key);
-                state = Settings.settings.scene.visibility.get(ct.toString());
+                state = GaiaSky.settings().scene.visibility.get(ct.toString());
             }
             i = 0;
             for (String slave : slaves) {

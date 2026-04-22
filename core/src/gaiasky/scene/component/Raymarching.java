@@ -9,7 +9,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.Texture;
-import gaiasky.util.Settings;
+import gaiasky.GaiaSky;
 
 /**
  * Stores information for raymarching-based rendering of bodies.
@@ -31,7 +31,7 @@ public class Raymarching implements Component {
     }
 
     public void setAdditionalTexture(String texture) {
-        this.additionalTexture = Settings.settings.data.dataFile(texture);
+        this.additionalTexture = GaiaSky.settings().data.dataFile(texture);
     }
 
     public void setRaymarchingTexture(String texture) {

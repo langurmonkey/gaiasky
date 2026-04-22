@@ -21,7 +21,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.OneTimeRunnable;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.ImageFormat;
 import gaiasky.util.i18n.I18n;
 
@@ -45,7 +44,7 @@ public class ScreenshotsManager implements IObserver {
         this.screenshotRenderer = new BasicFileImageRenderer();
 
         // Frame output GUI
-        this.renderGui = new FrameOutputGui(globalResources.getSkin(), Gdx.graphics, Settings.settings.program.ui.scale);
+        this.renderGui = new FrameOutputGui(globalResources.getSkin(), Gdx.graphics, GaiaSky.settings().program.ui.scale);
         this.renderGui.initialize(null, globalResources.getSpriteBatch());
         this.renderGui.doneLoading(null);
 
@@ -60,7 +59,7 @@ public class ScreenshotsManager implements IObserver {
 
     public void renderFrame() {
         gaiaSky.getCameraManager().backupCamera();
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         if (settings.frame.active) {
             switch (settings.frame.mode) {
             case SIMPLE -> frameRenderer.saveScreenshot(settings.frame.location, settings.frame.prefix, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true, settings.frame.format, settings.frame.quality);
@@ -77,7 +76,7 @@ public class ScreenshotsManager implements IObserver {
 
     private void renderScreenshot(final int width, final int height, final String directory) {
         gaiaSky.getCameraManager().backupCamera();
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         String file = null;
         String filename = getCurrentTimeStamp() + "_" + SCREENSHOT_FILENAME;
         switch (settings.screenshot.mode) {
@@ -97,7 +96,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     public void renderCurrentFrameBuffer(String folder, String file, int w, int h) {
-        String f = ImageRenderer.renderToImageGl20(folder, file, w, h, Settings.settings.screenshot.format, Settings.settings.screenshot.quality);
+        String f = ImageRenderer.renderToImageGl20(folder, file, w, h, GaiaSky.settings().screenshot.format, GaiaSky.settings().screenshot.quality);
         if (f != null) {
             EventManager.publish(Event.SCREENSHOT_INFO, this, f);
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.screenshot", file));
@@ -155,7 +154,7 @@ public class ScreenshotsManager implements IObserver {
             // the renderSgr() has closed it.
             frameBuffer.begin();
         }
-        if (Settings.settings.frame.time) {
+        if (GaiaSky.settings().frame.time) {
             // Timestamp
             renderGui().resize(width, height);
             renderGui().render(width, height);

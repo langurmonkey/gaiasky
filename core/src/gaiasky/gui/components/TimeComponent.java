@@ -18,7 +18,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.main.KeyBindings;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -52,7 +51,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
     public TimeComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        timeZone = Settings.settings.program.timeZone.getTimeZone();
+        timeZone = GaiaSky.settings().program.timeZone.getTimeZone();
         dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
@@ -132,7 +131,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         stepForward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime", true), skin));
 
         playPause = new OwnImageButton(skin, "media-play-pause");
-        playPause.setChecked(Settings.settings.runtime.timeOn);
+        playPause.setChecked(GaiaSky.settings().runtime.timeOn);
         playPause.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.TIME_STATE_CMD, playPause, playPause.isChecked());

@@ -24,13 +24,12 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector2D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,10 +66,10 @@ public class GridRecInitializer extends AbstractInitSystem {
         line.renderConsumer = LineEntityRenderSystem::renderGridRec;
 
         transform.floatVersion = true;
-        transform.setTransformName(Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? "galacticToEquatorial" : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? "eclipticToEquatorial" : null));
+        transform.setTransformName(GaiaSky.settings().scene.visibility.get(ComponentType.Galactic.toString()) ? "galacticToEquatorial" : (GaiaSky.settings().scene.visibility.get(ComponentType.Ecliptic.toString()) ? "eclipticToEquatorial" : null));
         gr.scalingFading = new Pair<>(0d, 0d);
 
-        body.color = Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? gr.ccGal : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? gr.ccEcl : gr.ccEq);
+        body.color = GaiaSky.settings().scene.visibility.get(ComponentType.Galactic.toString()) ? gr.ccGal : (GaiaSky.settings().scene.visibility.get(ComponentType.Ecliptic.toString()) ? gr.ccEcl : gr.ccEq);
         body.labelColor = body.color;
 
         gr.p01 = new Vector3D();
@@ -195,7 +194,7 @@ public class GridRecInitializer extends AbstractInitSystem {
         EventManager.instance.subscribe(new GridRecursiveRadio(entity), Event.TOGGLE_VISIBILITY_CMD);
 
         // Fade out in VR
-        if (Settings.settings.runtime.openXr) {
+        if (GaiaSky.settings().runtime.openXr) {
             var fade = Mapper.fade.get(entity);
             fade.setFadeOut(new double[] { 5e6, 50e6 });
             fade.fadeOutMap = new Vector2D(1, 0);

@@ -19,10 +19,9 @@ import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.math.IntersectorDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
 import java.util.Map;
@@ -100,7 +99,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         force.set(thrust);
 
         // Scale force if relativistic effects are on
-        if (Settings.settings.runtime.relativisticAberration) {
+        if (GaiaSky.settings().runtime.relativisticAberration) {
             double speed = vel.len();
             double scale = (spacecraft.relativisticSpeedCap() - speed) / spacecraft.relativisticSpeedCap();
             force.scl(scale);
@@ -134,7 +133,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         // convert metres to internal units so we have the velocity in u/s
         Vector3D acc = D31.set(accel).scl(Constants.M_TO_U);
 
-        if (Settings.settings.spacecraft.velocityDirection) {
+        if (GaiaSky.settings().spacecraft.velocityDirection) {
             double velocityLength = vel.len();
             vel.set(direction).nor().scl(velocityLength);
         }

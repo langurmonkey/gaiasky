@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -22,7 +23,6 @@ import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 
@@ -95,7 +95,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         var raymarching = Mapper.raymarching.get(entity);
 
         if (raymarching != null) {
-            if (raymarching.raymarchingShader != null && !raymarching.raymarchingShader.isBlank() && !Settings.settings.program.safeMode) {
+            if (raymarching.raymarchingShader != null && !raymarching.raymarchingShader.isBlank() && !GaiaSky.settings().program.safeMode) {
                 if (raymarching.additionalTextureUnpacked != null) {
                     if (AssetBean.manager().isLoaded(raymarching.additionalTextureUnpacked)) {
                         raymarching.additional = AssetBean.manager().get(raymarching.additionalTextureUnpacked);
@@ -111,7 +111,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
                 // Set up label
                 var label = Mapper.label.get(entity);
                 var sa = Mapper.sa.get(entity);
-                sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * 60.0;
+                sa.thresholdLabel = (Math.toRadians(1e-6) / GaiaSky.settings().scene.label.number) * 60.0;
                 label.textScale = 0.2f;
                 label.labelMax = 1.6f;
                 if (label.labelFactor == 0)

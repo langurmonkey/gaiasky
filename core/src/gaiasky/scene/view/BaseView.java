@@ -16,7 +16,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Render;
-import gaiasky.util.Settings;
 
 public non-sealed class BaseView extends AbstractView {
 
@@ -92,7 +91,7 @@ public non-sealed class BaseView extends AbstractView {
     }
 
     public boolean isVisible() {
-        return base.visible || base.msSinceStateChange() <= Settings.settings.scene.fadeMs;
+        return base.visible || base.msSinceStateChange() <= GaiaSky.settings().scene.fadeMs;
     }
 
     public void setVisible(boolean visible) {

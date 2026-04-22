@@ -28,7 +28,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.RenderView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -48,7 +47,7 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
         super(sceneRenderer, rg, alphas, shaders);
         this.view = new RenderView();
         this.ct = ct;
-        this.triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
+        this.triComponent.setStarTexture(GaiaSky.settings().scene.star.getStarTexture());
         initializing = true;
 
         // Create mesh data.
@@ -213,7 +212,7 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_BASE_LEVEL_CMD -> {
-            triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);
+            triComponent.updateStarOpacityLimits((float) data[0], GaiaSky.settings().scene.star.opacity[1]);
             triComponent.touchStarParameters(getShaderProgram());
         }
         case STAR_BRIGHTNESS_CMD -> {
@@ -228,7 +227,7 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
             triComponent.updateStarPointSize((float) data[0]);
             triComponent.touchStarParameters(getShaderProgram());
         }
-        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(GaiaSky.settings().scene.star.getStarTexture()));
         default -> {
         }
         }

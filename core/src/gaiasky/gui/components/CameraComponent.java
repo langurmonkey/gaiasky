@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -19,7 +20,6 @@ import gaiasky.gui.main.KeyBindings;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.SlaveManager;
 import gaiasky.util.TextUtils;
 import gaiasky.util.camera.rec.Camcorder;
@@ -51,7 +51,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // Record camera button.
         recCamera = new OwnImageButton(skin, "rec");
         recCamera.setName("recCam");
-        recCamera.setChecked(Settings.settings.runtime.recordCamera);
+        recCamera.setChecked(GaiaSky.settings().runtime.recordCamera);
         recCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (recCamera.isChecked() && Camcorder.instance.isPlaying()) {
@@ -73,7 +73,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // Record camera (keyframes).
         recKeyframeCamera = new OwnImageButton(skin, "rec-key");
         recKeyframeCamera.setName("recKeyframeCamera");
-        recKeyframeCamera.setChecked(Settings.settings.runtime.recordKeyframeCamera);
+        recKeyframeCamera.setChecked(GaiaSky.settings().runtime.recordKeyframeCamera);
         recKeyframeCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_KEYFRAMES_WINDOW_ACTION, recKeyframeCamera);
@@ -113,7 +113,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // Cinematic camera check box.
         cinematic = new OwnCheckBox(I18n.msg("gui.camera.cinematic"), skin, pad8);
         cinematic.setName("cinematic camera");
-        cinematic.setChecked(Settings.settings.scene.camera.cinematic);
+        cinematic.setChecked(GaiaSky.settings().scene.camera.cinematic);
         final String[] hkc = KeyBindings.instance.getStringKeys("action.toggle/camera.cinematic", true);
         cinematic.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("gui.camera.cinematic")), hkc, skin));
         cinematic.addListener(event -> {
@@ -146,11 +146,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        if (!Settings.settings.runtime.openXr) {
+        if (!GaiaSky.settings().runtime.openXr) {
             var buttonSize = 55f;
             final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", Align.center, icon3d, skin, "toggle");
-            button3d.setChecked(Settings.settings.program.modeStereo.active);
+            button3d.setChecked(GaiaSky.settings().program.modeStereo.active);
             final String[] hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode", true);
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
@@ -174,7 +174,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
             final Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", Align.center, iconDome, skin, "toggle");
-            buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
+            buttonDome.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPlanetariumOn());
             final String[] hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium", true);
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
@@ -200,7 +200,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
             buttonCubemap = new OwnTextIconButton("", Align.center, iconCubemap, skin, "toggle");
             buttonCubemap.setProgrammaticChangeEvents(false);
-            buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
+            buttonCubemap.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPanoramaOn());
             final String[] hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360", true);
             buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
@@ -226,7 +226,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
             buttonOrthosphere = new OwnTextIconButton("", Align.center, iconOrthosphere, skin, "toggle");
             buttonOrthosphere.setProgrammaticChangeEvents(false);
-            buttonOrthosphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
+            buttonOrthosphere.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isOrthosphereOn());
             final String[] hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere", true);
             buttonOrthosphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
             buttonOrthosphere.setName("orthosphere");
@@ -249,7 +249,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 return false;
             });
 
-            if (Settings.settings.program.net.isMasterInstance()) {
+            if (GaiaSky.settings().program.net.isMasterInstance()) {
                 final Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
                 buttonMaster = new OwnTextIconButton("", Align.center, iconMaster, skin, "default");
                 buttonMaster.setProgrammaticChangeEvents(false);
@@ -273,10 +273,10 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(componentWidth);
-        fieldOfView.setValue(Settings.settings.scene.camera.fov);
-        fieldOfView.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
+        fieldOfView.setValue(GaiaSky.settings().scene.camera.fov);
+        fieldOfView.setDisabled(GaiaSky.settings().program.modeCubemap.isFixedFov());
         fieldOfView.addListener(event -> {
-            if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
+            if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive() && !GaiaSky.settings().program.modeCubemap.isFixedFov()) {
                 final float value = fieldOfView.getMappedValue();
                 EventManager.publish(Event.FOV_CMD, fieldOfView, value);
                 return true;
@@ -327,7 +327,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        cameraSpeedLimit.setSelectedIndex(Settings.settings.scene.camera.speedLimitIndex);
+        cameraSpeedLimit.setSelectedIndex(GaiaSky.settings().scene.camera.speedLimitIndex);
 
         // CAMERA SPEED
         cameraSpeed = new OwnSliderReset(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED,
@@ -335,7 +335,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(componentWidth);
         cameraSpeed.setDisplayValueMapped(false);
-        cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
+        cameraSpeed.setMappedValue(GaiaSky.settings().scene.camera.speed);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.publish(Event.CAMERA_SPEED_CMD, cameraSpeed, cameraSpeed.getMappedValue());
@@ -350,7 +350,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(componentWidth);
         rotateSpeed.setDisplayValueMapped(false);
-        rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
+        rotateSpeed.setMappedValue(GaiaSky.settings().scene.camera.rotate);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.publish(Event.ROTATION_SPEED_CMD, rotateSpeed, rotateSpeed.getMappedValue());
@@ -365,7 +365,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(componentWidth);
         turnSpeed.setDisplayValueMapped(false);
-        turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);
+        turnSpeed.setMappedValue(GaiaSky.settings().scene.camera.turn);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.publish(Event.TURNING_SPEED_CMD, turnSpeed, turnSpeed.getMappedValue(), true);
@@ -377,7 +377,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // FOCUS_MODE lock
         focusLock = new CheckBox(" " + I18n.msg("gui.camera.lock"), skin);
         focusLock.setName("focus lock");
-        focusLock.setChecked(Settings.settings.scene.camera.focusLock.position);
+        focusLock.setChecked(GaiaSky.settings().scene.camera.focusLock.position);
         focusLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.FOCUS_LOCK_CMD, focusLock, focusLock.isChecked());
@@ -390,8 +390,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // FOCUS_MODE orientation lock
         orientationLock = new CheckBox(" " + I18n.msg("gui.camera.lock.orientation"), skin);
         orientationLock.setName("orientation lock");
-        orientationLock.setChecked(Settings.settings.scene.camera.focusLock.orientation);
-        orientationLock.setVisible(Settings.settings.scene.camera.focusLock.position);
+        orientationLock.setChecked(GaiaSky.settings().scene.camera.focusLock.orientation);
+        orientationLock.setVisible(GaiaSky.settings().scene.camera.focusLock.position);
         orientationLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.ORIENTATION_LOCK_CMD, orientationLock, orientationLock.isChecked());
@@ -401,14 +401,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         HorizontalGroup buttonGroup = null;
-        if (!Settings.settings.runtime.openXr) {
+        if (!GaiaSky.settings().runtime.openXr) {
             buttonGroup = new HorizontalGroup();
             buttonGroup.space(pad4);
             buttonGroup.addActor(button3d);
             buttonGroup.addActor(buttonDome);
             buttonGroup.addActor(buttonCubemap);
             buttonGroup.addActor(buttonOrthosphere);
-            if (Settings.settings.program.net.isMasterInstance())
+            if (GaiaSky.settings().program.net.isMasterInstance())
                 buttonGroup.addActor(buttonMaster);
         }
 
@@ -425,7 +425,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.add(cinematic).top().left().padBottom(pad9).row();
         cameraGroup.add(focusLock).top().left().padBottom(pad9).row();
         cameraGroup.add(orientationLock).top().left().row();
-        if (!Settings.settings.runtime.openXr)
+        if (!GaiaSky.settings().runtime.openXr)
             cameraGroup.add(group(new Label("", skin), buttonGroup, pad3)).top().center();
 
         component = cameraGroup;
@@ -517,14 +517,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
         }
         case STEREOSCOPIC_CMD -> {
-            if (source != button3d && !Settings.settings.runtime.openXr) {
+            if (source != button3d && !GaiaSky.settings().runtime.openXr) {
                 button3d.setProgrammaticChangeEvents(false);
                 button3d.setChecked((boolean) data[0]);
                 button3d.setProgrammaticChangeEvents(true);
             }
         }
         case CUBEMAP_CMD -> {
-            if (!Settings.settings.runtime.openXr) {
+            if (!GaiaSky.settings().runtime.openXr) {
                 final CubemapProjection proj = (CubemapProjection) data[1];
                 final boolean enable = (boolean) data[0];
                 if (proj.isPanorama() && source != buttonCubemap) {

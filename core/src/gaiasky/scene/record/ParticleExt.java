@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.TextUtils;
-import gaiasky.util.math.Vector3D;
 import gaiasky.util.ucd.UCD;
 
 

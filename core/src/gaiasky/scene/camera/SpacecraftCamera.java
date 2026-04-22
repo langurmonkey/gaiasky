@@ -26,10 +26,9 @@ import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.SpacecraftCoordinates;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -124,7 +123,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // Initialize mouse+keyboard input listener.
         spacecraftMouseKbdListener = new SpacecraftMouseKbdListener(this, new GestureAdapter());
         // Initialize gamepad input listener.
-        gamepadListener = new SpacecraftGamepadListener(this, Settings.settings.controls.gamepad.mappingsFile);
+        gamepadListener = new SpacecraftGamepadListener(this, GaiaSky.settings().controls.gamepad.mappingsFile);
 
         // FOCUS_MODE is changed from GUI
         EventManager.instance.subscribe(this, Event.FOV_CMD, Event.SPACECRAFT_LOADED, Event.SPACECRAFT_MACHINE_SELECTION_INFO);
@@ -344,12 +343,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     public void addGamepadListener() {
-        Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
+        GaiaSky.settings().controls.gamepad.addControllerListener(gamepadListener);
         gamepadListener.activate();
     }
 
     public void removeGamepadListener() {
-        Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
+        GaiaSky.settings().controls.gamepad.removeControllerListener(gamepadListener);
         gamepadListener.deactivate();
     }
 

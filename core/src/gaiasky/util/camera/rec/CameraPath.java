@@ -1,9 +1,9 @@
 package gaiasky.util.camera.rec;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.util.DoubleArray;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.camera.rec.KeyframesManager.PathPart;
 import gaiasky.util.camera.rec.KeyframesManager.PathType;
 import gaiasky.util.i18n.I18n;
@@ -135,7 +135,7 @@ public class CameraPath {
         final var v3d2 = new Vector3D();
 
         /* Frame counter */
-        frameRate = Settings.settings.camrecorder.targetFps;
+        frameRate = GaiaSky.settings().camrecorder.targetFps;
 
         PathPart currentPosSpline = posSplines[0];
         int k = 0;
@@ -185,7 +185,7 @@ public class CameraPath {
             splinePosIdx += splinePosStep;
 
             // If k1 is seam and not last, and we're doing splines, jump to next spline
-            if (k1.seam && i < keyframes.size() - 1 && Settings.settings.camrecorder.keyframe.position == PathType.CATMULL_ROM_SPLINE) {
+            if (k1.seam && i < keyframes.size() - 1 && GaiaSky.settings().camrecorder.keyframe.position == PathType.CATMULL_ROM_SPLINE) {
                 currentPosSpline = posSplines[++k];
                 splinePosIdx = 0;
                 splinePosStep = 1d / (currentPosSpline.nPoints - 1);

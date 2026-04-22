@@ -9,6 +9,7 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IRenderable;
@@ -20,7 +21,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.LineView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
@@ -62,7 +62,7 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
 
             view.render(this, camera, getAlpha(render));
 
-            Gdx.gl.glLineWidth(view.getLineWidth() * 1.5f * Settings.settings.scene.renderer.line.width * camera.getFovFactor() + Settings.settings.scene.renderer.line.glWidthBias);
+            Gdx.gl.glLineWidth(view.getLineWidth() * 1.5f * GaiaSky.settings().scene.renderer.line.width * camera.getFovFactor() + GaiaSky.settings().scene.renderer.line.glWidthBias);
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);

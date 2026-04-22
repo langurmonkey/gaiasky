@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.GaiaSkyShaderCompileException;
-import gaiasky.util.ArrayUtils;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;

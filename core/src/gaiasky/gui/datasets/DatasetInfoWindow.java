@@ -9,13 +9,14 @@ package gaiasky.gui.datasets;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.GaiaSky;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnScrollPane;
+import gaiasky.util.scene2d.OwnTextArea;
 
 /**
  * A window that displays information on a particular dataset.
@@ -55,7 +56,7 @@ public class DatasetInfoWindow extends GenericDialog {
         content.add(new OwnLabel(ci.sizeBytes > 0 ? GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "?", skin)).top().left().padRight(pad18).padBottom(pad18).row();
         // Added
         content.add(new OwnLabel(I18n.msg("gui.dataset.loaded"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18);
-        content.add(new OwnLabel(ci.loadDateUTC.atZone(Settings.settings.program.timeZone.getTimeZone()).toString(), skin)).top().left().padRight(pad18).padBottom(pad18).row();
+        content.add(new OwnLabel(ci.loadDateUTC.atZone(GaiaSky.settings().program.timeZone.getTimeZone()).toString(), skin)).top().left().padRight(pad18).padBottom(pad18).row();
         // Description
         final OwnScrollPane scroll = getOwnScrollPane();
         content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18 * 2f);

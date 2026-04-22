@@ -167,7 +167,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources, final boolean welcomeScreen) {
-        super(I18n.msg("gui.settings") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build),
+        super(I18n.msg("gui.settings") + " - " + GaiaSky.settings().version.version + " - " + I18n.msg("gui.build", GaiaSky.settings().version.build),
               skin,
               stage);
 
@@ -233,7 +233,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final float sliderWidth = 600f;
         final float buttonHeight = 40f;
 
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         boolean safeMode = settings.program.safeMode;
         boolean vr = settings.runtime.openXr;
 
@@ -324,7 +324,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     lineRenderer.setSelectedIndex(LineMode.GL_LINES.ordinal());
                     // Lens flare.
                     lensFlare.setValue(0f);
-                    Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
+                    GaiaSky.settings().postprocess.lensFlare.type = LensFlareType.SIMPLE;
                     // No bloom.
                     bloomEffect.setValue(0f);
                     // No unsharp mask.
@@ -362,7 +362,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
                     // Simple lens flare.
                     lensFlare.setValue(1f);
-                    Settings.settings.postprocess.lensFlare.type = LensFlareType.SIMPLE;
+                    GaiaSky.settings().postprocess.lensFlare.type = LensFlareType.SIMPLE;
                     // Vertex displacement elevation representation.
                     elevationSb.setSelectedIndex(ElevationType.REGULAR.ordinal());
                     // 5 shadows, 1024.
@@ -392,7 +392,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
                     // Complex lens flare.
                     lensFlare.setValue(1f);
-                    Settings.settings.postprocess.lensFlare.type = LensFlareType.COMPLEX;
+                    GaiaSky.settings().postprocess.lensFlare.type = LensFlareType.COMPLEX;
                     // Tessellation elevation representation.
                     elevationSb.setSelectedIndex(ElevationType.TESSELLATION.ordinal());
                     // 6 shadows, 2048.
@@ -556,8 +556,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // Resolution info
             var resolutionLabel = new OwnLabel(I18n.msg("gui.extview.resolution"), skin);
 
-            float w = (float) (Gdx.graphics.getWidth() * Settings.settings.graphics.backBufferScale);
-            float h = (float) (Gdx.graphics.getHeight() * Settings.settings.graphics.backBufferScale);
+            float w = (float) (Gdx.graphics.getWidth() * GaiaSky.settings().graphics.backBufferScale);
+            float h = (float) (Gdx.graphics.getHeight() * GaiaSky.settings().graphics.backBufferScale);
             var resInfo = TextUtils.breakCharacters(I18n.msg("gui.extview.resolution.info",
                                                              Integer.toString(MathUtils.round(w)),
                                                              Integer.toString(MathUtils.round(h))), 45);
@@ -775,7 +775,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             elevationSb = new OwnSelectBox<>(skin);
             elevationSb.setItems(ecbb);
             elevationSb.setWidth(selectWidth);
-            elevationSb.setSelectedIndex(Settings.settings.scene.renderer.elevation.type.ordinal());
+            elevationSb.setSelectedIndex(GaiaSky.settings().scene.renderer.elevation.type.ordinal());
             elevationSb.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     enableComponents(elevationSb.getSelected().type.isTessellation(), tessQuality, tessQualityLabel);
@@ -1321,7 +1321,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // Save textures to disk
             OwnLabel saveTexturesLabel = new OwnLabel(I18n.msg("gui.procedural.savetextures"), skin);
             saveTextures = new OwnCheckBox("", skin, pad10);
-            saveTextures.setChecked(Settings.settings.program.saveProceduralTextures);
+            saveTextures.setChecked(GaiaSky.settings().program.saveProceduralTextures);
             OwnImageButton saveTexturesTooltip = new OwnImageButton(skin, "tooltip");
             saveTexturesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.savetextures",
                                                                         SysUtils.getProceduralPixmapDir().toString()), skin));
@@ -1392,7 +1392,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
-        accentColor = new ColorPicker(Settings.settings.program.ui.accentColor, stage, skin);
+        accentColor = new ColorPicker(GaiaSky.settings().program.ui.accentColor, stage, skin);
         accentColor.setNewColorRunnable(() -> {
             EventManager.publish(Event.UI_ACCENT_COLOR_CMD, accentColor, (Object) accentColor.getPickedColorArray());
         });
@@ -2312,13 +2312,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Anaglyph custom colors
         var customColorsLabel = new OwnLabel(I18n.msg("gui.stereo.anaglyph.custom"), skin);
         // Left
-        anaglyphCustomLeft = new ColorPicker(Settings.settings.program.modeStereo.customColorLeft, stage, skin);
+        anaglyphCustomLeft = new ColorPicker(GaiaSky.settings().program.modeStereo.customColorLeft, stage, skin);
         anaglyphCustomLeft.setNewColorRunnable(() -> {
             EventManager.publish(Event.STEREO_ANAGLYPH_CUSTOM_COLOR_LEFT_CMD, anaglyphCustomLeft, anaglyphCustomLeft.getPickedColor());
         });
 
         // Right
-        anaglyphCustomRight = new ColorPicker(Settings.settings.program.modeStereo.customColorRight, stage, skin);
+        anaglyphCustomRight = new ColorPicker(GaiaSky.settings().program.modeStereo.customColorRight, stage, skin);
         anaglyphCustomRight.setNewColorRunnable(() -> {
             EventManager.publish(Event.STEREO_ANAGLYPH_CUSTOM_COLOR_RIGHT_CMD, anaglyphCustomRight, anaglyphCustomRight.getPickedColor());
         });
@@ -2577,7 +2577,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(settings.data.location) + "/gaiasky-data.json");
                     DownloadHelper.downloadFile(settings.program.url.getCurrentDataDescriptor(),
                                                 dataDescriptor,
-                                                Settings.settings.program.offlineMode,
+                                                GaiaSky.settings().program.offlineMode,
                                                 null,
                                                 null,
                                                 (digest) -> {
@@ -2785,11 +2785,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private void initStarTextures(IntArray indices) {
         if (starTextures == null) {
             starTextures = new Array<>(indices.size);
-            var ss = Settings.settings.scene.star;
+            var ss = GaiaSky.settings().scene.star;
 
             for (int i = 0; i < indices.size; i++) {
                 var path = ss.getStarTexture(indices.get(i));
-                var tex = new Texture(Settings.settings.data.dataFileHandle(path), true);
+                var tex = new Texture(GaiaSky.settings().data.dataFileHandle(path), true);
                 tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
                 starTextures.add(tex);
             }
@@ -2797,7 +2797,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private Pair<WidgetGroup, OwnSelectBox> getTextureWidget(int selectedIndex) {
-        var indexList = Settings.settings.scene.star.getStarTextureIndices();
+        var indexList = GaiaSky.settings().scene.star.getStarTextureIndices();
         initStarTextures(indexList);
 
         Array<ComboBoxBean<Integer>> indices = new Array<>(indexList.size);
@@ -2868,7 +2868,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     @Override
     public void touch() {
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         // Effects
         setSlider(bloomEffect, settings.postprocess.bloom.intensity);
         setSlider(unsharpMask, settings.postprocess.unsharpMask.factor);
@@ -2896,7 +2896,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private void updateBackupValues() {
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         aberrationBak = settings.postprocess.chromaticAberration.amount;
@@ -2932,7 +2932,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (Path path : mappingFiles) {
             FileComboBoxBean fileBean = new MappingFileComboBoxBean(path);
             gamepadMappingsFile.add(fileBean);
-            if (selectedFile == null && Settings.settings.controls.gamepad.mappingsFile.endsWith(path.getFileName().toString())) {
+            if (selectedFile == null && GaiaSky.settings().controls.gamepad.mappingsFile.endsWith(path.getFileName().toString())) {
                 selected = fileBean;
             } else if (selectedFile != null && selectedFile.toAbsolutePath().toString().endsWith(path.getFileName().toString())) {
                 selected = fileBean;
@@ -2951,7 +2951,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (Controller c : controllers) {
             OwnLabel cl = new OwnLabel(c.getName(), skin, "default-blue");
             cl.setName(c.getName());
-            if (Settings.settings.controls.gamepad.isControllerBlacklisted(c.getName())) {
+            if (GaiaSky.settings().controls.gamepad.isControllerBlacklisted(c.getName())) {
                 cl.setText(cl.getText() + " [*]");
                 cl.setColor(1, 0, 0, 1);
                 cl.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.controller.blacklist"), skin));
@@ -2969,7 +2969,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (OwnLabel cn : controllerNames) {
             String controllerName = cn.getName();
             table.add(cn).left().padBottom(i == controllerNames.size - 1 ? 0f : pad18).padRight(pad34);
-            if (controllerName != null && !Settings.settings.controls.gamepad.isControllerBlacklisted(controllerName)) {
+            if (controllerName != null && !GaiaSky.settings().controls.gamepad.isControllerBlacklisted(controllerName)) {
                 OwnTextButton config = new OwnTextButton(I18n.msg("gui.controller.configure"), skin);
                 config.pad(pad10, pad18, pad10, pad18);
                 config.addListener(event -> {
@@ -3052,7 +3052,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private void saveCurrentPreferences() {
         // Add all properties to settings.instance
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
 
         final boolean reloadFullScreenMode = fullScreen.isChecked() != settings.graphics.fullScreen.active;
         final var selected = fullScreenResolutions.getSelected();
@@ -3108,7 +3108,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, 0.0);
         }
 
-        restartDialog = restartDialog || Settings.settings.data.realGaiaAttitude != real.isChecked();
+        restartDialog = restartDialog || GaiaSky.settings().data.realGaiaAttitude != real.isChecked();
 
         // Line renderer
         boolean reloadLineRenderer = settings.scene.renderer.line.mode != LineMode.values()[lineRenderer.getSelected().value];
@@ -3397,8 +3397,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.program.exitConfirmation = exitConfirmation.isChecked();
 
         // Save configuration
-        SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
-        EventManager.publish(Event.PROPERTIES_WRITTEN, this);
+        var settingsManager = new SettingsManager();
+        settingsManager.persist(settings);
 
         if (reloadScreenMode) {
             GaiaSky.postRunnable(() -> EventManager.publish(Event.SCREEN_MODE_CMD, this));
@@ -3489,7 +3489,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                   OwnTextField heightField,
                                   SelectBox<DisplayMode> fullScreenResolutions,
                                   OwnLabel xLabel) {
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         if (fullscreen) {
             settings.graphics.resolution[0] = fullScreenResolutions.getSelected().width;
             settings.graphics.resolution[1] = fullScreenResolutions.getSelected().height;

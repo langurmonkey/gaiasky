@@ -7,10 +7,10 @@
 
 package gaiasky.data.group;
 
+import gaiasky.GaiaSky;
 import gaiasky.data.api.BinaryIO;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 
 import java.io.*;
@@ -127,7 +127,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadDataMapped(String file, double factor) {
-        try (var raf = new RandomAccessFile(Settings.settings.data.dataFile(file), "r")) {
+        try (var raf = new RandomAccessFile(GaiaSky.settings().data.dataFile(file), "r")) {
             FileChannel fc = raf.getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
@@ -169,7 +169,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
      * @return The list of particle records.
      */
     public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
-        try (var raf = new RandomAccessFile(Settings.settings.data.dataFile(file), "r")) {
+        try (var raf = new RandomAccessFile(GaiaSky.settings().data.dataFile(file), "r")) {
             FileChannel fc = raf.getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());

@@ -35,7 +35,6 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class SAMPClient implements IObserver {
         meta.put("author.email", Settings.AUTHOR_EMAIL);
         meta.put("author.affiliation", Settings.AUTHOR_AFFILIATION_PLAIN);
         meta.put("home.page", Settings.HOMEPAGE);
-        meta.put("gaiasky.version", Settings.settings.version.version);
+        meta.put("gaiasky.version", GaiaSky.settings().version.version);
 
         conn.declareMetadata(meta);
 

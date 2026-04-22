@@ -27,7 +27,6 @@ import gaiasky.scene.record.NamedComponent;
 import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -45,7 +44,7 @@ public class SVTManager implements IObserver {
      * the size needs to be a multiple of the tile size, and tile sizes are powers of two,
      * capping at 1024. Hence, the cache size needs to be a multiple of 1024.
      **/
-    private static final int CACHE_BUFFER_SIZE = 1024 * Settings.settings.scene.renderer.virtualTextures.cacheSize;
+    private static final int CACHE_BUFFER_SIZE = 1024 * GaiaSky.settings().scene.renderer.virtualTextures.cacheSize;
 
     // Tile state tokens.
     private static final int STATE_NOT_LOADED = 0;
@@ -255,7 +254,7 @@ public class SVTManager implements IObserver {
         int removedTiles = 0;
         SVTQuadtreeNode<Path> tile;
         SVTQuadtreeNode<Path> finalTile = null;
-        while ((tile = queuedTiles.poll()) != null && addedTiles < Settings.settings.scene.renderer.virtualTextures.maxTilesPerFrame) {
+        while ((tile = queuedTiles.poll()) != null && addedTiles < GaiaSky.settings().scene.renderer.virtualTextures.maxTilesPerFrame) {
             finalTile = tile;
             if (tile.state == STATE_QUEUED) {
                 if (!tileLocation.containsKey(tile)) {

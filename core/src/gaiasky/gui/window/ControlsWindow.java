@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -29,7 +30,6 @@ import gaiasky.gui.main.KeyBindings;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.util.CatalogManager;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.*;
@@ -186,7 +186,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         buttonMinimap = new OwnTextIconButton("", skin, "menu-map");
         buttonMinimap.setSize(bw, bh);
         buttonMinimap.setName("map");
-        buttonMinimap.setChecked(Settings.settings.program.minimap.active);
+        buttonMinimap.setChecked(GaiaSky.settings().program.minimap.active);
         String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
         buttonMinimap.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
         buttonMinimap.addListener(event -> {

@@ -21,7 +21,6 @@ import gaiasky.GaiaSky;
 import gaiasky.gui.api.IMinimapScale;
 import gaiasky.gui.main.KeyBindings;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
@@ -39,9 +38,9 @@ public class MinimapWidget implements Disposable {
     private IMinimapScale current;
 
     public MinimapWidget(final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
-        side = (int) (1.4f * Settings.settings.program.minimap.size);
+        side = (int) (1.4f * GaiaSky.settings().program.minimap.size);
         side2 = side / 2;
-        sideShort = (int) (0.7f * Settings.settings.program.minimap.size);
+        sideShort = (int) (0.7f * GaiaSky.settings().program.minimap.size);
         sideShort2 = sideShort / 2;
 
         OrthographicCamera orthographic = new OrthographicCamera();

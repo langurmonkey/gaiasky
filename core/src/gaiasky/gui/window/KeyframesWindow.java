@@ -33,7 +33,6 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.KeyframesView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.TextUtils;
 import gaiasky.util.camera.rec.Keyframe;
@@ -42,8 +41,8 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.InterpolationDouble;
 import gaiasky.util.math.QuaternionDouble;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
@@ -375,8 +374,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
-                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
+                fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));
                 fc.setAcceptedFiles("*.gkf");
                 fc.setResultListener((success, result) -> {
@@ -846,7 +845,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private void checkKeyframeTimings() {
         if (!manager.checkKeyframeTimings() && notice != null) {
-            Label warn = new OwnLabel(I18n.msg("gui.keyframes.timings", Settings.settings.camrecorder.targetFps), skin);
+            Label warn = new OwnLabel(I18n.msg("gui.keyframes.timings", GaiaSky.settings().camrecorder.targetFps), skin);
             warn.setColor(1f, .4f, .4f, 1f);
             notice.setActor(warn);
         } else if (notice != null) {
@@ -905,7 +904,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             secondsCells.put(kf, secondsCell);
         }
         secondsCell.setActor(secondsL).left().padRight(pad18 / 2f).padBottom(pad10);
-        secondsL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seconds", kf.seconds, Settings.settings.camrecorder.targetFps), skin));
+        secondsL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seconds", kf.seconds, GaiaSky.settings().camrecorder.targetFps), skin));
         // Can't modify time of first keyframe; it's always zero
         if (index > 0)
             secondsL.addListener((event) -> {
@@ -1087,7 +1086,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
         framesL.setWidth(75f);
-        framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / Settings.settings.camrecorder.targetFps)), skin));
+        framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / GaiaSky.settings().camrecorder.targetFps)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad18).padBottom(pad10);
 
@@ -1384,7 +1383,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
         if (focus != null && Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith(
                 I18n.msg("gui.keyframes.name.default", 0).substring(0, 6))) {
-            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, Settings.settings.scene.homeObject);
+            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, GaiaSky.settings().scene.homeObject);
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
         }
 

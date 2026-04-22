@@ -12,9 +12,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.util.Settings;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 /**
  * Contains the parameters for star sets. These are groups of stars that are rendered together.
@@ -48,7 +47,7 @@ public class StarSet extends ParticleSet {
         this.focusDistToCamera = aux.len();
         this.focusSize = getFocusSize();
         this.focusSolidAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
-        this.focusSolidAngleApparent = this.focusSolidAngle * Settings.settings.scene.star.brightness;
+        this.focusSolidAngleApparent = this.focusSolidAngle * GaiaSky.settings().scene.star.brightness;
     }
 
     /**
@@ -92,7 +91,7 @@ public class StarSet extends ParticleSet {
             Vector3D aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
             double va = (float) ((candidate.radius() / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
-            return va * Settings.settings.scene.star.brightness;
+            return va * GaiaSky.settings().scene.star.brightness;
         } else {
             return -1;
         }

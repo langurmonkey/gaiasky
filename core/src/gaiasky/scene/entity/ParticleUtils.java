@@ -19,7 +19,10 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.ModelComponent;
-import gaiasky.util.*;
+import gaiasky.util.Bits;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.ModelCache;
+import gaiasky.util.Pair;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.model.IntModel;
@@ -96,7 +99,7 @@ public class ParticleUtils {
      * @return The color, saturated if necessary.
      */
     public float saturateColor(int index, ParticleSet set, Highlight highlight) {
-        var saturate = Settings.settings.scene.star.saturate;
+        var saturate = GaiaSky.settings().scene.star.saturate;
         var colorPacked = getColor(index, set, highlight);
         if (!highlight.highlighted && saturate != 0) {
             // Saturate colors a bit.
@@ -175,7 +178,7 @@ public class ParticleUtils {
         model.model.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
         model.model.instance = new IntModelInstance(intModel, modelTransform);
         // Relativistic effects
-        if (Settings.settings.runtime.relativisticAberration)
+        if (GaiaSky.settings().runtime.relativisticAberration)
             model.model.rec.setUpRelativisticEffectsMaterial(model.model.instance.materials);
         model.model.setModelInitialized(true);
     }

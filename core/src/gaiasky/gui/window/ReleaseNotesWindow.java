@@ -9,9 +9,9 @@ package gaiasky.gui.window;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
@@ -47,7 +47,7 @@ public class ReleaseNotesWindow extends GenericDialog {
         try {
             String releaseNotes = Files.readString(releaseNotesFile).trim();
 
-            OwnLabel title = new OwnLabel(Settings.getApplicationTitle(false) + "   " + Settings.settings.version.version, skin, "header");
+            OwnLabel title = new OwnLabel(GaiaSky.settings().getApplicationTitle(false) + "   " + GaiaSky.settings().version.version, skin, "header");
             content.add(title).left().pad(pad18).padBottom(pad34).row();
 
             OwnTextArea releaseNotesText = new OwnTextArea(releaseNotes, skin, "disabled-nobg");
@@ -83,7 +83,7 @@ public class ReleaseNotesWindow extends GenericDialog {
         try {
             if (Files.exists(releaseNotesRev))
                 Files.delete(releaseNotesRev);
-            Files.writeString(releaseNotesRev, Integer.toString(Settings.settings.version.versionNumber));
+            Files.writeString(releaseNotesRev, Integer.toString(GaiaSky.settings().version.versionNumber));
         } catch (IOException e) {
             logger.error(e);
         }

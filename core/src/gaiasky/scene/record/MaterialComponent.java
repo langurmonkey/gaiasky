@@ -63,7 +63,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
     private void initializeLookUpTables() {
         if (lookUpTextures.isEmpty()) {
-            var dataPath = Settings.settings.data.dataPath("default-data/tex/lut");
+            var dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
             var sep = File.separatorChar;
             try (var paths = Files.list(dataPath)) {
                 List<Path> l = paths.filter(
@@ -665,7 +665,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
         material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
         material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor,
-                                        (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
+                                        (float) GaiaSky.settings().scene.renderer.virtualTextures.detectionBufferFactor));
         // Only update depth and resolution if it does not exist, or if it exists and its value is less than ours.
         if (!material.has(FloatAttribute.SvtDepth) || ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.SvtDepth))).value < svt.tree.depth) {
             // Depth.
@@ -685,9 +685,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             heightSize.set(heightTex.getWidth(), heightTex.getHeight());
             material.set(new TextureAttribute(TextureAttribute.Height, heightTex));
             material.set(new FloatAttribute(FloatAttribute.HeightScale, heightScale));
-            material.set(new FloatAttribute(FloatAttribute.ElevationMultiplier, (float) Settings.settings.scene.renderer.elevation.multiplier));
+            material.set(new FloatAttribute(FloatAttribute.ElevationMultiplier, (float) GaiaSky.settings().scene.renderer.elevation.multiplier));
             material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
-            material.set(new FloatAttribute(FloatAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
+            material.set(new FloatAttribute(FloatAttribute.TessQuality, (float) GaiaSky.settings().scene.renderer.elevation.quality));
         }
     }
 
@@ -744,8 +744,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             heightGenerated.set(true);
             GaiaSky.postRunnable(() -> {
                 // 1ST FRAME - CREATE NOISE.
-                final int N = Settings.settings.graphics.proceduralGenerationResolution[0];
-                final int M = Settings.settings.graphics.proceduralGenerationResolution[1];
+                final int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
+                final int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
                 logger.info(I18n.msg("gui.procedural.info.generate",
                                      I18n.msg("gui.procedural.surface"),
                                      Integer.toString(N),
@@ -773,7 +773,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                                                                    biomeLUT,
                                                                    biomeHueShift,
                                                                    biomeSaturation,
-                                                                   Settings.settings.scene.renderer.elevation.type.isNone());
+                                                                   GaiaSky.settings().scene.renderer.elevation.type.isNone());
 
                         GaiaSky.postRunnable(() -> {
                             // 4TH FRAME - ADD TEXTURES TO MATERIAL.
@@ -796,7 +796,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                             // BIOME: HEIGHT and MOISTURE.
                             if (heightT != null) {
                                 // Create texture, populate material
-                                if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                                if (!GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
                                     heightData = new HeightDataPixmap(heightT, null);
                                     heightTex = heightT;
                                     addHeightTex(heightTex);
@@ -837,7 +837,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                             }
 
                             // Save textures to disk as image files.
-                            if (Settings.settings.program.saveProceduralTextures) {
+                            if (GaiaSky.settings().program.saveProceduralTextures) {
                                 SysUtils.saveProceduralGLTextures(new Texture[]{
                                                                           heightT,
                                                                           diffuseT,
@@ -914,11 +914,11 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setDiffuse(String diffuse) {
-        this.diffuse = Settings.settings.data.dataFile(diffuse);
+        this.diffuse = GaiaSky.settings().data.dataFile(diffuse);
     }
 
     public void setSpecular(String specular) {
-        this.specular = Settings.settings.data.dataFile(specular);
+        this.specular = GaiaSky.settings().data.dataFile(specular);
     }
 
     public void setSpecularValue(Double specular) {
@@ -944,7 +944,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setNormal(String normal) {
-        this.normal = Settings.settings.data.dataFile(normal);
+        this.normal = GaiaSky.settings().data.dataFile(normal);
     }
 
     /**
@@ -956,7 +956,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setEmissive(String emissive) {
-        this.emissive = Settings.settings.data.dataFile(emissive);
+        this.emissive = GaiaSky.settings().data.dataFile(emissive);
     }
 
     public void setEmissive(Double emissive) {
@@ -992,7 +992,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setRingDiffuse(String ringDiffuse) {
-        this.ring = Settings.settings.data.dataFile(ringDiffuse);
+        this.ring = GaiaSky.settings().data.dataFile(ringDiffuse);
     }
 
     public void setRingnormal(String ringNormal) {
@@ -1000,7 +1000,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setRingNormal(String ringNormal) {
-        this.ringnormal = Settings.settings.data.dataFile(ringNormal);
+        this.ringnormal = GaiaSky.settings().data.dataFile(ringNormal);
     }
 
     public void setRingDiffuseScattering(Double ringDiffuseScattering) {
@@ -1018,7 +1018,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setHeight(String height) {
-        this.height = Settings.settings.data.dataFile(height);
+        this.height = GaiaSky.settings().data.dataFile(height);
     }
 
     public void setHeightScaleKm(Double heightScale) {
@@ -1083,7 +1083,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setMetallic(String metallic) {
-        this.metallic = Settings.settings.data.dataFile(metallic);
+        this.metallic = GaiaSky.settings().data.dataFile(metallic);
     }
 
     public void setReflection(double[] metallic) {
@@ -1096,7 +1096,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setRoughness(String roughness) {
-        this.roughness = Settings.settings.data.dataFile(roughness);
+        this.roughness = GaiaSky.settings().data.dataFile(roughness);
     }
 
     public void setRoughness(Double roughness) {
@@ -1104,35 +1104,35 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setAo(String ao) {
-        this.ao = Settings.settings.data.dataFile(ao);
+        this.ao = GaiaSky.settings().data.dataFile(ao);
     }
 
     public void setOcclusionMetallicRoughness(String texture) {
-        this.occlusionMetallicRoughness = Settings.settings.data.dataFile(texture);
+        this.occlusionMetallicRoughness = GaiaSky.settings().data.dataFile(texture);
     }
 
     public void setTexture0(String texture0) {
-        this.texture0 = Settings.settings.data.dataFile(texture0);
+        this.texture0 = GaiaSky.settings().data.dataFile(texture0);
     }
 
     public void setTexture1(String texture1) {
-        this.texture1 = Settings.settings.data.dataFile(texture1);
+        this.texture1 = GaiaSky.settings().data.dataFile(texture1);
     }
 
     public void setVolume0(String tex) {
-        this.volume0 = Settings.settings.data.dataFile(tex);
+        this.volume0 = GaiaSky.settings().data.dataFile(tex);
     }
 
     public void setVolume1(String tex) {
-        this.volume1 = Settings.settings.data.dataFile(tex);
+        this.volume1 = GaiaSky.settings().data.dataFile(tex);
     }
 
     public void setVolume2(String tex) {
-        this.volume2 = Settings.settings.data.dataFile(tex);
+        this.volume2 = GaiaSky.settings().data.dataFile(tex);
     }
 
     public void setVolume3(String tex) {
-        this.volume3 = Settings.settings.data.dataFile(tex);
+        this.volume3 = GaiaSky.settings().data.dataFile(tex);
     }
 
     public void setDiffuseCubemap(String cubemap) {
@@ -1382,7 +1382,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                                 } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
                                     if (!height.endsWith(Constants.GEN_KEYWORD)) {
                                         Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
-                                        if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                                        if (!GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
                                             initializeElevationData(tex);
                                         }
                                     } else {

@@ -11,13 +11,17 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectMap;
+import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.*;
 import gaiasky.scene.system.render.draw.VariableSetInstancedRenderer;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Pair;
+import gaiasky.util.TextUtils;
 import gaiasky.util.color.BVToTeffBallesteros;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
@@ -95,7 +99,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                           double factor) {
         logger.info(I18n.msg("notif.datafile", file));
         try {
-            loadData(new FileDataSource(Settings.settings.data.dataFile(file)), factor);
+            loadData(new FileDataSource(GaiaSky.settings().data.dataFile(file)), factor);
         } catch (Exception e1) {
             try {
                 logger.info("File " + file + " not found in data folder, trying relative path");

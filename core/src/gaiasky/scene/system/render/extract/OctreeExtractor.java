@@ -9,14 +9,13 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
-import gaiasky.scene.component.Label;
 import gaiasky.scene.component.Octree;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.util.Settings;
 import gaiasky.util.tree.OctreeNode;
 
 import static gaiasky.render.RenderGroup.LINE;
@@ -66,7 +65,7 @@ public class OctreeExtractor extends AbstractExtractSystem {
     }
 
     public void addToRenderLists(Base base, OctreeNode octant, ICamera camera) {
-        if (Settings.settings.runtime.drawOctree && mustRender(base)) {
+        if (GaiaSky.settings().runtime.drawOctree && mustRender(base)) {
             boolean added = addToRender(octant, LINE);
 
             if (added) {

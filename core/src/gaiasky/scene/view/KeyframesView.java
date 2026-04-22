@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -22,12 +23,11 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.entity.KeyframeUtils;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.util.List;
@@ -122,7 +122,7 @@ public class KeyframesView extends BaseView {
             }
 
             // Set points to path
-            double[] pathSamples = KeyframesManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
+            double[] pathSamples = KeyframesManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, GaiaSky.settings().camrecorder.keyframe.position);
             synchronized (verts) {
                 verts.setEntity(kf.path);
                 verts.setPoints(pathSamples);
@@ -192,7 +192,7 @@ public class KeyframesView extends BaseView {
             }
             kfPositionsSep.add(current);
 
-            double[] pathSamples = KeyframesManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
+            double[] pathSamples = KeyframesManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, GaiaSky.settings().camrecorder.keyframe.position);
             synchronized (verts) {
                 verts.setEntity(kf.path);
                 verts.setPoints(pathSamples);
@@ -307,7 +307,7 @@ public class KeyframesView extends BaseView {
                 double angle = 0.0001;
 
                 PerspectiveCamera perspectiveCamera;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
                         perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
@@ -322,7 +322,7 @@ public class KeyframesView extends BaseView {
                 double pixelSize = FastMath.max(minPixDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                 perspectiveCamera.project(pos);
                 pos.y = perspectiveCamera.viewportHeight - pos.y;
-                if (Settings.settings.program.modeStereo.active) {
+                if (GaiaSky.settings().program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance

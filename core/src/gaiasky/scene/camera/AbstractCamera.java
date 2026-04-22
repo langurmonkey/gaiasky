@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
@@ -19,11 +20,10 @@ import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.camera.Proximity.NearbyRecord;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 /**
@@ -110,11 +110,11 @@ public abstract class AbstractCamera implements ICamera {
         tmp = new Vector3D();
         prevCombined = new Matrix4();
 
-        camLeft = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
+        camLeft = new PerspectiveCamera(GaiaSky.settings().scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
         camLeft.near = (float) CAM_NEAR;
         camLeft.far = (float) CAM_FAR;
 
-        camRight = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
+        camRight = new PerspectiveCamera(GaiaSky.settings().scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
         camRight.near = (float) CAM_NEAR;
         camRight.far = (float) CAM_FAR;
 

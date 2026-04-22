@@ -8,17 +8,15 @@
 package gaiasky.gui.window;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -60,7 +58,7 @@ public class IndexNameConflictsWindow extends GenericDialog {
             doNotAsk.setChecked(false);
             doNotAsk.addListener(event -> {
                 if (event instanceof ChangeListener.ChangeEvent) {
-                    Settings.settings.program.showNameConflicts = !doNotAsk.isChecked();
+                    GaiaSky.settings().program.showNameConflicts = !doNotAsk.isChecked();
                 }
                 return false;
             });

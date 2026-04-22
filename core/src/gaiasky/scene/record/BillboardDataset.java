@@ -8,11 +8,15 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.util.*;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.LocalizedEnum;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Pair;
 import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -210,7 +214,7 @@ public class BillboardDataset {
     }
 
     private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<IParticleRecord> curr) {
-        String upk = GlobalResources.unpackAssetPath(Settings.settings.data.dataFile(src));
+        String upk = GlobalResources.unpackAssetPath(GaiaSky.settings().data.dataFile(src));
         if (srcUpk == null || !srcUpk.equals(upk)) {
             return new Pair<>(prov.loadData(upk), upk);
         } else {

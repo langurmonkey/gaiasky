@@ -11,6 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import gaiasky.GaiaSky;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
@@ -77,7 +78,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
                     && !this.checkStr.startsWith(Constants.DATA_LOCATION_TOKEN)) {
                 this.checkStr = Constants.DATA_LOCATION_TOKEN + this.checkStr;
             }
-            this.checkPath = Settings.settings.data.dataPath(checkStr);
+            this.checkPath = GaiaSky.settings().data.dataPath(checkStr);
             this.exists = Files.exists(checkPath) && Files.isReadable(checkPath);
             this.serverVersion = source.getInt("version", 0);
             if (this.exists) {
@@ -88,7 +89,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
             }
         } else if (localCatalogFile != null) {
             this.checkPath = localCatalogFile.file().toPath();
-            Path dataLocation = Path.of(Settings.settings.data.location);
+            Path dataLocation = Path.of(GaiaSky.settings().data.location);
             String relative = dataLocation.toUri().relativize(this.checkPath.toUri()).getPath();
             this.checkStr = Constants.DATA_LOCATION_TOKEN + relative;
             this.exists = localCatalogFile.exists();
@@ -202,7 +203,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
             try {
                 this.files = dataFiles.asStringArray();
                 for (int i = 0; i < this.files.length; i++) {
-                    this.files[i] = Settings.settings.data.dataFile(this.files[i]);
+                    this.files[i] = GaiaSky.settings().data.dataFile(this.files[i]);
                 }
             } catch (Exception ignored) {
             }

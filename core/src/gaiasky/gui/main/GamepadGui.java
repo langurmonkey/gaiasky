@@ -45,8 +45,11 @@ import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.GuiUtils;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
+import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;
@@ -147,7 +150,7 @@ public class GamepadGui extends AbstractGui {
         vp.setUnitsPerPixel(unitsPerPixel);
         stage = new Stage(vp, sb);
 
-        gamepadListener = new GamepadGuiListener(this, Settings.settings.controls.gamepad.mappingsFile);
+        gamepadListener = new GamepadGuiListener(this, GaiaSky.settings().controls.gamepad.mappingsFile);
 
         // Comment to hide this whole dialog and functionality
         registerEvents();
@@ -212,7 +215,7 @@ public class GamepadGui extends AbstractGui {
 
             // BOTTOM LINE (go home)
             buttonGoHome = new OwnTextIconButton("", skin, "home");
-            buttonGoHome.addListener(new OwnTextTooltip(I18n.msg("context.goto", Settings.settings.scene.homeObject), skin, 10));
+            buttonGoHome.addListener(new OwnTextTooltip(I18n.msg("context.goto", GaiaSky.settings().scene.homeObject), skin, 10));
             buttonGoHome.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.GO_HOME_INSTANT_CMD, buttonGoHome);
@@ -231,8 +234,8 @@ public class GamepadGui extends AbstractGui {
             vrInfoT.setSize(tw1, th);
 
             // Title
-            OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title-s");
-            OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "header-raw");
+            OwnLabel welcomeTitle = new OwnLabel(GaiaSky.settings().getApplicationTitle(GaiaSky.settings().runtime.openXr), skin, "main-title-s");
+            OwnLabel version = new OwnLabel(GaiaSky.settings().version.version, skin, "header-raw");
             vrInfoT.add(welcomeTitle).center().top().padBottom(pad20).colspan(2).row();
             vrInfoT.add(version).center().top().padBottom(pad40).colspan(2).row();
 
@@ -433,7 +436,7 @@ public class GamepadGui extends AbstractGui {
             final Label cinematicLabel = new Label(I18n.msg("gui.camera.cinematic"), skin, "header-raw");
             cinematic = new OwnCheckBox("", skin, 0f);
             cameraModel[0][1] = cinematic;
-            cinematic.setChecked(Settings.settings.scene.camera.cinematic);
+            cinematic.setChecked(GaiaSky.settings().scene.camera.cinematic);
             cinematic.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.CAMERA_CINEMATIC_CMD, cinematic, cinematic.isChecked());
@@ -451,8 +454,8 @@ public class GamepadGui extends AbstractGui {
             fovSlider.setValueSuffix("°");
             fovSlider.setName("field of view");
             fovSlider.setWidth(ww);
-            fovSlider.setValue(Settings.settings.scene.camera.fov);
-            fovSlider.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
+            fovSlider.setValue(GaiaSky.settings().scene.camera.fov);
+            fovSlider.setDisabled(GaiaSky.settings().program.modeCubemap.isFixedFov());
             fovSlider.connect(Event.FOV_CMD);
             camT.add(fovLabel).right().padBottom(pad20).padRight(pad20);
             camT.add(fovSlider).left().padBottom(pad20).row();
@@ -483,7 +486,7 @@ public class GamepadGui extends AbstractGui {
         cameraModel[0][3] = camSpeedSlider;
         camSpeedSlider.setName("camera speed");
         camSpeedSlider.setWidth(ww);
-        camSpeedSlider.setMappedValue(Settings.settings.scene.camera.speed);
+        camSpeedSlider.setMappedValue(GaiaSky.settings().scene.camera.speed);
         camSpeedSlider.connect(Event.CAMERA_SPEED_CMD);
         camT.add(speedLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camSpeedSlider).left().padBottom(pad20).row();
@@ -501,7 +504,7 @@ public class GamepadGui extends AbstractGui {
         cameraModel[0][4] = camRotSlider;
         camRotSlider.setName("rotate speed");
         camRotSlider.setWidth(ww);
-        camRotSlider.setMappedValue(Settings.settings.scene.camera.rotate);
+        camRotSlider.setMappedValue(GaiaSky.settings().scene.camera.rotate);
         camRotSlider.connect(Event.ROTATION_SPEED_CMD);
         camT.add(rotationLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camRotSlider).left().padBottom(pad20).row();
@@ -519,7 +522,7 @@ public class GamepadGui extends AbstractGui {
         cameraModel[0][5] = camTurnSlider;
         camTurnSlider.setName("turn speed");
         camTurnSlider.setWidth(ww);
-        camTurnSlider.setMappedValue(Settings.settings.scene.camera.turn);
+        camTurnSlider.setMappedValue(GaiaSky.settings().scene.camera.turn);
         camTurnSlider.connect(Event.TURNING_SPEED_CMD);
         camT.add(turnLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camTurnSlider).left().padBottom(pad20).row();
@@ -529,7 +532,7 @@ public class GamepadGui extends AbstractGui {
         crosshairFocus = new OwnCheckBox("", skin);
         cameraModel[0][6] = crosshairFocus;
         crosshairFocus.setName("ch focus");
-        crosshairFocus.setChecked(Settings.settings.scene.crosshair.focus);
+        crosshairFocus.setChecked(GaiaSky.settings().scene.crosshair.focus);
         crosshairFocus.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CROSSHAIR_FOCUS_CMD, this, crosshairFocus.isChecked());
@@ -544,7 +547,7 @@ public class GamepadGui extends AbstractGui {
         crosshairClosest = new OwnCheckBox("", skin);
         cameraModel[0][7] = crosshairClosest;
         crosshairClosest.setName("ch closest");
-        crosshairClosest.setChecked(Settings.settings.scene.crosshair.closest);
+        crosshairClosest.setChecked(GaiaSky.settings().scene.crosshair.closest);
         crosshairClosest.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CROSSHAIR_CLOSEST_CMD, this, crosshairClosest.isChecked());
@@ -559,7 +562,7 @@ public class GamepadGui extends AbstractGui {
         crosshairHome = new OwnCheckBox("", skin);
         cameraModel[0][8] = crosshairHome;
         crosshairHome.setName("ch home");
-        crosshairHome.setChecked(Settings.settings.scene.crosshair.home);
+        crosshairHome.setChecked(GaiaSky.settings().scene.crosshair.home);
         crosshairHome.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CROSSHAIR_HOME_CMD, this, crosshairHome.isChecked());
@@ -576,7 +579,7 @@ public class GamepadGui extends AbstractGui {
             final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             cameraModel[0][9] = button3d;
-            button3d.setChecked(Settings.settings.program.modeStereo.active);
+            button3d.setChecked(GaiaSky.settings().program.modeStereo.active);
             final String[] hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode", true);
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
@@ -601,7 +604,7 @@ public class GamepadGui extends AbstractGui {
             final Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
             cameraModel[1][9] = buttonDome;
-            buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
+            buttonDome.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPlanetariumOn());
             final String[] hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium", true);
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
@@ -628,7 +631,7 @@ public class GamepadGui extends AbstractGui {
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
             cameraModel[2][9] = buttonCubemap;
             buttonCubemap.setProgrammaticChangeEvents(false);
-            buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
+            buttonCubemap.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPanoramaOn());
             final String[] hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360", true);
             buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
@@ -655,7 +658,7 @@ public class GamepadGui extends AbstractGui {
             buttonOrthoSphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
             cameraModel[3][9] = buttonOrthoSphere;
             buttonOrthoSphere.setProgrammaticChangeEvents(false);
-            buttonOrthoSphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
+            buttonOrthoSphere.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isOrthosphereOn());
             final String[] hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere", true);
             buttonOrthoSphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
             buttonOrthoSphere.setName("orthosphere");
@@ -690,7 +693,7 @@ public class GamepadGui extends AbstractGui {
 
         Table timeT = new Table(skin);
 
-        boolean timeOn = Settings.settings.runtime.timeOn;
+        boolean timeOn = GaiaSky.settings().runtime.timeOn;
         timeStartStop = new OwnTextButton(I18n.msg(timeOn ? "gui.time.pause" : "gui.time.start"), skin, "toggle-big");
         timeModel[1][0] = timeStartStop;
         timeStartStop.setWidth(ww * 0.7f);
@@ -824,7 +827,7 @@ public class GamepadGui extends AbstractGui {
             var controllers = Controllers.getControllers();
             Controller controller = null;
             for (var c : controllers) {
-                if (!Settings.settings.controls.gamepad.isControllerBlacklisted(c.getName())) {
+                if (!GaiaSky.settings().controls.gamepad.isControllerBlacklisted(c.getName())) {
                     // Found it!
                     controller = c;
                     break;
@@ -848,7 +851,7 @@ public class GamepadGui extends AbstractGui {
                 configureControllerButton.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         // Get currently selected mappings
-                        GamepadMappings mappings = new GamepadMappings(controllerName, Path.of(Settings.settings.controls.gamepad.mappingsFile));
+                        GamepadMappings mappings = new GamepadMappings(controllerName, Path.of(GaiaSky.settings().controls.gamepad.mappingsFile));
                         GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, mappings, stage, skin);
                         ccw.setAcceptListener(() -> {
                             if (ccw.savedFile != null) {
@@ -875,7 +878,7 @@ public class GamepadGui extends AbstractGui {
             invertXButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "X"), skin, "toggle-big");
             controlsModel[0][1] = invertXButton;
             invertXButton.setWidth(ww);
-            invertXButton.setChecked(Settings.settings.controls.gamepad.invertX);
+            invertXButton.setChecked(GaiaSky.settings().controls.gamepad.invertX);
             invertXButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.INVERT_X_CMD, this, invertXButton.isChecked());
@@ -889,7 +892,7 @@ public class GamepadGui extends AbstractGui {
             invertYButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "Y"), skin, "toggle-big");
             controlsModel[0][2] = invertYButton;
             invertYButton.setWidth(ww);
-            invertYButton.setChecked(Settings.settings.controls.gamepad.invertY);
+            invertYButton.setChecked(GaiaSky.settings().controls.gamepad.invertY);
             invertYButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.INVERT_Y_CMD, this, invertYButton.isChecked());
@@ -921,7 +924,7 @@ public class GamepadGui extends AbstractGui {
                                                "header-raw");
         starBrightness.setWidth(ww);
         starBrightness.setHeight(sh);
-        starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
+        starBrightness.setMappedValue(GaiaSky.settings().scene.star.brightness);
         starBrightness.connect(Event.STAR_BRIGHTNESS_CMD);
 
         // Magnitude multiplier
@@ -935,7 +938,7 @@ public class GamepadGui extends AbstractGui {
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
-        magnitudeMultiplier.setValue(Settings.settings.scene.star.power);
+        magnitudeMultiplier.setValue(GaiaSky.settings().scene.star.power);
         magnitudeMultiplier.connect(Event.STAR_BRIGHTNESS_POW_CMD);
 
         // Star glow factor
@@ -949,7 +952,7 @@ public class GamepadGui extends AbstractGui {
         starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
         starGlowFactor.setWidth(ww);
         starGlowFactor.setHeight(sh);
-        starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
+        starGlowFactor.setMappedValue(GaiaSky.settings().scene.star.glowFactor);
         starGlowFactor.connect(Event.STAR_GLOW_FACTOR_CMD);
 
         // Point size
@@ -963,7 +966,7 @@ public class GamepadGui extends AbstractGui {
         pointSize.setWidth(ww);
         pointSize.setHeight(sh);
         pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
-        pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
+        pointSize.setMappedValue(GaiaSky.settings().scene.star.pointSize);
         pointSize.connect(Event.STAR_POINT_SIZE_CMD);
 
         // Base star level
@@ -977,7 +980,7 @@ public class GamepadGui extends AbstractGui {
         starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
         starBaseLevel.setWidth(ww);
         starBaseLevel.setHeight(sh);
-        starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
+        starBaseLevel.setMappedValue(GaiaSky.settings().scene.star.opacity[0]);
         starBaseLevel.connect(Event.STAR_BASE_LEVEL_CMD);
 
         // Bloom
@@ -990,7 +993,7 @@ public class GamepadGui extends AbstractGui {
                                             "header-raw");
         bloomSlider.setWidth(ww);
         bloomSlider.setHeight(sh);
-        bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity);
+        bloomSlider.setValue(GaiaSky.settings().postprocess.bloom.intensity);
         bloomSlider.connect(Event.BLOOM_CMD);
 
         // Unsharp mask
@@ -1003,7 +1006,7 @@ public class GamepadGui extends AbstractGui {
                                                   "header-raw");
         unsharpMaskSlider.setWidth(ww);
         unsharpMaskSlider.setHeight(sh);
-        unsharpMaskSlider.setValue(Settings.settings.postprocess.unsharpMask.factor);
+        unsharpMaskSlider.setValue(GaiaSky.settings().postprocess.unsharpMask.factor);
         unsharpMaskSlider.connect(Event.UNSHARP_MASK_CMD);
 
         OwnSliderPlus lensFlare = null;
@@ -1019,13 +1022,13 @@ public class GamepadGui extends AbstractGui {
                                           "header-raw");
             lensFlare.setWidth(ww);
             lensFlare.setHeight(sh);
-            lensFlare.setValue(Settings.settings.postprocess.lensFlare.strength);
+            lensFlare.setValue(GaiaSky.settings().postprocess.lensFlare.strength);
             lensFlare.connect(Event.LENS_FLARE_CMD);
 
             // Star glow
             starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
             starGlowButton.setWidth(ww);
-            starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
+            starGlowButton.setChecked(GaiaSky.settings().postprocess.lightGlow.active);
             starGlowButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.LIGHT_GLOW_CMD, starGlowButton, starGlowButton.isChecked());
@@ -1044,7 +1047,7 @@ public class GamepadGui extends AbstractGui {
                                            "header-raw");
             motionBlur.setWidth(ww);
             motionBlur.setHeight(sh);
-            motionBlur.setMappedValue(Settings.settings.postprocess.motionBlur.strength);
+            motionBlur.setMappedValue(GaiaSky.settings().postprocess.motionBlur.strength);
             motionBlur.connect(Event.MOTION_BLUR_CMD);
         }
 
@@ -1123,7 +1126,7 @@ public class GamepadGui extends AbstractGui {
         final Label debugLabel = new Label(I18n.msg("gui.system.debuginfo"), skin, "header-raw");
         debugInfo = new OwnCheckBox("", skin, 0f);
         systemModel[0][0] = debugInfo;
-        debugInfo.setChecked(Settings.settings.program.debugInfo);
+        debugInfo.setChecked(GaiaSky.settings().program.debugInfo);
         debugInfo.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_DEBUG_CMD, debugInfo, debugInfo.isChecked());
@@ -1864,7 +1867,7 @@ public class GamepadGui extends AbstractGui {
         if (content.isVisible() && content.hasParent()) {
             searchField.setText("");
             content.addAction(Actions.sequence(Actions.alpha(1f),
-                                               Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                                               Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()),
                                                Actions.visible(false),
                                                Actions.run(() -> {
                                                    content.remove();
@@ -1886,7 +1889,7 @@ public class GamepadGui extends AbstractGui {
             stage.addActor(content);
             content.addAction(Actions.sequence(Actions.alpha(0f),
                                                Actions.visible(true),
-                                               Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                                               Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds()),
                                                Actions.run(() -> {
                                                    updateFocused();
                                                    addGamepadListener();
@@ -1908,7 +1911,7 @@ public class GamepadGui extends AbstractGui {
 
     private void addGamepadListener() {
         if (gamepadListener != null) {
-            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            GamepadSettings gamepadSettings = GaiaSky.settings().controls.gamepad;
             // Backup and clean
             backupGamepadListeners = gamepadSettings.getControllerListeners();
             gamepadSettings.removeAllControllerListeners();
@@ -1920,7 +1923,7 @@ public class GamepadGui extends AbstractGui {
 
     private void removeGamepadListener() {
         if (gamepadListener != null) {
-            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            GamepadSettings gamepadSettings = GaiaSky.settings().controls.gamepad;
             // Remove current listener
             gamepadSettings.removeControllerListener(gamepadListener);
 

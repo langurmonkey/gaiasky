@@ -263,7 +263,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public float get_star_brightness() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.brightness,
+        return MathUtilsDouble.lint(GaiaSky.settings().scene.star.brightness,
                                     Constants.MIN_STAR_BRIGHTNESS,
                                     Constants.MAX_STAR_BRIGHTNESS,
                                     Constants.MIN_SLIDER,
@@ -287,7 +287,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public float get_point_size() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize,
+        return MathUtilsDouble.lint(GaiaSky.settings().scene.star.pointSize,
                                     Constants.MIN_STAR_POINT_SIZE,
                                     Constants.MAX_STAR_POINT_SIZE,
                                     Constants.MIN_SLIDER,
@@ -306,7 +306,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
 
     @Override
     public float get_star_base_opacity() {
-        return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0],
+        return MathUtilsDouble.lint(GaiaSky.settings().scene.star.opacity[0],
                                     Constants.MIN_STAR_MIN_OPACITY,
                                     Constants.MAX_STAR_MIN_OPACITY,
                                     Constants.MIN_SLIDER,

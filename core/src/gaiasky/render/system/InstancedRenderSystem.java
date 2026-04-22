@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
@@ -29,7 +30,6 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Bits;
 import gaiasky.util.ModelCache;
-import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.gdx.IcoSphereCreator;
 import gaiasky.util.gdx.ModelCreator.IFace;
@@ -641,7 +641,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         var light = (Proximity.NearbyRecord) camera.getCloseLightSource(0);
         shaderProgram.setUniformf("u_lightPos", light.pos);
 
-        shaderProgram.setUniformf("u_ambientLight", (float) Settings.settings.scene.renderer.ambient);
+        shaderProgram.setUniformf("u_ambientLight", (float) GaiaSky.settings().scene.renderer.ambient);
         shaderProgram.setUniformf("u_diffuseScattering", MathUtils.clamp(ambient, 0, 1));
         shaderProgram.setUniformi("u_shadingType", shadingType);
         shaderProgram.setUniformf("u_lightIntensity", 1f);

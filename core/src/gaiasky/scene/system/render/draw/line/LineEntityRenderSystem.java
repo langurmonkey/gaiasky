@@ -26,7 +26,6 @@ import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.view.LineView;
 import gaiasky.util.Constants;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
@@ -603,8 +602,8 @@ public class LineEntityRenderSystem {
         lineView.setEntity(entity);
 
         alpha *= GaiaSky.instance.sceneRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
-        float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
-        int n = (int) (getMaxVelocityVectors(entity, set) * (Settings.settings.scene.properMotion.number * 0.1));
+        float thPointTimesFovFactor = (float) GaiaSky.settings().scene.star.threshold.point * camera.getFovFactor();
+        int n = (int) (getMaxVelocityVectors(entity, set) * (GaiaSky.settings().scene.properMotion.number * 0.1));
 
 
         for (int i = n - 1; i >= 0; i--) {
@@ -620,17 +619,17 @@ public class LineEntityRenderSystem {
             Vector3D pm = D32.set(star.vx(), star.vy(), star.vz()).scl(set.currDeltaYears);
             // Rest of attributes
             float distToCamera = (float) lPos.lenDouble();
-            float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
+            float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * GaiaSky.settings().scene.star.brightness;
             if (viewAngle >= thPointTimesFovFactor && (star.vx() != 0 || star.vy() != 0 || star.vz() != 0)) {
                 Vector3D p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
-                Vector3D ppm = D32.set(star.vx(), star.vy(), star.vz()).scl(Settings.settings.scene.properMotion.length);
+                Vector3D ppm = D32.set(star.vx(), star.vy(), star.vz()).scl(GaiaSky.settings().scene.properMotion.length);
                 double p1p2len = ppm.len();
                 Vector3D p2 = D33.set(ppm).add(p1);
 
                 // Maximum speed in km/s, to normalize
                 float maxSpeedKms = 100;
                 float r, g, b;
-                switch (Settings.settings.scene.properMotion.colorMode) {
+                switch (GaiaSky.settings().scene.properMotion.colorMode) {
                     case 1 -> {
                         // LENGTH
                         ppm.set(star.vx(), star.vy(), star.vz());
@@ -708,7 +707,7 @@ public class LineEntityRenderSystem {
                 b = MathUtilsDouble.clamp(b, 0, 1);
 
                 renderer.addLine(lineView, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
-                if (Settings.settings.scene.properMotion.arrowHeads) {
+                if (GaiaSky.settings().scene.properMotion.arrowHeads) {
                     // Add the arrow cap.
                     Vector3D p3 = D32.set(ppm).nor().scl(p1p2len * .86).add(p1);
                     p3.rotate(p2, 30);
@@ -724,7 +723,7 @@ public class LineEntityRenderSystem {
     private long getMaxVelocityVectors(Entity entity, StarSet set) {
         // Star sets in octrees get their number tuned down, because usually there's many of them in view.
         return FastMath.min(set.indices.length,
-                            FastMath.max(Math.round(Settings.settings.scene.star.group.numVelocityVector / (Mapper.octant.has(entity) ? 5f : 1f)),
+                            FastMath.max(Math.round(GaiaSky.settings().scene.star.group.numVelocityVector / (Mapper.octant.has(entity) ? 5f : 1f)),
                                          Constants.MIN_VELOCITY_VECTORS_STAR_GROUP));
     }
 

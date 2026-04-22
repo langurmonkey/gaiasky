@@ -8,13 +8,13 @@
 package gaiasky.input;
 
 import com.badlogic.gdx.controllers.Controller;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.camera.SpacecraftCamera;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 public class SpacecraftGamepadListener extends AbstractGamepadListener {
@@ -133,12 +133,12 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
             EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
             treated = true;
         } else if (axisCode == mappings.getAxisRstickH()) {
-            double effValue = -(Settings.settings.controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
+            double effValue = -(GaiaSky.settings().controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
             sc.setYawPower(effValue);
             EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
             treated = true;
         } else if (axisCode == mappings.getAxisRstickV()) {
-            double effValue = (Settings.settings.controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
+            double effValue = (GaiaSky.settings().controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
             sc.setPitchPower(effValue);
             EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
             treated = true;

@@ -10,7 +10,6 @@ package gaiasky.render.postprocess.effects;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.Combine3Filter;
-import gaiasky.render.postprocess.filters.CombineFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
 /**

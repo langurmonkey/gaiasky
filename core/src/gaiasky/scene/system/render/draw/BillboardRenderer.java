@@ -25,7 +25,6 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.view.BillboardView;
-import gaiasky.util.Settings;
 import gaiasky.util.comp.DistanceEntityComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -93,7 +92,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
     public void setBillboardTexture(String texturePath) {
         if (texturePath != null) {
-            billboardTexture = new Texture(Settings.settings.data.dataFileHandle(texturePath), true);
+            billboardTexture = new Texture(GaiaSky.settings().data.dataFileHandle(texturePath), true);
             billboardTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         }
     }
@@ -180,7 +179,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.BILLBOARD_TEXTURE_IDX_CMD) {
-            GaiaSky.postRunnable(() -> setBillboardTexture(Settings.settings.scene.star.getStarTexture()));
+            GaiaSky.postRunnable(() -> setBillboardTexture(GaiaSky.settings().scene.star.getStarTexture()));
         }
     }
 }

@@ -27,7 +27,6 @@ import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogManager;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
@@ -75,7 +74,7 @@ public class SceneContextMenu extends ContextMenu {
                             final Scene scene) {
         super(skin, styleName);
         this.skin = skin;
-        this.screenX = (int) (screenX / Settings.settings.program.ui.scale);
+        this.screenX = (int) (screenX / GaiaSky.settings().program.ui.scale);
         this.screenY = screenY;
         this.candidate = candidate;
         this.catalogManager = catalogManager;

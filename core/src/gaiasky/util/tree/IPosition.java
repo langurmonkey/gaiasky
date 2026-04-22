@@ -7,8 +7,8 @@
 
 package gaiasky.util.tree;
 
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 
 public interface IPosition {
 

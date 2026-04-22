@@ -35,8 +35,6 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
-import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
@@ -187,11 +185,11 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 if (selected.node.uuid != null) {
                                     var settings = selected.node.loadSettingsFromFile();
                                     if (settings != null) {
-                                        var version = Settings.settings.version.clone();
-                                        if (SettingsManager.setSettingsInstance(settings)) {
-                                            Settings.settings.setupListeners();
-                                            Settings.settings.version = version;
-                                            Settings.settings.apply();
+                                        var version = GaiaSky.settings().version.clone();
+                                        if (GaiaSky.instance.setSettingsReference(settings)) {
+                                            GaiaSky.settings().setupListeners();
+                                            GaiaSky.settings().version = version;
+                                            GaiaSky.settings().apply();
                                         }
                                     }
                                 }

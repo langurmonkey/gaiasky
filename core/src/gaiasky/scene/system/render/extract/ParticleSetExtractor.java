@@ -9,13 +9,12 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Octree;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.StarSet;
-import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 public class ParticleSetExtractor extends AbstractExtractSystem {
@@ -70,10 +69,10 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
             } else {
                 addToRender(render, RenderGroup.STAR_GROUP);
             }
-            if (Settings.settings.scene.star.renderStarSpheres) {
+            if (GaiaSky.settings().scene.star.renderStarSpheres) {
                 addToRender(render, RenderGroup.MODEL_VERT_STAR);
             }
-            if (Settings.settings.scene.star.group.billboard) {
+            if (GaiaSky.settings().scene.star.group.billboard) {
                 addToRender(render, RenderGroup.BILLBOARD_STAR);
             }
         }

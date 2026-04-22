@@ -69,7 +69,7 @@ public class DataInfoWindow extends GenericDialog {
     private static final String URL_WIKI_API_SUMMARY = "https://$LANG.wikipedia.org/api/rest_v1/page/summary/";
     private static final String URL_WIKI_REDIRECT = "https://en.wikipedia.org/w/api.php?action=query&titles=$NAME&redirects&format=json";
     private static final String URL_WIKI_LANGLINKS = "https://en.wikipedia.org/w/api.php?action=query&prop=langlinks&titles=$NAME&lllimit=500&format=json";
-    private static final String USER_AGENT = "GaiaSky/" + Settings.settings.version.version + " (https://gaiasky.space)";
+    private static final String USER_AGENT = "GaiaSky/" + GaiaSky.settings().version.version + " (https://gaiasky.space)";
     /** Timeout for HTTP requests. **/
     private static final int REQUEST_TIMEOUT_MS = 15000;
     /** Minimum wait time between requests. **/
@@ -814,7 +814,7 @@ public class DataInfoWindow extends GenericDialog {
      */
     private void getJSONData(String url, final WikiDataListener listener) {
 
-        if (Settings.settings.program.offlineMode) {
+        if (GaiaSky.settings().program.offlineMode) {
             listener.ko(I18n.msg("gui.system.offlinemode.tooltip"));
         } else {
             sendTrackedRequest(url, "json", new HttpResponseListener() {

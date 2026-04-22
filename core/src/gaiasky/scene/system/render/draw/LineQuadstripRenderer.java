@@ -7,6 +7,7 @@
 
 package gaiasky.scene.system.render.draw;
 
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.camera.ICamera;
@@ -14,7 +15,6 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
@@ -55,7 +55,7 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
                 octant.render(this, camera, getAlpha(octant));
             }
 
-            shaderProgram.setUniformf("u_lineWidthTan", (float) (view.getLineWidth() * 0.8f * baseWidthAngleTan * Settings.settings.scene.renderer.line.width * camera.getFovFactor()));
+            shaderProgram.setUniformf("u_lineWidthTan", (float) (view.getLineWidth() * 0.8f * baseWidthAngleTan * GaiaSky.settings().scene.renderer.line.width * camera.getFovFactor()));
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);

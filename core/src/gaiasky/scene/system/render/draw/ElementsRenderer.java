@@ -30,7 +30,6 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
@@ -171,7 +170,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
                 addCameraUpCubemapMode(shaderProgram, camera);
                 shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * first.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.08f);
+                shaderProgram.setUniformf("u_sizeFactor", GaiaSky.settings().scene.star.pointSize * 0.08f);
                 shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
 
                 // VR scale

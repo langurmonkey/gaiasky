@@ -426,8 +426,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                     }
                                 });
                                 datasetContext.addItem(delete);
-                                datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale,
-                                                        stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
+                                datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / GaiaSky.settings().program.ui.scale,
+                                                        stage.getHeight() - Gdx.input.getY(ie.getPointer()) / GaiaSky.settings().program.ui.scale);
                             });
                             // Set to processed
                             event.setBubbles(false);

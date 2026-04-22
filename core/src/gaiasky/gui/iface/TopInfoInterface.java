@@ -20,7 +20,6 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -67,7 +66,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         this.scene = scene;
         view = new FocusView();
 
-        timeZone = Settings.settings.program.timeZone.getTimeZone();
+        timeZone = GaiaSky.settings().program.timeZone.getTimeZone();
         dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
         dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
@@ -80,7 +79,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         time.setName("label time tii");
         time.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
-        pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "default");
+        pace = new OwnLabel("(" + (GaiaSky.settings().runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "default");
         pace.setName("pace tii");
 
         // Datetime table.
@@ -102,7 +101,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         OwnLabel s2 = new OwnLabel("|", skin, "default");
 
-        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(Settings.settings.scene.homeObject), maxNameLen)), skin, "default");
+        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(GaiaSky.settings().scene.homeObject), maxNameLen)), skin, "default");
         home.setName("home tii");
         home.setColor(ColorUtils.aOrangeC);
 

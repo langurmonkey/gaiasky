@@ -28,7 +28,6 @@ import gaiasky.script.ConsoleManager;
 import gaiasky.script.ConsoleManager.Message;
 import gaiasky.script.ConsoleManager.MsgType;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -216,12 +215,12 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     public void showConsole() {
         rebuildMainTable();
         input.getStage().setKeyboardFocus(input);
-        this.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())));
+        this.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds())));
     }
 
     public void closeConsole() {
         this.addAction(Actions.sequence(Actions.alpha(1f),
-                                        Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                                        Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()),
                                         Actions.run(this::remove)));
     }
 

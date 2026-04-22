@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -62,7 +63,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         starBrightness.setTooltip(I18n.msg("gui.star.brightness.info"));
         starBrightness.setWidth(componentWidth);
         starBrightness.setDisplayValueMapped(false);
-        starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
+        starBrightness.setMappedValue(GaiaSky.settings().scene.star.brightness);
         starBrightness.connect(Event.STAR_BRIGHTNESS_CMD);
 
         /* Star brightness power */
@@ -74,7 +75,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                                 skin);
         starBrightnessPow.setTooltip(I18n.msg("gui.star.brightness.pow.info"));
         starBrightnessPow.setWidth(componentWidth);
-        starBrightnessPow.setValue(Settings.settings.scene.star.power);
+        starBrightnessPow.setValue(GaiaSky.settings().scene.star.power);
         starBrightnessPow.connect(Event.STAR_BRIGHTNESS_POW_CMD);
 
         /* Star glow factor */
@@ -86,7 +87,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                            skin);
         starGlowFactor.setTooltip(I18n.msg("gui.star.glowfactor.info"));
         starGlowFactor.setWidth(componentWidth);
-        starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
+        starGlowFactor.setMappedValue(GaiaSky.settings().scene.star.glowFactor);
         starGlowFactor.connect(Event.STAR_GLOW_FACTOR_CMD);
 
         /* Point size */
@@ -98,7 +99,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                       skin);
         pointSize.setTooltip(I18n.msg("gui.star.size.info"));
         pointSize.setWidth(componentWidth);
-        pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
+        pointSize.setMappedValue(GaiaSky.settings().scene.star.pointSize);
         pointSize.connect(Event.STAR_POINT_SIZE_CMD);
 
         /* Star min opacity */
@@ -110,7 +111,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                           skin);
         starBaseLevel.setTooltip(I18n.msg("gui.star.opacity.info"));
         starBaseLevel.setWidth(componentWidth);
-        starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
+        starBaseLevel.setMappedValue(GaiaSky.settings().scene.star.opacity[0]);
         starBaseLevel.connect(Event.STAR_BASE_LEVEL_CMD);
 
         /* Ambient light */
@@ -121,7 +122,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                          0f,
                                                          skin);
         ambientLight.setWidth(componentWidth);
-        ambientLight.setMappedValue(Settings.settings.scene.renderer.ambient);
+        ambientLight.setMappedValue(GaiaSky.settings().scene.renderer.ambient);
         ambientLight.connect(Event.AMBIENT_LIGHT_CMD);
 
         /* Label size */
@@ -132,7 +133,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                       1.3f,
                                                       skin);
         labelSize.setWidth(componentWidth);
-        labelSize.setMappedValue(Settings.settings.scene.label.size);
+        labelSize.setMappedValue(GaiaSky.settings().scene.label.size);
         labelSize.connect(Event.LABEL_SIZE_CMD);
 
         /* Line width */
@@ -145,7 +146,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                       1f,
                                                       skin);
         lineWidth.setWidth(componentWidth);
-        lineWidth.setMappedValue(Settings.settings.scene.renderer.line.width);
+        lineWidth.setMappedValue(GaiaSky.settings().scene.renderer.line.width);
         lineWidth.connect(Event.LINE_WIDTH_CMD);
 
         /* Elevation multiplier */
@@ -156,7 +157,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                      1f,
                                                      skin);
         elevMult.setWidth(componentWidth);
-        elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
+        elevMult.setValue((float) MathUtilsDouble.roundAvoid(GaiaSky.settings().scene.renderer.elevation.multiplier, 1));
         elevMult.connect(Event.ELEVATION_MULTIPLIER_CMD);
 
         /* Reset visual settings defaults */
@@ -196,7 +197,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     private void resetVisualSettingsDefaults(Object source) {
         try {
             Path confFolder = Settings.assetsPath("conf");
-            Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openXr));
+            Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(GaiaSky.settings().runtime.openXr));
             Yaml yaml = new Yaml();
             Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
 

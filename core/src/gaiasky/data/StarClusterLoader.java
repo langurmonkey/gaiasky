@@ -11,12 +11,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Quadruple;
@@ -76,7 +76,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
             numLoaded = 0;
             if (filePaths != null) {
                 for (String file : filePaths) {
-                    FileHandle f = Settings.settings.data.dataFileHandle(file);
+                    FileHandle f = GaiaSky.settings().data.dataFileHandle(file);
                     try (InputStream is = f.read()) {
                         try {
                             loadClustersCsv(is, clusters);

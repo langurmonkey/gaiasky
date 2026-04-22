@@ -9,11 +9,11 @@ package gaiasky.gui.window;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
@@ -50,7 +50,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.msg("gui.target.fps"), skin);
-        camcorderFps = new OwnTextField(nf3.format(Settings.settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
+        camcorderFps = new OwnTextField(nf3.format(GaiaSky.settings().camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
         camcorderFps.setWidth(240f);
 
         OwnLabel interpTitle = new OwnLabel(I18n.msg("gui.keyframes.interp"), skin, "hud-header");
@@ -59,7 +59,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         OwnLabel pos = new OwnLabel(I18n.msg("gui.cam.pos"), skin);
         posMethod = new OwnSelectBox<>(skin);
         posMethod.setItems(interpolation);
-        posMethod.setSelectedIndex(Settings.settings.camrecorder.keyframe.position.ordinal());
+        posMethod.setSelectedIndex(GaiaSky.settings().camrecorder.keyframe.position.ordinal());
         posMethod.setItems(interpolation);
         posMethod.setWidth(240f);
 
@@ -92,7 +92,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
     @Override
     protected boolean accept() {
         EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camcorderFps.getText()));
-        Settings.settings.camrecorder.keyframe.position = KeyframesManager.PathType.values()[posMethod.getSelectedIndex()];
+        GaiaSky.settings().camrecorder.keyframe.position = KeyframesManager.PathType.values()[posMethod.getSelectedIndex()];
         return true;
     }
 

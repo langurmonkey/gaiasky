@@ -9,9 +9,9 @@ package gaiasky.render.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
 import java.nio.file.Files;
@@ -58,7 +58,7 @@ public final class ShaderLoader {
                 return Gdx.files.internal(BasePath + file).readString();
             } catch (Exception e0) {
                 // Try to load from data
-                Path path = Settings.settings.data.dataPath(file);
+                Path path = GaiaSky.settings().data.dataPath(file);
                 if (Files.exists(path) && Files.isReadable(path)) {
                     try {
                         return Files.readString(path);

@@ -14,11 +14,10 @@ import gaiasky.event.IObserver;
 import gaiasky.gui.window.FileNameWindow;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -119,7 +118,7 @@ public class Camcorder implements IObserver {
                         EventManager.publish(Event.FRAME_OUTPUT_CMD, this, false);
 
                         // Re-show UI.
-                        if (Settings.settings.camrecorder.hideUI) {
+                        if (GaiaSky.settings().camrecorder.hideUI) {
                             EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                         }
                         break;
@@ -154,11 +153,11 @@ public class Camcorder implements IObserver {
                     }
 
                     // Create recording path.
-                    recordingPath.set(new CameraPath(Settings.settings.camrecorder.targetFps));
+                    recordingPath.set(new CameraPath(GaiaSky.settings().camrecorder.targetFps));
 
                     // Cap frames if needed.
                     if (recordingPath.get().frameRate > 0.0) {
-                        fpsLimitBackup = Settings.settings.graphics.fpsLimit;
+                        fpsLimitBackup = GaiaSky.settings().graphics.fpsLimit;
                         EventManager.publish(Event.LIMIT_FPS_CMD, this, recordingPath.get().frameRate);
                     }
 
@@ -259,7 +258,7 @@ public class Camcorder implements IObserver {
 
                         // Limit frame rate if necessary.
                         if (playingPath.get().frameRate > 0.0) {
-                            fpsLimitBackup = Settings.settings.graphics.fpsLimit;
+                            fpsLimitBackup = GaiaSky.settings().graphics.fpsLimit;
                             EventManager.publish(Event.LIMIT_FPS_CMD, this, playingPath.get().frameRate);
                         }
                         // Start playing mode.
@@ -269,13 +268,13 @@ public class Camcorder implements IObserver {
                         EventManager.publish(Event.CAMERA_PLAY_INFO, this, true);
 
                         // Enable frame output if option is on.
-                        if (Settings.settings.camrecorder.frameOutput) {
+                        if (GaiaSky.settings().camrecorder.frameOutput) {
                             // Stop frame output if it is on!
                             EventManager.publish(Event.FRAME_OUTPUT_CMD, this, true);
                         }
 
                         // Hide UI if necessary.
-                        if (Settings.settings.camrecorder.hideUI) {
+                        if (GaiaSky.settings().camrecorder.hideUI) {
                             EventManager.publish(Event.DISPLAY_GUI_CMD, this, false, I18n.msg("notif.cleanmode"));
                         }
                     } catch (Exception e) {
@@ -308,7 +307,7 @@ public class Camcorder implements IObserver {
                     EventManager.publish(Event.FRAME_OUTPUT_CMD, this, false);
 
                     // Re-show UI.
-                    if (Settings.settings.camrecorder.hideUI) {
+                    if (GaiaSky.settings().camrecorder.hideUI) {
                         EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                     }
                 }

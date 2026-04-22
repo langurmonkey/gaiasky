@@ -18,7 +18,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.LightingUtils;
-import gaiasky.scene.view.FocusView;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;

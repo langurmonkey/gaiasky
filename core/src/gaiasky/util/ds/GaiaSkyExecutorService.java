@@ -7,8 +7,8 @@
 
 package gaiasky.util.ds;
 
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 import java.util.concurrent.*;
@@ -30,7 +30,7 @@ public class GaiaSkyExecutorService {
 
     public void initialize() {
         workQueue = new LinkedBlockingQueue<>();
-        int nThreads = !Settings.settings.performance.multithreading ? 1 : FastMath.max(1, Settings.settings.performance.getNumberOfThreads());
+        int nThreads = !GaiaSky.settings().performance.multithreading ? 1 : FastMath.max(1, GaiaSky.settings().performance.getNumberOfThreads());
         // Create fixed thread pool executor, with a static number of threads.
         pool = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.SECONDS, workQueue);
         pool.setThreadFactory(new DaemonThreadFactory());

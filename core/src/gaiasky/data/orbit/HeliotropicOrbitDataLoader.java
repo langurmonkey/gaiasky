@@ -10,7 +10,9 @@ package gaiasky.data.orbit;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -45,7 +47,11 @@ public class HeliotropicOrbitDataLoader {
 
             Gdx.files = new Lwjgl3Files();
 
-            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
+            // Initialize settings
+
+            var manager = new SettingsManager();
+            var settings = manager.loadSettings(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
+            new GaiaSky(new GaiaSkyDesktop.CLIArgs(), settings);
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"), new FileHandle(ASSETS_LOC + "/i18n/objects"));
 

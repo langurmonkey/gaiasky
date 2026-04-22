@@ -19,7 +19,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Settings;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3D;
 
@@ -40,7 +39,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
     public LightPositionUpdater() {
         this.lock = new Object();
 
-        reinitialize(Settings.settings.graphics.quality.getGlowNLights());
+        reinitialize(GaiaSky.settings().graphics.quality.getGlowNLights());
 
         this.auxV = new Vector3();
         this.auxD = new Vector3D();
@@ -85,7 +84,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
                     ICamera camera) {
         synchronized (lock) {
             int size = renderables.size();
-            final var settings = Settings.settings;
+            final var settings = GaiaSky.settings();
             if (GaiaSky.instance.getPostProcessor().isLightScatterEnabled() ||
                     GaiaSky.instance.getPostProcessor().isLensFlareEnabled()) {
                 // Compute light positions for light scattering or light

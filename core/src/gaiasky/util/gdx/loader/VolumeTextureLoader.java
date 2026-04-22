@@ -27,7 +27,6 @@ import gaiasky.util.gdx.graphics.VolumeTexture;
 import gaiasky.util.gdx.graphics.VolumeType;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.zip.GZIPInputStream;
 

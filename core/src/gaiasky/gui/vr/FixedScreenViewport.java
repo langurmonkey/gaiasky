@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import gaiasky.util.Settings;
+import gaiasky.GaiaSky;
 import gaiasky.util.camera.CameraUtils;
 
 /**
@@ -70,8 +70,8 @@ public class FixedScreenViewport extends Viewport {
 
     @Override
     public void apply(boolean centerCamera) {
-        int bbw = Settings.settings.graphics.backBufferResolution[0];
-        int bbh = Settings.settings.graphics.backBufferResolution[1];
+        int bbw = GaiaSky.settings().graphics.backBufferResolution[0];
+        int bbh = GaiaSky.settings().graphics.backBufferResolution[1];
         if (width != bbw || height != bbh) {
             HdpiUtils.glViewport(0, 0, width * bbw / width, height * bbh / height);
         } else {

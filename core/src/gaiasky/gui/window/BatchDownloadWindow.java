@@ -128,7 +128,7 @@ public class BatchDownloadWindow extends GenericDialog {
     }
 
     private void downloadDataset(DatasetDesc dataset, Runnable successRunnable) {
-        var tempDir = SysUtils.getDataTempDir(Settings.settings.data.location);
+        var tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
 
         try {
             var fileStore = Files.getFileStore(tempDir);
@@ -147,7 +147,7 @@ public class BatchDownloadWindow extends GenericDialog {
         }
 
         String name = dataset.name;
-        String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.getCurrentDataMirror());
+        String url = dataset.file.replace("@mirror-url@", GaiaSky.settings().program.url.getCurrentDataMirror());
 
         String filename = FilenameUtils.getName(url);
         FileHandle tempDownload = Gdx.files.absolute(tempDir + "/" + filename + ".part");
@@ -184,7 +184,7 @@ public class BatchDownloadWindow extends GenericDialog {
             // Unpack.
             int errors = 0;
             logger.info(I18n.msg("gui.download.extracting", tempDownload.path()));
-            String dataLocation = Settings.settings.data.location + File.separatorChar;
+            String dataLocation = GaiaSky.settings().data.location + File.separatorChar;
             // Checksum.
             if (digest != null && dataset.sha256 != null) {
                 String serverDigest = dataset.sha256;
@@ -270,7 +270,7 @@ public class BatchDownloadWindow extends GenericDialog {
         // Download.
         final Net.HttpRequest request = DownloadHelper.downloadFile(url,
                                                                     tempDownload,
-                                                                    Settings.settings.program.offlineMode,
+                                                                    GaiaSky.settings().program.offlineMode,
                                                                     progressDownload,
                                                                     progressHashResume,
                                                                     finish,
@@ -308,7 +308,7 @@ public class BatchDownloadWindow extends GenericDialog {
             filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
         }
         if (filePath != null && !filePath.isBlank()) {
-            Settings.settings.data.dataFiles.add(filePath);
+            GaiaSky.settings().data.dataFiles.add(filePath);
         }
     }
 
@@ -325,7 +325,7 @@ public class BatchDownloadWindow extends GenericDialog {
                 filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
             }
             if (filePath != null && !filePath.isBlank()) {
-                Settings.settings.data.dataFiles.remove(filePath);
+                GaiaSky.settings().data.dataFiles.remove(filePath);
             }
         }
     }

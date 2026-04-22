@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import gaiasky.GaiaSky;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.CamcorderSettings.KeyframeSettings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
@@ -145,7 +146,7 @@ public class SettingsMorph {
         // Make paths relative to $data/
         data.dataFiles = new ArrayList<>(dataFiles.size());
         for (String dataFile : dataFiles) {
-            Path dataLocation = Path.of(Settings.settings.data.location);
+            Path dataLocation = Path.of(GaiaSky.settings().data.location);
             String relative = dataLocation.toUri().relativize(new java.io.File(dataFile).toURI()).getPath();
             String f = Constants.DATA_LOCATION_TOKEN + relative;
             data.dataFiles.add(f);

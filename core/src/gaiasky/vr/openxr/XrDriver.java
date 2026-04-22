@@ -12,9 +12,9 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
@@ -166,7 +166,7 @@ public class XrDriver implements Disposable {
                     .next(NULL)
                     .createFlags(0)
                     .applicationInfo(XrApplicationInfo.calloc(stack)
-                                             .applicationName(stack.UTF8(Settings.getApplicationName(false)))
+                                             .applicationName(stack.UTF8(GaiaSky.settings().getApplicationName(false)))
                                              .apiVersion(XR_CURRENT_API_VERSION))
                     .enabledApiLayerNames(wantedLayers)
                     .enabledExtensionNames(wantedExtensions);
@@ -428,7 +428,7 @@ public class XrDriver implements Disposable {
     public void initializeOpenGLFrameBuffers() {
         GLFrameBuffer.FrameBufferBuilder frameBufferBuilder = new GLFrameBuffer.FrameBufferBuilder(getWidth(), getHeight());
         int internalFormat = org.lwjgl.opengl.GL30.GL_RGBA8;
-        if (Settings.settings.graphics.useSRGB) {
+        if (GaiaSky.settings().graphics.useSRGB) {
             internalFormat = org.lwjgl.opengl.GL30.GL_SRGB8_ALPHA8;
         }
         frameBufferBuilder.addColorTextureAttachment(internalFormat, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE);
@@ -516,7 +516,7 @@ public class XrDriver implements Disposable {
             if (frameState.shouldRender()) {
                 if (renderLayerOpenXR(stack, currentFrameTime, layerProjection)) {
                     // Desktop mirroring.
-                    if (Settings.settings.runtime.vrDesktopMirror
+                    if (GaiaSky.settings().runtime.vrDesktopMirror
                             && currentRenderer.get() != null
                             && leftEyeSwapchainIndex != -1) {
                         // Get the actual GL texture ID from the swapchain buffer.

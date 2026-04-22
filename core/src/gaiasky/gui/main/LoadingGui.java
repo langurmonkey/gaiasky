@@ -12,13 +12,10 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
@@ -30,7 +27,6 @@ import gaiasky.event.EventManager;
 import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.gui.vr.FixedScreenViewport;
 import gaiasky.util.LoadingTextGenerator;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.TipsGenerator;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
@@ -70,7 +66,7 @@ public class LoadingGui extends AbstractGui {
         interfaces = new Array<>();
         float pad32 = 32f;
         float pad10 = 10f;
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         // User interface.
         Viewport vp;
         if (vr) {
@@ -122,9 +118,9 @@ public class LoadingGui extends AbstractGui {
         logo.setScale(1.05f);
         logo.setOrigin(Align.center);
 
-        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
+        OwnLabel gaiaSky = new OwnLabel(GaiaSky.settings().getApplicationTitle(GaiaSky.settings().runtime.openXr), skin, "main-title");
         gaiaSky.setFontScale(1.5f);
-        OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
+        OwnLabel version = new OwnLabel(GaiaSky.settings().version.version, skin, "main-title");
         version.setColor(skin.getColor("theme"));
         Table title = new Table(skin);
         title.add(gaiaSky).bottom().left().padBottom(pad10).row();
@@ -223,7 +219,7 @@ public class LoadingGui extends AbstractGui {
     }
 
     private void randomFunnyText() {
-        if (Settings.settings.runtime.openXr) {
+        if (GaiaSky.settings().runtime.openXr) {
             spin.setText(I18n.msg("gui.loading"));
         } else {
             try {

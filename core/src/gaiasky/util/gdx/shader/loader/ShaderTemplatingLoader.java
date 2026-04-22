@@ -9,8 +9,8 @@ package gaiasky.util.gdx.shader.loader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.GaiaSky;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 
 import java.util.Scanner;
 
@@ -29,7 +29,7 @@ public class ShaderTemplatingLoader {
         FileHandle fh;
         if(file.startsWith(Constants.DATA_LOCATION_TOKEN)) {
             // Dataset.
-            fh = Settings.settings.data.dataFileHandle(file);
+            fh = GaiaSky.settings().data.dataFileHandle(file);
         } else {
             // Internal file (assets directory).
             fh = Gdx.files.internal(file);

@@ -7,11 +7,11 @@
 
 package gaiasky.script.v2.impl;
 
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.script.v2.api.InstancesAPI;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.SlaveManager;
 
 /**
@@ -33,7 +33,7 @@ public class InstancesModule extends APIModule implements InstancesAPI {
     public void set_projection_yaw(float yaw) {
         if (SlaveManager.projectionActive()) {
             api.base.post_runnable(() -> {
-                Settings.settings.program.net.slave.yaw = yaw;
+                GaiaSky.settings().program.net.slave.yaw = yaw;
                 SlaveManager.instance.yaw = yaw;
             });
         }
@@ -43,7 +43,7 @@ public class InstancesModule extends APIModule implements InstancesAPI {
     public void set_projection_pitch(float pitch) {
         if (SlaveManager.projectionActive()) {
             api.base.post_runnable(() -> {
-                Settings.settings.program.net.slave.pitch = pitch;
+                GaiaSky.settings().program.net.slave.pitch = pitch;
                 SlaveManager.instance.pitch = pitch;
             });
         }
@@ -53,7 +53,7 @@ public class InstancesModule extends APIModule implements InstancesAPI {
     public void set_projection_roll(float roll) {
         if (SlaveManager.projectionActive()) {
             api.base.post_runnable(() -> {
-                Settings.settings.program.net.slave.roll = roll;
+                GaiaSky.settings().program.net.slave.roll = roll;
                 SlaveManager.instance.roll = roll;
             });
         }

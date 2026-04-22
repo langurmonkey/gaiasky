@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.Texture;
 import gaiasky.GaiaSky;
 import gaiasky.scene.component.Highlight;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
@@ -25,20 +24,20 @@ public class StarSetQuadComponent {
     protected Texture starTex;
 
     public void setStarTexture(String starTexture) {
-        starTex = new Texture(Settings.settings.data.dataFileHandle(starTexture), true);
+        starTex = new Texture(GaiaSky.settings().data.dataFileHandle(starTexture), true);
         starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     protected void initShaderProgram(ExtShaderProgram shaderProgram) {
         this.alphaSizeBr = new float[3];
         this.opacityLimits = new float[2];
-        this.opacityLimitsHlShowAll = new float[]{0.95f, Settings.settings.scene.star.opacity[1]};
+        this.opacityLimitsHlShowAll = new float[]{0.95f, GaiaSky.settings().scene.star.opacity[1]};
 
-        updateMinQuadSolidAngle(Settings.settings.graphics.backBufferResolution);
-        updateStarBrightness(Settings.settings.scene.star.brightness);
-        updateBrightnessPower(Settings.settings.scene.star.power);
-        updateStarPointSize(Settings.settings.scene.star.pointSize);
-        updateStarOpacityLimits(Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1]);
+        updateMinQuadSolidAngle(GaiaSky.settings().graphics.backBufferResolution);
+        updateStarBrightness(GaiaSky.settings().scene.star.brightness);
+        updateBrightnessPower(GaiaSky.settings().scene.star.power);
+        updateStarPointSize(GaiaSky.settings().scene.star.pointSize);
+        updateStarOpacityLimits(GaiaSky.settings().scene.star.opacity[0], GaiaSky.settings().scene.star.opacity[1]);
 
         shaderProgram.begin();
         // Uniforms that rarely change
@@ -99,7 +98,7 @@ public class StarSetQuadComponent {
     protected void setOpacityLimitsUniform(ExtShaderProgram shaderProgram, Highlight highlight) {
         if (highlight != null && highlight.isHighlighted() && highlight.isHlAllVisible()) {
             opacityLimitsHlShowAll[0] = 0.95f;
-            opacityLimitsHlShowAll[1] = Settings.settings.scene.star.opacity[1];
+            opacityLimitsHlShowAll[1] = GaiaSky.settings().scene.star.opacity[1];
             shaderProgram.setUniform2fv("u_opacityLimits", opacityLimitsHlShowAll, 0, 2);
         } else {
             shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);

@@ -7,14 +7,9 @@
 
 package gaiasky.render.postprocess.effects;
 
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaiasky.render.postprocess.PostProcessor;
 import gaiasky.render.postprocess.PostProcessorEffect;
-import gaiasky.render.postprocess.filters.BlurFilter;
-import gaiasky.render.postprocess.filters.CombineFilter;
 import gaiasky.render.postprocess.filters.NoiseFilter;
-import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
 public final class Noise extends PostProcessorEffect {

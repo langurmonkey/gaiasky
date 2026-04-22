@@ -11,12 +11,12 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.util.Settings;
 
 import java.util.function.BooleanSupplier;
 
@@ -50,7 +50,7 @@ public class RenderModeAbstract {
         ppb.render(fb);
 
         // Render camera.
-        if (!Settings.settings.runtime.openXr) {
+        if (!GaiaSky.settings().runtime.openXr) {
             if (fb != null && postproc) {
                 fb.begin();
             }

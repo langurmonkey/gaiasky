@@ -15,7 +15,6 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 
 /**
  * Updates ruler entities, managing their endpoints and distance measurements.
@@ -52,7 +51,7 @@ public class RulerUpdater extends AbstractUpdateSystem {
             body.distToCamera = graph.translation.lenDouble();
             // Distance in internal units
             double dst = ruler.p0.dst(ruler.p1);
-            Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst, Settings.settings.program.ui.distanceUnits);
+            Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst, GaiaSky.settings().program.ui.distanceUnits);
             ruler.dist = GlobalResources.formatNumber(d.getFirst()) + " " + d.getSecond();
 
             GaiaSky.postRunnable(() -> EventManager.publish(Event.RULER_DIST, entity, dst, ruler.dist));

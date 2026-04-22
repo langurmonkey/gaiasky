@@ -13,6 +13,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -21,13 +22,12 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -325,7 +325,7 @@ public class CameraManager implements ICamera, IObserver {
         speed = (velocity.len() * Constants.U_TO_KM) / (dt * Nature.S_TO_H);
 
         // High speed?
-        if (speed > (Settings.settings.runtime.openXr ? 5e6 : 5e5)) {
+        if (speed > (GaiaSky.settings().runtime.openXr ? 5e6 : 5e5)) {
             EventManager.publish(Event.CLEAR_OCTANT_QUEUE, this);
         }
 

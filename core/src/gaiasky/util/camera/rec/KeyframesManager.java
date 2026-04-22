@@ -14,7 +14,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.camera.rec.Camcorder.RecorderState;
 import gaiasky.util.i18n.I18n;
@@ -109,7 +108,7 @@ public class KeyframesManager implements IObserver {
      */
     public void regenerateCameraPath() {
         synchronized (keyframes) {
-            currentPath = new CameraPath(keyframes, positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position));
+            currentPath = new CameraPath(keyframes, positionsToPathParts(keyframes, GaiaSky.settings().camrecorder.keyframe.position));
         }
     }
 
@@ -141,7 +140,7 @@ public class KeyframesManager implements IObserver {
             t += keyframes.get(i).seconds;
         }
         t += kf.seconds;
-        return (long) (t * Settings.settings.camrecorder.targetFps);
+        return (long) (t * GaiaSky.settings().camrecorder.targetFps);
     }
 
     private PathDouble<Vector3D> getPath(Vector3D[] data, PathType pathType) {
@@ -312,7 +311,7 @@ public class KeyframesManager implements IObserver {
                 f = SysUtils.uniqueFileName(f);
             }
         }
-        var cameraPath = new CameraPath(keyframes, positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position));
+        var cameraPath = new CameraPath(keyframes, positionsToPathParts(keyframes, GaiaSky.settings().camrecorder.keyframe.position));
 
         try {
             cameraPath.persist(f);
@@ -320,7 +319,7 @@ public class KeyframesManager implements IObserver {
             logger.error(e);
             return;
         }
-        double frameRate = Settings.settings.camrecorder.targetFps;
+        double frameRate = GaiaSky.settings().camrecorder.targetFps;
         // Notification.
         GaiaSky.popupNotification(I18n.msg("gui.keyframes.export.ok", keyframes.size(), cameraPath.n, frameRate, f), 10, this);
     }
@@ -333,7 +332,7 @@ public class KeyframesManager implements IObserver {
      * @return Array of path parts.
      */
     private PathPart[] positionsToPathParts(List<Keyframe> keyframes, PathType pathType) {
-        double frameRate = Settings.settings.camrecorder.targetFps;
+        double frameRate = GaiaSky.settings().camrecorder.targetFps;
         Array<Array<Vector3D>> positionsSep = new Array<>();
         Array<Vector3D> current = new Array<>();
         Array<Double> times = new Array<>();
@@ -446,7 +445,7 @@ public class KeyframesManager implements IObserver {
      */
     public boolean checkKeyframeTimings() {
         if (!keyframes.isEmpty()) {
-            double fPS = Settings.settings.camrecorder.targetFps;
+            double fPS = GaiaSky.settings().camrecorder.targetFps;
             double sPF = 1.0 / fPS;
             long msPF = (long) (sPF * 1000L);
 
@@ -527,7 +526,7 @@ public class KeyframesManager implements IObserver {
                         "run", scriptLocation.resolve(scriptName).toString(),
                         "-i", inputFile.toString(),
                         "-o", output.toString(),
-                        "--fps", Double.toString(Settings.settings.camrecorder.targetFps));
+                        "--fps", Double.toString(GaiaSky.settings().camrecorder.targetFps));
 
                 ProcessBuilder builder = new ProcessBuilder(args);
                 builder.directory(scriptLocation.toFile());

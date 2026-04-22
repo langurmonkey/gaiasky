@@ -10,13 +10,13 @@ package gaiasky.data.orbit;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.GaiaSky;
 import gaiasky.data.api.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.component.Trajectory;
-import gaiasky.util.Settings;
 
 public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvider {
     private PointCloudData data;
@@ -30,7 +30,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
     public void load(String file, OrbitDataLoaderParameters parameter) {
         FileDataLoaderEclipticJulianTime odl = new FileDataLoaderEclipticJulianTime();
         try {
-            FileHandle f = Settings.settings.data.dataFileHandle(file);
+            FileHandle f = GaiaSky.settings().data.dataFileHandle(file);
             data = odl.load(f.read());
             EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, file);
         } catch (Exception e) {

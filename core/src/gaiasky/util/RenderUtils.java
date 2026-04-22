@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import gaiasky.GaiaSky;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.graphics.TextureView;
 
@@ -70,8 +71,8 @@ public class RenderUtils {
         float tw = tex.getWidth();
         float th = tex.getHeight();
         float tar = tw / th;
-        float gw = (float) (g.getWidth() * Settings.settings.graphics.backBufferScale);
-        float gh = (float) (g.getHeight() * Settings.settings.graphics.backBufferScale);
+        float gw = (float) (g.getWidth() * GaiaSky.settings().graphics.backBufferScale);
+        float gh = (float) (g.getHeight() * GaiaSky.settings().graphics.backBufferScale);
         float gar = gw / gh;
 
         if (lastSize != null && (tw != lastSize.x || th != lastSize.y)) {
@@ -146,8 +147,8 @@ public class RenderUtils {
         float tw = tex.getWidth();
         float th = tex.getHeight();
         float tar = tw / th;
-        float gw = (float) (g.getWidth() * Settings.settings.graphics.backBufferScale);
-        float gh = (float) (g.getHeight() * Settings.settings.graphics.backBufferScale);
+        float gw = (float) (g.getWidth() * GaiaSky.settings().graphics.backBufferScale);
+        float gh = (float) (g.getHeight() * GaiaSky.settings().graphics.backBufferScale);
         float gar = gw / gh;
 
         if (lastSize != null && (tw != lastSize.x || th != lastSize.y)) {

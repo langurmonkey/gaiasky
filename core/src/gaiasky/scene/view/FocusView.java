@@ -28,7 +28,6 @@ import gaiasky.scene.record.RotationComponent;
 import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.util.Constants;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.*;
@@ -764,7 +763,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         } else if (isModel()) {
             var model = Mapper.model.get(entity);
             var mc = model.model;
-            double multiplier = Settings.settings.scene.renderer.elevation.multiplier;
+            double multiplier = GaiaSky.settings().scene.renderer.elevation.multiplier;
             double height = 0;
             if (mc != null && mc.mtc != null && mc.mtc.heightData != null) {
                 double dCam;

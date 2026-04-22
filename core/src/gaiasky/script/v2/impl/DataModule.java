@@ -30,7 +30,6 @@ import gaiasky.script.v2.api.DataAPI;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
@@ -76,7 +75,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
     @Override
     public String get_datasets_directory() {
-        return Settings.settings.data.location;
+        return GaiaSky.settings().data.location;
     }
 
     @Override

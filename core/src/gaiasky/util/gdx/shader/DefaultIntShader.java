@@ -25,7 +25,6 @@ import gaiasky.render.ShadowMapImpl;
 import gaiasky.scene.system.render.pass.CascadedShadowMapRenderPass;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.model.gltf.scene3d.attributes.*;
 import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
@@ -521,7 +520,7 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define heightFlag\n");
         }
 
-        if (Settings.settings.scene.renderer.elevation.type.isNone()) {
+        if (GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
             prefix.append("#define noHeightFlag\n");
         }
 
@@ -589,7 +588,7 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define " + Texture3DAttribute.Volume3Alias + "Flag\n");
         }
 
-        if (Settings.settings.postprocess.ssr.active) {
+        if (GaiaSky.settings().postprocess.ssr.active) {
             prefix.append("#define ssrFlag\n");
         }
 

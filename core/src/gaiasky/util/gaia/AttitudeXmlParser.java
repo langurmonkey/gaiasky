@@ -11,11 +11,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
+import gaiasky.GaiaSky;
 import gaiasky.util.BinarySearchTree;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Nature;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.gaia.time.Hours;
@@ -47,7 +47,7 @@ public class AttitudeXmlParser {
 
     public static BinarySearchTree<AttitudeIntervalBean> parseFolder(String folder) {
         final Array<FileHandle> list;
-        try (Stream<Path> paths = Files.walk(Paths.get(Settings.settings.data.dataFile(folder)))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(GaiaSky.settings().data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).toList();
             list = new Array<>(false, ps.size());
             for (Path p : ps) {

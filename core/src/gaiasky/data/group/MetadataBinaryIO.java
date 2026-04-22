@@ -7,11 +7,11 @@
 
 package gaiasky.data.group;
 
+import gaiasky.GaiaSky;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
@@ -132,7 +132,7 @@ public class MetadataBinaryIO {
     public OctreeNode readMetadataMapped(String file, LoadStatus status) {
         nodesMap = new HashMap<>();
 
-        try (var f = new RandomAccessFile(Settings.settings.data.dataFile(file), "r")) {
+        try (var f = new RandomAccessFile(GaiaSky.settings().data.dataFile(file), "r")) {
             FileChannel fc = f.getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());

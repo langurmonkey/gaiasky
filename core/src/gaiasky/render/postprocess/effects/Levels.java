@@ -16,7 +16,6 @@ import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.LevelsFilter;
 import gaiasky.render.postprocess.filters.LumaFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
-import gaiasky.util.Settings;
 import net.jafama.FastMath;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
@@ -55,7 +54,7 @@ public final class Levels extends PostProcessorEffect {
         }
 
         GLFrameBuffer.FrameBufferBuilder builder = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
-        builder.addColorTextureAttachment(Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGB16F, GL30.GL_RGB, GL30.GL_FLOAT);
+        builder.addColorTextureAttachment(GaiaSky.settings().graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGB16F, GL30.GL_RGB, GL30.GL_FLOAT);
         lumaBuffer = new GaiaSkyFrameBuffer(builder, 0);
         lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
 

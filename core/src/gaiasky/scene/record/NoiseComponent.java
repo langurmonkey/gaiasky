@@ -11,14 +11,13 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.render.postprocess.effects.Noise;
 import gaiasky.render.postprocess.effects.SurfaceGen;
 import gaiasky.render.postprocess.filters.NoiseFilter.NoiseType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import net.jafama.FastMath;
 
 import java.util.Arrays;
@@ -149,7 +148,7 @@ public final class NoiseComponent extends NamedComponent {
 
         // Gen surface with 2 color targets (diffuse, specular).
         // We use 3 color targets if we need to generate the normal map.
-        Texture lut = new Texture(Settings.settings.data.dataFileHandle(biomeLut));
+        Texture lut = new Texture(GaiaSky.settings().data.dataFileHandle(biomeLut));
         lut.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, generateNormalMap ? 3 : 2);
 

@@ -26,11 +26,9 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.BillboardDataset;
-import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ComputeShaderProgram;
@@ -38,10 +36,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Matrix4Utils;
 import gaiasky.util.math.Vector3Q;
 import gaiasky.util.tree.GenStatus;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL43;
 
-import java.nio.FloatBuffer;
 import java.util.List;
 
 /**
@@ -285,7 +281,7 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
-            int qualityIndex = Settings.settings.graphics.quality.ordinal();
+            int qualityIndex = GaiaSky.settings().graphics.quality.ordinal();
 
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
             for (var dataset : billboard.datasets) {

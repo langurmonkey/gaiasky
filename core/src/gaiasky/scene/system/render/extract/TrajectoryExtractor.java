@@ -9,13 +9,13 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
-import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsDouble;
 
 public class TrajectoryExtractor extends AbstractExtractSystem {
@@ -58,7 +58,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                     return;
 
                 boolean added = false;
-                float angleLimit = (float) Settings.settings.scene.renderer.orbitSolidAngleThreshold * camera.getFovFactor();
+                float angleLimit = (float) GaiaSky.settings().scene.renderer.orbitSolidAngleThreshold * camera.getFovFactor();
                 var angleLimitUp = angleLimit * SHADER_MODEL_OVERLAP_FACTOR;
                 if (body.solidAngle > angleLimit) {
                     // Fade the orbit using its solid angle and the threshold in the settings.

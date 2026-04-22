@@ -7,11 +7,11 @@
 
 package gaiasky.util.gaia;
 
+import gaiasky.GaiaSky;
 import gaiasky.data.api.OrientationServer;
 import gaiasky.util.BinarySearchTree;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.QuaternionDouble;
 
@@ -32,7 +32,7 @@ public class GaiaAttitudeServer implements OrientationServer {
     private IAttitude attitude;
 
     public GaiaAttitudeServer(String folder) {
-        if (Settings.settings.data.realGaiaAttitude) {
+        if (GaiaSky.settings().data.realGaiaAttitude) {
             attitudes = AttitudeXmlParser.parseFolder(folder);
             if (attitudes != null) {
                 initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
@@ -86,7 +86,7 @@ public class GaiaAttitudeServer implements OrientationServer {
      */
     public synchronized IAttitude getAttitude(final Instant date) {
         IAttitude result;
-        if (Settings.settings.data.realGaiaAttitude) {
+        if (GaiaSky.settings().data.realGaiaAttitude) {
             // Find AttitudeType in timeSlots
             if (date.compareTo(initialDate) < 0) {
                 result = dummyAttitude;

@@ -9,9 +9,9 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.util.Settings;
 
 /**
  * Extracts data for billboard set entities.
@@ -39,7 +39,7 @@ public class BillboardSetExtractor extends AbstractExtractSystem {
 
             // Billboard group.
             if (billboard.procedural) {
-                if (Settings.settings.runtime.compute) {
+                if (GaiaSky.settings().runtime.compute) {
                     // Procedural galaxy generation in the GPU.
                     addToRender(render, RenderGroup.BILLBOARD_GROUP_PROCEDURAL);
                 } else {

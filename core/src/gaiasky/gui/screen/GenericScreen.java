@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.api.IScreen;
@@ -31,7 +32,6 @@ import gaiasky.input.AbstractMouseKbdListener;
 import gaiasky.input.ScreenGamepadListener;
 import gaiasky.input.ScreenKbdListener;
 import gaiasky.util.GuiUtils;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
@@ -390,7 +390,7 @@ public abstract class GenericScreen extends Table implements IScreen {
         }
         // Add default gamepad listener.
         if (defaultGamepadListener) {
-            gamepadListener = new ScreenGamepadListener(Settings.settings.controls.gamepad.mappingsFile, this);
+            gamepadListener = new ScreenGamepadListener(GaiaSky.settings().controls.gamepad.mappingsFile, this);
         }
     }
 
@@ -531,7 +531,7 @@ public abstract class GenericScreen extends Table implements IScreen {
      * {@link #pack() Packs} the dialog and adds it to the stage at the specified position.
      */
     public GenericScreen show(Stage stage, float x, float y) {
-        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds(), Interpolation.fade)));
+        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds(), Interpolation.fade)));
         setPosition(Math.round(x), FastMath.round(y));
         setKeyboardFocus();
         return this;
@@ -679,7 +679,7 @@ public abstract class GenericScreen extends Table implements IScreen {
             }
         }
         if (gamepadListener != null) {
-            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            GamepadSettings gamepadSettings = GaiaSky.settings().controls.gamepad;
             // Backup and clean
             backupGamepadListeners = gamepadSettings.getControllerListeners();
             gamepadSettings.removeAllControllerListeners();
@@ -701,7 +701,7 @@ public abstract class GenericScreen extends Table implements IScreen {
             }
         }
         if (gamepadListener != null) {
-            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            GamepadSettings gamepadSettings = GaiaSky.settings().controls.gamepad;
             // Remove current listener
             gamepadSettings.removeControllerListener(gamepadListener);
 

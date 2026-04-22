@@ -21,7 +21,6 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnTextButton;
@@ -81,7 +80,7 @@ public class ExternalInformationUpdater {
                 if (infoButton != null)
                     infoButton.remove();
                 infoButton = new OwnTextButton(I18n.msg("gui.focusinfo.moreinfo"), skin);
-                infoButton.setDisabled(Settings.settings.program.offlineMode);
+                infoButton.setDisabled(GaiaSky.settings().program.offlineMode);
                 infoButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.wiki"), skin));
                 infoButton.pad(pad / 3f, pad, pad / 3f, pad);
                 infoButton.addListener((event) -> {

@@ -14,8 +14,8 @@ import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.math.Matrix4D;
-import gaiasky.util.math.Vector3Q;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.time.Instant;

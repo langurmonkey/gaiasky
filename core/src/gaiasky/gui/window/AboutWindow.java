@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
+import gaiasky.GaiaSky;
 import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -64,8 +65,8 @@ public class AboutWindow extends GenericDialog {
     private MemInfoWindow memInfoWindow;
 
     public AboutWindow(Stage stage, Skin skin) {
-        super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " (" + I18n.msg("gui.build",
-                                                                                                      Settings.settings.version.build) + ")",
+        super(I18n.msg("gui.help.help") + " - " + GaiaSky.settings().version.version + " (" + I18n.msg("gui.build",
+                                                                                                      GaiaSky.settings().version.build) + ")",
               skin,
               stage);
         this.linkStyle = skin.get("link", LabelStyle.class);
@@ -134,13 +135,13 @@ public class AboutWindow extends GenericDialog {
         final var contentHelp = new Table(skin);
         contentHelp.top();
 
-        var gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title-s");
+        var gaiasky = new OwnLabel(GaiaSky.settings().getApplicationTitle(GaiaSky.settings().runtime.openXr), skin, "main-title-s");
 
-        var versionBig = new OwnLabel(Settings.settings.version.version,
+        var versionBig = new OwnLabel(GaiaSky.settings().version.version,
                                       skin,
                                       "msg-33");
         var build = new OwnLabel(I18n.msg("gui.build",
-                                          Settings.settings.version.build),
+                                          GaiaSky.settings().version.build),
                                  skin,
                                  "big");
 
@@ -157,7 +158,7 @@ public class AboutWindow extends GenericDialog {
         var repoLink = new Link(Settings.REPOSITORY, linkLargeStyle, Settings.REPOSITORY);
 
         // Icon.
-        var gsIcon = Gdx.files.internal(Settings.settings.runtime.openXr ? "icon/gsvr_round_256.png" : "icon/gs_icon_256.png");
+        var gsIcon = Gdx.files.internal(GaiaSky.settings().runtime.openXr ? "icon/gsvr_round_256.png" : "icon/gs_icon_256.png");
         var iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         var gaiaSkyIcon = new Image(iconTex);
@@ -187,7 +188,7 @@ public class AboutWindow extends GenericDialog {
         contentAbout.top();
 
         // Intro
-        var intro = new OwnTextArea(I18n.msg("gui.help.gscredits", Settings.settings.version.version), skin.get("regular", TextFieldStyle.class));
+        var intro = new OwnTextArea(I18n.msg("gui.help.gscredits", GaiaSky.settings().version.version), skin.get("regular", TextFieldStyle.class));
         intro.setDisabled(true);
         intro.setPrefRows(3);
         intro.setWidth(contentWidth);
@@ -309,22 +310,22 @@ public class AboutWindow extends GenericDialog {
         var buildInfo = new OwnLabel(I18n.msg("gui.help.buildinfo"), skin, "header");
 
         var versionTitle = new OwnLabel(I18n.msg("gui.help.version", Settings.APPLICATION_NAME), skin);
-        var version = new OwnLabel(Settings.settings.version.version, skin);
+        var version = new OwnLabel(GaiaSky.settings().version.version, skin);
 
         var revisionTitle = new OwnLabel(I18n.msg("gui.help.buildnumber"), skin);
-        var revision = new OwnLabel(Settings.settings.version.build, skin);
+        var revision = new OwnLabel(GaiaSky.settings().version.build, skin);
 
         var timeTitle = new OwnLabel(I18n.msg("gui.help.buildtime"), skin);
-        var time = new OwnLabel(Settings.settings.version.buildTime.toString(), skin);
+        var time = new OwnLabel(GaiaSky.settings().version.buildTime.toString(), skin);
 
         var systemTitle = new OwnLabel(I18n.msg("gui.help.buildsys"), skin);
-        var system = new OwnTextArea(Settings.settings.version.system, skin.get("regular", TextFieldStyle.class));
+        var system = new OwnTextArea(GaiaSky.settings().version.system, skin.get("regular", TextFieldStyle.class));
         system.setDisabled(true);
         system.setPrefRows(3);
         system.setWidth(taWidth * 2f / 3f);
 
         var builderTitle = new OwnLabel(I18n.msg("gui.help.builder"), skin);
-        var builder = new OwnLabel(Settings.settings.version.builder, skin);
+        var builder = new OwnLabel(GaiaSky.settings().version.builder, skin);
 
         // Paths
         var paths = new OwnLabel(I18n.msg("gui.help.paths"), skin, "header");
@@ -622,15 +623,15 @@ public class AboutWindow extends GenericDialog {
             checkLabel = new OwnLabel("", skin);
 
             checkTable.add(checkLabel).top().left().padBottom(pad10).row();
-            if (Settings.settings.program.update.lastCheck == null || new Date().getTime() - Settings.settings.program.update.lastCheck.toEpochMilli() > Settings.ProgramSettings.UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
+            if (GaiaSky.settings().program.update.lastCheck == null || new Date().getTime() - GaiaSky.settings().program.update.lastCheck.toEpochMilli() > Settings.ProgramSettings.UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
                 // Check!
                 checkLabel.setText(I18n.msg("gui.newversion.checking"));
                 getCheckVersionThread().start();
             } else {
                 // Inform latest
-                newVersionCheck(Settings.settings.version.version,
-                                Settings.settings.version.versionNumber,
-                                Settings.settings.version.buildTime,
+                newVersionCheck(GaiaSky.settings().version.version,
+                                GaiaSky.settings().version.versionNumber,
+                                GaiaSky.settings().version.buildTime,
                                 false);
             }
             contentUpdates.add(checkTable).left().top().padTop(pad34);
@@ -682,16 +683,16 @@ public class AboutWindow extends GenericDialog {
      * @param tagDate       The date
      */
     private void newVersionCheck(String tagVersion, Integer versionNumber, Instant tagDate, boolean log) {
-        Settings.settings.program.update.lastCheck = Instant.now();
-        if (versionNumber > Settings.settings.version.versionNumber) {
+        GaiaSky.settings().program.update.lastCheck = Instant.now();
+        if (versionNumber > GaiaSky.settings().version.versionNumber) {
             DateTimeFormatter df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM)
                     .withLocale(I18n.locale)
                     .withZone(ZoneOffset.UTC);
             if (log) {
-                logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
+                logger.info(I18n.msg("gui.newversion.available", GaiaSky.settings().version.version, tagVersion + " [" + df.format(tagDate) + "]"));
             }
             // There's a new version!
-            checkLabel.setText(I18n.msg("gui.newversion.available", Settings.settings.version, tagVersion + " [" + df.format(tagDate) + "]"));
+            checkLabel.setText(I18n.msg("gui.newversion.available", GaiaSky.settings().version, tagVersion + " [" + df.format(tagDate) + "]"));
             final String uri = Settings.HOMEPAGE_DOWNLOADS;
 
             OwnTextButton getNewVersion = new OwnTextButton(I18n.msg("gui.newversion.getit"), skin);
@@ -711,8 +712,8 @@ public class AboutWindow extends GenericDialog {
 
         } else {
             if (log)
-                logger.info(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
-            checkLabel.setText(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
+                logger.info(I18n.msg("gui.newversion.nonew", GaiaSky.settings().program.update.getLastCheckedString()));
+            checkLabel.setText(I18n.msg("gui.newversion.nonew", GaiaSky.settings().program.update.getLastCheckedString()));
             // Add check now button
             OwnTextButton checkNewVersion = new OwnTextButton(I18n.msg("gui.newversion.checknow"), skin);
             checkNewVersion.pad(pad10, pad18, pad10, pad18);
@@ -731,7 +732,7 @@ public class AboutWindow extends GenericDialog {
 
     private Thread getCheckVersionThread() {
         // Start version check
-        VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
+        VersionChecker vc = new VersionChecker(GaiaSky.settings().program.url.versionCheck);
         vc.setListener(event -> {
             if (event instanceof VersionCheckEvent vce) {
                 if (!vce.isFailed()) {

@@ -26,7 +26,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.BillboardRenderer;
-import gaiasky.util.Settings;
 import org.lwjgl.opengl.GL40;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class LightGlowRenderPass extends RenderPass {
         } else {
             frameBuffer = (FrameBuffer) params[0];
         }
-        if (Settings.settings.postprocess.lightGlow.active && frameBuffer != null) {
+        if (GaiaSky.settings().postprocess.lightGlow.active && frameBuffer != null) {
             var renderLists = sceneRenderer.getRenderListsFull();
             var renderAssets = sceneRenderer.getRenderAssets();
             // Get all billboard stars.
@@ -100,7 +99,7 @@ public class LightGlowRenderPass extends RenderPass {
             List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
 
             // VR controllers.
-            if (Settings.settings.runtime.openXr) {
+            if (GaiaSky.settings().runtime.openXr) {
                 RenderModeOpenXR sgrVR = sceneRenderer.getRenderModeOpenXR();
                 if (sceneRenderer.getVrContext() != null) {
                     for (Entity m : sgrVR.controllerObjects) {

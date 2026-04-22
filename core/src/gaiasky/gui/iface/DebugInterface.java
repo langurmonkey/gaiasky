@@ -15,10 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -77,7 +77,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
 
         build();
 
-        this.setVisible(Settings.settings.program.debugInfo);
+        this.setVisible(GaiaSky.settings().program.debugInfo);
         this.lock = lock;
         EventManager.instance.subscribe(this,
                                         Event.DEBUG_TIME,
@@ -128,7 +128,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     maximized = false;
                     extra.addAction(Actions.sequence(
                             Actions.alpha(1f),
-                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()),
                             Actions.run(() -> {
                                 extraCell.setActor(null);
                                 toggleSize.setText("(+)");
@@ -141,7 +141,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     extraCell.setActor(extra);
                     extra.addAction(Actions.sequence(
                             Actions.alpha(0f),
-                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds()),
                             Actions.run(() -> {
                                 toggleSize.setText("(-)");
                                 toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
@@ -171,7 +171,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         add(toggleSize).right().row();
 
         /* GRAPHICS DEVICE */
-        final var settings = Settings.settings;
+        final var settings = GaiaSky.settings();
         HorizontalGroup deviceGroup = new HorizontalGroup();
         deviceGroup.space(pad05);
         String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);
@@ -340,7 +340,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
-            final boolean debug = Settings.settings.program.debugInfo;
+            final boolean debug = GaiaSky.settings().program.debugInfo;
             switch (event) {
                 case DEBUG_TIME -> {
                     if (debug && data.length > 0) {
@@ -427,19 +427,19 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     } else {
                         showDebugInfo = !this.isVisible();
                     }
-                    Settings.settings.program.debugInfo = showDebugInfo;
+                    GaiaSky.settings().program.debugInfo = showDebugInfo;
                     if (showDebugInfo) {
                         // Display.
                         this.addAction(Actions.sequence(
                                 Actions.visible(true),
                                 Actions.alpha(0f),
-                                Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())
+                                Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds())
                         ));
                     } else {
                         // Hide.
                         this.addAction(Actions.sequence(
                                 Actions.alpha(1f),
-                                Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                                Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()),
                                 Actions.visible(false)
                         ));
                     }

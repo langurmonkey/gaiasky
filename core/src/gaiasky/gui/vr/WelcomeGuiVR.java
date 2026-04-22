@@ -23,7 +23,6 @@ import gaiasky.GaiaSky;
 import gaiasky.gui.main.AbstractGui;
 import gaiasky.gui.main.VersionLineTable;
 import gaiasky.gui.main.WelcomeGui;
-import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
@@ -68,8 +67,8 @@ public class WelcomeGuiVR extends AbstractGui {
         // Title.
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(64f);
-        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
-        OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
+        OwnLabel gaiaSky = new OwnLabel(GaiaSky.settings().getApplicationTitle(GaiaSky.settings().runtime.openXr), skin, "main-title");
+        OwnLabel version = new OwnLabel(GaiaSky.settings().version.version, skin, "main-title");
         version.setColor(skin.getColor("theme"));
         titleGroup.addActor(gaiaSky);
         titleGroup.addActor(version);

@@ -7,7 +7,7 @@
 
 package gaiasky.util.coord;
 
-import gaiasky.util.Settings;
+import gaiasky.GaiaSky;
 import gaiasky.util.SysUtils;
 
 import java.io.BufferedReader;
@@ -17,7 +17,10 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -107,7 +110,7 @@ public class TLEParser {
     public List<String> fetchTLEData(String urlString) throws IOException {
         URL url = java.net.URI.create(urlString).toURL();
         String group = getGroupFromURL(url);
-        final var cacheDir = SysUtils.getDataCacheDir(Settings.settings.data.location);
+        final var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
         var file = cacheDir.resolve("TLE-" + group);
         boolean download = true;
         if (Files.exists(file) && Files.isRegularFile(file)) {

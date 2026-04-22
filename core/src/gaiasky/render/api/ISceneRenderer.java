@@ -8,12 +8,10 @@
 package gaiasky.render.api;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.system.render.pass.LightGlowRenderPass;
 
 import java.util.List;
 

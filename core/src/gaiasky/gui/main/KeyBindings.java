@@ -243,13 +243,13 @@ public class KeyBindings {
         // Condition that checks the current camera is not Game
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
         // Condition that checks the GUI is visible (no clean mode)
-        BooleanRunnable noCleanMode = () -> Settings.settings.runtime.displayGui || GaiaSky.instance.getCliArgs().externalView;
+        BooleanRunnable noCleanMode = () -> GaiaSky.settings().runtime.displayGui || GaiaSky.instance.getCliArgs().externalView;
         // Condition that checks that panorama mode is off
-        BooleanRunnable noPanorama = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPanorama());
+        BooleanRunnable noPanorama = () -> !(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.projection.isPanorama());
         // Condition that checks that planetarium mode is off
-        BooleanRunnable noPlanetarium = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPlanetarium());
+        BooleanRunnable noPlanetarium = () -> !(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.projection.isPlanetarium());
         // Condition that checks that ortho-sphere view mode is off
-        BooleanRunnable noOrthoSphere = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isOrthosphere());
+        BooleanRunnable noOrthoSphere = () -> !(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.projection.isOrthosphere());
         // Condition that checks that we are not a slave with a special projection
         BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
         // Condition that checks that we are a master and have slaves
@@ -370,22 +370,22 @@ public class KeyBindings {
         addAction(new ProgramAction("action.pauseresume", () -> {
             // Game mode has space bound to 'up'
             if (!GaiaSky.instance.cameraManager.mode.isGame())
-                EventManager.publish(Event.TIME_STATE_CMD, this, !Settings.settings.runtime.timeOn);
+                EventManager.publish(Event.TIME_STATE_CMD, this, !GaiaSky.settings().runtime.timeOn);
         }));
 
         // Increase field of view
         addAction(new ProgramAction("action.incfov",
-                                    () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov + 1f),
+                                    () -> EventManager.publish(Event.FOV_CMD, this, GaiaSky.settings().scene.camera.fov + 1f),
                                     noSlaveProj));
 
         // Decrease field of view
         addAction(new ProgramAction("action.decfov",
-                                    () -> EventManager.publish(Event.FOV_CMD, this, Settings.settings.scene.camera.fov - 1f),
+                                    () -> EventManager.publish(Event.FOV_CMD, this, GaiaSky.settings().scene.camera.fov - 1f),
                                     noSlaveProj));
 
         // Fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {
-            Settings.settings.graphics.fullScreen.active = !Settings.settings.graphics.fullScreen.active;
+            GaiaSky.settings().graphics.fullScreen.active = !GaiaSky.settings().graphics.fullScreen.active;
             EventManager.publish(Event.SCREEN_MODE_CMD, this);
         }));
 
@@ -393,17 +393,17 @@ public class KeyBindings {
         addAction(new ProgramAction("action.screenshot",
                                     () -> EventManager.publish(Event.SCREENSHOT_CMD,
                                                                this,
-                                                               Settings.settings.screenshot.resolution[0],
-                                                               Settings.settings.screenshot.resolution[1],
-                                                               Settings.settings.screenshot.location)));
+                                                               GaiaSky.settings().screenshot.resolution[0],
+                                                               GaiaSky.settings().screenshot.resolution[1],
+                                                               GaiaSky.settings().screenshot.location)));
 
         // Save cubemap faces
         addAction(new ProgramAction("action.screenshot.cubemap",
-                                    () -> EventManager.publish(Event.SCREENSHOT_CUBEMAP_CMD, this, Settings.settings.screenshot.location)));
+                                    () -> EventManager.publish(Event.SCREENSHOT_CUBEMAP_CMD, this, GaiaSky.settings().screenshot.location)));
 
         // Toggle frame output
         addAction(new ProgramAction("action.toggle/element.frameoutput",
-                                    () -> EventManager.publish(Event.FRAME_OUTPUT_CMD, this, !Settings.settings.frame.active)));
+                                    () -> EventManager.publish(Event.FRAME_OUTPUT_CMD, this, !GaiaSky.settings().frame.active)));
 
         // Toggle UI collapse/expand
         addAction(new ProgramAction("action.toggle/element.controls",
@@ -413,42 +413,42 @@ public class KeyBindings {
 
         // Toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
-            boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPlanetariumOn();
+            boolean enable = !GaiaSky.settings().program.modeCubemap.active || !GaiaSky.settings().program.modeCubemap.isPlanetariumOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
         }, noPanorama, noOrthoSphere));
 
         // Toggle planetarium projection
         addAction(new ProgramAction("action.toggle/element.planetarium.projection", () -> {
-            if (Settings.settings.program.modeCubemap.isPlanetariumOn()) {
-                int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPlanetariumProjection().ordinal();
+            if (GaiaSky.settings().program.modeCubemap.isPlanetariumOn()) {
+                int newProjectionIndex = GaiaSky.settings().program.modeCubemap.projection.getNextPlanetariumProjection().ordinal();
                 EventManager.publish(Event.PLANETARIUM_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
         }, noPanorama, noOrthoSphere));
 
         // Toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
-            boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPanoramaOn();
+            boolean enable = !GaiaSky.settings().program.modeCubemap.active || !GaiaSky.settings().program.modeCubemap.isPanoramaOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.EQUIRECTANGULAR);
         }, noPlanetarium, noOrthoSphere));
 
         // Toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
-            if (Settings.settings.program.modeCubemap.isPanoramaOn()) {
-                int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
+            if (GaiaSky.settings().program.modeCubemap.isPanoramaOn()) {
+                int newProjectionIndex = GaiaSky.settings().program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
         }, noPlanetarium, noOrthoSphere));
 
         // Toggle orthosphere mode
         addAction(new ProgramAction("action.toggle/element.orthosphere", () -> {
-            boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isOrthosphereOn();
+            boolean enable = !GaiaSky.settings().program.modeCubemap.active || !GaiaSky.settings().program.modeCubemap.isOrthosphereOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.ORTHOSPHERE);
         }, noPlanetarium, noPanorama));
 
         // Toggle orthosphere profile
         addAction(new ProgramAction("action.toggle/element.orthosphere.profile", () -> {
-            if (Settings.settings.program.modeCubemap.isOrthosphereOn()) {
-                int newProfileIndex = Settings.settings.program.modeCubemap.projection.getNextOrthosphereProfile().ordinal();
+            if (GaiaSky.settings().program.modeCubemap.isOrthosphereOn()) {
+                int newProfileIndex = GaiaSky.settings().program.modeCubemap.projection.getNextOrthosphereProfile().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProfileIndex]);
             }
         }));
@@ -474,15 +474,15 @@ public class KeyBindings {
 
         // Toggle particle fade
         addAction(new ProgramAction("action.toggle/element.octreeparticlefade",
-                                    () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, !Settings.settings.scene.octree.fade)));
+                                    () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, !GaiaSky.settings().scene.octree.fade)));
 
         // Toggle stereoscopic mode
         addAction(new ProgramAction("action.toggle/element.stereomode",
-                                    () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active)));
+                                    () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !GaiaSky.settings().program.modeStereo.active)));
 
         // Switch stereoscopic profile
         addAction(new ProgramAction("action.switchstereoprofile", () -> {
-            int newidx = Settings.settings.program.modeStereo.profile.ordinal();
+            int newidx = GaiaSky.settings().program.modeStereo.profile.ordinal();
             newidx = (newidx + 1) % values().length;
             EventManager.publish(Event.STEREO_PROFILE_CMD, this, values()[newidx]);
         }));
@@ -491,7 +491,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.cleanmode",
                                     () -> EventManager.publish(Event.DISPLAY_GUI_CMD,
                                                                this,
-                                                               !Settings.settings.runtime.displayGui,
+                                                               !GaiaSky.settings().runtime.displayGui,
                                                                I18n.msg("notif.cleanmode"))));
 
         // Travel to focus object
@@ -560,7 +560,7 @@ public class KeyBindings {
 
         // Toggle cinematic camera behaviour
         addAction(new ProgramAction("action.toggle/camera.cinematic",
-                                    () -> EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, !Settings.settings.scene.camera.cinematic)));
+                                    () -> EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, !GaiaSky.settings().scene.camera.cinematic)));
 
         // Empty action, press to speed up camera
         addAction(new ProgramAction("action.camera.speedup", () -> {
@@ -571,7 +571,7 @@ public class KeyBindings {
 
         // Debug upscale filter
         addAction(new ProgramAction("action.upscale", () -> {
-            var filter = Settings.settings.postprocess.upscaleFilter;
+            var filter = GaiaSky.settings().postprocess.upscaleFilter;
             var newFilter = UpscaleFilter.values()[(filter.ordinal() + 1) % UpscaleFilter.values().length];
             EventManager.publish(Event.UPSCALE_FILTER_CMD, this, newFilter);
             logger.info("Upscaling filter: " + newFilter);

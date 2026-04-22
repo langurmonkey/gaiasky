@@ -24,7 +24,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.component.Base;
-import gaiasky.scene.component.Label;
 import gaiasky.scene.component.Label.LabelDisplay;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.GlobalResources;

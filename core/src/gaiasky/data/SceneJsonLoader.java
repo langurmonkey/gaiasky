@@ -16,11 +16,11 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import gaiasky.GaiaSky;
 import gaiasky.data.api.ISceneLoader;
 import gaiasky.scene.Scene;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.i18n.I18n;
@@ -73,7 +73,7 @@ public class SceneJsonLoader {
 
         // The dataset directory corresponding to this JSON file. Usually coincides with the dataset key.
         // For old-style datasets, this should be null.
-        var dataLocation = Path.of(Settings.settings.data.location);
+        var dataLocation = Path.of(GaiaSky.settings().data.location);
         var parent = jsonFile.file().toPath().getParent();
         // Check that the dataset parent is not the data location. Otherwise, get its name.
         var datasetDirectory = dataLocation.toAbsolutePath().compareTo(parent.toAbsolutePath()) == 0 ? null : parent.getFileName().toString();
