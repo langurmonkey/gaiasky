@@ -490,7 +490,7 @@ void main() {
             vec3 roughness3 = fetchColorRoughness(texCoords);
             roughnessValue = roughness3.r;
         #elif defined(shininessFlag)
-            roughnessValue = 1.0 - u_shininess;
+            roughnessValue = clamp(sqrt(2.0 / (u_shininess + 2.0)), 0.0, 1.0);
         #endif // roughness
 
         // Fetch Metallic

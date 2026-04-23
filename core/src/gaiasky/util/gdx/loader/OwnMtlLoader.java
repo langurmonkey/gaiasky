@@ -9,13 +9,13 @@ package gaiasky.util.gdx.loader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.data.OwnModelMaterial;
 import gaiasky.util.gdx.model.data.OwnModelTexture;
+import net.jafama.FastMath;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,12 +34,13 @@ public class OwnMtlLoader {
         String line;
         String[] tokens;
         String curMatName = "default";
-        Color difcolor = Color.WHITE;
-        Color speccolor = Color.WHITE;
-        Color emicolor = Color.WHITE;
+        Color difcolor = Color.GRAY;
+        Color speccolor = Color.BLACK;
+        Color emicolor = Color.BLACK;
         Color metcolor = null;
         Color roughcolor = null;
         float ior = -1f;
+        float specular = 0f;
         float metallic = -1f;
         float roughness = -1f;
         float opacity = 1.0f;
@@ -50,6 +51,8 @@ public class OwnMtlLoader {
         String texSpecularFilename = null;
         String texRoughnessFilename = null;
         String texMetallicFilename = null;
+        // PBR packed: R: occlusion, G: Roughness, B: metallic
+        String texPBRFilename = null;
 
         if (file == null || !file.exists()) {
             logger.error("ERROR: Material file not found: " + (file == null ? "Null file!" : file.name()));
@@ -77,6 +80,7 @@ public class OwnMtlLoader {
                                           emicolor,
                                           metcolor,
                                           roughcolor,
+                                          specular,
                                           metallic,
                                           roughness,
                                           ior,
@@ -88,6 +92,7 @@ public class OwnMtlLoader {
                                           texSpecularFilename,
                                           texRoughnessFilename,
                                           texMetallicFilename,
+                                          texPBRFilename,
                                           materials);
                             if (tokens.length > 1) {
                                 curMatName = tokens[1];
@@ -95,9 +100,9 @@ public class OwnMtlLoader {
                             } else {
                                 curMatName = "default";
                             }
-                            difcolor = Color.WHITE;
-                            speccolor = Color.WHITE;
-                            emicolor = Color.WHITE;
+                            difcolor = Color.GRAY;
+                            speccolor = Color.BLACK;
+                            emicolor = Color.BLACK;
                             metcolor = null;
                             roughcolor = null;
                             texDiffuseFilename = null;
@@ -105,9 +110,11 @@ public class OwnMtlLoader {
                             texNormalFilename = null;
                             texRoughnessFilename = null;
                             texMetallicFilename = null;
+                            texPBRFilename = null;
                             ior = -1f;
                             roughness = -1f;
                             metallic = -1f;
+                            specular = 0f;
                             opacity = 1.f;
                             shininess = -1f;
                         }
@@ -143,17 +150,19 @@ public class OwnMtlLoader {
                         }
                         case "pr" -> roughness = Float.parseFloat(tokens[1]);
                         case "pm" -> metallic = Float.parseFloat(tokens[1]);
+                        case "ps" -> specular = Float.parseFloat(tokens[1]);
 
                         case "d" -> opacity = Float.parseFloat(tokens[1]);
                         case "tr" -> opacity = 1f - Float.parseFloat(tokens[1]);
                         case "ni" -> ior = Float.parseFloat(tokens[1]);
-                        case "ns" -> shininess = MathUtils.clamp(Float.parseFloat(tokens[1]), 0, 1);
+                        case "ns" -> shininess = FastMath.max(Float.parseFloat(tokens[1]), 0);
                         case "map_kd" -> texDiffuseFilename = file.parent().child(tokens[1]).path();
                         case "map_ke" -> texEmissiveFilename = file.parent().child(tokens[1]).path();
                         case "map_kn", "map_bump", "norm" -> texNormalFilename = file.parent().child(tokens[1]).path();
                         case "map_ks" -> texSpecularFilename = file.parent().child(tokens[1]).path();
                         case "map_kr", "map_km", "map_pm" -> texMetallicFilename = file.parent().child(tokens[1]).path();
                         case "map_pr", "map_ns" -> texRoughnessFilename = file.parent().child(tokens[1]).path();
+                        case "map_pbr" -> texPBRFilename = file.parent().child(tokens[1]).path();
                     }
                 }
             }
@@ -170,6 +179,7 @@ public class OwnMtlLoader {
                       emicolor,
                       metcolor,
                       roughcolor,
+                      specular,
                       metallic,
                       roughness,
                       ior,
@@ -181,6 +191,7 @@ public class OwnMtlLoader {
                       texSpecularFilename,
                       texRoughnessFilename,
                       texMetallicFilename,
+                      texPBRFilename,
                       materials);
     }
 
@@ -190,6 +201,7 @@ public class OwnMtlLoader {
                                Color emicolor,
                                Color metcolor,
                                Color roughcolor,
+                               float specular,
                                float metallic,
                                float roughness,
                                float ior,
@@ -201,12 +213,16 @@ public class OwnMtlLoader {
                                String texSpecularFilename,
                                String texRoughnessFilename,
                                String texMetallicFilename,
+                               String texPBRFilename,
                                Array<OwnModelMaterial> materials) {
         OwnModelMaterial mat = new OwnModelMaterial();
         mat.id = curMatName;
         mat.diffuseColor = new Color(difcolor);
-        if (!ColorUtils.isZero(speccolor))
+        if (!ColorUtils.isZero(speccolor)) {
             mat.specularColor = new Color(speccolor);
+        } else if (specular > 0) {
+            mat.specularColor = ColorUtils.of(specular);
+        }
         if (!ColorUtils.isZero(emicolor))
             mat.emissiveColor = new Color(emicolor);
         if (metcolor != null)
@@ -262,6 +278,14 @@ public class OwnMtlLoader {
             OwnModelTexture tex = new OwnModelTexture();
             tex.usage = OwnModelTexture.USAGE_METALLIC;
             tex.fileName = texMetallicFilename;
+            if (mat.textures == null)
+                mat.textures = new Array<>(1);
+            mat.textures.add(tex);
+        }
+        if (texPBRFilename != null) {
+            OwnModelTexture tex = new OwnModelTexture();
+            tex.usage = OwnModelTexture.USAGE_AO_ROUGHNESS_METALLIC;
+            tex.fileName = texPBRFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);

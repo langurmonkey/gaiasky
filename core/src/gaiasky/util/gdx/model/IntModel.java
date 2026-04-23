@@ -31,6 +31,7 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 
 public class IntModel implements Disposable {
@@ -280,9 +281,17 @@ public class IntModel implements Disposable {
         //if (mtl.ior > 0f)
         //    result.set(new FloatAttribute(FloatAttribute.IoR, 1f));
 
-        // Roughness is 1 - shininess
-        if (mtl.shininess > 0f)
+        // Shininess, in [0,1000]
+        if (mtl.shininess > 0f) {
             result.set(new FloatAttribute(FloatAttribute.Shininess, mtl.shininess));
+            // Convert Wavefront Ns (Specular Exponent) to PBR Roughness (0.0 - 1.0).
+            // Only if roughness has not been specifically set yet.
+            if (!result.has(ColorAttribute.Roughness)) {
+                var roughness = FastMath.sqrt(2.0 / (mtl.shininess + 2.0));
+                roughness = MathUtilsDouble.clamp(roughness, 0.0, 1.0);
+                result.set(new ColorAttribute(ColorAttribute.Roughness, ColorUtils.of((float) roughness)));
+            }
+        }
 
         if (mtl.opacity != 1.0f) {
             result.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, mtl.opacity));
@@ -328,6 +337,8 @@ public class IntModel implements Disposable {
                             result.set(new TextureAttribute(TextureAttribute.Emissive, descriptor, offsetU, offsetV, scaleU, scaleV));
                     case OwnModelTexture.USAGE_METALLIC ->
                             result.set(new TextureAttribute(TextureAttribute.Metallic, descriptor, offsetU, offsetV, scaleU, scaleV));
+                    case OwnModelTexture.USAGE_AO_ROUGHNESS_METALLIC ->
+                            result.set(new TextureAttribute(TextureAttribute.OcclusionMetallicRoughness, descriptor, offsetU, offsetV, scaleU, scaleV));
                     case OwnModelTexture.USAGE_ROUGHNESS, ModelTexture.USAGE_SHININESS ->
                             result.set(new TextureAttribute(TextureAttribute.Roughness, descriptor, offsetU, offsetV, scaleU, scaleV));
                 }

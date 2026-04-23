@@ -15,4 +15,6 @@ public class OwnModelTexture extends ModelTexture {
 	public final static int USAGE_HEIGHT = 12;
 	public final static int USAGE_ROUGHNESS = 13;
 	public final static int USAGE_AO = 14;
+	// PBR packed texture.
+	public final static int USAGE_AO_ROUGHNESS_METALLIC = 15;
 }
