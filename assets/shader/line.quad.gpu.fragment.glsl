@@ -1,6 +1,7 @@
 #version 330 core
 
 #include <shader/lib/logdepthbuff.glsl>
+#include <shader/lib/lines.glsl>
 
 uniform float u_alpha;
 uniform float u_zfar;
@@ -21,8 +22,6 @@ layout (location = 1) out vec4 layerBuffer;
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
 #endif// ssrFlag
-
-#define PI 3.14159
 
 void main() {
     float trail;
@@ -55,14 +54,10 @@ void main() {
         discard;
     }
 
-    // x is in [-1,1], where 0 is the center of the line
-    float x = (v_uv.y - 0.5) * 2.0;
+    vec2 line = computeLine(v_uv);
 
-    float core = min(cos(PI * x / 2.0), 1.0 - abs(x));
-    float alpha = pow(core, 1.8);
-    float cplus = pow(core, 10.0);
-
-    layerBuffer = vec4(v_col.rgb + cplus, 1.0) * v_col.a * alpha * trail * u_alpha;
+    // Final color calculation.
+    layerBuffer = vec4(v_col.rgb + line.y, 1.0) * v_col.a * line.x * trail * u_alpha;
 
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
