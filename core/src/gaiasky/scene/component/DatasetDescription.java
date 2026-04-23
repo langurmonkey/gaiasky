@@ -50,12 +50,16 @@ public class DatasetDescription implements Component {
         String desc = (String) map.get("description");
         String source = (String) map.get("source");
         CatalogInfo.CatalogInfoSource type = map.containsKey("type") ? CatalogInfo.CatalogInfoSource.valueOf((String) map.get("type")) : CatalogInfo.CatalogInfoSource.INTERNAL;
-        float size = getFloat(map, "size", 1);
-        long sizeBytes = getLong(map, "sizebytes", -1);
-        long nParticles = getLong(map, "nParticles", -1);
+        // Highlight size factor.
+        float size = getFloat(map, 1, "size", "hlSizeFactor", "highlightSizeFactor");
+        // Size in bytes.
+        long sizeBytes = getLong(map, -1, "sizebytes", "sizeBytes");
+        // Number of particles/objects.
+        long nParticles = getLong(map, -1, "nParticles");
         if (nParticles <= 0) {
-            nParticles = getLong(map, "nobjects", -1);
+            nParticles = getLong(map, -1, "nobjects", "nObjects", "numObjects");
         }
+
         this.catalogInfo = new CatalogInfo(name, desc, source, type, size);
         this.catalogInfo.sizeBytes = sizeBytes;
         this.catalogInfo.nParticles = nParticles;
@@ -70,25 +74,29 @@ public class DatasetDescription implements Component {
         setCatalogInfo(map);
     }
 
-    public float getFloat(Map<String, Object> map, String key, float defaultValue) {
-        if (map.containsKey(key)) {
-            Object value = map.get(key);
-            if (value instanceof Float || value instanceof Double) {
-                return (float) value;
-            } else if (value instanceof String) {
-                return Parser.parseFloat((String) value);
+    public float getFloat(Map<String, Object> map, float defaultValue, String... keys) {
+        for (var key : keys) {
+            if (map.containsKey(key)) {
+                Object value = map.get(key);
+                if (value instanceof Float || value instanceof Double) {
+                    return (float) value;
+                } else if (value instanceof String) {
+                    return Parser.parseFloat((String) value);
+                }
             }
         }
         return defaultValue;
     }
 
-    public long getLong(Map<String, Object> map, String key, long defaultValue) {
-        if (map.containsKey(key)) {
-            Object value = map.get(key);
-            if (value instanceof Long || value instanceof Integer) {
-                return (long) value;
-            } else if (value instanceof String) {
-                return Parser.parseLong((String) value);
+    public long getLong(Map<String, Object> map, long defaultValue, String... keys) {
+        for (var key : keys) {
+            if (map.containsKey(key)) {
+                Object value = map.get(key);
+                if (value instanceof Long || value instanceof Integer) {
+                    return (long) value;
+                } else if (value instanceof String) {
+                    return Parser.parseLong((String) value);
+                }
             }
         }
         return defaultValue;
