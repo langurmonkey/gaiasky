@@ -16,8 +16,8 @@ import gaiasky.gui.main.WelcomeGui;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.CatalogInfo;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.DatasetCard;
+import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.datadesc.DatasetDesc;
 
 import java.nio.file.Files;
@@ -48,24 +48,24 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
         var graph = Mapper.graph.get(entity);
         // Do not create nested datasets (those whose parents are also datasets)
         var nested = graph.parent != null && Mapper.datasetDescription.has(graph.parent);
-        if (datasetDesc.catalogInfo == null && WelcomeGui.getLocalDatasets().get() != null) {
+        if (datasetDesc.datasetCard == null && WelcomeGui.getLocalDatasets().get() != null) {
             // Try to get it from the datasets.
             var local = WelcomeGui.getLocalDatasets().get();
             var dataset = local.findDatasetByName(base.getName());
             if (dataset != null) {
-                datasetDesc.catalogInfo = fromDatasetDesc(dataset, entity);
+                datasetDesc.datasetCard = fromDatasetDesc(dataset, entity);
             }
         }
         initializeCatalogInfo(entity, datasetDesc, !nested, base.getName(), datasetDesc.description);
     }
 
-    private CatalogInfo fromDatasetDesc(DatasetDesc dd, Entity entity) {
-        var result = new CatalogInfo(dd.name,
-                dd.description,
-                view.getDataFile(),
-                CatalogInfoSource.INTERNAL,
-                1f,
-                entity);
+    private DatasetCard fromDatasetDesc(DatasetDesc dd, Entity entity) {
+        var result = new DatasetCard(dd.name,
+                                     dd.description,
+                                     view.getDataFile(),
+                                     DatasetSourceType.INTERNAL,
+                                     1f,
+                                     entity);
         result.nParticles = dd.nObjects;
         result.sizeBytes = dd.sizeBytes;
         return result;
@@ -79,28 +79,29 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
         view.setEntity(entity);
         String dataFile = view.getDataFile();
 
-        if (create && dd.catalogInfo == null) {
-            dd.catalogInfo = new CatalogInfo(name, description, dataFile, CatalogInfoSource.INTERNAL, 1f, entity);
+        if (create && dd.datasetCard == null) {
+            dd.datasetCard = new DatasetCard(name, description, dataFile, DatasetSourceType.INTERNAL, 1f, entity);
         }
 
-        if (dd.catalogInfo != null && dd.addDataset) {
-            if (dd.catalogInfo.nParticles <= 0) {
-                dd.catalogInfo.nParticles = view.getNumParticles();
+        if (dd.datasetCard != null && dd.datasetCard.entity == null) {
+            dd.datasetCard.setEntity(entity);
+        }
+
+        if (dd.datasetCard != null && dd.addDataset) {
+            if (dd.datasetCard.nParticles <= 0) {
+                dd.datasetCard.nParticles = view.getNumParticles();
             }
 
-            if (dd.catalogInfo.sizeBytes <= 0 && dataFile != null && !dataFile.isBlank()) {
+            if (dd.datasetCard.sizeBytes <= 0 && dataFile != null && !dataFile.isBlank()) {
                 Path df = Path.of(dataFile);
                 if (!Files.isRegularFile(df) || !Files.exists(df)) {
                     df = Path.of(GaiaSky.settings().data.dataFile(dataFile));
                 }
-                dd.catalogInfo.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
+                dd.datasetCard.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
             }
 
-            if (dd.catalogInfo.entity == null) {
-                dd.catalogInfo.entity = entity;
-            }
             // Insert
-            EventManager.publish(Event.CATALOG_ADD, entity, dd.catalogInfo, false);
+            EventManager.publish(Event.CATALOG_ADD, entity, dd.datasetCard, false);
         }
     }
 

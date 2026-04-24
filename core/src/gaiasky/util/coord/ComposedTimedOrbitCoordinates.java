@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Implementation of coordinates that contains more than one timed coordinates object.
  */
-public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
+public class ComposedTimedOrbitCoordinates implements IOrbitCoordinates {
     protected static final Logger.Log logger = Logger.getLogger(ComposedTimedOrbitCoordinates.class);
 
     public Array<TimedOrbitCoordinates> coordinates;
@@ -70,11 +70,20 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
                 if (Mapper.tagNoProcess.has(entity) && GaiaSky.instance.isInitialised()) {
                     entity.remove(TagNoProcess.class);
                 }
-                // Parent.
-                var owner = c.coordinates.owner;
-                if (c.parent != null && Mapper.graph.get(owner).parent != c.parent) {
-                    var parentGraph = Mapper.graph.get(c.parent);
-                    parentGraph.addChild(c.parent, owner, true, 1);
+                {
+                    // Parent.
+                    var owner = c.coordinates.owner;
+                    // Check if owner has parent catalog, then use that.
+                    var ownerGraph = Mapper.graph.get(owner);
+                    var ownerParent = ownerGraph.parent;
+                    if (Mapper.datasetDescription.has(ownerParent)) {
+                        owner = ownerParent;
+                    }
+                    // Change parent to that of orbit.
+                    if (c.parent != null && Mapper.graph.get(owner).parent != c.parent) {
+                        var parentGraph = Mapper.graph.get(c.parent);
+                        parentGraph.addChild(c.parent, owner, true, 1);
+                    }
                 }
                 if (!found) {
                     try {
@@ -90,7 +99,7 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
                 }
             }
         }
-        return out;
+        return found ? out : null;
     }
 
     @Override
@@ -98,8 +107,8 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
         String method = "getEclipticSphericalCoordinates";
         try {
             return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3Q.class));
-        } catch (NoSuchMethodException nsme) {
-            logger.error(nsme, "Method does not exist: " + method);
+        } catch (NoSuchMethodException e) {
+            logger.error(e, "Method does not exist: " + method);
             return out;
         }
     }
@@ -109,8 +118,8 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
         String method = "getEclipticCartesianCoordinates";
         try {
             return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3Q.class));
-        } catch (NoSuchMethodException nsme) {
-            logger.error(nsme, "Method does not exist: " + method);
+        } catch (NoSuchMethodException e) {
+            logger.error(e, "Method does not exist: " + method);
             return out;
         }
     }
@@ -120,8 +129,8 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
         String method = "getEquatorialCartesianCoordinates";
         try {
             return getGenericCoordinates(instant, out, IBodyCoordinates.class.getMethod(method, Instant.class, Vector3Q.class));
-        } catch (NoSuchMethodException nsme) {
-            logger.error(nsme, "Method does not exist: " + method);
+        } catch (NoSuchMethodException e) {
+            logger.error(e, "Method does not exist: " + method);
             return out;
         }
     }
@@ -143,5 +152,13 @@ public class ComposedTimedOrbitCoordinates implements IBodyCoordinates {
             copy.coordinates.add((TimedOrbitCoordinates) c.getCopy());
         }
         return copy;
+    }
+
+    @Override
+    public Entity getOrbitObject() {
+        if (this.coordinates != null && !this.coordinates.isEmpty()) {
+            return this.coordinates.first().getOrbitObject();
+        }
+        return null;
     }
 }

@@ -28,7 +28,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
@@ -528,7 +528,7 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
                 boolean timeOverflow = view.isCoordinatesTimeOverflow();
                 boolean canSelect = view.getSet() == null || view.getSet().canSelect(filterView);
                 boolean ctOn = GaiaSky.instance.isOn(view.getCt());
-                Optional<CatalogInfo> ci = GaiaSky.instance.getCatalogInfoFromEntity(entity);
+                Optional<DatasetCard> ci = GaiaSky.instance.getCatalogInfoFromEntity(entity);
                 boolean datasetVisible = ci.isEmpty() || ci.get().isVisible(true);
                 if (!timeOverflow && canSelect && ctOn && datasetVisible) {
                     GaiaSky.postRunnable(() -> {

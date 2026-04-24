@@ -60,12 +60,14 @@ public interface IBodyCoordinates {
 
     /**
      * Update the references in this coordinates object with the given index.
+     *
      * @param index The index to use.
      */
     void updateReferences(Map<String, Entity> index);
 
     /**
      * Gets a copy of this coordinates object.
+     *
      * @return The copy.
      */
     IBodyCoordinates getCopy();

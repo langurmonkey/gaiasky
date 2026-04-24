@@ -21,7 +21,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.AffineTransformations;
 import gaiasky.scene.record.*;
 import gaiasky.scene.system.initialize.MeshInitializer;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
@@ -40,12 +40,12 @@ import java.util.Vector;
 public class DatasetTransformsWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetTransformsWindow.class);
 
-    private final CatalogInfo ci;
+    private final DatasetCard ci;
     private Table transformsTable;
     private AffineTransformations affine;
     private boolean transformsEdited;
 
-    public DatasetTransformsWindow(CatalogInfo ci,
+    public DatasetTransformsWindow(DatasetCard ci,
                                    Skin skin,
                                    Stage stage) {
         super(I18n.msg("gui.dataset.transform") + " - " + ci.name, skin, stage);

@@ -25,7 +25,7 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.TextUtils;
 import gaiasky.util.camera.CameraUtils;
@@ -430,11 +430,11 @@ public class SceneContextMenu extends ContextMenu {
         addItem(dsLoad);
 
         // Dataset highlight
-        Collection<CatalogInfo> cis = catalogManager.getCatalogInfos();
+        Collection<DatasetCard> cis = catalogManager.getCatalogInfos();
         if (cis != null && !cis.isEmpty()) {
             MenuItem dsHighlight = new MenuItem(I18n.msg("context.dataset.highlight"), skin, skin.getDrawable("highlight-on"));
             ContextMenu dsHighlightSubmenu = new ContextMenu(skin, "default");
-            for (CatalogInfo ci : cis) {
+            for (DatasetCard ci : cis) {
                 if (ci.isVisible()) {
                     MenuItem cim = new MenuItem(ci.name, skin, "default");
                     cim.align(Align.right);
@@ -459,7 +459,7 @@ public class SceneContextMenu extends ContextMenu {
         if (cis != null && !cis.isEmpty()) {
             MenuItem dsVisibility = new MenuItem(I18n.msg("context.dataset.visibility"), skin, skin.getDrawable("eye-icon"));
             ContextMenu dsVisibilitySubmenu = new ContextMenu(skin, "default");
-            for (CatalogInfo ci : cis) {
+            for (DatasetCard ci : cis) {
                 MenuItem cim = new MenuItem(ci.name, skin, "default");
                 cim.align(Align.right);
 

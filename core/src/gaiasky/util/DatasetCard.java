@@ -12,6 +12,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -25,8 +26,8 @@ import java.time.Instant;
  * Saves the metadata on a particular catalog or dataset loaded into Gaia Sky, and implements
  * some common operations like highlighting.
  */
-public class CatalogInfo {
-    private static final Log logger = Logger.getLogger(CatalogInfo.class);
+public class DatasetCard {
+    private static final Log logger = Logger.getLogger(DatasetCard.class);
     private static int colorIndexSequence = 0;
     private final FocusView view;
     // Base properties
@@ -48,29 +49,31 @@ public class CatalogInfo {
     public IAttribute hlCmapAttribute;
     public double hlCmapMin = 0, hlCmapMax = 0;
 
-    // The filtering object. May be null
+    // The filtering object. May be null.
     public Filter filter;
 
-    // Catalog type
-    public CatalogInfoSource type;
+    // Catalog source type
+    public DatasetSourceType type;
+    // Catalog content type
+    public DatasetContentType objectType;
 
     // Reference to the entity
     public Entity entity;
 
-    public CatalogInfo(String name,
+    public DatasetCard(String name,
                        String description,
                        String source,
-                       CatalogInfoSource type,
+                       DatasetSourceType type,
                        float hlSizeFactor,
                        Entity entity) {
         this(name, description, source, type, hlSizeFactor);
         setEntity(entity);
     }
 
-    public CatalogInfo(String name,
+    public DatasetCard(String name,
                        String description,
                        String source,
-                       CatalogInfoSource type,
+                       DatasetSourceType type,
                        float hlSizeFactor) {
         super();
         this.name = name;
@@ -92,6 +95,18 @@ public class CatalogInfo {
             this.view.setEntity(this.entity);
             if (Mapper.datasetDescription.has(entity)) {
                 Mapper.datasetDescription.get(entity).setCatalogInfo(this);
+            }
+
+            if (this.objectType == null) {
+                if (isEntitySatellite()) {
+                    this.objectType = DatasetContentType.MISSION;
+                } else if (isEntityStarSet()) {
+                    this.objectType = DatasetContentType.STAR_SET;
+                } else if (isEntityParticleSet()) {
+                    this.objectType = DatasetContentType.PARTICLE_SET;
+                } else {
+                    this.objectType = DatasetContentType.OTHER;
+                }
             }
         }
     }
@@ -200,11 +215,14 @@ public class CatalogInfo {
      * @return True if this is a highlightable catalog, false otherwise.
      */
     public boolean isHighlightable() {
-        return this.entity != null && isBaseDataset(entity);
+        return isParticleDataset(entity);
     }
 
-    private boolean isBaseDataset(Entity entity) {
-        return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity) || Mapper.orbitElementsSet.has(entity);
+    private boolean isParticleDataset(Entity entity) {
+        if (entity != null) {
+            return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity) || Mapper.orbitElementsSet.has(entity);
+        }
+        return false;
     }
 
     /**
@@ -217,19 +235,36 @@ public class CatalogInfo {
         return false;
     }
 
-    public boolean isParticleSet() {
+    public boolean isEntityParticleSet() {
         if (this.entity != null) {
             return Mapper.particleSet.has(entity);
         }
         return false;
     }
 
-    public boolean isStarSet() {
+    public boolean isEntityStarSet() {
         if (this.entity != null) {
             return Mapper.starSet.has(entity);
         }
         return false;
     }
+
+    public boolean isMission() {
+        return objectType != null && objectType.isMission();
+    }
+
+    /**
+     * The dataset is a mission if it has a child of archetype 'Satellite'.
+     *
+     * @return Whether the dataset represented by this entity.
+     */
+    private boolean isEntitySatellite() {
+        if (this.entity != null) {
+            return EntityUtils.getFirstChildWithComponent(entity, Mapper.parentOrientation) != null;
+        }
+        return false;
+    }
+
 
     /**
      * Gets the component type of the model object linked to this catalog.
@@ -243,12 +278,27 @@ public class CatalogInfo {
         return null;
     }
 
-    public enum CatalogInfoSource {
+    public enum DatasetSourceType {
         INTERNAL,
         LOD,
         SAMP,
         SCRIPT,
         UI
+    }
+
+    public enum DatasetContentType {
+        STAR_SET,
+        PARTICLE_SET,
+        MISSION,
+        OTHER;
+
+        boolean isSet() {
+            return this == STAR_SET || this == PARTICLE_SET;
+        }
+
+        boolean isMission() {
+            return this == MISSION;
+        }
     }
 
 }

@@ -20,7 +20,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.scene.Mapper;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.i18n.I18n;
@@ -37,7 +37,7 @@ import java.text.DecimalFormat;
  * Visual settings of a particular dataset.
  */
 public class DatasetVisualSettingsWindow extends GenericDialog implements IObserver {
-    private final CatalogInfo ci;
+    private final DatasetCard ci;
     private OwnTextField highlightSizeFactor, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
     private OwnCheckBox allVisible, fadeIn, fadeOut;
     private OwnSliderReset pointSize, minSolidAngle, maxSolidAngle;
@@ -45,7 +45,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
 
     private double backupMinSolidAngle, backupMaxSolidAngle;
 
-    public DatasetVisualSettingsWindow(CatalogInfo ci,
+    public DatasetVisualSettingsWindow(DatasetCard ci,
                                        Skin skin,
                                        Stage stage) {
         super(I18n.msg("gui.dataset.visuals") + " - " + ci.name, skin, stage);
@@ -99,7 +99,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
         });
         content.add(pointSize).colspan(2).left().top().padBottom(pad18).row();
 
-        if (ci.isParticleSet() && !ci.isStarSet()) {
+        if (ci.isEntityParticleSet() && !ci.isEntityStarSet()) {
             // Min/max solid angle only for particles.
             addMinMaxSolidAngle(content);
         }
@@ -337,7 +337,7 @@ public class DatasetVisualSettingsWindow extends GenericDialog implements IObser
 
     @Override
     protected void cancel() {
-        if (ci.isParticleSet() && !ci.isStarSet()) {
+        if (ci.isEntityParticleSet() && !ci.isEntityStarSet()) {
             // Roll back min/max solid angle only for particles.
             var set = Mapper.particleSet.get(ci.entity);
             set.particleSizeLimits[0] = backupMinSolidAngle;

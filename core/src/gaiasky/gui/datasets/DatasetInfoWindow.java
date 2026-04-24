@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.gui.window.GenericDialog;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
@@ -22,9 +22,9 @@ import gaiasky.util.scene2d.OwnTextArea;
  * A window that displays information on a particular dataset.
  */
 public class DatasetInfoWindow extends GenericDialog {
-    private final CatalogInfo ci;
+    private final DatasetCard ci;
 
-    public DatasetInfoWindow(CatalogInfo ci,
+    public DatasetInfoWindow(DatasetCard ci,
                              Skin skin,
                              Stage stage) {
         super(I18n.msg("gui.dataset.info") + " - " + ci.name, skin, stage);
@@ -66,7 +66,7 @@ public class DatasetInfoWindow extends GenericDialog {
 
     private OwnScrollPane getOwnScrollPane() {
         String descriptionString = ci.description != null ? ci.description : ci.name;
-        OwnTextArea descriptionTextArea = new OwnTextArea(descriptionString, skin, "no-disabled");
+        OwnTextArea descriptionTextArea = new OwnTextArea(descriptionString, skin, "info");
         descriptionTextArea.setWidth(600f);
         descriptionTextArea.setDisabled(true);
         float fontHeight = descriptionTextArea.getStyle().font.getLineHeight();

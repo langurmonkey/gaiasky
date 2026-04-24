@@ -28,7 +28,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleType;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Pair;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
@@ -67,7 +67,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         cmapList.add(new Pair<>("cool", 8));
     }
 
-    private final CatalogInfo catalogInfo;
+    private final DatasetCard datasetCard;
     private final FocusView view;
     private final Drawable drawableColor;
     private final Drawable drawableColormap;
@@ -76,11 +76,11 @@ public class ColormapPicker extends ColorPickerAbstract {
     private double cmapMin, cmapMax;
 
     private ColormapPicker(String name,
-                           CatalogInfo ci,
+                           DatasetCard ci,
                            Stage stage,
                            Skin skin) {
         super(name, stage, skin);
-        this.catalogInfo = ci;
+        this.datasetCard = ci;
         this.drawableColor = skin.getDrawable("white");
         this.drawableColormap = skin.getDrawable("iconic-star");
         this.view = new FocusView();
@@ -88,7 +88,7 @@ public class ColormapPicker extends ColorPickerAbstract {
     }
 
     public ColormapPicker(float[] rgba,
-                          CatalogInfo ci,
+                          DatasetCard ci,
                           Stage stage,
                           Skin skin) {
         this(null, rgba, ci, stage, skin);
@@ -96,7 +96,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
     public ColormapPicker(String name,
                           float[] rgba,
-                          CatalogInfo ci,
+                          DatasetCard ci,
                           Stage stage,
                           Skin skin) {
         this(name, ci, stage, skin);
@@ -172,7 +172,7 @@ public class ColormapPicker extends ColorPickerAbstract {
     }
 
     public Drawable getDrawable() {
-        if (catalogInfo.plainColor)
+        if (datasetCard.plainColor)
             return drawableColor;
         else
             return drawableColormap;
@@ -188,7 +188,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
     @Override
     public void setPickedColor(float[] rgba) {
-        catalogInfo.plainColor = true;
+        datasetCard.plainColor = true;
 
         // Plain color
         initColor();
@@ -198,11 +198,11 @@ public class ColormapPicker extends ColorPickerAbstract {
     }
 
     public void setPickedColormap(Image cmapImageSmall) {
-        catalogInfo.plainColor = false;
-        catalogInfo.hlCmapAttribute = this.cmapAttrib;
-        catalogInfo.hlCmapIndex = this.cmapIndex;
-        catalogInfo.hlCmapMin = this.cmapMin;
-        catalogInfo.hlCmapMax = this.cmapMax;
+        datasetCard.plainColor = false;
+        datasetCard.hlCmapAttribute = this.cmapAttrib;
+        datasetCard.hlCmapIndex = this.cmapIndex;
+        datasetCard.hlCmapMin = this.cmapMin;
+        datasetCard.hlCmapMax = this.cmapMax;
 
         super.setColor(1, 1, 1, 1);
         super.setDrawable(cmapImageSmall.getDrawable());
@@ -298,7 +298,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            plainColor.setChecked(catalogInfo.plainColor);
+            plainColor.setChecked(datasetCard.plainColor);
             content.add(plainColor).left().padBottom(pad10).row();
 
             colormap = new OwnCheckBox(I18n.msg("gui.colorpicker.colormap"), skin, "radio", pad10);
@@ -313,7 +313,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            colormap.setChecked(!catalogInfo.plainColor);
+            colormap.setChecked(!datasetCard.plainColor);
             content.add(colormap).left().padBottom(pad10 * 2f).row();
 
             content.add(new Separator(skin, "gray")).center().growX().padBottom(pad10 * 2f).row();
@@ -339,7 +339,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             cmap.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     cmapIndex = cmap.getSelectedIndex();
-                    updateCmapImage(cmap.getSelected().value, catalogInfo.hlCmapAlpha);
+                    updateCmapImage(cmap.getSelected().value, datasetCard.hlCmapAlpha);
                     return true;
                 }
                 return false;
@@ -354,8 +354,8 @@ public class ColormapPicker extends ColorPickerAbstract {
             alphaSlider.setValue(color[3]);
             alphaSlider.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    catalogInfo.hlCmapAlpha = alphaSlider.getValue();
-                    updateCmapImage(cmap.getSelected().value, catalogInfo.hlCmapAlpha);
+                    datasetCard.hlCmapAlpha = alphaSlider.getValue();
+                    updateCmapImage(cmap.getSelected().value, datasetCard.hlCmapAlpha);
                     return true;
                 }
                 return false;
@@ -365,9 +365,9 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Color map image
             cmapImageCell = container.add();
             cmapImageCell.colspan(3).center().padBottom(pad18 * 2).padTop(pad10).row();
-            updateCmapImage(cmap.getSelected().value, catalogInfo.hlCmapAlpha);
+            updateCmapImage(cmap.getSelected().value, datasetCard.hlCmapAlpha);
 
-            var catalog = catalogInfo.entity;
+            var catalog = datasetCard.entity;
             view.setEntity(catalog);
 
             // Attribute
@@ -410,7 +410,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             attribute.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     cmapAttrib = attribute.getSelected().attr;
-                    recomputeAttributeMinMax(catalogInfo, cmapAttrib);
+                    recomputeAttributeMinMax(datasetCard, cmapAttrib);
                     return true;
                 }
                 return false;
@@ -419,12 +419,12 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             // Min mapping value
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.min"), skin)).left().padRight(pad18).padBottom(pad10);
-            minMap = new OwnTextField(Double.toString(getCmapMin(cmapAttrib, catalogInfo)), skin);
+            minMap = new OwnTextField(Double.toString(getCmapMin(cmapAttrib, datasetCard)), skin);
             minMap.setWidth(sbWidth * 0.9f);
             minMap.addListener(event -> {
                 if (event instanceof ChangeEvent && minMap.isValid()) {
                     cmapMin = Parser.parseFloat(minMap.getText());
-                    updateMinMaxMap(catalogInfo, cmapAttrib, 0, cmapMin);
+                    updateMinMaxMap(datasetCard, cmapAttrib, 0, cmapMin);
                     return true;
                 }
                 return false;
@@ -435,7 +435,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             reloadCmap.addListener(new OwnTextTooltip(I18n.msg("gui.colorpicker.minmax.reload"), skin, 3));
             reloadCmap.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    recomputeAttributeMinMax(catalogInfo, cmapAttrib, true);
+                    recomputeAttributeMinMax(datasetCard, cmapAttrib, true);
                     return true;
                 }
                 return false;
@@ -444,12 +444,12 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             // Max mapping value
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.max"), skin)).left().padRight(pad18).padBottom(pad10);
-            maxMap = new OwnTextField(Double.toString(getCmapMax(cmapAttrib, catalogInfo)), skin);
+            maxMap = new OwnTextField(Double.toString(getCmapMax(cmapAttrib, datasetCard)), skin);
             maxMap.setWidth(sbWidth * 0.9f);
             maxMap.addListener(event -> {
                 if (event instanceof ChangeEvent && maxMap.isValid()) {
                     cmapMax = Parser.parseFloat(maxMap.getText());
-                    updateMinMaxMap(catalogInfo, cmapAttrib, 1, cmapMax);
+                    updateMinMaxMap(datasetCard, cmapAttrib, 1, cmapMax);
                     return true;
                 }
                 return false;
@@ -458,9 +458,9 @@ public class ColormapPicker extends ColorPickerAbstract {
             container.add().row();
 
             // Select
-            cmap.setSelectedIndex(catalogInfo.hlCmapIndex);
-            alphaSlider.setValue(catalogInfo.hlCmapAlpha);
-            attribute.setSelectedIndex(findIndex(catalogInfo.hlCmapAttribute, attrs));
+            cmap.setSelectedIndex(datasetCard.hlCmapIndex);
+            alphaSlider.setValue(datasetCard.hlCmapAlpha);
+            attribute.setSelectedIndex(findIndex(datasetCard.hlCmapAttribute, attrs));
 
             // Trigger first update
             attribute.getSelection().fireChangeEvent();
@@ -478,7 +478,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private double getCmapMin(IAttribute attrib,
-                                  CatalogInfo ci) {
+                                  DatasetCard ci) {
             if (attrib != null && ci != null) {
                 String key = key(ci, attrib);
                 if (!minMaxMap.containsKey(key))
@@ -491,7 +491,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private double getCmapMax(IAttribute attrib,
-                                  CatalogInfo ci) {
+                                  DatasetCard ci) {
             String key = key(ci, attrib);
             if (!minMaxMap.containsKey(key))
                 return ci.hlCmapMax;
@@ -499,7 +499,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 return minMaxMap.get(key)[1];
         }
 
-        private void updateMinMaxMap(CatalogInfo ci,
+        private void updateMinMaxMap(DatasetCard ci,
                                      IAttribute attrib,
                                      int index,
                                      double value) {
@@ -511,18 +511,18 @@ public class ColormapPicker extends ColorPickerAbstract {
             }
         }
 
-        private String key(CatalogInfo ci,
+        private String key(DatasetCard ci,
                            IAttribute attrib) {
             return (ci != null ? ci.name + "-" : "") + (attrib != null ? attrib.toString() : "dummy");
         }
 
         /** Compute every time, this is costly **/
-        private void recomputeAttributeMinMax(CatalogInfo ci,
+        private void recomputeAttributeMinMax(DatasetCard ci,
                                               IAttribute attrib) {
             recomputeAttributeMinMax(ci, attrib, false);
         }
 
-        private void recomputeAttributeMinMax(CatalogInfo ci,
+        private void recomputeAttributeMinMax(DatasetCard ci,
                                               IAttribute attrib,
                                               boolean force) {
             String key = key(ci, attrib);

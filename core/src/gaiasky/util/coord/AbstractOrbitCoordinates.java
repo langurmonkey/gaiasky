@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
+public abstract class AbstractOrbitCoordinates implements IOrbitCoordinates {
     protected static final Log logger = Logger.getLogger(AbstractOrbitCoordinates.class);
     // Holds all instances
     protected static final List<AbstractOrbitCoordinates> instances = new ArrayList<>();
@@ -30,7 +30,9 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected String orbitName;
     protected boolean periodic = true;
     protected Vector3D center;
+    /** The orbit/trajectory entity. **/
     protected Entity entity;
+    /** The celestial body owner (planet, moon, spacecraft, etc.). **/
     protected Entity owner;
     protected double scaling = 1d;
 
@@ -153,5 +155,10 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     @Override
     public IBodyCoordinates getCopy() {
         return this;
+    }
+
+    @Override
+    public Entity getOrbitObject() {
+        return entity;
     }
 }

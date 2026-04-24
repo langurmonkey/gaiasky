@@ -16,8 +16,12 @@ import gaiasky.util.parse.Parser;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 
 /**
  * Loads orbit data from an ASCII text file.
@@ -55,20 +59,34 @@ public class FileDataLoader {
         super();
     }
 
+    private static final DateTimeFormatter FORMAT = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd_HH:mm:ss")
+            // Make the .SSS part optional
+            .optionalStart()
+            .appendFraction(ChronoField.MILLI_OF_SECOND, 0, 3, true)
+            .optionalEnd()
+            .toFormatter();
+
     /**
-     * Parses the given time and returns the number of milliseconds from the epoch of 1970-01-01T00:00:00Z.
-     *
-     * @param token The token to parse.
-     * @return time as milliseconds from the epoch of 1970-01-01T00:00:00Z
+     * Parse a time string with the format {@link #FORMAT} in UTC.
+     * @param token The string.
+     * @return The time as the number of seconds to epoch (see {@link Instant}).
      */
     public long parseTime(String token) {
         try {
-            Timestamp t = Timestamp.valueOf(token.replace('_', ' '));
-            return t.getTime();
+            // Handles both "2023-07-07_13:29:42.000"
+            // and "2023-07-07_13:29:42"
+            LocalDateTime ldt = LocalDateTime.parse(token, FORMAT);
+            return ldt.toInstant(ZoneOffset.UTC).toEpochMilli();
+
         } catch (Exception e) {
-            // Not a timestamp. Possibly a julian date.
-            double jd = Parser.parseDouble(token);
-            return AstroUtils.julianDateToInstant(jd).toEpochMilli();
+            // Fallback for Julian dates remains the same.
+            try {
+                double jd = Double.parseDouble(token);
+                return AstroUtils.julianDateToInstant(jd).toEpochMilli();
+            } catch (Exception nfe) {
+                throw new IllegalArgumentException("Unable to parse token: " + token);
+            }
         }
     }
 

@@ -28,8 +28,8 @@ import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scene.system.initialize.SceneGraphBuilderSystem;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.util.CatalogInfo;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.DatasetCard;
+import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -219,7 +219,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
-            CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoSource.LOD, 1.5f, entity);
+            DatasetCard ci = new DatasetCard(name, description, null, DatasetSourceType.LOD, 1.5f, entity);
             ci.nParticles = params.containsKey("nObjects") ? (Long) params.get("nObjects") : -1;
             ci.nParticles = ci.nParticles < 0 && params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
@@ -554,7 +554,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         set.setEpoch(epoch);
 
         var sgDatasetDesc = Mapper.datasetDescription.get(sg);
-        sgDatasetDesc.setCatalogInfoBare(datasetDesc.catalogInfo);
+        sgDatasetDesc.setCatalogInfoBare(datasetDesc.datasetCard);
 
         var sgOctant = Mapper.octant.get(sg);
 

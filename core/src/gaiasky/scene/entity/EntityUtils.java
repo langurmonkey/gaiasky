@@ -7,9 +7,11 @@
 
 package gaiasky.scene.entity;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.ParticleSet;
@@ -25,6 +27,7 @@ public class EntityUtils {
      *
      * @param entity The entity.
      * @param out    Auxiliary vector to put the result in.
+     *
      * @return The vector with the position.
      */
     public static Vector3Q getAbsolutePosition(final Entity entity, Vector3Q out) {
@@ -49,6 +52,7 @@ public class EntityUtils {
      *
      * @param entity The entity.
      * @param out    Auxiliary vector to put the result in.
+     *
      * @return The vector with the position.
      */
     public static Vector3D getAbsolutePosition(final Entity entity, Vector3D out) {
@@ -74,6 +78,7 @@ public class EntityUtils {
      * @param entity The entity.
      * @param name   The name.
      * @param out    Auxiliary vector to put the result in.
+     *
      * @return The vector with the position.
      */
     public static Vector3Q getAbsolutePosition(Entity entity, String name, Vector3Q out) {
@@ -93,6 +98,7 @@ public class EntityUtils {
      * @param entity The entity.
      * @param name   The name.
      * @param out    Auxiliary vector to put the result in.
+     *
      * @return The vector with the position.
      */
     public static Vector3D getAbsolutePosition(Entity entity, String name, Vector3D out) {
@@ -156,6 +162,7 @@ public class EntityUtils {
      * Re-implementation of {@link FocusView#getRadius()} in a static context.
      *
      * @param entity The entity.
+     *
      * @return The radius of the entity.
      */
     public static double getRadius(Entity entity) {
@@ -175,6 +182,7 @@ public class EntityUtils {
      * the furthest vertex from the origin) plus the scaling in its local transform (size and sizeScaleFactor).
      *
      * @param entity The entity.
+     *
      * @return The total span of the entity, in internal units.
      */
     public static double getModelSpan(Entity entity) {
@@ -194,6 +202,47 @@ public class EntityUtils {
             return Mapper.particleSet.get(entity);
         } else if (Mapper.starSet.has(entity)) {
             return Mapper.starSet.get(entity);
+        }
+        return null;
+    }
+
+    public static Entity getFirstChildWithComponent(Entity entity, ComponentMapper<?> cm) {
+        if (entity != null) {
+            var graph = Mapper.graph.get(entity);
+            if (graph.children != null) {
+                for (var c : graph.children) {
+                    if (cm.has(c)) {
+                        return c;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Entity getFirstChildOfType(Entity entity, String... archetypeNames) {
+        if (entity != null) {
+            var graph = Mapper.graph.get(entity);
+            for (var archetypeName : archetypeNames) {
+                return graph.getFirstChildOfType(GaiaSky.instance.scene.archetypes().get(archetypeName));
+            }
+        }
+        return null;
+    }
+
+    public static Array<Entity> getChildrenByArchetype(Entity entity, String archetypeName) {
+        if (entity != null) {
+            var graph = Mapper.graph.get(entity);
+            return graph.getChildrenByArchetype(GaiaSky.instance.scene.archetypes().get(archetypeName));
+        }
+        return null;
+
+    }
+
+    public static Array<Entity> getChildrenWithComponent(Entity entity, ComponentMapper<?> cm) {
+        if (entity != null) {
+            var graph = Mapper.graph.get(entity);
+            return graph.getChildrenWithComponent(cm);
         }
         return null;
     }

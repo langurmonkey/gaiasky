@@ -10,7 +10,7 @@ package gaiasky.script.v2.api;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.script.v2.impl.BaseModule;
 import gaiasky.script.v2.impl.DataModule;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 
 import java.util.List;
 
@@ -90,7 +90,7 @@ public interface DataAPI {
      * @param name    The name of the dataset, used to identify the subsequent operations on the
      *                dataset.
      * @param path    Absolute path (or relative to the working path of Gaia Sky) to the file to load.
-     * @param type    The {@link CatalogInfo.CatalogInfoSource} object to use as the dataset type.
+     * @param type    The {@link DatasetCard.DatasetSourceType} object to use as the dataset type.
      * @param options The {@link DatasetOptions} object holding the options for this dataset.
      * @param sync    Whether the load must happen synchronously or asynchronously.
      *
@@ -99,7 +99,7 @@ public interface DataAPI {
      */
     boolean load_dataset(final String name,
                          final String path,
-                         final CatalogInfo.CatalogInfoSource type,
+                         final DatasetCard.DatasetSourceType type,
                          final DatasetOptions options,
                          final boolean sync);
 

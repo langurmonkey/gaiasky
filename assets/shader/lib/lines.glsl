@@ -3,7 +3,7 @@
 
 // Determine how thick you want the "solid" part of the line (0.0 to 1.0).
 // 0.6 means the line is solid for 60% of the quad width and fades at the last 40%
-#define LINE_THICKNESS 0.4
+#define LINE_THICKNESS 0.5
 // Use new method based on screen-space rate of change.
 // Comment out to use the legacy method based on a power function.
 #define LINE_FWIDTH

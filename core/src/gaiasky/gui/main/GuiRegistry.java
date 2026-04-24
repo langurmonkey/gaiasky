@@ -36,7 +36,7 @@ import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.FileChooser;
@@ -504,11 +504,11 @@ public class GuiRegistry implements IObserver {
                                             GaiaSky.instance.scripting().apiv2().data
                                                     .load_dataset(datasetOptions.catalogName,
                                                                   result.toAbsolutePath().toString(),
-                                                                  CatalogInfoSource.UI,
+                                                                  DatasetSourceType.UI,
                                                                   datasetOptions,
                                                                   true);
                                             // Select first.
-                                            CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
+                                            DatasetCard ci = this.catalogManager.get(datasetOptions.catalogName);
                                             if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
                                                 view.setEntity(ci.entity);
                                                 if (view.isSet()) {

@@ -17,7 +17,7 @@ import gaiasky.scene.component.RigidRotation;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.script.v2.impl.APIv2;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.IPythonCoordinatesProvider;
 
@@ -3466,7 +3466,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param dsName  The name of the dataset, used to identify the subsequent operations on the
      *                dataset.
      * @param path    Absolute path (or relative to the working path of Gaia Sky) to the file to load.
-     * @param type    The {@link CatalogInfoSource} object to use as the dataset type.
+     * @param type    The {@link DatasetSourceType} object to use as the dataset type.
      * @param options The {@link DatasetOptions} object holding the options for this dataset.
      * @param sync    Whether the load must happen synchronously or asynchronously.
      *
@@ -3475,7 +3475,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      */
     boolean loadDataset(final String dsName,
                         final String path,
-                        final CatalogInfoSource type,
+                        final DatasetSourceType type,
                         final DatasetOptions options,
                         final boolean sync);
 

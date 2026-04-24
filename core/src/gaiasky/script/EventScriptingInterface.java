@@ -20,7 +20,7 @@ import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.script.v2.impl.APIv2;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -2307,15 +2307,15 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         return apiv2.data.load_dataset(dsName, path, sync);
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, boolean sync) {
+    public boolean loadDataset(String dsName, String path, DatasetSourceType type, boolean sync) {
         return apiv2.data.load_dataset(dsName, path, type, sync);
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean loadDataset(String dsName, String path, DatasetSourceType type, DatasetOptions datasetOptions, boolean sync) {
         return apiv2.data.load_dataset(dsName, path, type, datasetOptions, sync);
     }
 
-    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean loadDataset(String dsName, DataSource ds, DatasetSourceType type, DatasetOptions datasetOptions, boolean sync) {
         return apiv2.data.load_dataset(dsName, ds, type, datasetOptions, sync);
     }
 
@@ -2373,7 +2373,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     public boolean loadStarDataset(String dsName,
                                    String path,
-                                   CatalogInfoSource type,
+                                   DatasetSourceType type,
                                    double magnitudeScale,
                                    double[] labelColor,
                                    double[] fadeIn,
@@ -2560,7 +2560,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     public boolean loadParticleDataset(String dsName,
                                        String path,
-                                       CatalogInfoSource type,
+                                       DatasetSourceType type,
                                        double profileDecay,
                                        double[] particleColor,
                                        double colorNoise,
@@ -2662,7 +2662,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
 
     public boolean loadVariableStarDataset(String dsName,
                                            String path,
-                                           CatalogInfoSource type,
+                                           DatasetSourceType type,
                                            double magnitudeScale,
                                            double[] labelColor,
                                            double[] fadeIn,

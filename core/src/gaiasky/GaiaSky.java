@@ -1485,7 +1485,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         return this.sceneRenderer.alpha(cts);
     }
 
-    public Optional<CatalogInfo> getCatalogInfoFromEntity(Entity entity) {
+    public Optional<DatasetCard> getCatalogInfoFromEntity(Entity entity) {
         if (Mapper.datasetDescription.has(entity)) {
             return gaiaSkyAssets.catalogManager.getByEntity(entity);
         }

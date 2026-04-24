@@ -20,7 +20,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Bits;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.AstroUtils;
@@ -50,7 +50,7 @@ public class ParticleUtils {
     }
 
     public float getDatasetSizeFactor(Entity entity, Highlight hl, DatasetDescription dd) {
-        return ((hl != null && hl.highlighted && dd != null && dd.catalogInfo != null) ? dd.catalogInfo.hlSizeFactor : 1) * getPointScaling(hl, Mapper.graph.get(entity));
+        return ((hl != null && hl.highlighted && dd != null && dd.datasetCard != null) ? dd.datasetCard.hlSizeFactor : 1) * getPointScaling(hl, Mapper.graph.get(entity));
     }
 
     public float getPointScaling(Highlight hl, GraphNode graph) {
@@ -127,9 +127,9 @@ public class ParticleUtils {
      * @return The result of the filter evaluation, true if the particle passed the filtering, false otherwise
      */
     public boolean filter(int index, ParticleSet particleSet, DatasetDescription datasetDescription) {
-        final CatalogInfo catalogInfo = datasetDescription.catalogInfo;
-        if (catalogInfo != null && catalogInfo.filter != null) {
-            return catalogInfo.filter.evaluate(particleSet.get(index));
+        final DatasetCard datasetCard = datasetDescription.datasetCard;
+        if (datasetCard != null && datasetCard.filter != null) {
+            return datasetCard.filter.evaluate(particleSet.get(index));
         }
         return true;
     }

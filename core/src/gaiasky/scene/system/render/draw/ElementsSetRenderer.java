@@ -29,7 +29,7 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.scene.record.ParticleKepler;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -106,7 +106,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
             var eSet = Mapper.orbitElementsSet.get(render.entity);
 
 
-            CatalogInfo ci = desc.catalogInfo;
+            DatasetCard ci = desc.datasetCard;
             if (!inGpu(render)) {
                 // Fetch parameters from particle or elements set.
                 var pointData = set != null ? set.pointData : eSet.pointData;

@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -30,11 +31,15 @@ import gaiasky.gui.window.ColorPicker;
 import gaiasky.gui.window.ColorPickerAbstract;
 import gaiasky.gui.window.ColormapPicker;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.camera.CameraManager;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
+import gaiasky.util.coord.IOrbitCoordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,9 +83,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         group = new VerticalGroup();
         group.columnAlign(Align.left);
 
-        Collection<CatalogInfo> cis = this.catalogManager.getCatalogInfos();
+        Collection<DatasetCard> cis = this.catalogManager.getCatalogInfos();
         if (cis != null) {
-            for (CatalogInfo ci : cis) {
+            for (DatasetCard ci : cis) {
                 addCatalogInfo(ci);
             }
         }
@@ -90,7 +95,70 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         addNoDatasets();
     }
 
-    private void setDatasetVisibility(CatalogInfo ci,
+    private void goToMissionStart(DatasetCard ci,
+                                  OwnImageButton button,
+                                  Actor source) {
+        if (ci.entity != null && ci.isMission()) {
+            var catalogEntity = ci.entity;
+            var satellite = EntityUtils.getFirstChildWithComponent(catalogEntity, Mapper.parentOrientation);
+            if (satellite != null) {
+                // Let's see if we have a start time.
+                Instant start = null;
+                var coordinates = Mapper.coordinates.get(satellite);
+                if (coordinates.coordinates instanceof IOrbitCoordinates oc) {
+                    var orbit = oc.getOrbitObject();
+                    if (orbit != null) {
+                        // Our orbit is here.
+                        var tr = Mapper.trajectory.get(orbit);
+                        if (!tr.closedLoop) {
+                            var verts = Mapper.verts.get(orbit);
+                            if (verts != null && verts.pointCloudData != null && !verts.pointCloudData.samples.isEmpty()) {
+                                start = verts.pointCloudData.getStart();
+                            }
+                        }
+                    }
+                }
+                if (start == null) {
+                    // We do not have time, only go to object.
+                    GaiaSky.postRunnable(() -> {
+                        // First, set camera mode and focus.
+                        EventManager.publish(Event.CAMERA_MODE_CMD, source, CameraManager.CameraMode.FOCUS_MODE, true);
+                        EventManager.publish(Event.FOCUS_CHANGE_CMD, source, satellite, true);
+                        GaiaSky.postRunnable(() -> {
+                            // Go to object.
+                            EventManager.publish(Event.GO_TO_OBJECT_CMD, this);
+                        });
+                    });
+                } else {
+                    final var time = start;
+                    GaiaSky.postRunnable(() -> {
+                        // First, time.
+                        EventManager.publish(Event.TIME_CHANGE_CMD, this, time);
+
+                        // Second, focus after a delay.
+                        var task = new Timer.Task() {
+                            @Override
+                            public void run() {
+                                // Set camera mode and focus.
+                                EventManager.publish(Event.CAMERA_MODE_CMD, source, CameraManager.CameraMode.FOCUS_MODE, true);
+                                EventManager.publish(Event.FOCUS_CHANGE_CMD, source, satellite, true);
+                                GaiaSky.postRunnable(() -> {
+                                    // Go to object.
+                                    EventManager.publish(Event.GO_TO_OBJECT_CMD, this);
+                                });
+
+                            }
+                        };
+                        Timer.schedule(task, 0.5f);
+                    });
+                }
+            }
+        }
+
+    }
+
+
+    private void setDatasetVisibility(DatasetCard ci,
                                       OwnImageButton eye,
                                       boolean visible,
                                       Actor source) {
@@ -106,7 +174,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private void setDatasetHighlight(CatalogInfo ci,
+    private void setDatasetHighlight(DatasetCard ci,
                                      OwnImageButton mark,
                                      boolean highlight,
                                      Actor source) {
@@ -118,7 +186,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private void showDatasetFilters(CatalogInfo ci) {
+    private void showDatasetFilters(DatasetCard ci) {
         if (!filtersMap.containsKey(ci.name)) {
             var dfw = new DatasetFiltersWindow(ci, skin, stage);
             dfw.setVisible(true);
@@ -131,7 +199,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private void showDatasetInfo(CatalogInfo ci) {
+    private void showDatasetInfo(DatasetCard ci) {
         if (!infoMap.containsKey(ci.name)) {
             var diw = new DatasetInfoWindow(ci, skin, stage);
             diw.setVisible(true);
@@ -144,7 +212,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private void showDatasetVisualSettings(CatalogInfo ci) {
+    private void showDatasetVisualSettings(DatasetCard ci) {
         if (!visualSettingsMap.containsKey(ci.name)) {
             var dpw = new DatasetVisualSettingsWindow(ci, skin, stage);
             dpw.setVisible(true);
@@ -157,7 +225,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private void showDatasetTransforms(CatalogInfo ci) {
+    private void showDatasetTransforms(DatasetCard ci) {
         if (!transformsMap.containsKey(ci.name)) {
             var dtw = new DatasetTransformsWindow(ci, skin, stage);
             dtw.setVisible(true);
@@ -170,9 +238,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private void addCatalogInfo(CatalogInfo ci) {
+    private void addCatalogInfo(DatasetCard ci) {
         // Controls
         Table controls = new Table(skin);
+
         OwnImageButton visibilityButton = new OwnImageButton(skin, "eye-toggle");
         visibilityButton.setCheckedNoFire(!ci.isVisible(true));
         visibilityButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.toggle"), skin));
@@ -194,6 +263,18 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
+
+        OwnImageButton goToButton = new OwnImageButton(skin, "go-to");
+        goToButton.setCheckedNoFire(!ci.isVisible(true));
+        goToButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.mission.goto"), skin));
+        goToButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                goToMissionStart(ci, goToButton, goToButton);
+                return true;
+            }
+            return false;
+        });
+
 
         OwnImageButton filtersButton = new OwnImageButton(skin, "filter");
         filtersButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.filter"), skin));
@@ -257,7 +338,15 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         } else {
             controls.add(visibilityButton).padRight(pad30);
         }
-        controls.add(transformsButton).padRight(pad30);
+        // Can only add arbitrary transformations to star and particle sets (and octrees).
+        if (ci.hasParticleAttributes()) {
+            controls.add(transformsButton).padRight(pad30);
+        }
+        // Go to object for mission datasets.
+        if (ci.isMission()) {
+            controls.add(goToButton).padRight(pad30);
+        }
+
         controls.add(infoButton).padRight(pad6);
         controls.add(rubbishButton);
 
@@ -318,11 +407,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         if (ci.isHighlightable()) {
             var sizeScaling = new OwnSliderReset(I18n.msg("gui.dataset.size"),
-                                                          Constants.MIN_POINT_SIZE_SCALE,
-                                                          Constants.MAX_POINT_SIZE_SCALE,
-                                                          Constants.SLIDER_STEP_TINY,
-                                                          1f,
-                                                          skin);
+                                                 Constants.MIN_POINT_SIZE_SCALE,
+                                                 Constants.MAX_POINT_SIZE_SCALE,
+                                                 Constants.SLIDER_STEP_TINY,
+                                                 1f,
+                                                 skin);
             sizeScaling.setWidth(350f);
             if (ci.entity != null) {
                 var graph = Mapper.graph.get(ci.entity);
@@ -475,7 +564,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         switch (event) {
             case CATALOG_ADD -> {
                 removeNoDatasets();
-                addCatalogInfo((CatalogInfo) data[0]);
+                addCatalogInfo((DatasetCard) data[0]);
             }
             case CATALOG_REMOVE -> {
                 String datasetName = (String) data[0];
@@ -516,7 +605,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
             case CATALOG_HIGHLIGHT -> {
                 if (source != this) {
-                    CatalogInfo ci = (CatalogInfo) data[0];
+                    DatasetCard ci = (DatasetCard) data[0];
                     float[] col = ci.hlColor;
                     if (colorMap.containsKey(ci.name) && col != null) {
                         if (ci.plainColor) {

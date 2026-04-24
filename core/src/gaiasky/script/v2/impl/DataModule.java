@@ -27,7 +27,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.entity.SetUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.v2.api.DataAPI;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
@@ -80,15 +80,15 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
     @Override
     public boolean load_dataset(String name, String absolutePath) {
-        return load_dataset(name, absolutePath, CatalogInfo.CatalogInfoSource.SCRIPT, true);
+        return load_dataset(name, absolutePath, DatasetCard.DatasetSourceType.SCRIPT, true);
     }
 
     @Override
     public boolean load_dataset(String name, String path, boolean sync) {
-        return load_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, sync);
+        return load_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, sync);
     }
 
-    public boolean load_dataset(String dsName, String path, CatalogInfo.CatalogInfoSource type, boolean sync) {
+    public boolean load_dataset(String dsName, String path, DatasetCard.DatasetSourceType type, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, true);
         } else {
@@ -98,7 +98,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         }
     }
 
-    public boolean load_dataset(String name, String path, CatalogInfo.CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean load_dataset(String name, String path, DatasetCard.DatasetSourceType type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(name, path, type, datasetOptions, true);
         } else {
@@ -108,7 +108,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         }
     }
 
-    public boolean load_dataset(String dsName, DataSource ds, CatalogInfo.CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean load_dataset(String dsName, DataSource ds, DatasetCard.DatasetSourceType type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, ds, type, datasetOptions, true);
         } else {
@@ -120,17 +120,17 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
     @Override
     public boolean load_star_dataset(String name, String path, boolean sync) {
-        return load_star_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, 1, new double[]{0, 0, 0, 0}, null, null, sync);
+        return load_star_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, 1, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
     public boolean load_star_dataset(String name, String path, double factor, boolean sync) {
-        return load_star_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, factor, new double[]{0, 0, 0, 0}, null, null, sync);
+        return load_star_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, factor, new double[]{0, 0, 0, 0}, null, null, sync);
     }
 
     @Override
     public boolean load_star_dataset(String name, String path, double factor, double[] label_color, boolean sync) {
-        return load_star_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, factor, label_color, null, null, sync);
+        return load_star_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, factor, label_color, null, null, sync);
     }
 
     public boolean load_star_dataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, boolean sync) {
@@ -145,7 +145,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                      double[] fadein,
                                      double[] fadeout,
                                      boolean sync) {
-        return load_star_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, factor, label_color, fadein, fadeout, sync);
+        return load_star_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, factor, label_color, fadein, fadeout, sync);
     }
 
     public boolean load_star_dataset(String dsName,
@@ -160,7 +160,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
     public boolean load_star_dataset(String dsName,
                                      String path,
-                                     CatalogInfo.CatalogInfoSource type,
+                                     DatasetCard.DatasetSourceType type,
                                      double magnitudeScale,
                                      double[] labelColor,
                                      double[] fadeIn,
@@ -334,7 +334,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                          boolean sync) {
         return load_particle_dataset(dsName,
                                      path,
-                                     CatalogInfo.CatalogInfoSource.SCRIPT,
+                                     DatasetCard.DatasetSourceType.SCRIPT,
                                      profileDecay,
                                      particleColor,
                                      colorNoise,
@@ -349,7 +349,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
     public boolean load_particle_dataset(String dsName,
                                          String path,
-                                         CatalogInfo.CatalogInfoSource type,
+                                         DatasetCard.DatasetSourceType type,
                                          double profileDecay,
                                          double[] particleColor,
                                          double colorNoise,
@@ -420,7 +420,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                              boolean sync) {
         ComponentTypes.ComponentType compType = ComponentTypes.ComponentType.valueOf(ct);
         DatasetOptions datasetOptions = DatasetOptions.getStarClusterDatasetOptions(name, color, color.clone(), compType, fadein, fadeout);
-        return load_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, datasetOptions, sync);
+        return load_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, datasetOptions, sync);
     }
 
     public boolean load_star_cluster_dataset(String dsName,
@@ -444,7 +444,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                              boolean sync) {
         ComponentTypes.ComponentType compType = ComponentTypes.ComponentType.valueOf(ct);
         DatasetOptions datasetOptions = DatasetOptions.getStarClusterDatasetOptions(name, color, label_color, compType, fadein, fadeout);
-        return load_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, datasetOptions, sync);
+        return load_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, datasetOptions, sync);
     }
 
     @Override
@@ -455,12 +455,12 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                               double[] fadein,
                                               double[] fadeout,
                                               boolean sync) {
-        return load_variable_star_dataset(name, path, CatalogInfo.CatalogInfoSource.SCRIPT, factor, label_color, fadein, fadeout, sync);
+        return load_variable_star_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, factor, label_color, fadein, fadeout, sync);
     }
 
     public boolean load_variable_star_dataset(String dsName,
                                               String path,
-                                              CatalogInfo.CatalogInfoSource type,
+                                              DatasetCard.DatasetSourceType type,
                                               double magnitudeScale,
                                               double[] labelColor,
                                               double[] fadeIn,
@@ -493,13 +493,13 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                          sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfo.CatalogInfoSource type, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, String path, DatasetCard.DatasetSourceType type, boolean sync) {
         return loadDatasetImmediate(dsName, path, type, null, sync);
     }
 
     private boolean loadDatasetImmediate(String dsName,
                                          String path,
-                                         CatalogInfo.CatalogInfoSource type,
+                                         DatasetCard.DatasetSourceType type,
                                          DatasetOptions datasetOptions,
                                          boolean sync) {
         Path p = Paths.get(path);
@@ -591,7 +591,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
     private boolean loadDatasetImmediate(String name,
                                          DataSource ds,
-                                         CatalogInfo.CatalogInfoSource type,
+                                         DatasetCard.DatasetSourceType type,
                                          DatasetOptions opts,
                                          boolean sync) {
         try {
@@ -639,7 +639,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                                                  false));
 
                             // Catalog info.
-                            new CatalogInfo(name, ds.getName(), null, type, 1.5f, starGroup.get());
+                            new DatasetCard(name, ds.getName(), null, type, 1.5f, starGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, starGroup.get(), true);
                             // Add to catalog manager -> setUp.
@@ -676,7 +676,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                                                          false));
 
                             // Catalog info
-                            CatalogInfo ci = new CatalogInfo(name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
+                            DatasetCard ci = new DatasetCard(name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                             // Add to catalog manager -> setUp
@@ -710,7 +710,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                                                          false));
 
                             // Catalog info
-                            CatalogInfo ci = new CatalogInfo(name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
+                            DatasetCard ci = new DatasetCard(name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                             // Add to catalog manager -> setUp
@@ -877,7 +877,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
     @Override
     public boolean highlight_dataset(String name, boolean highlight) {
         if (api.validator.checkString(name, "datasetName") && api.validator.checkDatasetName(name)) {
-            CatalogInfo ci = api.catalogManager.get(name);
+            DatasetCard ci = api.catalogManager.get(name);
             api.base.post_runnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
             return true;
         }
@@ -895,7 +895,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         if (api.validator.checkString(name, "datasetName")
                 && api.validator.checkLength(color, 4, "color")
                 && api.validator.checkDatasetName(name)) {
-            CatalogInfo ci = api.catalogManager.get(name);
+            DatasetCard ci = api.catalogManager.get(name);
             ci.plainColor = true;
             ci.hlColor[0] = color[0];
             ci.hlColor[1] = color[1];
@@ -910,7 +910,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
     @Override
     public boolean highlight_dataset(String name, String attr_name, String colmap, double min, double max, boolean highlight) {
         if (api.validator.checkString(name, "datasetName") && api.validator.checkDatasetName(name)) {
-            CatalogInfo ci = api.catalogManager.get(name);
+            DatasetCard ci = api.catalogManager.get(name);
             IAttribute attribute = getAttributeByName(attr_name, ci);
             int cmapIndex = getCmapIndexByName(colmap);
             if (attribute != null && cmapIndex >= 0) {
@@ -939,7 +939,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
             boolean exists = api.catalogManager.contains(name);
             if (exists) {
-                CatalogInfo ci = api.catalogManager.get(name);
+                DatasetCard ci = api.catalogManager.get(name);
                 ci.setHlSizeFactor(factor);
             } else {
                 logger.warn("Dataset with name " + name + " does not exist");
@@ -955,7 +955,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
 
             boolean exists = api.catalogManager.contains(name);
             if (exists) {
-                CatalogInfo ci = api.catalogManager.get(name);
+                DatasetCard ci = api.catalogManager.get(name);
                 ci.setHlAllVisible(visible);
             } else {
                 logger.warn("Dataset with name " + name + " does not exist");
@@ -1004,7 +1004,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         return -1;
     }
 
-    private IAttribute getAttributeByName(String name, CatalogInfo ci) {
+    private IAttribute getAttributeByName(String name, DatasetCard ci) {
         try {
             // One of the default attributes
             Class<?> clazz = Class.forName("gaiasky.util.filter.attrib.Attribute" + name);

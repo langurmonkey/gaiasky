@@ -622,7 +622,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
 
                 // Size.
-                var size = new OwnLabel(dataset.size, skin, "grey-large");
+                var size = new OwnLabel(dataset.sizeString, skin, "grey-large");
                 size.addListener(new OwnTextTooltip(I18n.msg("gui.download.size.tooltip"), skin, 10));
                 size.setWidth(88f);
 
@@ -887,7 +887,7 @@ public class DatasetManagerWindow extends GenericDialog {
             var creator = new OwnLabel(I18n.msg("gui.download.creator", TextUtils.capString(dataset.creator, 70)), skin, "grey-large");
 
             // Size.
-            var size = new OwnLabel(I18n.msg("gui.download.size", dataset.size), skin, "grey-large");
+            var size = new OwnLabel(I18n.msg("gui.download.size", dataset.sizeString), skin, "grey-large");
             size.addListener(new OwnTextTooltip(I18n.msg("gui.download.size.tooltip"), skin, 10));
 
             // Num objects.

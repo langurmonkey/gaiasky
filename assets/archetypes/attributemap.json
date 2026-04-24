@@ -538,10 +538,11 @@
     },
     "DatasetDescription": {
       "description": "Contains metadata about the dataset represented by this object. All objects with this component get an entry in the datasets list.",
-      "catalogInfo": {
-        "description": "A map containing the metadata for the catalog represented by this object. |brsp| **Attributes:** |ul| |li| ``name`` -- the name of the catalog. |eli| |li| ``description`` -- description of the catalog. |eli| |li| ``type`` -- catalog type, for informative purposes. One of ``INTERNAL``, ``SCRIPT``, ``LOD``, ``SAMP``, ``UI``. |eli| |li| ``nParticles`` -- number of particles contained in the catalog. |eli| |li| ``sizeBytes`` -- size in bytes of the catalog file. |eli| |eul| |brsp| See :ref:`catalog-formats` for more information.",
+      "datasetCard": {
+        "description": "A map containing the metadata for the catalog represented by this object. |brsp| **Attributes:** |ul| |li| ``name`` -- the name of the catalog. |eli| |li| ``description`` -- description of the catalog. |eli| |li| ``type`` -- dataset source typee, for informative purposes. One of ``INTERNAL``, ``SCRIPT``, ``LOD``, ``SAMP``, ``UI``. |eli| |li| ``objectType`` -- type of objects contained in the dataset. One of ``STAR_SET``, ``PARTICLE_SET``, ``MISSION``, ``OTHER``. Best left empty, as it is auto-populated. |eli| |li| ``nParticles`` -- number of particles or objects contained in the catalog. |eli| |li| ``sizeBytes`` -- size in bytes of the catalog file. |eli| |eul| |brsp| See :ref:`catalog-formats` for more information.",
         "unit": "Map",
         "aliases": [
+          "catalogInfo",
           "datasetInfo",
           "cataloginfo"
         ]

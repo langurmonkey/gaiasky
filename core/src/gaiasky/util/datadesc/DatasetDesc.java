@@ -44,7 +44,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
     public Path checkPath;
     public String checkStr;
     public FileHandle catalogFile;
-    public String size;
+    public String sizeString;
     public long sizeBytes;
     public String nObjectsStr;
     public long nObjects;
@@ -168,10 +168,10 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         // Size
         try {
             sizeBytes = getLong("size", "sizeBytes");
-            size = GlobalResources.humanReadableByteCount(sizeBytes, true);
+            sizeString = GlobalResources.humanReadableByteCount(sizeBytes, true);
         } catch (IllegalArgumentException e) {
             sizeBytes = -1;
-            size = "?";
+            sizeString = "?";
         }
 
         // Number objects
@@ -453,7 +453,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         copy.checkStr = this.checkStr;
         copy.checkPath = this.checkPath;
         copy.catalogFile = this.catalogFile;
-        copy.size = this.size;
+        copy.sizeString = this.sizeString;
         copy.sizeBytes = this.sizeBytes;
         copy.nObjectsStr = this.nObjectsStr;
         copy.nObjects = this.nObjects;

@@ -29,7 +29,7 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
     private static final Log logger = Logger.getLogger(SpacecraftView.class);
     private final Vector3D D31 = new Vector3D();
     public MotorEngine engine;
-    public Coordinates coord;
+    public Coordinates coordinates;
 
     @Override
     protected void entityCheck(Entity entity) {
@@ -43,14 +43,14 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
     protected void entityChanged() {
         super.entityChanged();
         this.engine = Mapper.engine.get(entity);
-        this.coord = Mapper.coordinates.get(entity);
+        this.coordinates = Mapper.coordinates.get(entity);
     }
 
     @Override
     protected void entityCleared() {
         super.entityCleared();
         this.engine = null;
-        this.coord = null;
+        this.coordinates = null;
     }
 
     public boolean isStopping() {
@@ -163,7 +163,7 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
     }
 
     public IBodyCoordinates getCoordinates() {
-        return coord.coordinates;
+        return coordinates.coordinates;
     }
 
     public double getYawPower() {

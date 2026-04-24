@@ -8,6 +8,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
@@ -16,8 +17,8 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.update.GraphUpdater;
-import gaiasky.util.CatalogInfo;
 import gaiasky.util.Consumers.Consumer4;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3Q;
@@ -217,6 +218,32 @@ public class GraphNode implements Component, ICopy {
         return null;
     }
 
+    public Array<Entity> getChildrenByArchetype(Archetype type) {
+        var result = new Array<Entity>();
+        int size = children.size;
+        for (int i = 0; i < size; i++) {
+            var child = children.get(i);
+            if (child != null) {
+                if (type.matches(child)) {
+                    result.add(child);
+                }
+            }
+        }
+        return result;
+    }
+
+    public Array<Entity> getChildrenWithComponent(ComponentMapper<?> cm) {
+        var result = new Array<Entity>();
+        if (children != null) {
+            for (var c : children) {
+                if (cm.has(c)) {
+                    result.add(c);
+                }
+            }
+        }
+        return result;
+    }
+
     public Entity getFirstAncestorOfType(ComponentType ct) {
         if (parent == null) {
             return null;
@@ -228,17 +255,17 @@ public class GraphNode implements Component, ICopy {
     }
 
     /**
-     * Gets the {@link CatalogInfo} of this node's ancestors, if it exists. Essentially,
+     * Gets the {@link DatasetCard} of this node's ancestors, if it exists. Essentially,
      * this method returns the catalog info object that contains this entity.
      *
      * @param e The entity for which to get the catalog info.
      *
-     * @return The {@link CatalogInfo} that contains this entity, if any.
+     * @return The {@link DatasetCard} that contains this entity, if any.
      */
-    public CatalogInfo getCatalogInfo(Entity e) {
+    public DatasetCard getCatalogInfo(Entity e) {
         if (e != null) {
             if (Mapper.datasetDescription.has(e)) {
-                return Mapper.datasetDescription.get(e).catalogInfo;
+                return Mapper.datasetDescription.get(e).datasetCard;
             } else {
                 var graph = Mapper.graph.get(e);
                 if (graph != null) {

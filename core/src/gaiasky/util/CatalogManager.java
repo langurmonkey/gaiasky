@@ -19,13 +19,13 @@ import gaiasky.util.tree.OctreeNode;
 import java.util.*;
 
 /**
- * Central manager for {@link CatalogInfo} objects.
+ * Central manager for {@link DatasetCard} objects.
  */
 public class CatalogManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CatalogManager.class);
 
-    private final Map<String, CatalogInfo> ciMap;
-    private final List<CatalogInfo> cis;
+    private final Map<String, DatasetCard> ciMap;
+    private final List<DatasetCard> cis;
 
     public CatalogManager() {
         super();
@@ -39,7 +39,7 @@ public class CatalogManager implements IObserver {
                                         Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
-    public Collection<CatalogInfo> getCatalogInfos() {
+    public Collection<DatasetCard> getCatalogInfos() {
         return cis;
     }
 
@@ -54,7 +54,7 @@ public class CatalogManager implements IObserver {
      *
      * @return The CatalogInfo object, null if it does not exist.
      */
-    public CatalogInfo get(String dsName) {
+    public DatasetCard get(String dsName) {
         return ciMap.get(dsName);
     }
 
@@ -65,13 +65,13 @@ public class CatalogManager implements IObserver {
         return null;
     }
 
-    public Optional<CatalogInfo> getByEntity(Entity entity) {
+    public Optional<DatasetCard> getByEntity(Entity entity) {
         OctreeNode octant = null;
         if (Mapper.octant.has(entity)) {
             var oct = Mapper.octant.get(entity);
             octant = oct.octant != null ? oct.octant.getRoot() : null;
         }
-        for (CatalogInfo ci : cis) {
+        for (DatasetCard ci : cis) {
             if (ci.entity != null) {
                 if (octant != null) {
                     // Octree branch
@@ -90,7 +90,7 @@ public class CatalogManager implements IObserver {
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
             case CATALOG_ADD -> {
-                CatalogInfo ci = (CatalogInfo) data[0];
+                DatasetCard ci = (DatasetCard) data[0];
                 boolean addToSg = (Boolean) data[1];
                 if (addToSg) {
                     // Insert object into scene graph
@@ -114,7 +114,7 @@ public class CatalogManager implements IObserver {
                 cis.add(ci);
             }
             case CATALOG_REMOVE -> {
-                CatalogInfo ci;
+                DatasetCard ci;
                 String dsName = (String) data[0];
                 if (ciMap.containsKey(dsName)) {
                     ci = ciMap.get(dsName);
@@ -125,7 +125,7 @@ public class CatalogManager implements IObserver {
                 }
             }
             case CATALOG_VISIBLE -> {
-                CatalogInfo ci;
+                DatasetCard ci;
                 String dsName;
                 dsName = (String) data[0];
                 boolean visible = (Boolean) data[1];
@@ -138,8 +138,8 @@ public class CatalogManager implements IObserver {
                 }
             }
             case CATALOG_HIGHLIGHT -> {
-                CatalogInfo ci;
-                ci = (CatalogInfo) data[0];
+                DatasetCard ci;
+                ci = (DatasetCard) data[0];
                 boolean highlight = (Boolean) data[1];
                 if (ci != null) {
                     ci.highlight(highlight);
@@ -151,7 +151,7 @@ public class CatalogManager implements IObserver {
                 }
             }
             case CATALOG_POINT_SIZE_SCALING_CMD -> {
-                CatalogInfo ci;
+                DatasetCard ci;
                 String dsName;
                 dsName = (String) data[0];
                 double scaling = (Double) data[1];

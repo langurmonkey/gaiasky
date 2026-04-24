@@ -19,7 +19,7 @@ import gaiasky.gui.window.GenericDialog;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleType;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 import gaiasky.util.filter.Filter;
@@ -39,13 +39,13 @@ import java.util.Locale;
 public class DatasetFiltersWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetFiltersWindow.class);
 
-    private final CatalogInfo ci;
+    private final DatasetCard ci;
     private Table filterTable;
     private Filter filter;
     private OwnTextIconButton addFilterOrRule;
     private boolean filterEdited;
 
-    public DatasetFiltersWindow(CatalogInfo ci,
+    public DatasetFiltersWindow(DatasetCard ci,
                                 Skin skin,
                                 Stage stage) {
         super(I18n.msg("gui.dataset.filters") + " - " + ci.name, skin, stage);

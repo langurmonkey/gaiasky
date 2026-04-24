@@ -197,7 +197,7 @@ public class Trajectory implements Component {
     }
 
     public void setClosedLoop(Boolean closedLoop) {
-
+        this.closedLoop = closedLoop;
     }
 
     public void setOrbitProvider(String provider) {

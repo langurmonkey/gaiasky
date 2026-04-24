@@ -24,7 +24,7 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.*;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
@@ -232,10 +232,10 @@ public class SAMPClient implements IObserver {
                 try {
                     DatasetOptions datasetOptions = dld.generateDatasetOptions();
                     // Load dataset
-                    boolean loaded = ((EventScriptingInterface) GaiaSky.instance.scripting()).loadDataset(id, dataSource, CatalogInfoSource.SAMP, datasetOptions, true);
+                    boolean loaded = ((EventScriptingInterface) GaiaSky.instance.scripting()).loadDataset(id, dataSource, DatasetSourceType.SAMP, datasetOptions, true);
                     if (loaded) {
                         // Select first
-                        CatalogInfo ci = catalogManager.get(id);
+                        DatasetCard ci = catalogManager.get(id);
                         var node = ci.entity;
                         if (node != null) {
                             var graph = Mapper.graph.get(node);

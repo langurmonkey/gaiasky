@@ -33,11 +33,11 @@ public class FilterView extends BaseView {
         if (set == null && elementsSet == null) {
             return false;
         }
-        if (dataset != null && dataset.catalogInfo != null && dataset.catalogInfo.filter != null) {
+        if (dataset != null && dataset.datasetCard != null && dataset.datasetCard.filter != null) {
             if (set != null) {
-                return dataset.catalogInfo.filter.evaluate(set.pointData.get(i));
+                return dataset.datasetCard.filter.evaluate(set.pointData.get(i));
             } else {
-                return dataset.catalogInfo.filter.evaluate(elementsSet.data().get(i));
+                return dataset.datasetCard.filter.evaluate(elementsSet.data().get(i));
             }
         }
         return true;

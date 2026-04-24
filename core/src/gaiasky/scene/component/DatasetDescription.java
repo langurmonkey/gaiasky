@@ -8,7 +8,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.parse.Parser;
 
 import java.util.Map;
@@ -17,7 +17,7 @@ public class DatasetDescription implements Component {
     /**
      * Information on the catalog this fade node represents (particle group, octree, etc.)
      */
-    public CatalogInfo catalogInfo = null;
+    public DatasetCard datasetCard = null;
 
     /**
      * A description.
@@ -33,23 +33,23 @@ public class DatasetDescription implements Component {
     /** Whether to add this as a dataset. **/
     public boolean addDataset = true;
 
-    public void setCatalogInfoBare(CatalogInfo info) {
-        this.catalogInfo = info;
+    public void setCatalogInfoBare(DatasetCard info) {
+        this.datasetCard = info;
     }
 
-    public void setCatalogInfo(CatalogInfo info) {
-        this.catalogInfo = info;
+    public void setCatalogInfo(DatasetCard info) {
+        this.datasetCard = info;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setCatalogInfo(Map<String, Object> map) {
+    public void setDatasetCard(Map<String, Object> map) {
         String name = (String) map.get("name");
         String desc = (String) map.get("description");
         String source = (String) map.get("source");
-        CatalogInfo.CatalogInfoSource type = map.containsKey("type") ? CatalogInfo.CatalogInfoSource.valueOf((String) map.get("type")) : CatalogInfo.CatalogInfoSource.INTERNAL;
+        DatasetCard.DatasetSourceType type = map.containsKey("type") ? DatasetCard.DatasetSourceType.valueOf((String) map.get("type")) : DatasetCard.DatasetSourceType.INTERNAL;
         // Highlight size factor.
         float size = getFloat(map, 1, "size", "hlSizeFactor", "highlightSizeFactor");
         // Size in bytes.
@@ -60,18 +60,22 @@ public class DatasetDescription implements Component {
             nParticles = getLong(map, -1, "nobjects", "nObjects", "numObjects");
         }
 
-        this.catalogInfo = new CatalogInfo(name, desc, source, type, size);
-        this.catalogInfo.sizeBytes = sizeBytes;
-        this.catalogInfo.nParticles = nParticles;
+        this.datasetCard = new DatasetCard(name, desc, source, type, size);
+        this.datasetCard.sizeBytes = sizeBytes;
+        this.datasetCard.nParticles = nParticles;
+    }
 
+
+    public void setCatalogInfo(Map<String, Object> map) {
+        setDatasetCard(map);
     }
 
     public void setCataloginfo(Map<String, Object> map) {
-        setCatalogInfo(map);
+        setDatasetCard(map);
     }
 
     public void setDatasetInfo(Map<String, Object> map) {
-        setCatalogInfo(map);
+        setDatasetCard(map);
     }
 
     public float getFloat(Map<String, Object> map, float defaultValue, String... keys) {

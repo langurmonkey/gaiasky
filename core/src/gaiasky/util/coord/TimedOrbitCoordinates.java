@@ -11,9 +11,9 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Composition of {@link IBodyCoordinates} that contains a start and end time of validity.
+ * Composition of {@link AbstractOrbitCoordinates} that contains a start and end time of validity.
  */
-public class TimedOrbitCoordinates implements IBodyCoordinates {
+public class TimedOrbitCoordinates implements IOrbitCoordinates {
 
     static final Pool<TimedOrbitCoordinates> pool = new Pool<>() {
         protected TimedOrbitCoordinates newObject() {
@@ -97,6 +97,11 @@ public class TimedOrbitCoordinates implements IBodyCoordinates {
                 parent = index.get(key);
             }
         }
+    }
+
+    @Override
+    public Entity getOrbitObject() {
+        return coordinates.getOrbitObject();
     }
 
     @Override
