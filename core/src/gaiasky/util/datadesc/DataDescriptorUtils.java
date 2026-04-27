@@ -403,4 +403,12 @@ public class DataDescriptorUtils {
             }
         }
     }
+
+    public DatasetDesc getMatchByKey(String key) {
+        var dd = DataDescriptor.localDataDescriptor;
+        if (dd != null && key != null && !key.isBlank()) {
+            return dd.findDatasetByKey(key);
+        }
+        return null;
+    }
 }

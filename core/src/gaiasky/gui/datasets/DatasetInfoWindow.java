@@ -7,13 +7,17 @@
 
 package gaiasky.gui.datasets;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.GaiaSky;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.DatasetCard;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.OwnImage;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextArea;
@@ -39,6 +43,30 @@ public class DatasetInfoWindow extends GenericDialog {
 
     @Override
     protected void build() {
+        // Image(s).
+        if (ci.dd != null && ci.dd.exists) {
+            var dataset = ci.dd;
+            // Max 3 images.
+            // 1:1 aspect, no larger than 800^2 px.
+            int n = Math.min(3, dataset.images.length);
+            Table imagesTable = null;
+            for (int i = 0; i < n; i++) {
+                var img = dataset.images[i];
+                var tex = new Texture(img);
+                if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                    var image = new OwnImage(tex, false);
+                    image.setSize(200, 200);
+                    if (imagesTable == null) {
+                        imagesTable = new Table(skin);
+                    }
+                    imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+                }
+            }
+            if (imagesTable != null) {
+                content.add(imagesTable).colspan(2).center().padBottom(pad18).row();
+            }
+
+        }
         // Name.
         content.add(new OwnLabel(I18n.msg("gui.dataset.name"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18);
         content.add(new OwnLabel(ci.name, skin)).top().left().padRight(pad18).padBottom(pad18).row();
@@ -53,10 +81,20 @@ public class DatasetInfoWindow extends GenericDialog {
         content.add(new OwnLabel(ci.nParticles > 0 ? Long.toString(ci.nParticles) : "?", skin)).top().left().padRight(pad18).padBottom(pad18).row();
         // Size bytes.
         content.add(new OwnLabel(I18n.msg("gui.dataset.sizebytes"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18);
-        content.add(new OwnLabel(ci.sizeBytes > 0 ? GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "?", skin)).top().left().padRight(pad18).padBottom(pad18).row();
+        content.add(new OwnLabel(ci.sizeBytes > 0 ? GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "?", skin))
+                .top()
+                .left()
+                .padRight(pad18)
+                .padBottom(pad18)
+                .row();
         // Added
         content.add(new OwnLabel(I18n.msg("gui.dataset.loaded"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18);
-        content.add(new OwnLabel(ci.loadDateUTC.atZone(GaiaSky.settings().program.timeZone.getTimeZone()).toString(), skin)).top().left().padRight(pad18).padBottom(pad18).row();
+        content.add(new OwnLabel(ci.loadDateUTC.atZone(GaiaSky.settings().program.timeZone.getTimeZone()).toString(), skin))
+                .top()
+                .left()
+                .padRight(pad18)
+                .padBottom(pad18)
+                .row();
         // Description
         final OwnScrollPane scroll = getOwnScrollPane();
         content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18 * 2f);

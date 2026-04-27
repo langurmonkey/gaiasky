@@ -219,7 +219,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
-            DatasetCard ci = new DatasetCard(name, description, null, DatasetSourceType.LOD, 1.5f, entity);
+            DatasetCard ci = new DatasetCard(null, name, description, null, DatasetSourceType.LOD, 1.5f, entity);
             ci.nParticles = params.containsKey("nObjects") ? (Long) params.get("nObjects") : -1;
             ci.nParticles = ci.nParticles < 0 && params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;

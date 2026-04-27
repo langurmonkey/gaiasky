@@ -21,13 +21,16 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
 
 /**
  * Contains a datasets' description, constructed from a JSON file or object.
  */
 public class DatasetDesc implements Comparable<DatasetDesc> {
-    private final Log logger = Logger.getLogger(DatasetDesc.class);
+    private static final Log logger = Logger.getLogger(DatasetDesc.class);
+    public static final int MAX_IMAGE_SIDE = 800;
+
     public JsonValue source;
     public String key;
     public String name;
@@ -56,6 +59,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
     public boolean baseData;
     public String[] releaseNotes;
     public String[] files;
+    public String[] images;
     // In case of local datasets, this links to the server description
     public DatasetDesc server;
     private JsonReader reader;
@@ -210,6 +214,92 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         } else {
             this.files = null;
         }
+
+        // Images
+        if (exists) {
+            this.images = discoverImages();
+        } else {
+            this.images = null;
+        }
+    }
+
+    /**
+     * Discovers image files in the dataset directory. Looks for files matching:
+     * <ul>
+     *     <li>image.jpg, image.png</li>
+     *     <li>image00.jpg, image01.jpg, ..., image99.jpg (and .png variants)</li>
+     * </ul>
+     * <p>
+     * Images are returned as absolute file paths.
+     *
+     * @return An array of image file paths, or null if none found.
+     */
+    private String[] discoverImages() {
+        if (checkPath == null) {
+            return null;
+        }
+        // Get parent to `dataset.json` file, this is the base location.
+        var basePath = checkPath.getParent();
+
+        if (!Files.isDirectory(basePath)) {
+            return null;
+        }
+
+        java.util.List<String> discoveredImages = new java.util.ArrayList<>();
+
+        try {
+            File dir = basePath.toFile();
+            File[] files = dir.listFiles();
+
+            if (files == null) {
+                return null;
+            }
+
+            // Helper to normalize extensions for comparison.
+            var supportedExtensions = new HashSet<>(Arrays.asList("jpg", "png"));
+
+            // Discover image.jpg, image.png
+            for (File file : files) {
+                String fileName = file.getName().toLowerCase(Locale.ROOT);
+                if (fileName.startsWith("image.")) {
+                    String ext = getExtension(fileName);
+                    if (supportedExtensions.contains(ext) && file.isFile()) {
+                        discoveredImages.add(file.getAbsolutePath());
+                    }
+                }
+            }
+
+            // Discover imageXX.jpg, imageXX.png where XX is [00,99]
+            for (File file : files) {
+                String fileName = file.getName().toLowerCase(Locale.ROOT);
+                if (fileName.matches("image\\d{2}\\.(jpg|png)")) {
+                    if (file.isFile()) {
+                        discoveredImages.add(file.getAbsolutePath());
+                    }
+                }
+            }
+
+            // Sort for consistent ordering
+            discoveredImages.sort(String::compareTo);
+
+            return discoveredImages.isEmpty() ? null : discoveredImages.toArray(new String[0]);
+
+        } catch (Exception e) {
+            logger.warn("Error discovering images in dataset directory: " + basePath, e);
+            return null;
+        }
+    }
+
+    /**
+     * Extracts the file extension from a filename (lowercase).
+     *
+     * @param fileName The filename.
+     *
+     * @return The extension without the dot, or empty string if no extension.
+     */
+    private String getExtension(String fileName) {
+        int lastDot = fileName.lastIndexOf('.');
+        return lastDot > 0 ? fileName.substring(lastDot + 1) : "";
     }
 
     /**
@@ -466,6 +556,7 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         copy.baseData = this.baseData;
         copy.releaseNotes = this.releaseNotes;
         copy.files = this.files;
+        copy.images = this.images;
         copy.server = this.server;
         copy.replaces = this.replaces;
         copy.replacedBy = this.replacedBy;

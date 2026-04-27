@@ -16,6 +16,8 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.i18n.I18n;
@@ -30,13 +32,19 @@ public class DatasetCard {
     private static final Log logger = Logger.getLogger(DatasetCard.class);
     private static int colorIndexSequence = 0;
     private final FocusView view;
-    // Base properties
+
+    /** Dataset key. A dataset may have multiple cards, in this case all point to the same dataset. **/
+    public String dsKey;
+    /** Dataset name. **/
     public String name;
+    /** Dataset description. **/
     public String description;
+    /** Dataset source string. **/
     public String source;
     public long nParticles;
     public long sizeBytes;
     public Instant loadDateUTC;
+    public DatasetDesc dd;
 
     // Highlight
     public boolean highlighted;
@@ -60,22 +68,25 @@ public class DatasetCard {
     // Reference to the entity
     public Entity entity;
 
-    public DatasetCard(String name,
+    public DatasetCard(String dsKey,
+                       String name,
                        String description,
                        String source,
                        DatasetSourceType type,
                        float hlSizeFactor,
                        Entity entity) {
-        this(name, description, source, type, hlSizeFactor);
+        this(dsKey, name, description, source, type, hlSizeFactor);
         setEntity(entity);
     }
 
-    public DatasetCard(String name,
+    public DatasetCard(String dsKey,
+                        String name,
                        String description,
                        String source,
                        DatasetSourceType type,
                        float hlSizeFactor) {
         super();
+        this.dsKey = dsKey;
         this.name = name;
         this.description = description;
         this.source = source;
@@ -87,6 +98,10 @@ public class DatasetCard {
         this.hlAllVisible = true;
         this.view = new FocusView();
         System.arraycopy(ColorUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
+
+        // Set descriptor, if any.
+        this.dd = DataDescriptorUtils.instance().getMatchByKey(dsKey);
+
     }
 
     public void setEntity(Entity entity) {

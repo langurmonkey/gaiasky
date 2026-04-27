@@ -30,6 +30,7 @@ allprojects {
     extra.set("ashleyVersion", "1.7.4")
     extra.set("jtarVersion", "2.+")
     extra.set("junitVersion", "4.+")
+    extra.set("annotationsVersion", "26.+")
     // Vulnerability fixes
     extra.set("jettyVersion", "10.0.24")
     extra.set("jsonVersion", "20231013")
@@ -157,6 +158,7 @@ project(":core") {
         implementation("com.badlogicgames.gdx-controllers:gdx-controllers-core:${property("gdxcontrollersVersion")}")
         implementation("com.badlogicgames.gdx-controllers:gdx-controllers-desktop:${property("gdxcontrollersVersion")}")
 
+        compileOnly("org.jetbrains:annotations:${property("annotationsVersion")}")
         implementation("com.badlogicgames.ashley:ashley:${property("ashleyVersion")}")
         implementation("uk.ac.starlink:stil:${property("stilVersion")}")
         implementation("uk.ac.starlink:jsamp:${property("jsampVersion")}")
@@ -180,10 +182,12 @@ project(":core") {
         implementation("org.json:json:${property("jsonVersion")}")
         implementation("org.apache.xmlrpc:xmlrpc:${property("xmlrpcVersion")}")
 
-        implementation(files("../assets"))
-
+        // Testing
         testImplementation("junit:junit:${property("junitVersion")}")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.+")
+
+        // Assets
+        implementation(files("../assets"))
     }
 
 }

@@ -60,7 +60,8 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
     }
 
     private DatasetCard fromDatasetDesc(DatasetDesc dd, Entity entity) {
-        var result = new DatasetCard(dd.name,
+        var result = new DatasetCard(dd.key,
+                                     dd.name,
                                      dd.description,
                                      view.getDataFile(),
                                      DatasetSourceType.INTERNAL,
@@ -80,7 +81,7 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
         String dataFile = view.getDataFile();
 
         if (create && dd.datasetCard == null) {
-            dd.datasetCard = new DatasetCard(name, description, dataFile, DatasetSourceType.INTERNAL, 1f, entity);
+            dd.datasetCard = new DatasetCard(null, name, description, dataFile, DatasetSourceType.INTERNAL, 1f, entity);
         }
 
         if (dd.datasetCard != null && dd.datasetCard.entity == null) {

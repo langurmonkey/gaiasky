@@ -46,6 +46,7 @@ public class DatasetDescription implements Component {
     }
 
     public void setDatasetCard(Map<String, Object> map) {
+        String key = (String) map.get("dsKey");
         String name = (String) map.get("name");
         String desc = (String) map.get("description");
         String source = (String) map.get("source");
@@ -60,7 +61,7 @@ public class DatasetDescription implements Component {
             nParticles = getLong(map, -1, "nobjects", "nObjects", "numObjects");
         }
 
-        this.datasetCard = new DatasetCard(name, desc, source, type, size);
+        this.datasetCard = new DatasetCard(key, name, desc, source, type, size);
         this.datasetCard.sizeBytes = sizeBytes;
         this.datasetCard.nParticles = nParticles;
     }

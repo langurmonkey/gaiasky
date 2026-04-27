@@ -639,7 +639,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                                                  false));
 
                             // Catalog info.
-                            new DatasetCard(name, ds.getName(), null, type, 1.5f, starGroup.get());
+                            new DatasetCard(null, name, ds.getName(), null, type, 1.5f, starGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, starGroup.get(), true);
                             // Add to catalog manager -> setUp.
@@ -676,7 +676,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                                                          false));
 
                             // Catalog info
-                            DatasetCard ci = new DatasetCard(name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
+                            DatasetCard ci = new DatasetCard(null, name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                             // Add to catalog manager -> setUp
@@ -710,7 +710,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                                                          false));
 
                             // Catalog info
-                            DatasetCard ci = new DatasetCard(name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
+                            DatasetCard ci = new DatasetCard(null, name, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
                             // Add to scene.
                             EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                             // Add to catalog manager -> setUp

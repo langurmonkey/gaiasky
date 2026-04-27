@@ -13,6 +13,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -855,6 +856,27 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
 
+            // Image(s).
+            Table imagesTable = null;
+            if (dataset.images != null && dataset.images.length > 0) {
+                // Max 3 images.
+                // 1:1 aspect, no larger than DatasetDesc#MAX_IMAGE_SIDE^2 px.
+                int n = Math.min(3, dataset.images.length);
+                for (int i = 0; i < n; i++) {
+                    var img = dataset.images[i];
+                    var tex = new Texture(img);
+                    if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                        var image = new OwnImage(tex, false);
+                        image.setSize(300, 300);
+                        if (imagesTable == null) {
+                            imagesTable = new Table(skin);
+                        }
+                        imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+
+                    }
+                }
+            }
+
             // Type.
             String typeString;
             if (I18n.hasMessage("gui.download.type." + dType)) {
@@ -935,7 +957,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 releaseNotesTable.add(l).left().row();
             }
 
-            // Credits
+            // Credits.
             var credits = dataset.credits;
             Table creditsContent = null;
             Label creditsTitle = null;
@@ -1103,6 +1125,9 @@ public class DatasetManagerWindow extends GenericDialog {
             rightTable.add(status).top().left().padLeft(pad18 * 3f).padBottom(pad34).row();
             if (replacedBy != null) {
                 rightTable.add(replacedBy).top().left().fillX().padBottom(pad10 * 3f).row();
+            }
+            if (imagesTable != null) {
+                rightTable.add(imagesTable).top().center().padBottom(pad34).row();
             }
             rightTable.add(type).top().left().padBottom(pad10).row();
             rightTable.add(version).top().left().padBottom(pad10).row();
