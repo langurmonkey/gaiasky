@@ -859,20 +859,71 @@ public class DatasetManagerWindow extends GenericDialog {
             // Image(s).
             Table imagesTable = null;
             if (dataset.images != null && dataset.images.length > 0) {
-                // Max 3 images.
-                // 1:1 aspect, no larger than DatasetDesc#MAX_IMAGE_SIDE^2 px.
-                int n = Math.min(3, dataset.images.length);
-                for (int i = 0; i < n; i++) {
-                    var img = dataset.images[i];
-                    var tex = new Texture(img);
-                    if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
-                        var image = new OwnImage(tex, false);
-                        image.setSize(300, 300);
-                        if (imagesTable == null) {
-                            imagesTable = new Table(skin);
+                // Max 3 images, 1:1 aspect, no larger than DatasetDesc#MAX_IMAGE_SIDE^2 px.
+                if (mode == DatasetMode.INSTALLED) {
+                    // LOCAL IMAGES
+                    int n = Math.min(3, dataset.images.length);
+                    for (int i = 0; i < n; i++) {
+                        var img = dataset.images[i];
+                        var tex = new Texture(img);
+                        if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                            var image = new OwnImage(tex, false);
+                            image.setSize(300, 300);
+                            if (imagesTable == null) {
+                                imagesTable = new Table(skin);
+                            }
+                            imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
                         }
-                        imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+                    }
+                } else if (mode == DatasetMode.AVAILABLE) {
+                    // REMOTE IMAGES
+                    int n = Math.min(3, dataset.images.length);
+                    if (n > 0) {
+                        imagesTable = new Table(skin);
+                    }
+                    for (int i = 0; i < n; i++) {
+                        String url = dataset.images[i].replace(DatasetDownloadUtils.mirrorKeyword,
+                                                               GaiaSky.settings().program.url.getCurrentDataMirror());
+                        String fileName = url.substring(url.lastIndexOf('/') + 1);
 
+                        var cacheDir = SysUtils.getCacheDir();
+                        var datasetDir = cacheDir.resolve("datasets").resolve(dataset.key);
+
+                        if (datasetDir.toFile().mkdirs()) {
+                            logger.debug("Created directory: " + datasetDir.toString());
+                        }
+                        var filePath = datasetDir.resolve(fileName);
+                        if (Files.exists(filePath)) {
+                            // Use cached file.
+                            logger.info("File found: " + filePath);
+                            var tex = new Texture(filePath.toAbsolutePath().toString());
+                            if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                                var image = new OwnImage(tex, false);
+                                image.setSize(300, 300);
+                                imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+                            }
+                        } else {
+                            // Download
+                            final var table = imagesTable;
+                            DownloadHelper.downloadFile(url,
+                                                        Gdx.files.absolute(filePath.toAbsolutePath().toString()),
+                                                        GaiaSky.settings().program.offlineMode,
+                                                        null,
+                                                        null,
+                                                        (digest) -> GaiaSky.postRunnable(() -> {
+                                                            // OK.
+                                                            logger.info("Image downloaded successfully: " + filePath);
+                                                            GaiaSky.postRunnable(() -> {
+                                                                var tex = new Texture(filePath.toAbsolutePath().toString());
+                                                                if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                                                                    var image = new OwnImage(tex, false);
+                                                                    image.setSize(300, 300);
+                                                                    table.add(image).center().padRight(pad10).padLeft(pad10);
+                                                                }
+                                                            });
+                                                        }),
+                                                        null, null);
+                        }
                     }
                 }
             }
@@ -925,7 +976,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 int i = 0;
                 for (var link : dataset.links) {
                     if (!link.isBlank()) {
-                        String linkStr = link.replace("@mirror-url@", GaiaSky.settings().program.url.getCurrentDataMirror());
+                        String linkStr = link.replace(DatasetDownloadUtils.mirrorKeyword, GaiaSky.settings().program.url.getCurrentDataMirror());
                         var linkActor = new Link(TextUtils.breakCharacters(linkStr, 70, true), skin, link);
                         if (i > 0)
                             linksGroup.row();
@@ -1193,7 +1244,7 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
         String name = dataset.name;
-        String url = dataset.file.replace("@mirror-url@", GaiaSky.settings().program.url.getCurrentDataMirror());
+        String url = dataset.file.replace(DatasetDownloadUtils.mirrorKeyword, GaiaSky.settings().program.url.getCurrentDataMirror());
 
         String filename = FilenameUtils.getName(url);
         FileHandle tempDownload = Gdx.files.absolute(tempDir + "/" + filename + ".part");

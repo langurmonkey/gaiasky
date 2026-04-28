@@ -215,11 +215,11 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
             this.files = null;
         }
 
-        // Images
-        if (exists) {
+        // Remote images.
+        this.images = getStringOrArray("images");
+        // Discover local images.
+        if (exists && this.images == null) {
             this.images = discoverImages();
-        } else {
-            this.images = null;
         }
     }
 

@@ -30,7 +30,8 @@ import java.util.zip.GZIPInputStream;
 
 public class DatasetDownloadUtils {
     private static final Logger.Log logger = Logger.getLogger(DatasetDownloadUtils.class);
-    private static final DatasetDownloadUtils instance = new DatasetDownloadUtils();
+
+    public static final String mirrorKeyword = "@mirror-url@";
 
     /**
      * Returns the file size.
@@ -160,10 +161,11 @@ public class DatasetDownloadUtils {
             long current = System.currentTimeMillis();
             long elapsed = current - last;
             if (elapsed > 250) {
+                final var source = entry;
                 GaiaSky.postRunnable(() -> {
                     float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
                     String progressString = I18n.msg("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
-                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, instance, dataset.key, val, progressString, null);
+                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, source, dataset.key, val, progressString, null);
                 });
                 last = current;
             }
@@ -173,7 +175,7 @@ public class DatasetDownloadUtils {
         if (error) {
             String msg = I18n.msg("gui.download.extracting.error", errorException);
             logger.error(errorException, msg);
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, instance, msg, -1f);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, entry, msg, -1f);
             // Delete uncompressed files.
             for (File f : processedFiles) {
                 DatasetDownloadUtils.deleteFile(f.toPath());
