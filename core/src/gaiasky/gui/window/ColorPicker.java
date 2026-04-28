@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.HexColorValidator;
@@ -153,7 +154,7 @@ public class ColorPicker extends ColorPickerAbstract {
             float colSize = 160f;
             content.clear();
 
-            HorizontalGroup hg = new HorizontalGroup();
+            var hg = new HorizontalGroup();
             hg.space(pad18);
             var oldColorImage = new OwnImage(skin.getDrawable("white"), false);
             oldColorImage.setColor(color[0], color[1], color[2], color[3]);
@@ -193,18 +194,18 @@ public class ColorPicker extends ColorPickerAbstract {
 
             /* Inputs */
             textfields = new OwnTextField[4];
-            FloatValidator floatValidator = new FloatValidator(0f, 1f);
+            FloatValidator colorValidator = new FloatValidator(0f, 1f);
             OwnTextField tRed, tGreen, tBlue, tAlpha;
-            tRed = new OwnTextField(nf.format(color[0]), skin, floatValidator);
+            tRed = new OwnTextField(nf.format(color[0]), skin, colorValidator);
             tRed.setWidth(textFieldLen);
             textfields[0] = tRed;
-            tGreen = new OwnTextField(nf.format(color[1]), skin, floatValidator);
+            tGreen = new OwnTextField(nf.format(color[1]), skin, colorValidator);
             tGreen.setWidth(textFieldLen);
             textfields[1] = tGreen;
-            tBlue = new OwnTextField(nf.format(color[2]), skin, floatValidator);
+            tBlue = new OwnTextField(nf.format(color[2]), skin, colorValidator);
             tBlue.setWidth(textFieldLen);
             textfields[2] = tBlue;
-            tAlpha = new OwnTextField(nf.format(color[3]), skin, floatValidator);
+            tAlpha = new OwnTextField(nf.format(color[3]), skin, colorValidator);
             tAlpha.setWidth(textFieldLen);
             textfields[3] = tAlpha;
 
@@ -377,7 +378,7 @@ public class ColorPicker extends ColorPickerAbstract {
                 } else {
                     // Update slider
                     if (cpd.textfields[idx].isValid()) {
-                        c = Float.parseFloat(cpd.textfields[idx].getText());
+                        c = Parser.parseFloat(cpd.textfields[idx].getText());
                     } else {
                         update = false;
                     }
