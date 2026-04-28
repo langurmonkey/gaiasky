@@ -857,6 +857,7 @@ public class DatasetManagerWindow extends GenericDialog {
             }
 
             // Image(s).
+            final int imageSide = 300;
             Table imagesTable = null;
             if (dataset.images != null && dataset.images.length > 0) {
                 // Max 3 images, 1:1 aspect, no larger than DatasetDesc#MAX_IMAGE_SIDE^2 px.
@@ -865,22 +866,25 @@ public class DatasetManagerWindow extends GenericDialog {
                     int n = Math.min(3, dataset.images.length);
                     for (int i = 0; i < n; i++) {
                         var img = dataset.images[i];
-                        var tex = new Texture(img);
-                        if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
-                            var image = new OwnImage(tex, false);
-                            image.setSize(300, 300);
-                            if (imagesTable == null) {
-                                imagesTable = new Table(skin);
+                        try {
+                            if (Files.exists(Path.of(img))) {
+                                var tex = new Texture(img);
+                                if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                                    var image = new OwnImage(tex, false);
+                                    image.setSize(imageSide, imageSide);
+                                    if (imagesTable == null) {
+                                        imagesTable = new Table(skin);
+                                    }
+                                    imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+                                }
                             }
-                            imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+                        } catch (Exception ignored) {
                         }
                     }
                 } else if (mode == DatasetMode.AVAILABLE) {
                     // REMOTE IMAGES
                     int n = Math.min(3, dataset.images.length);
-                    if (n > 0) {
-                        imagesTable = new Table(skin);
-                    }
+                    imagesTable = new Table(skin);
                     for (int i = 0; i < n; i++) {
                         String url = dataset.images[i].replace(DatasetDownloadUtils.mirrorKeyword,
                                                                GaiaSky.settings().program.url.getCurrentDataMirror());
@@ -899,7 +903,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             var tex = new Texture(filePath.toAbsolutePath().toString());
                             if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
                                 var image = new OwnImage(tex, false);
-                                image.setSize(300, 300);
+                                image.setSize(imageSide, imageSide);
                                 imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
                             }
                         } else {
