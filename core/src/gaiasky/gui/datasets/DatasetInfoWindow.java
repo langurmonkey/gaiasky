@@ -53,7 +53,7 @@ public class DatasetInfoWindow extends GenericDialog {
             for (int i = 0; i < n; i++) {
                 var img = dataset.images[i];
                 var tex = new Texture(img);
-                if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                if (DatasetDesc.verifyDatasetImage(tex)) {
                     var image = new OwnImage(tex, false);
                     image.setSize(200, 200);
                     if (imagesTable == null) {

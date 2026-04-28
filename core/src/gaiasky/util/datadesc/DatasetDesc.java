@@ -9,6 +9,7 @@ package gaiasky.util.datadesc;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
@@ -16,6 +17,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.update.VersionChecker;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -29,7 +31,13 @@ import java.util.Locale;
  */
 public class DatasetDesc implements Comparable<DatasetDesc> {
     private static final Log logger = Logger.getLogger(DatasetDesc.class);
-    public static final int MAX_IMAGE_SIDE = 800;
+
+    public static boolean verifyDatasetImage(@NotNull Texture tex) {
+        final int MAX_IMAGE_SIDE = 800;
+        final float MAX_AR_DELTA = 0.1f;
+        float ar = (float) tex.getWidth() / (float) tex.getHeight();
+        return Math.abs(ar - 1.0) < MAX_AR_DELTA && tex.getWidth() <= MAX_IMAGE_SIDE;
+    }
 
     public JsonValue source;
     public String key;

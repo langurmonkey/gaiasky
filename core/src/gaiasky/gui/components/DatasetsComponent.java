@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
-    private final Map<String, WidgetGroup> groupMap;
+    private final Map<String, Table> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
     private final Map<String, OwnSliderReset> scalingMap;
@@ -54,7 +54,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, DatasetInfoWindow> infoMap;
     private final Map<String, DatasetTransformsWindow> transformsMap;
     private final CatalogManager catalogManager;
-    private VerticalGroup group;
+    private Table group;
     private OwnLabel noDatasetsLabel = null;
     private float componentWidth;
 
@@ -80,8 +80,13 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     public void initialize(float componentWidth) {
         this.componentWidth = componentWidth;
 
-        group = new VerticalGroup();
-        group.columnAlign(Align.left);
+        group = new Table();
+        var scroll = new OwnScrollPane(group, skin, "minimalist-nobg");
+        scroll.setScrollingDisabled(true, false);
+        scroll.setForceScroll(false, false);
+        scroll.setFadeScrollBars(false);
+        scroll.setOverscroll(false, false);
+        scroll.setSmoothScrolling(true);
 
         Collection<DatasetCard> cis = this.catalogManager.getCatalogInfos();
         if (cis != null) {
@@ -89,8 +94,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 addCatalogInfo(ci);
             }
         }
+        group.pack();;
 
-        component = group;
+        scroll.setWidth(group.getWidth() + pad30);
+        scroll.setHeight(800f);
+        component = scroll;
 
         addNoDatasets();
     }
@@ -154,7 +162,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 }
             }
         }
-
     }
 
 
@@ -392,7 +399,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         desc.addListener(new OwnTextTooltip(description, skin));
         t.add(desc).left().expandX();
         if (!description.isBlank()) {
-            Link info = new Link("(i)", skin.get("link", Label.LabelStyle.class), null);
+            Link info = new Link("(+)", skin.get("link", Label.LabelStyle.class), null);
             info.addListener(new OwnTextTooltip(description, skin));
             t.add(info).left().padLeft(pad);
         }
@@ -438,22 +445,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(sizeScaling).left().colspan(2).padTop(pad9);
             scalingMap.put(ci.name, sizeScaling);
         }
-        Container<Table> c = new Container<>(t);
-        c.setFillParent(true);
-        c.align(Align.topLeft);
-        c.minHeight(80f);
-        c.width(componentWidth * 0.94f);
 
-        // Info
-        ScrollPane scroll = new OwnScrollPane(c, skin, "minimalist-nobg");
-        scroll.setScrollingDisabled(false, true);
-        scroll.setForceScroll(false, false);
-        scroll.setFadeScrollBars(false);
-        scroll.setOverscroll(false, false);
-        scroll.setSmoothScrolling(true);
-        scroll.setWidth(componentWidth * 0.94f);
-
-        CollapsibleEntry catalogWidget = new CollapsibleEntry(nameLabel, scroll, skin);
+        CollapsibleEntry catalogWidget = new CollapsibleEntry(nameLabel, t, skin);
         catalogWidget.align(Align.topLeft);
         catalogWidget.pad(pad9);
         catalogWidget.setWidth(componentWidth * 0.94f);
@@ -528,7 +521,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
         });
 
-        group.addActor(catalogWidget);
+        group.add(catalogWidget).left().row();
 
         groupMap.put(ci.name, catalogWidget);
     }

@@ -19,7 +19,7 @@ public class DataDescriptor {
 
     public static DataDescriptor localDataDescriptor, serverDataDescriptor;
 
-    /** View organised by types, where each time has a list of datasets **/
+    /** View organized by types, where each time has a list of datasets **/
     public final List<DatasetType> types;
     /** Raw datasets list, where each dataset has a type **/
     public final List<DatasetDesc> datasets;

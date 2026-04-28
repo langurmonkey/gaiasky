@@ -230,7 +230,7 @@ public class DataDescriptorUtils {
                     typesList.add(currentType);
                 }
 
-                DataDescriptor desc = new DataDescriptor(typesList, datasetsList, recommended);
+                DataDescriptor desc = new DataDescriptor(typesList, datasetsList);
                 DataDescriptor.serverDataDescriptor = desc;
                 updateReplacedBy();
                 return desc;
@@ -269,6 +269,7 @@ public class DataDescriptorUtils {
         catalogLocations.add(Gdx.files.absolute(GaiaSky.settings().data.location));
 
         Array<FileHandle> catalogFiles = new Array<>();
+
 
         for (FileHandle catalogLocation : catalogLocations) {
             final var cfs = catalogLocation.list(pathname -> (pathname.canRead()

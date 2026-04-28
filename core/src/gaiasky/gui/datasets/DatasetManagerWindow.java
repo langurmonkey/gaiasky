@@ -869,7 +869,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         try {
                             if (Files.exists(Path.of(img))) {
                                 var tex = new Texture(img);
-                                if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                                if (DatasetDesc.verifyDatasetImage(tex)) {
                                     var image = new OwnImage(tex, false);
                                     image.setSize(imageSide, imageSide);
                                     if (imagesTable == null) {
@@ -901,7 +901,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             // Use cached file.
                             logger.info("File found: " + filePath);
                             var tex = new Texture(filePath.toAbsolutePath().toString());
-                            if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                            if (DatasetDesc.verifyDatasetImage(tex)) {
                                 var image = new OwnImage(tex, false);
                                 image.setSize(imageSide, imageSide);
                                 imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
@@ -919,7 +919,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                             logger.info("Image downloaded successfully: " + filePath);
                                                             GaiaSky.postRunnable(() -> {
                                                                 var tex = new Texture(filePath.toAbsolutePath().toString());
-                                                                if (tex.getWidth() == tex.getHeight() && tex.getWidth() <= DatasetDesc.MAX_IMAGE_SIDE) {
+                                                                if (DatasetDesc.verifyDatasetImage(tex)) {
                                                                     var image = new OwnImage(tex, false);
                                                                     image.setSize(300, 300);
                                                                     table.add(image).center().padRight(pad10).padLeft(pad10);
