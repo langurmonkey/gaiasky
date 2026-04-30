@@ -14,7 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
@@ -45,6 +48,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
+    private static final float MAX_SCROLL_HEIGHT = 800f;
     private final Map<String, Table> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
@@ -55,6 +59,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, DatasetTransformsWindow> transformsMap;
     private final CatalogManager catalogManager;
     private Table group;
+    private OwnScrollPane scroll;
     private OwnLabel noDatasetsLabel = null;
     private float componentWidth;
 
@@ -81,7 +86,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         this.componentWidth = componentWidth;
 
         group = new Table();
-        var scroll = new OwnScrollPane(group, skin, "minimalist-nobg");
+        group.align(Align.topLeft);
+        scroll = new OwnScrollPane(group, skin, "minimalist-nobg");
         scroll.setScrollingDisabled(true, false);
         scroll.setForceScroll(false, false);
         scroll.setFadeScrollBars(false);
@@ -94,10 +100,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 addCatalogInfo(ci);
             }
         }
-        group.pack();;
+        group.pack();
+        ;
 
         scroll.setWidth(group.getWidth() + pad30);
-        scroll.setHeight(800f);
+        recalculateScrollHeight();
         component = scroll;
 
         addNoDatasets();
@@ -450,8 +457,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         catalogWidget.align(Align.topLeft);
         catalogWidget.pad(pad9);
         catalogWidget.setWidth(componentWidth * 0.94f);
-        catalogWidget.setExpandRunnable(() -> EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this));
-        catalogWidget.setCollapseRunnable(() -> EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this));
+        catalogWidget.setExpandRunnable(() -> {
+            EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
+            recalculateScrollHeight();
+        });
+        catalogWidget.setCollapseRunnable(() -> {
+            EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
+            recalculateScrollHeight();
+        });
         catalogWidget.addListener(new InputListener() {
             @Override
             public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
@@ -550,6 +563,13 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
+    private void recalculateScrollHeight() {
+        if (scroll != null && group != null) {
+            group.pack();
+            scroll.setHeight(Math.min(MAX_SCROLL_HEIGHT, group.getHeight()));
+        }
+    }
+
     @Override
     public void notify(final gaiasky.event.Event event,
                        Object source,
@@ -558,6 +578,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             case CATALOG_ADD -> {
                 removeNoDatasets();
                 addCatalogInfo((DatasetCard) data[0]);
+                recalculateScrollHeight();
             }
             case CATALOG_REMOVE -> {
                 String datasetName = (String) data[0];
@@ -569,6 +590,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                     EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
                 }
                 addNoDatasets();
+                recalculateScrollHeight();
             }
             case CATALOG_VISIBLE -> {
                 if (source != this) {
