@@ -7,13 +7,14 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 
-public class OwnTextIconButton extends OwnTextButton {
+public class OwnTextIconButton extends OwnTextButton implements ProgrammaticButton {
 
     private final Skin skin;
     private Image icon;
@@ -59,6 +60,7 @@ public class OwnTextIconButton extends OwnTextButton {
         this.skin = skin;
         setIcon(up);
     }
+
     public OwnTextIconButton(String text, int contentAlign, Image up, Skin skin, String styleName) {
         super(text, skin, styleName);
         this.skin = skin;
@@ -138,6 +140,10 @@ public class OwnTextIconButton extends OwnTextButton {
             add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().size > 0 ? 12.8f : 1f) : space);
             add(getLabel()).align(contentAlign).padRight(pad);
         }
+    }
+
+    public void setIconColor (Color color) {
+        icon.setColor(color);
     }
 
     public void draw(Batch batch, float parentAlpha) {

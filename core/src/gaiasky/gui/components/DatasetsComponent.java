@@ -14,10 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
@@ -38,6 +35,7 @@ import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.IOrbitCoordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -50,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private static final float MAX_SCROLL_HEIGHT = 800f;
     private final Map<String, Table> groupMap;
-    private final Map<String, OwnImageButton[]> imageMap;
+    private final Map<String, ProgrammaticButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
     private final Map<String, OwnSliderReset> scalingMap;
     private final Map<String, DatasetVisualSettingsWindow> visualSettingsMap;
@@ -61,6 +59,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private Table group;
     private OwnScrollPane scroll;
     private OwnLabel noDatasetsLabel = null;
+    private OwnTextIconButton loadDatasets;
     private float componentWidth;
 
 
@@ -101,13 +100,19 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
         }
         group.pack();
-        ;
 
         scroll.setWidth(group.getWidth() + pad12);
         recalculateScrollHeight();
-        component = scroll;
 
         addNoDatasets();
+
+        loadDatasets = new OwnTextIconButton(I18n.msg("gui.dsload.title"), skin, "load");
+
+        Table main = new Table(skin);
+        main.add(scroll).center().top().padBottom(pad8).row();
+        main.add(loadDatasets).center();
+
+        component = main;
     }
 
     private void goToMissionStart(DatasetCard ci,
@@ -171,9 +176,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
     }
 
-
     private void setDatasetVisibility(DatasetCard ci,
-                                      OwnImageButton eye,
+                                      ProgrammaticButton eye,
                                       boolean visible,
                                       Actor source) {
         if (ci.entity != null) {
@@ -256,7 +260,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         // Controls
         Table controls = new Table(skin);
 
-        OwnImageButton visibilityButton = new OwnImageButton(skin, "eye-toggle");
+        var visibilityButton = new OwnImageButton(skin, "eye");
         visibilityButton.setCheckedNoFire(!ci.isVisible(true));
         visibilityButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.toggle"), skin));
         visibilityButton.addListener(event -> {
@@ -267,7 +271,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        OwnImageButton highlightButton = new OwnImageButton(skin, "highlight-ds-s");
+        var highlightButton = new OwnImageButton(skin, "highlight-ds-s");
         highlightButton.setCheckedNoFire(ci.highlighted);
         highlightButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight"), skin));
         highlightButton.addListener(event -> {
@@ -278,7 +282,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        OwnImageButton goToButton = new OwnImageButton(skin, "go-to");
+        var goToButton = new OwnImageButton(skin, "go-to");
         goToButton.setCheckedNoFire(!ci.isVisible(true));
         goToButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.mission.goto"), skin));
         goToButton.addListener(event -> {
@@ -290,7 +294,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
 
-        OwnImageButton filtersButton = new OwnImageButton(skin, "filter");
+        var filtersButton = new OwnImageButton(skin, "filter");
         filtersButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.filter"), skin));
         filtersButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -300,7 +304,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        OwnImageButton visualSettingsButton = new OwnImageButton(skin, "bolt");
+        var visualSettingsButton = new OwnImageButton(skin, "bolt");
         visualSettingsButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.visuals"), skin));
         visualSettingsButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -310,7 +314,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        OwnImageButton transformsButton = new OwnImageButton(skin, "matrix");
+        var transformsButton = new OwnImageButton(skin, "matrix");
         transformsButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.transforms"), skin));
         transformsButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -320,7 +324,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        OwnImageButton infoButton = new OwnImageButton(skin, "info");
+        var infoButton = new OwnTextIconButton("", skin, "info");
+        infoButton.setPad(0);
+        infoButton.setIconColor(ColorUtils.gBlueC);
         infoButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.info"), skin));
         infoButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -330,7 +336,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        ImageButton rubbishButton = new OwnImageButton(skin, "rubbish-bin");
+        var rubbishButton = new OwnTextIconButton("", skin, "rubbish");
+        rubbishButton.setPad(0);
+        rubbishButton.setIconColor(ColorUtils.gRedC);
         rubbishButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.remove"), skin));
         rubbishButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -341,7 +349,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        imageMap.put(ci.name, new OwnImageButton[]{visibilityButton, highlightButton});
+        imageMap.put(ci.name, new ProgrammaticButton[]{visibilityButton, highlightButton});
         if (ci.isHighlightable()) {
             controls.add(visibilityButton).padRight(pad6);
             controls.add(highlightButton).padRight(pad30);
@@ -361,7 +369,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             controls.add(goToButton).padRight(pad30);
         }
 
-        controls.add(infoButton).padRight(pad6);
+        controls.add(infoButton).padRight(pad3);
         controls.add(rubbishButton);
 
         // Dataset table
@@ -596,7 +604,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 if (source != this) {
                     String datasetName = (String) data[0];
                     boolean visible = (Boolean) data[1];
-                    OwnImageButton eye = imageMap.get(datasetName)[0];
+                    ProgrammaticButton eye = imageMap.get(datasetName)[0];
                     eye.setCheckedNoFire(!visible);
                 }
             }
@@ -612,7 +620,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                         String datasetName = (String) data[1];
                         boolean checked = (Boolean) data[2];
                         if (Mapper.mesh.has(e)) {
-                            OwnImageButton eye = imageMap.get(datasetName)[0];
+                            ProgrammaticButton eye = imageMap.get(datasetName)[0];
                             eye.setCheckedNoFire(!checked);
                         }
                     }
@@ -630,7 +638,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
                     if (imageMap.containsKey(ci.name)) {
                         boolean hl = (Boolean) data[1];
-                        OwnImageButton hig = imageMap.get(ci.name)[1];
+                        ProgrammaticButton hig = imageMap.get(ci.name)[1];
                         hig.setCheckedNoFire(hl);
                     }
                 }

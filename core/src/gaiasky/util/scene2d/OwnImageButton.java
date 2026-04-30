@@ -16,10 +16,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-public class OwnImageButton extends ImageButton {
-    OwnImageButton me;
-    SystemCursor cursor;
+import java.util.Objects;
+
+public class OwnImageButton extends ImageButton implements ProgrammaticButton {
+    private final OwnImageButton me;
+    private SystemCursor cursor;
     private float ownWidth = 0f, ownHeight = 0f;
+    private final Color baseColor = new Color(1, 1, 1, 1);
 
     public OwnImageButton(Skin skin) {
         super(skin);
@@ -46,6 +49,7 @@ public class OwnImageButton extends ImageButton {
     }
 
     private void initialize() {
+        baseColor.set(getColor());
         cursor = SystemCursor.Hand;
         this.addListener(event -> {
             if (event instanceof InputEvent) {
@@ -72,13 +76,11 @@ public class OwnImageButton extends ImageButton {
             theme = null;
         }
 
+        var c = baseColor != null ? baseColor : Color.WHITE;
         if (isOver()) {
-            if (theme != null)
-                getImage().setColor(theme);
-            else
-                getImage().setColor(1, 1, 1, 1);
+            getImage().setColor(Objects.requireNonNullElse(theme, c));
         } else {
-            getImage().setColor(1, 1, 1, 1);
+            getImage().setColor(c);
         }
     }
 
@@ -111,4 +113,21 @@ public class OwnImageButton extends ImageButton {
             return super.getPrefHeight();
         }
     }
+
+    @Override
+    public void setColor(Color color) {
+        super.setColor(color);
+        baseColor.set(color);
+        if (getImage() != null)
+            getImage().setColor(color);
+    }
+
+    @Override
+    public void setColor(float r, float g, float b, float a) {
+        super.setColor(r, g, b, a);
+        baseColor.set(r, g, b, a);
+        if (getImage() != null)
+            getImage().setColor(r, g, b, a);
+    }
+
 }

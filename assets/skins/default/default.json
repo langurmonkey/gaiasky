@@ -381,6 +381,9 @@
     "new": {
       "imageUp": "iconic-plus"
     },
+    "info": {
+      "imageUp": "iconic-info"
+    },
     "generate": {
       "imageUp": "iconic-wrench"
     },
