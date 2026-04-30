@@ -80,21 +80,25 @@ public class PointDataProvider implements IParticleGroupDataProvider {
             preCallback.run();
 
         try (is) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
             // Load all valid lines into memory.
             // This presupposes that the file is not too large.
             List<String> validLines = new ArrayList<>();
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.isEmpty() && !line.startsWith("#")) {
-                    validLines.add(line);
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (!line.isEmpty() && !line.startsWith("#")) {
+                        validLines.add(line);
+                    }
                 }
+            } catch (IOException e) {
+                logger.error(e);
+                if (postCallback != null) postCallback.run();
+                return null;
             }
 
             long totalLines = validLines.size();
 
-            // Process lines with progress updates
+            // Process lines with progress updates.
             for (long currentLine = 0; currentLine < validLines.size(); currentLine++) {
                 try {
                     String[] tokens = validLines.get((int) currentLine).split("\\s+");
@@ -124,7 +128,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                     }
 
                 } catch (NumberFormatException e) {
-                    // Skip line
+                    // Skip line.
                 }
             }
 
