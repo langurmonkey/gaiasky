@@ -17,6 +17,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.ucd.UCD;
+import net.jafama.FastMath;
 import uk.ac.starlink.table.StarTableFactory;
 import uk.ac.starlink.table.TableBuilder;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
 /**
@@ -63,8 +65,8 @@ import java.util.logging.Level;
  * designates an Asteroid ("A"), and all other values default to Comet ("C").</li>
  * </ul>
  *
- * @deprecated Use {@link STILDataProvider} instead.
  * @see ParticleKepler
+ * @deprecated Use {@link STILDataProvider} instead.
  */
 @Deprecated
 public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider {
@@ -91,25 +93,37 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
     }
 
     @Override
-    public List<IParticleRecord> loadData(String file) {
-        return loadData(file, 1.0);
+    public List<IParticleRecord> loadData(String file,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
+        return loadData(file, 1.0, preCallback, updateCallback, postCallback);
     }
 
     @Override
-    public List<IParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file,
+                                                double factor,
+                                                Runnable preCallback,
+                                                BiConsumer<Long, Long> updateCallback,
+                                                Runnable postCallback) {
+        logger.warn("loadDataMapped(file, factor, pre, update, post): This method should not be used!");
         return null;
     }
 
     @Override
-    public List<IParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file,
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         logger.info(I18n.msg("notif.datafile", file));
         List<IParticleRecord> list = null;
         try {
-            list = loadData(new FileDataSource(GaiaSky.settings().data.dataFile(file)), factor);
+            list = loadData(new FileDataSource(GaiaSky.settings().data.dataFile(file)), factor, preCallback, updateCallback, postCallback);
         } catch (Exception e1) {
             try {
                 logger.info("File " + file + " not found in data folder, trying relative path");
-                list = loadData(new FileDataSource(file), factor);
+                list = loadData(new FileDataSource(file), factor, preCallback, updateCallback, postCallback);
             } catch (Exception e2) {
                 logger.error(e1);
                 logger.error(e2);
@@ -121,25 +135,40 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
     }
 
     @Override
-    public List<IParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is,
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         return null;
     }
 
-    private List<IParticleRecord> loadData(DataSource ds, double factor) {
+    private List<IParticleRecord> loadData(DataSource ds,
+                                           double factor,
+                                           Runnable preCallback,
+                                           BiConsumer<Long, Long> updateCallback,
+                                           Runnable postCallback) {
 
         if (factory != null) {
             // Add extra builders
             List<TableBuilder> builders = factory.getDefaultBuilders();
             builders.add(new CsvTableBuilder());
             builders.add(new AsciiTableBuilder());
+
+            if (preCallback != null) {
+                preCallback.run();
+            }
             try (var table = factory.makeStarTable(ds)) {
                 long nRows = table.getRowCount();
+                long step = FastMath.max(1L, FastMath.round(nRows / 100d));
+
                 List<IParticleRecord> list = new ArrayList<>((int) nRows);
 
                 var typeUCD = new UCD(table.getColumnInfo(3).getUCD(), "type", null, 4);
                 var obsUCD = new UCD(table.getColumnInfo(4).getUCD(), "n_observations", null, 5);
 
                 double prevEpoch = -1;
+                long current = 0;
                 try (var rs = table.getRowSequence()) {
                     while (rs.next()) {
                         var row = rs.getRow();
@@ -179,12 +208,21 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
                                                           period,
                                                           map);
                         list.add(particle);
+
+                        if (updateCallback != null && current % step == 0) {
+                            updateCallback.accept(current + 1, nRows);
+                        }
+                        current++;
                     }
                 }
 
                 return list;
             } catch (Exception e) {
                 logger.error(e);
+            } finally {
+                if (postCallback != null) {
+                    postCallback.run();
+                }
             }
         }
 

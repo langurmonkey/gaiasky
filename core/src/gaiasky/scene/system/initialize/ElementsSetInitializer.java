@@ -62,7 +62,21 @@ public class ElementsSetInitializer extends AbstractInitSystem {
                 IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor()
                         .newInstance();
                 // By default, do not generate index in particle sets.
-                set.setPointData(provider.loadData(set.datafile, 1));
+                set.setPointData(provider.loadData(set.datafile, 1,
+                                                   () -> {
+                                                       // Create
+                                                       EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 0f);
+                                                   },
+                                                   (current, count) -> {
+                                                       EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                            this,
+                                                                            set.datafile,
+                                                                            (float) current / (float) count);
+                                                   },
+                                                   () -> {
+                                                       // Force remove
+                                                       EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 2f);
+                                                   }));
             } catch (Exception e) {
                 Logger.getLogger(this.getClass())
                         .error(e);

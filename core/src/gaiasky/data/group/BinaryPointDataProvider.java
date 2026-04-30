@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 /**
  * Loads and writes binary data into particle groups ({@link ParticleType#PARTICLE_EXT}).
@@ -87,21 +88,32 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
     }
 
     @Override
-    public List<IParticleRecord> loadData(String file) {
-        return loadData(file, 1.0);
+    public List<IParticleRecord> loadData(String file,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
+        return loadData(file, 1.0, preCallback, updateCallback, postCallback);
     }
 
     @Override
-    public List<IParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file,
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         logger.info(I18n.msg("notif.datafile", file));
-        loadDataMapped(file, factor);
+        loadDataMapped(file, factor, preCallback, updateCallback, postCallback);
         logger.info(I18n.msg("notif.nodeloader", list.size(), file));
 
         return list;
     }
 
     @Override
-    public List<IParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is,
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         list = readData(is, factor);
         return list;
     }
@@ -134,7 +146,13 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
     }
 
     @Override
-    public List<IParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file,
+                                                double factor,
+                                                Runnable preCallback,
+                                                BiConsumer<Long, Long> updateCallback,
+                                                Runnable postCallback) {
+        if (preCallback != null)
+            preCallback.run();
         try (var raf = new RandomAccessFile(GaiaSky.settings().data.dataFile(file), "r")) {
             FileChannel fc = raf.getChannel();
 
@@ -142,6 +160,7 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
             mem.mark();
             int size = mem.getInt();
+            long step = FastMath.max(1L, FastMath.round(size / 100d));
             boolean extra = mem.get() == (byte) 1;
             this.extra.set(extra);
 
@@ -149,6 +168,9 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
             for (int i = 0; i < size; i++) {
                 if (particleNumberCap < 0 || i < particleNumberCap) {
                     list.add(readParticleRecord(mem, factor));
+                }
+                if (updateCallback != null && i % step == 0) {
+                    updateCallback.accept((long) i, (long) size);
                 }
             }
 
@@ -158,6 +180,9 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
 
         } catch (Exception e) {
             logger.error(e);
+        } finally {
+            if (preCallback != null)
+                preCallback.run();
         }
         return null;
     }

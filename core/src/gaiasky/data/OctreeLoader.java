@@ -73,6 +73,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * Maximum number of pages to send to load every batch.
      **/
     protected static final int MAX_LOAD_CHUNK = 5;
+    /** Default dataset name. **/
+    private static final String DEFAULT_NAME = "LOD data";
     private static final Log logger = Logger.getLogger(OctreeLoader.class);
     public static OctreeLoader instance;
     /**
@@ -205,7 +207,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         rootOctant.setOctantLoader(this, true);
 
         {
-            logger.info(I18n.msg("notif.nodeloader", rootOctant.numNodesRec(), metadata));
+            var numNodesRec = rootOctant.numNodesRec();
+            logger.info(I18n.msg("notif.nodeloader", numNodesRec, metadata));
             logger.info(I18n.msg("notif.loading", particles));
 
             /*
@@ -217,12 +220,9 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             Entity entity = archetype.createEntity();
 
             // Catalog info
-            String name = this.name != null ? this.name : "LOD data";
+            String name = this.name != null ? this.name : DEFAULT_NAME;
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
             DatasetCard ci = new DatasetCard(null, name, description, null, DatasetSourceType.LOD, 1.5f, entity);
-            ci.nParticles = params.containsKey("nObjects") ? (Long) params.get("nObjects") : -1;
-            ci.nParticles = ci.nParticles < 0 && params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
-            ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
 
             var octree = Mapper.octree.get(entity);
             octree.roulette = new ArrayList<>(Math.min(10, (int) (rootOctant.numObjectsRec * 0.5)));
@@ -254,6 +254,12 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             }
 
             root.octant.updateCounts();
+
+            // Update number of particles. Use real number frist.
+            ci.nParticles = rootOctant.numObjectsRec;
+            ci.nParticles = ci.nParticles <= 0 && params.containsKey("nObjects") ? (Long) params.get("nObjects") : -1;
+            ci.nParticles = ci.nParticles < 0 && params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
+            ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
 
             // Override number of labels in case we have a compact octree (~3 octants tops).
             if (root.octant.numChildrenRec + 1 < 4 && GaiaSky.settings().scene.star.group.numLabels <= 50) {
@@ -461,6 +467,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         daemon.abort();
     }
 
+
     /**
      * Loads all the levels of detail until the given one.
      *
@@ -471,7 +478,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      */
     public void loadLod(final Integer lod, final Entity octreeWrapper, boolean immediate) throws IOException {
         var root = Mapper.octant.get(octreeWrapper);
-        loadOctant(root.octant, octreeWrapper, lod, immediate);
+        // Load.
+        loadOctant(root.octant, octreeWrapper, lod, true, immediate);
     }
 
     /**
@@ -483,13 +491,13 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @param level         The depth to load.
      * @param immediate     Populate the objects list in the octant immediately.
      */
-    public void loadOctant(final OctreeNode octant, final Entity octreeWrapper, Integer level, boolean immediate) {
+    public void loadOctant(final OctreeNode octant, final Entity octreeWrapper, Integer level, boolean progress, boolean immediate) {
         if (level >= 0) {
-            loadOctant(octant, octreeWrapper, true, immediate);
+            loadOctant(octant, octreeWrapper, progress, true, immediate);
             if (octant.children != null) {
                 for (OctreeNode child : octant.children) {
                     if (child != null && child.numObjectsRec > 0)
-                        loadOctant(child, octreeWrapper, level - 1, immediate);
+                        loadOctant(child, octreeWrapper, level - 1, progress, immediate);
                 }
             }
         }
@@ -508,7 +516,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             int i = 0;
             OctreeNode octant = octants.get(0);
             while (i < octants.size && !abort.get()) {
-                if (!loadOctant(octant, octreeWrapper, true, immediate)) {
+                if (!loadOctant(octant, octreeWrapper, false, true, immediate)) {
                     logger.warn("Octant not loaded: " + octant.pageId);
                 }
                 i += 1;
@@ -531,13 +539,18 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      *
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper entity.
-     * @param fullInit      Whether to fully initialise the objects (on-demand load) or
+     * @param progress      Whether to publish progress events.
+     * @param fullInit      Whether to fully initialize the objects (on-demand load) or
      *                      not (startup)
      * @param immediate     Populate the octant list immediately with the new star group.
      *
      * @return True if the octant was loaded, false otherwise
      */
-    public boolean loadOctant(final OctreeNode octant, final Entity octreeWrapper, final boolean fullInit, final boolean immediate) {
+    public boolean loadOctant(final OctreeNode octant,
+                              final Entity octreeWrapper,
+                              final boolean progress,
+                              final boolean fullInit,
+                              final boolean immediate) {
         FileHandle octantFile = GaiaSky.settings().data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
@@ -546,7 +559,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         var datasetDesc = Mapper.datasetDescription.get(octreeWrapper);
         var octree = Mapper.octree.get(octreeWrapper);
 
-        List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
+        List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint, progress);
         Entity sg = SetUtils.createStarSet(scene, STAR_GROUP_NAME_TEMPLATE, data, baseInitializer, setInitializer, fullInit);
         sg.add(new TagOctreeObject());
 
@@ -567,10 +580,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
                 // Add to index
                 if (scene.index() != null) {
-                    scene.index()
-                            .addToIndex(sg);
-                    scene.index()
-                            .addToHipMap(sg);
+                    scene.index().addToIndex(sg);
+                    scene.index().addToHipMap(sg);
                 }
 
                 nLoadedStars += set.pointData.size();

@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -37,12 +38,18 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     private Matrix4D transform;
     private final Vector3D aux = new Vector3D();
 
-    public List<IParticleRecord> loadData(String file) {
-        return loadData(file, 1d);
+    public List<IParticleRecord> loadData(String file,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
+        return loadData(file, 1d, preCallback, updateCallback, postCallback);
     }
 
     public List<IParticleRecord> loadData(String file,
-                                          double factor) {
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         InputStream is = GaiaSky.settings().data.dataFileHandle(file).read();
 
         if (file.endsWith(".gz")) {
@@ -53,7 +60,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
             }
         }
 
-        List<IParticleRecord> pointData = loadData(is, factor);
+        List<IParticleRecord> pointData = loadData(is, factor, preCallback, updateCallback, postCallback);
 
         if (pointData != null)
             logger.info(I18n.msg("notif.nodeloader", pointData.size(), file));
@@ -63,48 +70,71 @@ public class PointDataProvider implements IParticleGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadData(InputStream is,
-                                          double factor) {
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         List<IParticleRecord> pointData = new ArrayList<>();
+
+        if (preCallback != null)
+            preCallback.run();
+
         try (is) {
-            int tokensLength;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+            // Load all valid lines into memory.
+            // This presupposes that the file is not too large.
+            List<String> validLines = new ArrayList<>();
             String line;
             while ((line = br.readLine()) != null) {
                 if (!line.isEmpty() && !line.startsWith("#")) {
-                    try {
-                        // Read line
-                        String[] tokens = line.split("\\s+");
-                        tokensLength = tokens.length;
-                        double[] point = new double[tokensLength];
-                        for (int j = 0; j < tokensLength; j++) {
-                            // We use regular parser because of scientific notation
-                            if (j < 3) {
-                                point[j] = Parser.parseDouble(tokens[j]) * factor;
-                            } else {
-                                point[j] = Parser.parseDouble(tokens[j]);
-                            }
-                        }
-                        if (transform != null) {
-                            aux.set(point);
-                            aux.mul(transform);
-                            point[0] = aux.x;
-                            point[1] = aux.y;
-                            point[2] = aux.z;
-                        }
-                        pointData.add(new ParticleVector(point));
-                    } catch (NumberFormatException e) {
-                        // Skip line
-                    }
+                    validLines.add(line);
                 }
             }
 
-            br.close();
+            long totalLines = validLines.size();
+
+            // Process lines with progress updates
+            for (long currentLine = 0; currentLine < validLines.size(); currentLine++) {
+                try {
+                    String[] tokens = validLines.get((int) currentLine).split("\\s+");
+                    int tokensLength = tokens.length;
+                    double[] point = new double[tokensLength];
+
+                    for (int j = 0; j < tokensLength; j++) {
+                        if (j < 3) {
+                            point[j] = Parser.parseDouble(tokens[j]) * factor;
+                        } else {
+                            point[j] = Parser.parseDouble(tokens[j]);
+                        }
+                    }
+
+                    if (transform != null) {
+                        aux.set(point);
+                        aux.mul(transform);
+                        point[0] = aux.x;
+                        point[1] = aux.y;
+                        point[2] = aux.z;
+                    }
+
+                    pointData.add(new ParticleVector(point));
+
+                    if (updateCallback != null) {
+                        updateCallback.accept(currentLine + 1, totalLines);
+                    }
+
+                } catch (NumberFormatException e) {
+                    // Skip line
+                }
+            }
 
         } catch (Exception e) {
             logger.error(e);
             return null;
+        } finally {
+            if (postCallback != null)
+                postCallback.run();
         }
-        // Nothing
 
         return pointData;
     }
@@ -128,7 +158,11 @@ public class PointDataProvider implements IParticleGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadDataMapped(String file,
-                                                double factor) {
+                                                double factor,
+                                                Runnable preCallback,
+                                                BiConsumer<Long, Long> updateCallback,
+                                                Runnable postCallback) {
+        logger.warn("loadDataMapped(file, factor, pre, update, post): This method should not be used!");
         return null;
     }
 }

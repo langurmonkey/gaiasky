@@ -131,9 +131,17 @@ public class JsonLoader extends AbstractSceneLoader {
                     }
 
                     child = child.next;
-                    EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) processed / (float) count);
+                    final float progressPercent = (float) processed / (float) count;
+                    GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                    this,
+                                                                    file.name(),
+                                                                    progressPercent));
                 }
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), 2f);
+                // End progress bar.
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                this,
+                                                                file.name(),
+                                                                2f));
                 logger.info(I18n.msg("notif.nodeloader", loaded, filePath));
             } else if (root.has("updates")) {
                 // If the top element is 'updates', we update existing objects with additional attributes.
@@ -175,7 +183,11 @@ public class JsonLoader extends AbstractSceneLoader {
                 }
 
                 child = child.next;
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) processed / (float) count);
+                final float progressPercent = (float) processed / (float) count;
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                  this,
+                                                                  file.name(),
+                                                                  progressPercent));
             }
             i++;
         }
@@ -219,44 +231,44 @@ public class JsonLoader extends AbstractSceneLoader {
                 } else if (attribute.isArray()) {
                     // We suppose our children are of the same type
                     switch (attribute.child.type()) {
-                    case stringValue -> {
-                        valueClass = String[].class;
-                        value = attribute.asStringArray();
-                    }
-                    case doubleValue -> {
-                        valueClass = double[].class;
-                        value = attribute.asDoubleArray();
-                    }
-                    case booleanValue -> {
-                        valueClass = boolean[].class;
-                        value = attribute.asBooleanArray();
-                    }
-                    case longValue -> {
-                        valueClass = int[].class;
-                        value = attribute.asIntArray();
-                    }
-                    case object -> {
-                        valueClass = Object[].class;
-                        value = new Object[attribute.size];
-                        JsonValue vectorAttribute = attribute.child;
-                        int i = 0;
-                        while (vectorAttribute != null) {
-                            String clazzName = vectorAttribute.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
-                            clazzName = replace(clazzName);
-                            Class<Object> childClazz = (Class<Object>) ClassReflection.forName(clazzName);
-                            ((Object[]) value)[i] = convertJsonToObject(vectorAttribute, childClazz);
-                            i++;
-                            vectorAttribute = vectorAttribute.next;
+                        case stringValue -> {
+                            valueClass = String[].class;
+                            value = attribute.asStringArray();
                         }
-                    }
-                    case array -> {
-                        // Multi-dim array
-                        Pair<Object, Class> p = toMultidimDoubleArray(attribute);
-                        value = p.getFirst();
-                        valueClass = p.getSecond();
-                    }
-                    default -> {
-                    }
+                        case doubleValue -> {
+                            valueClass = double[].class;
+                            value = attribute.asDoubleArray();
+                        }
+                        case booleanValue -> {
+                            valueClass = boolean[].class;
+                            value = attribute.asBooleanArray();
+                        }
+                        case longValue -> {
+                            valueClass = int[].class;
+                            value = attribute.asIntArray();
+                        }
+                        case object -> {
+                            valueClass = Object[].class;
+                            value = new Object[attribute.size];
+                            JsonValue vectorAttribute = attribute.child;
+                            int i = 0;
+                            while (vectorAttribute != null) {
+                                String clazzName = vectorAttribute.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                                clazzName = replace(clazzName);
+                                Class<Object> childClazz = (Class<Object>) ClassReflection.forName(clazzName);
+                                ((Object[]) value)[i] = convertJsonToObject(vectorAttribute, childClazz);
+                                i++;
+                                vectorAttribute = vectorAttribute.next;
+                            }
+                        }
+                        case array -> {
+                            // Multi-dim array
+                            Pair<Object, Class> p = toMultidimDoubleArray(attribute);
+                            value = p.getFirst();
+                            valueClass = p.getSecond();
+                        }
+                        default -> {
+                        }
                     }
 
                 } else if (attribute.isObject()) {
@@ -459,38 +471,38 @@ public class JsonLoader extends AbstractSceneLoader {
     private Object getValue(JsonValue val) {
         Object value = null;
         switch (val.type()) {
-        case stringValue -> value = val.asString();
-        case doubleValue -> value = val.asDouble();
-        case booleanValue -> value = val.asBoolean();
-        case longValue -> value = val.asLong();
-        case array -> {
-            try {
-                value = val.asDoubleArray();
-            } catch (IllegalStateException e1) {
+            case stringValue -> value = val.asString();
+            case doubleValue -> value = val.asDouble();
+            case booleanValue -> value = val.asBoolean();
+            case longValue -> value = val.asLong();
+            case array -> {
                 try {
-                    value = val.asFloatArray();
-                } catch (IllegalStateException e2) {
+                    value = val.asDoubleArray();
+                } catch (IllegalStateException e1) {
                     try {
-                        value = val.asLongArray();
-                    } catch (IllegalStateException e3) {
+                        value = val.asFloatArray();
+                    } catch (IllegalStateException e2) {
                         try {
-                            value = val.asIntArray();
-                        } catch (IllegalStateException e4) {
+                            value = val.asLongArray();
+                        } catch (IllegalStateException e3) {
                             try {
-                                value = val.asStringArray();
-                            } catch (IllegalStateException e5) {
+                                value = val.asIntArray();
+                            } catch (IllegalStateException e4) {
                                 try {
-                                    value = val.asCharArray();
-                                } catch (IllegalStateException ignored) {
+                                    value = val.asStringArray();
+                                } catch (IllegalStateException e5) {
+                                    try {
+                                        value = val.asCharArray();
+                                    } catch (IllegalStateException ignored) {
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        default -> {
-        }
+            default -> {
+            }
         }
         return value;
     }
@@ -498,12 +510,12 @@ public class JsonLoader extends AbstractSceneLoader {
     private Class<?> getValueClass(JsonValue val) {
         Class<?> valueClass = null;
         switch (val.type()) {
-        case stringValue -> valueClass = String.class;
-        case doubleValue -> valueClass = Double.class;
-        case booleanValue -> valueClass = Boolean.class;
-        case longValue -> valueClass = Long.class;
-        default -> {
-        }
+            case stringValue -> valueClass = String.class;
+            case doubleValue -> valueClass = Double.class;
+            case booleanValue -> valueClass = Boolean.class;
+            case longValue -> valueClass = Long.class;
+            default -> {
+            }
         }
         return valueClass;
     }
@@ -520,15 +532,15 @@ public class JsonLoader extends AbstractSceneLoader {
     public Pair<Object, Class> toMultidimDoubleArray(JsonValue attribute) {
         final int dim = depth(attribute) - 1;
         switch (dim) {
-        case 1 -> {
-            return to1DoubleArray(attribute);
-        }
-        case 2 -> {
-            return to2DoubleArray(attribute);
-        }
-        case 3 -> {
-            return to3DoubleArray(attribute);
-        }
+            case 1 -> {
+                return to1DoubleArray(attribute);
+            }
+            case 2 -> {
+                return to2DoubleArray(attribute);
+            }
+            case 3 -> {
+                return to3DoubleArray(attribute);
+            }
         }
         logger.error("Double arrays of dimension " + dim + " not supported: attribute \"" + attribute.name + "\"");
         return null;

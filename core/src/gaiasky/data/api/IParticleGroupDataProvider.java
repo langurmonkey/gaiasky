@@ -13,46 +13,74 @@ import gaiasky.util.math.Matrix4D;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public interface IParticleGroupDataProvider {
     /**
      * Loads the data as it is.
      *
-     * @param file The file to load.
+     * @param file           The file to load.
+     * @param preCallback    Callback to run before loading starts.
+     * @param updateCallback Callback to run during loading, for every object. Contains the current object number and the total number.
+     * @param postCallback   Callback to run after loading is done.
      *
      * @return The array of particle records.
      */
-    List<IParticleRecord> loadData(String file);
+    List<IParticleRecord> loadData(String file,
+                                   Runnable preCallback,
+                                   BiConsumer<Long, Long> updateCallback,
+                                   Runnable postCallback);
 
     /**
      * Loads the data applying a factor using a memory mapped file for improved speed.
      *
-     * @param file   The file to load.
-     * @param factor Factor to apply to the positions.
+     * @param file           The file to load.
+     * @param factor         Factor to apply to the positions.
+     * @param preCallback    Callback to run before loading starts.
+     * @param updateCallback Callback to run during loading, for every object. Contains the current object number and the total number.
+     * @param postCallback   Callback to run after loading is done.
      *
      * @return The array of particle records.
      */
-    List<IParticleRecord> loadDataMapped(String file, double factor);
+    List<IParticleRecord> loadDataMapped(String file,
+                                         double factor,
+                                         Runnable preCallback,
+                                         BiConsumer<Long, Long> updateCallback,
+                                         Runnable postCallback);
 
     /**
      * Loads the data applying a factor.
      *
-     * @param file   The file to load.
-     * @param factor Factor to apply to the positions.
+     * @param file           The file to load.
+     * @param factor         Factor to apply to the positions.
+     * @param preCallback    Callback to run before loading starts.
+     * @param updateCallback Callback to run during loading, for every object. Contains the current object number and the total number.
+     * @param postCallback   Callback to run after loading is done.
      *
      * @return The array of particle records.
      */
-    List<IParticleRecord> loadData(String file, double factor);
+    List<IParticleRecord> loadData(String file,
+                                   double factor,
+                                   Runnable preCallback,
+                                   BiConsumer<Long, Long> updateCallback,
+                                   Runnable postCallback);
 
     /**
      * Loads the data applying a factor.
      *
-     * @param is     Input stream to load the data from.
-     * @param factor Factor to apply to the positions.
+     * @param is             Input stream to load the data from.
+     * @param factor         Factor to apply to the positions.
+     * @param preCallback    Callback to run before loading starts.
+     * @param updateCallback Callback to run during loading, for every object. Contains the current object number and the total number.
+     * @param postCallback   Callback to run after loading is done.
      *
      * @return The array of particle records.
      */
-    List<IParticleRecord> loadData(InputStream is, double factor);
+    List<IParticleRecord> loadData(InputStream is,
+                                   double factor,
+                                   Runnable preCallback,
+                                   BiConsumer<Long, Long> updateCallback,
+                                   Runnable postCallback);
 
     /**
      * Sets a cap on the number of files to load. Set to negative for

@@ -10,6 +10,8 @@ package gaiasky.scene.record;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.PointDataProvider;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.GlobalResources;
@@ -216,7 +218,17 @@ public class BillboardDataset {
     private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<IParticleRecord> curr) {
         String upk = GlobalResources.unpackAssetPath(GaiaSky.settings().data.dataFile(src));
         if (srcUpk == null || !srcUpk.equals(upk)) {
-            return new Pair<>(prov.loadData(upk), upk);
+            var d = prov.loadData(upk, () -> {
+                // Create
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, src, 0f);
+            }, (current, count) -> {
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, src, (float) current / (float) count);
+            }, () -> {
+                // Force remove
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, src, 2f);
+            });
+            return new Pair<>(d, upk);
+
         } else {
             return new Pair<>(curr, srcUpk);
         }

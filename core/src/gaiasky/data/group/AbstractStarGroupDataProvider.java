@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -210,8 +211,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public List<IParticleRecord> loadData(String file) {
-        return loadData(file, 1.0f);
+    public List<IParticleRecord> loadData(String file,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
+        return loadData(file, 1.0f, preCallback, updateCallback, postCallback);
     }
 
     /**

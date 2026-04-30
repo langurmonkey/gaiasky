@@ -18,6 +18,8 @@ import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.api.IStarGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
@@ -213,7 +215,21 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 }
                 provider.setTransformMatrix(transform.matrix);
                 // By default, do not generate index in particle sets.
-                set.setData(provider.loadData(set.datafile, set.factor));
+                set.setData(provider.loadData(set.datafile, set.factor,
+                                              () -> {
+                                                  // Create
+                                                  EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 0f);
+                                              },
+                                              (current, count) -> {
+                                                  EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                       this,
+                                                                       set.datafile,
+                                                                       (float) current / (float) count);
+                                              },
+                                              () -> {
+                                                  // Force remove
+                                                  EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 2f);
+                                              }));
                 set.isExtended = !set.data()
                         .isEmpty() && set.data()
                         .getFirst()
@@ -279,7 +295,22 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 provider.setTransformMatrix(transform.matrix);
 
                 // Set data, generate index
-                List<IParticleRecord> l = provider.loadData(set.datafile, set.factor);
+                List<IParticleRecord> l = provider.loadData(set.datafile,
+                                                            set.factor,
+                                                            () -> {
+                                                                // Create
+                                                                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 0f);
+                                                            },
+                                                            (current, count) -> {
+                                                                EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                                     this,
+                                                                                     set.datafile,
+                                                                                     (float) current / (float) count);
+                                                            },
+                                                            () -> {
+                                                                // Force remove
+                                                                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 2f);
+                                                            });
                 set.setData(l, true);
 
             } catch (Exception e) {
@@ -347,12 +378,21 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             body.pos.set(0, 0, 0);
         } else {
             // Compute mean position from particles.
-            for (IParticleRecord point : set.data()) {
-                var pos = set.fetchPositionDouble(point, GaiaSky.instance.getCameraManager().getPos(), new Vector3D(), 0);
-                body.pos.add(pos);
+            int i = 0;
+            long step = 1L;
+            if (set.data().size() > 50_000) {
+                step = FastMath.max(1L, FastMath.round(set.data().size() / 20d));
             }
-            body.pos.scl(1d / set.data()
-                    .size());
+            int particlesUsed = 0;
+            for (IParticleRecord point : set.data()) {
+                if (i % step == 0) {
+                    var pos = set.fetchPositionDouble(point, GaiaSky.instance.getCameraManager().getPos(), new Vector3D(), 0);
+                    body.pos.add(pos);
+                    particlesUsed++;
+                }
+                i++;
+            }
+            body.pos.scl(1d / particlesUsed);
         }
     }
 

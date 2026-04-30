@@ -185,7 +185,7 @@ public class Index {
      */
     private boolean addParticleSet(Entity entity, ParticleSet set) {
         boolean added = false;
-        if (set != null && set.index != null) {
+        if (set != null && set.index != null && !set.addedToMainIndex) {
             var pgBase = Mapper.base.get(entity);
             var pgName = pgBase.getName();
             var pgArchetype = pgBase.archetype;
@@ -222,6 +222,7 @@ public class Index {
                     }
                 }
             }
+            set.addedToMainIndex = true;
         }
         return added;
     }

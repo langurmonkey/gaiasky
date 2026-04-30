@@ -344,6 +344,9 @@ public class ParticleSet implements Component, IDisposable {
     public boolean disposed = false;
     /** Name to array index. **/
     public FastObjectIntMap<String> index;
+    /** Flag that flips when the particle set has been added to the main index. **/
+    public boolean addedToMainIndex = false;
+    /** Index synchronization object. **/
     private final Object indexSync = new Object();
     /** Metadata, for sorting - holds distances from each particle to the camera, squared. **/
     public double[] metadata;
@@ -443,8 +446,10 @@ public class ParticleSet implements Component, IDisposable {
      * @return A map{string,int} mapping names to indices
      */
     public FastObjectIntMap<String> generateIndex(List<IParticleRecord> pointData) {
+        var update = new UpdaterHelper("Index", pointData.size());
         FastObjectIntMap<String> index = new FastObjectIntMap<>((int) (pointData.size() * 1.25f), String.class);
         synchronized (indexSync) {
+            update.pre();
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
                 IParticleRecord pb = pointData.get(i);
@@ -462,7 +467,9 @@ public class ParticleSet implements Component, IDisposable {
                         }
                     }
                 }
+                update.update(i);
             }
+            update.post();
         }
         return index;
     }

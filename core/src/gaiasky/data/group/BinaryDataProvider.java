@@ -9,15 +9,19 @@ package gaiasky.data.group;
 
 import gaiasky.GaiaSky;
 import gaiasky.data.api.BinaryIO;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
+import net.jafama.FastMath;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * Reads binary files using the infrastructure under {@link BinaryIO}. The format includes a header token
@@ -51,16 +55,24 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<IParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file,
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         logger.info(I18n.msg("notif.datafile", file));
-        loadDataMapped(file, factor);
+        loadDataMapped(file, factor, preCallback, updateCallback, postCallback);
         logger.info(I18n.msg("notif.nodeloader", list.size(), file));
 
         return list;
     }
 
     @Override
-    public List<IParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is,
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         list = readData(is, factor);
         return list;
     }
@@ -126,7 +138,15 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<IParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file,
+                                                double factor,
+                                                Runnable preCallback,
+                                                BiConsumer<Long, Long> updateCallback,
+                                                Runnable postCallback) {
+
+        if (preCallback != null)
+            preCallback.run();
+
         try (var raf = new RandomAccessFile(GaiaSky.settings().data.dataFile(file), "r")) {
             FileChannel fc = raf.getChannel();
 
@@ -141,11 +161,17 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
                 // Rewind.
                 mem.reset();
             }
+
             // Read size of stars.
-            int size = mem.getInt();
-            list = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
+            long size = mem.getInt();
+            long step = FastMath.max(1L, FastMath.round(size / 100d));
+
+            list = new ArrayList<>((int) size);
+            for (long i = 0; i < size; i++) {
                 list.add(binaryVersions[version].readParticleRecord(mem, factor));
+                if (updateCallback != null && i % step == 0) {
+                    updateCallback.accept(i + 1, size);
+                }
             }
 
             fc.close();
@@ -154,6 +180,9 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
         } catch (Exception e) {
             logger.error(e);
+        } finally {
+            if (postCallback != null)
+                postCallback.run();
         }
         return null;
     }
@@ -168,7 +197,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
      *
      * @return The list of particle records.
      */
-    public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint, boolean progress) {
         try (var raf = new RandomAccessFile(GaiaSky.settings().data.dataFile(file), "r")) {
             FileChannel fc = raf.getChannel();
 
@@ -185,12 +214,38 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             }
             // Read size of stars.
             int size = mem.getInt();
+
+            if (progress) {
+                // Initialize progress.
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                this,
+                                                                file,
+                                                                0f));
+            }
+
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 list.add(binaryVersions[version].readParticleRecord(mem, factor));
+
+                if (progress) {
+                    // Update progress.
+                    final int idx = i;
+                    GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                    this,
+                                                                    file,
+                                                                    (float) idx / (float) (size - 1)));
+                }
             }
 
             fc.close();
+
+            if (progress) {
+                // End progress.
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
+                                                                this,
+                                                                file,
+                                                                2f));
+            }
 
             return list;
 

@@ -96,14 +96,17 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadData(String file,
-                                          double factor) {
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         logger.info(I18n.msg("notif.datafile", file));
         try {
-            loadData(new FileDataSource(GaiaSky.settings().data.dataFile(file)), factor);
+            loadData(new FileDataSource(GaiaSky.settings().data.dataFile(file)), factor, preCallback, updateCallback, postCallback);
         } catch (Exception e1) {
             try {
                 logger.info("File " + file + " not found in data folder, trying relative path");
-                loadData(new FileDataSource(file), factor);
+                loadData(new FileDataSource(file), factor, preCallback, updateCallback, postCallback);
             } catch (Exception e2) {
                 logger.error(e1);
                 logger.error(e2);
@@ -214,11 +217,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         }
         return result;
 
-    }
-
-    public List<IParticleRecord> loadData(DataSource ds,
-                                          double factor) {
-        return loadData(ds, factor, null, null, null);
     }
 
     /**
@@ -890,13 +888,19 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadData(InputStream is,
-                                          double factor) {
+                                          double factor,
+                                          Runnable preCallback,
+                                          BiConsumer<Long, Long> updateCallback,
+                                          Runnable postCallback) {
         return null;
     }
 
     @Override
     public List<IParticleRecord> loadDataMapped(String file,
-                                                double factor) {
+                                                double factor,
+                                                Runnable preCallback,
+                                                BiConsumer<Long, Long> updateCallback,
+                                                Runnable postCallback) {
         return null;
     }
 

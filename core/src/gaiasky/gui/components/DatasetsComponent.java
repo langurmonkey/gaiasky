@@ -103,7 +103,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         group.pack();
         ;
 
-        scroll.setWidth(group.getWidth() + pad30);
+        scroll.setWidth(group.getWidth() + pad12);
         recalculateScrollHeight();
         component = scroll;
 

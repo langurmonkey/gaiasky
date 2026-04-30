@@ -520,7 +520,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         String catalogName = opts != null && opts.catalogName != null ? opts.catalogName : ds.getName();
         return provider.loadData(ds, 1.0f, () -> {
             // Create
-            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, catalogName, 0.01f);
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, catalogName, 0f);
         }, (current, count) -> {
             EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, catalogName, (float) current / (float) count);
             if (current % 250000 == 0) {

@@ -314,7 +314,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
     public void recalculateSize() {
         // Save position
-        float topy = getY() + getHeight();
+        float topY = getY() + getHeight();
 
         // Calculate new size
         guiLayout.pack();
@@ -332,7 +332,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         validate();
 
         // Restore position
-        setY(topy - getHeight());
+        setY(topY - getHeight());
     }
 
     public void setScene(Scene scene) {
