@@ -313,7 +313,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                skin,
                                                stage,
                                                Path.of(GaiaSky.settings().data.location),
-                                               FilePicker.FilePickerTarget.DIRECTORIES);
+                                               FilePickerComponent.FilePickerTarget.DIRECTORIES);
                 fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {

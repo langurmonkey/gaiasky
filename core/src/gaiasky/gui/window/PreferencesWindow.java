@@ -1902,7 +1902,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                                skin,
                                                stage,
                                                Paths.get(settings.screenshot.location),
-                                               FilePicker.FilePickerTarget.DIRECTORIES);
+                                               FilePickerComponent.FilePickerTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -2052,7 +2052,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                                skin,
                                                stage,
                                                Paths.get(settings.frame.location),
-                                               FilePicker.FilePickerTarget.DIRECTORIES);
+                                               FilePickerComponent.FilePickerTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -2475,7 +2475,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                                skin,
                                                stage,
                                                meshWarpPath,
-                                               FilePicker.FilePickerTarget.FILES);
+                                               FilePickerComponent.FilePickerTarget.FILES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> Files.exists(pathname) && Files.isRegularFile(pathname));

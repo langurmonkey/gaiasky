@@ -40,6 +40,7 @@ import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.FilePicker;
+import gaiasky.util.scene2d.FilePickerComponent;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
 import org.lwjgl.glfw.GLFW;
@@ -470,7 +471,7 @@ public class GuiRegistry implements IObserver {
                     } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
                         lastOpenLocation = SysUtils.getHomeDir();
                     }
-                    FilePicker fc = new FilePicker(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FilePicker.FilePickerTarget.FILES);
+                    FilePicker fc = new FilePicker(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FilePickerComponent.FilePickerTarget.FILES);
                     fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
                     fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                     fc.setAcceptText(I18n.msg("gui.loadcatalog"));
