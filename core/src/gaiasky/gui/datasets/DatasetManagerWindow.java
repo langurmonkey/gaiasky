@@ -558,6 +558,8 @@ public class DatasetManagerWindow extends GenericDialog {
                 Actor installOrSelect;
                 float installOrSelectSize = 43f;
                 if (mode == DatasetMode.AVAILABLE || dataset.outdated) {
+                    // Server datasets.
+                    // Add download/update button.
                     var install = new OwnTextIconButton("", skin, "install");
                     install.setContentAlign(Align.center);
                     install.addListener(new OwnTextTooltip(I18n.msg(dataset.outdated ? "gui.download.update" : "gui.download.install"), skin));
@@ -578,6 +580,8 @@ public class DatasetManagerWindow extends GenericDialog {
                     installOrSelect = install;
                     anySelected = true;
                 } else {
+                    // Local datasets.
+                    // Add enable/disable checkbox.
                     var select = new OwnCheckBox("", skin, 0f);
                     groupCheckBoxes.add(select);
                     installOrSelect = select;

@@ -607,6 +607,10 @@ public class JsonLoader extends AbstractSceneLoader {
         return map;
     }
 
+    public void setKey(String key) {
+
+    }
+
     @Override
     public void setName(String name) {
 

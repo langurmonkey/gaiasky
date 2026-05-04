@@ -24,12 +24,14 @@ import java.util.*;
 public class CatalogManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CatalogManager.class);
 
-    private final Map<String, DatasetCard> ciMap;
+    /** Maps dataset card name to object. **/
+    private final Map<String, DatasetCard> nameMap;
+    /** List of all dataset cards. **/
     private final List<DatasetCard> cis;
 
     public CatalogManager() {
         super();
-        ciMap = new HashMap<>();
+        nameMap = new HashMap<>();
         cis = new ArrayList<>(5);
         EventManager.instance.subscribe(this,
                                         Event.CATALOG_ADD,
@@ -39,12 +41,16 @@ public class CatalogManager implements IObserver {
                                         Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
+    public boolean containsKey(String key) {
+        return cis.stream().anyMatch((ds) -> ds.dsKey != null && ds.dsKey.equals(key));
+    }
+
     public Collection<DatasetCard> getCatalogInfos() {
         return cis;
     }
 
     public boolean contains(String dsName) {
-        return ciMap.containsKey(dsName);
+        return nameMap.containsKey(dsName);
     }
 
     /**
@@ -55,12 +61,12 @@ public class CatalogManager implements IObserver {
      * @return The CatalogInfo object, null if it does not exist.
      */
     public DatasetCard get(String dsName) {
-        return ciMap.get(dsName);
+        return nameMap.get(dsName);
     }
 
     public Set<String> getDatasetNames() {
-        if (ciMap != null) {
-            return ciMap.keySet();
+        if (nameMap != null) {
+            return nameMap.keySet();
         }
         return null;
     }
@@ -98,29 +104,29 @@ public class CatalogManager implements IObserver {
                         EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                     }
                 }
-                String key = ci.name;
-                if (ciMap.containsKey(key)) {
+                String name = ci.name;
+                if (nameMap.containsKey(name)) {
                     int i = 1;
                     String newKey = ci.name + " (" + i + ")";
-                    while (ciMap.containsKey(newKey)) {
+                    while (nameMap.containsKey(newKey)) {
                         i++;
                         newKey = ci.name + " (" + i + ")";
                     }
                     ci.name = newKey;
-                    key = newKey;
+                    name = newKey;
                 }
                 // Add to map and list
-                ciMap.put(key, ci);
+                nameMap.put(name, ci);
                 cis.add(ci);
             }
             case CATALOG_REMOVE -> {
                 DatasetCard ci;
                 String dsName = (String) data[0];
-                if (ciMap.containsKey(dsName)) {
-                    ci = ciMap.get(dsName);
+                if (nameMap.containsKey(dsName)) {
+                    ci = nameMap.get(dsName);
                     EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.entity);
                     ci.removeCatalog();
-                    ciMap.remove(dsName);
+                    nameMap.remove(dsName);
                     cis.remove(ci);
                 }
             }
@@ -129,8 +135,8 @@ public class CatalogManager implements IObserver {
                 String dsName;
                 dsName = (String) data[0];
                 boolean visible = (Boolean) data[1];
-                if (ciMap.containsKey(dsName)) {
-                    ci = ciMap.get(dsName);
+                if (nameMap.containsKey(dsName)) {
+                    ci = nameMap.get(dsName);
                     if (!visible)
                         EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.entity);
                     ci.setVisibility(visible);
@@ -155,8 +161,8 @@ public class CatalogManager implements IObserver {
                 String dsName;
                 dsName = (String) data[0];
                 double scaling = (Double) data[1];
-                if (ciMap.containsKey(dsName)) {
-                    ci = ciMap.get(dsName);
+                if (nameMap.containsKey(dsName)) {
+                    ci = nameMap.get(dsName);
                     if (ci.entity != null) {
                         var hl = Mapper.highlight.get(ci.entity);
                         hl.pointscaling = (float) scaling;

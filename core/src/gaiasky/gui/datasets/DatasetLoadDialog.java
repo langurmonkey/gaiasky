@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.gui.beans.ComponentTypeBean;
-import gaiasky.gui.window.ColorPicker;
+import gaiasky.util.scene2d.ColorPicker;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;

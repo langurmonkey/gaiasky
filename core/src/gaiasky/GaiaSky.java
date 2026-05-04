@@ -754,7 +754,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
         // Initialize input multiplexer to handle various input processors.
         inputMultiplexer.clear();
-        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, gaiaSkyAssets.catalogManager);
+        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -1017,7 +1017,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     public void reinitialiseGUI2() {
         // Reinitialise registry to listen to relevant events.
         if (guiRegistry != null) guiRegistry.dispose();
-        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, gaiaSkyAssets.catalogManager);
+        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
 
         // Unregister all current GUIs.

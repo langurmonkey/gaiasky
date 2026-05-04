@@ -30,6 +30,8 @@ public interface ISceneLoader {
      */
     Array<Entity> loadData() throws FileNotFoundException;
 
+    void setKey(String key);
+
     void setName(String name);
 
     void setDescription(String description);

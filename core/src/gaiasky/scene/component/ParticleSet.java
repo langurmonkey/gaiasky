@@ -462,7 +462,7 @@ public class ParticleSet implements Component, IDisposable {
                             var loc = I18n.localize(nlc);
                             if (!loc.equals(nlc)) {
                                 // We still use root locale here, by design.
-                                index.put(I18n.localize(nlc).toLowerCase(Locale.ROOT), idx);
+                                index.put(loc.toLowerCase(Locale.ROOT), idx);
                             }
                         }
                     }

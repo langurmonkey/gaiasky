@@ -201,7 +201,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         buttonLoad.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
         buttonLoad.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LOAD_FILE_ACTION, buttonLoad);
+                EventManager.publish(Event.SHOW_LOAD_DATASET_ACTION, buttonLoad);
                 buttonLoad.setCheckedNoFire(false);
             }
             return false;

@@ -14,23 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Tooltip;
 
 public class OwnButton extends Button {
     OwnButton me;
     SystemCursor cursor;
     private boolean changeCursor = true;
-
-    public OwnButton(Skin skin) {
-        super(skin);
-        this.me = this;
-        initialize();
-    }
-
-    public OwnButton(Skin skin, String styleName) {
-        super(skin, styleName);
-        this.me = this;
-        initialize();
-    }
+    private float ownWidth = 0f, ownHeight = 0f;
 
     public OwnButton(Skin skin, String styleName, boolean changeCursor) {
         super(skin, styleName);
@@ -46,10 +36,56 @@ public class OwnButton extends Button {
         initialize();
     }
 
+    public void setPrefWidth(float width) {
+        ownWidth = width;
+    }
+
+    public void setPrefHeight(float height) {
+        ownHeight = height;
+    }
+
+    public void setPrefSize(float width, float height) {
+        setPrefWidth(width);
+        setPrefHeight(height);
+    }
+
+    @Override
+    public float getPrefWidth() {
+        if (ownWidth != 0) {
+            return ownWidth;
+        } else {
+            return super.getPrefWidth();
+        }
+    }
+
+    @Override
+    public float getPrefHeight() {
+        if (ownHeight != 0) {
+            return ownHeight;
+        } else {
+            return super.getPrefHeight();
+        }
+    }
+
     public void setCheckedNoFire(boolean isChecked) {
         this.setProgrammaticChangeEvents(false);
         this.setChecked(isChecked);
         this.setProgrammaticChangeEvents(true);
+    }
+
+    public void removeTooltipListeners() {
+        var listeners = getListeners();
+        listeners.begin();
+        for (int i = 0, n = listeners.size; i < n; i++) {
+            if (listeners.get(i) instanceof Tooltip) {
+                listeners.removeValue(listeners.get(i), true);
+            }
+        }
+        listeners.end();
+    }
+
+    public void setTooltip(String tooltip) {
+        addListener(new OwnTextTooltip(tooltip, getSkin()));
     }
 
     private void initialize() {

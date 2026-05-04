@@ -50,6 +50,7 @@ public class FilePickerComponent extends Table {
     private final FilePickerTarget target;
     private final boolean directoryBrowsingEnabled;
     private final boolean fileBrowsingEnabled;
+    protected ResultListener resultListener;
 
     private OwnTextField location;
     private List<FileListItem> fileList;
@@ -403,6 +404,21 @@ public class FilePickerComponent extends Table {
         if (result == null || result.isEmpty()) return currentDir;
         Path resolved = currentDir.resolve(result).normalize();
         return Files.exists(resolved) ? resolved : currentDir.resolve(result);
+    }
+
+    public void setResultListener(ResultListener listener) {
+        this.resultListener = listener;
+    }
+
+    /**
+     * Runs the result listener with the given operation (accept/cancel).
+     *
+     * @param accept True if the result of the file picker component is to be accepted.
+     */
+    public void result(boolean accept) {
+        if (this.resultListener != null) {
+            this.resultListener.result(accept, this.getResult());
+        }
     }
 
     public void setSelectionValidListener(Consumer<Boolean> listener) {

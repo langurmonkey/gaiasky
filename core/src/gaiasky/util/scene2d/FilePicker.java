@@ -7,7 +7,6 @@
 
 package gaiasky.util.scene2d;
 
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -21,10 +20,9 @@ import java.util.function.Consumer;
 
 public class FilePicker extends GenericDialog {
     private final FilePickerComponent component;
-    protected ResultListener resultListener;
 
     public FilePicker(String title, final Skin skin, Stage stage, Path baseDir, FilePickerTarget target) {
-        this(title, skin, stage, baseDir, target, null, true);
+        this(title, skin, stage, baseDir, target, true);
     }
 
     public FilePicker(String title,
@@ -32,7 +30,6 @@ public class FilePicker extends GenericDialog {
                       Stage stage,
                       Path baseDir,
                       FilePickerTarget target,
-                      EventListener selectionListener,
                       boolean directoryBrowsingEnabled) {
         super(title, skin, stage);
 
@@ -54,11 +51,6 @@ public class FilePicker extends GenericDialog {
         content.add(component).expand().fill();
     }
 
-    public FilePicker setFileNameEnabled(boolean enabled) {
-        component.setFileNameEnabled(enabled);
-        return this;
-    }
-
     public void setShowHidden(boolean showHidden) {
         component.setShowHidden(showHidden);
     }
@@ -72,7 +64,7 @@ public class FilePicker extends GenericDialog {
     }
 
     public void setResultListener(ResultListener listener) {
-        this.resultListener = listener;
+        component.setResultListener(listener);
     }
 
     public void setShowHiddenConsumer(Consumer<Boolean> c) {
@@ -81,13 +73,13 @@ public class FilePicker extends GenericDialog {
 
     @Override
     public boolean accept() {
-        if (resultListener != null) resultListener.result(true, component.getResult());
+        component.result(true);
         return true;
     }
 
     @Override
     public void cancel() {
-        if (resultListener != null) resultListener.result(false, component.getResult());
+        component.result(false);
     }
 
     @Override

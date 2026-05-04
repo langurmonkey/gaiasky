@@ -80,6 +80,7 @@ public class SceneJsonLoader {
 
         // Must have a 'data' element.
         if (model.has("data")) {
+            String key = model.get("key") != null ? model.get("key").asString() : null;
             String name = model.get("name") != null ? model.get("name").asString() : null;
             String desc = model.get("description") != null ? model.get("description").asString() : null;
             Long size = model.get("size") != null ? model.get("size").asLong() : -1;
@@ -103,6 +104,8 @@ public class SceneJsonLoader {
                     ISceneLoader loader = (ISceneLoader) c.newInstance();
                     loader.setIndex(globalIndex);
 
+                    if (key != null)
+                        loader.setKey(key);
                     if (name != null)
                         loader.setName(name);
                     if (desc != null)

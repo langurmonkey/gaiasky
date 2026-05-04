@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui.window;
+package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
@@ -20,10 +20,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
-import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.HexColorValidator;
 import gaiasky.util.validator.IValidator;

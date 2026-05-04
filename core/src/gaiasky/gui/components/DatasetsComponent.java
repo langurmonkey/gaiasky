@@ -10,7 +10,6 @@ package gaiasky.gui.components;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -20,16 +19,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.datasets.*;
-import gaiasky.gui.window.ColorPicker;
-import gaiasky.gui.window.ColorPickerAbstract;
-import gaiasky.gui.window.ColormapPicker;
+import gaiasky.gui.datasets.DatasetFiltersWindow;
+import gaiasky.gui.datasets.DatasetInfoWindow;
+import gaiasky.gui.datasets.DatasetTransformsWindow;
+import gaiasky.gui.datasets.DatasetVisualSettingsWindow;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.entity.EntityUtils;
@@ -37,8 +37,6 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.IOrbitCoordinates;
-import gaiasky.util.datadesc.DataDescriptor;
-import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
@@ -113,6 +111,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         final var buttonHeight = 50f;
         OwnTextIconButton loadDataset = new OwnTextIconButton(I18n.msg("gui.dsload.title"), skin, "load");
         loadDataset.setSize(buttonWidth, buttonHeight);
+        loadDataset.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                EventManager.publish(Event.SHOW_LOAD_DATASET_ACTION, this);
+            }
+        });
 
         Table main = new Table(skin);
         main.add(scroll).center().top().padBottom(pad12).row();

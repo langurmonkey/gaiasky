@@ -1,16 +1,15 @@
 /*
- * Copyright (c) 2023-2024 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui.window;
+package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.util.scene2d.OwnImage;
 
 public abstract class ColorPickerAbstract extends OwnImage {
     protected Stage stage;
@@ -34,8 +33,12 @@ public abstract class ColorPickerAbstract extends OwnImage {
         }
     }
 
-    public float[] getPickedColorArray() {
+    public float[] color() {
         return color;
+    }
+
+    public float[] getPickedColorArray() {
+        return color();
     }
 
     public Color getPickedColor() {

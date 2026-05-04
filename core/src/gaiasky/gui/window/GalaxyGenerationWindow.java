@@ -672,19 +672,19 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
             var cLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.color"), skin);
             var c1 = new ColorPicker("c1", ds.getColorRGBA(0), stage, skin);
             c1.setNewColorRunnable(() -> {
-                ds.setColorRGBA(c1.color, 0);
+                ds.setColorRGBA(c1.color(), 0);
             });
             var c2 = new ColorPicker("c2", ds.getColorRGBA(1), stage, skin);
             c2.setNewColorRunnable(() -> {
-                ds.setColorRGBA(c2.color, 1);
+                ds.setColorRGBA(c2.color(), 1);
             });
             var c3 = new ColorPicker("c3", ds.getColorRGBA(2), stage, skin);
             c3.setNewColorRunnable(() -> {
-                ds.setColorRGBA(c3.color, 2);
+                ds.setColorRGBA(c3.color(), 2);
             });
             var c4 = new ColorPicker("c4", ds.getColorRGBA(3), stage, skin);
             c4.setNewColorRunnable(() -> {
-                ds.setColorRGBA(c4.color, 3);
+                ds.setColorRGBA(c4.color(), 3);
             });
             var colorsTable = new Table(skin);
             colorsTable.add(cLabel).left().padRight(pad34);

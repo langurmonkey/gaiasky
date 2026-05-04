@@ -1128,8 +1128,6 @@ public enum Event {
     SHOW_LAND_AT_LOCATION_CMD,
     /** Shows the window to load a dataset on the fly. **/
     SHOW_LOAD_DATASET_ACTION,
-    /** Shows the window to load a file directly (.vot, .csv, .json, etc.). **/
-    SHOW_LOAD_FILE_ACTION,
     /** Shows the log window. **/
     SHOW_LOG_CMD,
     /**

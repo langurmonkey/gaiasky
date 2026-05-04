@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
-import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -28,19 +27,14 @@ import gaiasky.gui.BookmarkInfoDialog;
 import gaiasky.gui.api.IGui;
 import gaiasky.gui.bookmarks.BookmarkNameDialog;
 import gaiasky.gui.bookmarks.BookmarksManager;
-import gaiasky.gui.datasets.DatasetLoadDialog;
 import gaiasky.gui.window.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
-import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
-import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
-import gaiasky.util.scene2d.FilePicker;
-import gaiasky.util.scene2d.FilePickerComponent;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
 import org.lwjgl.glfw.GLFW;
@@ -48,7 +42,6 @@ import org.lwjgl.glfw.GLFW;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -73,11 +66,6 @@ public class GuiRegistry implements IObserver {
      * Render lock object.
      */
     private final Object renderLock = new Object();
-    /**
-     * The catalog manager.
-     */
-    private final CatalogManager catalogManager;
-    private final FocusView view;
     /**
      * Mode change info popup.
      */
@@ -108,6 +96,10 @@ public class GuiRegistry implements IObserver {
      */
     private IndividualVisibilityWindow indVisWindow;
     /**
+     * Load dataset.
+     */
+    private DatasetLoadWindow datasetLoadWindow;
+    /**
      * Task to remove the information pop-up.
      **/
     private Task removePopup;
@@ -126,21 +118,18 @@ public class GuiRegistry implements IObserver {
      * Create new GUI registry object.
      */
     public GuiRegistry(final Skin skin,
-                       final Scene scene,
-                       final CatalogManager catalogManager) {
+                       final Scene scene) {
         super();
         this.skin = skin;
         this.scene = scene;
         this.guis = new Array<>(true, 2);
         this.specialGuis = new Array<>(true, 1);
-        this.catalogManager = catalogManager;
-        this.view = new FocusView();
         // Windows which are visible from any GUI.
         EventManager.instance.subscribe(this,
                                         Event.SHOW_SEARCH_ACTION,
                                         Event.SHOW_QUIT_ACTION,
                                         Event.SHOW_ABOUT_ACTION,
-                                        Event.SHOW_LOAD_FILE_ACTION,
+                                        Event.SHOW_LOAD_DATASET_ACTION,
                                         Event.SHOW_PREFERENCES_ACTION,
                                         Event.SHOW_KEYFRAMES_WINDOW_ACTION,
                                         Event.SHOW_SLAVE_CONFIG_ACTION,
@@ -457,108 +446,13 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                case SHOW_LOAD_FILE_ACTION -> {
-                    if (lastOpenLocation == null && GaiaSky.settings().program.fileChooser.lastLocation != null
-                            && !GaiaSky.settings().program.fileChooser.lastLocation.isEmpty()) {
-                        try {
-                            lastOpenLocation = Paths.get(GaiaSky.settings().program.fileChooser.lastLocation);
-                        } catch (Exception e) {
-                            lastOpenLocation = null;
-                        }
-                    }
-                    if (lastOpenLocation == null) {
-                        lastOpenLocation = SysUtils.getUserHome();
-                    } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
-                        lastOpenLocation = SysUtils.getHomeDir();
-                    }
-                    FilePicker fc = new FilePicker(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FilePickerComponent.FilePickerTarget.FILES);
-                    fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
-                    fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
-                    fc.setAcceptText(I18n.msg("gui.loadcatalog"));
-                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName()
-                            .toString()
-                            .endsWith(".csv")
-                            || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
-                    fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
-                    fc.setResultListener((success, result) -> {
-                        if (success) {
-                            if (Files.exists(result) && Files.exists(result)) {
-                                // Load selected file.
-                                try {
-                                    String fileName = result.getFileName().toString();
-                                    if (fileName.endsWith(".json")) {
-                                        // Load internal JSON catalog file.
-                                        GaiaSky.instance.getExecutorService().execute(() -> {
-                                            var loaded = GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
-                                            if (!loaded) {
-                                                logger.warn("The dataset could not be loaded: " + result.toAbsolutePath());
-                                            }
-                                        });
-                                    } else {
-                                        final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName,
-                                                                                            fileName,
-                                                                                            skin,
-                                                                                            stage);
-                                        Runnable doLoad = () -> GaiaSky.instance.getExecutorService().execute(() -> {
-                                            DatasetOptions datasetOptions = dld.generateDatasetOptions();
-                                            // Load dataset.
-                                            GaiaSky.instance.scripting().apiv2().data
-                                                    .load_dataset(datasetOptions.catalogName,
-                                                                  result.toAbsolutePath().toString(),
-                                                                  DatasetSourceType.UI,
-                                                                  datasetOptions,
-                                                                  true);
-                                            // Select first.
-                                            DatasetCard ci = this.catalogManager.get(datasetOptions.catalogName);
-                                            if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
-                                                view.setEntity(ci.entity);
-                                                if (view.isSet()) {
-                                                    var set = view.getSet();
-                                                    if (set.data() != null && !set.data().isEmpty() && EntityUtils.isVisibilityOn(ci.entity)) {
-                                                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getFirstParticleName());
-                                                    }
-                                                } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(
-                                                        view.getGraph().children.get(0))) {
-                                                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                    EventManager.publish(Event.FOCUS_CHANGE_CMD,
-                                                                         this,
-                                                                         EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
-                                                }
-                                                // Open UI datasets.
-                                                GaiaSky.instance.scripting().expandUIPane("Datasets");
-                                            } else {
-                                                logger.info("No data loaded (did the load crash?)");
-                                            }
-                                        });
-                                        dld.setAcceptListener(doLoad);
-                                        dld.show(stage);
-                                    }
-
-                                    lastOpenLocation = result.getParent();
-                                    GaiaSky.settings().program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
-                                    return true;
-                                } catch (Exception e) {
-                                    logger.error(I18n.msg("notif.error", result.getFileName()), e);
-                                    return false;
-                                }
-
-                            } else {
-                                logger.error("Selection must be a file: " + result.toAbsolutePath());
-                                return false;
-                            }
-                        } else {
-                            // Still, update last location.
-                            if (!Files.isDirectory(result)) {
-                                lastOpenLocation = result.getParent();
-                            } else {
-                                lastOpenLocation = result;
-                            }
-                            GaiaSky.settings().program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
-                        }
-                        return false;
-                    });
-                    fc.show(stage);
+                case SHOW_LOAD_DATASET_ACTION -> {
+                   if (datasetLoadWindow == null) {
+                       datasetLoadWindow = new DatasetLoadWindow(stage, skin);
+                   } else {
+                       datasetLoadWindow.reload();
+                   }
+                   datasetLoadWindow.show(stage);
                 }
                 case SHOW_KEYFRAMES_WINDOW_ACTION -> {
                     if (keyframesWindow == null) {

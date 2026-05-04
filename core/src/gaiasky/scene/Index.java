@@ -79,7 +79,11 @@ public class Index {
     public Entity getEntity(String name) {
         name = name.toLowerCase(Locale.ROOT)
                 .strip();
-        return index.get(name);
+        try {
+            return index.get(name);
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+        return null;
     }
 
     /**

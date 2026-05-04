@@ -150,6 +150,11 @@ public class GeoJsonLoader extends AbstractSceneLoader {
     }
 
     @Override
+    public void setKey(String key) {
+
+    }
+
+    @Override
     public void setName(String name) {
 
     }

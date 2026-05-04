@@ -10,6 +10,8 @@ package gaiasky.script.v2.impl;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.data.SceneJsonLoader;
@@ -19,7 +21,6 @@ import gaiasky.data.group.STILDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.window.ColormapPicker;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -27,13 +28,14 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.entity.SetUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.v2.api.DataAPI;
-import gaiasky.util.DatasetCard;
 import gaiasky.util.Constants;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.ColormapPicker;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 import uk.ac.starlink.util.DataSource;
@@ -361,15 +363,15 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                          double[] fadeOut,
                                          boolean sync) {
         DatasetOptions datasetOptions = DatasetOptions.getParticleDatasetOptions(dsName,
-                                                                       profileDecay,
-                                                                       particleColor,
-                                                                       colorNoise,
-                                                                       labelColor,
-                                                                       particleSize,
-                                                                       sizeLimits,
-                                                                       ct,
-                                                                       fadeIn,
-                                                                       fadeOut);
+                                                                                 profileDecay,
+                                                                                 particleColor,
+                                                                                 colorNoise,
+                                                                                 labelColor,
+                                                                                 particleSize,
+                                                                                 sizeLimits,
+                                                                                 ct,
+                                                                                 fadeIn,
+                                                                                 fadeOut);
         return load_dataset(dsName, path, type, datasetOptions, sync);
     }
 
@@ -407,7 +409,13 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                              List<?> fadeIn,
                                              List<?> fadeOut,
                                              boolean sync) {
-        return load_star_cluster_dataset(dsName, path, api.dArray(particleColor), api.dArray(labelColor), api.dArray(fadeIn), api.dArray(fadeOut), sync);
+        return load_star_cluster_dataset(dsName,
+                                         path,
+                                         api.dArray(particleColor),
+                                         api.dArray(labelColor),
+                                         api.dArray(fadeIn),
+                                         api.dArray(fadeOut),
+                                         sync);
     }
 
     @Override
@@ -467,11 +475,11 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                               double[] fadeOut,
                                               boolean sync) {
         DatasetOptions datasetOptions = DatasetOptions.getVariableStarDatasetOptions(dsName,
-                                                                           magnitudeScale,
-                                                                           labelColor,
-                                                                           ComponentTypes.ComponentType.Stars,
-                                                                           fadeIn,
-                                                                           fadeOut);
+                                                                                     magnitudeScale,
+                                                                                     labelColor,
+                                                                                     ComponentTypes.ComponentType.Stars,
+                                                                                     fadeIn,
+                                                                                     fadeOut);
         return load_dataset(dsName, path, type, datasetOptions, sync);
     }
 
@@ -545,7 +553,12 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         // Load internal JSON dataset file.
         try {
             logger.info(I18n.msg("notif.catalog.loading", pathString));
-            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(Gdx.files.absolute(pathString), scene);
+            var jsonFile = Gdx.files.absolute(pathString);
+            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(jsonFile, scene);
+            JsonReader jsonReader = new JsonReader();
+            JsonValue model = jsonReader.parse(jsonFile.read());
+            String dsKey = model.get("key") != null ? model.get("key").asString() : null;
+
             int i = 0;
             for (Entity e : objects) {
                 if (e == null) {
@@ -559,6 +572,17 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                     objects.forEach(scene.engine::addEntity);
                     objects.forEach(scene::initializeEntity);
                     objects.forEach(scene::addToIndex);
+                    // Inject dataset key to dataset card.
+                    if (dsKey != null) {
+                        objects.forEach((entity) -> {
+                            if (Mapper.datasetDescription.has(entity)) {
+                                var dc = Mapper.datasetDescription.get(entity);
+                                if (dc.datasetCard != null && dc.datasetCard.dsKey == null) {
+                                    dc.datasetCard.dsKey = dsKey;
+                                }
+                            }
+                        });
+                    }
 
                     // Wait for entity in new task.
                     GaiaSky.instance.getExecutorService().execute(() -> {

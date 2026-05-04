@@ -102,7 +102,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      **/
     protected long lastQueueClearMs = 0;
     // Dataset name and description.
-    protected String name, description;
+    protected String name, description, key;
     // Dataset parameters
     protected Map<String, Object> params;
     /**
@@ -220,9 +220,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             Entity entity = archetype.createEntity();
 
             // Catalog info
+            String dsKey = this.key != null ? this.key : null;
             String name = this.name != null ? this.name : DEFAULT_NAME;
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
-            DatasetCard ci = new DatasetCard(null, name, description, null, DatasetSourceType.LOD, 1.5f, entity);
+            DatasetCard ci = new DatasetCard(dsKey, name, description, null, DatasetSourceType.LOD, 1.5f, entity);
 
             var octree = Mapper.octree.get(entity);
             octree.roulette = new ArrayList<>(Math.min(10, (int) (rootOctant.numObjectsRec * 0.5)));
@@ -667,6 +668,11 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             }
         }
 
+    }
+
+    @Override
+    public void setKey(String key) {
+        this.key = key;
     }
 
     @Override
