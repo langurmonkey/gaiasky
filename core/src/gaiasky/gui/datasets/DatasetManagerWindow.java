@@ -309,11 +309,11 @@ public class DatasetManagerWindow extends GenericDialog {
 
         dataLocationButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"),
-                                                 skin,
-                                                 stage,
-                                                 Path.of(GaiaSky.settings().data.location),
-                                                 FileChooser.FileChooserTarget.DIRECTORIES);
+                FilePicker fc = new FilePicker(I18n.msg("gui.download.pickloc"),
+                                               skin,
+                                               stage,
+                                               Path.of(GaiaSky.settings().data.location),
+                                               FilePicker.FilePickerTarget.DIRECTORIES);
                 fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {

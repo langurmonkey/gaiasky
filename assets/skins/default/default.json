@@ -369,6 +369,9 @@
     "load": {
       "imageUp": "open-icon"
     },
+    "dataset-manager": {
+      "imageUp": "iconic-hard-drive"
+    },
     "tutorial": {
       "imageUp": "tutorial-icon"
     },

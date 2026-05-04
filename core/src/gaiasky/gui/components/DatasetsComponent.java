@@ -10,11 +10,14 @@ package gaiasky.gui.components;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
@@ -23,10 +26,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.datasets.DatasetFiltersWindow;
-import gaiasky.gui.datasets.DatasetInfoWindow;
-import gaiasky.gui.datasets.DatasetTransformsWindow;
-import gaiasky.gui.datasets.DatasetVisualSettingsWindow;
+import gaiasky.gui.datasets.*;
 import gaiasky.gui.window.ColorPicker;
 import gaiasky.gui.window.ColorPickerAbstract;
 import gaiasky.gui.window.ColormapPicker;
@@ -37,6 +37,8 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.IOrbitCoordinates;
+import gaiasky.util.datadesc.DataDescriptor;
+import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
@@ -46,6 +48,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
+    private static final Logger.Log logger = Logger.getLogger(DatasetsComponent.class);
+
     private static final float MAX_SCROLL_HEIGHT = 800f;
     private final Map<String, Table> groupMap;
     private final Map<String, ProgrammaticButton[]> imageMap;
@@ -59,7 +63,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private Table group;
     private OwnScrollPane scroll;
     private OwnLabel noDatasetsLabel = null;
-    private OwnTextIconButton loadDatasets;
     private float componentWidth;
 
 
@@ -106,11 +109,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         addNoDatasets();
 
-        loadDatasets = new OwnTextIconButton(I18n.msg("gui.dsload.title"), skin, "load");
+        final var buttonWidth = 300f;
+        final var buttonHeight = 50f;
+        OwnTextIconButton loadDataset = new OwnTextIconButton(I18n.msg("gui.dsload.title"), skin, "load");
+        loadDataset.setSize(buttonWidth, buttonHeight);
 
         Table main = new Table(skin);
-        main.add(scroll).center().top().padBottom(pad8).row();
-        main.add(loadDatasets).center();
+        main.add(scroll).center().top().padBottom(pad12).row();
+        main.add(loadDataset).center();
 
         component = main;
     }

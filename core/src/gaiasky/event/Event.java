@@ -1124,8 +1124,13 @@ public enum Event {
      * </ol>
      */
     SHOW_TEXTURE_WINDOW_ACTION,
+    /** Shows window to land at a location. **/
     SHOW_LAND_AT_LOCATION_CMD,
-    SHOW_LOAD_CATALOG_ACTION,
+    /** Shows the window to load a dataset on the fly. **/
+    SHOW_LOAD_DATASET_ACTION,
+    /** Shows the window to load a file directly (.vot, .csv, .json, etc.). **/
+    SHOW_LOAD_FILE_ACTION,
+    /** Shows the log window. **/
     SHOW_LOG_CMD,
     /**
      * Procedural surface, atmosphere, and clouds generation.
@@ -1145,6 +1150,7 @@ public enum Event {
      **/
     SHOW_PLAYCAMERA_CMD,
 
+    /** Shows the preferences window. **/
     SHOW_PREFERENCES_ACTION,
 
     SHOW_PER_OBJECT_VISIBILITY_ACTION,

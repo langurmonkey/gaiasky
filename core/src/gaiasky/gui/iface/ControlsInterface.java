@@ -147,10 +147,10 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         buttonLoad = new OwnTextIconButton("", skin, "load");
         buttonLoad.setSize(buttonWidth, buttonHeight);
         buttonLoad.setName("loadcatalog");
-        buttonLoad.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog", true), skin));
+        buttonLoad.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.dsload.title"), kb.getStringKeys("action.loadcatalog", true), skin));
         buttonLoad.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, buttonLoad);
+                EventManager.publish(Event.SHOW_LOAD_FILE_ACTION, buttonLoad);
                 buttonLoad.setCheckedNoFire(false);
             }
             return false;

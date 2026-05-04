@@ -421,7 +421,7 @@ public class SceneContextMenu extends ContextMenu {
 
                            {
                                if (event instanceof ChangeEvent) {
-                                   EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, dsLoad);
+                                   EventManager.publish(Event.SHOW_LOAD_FILE_ACTION, dsLoad);
                                    return true;
                                }
                                return false;

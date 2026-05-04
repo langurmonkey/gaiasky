@@ -39,7 +39,7 @@ import gaiasky.util.*;
 import gaiasky.util.DatasetCard.DatasetSourceType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
-import gaiasky.util.scene2d.FileChooser;
+import gaiasky.util.scene2d.FilePicker;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
 import org.lwjgl.glfw.GLFW;
@@ -139,7 +139,7 @@ public class GuiRegistry implements IObserver {
                                         Event.SHOW_SEARCH_ACTION,
                                         Event.SHOW_QUIT_ACTION,
                                         Event.SHOW_ABOUT_ACTION,
-                                        Event.SHOW_LOAD_CATALOG_ACTION,
+                                        Event.SHOW_LOAD_FILE_ACTION,
                                         Event.SHOW_PREFERENCES_ACTION,
                                         Event.SHOW_KEYFRAMES_WINDOW_ACTION,
                                         Event.SHOW_SLAVE_CONFIG_ACTION,
@@ -456,7 +456,7 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                case SHOW_LOAD_CATALOG_ACTION -> {
+                case SHOW_LOAD_FILE_ACTION -> {
                     if (lastOpenLocation == null && GaiaSky.settings().program.fileChooser.lastLocation != null
                             && !GaiaSky.settings().program.fileChooser.lastLocation.isEmpty()) {
                         try {
@@ -470,7 +470,7 @@ public class GuiRegistry implements IObserver {
                     } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
                         lastOpenLocation = SysUtils.getHomeDir();
                     }
-                    FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                    FilePicker fc = new FilePicker(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FilePicker.FilePickerTarget.FILES);
                     fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
                     fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                     fc.setAcceptText(I18n.msg("gui.loadcatalog"));

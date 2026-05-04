@@ -286,7 +286,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.console", () -> EventManager.publish(Event.CONSOLE_CMD, this, true), noCleanMode));
 
         // load catalog
-        addAction(new ProgramAction("action.loadcatalog", () -> EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, this), noCleanMode));
+        addAction(new ProgramAction("action.loadcatalog", () -> EventManager.publish(Event.SHOW_LOAD_FILE_ACTION, this), noCleanMode));
 
         // play camera path
         addAction(new ProgramAction("action.playcamera", () -> EventManager.publish(Event.SHOW_PLAYCAMERA_CMD, this), noCleanMode));

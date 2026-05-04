@@ -1898,11 +1898,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsLocation.pad(pad10);
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.msg("gui.screenshots.directory.choose"),
-                                                 skin,
-                                                 stage,
-                                                 Paths.get(settings.screenshot.location),
-                                                 FileChooser.FileChooserTarget.DIRECTORIES);
+                FilePicker fc = new FilePicker(I18n.msg("gui.screenshots.directory.choose"),
+                                               skin,
+                                               stage,
+                                               Paths.get(settings.screenshot.location),
+                                               FilePicker.FilePickerTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -2048,11 +2048,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameOutputLocation.pad(pad10);
         frameOutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.msg("gui.frameoutput.directory.choose"),
-                                                 skin,
-                                                 stage,
-                                                 Paths.get(settings.frame.location),
-                                                 FileChooser.FileChooserTarget.DIRECTORIES);
+                FilePicker fc = new FilePicker(I18n.msg("gui.frameoutput.directory.choose"),
+                                               skin,
+                                               stage,
+                                               Paths.get(settings.frame.location),
+                                               FilePicker.FilePickerTarget.DIRECTORIES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -2471,11 +2471,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         meshWarpFilePath = settings.program.modeCubemap.planetarium.sphericalMirrorWarp;
         meshWarpFileLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.msg("gui.planetarium.sphericalmirror.warpfile"),
-                                                 skin,
-                                                 stage,
-                                                 meshWarpPath,
-                                                 FileChooser.FileChooserTarget.FILES);
+                FilePicker fc = new FilePicker(I18n.msg("gui.planetarium.sphericalmirror.warpfile"),
+                                               skin,
+                                               stage,
+                                               meshWarpPath,
+                                               FilePicker.FilePickerTarget.FILES);
                 fc.setShowHidden(settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> Files.exists(pathname) && Files.isRegularFile(pathname));
@@ -2573,7 +2573,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     ddw.setModal(true);
                     ddw.show(stage);
                 } else {
-                    // Try again
+                    // No data descriptor? Try to download it.
                     FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDataTempDir(settings.data.location) + "/gaiasky-data.json");
                     DownloadHelper.downloadFile(settings.program.url.getCurrentDataDescriptor(),
                                                 dataDescriptor,

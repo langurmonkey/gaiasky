@@ -373,7 +373,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.pad(pad10);
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+                FilePicker fc = new FilePicker(I18n.msg("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FilePicker.FilePickerTarget.FILES);
                 fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));

@@ -45,7 +45,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.FileChooser;
+import gaiasky.util.scene2d.FilePicker;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.update.VersionCheckEvent;
@@ -487,11 +487,11 @@ public class MainGui extends AbstractGui {
                 landAtLocation.show(stage);
             }
             case SHOW_PLAYCAMERA_CMD -> {
-                var fc = new FileChooser(I18n.msg("gui.camera.title"),
-                                         skin,
-                                         stage,
-                                         SysUtils.getDefaultCameraDir(),
-                                         FileChooser.FileChooserTarget.FILES);
+                var fc = new FilePicker(I18n.msg("gui.camera.title"),
+                                        skin,
+                                        stage,
+                                        SysUtils.getDefaultCameraDir(),
+                                        FilePicker.FilePickerTarget.FILES);
                 fc.setShowHidden(GaiaSky.settings().program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> GaiaSky.settings().program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.camera.run"));
