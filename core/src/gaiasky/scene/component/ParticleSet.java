@@ -451,19 +451,18 @@ public class ParticleSet implements Component, IDisposable {
         synchronized (indexSync) {
             update.pre();
             int n = pointData.size();
+
             for (int i = 0; i < n; i++) {
                 IParticleRecord pb = pointData.get(i);
                 if (pb.names() != null) {
                     final int idx = i;
                     for (var name : pb.names()) {
-                        var nlc = name.toLowerCase(Locale.ROOT);
-                        index.put(nlc, idx);
-                        if (I18n.hasLocalizedVersion(nlc)) {
-                            var loc = I18n.localize(nlc);
-                            if (!loc.equals(nlc)) {
-                                // We still use root locale here, by design.
-                                index.put(loc.toLowerCase(Locale.ROOT), idx);
-                            }
+                        var nameLC = name.toLowerCase(Locale.ROOT);
+                        index.put(nameLC, idx);
+
+                        var loc = I18n.localizeIfExists(nameLC);
+                        if (loc != null && !loc.equals(nameLC)) {
+                            index.put(loc.toLowerCase(Locale.ROOT), idx);
                         }
                     }
                 }
@@ -473,6 +472,8 @@ public class ParticleSet implements Component, IDisposable {
         }
         return index;
     }
+
+
 
     public void setMeanPosition(double[] pos) {
         this.meanPosition = new Vector3D(pos[0], pos[1], pos[2]);
@@ -1195,7 +1196,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public String getLocalizedName() {
-        return I18n.localize(getName());
+        return I18n.localize(getName().toLowerCase(Locale.ROOT));
     }
 
     public long getCandidateId() {
@@ -1235,7 +1236,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public String getClosestLocalizedName() {
-        return I18n.localize(getClosestName());
+        return I18n.localize(getClosestName().toLowerCase(Locale.ROOT));
     }
 
     public boolean canSelect(FilterView view) {

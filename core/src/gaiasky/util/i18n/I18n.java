@@ -9,7 +9,6 @@ package gaiasky.util.i18n;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.I18NBundle;
 import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -110,47 +109,43 @@ public class I18n {
         }
     }
 
-    public static synchronized boolean exists(String key) {
-        try {
-            return messages.get(key) != null;
-        } catch (MissingResourceException e) {
-            return false;
-        }
+    public static boolean exists(String key) {
+        return messages.contains(key);
     }
 
-    public static synchronized String get(String key) {
+    public static String get(String key) {
         return msg(key);
     }
 
-    public static synchronized String msg(String key) {
+    public static String msg(String key) {
         return get(messages, key);
     }
 
-    public static synchronized String msgOr(String key, String defaultValue) {
+    public static String msgOr(String key, String defaultValue) {
         return getOr(messages, key, defaultValue);
     }
 
-    public static synchronized String obj(String key) {
+    public static String obj(String key) {
         return get(objects, key);
     }
 
-    public static synchronized String objOr(String key, String defaultValue) {
+    public static String objOr(String key, String defaultValue) {
         return getOr(objects, key, defaultValue);
     }
 
-    public static synchronized String msg(String key, Object... params) {
+    public static String msg(String key, Object... params) {
         return I18n.messages.format(key, params);
     }
 
-    public static synchronized String obj(String key, Object... params) {
+    public static String obj(String key, Object... params) {
         return I18n.objects.format(key, params);
     }
 
-    public static synchronized boolean hasMessage(String key) {
+    public static boolean hasMessage(String key) {
         return has(messages, key);
     }
 
-    public static synchronized boolean hasObject(String key) {
+    public static boolean hasObject(String key) {
         return has(objects, key);
     }
 
@@ -159,17 +154,30 @@ public class I18n {
         return hasObject(base);
     }
 
-    public static String localize(String name) {
-        if (name == null) {
+    public static String localize(String nameLowerCase) {
+        if (nameLowerCase == null) {
             return null;
         }
-        var base = name.toLowerCase(Locale.ROOT)
-                .replace(' ', '_');
+        var base = nameLowerCase.replace(' ', '_');
         if (hasObject(base)) {
             return obj(base);
         } else {
-            return name;
+            return nameLowerCase;
         }
+    }
+
+    /**
+     * Returns the localized version of name if it exists, null otherwise.
+     * Avoids the double replace() and double hasObject() of calling
+     * hasLocalizedVersion() + localize() separately.
+     */
+    public static String localizeIfExists(String nameLowerCase) {
+        if (nameLowerCase == null) return null;
+        var base = nameLowerCase.replace(' ', '_');
+        if (hasObject(base)) {
+            return objects.get(base);  // direct bundle get, avoids synchronized obj()
+        }
+        return null;
     }
 
     private static String get(I18NBundle b, String key) {
@@ -185,13 +193,7 @@ public class I18n {
     }
 
     private static boolean has(I18NBundle b, String key) {
-        try {
-            b.get(key);
-            return true;
-        } catch (MissingResourceException e) {
-            // Void
-        }
-        return false;
+        return b.contains(key);
     }
 
 }

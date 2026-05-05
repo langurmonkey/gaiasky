@@ -32,6 +32,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
+import java.util.Locale;
 
 /**
  * Displays system information in the welcome and loading screens.
@@ -185,7 +186,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
                     f = view;
                 }
                 if (f != null) {
-                    String candidate = I18n.localize(f.getCandidateName());
+                    String candidate = I18n.localize(f.getCandidateName().toLowerCase(Locale.ROOT));
                     if (candidate != null) {
                         lastFocusName = TextUtils.capString(candidate, maxNameLen);
                         focus.setText(I18n.msg("gui.top.focus", lastFocusName));

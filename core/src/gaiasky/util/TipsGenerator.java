@@ -20,7 +20,6 @@ import gaiasky.util.scene2d.OwnTextButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
 
 /**
  * Generates tip strings.
@@ -39,8 +38,8 @@ public class TipsGenerator {
 
         this.tips = new ArrayList<>();
         for (int j = 0; j < MAX_KEYS; j++) {
-            try {
-                String tipStr = I18n.msg("tip." + j);
+            String tipStr = I18n.msg("tip." + j);
+            if (tipStr != null) {
                 String[] lines = tipStr.split("\\r\\n|\\n|\\r");
                 KeyBindings kb = KeyBindings.instance;
                 for (String line : lines) {
@@ -83,8 +82,6 @@ public class TipsGenerator {
                     }
                     tips.add(parts);
                 }
-            } catch (MissingResourceException e) {
-                // Skip
             }
         }
 

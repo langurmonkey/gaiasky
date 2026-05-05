@@ -337,7 +337,7 @@ public class OrbitElementsSet implements Component {
     }
 
     public String getLocalizedName() {
-        return I18n.localize(getName());
+        return I18n.localize(getName().toLowerCase(Locale.ROOT));
     }
 
     public long getCandidateId() {

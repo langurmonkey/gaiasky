@@ -25,6 +25,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 public class Proximity {
     // Default number of proximity entries
@@ -348,7 +349,7 @@ public class Proximity {
 
         @Override
         public String getClosestLocalizedName() {
-            return I18n.localize(getClosestName());
+            return I18n.localize(getClosestName().toLowerCase(Locale.ROOT));
         }
 
         @Override

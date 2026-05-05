@@ -39,6 +39,7 @@ import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -426,7 +427,7 @@ public class LabelEntityRenderSystem {
                           sys.fontDistanceField,
                           camera,
                           rc,
-                          I18n.localize(pb.names()[0]),
+                          I18n.localize(pb.names()[0].toLowerCase(Locale.ROOT)),
                           labelPosition,
                           distToCamera,
                           view.textScale() * camera.getFovFactor(),
@@ -527,7 +528,7 @@ public class LabelEntityRenderSystem {
             }
 
             var textSize = alpha * distToCamera * 0.5f;
-            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, I18n.localize(star.names()[0]), labelPosition, distToCamera,
+            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, I18n.localize(star.names()[0].toLowerCase()), labelPosition, distToCamera,
                           view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
         }
     }
