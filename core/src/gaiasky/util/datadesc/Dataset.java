@@ -27,10 +27,10 @@ import java.util.HashSet;
 import java.util.Locale;
 
 /**
- * Contains a datasets' description, constructed from a JSON file or object.
+ * Contains the metadata of a single dataset, constructed from a JSON file or object.
  */
-public class DatasetDesc implements Comparable<DatasetDesc> {
-    private static final Log logger = Logger.getLogger(DatasetDesc.class);
+public class Dataset implements Comparable<Dataset> {
+    private static final Log logger = Logger.getLogger(Dataset.class);
 
     public static boolean verifyDatasetImage(@NotNull Texture tex) {
         final int MAX_IMAGE_SIDE = 800;
@@ -39,47 +39,89 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         return Math.abs(ar - 1.0) < MAX_AR_DELTA && tex.getWidth() <= MAX_IMAGE_SIDE;
     }
 
-    public JsonValue source;
+    /** Dataset key. It is a kebab-case string without whitespaces. **/
     public String key;
+    /** Common name of the dataset. **/
     public String name;
+    /** Text description of the dataset. **/
     public String description;
+    /** Link(s) to get more information about this dataset. **/
     public String[] links;
+    /** Credit(s) for this dataset. These usually point to the data sources. **/
     public String[] credits;
+    /** Keys of the datasets that this dataset replaces, if any. **/
     public String[] replaces;
+    /** Contains the key of the dataset that replaces this one, if any. If this is non-null, the current dataset is obsolete. **/
     public String replacedBy;
+    /**
+     * The 'feature' that this dataset provides. For instance, all star catalogs would provide 'starfield'.
+     * This is useful to detect possible errors in the case of several datasets providing the same
+     * feature being enabled.
+     **/
+    public String provides;
+    /** Creator of the dataset. Usually "Name - email" is sufficient. **/
     public String creator;
-    public String type;
+    /** URL (possibly with @mirror-url@ wildcard) of the gzipped dataset tarball. **/
     public String file;
+    /** Dataset type. **/
     public DatasetType datasetType;
+    /** Dataset type string. **/
+    public String type;
+    /** Dataset status. **/
     public DatasetStatus status;
+    /** Path of the <code>dataset.json</code> file for this dataset. **/
     public Path checkPath;
+    /** Path of the <code>dataset.json</code> file, as a string. **/
     public String checkStr;
+    /** File handle to the <code>dataset.json</code> file. **/
     public FileHandle catalogFile;
+    /** Dataset pretty size, as a string. **/
     public String sizeString;
+    /**
+     * Dataset raw size in bytes. This is the package file ({@link #file} size in server datasets,
+     * and the uncompressed disk size in installed datasets.
+     **/
     public long sizeBytes;
+    /** Number of objects, as a pretty string (i.e. 3B). **/
     public String nObjectsStr;
+    /** Raw number of objects. **/
     public long nObjects;
+    /** SHA256 checksum. **/
     public String sha256;
+    /** Flag that signals whether the dataset is in the local file system. **/
     public boolean exists;
-    public int myVersion = -1, serverVersion;
+    /** Local dataset version. **/
+    public int myVersion = -1;
+    /** Server dataset version. **/
+    public int serverVersion;
+    /** Minimum Gaia Sky version needed for this dataset. **/
     public int minGsVersion = -1;
+    /** Flag that marks the dataset as outdated: {@link #replacedBy} is not empty. **/
     public boolean outdated;
+    /** Flag set to true in the base data pack. **/
     public boolean baseData;
+    /** List of release notes for this version. **/
     public String[] releaseNotes;
+    /** List of files or directories included in this dataset. **/
     public String[] files;
+    /** URLs to dataset images. These are displayed in the dataset manager. **/
     public String[] images;
-    // In case of local datasets, this links to the server description
-    public DatasetDesc server;
+    /** In case of local datasets, this links to the server description. **/
+    public Dataset server;
+
+    /** Source JSON object. **/
+    private JsonValue source;
+    /** JSON reader. **/
     private JsonReader reader;
 
-    public DatasetDesc() {
+    public Dataset() {
     }
 
-    public DatasetDesc(JsonReader reader, JsonValue source) {
+    public Dataset(JsonReader reader, JsonValue source) {
         this(reader, source, null);
     }
 
-    public DatasetDesc(JsonReader reader, JsonValue source, FileHandle localCatalogFile) {
+    public Dataset(JsonReader reader, JsonValue source, FileHandle localCatalogFile) {
         this.reader = reader;
         this.source = source;
 
@@ -485,8 +527,8 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         if (path != null) {
             File file = path.toFile();
             if (file.exists() && file.canRead() && file.isFile()) {
-                String fname = file.getName();
-                String extension = fname.substring(fname.lastIndexOf(".") + 1);
+                String fileName = file.getName();
+                String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
                 if (extension.equalsIgnoreCase("json")) {
                     JsonValue jf = reader.parse(Gdx.files.absolute(file.getAbsolutePath()));
                     if (jf.has("version")) {
@@ -529,14 +571,14 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         return this.type != null && (this.type.equals("catalog-lod") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
     }
 
-    public DatasetDesc getLocalCopy() {
-        DatasetDesc copy = this.copy();
+    public Dataset getLocalCopy() {
+        Dataset copy = this.copy();
         copy.catalogFile = Gdx.files.absolute(copy.checkPath.toAbsolutePath().toString());
         return copy;
     }
 
-    public DatasetDesc copy() {
-        DatasetDesc copy = new DatasetDesc();
+    public Dataset copy() {
+        Dataset copy = new Dataset();
         copy.reader = this.reader;
         copy.source = this.source;
         copy.key = this.key;
@@ -569,11 +611,12 @@ public class DatasetDesc implements Comparable<DatasetDesc> {
         copy.server = this.server;
         copy.replaces = this.replaces;
         copy.replacedBy = this.replacedBy;
+        copy.provides = this.provides;
         return copy;
     }
 
     @Override
-    public int compareTo(DatasetDesc other) {
+    public int compareTo(Dataset other) {
         return this.name.compareTo(other.name);
     }
 

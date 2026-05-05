@@ -59,7 +59,7 @@ public class Index {
 
         // String-to-node map. The number of objects is a first approximation, as
         // some nodes actually contain multiple objects.
-        index = new FastStringObjectMap<>((int) (numberEntities * 1.25), Entity.class);
+        index = new FastStringObjectMap<>((int) (numberEntities * 1.25));
 
         // HIP map with 121k * 1.25
         hipMap = new IntMap<>(151250, 0.9f);

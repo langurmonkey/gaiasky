@@ -17,7 +17,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnProgressBar;
@@ -28,14 +28,14 @@ import gaiasky.util.scene2d.OwnTextIconButton;
  * This watcher controls and manages the progress and events produced by the download of a dataset.
  */
 public class DatasetWatcher implements IObserver {
-    private final DatasetDesc dataset;
+    private final Dataset dataset;
     private final OwnProgressBar progress;
     private final OwnTextIconButton button;
     private final OwnLabel status;
     private final Table table;
     private final Runnable success;
 
-    public DatasetWatcher(DatasetDesc dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table, Runnable success) {
+    public DatasetWatcher(Dataset dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table, Runnable success) {
         super();
         this.dataset = dataset;
         this.progress = progress;
@@ -47,7 +47,7 @@ public class DatasetWatcher implements IObserver {
         EventManager.instance.subscribe(this, Event.DATASET_DOWNLOAD_START_INFO, Event.DATASET_DOWNLOAD_FINISH_INFO, Event.DATASET_DOWNLOAD_PROGRESS_INFO);
 
     }
-    public DatasetWatcher(DatasetDesc dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table) {
+    public DatasetWatcher(Dataset dataset, OwnProgressBar progress, OwnTextIconButton button, OwnLabel status, Table table) {
         this(dataset, progress, button, status, table, null);
     }
 

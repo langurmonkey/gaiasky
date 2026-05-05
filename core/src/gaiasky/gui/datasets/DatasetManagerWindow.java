@@ -65,51 +65,30 @@ import java.util.stream.Collectors;
 public class DatasetManagerWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(DatasetManagerWindow.class);
 
-    private static final Map<String, String> iconMap;
-
-    static {
-        iconMap = new HashMap<>();
-        iconMap.put("other", "icon-elem-others");
-        iconMap.put("data-pack", "icon-elem-others");
-        iconMap.put("catalog-lod", "icon-elem-stars");
-        iconMap.put("catalog-gaia", "icon-elem-stars");
-        iconMap.put("catalog-star", "icon-elem-stars");
-        iconMap.put("catalog-gal", "icon-elem-galaxies");
-        iconMap.put("catalog-cluster", "icon-elem-clusters");
-        iconMap.put("catalog-sso", "icon-elem-asteroids");
-        iconMap.put("catalog-other", "icon-elem-others");
-        iconMap.put("mesh", "icon-elem-meshes");
-        iconMap.put("spacecraft", "icon-elem-satellites");
-        iconMap.put("system", "iconic-target");
-        iconMap.put("texture-pack", "icon-elem-moons");
-        iconMap.put("virtualtex-pack", "iconic-image");
-        iconMap.put("volume", "icon-elem-nebulae");
-    }
-
-    private final DatasetDesc[] selectedDataset;
+    private final Dataset[] selectedDataset;
     private final float[][] scroll;
-    private final Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
+    private final Map<String, Pair<Dataset, Net.HttpRequest>> currentDownloads;
     private final Map<String, Button>[] buttonMap;
-    private final List<Pair<DatasetDesc, Actor>> selectionOrder;
+    private final List<Pair<Dataset, Actor>> selectionOrder;
     private final Color highlight;
-    // Whether to show the data location chooser
+    /** Whether to show the data location file picker. **/
     private final boolean dataLocation;
     private final DecimalFormat nf;
     private final Set<DatasetWatcher> watchers;
     private final AtomicBoolean initialized;
-    private DataDescriptor serverDd;
-    private DataDescriptor localDd;
+    private DatasetGroup serverDd;
+    private DatasetGroup localDd;
     private DatasetMode currentMode;
     private Cell<?> right;
     private OwnScrollPane leftScroll;
     private int selectedIndex = 0;
     private DatasetWatcher rightPaneWatcher;
 
-    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd) {
+    public DatasetManagerWindow(Stage stage, Skin skin, DatasetGroup serverDd) {
         this(stage, skin, serverDd, true, I18n.msg("gui.close"));
     }
 
-    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
+    public DatasetManagerWindow(Stage stage, Skin skin, DatasetGroup serverDd, boolean dataLocation, String acceptText) {
         super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates",
                                                                                                                  serverDd.numUpdates) : ""),
               skin,
@@ -119,7 +98,7 @@ public class DatasetManagerWindow extends GenericDialog {
         this.highlight = ColorUtils.gYellowC;
         this.watchers = new HashSet<>();
         this.scroll = new float[][]{{0f, 0f}, {0f, 0f}};
-        this.selectedDataset = new DatasetDesc[2];
+        this.selectedDataset = new Dataset[2];
         this.initialized = new AtomicBoolean(false);
         this.buttonMap = new HashMap[2];
         this.buttonMap[0] = new HashMap<>();
@@ -140,33 +119,6 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Build
         buildSuper();
-    }
-
-    public static int getTypeWeight(String type) {
-        return switch (type) {
-            case "data-pack" -> -2;
-            case "texture-pack" -> -1;
-            case "catalog-lod" -> 0;
-            case "catalog-gaia" -> 1;
-            case "catalog-star" -> 2;
-            case "catalog-gal" -> 3;
-            case "catalog-cluster" -> 4;
-            case "catalog-sso" -> 5;
-            case "catalog-other" -> 6;
-            case "system" -> 7;
-            case "spacecraft" -> 8;
-            case "mesh" -> 9;
-            case "volume" -> 10;
-            case "virtualtex-pack" -> 11;
-            case "other" -> 12;
-            default -> 13;
-        };
-    }
-
-    public static String getIcon(String type) {
-        if (type != null && iconMap.containsKey(type))
-            return iconMap.get(type);
-        return "icon-elem-others";
     }
 
     @Override
@@ -262,7 +214,7 @@ public class DatasetManagerWindow extends GenericDialog {
         // - There are updates to installed datasets.
         // - We can't contact the server.
         // - We have local datasets other than the base data.
-        localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
+        localDd = DatasetUtils.instance().buildLocalDatasets(this.serverDd);
         if ((serverDd != null && serverDd.updatesAvailable)
                 || (serverDd == null || serverDd.datasets.isEmpty())
                 || (localDd != null && localDd.datasets.size() > 1))
@@ -354,11 +306,11 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void reloadInstalled(Table content, float width) {
-        localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
+        localDd = DatasetUtils.instance().buildLocalDatasets(this.serverDd);
         reloadBothPanes(content, width, localDd, currentMode = DatasetMode.INSTALLED);
     }
 
-    private void reloadBothPanes(Table content, float width, DataDescriptor dataDescriptor, DatasetMode mode) {
+    private void reloadBothPanes(Table content, float width, DatasetGroup dataDescriptor, DatasetMode mode) {
         content.clear();
         if (dataDescriptor == null || dataDescriptor.datasets.isEmpty()) {
             if (mode == DatasetMode.AVAILABLE) {
@@ -387,7 +339,7 @@ public class DatasetManagerWindow extends GenericDialog {
         me.pack();
     }
 
-    private int reloadLeftPane(Cell<?> left, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
+    private int reloadLeftPane(Cell<?> left, DatasetGroup dataDescriptor, DatasetMode mode, float width) {
         final var leftContent = new Table(skin);
         final var leftTable = new Table(skin);
 
@@ -440,7 +392,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private int populateLeftTable(Table leftTable,
                                   DatasetMode mode,
-                                  DataDescriptor dataDescriptor,
+                                  DatasetGroup dataDescriptor,
                                   List<String> currentSetting,
                                   float width,
                                   String filter) {
@@ -448,8 +400,8 @@ public class DatasetManagerWindow extends GenericDialog {
         int added = 0;
         int group = 0;
         for (DatasetType type : dataDescriptor.types) {
-            List<DatasetDesc> datasets = type.datasets;
-            List<DatasetDesc> filtered = datasets.stream()
+            List<Dataset> datasets = type.datasets;
+            List<Dataset> filtered = datasets.stream()
                     .filter(d -> d.filter(filter) && (mode != DatasetMode.AVAILABLE || !d.exists))
                     .collect(Collectors.toList());
             var a = addDatasetTypeGroup(leftTable, mode, currentSetting, type, filtered, width, filter, group);
@@ -466,7 +418,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                     DatasetMode mode,
                                     List<String> currentSetting,
                                     DatasetType type,
-                                    List<DatasetDesc> filtered,
+                                    List<Dataset> filtered,
                                     float width,
                                     String filter,
                                     int i) {
@@ -515,7 +467,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 buttons.add(selectNone).size(buttonSize, buttonSize).right().bottom();
             }
 
-            var paneImage = new OwnImage(skin.getDrawable(getIcon(type.typeStr)));
+            var paneImage = new OwnImage(skin.getDrawable(type.getIcon()));
             paneImage.setSize(45f, 45f);
             String typeString;
             if (I18n.hasMessage("gui.download.type." + type.typeStr)) {
@@ -531,14 +483,14 @@ public class DatasetManagerWindow extends GenericDialog {
 
             // Add datasets to content table.
             boolean anySelected = false;
-            for (DatasetDesc dataset : filtered) {
+            for (Dataset dataset : filtered) {
                 var t = new Table(skin);
                 t.pad(pad18, pad18, 0, pad18);
 
                 var tooltipText = dataset.key;
 
                 // Type icon.
-                var typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
+                var typeImage = new OwnImage(skin.getDrawable(type.getIcon()));
                 float scl = 0.7f;
                 float iw = typeImage.getWidth();
                 float ih = typeImage.getHeight();
@@ -806,7 +758,7 @@ public class DatasetManagerWindow extends GenericDialog {
         return added;
     }
 
-    private void reloadRightPane(Cell<?> cell, DatasetDesc dataset, DatasetMode mode) {
+    private void reloadRightPane(Cell<?> cell, Dataset dataset, DatasetMode mode) {
         if (rightPaneWatcher != null) {
             rightPaneWatcher.dispose();
             watchers.remove(rightPaneWatcher);
@@ -820,7 +772,7 @@ public class DatasetManagerWindow extends GenericDialog {
         } else {
             // Type icon.
             var dType = dataset.type != null ? dataset.type : "other";
-            var typeImage = new OwnImage(skin.getDrawable(getIcon(dType)));
+            var typeImage = new OwnImage(skin.getDrawable(DatasetType.getTypeIcon(dType)));
             var scl = 0.7f;
             var iw = typeImage.getWidth();
             var ih = typeImage.getHeight();
@@ -873,7 +825,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         try {
                             if (Files.exists(Path.of(img))) {
                                 var tex = new Texture(img);
-                                if (DatasetDesc.verifyDatasetImage(tex)) {
+                                if (Dataset.verifyDatasetImage(tex)) {
                                     var image = new OwnImage(tex, false);
                                     image.setSize(imageSide, imageSide);
                                     if (imagesTable == null) {
@@ -905,7 +857,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             // Use cached file.
                             logger.info("File found: " + filePath);
                             var tex = new Texture(filePath.toAbsolutePath().toString());
-                            if (DatasetDesc.verifyDatasetImage(tex)) {
+                            if (Dataset.verifyDatasetImage(tex)) {
                                 var image = new OwnImage(tex, false);
                                 image.setSize(imageSide, imageSide);
                                 imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
@@ -923,7 +875,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                             logger.info("Image downloaded successfully: " + filePath);
                                                             GaiaSky.postRunnable(() -> {
                                                                 var tex = new Texture(filePath.toAbsolutePath().toString());
-                                                                if (DatasetDesc.verifyDatasetImage(tex)) {
+                                                                if (Dataset.verifyDatasetImage(tex)) {
                                                                     var image = new OwnImage(tex, false);
                                                                     image.setSize(300, 300);
                                                                     table.add(image).center().padRight(pad10).padLeft(pad10);
@@ -1084,7 +1036,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 var server = serverDd != null ? serverDd.findDatasetByKey(dataset.replacedBy) : null;
                 var local = localDd != null ? localDd.findDatasetByKey(dataset.replacedBy) : null;
                 String text = null;
-                DatasetDesc dd = null;
+                Dataset dd = null;
                 if (local != null) {
                     text = I18n.msg("gui.download.replaced-by.info.local");
                     dd = local;
@@ -1165,7 +1117,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
             OwnTextIconButton cancelDownloadButton = null;
             if (currentDownloads.containsKey(dataset.key)) {
-                Pair<DatasetDesc, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
+                Pair<Dataset, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
                 HttpRequest request = pair.getSecond();
                 cancelDownloadButton = new OwnTextIconButton(I18n.msg("gui.download.cancel"), skin, "quit");
                 cancelDownloadButton.pad(14.4f);
@@ -1228,11 +1180,11 @@ public class DatasetManagerWindow extends GenericDialog {
         build();
     }
 
-    private void downloadDataset(DatasetDesc dataset) {
+    private void downloadDataset(Dataset dataset) {
         downloadDataset(dataset, null);
     }
 
-    private void downloadDataset(DatasetDesc dataset, Runnable successRunnable) {
+    private void downloadDataset(Dataset dataset, Runnable successRunnable) {
         var tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
 
         try {
@@ -1418,11 +1370,11 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
 
-    private void setStatusError(DatasetDesc ds) {
+    private void setStatusError(Dataset ds) {
         setStatusError(ds, null);
     }
 
-    private void setStatusError(DatasetDesc ds, String message) {
+    private void setStatusError(Dataset ds, String message) {
         if (message != null && !message.isEmpty()) {
             EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1, message);
         } else {
@@ -1430,7 +1382,7 @@ public class DatasetManagerWindow extends GenericDialog {
         }
     }
 
-    private void setStatusCancelled(DatasetDesc ds) {
+    private void setStatusCancelled(Dataset ds) {
         EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 2);
     }
 
@@ -1438,7 +1390,7 @@ public class DatasetManagerWindow extends GenericDialog {
     protected boolean accept() {
         final GenericDialog myself = me;
         // Create a copy.
-        Map<String, Pair<DatasetDesc, HttpRequest>> copy = new HashMap<>(currentDownloads);
+        Map<String, Pair<Dataset, HttpRequest>> copy = new HashMap<>(currentDownloads);
 
         if (!copy.isEmpty()) {
             GenericDialog question = new GenericDialog(I18n.msg("gui.download.close.title"), skin, stage) {
@@ -1449,7 +1401,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     content.add(new OwnLabel(I18n.msg("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad34).row();
                     content.add(new OwnLabel(I18n.msg("gui.download.close.current"), skin)).left().padBottom(pad18).row();
                     for (String key : copy.keySet()) {
-                        DatasetDesc dd = copy.get(key).getFirst();
+                        Dataset dd = copy.get(key).getFirst();
                         content.add(new OwnLabel(dd.name, skin, "warp")).center().padBottom(pad10).row();
                     }
                 }
@@ -1537,7 +1489,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private void reloadAll() {
         cleanWatchers();
 
-        serverDd = DataDescriptorUtils.instance().buildServerDatasets(null);
+        serverDd = DatasetUtils.instance().buildServerDatasets(null);
         backupScrollValues();
         leftScroll = null;
         content.clear();
@@ -1546,11 +1498,11 @@ public class DatasetManagerWindow extends GenericDialog {
         restoreScrollValues();
     }
 
-    private void actionDownloadDataset(DatasetDesc dataset) {
+    private void actionDownloadDataset(Dataset dataset) {
         downloadDataset(dataset);
     }
 
-    private void actionUpdateDataset(DatasetDesc dataset) {
+    private void actionUpdateDataset(Dataset dataset) {
         // First, delete old dataset.
         actionDeleteDatasetDirect(dataset);
         // Second, download update.
@@ -1577,7 +1529,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * @param dataset The dataset to enable.
      * @param cb      The checkbox to enable the dataset.
      */
-    private void actionEnableDataset(DatasetDesc dataset, OwnCheckBox cb) {
+    private void actionEnableDataset(Dataset dataset, OwnCheckBox cb) {
         // Texture packs can't be enabled here.
         if (dataset.type.equals("texture-pack"))
             return;
@@ -1655,7 +1607,7 @@ public class DatasetManagerWindow extends GenericDialog {
      *
      * @return Whether there are incompatibilities with the given dataset and the enabled datasets.
      */
-    private Optional<String> checkDatasetIncompatibilities(DatasetDesc dataset) {
+    private Optional<String> checkDatasetIncompatibilities(Dataset dataset) {
         // Check LOD catalogs.
         if (dataset.datasetType.typeStr.equalsIgnoreCase("catalog-lod")) {
             var lodDatasets = dataset.datasetType.datasets;
@@ -1691,7 +1643,7 @@ public class DatasetManagerWindow extends GenericDialog {
      *
      * @param dataset The dataset to disable.
      */
-    private void actionDisableDataset(DatasetDesc dataset) {
+    private void actionDisableDataset(Dataset dataset) {
         GaiaSky.settings().data.disableDataset(dataset);
     }
 
@@ -1700,7 +1652,7 @@ public class DatasetManagerWindow extends GenericDialog {
      *
      * @param dataset The dataset to delete.
      */
-    private void actionDeleteDataset(DatasetDesc dataset) {
+    private void actionDeleteDataset(Dataset dataset) {
         GenericDialog question = new GenericDialog(I18n.msg("gui.download.delete.title"), skin, stage) {
 
             @Override
@@ -1741,8 +1693,8 @@ public class DatasetManagerWindow extends GenericDialog {
      *
      * @param dataset The dataset to delete.
      */
-    private void actionDeleteDatasetDirect(DatasetDesc dataset) {
-        DatasetDesc serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
+    private void actionDeleteDatasetDirect(Dataset dataset) {
+        Dataset serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
         boolean deleted = false;
         // Delete
         if (dataset.files != null) {
@@ -1821,7 +1773,7 @@ public class DatasetManagerWindow extends GenericDialog {
         if (selectedIndex < 0) {
             selectedIndex = selectionOrder.size() - 1;
         }
-        Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
+        Pair<Dataset, Actor> selection = selectionOrder.get(selectedIndex);
         // Skip collapsed and disabled entries.
         if (!selection.getSecond().isDescendantOf(leftScroll) || (selection.getSecond() instanceof Disableable d) && d.isDisabled()) {
             return up(recNum + 1);
@@ -1838,7 +1790,7 @@ public class DatasetManagerWindow extends GenericDialog {
             return false;
         }
         selectedIndex = (selectedIndex + 1) % selectionOrder.size();
-        Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
+        Pair<Dataset, Actor> selection = selectionOrder.get(selectedIndex);
         // Skip collapsed and disabled entries.
         if (!selection.getSecond().isDescendantOf(leftScroll) || (selection.getSecond() instanceof Disableable d) && d.isDisabled()) {
             return down(recNum + 1);
@@ -1848,7 +1800,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private boolean updateSelection() {
         if (selectedIndex >= 0 && selectedIndex < selectionOrder.size()) {
-            Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
+            Pair<Dataset, Actor> selection = selectionOrder.get(selectedIndex);
             Actor target = selection.getSecond();
             stage.setKeyboardFocus(target);
             // Move scroll, select parent container button (dataset widget), and use its position.

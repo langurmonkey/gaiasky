@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Utilities to fetch and uncompress datasets.
+ */
 public class DatasetDownloadUtils {
     private static final Logger.Log logger = Logger.getLogger(DatasetDownloadUtils.class);
 
@@ -118,7 +121,7 @@ public class DatasetDownloadUtils {
 
     private final static DecimalFormat nf = new DecimalFormat("##0.0");
 
-    public static void decompress(String in, File out, DatasetDesc dataset) throws Exception {
+    public static void decompress(String in, File out, Dataset dataset) throws Exception {
         FileInfoInputStream fIs = new FileInfoInputStream(in);
         GZIPInputStream gzIs = new GZIPInputStream(fIs);
         TarInputStream tarIs = new TarInputStream(gzIs);
@@ -184,7 +187,7 @@ public class DatasetDownloadUtils {
         }
     }
 
-    public static  boolean isEnabled(final DatasetDesc dataset) {
+    public static  boolean isEnabled(final Dataset dataset) {
         return isPathIn(GaiaSky.settings().data.dataFile(dataset.checkStr), GaiaSky.settings().data.dataFiles);
     }
 

@@ -18,7 +18,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.datasets.DatasetWatcher;
 import gaiasky.util.*;
-import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.datadesc.DatasetDownloadUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
@@ -33,13 +33,13 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * A window that downloads a list of datasets ({@link DatasetDesc}) sequentially.
+ * A window that downloads a list of datasets ({@link Dataset}) sequentially.
  */
 public class BatchDownloadWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(BatchDownloadWindow.class);
 
     private final String infoString;
-    private final List<DatasetDesc> datasets;
+    private final List<Dataset> datasets;
     private final DecimalFormat nf;
     private final Set<DatasetWatcher> watchers;
     /** Runs when all downloads are successful. **/
@@ -47,9 +47,9 @@ public class BatchDownloadWindow extends GenericDialog {
     /** Runs when at least one of the downloads fail. **/
     private Runnable error;
 
-    private final Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
+    private final Map<String, Pair<Dataset, Net.HttpRequest>> currentDownloads;
 
-    public BatchDownloadWindow(String title, String info, Skin skin, Stage stage, List<DatasetDesc> datasets, Runnable success, Runnable error) {
+    public BatchDownloadWindow(String title, String info, Skin skin, Stage stage, List<Dataset> datasets, Runnable success, Runnable error) {
         super(title, skin, stage);
         this.nf = new DecimalFormat("##0.0");
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
@@ -65,7 +65,7 @@ public class BatchDownloadWindow extends GenericDialog {
         buildSuper();
     }
 
-    public BatchDownloadWindow(String title, String info, Skin skin, Stage stage, List<DatasetDesc> datasets) {
+    public BatchDownloadWindow(String title, String info, Skin skin, Stage stage, List<Dataset> datasets) {
         this(title, info, skin, stage, datasets, null, null);
     }
 
@@ -127,7 +127,7 @@ public class BatchDownloadWindow extends GenericDialog {
                 };
     }
 
-    private void downloadDataset(DatasetDesc dataset, Runnable successRunnable) {
+    private void downloadDataset(Dataset dataset, Runnable successRunnable) {
         var tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
 
         try {
@@ -281,11 +281,11 @@ public class BatchDownloadWindow extends GenericDialog {
 
     }
 
-    private void setStatusError(DatasetDesc ds) {
+    private void setStatusError(Dataset ds) {
         setStatusError(ds, null);
     }
 
-    private void setStatusError(DatasetDesc ds, String message) {
+    private void setStatusError(Dataset ds, String message) {
         if (message != null && !message.isEmpty()) {
             EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1, message);
         } else {
@@ -298,7 +298,7 @@ public class BatchDownloadWindow extends GenericDialog {
      *
      * @param dataset The dataset to enable.
      */
-    private void actionEnableDataset(DatasetDesc dataset) {
+    private void actionEnableDataset(Dataset dataset) {
         // Texture packs can't be enabled here.
         if (dataset.type.equals("texture-pack"))
             return;
@@ -317,7 +317,7 @@ public class BatchDownloadWindow extends GenericDialog {
      *
      * @param dataset The dataset to disable.
      */
-    private void actionDisableDataset(DatasetDesc dataset) {
+    private void actionDisableDataset(Dataset dataset) {
         // Base data can't be disabled
         if (!dataset.baseData) {
             String filePath = null;

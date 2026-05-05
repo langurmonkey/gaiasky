@@ -35,7 +35,7 @@ import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProject
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.KeyframesManager;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
@@ -970,11 +970,11 @@ public class Settings extends SettingsObject {
         }
 
         /**
-         * Disables the given {@link DatasetDesc} by removing it from the {@link #dataFiles} list of enabled datasets.
+         * Disables the given {@link Dataset} by removing it from the {@link #dataFiles} list of enabled datasets.
          *
          * @param dataset The dataset.
          */
-        public void disableDataset(DatasetDesc dataset) {
+        public void disableDataset(Dataset dataset) {
             // Base data can't be disabled
             if (!dataset.baseData) {
                 String filePath = null;

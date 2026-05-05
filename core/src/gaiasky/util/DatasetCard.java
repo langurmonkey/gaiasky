@@ -16,8 +16,8 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.datadesc.DataDescriptorUtils;
-import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.DatasetUtils;
+import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.i18n.I18n;
@@ -44,7 +44,7 @@ public class DatasetCard {
     public long nParticles;
     public long sizeBytes;
     public Instant loadDateUTC;
-    public DatasetDesc dd;
+    public Dataset dd;
 
     // Highlight
     public boolean highlighted;
@@ -100,7 +100,7 @@ public class DatasetCard {
         System.arraycopy(ColorUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
 
         // Set descriptor, if any.
-        this.dd = DataDescriptorUtils.instance().getMatchByKey(dsKey);
+        this.dd = DatasetUtils.instance().getMatchByKey(dsKey);
 
     }
 

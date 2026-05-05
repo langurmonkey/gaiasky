@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
@@ -32,23 +31,26 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
-public class DataDescriptorUtils {
-    private static final Log logger = Logger.getLogger(DataDescriptorUtils.class);
+/**
+ * Utility methods to construct and manage {@link Dataset}s and {@link DatasetGroup}s.
+ */
+public class DatasetUtils {
+    private static final Log logger = Logger.getLogger(DatasetUtils.class);
 
-    private static DataDescriptorUtils instance;
+    private static DatasetUtils instance;
     private final JsonReader reader;
     private FileHandle fh;
 
     private static final Set<String> specialDirectories = Set.of(SysUtils.TMP_DIR_NAME, SysUtils.CACHE_DIR_NAME, SysUtils.PROCEDURAL_TEX_DIR_NAME);
 
-    private DataDescriptorUtils() {
+    private DatasetUtils() {
         super();
         this.reader = new JsonReader();
     }
 
-    public static DataDescriptorUtils instance() {
+    public static DatasetUtils instance() {
         if (instance == null) {
-            instance = new DataDescriptorUtils();
+            instance = new DatasetUtils();
         }
         return instance;
     }
@@ -122,9 +124,9 @@ public class DataDescriptorUtils {
      *
      * @param fh The pointer to the server JSON file.
      *
-     * @return An instance of {@link DataDescriptor}.
+     * @return An instance of {@link DatasetGroup}.
      */
-    public synchronized DataDescriptor buildServerDatasets(FileHandle fh) {
+    public synchronized DatasetGroup buildServerDatasets(FileHandle fh) {
         if (fh != null) {
             this.fh = fh;
         }
@@ -216,13 +218,13 @@ public class DataDescriptorUtils {
 
                 // Convert to model
                 List<DatasetType> typesList = new ArrayList<>(types.size());
-                List<DatasetDesc> datasetsList = new ArrayList<>();
+                List<Dataset> datasetsList = new ArrayList<>();
                 for (String typeStr : types) {
                     List<JsonValue> datasets = typeMap.get(typeStr);
                     DatasetType currentType = new DatasetType(typeStr);
 
                     for (JsonValue dataset : datasets) {
-                        DatasetDesc dd = new DatasetDesc(reader, dataset);
+                        Dataset dd = new Dataset(reader, dataset);
                         dd.datasetType = currentType;
                         currentType.addDataset(dd);
                         datasetsList.add(dd);
@@ -230,8 +232,8 @@ public class DataDescriptorUtils {
                     typesList.add(currentType);
                 }
 
-                DataDescriptor desc = new DataDescriptor(typesList, datasetsList);
-                DataDescriptor.serverDataDescriptor = desc;
+                DatasetGroup desc = new DatasetGroup(typesList, datasetsList);
+                DatasetGroup.serverDataDescriptor = desc;
                 updateReplacedBy();
                 return desc;
             } catch (Exception e) {
@@ -251,13 +253,13 @@ public class DataDescriptorUtils {
      *
      * @param server The server data descriptor, for combining with the local catalogs.
      *
-     * @return An instance of {@link DataDescriptor}.
+     * @return An instance of {@link DatasetGroup}.
      */
-    public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
+    public synchronized DatasetGroup buildLocalDatasets(DatasetGroup server) {
         // Get all server datasets that exist locally
-        List<DatasetDesc> existing = new ArrayList<>();
+        List<Dataset> existing = new ArrayList<>();
         if (server != null) {
-            for (DatasetDesc dd : server.datasets) {
+            for (Dataset dd : server.datasets) {
                 if (dd.exists) {
                     existing.add(dd.getLocalCopy());
                 }
@@ -286,15 +288,15 @@ public class DataDescriptorUtils {
 
         JsonReader reader = new JsonReader();
         List<DatasetType> types = new ArrayList<>();
-        List<DatasetDesc> datasets = new ArrayList<>();
+        List<Dataset> datasets = new ArrayList<>();
         for (FileHandle catalogFile : catalogFiles) {
             JsonValue val = reader.parse(catalogFile);
             Path path = Path.of(catalogFile.path());
 
-            DatasetDesc dd = null;
-            Iterator<DatasetDesc> it = existing.iterator();
+            Dataset dd = null;
+            Iterator<Dataset> it = existing.iterator();
             while (it.hasNext()) {
-                DatasetDesc remote = it.next();
+                Dataset remote = it.next();
                 if (remote.checkPath.equals(path)) {
                     // Found in remotes.
                     dd = remote;
@@ -304,18 +306,18 @@ public class DataDescriptorUtils {
             }
             if (dd == null) {
                 // Not found in remote (server) dataset list, create it.
-                dd = new DatasetDesc(reader, val, catalogFile);
+                dd = new Dataset(reader, val, catalogFile);
             }
             dd.catalogFile = catalogFile;
             dd.exists = true;
-            dd.status = DatasetDesc.DatasetStatus.INSTALLED;
+            dd.status = Dataset.DatasetStatus.INSTALLED;
 
             datasets.add(dd);
         }
         datasets.addAll(existing);
 
         // Default values in case this is a totally offline dataset
-        for (DatasetDesc dd : datasets) {
+        for (Dataset dd : datasets) {
             if (dd.description == null)
                 dd.description = dd.checkPath.toString();
             if (dd.name == null)
@@ -324,7 +326,7 @@ public class DataDescriptorUtils {
 
         // Create types
         Map<String, DatasetType> typeMap = new HashMap<>();
-        for (DatasetDesc dd : datasets) {
+        for (Dataset dd : datasets) {
             DatasetType dt;
             if (typeMap.containsKey(dd.type)) {
                 dt = typeMap.get(dd.type);
@@ -341,35 +343,36 @@ public class DataDescriptorUtils {
             }
         }
         // Sort
-        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
+        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetType.getTypeWeight(datasetType.typeStr));
         types.sort(byType);
 
-        DataDescriptor desc = new DataDescriptor(types, datasets);
-        DataDescriptor.localDataDescriptor = desc;
+        DatasetGroup desc = new DatasetGroup(types, datasets);
+        DatasetGroup.localDataDescriptor = desc;
         updateReplacedBy();
         return desc;
     }
 
     /**
-     * Updates the {@link DatasetDesc#replacedBy} attribute of datasets by looking at the {@link DatasetDesc#replaces} attributes
+     * Updates the {@link Dataset#replacedBy} attribute of datasets by looking at the {@link Dataset#replaces} attributes
      * and cross-referencing them. This function works across both local and server datasets
      */
     private void updateReplacedBy() {
         // Build full list.
-        var list = new ArrayList<DatasetDesc>();
-        var index = new FastStringObjectMap<>(100, Set.class);
-        if (DataDescriptor.serverDataDescriptor != null) {
-            list.addAll(DataDescriptor.serverDataDescriptor.datasets);
+        var list = new ArrayList<Dataset>();
+        var index = new FastStringObjectMap<Set<Dataset>>(100);
+        if (DatasetGroup.serverDataDescriptor != null) {
+            list.addAll(DatasetGroup.serverDataDescriptor.datasets);
         }
-        if (DataDescriptor.localDataDescriptor != null) {
-            list.addAll(DataDescriptor.localDataDescriptor.datasets);
+        if (DatasetGroup.localDataDescriptor != null) {
+            list.addAll(DatasetGroup.localDataDescriptor.datasets);
         }
         // Fill index.
         list.forEach((ds) -> {
             if (index.containsKey(ds.key)) {
-                index.get(ds.key).add(ds);
+                var set = index.get(ds.key);
+                set.add(ds);
             } else {
-                var set = new HashSet<DatasetDesc>();
+                var set = new HashSet<Dataset>();
                 set.add(ds);
                 index.put(ds.key, set);
             }
@@ -379,7 +382,7 @@ public class DataDescriptorUtils {
         for (var ds : list) {
             if (ds.replaces != null) {
                 for (var k : ds.replaces) {
-                    var others = (HashSet<DatasetDesc>) index.get(k);
+                    var others = (HashSet<Dataset>) index.get(k);
                     if (others != null && !others.isEmpty()) {
                         for (var other : others) {
                             if (other != null && !other.isReplacedBy(ds.key)) {
@@ -393,7 +396,7 @@ public class DataDescriptorUtils {
         // Update 'replaces' attribute if needed.
         for (var ds : list) {
             if (ds.replacedBy != null && !ds.replacedBy.isBlank()) {
-                var others = (HashSet<DatasetDesc>) index.get(ds.replacedBy);
+                var others = (HashSet<Dataset>) index.get(ds.replacedBy);
                 if (others != null && !others.isEmpty()) {
                     for (var other : others) {
                         if (other != null) {
@@ -405,8 +408,8 @@ public class DataDescriptorUtils {
         }
     }
 
-    public DatasetDesc getMatchByKey(String key) {
-        var dd = DataDescriptor.localDataDescriptor;
+    public Dataset getMatchByKey(String key) {
+        var dd = DatasetGroup.localDataDescriptor;
         if (dd != null && key != null && !key.isBlank()) {
             return dd.findDatasetByKey(key);
         }

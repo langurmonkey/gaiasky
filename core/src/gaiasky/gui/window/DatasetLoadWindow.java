@@ -20,7 +20,6 @@ import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.datasets.DatasetLoadDialog;
-import gaiasky.gui.datasets.DatasetManagerWindow;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
@@ -28,9 +27,10 @@ import gaiasky.util.DatasetCard;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
-import gaiasky.util.datadesc.DataDescriptor;
-import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.datadesc.DatasetDownloadUtils;
+import gaiasky.util.datadesc.Dataset;
+import gaiasky.util.datadesc.DatasetGroup;
+import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
@@ -48,7 +48,7 @@ public class DatasetLoadWindow extends GenericDialog {
     private Path lastOpenLocation;
     private final FocusView view;
     private FilePickerComponent filePicker;
-    private DatasetDesc selectedDataset = null;
+    private Dataset selectedDataset = null;
     private final Table contentExisting, contentFile, datasetsTable;
 
     public DatasetLoadWindow(Stage stage, Skin skin) {
@@ -140,7 +140,7 @@ public class DatasetLoadWindow extends GenericDialog {
 
     private void addContentExisting(Table contentExisting) {
         contentExisting.clear();
-        var local = DataDescriptor.localDataDescriptor;
+        var local = DatasetGroup.localDataDescriptor;
         if (local != null && !local.datasets.isEmpty()) {
 
             ButtonGroup<Button> g = new ButtonGroup<>();
@@ -177,7 +177,7 @@ public class DatasetLoadWindow extends GenericDialog {
         }
     }
 
-    private void reloadDatasetsTable(DataDescriptor local, ButtonGroup<Button> g, String filter) {
+    private void reloadDatasetsTable(DatasetGroup local, ButtonGroup<Button> g, String filter) {
         datasetsTable.clear();
         datasetsTable.align(Align.topLeft);
         g.clear();
@@ -194,7 +194,7 @@ public class DatasetLoadWindow extends GenericDialog {
                 var dataFiles = GaiaSky.settings().data.dataFiles;
                 var catalogManager = GaiaSky.instance.gaiaSkyAssets.catalogManager;
                 boolean available;
-                if (dataset.status != DatasetDesc.DatasetStatus.INSTALLED) {
+                if (dataset.status != Dataset.DatasetStatus.INSTALLED) {
                     available = false;
                 } else if (dataset.baseData || dataset.type.equals("texture-pack") || dataset.type.equals("virtualtex-pack")) {
                     available = false;
@@ -216,7 +216,7 @@ public class DatasetLoadWindow extends GenericDialog {
                     }
                     // Add dataset.
                     var t = new Table(skin);
-                    var icon = new OwnImage(skin.getDrawable(DatasetManagerWindow.getIcon(dataset.type)));
+                    var icon = new OwnImage(skin.getDrawable(DatasetType.getTypeIcon(dataset.type)));
                     icon.setSize(45f, 45f);
                     var name = new OwnLabel(dataset.name, skin, "big");
                     t.add(icon).left().padRight(pad10);

@@ -40,8 +40,8 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
-import gaiasky.util.datadesc.DataDescriptor;
-import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.util.datadesc.DatasetGroup;
+import gaiasky.util.datadesc.DatasetUtils;
 import gaiasky.util.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -595,7 +595,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 if (event instanceof ChangeEvent) {
                     ComboBoxBean<Integer> s = graphicsQuality.getSelected();
                     GraphicsQuality gq = GraphicsQuality.values()[s.value];
-                    if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent(Constants.HI_RES_TEXTURES_DATASET_KEY)) && (gq.isHigh() || gq.isUltra())) {
+                    if ((DatasetGroup.localDataDescriptor == null || !DatasetGroup.localDataDescriptor.datasetPresent(Constants.HI_RES_TEXTURES_DATASET_KEY)) && (gq.isHigh() || gq.isUltra())) {
                         // Show notice
                         // Hi resolution textures notice
                         if (noticeHiResCell != null && noticeHiResCell.getActor() == null) {
@@ -2567,8 +2567,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataDownload.setHeight(buttonHeight);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                if (DataDescriptor.serverDataDescriptor != null || DataDescriptor.localDataDescriptor != null) {
-                    DataDescriptor dd = DataDescriptor.serverDataDescriptor != null ? DataDescriptor.serverDataDescriptor : DataDescriptor.localDataDescriptor;
+                if (DatasetGroup.serverDataDescriptor != null || DatasetGroup.localDataDescriptor != null) {
+                    DatasetGroup dd = DatasetGroup.serverDataDescriptor != null ? DatasetGroup.serverDataDescriptor : DatasetGroup.localDataDescriptor;
                     DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, I18n.msg("gui.save"));
                     ddw.setModal(true);
                     ddw.show(stage);
@@ -2581,7 +2581,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                                 null,
                                                 null,
                                                 (digest) -> {
-                                                    DataDescriptor dd = DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor);
+                                                    DatasetGroup dd = DatasetUtils.instance().buildServerDatasets(dataDescriptor);
                                                     DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
                                                     ddw.setModal(true);
                                                     ddw.show(stage);

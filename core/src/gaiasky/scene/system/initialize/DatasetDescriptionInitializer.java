@@ -18,7 +18,7 @@ import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.DatasetCard;
 import gaiasky.util.DatasetCard.DatasetSourceType;
-import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.Dataset;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,7 +59,7 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
         initializeCatalogInfo(entity, datasetDesc, !nested, base.getName(), datasetDesc.description);
     }
 
-    private DatasetCard fromDatasetDesc(DatasetDesc dd, Entity entity) {
+    private DatasetCard fromDatasetDesc(Dataset dd, Entity entity) {
         var result = new DatasetCard(dd.key,
                                      dd.name,
                                      dd.description,

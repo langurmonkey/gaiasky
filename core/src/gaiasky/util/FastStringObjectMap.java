@@ -1,6 +1,5 @@
 package gaiasky.util;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -20,18 +19,17 @@ public class FastStringObjectMap<V> {
     private int size;
     private int capacity;
     private int threshold;
-    private final Class<V> clazz;
 
     /**
      * Constructs a new map with the specified initial capacity.
      *
      * @param initialCapacity the initial capacity
      */
-    public FastStringObjectMap(int initialCapacity, Class<V> c) {
-        clazz = c;
+    @SuppressWarnings("unchecked")
+    public FastStringObjectMap(int initialCapacity) {
         capacity = Math.max(DEFAULT_CAPACITY, initialCapacity);
         keys = new String[capacity];
-        values = (V[]) Array.newInstance(clazz, capacity);
+        values = (V[]) new Object[capacity];
         Arrays.fill(keys, null);
         threshold = (int) (capacity * LOAD_FACTOR);
         size = 0;
@@ -155,13 +153,14 @@ public class FastStringObjectMap<V> {
         return -1;
     }
 
+    @SuppressWarnings("unchecked")
     private void resize(int newCapacity) {
         String[] oldKeys = keys;
         Object[] oldValues = values;
         capacity = newCapacity;
         threshold = (int) (capacity * LOAD_FACTOR);
         keys = new String[capacity];
-        values = (V[]) Array.newInstance(clazz, capacity);
+        values = (V[]) new Object[capacity];
         Arrays.fill(keys, null);
         size = 0;
 

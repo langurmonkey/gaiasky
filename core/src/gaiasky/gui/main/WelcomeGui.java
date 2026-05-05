@@ -41,9 +41,10 @@ import gaiasky.util.*;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.datadesc.DataDescriptor;
-import gaiasky.util.datadesc.DataDescriptorUtils;
-import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.Dataset;
+import gaiasky.util.datadesc.DatasetGroup;
+import gaiasky.util.datadesc.DatasetUtils;
+import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -66,7 +67,7 @@ import java.util.stream.Collectors;
  */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
-    private static final AtomicReference<DataDescriptor> localDatasets = new AtomicReference<>();
+    private static final AtomicReference<DatasetGroup> localDatasets = new AtomicReference<>();
 
     private final XrLoadStatus vrStatus;
     private final boolean skipWelcome;
@@ -77,7 +78,7 @@ public class WelcomeGui extends AbstractGui {
     private FileHandle dataDescriptor;
     private boolean downloadError = false;
     private Texture bgTex;
-    private DataDescriptor serverDatasets;
+    private DatasetGroup serverDatasets;
     private Array<Button> buttonList;
     private int currentSelected = 0;
     private PopupNotificationsInterface popupInterface;
@@ -123,12 +124,12 @@ public class WelcomeGui extends AbstractGui {
                 .right();
         popupInterface.setFillParent(true);
 
-        if (DataDescriptorUtils.dataLocationOldVersionDatasetsCheck()) {
+        if (DatasetUtils.dataLocationOldVersionDatasetsCheck()) {
             var fsCheck = new DataLocationCheckWindow(I18n.msg("gui.dscheck.title"), skin, stage);
             fsCheck.setAcceptListener(() -> {
                 // Clean old datasets in a thread in the background.
                 GaiaSky.instance.getExecutorService()
-                        .execute(DataDescriptorUtils::cleanDataLocationOldDatasets);
+                        .execute(DatasetUtils::cleanDataLocationOldDatasets);
                 // Continue immediately.
                 continueWelcomeGui01();
             });
@@ -354,7 +355,7 @@ public class WelcomeGui extends AbstractGui {
         stage.clear();
         addOwnListeners();
         buttonList = new Array<>();
-        serverDatasets = !downloadError ? DataDescriptorUtils.instance()
+        serverDatasets = !downloadError ? DatasetUtils.instance()
                 .buildServerDatasets(dataDescriptor) : null;
         reloadLocalDatasets();
 
@@ -795,7 +796,7 @@ public class WelcomeGui extends AbstractGui {
             enabledDatasets.stream()
                     .sorted()
                     .forEach(ds -> {
-                        var typeIcon = new OwnImage(skin.getDrawable(DatasetManagerWindow.getIcon(ds.type)));
+                        var typeIcon = new OwnImage(skin.getDrawable(DatasetType.getTypeIcon(ds.type)));
                         typeIcon.setSize(30f, 30f);
                         var disable = new OwnTextIconButton("", skin, "select-none");
                         disable.setSize(40f, 35f);
@@ -935,7 +936,7 @@ public class WelcomeGui extends AbstractGui {
         if (baseDataPresent) {
             // Check if there is an update for the base data, and show a notice if so
             if (serverDatasets != null && serverDatasets.updatesAvailable) {
-                DatasetDesc baseData = serverDatasets.findDatasetByKey(Constants.DEFAULT_DATASET_KEY);
+                Dataset baseData = serverDatasets.findDatasetByKey(Constants.DEFAULT_DATASET_KEY);
                 if (baseData != null && baseData.myVersion < baseData.serverVersion) {
                     // We have a base data update, show notice.
                     GenericDialog baseDataNotice = new GenericDialog(I18n.msg("gui.basedata.title"), skin, stage) {
@@ -1020,10 +1021,10 @@ public class WelcomeGui extends AbstractGui {
         return datasetsScroll;
     }
 
-    private void ensureBaseDataEnabled(DataDescriptor dd) {
+    private void ensureBaseDataEnabled(DatasetGroup dd) {
         if (dd != null) {
-            DatasetDesc base = null;
-            for (DatasetDesc dataset : dd.datasets) {
+            Dataset base = null;
+            for (Dataset dataset : dd.datasets) {
                 if (dataset.baseData) {
                     base = dataset;
                     break;
@@ -1070,7 +1071,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private static void reloadLocalDatasets() {
-        localDatasets.set(DataDescriptorUtils.instance()
+        localDatasets.set(DatasetUtils.instance()
                                   .buildLocalDatasets(null));
     }
 
@@ -1080,7 +1081,7 @@ public class WelcomeGui extends AbstractGui {
                 .count() : 0;
     }
 
-    private Collection<DatasetDesc> getEnabledDatasets() {
+    private Collection<Dataset> getEnabledDatasets() {
         return localDatasets.get() != null ? localDatasets.get().datasets.stream()
                 .filter(ds -> GaiaSky.settings().data.dataFiles.contains(ds.checkStr))
                 .sorted(Comparator.comparing(a -> a.type))
@@ -1118,7 +1119,7 @@ public class WelcomeGui extends AbstractGui {
             String filenameExt = path.getFileName()
                     .toString();
             try {
-                DatasetDesc dataset = null;
+                Dataset dataset = null;
                 // Try with server description
                 if (serverDatasets != null) {
                     dataset = serverDatasets.findDatasetByDescriptor(path);
@@ -1192,7 +1193,7 @@ public class WelcomeGui extends AbstractGui {
     public void doneLoading(AssetManager assetManager) {
     }
 
-    private void addDatasetManagerWindow(DataDescriptor dd) {
+    private void addDatasetManagerWindow(DatasetGroup dd) {
         if (datasetManager == null) {
             datasetManager = new DatasetManagerWindow(stage, skin, dd);
             datasetManager.setAcceptListener(() -> {
@@ -1484,7 +1485,7 @@ public class WelcomeGui extends AbstractGui {
 
     }
 
-    public static AtomicReference<DataDescriptor> getLocalDatasets() {
+    public static AtomicReference<DatasetGroup> getLocalDatasets() {
         return localDatasets;
     }
 

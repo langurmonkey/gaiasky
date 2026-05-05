@@ -15,7 +15,7 @@ import gaiasky.GaiaSky;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.DatasetCard;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnImage;
 import gaiasky.util.scene2d.OwnLabel;
@@ -53,7 +53,7 @@ public class DatasetInfoWindow extends GenericDialog {
             for (int i = 0; i < n; i++) {
                 var img = dataset.images[i];
                 var tex = new Texture(img);
-                if (DatasetDesc.verifyDatasetImage(tex)) {
+                if (Dataset.verifyDatasetImage(tex)) {
                     var image = new OwnImage(tex, false);
                     image.setSize(200, 200);
                     if (imagesTable == null) {

@@ -13,16 +13,16 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Contains a list of dataset descriptors, as {@link DatasetDesc}s.
+ * Contains a group of dataset metadata objects, as {@link Dataset}s.
  */
-public class DataDescriptor {
+public class DatasetGroup {
 
-    public static DataDescriptor localDataDescriptor, serverDataDescriptor;
+    public static DatasetGroup localDataDescriptor, serverDataDescriptor;
 
     /** View organized by types, where each time has a list of datasets **/
     public final List<DatasetType> types;
     /** Raw datasets list, where each dataset has a type **/
-    public final List<DatasetDesc> datasets;
+    public final List<Dataset> datasets;
 
     /** Recommended datasets as an array of keys. **/
     public String[] recommended;
@@ -30,7 +30,7 @@ public class DataDescriptor {
     public boolean updatesAvailable = false;
     public int numUpdates = 0;
 
-    public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets, String[] recommended) {
+    public DatasetGroup(List<DatasetType> types, List<Dataset> datasets, String[] recommended) {
         this.types = types;
         this.datasets = datasets;
         this.recommended = recommended;
@@ -39,13 +39,13 @@ public class DataDescriptor {
 
     }
 
-    public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets) {
+    public DatasetGroup(List<DatasetType> types, List<Dataset> datasets) {
         this(types, datasets, null);
     }
 
     private void initialize() {
         // Index and number of updates.
-        for (DatasetDesc ds : datasets) {
+        for (Dataset ds : datasets) {
             if (ds != null) {
                 updatesAvailable = updatesAvailable || ds.outdated;
                 if (ds.outdated)
@@ -61,8 +61,8 @@ public class DataDescriptor {
      *
      * @return The dataset descriptor or null if it was not found.
      */
-    public DatasetDesc findDatasetByName(String name) {
-        for (DatasetDesc dd : datasets) {
+    public Dataset findDatasetByName(String name) {
+        for (Dataset dd : datasets) {
             if (dd.name.equalsIgnoreCase(name))
                 return dd;
         }
@@ -76,8 +76,8 @@ public class DataDescriptor {
      *
      * @return The dataset descriptor or null if it was not found.
      */
-    public DatasetDesc findDatasetByKey(String key) {
-        for (DatasetDesc dd : datasets) {
+    public Dataset findDatasetByKey(String key) {
+        for (Dataset dd : datasets) {
             if (dd.key.equalsIgnoreCase(key))
                 return dd;
         }
@@ -93,7 +93,7 @@ public class DataDescriptor {
      * @return True if the dataset is present, false otherwise.
      */
     public boolean datasetPresent(String key) {
-        DatasetDesc dd = findDatasetByKey(key);
+        Dataset dd = findDatasetByKey(key);
         if (dd != null) {
             return dd.exists;
         }
@@ -107,9 +107,9 @@ public class DataDescriptor {
      *
      * @return The dataset descriptor or null if it was not found.
      */
-    public DatasetDesc findDatasetByDescriptor(Path descriptorFile) throws IOException {
+    public Dataset findDatasetByDescriptor(Path descriptorFile) throws IOException {
         if (Files.exists(descriptorFile))
-            for (DatasetDesc dd : datasets) {
+            for (Dataset dd : datasets) {
                 if (dd.checkPath != null && Files.exists(dd.checkPath) && Files.isSameFile(dd.checkPath, descriptorFile))
                     return dd;
             }
