@@ -20,7 +20,7 @@ import static com.badlogic.gdx.Input.Keys.NUM_4;
  */
 public class InputUtils {
 
-    public static int physicalToLogicalKeyCode(final int physicalKeyCode) {
+    public static int physicalToLogicalKeyCode(int physicalKeyCode) {
         var str = InputUtils.physicalKeyCodeToLogicalKeyString(physicalKeyCode);
         return str != null ? InputUtils.keyStringToKeyCode(str) : -1;
     }
@@ -31,7 +31,7 @@ public class InputUtils {
      * @param keyCode The physical key code.
      * @return The string representing the logical key.
      */
-    public static String physicalKeyCodeToLogicalKeyString(final int keyCode) {
+    public static String physicalKeyCodeToLogicalKeyString(int keyCode) {
         String keyName = GLFW.glfwGetKeyName(getGlfwKeyCode(keyCode), 0);
         if (keyName != null && !keyName.isEmpty()) {
             return keyName.toUpperCase(Locale.ROOT);
@@ -177,7 +177,7 @@ public class InputUtils {
      * @param keyString The string representation.
      * @return The key code.
      */
-    public static int keyStringToKeyCode(final String keyString) {
+    public static int keyStringToKeyCode(String keyString) {
         return switch (keyString) {
             // META* variables should not be used with this method.
             case "0" -> Keys.NUM_0;

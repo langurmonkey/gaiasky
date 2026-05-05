@@ -39,7 +39,12 @@ import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -365,6 +370,7 @@ public class SysUtils {
      * The temp directory is used to store partial dataset downloads and data descriptors.
      *
      * @param dataLocation The user-defined data location.
+     *
      * @return A path that points to the temporary directory.
      */
     public static Path getDataTempDir(String dataLocation) {
@@ -378,6 +384,7 @@ public class SysUtils {
      * The cache directory is used to store TLE and other time-changing data.
      *
      * @param dataLocation The user-defined data location.
+     *
      * @return A path that points to the cache directory.
      */
     public static Path getDataCacheDir(String dataLocation) {
@@ -541,8 +548,8 @@ public class SysUtils {
 
             GaiaSky.instance.getExecutorService().execute(() -> {
                 switch (format) {
-                case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
-                case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                    case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                    case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
                 }
                 logger.info(I18n.msg("gui.procedural.info.savetextures.ok", TextUtils.capitalise(name), file));
                 pixmap.dispose();
@@ -585,14 +592,16 @@ public class SysUtils {
                 var name = names[pair.getSecond()];
                 Path file = proceduralDir.resolve(name + "." + format.extension);
                 switch (format) {
-                case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
-                case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                    case JPG -> JPGWriter.write(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
+                    case PNG -> PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), pixmap);
                 }
                 logger.info(I18n.msg("gui.procedural.info.savetextures.ok", TextUtils.capitalise(name), file));
                 pixmap.dispose();
             }
             // Post popup.
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, pixmaps, I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                 pixmaps,
+                                 I18n.msg("gui.procedural.info.savetextures", SysUtils.getProceduralPixmapDir().toString()));
 
         });
 
@@ -602,6 +611,7 @@ public class SysUtils {
      * Creates a {@link Pixmap} from a {@link Texture} for CPU access.
      *
      * @param t The Texture.
+     *
      * @return The Pixmap.
      */
     public static Pixmap pixmapFromGLTexture(Texture t) {
@@ -623,6 +633,7 @@ public class SysUtils {
      * Checks if the given file path belongs to an AppImage.
      *
      * @param path The path to check.
+     *
      * @return Whether the path to the file belongs to an AppImage or not.
      */
     public static boolean isAppImagePath(String path) {
@@ -651,7 +662,7 @@ public class SysUtils {
         // MacOS seems to be "special", only likes headless mode.
         // If we access any of the AWT classes we get a nice black screen.
         if (isMac()) {
-            return new int[] { Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT };
+            return new int[]{Constants.DEFAULT_RESOLUTION_WIDTH, Constants.DEFAULT_RESOLUTION_HEIGHT};
         }
 
         // Graphics device method, screen device.
@@ -664,7 +675,7 @@ public class SysUtils {
             w = (int) (gc.getBounds().getWidth() * scaleX);
             h = (int) (gc.getBounds().getHeight() * scaleY);
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             } else {
                 logger.warn(I18n.msg("error.screensize.gd"));
             }
@@ -681,7 +692,7 @@ public class SysUtils {
             w = (int) (rect.width * scale);
             h = (int) (rect.height * scale);
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             } else {
                 logger.warn(I18n.msg("error.screensize.gd.windowbounds"));
             }
@@ -698,7 +709,7 @@ public class SysUtils {
             w = (int) (screenSize.getWidth() * scale);
             h = (int) (screenSize.getHeight() * scale);
             if (w > 0 && h > 0) {
-                return new int[] { w, h };
+                return new int[]{w, h};
             } else {
                 logger.warn(I18n.msg("error.screensize.toolkit"));
             }
@@ -733,7 +744,8 @@ public class SysUtils {
 
     private static Path getCurrentJARDirectory() {
         try {
-            return Path.of(new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent()).toAbsolutePath();
+            return Path.of(new File(SysUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent())
+                    .toAbsolutePath();
         } catch (URISyntaxException exception) {
             logger.error(exception);
         }
@@ -815,6 +827,59 @@ public class SysUtils {
         // Sort using natural order.
         actualFilePaths.sort();
         return actualFilePaths;
+    }
+
+    /**
+     * Copies the file src to the file dst, optionally making a backup.
+     *
+     * @param src    The source file.
+     * @param dst    The destination file.
+     * @param backup Whether to create a backup of dst if it exists.
+     */
+    public static void safeFileCopy(Path src,
+                                    Path dst,
+                                    boolean backup) {
+        assert src != null
+                && src.toFile().exists()
+                && src.toFile().isFile()
+                && src.toFile().canRead()
+                : I18n.msg("error.file.exists.readable", src != null ? src.getFileName().toString() : "null");
+
+        assert dst != null : I18n.msg("notif.null.not", "dest");
+
+        if (backup && dst.toFile().exists() && dst.toFile().canRead()) {
+            Date date = Calendar.getInstance().getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-hhmmss");
+            String strDate = dateFormat.format(date);
+
+            var backupName = dst.getFileName().toString() + "." + strDate;
+            Path backupFile = dst.getParent().resolve(backupName);
+            // Copy.
+            try {
+                Files.copy(dst, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                logger.info(I18n.msg("notif.file.backup", backupFile));
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+        // Actually copy file.
+        try {
+            Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+            logger.info(I18n.msg("notif.file.update", dst.toString()));
+            if (backup) {
+                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION,
+                                                      src,
+                                                      I18n.msg("notif.file.overriden.backup", dst.toString()),
+                                                      -1f);
+            } else {
+                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION,
+                                                      src,
+                                                      I18n.msg("notif.file.overriden", dst.toString()),
+                                                      -1f);
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        }
     }
 
     public static void checkForOpenGLErrors(String location) {

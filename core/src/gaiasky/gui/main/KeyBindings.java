@@ -585,21 +585,21 @@ public class KeyBindings {
         Path defaultMappings = Paths.get(Settings.ASSETS_LOC, SysUtils.getMappingsDirName(), mappingsFileName);
         if (!Files.exists(customMappings)) {
             // Mappings file does not exist, just copy it.
-            overwriteMappingsFile(defaultMappings, customMappings, false);
+            SysUtils.safeFileCopy(defaultMappings, customMappings, false);
         } else {
             // Check versions.
             var customVersionStr = TextUtils.readFirstLine(customMappings);
             var defaultVersionStr = TextUtils.readFirstLine(defaultMappings);
             if (customVersionStr.isEmpty() || !customVersionStr.get().startsWith("#v")) {
                 // We have no version in local file, overwrite.
-                overwriteMappingsFile(defaultMappings, customMappings, true);
+                SysUtils.safeFileCopy(defaultMappings, customMappings, true);
             } else if (defaultVersionStr.isPresent()) {
                 var customVersion = Parser.parseInt(customVersionStr.get().substring(2));
                 var defaultVersion = Parser.parseInt(defaultVersionStr.get().substring(2));
 
                 if (defaultVersion > customVersion) {
                     // Our version is greater, overwrite.
-                    overwriteMappingsFile(defaultMappings, customMappings, true);
+                    SysUtils.safeFileCopy(defaultMappings, customMappings, true);
                 }
             }
         }
@@ -627,50 +627,6 @@ public class KeyBindings {
             }
         } catch (Exception e) {
             logger.error(e, I18n.msg("notif.kbd.mappings.error", customMappings));
-        }
-    }
-
-    /**
-     * Copies the file src to the file to, optionally making a backup.
-     *
-     * @param src    The source file.
-     * @param dst    The destination file.
-     * @param backup Whether to create a backup of dst if it exists.
-     */
-    private void overwriteMappingsFile(Path src, Path dst, boolean backup) {
-        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : I18n.msg("error.file.exists.readable",
-                                                                                                                  src != null ? src.getFileName()
-                                                                                                                          .toString() : "null");
-        assert dst != null : I18n.msg("notif.null.not", "dest");
-        if (backup && dst.toFile().exists() && dst.toFile().canRead()) {
-            Date date = Calendar.getInstance().getTime();
-            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-hhmmss");
-            String strDate = dateFormat.format(date);
-
-            var backupName = dst.getFileName().toString() + "." + strDate;
-            Path backupFile = dst.getParent().resolve(backupName);
-            // Copy.
-            try {
-                Files.copy(dst, backupFile, StandardCopyOption.REPLACE_EXISTING);
-                logger.info(I18n.msg("notif.file.backup", backupFile));
-            } catch (IOException e) {
-                logger.error(e);
-            }
-        }
-        // Actually copy file.
-        try {
-            Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
-            logger.info(I18n.msg("notif.file.update", dst.toString()));
-            if (backup) {
-                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION,
-                                                      this,
-                                                      I18n.msg("notif.file.overriden.backup", dst.toString()),
-                                                      -1f);
-            } else {
-                EventManager.publishWaitUntilConsumer(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.file.overriden", dst.toString()), -1f);
-            }
-        } catch (IOException e) {
-            logger.error(e);
         }
     }
 
