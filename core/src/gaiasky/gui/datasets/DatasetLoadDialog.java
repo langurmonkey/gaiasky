@@ -46,7 +46,7 @@ public class DatasetLoadDialog extends GenericDialog {
     public ColorPicker particleColor, labelColor;
     public OwnSelectBox<ComponentTypeBean> componentType;
 
-    public DatasetLoadDialog(final String title, final String fileName, final Skin skin, final Stage ui) {
+    public DatasetLoadDialog(String title, String fileName, Skin skin, Stage ui) {
         super(title, skin, ui);
 
         this.fileName = fileName;

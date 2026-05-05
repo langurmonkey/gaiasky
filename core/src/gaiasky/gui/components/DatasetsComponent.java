@@ -64,9 +64,9 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private float componentWidth;
 
 
-    public DatasetsComponent(final Skin skin,
-                             final Stage stage,
-                             final CatalogManager catalogManager) {
+    public DatasetsComponent(Skin skin,
+                             Stage stage,
+                             CatalogManager catalogManager) {
         super(skin, stage);
         this.catalogManager = catalogManager;
         groupMap = new ConcurrentHashMap<>();
@@ -126,7 +126,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     private void goToMissionStart(DatasetCard ci,
-                                  OwnImageButton button,
                                   Actor source) {
         if (ci.entity != null && ci.isMission()) {
             var catalogEntity = ci.entity;
@@ -297,7 +296,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         goToButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.mission.goto"), skin));
         goToButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                goToMissionStart(ci, goToButton, goToButton);
+                goToMissionStart(ci, goToButton);
                 return true;
             }
             return false;
@@ -404,8 +403,17 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
         colorMap.put(ci.name, cp);
 
+
+        var title = new Table(skin);
+        title.left();
+        if (ci.dd != null) {
+            var icon = new OwnImage(skin.getDrawable(ci.dd.datasetType.getIcon()));
+            icon.setSize(35f, 35f);
+            title.add(icon).left().padRight(pad9);
+        }
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 23), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
+        title.add(nameLabel).left();
 
         float pad = 4.8f;
         if (ci.isHighlightable()) {
@@ -471,7 +479,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             scalingMap.put(ci.name, sizeScaling);
         }
 
-        CollapsibleEntry catalogWidget = new CollapsibleEntry(nameLabel, t, skin);
+        CollapsibleEntry catalogWidget = new CollapsibleEntry(title, t, skin);
         catalogWidget.align(Align.topLeft);
         catalogWidget.pad(pad9);
         catalogWidget.setWidth(componentWidth * 0.94f);

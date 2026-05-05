@@ -216,7 +216,7 @@ public class DatasetLoadWindow extends GenericDialog {
                     }
                     // Add dataset.
                     var t = new Table(skin);
-                    var icon = new OwnImage(skin.getDrawable(DatasetType.getTypeIcon(dataset.type)));
+                    var icon = new OwnImage(skin.getDrawable(dataset.datasetType.getIcon()));
                     icon.setSize(45f, 45f);
                     var name = new OwnLabel(dataset.name, skin, "big");
                     t.add(icon).left().padRight(pad10);

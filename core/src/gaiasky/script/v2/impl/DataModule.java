@@ -578,7 +578,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                             if (Mapper.datasetDescription.has(entity)) {
                                 var dc = Mapper.datasetDescription.get(entity);
                                 if (dc.datasetCard != null && dc.datasetCard.dsKey == null) {
-                                    dc.datasetCard.dsKey = dsKey;
+                                    dc.datasetCard.setDatasetKey(dsKey);
                                 }
                             }
                         });

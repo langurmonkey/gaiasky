@@ -16,8 +16,8 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.datadesc.DatasetUtils;
 import gaiasky.util.datadesc.Dataset;
+import gaiasky.util.datadesc.DatasetUtils;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.i18n.I18n;
@@ -80,13 +80,13 @@ public class DatasetCard {
     }
 
     public DatasetCard(String dsKey,
-                        String name,
+                       String name,
                        String description,
                        String source,
                        DatasetSourceType type,
                        float hlSizeFactor) {
         super();
-        this.dsKey = dsKey;
+        setDatasetKey(dsKey);
         this.name = name;
         this.description = description;
         this.source = source;
@@ -99,9 +99,15 @@ public class DatasetCard {
         this.view = new FocusView();
         System.arraycopy(ColorUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
 
-        // Set descriptor, if any.
-        this.dd = DatasetUtils.instance().getMatchByKey(dsKey);
 
+    }
+
+    /**
+     * Sets the dataset key and initializes the dataset reference, if any.
+     */
+    public void setDatasetKey(String key) {
+        this.dsKey = key;
+        this.dd = DatasetUtils.instance().getMatchByKey(dsKey);
     }
 
     public void setEntity(Entity entity) {

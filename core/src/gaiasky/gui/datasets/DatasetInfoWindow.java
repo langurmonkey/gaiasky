@@ -96,7 +96,7 @@ public class DatasetInfoWindow extends GenericDialog {
                 .padBottom(pad18)
                 .row();
         // Description
-        final OwnScrollPane scroll = getOwnScrollPane();
+        OwnScrollPane scroll = getOwnScrollPane();
         content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).top().right().padRight(pad18).padBottom(pad18 * 2f);
         content.add(scroll).top().left().padRight(pad18).padBottom(pad18 * 2f).row();
 
