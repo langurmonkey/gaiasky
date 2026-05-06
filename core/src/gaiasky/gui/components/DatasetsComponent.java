@@ -94,17 +94,15 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         reloadDatasets();
 
-        final var buttonWidth = 300f;
         final var buttonHeight = 50f;
         OwnTextIconButton loadDataset = new OwnTextIconButton(I18n.msg("gui.dsload.title"), skin, "load");
-        loadDataset.setSize(buttonWidth, buttonHeight);
+        loadDataset.setSize(componentWidth, buttonHeight);
         loadDataset.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 EventManager.publish(Event.SHOW_LOAD_DATASET_ACTION, this);
             }
         });
-
 
         Table main = new Table(skin);
         main.add(scroll).center().top().padBottom(pad12).row();
@@ -423,7 +421,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         title.left();
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 23), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
-        title.add(nameLabel).left().padRight(pad6);
+        title.add(nameLabel).left().padRight(pad9);
         if (ci.dd != null) {
             var type = ci.dd.datasetType;
             var icon = new OwnImage(skin.getDrawable(type.getIcon()));
@@ -434,7 +432,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 typeString = TextUtils.trueCapitalise(type.typeStr);
             }
             icon.setTooltip(typeString, skin);
-            icon.setSize(35f, 35f);
+            icon.setSize(30f, 30f);
             title.add(icon).left();
         }
 

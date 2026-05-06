@@ -20,6 +20,7 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.FocusView;
+import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -38,6 +39,7 @@ import java.util.Locale;
  * Displays system information in the welcome and loading screens.
  */
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
+    private static final Logger.Log logger = Logger.getLogger(TopInfoInterface.class);
 
     private final ZoneId timeZone;
     /** Date format **/
@@ -80,7 +82,9 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         time.setName("label time tii");
         time.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
-        pace = new OwnLabel("(" + (GaiaSky.settings().runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "default");
+        pace = new OwnLabel("(" + (GaiaSky.settings().runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")",
+                            skin,
+                            "default");
         pace.setName("pace tii");
 
         // Datetime table.
@@ -102,7 +106,9 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         OwnLabel s2 = new OwnLabel("|", skin, "default");
 
-        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(GaiaSky.settings().scene.homeObject), maxNameLen)), skin, "default");
+        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(GaiaSky.settings().scene.homeObject), maxNameLen)),
+                                     skin,
+                                     "default");
         home.setName("home tii");
         home.setColor(ColorUtils.aOrangeC);
 
@@ -126,77 +132,81 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
-        switch (event) {
-        case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
-            // Update input time
-            Instant datetime = (Instant) data[0];
-            GaiaSky.postRunnable(() -> {
-                date.setText(dfDate.format(datetime) + " " + dfEra.format(datetime));
-                time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
-                pack();
-            });
-        }
-        case TIME_WARP_CHANGED_INFO -> {
-            if (data.length == 1)
-                pace.setText("(" + TextUtils.getFormattedTimeWarp((double) data[0]) + ")");
-        }
-        case TIME_STATE_CMD -> {
-            Boolean t = (Boolean) data[0];
-            if (!t) {
-                pace.setText("(" + I18n.msg("gui.top.time.off") + ")");
-            } else {
-                pace.setText("(" + TextUtils.getFormattedTimeWarp() + ")");
-            }
-        }
-        case CAMERA_CLOSEST_INFO -> {
-            IFocus closestObject = (IFocus) data[0];
-            if (closestObject != null) {
-                closest.setText(TextUtils.capString(closestObject.getClosestLocalizedName(), maxNameLen));
-                closest.setText(I18n.msg("gui.top.closest", closest.getText()));
-            } else {
-                closest.setText("");
-            }
-        }
-        case CAMERA_MODE_CMD -> {
-            CameraMode mode = (CameraMode) data[0];
-            if (!mode.isFocus()) {
-                focus.setText("");
-                s1.setText("");
-            } else {
-                focus.setText(I18n.msg("gui.top.focus", lastFocusName));
-                s1.setText("|");
-            }
-        }
-        case FOCUS_CHANGE_CMD -> {
-            IFocus f = null;
-            Entity e;
-            if (data[0] instanceof String) {
-                e = scene.getEntity((String) data[0]);
-            } else if (data[0] instanceof FocusView) {
-                e = ((FocusView) data[0]).getEntity();
-            } else {
-                e = (Entity) data[0];
-            }
-            if (e != null) {
-                if (Mapper.focus.has(e)) {
-                    view.setEntity(e);
-                    f = view;
+                       Object... data) {
+        try {
+            switch (event) {
+                case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
+                    // Update input time
+                    Instant datetime = (Instant) data[0];
+                    GaiaSky.postRunnable(() -> {
+                        date.setText(dfDate.format(datetime) + " " + dfEra.format(datetime));
+                        time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
+                        pack();
+                    });
                 }
-                if (f != null) {
-                    String candidate = I18n.localize(f.getCandidateName().toLowerCase(Locale.ROOT));
-                    if (candidate != null) {
-                        lastFocusName = TextUtils.capString(candidate, maxNameLen);
+                case TIME_WARP_CHANGED_INFO -> {
+                    if (data.length == 1)
+                        pace.setText("(" + TextUtils.getFormattedTimeWarp((double) data[0]) + ")");
+                }
+                case TIME_STATE_CMD -> {
+                    Boolean t = (Boolean) data[0];
+                    if (!t) {
+                        pace.setText("(" + I18n.msg("gui.top.time.off") + ")");
+                    } else {
+                        pace.setText("(" + TextUtils.getFormattedTimeWarp() + ")");
+                    }
+                }
+                case CAMERA_CLOSEST_INFO -> {
+                    IFocus closestObject = (IFocus) data[0];
+                    if (closestObject != null) {
+                        closest.setText(TextUtils.capString(closestObject.getClosestLocalizedName(), maxNameLen));
+                        closest.setText(I18n.msg("gui.top.closest", closest.getText()));
+                    } else {
+                        closest.setText("");
+                    }
+                }
+                case CAMERA_MODE_CMD -> {
+                    CameraMode mode = (CameraMode) data[0];
+                    if (!mode.isFocus()) {
+                        focus.setText("");
+                        s1.setText("");
+                    } else {
                         focus.setText(I18n.msg("gui.top.focus", lastFocusName));
                         s1.setText("|");
                     }
                 }
+                case FOCUS_CHANGE_CMD -> {
+                    IFocus f = null;
+                    Entity e;
+                    if (data[0] instanceof String) {
+                        e = scene.getEntity((String) data[0]);
+                    } else if (data[0] instanceof FocusView) {
+                        e = ((FocusView) data[0]).getEntity();
+                    } else {
+                        e = (Entity) data[0];
+                    }
+                    if (e != null) {
+                        if (Mapper.focus.has(e)) {
+                            view.setEntity(e);
+                            f = view;
+                        }
+                        if (f != null) {
+                            String candidate = I18n.localize(f.getCandidateName().toLowerCase(Locale.ROOT));
+                            if (candidate != null) {
+                                lastFocusName = TextUtils.capString(candidate, maxNameLen);
+                                focus.setText(I18n.msg("gui.top.focus", lastFocusName));
+                                s1.setText("|");
+                            }
+                        }
+                    }
+                }
+                default -> {
+                }
             }
-        }
-        default -> {
-        }
+        } catch (Exception e) {
+            logger.error(e);
         }
     }
 
@@ -217,5 +227,4 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     public void update() {
 
     }
-
 }

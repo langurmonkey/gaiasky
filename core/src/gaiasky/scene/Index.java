@@ -194,6 +194,9 @@ public class Index {
             var pgName = pgBase.getName();
             var pgArchetype = pgBase.archetype;
             var pgParent = Mapper.graph.get(entity).parentName;
+            // Add set object in case it has children.
+            index.put(pgName.toLowerCase(Locale.ROOT), entity);
+
             String[] keys = set.index.keys();
             for (String key : keys) {
                 if (key != null) {
