@@ -39,7 +39,7 @@ public class CollapsiblePane extends Table {
     float space;
     Cell<?> contentCell;
     float targetHeight;
-    boolean expanded = false;
+    boolean expanded;
     Runnable expandCollapseRunnable;
 
     /**
@@ -59,12 +59,12 @@ public class CollapsiblePane extends Table {
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage,
-                           final Image icon,
-                           final String title,
-                           final Actor content,
+    public CollapsiblePane(Stage stage,
+                           Image icon,
+                           String title,
+                           Actor content,
                            float width,
-                           final Skin skin,
+                           Skin skin,
                            String titleStyle,
                            String expandButtonStyle,
                            String detachButtonStyle,
@@ -72,7 +72,7 @@ public class CollapsiblePane extends Table {
                            String shortcut,
                            Actor... topIcons) {
         this(stage, icon, title, content, width, skin, titleStyle, expandButtonStyle, detachButtonStyle, expanded,
-                null, shortcut, topIcons);
+             null, shortcut, topIcons);
     }
 
     /**
@@ -91,11 +91,11 @@ public class CollapsiblePane extends Table {
      * @param topIcons          List of top icons that will be added between the label and the
      *                          expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage,
-                           final String title,
-                           final Actor content,
+    public CollapsiblePane(Stage stage,
+                           String title,
+                           Actor content,
                            float width,
-                           final Skin skin,
+                           Skin skin,
                            String titleStyle,
                            String expandButtonStyle,
                            String detachButtonStyle,
@@ -103,7 +103,7 @@ public class CollapsiblePane extends Table {
                            String shortcut,
                            Actor... topIcons) {
         this(stage, null, title, content, width, skin, titleStyle, expandButtonStyle,
-                detachButtonStyle, expanded, null, shortcut, topIcons);
+             detachButtonStyle, expanded, null, shortcut, topIcons);
     }
 
     /**
@@ -124,12 +124,12 @@ public class CollapsiblePane extends Table {
      * @param topIcons               List of top icons that will be added between the label and the
      *                               expand/detach icons.
      */
-    public CollapsiblePane(final Stage stage,
-                           final Image icon,
-                           final String title,
-                           final Actor content,
+    public CollapsiblePane(Stage stage,
+                           Image icon,
+                           String title,
+                           Actor content,
                            float width,
-                           final Skin skin,
+                           Skin skin,
                            String titleStyle,
                            String expandButtonStyle,
                            String detachButtonStyle,
@@ -281,7 +281,7 @@ public class CollapsiblePane extends Table {
      * @param topIcons List of top icons that will be added between the label and the
      *                 expand/detach icons.
      */
-    public CollapsiblePane(Stage stage, String title, final Actor content, float width, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
+    public CollapsiblePane(Stage stage, String title, Actor content, float width, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
         this(stage, title, content, width, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
     }
 
@@ -318,8 +318,11 @@ public class CollapsiblePane extends Table {
     }
 
     public void togglePane() {
-        if (!expandPane())
-            collapsePane();
+        if (!expandPane()) {
+            if (!collapsePane()) {
+                // What is this state??
+            }
+        }
     }
 
     private void toggleExpandCollapse(Actor source) {
@@ -361,8 +364,8 @@ public class CollapsiblePane extends Table {
         detachIcon.setDisabled(true);
     }
 
-    private CollapsibleWindow createWindow(String labelText, final Actor content, Skin skin, Stage stage, float x, float y) {
-        final CollapsibleWindow window = new CollapsibleWindow(labelText, skin);
+    private CollapsibleWindow createWindow(String labelText, Actor content, Skin skin, Stage stage, float x, float y) {
+        CollapsibleWindow window = new CollapsibleWindow(labelText, skin);
         window.align(Align.center);
 
         OwnScrollPane contentScroll = new OwnScrollPane(content, skin, "minimalist-nobg");

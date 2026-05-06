@@ -68,7 +68,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private final Dataset[] selectedDataset;
     private final float[][] scroll;
     private final Map<String, Pair<Dataset, Net.HttpRequest>> currentDownloads;
-    private final Map<String, Button>[] buttonMap;
+    private final List<Map<String, Button>> buttonMap;
     private final List<Pair<Dataset, Actor>> selectionOrder;
     private final Color highlight;
     /** Whether to show the data location file picker. **/
@@ -81,7 +81,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private DatasetMode currentMode;
     private Cell<?> right;
     private OwnScrollPane leftScroll;
-    private int selectedIndex = 0;
+    private int selectedIndex;
     private DatasetWatcher rightPaneWatcher;
 
     public DatasetManagerWindow(Stage stage, Skin skin, DatasetGroup serverDd) {
@@ -100,9 +100,9 @@ public class DatasetManagerWindow extends GenericDialog {
         this.scroll = new float[][]{{0f, 0f}, {0f, 0f}};
         this.selectedDataset = new Dataset[2];
         this.initialized = new AtomicBoolean(false);
-        this.buttonMap = new HashMap[2];
-        this.buttonMap[0] = new HashMap<>();
-        this.buttonMap[1] = new HashMap<>();
+        this.buttonMap = new ArrayList<>(2);
+        this.buttonMap.add(new HashMap<String, Button>());
+        this.buttonMap.add(new HashMap<String, Button>());
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
         this.selectionOrder = new ArrayList<>();
         this.dataLocation = dataLocation;
@@ -148,10 +148,10 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
 
-        final OwnTextButton tabAvail = new OwnTextButton(I18n.msg("gui.download.tab.available"), skin, "toggle-big");
+        OwnTextButton tabAvail = new OwnTextButton(I18n.msg("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad10);
         tabAvail.setWidth(tabWidth);
-        final OwnTextButton tabInstalled = new OwnTextButton(tabInstalledText, skin, "toggle-big");
+        OwnTextButton tabInstalled = new OwnTextButton(tabInstalledText, skin, "toggle-big");
         tabInstalled.pad(pad10);
         tabInstalled.setWidth(tabWidth);
 
@@ -164,11 +164,11 @@ public class DatasetManagerWindow extends GenericDialog {
         tabStack = new Stack();
 
         // Content.
-        final Table contentAvail = new Table(skin);
+        Table contentAvail = new Table(skin);
         contentAvail.align(Align.top);
         contentAvail.pad(pad18);
 
-        final Table contentInstalled = new Table(skin);
+        Table contentInstalled = new Table(skin);
         contentInstalled.align(Align.top);
         contentInstalled.pad(pad18);
 
@@ -340,8 +340,8 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private int reloadLeftPane(Cell<?> left, DatasetGroup dataDescriptor, DatasetMode mode, float width) {
-        final var leftContent = new Table(skin);
-        final var leftTable = new Table(skin);
+        var leftContent = new Table(skin);
+        var leftTable = new Table(skin);
 
         var filter = new OwnTextField("", skin, "big");
         filter.setMessageText(I18n.msg("gui.filter"));
@@ -375,7 +375,7 @@ public class DatasetManagerWindow extends GenericDialog {
         // Add datasets to table.
         var added = populateLeftTable(leftTable, mode, dataDescriptor, GaiaSky.settings().data.dataFiles, width, "");
 
-        final var maxScrollHeight = stage.getHeight() * 0.65f;
+        var maxScrollHeight = stage.getHeight() * 0.65f;
         leftScroll.setFadeScrollBars(false);
         leftScroll.setWidth(width * 0.52f);
         leftScroll.setHeight(maxScrollHeight);
@@ -424,7 +424,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                     int i) {
         int added = 0;
         if (!filtered.isEmpty()) {
-            final Array<CheckBox> groupCheckBoxes = new Array<>();
+            Array<CheckBox> groupCheckBoxes = new Array<>();
 
             // Create collapsible group pane.
             Table contentTable = new Table(skin);
@@ -627,7 +627,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 OwnButton button = new OwnButton(t, skin, "dataset", false);
                 button.setWidth(width * 0.52f);
                 title.addListener(new OwnTextTooltip(tooltipText, skin, 10));
-                buttonMap[mode.ordinal()].put(dataset.key, button);
+                buttonMap.get(mode.ordinal()).put(dataset.key, button);
 
                 // Clicks.
                 button.addListener(new InputListener() {
@@ -850,7 +850,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         var datasetDir = cacheDir.resolve("datasets").resolve(dataset.key);
 
                         if (datasetDir.toFile().mkdirs()) {
-                            logger.debug("Created directory: " + datasetDir.toString());
+                            logger.debug("Created directory: " + datasetDir);
                         }
                         var filePath = datasetDir.resolve(fileName);
                         if (Files.exists(filePath)) {
@@ -864,7 +864,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             }
                         } else {
                             // Download
-                            final var table = imagesTable;
+                            var table = imagesTable;
                             DownloadHelper.downloadFile(url,
                                                         Gdx.files.absolute(filePath.toAbsolutePath().toString()),
                                                         GaiaSky.settings().program.offlineMode,
@@ -1060,8 +1060,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 // Enable new, disable current.
                                 actionEnableDataset(local, null);
                                 actionDisableDataset(dataset);
-                                var index = localDd.datasets.indexOf(local);
-                                selectedIndex = index;
+                                selectedIndex = localDd.datasets.indexOf(local);
                                 Timer.schedule(new Timer.Task() {
                                     @Override
                                     public void run() {
@@ -1071,7 +1070,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                         reloadAll();
                                         // After reload, scroll to and highlight the new dataset.
                                         GaiaSky.postRunnable(() -> {
-                                            Button targetButton = buttonMap[DatasetMode.INSTALLED.ordinal()].get(local.key);
+                                            Button targetButton = buttonMap.get(DatasetMode.INSTALLED.ordinal()).get(local.key);
                                             if (targetButton != null && leftScroll != null) {
                                                 // Scroll so the button is visible.
                                                 Vector2 pos = targetButton.localToAscendantCoordinates(leftScroll, new Vector2(0, 0));
@@ -1088,7 +1087,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 selectedDataset[DatasetMode.AVAILABLE.ordinal()] = server;
                                 reloadAll();
                                 GaiaSky.postRunnable(() -> {
-                                    Button targetButton = buttonMap[DatasetMode.AVAILABLE.ordinal()].get(server.key);
+                                    Button targetButton = buttonMap.get(DatasetMode.AVAILABLE.ordinal()).get(server.key);
                                     if (targetButton != null && leftScroll != null) {
                                         Vector2 pos = targetButton.localToAscendantCoordinates(leftScroll, new Vector2(0, 0));
                                         leftScroll.scrollTo(pos.x, pos.y, targetButton.getWidth(), targetButton.getHeight());
@@ -1157,7 +1156,7 @@ public class DatasetManagerWindow extends GenericDialog {
             rightTable.pack();
 
             // Scroll.
-            final var maxScrollHeight = stage.getHeight() * 0.65f;
+            var maxScrollHeight = stage.getHeight() * 0.65f;
             var scrollPane = new OwnScrollPane(rightTable, skin, "minimalist-nobg");
             scrollPane.setScrollingDisabled(true, false);
             scrollPane.setSmoothScrolling(false);
@@ -1213,9 +1212,9 @@ public class DatasetManagerWindow extends GenericDialog {
             try {
                 double readMb = (double) read / 1e6d;
                 double totalMb = (double) total / 1e6d;
-                final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.downloading", nf.format(progress));
+                String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.downloading", nf.format(progress));
                 double mbPerSecond = speed / 1000d;
-                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
+                String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
                 // Since we are downloading on a background thread, post a runnable to touch UI.
                 GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO,
                                                                 this,
@@ -1230,9 +1229,9 @@ public class DatasetManagerWindow extends GenericDialog {
         ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
             double readMb = (double) read / 1e6d;
             double totalMb = (double) total / 1e6d;
-            final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksum.check", nf.format(progress));
+            String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksum.check", nf.format(progress));
             double mbPerSecond = speed / 1000d;
-            final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
+            String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI.
             GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO,
                                                             this,
@@ -1286,8 +1285,8 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
 
-            final String errorMessage = errorMsg;
-            final int numErrors = errors;
+            String errorMessage = errorMsg;
+            int numErrors = errors;
             // Done.
             GaiaSky.postRunnable(() -> {
                 currentDownloads.remove(dataset.key);
@@ -1356,14 +1355,14 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         // Download.
-        final Net.HttpRequest request = DownloadHelper.downloadFile(url,
-                                                                    tempDownload,
-                                                                    GaiaSky.settings().program.offlineMode,
-                                                                    progressDownload,
-                                                                    progressHashResume,
-                                                                    finish,
-                                                                    fail,
-                                                                    cancel);
+        Net.HttpRequest request = DownloadHelper.downloadFile(url,
+                                                              tempDownload,
+                                                              GaiaSky.settings().program.offlineMode,
+                                                              progressDownload,
+                                                              progressHashResume,
+                                                              finish,
+                                                              fail,
+                                                              cancel);
         GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_START_INFO, this, dataset.key, request));
         currentDownloads.put(dataset.key, new Pair<>(dataset, request));
 
@@ -1388,7 +1387,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
     @Override
     protected boolean accept() {
-        final GenericDialog myself = me;
+        GenericDialog myself = me;
         // Create a copy.
         Map<String, Pair<Dataset, HttpRequest>> copy = new HashMap<>(currentDownloads);
 
@@ -1468,7 +1467,7 @@ public class DatasetManagerWindow extends GenericDialog {
     @Override
     public void setKeyboardFocus() {
         if (stage != null && selectedDataset[selectedTab] != null) {
-            Button button = buttonMap[selectedTab].get(selectedDataset[selectedTab].key);
+            Button button = buttonMap.get(selectedTab).get(selectedDataset[selectedTab].key);
             if (button != null) {
                 stage.setKeyboardFocus(button);
             }
@@ -1550,7 +1549,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         cb.setChecked(false);
                         cb.setProgrammaticChangeEvents(true);
                     }
-                    final var path = filePath;
+                    var path = filePath;
                     GenericDialog question = new GenericDialog(I18n.msg("gui.download.incompatibility"), skin, stage) {
                         @Override
                         protected void build() {
@@ -1699,16 +1698,17 @@ public class DatasetManagerWindow extends GenericDialog {
         // Delete
         if (dataset.files != null) {
             for (String fileToDelete : dataset.files) {
+                String toDelete = fileToDelete;
                 try {
-                    if (fileToDelete.endsWith("/")) {
-                        fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
+                    if (toDelete.endsWith("/")) {
+                        toDelete = toDelete.substring(0, toDelete.length() - 1);
                     }
                     // Separate parent from file.
                     String baseParent = "";
-                    String baseName = fileToDelete;
-                    if (fileToDelete.contains("/")) {
-                        baseParent = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
-                        baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
+                    String baseName = toDelete;
+                    if (toDelete.contains("/")) {
+                        baseParent = toDelete.substring(0, toDelete.lastIndexOf('/'));
+                        baseName = toDelete.substring(toDelete.lastIndexOf('/') + 1);
                     }
                     // Add data location if necessary.
                     Path dataPath;

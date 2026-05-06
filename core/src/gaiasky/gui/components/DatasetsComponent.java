@@ -406,14 +406,22 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         var title = new Table(skin);
         title.left();
-        if (ci.dd != null) {
-            var icon = new OwnImage(skin.getDrawable(ci.dd.datasetType.getIcon()));
-            icon.setSize(35f, 35f);
-            title.add(icon).left().padRight(pad9);
-        }
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 23), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
-        title.add(nameLabel).left();
+        title.add(nameLabel).left().padRight(pad6);
+        if (ci.dd != null) {
+            var type = ci.dd.datasetType;
+            var icon = new OwnImage(skin.getDrawable(type.getIcon()));
+            String typeString;
+            if (I18n.hasMessage("gui.download.type." + type.typeStr)) {
+                typeString = I18n.msg("gui.download.type." + type.typeStr);
+            } else {
+                typeString = TextUtils.trueCapitalise(type.typeStr);
+            }
+            icon.setTooltip(typeString, skin);
+            icon.setSize(35f, 35f);
+            title.add(icon).left();
+        }
 
         float pad = 4.8f;
         if (ci.isHighlightable()) {

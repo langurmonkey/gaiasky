@@ -60,8 +60,8 @@ public class CollapsibleEntry extends OwnButton {
         pad(5f);
         collapse = new OwnImageButton(skin, "expand-collapse");
         collapse.setCheckedNoFire(false); // start collapsed (show expand icon)
-        add(collapse).top().left().padBottom(10f).padRight(15f);
-        actorCell = add(title).top().left().padBottom(10f);
+        add(collapse).center().left().padBottom(10f).padRight(15f);
+        actorCell = add(title).center().left().padBottom(10f);
         actorCell.row();
         contentCell = add().top().left().colspan(2).expandX();
 
