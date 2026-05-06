@@ -181,7 +181,7 @@ public class Scene {
     }
 
     /**
-     * Runs the set up initialization stage for all entities. This happens when all
+     * Runs the set-up initialization stage for all entities. This happens when all
      * asset loading has finished.
      */
     public void setUpEntities() {
@@ -222,7 +222,7 @@ public class Scene {
             int priority = 0;
 
             // Prepare systems.
-            initializers = new Array<>(26);
+            initializers = new Array<>(29);
             addInitializer(new BaseInitializer(this, setUp, families.graphNodes, priority++));
             addInitializer(new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++));
             addInitializer(new ParticleSetInitializer(setUp, families.particleSets, priority++));
@@ -529,11 +529,22 @@ public class Scene {
         engine.update((float) time.getDt());
     }
 
+    /**
+     * Insert the given entity to the scene, possibly adding it to the index as well.
+     *
+     * @param entity     The entity to add.
+     * @param addToIndex Whether to add it to the index.
+     */
     public void insert(Entity entity,
                        boolean addToIndex) {
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
+        // Check index first.
         var parent = getEntity(graph.parentName);
+        if (parent == null) {
+            // Run a deep search if not in index.
+            parent = getNonIndexEntity(graph.parentName);
+        }
         boolean ok = true;
         if (addToIndex) {
             ok = index.addToIndex(entity);

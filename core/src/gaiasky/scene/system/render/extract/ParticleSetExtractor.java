@@ -63,7 +63,7 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
                                   Entity entity,
                                   StarSet starSet,
                                   Entity octreeEntity) {
-        if (starSet.renderParticles) {
+        if (starSet.renderParticles && starSet.readyToRender) {
             if (starSet.variableStars) {
                 addToRender(render, RenderGroup.VARIABLE_GROUP);
             } else {
@@ -100,7 +100,7 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
      **/
     private void addToRenderLists(Render render, Entity octreeEntity) {
         var set = Mapper.particleSet.get(render.entity);
-        if (set.renderParticles) {
+        if (set.renderParticles && set.readyToRender) {
             if (set.isExtended) {
                 if (set.isBillboard()) {
                     addToRender(render, RenderGroup.PARTICLE_GROUP_EXT_BILLBOARD);

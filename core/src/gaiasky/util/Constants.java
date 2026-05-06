@@ -12,9 +12,12 @@ import gaiasky.event.EventManager;
 import net.jafama.FastMath;
 
 /**
- * Random constants holder.
+ * Random constants' holder.
  */
 public class Constants {
+
+    /** Name of the main thread. **/
+    public static final String MAIN_THREAD_NAME = "gaiasky-main-thread";
 
     /** Default resolution: width. **/
     public static final int DEFAULT_RESOLUTION_WIDTH = 1920;

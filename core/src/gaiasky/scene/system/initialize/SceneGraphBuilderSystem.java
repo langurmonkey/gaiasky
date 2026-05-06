@@ -19,7 +19,7 @@ public class SceneGraphBuilderSystem extends AbstractInitSystem {
     /** The scene. **/
     private final Scene scene;
 
-    public SceneGraphBuilderSystem(final Scene scene, Family family, int priority) {
+    public SceneGraphBuilderSystem(Scene scene, Family family, int priority) {
         super(false, family, priority);
         this.scene = scene;
     }
@@ -28,10 +28,13 @@ public class SceneGraphBuilderSystem extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
         var graph = entity.getComponent(GraphNode.class);
         if (graph.parentName != null) {
+            // Look for entity with parentName in the scene. Must be in index.
             var parent = scene.getEntity(graph.parentName);
             if (parent != null) {
+                // Index hit, just add.
                 addChild(parent, entity, true);
             } else {
+                // We did not find it in the index. Traverse the scene instead.
                 parent = scene.getNonIndexEntity(graph.parentName);
                 if (parent != null) {
                     addChild(parent, entity, true);
@@ -56,24 +59,8 @@ public class SceneGraphBuilderSystem extends AbstractInitSystem {
      * @param updateAncestorCount Whether to update the ancestors number of children.
      */
     public final void addChild(Entity parent, Entity child, boolean updateAncestorCount) {
-        var graph = Mapper.graph.get(child);
         var parentGraph = Mapper.graph.get(parent);
-        if (parentGraph.children == null) {
-            parentGraph.initChildren(parentGraph.parent == null ? 100 : 1);
-        }
-        parentGraph.children.add(child);
-        graph.parent = parent;
-        parentGraph.numChildren++;
-
-        if (updateAncestorCount) {
-            // Update num children in ancestors
-            var ancestor = parentGraph.parent;
-            while (ancestor != null) {
-                var ancestorGraph = Mapper.graph.get(ancestor);
-                ancestorGraph.numChildren++;
-                ancestor = ancestorGraph.parent;
-            }
-        }
+        parentGraph.addChild(parent, child, updateAncestorCount, parentGraph.parent == null ? 100 : 1);
     }
 
     /**

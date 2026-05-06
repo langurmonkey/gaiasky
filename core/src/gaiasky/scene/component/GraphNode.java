@@ -108,11 +108,14 @@ public class GraphNode implements Component, ICopy {
         if (this.children == null) {
             initChildren(numChildren);
         }
+        // Add to children list.
         this.children.add(child);
+        // Remove from previous parent, if any.
         var childGraph = Mapper.graph.get(child);
         if (childGraph.parent != null) {
             Mapper.graph.get(childGraph.parent).removeChild(child, true);
         }
+        // Set new parent.
         childGraph.parent = me;
         this.numChildren++;
 

@@ -341,7 +341,7 @@ public class ParticleSet implements Component, IDisposable {
      */
     public Proximity proximity;
     /** Set has been disposed. **/
-    public boolean disposed = false;
+    public boolean disposed;
     /** Name to array index. **/
     public FastObjectIntMap<String> index;
     /** Flag that flips when the particle set has been added to the main index. **/
@@ -366,6 +366,9 @@ public class ParticleSet implements Component, IDisposable {
     public Vector3Q lastSortCameraPos, cPosD;
     /** Auxiliary matrix. **/
     protected final Matrix4D mat = new Matrix4D();
+
+    /** The set is ready to render. This is flipped when initialization is fully done. **/
+    public boolean readyToRender;
 
     public float[] getColorMin() {
         return ccMin;
@@ -452,10 +455,9 @@ public class ParticleSet implements Component, IDisposable {
             update.pre();
             int n = pointData.size();
 
-            for (int i = 0; i < n; i++) {
-                IParticleRecord pb = pointData.get(i);
+            for (int idx = 0; idx < n; idx++) {
+                IParticleRecord pb = pointData.get(idx);
                 if (pb.names() != null) {
-                    final int idx = i;
                     for (var name : pb.names()) {
                         var nameLC = name.toLowerCase(Locale.ROOT);
                         index.put(nameLC, idx);
@@ -466,7 +468,7 @@ public class ParticleSet implements Component, IDisposable {
                         }
                     }
                 }
-                update.update(i);
+                update.update(idx);
             }
             update.post();
         }

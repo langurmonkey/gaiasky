@@ -123,7 +123,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     protected void renderObject(ExtShaderProgram shaderProgram,
                                 ICamera camera,
                                 IRenderable renderable) {
-        final var render = (Render) renderable;
+        var render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
         var body = Mapper.body.get(render.entity);
         var graph = Mapper.graph.get(render.entity);
@@ -356,9 +356,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         if (event == Event.GPU_DISPOSE_PARTICLE_GROUP) {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);

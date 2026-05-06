@@ -34,8 +34,9 @@ public class UpdaterHelper {
 
     public void update(long current) {
         // Just update.
-        if (current % step == 0)
+        if (current % step == 0) {
             EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, (float) current / (float) count);
+        }
     }
 
     public void post() {

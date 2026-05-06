@@ -109,8 +109,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             initSortingData(entity, starSet);
 
             var model = Mapper.model.get(entity);
+
             // Star set.
             model.renderConsumer = ModelEntityRenderSystem::renderParticleStarSetModel;
+
+            // Ready to render.
+            starSet.readyToRender = true;
 
             // Load model in main thread
             GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
@@ -127,8 +131,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 particleSet.model = manager.get(GaiaSky.settings().data.dataFile(particleSet.modelFile), IntModel.class);
             }
 
+            // Ready to render.
+            particleSet.readyToRender = true;
         }
-
     }
 
     /**

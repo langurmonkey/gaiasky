@@ -131,8 +131,8 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * @param args CLI arguments (see {@link CLIArgs}).
      */
-    public static void main(final String[] args) {
-        Thread.currentThread().setName("gaiasky-main-thread");
+    public static void main(String[] args) {
+        Thread.currentThread().setName(Constants.MAIN_THREAD_NAME);
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         cliArgs = new CLIArgs();
         JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
