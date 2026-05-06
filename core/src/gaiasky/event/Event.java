@@ -311,6 +311,10 @@ public enum Event {
      */
     CATALOG_POINT_SIZE_SCALING_CMD,
     /**
+     * Reloads the datasets component widget.
+     */
+    CATALOGS_RELOAD,
+    /**
      * Clears the headline message.
      **/
     CLEAR_HEADLINE_MESSAGE,

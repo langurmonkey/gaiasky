@@ -47,7 +47,11 @@ public class MeshUpdater extends AbstractUpdateSystem {
 
             // Update local transform
             float[] trn = graph.translation.valuesF(auxArray);
-            graph.localTransform.idt().translate(trn[0], trn[1], trn[2]).scl(body.size).mul(mesh.coordinateSystem);
+            if (mesh.coordinateSystem != null) {
+                graph.localTransform.idt().translate(trn[0], trn[1], trn[2]).scl(body.size).mul(mesh.coordinateSystem);
+            } else {
+                graph.localTransform.idt().translate(trn[0], trn[1], trn[2]).scl(body.size);
+            }
 
             // Affine transformations for meshes are already contained in mesh.coordinateSystem.
         }

@@ -46,8 +46,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DatasetsComponent extends GuiComponent implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(DatasetsComponent.class);
-
     private static final float MAX_SCROLL_HEIGHT = 800f;
     private final Map<String, Table> groupMap;
     private final Map<String, ProgrammaticButton[]> imageMap;
@@ -60,7 +58,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final CatalogManager catalogManager;
     private Table group;
     private OwnScrollPane scroll;
-    private OwnLabel noDatasetsLabel = null;
+    private OwnLabel noDatasetsLabel;
     private float componentWidth;
 
 
@@ -78,7 +76,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         infoMap = new ConcurrentHashMap<>();
         transformsMap = new ConcurrentHashMap<>();
         EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT,
-                                        Event.CATALOG_POINT_SIZE_SCALING_CMD);
+                                        Event.CATALOG_POINT_SIZE_SCALING_CMD, Event.CATALOGS_RELOAD);
     }
 
     @Override
@@ -94,18 +92,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
 
-        Collection<DatasetCard> cis = this.catalogManager.getCatalogInfos();
-        if (cis != null) {
-            for (DatasetCard ci : cis) {
-                addCatalogInfo(ci);
-            }
-        }
-        group.pack();
-
-        scroll.setWidth(group.getWidth() + pad12);
-        recalculateScrollHeight();
-
-        addNoDatasets();
+        reloadDatasets();
 
         final var buttonWidth = 300f;
         final var buttonHeight = 50f;
@@ -118,11 +105,39 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
         });
 
+
         Table main = new Table(skin);
         main.add(scroll).center().top().padBottom(pad12).row();
         main.add(loadDataset).center();
-
         component = main;
+
+    }
+
+    public void reloadDatasets() {
+        // Clear maps.
+        imageMap.clear();
+        colorMap.clear();
+        visualSettingsMap.clear();
+        filtersMap.clear();
+        infoMap.clear();
+        transformsMap.clear();
+        groupMap.clear();
+
+        // Clear main table.
+        group.clear();
+
+        Collection<DatasetCard> cis = this.catalogManager.getCatalogInfos();
+        if (cis != null) {
+            for (DatasetCard ci : cis) {
+                addCatalogInfo(ci);
+            }
+        }
+        group.pack();
+
+        scroll.setWidth(group.getWidth() + pad12);
+        recalculateScrollHeight();
+
+        addNoDatasets();
     }
 
     private void goToMissionStart(DatasetCard ci,
@@ -159,7 +174,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                         });
                     });
                 } else {
-                    final var time = start;
+                    var time = start;
                     GaiaSky.postRunnable(() -> {
                         // First, time.
                         EventManager.publish(Event.TIME_CHANGE_CMD, this, time);
@@ -605,10 +620,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final gaiasky.event.Event event,
+    public void notify(gaiasky.event.Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
+            case CATALOGS_RELOAD -> reloadDatasets();
             case CATALOG_ADD -> {
                 removeNoDatasets();
                 addCatalogInfo((DatasetCard) data[0]);

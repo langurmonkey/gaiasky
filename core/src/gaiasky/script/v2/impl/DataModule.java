@@ -135,7 +135,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         return load_star_dataset(name, path, DatasetCard.DatasetSourceType.SCRIPT, factor, label_color, null, null, sync);
     }
 
-    public boolean load_star_dataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, boolean sync) {
+    public boolean load_star_dataset(String dsName, String path, double magnitudeScale, List<?> labelColor, boolean sync) {
         return load_star_dataset(dsName, path, magnitudeScale, api.dArray(labelColor), sync);
     }
 
@@ -153,9 +153,9 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
     public boolean load_star_dataset(String dsName,
                                      String path,
                                      double magnitudeScale,
-                                     final List<?> labelColor,
-                                     final List<?> fadeIn,
-                                     final List<?> fadeOut,
+                                     List<?> labelColor,
+                                     List<?> fadeIn,
+                                     List<?> fadeOut,
                                      boolean sync) {
         return load_star_dataset(dsName, path, magnitudeScale, api.dArray(labelColor), api.dArray(fadeIn), api.dArray(fadeOut), sync);
     }
@@ -247,13 +247,13 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
     public boolean load_particle_dataset(String dsName,
                                          String path,
                                          double profileDecay,
-                                         final List<?> particleColor,
+                                         List<?> particleColor,
                                          double colorNoise,
-                                         final List<?> labelColor,
+                                         List<?> labelColor,
                                          double particleSize,
                                          String ct,
-                                         final List<?> fadeIn,
-                                         final List<?> fadeOut,
+                                         List<?> fadeIn,
+                                         List<?> fadeOut,
                                          boolean sync) {
         return load_particle_dataset(dsName,
                                      path,
@@ -299,14 +299,14 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
     public boolean load_particle_dataset(String dsName,
                                          String path,
                                          double profileDecay,
-                                         final List<?> particleColor,
+                                         List<?> particleColor,
                                          double colorNoise,
-                                         final List<?> labelColor,
+                                         List<?> labelColor,
                                          double particleSize,
                                          List<?> sizeLimits,
                                          String ct,
-                                         final List<?> fadeIn,
-                                         final List<?> fadeOut,
+                                         List<?> fadeIn,
+                                         List<?> fadeOut,
                                          boolean sync) {
         return load_particle_dataset(dsName,
                                      path,
@@ -554,7 +554,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
         try {
             logger.info(I18n.msg("notif.catalog.loading", pathString));
             var jsonFile = Gdx.files.absolute(pathString);
-            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(jsonFile, scene);
+            Array<Entity> objects = SceneJsonLoader.loadJsonFile(jsonFile, scene);
             JsonReader jsonReader = new JsonReader();
             JsonValue model = jsonReader.parse(jsonFile.read());
             String dsKey = model.get("key") != null ? model.get("key").asString() : null;
@@ -572,17 +572,6 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                     objects.forEach(scene.engine::addEntity);
                     objects.forEach(scene::initializeEntity);
                     objects.forEach(scene::addToIndex);
-                    // Inject dataset key to dataset card.
-                    if (dsKey != null) {
-                        objects.forEach((entity) -> {
-                            if (Mapper.datasetDescription.has(entity)) {
-                                var dc = Mapper.datasetDescription.get(entity);
-                                if (dc.datasetCard != null && dc.datasetCard.dsKey == null) {
-                                    dc.datasetCard.setDatasetKey(dsKey);
-                                }
-                            }
-                        });
-                    }
 
                     // Wait for entity in new task.
                     GaiaSky.instance.getExecutorService().execute(() -> {
@@ -595,6 +584,18 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                         api.base.post_runnable(() -> {
                             objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
                             objects.forEach(scene::setUpEntity);
+                            // Inject dataset key to dataset card.
+                            if (dsKey != null) {
+                                objects.forEach((entity) -> {
+                                    if (Mapper.datasetDescription.has(entity)) {
+                                        var dc = Mapper.datasetDescription.get(entity);
+                                        if (dc.datasetCard != null && dc.datasetCard.dsKey == null) {
+                                            dc.datasetCard.setDatasetKey(dsKey);
+                                        }
+                                    }
+                                });
+                                EventManager.publish(Event.CATALOGS_RELOAD, this);
+                            }
                             GaiaSky.instance.touchSceneGraph();
 
                             if (select) {
