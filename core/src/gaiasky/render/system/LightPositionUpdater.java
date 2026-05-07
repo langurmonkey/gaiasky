@@ -18,7 +18,7 @@ import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3D;
 

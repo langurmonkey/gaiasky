@@ -10,7 +10,7 @@ package gaiasky.scene.component.tag;
 import com.badlogic.ashley.core.Component;
 
 /**
- * Tag component indicating that the entity should not be processed by systems.
+ * Tag for entities should not be processed at all by any systems.
  */
 public class TagNoProcess implements Component {
 }

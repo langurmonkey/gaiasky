@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util;
+package gaiasky.data.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.GraphicsQuality;
@@ -47,9 +48,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-/**
- * Contains resources that don't change during the runtime of the application.
- */
 public class GlobalResources implements Disposable {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
     private static final Vector3D aux = new Vector3D();

@@ -9,5 +9,8 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Tag for entities that are objects in an octree.
+ */
 public class TagOctreeObject implements Component {
 }

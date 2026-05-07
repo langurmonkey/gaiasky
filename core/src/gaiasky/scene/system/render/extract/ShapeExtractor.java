@@ -25,15 +25,15 @@ public class ShapeExtractor extends AbstractExtractSystem {
         var base = Mapper.base.get(entity);
         var render = Mapper.render.get(entity);
         var label = Mapper.label.get(entity);
-        boolean mustRender = mustRender(base);
-        if (mustRender) {
+
+        if (mustRender(base)) {
             var model = Mapper.model.get(entity);
             if (model.model != null) {
                 addToRender(render, render.renderGroup != null ? render.renderGroup : RenderGroup.MODEL_VERT_ADDITIVE);
             }
-        }
-        if (mustRender && label.renderLabel() || label.forceLabel()) {
-            addToRender(render, RenderGroup.FONT_LABEL);
+            if (label.renderLabel() || label.forceLabel()) {
+                addToRender(render, RenderGroup.FONT_LABEL);
+            }
         }
     }
 }

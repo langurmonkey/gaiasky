@@ -17,15 +17,20 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
 
-public class QuitWindow extends GenericDialog {
+/**
+ * A dialog that asks user for confirmation on quitting the program.
+ */
+public class QuitDialog extends GenericDialog {
 
     private OwnCheckBox doNotAsk;
 
-    public QuitWindow(Stage ui, Skin skin) {
+    public QuitDialog(Stage ui, Skin skin) {
         super(I18n.msg("gui.quit.title"), skin, ui);
 
         setAcceptText(I18n.msg("gui.yes"));
         setCancelText(I18n.msg("gui.no"));
+
+        setModal(false);
 
         buildSuper();
     }

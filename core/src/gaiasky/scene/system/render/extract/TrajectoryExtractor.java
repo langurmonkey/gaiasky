@@ -44,7 +44,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
     protected void addToRenderLists(Entity entity, ICamera camera) {
         var base = Mapper.base.get(entity);
 
-        if (this.mustRender(base)) {
+        if (mustRender(base)) {
             var trajectory = Mapper.trajectory.get(entity);
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
@@ -78,7 +78,11 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                         // body radius units.
                         if (bodyBody.distToCamera > trajectory.distDown) {
                             if (bodyBody.distToCamera < trajectory.distUp)
-                                trajectory.alpha *= MathUtilsDouble.lint(bodyBody.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
+                                trajectory.alpha *= MathUtilsDouble.lint(bodyBody.distToCamera,
+                                                                         trajectory.distDown / camera.getFovFactor(),
+                                                                         trajectory.distUp / camera.getFovFactor(),
+                                                                         0,
+                                                                         1);
                             addToRender(render, verts.renderGroup);
                             added = true;
                         }
@@ -90,7 +94,8 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                 }
             }
             // Orbital element renderer.
-            if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && renderer.isOn(ComponentType.Asteroids)) {
+            if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && renderer.isOn(
+                    ComponentType.Asteroids)) {
                 addToRender(render, RenderGroup.ORBITAL_ELEMENTS_PARTICLE);
             }
             if (label.renderLabel() && label.forceLabel()) {

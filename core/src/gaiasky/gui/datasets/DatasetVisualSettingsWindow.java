@@ -22,7 +22,7 @@ import gaiasky.gui.window.GenericDialog;
 import gaiasky.scene.Mapper;
 import gaiasky.util.DatasetCard;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector2D;
 import gaiasky.util.parse.Parser;

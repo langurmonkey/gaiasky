@@ -40,7 +40,7 @@ import gaiasky.scene.record.MachineDefinition;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntModelBuilder;

@@ -28,10 +28,7 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
 import gaiasky.data.OctreeLoader;
 import gaiasky.data.api.OrientationServer;
-import gaiasky.data.util.OrbitDataLoader;
-import gaiasky.data.util.OrientationServerLoader;
-import gaiasky.data.util.PointCloudData;
-import gaiasky.data.util.SceneLoader;
+import gaiasky.data.util.*;
 import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
 import gaiasky.desktop.GaiaSkyDesktop.CLIArgs;
 import gaiasky.event.Event;
@@ -59,7 +56,7 @@ import gaiasky.script.ConsoleManager;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
-import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
+import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.Camcorder;
@@ -499,6 +496,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(GaiaSkyAssets.class, new GaiaSkyLoader(internalResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(VSOP87Binary.class, new VSOP87Loader(dataResolver));
+        assetManager.setLoader(ParticleSetData.class, new ParticleSetLoader(internalResolver));
 
         // Init global resources -- Can't be postponed!
         this.globalResources = new GlobalResources();

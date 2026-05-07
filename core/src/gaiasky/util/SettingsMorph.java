@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import gaiasky.GaiaSky;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.CamcorderSettings.KeyframeSettings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;

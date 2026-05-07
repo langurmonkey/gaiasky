@@ -83,6 +83,7 @@ public class SetUtils {
         if (fullInit) {
             baseInitializer.setUpEntity(entity);
             starSetInitializer.setUpEntity(entity);
+            base.initialized = true;
         }
         return entity;
     }

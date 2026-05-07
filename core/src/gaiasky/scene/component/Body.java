@@ -10,7 +10,7 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
 

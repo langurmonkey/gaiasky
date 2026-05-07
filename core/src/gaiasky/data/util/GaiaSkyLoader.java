@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util;
+package gaiasky.data.util;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -22,14 +22,13 @@ import gaiasky.render.MainPostProcessor;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
-import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
+import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
+import gaiasky.util.CatalogManager;
+import gaiasky.util.LocationLogManager;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.svt.SVTManager;
 
-/**
- * Loads {@link GaiaSkyAssets}.
- */
 public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSkyLoaderParameters> {
 
     private GaiaSkyAssets assets;
@@ -47,10 +46,10 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
         // Tooltip to 1s
         TooltipManager.getInstance().initialTime = 1f;
 
-        // Initialise hidden helper user
+        // Initialize hidden helper user
         HiddenHelperUser.initialize();
 
-        // Initialise gravitational waves helper
+        // Initialize gravitational waves helper
         RelativisticEffectsManager.initialize(parameter.gaiaSky.time);
 
         // Location log

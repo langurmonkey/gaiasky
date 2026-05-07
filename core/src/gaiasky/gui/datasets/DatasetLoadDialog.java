@@ -19,7 +19,7 @@ import gaiasky.util.scene2d.ColorPicker;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.GuiUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -58,6 +58,8 @@ public class DatasetLoadDialog extends GenericDialog {
 
         setAcceptText(I18n.msg("gui.ok"));
         setCancelText(I18n.msg("gui.cancel"));
+
+        setModal(false);
 
         buildSuper();
     }

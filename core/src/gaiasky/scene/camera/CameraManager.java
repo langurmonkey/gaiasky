@@ -20,7 +20,7 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Nature;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.camera.Proximity;

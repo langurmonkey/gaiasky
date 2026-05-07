@@ -9,5 +9,8 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Tag for entities whose children are not to be processed.
+ */
 public class TagNoProcessChildren implements Component {
 }

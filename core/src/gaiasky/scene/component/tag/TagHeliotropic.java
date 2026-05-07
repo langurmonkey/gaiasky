@@ -9,5 +9,9 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Tag for heliotropic entities, which position themselves with respect to the
+ * positions of both Earth and Sun.
+ */
 public class TagHeliotropic implements Component {
 }

@@ -68,7 +68,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         // Update light with global position.
         LightingUtils.updateLights(model, body, camera);
         updateLocalTransform(entity, body, graph, scaffolding);
-        updateRing(entity, body, model);
+        updateRing(body, model);
 
         // Atmosphere.
         if (atmosphere != null && atmosphere.atmosphere != null) {
@@ -95,7 +95,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         }
     }
 
-    protected void updateRing(Entity entity, Body body, Model model) {
+    protected void updateRing(Body body, Model model) {
         if (model.model != null && model.model.ringDataset) {
             // Compute alpha.
             var d = body.distToCamera;

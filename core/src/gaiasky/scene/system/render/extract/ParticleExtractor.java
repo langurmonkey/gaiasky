@@ -35,11 +35,13 @@ public class ParticleExtractor extends AbstractExtractSystem {
     }
 
     private void addToRenderLists(Entity entity, ICamera camera) {
+        // Does this need to be outside the 'mustRender' case?
         view.setEntity(entity);
-        var base = Mapper.base.get(entity);
         camera.checkClosestParticle(view);
 
-        if (this.mustRender(base)) {
+        var base = Mapper.base.get(entity);
+        if (mustRender(base)) {
+
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
             var hip = Mapper.hip.get(entity);

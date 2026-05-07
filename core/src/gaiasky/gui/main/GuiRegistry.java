@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -386,7 +387,7 @@ public class GuiRegistry implements IObserver {
                         } else {
                             Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
                             if (GaiaSky.settings().program.exitConfirmation) {
-                                QuitWindow quit = new QuitWindow(stage, skin);
+                                QuitDialog quit = new QuitDialog(stage, skin);
                                 if (data.length > 0) {
                                     quit.setAcceptListener(quitRunnable);
                                 }

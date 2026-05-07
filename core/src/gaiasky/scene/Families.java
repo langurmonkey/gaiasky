@@ -53,7 +53,7 @@ public class Families {
 
     public Families() {
         roots = Family.all(GraphRoot.class).exclude(TagNoProcess.class, TagNoProcessGraph.class).get();
-        graphNodes = Family.all(Base.class, GraphNode.class).exclude(TagNoProcess.class, TagOctreeObject.class, TagSetElement.class).get();
+        graphNodes = Family.all(Base.class, GraphNode.class).exclude(TagNoProcess.class, TagOctreeObject.class, TagSetElements.class).get();
         models = Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class)
                 .exclude(Hip.class, TagNoProcess.class)
                 .get();
@@ -66,8 +66,8 @@ public class Families {
         particles = Family.all(Base.class, Celestial.class, ProperMotion.class, ParticleExtra.class)
                 .exclude(TagNoProcess.class)
                 .get();
-        orbits = Family.all(Trajectory.class, Verts.class).exclude(TagNoProcess.class, TagSetElement.class).get();
-        orbitsTLE = Family.all(TLESource.class).exclude(TagNoProcess.class, TagSetElement.class).get();
+        orbits = Family.all(Trajectory.class, Verts.class).exclude(TagNoProcess.class, TagSetElements.class).get();
+        orbitsTLE = Family.all(TLESource.class).exclude(TagNoProcess.class, TagSetElements.class).get();
         locations = Family.all(LocationMark.class).exclude(TagNoProcess.class).get();
         billboardSets = Family.all(BillboardSet.class).exclude(TagNoProcess.class).get();
         billboardGalaxies = Family.all(TagBillboardGalaxy.class).exclude(TagNoProcess.class).get();

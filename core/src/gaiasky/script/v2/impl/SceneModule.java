@@ -38,7 +38,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.script.v2.api.SceneAPI;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.*;

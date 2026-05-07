@@ -7,6 +7,7 @@
 
 package gaiasky.event;
 
+import gaiasky.data.util.GlobalResources;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.api.IFocus;
@@ -1502,7 +1503,7 @@ public enum Event {
      **/
     TURNING_SPEED_CMD,
     /**
-     * Issues the command to reload the UI, contains the {@link gaiasky.util.GlobalResources} instance.
+     * Issues the command to reload the UI, contains the {@link GlobalResources} instance.
      */
     UI_RELOAD_CMD,
     /**

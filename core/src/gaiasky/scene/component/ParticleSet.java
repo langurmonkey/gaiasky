@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
 import gaiasky.GaiaSky;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -367,9 +368,6 @@ public class ParticleSet implements Component, IDisposable {
     /** Auxiliary matrix. **/
     protected final Matrix4D mat = new Matrix4D();
 
-    /** The set is ready to render. This is flipped when initialization is fully done. **/
-    public boolean readyToRender;
-
     public float[] getColorMin() {
         return ccMin;
     }
@@ -452,7 +450,7 @@ public class ParticleSet implements Component, IDisposable {
         var update = new UpdaterHelper("Index", pointData.size());
         FastObjectIntMap<String> index = new FastObjectIntMap<>((int) (pointData.size() * 1.25f), String.class);
         synchronized (indexSync) {
-            update.pre();
+            update.start();
             int n = pointData.size();
 
             for (int idx = 0; idx < n; idx++) {
@@ -470,7 +468,7 @@ public class ParticleSet implements Component, IDisposable {
                 }
                 update.update(idx);
             }
-            update.post();
+            update.end();
         }
         return index;
     }

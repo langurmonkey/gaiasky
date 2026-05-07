@@ -14,6 +14,7 @@ import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Archetype;
+import gaiasky.scene.system.initialize.EntityInitializer;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 
@@ -37,12 +38,12 @@ public class Base implements Component, ICopy {
     /**
      * The index of the localized name in the {@link #names} array.
      */
-    public int localizedNameIndex = 0;
+    public int localizedNameIndex;
 
     /**
      * Time of last visibility change in milliseconds
      */
-    public long lastStateChangeTimeMs = 0;
+    public long lastStateChangeTimeMs;
 
     /**
      * The ownOpacity value (alpha)
@@ -59,6 +60,13 @@ public class Base implements Component, ICopy {
      */
     public boolean computed = true;
 
+
+    /**
+     * Flag marking entities as fully initialized. This means that both {@link EntityInitializer#initializeEntity} and
+     * {@link EntityInitializer#setUpEntity} have run.
+     */
+    public boolean initialized;
+
     /**
      * Is this node visible?
      */
@@ -67,12 +75,7 @@ public class Base implements Component, ICopy {
     /**
      * Is this just a copy?
      */
-    public boolean copy = false;
-
-    /**
-     * Has this been updated at least once?
-     */
-    public boolean initialUpdate = false;
+    public boolean copy;
 
     /**
      * Extra attributes.
@@ -148,10 +151,11 @@ public class Base implements Component, ICopy {
             return false;
         } else {
             for (String name : names) {
+                String s = name;
                 if (!matchCase) {
-                    name = name.toLowerCase(Locale.ROOT);
+                    s = s.toLowerCase(Locale.ROOT);
                 }
-                if (name.equals(candidate) || name.contains(candidate))
+                if (s.equals(candidate) || s.contains(candidate))
                     return true;
             }
         }

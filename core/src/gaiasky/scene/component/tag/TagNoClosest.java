@@ -9,5 +9,8 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Tag for entities that should not be considered during the closest-to-camera computations.
+ */
 public class TagNoClosest implements Component {
 }

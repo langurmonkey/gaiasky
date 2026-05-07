@@ -9,5 +9,8 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Tag for the Virtual Reality interface object.
+ */
 public class TagVRUI implements Component {
 }

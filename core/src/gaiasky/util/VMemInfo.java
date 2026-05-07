@@ -7,6 +7,7 @@
 
 package gaiasky.util;
 
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Logger.Log;
 import org.lwjgl.opengl.ATIMeminfo;
 import org.lwjgl.opengl.GL20;

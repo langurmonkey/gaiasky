@@ -14,14 +14,18 @@ public interface EntityInitializer {
     /**
      * Contains the initialization of this entity before the scene graph
      * structure has been constructed, or the entity is in the index.
+     * Typically, this adds resources to load via the asset manager, and
+     * initializes basic attributes.
      *
      * @param entity The entity.
      */
     void initializeEntity(Entity entity);
 
     /**
-     * Contains the set up of this entity, after the entity has been
-     * added to the scene graph and it is in the index.
+     * Contains the set-up of this entity, after the entity has been
+     * added to the scene graph, it is in the index, and assets have been loaded.
+     * Typically, this fetches loaded assets from the asset manager, and
+     * completes the initialization.
      *
      * @param entity The entity.
      */

@@ -15,6 +15,7 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
+import gaiasky.util.UpdaterHelper;
 import gaiasky.util.camera.rec.Camcorder.RecorderState;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
@@ -481,14 +482,14 @@ public class KeyframesManager implements IObserver {
                 outputFile = SysUtils.uniqueFileName(outputFile);
             }
         }
-        final var output = outputFile;
+        var output = outputFile;
 
         final var scriptName = "optflowcam_convert.py";
         final var inputFileName = "temp_keyframes.gkf";
-        final var progressName = "OptFlowCam export: " + output.toString();
+        var progressName = "OptFlowCam export: " + output.toString();
 
-        // Init progress bar.
-        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.01f);
+        var updater = new UpdaterHelper(progressName, 6);
+        updater.start();
 
         GaiaSky.instance.getExecutorService().execute(() -> {
             // Dependency detection.
@@ -499,24 +500,24 @@ public class KeyframesManager implements IObserver {
             if (!hasPython || !hasUv) {
                 String missing = (!hasPython && !hasUv) ? "Python 3 and uv" : (!hasPython ? "Python 3" : "uv");
                 GaiaSky.popupNotification(I18n.msg("error.process.run", "Missing " + missing + ": Install to use OptFlowCam."), 15, this, Logger.LoggerLevel.ERROR, null);
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
+                updater.end();
                 return;
             }
-            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.2f);
+            updater.update(1);
 
             EventManager.publish(Event.KEYFRAMES_FILE_SAVE, this, keyframes, inputFileName, true, false);
             var inputFile = SysUtils.getDefaultCameraDir().resolve(inputFileName);
 
             try {
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.3f);
+                updater.update(2);
                 GaiaSky.popupNotification("Installing dependencies with uv...", 5, this);
                 logger.info("OptFlowCam: Running 'uv install' in " + scriptLocation);
 
-                if (!prepareUVEnvironment(scriptLocation, pythonInterpreter, progressName, this)) {
+                if (!prepareUVEnvironment(scriptLocation, pythonInterpreter, updater, this)) {
                     return;
                 }
 
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.5f);
+                updater.update(3);
 
                 GaiaSky.popupNotification("Processing keyframes with OptFlowCam...", 5, this);
                 logger.info("OptFlowCam: Running script " + scriptName);
@@ -534,7 +535,7 @@ public class KeyframesManager implements IObserver {
                 var process = builder.start();
                 process.waitFor();
 
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.9f);
+                updater.update(4);
 
                 if (process.exitValue() == 0) {
                     var outputFileLocation = output.toAbsolutePath().toString();
@@ -550,7 +551,7 @@ public class KeyframesManager implements IObserver {
                 }
                 process.destroy();
 
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 0.99f);
+                updater.update(5);
 
             } catch (IOException | InterruptedException e) {
                 GaiaSky.popupNotification(I18n.msg("error.process.run", e.getLocalizedMessage()), 10, this, Logger.LoggerLevel.ERROR, e);
@@ -561,12 +562,12 @@ public class KeyframesManager implements IObserver {
                 } catch (IOException e) {
                     logger.error("Failed to delete temp file: " + inputFile, e);
                 }
-                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, progressName, 2f);
+                updater.end();
             }
         });
     }
 
-    private static boolean prepareUVEnvironment(Path scriptLocation, String pythonInterpreter, String progressName, Object me) throws IOException, InterruptedException {
+    private static boolean prepareUVEnvironment(Path scriptLocation, String pythonInterpreter, UpdaterHelper updater, Object me) throws IOException, InterruptedException {
         Process initProcess = new ProcessBuilder(buildUvCommand(pythonInterpreter, "init", "-q"))
                 .directory(scriptLocation.toFile())
                 .start();
@@ -579,7 +580,7 @@ public class KeyframesManager implements IObserver {
 
         if (installProcess.exitValue() != 0) {
             GaiaSky.popupNotification(I18n.msg("error.process.run", "'uv add' process failed"), 10, me, Logger.LoggerLevel.ERROR, null);
-            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, me, progressName, 2f);
+            updater.end();
             return false;
         }
 
@@ -638,7 +639,7 @@ public class KeyframesManager implements IObserver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
 
         switch (event) {
         case KEYFRAMES_FILE_SAVE -> {

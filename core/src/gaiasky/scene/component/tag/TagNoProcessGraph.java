@@ -9,5 +9,8 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
+/**
+ * Tag for the graph root.
+ */
 public class TagNoProcessGraph implements Component {
 }

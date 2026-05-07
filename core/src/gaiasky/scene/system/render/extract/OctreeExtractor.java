@@ -38,10 +38,11 @@ public class OctreeExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        var root = Mapper.octant.get(entity);
-        var octree = Mapper.octree.get(entity);
 
-        if (base.isVisible() && !base.copy) {
+        if (mustRender(base)) {
+            var root = Mapper.octant.get(entity);
+            var octree = Mapper.octree.get(entity);
+
             // Extract objects.
             extractParticleSet(entity, octree);
 

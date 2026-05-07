@@ -13,6 +13,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Logger;
+import gaiasky.util.UpdaterHelper;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
 
@@ -215,12 +216,11 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             // Read size of stars.
             int size = mem.getInt();
 
+            UpdaterHelper updater = null;
+
             if (progress) {
-                // Initialize progress.
-                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                this,
-                                                                file,
-                                                                0f));
+                updater = new UpdaterHelper(file, size);
+                updater.start();
             }
 
             list = new ArrayList<>(size);
@@ -229,11 +229,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
                 if (progress) {
                     // Update progress.
-                    final int idx = i;
-                    GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                    this,
-                                                                    file,
-                                                                    (float) idx / (float) (size - 1)));
+                    updater.update(i);
                 }
             }
 
@@ -241,10 +237,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
             if (progress) {
                 // End progress.
-                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                this,
-                                                                file,
-                                                                2f));
+                updater.end();
             }
 
             return list;

@@ -18,8 +18,6 @@ import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.GaiaSky;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.scene.AttributeMap;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
@@ -30,6 +28,7 @@ import gaiasky.util.Functions.Function3;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.TextUtils;
+import gaiasky.util.UpdaterHelper;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.i18n.I18n;
 
@@ -100,7 +99,9 @@ public class JsonLoader extends AbstractSceneLoader {
             if (root.has("objects")) {
                 // If the top element is 'objects', we have a list of new objects.
                 JsonValue child = root.get("objects").child;
-                final int count = root.get("objects").size;
+                int count = root.get("objects").size;
+                var updater = new UpdaterHelper(file.name(), count);
+                updater.start();
                 int processed = 0;
                 int loaded = 0;
                 while (child != null) {
@@ -131,17 +132,9 @@ public class JsonLoader extends AbstractSceneLoader {
                     }
 
                     child = child.next;
-                    final float progressPercent = (float) processed / (float) count;
-                    GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                    this,
-                                                                    file.name(),
-                                                                    progressPercent));
+                    updater.update(processed);
                 }
-                // End progress bar.
-                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                this,
-                                                                file.name(),
-                                                                2f));
+                updater.end();
                 logger.info(I18n.msg("notif.nodeloader", loaded, filePath));
             } else if (root.has("updates")) {
                 // If the top element is 'updates', we update existing objects with additional attributes.
@@ -156,7 +149,9 @@ public class JsonLoader extends AbstractSceneLoader {
         for (var model : updates) {
             var file = updateFiles.get(i);
             JsonValue child = model.get("updates").child;
-            final int count = model.get("updates").size;
+            int count = model.get("updates").size;
+            var updater = new UpdaterHelper(file.name(), count);
+            updater.start();
             int processed = 0;
             while (child != null) {
                 String name = child.getString("name");
@@ -183,13 +178,10 @@ public class JsonLoader extends AbstractSceneLoader {
                 }
 
                 child = child.next;
-                final float progressPercent = (float) processed / (float) count;
-                GaiaSky.postRunnable(() -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                  this,
-                                                                  file.name(),
-                                                                  progressPercent));
+                updater.update(processed);
             }
             i++;
+            updater.end();
         }
         return loadedEntities;
     }
@@ -296,7 +288,7 @@ public class JsonLoader extends AbstractSceneLoader {
         }
     }
 
-    public void fillEntity(final JsonValue json, final Entity entity, final String className, boolean update) throws ReflectionException {
+    public void fillEntity(JsonValue json, Entity entity, String className, boolean update) throws ReflectionException {
         processJson(json, (valueClass, value, attribute) -> {
             try {
                 // We can't update the name!
@@ -530,7 +522,7 @@ public class JsonLoader extends AbstractSceneLoader {
     }
 
     public Pair<Object, Class> toMultidimDoubleArray(JsonValue attribute) {
-        final int dim = depth(attribute) - 1;
+        int dim = depth(attribute) - 1;
         switch (dim) {
             case 1 -> {
                 return to1DoubleArray(attribute);

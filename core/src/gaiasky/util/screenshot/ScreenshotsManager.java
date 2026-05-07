@@ -19,7 +19,7 @@ import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.OneTimeRunnable;
 import gaiasky.util.Settings.ImageFormat;
 import gaiasky.util.i18n.I18n;

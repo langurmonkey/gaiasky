@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.glutils.GLOnlyTextureData;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import gaiasky.GaiaSky;
 import gaiasky.scene.record.BilinearInterpolator.GridModel;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.SysUtils;
 
 public final class HeightDataPixmap implements IHeightData {

@@ -23,7 +23,7 @@ import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;

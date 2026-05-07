@@ -27,12 +27,12 @@ public class LocExtractor extends AbstractExtractSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        view.setEntity(entity);
-        if (!view.renderTextLocation()) {
-            return;
-        }
         var base = Mapper.base.get(entity);
         if (mustRender(base)) {
+            view.setEntity(entity);
+            if (!view.renderTextLocation()) {
+                return;
+            }
             var loc = Mapper.loc.get(entity);
             addToRender(Mapper.render.get(entity), RenderGroup.FONT_LABEL);
             // Only render marker if texture is not 'none'.

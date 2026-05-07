@@ -584,6 +584,7 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                         api.base.post_runnable(() -> {
                             objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
                             objects.forEach(scene::setUpEntity);
+                            scene.reportDebugObjects();
                             // Inject dataset key to dataset card.
                             if (dsKey != null) {
                                 objects.forEach((entity) -> {

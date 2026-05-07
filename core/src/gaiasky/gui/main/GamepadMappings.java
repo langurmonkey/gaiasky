@@ -7,7 +7,7 @@
 
 package gaiasky.gui.main;
 
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.parse.Parser;

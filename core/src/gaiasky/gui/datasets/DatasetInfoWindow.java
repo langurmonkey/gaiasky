@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.GaiaSky;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.DatasetCard;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnImage;

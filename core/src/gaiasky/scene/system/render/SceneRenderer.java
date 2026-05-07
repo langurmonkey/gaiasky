@@ -46,7 +46,7 @@ import gaiasky.scene.system.render.pass.RenderPass;
 import gaiasky.scene.system.render.pass.SVTRenderPass;
 import gaiasky.scene.system.render.pass.ShadowMapRenderPass;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.IntModelBatch;

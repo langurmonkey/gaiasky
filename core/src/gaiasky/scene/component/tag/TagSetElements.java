@@ -9,5 +9,8 @@ package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 
-public class TagSetElement implements Component {
+/**
+ * Tag for orbital elements sets.
+ */
+public class TagSetElements implements Component {
 }

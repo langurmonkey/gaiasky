@@ -19,7 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.OrbitElementsSet;
-import gaiasky.scene.component.tag.TagSetElement;
+import gaiasky.scene.component.tag.TagSetElements;
 import gaiasky.scene.entity.ElementsSetRadio;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.util.Logger;
@@ -125,7 +125,7 @@ public class ElementsSetInitializer extends AbstractInitSystem {
         if (graph.children != null && graph.children.size > 0) {
             for (Entity e : graph.children) {
                 // Add tag to identify them as set elements.
-                e.add(new TagSetElement());
+                e.add(new TagSetElements());
 
                 // The orbits need to go to the alwaysUpdate list.
                 if (Mapper.trajectory.has(e)) {

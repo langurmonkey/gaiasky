@@ -255,6 +255,11 @@ public class Scene {
 
             // Run once.
             runOnce(initializers);
+
+            // Mark initialized if we are at the second stage (set-up).
+            if (setUp) {
+                engine.getEntities().forEach((entity) -> Mapper.base.get(entity).initialized = true);
+            }
         }
     }
 
@@ -263,8 +268,7 @@ public class Scene {
      */
     public void initializeIndex() {
         if (engine != null) {
-            int numEntities = engine.getEntities()
-                    .size();
+            int numEntities = engine.getEntities().size();
 
             index = new Index(archetypes, numEntities);
             copyIndex = ThreadLocal.withInitial(HashMap::new);
@@ -413,6 +417,8 @@ public class Scene {
                 }
             }
         }
+        // Mark as initialized.
+        Mapper.base.get(entity).initialized = true;
     }
 
     /**
@@ -977,15 +983,12 @@ public class Scene {
      * @return The number of objects it holds.
      */
     public int getNumberObjects(Entity entity) {
-
         if (Mapper.particleSet.has(entity)) {
-            return Mapper.particleSet.get(entity)
-                    .data()
-                    .size();
+            var set = Mapper.particleSet.get(entity);
+            return set.data() == null ? 0 : set.data().size();
         } else if (Mapper.starSet.has(entity)) {
-            return Mapper.starSet.get(entity)
-                    .data()
-                    .size();
+            var set = Mapper.starSet.get(entity);
+            return set.data() == null ? 0 : set.data().size();
         } else if (Mapper.octree.has(entity)) {
             var octant = Mapper.octant.get(entity);
             return getNumberObjects(octant.octant);

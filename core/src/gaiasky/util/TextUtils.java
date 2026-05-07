@@ -9,6 +9,7 @@ package gaiasky.util;
 
 import com.badlogic.gdx.utils.CharArray;
 import gaiasky.GaiaSky;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
 

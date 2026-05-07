@@ -25,7 +25,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.ModelView;
-import gaiasky.util.GaiaSkyAssets;
+import gaiasky.data.util.GaiaSkyAssets;
 import gaiasky.util.svt.SVTManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;

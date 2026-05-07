@@ -10,7 +10,7 @@ package gaiasky.scene.record;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.render.BlendMode;
-import gaiasky.util.GlobalResources;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.util.gdx.graphics.VolumeTexture;
 import gaiasky.util.gdx.loader.VolumeTextureLoader;
 

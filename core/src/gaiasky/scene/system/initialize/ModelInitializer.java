@@ -212,16 +212,7 @@ public class ModelInitializer extends AbstractInitSystem {
             }
         }
 
-        // Ringed models with dataset -> Fade out the ring.
-        if (model != null
-                && model.model != null
-                && model.model.type != null
-                && model.model.type.equalsIgnoreCase("ring")) {
-            model.model.ringDataset = graph.numChildren > 0
-                    && graph.getFirstChildOfType(GaiaSky.instance.scene.archetypes()
-                                                         .get("ParticleGroup")) != null;
-
-        }
+        // The ring dataset is initialized in ParticleSetInitializer.
     }
 
     private void initializeSpacecraft(Entity entity,

@@ -18,8 +18,8 @@ import gaiasky.data.AssetBean;
 import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.data.api.IStarGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
+import gaiasky.data.util.ParticleSetData;
+import gaiasky.data.util.ParticleSetLoader;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
@@ -80,7 +80,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Initialize particle set
         if (starSet == null) {
             initializeCommon(entity, base, particleSet, label);
-            initializeParticleSet(entity, particleSet, label, transform);
+            initializeParticleSet(particleSet, label, transform);
         } else {
             initializeCommon(entity, base, starSet, label);
             initializeStarSet(entity, starSet, label, transform);
@@ -89,51 +89,22 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
+        var particleSet = Mapper.particleSet.get(entity);
+        var starSet = Mapper.starSet.get(entity);
+
+        if (starSet != null) {
+            setUpStarSet(entity, starSet);
+        } else {
+            setUpParticleSet(entity, particleSet);
+        }
+
         // Textures.
         var base = Mapper.base.get(entity);
-        var particleSet = Mapper.particleSet.get(entity);
         AssetManager manager = AssetBean.manager();
         if (manager.contains(base.getName() + " TextureArray")) {
             particleSet.textureArray = manager.get(base.getName() + " TextureArray");
         }
 
-        var starSet = Mapper.starSet.get(entity);
-
-        if (starSet != null) {
-            // Stars.
-            // Is it a catalog of variable stars?
-            starSet.variableStars = !starSet.pointData.isEmpty() && starSet.pointData.getFirst()
-                    .isVariable();
-            // We need the sorting data ALWAYS, not only when numLabels > 0.
-            // We use them to draw the close-up stars.
-            initSortingData(entity, starSet);
-
-            var model = Mapper.model.get(entity);
-
-            // Star set.
-            model.renderConsumer = ModelEntityRenderSystem::renderParticleStarSetModel;
-
-            // Ready to render.
-            starSet.readyToRender = true;
-
-            // Load model in main thread
-            GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
-
-        } else {
-            // Particles.
-            if (particleSet.numLabels > 0) {
-                initSortingData(entity, particleSet);
-            }
-
-            // Model.
-            if (particleSet.modelFile != null && manager.isLoaded(GaiaSky.settings().data.dataFile(particleSet.modelFile))) {
-                // Model comes from file (probably .obj or .g3db)
-                particleSet.model = manager.get(GaiaSky.settings().data.dataFile(particleSet.modelFile), IntModel.class);
-            }
-
-            // Ready to render.
-            particleSet.readyToRender = true;
-        }
     }
 
     /**
@@ -193,13 +164,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
     /**
      * Initializes a particle set. It loads the data from the provider
      *
-     * @param entity    The entity.
      * @param set       The particle set.
      * @param label     The label component.
      * @param transform The transform.
      */
-    private void initializeParticleSet(Entity entity,
-                                       ParticleSet set,
+    private void initializeParticleSet(ParticleSet set,
                                        Label label,
                                        RefSysTransform transform) {
         set.isStars = false;
@@ -219,47 +188,14 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                     provider.setProviderParams(params);
                 }
                 provider.setTransformMatrix(transform.matrix);
-                // By default, do not generate index in particle sets.
-                set.setData(provider.loadData(set.datafile, set.factor,
-                                              () -> {
-                                                  // Create
-                                                  EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 0f);
-                                              },
-                                              (current, count) -> {
-                                                  EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                       this,
-                                                                       set.datafile,
-                                                                       (float) current / (float) count);
-                                              },
-                                              () -> {
-                                                  // Force remove
-                                                  EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 2f);
-                                              }));
-                set.isExtended = !set.data()
-                        .isEmpty() && set.data()
-                        .getFirst()
-                        .getType() == ParticleType.PARTICLE_EXT;
-                set.isElements = !set.data()
-                        .isEmpty() && set.data()
-                        .getFirst()
-                        .getType() == ParticleType.KEPLER;
 
-                // Same epoch for all particles?
-                set.setUniformEpoch(provider.isUniformEpoch());
-
-                if (provider instanceof STILDataProvider stil) {
-                    set.setColumnInfoList(stil.getColumnInfoList());
-                }
+                AssetManager manager = AssetBean.manager();
+                var param = new ParticleSetLoader.ParticleSetLoaderParameters(provider, set.datafile, set.factor);
+                manager.load(Integer.toString(set.hashCode()), ParticleSetData.class, param);
             } catch (Exception e) {
-                Logger.getLogger(this.getClass())
-                        .error(e);
-                set.pointData = null;
+                logger.error(e);
             }
         }
-
-        computeMinMeanMaxDistances(set);
-        computeMeanPosition(entity, set);
-        setLabelPosition(entity);
 
         // Labels.
         label.labelMax = 1;
@@ -270,6 +206,62 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Model.
         if (set.modelFile != null && !set.modelFile.isBlank()) {
             AssetBean.addAsset(GaiaSky.settings().data.dataFile(set.modelFile), IntModel.class);
+        }
+    }
+
+    public void setUpParticleSet(Entity entity, ParticleSet set) {
+        // First, set data.
+        var key = Integer.toString(set.hashCode());
+        var manager = AssetBean.manager();
+        if (manager.isLoaded(key)) {
+            var psData = AssetBean.manager().get(key, ParticleSetData.class);
+            var provider = psData.provider();
+            set.setData(psData.data());
+
+            set.isExtended = !set.data()
+                    .isEmpty() && set.data()
+                    .getFirst()
+                    .getType() == ParticleType.PARTICLE_EXT;
+            set.isElements = !set.data()
+                    .isEmpty() && set.data()
+                    .getFirst()
+                    .getType() == ParticleType.KEPLER;
+
+            // Same epoch for all particles?
+            set.setUniformEpoch(provider.isUniformEpoch());
+
+            if (provider instanceof STILDataProvider stil) {
+                set.setColumnInfoList(stil.getColumnInfoList());
+            }
+        } else {
+            set.pointData = null;
+        }
+
+        computeMinMeanMaxDistances(set);
+        computeMeanPosition(entity, set);
+        setLabelPosition(entity);
+
+
+        // Then, the rest.
+        if (set.numLabels > 0) {
+            initSortingData(entity, set);
+        }
+
+        // Model.
+        if (set.modelFile != null && manager.isLoaded(GaiaSky.settings().data.dataFile(set.modelFile))) {
+            // Model comes from file (probably .obj or .g3db)
+            set.model = manager.get(GaiaSky.settings().data.dataFile(set.modelFile), IntModel.class);
+        }
+
+        // Set ring dataset to parent, if necessary.
+        // We assume that if the parent of a particle set is a ringed planet (model type "ring"), we are the ring dataset.
+        var graph = Mapper.graph.get(entity);
+        var parent = graph.parent;
+        if (parent != null && Mapper.model.has(parent)) {
+            var model = Mapper.model.get(parent);
+            if (model.model != null && model.model.type != null && model.model.type.equalsIgnoreCase("ring")) {
+                model.model.ringDataset = true;
+            }
         }
     }
 
@@ -299,34 +291,14 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 provider.setProviderParams(set.providerParams);
                 provider.setTransformMatrix(transform.matrix);
 
-                // Set data, generate index
-                List<IParticleRecord> l = provider.loadData(set.datafile,
-                                                            set.factor,
-                                                            () -> {
-                                                                // Create
-                                                                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 0f);
-                                                            },
-                                                            (current, count) -> {
-                                                                EventManager.publish(Event.UPDATE_LOAD_PROGRESS,
-                                                                                     this,
-                                                                                     set.datafile,
-                                                                                     (float) current / (float) count);
-                                                            },
-                                                            () -> {
-                                                                // Force remove
-                                                                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, set.datafile, 2f);
-                                                            });
-                set.setData(l, true);
+                AssetManager manager = AssetBean.manager();
+                var param = new ParticleSetLoader.ParticleSetLoaderParameters(provider, set.datafile, set.factor);
+                manager.load(Integer.toString(set.hashCode()), ParticleSetData.class, param);
 
             } catch (Exception e) {
-                Logger.getLogger(this.getClass())
-                        .error(e);
-                set.pointData = null;
+                logger.error(e);
             }
         }
-
-        computeMeanPosition(entity, set);
-        setLabelPosition(entity);
 
         // Default variability epoch, if not set
         if (set.variabilityEpochJd <= 0) {
@@ -348,6 +320,34 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardStarSet;
         set.numBillboards = set.numBillboards > 0 ? set.numBillboards : GaiaSky.settings().scene.star.group.numBillboard;
 
+    }
+
+    public void setUpStarSet(Entity entity, StarSet set) {
+        // First, data.
+        var key = Integer.toString(set.hashCode());
+        if (AssetBean.manager().isLoaded(key)) {
+            var psData = AssetBean.manager().get(key, ParticleSetData.class);
+            set.setData(psData.data(), true);
+        }
+
+        computeMeanPosition(entity, set);
+        setLabelPosition(entity);
+
+        // Then, the rest.
+        // Is it a catalog of variable stars?
+        set.variableStars = !set.pointData.isEmpty() && set.pointData.getFirst()
+                .isVariable();
+        // We need the sorting data ALWAYS, not only when numLabels > 0.
+        // We use them to draw the close-up stars.
+        initSortingData(entity, set);
+
+        var model = Mapper.model.get(entity);
+
+        // Star set.
+        model.renderConsumer = ModelEntityRenderSystem::renderParticleStarSetModel;
+
+        // Load model in main thread
+        GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
     }
 
     public void computeMinMeanMaxDistances(ParticleSet set) {

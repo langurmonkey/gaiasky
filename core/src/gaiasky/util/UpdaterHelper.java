@@ -15,10 +15,12 @@ import net.jafama.FastMath;
  * This class helps send load progress events in a streamlined way.
  */
 public class UpdaterHelper {
+    private static Logger.Log logger = Logger.getLogger(UpdaterHelper.class);
 
     private final String name;
     private final long count;
     private final long step;
+    private boolean active;
 
     public UpdaterHelper(String name, long count) {
         this.name = name;
@@ -27,20 +29,26 @@ public class UpdaterHelper {
     }
 
 
-    public void pre() {
+    public void start() {
         // Initialize progress with name.
         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, 0f);
+        active = true;
     }
 
     public void update(long current) {
-        // Just update.
-        if (current % step == 0) {
-            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, (float) current / (float) count);
+        if (!active) {
+            logger.warn("Using updater helper without starting it: " + name);
+        } else {
+            // Just update.
+            if (current % step == 0) {
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, (float) current / (float) count);
+            }
         }
     }
 
-    public void post() {
+    public void end() {
         // Remove progress.
         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, 2f);
+        active = false;
     }
 }

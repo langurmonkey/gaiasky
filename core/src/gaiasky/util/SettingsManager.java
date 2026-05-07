@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
