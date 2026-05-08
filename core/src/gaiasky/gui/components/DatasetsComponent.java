@@ -46,6 +46,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Contains the dataset cards in a list view.
+ */
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private static final float MAX_SCROLL_HEIGHT = 800f;
     private final Map<String, Table> groupMap;
@@ -283,7 +286,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         // Controls
         Table controls = new Table(skin);
 
-        var visibilityButton = new OwnImageButton(skin, "eye");
+        var visibilityButton = new OwnImageButton(skin, "eye-toggle");
         visibilityButton.setCheckedNoFire(!ci.isVisible(true));
         visibilityButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.toggle"), skin));
         visibilityButton.addListener(event -> {
