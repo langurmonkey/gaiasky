@@ -106,8 +106,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         // We save the generated datasets after generation.
         if (billboard.procedural && billboard.morphology != null) {
             if (generatedDatasets.containsKey(entity)) {
-                var datasets = generatedDatasets.get(entity);
-                billboard.datasets = datasets;
+                billboard.datasets = generatedDatasets.get(entity);
             } else {
                 var graph = Mapper.graph.get(entity);
                 Entity full, half;
@@ -121,7 +120,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
                     half = graph.getFirstChildOfType(GaiaSky.instance.scene.archetypes().get("BillboardGroup"));
                 }
                 // Generate two components (full- and half-res). We assume full-res is always the parent.
-                GalaxyGenerator gg = new GalaxyGenerator();
+                var gg = new GalaxyGenerator();
                 var components = gg.generateGalaxy(billboard.morphology, billboard.seed);
                 if (full != null) {
                     var bbFull = Mapper.billboardSet.get(full);
