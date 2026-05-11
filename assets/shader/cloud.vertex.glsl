@@ -298,7 +298,7 @@ void main() {
     #endif // ambientCubemapFlag
 
     vec3 viewDir = (u_cameraPosition.xyz - pos.xyz);
-    v_viewDir = normalize(viewDir * TBN);
+    v_viewDir = normalize(viewDir);
 
     pushNormal();
     pushTexCoord0(g_texCoord0);

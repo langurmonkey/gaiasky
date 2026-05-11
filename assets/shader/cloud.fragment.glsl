@@ -108,6 +108,23 @@ layout(location = 1) out vec4 layerBuffer;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
+// Uniform: how many pixels of fade at the silhouette
+const int FADE_PIXELS = 25;
+float cloudLimbFade(vec3 viewDir, vec3 normal) {
+
+    // The rim value at the silhouette
+    float rim = 1.0 - max(0.0, dot(normalize(viewDir), normal));
+
+    // How many rim-units per pixel, right now, at this fragment
+    float rimPerPixel = fwidth(rim);
+
+    // Fade over the last FADE_PIXELS pixels
+    float fadeStart = 1.0 - rimPerPixel * float(FADE_PIXELS);
+    float factor = 1.0 - smoothstep(fadeStart, 1.0, rim);
+
+    return factor;
+}
+
 void main() {
     vec2 g_texCoord0 = v_texCoord0;
 
@@ -166,10 +183,15 @@ void main() {
     vec3 cloudColor = cloud.rgb * brightness;
 
     fragColor = vec4(cloudColor, 1.0) * v_opacity;
+
     // Eclipses
     #ifdef eclipsingBodyFlag
         fragColor.rgb = eclipseBlend(fragColor.rgb, diffractionTint, eclshdw);
     #endif // eclipsingBodyFlag
+
+    // Cloud limb fade
+    float cloudLimbFade = cloudLimbFade(v_viewDir, v_normal);
+    fragColor *= cloudLimbFade;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
