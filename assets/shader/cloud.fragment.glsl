@@ -113,7 +113,7 @@ const int FADE_PIXELS = 25;
 float cloudLimbFade(vec3 viewDir, vec3 normal) {
 
     // The rim value at the silhouette
-    float rim = 1.0 - max(0.0, dot(normalize(viewDir), normal));
+    float rim = 1.0 - max(0.0, dot(viewDir, normal));
 
     // How many rim-units per pixel, right now, at this fragment
     float rimPerPixel = fwidth(rim);
