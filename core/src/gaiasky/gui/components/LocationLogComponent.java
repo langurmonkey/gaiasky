@@ -29,6 +29,12 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.util.LinkedList;
 
+/**
+ * GUI component that displays a scrollable log of visited locations in Gaia Sky.
+ * Each entry shows the location name, elapsed time, and provides buttons to
+ * navigate the camera to that position or focus on the corresponding object.
+ * Automatically refreshes when new location records are added.
+ */
 public class LocationLogComponent extends GuiComponent implements IObserver {
 
     private VerticalGroup locations;

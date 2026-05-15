@@ -26,6 +26,12 @@ import gaiasky.util.scene2d.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * GUI component that controls the visibility of scene entity types in Gaia Sky.
+ * Provides toggle buttons for constellation lines, asterisms, Milky Way, and other
+ * component types, along with proper motion vector controls (toggle, arrowheads,
+ * number factor, length factor, color mode) and individual object visibility access.
+ */
 public class VisibilityComponent extends GuiComponent implements IObserver {
     protected Map<String, Button> visibilityButtonMap;
     /**

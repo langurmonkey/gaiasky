@@ -43,6 +43,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * GUI component that manages the bookmarks tree in the Gaia Sky control panel.
+ * Displays a hierarchical tree of location and object bookmarks with a search
+ * box, context menu support (add folder, delete, move), and bookmark activation
+ * that navigates the camera to the bookmarked position and orientation.
+ */
 public class BookmarksComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(BookmarksComponent.class);
 

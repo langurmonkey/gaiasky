@@ -29,6 +29,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
 
+/**
+ * GUI component that displays and controls the simulation time in Gaia Sky.
+ * Shows the current date and time, provides a time warp slider for adjusting
+ * simulation speed, play/pause controls, time step buttons, and a date/time
+ * edit button. Subscribes to time-related events to update the display.
+ */
 public class TimeComponent extends GuiComponent implements IObserver {
 
     private final ZoneId timeZone;

@@ -13,6 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 
+/**
+ * Abstract base class for all control panel components in Gaia Sky.
+ * Provides common infrastructure for UI construction including skin, stage,
+ * and padding constants. Subclasses implement {@link #initialize(float)}
+ * and {@link #dispose()} to define their specific behavior.
+ */
 public abstract class GuiComponent {
 
     protected Actor component;

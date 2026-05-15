@@ -28,6 +28,13 @@ import gaiasky.util.scene2d.*;
 
 import java.util.Objects;
 
+/**
+ * GUI component that provides camera controls in the Gaia Sky control panel.
+ * Includes camera mode selection, speed and rotation sliders, field of view
+ * control, stereoscopic mode toggles (3D, dome, cubemap, orthosphere),
+ * cinematic camera toggle, focus locks, and camera recording controls.
+ * Subscribes to camera-related events to synchronize UI state.
+ */
 public class CameraComponent extends GuiComponent implements IObserver {
 
     protected OwnLabel date;
