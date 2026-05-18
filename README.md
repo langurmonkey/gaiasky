@@ -10,7 +10,7 @@
 
 [**Gaia Sky**](https://gaiasky.space) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://www.esa.int/Science_Exploration/Space_Science/Gaia) to chart more than 1 billion stars.
 
-A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Catalog](https://dx.doi.org/10.1109/TVCG.2018.2864508).
+Gaia Sky is partly described in the paper [Gaia Sky: Navigating the Gaia Catalog](https://dx.doi.org/10.1109/TVCG.2018.2864508).
 
 
 To get the latest up-to-date and most complete information,
