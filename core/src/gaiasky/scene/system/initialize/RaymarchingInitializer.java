@@ -56,16 +56,16 @@ public class RaymarchingInitializer extends AbstractInitSystem {
                 base.ct = new ComponentTypes(ComponentType.Invisible);
             }
 
-            if (rm.raymarchingShader != null && rm.additionalTexture != null) {
+            if (rm.raymarchingShader != null && rm.additionalTexStr != null) {
                 var tp = new OwnTextureLoader.OwnTextureParameter();
                 tp.genMipMaps = false;
                 tp.minFilter = TextureFilter.Linear;
                 tp.magFilter = TextureFilter.Linear;
                 tp.wrapU = Texture.TextureWrap.Repeat;
                 tp.wrapV = Texture.TextureWrap.Repeat;
-                rm.additionalTextureUnpacked = addToLoad(rm.additionalTexture, tp);
+                rm.additionalTexStrUnpacked = addToLoad(rm.additionalTexStr, tp);
             } else {
-                rm.additionalTextureUnpacked = null;
+                rm.additionalTexStrUnpacked = null;
             }
         }
     }
@@ -96,16 +96,16 @@ public class RaymarchingInitializer extends AbstractInitSystem {
 
         if (raymarching != null) {
             if (raymarching.raymarchingShader != null && !raymarching.raymarchingShader.isBlank() && !GaiaSky.settings().program.safeMode) {
-                if (raymarching.additionalTextureUnpacked != null) {
-                    if (AssetBean.manager().isLoaded(raymarching.additionalTextureUnpacked)) {
-                        raymarching.additional = AssetBean.manager().get(raymarching.additionalTextureUnpacked);
-                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[]{1f, 0f, 0f, 0f}, raymarching.additional);
+                if (raymarching.additionalTexStrUnpacked != null) {
+                    if (AssetBean.manager().isLoaded(raymarching.additionalTexStrUnpacked)) {
+                        raymarching.additionalTexture = AssetBean.manager().get(raymarching.additionalTexStrUnpacked);
+                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, raymarching.additional, raymarching.additionalTexture);
                     } else {
-                        logger.warn("Could not load texture: " + raymarching.additionalTexture);
-                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[]{1f, 0f, 0f, 0f});
+                        logger.warn("Could not load texture: " + raymarching.additionalTexStr);
+                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, raymarching.additional);
                     }
                 } else {
-                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[]{1f, 0f, 0f, 0f});
+                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, raymarching.additional);
                 }
 
                 // Set up label

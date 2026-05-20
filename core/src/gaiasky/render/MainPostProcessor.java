@@ -188,7 +188,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private PostProcessBean newPostProcessor(RenderType rt, float width, float height, float targetWidth, float targetHeight, AssetManager manager) {
         PostProcessBean ppb = new PostProcessBean();
 
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         StarSettings ss = settings.scene.star;
         boolean safeMode = settings.program.safeMode;
         boolean vr = settings.runtime.openXr;
@@ -530,12 +530,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     @Override
-    public void resize(final int width, final int height, final int targetWidth, final int targetHeight) {
+    public void resize(int width, int height, int targetWidth, int targetHeight) {
         GaiaSky.postRunnable(() -> resizeImmediate(width, height, targetWidth, targetHeight));
     }
 
     @Override
-    public void resizeImmediate(final int width, final int height, int targetWidth, int targetHeight) {
+    public void resizeImmediate(int width, int height, int targetWidth, int targetHeight) {
         replace(RenderType.screen, width, height, targetWidth, targetHeight);
     }
 
@@ -565,7 +565,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case SCENE_LOADED -> {
                 this.scene = (Scene) data[0];
@@ -824,9 +824,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             case RAYMARCHING_CMD -> {
-                final var name = (String) data[0];
-                final var status = (Boolean) data[1];
-                final var entity = (Entity) data[2];
+                var name = (String) data[0];
+                var status = (Boolean) data[1];
+                var entity = (Entity) data[2];
                 if (data.length > 3) {
                     // Add effect description for later initialization.
                     String shader = (String) data[3];
@@ -1051,7 +1051,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     updateStereo(GaiaSky.settings().program.modeStereo.active, (StereoProfile) data[0]);
             }
             case ANTIALIASING_CMD -> {
-                final AntialiasType antiAliasingValue = (AntialiasType) data[0];
+                AntialiasType antiAliasingValue = (AntialiasType) data[0];
                 GaiaSky.postRunnable(() -> {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
@@ -1220,7 +1220,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         return (Antialiasing) ppe;
     }
 
-    private void replace(RenderType rt, final float width, final float height, final float targetWidth, final float targetHeight) {
+    private void replace(RenderType rt, float width, float height, float targetWidth, float targetHeight) {
         // Dispose of old post processor, if exists
         if (pps[rt.index] != null)
             pps[rt.index].dispose(false);

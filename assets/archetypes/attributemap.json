@@ -1064,10 +1064,17 @@
         ]
       },
       "additionalTexture": {
-        "description": "Texture file to pass to the raymarching shader as additional texture. This is usually a noise texture, but can be anything, really.",
+        "description": "Texture file to pass to the ray-marching shader (u_additionalTexture uniform) as additional texture. This is usually a noise texture, but can be anything, really.",
         "unit": "String",
         "aliases": [
           "raymarchingTexture"
+        ]
+      },
+      "additional": {
+        "description": "Array of up to 4 components to pass to the ray-marching shader (u_additional uniform) as additional data.",
+        "unit":  "Double[4]",
+        "aliases": [
+          "additionalData"
         ]
       }
     },
