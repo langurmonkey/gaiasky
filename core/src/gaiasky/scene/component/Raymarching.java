@@ -28,13 +28,14 @@ public class Raymarching implements Component {
     public String additionalTexStrUnpacked;
     /**
      * Texture object corresponding to {@link #additionalTexStr}.
-      */
+     */
     public Texture additionalTexture;
     /**
      * A vector of up to 4 components with additional floating point numbers to
      * pass in as data to the ray-marching shader via the <code>u_additional</code> uniform.
+     * <p>Defaults to [1,0,0,0] because some raymarching shaders expect a scale factor in u_additional.x (e.g. black holes).</p>
      */
-    public float[] additional = new float[4];
+    public float[] additional = new float[]{1f, 0f, 0f, 0f};
     public boolean isOn;
 
     public void setShader(String shader) {
@@ -55,30 +56,21 @@ public class Raymarching implements Component {
 
     /**
      * Sets the additional array.
+     *
      * @param additional The additional array as an array of doubles.
      */
-    public void setAdditional(Double[] additional) {
+    public void setAdditional(double[] additional) {
         if (additional == null) {
             return; // or handle as needed
         }
         int count = Math.min(additional.length, this.additional.length);
         for (int i = 0; i < count; i++) {
-            if (additional[i] != null) {
-                this.additional[i] = additional[i].floatValue();
-            }
+            this.additional[i] = (float) additional[i];
         }
     }
 
-    public void setAdditionalData(Double[] additional) {
+    public void setAdditionalData(double[] additional) {
         setAdditional(additional);
-    }
-
-    /**
-     * Sets the first value in {@link #additional}.
-     * @param additional The value.
-     */
-    public void setAdditional(Double additional) {
-        this.additional[0] = additional.floatValue();
     }
 
 }
