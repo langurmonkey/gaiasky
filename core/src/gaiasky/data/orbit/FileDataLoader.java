@@ -82,7 +82,7 @@ public class FileDataLoader {
         } catch (Exception e) {
             // Fallback for Julian dates remains the same.
             try {
-                double jd = Double.parseDouble(token);
+                double jd = Parser.parseDouble(token);
                 return AstroUtils.julianDateToInstant(jd).toEpochMilli();
             } catch (Exception nfe) {
                 throw new IllegalArgumentException("Unable to parse token: " + token);
