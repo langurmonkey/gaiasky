@@ -65,26 +65,5 @@ public class ConstellationInitializer extends AbstractInitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-        var constel = Mapper.constel.get(entity);
-
-        if (!constel.allLoaded) {
-            int nPairs = constel.ids.size;
-            if (constel.lines == null) {
-                constel.lines = new IPosition[nPairs][];
-            }
-            IntMap<IPosition> hipMap = scene.index().getHipMap();
-            constel.allLoaded = true;
-            for (int i = 0; i < nPairs; i++) {
-                int[] pair = constel.ids.get(i);
-                IPosition s1, s2;
-                s1 = hipMap.get(pair[0]);
-                s2 = hipMap.get(pair[1]);
-                if (constel.lines[i] == null && s1 != null && s2 != null) {
-                    constel.lines[i] = new IPosition[] { s1, s2 };
-                } else {
-                    constel.allLoaded = false;
-                }
-            }
-        }
     }
 }

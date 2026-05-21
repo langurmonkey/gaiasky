@@ -10,7 +10,6 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
-import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
 import gaiasky.scene.record.Position;
 import gaiasky.scene.view.PositionView;
@@ -233,33 +232,26 @@ public class Index {
     }
 
     public void addToHipMapInit(Entity entity) {
-        if (Mapper.octree.has(entity)) {
-            // Octree.
-            var octree = Mapper.octree.get(entity);
-            Set<Entity> set = octree.parenthood.keySet();
-            for (Entity e : set)
-                addToHipMapInit(e);
-        } else {
-            Archetype starArchetype = archetypes.get("gaiasky.scenegraph.Star");
-            if (starArchetype.matches(entity)) {
-                // Regular stars.
-                Hip hip = Mapper.hip.get(entity);
-                if (hip.hip > 0) {
-                    if (hipMap.containsKey(hip.hip)) {
-                        logger.debug(I18n.msg("error.id.hip.duplicate", hip.hip));
-                    } else {
-                        hipMap.put(hip.hip, new PositionView(entity));
-                    }
+        Archetype starArchetype = archetypes.get("gaiasky.scenegraph.Star");
+        if (starArchetype.matches(entity)) {
+            // Regular stars.
+            Hip hip = Mapper.hip.get(entity);
+            if (hip.hip > 0) {
+                if (hipMap.containsKey(hip.hip)) {
+                    logger.debug(I18n.msg("error.id.hip.duplicate", hip.hip));
+                } else {
+                    hipMap.put(hip.hip, new PositionView(entity));
                 }
             }
         }
     }
+
     public void addToHipMapSetUp(Entity entity) {
         if (Mapper.starSet.has(entity)) {
             // Groups.
             var stars = Mapper.starSet.get(entity).data();
             if (stars != null) {
-                for (IParticleRecord pb : stars) {
+                for (var pb : stars) {
                     if (pb.hip() > 0) {
                         hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
                                                           pb.vx(),
@@ -267,6 +259,13 @@ public class Index {
                                                           pb.vz()));
                     }
                 }
+            }
+        } else if (Mapper.octree.has(entity)) {
+            // Octree.
+            var octree = Mapper.octree.get(entity);
+            Set<Entity> set = octree.parenthood.keySet();
+            for (var e : set) {
+                addToHipMapSetUp(e);
             }
         }
     }

@@ -38,6 +38,9 @@ public class ConstellationRadio extends EntityRadio {
         synchronized (constel) {
             if (!constel.allLoaded) {
                 int nPairs = constel.ids.size;
+                if (constel.lines == null) {
+                    constel.lines = new IPosition[nPairs][];
+                }
                 IntMap<IPosition> hipMap = scene.index().getHipMap();
                 constel.allLoaded = true;
                 for (int i = 0; i < nPairs; i++) {

@@ -829,7 +829,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         };
 
         // SAMP status.
-        final var sampInfoTask = new Task() {
+        final var sampStatusTask = new Task() {
             @Override
             public void run() {
                 EventManager.publish(Event.SAMP_INFO, this, gaiaSkyAssets.sampClient.getStatus());
@@ -839,7 +839,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         // Every second.
         Timer.schedule(debugInfoTask, 2, 1);
         // Every 10 seconds.
-        Timer.schedule(sampInfoTask, 2, 10);
+        Timer.schedule(sampStatusTask, 2, 10);
 
         // Start capturing locations.
         final var startCapturing = new Task() {
@@ -850,6 +850,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             }
         };
         Timer.schedule(startCapturing, 1f);
+
+        // Update constellations.
+        EventManager.publishDelayed(Event.CONSTELLATION_UPDATE_CMD, this, 3_000L, scene);
 
         // Show index name conflicts.
         EventManager.publishDelayed(Event.SHOW_INDEX_NAME_CONFLICTS_ACTION, this, 6_000L, scene);

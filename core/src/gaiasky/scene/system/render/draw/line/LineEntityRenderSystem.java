@@ -323,6 +323,10 @@ public class LineEntityRenderSystem {
         var base = lineView.base;
         var body = lineView.body;
         var constel = Mapper.constel.get(entity);
+        if (constel.lines == null) {
+            // Not ready!
+            return;
+        }
 
         alpha *= constel.alpha * base.opacity;
 

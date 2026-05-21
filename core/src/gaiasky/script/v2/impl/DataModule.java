@@ -602,6 +602,9 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                                 focusView.setEntity(objects.get(0));
                                 api.camera.focus_mode(focusView.getName());
                             }
+
+                            // Update constellations
+                            api.base.post_runnable(() -> EventManager.publish(Event.CONSTELLATION_UPDATE_CMD, this, GaiaSky.instance.scene));
                         });
                     });
                 });

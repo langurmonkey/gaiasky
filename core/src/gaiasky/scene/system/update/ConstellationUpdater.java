@@ -39,6 +39,11 @@ public class ConstellationUpdater extends AbstractUpdateSystem {
     public void updateEntity(Entity entity, float deltaTime) {
         ICamera camera = GaiaSky.instance.getICamera();
         var constel = Mapper.constel.get(entity);
+        if (constel.lines == null) {
+            // Not ready!
+            return;
+        }
+
         var body = Mapper.body.get(entity);
         var label = Mapper.label.get(entity);
 

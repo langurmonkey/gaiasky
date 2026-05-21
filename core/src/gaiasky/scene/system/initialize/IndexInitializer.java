@@ -39,7 +39,6 @@ public class IndexInitializer extends AbstractInitSystem {
 
         // Add entity to HIP map, for constellations
         index.addToHipMapInit(entity);
-
     }
 
     @Override
