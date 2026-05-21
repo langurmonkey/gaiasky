@@ -528,8 +528,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             if (abort.get()) {
                 // We aborted, roll back status of rest of octants
                 for (int j = i; j < octants.size; j++) {
-                    octants.get(j)
-                            .setStatus(LoadStatus.NOT_LOADED);
+                    octants.get(j).setStatus(LoadStatus.NOT_LOADED);
                 }
             }
         }
@@ -582,7 +581,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                 // Add to index
                 if (scene.index() != null) {
                     scene.index().addToIndexInit(sg);
-                    scene.index().addToHipMapInit(sg);
+                    scene.index().addToIndexSetUp(sg);
+                    scene.index().addToHipMapSetUp(sg);
                 }
 
                 nLoadedStars += set.pointData.size();

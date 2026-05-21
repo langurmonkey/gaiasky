@@ -64,7 +64,7 @@ public class EventManager implements IObserver {
      * @param source The source object, if any.
      * @param data   The event data.
      */
-    public static void publish(final Event event, Object source, final Object... data) {
+    public static void publish(Event event, Object source, Object... data) {
         instance.post(event, source, data);
     }
 
@@ -91,7 +91,7 @@ public class EventManager implements IObserver {
      * @param source The source object, if any.
      * @param data   The event data.
      */
-    public static void publishWaitUntilConsumer(final Event event, Object source, final Object... data) {
+    public static void publishWaitUntilConsumer(Event event, Object source, Object... data) {
        instance.postWaitUntilConsumer(event, source, data);
     }
 
@@ -196,7 +196,7 @@ public class EventManager implements IObserver {
      * @param event  The event.
      * @param source The source object, if any.
      */
-    public void post(final Event event, Object source) {
+    public void post(Event event, Object source) {
         post(event, source, new Object[0]);
     }
 
@@ -207,7 +207,7 @@ public class EventManager implements IObserver {
      * @param source The source object, if any.
      * @param data   The event data.
      */
-    public void post(final Event event, Object source, final Object... data) {
+    public void post(Event event, Object source, Object... data) {
         Set<IObserver> observers = subscriptions.get(event.ordinal());
         if (observers != null && !observers.isEmpty()) {
             for (IObserver observer : observers) {
@@ -224,7 +224,7 @@ public class EventManager implements IObserver {
      * @param source The source object, if any.
      * @param data   The event data.
      */
-    public void postWaitUntilConsumer(final Event event, Object source, final Object... data) {
+    public void postWaitUntilConsumer(Event event, Object source, Object... data) {
         Set<IObserver> observers = subscriptions.get(event.ordinal());
         if (observers == null || observers.isEmpty()) {
             // Add to consumers queue.
@@ -322,7 +322,7 @@ public class EventManager implements IObserver {
         // past their time stamp.
         do {
             // Read the telegram from the front of the queue
-            final Telegram telegram = queue.peek();
+            Telegram telegram = queue.peek();
             if (telegram.timestamp > currentTime)
                 break;
 
@@ -351,7 +351,7 @@ public class EventManager implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.EVENT_TIME_FRAME_CMD) {
             defaultTimeFrame = (TimeFrame) data[0];
         }
