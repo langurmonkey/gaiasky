@@ -349,7 +349,8 @@ public class Proximity {
 
         @Override
         public String getClosestLocalizedName() {
-            return I18n.localize(getClosestName().toLowerCase(Locale.ROOT));
+            var name = getClosestName();
+            return I18n.localize(name.toLowerCase(Locale.ROOT), name);
         }
 
         @Override

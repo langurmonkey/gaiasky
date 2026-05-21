@@ -1196,7 +1196,8 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public String getLocalizedName() {
-        return I18n.localize(getName().toLowerCase(Locale.ROOT));
+        var name = getName();
+        return I18n.localize(name.toLowerCase(Locale.ROOT), name);
     }
 
     public long getCandidateId() {
@@ -1236,7 +1237,8 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public String getClosestLocalizedName() {
-        return I18n.localize(getClosestName().toLowerCase(Locale.ROOT));
+        var name = getClosestName();
+        return I18n.localize(name.toLowerCase(Locale.ROOT), name);
     }
 
     public boolean canSelect(FilterView view) {

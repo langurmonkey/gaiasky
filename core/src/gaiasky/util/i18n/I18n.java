@@ -154,7 +154,7 @@ public class I18n {
         return hasObject(base);
     }
 
-    public static String localize(String nameLowerCase) {
+    public static String localize(String nameLowerCase, String defaultValue) {
         if (nameLowerCase == null) {
             return null;
         }
@@ -162,7 +162,7 @@ public class I18n {
         if (hasObject(base)) {
             return obj(base);
         } else {
-            return nameLowerCase;
+            return defaultValue;
         }
     }
 
@@ -175,7 +175,7 @@ public class I18n {
         if (nameLowerCase == null) return null;
         var base = nameLowerCase.replace(' ', '_');
         if (hasObject(base)) {
-            return objects.get(base);  // direct bundle get, avoids synchronized obj()
+            return obj(base);  // direct bundle get, avoids synchronized obj()
         }
         return null;
     }

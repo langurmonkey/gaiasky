@@ -270,15 +270,14 @@ public class OrbitElementsSet implements Component {
             for (int i = 0; i < n; i++) {
                 ParticleKepler pb = (ParticleKepler) pointData.get(i);
                 if (pb.name() != null) {
-                    final int idx = i;
                     var name = pb.name();
                     var nlc = name.toLowerCase(Locale.ROOT);
-                    index.put(nlc, idx);
+                    index.put(nlc, i);
                     if (I18n.hasLocalizedVersion(nlc)) {
-                        var loc = I18n.localize(nlc);
+                        var loc = I18n.localize(nlc, name);
                         if (!loc.equals(nlc)) {
                             // We still use root locale here, by design.
-                            index.put(I18n.localize(nlc).toLowerCase(Locale.ROOT), idx);
+                            index.put(I18n.localize(nlc, name).toLowerCase(Locale.ROOT), i);
                         }
                     }
                 }
@@ -337,7 +336,8 @@ public class OrbitElementsSet implements Component {
     }
 
     public String getLocalizedName() {
-        return I18n.localize(getName().toLowerCase(Locale.ROOT));
+        var name = getName();
+        return I18n.localize(name.toLowerCase(Locale.ROOT), name);
     }
 
     public long getCandidateId() {

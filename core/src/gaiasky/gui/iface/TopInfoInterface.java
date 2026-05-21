@@ -106,7 +106,9 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         OwnLabel s2 = new OwnLabel("|", skin, "default");
 
-        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(I18n.localize(GaiaSky.settings().scene.homeObject), maxNameLen)),
+        OwnLabel home = new OwnLabel(I18n.msg("gui.top.home",
+                                              TextUtils.capString(I18n.localize(GaiaSky.settings().scene.homeObject.toLowerCase(Locale.ROOT),
+                                                                                GaiaSky.settings().scene.homeObject), maxNameLen)),
                                      skin,
                                      "default");
         home.setName("home tii");
@@ -193,7 +195,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
                             f = view;
                         }
                         if (f != null) {
-                            String candidate = I18n.localize(f.getCandidateName().toLowerCase(Locale.ROOT));
+                            var name = f.getCandidateName();
+                            String candidate = I18n.localize(name.toLowerCase(Locale.ROOT), f.getCandidateName());
                             if (candidate != null) {
                                 lastFocusName = TextUtils.capString(candidate, maxNameLen);
                                 focus.setText(I18n.msg("gui.top.focus", lastFocusName));

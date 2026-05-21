@@ -422,13 +422,14 @@ public class LabelEntityRenderSystem {
             }
 
             textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+            var name = pb.names()[0];
             render3DLabel(view,
                           batch,
                           shader,
                           sys.fontDistanceField,
                           camera,
                           rc,
-                          I18n.localize(pb.names()[0].toLowerCase(Locale.ROOT)),
+                          I18n.localize(name.toLowerCase(Locale.ROOT), name),
                           labelPosition,
                           distToCamera,
                           view.textScale() * camera.getFovFactor(),
@@ -529,13 +530,14 @@ public class LabelEntityRenderSystem {
             }
 
             var textSize = alpha * distToCamera * 0.5f;
-            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, I18n.localize(star.names()[0].toLowerCase()), labelPosition, distToCamera,
+            var name = star.names()[0];
+            render3DLabel(view, batch, shader, sys.fontDistanceField, camera, rc, I18n.localize(name.toLowerCase(), name), labelPosition, distToCamera,
                           view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
         }
     }
 
     private static final int divisionsUV = 36;
-    private static int verticalOffset = 0;
+    private static int verticalOffset;
 
     public static void resetVerticalOffset() {
         verticalOffset = 0;
