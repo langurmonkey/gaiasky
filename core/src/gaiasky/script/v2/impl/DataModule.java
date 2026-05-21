@@ -571,7 +571,6 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                 api.base.post_runnable(() -> {
                     objects.forEach(scene.engine::addEntity);
                     objects.forEach(scene::initializeEntity);
-                    objects.forEach(scene::addToIndex);
 
                     // Wait for entity in new task.
                     GaiaSky.instance.getExecutorService().execute(() -> {

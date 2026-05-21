@@ -280,7 +280,7 @@ public class ParticleSet implements Component, IDisposable {
     public double lastSortTime;
 
     /** Whether to generate an index or not. Defaults to false for particle sets. Unused in star sets. **/
-    public boolean generateIndex = false;
+    public boolean generateIndex;
 
     /** Whether to allow the star streaks effect, where particles get stretched in the direction of motion when the camera moves. **/
     public boolean allowStreaks = true;
@@ -346,7 +346,7 @@ public class ParticleSet implements Component, IDisposable {
     /** Name to array index. **/
     public FastObjectIntMap<String> index;
     /** Flag that flips when the particle set has been added to the main index. **/
-    public boolean addedToMainIndex = false;
+    public boolean addedToMainIndex;
     /** Index synchronization object. **/
     private final Object indexSync = new Object();
     /** Metadata, for sorting - holds distances from each particle to the camera, squared. **/

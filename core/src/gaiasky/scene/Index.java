@@ -19,7 +19,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
@@ -99,13 +98,14 @@ public class Index {
     }
 
     /**
-     * Adds the given node to the index.
+     * Adds the given node to the index. This only adds to index entities in the scene graph, it does not
+     * descend onto particles in particle sets.
      *
      * @param entity The entity to add.
      *
      * @return True if at least one entry has been added to the index for this entity, false otherwise.
      */
-    public boolean addToIndex(Entity entity) {
+    public boolean addToIndexInit(Entity entity) {
         Base base;
         boolean added = false;
         if ((base = Mapper.base.get(entity)) != null) {
@@ -170,13 +170,15 @@ public class Index {
                         added = true;
                     }
                 }
-
-                // Particle/star sets add names of each contained particle.
-                added |= addParticleSet(entity, Mapper.particleSet.get(entity));
-                added |= addParticleSet(entity, Mapper.starSet.get(entity));
             }
         }
         return added;
+    }
+
+    public void addToIndexSetUp(Entity entity) {
+        // Particle/star sets add names of each contained particle.
+        addParticleSet(entity, Mapper.particleSet.get(entity));
+        addParticleSet(entity, Mapper.starSet.get(entity));
     }
 
     /**
@@ -184,11 +186,8 @@ public class Index {
      *
      * @param entity The particle set entity.
      * @param set    The particle set component.
-     *
-     * @return True if at least one entry has been added to the index. False otherwise.
      */
-    private boolean addParticleSet(Entity entity, ParticleSet set) {
-        boolean added = false;
+    private void addParticleSet(Entity entity, ParticleSet set) {
         if (set != null && set.index != null && !set.addedToMainIndex) {
             var pgBase = Mapper.base.get(entity);
             var pgName = pgBase.getName();
@@ -222,28 +221,28 @@ public class Index {
                     } else {
                         // Add to main index.
                         index.put(key, entity);
-                        added = true;
                     }
                 }
             }
             set.addedToMainIndex = true;
         }
-        return added;
     }
 
     public IntMap<IPosition> getHipMap() {
         return hipMap;
     }
 
-    public void addToHipMap(Entity entity) {
+    public void addToHipMapInit(Entity entity) {
         if (Mapper.octree.has(entity)) {
+            // Octree.
             var octree = Mapper.octree.get(entity);
             Set<Entity> set = octree.parenthood.keySet();
             for (Entity e : set)
-                addToHipMap(e);
+                addToHipMapInit(e);
         } else {
             Archetype starArchetype = archetypes.get("gaiasky.scenegraph.Star");
             if (starArchetype.matches(entity)) {
+                // Regular stars.
                 Hip hip = Mapper.hip.get(entity);
                 if (hip.hip > 0) {
                     if (hipMap.containsKey(hip.hip)) {
@@ -252,16 +251,20 @@ public class Index {
                         hipMap.put(hip.hip, new PositionView(entity));
                     }
                 }
-            } else if (Mapper.starSet.has(entity)) {
-                var stars = Mapper.starSet.get(entity).data();
-                if (stars != null) {
-                    for (IParticleRecord pb : stars) {
-                        if (pb.hip() > 0) {
-                            hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
-                                                              pb.vx(),
-                                                              pb.vy(),
-                                                              pb.vz()));
-                        }
+            }
+        }
+    }
+    public void addToHipMapSetUp(Entity entity) {
+        if (Mapper.starSet.has(entity)) {
+            // Groups.
+            var stars = Mapper.starSet.get(entity).data();
+            if (stars != null) {
+                for (IParticleRecord pb : stars) {
+                    if (pb.hip() > 0) {
+                        hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
+                                                          pb.vx(),
+                                                          pb.vy(),
+                                                          pb.vz()));
                     }
                 }
             }

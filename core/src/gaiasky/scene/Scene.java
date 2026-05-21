@@ -251,7 +251,8 @@ public class Scene {
             addInitializer(new VRDeviceInitializer(setUp, families.vrdevices, priority++));
             addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++));
             addInitializer(new VolumeInitializer(setUp, families.volumes, priority++));
-            addInitializer(new ProceduralTriggerInitializer(setUp, families.proceduralTriggers, priority));
+            addInitializer(new ProceduralTriggerInitializer(setUp, families.proceduralTriggers, priority++));
+            addInitializer(new IndexInitializer(index, setUp, families.graphNodes, priority));
 
             // Run once.
             runOnce(initializers);
@@ -268,30 +269,11 @@ public class Scene {
      */
     public void initializeIndex() {
         if (engine != null) {
-            int numEntities = engine.getEntities().size();
-
-            index = new Index(archetypes, numEntities);
+            index = new Index(archetypes, 5000);
             copyIndex = ThreadLocal.withInitial(HashMap::new);
-
-            // Prepare system.
-            indexInitializer = new IndexInitializer(index, Family.all(Base.class)
-                    .get(), 0);
-
-            // Run once.
-            runOnce(indexInitializer);
         }
     }
 
-    /**
-     * Inserts the given entity into the index by running the index initializer system on it.
-     *
-     * @param entity The entity.
-     */
-    public void addToIndex(Entity entity) {
-        if (Mapper.base.has(entity)) {
-            indexInitializer.initializeEntity(entity);
-        }
-    }
 
     /**
      * Constructs the scene graph structure in the {@link GraphNode}
@@ -553,7 +535,7 @@ public class Scene {
         }
         boolean ok = true;
         if (addToIndex) {
-            ok = index.addToIndex(entity);
+            ok = index.addToIndexInit(entity);
         }
         if (!ok) {
             logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity)

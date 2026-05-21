@@ -18,7 +18,7 @@ public class FadeNodeInitializer extends AbstractInitSystem {
     /** The index reference. **/
     private final Index index;
 
-    public FadeNodeInitializer(final Index index, boolean setUp, Family family, int priority) {
+    public FadeNodeInitializer(Index index, boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
         this.index = index;
     }

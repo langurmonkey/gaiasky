@@ -14,40 +14,57 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.tree.OctreeNode;
 
+import java.util.function.Consumer;
+
 public class IndexInitializer extends AbstractInitSystem {
 
     /** The index reference. **/
     private final Index index;
 
-    public IndexInitializer(Index index, Family family, int priority) {
-        super(false, family, priority);
+    public IndexInitializer(Index index, boolean setUp, Family family, int priority) {
+        super(setUp, family, priority);
         this.index = index;
     }
 
     @Override
     public void initializeEntity(Entity entity) {
         // Add entity to index
-        index.addToIndex(entity);
+        index.addToIndexInit(entity);
 
         // Unwrap octree objects
         if (Mapper.octree.has(entity)) {
             var octant = Mapper.octant.get(entity);
-            initializeOctant(octant.octant);
+            initializeOctant(octant.octant, index::addToIndexInit);
         }
 
         // Add entity to HIP map, for constellations
-        index.addToHipMap(entity);
+        index.addToHipMapInit(entity);
 
     }
 
-    private void initializeOctant(OctreeNode octant) {
+    @Override
+    public void setUpEntity(Entity entity) {
+        // Initialize particle/star groups & co.
+        index.addToIndexSetUp(entity);
+
+        // Unwrap octree objects
+        if (Mapper.octree.has(entity)) {
+            var octant = Mapper.octant.get(entity);
+            initializeOctant(octant.octant, index::addToIndexSetUp);
+        }
+
+        // Add to HIP map (star groups)
+        index.addToHipMapSetUp(entity);
+    }
+
+    private void initializeOctant(OctreeNode octant, Consumer<Entity> c) {
         if (octant != null) {
 
             // Add objects to index.
             if (octant.objects != null) {
                 octant.objects.forEach((object) -> {
                     if (object instanceof OctreeObjectView) {
-                        index.addToIndex(((OctreeObjectView) object).getEntity());
+                        c.accept(((OctreeObjectView) object).getEntity());
                     }
                 });
             }
@@ -56,17 +73,11 @@ public class IndexInitializer extends AbstractInitSystem {
             if (octant.children != null) {
                 for (OctreeNode child : octant.children) {
                     if (child != null) {
-                        initializeOctant(child);
+                        initializeOctant(child, c);
                     }
                 }
             }
         }
-        ;
-
     }
 
-    @Override
-    public void setUpEntity(Entity entity) {
-
-    }
 }

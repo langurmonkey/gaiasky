@@ -54,11 +54,11 @@ public class SceneJsonLoader {
         // Add entities to engine.
         loadedEntities.forEach(scene.engine::addEntity);
 
-        // Initialize nodes, look for octrees and star groups.
-        scene.initializeEntities();
-
         // Initialize index and hip map with names.
         scene.initializeIndex();
+
+        // Initialize nodes, look for octrees and star groups.
+        scene.initializeEntities();
 
         // Construct scene graph in GraphNodes.
         scene.buildSceneGraph();

@@ -581,8 +581,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
                 // Add to index
                 if (scene.index() != null) {
-                    scene.index().addToIndex(sg);
-                    scene.index().addToHipMap(sg);
+                    scene.index().addToIndexInit(sg);
+                    scene.index().addToHipMapInit(sg);
                 }
 
                 nLoadedStars += set.pointData.size();
