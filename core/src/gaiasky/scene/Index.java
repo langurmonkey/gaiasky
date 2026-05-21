@@ -253,14 +253,15 @@ public class Index {
                     }
                 }
             } else if (Mapper.starSet.has(entity)) {
-                StarSet starSet = Mapper.starSet.get(entity);
-                List<IParticleRecord> stars = starSet.data();
-                for (IParticleRecord pb : stars) {
-                    if (pb.hip() > 0) {
-                        hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
-                                                          pb.vx(),
-                                                          pb.vy(),
-                                                          pb.vz()));
+                var stars = Mapper.starSet.get(entity).data();
+                if (stars != null) {
+                    for (IParticleRecord pb : stars) {
+                        if (pb.hip() > 0) {
+                            hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(),
+                                                              pb.vx(),
+                                                              pb.vy(),
+                                                              pb.vz()));
+                        }
                     }
                 }
             }
