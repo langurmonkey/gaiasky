@@ -33,7 +33,13 @@ import static gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
  * @author Alexander Dorokhov
  */
 public class GlyphLayout implements Poolable {
-    public static final PoolManager POOLS = new PoolManager(GlyphRun::new, Color::new);
+    public static final PoolManager POOLS = new PoolManager();
+
+    static {
+        POOLS.addPool(GlyphRun.class, GlyphRun::new);
+        POOLS.addPool(Color.class, Color::new);
+    }
+
     public final Array<GlyphRun> runs = new Array<>();
     private final Array<Color> colorStack = new Array<>(4);
     public float width, height;

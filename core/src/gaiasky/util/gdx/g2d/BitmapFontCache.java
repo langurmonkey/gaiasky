@@ -1,12 +1,9 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *   https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,12 +31,17 @@ import static gaiasky.util.gdx.g2d.GlyphLayout.GlyphRun;
  * @author Alexander Dorokhov
  */
 public class BitmapFontCache {
-    private static final PoolManager POOLS = new PoolManager(GlyphLayout::new);
+    private static final PoolManager POOLS = new PoolManager();
+
+    static {
+        POOLS.addPool(GlyphLayout.class, GlyphLayout::new);
+    }
+
     static private final Color tempColor = new Color(1, 1, 1, 1);
 
     private final BitmapFont font;
-    private final Array<GlyphLayout> layouts = new Array();
-    private final Array<GlyphLayout> pooledLayouts = new Array();
+    private final Array<GlyphLayout> layouts = new Array<>();
+    private final Array<GlyphLayout> pooledLayouts = new Array<>();
     private final Color color = new Color(1, 1, 1, 1);
     private boolean integer;
     private int glyphCount;

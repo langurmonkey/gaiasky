@@ -32,7 +32,12 @@ import org.lwjgl.opengl.GL32;
  * Base implementation for top-level GUIs. Contains the essentials used by (almost) all.
  */
 public abstract class AbstractGui implements IObserver, IGui {
-    static public PoolManager POOLS = new PoolManager(InputEvent::new, ChangeEvent::new);
+    public static final PoolManager POOLS = new PoolManager();
+
+    static {
+        POOLS.addPool(InputEvent.class, InputEvent::new);
+        POOLS.addPool(ChangeEvent.class, ChangeEvent::new);
+    }
 
     /**
      * Graphics instance.
