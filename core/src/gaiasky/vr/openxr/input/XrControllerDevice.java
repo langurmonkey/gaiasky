@@ -35,8 +35,8 @@ public class XrControllerDevice {
     }
 
     public final DeviceType deviceType;
-    public boolean active = false;
-    private boolean initialized = false;
+    public boolean active;
+    private boolean initialized;
 
     public Vector3 position = new Vector3();
     public Quaternion orientation = new Quaternion();

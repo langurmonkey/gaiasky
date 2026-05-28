@@ -80,8 +80,8 @@ public class XrDriver implements Disposable {
     //Runtime
     XrEventDataBuffer eventDataBuffer;
     int sessionState;
-    boolean sessionRunning, disposing = false;
-    public long currentFrameTime = 0L;
+    boolean sessionRunning, disposing;
+    public long currentFrameTime;
 
     public static class SwapChain {
         public XrSwapchain handle;
@@ -624,7 +624,7 @@ public class XrDriver implements Disposable {
         }
     }
 
-    private boolean lastPollResult = false;
+    private boolean lastPollResult;
 
     public boolean getLastPollEventsResult() {
         return lastPollResult;
@@ -688,7 +688,7 @@ public class XrDriver implements Disposable {
                 actions.sync(this);
 
                 // Check input.
-                var gsActions = (GaiaSkyActionSet) actions;
+                var gsActions = actions;
                 for (var listener : listeners) {
                     gsActions.processListener(listener);
                 }
