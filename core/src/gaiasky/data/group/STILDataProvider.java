@@ -256,7 +256,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 UCDParser ucdParser = new UCDParser();
                 ucdParser.parse(table);
 
-                final int numColumns = table.getColumnCount();
+                int numColumns = table.getColumnCount();
                 if (columnInfoList == null) {
                     columnInfoList = new ArrayList<>(numColumns);
                 } else {
@@ -384,7 +384,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             appMag = appMag - magScl;
 
                             // Absolute magnitude to pseudo-size.
-                            final double absMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
+                            double absMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
                             double sizePc = AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
 
                             // SIZE (DIAMETER, not RADIUS!)

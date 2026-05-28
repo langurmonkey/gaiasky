@@ -87,7 +87,7 @@ public class OrbitRefresher implements IObserver {
 
         private final TrajectoryUtils utils = new TrajectoryUtils();
 
-        public OrbitUpdaterThread(final OrbitRefresher orbitRefresher) {
+        public OrbitUpdaterThread(OrbitRefresher orbitRefresher) {
             super();
             this.toLoad = new Array<>();
             this.task = () -> {
@@ -120,7 +120,7 @@ public class OrbitRefresher implements IObserver {
                                     }
                                     // Generate data
                                     currentProvider.load(trajectory.oc.source, params);
-                                    final PointCloudData pcd = currentProvider.getData();
+                                    PointCloudData pcd = currentProvider.getData();
                                     // Post new data to object
                                     GaiaSky.postRunnable(() -> {
                                         // Update orbit object

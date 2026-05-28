@@ -13,8 +13,8 @@ import java.time.Instant;
 import java.util.Date;
 
 public interface OrientationServer {
-    QuaternionDouble updateOrientation(final Date date);
-    QuaternionDouble updateOrientation(final Instant instant);
+    QuaternionDouble updateOrientation(Date date);
+    QuaternionDouble updateOrientation(Instant instant);
     QuaternionDouble getCurrentOrientation();
     boolean hasOrientation();
 }

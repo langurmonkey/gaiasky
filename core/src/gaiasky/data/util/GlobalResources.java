@@ -349,7 +349,7 @@ public class GlobalResources implements Disposable {
      * @param l          The list with the results
      * @param extensions The allowed extensions
      */
-    public static void listRecursive(Path f, final Array<Path> l, String... extensions) {
+    public static void listRecursive(Path f, Array<Path> l, String... extensions) {
         if (Files.exists(f)) {
             if (Files.isDirectory(f)) {
                 try (Stream<Path> partial = Files.list(f)) {
@@ -495,7 +495,7 @@ public class GlobalResources implements Disposable {
      */
     public static long size(Path path) throws IOException {
 
-        final AtomicLong size = new AtomicLong(0);
+        AtomicLong size = new AtomicLong(0);
 
         Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override

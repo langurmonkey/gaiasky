@@ -46,7 +46,7 @@ public class SceneJsonLoader {
             }
         }
 
-        final Array<Entity> loadedEntities = new Array<>();
+        Array<Entity> loadedEntities = new Array<>();
         // Load files.
         for (FileHandle jsonFile : jsonFiles) {
             loadedEntities.addAll(loadJsonFile(jsonFile, scene));

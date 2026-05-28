@@ -63,7 +63,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         public String name;
         public OrbitComponent orbitalParamaters;
         public Entity entity;
-        public boolean force = false;
+        public boolean force;
         Class<? extends IOrbitDataProvider> providerClass;
 
         public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass) {

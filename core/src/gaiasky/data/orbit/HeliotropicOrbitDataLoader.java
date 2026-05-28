@@ -27,7 +27,7 @@ import java.util.Calendar;
 
 public class HeliotropicOrbitDataLoader {
     static Log logger = Logger.getLogger(HeliotropicOrbitDataLoader.class);
-    int count = 0;
+    int count;
     // Maximum time between accepted samples
     long maxMsSep = (long) (12d * Nature.H_TO_MS);
 
@@ -164,7 +164,7 @@ public class HeliotropicOrbitDataLoader {
      *
      * @return Vector3 with the position in the heliotropic reference frame
      */
-    protected Vector3D correctSunLongitude(final Vector3D pos, Instant t) {
+    protected Vector3D correctSunLongitude(Vector3D pos, Instant t) {
         Vector3D upDirection = new Vector3D(0, 1, 0);
         // We get the Up direction of the ecliptic in equatorial coordinates
         upDirection.mul(Coordinates.eclToEq());

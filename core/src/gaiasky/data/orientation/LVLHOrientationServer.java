@@ -29,7 +29,7 @@ public class LVLHOrientationServer implements OrientationServer {
     protected Entity parent;
     protected final Vector3Q a, b, c, lastPos;
     protected final Vector3D up, dir, side, lastDir;
-    protected boolean initialized = false;
+    protected boolean initialized;
 
     public LVLHOrientationServer(String objectName) {
         super();

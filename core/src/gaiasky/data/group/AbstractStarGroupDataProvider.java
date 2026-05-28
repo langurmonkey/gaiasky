@@ -54,13 +54,13 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
     protected Matrix4D transform;
-    protected Set<Long> mustLoadIds = null;
+    protected Set<Long> mustLoadIds;
     protected List<AdditionalCols> additional;
     /**
      * Files or folders with optionally gzipped CSVs containing additional columns to be matched by sourceId with the main catalog. Column names must comport
      * to {@link ColId}.
      */
-    protected String[] additionalFiles = null;
+    protected String[] additionalFiles;
     /**
      * RUWE cap value. Will accept all stars with star_ruwe &le; ruwe
      */
@@ -96,11 +96,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * The zero point for the parallaxes in mas. Gets added to all loaded
      * parallax values
      */
-    protected double parallaxZeroPoint = 0;
+    protected double parallaxZeroPoint;
     /**
      * Apply magnitude/color corrections for extinction/reddening
      */
-    protected boolean magCorrections = false;
+    protected boolean magCorrections;
     /**
      * Maximum number of files to load. Negative for unlimited
      */
@@ -117,7 +117,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    public ColId colIdFromStr(final String name) {
+    public ColId colIdFromStr(String name) {
         return switch (name) {
             case "source_id", "sourceid" -> ColId.sourceid;
             case "hip" -> ColId.hip;

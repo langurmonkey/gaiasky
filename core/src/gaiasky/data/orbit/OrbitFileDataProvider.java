@@ -42,7 +42,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
             FileDataLoader odl = new FileDataLoader();
             FileHandle f = GaiaSky.settings().data.dataFileHandle(file);
             try {
-                final InputStream is;
+                InputStream is;
                 var isGzip = false;
                 try (var fis = f.read()){
                     isGzip = GzipUtils.isGZipped(fis);

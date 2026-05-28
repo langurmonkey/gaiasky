@@ -29,7 +29,7 @@ public class AssetBean<T> {
 
     private final String assetName;
     private final Class<T> assetClass;
-    private AssetLoaderParameters<T> assetParams = null;
+    private AssetLoaderParameters<T> assetParams;
 
     private AssetBean(String assetName, Class<T> assetClass) {
         super();

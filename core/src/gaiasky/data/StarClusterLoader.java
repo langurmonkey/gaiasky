@@ -50,7 +50,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
     private static final Log logger = Logger.getLogger(StarClusterLoader.class);
     boolean active = true;
     private Archetype archetype;
-    private int numLoaded = 0;
+    private int numLoaded;
 
     private final float[] clusterColor = new float[] { 0.93f, 0.93f, 0.3f, 1f };
 

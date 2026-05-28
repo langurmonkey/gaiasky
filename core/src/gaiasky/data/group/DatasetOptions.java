@@ -32,7 +32,7 @@ public class DatasetOptions {
     public double[] fadeIn;
     public double[] fadeOut;
     public int numLabels;
-    public boolean renderSetLabel = false;
+    public boolean renderSetLabel;
     public boolean initializeCatalogInfo = true;
 
     public static DatasetOptions getStarDatasetOptions(String datasetName,

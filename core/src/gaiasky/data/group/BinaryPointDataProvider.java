@@ -238,9 +238,9 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         }
 
         // XYZ
-        final double alphaDeg = in.readDouble();
-        final double deltaDeg = in.readDouble();
-        final double distPc = in.readDouble();
+        double alphaDeg = in.readDouble();
+        double deltaDeg = in.readDouble();
+        double distPc = in.readDouble();
         var pos = Coordinates.sphericalToCartesian(alphaDeg * MathUtilsDouble.degRad,
                                                    deltaDeg * MathUtilsDouble.degRad,
                                                    distPc * Constants.PC_TO_U,
@@ -269,7 +269,7 @@ public class BinaryPointDataProvider implements IParticleGroupDataProvider, Bina
         } else {
             appMag = (float) Constants.DEFAULT_MAG;
         }
-        final float absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
+        float absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
 
         // COLOR
         float color;

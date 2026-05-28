@@ -88,7 +88,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     /**
      * Current number of stars that are loaded.
      **/
-    protected int nLoadedStars = 0;
+    protected int nLoadedStars;
     /**
      * The octant loading queue.
      **/
@@ -96,11 +96,11 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     /**
      * Whether loading is paused or not.
      **/
-    protected boolean loadingPaused = false;
+    protected boolean loadingPaused;
     /**
      * Last time of a queue clear event went through.
      **/
-    protected long lastQueueClearMs = 0;
+    protected long lastQueueClearMs;
     // Dataset name and description.
     protected String name, description, key;
     // Dataset parameters
@@ -203,7 +203,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         logger.info(I18n.msg("notif.loading", metadata));
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
-        final OctreeNode rootOctant = metadataReader.readMetadataMapped(metadata);
+        OctreeNode rootOctant = metadataReader.readMetadataMapped(metadata);
         rootOctant.setOctantLoader(this, true);
 
         {
@@ -273,7 +273,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         }
     }
 
-    private void updateNumLabelsRecursive(final OctreeNode octant, final long numLabels) {
+    private void updateNumLabelsRecursive(OctreeNode octant, long numLabels) {
         if (octant.objects != null && !octant.objects.isEmpty()) {
             for (var sg : octant.objects) {
                 if (sg instanceof OctreeObjectView oov && oov.set != null) {
@@ -477,7 +477,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      *
      * @throws IOException When any of the level's files fails to load.
      */
-    public void loadLod(final Integer lod, final Entity octreeWrapper, boolean immediate) throws IOException {
+    public void loadLod(Integer lod, Entity octreeWrapper, boolean immediate) throws IOException {
         var root = Mapper.octant.get(octreeWrapper);
         // Load.
         loadOctant(root.octant, octreeWrapper, lod, true, immediate);
@@ -492,7 +492,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @param level         The depth to load.
      * @param immediate     Populate the objects list in the octant immediately.
      */
-    public void loadOctant(final OctreeNode octant, final Entity octreeWrapper, Integer level, boolean progress, boolean immediate) {
+    public void loadOctant(OctreeNode octant, Entity octreeWrapper, Integer level, boolean progress, boolean immediate) {
         if (level >= 0) {
             loadOctant(octant, octreeWrapper, progress, true, immediate);
             if (octant.children != null) {
@@ -512,7 +512,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @param immediate     Populate the objects list in the octant immediately.
      * @param abort         State variable that will be set to true if an abort is called.
      */
-    public void loadOctants(final Array<OctreeNode> octants, final Entity octreeWrapper, final boolean immediate, final AtomicBoolean abort) {
+    public void loadOctants(Array<OctreeNode> octants, Entity octreeWrapper, boolean immediate, AtomicBoolean abort) {
         if (octants.size > 0) {
             int i = 0;
             OctreeNode octant = octants.get(0);
@@ -546,11 +546,11 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      *
      * @return True if the octant was loaded, false otherwise
      */
-    public boolean loadOctant(final OctreeNode octant,
-                              final Entity octreeWrapper,
-                              final boolean progress,
-                              final boolean fullInit,
-                              final boolean immediate) {
+    public boolean loadOctant(OctreeNode octant,
+                              Entity octreeWrapper,
+                              boolean progress,
+                              boolean fullInit,
+                              boolean immediate) {
         FileHandle octantFile = GaiaSky.settings().data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
@@ -610,8 +610,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     /**
      * Unloads the given octant.
      */
-    public void unloadOctant(final OctreeNode octant, final Entity octreeWrapper) {
-        final List<IOctreeObject> objects = octant.objects;
+    public void unloadOctant(OctreeNode octant, Entity octreeWrapper) {
+        List<IOctreeObject> objects = octant.objects;
         if (objects != null) {
             GaiaSky.postRunnable(() -> {
                 synchronized (octant) {
@@ -646,7 +646,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case PAUSE_BACKGROUND_LOADING -> {
                 loadingPaused = true;

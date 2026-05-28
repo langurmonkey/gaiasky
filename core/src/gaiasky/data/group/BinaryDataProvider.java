@@ -36,7 +36,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     /** The default output format version to use for writing **/
     public static int DEFAULT_OUTPUT_VERSION = 3;
 
-    public static int MIN_OUTPUT_VERSION = 0;
+    public static int MIN_OUTPUT_VERSION;
     public static int MAX_OUTPUT_VERSION = DEFAULT_OUTPUT_VERSION;
     /**
      * Binary IO for the different format versions
