@@ -73,7 +73,7 @@ public class GalaxyDataGenerator {
 
     private static class CLIArgs {
         @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
-        private boolean help = false;
+        private boolean help;
 
         @Parameter(names = {"--galaxytype"}, required = true, description = "The galaxy type to use.", order = 1)
         private GalaxyDataType galaxyType = GalaxyDataType.uniform;
@@ -85,7 +85,7 @@ public class GalaxyDataGenerator {
         private String outputDir = "/home/tsagrista/.local/share/gaiasky/data/galaxy/";
 
         @Parameter(names = {"-s", "--skip-welcome"}, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
-        private boolean skipWelcome = false;
+        private boolean skipWelcome;
 
     }
 
@@ -361,7 +361,7 @@ public class GalaxyDataGenerator {
         }
         if (f.createNewFile()) {
 
-            final BufferedWriter bw = getBufferedWriter(gal, filePath);
+            BufferedWriter bw = getBufferedWriter(gal, filePath);
 
             bw.close();
             logger.info(I18n.msg("notif.written", gal.size(), filePath));

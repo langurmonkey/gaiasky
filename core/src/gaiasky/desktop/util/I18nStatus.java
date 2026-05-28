@@ -178,11 +178,11 @@ public class I18nStatus {
 
     private static class CLIArgs {
         @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
-        private boolean help = false;
+        private boolean help;
         @Parameter(names = {"-s", "--show-untranslated"}, description = "Show untranslated keys for each language.", order = 1)
-        private boolean showUntranslated = false;
+        private boolean showUntranslated;
         @Parameter(names = {"-u", "--show-unknown"}, description = "Show unknown keys for each language.", order = 2)
-        private boolean showUnknown = false;
+        private boolean showUnknown;
         @Parameter(names = {"-f", "--file"}, description = "The name of the file to check, either 'gsbundle' or 'objects'.", order = 3)
         private String bundleFile = "gsbundle";
 

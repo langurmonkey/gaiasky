@@ -16,6 +16,6 @@ public interface IObserver {
      * @param source The source object, if any.
      * @param data   The data associated with this event.
      */
-    void notify(final Event event, Object source, final Object... data);
+    void notify(Event event, Object source, Object... data);
 
 }

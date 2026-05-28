@@ -18,7 +18,7 @@ public class Telegram implements Comparable<Telegram> {
     public Telegram() {
     }
 
-    public Telegram(Event event, Object source, long time, final Object... data) {
+    public Telegram(Event event, Object source, long time, Object... data) {
         this.event = event;
         this.source = source;
         this.timestamp = time;

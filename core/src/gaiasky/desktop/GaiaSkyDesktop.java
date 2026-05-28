@@ -269,7 +269,7 @@ public class GaiaSkyDesktop implements IObserver {
         System.exit(statusCode);
     }
 
-    private static void checkLogger(final ConsoleLogger consoleLogger) {
+    private static void checkLogger(ConsoleLogger consoleLogger) {
         EventManager.instance.clearAllSubscriptions();
         consoleLogger.subscribe();
     }
@@ -286,7 +286,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * @throws IOException If the file fails to be written successfully.
      */
-    private static boolean initConfigFile(final boolean vr) throws IOException {
+    private static boolean initConfigFile(boolean vr) throws IOException {
         // Use user folder
         Path userFolderConfFile = SysUtils.getConfigDir().resolve(SettingsManager.getConfigFileName(vr));
 
@@ -528,11 +528,11 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg) {
+    private void configureWindowSize(Lwjgl3ApplicationConfiguration cfg) {
         configureWindowSize(cfg, 1f, 1f);
     }
 
-    private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg,
+    private void configureWindowSize(Lwjgl3ApplicationConfiguration cfg,
                                      float widthFactor,
                                      float heightFactor) {
         int w = settings.graphics.getApplicationWidth();
@@ -566,20 +566,20 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
+    private void runGaiaSky(Lwjgl3ApplicationConfiguration cfg) {
         gs = new GaiaSky(cliArgs,  settings);
         new Lwjgl3Application(gs, cfg);
     }
 
-    private void setSafeMode(final Lwjgl3ApplicationConfiguration cfg) {
+    private void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
         logger.info(I18n.msg("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
         settings.scene.renderer.elevation.type = ElevationType.NONE;
         settings.program.safeMode = true;
         cfg.setOpenGLEmulation(GLEmulation.GL30, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
-    private void showDialogOGL(final Exception ex,
-                               final String title) {
+    private void showDialogOGL(Exception ex,
+                               String title) {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
@@ -591,9 +591,9 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case SCENE_LOADED -> {
                 if (REST_ENABLED) {
@@ -628,56 +628,56 @@ public class GaiaSkyDesktop implements IObserver {
      */
     public static class CLIArgs {
         @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
-        public boolean help = false;
+        public boolean help;
 
         @Parameter(names = {"-v", "--version"}, description = "List Gaia Sky version and relevant information.", order = 1)
-        public boolean version = false;
+        public boolean version;
 
         @Parameter(names = {"-i", "--ascii-art"}, description = "Add nice ascii art to --version information.", order = 1)
-        public boolean asciiArt = false;
+        public boolean asciiArt;
 
         @Parameter(names = {"-s", "--skip-welcome"}, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
-        public boolean skipWelcome = false;
+        public boolean skipWelcome;
 
         @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file.", order = 4)
-        public String propertiesFile = null;
+        public String propertiesFile;
 
         @Parameter(names = {"-a",
                 "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
-        public String assetsLocation = null;
+        public String assetsLocation;
 
         @Parameter(names = {"-vr",
                 "--openxr"}, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenXR. Make sure your OpenXR runtime is running.", order = 6)
-        public boolean vr = false;
+        public boolean vr;
 
         @Parameter(names = {"-e", "--externalview"}, description = "Create a window with a view of the scene and no UI.", order = 7)
-        public boolean externalView = false;
+        public boolean externalView;
 
         @Parameter(names = {"-n",
                 "--no-script"}, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
-        public boolean noScriptingServer = false;
+        public boolean noScriptingServer;
 
         @Parameter(names = {"-d", "--debug"}, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9)
-        public boolean debug = false;
+        public boolean debug;
 
         @Parameter(names = {"-g",
                 "--debug-gpu"}, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10)
-        public boolean debugGpu = false;
+        public boolean debugGpu;
 
         @Parameter(names = {
                 "--debug-input"}, description = "Activate input debug mode. Prints out debug information for all input events (keyboard/mouse/controllers).", order = 10)
-        public boolean debugInput = false;
+        public boolean debugInput;
 
         @Parameter(names = {"-l", "--headless"}, description = "Use headless (windowless) mode, for servers.", order = 11)
-        public boolean headless = false;
+        public boolean headless;
 
         @Parameter(names = {
                 "--safe-mode"}, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12)
-        public boolean safeMode = false;
+        public boolean safeMode;
 
         @Parameter(names = {
                 "--no-safe-mode"}, description = "Force deactivation of safe graphics mode. Warning: this bypasses internal checks and may break things! Useful to get rid of safe graphics mode in the settings.", order = 13)
-        public boolean noSafeMode = false;
+        public boolean noSafeMode;
 
         @Parameter(names = {"--hdpi-mode"}, description =
                 "The HDPI mode to use. Defines how HiDPI monitors are handled. Operating systems may have a per-monitor HiDPI scale setting. The operating system " +

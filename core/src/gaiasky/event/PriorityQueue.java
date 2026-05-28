@@ -33,7 +33,7 @@ public class PriorityQueue<E extends Comparable<E>> {
     private boolean uniqueness;
 
     /** The number of elements in the priority queue. */
-    private int size = 0;
+    private int size;
 
     /**
      * Creates a {@code PriorityQueue} with the default initial capacity (11) that orders its elements according to their
