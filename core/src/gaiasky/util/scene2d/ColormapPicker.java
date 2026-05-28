@@ -657,7 +657,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                     for (float b = 0f; b <= 1f; b += 0.3333f) {
                         Image c = new Image(skin.getDrawable("white"));
                         c.setColor(r, g, b, a);
-                        final float[] pick = new float[] { r, g, b, a };
+                        float[] pick = new float[] { r, g, b, a };
                         c.addListener(new ClickListener() {
                             @Override
                             public void clicked(InputEvent event,

@@ -65,8 +65,8 @@ public class CollapsibleWindow extends OwnWindow {
         initWindow(skin, collapseSpeed);
     }
 
-    private void initWindow(final Skin skin,
-                            final float collapseSpeed) {
+    private void initWindow(Skin skin,
+                            float collapseSpeed) {
         this.me = this;
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
@@ -204,12 +204,9 @@ public class CollapsibleWindow extends OwnWindow {
     }
 
     public void expand() {
-        if (!collapsed || expanding || collapsing)
-            return;
-        else {
+        if (collapsed && !expanding && !collapsing) {
             expanding = true;
         }
-
     }
 
     public void expandInstant() {
@@ -222,9 +219,7 @@ public class CollapsibleWindow extends OwnWindow {
 
     public void collapse() {
         if (collapsible) {
-            if (collapsed || expanding || collapsing)
-                return;
-            else {
+            if (!collapsed && !expanding && !collapsing) {
                 expandHeight = getHeight();
                 collapsing = true;
             }

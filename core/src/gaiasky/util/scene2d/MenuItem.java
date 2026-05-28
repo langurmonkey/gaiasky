@@ -140,7 +140,7 @@ public class MenuItem extends Button {
         return subMenu;
     }
 
-    public void setSubMenu(final ContextMenu subMenu) {
+    public void setSubMenu(ContextMenu subMenu) {
         this.subMenu = subMenu;
 
         if (subMenu == null) {

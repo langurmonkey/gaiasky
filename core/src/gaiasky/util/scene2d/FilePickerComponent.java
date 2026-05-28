@@ -353,7 +353,7 @@ public class FilePickerComponent extends Table {
         location.setText(text != null && !text.isBlank() ? text : pathStr);
         location.setToRegularColor();
 
-        final Array<FileListItem> items = new Array<>();
+        Array<FileListItem> items = new Array<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, filter)) {
             for (Path p : stream) {
                 if (showHidden || !p.getFileName().toString().startsWith(".")) {

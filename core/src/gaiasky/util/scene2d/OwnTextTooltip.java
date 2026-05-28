@@ -41,7 +41,7 @@ public class OwnTextTooltip extends Tooltip<Label> {
         this(text, manager, skin.get(styleName, TextTooltipStyle.class), -1);
     }
 
-    public OwnTextTooltip(String text, final TooltipManager manager, TextTooltipStyle style, int breakSpaces) {
+    public OwnTextTooltip(String text, TooltipManager manager, TextTooltipStyle style, int breakSpaces) {
         super(null, manager);
 
         // Warp text if breakSpaces <= 0

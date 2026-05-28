@@ -24,7 +24,7 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.validator.*;
 
 /**
- * Extension of libgdx's text field that incorporates some QOL improvements like built-in validation
+ * Extension of LibGDX's text field that incorporates some QOL improvements like built-in validation
  * or a clear button.
  */
 public class OwnTextField extends TextField {
@@ -75,7 +75,7 @@ public class OwnTextField extends TextField {
             clearDrawable = skin.getDrawable(clearButtonDrawableUp);
             clearW = clearDrawable.getMinWidth();
             clearH = clearDrawable.getMinHeight();
-            final var me = this;
+            var me = this;
             // Clear text if collision with drawable.
             this.addListener(new ClickListener() {
                 public void clicked(InputEvent event, float x, float y) {
@@ -207,18 +207,26 @@ public class OwnTextField extends TextField {
 
     private void addValidatorTooltip(IValidator validator) {
         if (validator != null) {
-            if (validator instanceof FloatValidator fv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMinString(), fv.getMaxString()),
-                                                                          skin));
-            } else if (validator instanceof DoubleValidator dv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", dv.getMinString(), dv.getMaxString()),
-                                                                          skin));
-            } else if (validator instanceof IntValidator iv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMinString(), iv.getMaxString()),
-                                                                          skin));
-            } else if (validator instanceof LongValidator lv) {
-                addListener(validatorTooltipListener = new OwnTextTooltip(I18n.msg("gui.validator.values", lv.getMinString(), lv.getMaxString()),
-                                                                          skin));
+            var lis = validatorTooltipListener;
+            switch (validator) {
+                case FloatValidator fv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
+                                                                                        fv.getMinString(),
+                                                                                        fv.getMaxString()),
+                                                                                        skin));
+                case DoubleValidator dv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
+                                                                                         dv.getMinString(),
+                                                                                         dv.getMaxString()),
+                                                                                         skin));
+                case IntValidator iv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
+                                                                                      iv.getMinString(),
+                                                                                      iv.getMaxString()),
+                                                                                      skin));
+                case LongValidator lv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
+                                                                                       lv.getMinString(),
+                                                                                       lv.getMaxString()),
+                                                                                       skin));
+                default -> {
+                }
             }
             if (validator instanceof CallbackValidator cv) {
                 addValidatorTooltip(cv.getParent());

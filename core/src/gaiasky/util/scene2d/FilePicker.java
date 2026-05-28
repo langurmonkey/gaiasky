@@ -21,12 +21,12 @@ import java.util.function.Consumer;
 public class FilePicker extends GenericDialog {
     private final FilePickerComponent component;
 
-    public FilePicker(String title, final Skin skin, Stage stage, Path baseDir, FilePickerTarget target) {
+    public FilePicker(String title, Skin skin, Stage stage, Path baseDir, FilePickerTarget target) {
         this(title, skin, stage, baseDir, target, true);
     }
 
     public FilePicker(String title,
-                      final Skin skin,
+                      Skin skin,
                       Stage stage,
                       Path baseDir,
                       FilePickerTarget target,

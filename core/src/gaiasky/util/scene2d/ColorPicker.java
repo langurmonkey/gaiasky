@@ -226,7 +226,7 @@ public class ColorPicker extends ColorPickerAbstract {
                     for (float b = 0f; b <= 1f; b += 0.3333f) {
                         var c = new OwnImage(skin.getDrawable("white"), false);
                         c.setColor(r, g, b, a);
-                        final float[] pick = new float[]{r, g, b, a};
+                        float[] pick = new float[]{r, g, b, a};
                         c.addListener(new ClickListener() {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {

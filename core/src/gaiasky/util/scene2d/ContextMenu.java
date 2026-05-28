@@ -228,7 +228,7 @@ public class ContextMenu extends Table {
      *
      * @param mouseButton from {@link Buttons}
      */
-    public InputListener getDefaultInputListener(final int mouseButton) {
+    public InputListener getDefaultInputListener(int mouseButton) {
         if (defaultInputListener == null) {
             defaultInputListener = new InputListener() {
                 @Override

@@ -14,7 +14,6 @@ import gaiasky.util.TextUtils;
 public class OwnTextHotkeyTooltip extends Tooltip<Table> {
     private final OwnLabel label;
     private HorizontalGroup groupHotkeys;
-    private OwnLabel labelHotkey;
 
     public OwnTextHotkeyTooltip(String text, String hotkey, Skin skin, int breakSpaces) {
         this(text, hotkey != null ? new String[]{hotkey} : null, skin, TooltipManager.getInstance(), skin.get(TextTooltipStyle.class), breakSpaces);
@@ -32,7 +31,7 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
         this(text, hotkeys, skin, -1);
     }
 
-    public OwnTextHotkeyTooltip(String text, String[] hotkeys, Skin skin, final TooltipManager manager, TextTooltipStyle style, int breakSpaces) {
+    public OwnTextHotkeyTooltip(String text, String[] hotkeys, Skin skin, TooltipManager manager, TextTooltipStyle style, int breakSpaces) {
         super(null, manager);
 
         // Warp text if breakSpaces <= 0.
@@ -51,7 +50,7 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
             int n = hotkeys.length;
             for (int i = 0; i < hotkeys.length; i++) {
                 var hotkey = hotkeys[i];
-                labelHotkey = new OwnLabel("[" + hotkey + "]", skin, "hotkey");
+                var labelHotkey = new OwnLabel("[" + hotkey + "]", skin, "hotkey");
                 groupHotkeys.addActor(labelHotkey);
                 if (i < n - 1) {
                     groupHotkeys.addActor(new OwnLabel(" / ", skin));
