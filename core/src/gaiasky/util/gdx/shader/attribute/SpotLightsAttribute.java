@@ -21,7 +21,7 @@ public class SpotLightsAttribute extends Attribute {
         lights = new Array<>(1);
     }
 
-    public SpotLightsAttribute(final SpotLightsAttribute copyFrom) {
+    public SpotLightsAttribute(SpotLightsAttribute copyFrom) {
         this();
         lights.addAll(copyFrom.lights);
     }

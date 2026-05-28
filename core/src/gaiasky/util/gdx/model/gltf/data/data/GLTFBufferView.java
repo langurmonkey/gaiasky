@@ -9,6 +9,6 @@ package gaiasky.util.gdx.model.gltf.data.data;
 import gaiasky.util.gdx.model.gltf.data.GLTFEntity;
 
 public class GLTFBufferView extends GLTFEntity {
-	public int byteOffset = 0, byteLength;
+	public int byteOffset, byteLength;
 	public Integer buffer, byteStride, target;
 }

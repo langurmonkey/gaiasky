@@ -82,7 +82,7 @@ public class IntIndexArray implements IntIndexData {
 
     @Override
     public void updateIndices(int targetOffset, int[] indices, int offset, int count) {
-        final int pos = byteBuffer.position();
+        int pos = byteBuffer.position();
         byteBuffer.position(targetOffset * 4);
         BufferUtils.copy(indices, offset, byteBuffer, count);
         byteBuffer.position(pos);

@@ -33,10 +33,10 @@ public class VertexBufferObjectInstanced implements IntVertexData {
     final int usage;
     int globalBufferHandle;
     int instanceBufferHandle;
-    boolean isDirtyGlobal = false;
-    boolean isDirtyInstance = false;
-    boolean isBoundGlobal = false;
-    boolean isBoundInstance = false;
+    boolean isDirtyGlobal;
+    boolean isDirtyInstance;
+    boolean isBoundGlobal;
+    boolean isBoundInstance;
     int meshVAO = -1;
     IntArray cachedLocationsGlobal = new IntArray();
     IntArray cachedLocationsInstance = new IntArray();
@@ -122,7 +122,7 @@ public class VertexBufferObjectInstanced implements IntVertexData {
     @Override
     public void updateVertices(int targetOffset, float[] vertices, int sourceOffset, int count) {
         isDirtyGlobal = true;
-        final int pos = byteBufferGlobal.position();
+        int pos = byteBufferGlobal.position();
         byteBufferGlobal.position(targetOffset * 4);
         BufferUtils.copy(vertices, sourceOffset, count, byteBufferGlobal);
         byteBufferGlobal.position(pos);
@@ -160,7 +160,7 @@ public class VertexBufferObjectInstanced implements IntVertexData {
 
     private void bindAttributes(ExtShaderProgram shader, int[] locations, VertexAttributes attributes, int bufferHandle, IntArray cachedLocations, int divisor) {
         boolean stillValid = cachedLocations.size != 0;
-        final int numAttributes = attributes.size();
+        int numAttributes = attributes.size();
 
         if (stillValid) {
             if (locations == null) {
@@ -246,12 +246,12 @@ public class VertexBufferObjectInstanced implements IntVertexData {
      * @param shader the shader
      */
     @Override
-    public void unbind(final ExtShaderProgram shader) {
+    public void unbind(ExtShaderProgram shader) {
         unbind(shader, null);
     }
 
     @Override
-    public void unbind(final ExtShaderProgram shader, final int[] locations) {
+    public void unbind(ExtShaderProgram shader, int[] locations) {
         GL30 gl = Gdx.gl30;
         gl.glBindVertexArray(0);
         isBoundGlobal = false;

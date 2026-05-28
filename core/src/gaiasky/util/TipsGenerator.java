@@ -30,7 +30,7 @@ public class TipsGenerator {
     private final Skin skin;
     private final List<TipPart[]> tips;
     private final int[] sequence;
-    private int currentIndex = 0;
+    private int currentIndex;
 
     public TipsGenerator(Skin skin) {
         super();

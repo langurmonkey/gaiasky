@@ -27,14 +27,14 @@ public class PBRCommon {
 	}
 	
 	public static void checkVertexAttributes(IntRenderable renderable){
-		final int numVertexAttributes = renderable.meshPart.mesh.getVertexAttributes().size();
-		final int maxVertexAttribs = getCapability(GL20.GL_MAX_VERTEX_ATTRIBS);
+		int numVertexAttributes = renderable.meshPart.mesh.getVertexAttributes().size();
+		int maxVertexAttribs = getCapability(GL20.GL_MAX_VERTEX_ATTRIBS);
 		if(numVertexAttributes > maxVertexAttribs){
 			throw new GdxRuntimeException("too many vertex attributes : " + numVertexAttributes + " > " + maxVertexAttribs);
 		}
 	}
 	
-	private static Boolean seamlessCubemapsShouldBeEnabled = null;
+	private static Boolean seamlessCubemapsShouldBeEnabled;
 	
 	public static void enableSeamlessCubemaps(){
 		if(seamlessCubemapsShouldBeEnabled == null){

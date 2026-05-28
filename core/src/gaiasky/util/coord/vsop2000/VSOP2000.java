@@ -113,7 +113,7 @@ public class VSOP2000 extends AbstractOrbitCoordinates {
         }
 
         // Maximum number of terms to use. Depends on high accuracy setting.
-        final int maxTerms = GaiaSky.settings().data.highAccuracy ? 2000 : 500;
+        int maxTerms = GaiaSky.settings().data.highAccuracy ? 2000 : 500;
 
         double t = time(AstroUtils.getJulianDateCache(date));
 

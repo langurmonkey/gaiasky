@@ -24,7 +24,7 @@ public interface IntMeshPartBuilder {
     VertexAttributes getAttributes();
 
     /** Set the color used if no vertex color is provided, or null to not use a default color. */
-    void setColor(final Color color);
+    void setColor(Color color);
 
     /** Set the color used if no vertex color is provided. */
     void setColor(float r, float g, float b, float a);
@@ -36,19 +36,19 @@ public interface IntMeshPartBuilder {
     void setUVRange(TextureRegion r);
 
     /** Add one or more vertices, returns the index of the last vertex added. The length of values must a power of the vertex size. */
-    int vertex(final float... values);
+    int vertex(float... values);
 
     /** Add a vertex, returns the index. Null values are allowed. Use {@link #getAttributes} to check which values are available. */
     int vertex(Vector3 pos, Vector3 nor, Color col, Vector2 uv);
 
     /** Add a vertex, returns the index. Use {@link #getAttributes} to check which values are available. */
-    int vertex(final VertexInfo info);
+    int vertex(VertexInfo info);
 
     /** @return The index of the last added vertex. */
     int lastIndex();
 
     /** Add an index, IntMeshPartBuilder expects all meshes to be indexed. */
-    void index(final int value);
+    void index(int value);
 
     /** Add multiple indices, IntMeshPartBuilder expects all meshes to be indexed. */
     void index(int value1, int value2);
@@ -145,10 +145,10 @@ public interface IntMeshPartBuilder {
     void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ);
 
     /** Add a circle */
-    void circle(float radius, int divisions, final Vector3 center, final Vector3 normal);
+    void circle(float radius, int divisions, Vector3 center, Vector3 normal);
 
     /** Add a circle */
-    void circle(float radius, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal);
+    void circle(float radius, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal);
 
     /** Add a circle */
     void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ);
@@ -157,10 +157,10 @@ public interface IntMeshPartBuilder {
     void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float angleFrom, float angleTo);
 
     /** Add a circle */
-    void circle(float radius, int divisions, final Vector3 center, final Vector3 normal, float angleFrom, float angleTo);
+    void circle(float radius, int divisions, Vector3 center, Vector3 normal, float angleFrom, float angleTo);
 
     /** Add a circle */
-    void circle(float radius, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal, float angleFrom, float angleTo);
+    void circle(float radius, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal, float angleFrom, float angleTo);
 
     /** Add a circle */
     void circle(float radius, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo);
@@ -169,10 +169,10 @@ public interface IntMeshPartBuilder {
     void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ);
 
     /** Add a circle */
-    void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal);
+    void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal);
 
     /** Add a circle */
-    void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal);
+    void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal);
 
     /** Add a circle */
     void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ);
@@ -181,10 +181,10 @@ public interface IntMeshPartBuilder {
     void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float angleFrom, float angleTo);
 
     /** Add a circle */
-    void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal, float angleFrom, float angleTo);
+    void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal, float angleFrom, float angleTo);
 
     /** Add a circle */
-    void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal, float angleFrom, float angleTo);
+    void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal, float angleFrom, float angleTo);
 
     /** Add a circle */
     void ellipse(float width, float height, int divisions, float centerX, float centerY, float centerZ, float normalX, float normalY, float normalZ, float tangentX, float tangentY, float tangentZ, float binormalX, float binormalY, float binormalZ, float angleFrom, float angleTo);
@@ -223,13 +223,13 @@ public interface IntMeshPartBuilder {
     void sphere(float width, float height, float depth, int divisionsU, int divisionsV);
 
     /** Add a sphere */
-    void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV);
+    void sphere(Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV);
 
     /** Add a sphere */
     void sphere(float width, float height, float depth, int divisionsU, int divisionsV, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
 
     /** Add a sphere */
-    void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
+    void sphere(Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
 
     /** Add an icosphere **/
     void icosphere(float radius, int divisions, boolean flipNormals, boolean smoothLighting);
@@ -280,7 +280,7 @@ public interface IntMeshPartBuilder {
     void sphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
 
     /** Add a sphere **/
-    void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
+    void sphere(Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
 
     /** Add a ring **/
     void ring(float innerRadius, float outerRadius, int divisions, boolean flipNormals);
@@ -347,7 +347,7 @@ public interface IntMeshPartBuilder {
             return this;
         }
 
-        public VertexInfo set(final VertexInfo other) {
+        public VertexInfo set(VertexInfo other) {
             if (other == null)
                 return set(null, null, null, null, null, null);
             hasPosition = other.hasPosition;
@@ -443,7 +443,7 @@ public interface IntMeshPartBuilder {
             return this;
         }
 
-        public VertexInfo lerp(final VertexInfo target, float alpha) {
+        public VertexInfo lerp(VertexInfo target, float alpha) {
             if (hasPosition && target.hasPosition)
                 position.lerp(target.position, alpha);
             if (hasNormal && target.hasNormal)

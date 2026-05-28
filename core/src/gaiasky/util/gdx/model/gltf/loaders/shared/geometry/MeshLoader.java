@@ -53,7 +53,7 @@ public class MeshLoader {
 
             for (GLTFPrimitive primitive : glMesh.primitives) {
 
-                final int glPrimitiveType = GLTFTypes.mapPrimitiveMode(primitive.mode);
+                int glPrimitiveType = GLTFTypes.mapPrimitiveMode(primitive.mode);
 
                 // material
                 Material material;

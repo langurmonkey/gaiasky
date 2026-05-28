@@ -459,7 +459,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             value = -value;
         } else negative = false;
 
-        final int bitsToShift = Long.numberOfLeadingZeros(value) + 1;
+        int bitsToShift = Long.numberOfLeadingZeros(value) + 1;
         value = (bitsToShift == 64) ? 0 : value << bitsToShift;
         return assignWithUnbiasedExponent(negative, 64 - bitsToShift, value, 0);
     }
@@ -582,12 +582,12 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      */
     @Override
     public int intValue() {
-        final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
+        long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
         if (exp < 0 || isNaN()) return 0;
         if (exp >= 31)
             return negative ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        final int intValue = exp == 0 ? 1 : (1 << exp) | (int) (mantHi >>> 64 - exp);
+        int intValue = exp == 0 ? 1 : (1 << exp) | (int) (mantHi >>> 64 - exp);
         return negative ? -intValue : intValue;
     }
 
@@ -599,12 +599,12 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      */
     @Override
     public long longValue() {
-        final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
+        long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
         if (exp < 0 || isNaN()) return 0;
         if (exp >= 63)
             return negative ? Long.MIN_VALUE : Long.MAX_VALUE;
 
-        final long longValue = exp == 0 ? 1 : (1L << exp) | (mantHi >>> 64 - exp);
+        long longValue = exp == 0 ? 1 : (1L << exp) | (mantHi >>> 64 - exp);
         return negative ? -longValue : longValue;
     }
 
@@ -665,7 +665,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
 
         if (expD > EXP_0D)
             return negative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
-        final long lValue = ((long) (expD + EXP_0D) << 52) | dMant | (negative ? DOUBLE_SIGN_MASK : 0);
+        long lValue = ((long) (expD + EXP_0D) << 52) | dMant | (negative ? DOUBLE_SIGN_MASK : 0);
         return Double.longBitsToDouble(lValue);
     }
 
@@ -803,7 +803,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return 1 if this instance is greater in magnitude than the {@code other} instance,
      *         0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
      */
-    public int compareMagnitudeTo(final Quadruple other) {
+    public int compareMagnitudeTo(Quadruple other) {
         if (isNaN())
             return other.isNaN() ? 0 : 1;
         if (other.isNaN())
@@ -865,7 +865,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return the reference to this object, which holds a new value that equals
      *         the sum of its previous value and the value of the summand
      */
-    public Quadruple add(final Quadruple summand) {
+    public Quadruple add(Quadruple summand) {
         if (isNaN() || summand.isNaN()) return assignNaN();
 
         if (isInfinite()) {
@@ -888,7 +888,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         if (negative == summand.negative)
             return addUnsigned(summand);
         else {
-            final boolean wasNegative = negative;
+            boolean wasNegative = negative;
             subtractUnsigned(summand);
             negative ^= wasNegative;
         }
@@ -1003,7 +1003,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         if (negative != subtrahend.negative)
             return addUnsigned(subtrahend);
         else {
-            final boolean wasNegative = negative;
+            boolean wasNegative = negative;
             subtractUnsigned(subtrahend);
             negative ^= wasNegative;
         }
@@ -1153,7 +1153,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         long thirdWord = sqrtMant();
 
         if (absExp % 2 != 0) {
-            final long[] multed = multBySqrt2(mantHi, mantLo, thirdWord);
+            long[] multed = multBySqrt2(mantHi, mantLo, thirdWord);
             mantHi = multed[0];
             mantLo = multed[1];
             thirdWord = multed[2];
@@ -1590,7 +1590,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
 
         for (int i = 5; i >= 0; i--) // compute partial 32-bit products
             for (int j = 5; j >= 0; j--) {
-                final long part = buff632a[i] * buff632b[j];
+                long part = buff632a[i] * buff632b[j];
                 buff1232[j + i + 1] += part & LOWER_32_BITS;
                 buff1232[j + i] += part >>> 32;
             }
@@ -1669,7 +1669,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return this instance, with exponent and mantHi set appropriately
      */
     private Quadruple makeQuadOfSubnormalDoubleAsLong(long doubleAsLong) {
-        final int numOfZeros = Long.numberOfLeadingZeros(doubleAsLong);
+        int numOfZeros = Long.numberOfLeadingZeros(doubleAsLong);
         exponent = EXPONENT_BIAS - EXP_0D - (numOfZeros - 12);
         if (numOfZeros < 63)
             mantHi = doubleAsLong << numOfZeros + 1;
@@ -1694,7 +1694,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             return 0;
         }
 
-        final long shiftedOutBit = shiftMantissa(exp2);
+        long shiftedOutBit = shiftMantissa(exp2);
 
         exp2 = 0;
         if (shiftedOutBit != 0)
@@ -1835,7 +1835,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addUnsigned(final Quadruple summand) {
+    private Quadruple addUnsigned(Quadruple summand) {
         if (exponent != 0 && summand.exponent != 0) {
             if (exponent == summand.exponent)
                 return addWithSameExps(summand);
@@ -1858,9 +1858,9 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addWithSameExps(final Quadruple summand) {
-        final long carryUp = addMant(summand.mantHi, summand.mantLo);
-        final long shiftedOutBit = mantLo & 1;
+    private Quadruple addWithSameExps(Quadruple summand) {
+        long carryUp = addMant(summand.mantHi, summand.mantLo);
+        long shiftedOutBit = mantLo & 1;
         shiftMantissaRight(1);
 
         if (shiftedOutBit != 0 && ++mantLo == 0)
@@ -1880,7 +1880,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addWitDifferentExps(final Quadruple summand) {
+    private Quadruple addWitDifferentExps(Quadruple summand) {
         long greaterHi, greaterLo, exp2;
         // Put the mantissa of the lesser summand, that is to be shifted, to the fields of this instance
         if (Integer.compareUnsigned(exponent, summand.exponent) < 0) {
@@ -1896,7 +1896,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             exp2 = summand.exponent;
         }
 
-        final int shift = exponent - (int) exp2;
+        int shift = exponent - (int) exp2;
         if (Integer.compareUnsigned(shift, 129) > 0) {
             mantHi = greaterHi;
             mantLo = greaterLo;
@@ -1906,8 +1906,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         if (shift == 129)
             return greaterPlusLowerBit(greaterHi, greaterLo);
 
-        final long shiftedOutBit = shiftAndSetUnity(shift);
-        final long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
+        long shiftedOutBit = shiftAndSetUnity(shift);
+        long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
         if (carryUp != 0)
             shiftAndCorrectExponent(shiftedOutBit);
 
@@ -1921,7 +1921,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return this instance with the new value (the sum of the two summands)
      */
-    private Quadruple addNormalAndSubnormal(final Quadruple summand) {
+    private Quadruple addNormalAndSubnormal(Quadruple summand) {
         long greaterHi;
         long greaterLo;
         long shiftedOutBit;
@@ -1939,7 +1939,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             mantLo = summand.mantLo;
         }
 
-        final int shift = exponent - 1;
+        int shift = exponent - 1;
         int lz = Long.numberOfLeadingZeros(mantHi);
         if (lz == 64) lz = 64 + Long.numberOfLeadingZeros(mantLo);
         if (shift + lz > 128) {
@@ -1950,7 +1950,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
 
         shiftedOutBit = highestShiftedOutBit(shift);
         shiftMantissaRight(shift);
-        final long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
+        long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
 
         if (carryUp != 0)
             shiftAndCorrectExponent(shiftedOutBit);
@@ -2040,7 +2040,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return the value of the highest bit that was shifted out
      */
     private long shiftAndSetUnity(int shift) {
-        final long shiftedOutBit = (shift == 0) ? 0 :
+        long shiftedOutBit = (shift == 0) ? 0 :
                 (shift <= 64) ? 1 & (mantLo >>> shift - 1) :
                         1 & (mantHi >>> shift - 65);
         shiftMantissaRight(shift);
@@ -2086,7 +2086,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param dontRoundUpAnyMore non-zero value
      */
     private void shiftAndCorrectExponent(long dontRoundUpAnyMore) {
-        final long shiftedOutBit = dontRoundUpAnyMore != 0 ? 0 : (mantLo & 1);
+        long shiftedOutBit = dontRoundUpAnyMore != 0 ? 0 : (mantLo & 1);
         shiftMantissaRight(1);
         if (shiftedOutBit != 0)
             addMant(0, 1);
@@ -2115,11 +2115,11 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @param subtrahend the value to be subtracted
      */
-    private void subtractUnsigned(final Quadruple subtrahend) {
+    private void subtractUnsigned(Quadruple subtrahend) {
         long minuendLo, minuendHi;
         int lesserExp;
 
-        final int thisIsGreater = compareMagnitudeTo(subtrahend);
+        int thisIsGreater = compareMagnitudeTo(subtrahend);
         if (thisIsGreater == 0) {
             assignZero(false);
             return;
@@ -2168,7 +2168,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param lesserExp the exponent of the subtrahend
      */
     private void subtractNormals(long minuendLo, long minuendHi, int lesserExp) {
-        final int shift = exponent - lesserExp;
+        int shift = exponent - lesserExp;
         if (shift > 130) {
             mantHi = minuendHi;
             mantLo = minuendLo;
@@ -2225,7 +2225,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param minuendHi the higher 64 bits of the minuend
      */
     private void subtract_1e_129(long minuendLo, long minuendHi) {
-        final long subtrahendHi = mantHi, subtrahendLo = mantLo;
+        long subtrahendHi = mantHi, subtrahendLo = mantLo;
 
         if ((minuendHi | minuendLo) == 0) {
             mantHi = mantLo = -1;
@@ -2253,7 +2253,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param shift     the difference between the exponents
      */
     private void subtractDifferentExp(long minuendLo, long minuendHi, int shift) {
-        final long shiftedOutBits = shiftMantissaRight(shift);
+        long shiftedOutBits = shiftMantissaRight(shift);
         setUnity(shift);
         long borrow =
                 Long.compareUnsigned(shiftedOutBits, HIGH_BIT) > 0 ? 1 : 0;
@@ -2370,8 +2370,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param minuendHi the higher 64 bits of the mantissa of the minuend
      */
     private void subtractSubnormalFromNormal(long minuendLo, long minuendHi) {
-        final int shift = exponent - 1;
-        final int lz = numberOfLeadingZeros();
+        int shift = exponent - 1;
+        int lz = numberOfLeadingZeros();
 
         if (((shift & 0xFFFF_FF00) != 0) || (shift + lz > 129)) {
             mantHi = minuendHi;
@@ -2379,7 +2379,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             return;
         }
 
-        final long shiftedOutBits = shiftMantissaRight(shift);
+        long shiftedOutBits = shiftMantissaRight(shift);
         long borrow = Long.compareUnsigned(shiftedOutBits, HIGH_BIT) > 0 ? 1 : 0;
 
         borrow = subtrMant(minuendHi, minuendLo, borrow);
@@ -2483,7 +2483,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      */
     private void multUnsigned(Quadruple factor) {
         // will use these buffers to hold unpacked mantissas of the factors (5 longs each, 4 x 32 bits + higher (implicit) unity)
-        final long[] factor1 = buffers.get().BUFFER_5x32_A, factor2 = buffers.get().BUFFER_5x32_B, product = buffers.get().BUFFER_10x32_A;
+        long[] factor1 = buffers.get().BUFFER_5x32_A, factor2 = buffers.get().BUFFER_5x32_B, product = buffers.get().BUFFER_10x32_A;
 
         long productExponent = Integer.toUnsignedLong(
                 exponent)
@@ -2501,7 +2501,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         }
 
         multiplyBuffers(factor1, factor2, product);
-        final boolean isRoundedUp = roundBuffer(product);
+        boolean isRoundedUp = roundBuffer(product);
 
         productExponent = normalizeProduct(product, productExponent, isRoundedUp);
         if (productExponent > EXPONENT_OF_MAX_VALUE) {
@@ -2545,7 +2545,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         }
 
         if (oneIsSubnormal) {
-            final int lz = numberOfLeadingZeros();
+            int lz = numberOfLeadingZeros();
             productExponent -= lz;
             if (productExponent < -129)
                 return productExponent;
@@ -2574,7 +2574,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
                 "Factors' lengths must be equal to each other and twice less than the product's length";
 
         Arrays.fill(product, 0);
-        final int maxIdxFact = factor1.length - 1;
+        int maxIdxFact = factor1.length - 1;
         long sum;
 
         for (int i = maxIdxFact; i >= 0; i--) {
@@ -2683,7 +2683,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param buffer the buffer of (at least) 6 longs, containing the mantissa of a Quadruple value
      */
     private void shiftBuffRightWithRounding(long[] buffer) {
-        final long carry = buffer[5] & 1;
+        long carry = buffer[5] & 1;
         shiftBuffRightWithoutRounding(buffer);
         buffer[5] += carry;
         for (int i = 5; i >= 2; i--) {
@@ -2784,7 +2784,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             return;
 
         boolean needToDivide = true;
-        final int[] divisorBuff = buffers.get().BUFFER_5x32_A_INT;
+        int[] divisorBuff = buffers.get().BUFFER_5x32_A_INT;
         if (exponent != 0 & divisor.exponent != 0) {
             if (mantHi == divisor.mantHi && mantLo == divisor.mantLo) {
                 mantHi = mantLo = 0;
@@ -2894,7 +2894,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         int shift = Long.numberOfLeadingZeros(mantHi);
         if (shift == 64)
             shift += Long.numberOfLeadingZeros(mantLo);
-        final long result = shift;
+        long result = shift;
         shift++;
 
         if (shift <= 64) {
@@ -2919,8 +2919,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return (possibly adjusted) exponent of the quotient
      */
-    private long doDivide(long quotientExponent, final int[] divisor) {
-        final int[] dividend = buffers.get().BUFFER_10x32_A_INT;
+    private long doDivide(long quotientExponent, int[] divisor) {
+        int[] dividend = buffers.get().BUFFER_10x32_A_INT;
         quotientExponent = unpackMantissaTo(quotientExponent, divisor, dividend);
         divideBuffers(dividend, divisor, quotientExponent);
         return quotientExponent;
@@ -2938,7 +2938,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return (possibly decremented) exponent of the quotient
      */
-    private long unpackMantissaTo(long quotientExponent, final int[] divisor, final int[] dividend) {
+    private long unpackMantissaTo(long quotientExponent, int[] divisor, int[] dividend) {
         // The mantissa of this is normalized, the normalized mantissa of the divisor is in divisorBuff
         if (compareMantissaWith(divisor) < 0) {
             unpackDoubledMantissaToBuff_10x32(dividend);
@@ -2963,7 +2963,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *         or a negative value if the mantissa of this instance is less than the mantissa of the other Quadruple.
      */
     private int compareMantissaWith(int[] divisor) {
-        final int cmp = Long.compareUnsigned(mantHi, ((long) divisor[1] << 32) | (divisor[2] & LOWER_32_BITS));
+        int cmp = Long.compareUnsigned(mantHi, ((long) divisor[1] << 32) | (divisor[2] & LOWER_32_BITS));
         return cmp == 0 ? Long.compareUnsigned(mantLo, ((long) divisor[3] << 32) | (divisor[4] & LOWER_32_BITS)) : cmp;
     }
 
@@ -3018,9 +3018,9 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param quotientExponent preliminary evaluated exponent of the quotient, may get adjusted
      */
     private void divideBuffers(int[] dividend, int[] divisor, long quotientExponent) {
-        final int[] quotientBuff = buffers.get().BUFFER_5x32_B_INT;
+        int[] quotientBuff = buffers.get().BUFFER_5x32_B_INT;
 
-        final long nextBit = divideArrays(dividend, divisor, quotientBuff);
+        long nextBit = divideArrays(dividend, divisor, quotientBuff);
 
         packMantissaFromWords_1to4(quotientBuff);
 
@@ -3049,13 +3049,13 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      */
     private static long divideArrays(int[] dividend, int[] divisor, int[] quotient) {
 
-        final long divisorHigh = ((long) divisor[0] << 32) | (divisor[1] & LOWER_32_BITS);
+        long divisorHigh = ((long) divisor[0] << 32) | (divisor[1] & LOWER_32_BITS);
         int offset = 0;
         quotient[offset++] = 1;
         subtractDivisor(divisor, dividend);
 
         do {
-            final long remainderHigh = ((long) dividend[offset + 1] << 32) | (dividend[offset + 2] & LOWER_32_BITS);
+            long remainderHigh = ((long) dividend[offset + 1] << 32) | (dividend[offset + 2] & LOWER_32_BITS);
 
             long quotientWord = (dividend[offset] == 0) ?
                     divideUnsignedLongs(remainderHigh, divisorHigh) :
@@ -3090,15 +3090,15 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
     private static void subtractDivisor(int[] divisor, int[] remainder) {
         long carry = 0;
         for (int i = 5; i >= 1; i--) {
-            final long difference = (remainder[i] & LOWER_32_BITS) - (divisor[i - 1] & LOWER_32_BITS) + carry;
+            long difference = (remainder[i] & LOWER_32_BITS) - (divisor[i - 1] & LOWER_32_BITS) + carry;
             remainder[i] = (int) difference;
             carry = difference >> 32;
         }
     }
 
     private static long divideUnsignedLongs(long dividend, long divisor) {
-        final long dividendHi = dividend >>> 16;
-        final long remainder = (dividendHi % divisor << 16) | (dividend & 0xFFFFL);
+        long dividendHi = dividend >>> 16;
+        long remainder = (dividendHi % divisor << 16) | (dividend & 0xFFFFL);
         return (dividendHi / divisor << 16) | (remainder / divisor);
     }
 
@@ -3114,9 +3114,9 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      */
     private static long divide65bits(long dividendHi, long dividendLo, long divisor) {
         dividendHi = dividendHi << 48 | dividendLo >>> 16;
-        final long quotientHi = dividendHi / divisor;
-        final long remainder = ((dividendHi % divisor) << 16) | (dividendLo & 0xFFFF);
-        final long quotientLo = remainder / divisor;
+        long quotientHi = dividendHi / divisor;
+        long remainder = ((dividendHi % divisor) << 16) | (dividendLo & 0xFFFF);
+        long quotientLo = remainder / divisor;
 
         return quotientHi << 16 | quotientLo;
     }
@@ -3142,7 +3142,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
 
         long difference = 0;
         for (int i = 4; i >= 0; i--) {
-            final long product = quotientWord * (divisor[i] & LOWER_32_BITS) + carry;
+            long product = quotientWord * (divisor[i] & LOWER_32_BITS) + carry;
             difference = remainder[offset] - product;
             remainder[offset--] = (int) difference;
             carry = product >>> 32;
@@ -3164,7 +3164,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         long carry = 0;
 
         for (int idx = 4; idx >= 0; idx--) {  // Index in the divisor
-            final long sum = (remainder[offset] & LOWER_32_BITS) + (divisor[idx] & LOWER_32_BITS) + carry;
+            long sum = (remainder[offset] & LOWER_32_BITS) + (divisor[idx] & LOWER_32_BITS) + carry;
             remainder[offset--] = (int) sum;
             carry = sum >>> 32;
         }
@@ -3173,7 +3173,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
 
     private static boolean greaterThanHalfOfDivisor_3(int[] remainder, int[] divisor, int offset) {
         for (int idx = 0; idx < 4; idx++) {
-            final int cmp = Integer.compare(
+            int cmp = Integer.compare(
                     (remainder[offset] << 1) + (remainder[++offset] >>> 31) + Integer.MIN_VALUE,
                     divisor[idx] + Integer.MIN_VALUE
             );
@@ -3182,7 +3182,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
             if (cmp < 0)
                 return false;
         }
-        final int cmp = Integer.compareUnsigned(
+        int cmp = Integer.compareUnsigned(
                 (remainder[offset] << 1),
                 divisor[4]
         );
@@ -3220,13 +3220,13 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @return bits 128 -- 135 of the root in the high byte of the long result
      */
     private long sqrtMant() {
-        final long[] remainder = buffers.get().BUFFER_3x64_A;
-        final long[] rootX2 = buffers.get().BUFFER_3x64_B;
+        long[] remainder = buffers.get().BUFFER_3x64_A;
+        long[] rootX2 = buffers.get().BUFFER_3x64_B;
         Arrays.fill(rootX2, 0);
-        final long[] root = buffers.get().BUFFER_3x64_C;
+        long[] root = buffers.get().BUFFER_3x64_C;
         Arrays.fill(root, 0);
 
-        final long digit = findFirstDigit();
+        long digit = findFirstDigit();
 
         remainder[0] = mantHi - ((0x200 + digit) * digit << 48);
         remainder[1] = mantLo;
@@ -3257,7 +3257,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * to corresponding 8 bits of the sought root
      */
     private long findFirstDigit() {
-        final int sqrtDigit = (int) (mantHi >>> 48);               // first 16 bits of the argument
+        int sqrtDigit = (int) (mantHi >>> 48);               // first 16 bits of the argument
         int idx = Arrays.binarySearch(SQUARE_BYTES, sqrtDigit);
         if (idx < 0) idx = -idx - 2;
         // first 8 bits of the root
@@ -3289,12 +3289,12 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      *
      * @return the position of the next to be found
      */
-    private static int computeNextDigit(final long[] remainder, final long[] rootX2, final long[] root, int bitNumber) {
-        final long[] aux = buffers.get().BUFFER_3x64_D;
-        final long digit = findNextDigit(rootX2, remainder, aux, bitNumber);
+    private static int computeNextDigit(long[] remainder, long[] rootX2, long[] root, int bitNumber) {
+        long[] aux = buffers.get().BUFFER_3x64_D;
+        long digit = findNextDigit(rootX2, remainder, aux, bitNumber);
         addDigit(root, digit, bitNumber);
 
-        final boolean remainderIsEmpty = subtractBuff(aux, remainder);
+        boolean remainderIsEmpty = subtractBuff(aux, remainder);
         if (remainderIsEmpty || bitNumber >= MAX_BITS_FOR_SQRT - 8)
             return Integer.MAX_VALUE;
 
@@ -3337,8 +3337,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param rootBitNumber the position to place the most significant bit of the digit at, counting from MSB
      */
     private static void addDigit(long[] root, long digit, int rootBitNumber) {
-        final int buffIdx = rootBitNumber / 64;
-        final int bitIdx = rootBitNumber % 64;
+        int buffIdx = rootBitNumber / 64;
+        int bitIdx = rootBitNumber % 64;
         root[buffIdx] += digit << 56 - bitIdx;
     }
 
@@ -3388,8 +3388,8 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
      * @param bitNumber the position to place the most significant bit of the digit at, counting from MSB
      */
     private static void addDigitToBuff(long[] buff, long digit, int bitNumber) {
-        final int buffIdx = bitNumber / 64;
-        final int bitIdx = bitNumber % 64;
+        int buffIdx = bitNumber / 64;
+        int bitIdx = bitNumber % 64;
 
         if (bitIdx <= 64 - 8) {
             buff[buffIdx] += digit << 64 - 8 - bitIdx;
@@ -3447,10 +3447,10 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
     private static void multBufByDigit(long[] buff, long digit) {
         long carry = 0;
         for (int i = buff.length - 1; i >= 0; i--) {
-            final long prodLo = (buff[i] & LOWER_32_BITS) * digit + carry;
-            final long prodHi = (buff[i] >>> 32) * digit;
+            long prodLo = (buff[i] & LOWER_32_BITS) * digit + carry;
+            long prodHi = (buff[i] >>> 32) * digit;
             carry = prodHi >>> 32;
-            final long product = prodLo + (prodHi << 32);
+            long product = prodLo + (prodHi << 32);
             if (Long.compareUnsigned(product, (prodHi << 32)) < 0)
                 carry++;
             buff[i] = product;
@@ -3478,7 +3478,7 @@ public class Quadruple extends Number implements Comparable<Quadruple> {
         buff464[2] = mantLo >>> 1 | mantHi << 63;
         buff464[3] = thirdWord >>> 1 | mantLo << 63;
 
-        final long[] product = multPacked3x64();
+        long[] product = multPacked3x64();
 
         product[0] = product[1] << 2 | product[2] >>> 62;
         product[1] = product[2] << 2 | product[3] >>> 62;

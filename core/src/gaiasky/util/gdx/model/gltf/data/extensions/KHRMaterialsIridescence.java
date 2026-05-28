@@ -12,7 +12,7 @@ public class KHRMaterialsIridescence {
 	
 	public static final String EXT = "KHR_materials_iridescence";
 	
-	public float iridescenceFactor = 0f;
+	public float iridescenceFactor;
 	public GLTFTextureInfo iridescenceTexture;
 	public float iridescenceIor = 1.3f;
 	public float iridescenceThicknessMinimum = 100;

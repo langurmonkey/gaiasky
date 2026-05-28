@@ -12,6 +12,6 @@ public class KHRMaterialsTransmission {
 	
 	public static final String EXT = "KHR_materials_transmission";
 	
-	public float transmissionFactor = 0;
-	public GLTFTextureInfo transmissionTexture = null;
+	public float transmissionFactor;
+	public GLTFTextureInfo transmissionTexture;
 }

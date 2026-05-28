@@ -22,12 +22,12 @@ public abstract class BaseAttitudeDataServer<A extends IAttitude> {
      * reference values. This flag indicates that the constants or tables
      * (whatever applicable) are up-to-date.
      */
-    protected boolean initialized = false;
+    protected boolean initialized;
     /**
      * native and initially requested time context of the server - has to be set by the implementing class
      */
-    protected TimeContext nativeTimeContext = null;
-    protected TimeContext initialRequestedTimeContext = null;
+    protected TimeContext nativeTimeContext;
+    protected TimeContext initialRequestedTimeContext;
     /**
      * switch to decide if attitude uncertainties and correlations should be calculated
      */

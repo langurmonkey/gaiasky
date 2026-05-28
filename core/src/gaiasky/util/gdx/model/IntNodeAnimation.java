@@ -16,9 +16,9 @@ public class IntNodeAnimation {
     /** the Node affected by this animation **/
     public IntNode node;
     /** the translation keyframes if any (might be null), sorted by time ascending **/
-    public Array<NodeKeyframe<Vector3>> translation = null;
+    public Array<NodeKeyframe<Vector3>> translation;
     /** the rotation keyframes if any (might be null), sorted by time ascending **/
-    public Array<NodeKeyframe<Quaternion>> rotation = null;
+    public Array<NodeKeyframe<Quaternion>> rotation;
     /** the scaling keyframes if any (might be null), sorted by time ascending **/
-    public Array<NodeKeyframe<Vector3>> scaling = null;
+    public Array<NodeKeyframe<Vector3>> scaling;
 }

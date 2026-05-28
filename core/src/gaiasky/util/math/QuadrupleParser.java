@@ -77,7 +77,7 @@ public class QuadrupleParser {
         if ((exponent | mantHi | mantLo) == 0)
             return negative ? "-0.0" : "0.0";
 
-        final int exp2 = exponent - EXPONENT_BIAS;
+        int exp2 = exponent - EXPONENT_BIAS;
 
         // Decimal mantissa M and decimal exponent E are found from the binary mantissa m and the binary exponent e as
         // M = m * 2^e / 10^E.
@@ -98,8 +98,8 @@ public class QuadrupleParser {
         } else {
             mant10 = multMantByPowerOfTwo(powerOfTwo(exp2), mant10, exponent, mantHi, mantLo);
         }
-        final StringBuilder mantStr = decimalMantToString(mant10);
-        final int exp10 = (int) mant10[0] - 1;
+        StringBuilder mantStr = decimalMantToString(mant10);
+        int exp10 = (int) mant10[0] - 1;
 
         mantStr.insert(1, '.');
         mantStr.append("e").append(String.format("%+03d", exp10));
@@ -120,8 +120,8 @@ public class QuadrupleParser {
      *     {@code qdNumber[1]..qdNumber[3]} -- decimal mantissa divided by 10)}</pre>
      */
     private static StringBuilder decimalMantToString(long[] qdNumber) {
-        final long[] multBuffer = BUFFER_6x32_A;
-        final StringBuilder sb = convertMantToString(qdNumber, multBuffer);
+        long[] multBuffer = BUFFER_6x32_A;
+        StringBuilder sb = convertMantToString(qdNumber, multBuffer);
 
         if ((multBuffer[0] & 0x8000_0000L) != 0)
             if (addCarry(sb) == 1)
@@ -144,7 +144,7 @@ public class QuadrupleParser {
      */
     private static int addCarry(StringBuilder sb) {
         for (int i = sb.length() - 1; i >= 0; i--) {
-            final char c = sb.charAt(i);
+            char c = sb.charAt(i);
             if (c == '9') sb.setCharAt(i, '0');
             else {
                 sb.setCharAt(i, (char) (c + 1));
@@ -170,7 +170,7 @@ public class QuadrupleParser {
      * @return a new {@code StringBuilder}, containing decimal digits of the number
      */
     private static StringBuilder convertMantToString(long[] qdNumber, long[] multBuffer) {
-        final StringBuilder sb = new StringBuilder(SIGNIFICANT_DIGITS);
+        StringBuilder sb = new StringBuilder(SIGNIFICANT_DIGITS);
         unpack_3x64_to_6x32(qdNumber, multBuffer);
         int charCount = 0;
         do {
@@ -193,11 +193,11 @@ public class QuadrupleParser {
      * @return product_4x64, filled with the product in a form of a 192-bit quasi-decimal value
      */
     private static long[] multMantByMinNormal(long[] product_4x64, long mantHi, long mantLo) {
-        final long[] factor_6x32 = BUFFER_6x32_A;
+        long[] factor_6x32 = BUFFER_6x32_A;
         unpack_3x64_to_6x32(MIN_NORMAL_QUASIDEC, factor_6x32);
-        final long decimalExpOfPow2 = MIN_NORMAL_QUASIDEC[0];
+        long decimalExpOfPow2 = MIN_NORMAL_QUASIDEC[0];
 
-        final long[] buffer_10x32 = BUFFER_10x32_A;
+        long[] buffer_10x32 = BUFFER_10x32_A;
         Arrays.fill(buffer_10x32, 0);
         return multMantBy192bits(factor_6x32, decimalExpOfPow2, product_4x64, buffer_10x32, 0, mantHi, mantLo);
     }
@@ -213,11 +213,11 @@ public class QuadrupleParser {
      * @return product_4x64, filled with the product in a form of a 192-bit quasi-decimal value
      */
     private static long[] multMantByPowerOfTwo(long[] pow2, long[] product_4x64, int exponent, long mantHi, long mantLo) {
-        final long[] factor_6x32 = BUFFER_6x32_A;
+        long[] factor_6x32 = BUFFER_6x32_A;
         unpack_3x64_to_6x32(pow2, factor_6x32);
-        final long decimalExpOfPow2 = pow2[0];
+        long decimalExpOfPow2 = pow2[0];
 
-        final long[] buffer_10x32 = BUFFER_10x32_A;
+        long[] buffer_10x32 = BUFFER_10x32_A;
         Arrays.fill(buffer_10x32, 0);
         System.arraycopy(factor_6x32, 0, buffer_10x32, 0, 6);
 
@@ -241,14 +241,14 @@ public class QuadrupleParser {
      *
      * @return product_4x64 filled with the product
      */
-    private static long[] multMantBy192bits(long[] factor_6x32, final long decimalExpOfPow2,
+    private static long[] multMantBy192bits(long[] factor_6x32, long decimalExpOfPow2,
                                             long[] product_4x64, long[] buffer_10x32,
                                             int exponent, long mantHi, long mantLo) {
         unpackQuadToBuff(mantHi, mantLo);
 
         for (int i = 5; i >= 0; i--)
             for (int j = 3; j >= 0; j--) {
-                final long product = factor_6x32[i] * BUFFER_4x32_A[j];
+                long product = factor_6x32[i] * BUFFER_4x32_A[j];
                 buffer_10x32[j + i + 1] += product & LOWER_32_BITS;
                 buffer_10x32[j + i] += product >>> 32;
             }
@@ -258,7 +258,7 @@ public class QuadrupleParser {
             buffer_10x32[i] &= LOWER_32_BITS;
         }
 
-        final int expCorrection = (exponent == 0) ?
+        int expCorrection = (exponent == 0) ?
                 correctPossibleUnderflow(buffer_10x32) :
                 correctPossibleOverflow(buffer_10x32);
 
@@ -338,7 +338,7 @@ public class QuadrupleParser {
      * @param buffer contains the unpacked value to multiply (32 least significant bits are used)
      */
     private static void multBuffBy10(long[] buffer) {
-        final int maxIdx = buffer.length - 1;
+        int maxIdx = buffer.length - 1;
         buffer[0] &= LOWER_32_BITS;
         buffer[maxIdx] *= 10;
         for (int i = maxIdx - 1; i >= 0; i--) {
@@ -354,7 +354,7 @@ public class QuadrupleParser {
      */
     private static void divBuffBy10(long[] buffer) {
         long r;
-        final int maxIdx = buffer.length - 1;
+        int maxIdx = buffer.length - 1;
         for (int i = 0; i <= maxIdx; i++) { // big/endian
             r = Long.remainderUnsigned(buffer[i], 10);
             buffer[i] = Long.divideUnsigned(buffer[i], 10);
@@ -463,7 +463,7 @@ public class QuadrupleParser {
      */
     private static long[] multPacked3x64_AndAdjustExponent(long[] factor1, long[] factor2) {
         multPacked3x64_simply(factor1, factor2);
-        final int expCorr = correctPossibleUnderflow(BUFFER_12x32);
+        int expCorr = correctPossibleUnderflow(BUFFER_12x32);
         long[] result = BUFFER_4x64_B;
         pack_12x32_to_3x64(result);
 
@@ -487,7 +487,7 @@ public class QuadrupleParser {
 
         for (int i = 5; i >= 0; i--)
             for (int j = 5; j >= 0; j--) {
-                final long part = BUFFER_6x32_A[i] * BUFFER_6x32_B[j];
+                long part = BUFFER_6x32_A[i] * BUFFER_6x32_B[j];
                 BUFFER_12x32[j + i + 1] += part & LOWER_32_BITS;
                 BUFFER_12x32[j + i] += part >>> 32;
             }
@@ -737,7 +737,7 @@ public class QuadrupleParser {
             private int buildMantString(String intPartString, String fractPartString) {
                 int expCorrection = uniteMantString(intPartString, fractPartString);
 
-                final Matcher m2 = LEADING_ZEROES_PTRN.matcher(mantStr);
+                Matcher m2 = LEADING_ZEROES_PTRN.matcher(mantStr);
                 if (m2.find()) {
                     mantStr = m2.group(2);
                     expCorrection -= m2.group(1).length();
@@ -783,7 +783,7 @@ public class QuadrupleParser {
             private static long extractExp10(String expString) {
                 long exp10 = 0;
                 if (expString != null) {
-                    final Matcher m = EXP_STR_PTRN.matcher(expString);
+                    Matcher m = EXP_STR_PTRN.matcher(expString);
                     if (m.find()) {
                         exp10 = parseLong(m.group(2));
                         if ("-".equals(m.group(1))) exp10 = -exp10;
@@ -824,7 +824,7 @@ public class QuadrupleParser {
         public static Quadruple parse(String source, Quadruple owner) {
             source = source.trim().toLowerCase(Locale.ROOT);
 
-            final Quadruple qConst = QUADRUPLE_CONSTANTS.get(source);
+            Quadruple qConst = QUADRUPLE_CONSTANTS.get(source);
             if (qConst != null)
                 return owner.assign(qConst);
 
@@ -845,7 +845,7 @@ public class QuadrupleParser {
         private static void buildQuadruple(NumberParser.NumberParts parts) {
             owner.setNegative(parts.negative);
             long exp10 = parts.exp10;
-            final int exp10Corr = parseMantissa(parts);
+            int exp10Corr = parseMantissa(parts);
             // and puts it into buff_6x32_C. Returns necessary exponent correction
             if (exp10Corr == 0 && isEmpty(BUFFER_6x32_C)) {
                 owner.assignZero(false);
@@ -857,7 +857,7 @@ public class QuadrupleParser {
             if (exceedsAcceptableExponentRange(exp10))
                 return;
 
-            final long exp2 = findBinaryExponent(exp10);
+            long exp2 = findBinaryExponent(exp10);
             findBinaryMantissa((int) exp10,
                                exp2
             );
@@ -897,10 +897,10 @@ public class QuadrupleParser {
          */
         private static int parseMantString(String mantStr) {
             int expCorr = 0;
-            final StringBuilder sb = new StringBuilder(mantStr);
+            StringBuilder sb = new StringBuilder(mantStr);
             // Limit the string length to avoid unnecessary fuss
             if (sb.length() > MAX_MANTISSA_LENGTH) {
-                final boolean carry = sb.charAt(MAX_MANTISSA_LENGTH) >= '5';
+                boolean carry = sb.charAt(MAX_MANTISSA_LENGTH) >= '5';
                 sb.delete(MAX_MANTISSA_LENGTH, sb.length());
                 if (carry)
                     expCorr += addCarry(sb);
@@ -951,9 +951,9 @@ public class QuadrupleParser {
          * @return found value of binary exponent
          */
         private static long findBinaryExponent(long exp10) {
-            final long mant10 = BUFFER_6x32_C[0] << 31 | BUFFER_6x32_C[1] >>> 1;
+            long mant10 = BUFFER_6x32_C[0] << 31 | BUFFER_6x32_C[1] >>> 1;
             // 0x0CC..CCC -- 0x7FF..FFF (2^63/10 -- 2^63-1)
-            final double mant10d = mant10 / TWO_POW_63_DIV_10;
+            double mant10d = mant10 / TWO_POW_63_DIV_10;
             return (long) Math.floor((exp10) * LOG2_10 + log2(mant10d));
         }
 
@@ -980,7 +980,7 @@ public class QuadrupleParser {
          * @param exp2  binary mantissa found from decimal mantissa
          */
         private static void findBinaryMantissa(int exp10, long exp2) {
-            final long[] powerOf2 = powerOfTwo(-exp2);
+            long[] powerOf2 = powerOfTwo(-exp2);
             long[] product = BUFFER_12x32;
             multUnpacked6x32bydPacked(powerOf2, product);
             multBuffBy10(product);
@@ -1029,11 +1029,11 @@ public class QuadrupleParser {
             unpack_3x64_to_6x32(factor2, BUFFER_6x32_B);
             factor2 = BUFFER_6x32_B;
 
-            final int maxFactIdx = BUFFER_6x32_C.length - 1;
+            int maxFactIdx = BUFFER_6x32_C.length - 1;
 
             for (int i = maxFactIdx; i >= 0; i--)
                 for (int j = maxFactIdx; j >= 0; j--) {
-                    final long part = BUFFER_6x32_C[i] * factor2[j];
+                    long part = BUFFER_6x32_C[i] * factor2[j];
                     product[j + i + 1] += part & LOWER_32_BITS;
                     product[j + i] += part >>> 32;
                 }
@@ -1065,7 +1065,7 @@ public class QuadrupleParser {
          * @return if the mantissa was not normal initially, a correction that should be added to the result's exponent, or 0 otherwise
          */
         private static int normalizeMant(long[] mantissa) {
-            final int expCorr = 31 - Long.numberOfLeadingZeros(mantissa[0]);
+            int expCorr = 31 - Long.numberOfLeadingZeros(mantissa[0]);
             if (expCorr != 0)
                 divBuffByPower2(mantissa, expCorr);
             return expCorr;
@@ -1100,7 +1100,7 @@ public class QuadrupleParser {
          * @param summand the summand to add to the idx-th element of the buffer
          */
         private static void addToBuff(long[] buff, int idx, long summand) {
-            final int maxIdx = idx;
+            int maxIdx = idx;
             buff[maxIdx] += summand;
             for (int i = maxIdx; i > 0; i--) {
                 if ((buff[i] & HIGHER_32_BITS) != 0) {
@@ -1120,8 +1120,8 @@ public class QuadrupleParser {
          * @param exp2   the exponent of the power of two to divide by, expected to be
          */
         private static void divBuffByPower2(long[] buffer, int exp2) {
-            final int maxIdx = buffer.length - 1;
-            final int backShift = 32 - Math.abs(exp2);
+            int maxIdx = buffer.length - 1;
+            int backShift = 32 - Math.abs(exp2);
 
             if (exp2 > 0) {
                 for (int i = maxIdx; i > 0; i--)

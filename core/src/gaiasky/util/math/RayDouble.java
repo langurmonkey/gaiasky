@@ -52,7 +52,7 @@ public class RayDouble implements Serializable {
      *
      * @return The out param
      */
-    public Vector3D getEndPoint(final Vector3D out, final float distance) {
+    public Vector3D getEndPoint(Vector3D out, float distance) {
         return out.set(direction).scl(distance).add(origin);
     }
 

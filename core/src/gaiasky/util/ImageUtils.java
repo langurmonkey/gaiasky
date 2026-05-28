@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public class ImageUtils {
 
-    public static boolean isMonochrome(final BufferedImage image) {
+    public static boolean isMonochrome(BufferedImage image) {
         return image.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_GRAY;
     }
 
@@ -30,8 +30,8 @@ public class ImageUtils {
      *
      * @return A boolean indicating whether the conversion was carried out (i.e. the image was actually monochrome)
      */
-    public static boolean monochromeToRGB(final File file) throws IOException {
-        final BufferedImage monochrome = ImageIO.read(file);
+    public static boolean monochromeToRGB(File file) throws IOException {
+        BufferedImage monochrome = ImageIO.read(file);
         if (isMonochrome(monochrome)) {
             BufferedImage rgb = monochromeToRGB(monochrome);
 

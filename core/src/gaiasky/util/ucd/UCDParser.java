@@ -54,34 +54,34 @@ public class UCDParser {
     public static String[] MANOMALY_NAMES = new String[]{"ma", "man", "meananomaly", "mean_anomaly"};
     public Map<UCDType, Array<UCD>> ucdmap;
     // IDS
-    public boolean hasId = false;
+    public boolean hasId;
     public Array<UCD> ID;
     // NAME
-    public boolean hasName = false;
+    public boolean hasName;
     public Array<UCD> NAME;
     // POSITIONS
-    public boolean hasPos = false;
+    public boolean hasPos;
     public Array<UCD> POS1, POS2, POS3;
     // PROPER MOTIONS
-    public boolean hasPm = false;
+    public boolean hasPm;
     public Array<UCD> PMRA, PMDEC, RADVEL;
     // MAGNITUDES
-    public boolean hasMag = false;
+    public boolean hasMag;
     public Array<UCD> MAG;
     // COLORS
-    public boolean hasColor = false;
+    public boolean hasColor;
     public Array<UCD> COL;
     // PHYSICAL PARAMS
-    public boolean hasSize = false;
+    public boolean hasSize;
     public Array<UCD> SIZE;
-    public boolean hasTEff = false;
+    public boolean hasTEff;
     public Array<UCD> TEFF;
     // VARIABILITY
-    public boolean hasVariability = false;
-    public boolean hasPeriod = false;
+    public boolean hasVariability;
+    public boolean hasPeriod;
     public Array<UCD> VARI_TIMES, VARI_MAGS, VARI_COLS, PERIOD;
     // KEPLERIAN ELEMENTS
-    public boolean hasKeplerElements = false;
+    public boolean hasKeplerElements;
     public Array<UCD> EPOCH, SMA, ECC, INC, ASCNODE, ARGPERI, MANOMALY;
     // REST
     public Array<UCD> extra;
@@ -245,7 +245,7 @@ public class UCDParser {
             String posRefSys = getBestRefSys(pos);
             for (UCD candidate : pos) {
                 String meaning = candidate.UCD[0][1];
-                final String coord = candidate.UCD[0].length > 2 ? candidate.UCD[0][2] : null;
+                String coord = candidate.UCD[0].length > 2 ? candidate.UCD[0][2] : null;
                 boolean derived = checkDerivedQuantity(candidate.UCD);
 
                 // Filter using best reference system (posRefSys)

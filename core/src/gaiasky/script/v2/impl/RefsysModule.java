@@ -52,7 +52,7 @@ public class RefsysModule extends APIModule implements RefsysAPI {
 
 
     public double[] galactic_to_cartesian(int l, int b, int r) {
-        return galactic_to_cartesian((double) l, (double) b, (double) r);
+        return galactic_to_cartesian(l, b, (double) r);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class RefsysModule extends APIModule implements RefsysAPI {
     }
 
     public double[] ecliptic_to_cartesian(int l, int b, int r) {
-        return ecliptic_to_cartesian((double) l, (double) b, (double) r);
+        return ecliptic_to_cartesian(l, b, (double) r);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class RefsysModule extends APIModule implements RefsysAPI {
     }
 
     public double[] equatorial_to_cartesian(int ra, int dec, int r) {
-        return equatorial_to_cartesian((double) ra, (double) dec, (double) r);
+        return equatorial_to_cartesian(ra, dec, (double) r);
     }
 
     public double[] cartesian_to_equatorial(double x, double y, double z) {
@@ -84,7 +84,7 @@ public class RefsysModule extends APIModule implements RefsysAPI {
     }
 
     public double[] cartesian_to_equatorial(int x, int y, int z) {
-        return cartesian_to_equatorial((double) x, (double) y, (double) z);
+        return cartesian_to_equatorial(x, y, (double) z);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class RefsysModule extends APIModule implements RefsysAPI {
         return new double[]{v.y, v.z, v.x};
     }
 
-    public double[] equatorial_cartesian_to_internal(final List<?> eq, double kmFactor) {
+    public double[] equatorial_cartesian_to_internal(List<?> eq, double kmFactor) {
         return equatorial_cartesian_to_internal(api.dArray(eq), kmFactor);
     }
 

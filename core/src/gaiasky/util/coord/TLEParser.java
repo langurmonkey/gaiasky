@@ -110,7 +110,7 @@ public class TLEParser {
     public List<String> fetchTLEData(String urlString) throws IOException {
         URL url = java.net.URI.create(urlString).toURL();
         String group = getGroupFromURL(url);
-        final var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
+        var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
         var file = cacheDir.resolve("TLE-" + group);
         boolean download = true;
         if (Files.exists(file) && Files.isRegularFile(file)) {

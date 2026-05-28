@@ -29,8 +29,8 @@ public class AtmosphereShader extends BaseIntShader {
     private final static Attributes tmpAttributes = new Attributes();
     protected static Bits implementedFlags = Bits.indices(BlendingAttribute.Type, TextureAttribute.Diffuse, ColorAttribute.Diffuse, ColorAttribute.Specular,
                                                           FloatAttribute.Shininess);
-    private static String defaultVertexShader = null;
-    private static String defaultFragmentShader = null;
+    private static String defaultVertexShader;
+    private static String defaultFragmentShader;
     // Global uniforms
     public final int u_projTrans;
     public final int u_viewTrans;
@@ -83,31 +83,31 @@ public class AtmosphereShader extends BaseIntShader {
     /** The renderable used to create this shader, invalid after the call to init */
     private IntRenderable renderable;
 
-    public AtmosphereShader(final IntRenderable renderable,
-                            final Config config) {
+    public AtmosphereShader(IntRenderable renderable,
+                            Config config) {
         this(renderable, config, createPrefix(renderable));
     }
 
-    public AtmosphereShader(final IntRenderable renderable,
-                            final Config config,
-                            final String prefix) {
+    public AtmosphereShader(IntRenderable renderable,
+                            Config config,
+                            String prefix) {
         this(renderable, config, prefix, config.vertexShader != null ? config.vertexShader : getDefaultVertexShader(),
              config.fragmentShader != null ? config.fragmentShader : getDefaultFragmentShader());
     }
 
-    public AtmosphereShader(final IntRenderable renderable,
-                            final Config config,
-                            final String prefix,
-                            final String vertexShader,
-                            final String fragmentShader) {
+    public AtmosphereShader(IntRenderable renderable,
+                            Config config,
+                            String prefix,
+                            String vertexShader,
+                            String fragmentShader) {
         this(renderable, config,
              new ExtShaderProgram("atmosphere", ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
-    public AtmosphereShader(final IntRenderable renderable,
-                            final Config config,
-                            final ExtShaderProgram shaderProgram) {
-        final Attributes attributes = combineAttributes(renderable);
+    public AtmosphereShader(IntRenderable renderable,
+                            Config config,
+                            ExtShaderProgram shaderProgram) {
+        Attributes attributes = combineAttributes(renderable);
         this.config = config;
         this.program = shaderProgram;
         this.renderable = renderable;
@@ -181,7 +181,7 @@ public class AtmosphereShader extends BaseIntShader {
     }
 
     // TODO: Perhaps move responsibility for combining attributes to IntRenderableProvider?
-    private static Attributes combineAttributes(final IntRenderable renderable) {
+    private static Attributes combineAttributes(IntRenderable renderable) {
         tmpAttributes.clear();//
         if (renderable.environment != null)
             tmpAttributes.set(renderable.environment);
@@ -190,7 +190,7 @@ public class AtmosphereShader extends BaseIntShader {
         return tmpAttributes;
     }
 
-    private static Bits combineAttributeMasks(final IntRenderable renderable) {
+    private static Bits combineAttributeMasks(IntRenderable renderable) {
         Bits mask = Bits.empty();
         if (renderable.environment != null)
             mask.or(renderable.environment.getMask());
@@ -199,8 +199,8 @@ public class AtmosphereShader extends BaseIntShader {
         return mask;
     }
 
-    public static String createPrefix(final IntRenderable renderable) {
-        final Attributes attributes = combineAttributes(renderable);
+    public static String createPrefix(IntRenderable renderable) {
+        Attributes attributes = combineAttributes(renderable);
         StringBuilder prefix = new StringBuilder();
         if (attributes.has(AtmosphereAttribute.KmESun))
             prefix.append("#define atmosphericScattering\n");
@@ -222,7 +222,7 @@ public class AtmosphereShader extends BaseIntShader {
 
     @Override
     public void init() {
-        final ExtShaderProgram program = this.program;
+        ExtShaderProgram program = this.program;
         this.program = null;
         init(program, renderable);
         renderable = null;
@@ -230,8 +230,8 @@ public class AtmosphereShader extends BaseIntShader {
     }
 
     @Override
-    public boolean canRender(final IntRenderable renderable) {
-        final Bits renderableMask = combineAttributeMasks(renderable);
+    public boolean canRender(IntRenderable renderable) {
+        Bits renderableMask = combineAttributeMasks(renderable);
         return attributesMask.equals(renderableMask.or(optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked());
     }
 
@@ -257,14 +257,14 @@ public class AtmosphereShader extends BaseIntShader {
     }
 
     @Override
-    public void begin(final Camera camera,
-                      final RenderContext context) {
+    public void begin(Camera camera,
+                      RenderContext context) {
         super.begin(camera, context);
 
     }
 
     @Override
-    public void render(final IntRenderable renderable) {
+    public void render(IntRenderable renderable) {
         if (!renderable.material.has(BlendingAttribute.Type))
             context.setBlending(false, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         bindMaterial(renderable);
@@ -277,7 +277,7 @@ public class AtmosphereShader extends BaseIntShader {
         super.end();
     }
 
-    protected void bindMaterial(final IntRenderable renderable) {
+    protected void bindMaterial(IntRenderable renderable) {
         if (currentMaterial == renderable.material)
             return;
 
@@ -288,8 +288,8 @@ public class AtmosphereShader extends BaseIntShader {
         boolean depthMask = true;
 
         currentMaterial = renderable.material;
-        for (final Attribute attr : currentMaterial) {
-            final int t = attr.index;
+        for (Attribute attr : currentMaterial) {
+            int t = attr.index;
             if (BlendingAttribute.is(t)) {
                 context.setBlending(true, ((BlendingAttribute) attr).sourceFunction, ((BlendingAttribute) attr).destFunction);
             } else if (attr.has(IntAttribute.CullFace))
@@ -333,9 +333,9 @@ public class AtmosphereShader extends BaseIntShader {
 
     public static class Config {
         /** The uber vertex shader to use, null to use the default vertex shader. */
-        public String vertexShader = null;
+        public String vertexShader;
         /** The uber fragment shader to use, null to use the default fragment shader. */
-        public String fragmentShader = null;
+        public String fragmentShader;
         /**  */
         public boolean ignoreUnimplemented = true;
         /** Set to 0 to disable culling. */
@@ -346,8 +346,8 @@ public class AtmosphereShader extends BaseIntShader {
         public Config() {
         }
 
-        public Config(final String vertexShader,
-                      final String fragmentShader) {
+        public Config(String vertexShader,
+                      String fragmentShader) {
             this.vertexShader = vertexShader;
             this.fragmentShader = fragmentShader;
         }

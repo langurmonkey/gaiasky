@@ -12,7 +12,7 @@ import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gdx.shader.attribute.Attributes;
 
 public class Material extends Attributes {
-    private static int counter = 0;
+    private static int counter;
     public String id;
 
     /** Create an empty material */
@@ -21,41 +21,41 @@ public class Material extends Attributes {
     }
 
     /** Create an empty material */
-    public Material(final String id) {
+    public Material(String id) {
         this.id = id;
     }
 
     /** Create a material with the specified attributes */
-    public Material(final Attribute... attributes) {
+    public Material(Attribute... attributes) {
         this();
         set(attributes);
     }
 
     /** Create a material with the specified attributes */
-    public Material(final String id, final Attribute... attributes) {
+    public Material(String id, Attribute... attributes) {
         this(id);
         set(attributes);
     }
 
     /** Create a material with the specified attributes */
-    public Material(final Array<Attribute> attributes) {
+    public Material(Array<Attribute> attributes) {
         this();
         set(attributes);
     }
 
     /** Create a material with the specified attributes */
-    public Material(final String id, final Array<Attribute> attributes) {
+    public Material(String id, Array<Attribute> attributes) {
         this(id);
         set(attributes);
     }
 
     /** Create a material which is an exact copy of the specified material */
-    public Material(final Material copyFrom) {
+    public Material(Material copyFrom) {
         this(copyFrom.id, copyFrom);
     }
 
     /** Create a material which is an exact copy of the specified material */
-    public Material(final String id, final Material copyFrom) {
+    public Material(String id, Material copyFrom) {
         this(id);
         for (Attribute attr : copyFrom)
             set(attr.copy());

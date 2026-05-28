@@ -39,16 +39,16 @@ public class IntModelBuilder {
      * {@link IntMeshPart}s within the model to the ones used within it's nodes.
      * This will make the model responsible for disposing all referenced meshes.
      */
-    public static void rebuildReferences(final IntModel model) {
+    public static void rebuildReferences(IntModel model) {
         model.materials.clear();
         model.meshes.clear();
         model.meshParts.clear();
-        for (final IntNode node : model.nodes)
+        for (IntNode node : model.nodes)
             rebuildReferences(model, node);
     }
 
-    private static void rebuildReferences(final IntModel model, final IntNode node) {
-        for (final IntNodePart mpm : node.parts) {
+    private static void rebuildReferences(IntModel model, IntNode node) {
+        for (IntNodePart mpm : node.parts) {
             if (!model.materials.contains(mpm.material, true))
                 model.materials.add(mpm.material);
             if (!model.meshParts.contains(mpm.meshPart, true)) {
@@ -59,18 +59,18 @@ public class IntModelBuilder {
             }
         }
         Iterable<IntNode> nodeIter = node.getChildren();
-        for (final IntNode child : nodeIter)
+        for (IntNode child : nodeIter)
             rebuildReferences(model, child);
     }
 
     // Old code below this line, as for now still useful for testing.
     @Deprecated
-    public static IntModel createFromMesh(final IntMesh mesh, int primitiveType, final Material material) {
+    public static IntModel createFromMesh(IntMesh mesh, int primitiveType, Material material) {
         return createFromMesh(mesh, 0, mesh.getNumIndices(), primitiveType, material);
     }
 
     @Deprecated
-    public static IntModel createFromMesh(final IntMesh mesh, int indexOffset, int vertexCount, int primitiveType, final Material material) {
+    public static IntModel createFromMesh(IntMesh mesh, int indexOffset, int vertexCount, int primitiveType, Material material) {
         IntModel result = new IntModel();
         IntMeshPart meshPart = new IntMeshPart();
         meshPart.id = "part1";
@@ -96,18 +96,18 @@ public class IntModelBuilder {
     }
 
     @Deprecated
-    public static IntModel createFromMesh(final float[] vertices, final VertexAttribute[] attributes, final int[] indices, int primitiveType, final Material material) {
-        final IntMesh mesh = new IntMesh(false, vertices.length, indices.length, attributes);
+    public static IntModel createFromMesh(float[] vertices, VertexAttribute[] attributes, int[] indices, int primitiveType, Material material) {
+        IntMesh mesh = new IntMesh(false, vertices.length, indices.length, attributes);
         mesh.setVertices(vertices);
         mesh.setIndices(indices);
         return createFromMesh(mesh, 0, indices.length, primitiveType, material);
     }
 
-    private IntIntMeshBuilder getBuilder(final VertexAttributes attributes) {
-        for (final IntIntMeshBuilder mb : builders)
+    private IntIntMeshBuilder getBuilder(VertexAttributes attributes) {
+        for (IntIntMeshBuilder mb : builders)
             if (mb.getAttributes().equals(attributes) && mb.lastIndex() < Integer.MAX_VALUE / 2)
                 return mb;
-        final IntIntMeshBuilder result = new IntIntMeshBuilder();
+        IntIntMeshBuilder result = new IntIntMeshBuilder();
         result.begin(attributes);
         builders.add(result);
         return result;
@@ -131,11 +131,11 @@ public class IntModelBuilder {
     public IntModel end() {
         if (model == null)
             throw new GdxRuntimeException("Call begin() first");
-        final IntModel result = model;
+        IntModel result = model;
         endnode();
         model = null;
 
-        for (final IntIntMeshBuilder mb : builders)
+        for (IntIntMeshBuilder mb : builders)
             mb.end();
         builders.clear();
 
@@ -154,7 +154,7 @@ public class IntModelBuilder {
      * Adds the {@link Node} to the model and sets it active for building. Use
      * any of the part(...) method to add a NodePart.
      */
-    protected IntNode node(final IntNode node) {
+    protected IntNode node(IntNode node) {
         if (model == null)
             throw new GdxRuntimeException("Call begin() first");
 
@@ -173,7 +173,7 @@ public class IntModelBuilder {
      * @return The node being created.
      */
     public IntNode node() {
-        final IntNode node = new IntNode();
+        IntNode node = new IntNode();
         node(node);
         node.id = "node" + model.nodes.size;
         return node;
@@ -186,12 +186,12 @@ public class IntModelBuilder {
      *
      * @return The newly created node containing the nodes of the given model.
      */
-    public IntNode node(final String id, final IntModel model) {
-        final IntNode node = new IntNode();
+    public IntNode node(String id, IntModel model) {
+        IntNode node = new IntNode();
         node.id = id;
         node.addChildren(model.nodes);
         node(node);
-        for (final Disposable disposable : model.getManagedDisposables())
+        for (Disposable disposable : model.getManagedDisposables())
             manage(disposable);
         return node;
     }
@@ -200,7 +200,7 @@ public class IntModelBuilder {
      * Add the {@link Disposable} object to the model, causing it to be disposed
      * when the model is disposed.
      */
-    public void manage(final Disposable disposable) {
+    public void manage(Disposable disposable) {
         if (model == null)
             throw new GdxRuntimeException("Call begin() first");
         model.manageDisposable(disposable);
@@ -212,7 +212,7 @@ public class IntModelBuilder {
      * Material might contain are not managed, use {@link #manage(Disposable)}
      * to add those to the model.
      */
-    public void part(final IntMeshPart meshpart, final Material material) {
+    public void part(IntMeshPart meshpart, Material material) {
         if (node == null)
             node();
         node.parts.add(new IntNodePart(meshpart, material));
@@ -226,8 +226,8 @@ public class IntModelBuilder {
      *
      * @return The added IntMeshPart.
      */
-    public IntMeshPart part(final String id, final IntMesh mesh, int primitiveType, int offset, int size, final Material material) {
-        final IntMeshPart meshPart = new IntMeshPart();
+    public IntMeshPart part(String id, IntMesh mesh, int primitiveType, int offset, int size, Material material) {
+        IntMeshPart meshPart = new IntMeshPart();
         meshPart.id = id;
         meshPart.primitiveType = primitiveType;
         meshPart.mesh = mesh;
@@ -245,7 +245,7 @@ public class IntModelBuilder {
      *
      * @return The added IntMeshPart.
      */
-    public IntMeshPart part(final String id, final IntMesh mesh, int primitiveType, final Material material) {
+    public IntMeshPart part(String id, IntMesh mesh, int primitiveType, Material material) {
         return part(id, mesh, primitiveType, 0, mesh.getNumIndices(), material);
     }
 
@@ -259,8 +259,8 @@ public class IntModelBuilder {
      *
      * @return The {@link IntMeshPartBuilder} you can use to build the IntMeshPart.
      */
-    public IntMeshPartBuilder part(final String id, int primitiveType, final VertexAttributes attributes, final Material material) {
-        final IntIntMeshBuilder builder = getBuilder(attributes);
+    public IntMeshPartBuilder part(String id, int primitiveType, VertexAttributes attributes, Material material) {
+        IntIntMeshBuilder builder = getBuilder(attributes);
         part(builder.part(id, primitiveType), material);
         return builder;
     }
@@ -279,7 +279,7 @@ public class IntModelBuilder {
      *
      * @return The {@link IntMeshPartBuilder} you can use to build the IntMeshPart.
      */
-    public IntMeshPartBuilder part(final String id, int primitiveType, final Bits attributes, final Material material) {
+    public IntMeshPartBuilder part(String id, int primitiveType, Bits attributes, Material material) {
         return part(id, primitiveType, IntIntMeshBuilder.createAttributes(attributes), material);
     }
 
@@ -292,7 +292,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createBox(float width, float height, float depth, boolean flip, final Material material, final Bits attributes) {
+    public IntModel createBox(float width, float height, float depth, boolean flip, Material material, Bits attributes) {
         return createBox(width, height, depth, flip, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -305,7 +305,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createBox(float width, float height, float depth, boolean flip, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createBox(float width, float height, float depth, boolean flip, int primitiveType, Material material, Bits attributes) {
         begin();
         part("box", primitiveType, attributes, material).box(width, height, depth, flip);
         return end();
@@ -321,7 +321,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createRect(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, final Material material, final Bits attributes) {
+    public IntModel createRect(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, Material material, Bits attributes) {
         return createRect(x00, y00, z00, x10, y10, z10, x11, y11, z11, x01, y01, z01, normalX, normalY, normalZ, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -335,7 +335,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createRect(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createRect(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, int primitiveType, Material material, Bits attributes) {
         begin();
         part("rect", primitiveType, attributes, material).rect(x00, y00, z00, x10, y10, z10, x11, y11, z11, x01, y01, z01, normalX, normalY, normalZ);
         return end();
@@ -350,7 +350,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCylinder(float width, float height, float depth, int divisions, final Material material, final Bits attributes) {
+    public IntModel createCylinder(float width, float height, float depth, int divisions, Material material, Bits attributes) {
         return createCylinder(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -363,7 +363,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCylinder(float width, float height, float depth, int divisions, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createCylinder(float width, float height, float depth, int divisions, int primitiveType, Material material, Bits attributes) {
         return createCylinder(width, height, depth, divisions, primitiveType, material, attributes, 0, 360);
     }
 
@@ -376,7 +376,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCylinder(float width, float height, float depth, int divisions, final Material material, final Bits attributes, float angleFrom, float angleTo) {
+    public IntModel createCylinder(float width, float height, float depth, int divisions, Material material, Bits attributes, float angleFrom, float angleTo) {
         return createCylinder(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes, angleFrom, angleTo);
     }
 
@@ -389,7 +389,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCylinder(float width, float height, float depth, int divisions, int primitiveType, final Material material, final Bits attributes, float angleFrom, float angleTo) {
+    public IntModel createCylinder(float width, float height, float depth, int divisions, int primitiveType, Material material, Bits attributes, float angleFrom, float angleTo) {
         begin();
         part("cylinder", primitiveType, attributes, material).cylinder(width, height, depth, divisions, angleFrom, angleTo);
         return end();
@@ -404,7 +404,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCone(float width, float height, float depth, int divisions, final Material material, final Bits attributes) {
+    public IntModel createCone(float width, float height, float depth, int divisions, Material material, Bits attributes) {
         return createCone(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -417,7 +417,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCone(float width, float height, float depth, int divisions, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createCone(float width, float height, float depth, int divisions, int primitiveType, Material material, Bits attributes) {
         return createCone(width, height, depth, divisions, primitiveType, material, attributes, 0, 360);
     }
 
@@ -430,7 +430,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCone(float width, float height, float depth, int divisions, int hdivisions, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createCone(float width, float height, float depth, int divisions, int hdivisions, int primitiveType, Material material, Bits attributes) {
         return createCone(width, height, depth, divisions, hdivisions, primitiveType, material, attributes, 0, 360);
     }
 
@@ -443,7 +443,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCone(float width, float height, float depth, int divisions, final Material material, final Bits attributes, float angleFrom, float angleTo) {
+    public IntModel createCone(float width, float height, float depth, int divisions, Material material, Bits attributes, float angleFrom, float angleTo) {
         return createCone(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes, angleFrom, angleTo);
     }
 
@@ -456,7 +456,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCone(float width, float height, float depth, int divisions, int primitiveType, final Material material, final Bits attributes, float angleFrom, float angleTo) {
+    public IntModel createCone(float width, float height, float depth, int divisions, int primitiveType, Material material, Bits attributes, float angleFrom, float angleTo) {
         begin();
         part("cone", primitiveType, attributes, material).cone(width, height, depth, divisions, angleFrom, angleTo);
         return end();
@@ -471,7 +471,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCone(float width, float height, float depth, int divisions, int hdivisions, int primitiveType, final Material material, final Bits attributes, float angleFrom, float angleTo) {
+    public IntModel createCone(float width, float height, float depth, int divisions, int hdivisions, int primitiveType, Material material, Bits attributes, float angleFrom, float angleTo) {
         begin();
         part("cone", primitiveType, attributes, material).cone(width, height, depth, divisions, hdivisions, angleFrom, angleTo);
         return end();
@@ -486,7 +486,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, final Material material, final Bits attributes) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, Material material, Bits attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -499,7 +499,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, int primitiveType, Material material, Bits attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, primitiveType, material, attributes, 0, 360, 0, 180);
     }
 
@@ -512,7 +512,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, final Material material, final Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, Material material, Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         return createSphere(width, height, depth, divisionsU, divisionsV, GL20.GL_TRIANGLES, material, attributes, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
 
@@ -525,7 +525,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, int primitiveType, final Material material, final Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, int primitiveType, Material material, Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         begin();
         part("cylinder", primitiveType, attributes, material).sphere(width, height, depth, divisionsU, divisionsV, angleUFrom, angleUTo, angleVFrom, angleVTo);
         return end();
@@ -540,7 +540,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCapsule(float radius, float height, int divisions, final Material material, final Bits attributes) {
+    public IntModel createCapsule(float radius, float height, int divisions, Material material, Bits attributes) {
         return createCapsule(radius, height, divisions, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -553,7 +553,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCapsule(float radius, float height, int divisions, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createCapsule(float radius, float height, int divisions, int primitiveType, Material material, Bits attributes) {
         begin();
         part("capsule", primitiveType, attributes, material).capsule(radius, height, divisions);
         return end();
@@ -699,7 +699,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCylinder(float width, float height, float depth, int divisions, boolean flipNormals, final Material material, final Bits attributes) {
+    public IntModel createCylinder(float width, float height, float depth, int divisions, boolean flipNormals, Material material, Bits attributes) {
         return createCylinder(width, height, depth, divisions, flipNormals, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -712,7 +712,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createCylinder(float width, float height, float depth, int divisions, boolean flipNormals, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createCylinder(float width, float height, float depth, int divisions, boolean flipNormals, int primitiveType, Material material, Bits attributes) {
         begin();
         part("cylinder", primitiveType, attributes, material).cylinder(width, height, depth, divisions, 0, 360, false, flipNormals);
         return end();
@@ -728,11 +728,11 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createIcoSphere(float radius, int recursion, boolean flipNormals, boolean hardEdges, final Material material, final Bits attributes) {
+    public IntModel createIcoSphere(float radius, int recursion, boolean flipNormals, boolean hardEdges, Material material, Bits attributes) {
         return createIcoSphere(radius, recursion, flipNormals, hardEdges, GL20.GL_TRIANGLES, material, attributes);
     }
 
-    public IntModel createIcoSphere(float radius, int recursion, boolean flipNormals, boolean hardEdges, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createIcoSphere(float radius, int recursion, boolean flipNormals, boolean hardEdges, int primitiveType, Material material, Bits attributes) {
         begin();
         int nfaces = (int) (10 * FastMath.pow(2, 2 * recursion - 1));
         if (nfaces * 3 <= Integer.MAX_VALUE) {
@@ -762,7 +762,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createOctahedronSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, final Material material, final Bits attributes) {
+    public IntModel createOctahedronSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, Material material, Bits attributes) {
         return createOctahedronSphere(radius, divisions, flipNormals, hardEdges, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -771,7 +771,7 @@ public class IntModelBuilder {
      *
      * @return The model
      */
-    public IntModel createOctahedronSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createOctahedronSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int primitiveType, Material material, Bits attributes) {
         begin();
         // All in one part
         part("octahedronsphere", primitiveType, attributes, material).octahedronsphere(radius, divisions, flipNormals, hardEdges);
@@ -788,7 +788,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, final Material materialShpere, final Material materialRing, final Bits attributes) {
+    public IntModel createRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, Material materialShpere, Material materialRing, Bits attributes) {
         begin();
         part("ring", primitiveType, attributes, materialRing).ring(innerRingRadius, outerRingRadius, ringDivisions, false);
         part("ring", primitiveType, attributes, materialRing).ring(new Matrix4().translate(0, -0.00001f, 0), innerRingRadius, outerRingRadius, ringDivisions, true);
@@ -805,7 +805,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphereRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, final Material materialShpere, final Material materialRing, final Bits attributes) {
+    public IntModel createSphereRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, Material materialShpere, Material materialRing, Bits attributes) {
         begin();
         part("sphere", primitiveType, attributes, materialShpere).sphere(sphereDiameter, sphereDiameter, sphereDiameter, divisionsU, divisionsV, false, 0, 360, 0, 180);
         part("ring", primitiveType, attributes, materialRing).ring(innerRingRadius, outerRingRadius, ringDivisions, false);
@@ -822,7 +822,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float diameter, int divisionsU, int divisionsV, final Material material, final Bits attributes) {
+    public IntModel createSphere(float diameter, int divisionsU, int divisionsV, Material material, Bits attributes) {
         return createSphere(diameter, diameter, diameter, divisionsU, divisionsV, false, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -835,7 +835,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float diameter, int divisionsU, int divisionsV, boolean flipNormals, final Material material, final Bits attributes) {
+    public IntModel createSphere(float diameter, int divisionsU, int divisionsV, boolean flipNormals, Material material, Bits attributes) {
         return createSphere(diameter, diameter, diameter, divisionsU, divisionsV, flipNormals, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -848,7 +848,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, final Material material, final Bits attributes) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, Material material, Bits attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, flipNormals, GL20.GL_TRIANGLES, material, attributes);
     }
 
@@ -861,7 +861,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, int primitiveType, final Material material, final Bits attributes) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, int primitiveType, Material material, Bits attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, flipNormals, primitiveType, material, attributes, 0, 360, 0, 180);
     }
 
@@ -874,7 +874,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, final Material material, final Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, Material material, Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         return createSphere(width, height, depth, divisionsU, divisionsV, flipNormals, GL20.GL_TRIANGLES, material, attributes, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
 
@@ -887,7 +887,7 @@ public class IntModelBuilder {
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, int primitiveType, final Material material, final Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+    public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, int primitiveType, Material material, Bits attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         begin();
         part("sphere", primitiveType, attributes, material).sphere(width, height, depth, divisionsU, divisionsV, flipNormals, angleUFrom, angleUTo, angleVFrom, angleVTo);
         return end();

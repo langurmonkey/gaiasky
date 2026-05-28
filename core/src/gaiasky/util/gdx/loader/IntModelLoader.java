@@ -34,31 +34,31 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
     }
 
     /** Directly load the raw model data on the calling thread. */
-    public abstract IntModelData loadModelData(final FileHandle fileHandle, P parameters);
+    public abstract IntModelData loadModelData(FileHandle fileHandle, P parameters);
 
     /** Directly load the raw model data on the calling thread. */
-    public IntModelData loadModelData(final FileHandle fileHandle) {
+    public IntModelData loadModelData(FileHandle fileHandle) {
         return loadModelData(fileHandle, null);
     }
 
     /** Directly load the model on the calling thread. The model with not be managed by an {@link AssetManager}. */
-    public IntModel loadModel(final FileHandle fileHandle, TextureProvider textureProvider, P parameters) {
-        final IntModelData data = loadModelData(fileHandle, parameters);
+    public IntModel loadModel(FileHandle fileHandle, TextureProvider textureProvider, P parameters) {
+        IntModelData data = loadModelData(fileHandle, parameters);
         return data == null ? null : new IntModel(data, textureProvider);
     }
 
     /** Directly load the model on the calling thread. The model with not be managed by an {@link AssetManager}. */
-    public IntModel loadModel(final FileHandle fileHandle, P parameters) {
+    public IntModel loadModel(FileHandle fileHandle, P parameters) {
         return loadModel(fileHandle, new TextureProvider.FileTextureProvider(), parameters);
     }
 
     /** Directly load the model on the calling thread. The model with not be managed by an {@link AssetManager}. */
-    public IntModel loadModel(final FileHandle fileHandle, TextureProvider textureProvider) {
+    public IntModel loadModel(FileHandle fileHandle, TextureProvider textureProvider) {
         return loadModel(fileHandle, textureProvider, null);
     }
 
     /** Directly load the model on the calling thread. The model with not be managed by an {@link AssetManager}. */
-    public IntModel loadModel(final FileHandle fileHandle) {
+    public IntModel loadModel(FileHandle fileHandle) {
         if (fileHandle.exists()) {
             return loadModel(fileHandle, new TextureProvider.FileTextureProvider(), null);
         }
@@ -67,7 +67,7 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
 
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, P parameters) {
-        final Array<AssetDescriptor> deps = new Array<>();
+        Array<AssetDescriptor> deps = new Array<>();
         IntModelData data = loadModelData(file, parameters);
         if (data == null)
             return deps;
@@ -81,9 +81,9 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
 
         OwnTextureLoader.OwnTextureParameter textureParameter = (parameters != null) ? parameters.textureParameter : defaultParameters.textureParameter;
 
-        for (final OwnModelMaterial modelMaterial : data.materials) {
+        for (OwnModelMaterial modelMaterial : data.materials) {
             if (modelMaterial.textures != null) {
-                for (final ModelTexture modelTexture : modelMaterial.textures)
+                for (ModelTexture modelTexture : modelMaterial.textures)
                     deps.add(new AssetDescriptor<>(modelTexture.fileName, Texture.class, textureParameter));
             }
         }
@@ -107,7 +107,7 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
         }
         if (data == null)
             return null;
-        final IntModel result = new IntModel(data, new TextureProvider.AssetTextureProvider(manager));
+        IntModel result = new IntModel(data, new TextureProvider.AssetTextureProvider(manager));
         // need to remove the textures from the managed disposables, or else ref counting
         // doesn't work!
         Iterator<Disposable> disposables = result.getManagedDisposables().iterator();

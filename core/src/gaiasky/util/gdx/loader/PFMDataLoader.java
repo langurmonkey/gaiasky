@@ -50,8 +50,8 @@ public class PFMDataLoader extends AsynchronousAssetLoader<PFMData, PFMDataLoade
     }
 
     static public class PFMDataParameter extends AssetLoaderParameters<PFMData> {
-        public PFMData data = null;
-        public boolean invert = false;
+        public PFMData data;
+        public boolean invert;
     }
 
 }

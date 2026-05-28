@@ -152,18 +152,18 @@ public class ModifiedNetJavaImpl {
         tasks = new ObjectMap<>();
     }
 
-    public void sendHttpRequest(final Net.HttpRequest httpRequest, final Net.HttpResponseListener httpResponseListener) {
+    public void sendHttpRequest(Net.HttpRequest httpRequest, Net.HttpResponseListener httpResponseListener) {
         if (httpRequest.getUrl() == null) {
             httpResponseListener.failed(new GdxRuntimeException("can't process a HTTP request without URL set"));
             return;
         }
 
         try {
-            final String method = httpRequest.getMethod();
+            String method = httpRequest.getMethod();
             URL url;
 
             // should be enabled to upload data.
-            final boolean doingOutPut = method.equalsIgnoreCase(Net.HttpMethods.POST) || method.equalsIgnoreCase(Net.HttpMethods.PUT)
+            boolean doingOutPut = method.equalsIgnoreCase(Net.HttpMethods.POST) || method.equalsIgnoreCase(Net.HttpMethods.PUT)
                     || method.equalsIgnoreCase(Net.HttpMethods.PATCH);
 
             if (method.equalsIgnoreCase(Net.HttpMethods.GET) || method.equalsIgnoreCase(Net.HttpMethods.HEAD)) {
@@ -175,7 +175,7 @@ public class ModifiedNetJavaImpl {
                 url = URI.create(httpRequest.getUrl()).toURL();
             }
 
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(doingOutPut);
             // Force doInput to true because we need to read the status code from the response.
             connection.setDoInput(true);
@@ -220,7 +220,7 @@ public class ModifiedNetJavaImpl {
 
                     connection.connect();
 
-                    final HttpClientResponse clientResponse = new HttpClientResponse(connection);
+                    HttpClientResponse clientResponse = new HttpClientResponse(connection);
                     try {
                         Net.HttpResponseListener listener = getFromListeners(httpRequest);
 
@@ -231,7 +231,7 @@ public class ModifiedNetJavaImpl {
                         removeFromConnectionsAndListeners(httpRequest);
                         connection.disconnect();
                     }
-                } catch (final Exception e) {
+                } catch (Exception e) {
                     connection.disconnect();
                     try {
                         httpResponseListener.failed(e);
@@ -249,14 +249,14 @@ public class ModifiedNetJavaImpl {
         }
     }
 
-    synchronized void removeFromConnectionsAndListeners(final Net.HttpRequest httpRequest) {
+    synchronized void removeFromConnectionsAndListeners(Net.HttpRequest httpRequest) {
         connections.remove(httpRequest);
         listeners.remove(httpRequest);
         tasks.remove(httpRequest);
     }
 
-    synchronized void putIntoConnectionsAndListeners(final Net.HttpRequest httpRequest,
-                                                     final Net.HttpResponseListener httpResponseListener, final HttpURLConnection connection) {
+    synchronized void putIntoConnectionsAndListeners(Net.HttpRequest httpRequest,
+                                                     Net.HttpResponseListener httpResponseListener, HttpURLConnection connection) {
         connections.put(httpRequest, connection);
         listeners.put(httpRequest, httpResponseListener);
     }

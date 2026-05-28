@@ -21,8 +21,8 @@ import java.nio.FloatBuffer;
 
 public class FloatTextureDataExt implements TextureData {
 
-    int width = 0;
-    int height = 0;
+    int width;
+    int height;
 
     int internalFormat;
     int format;
@@ -31,7 +31,7 @@ public class FloatTextureDataExt implements TextureData {
     boolean isGpuOnly;
     boolean useMipMaps;
 
-    boolean isPrepared = false;
+    boolean isPrepared;
     FloatBuffer buffer;
 
     public FloatTextureDataExt(int w, int h, int internalFormat, int format, int type, boolean useMipMaps, boolean isGpuOnly) {

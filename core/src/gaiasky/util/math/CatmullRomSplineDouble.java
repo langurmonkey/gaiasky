@@ -26,7 +26,7 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
     public CatmullRomSplineDouble() {
     }
 
-    public CatmullRomSplineDouble(final T[] controlPoints, final boolean continuous) {
+    public CatmullRomSplineDouble(T[] controlPoints, boolean continuous) {
         set(controlPoints, continuous);
     }
 
@@ -40,9 +40,9 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T calculate(final T out, final double t, final T[] points, final boolean continuous,
-                                                          final T tmp) {
-        final int n = continuous ? points.length : points.length - 3;
+    public static <T extends VectorDouble<T>> T calculate(T out, double t, T[] points, boolean continuous,
+                                                          T tmp) {
+        int n = continuous ? points.length : points.length - 3;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -60,11 +60,11 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T calculate(final T out, final int i, final double u, final T[] points,
-                                                          final boolean continuous, final T tmp) {
-        final int n = points.length;
-        final double u2 = u * u;
-        final double u3 = u2 * u;
+    public static <T extends VectorDouble<T>> T calculate(T out, int i, double u, T[] points,
+                                                          boolean continuous, T tmp) {
+        int n = points.length;
+        double u2 = u * u;
+        double u3 = u2 * u;
         out.set(points[i]).scl(1.5 * u3 - 2.5 * u2 + 1.0);
         if (continuous || i > 0)
             out.add(tmp.set(points[(n + i - 1) % n]).scl(-0.5 * u3 + u2 - 0.5 * u));
@@ -85,9 +85,9 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T derivative(final T out, final double t, final T[] points, final boolean continuous,
-                                                           final T tmp) {
-        final int n = continuous ? points.length : points.length - 3;
+    public static <T extends VectorDouble<T>> T derivative(T out, double t, T[] points, boolean continuous,
+                                                           T tmp) {
+        int n = continuous ? points.length : points.length - 3;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -105,13 +105,13 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T derivative(final T out, final int i, final double u, final T[] points,
-                                                           final boolean continuous, final T tmp) {
+    public static <T extends VectorDouble<T>> T derivative(T out, int i, double u, T[] points,
+                                                           boolean continuous, T tmp) {
         /*
          * catmull'(u) = 0.5 *((-p0 + p2) + 2 * (2*p0 - 5*p1 + 4*p2 - p3) * u + 3 * (-p0 + 3*p1 - 3*p2 + p3) * u * u)
          */
-        final int n = points.length;
-        final double u2 = u * u;
+        int n = points.length;
+        double u2 = u * u;
         // final double u3 = u2 * u;
         out.set(points[i]).scl(-u * 5 + u2 * 4.5f);
         if (continuous || i > 0)
@@ -123,7 +123,7 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
         return out;
     }
 
-    public CatmullRomSplineDouble set(final T[] controlPoints, final boolean continuous) {
+    public CatmullRomSplineDouble set(T[] controlPoints, boolean continuous) {
         if (tmp == null)
             tmp = controlPoints[0].cpy();
         if (tmp2 == null)
@@ -138,7 +138,7 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
 
     @Override
     public T valueAt(T out, double t) {
-        final int n = spanCount;
+        int n = spanCount;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -146,13 +146,13 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
     }
 
     /** @return The value of the spline at position u of the specified span */
-    public T valueAt(final T out, final int span, final double u) {
+    public T valueAt(T out, int span, double u) {
         return calculate(out, continuous ? span : (span + 1), u, controlPoints, continuous, tmp);
     }
 
     @Override
     public T derivativeAt(T out, double t) {
-        final int n = spanCount;
+        int n = spanCount;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -160,24 +160,24 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
     }
 
     /** @return The derivative of the spline at position u of the specified span */
-    public T derivativeAt(final T out, final int span, final double u) {
+    public T derivativeAt(T out, int span, double u) {
         return derivative(out, continuous ? span : (span + 1), u, controlPoints, continuous, tmp);
     }
 
     /** @return The span closest to the specified value */
-    public int nearest(final T in) {
+    public int nearest(T in) {
         return nearest(in, 0, spanCount);
     }
 
     /** @return The span closest to the specified value, restricting to the specified spans. */
-    public int nearest(final T in, int start, final int count) {
+    public int nearest(T in, int start, int count) {
         while (start < 0)
             start += spanCount;
         int result = start % spanCount;
         double dst = in.dst2(controlPoints[result]);
         for (int i = 1; i < count; i++) {
-            final int idx = (start + i) % spanCount;
-            final double d = in.dst2(controlPoints[idx]);
+            int idx = (start + i) % spanCount;
+            double d = in.dst2(controlPoints[idx]);
             if (d < dst) {
                 dst = d;
                 result = idx;
@@ -191,17 +191,17 @@ public class CatmullRomSplineDouble<T extends VectorDouble<T>> implements PathDo
         return approximate(v, nearest(v));
     }
 
-    public double approximate(final T in, int start, final int count) {
+    public double approximate(T in, int start, int count) {
         return approximate(in, nearest(in, start, count));
     }
 
-    public double approximate(final T in, final int near) {
+    public double approximate(T in, int near) {
         int n = near;
-        final T nearest = controlPoints[n];
-        final T previous = controlPoints[n > 0 ? n - 1 : spanCount - 1];
-        final T next = controlPoints[(n + 1) % spanCount];
-        final double dstPrev2 = in.dst2(previous);
-        final double dstNext2 = in.dst2(next);
+        T nearest = controlPoints[n];
+        T previous = controlPoints[n > 0 ? n - 1 : spanCount - 1];
+        T next = controlPoints[(n + 1) % spanCount];
+        double dstPrev2 = in.dst2(previous);
+        double dstNext2 = in.dst2(next);
         T P1, P2, P3;
         if (dstNext2 < dstPrev2) {
             P1 = nearest;

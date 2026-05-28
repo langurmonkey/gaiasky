@@ -53,7 +53,7 @@ public interface IntShader extends Disposable {
      * @param renderable The renderable to render, all required fields (e.g. {@link IntRenderable#material} and others) must be set.
      *                   The {@link IntRenderable#shader} field will be ignored.
      */
-    void render(final IntRenderable renderable);
+    void render(IntRenderable renderable);
 
     /**
      * Cleanup the context so other shaders can render. Must be called when done rendering using the {@link #render(IntRenderable)}

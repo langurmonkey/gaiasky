@@ -19,16 +19,16 @@ import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 public class RelativisticShaderProvider extends DefaultIntShaderProvider {
     public final Config config;
 
-    public RelativisticShaderProvider(final Config config) {
+    public RelativisticShaderProvider(Config config) {
         this.config = (config == null) ? new Config() : config;
         EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
-    public RelativisticShaderProvider(final String vertexFile, final String fragmentFile, final String vertexShaderCode, final String fragmentShaderCode) {
+    public RelativisticShaderProvider(String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode) {
         this(new Config(vertexFile, fragmentFile, vertexShaderCode, fragmentShaderCode));
     }
 
-    public RelativisticShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {
+    public RelativisticShaderProvider(FileHandle vertexShader, FileHandle fragmentShader) {
         this(vertexShader.name(), fragmentShader.name(), ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
     }
 
@@ -37,7 +37,7 @@ public class RelativisticShaderProvider extends DefaultIntShaderProvider {
     }
 
     @Override
-    protected IntShader createShader(final IntRenderable renderable) {
+    protected IntShader createShader(IntRenderable renderable) {
         return new RelativisticShader(renderable, config);
     }
 }

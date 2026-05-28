@@ -19,16 +19,16 @@ import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 public class GroundShaderProvider extends DefaultIntShaderProvider {
     public final Config config;
 
-    public GroundShaderProvider(final Config config) {
+    public GroundShaderProvider(Config config) {
         this.config = (config == null) ? new Config() : config;
         EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
-    public GroundShaderProvider(final String vertexFile, final String fragmentFile, final String vertexShader, final String fragmentShader) {
+    public GroundShaderProvider(String vertexFile, String fragmentFile, String vertexShader, String fragmentShader) {
         this(new Config(vertexFile, fragmentFile, vertexShader, fragmentShader));
     }
 
-    public GroundShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {
+    public GroundShaderProvider(FileHandle vertexShader, FileHandle fragmentShader) {
         this(vertexShader.name(), fragmentShader.name(), ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
     }
 
@@ -37,7 +37,7 @@ public class GroundShaderProvider extends DefaultIntShaderProvider {
     }
 
     @Override
-    protected IntShader createShader(final IntRenderable renderable) {
+    protected IntShader createShader(IntRenderable renderable) {
         return new GroundShader(renderable, config);
     }
 }

@@ -23,22 +23,22 @@ public class RelativisticShader extends DefaultIntShader {
     public final int u_gwmat3;
     public final int u_ts;
     public final int u_omgw;
-    public RelativisticShader(final IntRenderable renderable) {
+    public RelativisticShader(IntRenderable renderable) {
         this(renderable, new Config());
     }
-    public RelativisticShader(final IntRenderable renderable, final Config config) {
+    public RelativisticShader(IntRenderable renderable, Config config) {
         this(renderable, config, createPrefix(renderable, config));
     }
 
-    public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix) {
+    public RelativisticShader(IntRenderable renderable, Config config, String prefix) {
         this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(), config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
-    public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
+    public RelativisticShader(IntRenderable renderable, Config config, String prefix, String vertexShader, String fragmentShader) {
         this(renderable, config, new ExtShaderProgram(config.vertexShaderFile, config.fragmentShaderFile, ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
-    public RelativisticShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
+    public RelativisticShader(IntRenderable renderable, Config config, ExtShaderProgram shaderProgram) {
         super(renderable, config, shaderProgram);
 
         u_vc = register(Inputs.vc, Setters.vc);
@@ -52,9 +52,9 @@ public class RelativisticShader extends DefaultIntShader {
 
     }
 
-    public static String createPrefix(final IntRenderable renderable, final Config config) {
+    public static String createPrefix(IntRenderable renderable, Config config) {
         String prefix = DefaultIntShader.createPrefix(renderable, config);
-        final Bits mask = renderable.material.getMask();
+        Bits mask = renderable.material.getMask();
         // Special relativity
         if (mask.has(FloatAttribute.Vc))
             prefix += "#define relativisticEffects\n";

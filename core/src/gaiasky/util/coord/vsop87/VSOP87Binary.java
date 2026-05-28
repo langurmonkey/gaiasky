@@ -135,7 +135,7 @@ public class VSOP87Binary implements IObserver {
     }
 
     public static double[] getMoon(double[] earth, double[] emb) {
-        final double[] temp = {0.0, 0.0, 0.0};
+        double[] temp = {0.0, 0.0, 0.0};
 
         temp[0] = (emb[0] - earth[0]) * (1 + 1 / 0.01230073677);
         temp[1] = (emb[1] - earth[1]) * (1 + 1 / 0.01230073677);
@@ -186,7 +186,7 @@ public class VSOP87Binary implements IObserver {
 
 
     double[] getPlanet(int[] offsets, double t) {
-        final double[] p = new double[varCount];
+        double[] p = new double[varCount];
         for (int i = 0; i < varCount; i++) {
             double acc = 0;
             for (int j = 0; j < 6; j++) {
@@ -197,9 +197,9 @@ public class VSOP87Binary implements IObserver {
                 int start = (int) (length * percentSkipped);
                 o += 3 * start;
                 for (int k = start; k < length; k++) {
-                    final double a = this.data[o];
-                    final double b = this.data[o + 1];
-                    final double c = this.data[o + 2];
+                    double a = this.data[o];
+                    double b = this.data[o + 1];
+                    double c = this.data[o + 2];
 
                     eacc += a * FastMath.cos(b + c * t);
 

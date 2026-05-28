@@ -135,7 +135,6 @@ public class PFMReader {
             return pixmap;
         } catch (Exception e) {
             throw new GdxRuntimeException("Couldn't read PFM file '" + file + "'", e);
-        } finally {
         }
     }
 
@@ -154,7 +153,6 @@ public class PFMReader {
             return new PFMData(data, width, height);
         } catch (Exception e) {
             throw new GdxRuntimeException("Couldn't construct PFM data", e);
-        } finally {
         }
     }
 
@@ -164,7 +162,6 @@ public class PFMReader {
             return new PFMData(data, width, height);
         } catch (Exception e) {
             throw new GdxRuntimeException("Couldn't construct PFM data", e);
-        } finally {
         }
     }
 
@@ -177,7 +174,7 @@ public class PFMReader {
                 float v = (float) j / (float) (h - 1);
 
                 // Store this pixel's position at end location
-                out[(w * j + i) * 3 + 0] = fx.apply(u);
+                out[(w * j + i) * 3] = fx.apply(u);
                 out[(w * j + i) * 3 + 1] = fy.apply(v);
                 out[(w * j + i) * 3 + 2] = Float.NaN;
             }
@@ -216,7 +213,7 @@ public class PFMReader {
      *
      * @return
      */
-    private static float[] invertWarp(final float[] d, int w, int h) throws RuntimeException {
+    private static float[] invertWarp(float[] d, int w, int h) throws RuntimeException {
         // Create transformed mesh
         List<Quad> mesh = generateMesh(d, w, h);
 
@@ -236,7 +233,7 @@ public class PFMReader {
                 List<Quad> matches = mesh.stream().filter(quad -> quad.containsAlt02(u, v)).collect(Collectors.toList());
                 if (matches.isEmpty()) {
                     // Black
-                    out[p + 0] = 0;
+                    out[p] = 0;
                     out[p + 1] = 0;
                     out[p + 2] = Float.NaN;
                     if (!warnedRange) {
@@ -256,7 +253,7 @@ public class PFMReader {
                     double finalU = quad.origUV[0] + du * uv[0];
                     double finalV = quad.origUV[1] + dv * uv[1];
 
-                    out[p + 0] = (float) finalU;
+                    out[p] = (float) finalU;
                     out[p + 1] = (float) finalV;
                     out[p + 2] = Float.NaN;
                 }

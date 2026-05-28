@@ -57,14 +57,14 @@ public class Vector2D implements VectorDouble<Vector2D> {
     }
 
     public static double dst(double x1, double y1, double x2, double y2) {
-        final double x_d = x2 - x1;
-        final double y_d = y2 - y1;
+        double x_d = x2 - x1;
+        double y_d = y2 - y1;
         return FastMath.sqrt(x_d * x_d + y_d * y_d);
     }
 
     public static double dst2(double x1, double y1, double x2, double y2) {
-        final double x_d = x2 - x1;
-        final double y_d = y2 - y1;
+        double x_d = x2 - x1;
+        double y_d = y2 - y1;
         return x_d * x_d + y_d * y_d;
     }
 
@@ -210,8 +210,8 @@ public class Vector2D implements VectorDouble<Vector2D> {
     }
 
     public double dst(Vector2D v) {
-        final double x_d = v.x - x;
-        final double y_d = v.y - y;
+        double x_d = v.x - x;
+        double y_d = v.y - y;
         return FastMath.sqrt(x_d * x_d + y_d * y_d);
     }
 
@@ -222,14 +222,14 @@ public class Vector2D implements VectorDouble<Vector2D> {
      * @return the distance between this and the other vector
      */
     public double dst(double x, double y) {
-        final double x_d = x - this.x;
-        final double y_d = y - this.y;
+        double x_d = x - this.x;
+        double y_d = y - this.y;
         return FastMath.sqrt(x_d * x_d + y_d * y_d);
     }
 
     public double dst2(Vector2D v) {
-        final double x_d = v.x - x;
-        final double y_d = v.y - y;
+        double x_d = v.x - x;
+        double y_d = v.y - y;
         return x_d * x_d + y_d * y_d;
     }
 
@@ -240,8 +240,8 @@ public class Vector2D implements VectorDouble<Vector2D> {
      * @return the squared distance between this and the other vector
      */
     public double dst2(double x, double y) {
-        final double x_d = x - this.x;
-        final double y_d = y - this.y;
+        double x_d = x - this.x;
+        double y_d = y - this.y;
         return x_d * x_d + y_d * y_d;
     }
 
@@ -270,7 +270,7 @@ public class Vector2D implements VectorDouble<Vector2D> {
     }
 
     public Vector2D clamp(double min, double max) {
-        final double l2 = len2();
+        double l2 = len2();
         if (l2 == 0f)
             return this;
         if (l2 > max * max)
@@ -407,7 +407,7 @@ public class Vector2D implements VectorDouble<Vector2D> {
     }
 
     public Vector2D lerp(Vector2D target, double alpha) {
-        final double invAlpha = 1.0f - alpha;
+        double invAlpha = 1.0f - alpha;
         this.x = (x * invAlpha) + (target.x * alpha);
         this.y = (y * invAlpha) + (target.y * alpha);
         return this;
@@ -447,7 +447,7 @@ public class Vector2D implements VectorDouble<Vector2D> {
         return isUnit(0.000000001);
     }
 
-    public boolean isUnit(final double margin) {
+    public boolean isUnit(double margin) {
         return FastMath.abs(len2() - 1) < margin;
     }
 
@@ -455,7 +455,7 @@ public class Vector2D implements VectorDouble<Vector2D> {
         return x == 0 && y == 0;
     }
 
-    public boolean isZero(final double margin) {
+    public boolean isZero(double margin) {
         return len2() < margin;
     }
 

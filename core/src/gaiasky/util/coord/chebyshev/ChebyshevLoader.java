@@ -33,13 +33,13 @@ public class ChebyshevLoader {
         final String positionTypeName = "position";
         final int positionTypeIndex = 0;
 
-        final InputStream inputStream = new FileInputStream(filePath.toFile());
+        InputStream inputStream = new FileInputStream(filePath.toFile());
 
-        final ChebyshevCoefficients chebyshevEphemerisData = new ChebyshevCoefficients();
+        ChebyshevCoefficients chebyshevEphemerisData = new ChebyshevCoefficients();
 
         try {
             try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);) {
+                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
                 chebyshevEphemerisData.header[positionTypeIndex] = this.loadHeader(bufferedReader);
                 chebyshevEphemerisData.coefficients[positionTypeIndex] = this.loadData(bufferedReader, chebyshevEphemerisData.header[positionTypeIndex]);
@@ -47,7 +47,7 @@ public class ChebyshevLoader {
             } finally {
                 inputStream.close();
             }
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Cannot read the resource file " + filePath, e);
         }
 
@@ -68,41 +68,41 @@ public class ChebyshevLoader {
      *                     <code>{@link BufferedReader}</code> or the parsing into
      *                     the <code>{@link Header}</code> fails
      */
-    private Header loadHeader(final BufferedReader bufferedReader) throws IOException {
+    private Header loadHeader(BufferedReader bufferedReader) throws IOException {
 
-        final String bodyLine = bufferedReader.readLine();
+        String bodyLine = bufferedReader.readLine();
         if (null == bodyLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String vectorLine = bufferedReader.readLine();
+        String vectorLine = bufferedReader.readLine();
         if (null == vectorLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String dimensionsLine = bufferedReader.readLine();
+        String dimensionsLine = bufferedReader.readLine();
         if (null == dimensionsLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String granulesLine = bufferedReader.readLine();
+        String granulesLine = bufferedReader.readLine();
         if (null == granulesLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String equisizedLine = bufferedReader.readLine();
+        String equisizedLine = bufferedReader.readLine();
         if (null == equisizedLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String tcbBeginLine = bufferedReader.readLine();
+        String tcbBeginLine = bufferedReader.readLine();
         if (null == tcbBeginLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String tcbEndLine = bufferedReader.readLine();
+        String tcbEndLine = bufferedReader.readLine();
         if (null == tcbEndLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String emptyLine = bufferedReader.readLine();
+        String emptyLine = bufferedReader.readLine();
         if (null == emptyLine) {
             throw new IOException("Unexpeced end of file.");
         }
-        final String headerLine = bufferedReader.readLine();
+        String headerLine = bufferedReader.readLine();
         if (null == headerLine) {
             throw new IOException("Unexpeced end of file.");
         }
@@ -114,10 +114,10 @@ public class ChebyshevLoader {
         // If the contents of the loaded data files are corrupt,
         // the following .parseXyz() calls may fail miserably and throw exceptions
 
-        final int nGranules = Integer.parseInt(this.parseHeaderLine(granulesLine));
-        final boolean isEquisized = Boolean.parseBoolean(this.parseHeaderLine(equisizedLine));
-        final long nanoscondsTcbBegin = Long.parseLong(this.parseHeaderLine(tcbBeginLine));
-        final long nanoscondsTcbEnd = Long.parseLong(this.parseHeaderLine(tcbEndLine));
+        int nGranules = Integer.parseInt(this.parseHeaderLine(granulesLine));
+        boolean isEquisized = Boolean.parseBoolean(this.parseHeaderLine(equisizedLine));
+        long nanoscondsTcbBegin = Long.parseLong(this.parseHeaderLine(tcbBeginLine));
+        long nanoscondsTcbEnd = Long.parseLong(this.parseHeaderLine(tcbEndLine));
 
         return new Header(nGranules, isEquisized, nanoscondsTcbBegin, nanoscondsTcbEnd);
     }
@@ -136,38 +136,38 @@ public class ChebyshevLoader {
      *                     the
      *                     <code>{@link ChebyshevCoefficients.Coefficients}</code> fails
      */
-    private ChebyshevCoefficients.Coefficients loadData(final BufferedReader bufferedReader,
-                                                        final Header header) throws IOException {
+    private ChebyshevCoefficients.Coefficients loadData(BufferedReader bufferedReader,
+                                                        Header header) throws IOException {
 
         // The nanosecondsTcbArray array holds the begin times of the
         // time granules. One extra array element is added at the end
         // to hold the end time of the last granule.
 
-        final long[] nanosecondsTcbArray = new long[header.nGranules + 1];
+        long[] nanosecondsTcbArray = new long[header.nGranules + 1];
         nanosecondsTcbArray[header.nGranules] = header.nanosecondsTcbEnd;
 
-        final double[][][] coefficientsArray = new double[header.nGranules][header.nDimensions][];
+        double[][][] coefficientsArray = new double[header.nGranules][header.nDimensions][];
 
         for (int iGranule = 0; iGranule < header.nGranules; iGranule++) {
             for (int iDimensions = 0; iDimensions < header.nDimensions; iDimensions++) {
 
-                final String dataLine = bufferedReader.readLine();
+                String dataLine = bufferedReader.readLine();
                 if (null == dataLine) {
                     throw new IOException("Unexpeced end of file.");
                 }
-                final String[] dataLineTokens = this.splitDataLine(dataLine.strip());
-                final int[] dataLineHeader = this.parseDataLineHeader(dataLineTokens);
+                String[] dataLineTokens = this.splitDataLine(dataLine.strip());
+                int[] dataLineHeader = this.parseDataLineHeader(dataLineTokens);
                 if (iGranule != dataLineHeader[0]) {
                     throw new IOException("Unexpeced file format.");
                 }
                 if (iDimensions != dataLineHeader[1]) {
                     throw new IOException("Unexpeced file format.");
                 }
-                final int nCoefficients = dataLineHeader[2];
+                int nCoefficients = dataLineHeader[2];
                 if (4 + nCoefficients != dataLineTokens.length) {
                     throw new IOException("Unexpeced file format.");
                 }
-                final long nanosecondsTcb = this.parseDataLineTime(dataLineTokens);
+                long nanosecondsTcb = this.parseDataLineTime(dataLineTokens);
                 if (nanosecondsTcb < header.nanosecondsTcbBegin || header.nanosecondsTcbEnd < nanosecondsTcb) {
                     throw new IOException("Granule time out of range.");
                 }
@@ -175,9 +175,9 @@ public class ChebyshevLoader {
                 coefficientsArray[iGranule][iDimensions] = this.parseDataLineCoefficients(dataLineTokens);
             }
 
-            final int nCoefficientsX = coefficientsArray[iGranule][0].length;
-            final int nCoefficientsY = coefficientsArray[iGranule][1].length;
-            final int nCoefficientsZ = coefficientsArray[iGranule][2].length;
+            int nCoefficientsX = coefficientsArray[iGranule][0].length;
+            int nCoefficientsY = coefficientsArray[iGranule][1].length;
+            int nCoefficientsZ = coefficientsArray[iGranule][2].length;
 
             if (nCoefficientsX != nCoefficientsZ || nCoefficientsY != nCoefficientsZ) {
                 throw new IOException("Different polynomial orders for vector components.");
@@ -195,9 +195,9 @@ public class ChebyshevLoader {
      * @return the second part of the line <code>{@link String}</code>
      * @throws IOException if splitting the given line fails
      */
-    private String parseHeaderLine(final String line) throws IOException {
+    private String parseHeaderLine(String line) throws IOException {
 
-        final String[] splitLine = line.split(":");
+        String[] splitLine = line.split(":");
         if (2 != splitLine.length) {
             throw new IOException("Unexpected file format.");
         }
@@ -214,9 +214,9 @@ public class ChebyshevLoader {
      * @throws IOException if the given data line <code>{@link String}</code> does
      *                     not contain the minimum number of expected tokens
      */
-    private String[] splitDataLine(final String line) throws IOException {
+    private String[] splitDataLine(String line) throws IOException {
 
-        final String[] splitLine = line.split("\\s+");
+        String[] splitLine = line.split("\\s+");
         if (4 > splitLine.length) {
             throw new IOException("Unexpected file format.");
         }
@@ -235,11 +235,11 @@ public class ChebyshevLoader {
      * <code>[iGranule, nDimensions, nCoefficients]</code>
      */
 
-    private int[] parseDataLineHeader(final String[] dataLineTokens) {
+    private int[] parseDataLineHeader(String[] dataLineTokens) {
 
-        final int iGranule = Integer.parseInt(dataLineTokens[0].strip());
-        final int nDimensions = Integer.parseInt(dataLineTokens[1].strip());
-        final int nCoefficients = Integer.parseInt(dataLineTokens[2].strip());
+        int iGranule = Integer.parseInt(dataLineTokens[0].strip());
+        int nDimensions = Integer.parseInt(dataLineTokens[1].strip());
+        int nCoefficients = Integer.parseInt(dataLineTokens[2].strip());
 
         return new int[]{
                 iGranule, nDimensions, nCoefficients,
@@ -255,7 +255,7 @@ public class ChebyshevLoader {
      *                       tokens
      * @return the time in nanoseconds TCB
      */
-    private long parseDataLineTime(final String[] dataLineTokens) {
+    private long parseDataLineTime(String[] dataLineTokens) {
 
         return Long.parseLong(dataLineTokens[3].strip());
     }
@@ -269,9 +269,9 @@ public class ChebyshevLoader {
      *                       tokens
      * @return the <code>double</code> array of Chebyshev coefficients
      */
-    private double[] parseDataLineCoefficients(final String[] dataLineTokens) {
+    private double[] parseDataLineCoefficients(String[] dataLineTokens) {
 
-        final double[] coefficients = new double[dataLineTokens.length - 4];
+        double[] coefficients = new double[dataLineTokens.length - 4];
         for (int iCoefficient = 0; iCoefficient < dataLineTokens.length - 4; iCoefficient++) {
             coefficients[iCoefficient] = Double.parseDouble(dataLineTokens[iCoefficient + 4].strip());
         }

@@ -89,11 +89,11 @@ public class IntModel implements Disposable {
     }
 
     protected void loadAnimations(Iterable<ModelAnimation> modelAnimations) {
-        for (final ModelAnimation anim : modelAnimations) {
+        for (ModelAnimation anim : modelAnimations) {
             IntAnimation animation = new IntAnimation();
             animation.id = anim.id;
             for (ModelNodeAnimation nanim : anim.nodeAnimations) {
-                final IntNode node = getNode(nanim.nodeId);
+                IntNode node = getNode(nanim.nodeId);
                 if (node == null)
                     continue;
                 IntNodeAnimation nodeAnim = new IntNodeAnimation();
@@ -385,7 +385,7 @@ public class IntModel implements Disposable {
      * was modified.</p>
      */
     public void calculateTransforms() {
-        final int n = nodes.size;
+        int n = nodes.size;
         for (int i = 0; i < n; i++) {
             nodes.get(i).calculateTransforms(true);
         }
@@ -402,7 +402,7 @@ public class IntModel implements Disposable {
      *
      * @return the out parameter for chaining
      */
-    public BoundingBox calculateBoundingBox(final BoundingBox out) {
+    public BoundingBox calculateBoundingBox(BoundingBox out) {
         out.inf();
         return extendBoundingBox(out);
     }
@@ -416,8 +416,8 @@ public class IntModel implements Disposable {
      *
      * @return the out parameter for chaining
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out) {
-        final int n = nodes.size;
+    public BoundingBox extendBoundingBox(BoundingBox out) {
+        int n = nodes.size;
         for (int i = 0; i < n; i++)
             nodes.get(i).extendBoundingBox(out);
         return out;
@@ -428,7 +428,7 @@ public class IntModel implements Disposable {
      *
      * @return The {@link Animation} with the specified id, or null if not available.
      */
-    public IntAnimation getAnimation(final String id) {
+    public IntAnimation getAnimation(String id) {
         return getAnimation(id, true);
     }
 
@@ -438,8 +438,8 @@ public class IntModel implements Disposable {
      *
      * @return The {@link Animation} with the specified id, or null if not available.
      */
-    public IntAnimation getAnimation(final String id, boolean ignoreCase) {
-        final int n = animations.size;
+    public IntAnimation getAnimation(String id, boolean ignoreCase) {
+        int n = animations.size;
         IntAnimation animation;
         if (ignoreCase) {
             for (int i = 0; i < n; i++)
@@ -458,7 +458,7 @@ public class IntModel implements Disposable {
      *
      * @return The {@link Material} with the specified id, or null if not available.
      */
-    public Material getMaterial(final String id) {
+    public Material getMaterial(String id) {
         return getMaterial(id, true);
     }
 
@@ -468,8 +468,8 @@ public class IntModel implements Disposable {
      *
      * @return The {@link Material} with the specified id, or null if not available.
      */
-    public Material getMaterial(final String id, boolean ignoreCase) {
-        final int n = materials.size;
+    public Material getMaterial(String id, boolean ignoreCase) {
+        int n = materials.size;
         Material material;
         if (ignoreCase) {
             for (int i = 0; i < n; i++)
@@ -488,7 +488,7 @@ public class IntModel implements Disposable {
      *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
-    public IntNode getNode(final String id) {
+    public IntNode getNode(String id) {
         return getNode(id, true);
     }
 
@@ -498,7 +498,7 @@ public class IntModel implements Disposable {
      *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
-    public IntNode getNode(final String id, boolean recursive) {
+    public IntNode getNode(String id, boolean recursive) {
         return getNode(id, recursive, false);
     }
 
@@ -509,7 +509,7 @@ public class IntModel implements Disposable {
      *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
-    public IntNode getNode(final String id, boolean recursive, boolean ignoreCase) {
+    public IntNode getNode(String id, boolean recursive, boolean ignoreCase) {
         return IntNode.getNode(nodes, id, recursive, ignoreCase);
     }
 

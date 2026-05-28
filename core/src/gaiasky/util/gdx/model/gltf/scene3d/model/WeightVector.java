@@ -33,9 +33,7 @@ public class WeightVector {
 		}
 			// throw new GdxRuntimeException("WeightVector out of bound");
 		this.count = weights.count;
-		for(int i=0 ; i<weights.values.length ; i++){
-			values[i] = weights.values[i];
-		}
+        System.arraycopy(weights.values, 0, values, 0, weights.values.length);
 		return this;
 	}
 

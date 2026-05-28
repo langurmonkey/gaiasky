@@ -88,8 +88,8 @@ public class NinePatch {
     public NinePatch(TextureRegion region, int left, int right, int top, int bottom) {
         if (region == null)
             throw new IllegalArgumentException("region cannot be null.");
-        final int middleWidth = region.getRegionWidth() - left - right;
-        final int middleHeight = region.getRegionHeight() - top - bottom;
+        int middleWidth = region.getRegionWidth() - left - right;
+        int middleHeight = region.getRegionHeight() - top - bottom;
 
         TextureRegion[] patches = new TextureRegion[9];
         if (top > 0) {
@@ -242,7 +242,7 @@ public class NinePatch {
     }
 
     private void load(TextureRegion[] patches) {
-        final float color = Color.WHITE_FLOAT_BITS; // placeholder color, overwritten at draw time
+        float color = Color.WHITE_FLOAT_BITS; // placeholder color, overwritten at draw time
 
         if (patches[BOTTOM_LEFT] != null) {
             bottomLeft = add(patches[BOTTOM_LEFT], color, false, false);
@@ -323,7 +323,7 @@ public class NinePatch {
             }
         }
 
-        final float[] vertices = this.vertices;
+        float[] vertices = this.vertices;
 
         vertices[idx + 2] = color;
         vertices[idx + 3] = u;
@@ -347,9 +347,9 @@ public class NinePatch {
 
     /** Set the coordinates and color of a ninth of the patch. */
     private void set(int idx, float x, float y, float width, float height, float color) {
-        final float fx2 = x + width;
-        final float fy2 = y + height;
-        final float[] vertices = this.vertices;
+        float fx2 = x + width;
+        float fy2 = y + height;
+        float[] vertices = this.vertices;
         vertices[idx] = x;
         vertices[idx + 1] = y;
         vertices[idx + 2] = color;
@@ -368,11 +368,11 @@ public class NinePatch {
     }
 
     private void prepareVertices(Batch batch, float x, float y, float width, float height) {
-        final float centerColumnX = x + leftWidth;
-        final float rightColumnX = x + width - rightWidth;
-        final float middleRowY = y + bottomHeight;
-        final float topRowY = y + height - topHeight;
-        final float c = tmpDrawColor.set(color).mul(batch.getColor()).toFloatBits();
+        float centerColumnX = x + leftWidth;
+        float rightColumnX = x + width - rightWidth;
+        float middleRowY = y + bottomHeight;
+        float topRowY = y + height - topHeight;
+        float c = tmpDrawColor.set(color).mul(batch.getColor()).toFloatBits();
 
         if (bottomLeft != -1)
             set(bottomLeft, x, y, centerColumnX - x, middleRowY - y, c);

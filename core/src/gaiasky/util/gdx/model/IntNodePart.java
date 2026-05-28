@@ -43,7 +43,7 @@ public class IntNodePart {
      * @param meshPart The MeshPart to reference.
      * @param material The Material to reference.
      */
-    public IntNodePart(final IntMeshPart meshPart, final Material material) {
+    public IntNodePart(IntMeshPart meshPart, Material material) {
         this.meshPart = meshPart;
         this.material = material;
     }
@@ -58,7 +58,7 @@ public class IntNodePart {
      *
      * @param out The Renderable of which to set the members to the values of this NodePart.
      */
-    public IntRenderable setRenderable(final IntRenderable out) {
+    public IntRenderable setRenderable(IntRenderable out) {
         out.material = material;
         out.meshPart.set(meshPart);
         out.bones = bones;

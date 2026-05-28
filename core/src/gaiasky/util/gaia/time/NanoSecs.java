@@ -25,7 +25,7 @@ public class NanoSecs extends ConcreteDuration {
      *
      * @param ns The amount of nanoseconds.
      */
-    public NanoSecs(final long ns) {
+    public NanoSecs(long ns) {
         this.ns = ns;
     }
 
@@ -34,7 +34,7 @@ public class NanoSecs extends ConcreteDuration {
      *
      * @return nanoSecs expressed in s.
      */
-    static public double asSecs(final long nanoSecs) {
+    static public double asSecs(long nanoSecs) {
         return (double) nanoSecs / (double) Duration.NS_PER_SEC;
     }
 
@@ -43,7 +43,7 @@ public class NanoSecs extends ConcreteDuration {
      *
      * @return nanoSecs expressed in mins
      */
-    static public double asMins(final long nanoSecs) {
+    static public double asMins(long nanoSecs) {
         return (double) nanoSecs / Duration.NS_PER_MIN;
     }
 
@@ -52,7 +52,7 @@ public class NanoSecs extends ConcreteDuration {
      *
      * @return nanoSecs expressed in hours
      */
-    static public double asHours(final long nanoSecs) {
+    static public double asHours(long nanoSecs) {
         return (double) nanoSecs / Duration.NS_PER_HOUR;
     }
 
@@ -61,7 +61,7 @@ public class NanoSecs extends ConcreteDuration {
      *
      * @return nanoSecs expressed in revs
      */
-    static public double asRevs(final long nanoSecs) {
+    static public double asRevs(long nanoSecs) {
         return (double) nanoSecs / Duration.NS_PER_REV;
     }
 
@@ -70,7 +70,7 @@ public class NanoSecs extends ConcreteDuration {
      *
      * @return nanoSecs expressed in days.
      */
-    static public double asDays(final long nanoSecs) {
+    static public double asDays(long nanoSecs) {
         return (double) nanoSecs / Duration.NS_PER_DAY;
     }
 
@@ -79,7 +79,7 @@ public class NanoSecs extends ConcreteDuration {
      *
      * @return nanoSecs expressed in years.
      */
-    static public double asJulianYears(final long nanoSecs) {
+    static public double asJulianYears(long nanoSecs) {
         return (double) nanoSecs / Duration.NS_PER_JULIAN_YEAR;
     }
 
@@ -87,7 +87,7 @@ public class NanoSecs extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#set(Duration)
      */
     @Override
-    public Duration set(final Duration d) {
+    public Duration set(Duration d) {
         this.ns = d.asNanoSecs();
 
         return this;
@@ -163,7 +163,7 @@ public class NanoSecs extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#add(Duration)
      */
     @Override
-    public Duration add(final Duration d) {
+    public Duration add(Duration d) {
         this.ns += d.asNanoSecs();
 
         return this;
@@ -173,7 +173,7 @@ public class NanoSecs extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration sub(final Duration d) {
+    public Duration sub(Duration d) {
         this.ns -= d.asNanoSecs();
 
         return this;

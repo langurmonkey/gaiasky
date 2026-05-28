@@ -104,7 +104,7 @@ public class SceneSkybox implements IntRenderableProvider, Updatable, Disposable
         }
 
         @Override
-        protected IntShader createShader(final IntRenderable renderable) {
+        protected IntShader createShader(IntRenderable renderable) {
             return new SkyboxShader(renderable, config);
         }
     }

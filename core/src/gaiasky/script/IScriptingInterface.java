@@ -266,7 +266,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param a    The alpha component of the color in [0,1].
      */
     void displayImageObject(int id,
-                            final String path,
+                            String path,
                             float x,
                             float y,
                             float r,
@@ -290,7 +290,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @param color The color as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
     void displayImageObject(int id,
-                            final String path,
+                            String path,
                             double x,
                             double y,
                             double[] color);
@@ -360,7 +360,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *
      * @param focusName The name of the new focus object.
      */
-    void setCameraFocusInstant(final String focusName);
+    void setCameraFocusInstant(String focusName);
 
     /**
      * Set the camera in focus mode with the given focus object and instantly moves
@@ -368,7 +368,7 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      *
      * @param focusName The name of the new focus object.
      */
-    void setCameraFocusInstantAndGo(final String focusName);
+    void setCameraFocusInstantAndGo(String focusName);
 
     /**
      * Activates or deactivates the camera lock to the focus reference system
@@ -3445,9 +3445,9 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      *         <code>sync</code> is false.
      */
-    boolean loadDataset(final String dsName,
-                        final String path,
-                        final boolean sync);
+    boolean loadDataset(String dsName,
+                        String path,
+                        boolean sync);
 
     /**
      * Load a VOTable, FITS, CSV or JSON dataset file with the given name.
@@ -3473,11 +3473,11 @@ public sealed interface IScriptingInterface permits EventScriptingInterface {
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      *         <code>sync</code> is false.
      */
-    boolean loadDataset(final String dsName,
-                        final String path,
-                        final DatasetSourceType type,
-                        final DatasetOptions options,
-                        final boolean sync);
+    boolean loadDataset(String dsName,
+                        String path,
+                        DatasetSourceType type,
+                        DatasetOptions options,
+                        boolean sync);
 
     /**
      * Load a star dataset from a VOTable, a CSV or a FITS file.

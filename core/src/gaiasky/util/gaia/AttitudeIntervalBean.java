@@ -19,7 +19,7 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
     public BaseAttitudeDataServer<IAttitude> attitude;
 
     public LruCacheLong<IAttitude> cache;
-    public long hits = 0, misses = 0;
+    public long hits, misses;
 
     public AttitudeIntervalBean(String name,
                                 Instant activationTime,

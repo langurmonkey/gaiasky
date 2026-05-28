@@ -25,7 +25,7 @@ public class ModelInstanceHack extends IntModelInstance {
         super(model, localTransform);
     }
 
-    public ModelInstanceHack(IntModel model, final String... rootNodeIds) {
+    public ModelInstanceHack(IntModel model, String... rootNodeIds) {
         super(model, rootNodeIds);
     }
 
@@ -33,8 +33,8 @@ public class ModelInstanceHack extends IntModelInstance {
         IntAnimation animation = new IntAnimation();
         animation.id = anim.id;
         animation.duration = anim.duration;
-        for (final IntNodeAnimation nanim : anim.nodeAnimations) {
-            final IntNode node = getNode(nanim.node.id);
+        for (IntNodeAnimation nanim : anim.nodeAnimations) {
+            IntNode node = getNode(nanim.node.id);
             if (node == null) continue;
             NodeAnimationHack nodeAnim = new NodeAnimationHack();
             nodeAnim.node = node;
@@ -52,22 +52,22 @@ public class ModelInstanceHack extends IntModelInstance {
             } else {
                 if (nanim.translation != null) {
                     nodeAnim.translation = new Array<>();
-                    for (final NodeKeyframe<Vector3> kf : nanim.translation)
+                    for (NodeKeyframe<Vector3> kf : nanim.translation)
                         nodeAnim.translation.add(new NodeKeyframe<>(kf.keytime, kf.value));
                 }
                 if (nanim.rotation != null) {
                     nodeAnim.rotation = new Array<>();
-                    for (final NodeKeyframe<Quaternion> kf : nanim.rotation)
+                    for (NodeKeyframe<Quaternion> kf : nanim.rotation)
                         nodeAnim.rotation.add(new NodeKeyframe<>(kf.keytime, kf.value));
                 }
                 if (nanim.scaling != null) {
                     nodeAnim.scaling = new Array<>();
-                    for (final NodeKeyframe<Vector3> kf : nanim.scaling)
+                    for (NodeKeyframe<Vector3> kf : nanim.scaling)
                         nodeAnim.scaling.add(new NodeKeyframe<>(kf.keytime, kf.value));
                 }
                 if (((NodeAnimationHack) nanim).weights != null) {
                     ((NodeAnimationHack) nanim).weights = new Array<>();
-                    for (final NodeKeyframe<WeightVector> kf : ((NodeAnimationHack) nanim).weights)
+                    for (NodeKeyframe<WeightVector> kf : ((NodeAnimationHack) nanim).weights)
                         ((NodeAnimationHack) nanim).weights.add(new NodeKeyframe<>(kf.keytime, kf.value));
                 }
             }
@@ -78,7 +78,7 @@ public class ModelInstanceHack extends IntModelInstance {
     }
 
     @Override
-    public IntRenderable getRenderable(final IntRenderable out, final IntNode node, final IntNodePart nodePart) {
+    public IntRenderable getRenderable(IntRenderable out, IntNode node, IntNodePart nodePart) {
         super.getRenderable(out, node, nodePart);
         if (nodePart instanceof NodePartPlus) {
             out.userData = ((NodePartPlus) nodePart).morphTargets;

@@ -186,13 +186,13 @@ public interface VectorDouble<T extends VectorDouble<T>> {
     boolean isUnit();
 
     /** @return Whether this vector is a unit length vector within the given margin. */
-    boolean isUnit(final double margin);
+    boolean isUnit(double margin);
 
     /** @return Whether this vector is a zero vector */
     boolean isZero();
 
     /** @return Whether the length of this vector is smaller than the given margin */
-    boolean isZero(final double margin);
+    boolean isZero(double margin);
 
     /** @return true if this vector is in line with the other vector (either in the same or the opposite direction) */
     boolean isOnLine(T other, double epsilon);

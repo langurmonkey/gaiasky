@@ -15,8 +15,8 @@ import java.util.Random;
 
 public class Place {
 
-    protected Vector3D dirICRS = null;
-    protected boolean haveAngles = false;
+    protected Vector3D dirICRS;
+    protected boolean haveAngles;
     protected double alpha;
     protected double delta;
 

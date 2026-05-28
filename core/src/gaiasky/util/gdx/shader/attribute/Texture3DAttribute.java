@@ -23,25 +23,25 @@ public class Texture3DAttribute extends Attribute {
     public final static int Volume3 = register(Volume3Alias);
 
     public final TextureDescriptor<Texture3D> textureDescription;
-    public float offsetU = 0;
-    public float offsetV = 0;
-    public float offsetW = 0;
+    public float offsetU;
+    public float offsetV;
+    public float offsetW;
     public float scaleU = 1;
     public float scaleV = 1;
     public float scaleW = 1;
 
-    public Texture3DAttribute(final int index) {
+    public Texture3DAttribute(int index) {
         super(index);
         textureDescription = new TextureDescriptor<>();
     }
 
-    public <T extends Texture3D> Texture3DAttribute(final int index, final TextureDescriptor<T> textureDescription) {
+    public <T extends Texture3D> Texture3DAttribute(int index, TextureDescriptor<T> textureDescription) {
         this(index);
         this.textureDescription.set(textureDescription);
     }
 
-    public <T extends Texture3D> Texture3DAttribute(final int index, final TextureDescriptor<T> textureDescription, float offsetU,
-                                                  float offsetV, float offsetW, float scaleU, float scaleV, float scaleW) {
+    public <T extends Texture3D> Texture3DAttribute(int index, TextureDescriptor<T> textureDescription, float offsetU,
+                                                    float offsetV, float offsetW, float scaleU, float scaleV, float scaleW) {
         this(index, textureDescription);
         this.offsetU = offsetU;
         this.offsetV = offsetV;
@@ -52,12 +52,12 @@ public class Texture3DAttribute extends Attribute {
     }
 
 
-    public Texture3DAttribute(final int index, final Texture3D texture) {
+    public Texture3DAttribute(int index, Texture3D texture) {
         this(index);
         textureDescription.texture = texture;
     }
 
-    public Texture3DAttribute(final Texture3DAttribute copyFrom) {
+    public Texture3DAttribute(Texture3DAttribute copyFrom) {
         this(copyFrom.index,
              copyFrom.textureDescription,
              copyFrom.offsetU,
@@ -91,7 +91,7 @@ public class Texture3DAttribute extends Attribute {
         if (index != o.index)
             return index < o.index ? -1 : 1;
         Texture3DAttribute other = (Texture3DAttribute) o;
-        final int c = textureDescription.compareTo(other.textureDescription);
+        int c = textureDescription.compareTo(other.textureDescription);
         if (c != 0)
             return c;
         if (!MathUtils.isEqual(scaleU, other.scaleU))

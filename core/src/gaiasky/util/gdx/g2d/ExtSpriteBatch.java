@@ -36,23 +36,23 @@ public class ExtSpriteBatch implements ExtBatch {
     private final ExtShaderProgram shader;
     private final Color color = new Color(1, 1, 1, 1);
     /** Number of render calls since the last {@link #begin()}. **/
-    public int renderCalls = 0;
+    public int renderCalls;
     /** Number of rendering calls, ever. Will not be reset unless set manually. **/
-    public int totalRenderCalls = 0;
+    public int totalRenderCalls;
     /** The maximum number of sprites rendered in one batch so far. **/
-    public int maxSpritesInBatch = 0;
-    int idx = 0;
-    Texture lastTexture = null;
-    TextureView lastTextureView = null;
-    float invTexWidth = 0, invTexHeight = 0;
-    boolean drawing = false;
+    public int maxSpritesInBatch;
+    int idx;
+    Texture lastTexture;
+    TextureView lastTextureView;
+    float invTexWidth, invTexHeight;
+    boolean drawing;
     float colorPacked = Color.WHITE_FLOAT_BITS;
-    private boolean blendingDisabled = false;
+    private boolean blendingDisabled;
     private int blendSrcFunc = GL20.GL_SRC_ALPHA;
     private int blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
     private int blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
     private int blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
-    private ExtShaderProgram customShader = null;
+    private ExtShaderProgram customShader;
     private boolean ownsShader;
 
     /**
@@ -234,8 +234,8 @@ public class ExtSpriteBatch implements ExtBatch {
             flush();
 
         // bottom left and top right corner points relative to origin
-        final float worldOriginX = x + originX;
-        final float worldOriginY = y + originY;
+        float worldOriginX = x + originX;
+        float worldOriginY = y + originY;
         float fx = -originX;
         float fy = -originY;
         float fx2 = width - originX;
@@ -250,14 +250,14 @@ public class ExtSpriteBatch implements ExtBatch {
         }
 
         // construct corner points, start from top left and go counter clockwise
-        final float p1x = fx;
-        final float p1y = fy;
-        final float p2x = fx;
-        final float p2y = fy2;
-        final float p3x = fx2;
-        final float p3y = fy2;
-        final float p4x = fx2;
-        final float p4y = fy;
+        float p1x = fx;
+        float p1y = fy;
+        float p2x = fx;
+        float p2y = fy2;
+        float p3x = fx2;
+        float p3y = fy2;
+        float p4x = fx2;
+        float p4y = fy;
 
         float x1;
         float y1;
@@ -270,8 +270,8 @@ public class ExtSpriteBatch implements ExtBatch {
 
         // rotate
         if (rotation != 0) {
-            final float cos = MathUtils.cosDeg(rotation);
-            final float sin = MathUtils.sinDeg(rotation);
+            float cos = MathUtils.cosDeg(rotation);
+            float sin = MathUtils.sinDeg(rotation);
 
             x1 = cos * p1x - sin * p1y;
             y1 = sin * p1x + cos * p1y;
@@ -368,8 +368,8 @@ public class ExtSpriteBatch implements ExtBatch {
         float v = (srcY + srcHeight) * invTexHeight;
         float u2 = (srcX + srcWidth) * invTexWidth;
         float v2 = srcY * invTexHeight;
-        final float fx2 = x + width;
-        final float fy2 = y + height;
+        float fx2 = x + width;
+        float fy2 = y + height;
 
         if (flipX) {
             float tmp = u;
@@ -427,8 +427,8 @@ public class ExtSpriteBatch implements ExtBatch {
         float v = (srcY + srcHeight) * invTexHeight;
         float u2 = (srcX + srcWidth) * invTexWidth;
         float v2 = srcY * invTexHeight;
-        final float fx2 = x + width;
-        final float fy2 = y + height;
+        float fx2 = x + width;
+        float fy2 = y + height;
 
         if (flipX) {
             float tmp = u;
@@ -481,12 +481,12 @@ public class ExtSpriteBatch implements ExtBatch {
         else if (idx == vertices.length) //
             flush();
 
-        final float u = srcX * invTexWidth;
-        final float v = (srcY + srcHeight) * invTexHeight;
-        final float u2 = (srcX + srcWidth) * invTexWidth;
-        final float v2 = srcY * invTexHeight;
-        final float fx2 = x + srcWidth;
-        final float fy2 = y + srcHeight;
+        float u = srcX * invTexWidth;
+        float v = (srcY + srcHeight) * invTexHeight;
+        float u2 = (srcX + srcWidth) * invTexWidth;
+        float v2 = srcY * invTexHeight;
+        float fx2 = x + srcWidth;
+        float fy2 = y + srcHeight;
 
         float color = this.colorPacked;
         int idx = this.idx;
@@ -527,8 +527,8 @@ public class ExtSpriteBatch implements ExtBatch {
         else if (idx == vertices.length) //
             flush();
 
-        final float fx2 = x + width;
-        final float fy2 = y + height;
+        float fx2 = x + width;
+        float fy2 = y + height;
 
         float color = this.colorPacked;
         int idx = this.idx;
@@ -573,8 +573,8 @@ public class ExtSpriteBatch implements ExtBatch {
         else if (idx == vertices.length) //
             flush();
 
-        final float fx2 = x + width;
-        final float fy2 = y + height;
+        float fx2 = x + width;
+        float fy2 = y + height;
         final float u = 0;
         final float v = 1;
         final float u2 = 1;
@@ -654,12 +654,12 @@ public class ExtSpriteBatch implements ExtBatch {
         } else if (idx == vertices.length) //
             flush();
 
-        final float fx2 = x + width;
-        final float fy2 = y + height;
-        final float u = region.u;
-        final float v = region.v2;
-        final float u2 = region.u2;
-        final float v2 = region.v;
+        float fx2 = x + width;
+        float fy2 = y + height;
+        float u = region.u;
+        float v = region.v2;
+        float u2 = region.u2;
+        float v2 = region.v;
 
         float color = this.colorPacked;
         int idx = this.idx;
@@ -703,8 +703,8 @@ public class ExtSpriteBatch implements ExtBatch {
             flush();
 
         // bottom left and top right corner points relative to origin
-        final float worldOriginX = x + originX;
-        final float worldOriginY = y + originY;
+        float worldOriginX = x + originX;
+        float worldOriginY = y + originY;
         float fx = -originX;
         float fy = -originY;
         float fx2 = width - originX;
@@ -719,14 +719,14 @@ public class ExtSpriteBatch implements ExtBatch {
         }
 
         // construct corner points, start from top left and go counter clockwise
-        final float p1x = fx;
-        final float p1y = fy;
-        final float p2x = fx;
-        final float p2y = fy2;
-        final float p3x = fx2;
-        final float p3y = fy2;
-        final float p4x = fx2;
-        final float p4y = fy;
+        float p1x = fx;
+        float p1y = fy;
+        float p2x = fx;
+        float p2y = fy2;
+        float p3x = fx2;
+        float p3y = fy2;
+        float p4x = fx2;
+        float p4y = fy;
 
         float x1;
         float y1;
@@ -739,8 +739,8 @@ public class ExtSpriteBatch implements ExtBatch {
 
         // rotate
         if (rotation != 0) {
-            final float cos = MathUtils.cosDeg(rotation);
-            final float sin = MathUtils.sinDeg(rotation);
+            float cos = MathUtils.cosDeg(rotation);
+            float sin = MathUtils.sinDeg(rotation);
 
             x1 = cos * p1x - sin * p1y;
             y1 = sin * p1x + cos * p1y;
@@ -776,10 +776,10 @@ public class ExtSpriteBatch implements ExtBatch {
         x4 += worldOriginX;
         y4 += worldOriginY;
 
-        final float u = region.u;
-        final float v = region.v2;
-        final float u2 = region.u2;
-        final float v2 = region.v;
+        float u = region.u;
+        float v = region.v2;
+        float u2 = region.u2;
+        float v2 = region.v;
 
         float color = this.colorPacked;
         int idx = this.idx;
@@ -823,8 +823,8 @@ public class ExtSpriteBatch implements ExtBatch {
             flush();
 
         // bottom left and top right corner points relative to origin
-        final float worldOriginX = x + originX;
-        final float worldOriginY = y + originY;
+        float worldOriginX = x + originX;
+        float worldOriginY = y + originY;
         float fx = -originX;
         float fy = -originY;
         float fx2 = width - originX;
@@ -839,14 +839,14 @@ public class ExtSpriteBatch implements ExtBatch {
         }
 
         // construct corner points, start from top left and go counter clockwise
-        final float p1x = fx;
-        final float p1y = fy;
-        final float p2x = fx;
-        final float p2y = fy2;
-        final float p3x = fx2;
-        final float p3y = fy2;
-        final float p4x = fx2;
-        final float p4y = fy;
+        float p1x = fx;
+        float p1y = fy;
+        float p2x = fx;
+        float p2y = fy2;
+        float p3x = fx2;
+        float p3y = fy2;
+        float p4x = fx2;
+        float p4y = fy;
 
         float x1;
         float y1;
@@ -859,8 +859,8 @@ public class ExtSpriteBatch implements ExtBatch {
 
         // rotate
         if (rotation != 0) {
-            final float cos = MathUtils.cosDeg(rotation);
-            final float sin = MathUtils.sinDeg(rotation);
+            float cos = MathUtils.cosDeg(rotation);
+            float sin = MathUtils.sinDeg(rotation);
 
             x1 = cos * p1x - sin * p1y;
             y1 = sin * p1x + cos * p1y;

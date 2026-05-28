@@ -47,7 +47,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     /** APIv2 object reference. This is the gateway to access the methods and calls in APIv2. **/
     public final APIv2 apiv2;
 
-    public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
+    public EventScriptingInterface(AssetManager manager, CatalogManager catalogManager) {
         this.em = EventManager.instance;
         this.apiv2 = new APIv2(manager, catalogManager);
     }
@@ -103,12 +103,12 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setHeadlineMessage(final String headline) {
+    public void setHeadlineMessage(String headline) {
         apiv2.ui.set_headline_message(headline);
     }
 
     @Override
-    public void setSubheadMessage(final String subhead) {
+    public void setSubheadMessage(String subhead) {
         apiv2.ui.set_subhead_message(subhead);
     }
 
@@ -143,39 +143,39 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setCameraFocus(final String focusName) {
+    public void setCameraFocus(String focusName) {
         apiv2.camera.focus_mode(focusName);
     }
 
     @Override
-    public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
+    public void setCameraFocus(String focusName, float waitTimeSeconds) {
         apiv2.camera.focus_mode(focusName, waitTimeSeconds);
     }
 
-    public void setCameraFocus(final String focusName, final int waitTimeSeconds) {
+    public void setCameraFocus(String focusName, int waitTimeSeconds) {
         apiv2.camera.focus_mode(focusName, waitTimeSeconds);
     }
 
-    public void setCameraFocus(final Entity entity, final float waitTimeSeconds) {
+    public void setCameraFocus(Entity entity, float waitTimeSeconds) {
         apiv2.camera.focus_mode(entity, waitTimeSeconds);
     }
 
     @Override
-    public void setCameraFocusInstant(final String focusName) {
+    public void setCameraFocusInstant(String focusName) {
         apiv2.camera.focus_mode_instant(focusName);
     }
 
     @Override
-    public void setCameraFocusInstantAndGo(final String focusName) {
+    public void setCameraFocusInstantAndGo(String focusName) {
         apiv2.camera.focus_mode_instant_go(focusName);
     }
 
-    public void setCameraFocusInstantAndGo(final String focusName, final boolean sleep) {
+    public void setCameraFocusInstantAndGo(String focusName, boolean sleep) {
         apiv2.camera.focus_mode_instant_go(focusName, sleep);
     }
 
     @Override
-    public void setCameraLock(final boolean lock) {
+    public void setCameraLock(boolean lock) {
         apiv2.camera.set_focus_lock(lock);
     }
 
@@ -190,7 +190,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setCameraPostion(final double[] vec) {
+    public void setCameraPostion(double[] vec) {
         apiv2.camera.set_position(vec);
     }
 
@@ -214,7 +214,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.camera.set_position(x, y, z, units, immediate);
     }
 
-    public void setCameraPosition(final List<?> vec, boolean immediate) {
+    public void setCameraPosition(List<?> vec, boolean immediate) {
         apiv2.camera.set_position(vec, immediate);
     }
 
@@ -243,7 +243,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setCameraPosition(final double[] position) {
+    public void setCameraPosition(double[] position) {
         apiv2.camera.set_position(position);
     }
 
@@ -252,15 +252,15 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.camera.set_position(position, units);
     }
 
-    public void setCameraPosition(final List<?> vec) {
+    public void setCameraPosition(List<?> vec) {
         apiv2.camera.set_position(vec);
     }
 
-    public void setCameraPosition(final List<?> vec, String units) {
+    public void setCameraPosition(List<?> vec, String units) {
         apiv2.camera.set_position(vec, units);
     }
 
-    public void setCameraDirection(final List<?> dir, final boolean immediate) {
+    public void setCameraDirection(List<?> dir, boolean immediate) {
         apiv2.camera.set_direction(dir, immediate);
     }
 
@@ -275,7 +275,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setCameraDirection(final double[] direction) {
+    public void setCameraDirection(double[] direction) {
         apiv2.camera.set_direction(direction);
     }
 
@@ -289,16 +289,16 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.camera.set_direction_galactic(l, b);
     }
 
-    public void setCameraDirection(final List<?> dir) {
+    public void setCameraDirection(List<?> dir) {
         apiv2.camera.set_direction(dir);
     }
 
-    public void setCameraUp(final List<?> up, final boolean immediate) {
+    public void setCameraUp(List<?> up, boolean immediate) {
         apiv2.camera.set_up(up, immediate);
     }
 
     @Override
-    public void setCameraUp(final double[] up, final boolean immediate) {
+    public void setCameraUp(double[] up, boolean immediate) {
         apiv2.camera.set_up(up, immediate);
     }
 
@@ -308,11 +308,11 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setCameraUp(final double[] up) {
+    public void setCameraUp(double[] up) {
         apiv2.camera.set_up(up);
     }
 
-    public void setCameraUp(final List<?> up) {
+    public void setCameraUp(List<?> up) {
         apiv2.camera.set_up(up);
     }
 
@@ -354,11 +354,11 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setCameraSpeed(final float speed) {
+    public void setCameraSpeed(float speed) {
         apiv2.camera.interactive.speed_setting(speed);
     }
 
-    public void setCameraSpeed(final int speed) {
+    public void setCameraSpeed(int speed) {
         apiv2.camera.interactive.speed_setting(speed);
     }
 
@@ -367,16 +367,16 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
-    public void setCameraRotationSpeed(final int speed) {
+    public void setCameraRotationSpeed(int speed) {
         apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
     @Override
-    public void setRotationCameraSpeed(final float speed) {
+    public void setRotationCameraSpeed(float speed) {
         apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
-    public void setRotationCameraSpeed(final int speed) {
+    public void setRotationCameraSpeed(int speed) {
         apiv2.camera.interactive.rotation_speed_setting(speed);
     }
 
@@ -385,16 +385,16 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
-    public void setCameraTurningSpeed(final int speed) {
+    public void setCameraTurningSpeed(int speed) {
         apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
     @Override
-    public void setTurningCameraSpeed(final float speed) {
+    public void setTurningCameraSpeed(float speed) {
         apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
-    public void setTurningCameraSpeed(final int speed) {
+    public void setTurningCameraSpeed(int speed) {
         apiv2.camera.interactive.turning_speed_setting(speed);
     }
 
@@ -419,68 +419,68 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void cameraForward(final double value) {
+    public void cameraForward(double value) {
         apiv2.camera.interactive.add_forward(value);
     }
 
-    public void cameraForward(final long value) {
+    public void cameraForward(long value) {
         apiv2.camera.interactive.add_forward(value);
     }
 
     @Override
-    public void cameraRotate(final double deltaX, final double deltaY) {
+    public void cameraRotate(double deltaX, double deltaY) {
         apiv2.camera.interactive.add_rotation(deltaX, deltaY);
     }
 
-    public void cameraRotate(final double deltaX, final long deltaY) {
+    public void cameraRotate(double deltaX, long deltaY) {
         apiv2.camera.interactive.add_rotation(deltaX, deltaY);
     }
 
-    public void cameraRotate(final long deltaX, final double deltaY) {
+    public void cameraRotate(long deltaX, double deltaY) {
         apiv2.camera.interactive.add_rotation(deltaX, deltaY);
     }
 
     @Override
-    public void cameraRoll(final double roll) {
+    public void cameraRoll(double roll) {
         apiv2.camera.interactive.add_roll(roll);
     }
 
-    public void cameraRoll(final long roll) {
+    public void cameraRoll(long roll) {
         apiv2.camera.interactive.add_roll(roll);
     }
 
     @Override
-    public void cameraTurn(final double deltaX, final double deltaY) {
+    public void cameraTurn(double deltaX, double deltaY) {
         apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
-    public void cameraTurn(final double deltaX, final long deltaY) {
+    public void cameraTurn(double deltaX, long deltaY) {
         apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
-    public void cameraTurn(final long deltaX, final double deltaY) {
+    public void cameraTurn(long deltaX, double deltaY) {
         apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
-    public void cameraTurn(final long deltaX, final long deltaY) {
+    public void cameraTurn(long deltaX, long deltaY) {
         apiv2.camera.interactive.add_turn(deltaX, deltaY);
     }
 
     @Override
-    public void cameraYaw(final double amount) {
+    public void cameraYaw(double amount) {
         apiv2.camera.interactive.add_yaw(amount);
     }
 
-    public void cameraYaw(final long amount) {
+    public void cameraYaw(long amount) {
         apiv2.camera.interactive.add_yaw(amount);
     }
 
     @Override
-    public void cameraPitch(final double amount) {
+    public void cameraPitch(double amount) {
         apiv2.camera.interactive.add_pitch(amount);
     }
 
-    public void cameraPitch(final long amount) {
+    public void cameraPitch(long amount) {
         apiv2.camera.interactive.add_pitch(amount);
     }
 
@@ -501,7 +501,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setFov(final float newFov) {
+    public void setFov(float newFov) {
         apiv2.camera.set_fov(newFov);
     }
 
@@ -510,12 +510,12 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         return apiv2.camera.get_fov();
     }
 
-    public void setFov(final int newFov) {
+    public void setFov(int newFov) {
         apiv2.camera.set_fov(newFov);
     }
 
     @Override
-    public void setVisibility(final String key, final boolean visible) {
+    public void setVisibility(String key, boolean visible) {
         apiv2.scene.set_component_type_visibility(key, visible);
     }
 
@@ -593,7 +593,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         apiv2.scene.set_label_color(name, color);
     }
 
-    public void setLabelColor(String name, final List<?> color) {
+    public void setLabelColor(String name, List<?> color) {
         apiv2.scene.set_label_color(name, color);
     }
 
@@ -603,7 +603,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setLineWidthFactor(final float factor) {
+    public void setLineWidthFactor(float factor) {
         apiv2.scene.set_line_width_factor(factor);
     }
 
@@ -679,11 +679,11 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setAmbientLight(final float value) {
+    public void setAmbientLight(float value) {
         apiv2.graphics.set_ambient_light(value);
     }
 
-    public void setAmbientLight(final int value) {
+    public void setAmbientLight(int value) {
         apiv2.graphics.set_ambient_light(value);
     }
 
@@ -693,7 +693,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setSimulationTime(final long time) {
+    public void setSimulationTime(long time) {
         apiv2.time.set_clock(time);
     }
 
@@ -723,20 +723,20 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setSimulationPace(final double warp) {
+    public void setSimulationPace(double warp) {
         apiv2.time.set_time_warp(warp);
     }
 
-    public void setSimulationPace(final long warp) {
+    public void setSimulationPace(long warp) {
         apiv2.time.set_time_warp(warp);
     }
 
     @Override
-    public void setTimeWarp(final double warp) {
+    public void setTimeWarp(double warp) {
         apiv2.time.set_time_warp(warp);
     }
 
-    public void setTimeWarp(final long warp) {
+    public void setTimeWarp(long warp) {
         apiv2.time.set_time_warp(warp);
     }
 
@@ -771,11 +771,11 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setStarBrightness(final float brightness) {
+    public void setStarBrightness(float brightness) {
         apiv2.graphics.set_star_brightness(brightness);
     }
 
-    public void setStarBrightness(final int brightness) {
+    public void setStarBrightness(int brightness) {
         apiv2.graphics.set_star_brightness(brightness);
     }
 
@@ -790,16 +790,16 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setPointSize(final float size) {
+    public void setPointSize(float size) {
         apiv2.graphics.set_point_size(size);
     }
 
     @Override
-    public void setStarSize(final float size) {
+    public void setStarSize(float size) {
         apiv2.graphics.set_point_size(size);
     }
 
-    public void setStarSize(final int size) {
+    public void setStarSize(int size) {
         apiv2.graphics.set_point_size(size);
     }
 
@@ -1236,13 +1236,13 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setGuiScrollPosition(final float pixelY) {
+    public void setGuiScrollPosition(float pixelY) {
         // This is removed from APIv2
         postRunnable(() -> em.post(Event.GUI_SCROLL_POSITION_CMD, this, pixelY));
 
     }
 
-    public void setGuiScrollPosition(final int pixelY) {
+    public void setGuiScrollPosition(int pixelY) {
         // This is removed from APIv2
         setGuiScrollPosition((float) pixelY);
     }
@@ -1263,96 +1263,96 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void displayMessageObject(final int id,
-                                     final String message,
-                                     final float x,
-                                     final float y,
-                                     final float r,
-                                     final float g,
-                                     final float b,
-                                     final float a,
-                                     final float fontSize) {
+    public void displayMessageObject(int id,
+                                     String message,
+                                     float x,
+                                     float y,
+                                     float r,
+                                     float g,
+                                     float b,
+                                     float a,
+                                     float fontSize) {
         apiv2.ui.display_message(id, message, x, y, r, g, b, a, fontSize);
     }
 
     @Override
-    public void displayMessageObject(final int id,
-                                     final String message,
-                                     final double x,
-                                     final double y,
-                                     final double[] color,
-                                     final double fontSize) {
+    public void displayMessageObject(int id,
+                                     String message,
+                                     double x,
+                                     double y,
+                                     double[] color,
+                                     double fontSize) {
         apiv2.ui.display_message(id, message, x, y, color, fontSize);
     }
 
-    public void displayMessageObject(final int id, final String message, final double x, final double y, final List<?> color, final double fontSize) {
+    public void displayMessageObject(int id, String message, double x, double y, List<?> color, double fontSize) {
         apiv2.ui.display_message(id, message, x, y, color, fontSize);
     }
 
-    public void displayMessageObject(final int id,
-                                     final String message,
-                                     final float x,
-                                     final float y,
-                                     final float r,
-                                     final float g,
-                                     final float b,
-                                     final float a,
-                                     final int fontSize) {
+    public void displayMessageObject(int id,
+                                     String message,
+                                     float x,
+                                     float y,
+                                     float r,
+                                     float g,
+                                     float b,
+                                     float a,
+                                     int fontSize) {
         apiv2.ui.display_message(id, message, x, y, r, g, b, a, fontSize);
     }
 
     @Override
-    public void displayTextObject(final int id,
-                                  final String text,
-                                  final float x,
-                                  final float y,
-                                  final float maxWidth,
-                                  final float maxHeight,
-                                  final float r,
-                                  final float g,
-                                  final float b,
-                                  final float a,
-                                  final float fontSize) {
+    public void displayTextObject(int id,
+                                  String text,
+                                  float x,
+                                  float y,
+                                  float maxWidth,
+                                  float maxHeight,
+                                  float r,
+                                  float g,
+                                  float b,
+                                  float a,
+                                  float fontSize) {
         apiv2.ui.display_text(id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize);
     }
 
-    public void displayTextObject(final int id,
-                                  final String text,
-                                  final float x,
-                                  final float y,
-                                  final float maxWidth,
-                                  final float maxHeight,
-                                  final float r,
-                                  final float g,
-                                  final float b,
-                                  final float a,
-                                  final int fontSize) {
+    public void displayTextObject(int id,
+                                  String text,
+                                  float x,
+                                  float y,
+                                  float maxWidth,
+                                  float maxHeight,
+                                  float r,
+                                  float g,
+                                  float b,
+                                  float a,
+                                  int fontSize) {
         apiv2.ui.display_text(id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize);
     }
 
     @Override
-    public void displayImageObject(final int id,
-                                   final String path,
-                                   final float x,
-                                   final float y,
-                                   final float r,
-                                   final float g,
-                                   final float b,
-                                   final float a) {
+    public void displayImageObject(int id,
+                                   String path,
+                                   float x,
+                                   float y,
+                                   float r,
+                                   float g,
+                                   float b,
+                                   float a) {
         apiv2.ui.display_image(id, path, x, y, r, g, b, a);
     }
 
     @Override
-    public void displayImageObject(final int id, final String path, final double x, final double y, final double[] color) {
+    public void displayImageObject(int id, String path, double x, double y, double[] color) {
         apiv2.ui.display_image(id, path, x, y, color);
     }
 
-    public void displayImageObject(final int id, final String path, final double x, final double y, final List<?> color) {
+    public void displayImageObject(int id, String path, double x, double y, List<?> color) {
         apiv2.ui.display_image(id, path, x, y, color);
     }
 
     @Override
-    public void displayImageObject(final int id, final String path, final float x, final float y) {
+    public void displayImageObject(int id, String path, float x, float y) {
         apiv2.ui.display_image(id, path, x, y);
     }
 
@@ -1362,16 +1362,16 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void removeObject(final int id) {
+    public void removeObject(int id) {
         apiv2.ui.remove_object(id);
     }
 
     @Override
-    public void removeObjects(final int[] ids) {
+    public void removeObjects(int[] ids) {
         apiv2.ui.remove_objects(ids);
     }
 
-    public void removeObjects(final List<?> ids) {
+    public void removeObjects(List<?> ids) {
         apiv2.ui.remove_objects(ids);
     }
 
@@ -1408,22 +1408,22 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     }
 
     @Override
-    public void setGuiPosition(final float x, final float y) {
+    public void setGuiPosition(float x, float y) {
         // Removed in APIv2
         postRunnable(() -> em.post(Event.GUI_MOVE_CMD, this, x, y));
     }
 
-    public void setGuiPosition(final int x, final int y) {
+    public void setGuiPosition(int x, int y) {
         // Removed in APIv2
         setGuiPosition((float) x, (float) y);
     }
 
-    public void setGuiPosition(final float x, final int y) {
+    public void setGuiPosition(float x, int y) {
         // Removed in APIv2
         setGuiPosition(x, (float) y);
     }
 
-    public void setGuiPosition(final int x, final float y) {
+    public void setGuiPosition(int x, float y) {
         // Removed in APIv2
         setGuiPosition((float) x, y);
     }
@@ -1892,7 +1892,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         return apiv2.refsys.equatorial_cartesian_to_internal(eq, kmFactor);
     }
 
-    public double[] equatorialCartesianToInternalCartesian(final List<?> eq, double kmFactor) {
+    public double[] equatorialCartesianToInternalCartesian(List<?> eq, double kmFactor) {
         return apiv2.refsys.equatorial_cartesian_to_internal(eq, kmFactor);
     }
 
@@ -2334,7 +2334,7 @@ public final class EventScriptingInterface implements IScriptingInterface  {
         return apiv2.data.load_star_dataset(dsName, path, magnitudeScale, labelColor, sync);
     }
 
-    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, List<?> labelColor, boolean sync) {
         return apiv2.data.load_star_dataset(dsName, path, magnitudeScale, labelColor, sync);
     }
 
@@ -2358,9 +2358,9 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     public boolean loadStarDataset(String dsName,
                                    String path,
                                    double magnitudeScale,
-                                   final List<?> labelColor,
-                                   final List<?> fadeIn,
-                                   final List<?> fadeOut,
+                                   List<?> labelColor,
+                                   List<?> fadeIn,
+                                   List<?> fadeOut,
                                    boolean sync) {
         return apiv2.data.load_star_dataset(dsName,
                                             path,
@@ -2458,13 +2458,13 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     public boolean loadParticleDataset(String dsName,
                                        String path,
                                        double profileDecay,
-                                       final List<?> particleColor,
+                                       List<?> particleColor,
                                        double colorNoise,
-                                       final List<?> labelColor,
+                                       List<?> labelColor,
                                        double particleSize,
                                        String ct,
-                                       final List<?> fadeIn,
-                                       final List<?> fadeOut,
+                                       List<?> fadeIn,
+                                       List<?> fadeOut,
                                        boolean sync) {
         return apiv2.data.load_particle_dataset(dsName,
                                                 path,
@@ -2509,14 +2509,14 @@ public final class EventScriptingInterface implements IScriptingInterface  {
     public boolean loadParticleDataset(String dsName,
                                        String path,
                                        double profileDecay,
-                                       final List<?> particleColor,
+                                       List<?> particleColor,
                                        double colorNoise,
-                                       final List<?> labelColor,
+                                       List<?> labelColor,
                                        double particleSize,
                                        List<?> sizeLimits,
                                        String ct,
-                                       final List<?> fadeIn,
-                                       final List<?> fadeOut,
+                                       List<?> fadeIn,
+                                       List<?> fadeOut,
                                        boolean sync) {
         return apiv2.data.load_particle_dataset(dsName,
                                                 path,

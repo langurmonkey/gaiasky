@@ -20,7 +20,7 @@ public class VertexArray implements IntVertexData {
     final VertexAttributes attributes;
     final FloatBuffer buffer;
     final ByteBuffer byteBuffer;
-    boolean isBound = false;
+    boolean isBound;
 
     /**
      * Constructs a new interleaved VertexArray
@@ -74,25 +74,25 @@ public class VertexArray implements IntVertexData {
 
     @Override
     public void updateVertices(int targetOffset, float[] vertices, int sourceOffset, int count) {
-        final int pos = byteBuffer.position();
+        int pos = byteBuffer.position();
         byteBuffer.position(targetOffset * 4);
         BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
         byteBuffer.position(pos);
     }
 
     @Override
-    public void bind(final ExtShaderProgram shader) {
+    public void bind(ExtShaderProgram shader) {
         bind(shader, null);
     }
 
     @Override
-    public void bind(final ExtShaderProgram shader, final int[] locations) {
-        final int numAttributes = attributes.size();
+    public void bind(ExtShaderProgram shader, int[] locations) {
+        int numAttributes = attributes.size();
         byteBuffer.limit(buffer.limit() * 4);
         if (locations == null) {
             for (int i = 0; i < numAttributes; i++) {
-                final VertexAttribute attribute = attributes.get(i);
-                final int location = shader.getAttributeLocation(attribute.alias);
+                VertexAttribute attribute = attributes.get(i);
+                int location = shader.getAttributeLocation(attribute.alias);
                 if (location < 0)
                     continue;
                 shader.enableVertexAttribute(location);
@@ -109,8 +109,8 @@ public class VertexArray implements IntVertexData {
             }
         } else {
             for (int i = 0; i < numAttributes; i++) {
-                final VertexAttribute attribute = attributes.get(i);
-                final int location = locations[i];
+                VertexAttribute attribute = attributes.get(i);
+                int location = locations[i];
                 if (location < 0)
                     continue;
                 shader.enableVertexAttribute(location);
@@ -141,14 +141,14 @@ public class VertexArray implements IntVertexData {
 
     @Override
     public void unbind(ExtShaderProgram shader, int[] locations) {
-        final int numAttributes = attributes.size();
+        int numAttributes = attributes.size();
         if (locations == null) {
             for (int i = 0; i < numAttributes; i++) {
                 shader.disableVertexAttribute(attributes.get(i).alias);
             }
         } else {
             for (int i = 0; i < numAttributes; i++) {
-                final int location = locations[i];
+                int location = locations[i];
                 if (location >= 0)
                     shader.disableVertexAttribute(location);
             }

@@ -22,7 +22,7 @@ public class Days extends ConcreteDuration {
      *
      * @param days number of days
      */
-    public Days(final double days) {
+    public Days(double days) {
         value = days;
     }
 
@@ -31,7 +31,7 @@ public class Days extends ConcreteDuration {
      *
      * @return days expressed in nanoSec
      */
-    public static long asNanoSecs(final double days) {
+    public static long asNanoSecs(double days) {
         return FastMath.round(days * Duration.NS_PER_DAY);
     }
 
@@ -40,7 +40,7 @@ public class Days extends ConcreteDuration {
      *
      * @return days expressed in sec
      */
-    public static double asSecs(final double days) {
+    public static double asSecs(double days) {
         return days * Duration.SECS_PER_DAY;
     }
 
@@ -49,7 +49,7 @@ public class Days extends ConcreteDuration {
      *
      * @return days expressed in mins
      */
-    public static double asMins(final double days) {
+    public static double asMins(double days) {
         return days * Duration.MINS_PER_DAY;
     }
 
@@ -58,7 +58,7 @@ public class Days extends ConcreteDuration {
      *
      * @return days expressed in revolutions
      */
-    public static double asRevs(final double days) {
+    public static double asRevs(double days) {
         return days * Duration.REVS_PER_DAY;
     }
 
@@ -67,7 +67,7 @@ public class Days extends ConcreteDuration {
      *
      * @return days expressed in hours
      */
-    public static double asHours(final double days) {
+    public static double asHours(double days) {
         return days * Duration.HOURS_PER_DAY;
     }
 
@@ -76,7 +76,7 @@ public class Days extends ConcreteDuration {
      *
      * @return days expressed in julian years
      */
-    public static double asJulianYears(final double days) {
+    public static double asJulianYears(double days) {
         return days / Duration.DAYS_PER_JULIAN_YEAR;
     }
 
@@ -88,7 +88,7 @@ public class Days extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#set(Duration)
      */
     @Override
-    public Duration set(final Duration d) {
+    public Duration set(Duration d) {
         value = d.asDays();
 
         return this;
@@ -184,7 +184,7 @@ public class Days extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration add(final Duration d) {
+    public Duration add(Duration d) {
         value += d.asDays();
 
         return this;
@@ -198,7 +198,7 @@ public class Days extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration sub(final Duration d) {
+    public Duration sub(Duration d) {
         value -= d.asDays();
 
         return this;

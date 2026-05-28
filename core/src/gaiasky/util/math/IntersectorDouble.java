@@ -31,14 +31,14 @@ public class IntersectorDouble {
     public static boolean intersectRayBoundsFast(RayDouble ray,
                                                  Vector3D center,
                                                  Vector3D dimensions) {
-        final double divX = 1f / ray.direction.x;
-        final double divY = 1f / ray.direction.y;
-        final double divZ = 1f / ray.direction.z;
+        double divX = 1f / ray.direction.x;
+        double divY = 1f / ray.direction.y;
+        double divZ = 1f / ray.direction.z;
 
         double minx = ((center.x - dimensions.x * .5f) - ray.origin.x) * divX;
         double maxx = ((center.x + dimensions.x * .5f) - ray.origin.x) * divX;
         if (minx > maxx) {
-            final double t = minx;
+            double t = minx;
             minx = maxx;
             maxx = t;
         }
@@ -46,7 +46,7 @@ public class IntersectorDouble {
         double miny = ((center.y - dimensions.y * .5f) - ray.origin.y) * divY;
         double maxy = ((center.y + dimensions.y * .5f) - ray.origin.y) * divY;
         if (miny > maxy) {
-            final double t = miny;
+            double t = miny;
             miny = maxy;
             maxy = t;
         }
@@ -54,7 +54,7 @@ public class IntersectorDouble {
         double minz = ((center.z - dimensions.z * .5f) - ray.origin.z) * divZ;
         double maxz = ((center.z + dimensions.z * .5f) - ray.origin.z) * divZ;
         if (minz > maxz) {
-            final double t = minz;
+            double t = minz;
             minz = maxz;
             maxz = t;
         }
@@ -226,18 +226,18 @@ public class IntersectorDouble {
      *
      * @return distance from v to line segment [a,b]
      */
-    public synchronized static double distanceSegmentPoint(final Vector3D a,
-                                                           final Vector3D b,
-                                                           final Vector3D v) {
-        final Vector3D ab = auxd1.set(b).sub(a);
+    public synchronized static double distanceSegmentPoint(Vector3D a,
+                                                           Vector3D b,
+                                                           Vector3D v) {
+        Vector3D ab = auxd1.set(b).sub(a);
         double ablen = ab.len();
-        final Vector3D av = auxd2.set(v).sub(a);
+        Vector3D av = auxd2.set(v).sub(a);
         double avlen = av.len();
 
         if (av.dot(ab) <= 0.0) // Point is lagging behind start of the segment, so perpendicular distance is not viable.
             return avlen; // Use distance to start of segment instead.
 
-        final Vector3D bv = auxd3.set(v).sub(b);
+        Vector3D bv = auxd3.set(v).sub(b);
         double bvlen = bv.len();
 
         if (bv.dot(ab) >= 0.0) // Point is advanced past the end of the segment, so perpendicular distance is not viable.

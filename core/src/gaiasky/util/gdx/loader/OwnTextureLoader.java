@@ -108,7 +108,7 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, TexturePa
          * Create a pixmap-backed texture which can be modified programmatically in the CPU.
          * Warning, slow!
          **/
-        public boolean pixmapBacked = false;
+        public boolean pixmapBacked;
     }
 
     public static class Factory {

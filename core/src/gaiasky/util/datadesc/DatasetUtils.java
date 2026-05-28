@@ -61,7 +61,7 @@ public class DatasetUtils {
      * @return True if the data location contains old datasets.
      */
     public static boolean dataLocationOldVersionDatasetsCheck() {
-        final var dataLocation = Path.of(GaiaSky.settings().data.location);
+        var dataLocation = Path.of(GaiaSky.settings().data.location);
 
         // Check presence of data-main.json
         if (Files.exists(dataLocation.resolve("data-main.json"))) {
@@ -88,7 +88,7 @@ public class DatasetUtils {
     }
 
     public static void cleanDataLocationOldDatasets() {
-        final var dataLocation = Path.of(GaiaSky.settings().data.location);
+        var dataLocation = Path.of(GaiaSky.settings().data.location);
         try (Stream<Path> stream = Files.list(dataLocation)) {
             var toDelete = stream.filter(p -> {
                 if (p.toFile().isFile() && p.getFileName().toString().endsWith(".json")) {
@@ -274,7 +274,7 @@ public class DatasetUtils {
 
 
         for (FileHandle catalogLocation : catalogLocations) {
-            final var cfs = catalogLocation.list(pathname -> (pathname.canRead()
+            var cfs = catalogLocation.list(pathname -> (pathname.canRead()
                     && pathname.isDirectory()
                     && !pathname.getName().equals(Constants.DEFAULT_DATASET_KEY)
                     && pathname.toPath().resolve("dataset.json").toFile().exists()));

@@ -47,7 +47,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     /**
      * An extra rotation by this angle [rad] is added to the generated attitude
      */
-    protected double extraOmega = 0.0;
+    protected double extraOmega;
 
     /**
      * Keep track of times when the precession rate is reduced

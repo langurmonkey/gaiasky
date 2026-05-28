@@ -71,7 +71,7 @@ public class OwnMtlLoader {
                 if (tokens[0].isEmpty() || tokens[0].charAt(0) == '#') {
                     // Skip.
                 } else {
-                    final String key = tokens[0].toLowerCase(Locale.ROOT);
+                    String key = tokens[0].toLowerCase(Locale.ROOT);
                     switch (key) {
                         case "newmtl" -> {
                             addCurrentMat(curMatName,
@@ -293,8 +293,8 @@ public class OwnMtlLoader {
         materials.add(mat);
     }
 
-    public OwnModelMaterial getMaterial(final String name) {
-        for (final OwnModelMaterial m : materials)
+    public OwnModelMaterial getMaterial(String name) {
+        for (OwnModelMaterial m : materials)
             if (m.id.equals(name))
                 return m;
         OwnModelMaterial mat = new OwnModelMaterial();

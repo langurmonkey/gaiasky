@@ -28,7 +28,7 @@ import java.util.function.Function;
  */
 public class TimeModule extends APIModule implements TimeAPI {
     /** Internal time transition sequence number. **/
-    private int cTransSeq = 0;
+    private int cTransSeq;
 
     /**
      * Create a new module with the given attributes.
@@ -66,7 +66,7 @@ public class TimeModule extends APIModule implements TimeAPI {
     }
 
     @Override
-    public void set_clock(final long time) {
+    public void set_clock(long time) {
         if (api.validator.checkNum(time, -Long.MAX_VALUE, Long.MAX_VALUE, "time")) em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
     }
 
@@ -102,14 +102,14 @@ public class TimeModule extends APIModule implements TimeAPI {
     }
 
     @Override
-    public void set_time_warp(final double warp) {
+    public void set_time_warp(double warp) {
         em.post(Event.TIME_WARP_CMD, this, warp);
     }
 
     /**
      * Alias to {@link #set_time_warp(double)}.
      */
-    public void set_time_warp(final long warp) {
+    public void set_time_warp(long warp) {
         set_time_warp((double) warp);
     }
 
@@ -298,10 +298,10 @@ public class TimeModule extends APIModule implements TimeAPI {
         private Function<Double, Double> getMapper(String smoothingType, double smoothingFactor) {
             Function<Double, Double> mapper;
             if (Objects.equals(smoothingType, "logisticsigmoid")) {
-                final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
+                double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
                 mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logisticSigmoid(x, fac), 0.0, 1.0);
             } else if (Objects.equals(smoothingType, "logit")) {
-                final double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
+                double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
                 mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logit(x) * fac + 0.5, 0.0, 1.0);
             } else {
                 mapper = (x) -> x;

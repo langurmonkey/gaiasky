@@ -93,7 +93,7 @@ public class CatalogManager implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case CATALOG_ADD -> {
                 DatasetCard ci = (DatasetCard) data[0];

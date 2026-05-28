@@ -52,7 +52,7 @@ public interface Duration {
      *
      * @return updated object
      */
-    Duration set(final Duration d);
+    Duration set(Duration d);
 
     /**
      * @return duration expressed in ns
@@ -101,7 +101,7 @@ public interface Duration {
      *
      * @return updated object
      */
-    Duration add(final Duration d);
+    Duration add(Duration d);
 
     /**
      * Subtract a duration from this one
@@ -110,7 +110,7 @@ public interface Duration {
      *
      * @return updated object
      */
-    Duration sub(final Duration d);
+    Duration sub(Duration d);
 
     /**
      * Check that this duration is longer than a given one
@@ -128,7 +128,7 @@ public interface Duration {
      *
      * @return updated object
      */
-    Duration mult(final double s);
+    Duration mult(double s);
 
     /**
      * @return Current time scale of the duration

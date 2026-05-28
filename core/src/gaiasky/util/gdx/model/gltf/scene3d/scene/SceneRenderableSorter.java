@@ -28,7 +28,7 @@ public class SceneRenderableSorter implements IntRenderableSorter, Comparator<In
     private final Vector3 tmpV2 = new Vector3();
 
     @Override
-    public void sort(final Camera camera, final Array<IntRenderable> renderables) {
+    public void sort(Camera camera, Array<IntRenderable> renderables) {
         this.camera = camera;
         renderables.sort(this);
     }
@@ -45,11 +45,11 @@ public class SceneRenderableSorter implements IntRenderableSorter, Comparator<In
     @Override
     public int compare(IntRenderable o1, IntRenderable o2) {
         // original (blending and hints)
-        final boolean b1 = o1.material.has(BlendingAttribute.Type) && ((BlendingAttribute) Objects.requireNonNull(o1.material.get(BlendingAttribute.Type))).blended;
-        final boolean b2 = o2.material.has(BlendingAttribute.Type) && ((BlendingAttribute) Objects.requireNonNull(o2.material.get(BlendingAttribute.Type))).blended;
+        boolean b1 = o1.material.has(BlendingAttribute.Type) && ((BlendingAttribute) Objects.requireNonNull(o1.material.get(BlendingAttribute.Type))).blended;
+        boolean b2 = o2.material.has(BlendingAttribute.Type) && ((BlendingAttribute) Objects.requireNonNull(o2.material.get(BlendingAttribute.Type))).blended;
 
-        final Hints h1 = o1.userData instanceof Hints ? (Hints) o1.userData : null;
-        final Hints h2 = o2.userData instanceof Hints ? (Hints) o2.userData : null;
+        Hints h1 = o1.userData instanceof Hints ? (Hints) o1.userData : null;
+        Hints h2 = o2.userData instanceof Hints ? (Hints) o2.userData : null;
 
         if (h1 != h2) {
             if (h1 == Hints.OPAQUE_LAST) {
@@ -85,8 +85,8 @@ public class SceneRenderableSorter implements IntRenderableSorter, Comparator<In
         // Classic with distance : front to back for solid, back to front for transparent.
         getTranslation(o1.worldTransform, o1.meshPart.center, tmpV1);
         getTranslation(o2.worldTransform, o2.meshPart.center, tmpV2);
-        final float dst = (int) (camera.position.dst2(tmpV1)) - (int) (camera.position.dst2(tmpV2));
-        final int result = dst < 0 ? -1 : (dst > 0 ? 1 : 0);
+        float dst = (int) (camera.position.dst2(tmpV1)) - (int) (camera.position.dst2(tmpV2));
+        int result = dst < 0 ? -1 : (dst > 0 ? 1 : 0);
         return b1 ? -result : result;
     }
 

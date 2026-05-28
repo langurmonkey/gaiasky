@@ -18,7 +18,7 @@ public class PlaneDouble implements Serializable {
     @Serial
     private static final long serialVersionUID = -1240652082930747866L;
     public final Vector3D normal = new Vector3D();
-    public double d = 0;
+    public double d;
 
     /**
      * Constructs a new plane with all values set to 0

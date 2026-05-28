@@ -31,7 +31,7 @@ public class ColorAttribute extends Attribute {
     public final static int DiffuseScattering = register(DiffuseScatteringAlias);
     public final Color color = new Color();
 
-    public ColorAttribute(final int index) {
+    public ColorAttribute(int index) {
         super(index);
     }
 
@@ -61,27 +61,27 @@ public class ColorAttribute extends Attribute {
         return -1;
     }
 
-    public ColorAttribute(final int index, final Color color) {
+    public ColorAttribute(int index, Color color) {
         this(index);
         if (color != null)
             this.color.set(color);
     }
 
-    public ColorAttribute(final int index, float r, float g, float b, float a) {
+    public ColorAttribute(int index, float r, float g, float b, float a) {
         this(index);
         this.color.set(r, g, b, a);
     }
 
-    public ColorAttribute(final int index, float l) {
+    public ColorAttribute(int index, float l) {
         this(index);
         this.color.set(l, l, l, 1.0f);
     }
 
-    public ColorAttribute(final ColorAttribute copyFrom) {
+    public ColorAttribute(ColorAttribute copyFrom) {
         this(copyFrom.index, copyFrom.color);
     }
 
-    public final static ColorAttribute createAmbient(final Color color) {
+    public final static ColorAttribute createAmbient(Color color) {
         return new ColorAttribute(Ambient, color);
     }
 
@@ -89,7 +89,7 @@ public class ColorAttribute extends Attribute {
         return new ColorAttribute(Ambient, r, g, b, a);
     }
 
-    public final static ColorAttribute createDiffuse(final Color color) {
+    public final static ColorAttribute createDiffuse(Color color) {
         return new ColorAttribute(Diffuse, color);
     }
 
@@ -97,7 +97,7 @@ public class ColorAttribute extends Attribute {
         return new ColorAttribute(Diffuse, r, g, b, a);
     }
 
-    public final static ColorAttribute createSpecular(final Color color) {
+    public final static ColorAttribute createSpecular(Color color) {
         return new ColorAttribute(Specular, color);
     }
 
@@ -105,7 +105,7 @@ public class ColorAttribute extends Attribute {
         return new ColorAttribute(Specular, r, g, b, a);
     }
 
-    public final static ColorAttribute createMetallic(final Color color) {
+    public final static ColorAttribute createMetallic(Color color) {
         return new ColorAttribute(Metallic, color);
     }
 
@@ -113,7 +113,7 @@ public class ColorAttribute extends Attribute {
         return new ColorAttribute(Metallic, r, g, b, a);
     }
 
-    public final static ColorAttribute createRoughness(final Color color) {
+    public final static ColorAttribute createRoughness(Color color) {
         return new ColorAttribute(Roughness, color);
     }
 
@@ -122,7 +122,7 @@ public class ColorAttribute extends Attribute {
     }
 
 
-    public final static ColorAttribute createEmissive(final Color color) {
+    public final static ColorAttribute createEmissive(Color color) {
         return new ColorAttribute(Emissive, color);
     }
 
@@ -130,7 +130,7 @@ public class ColorAttribute extends Attribute {
         return new ColorAttribute(Emissive, r, g, b, a);
     }
 
-    public final static ColorAttribute createAmbientLight(final Color color) {
+    public final static ColorAttribute createAmbientLight(Color color) {
         return new ColorAttribute(AmbientLight, color);
     }
 
@@ -138,7 +138,7 @@ public class ColorAttribute extends Attribute {
         return new ColorAttribute(AmbientLight, r, g, b, a);
     }
 
-    public final static ColorAttribute createFog(final Color color) {
+    public final static ColorAttribute createFog(Color color) {
         return new ColorAttribute(Fog, color);
     }
 

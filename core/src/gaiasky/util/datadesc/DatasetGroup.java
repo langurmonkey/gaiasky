@@ -27,8 +27,8 @@ public class DatasetGroup {
     /** Recommended datasets as an array of keys. **/
     public String[] recommended;
 
-    public boolean updatesAvailable = false;
-    public int numUpdates = 0;
+    public boolean updatesAvailable;
+    public int numUpdates;
 
     public DatasetGroup(List<DatasetType> types, List<Dataset> datasets, String[] recommended) {
         this.types = types;

@@ -30,7 +30,7 @@ public class SVTQuadtree<T> {
     /**
      * Depth of the tree, e.g., the deepest level, in [0,n].
      **/
-    public int depth = 0;
+    public int depth;
 
     /**
      * Root node(s) of the tree.
@@ -54,7 +54,7 @@ public class SVTQuadtree<T> {
         this.levels = new LongMap[MAX_LEVEL + 1];
     }
 
-    public void insert(final int level, final int col, final int row, T object) {
+    public void insert(int level, int col, int row, T object) {
         assert level >= 0 && level <= MAX_LEVEL : "Level out of bounds: " + level;
         assert col >= 0 && row >= 0 : "Invalid UV: " + col + ", " + row;
 
@@ -107,7 +107,7 @@ public class SVTQuadtree<T> {
      * @return The tile at the given level and UV.
      */
     public SVTQuadtreeNode<T> getTileFromUV(int level, double u, double v) {
-        final var pair = getColRow(level, u, v);
+        var pair = getColRow(level, u, v);
         return getTile(level, pair[0], pair[1]);
     }
 

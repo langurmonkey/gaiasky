@@ -38,18 +38,18 @@ public class GroundShader extends RelativisticShader {
     public final int v3LightPos;
     public final int v3CameraPos;
     public final int v3InvWavelength;
-    public GroundShader(final IntRenderable renderable, final Config config) {
+    public GroundShader(IntRenderable renderable, Config config) {
         this(renderable, config, createPrefix(renderable, config));
     }
-    public GroundShader(final IntRenderable renderable, final Config config, final String prefix) {
+    public GroundShader(IntRenderable renderable, Config config, String prefix) {
         this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(), config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
-    public GroundShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
+    public GroundShader(IntRenderable renderable, Config config, String prefix, String vertexShader, String fragmentShader) {
         this(renderable, config, new ExtShaderProgram(config.vertexShaderFile, config.fragmentShaderFile, ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
-    public GroundShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
+    public GroundShader(IntRenderable renderable, Config config, ExtShaderProgram shaderProgram) {
         super(renderable, config, shaderProgram);
 
         fAlpha = register(Inputs.alpha, Setters.alpha);
@@ -76,9 +76,9 @@ public class GroundShader extends RelativisticShader {
 
     }
 
-    public static String createPrefix(final IntRenderable renderable, final Config config) {
+    public static String createPrefix(IntRenderable renderable, Config config) {
         String prefix = RelativisticShader.createPrefix(renderable, config);
-        final Bits mask = renderable.material.getMask();
+        Bits mask = renderable.material.getMask();
         // Atmosphere ground only if camera height is set
         if (mask.has(AtmosphereAttribute.CameraHeight))
             prefix += "#define atmosphereGround\n";
@@ -88,7 +88,7 @@ public class GroundShader extends RelativisticShader {
     }
 
     @Override
-    public boolean canRender(final IntRenderable renderable) {
+    public boolean canRender(IntRenderable renderable) {
         return super.canRender(renderable) && this.shadowMap == (renderable.environment.shadowMap != null);
     }
 

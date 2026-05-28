@@ -44,7 +44,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     /** Focus view. **/
     private final FocusView focusView;
     /** Internal camera transition sequence number. **/
-    private int cTransSeq = 0;
+    private int cTransSeq;
 
     /** Axuiliary vector. **/
     private final Vector3Q aux3b1 = new Vector3Q();
@@ -68,12 +68,12 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void focus_mode(final String name) {
+    public void focus_mode(String name) {
         focus_mode(name, 0.0f);
     }
 
     @Override
-    public void focus_mode(final String name, final float wait) {
+    public void focus_mode(String name, float wait) {
         if (api.validator.checkString(name, "focusName") && api.validator.checkFocusName(name)) {
             var entity = api.scene.get_focus(name);
             // Make sure that star and particle sets have the correct focus index.
@@ -95,7 +95,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
      * @param waitTimeSeconds Maximum time, in seconds, to wait for the camera to face the
      *                        focus. If negative, the call waits until the camera transition is finished.
      */
-    public void focus_mode(final Entity entity, final float waitTimeSeconds) {
+    public void focus_mode(Entity entity, float waitTimeSeconds) {
         if (api.validator.checkNotNull(entity, "Entity is null")) {
             synchronized (focusView) {
                 focusView.setEntity(entity);
@@ -112,12 +112,12 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     /**
      * Alias to {@link #focus_mode(String, float)}, but with <code>waitTimeSeconds</code> given as an <code>int</code>.
      */
-    public void focus_mode(final String focusName, final int waitTimeSeconds) {
+    public void focus_mode(String focusName, int waitTimeSeconds) {
         focus_mode(focusName, (float) waitTimeSeconds);
     }
 
     @Override
-    public void focus_mode_instant(final String name) {
+    public void focus_mode_instant(String name) {
         if (api.validator.checkString(name, "focusName")) {
             Entity entity = api.scene.get_entity(name);
             if (Mapper.focus.has(entity)) {
@@ -147,7 +147,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void focus_mode_instant_go(final String name) {
+    public void focus_mode_instant_go(String name) {
         focus_mode_instant_go(name, true);
     }
 
@@ -155,7 +155,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
      * Alias to {@link #focus_mode_instant(String)}, but with an extra boolean parameter (for internal use)
      * that makes sure that the camera changes are flushed before returning.
      */
-    public void focus_mode_instant_go(final String focusName, final boolean sleep) {
+    public void focus_mode_instant_go(String focusName, boolean sleep) {
         if (api.validator.checkString(focusName, "focusName")) {
             Entity entity = api.scene.get_entity(focusName);
             if (Mapper.focus.has(entity)) {
@@ -225,7 +225,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
 
 
     @Override
-    public void set_focus_lock(final boolean lock) {
+    public void set_focus_lock(boolean lock) {
         api.base.post_runnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, lock));
     }
 
@@ -252,7 +252,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_position(final double[] pos) {
+    public void set_position(double[] pos) {
         this.set_position(pos, "km");
     }
 
@@ -279,7 +279,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     /**
      * Alias for {@link #set_position(double[], boolean)}.
      */
-    public void set_position(final List<?> vec, boolean immediate) {
+    public void set_position(List<?> vec, boolean immediate) {
         set_position(api.dArray(vec), immediate);
     }
 
@@ -341,18 +341,18 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     /**
      * Alias for {@link #set_position(double[])}.
      */
-    public void set_position(final List<?> vec) {
+    public void set_position(List<?> vec) {
         set_position(vec, "km");
     }
 
-    public void set_position(final List<?> vec, String units) {
+    public void set_position(List<?> vec, String units) {
         set_position(api.dArray(vec), units);
     }
 
     /**
      * Alias for {@link #set_direction(double[], boolean)}.
      */
-    public void set_direction(final List<?> dir, final boolean immediate) {
+    public void set_direction(List<?> dir, boolean immediate) {
         set_direction(api.dArray(dir), immediate);
     }
 
@@ -372,7 +372,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
      *
      * @param direction Direction vector.
      */
-    private void sendDirectionEvent(final double[] direction) {
+    private void sendDirectionEvent(double[] direction) {
         em.post(Event.CAMERA_DIR_CMD, this, (Object) direction);
     }
 
@@ -383,7 +383,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_direction(final double[] direction) {
+    public void set_direction(double[] direction) {
         set_direction(direction, false);
     }
 
@@ -416,16 +416,16 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         }
     }
 
-    public void set_direction(final List<?> dir) {
+    public void set_direction(List<?> dir) {
         set_direction(api.dArray(dir));
     }
 
-    public void set_up(final List<?> up, final boolean immediate) {
+    public void set_up(List<?> up, boolean immediate) {
         set_up(api.dArray(up), immediate);
     }
 
     @Override
-    public void set_up(final double[] up, final boolean immediate) {
+    public void set_up(double[] up, boolean immediate) {
         if (api.validator.checkLength(up, 3, "up")) {
             if (immediate) {
                 sendUpEvent(up);
@@ -435,7 +435,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         }
     }
 
-    private void sendUpEvent(final double[] up) {
+    private void sendUpEvent(double[] up) {
         em.post(Event.CAMERA_UP_CMD, this, (Object) up);
     }
 
@@ -446,11 +446,11 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_up(final double[] up) {
+    public void set_up(double[] up) {
         set_up(up, false);
     }
 
-    public void set_up(final List<?> up) {
+    public void set_up(List<?> up) {
         set_up(api.dArray(up));
     }
 
@@ -737,7 +737,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
     }
 
     @Override
-    public void set_fov(final float fov) {
+    public void set_fov(float fov) {
         if (!SlaveManager.projectionActive()) {
             if (api.validator.checkNum(fov, Constants.MIN_FOV, Constants.MAX_FOV, "fov"))
                 api.base.post_runnable(() -> em.post(Event.FOV_CMD, this, fov));
@@ -749,7 +749,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         return GaiaSky.instance.cameraManager.getCamera().fieldOfView;
     }
 
-    public void set_fov(final int newFov) {
+    public void set_fov(int newFov) {
         set_fov((float) newFov);
     }
 
@@ -1207,10 +1207,10 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
         protected Function<Double, Double> getMapper(String smoothingType, double smoothingFactor) {
             Function<Double, Double> mapper;
             if (Objects.equals(smoothingType.toLowerCase(Locale.ROOT), "logisticsigmoid")) {
-                final double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
+                double fac = MathUtilsDouble.clamp(smoothingFactor, 12.0, 500.0);
                 mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logisticSigmoid(x, fac), 0.0, 1.0);
             } else if (Objects.equals(smoothingType, "logit")) {
-                final double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
+                double fac = MathUtilsDouble.clamp(smoothingFactor, 0.01, 0.09);
                 mapper = (x) -> MathUtilsDouble.clamp(MathUtilsDouble.logit(x) * fac + 0.5, 0.0, 1.0);
             } else {
                 mapper = (x) -> x;
@@ -1465,7 +1465,7 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
             this.fovMapper = getMapper(smoothType, smoothFactor);
         }
 
-        float lastFov = 0;
+        float lastFov;
         @Override
         public void run() {
             // Update elapsed time

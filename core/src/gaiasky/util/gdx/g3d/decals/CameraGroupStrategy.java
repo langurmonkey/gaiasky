@@ -105,7 +105,7 @@ public class CameraGroupStrategy implements GroupStrategy, Disposable {
     Camera camera;
     ShaderProgram shader;
 
-    public CameraGroupStrategy(final Camera camera) {
+    public CameraGroupStrategy(Camera camera) {
         this(camera, (o1, o2) -> {
             float dist1 = camera.position.dst(o1.getPosition());
             float dist2 = camera.position.dst(o2.getPosition());

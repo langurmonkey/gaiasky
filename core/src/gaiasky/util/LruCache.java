@@ -19,7 +19,7 @@ import java.util.Map;
 public class LruCache<A, B> extends LinkedHashMap<A, B> {
     private final int maxEntries;
 
-    public LruCache(final int maxEntries) {
+    public LruCache(int maxEntries) {
         super(maxEntries, 1.0f, true);
         this.maxEntries = maxEntries;
     }
@@ -40,7 +40,7 @@ public class LruCache<A, B> extends LinkedHashMap<A, B> {
      * @see java.util.LinkedHashMap#removeEldestEntry(Map.Entry)
      */
     @Override
-    protected boolean removeEldestEntry(final Map.Entry<A, B> eldest) {
+    protected boolean removeEldestEntry(Map.Entry<A, B> eldest) {
         return super.size() >= maxEntries;
     }
 }

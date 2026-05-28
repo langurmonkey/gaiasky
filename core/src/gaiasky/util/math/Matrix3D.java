@@ -146,8 +146,8 @@ public class Matrix3D implements Serializable {
 	 * @param radians the angle in radians.
 	 * @return This matrix for the purpose of chaining operations. */
 	public Matrix3D setToRotationRad (double radians) {
-		double cos = (double)Math.cos(radians);
-		double sin = (double)Math.sin(radians);
+		double cos = Math.cos(radians);
+		double sin = Math.sin(radians);
 		double[] val = this.val;
 
 		val[M00] = cos;
@@ -450,8 +450,8 @@ public class Matrix3D implements Serializable {
 	 * @return This matrix for the purpose of chaining. */
 	public Matrix3D rotateRad (double radians) {
 		if (radians == 0) return this;
-		double cos = (double)Math.cos(radians);
-		double sin = (double)Math.sin(radians);
+		double cos = Math.cos(radians);
+		double sin = Math.sin(radians);
 
 		double[] tmp = this.tmp;
 		tmp[M00] = cos;
@@ -531,17 +531,17 @@ public class Matrix3D implements Serializable {
 	 * @return The provided vector for chaining. */
 	public Vector2D getScale (Vector2D scale) {
 		double[] val = this.val;
-		scale.x = (double)Math.sqrt(val[M00] * val[M00] + val[M01] * val[M01]);
-		scale.y = (double)Math.sqrt(val[M10] * val[M10] + val[M11] * val[M11]);
+		scale.x = Math.sqrt(val[M00] * val[M00] + val[M01] * val[M01]);
+		scale.y = Math.sqrt(val[M10] * val[M10] + val[M11] * val[M11]);
 		return scale;
 	}
 
 	public double getRotation () {
-		return MathUtils.radiansToDegrees * (double)Math.atan2(val[M10], val[M00]);
+		return MathUtils.radiansToDegrees * Math.atan2(val[M10], val[M00]);
 	}
 
 	public double getRotationRad () {
-		return (double)Math.atan2(val[M10], val[M00]);
+		return Math.atan2(val[M10], val[M00]);
 	}
 
 	/** Scale the matrix in the both the x and y components by the scalar value.

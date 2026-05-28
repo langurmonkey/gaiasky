@@ -40,8 +40,8 @@ public class DefaultIntShader extends BaseIntShader {
      */
     private final static Bits optionalAttributes = Bits.indices(IntAttribute.CullFace, DepthTestAttribute.Type);
     private final static Attributes tmpAttributes = new Attributes();
-    private static String defaultVertexShader = null;
-    private static String defaultFragmentShader = null;
+    private static String defaultVertexShader;
+    private static String defaultFragmentShader;
     // Global uniforms
     public final int u_projTrans;
     public final int u_projViewTrans;
@@ -197,35 +197,35 @@ public class DefaultIntShader extends BaseIntShader {
     private IntRenderable renderable;
     private boolean lightsSet;
 
-    public DefaultIntShader(final IntRenderable renderable) {
+    public DefaultIntShader(IntRenderable renderable) {
         this(renderable, new Config());
     }
 
-    public DefaultIntShader(final IntRenderable renderable,
-                            final Config config) {
+    public DefaultIntShader(IntRenderable renderable,
+                            Config config) {
         this(renderable, config, createPrefix(renderable, config));
     }
 
-    public DefaultIntShader(final IntRenderable renderable,
-                            final Config config,
-                            final String prefix) {
+    public DefaultIntShader(IntRenderable renderable,
+                            Config config,
+                            String prefix) {
         this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(),
                 config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
-    public DefaultIntShader(final IntRenderable renderable,
-                            final Config config,
-                            final String prefix,
-                            final String vertexShader,
-                            final String fragmentShader) {
+    public DefaultIntShader(IntRenderable renderable,
+                            Config config,
+                            String prefix,
+                            String vertexShader,
+                            String fragmentShader) {
         this(renderable, config,
                 new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
-    public DefaultIntShader(final IntRenderable renderable,
-                            final Config config,
-                            final ExtShaderProgram shaderProgram) {
-        final Attributes attributes = combineAttributes(renderable);
+    public DefaultIntShader(IntRenderable renderable,
+                            Config config,
+                            ExtShaderProgram shaderProgram) {
+        Attributes attributes = combineAttributes(renderable);
         this.config = config;
         this.program = shaderProgram;
         this.lighting = renderable.environment != null;
@@ -393,17 +393,17 @@ public class DefaultIntShader extends BaseIntShader {
         return defaultFragmentShader;
     }
 
-    private static boolean and(final long mask,
-                               final long flag) {
+    private static boolean and(long mask,
+                               long flag) {
         return (mask & flag) == flag;
     }
 
-    private static boolean or(final long mask,
-                              final long flag) {
+    private static boolean or(long mask,
+                              long flag) {
         return (mask & flag) != 0;
     }
 
-    private static Attributes combineAttributes(final IntRenderable renderable) {
+    private static Attributes combineAttributes(IntRenderable renderable) {
         tmpAttributes.clear();
         if (renderable.environment != null)
             tmpAttributes.set(renderable.environment);
@@ -412,7 +412,7 @@ public class DefaultIntShader extends BaseIntShader {
         return tmpAttributes;
     }
 
-    private static Bits combineAttributeMasks(final IntRenderable renderable) {
+    private static Bits combineAttributeMasks(IntRenderable renderable) {
         Bits mask = Bits.empty();
         if (renderable.environment != null)
             mask.or(renderable.environment.getMask());
@@ -421,11 +421,11 @@ public class DefaultIntShader extends BaseIntShader {
         return mask;
     }
 
-    public static String createPrefix(final IntRenderable renderable,
-                                      final Config config) {
-        final Attributes attributes = combineAttributes(renderable);
+    public static String createPrefix(IntRenderable renderable,
+                                      Config config) {
+        Attributes attributes = combineAttributes(renderable);
         StringBuilder prefix = new StringBuilder();
-        final long vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMask();
+        long vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMask();
         if (and(vertexMask, Usage.Position))
             prefix.append("#define positionFlag\n");
         if (or(vertexMask, Usage.ColorUnpacked | Usage.ColorPacked))
@@ -472,9 +472,9 @@ public class DefaultIntShader extends BaseIntShader {
             }
         }
 
-        final int n = renderable.meshPart.mesh.getVertexAttributes().size();
+        int n = renderable.meshPart.mesh.getVertexAttributes().size();
         for (int i = 0; i < n; i++) {
-            final VertexAttribute attr = renderable.meshPart.mesh.getVertexAttributes().get(i);
+            VertexAttribute attr = renderable.meshPart.mesh.getVertexAttributes().get(i);
             if (attr.usage == Usage.BoneWeight)
                 prefix.append("#define boneWeight").append(attr.unit).append("Flag\n");
             else if (attr.usage == Usage.TextureCoordinates)
@@ -685,7 +685,7 @@ public class DefaultIntShader extends BaseIntShader {
 
     @Override
     public void init() {
-        final ExtShaderProgram program = this.program;
+        ExtShaderProgram program = this.program;
         this.program = null;
         init(program, renderable);
         renderable = null;
@@ -706,8 +706,8 @@ public class DefaultIntShader extends BaseIntShader {
     }
 
     @Override
-    public boolean canRender(final IntRenderable renderable) {
-        final Bits renderableMask = combineAttributeMasks(renderable);
+    public boolean canRender(IntRenderable renderable) {
+        Bits renderableMask = combineAttributeMasks(renderable);
         return attributesMask.equals(renderableMask.or(optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked())
                 && (renderable.environment != null) == lighting;
     }
@@ -729,13 +729,13 @@ public class DefaultIntShader extends BaseIntShader {
     }
 
     @Override
-    public void begin(final Camera camera,
-                      final RenderContext context) {
+    public void begin(Camera camera,
+                      RenderContext context) {
         super.begin(camera, context);
 
-        for (final DirectionalLight dirLight : directionalLights)
+        for (DirectionalLight dirLight : directionalLights)
             dirLight.set(0, 0, 0, 0, -1, 0);
-        for (final PointLight pointLight : pointLights)
+        for (PointLight pointLight : pointLights)
             pointLight.set(0, 0, 0, 0, 0, 0, 0);
         lightsSet = false;
 
@@ -765,14 +765,14 @@ public class DefaultIntShader extends BaseIntShader {
         super.end();
     }
 
-    protected void bindMaterial(final Attributes attributes) {
+    protected void bindMaterial(Attributes attributes) {
         int cullFace = config.defaultCullFace;
         int depthFunc = config.defaultDepthFunc;
         float depthRangeNear = 0f;
         float depthRangeFar = 1f;
         boolean depthMask = true;
 
-        for (final Attribute attr : attributes) {
+        for (Attribute attr : attributes) {
             if (BlendingAttribute.is(attr.index)) {
                 context.setBlending(true, ((BlendingAttribute) attr).sourceFunction, ((BlendingAttribute) attr).destFunction);
                 set(u_opacity, ((BlendingAttribute) attr).opacity);
@@ -803,13 +803,13 @@ public class DefaultIntShader extends BaseIntShader {
             Gdx.gl.glDisable(GL20.GL_CULL_FACE);
     }
 
-    protected void bindLights(final IntRenderable renderable,
-                              final Attributes attributes) {
-        final Environment lights = renderable.environment;
-        final DirectionalLightsAttribute dla = attributes.get(DirectionalLightsAttribute.class, DirectionalLightsAttribute.Type);
-        final Array<DirectionalLight> dirs = dla == null ? null : dla.lights;
-        final PointLightsAttribute pla = attributes.get(PointLightsAttribute.class, PointLightsAttribute.Type);
-        final Array<PointLight> points = pla == null ? null : pla.lights;
+    protected void bindLights(IntRenderable renderable,
+                              Attributes attributes) {
+        Environment lights = renderable.environment;
+        DirectionalLightsAttribute dla = attributes.get(DirectionalLightsAttribute.class, DirectionalLightsAttribute.Type);
+        Array<DirectionalLight> dirs = dla == null ? null : dla.lights;
+        PointLightsAttribute pla = attributes.get(PointLightsAttribute.class, PointLightsAttribute.Type);
+        Array<PointLight> points = pla == null ? null : pla.lights;
 
         if (dirLightsLoc >= 0) {
             for (int i = 0; i < directionalLights.length; i++) {
@@ -924,19 +924,19 @@ public class DefaultIntShader extends BaseIntShader {
         /**
          * File with the vertex shader, if any
          **/
-        public String vertexShaderFile = null;
+        public String vertexShaderFile;
         /**
          * File with the fragment shader, if any
          **/
-        public String fragmentShaderFile = null;
+        public String fragmentShaderFile;
         /**
          * The uber vertex shader to use, null to use the default vertex shader.
          */
-        public String vertexShaderCode = null;
+        public String vertexShaderCode;
         /**
          * The uber fragment shader to use, null to use the default fragment shader.
          */
-        public String fragmentShaderCode = null;
+        public String fragmentShaderCode;
         /**
          * The number of directional lights to use
          */
@@ -952,7 +952,7 @@ public class DefaultIntShader extends BaseIntShader {
         /**
          * The number of bones to use
          */
-        public int numBones = 0;
+        public int numBones;
         /**
          * Set to 0 to disable culling.
          */
@@ -965,18 +965,18 @@ public class DefaultIntShader extends BaseIntShader {
         public Config() {
         }
 
-        public Config(final String vertexShaderFile,
-                      final String fragmentShaderFile,
-                      final String vertexShaderCode,
-                      final String fragmentShaderCode) {
+        public Config(String vertexShaderFile,
+                      String fragmentShaderFile,
+                      String vertexShaderCode,
+                      String fragmentShaderCode) {
             this.vertexShaderFile = vertexShaderFile;
             this.fragmentShaderFile = fragmentShaderFile;
             this.vertexShaderCode = vertexShaderCode;
             this.fragmentShaderCode = fragmentShaderCode;
         }
 
-        public Config(final String vertexShaderCode,
-                      final String fragmentShaderCode) {
+        public Config(String vertexShaderCode,
+                      String fragmentShaderCode) {
             this(null, null, vertexShaderCode, fragmentShaderCode);
         }
     }
@@ -1256,7 +1256,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.AO)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1294,7 +1294,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Diffuse)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1314,7 +1314,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Specular)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1334,7 +1334,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Emissive)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1354,7 +1354,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Metallic)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1383,7 +1383,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Roughness)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1403,7 +1403,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.OcclusionMetallicRoughness)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1414,7 +1414,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Normal)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1425,7 +1425,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Height)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1643,7 +1643,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
+                int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
                         .get(PBRTextureAttribute.IridescenceTexture)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1654,7 +1654,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
+                int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
                         .get(PBRTextureAttribute.IridescenceThicknessTexture)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1705,7 +1705,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
+                int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes
                         .get(PBRTextureAttribute.ThicknessTexture)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -1994,7 +1994,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Texture0)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -2005,7 +2005,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Texture1)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -2016,7 +2016,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((Texture3DAttribute) (Objects.requireNonNull(combinedAttributes.get(Texture3DAttribute.Volume0)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -2027,7 +2027,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((Texture3DAttribute) (Objects.requireNonNull(combinedAttributes.get(Texture3DAttribute.Volume1)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -2038,7 +2038,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((Texture3DAttribute) (Objects.requireNonNull(combinedAttributes.get(Texture3DAttribute.Volume2)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -2049,7 +2049,7 @@ public class DefaultIntShader extends BaseIntShader {
                             int inputID,
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(
+                int unit = shader.context.textureBinder.bind(
                         ((Texture3DAttribute) (Objects.requireNonNull(combinedAttributes.get(Texture3DAttribute.Volume3)))).textureDescription);
                 shader.set(inputID, unit);
             }
@@ -2059,7 +2059,7 @@ public class DefaultIntShader extends BaseIntShader {
             private final static Matrix4 idtMatrix = new Matrix4();
             public final float[] bones;
 
-            public Bones(final int numBones) {
+            public Bones(int numBones) {
                 this.bones = new float[numBones * 16];
             }
 
@@ -2069,7 +2069,7 @@ public class DefaultIntShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 for (int i = 0; i < bones.length; i++) {
-                    final int idx = i / 16;
+                    int idx = i / 16;
                     bones[i] = (renderable.bones == null || idx >= renderable.bones.length || renderable.bones[idx] == null) ?
                             idtMatrix.val[i % 16] :
                             renderable.bones[idx].val[i % 16];
@@ -2085,8 +2085,8 @@ public class DefaultIntShader extends BaseIntShader {
             public final int pointLightsOffset;
             private final AmbientCubemap cacheAmbientCubemap = new AmbientCubemap();
 
-            public ACubemap(final int dirLightsOffset,
-                            final int pointLightsOffset) {
+            public ACubemap(int dirLightsOffset,
+                            int pointLightsOffset) {
                 this.dirLightsOffset = dirLightsOffset;
                 this.pointLightsOffset = pointLightsOffset;
             }

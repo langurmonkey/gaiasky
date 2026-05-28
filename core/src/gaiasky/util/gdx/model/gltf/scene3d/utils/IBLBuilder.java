@@ -170,7 +170,7 @@ public class IBLBuilder implements Disposable
 	 * @param mipMapLevels how many mipmaps level, eg. 10 levels produce a 1024x1024 cubemap with mipmaps.
 	 * @return generated cubemap, caller is responsible to dispose it when no longer used.
 	 */
-	public Cubemap buildRadianceMap(final int mipMapLevels){
+	public Cubemap buildRadianceMap(int mipMapLevels){
 		Pixmap[] maps = new Pixmap[mipMapLevels * 6];
 		int index = 0;
 		for(int level=0 ; level<mipMapLevels ; level++){

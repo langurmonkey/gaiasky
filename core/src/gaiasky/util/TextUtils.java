@@ -281,8 +281,8 @@ public class TextUtils {
      *
      * @return The concatenation
      */
-    public static String concatenate(final String split,
-                                     final java.util.List<String> strings) {
+    public static String concatenate(String split,
+                                     java.util.List<String> strings) {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strings) {
             if (str != null && !str.isEmpty()) {
@@ -989,7 +989,7 @@ public class TextUtils {
                 h ^= (int) data[len - 2] << 8;
             }
             if (left >= 1) {
-                h ^= (int) data[len - 1];
+                h ^= data[len - 1];
             }
 
             h *= m;
@@ -1098,10 +1098,10 @@ public class TextUtils {
                         index = index2;
                         continue;
                     }
-                    str = str.substring(0, index) + Character.toString((char) result) + str.substring(index2 + 1);
+                    str = str.substring(0, index) + (char) result + str.substring(index2 + 1);
                     ++index;
                 } else if ((cCode = knownEscapes.get(str.substring(index + 1, index2))) != null) {
-                    str = str.substring(0, index) + Character.toString((char) ((int) cCode)) + str.substring(index2 + 1);
+                    str = str.substring(0, index) + (char) ((int) cCode) + str.substring(index2 + 1);
                     ++index;
                 } else {
                     index = index2 + 1;
@@ -1112,9 +1112,9 @@ public class TextUtils {
 
         private static int hexValue(char c) {
             if ((c >= '0') && (c <= '9'))
-                return (int) (c - '0');
+                return c - '0';
             if ((c >= 'A') && (c <= 'F'))
-                return ((int) (c - 'A')) + 0x0A;
+                return (c - 'A') + 0x0A;
             throw new NumberFormatException();
         }
 

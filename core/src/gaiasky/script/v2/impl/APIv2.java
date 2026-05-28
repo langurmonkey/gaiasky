@@ -83,7 +83,7 @@ public class APIv2 implements IObserver {
      * @param assetManager   The global asset manager reference.
      * @param catalogManager The global camera manager reference.
      */
-    public APIv2(final AssetManager assetManager, final CatalogManager catalogManager) {
+    public APIv2(AssetManager assetManager, CatalogManager catalogManager) {
         this.assetManager = assetManager;
         this.catalogManager = catalogManager;
         this.em = EventManager.instance;

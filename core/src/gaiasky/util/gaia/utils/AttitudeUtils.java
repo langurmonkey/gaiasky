@@ -32,7 +32,7 @@ public class AttitudeUtils {
      *
      * @return The left index
      **/
-    public static int findLeftIndex(final long x, final long[] xa, int splineOrder) {
+    public static int findLeftIndex(long x, long[] xa, int splineOrder) {
         // Check if x is in the range of xa.
         if (x >= xa[xa.length - 1]) {
             return xa.length - 1;
@@ -83,7 +83,7 @@ public class AttitudeUtils {
      *
      * @return left index
      **/
-    public static int findLeftIndexVar(final long x, final long[] xa, int splineOrder) {
+    public static int findLeftIndexVar(long x, long[] xa, int splineOrder) {
 
         // handle the special case
         if (x == xa[xa.length - 1]) {
@@ -125,7 +125,7 @@ public class AttitudeUtils {
      *
      * @return left index
      **/
-    public static int findLeftIndexBSpline(final long x, final long[] xa) {
+    public static int findLeftIndexBSpline(long x, long[] xa) {
         if (x > xa[xa.length - 1]) {
             return -1;
         }
@@ -145,7 +145,7 @@ public class AttitudeUtils {
         int klo = 0;
         int khi = xa.length - 1;
         while ((khi - klo) > 1) { // Indices must differ by at least 1.
-            final int k = (khi + klo) >>> 1;
+            int k = (khi + klo) >>> 1;
 
             if (xa[k] > x) {
                 khi = k;
@@ -192,7 +192,7 @@ public class AttitudeUtils {
      *
      * @return left index
      */
-    public static int findLeftIndexBisection(final long x, final long[] xa) {
+    public static int findLeftIndexBisection(long x, long[] xa) {
         int klo = 0;
         int khi = xa.length - 1;
 
@@ -206,7 +206,7 @@ public class AttitudeUtils {
         }
 
         while ((khi - klo) > 1) { // Indices must differ by at least 1.
-            final int k = (khi + klo) >>> 1;
+            int k = (khi + klo) >>> 1;
 
             if (xa[k] > x) {
                 khi = k;
@@ -228,7 +228,7 @@ public class AttitudeUtils {
      *
      * @return left index
      **/
-    public static int findLeftIndexBisectionVar(final long x, final long[] xa) {
+    public static int findLeftIndexBisectionVar(long x, long[] xa) {
 
         // handle the special case
         if (x == xa[xa.length - 1]) {
@@ -256,7 +256,7 @@ public class AttitudeUtils {
      *
      * @return left index
      */
-    public static int findLeftIndexBisection(final int x, final int[] xa) {
+    public static int findLeftIndexBisection(int x, int[] xa) {
         int klo = 0;
         int khi = xa.length - 1;
 
@@ -270,7 +270,7 @@ public class AttitudeUtils {
         }
 
         while ((khi - klo) > 1) { // Indices must differ by at least 1.
-            final int k = (khi + klo) >>> 1;
+            int k = (khi + klo) >>> 1;
 
             if (xa[k] > x) {
                 khi = k;
@@ -292,7 +292,7 @@ public class AttitudeUtils {
      *
      * @return left index
      **/
-    public static int findLeftIndexBisectionVar(final int x, final int[] xa) {
+    public static int findLeftIndexBisectionVar(int x, int[] xa) {
 
         // handle the special case
         if (x == xa[xa.length - 1]) {
@@ -328,7 +328,7 @@ public class AttitudeUtils {
      *
      * @throws RuntimeException if input is inconsistent
      */
-    public static void calcBsplines(final long x, final long[] tau, int splineOrder, final int leftIndex, final double[] b0, final double[] b1) throws RuntimeException {
+    public static void calcBsplines(long x, long[] tau, int splineOrder, int leftIndex, double[] b0, double[] b1) throws RuntimeException {
         /*
          * check that left index is in correct range to avoid AIOBE below: See
          * B.2 in AGIS A&A paper: The knots used for computing the B-spline
@@ -400,7 +400,7 @@ public class AttitudeUtils {
      * @return Array of length 3 with angle between principal axes
      */
     @Deprecated
-    public static double[] smallAngularDifferences(final double[] q0, final double[] q1) {
+    public static double[] smallAngularDifferences(double[] q0, double[] q1) {
         double[] dq = new double[4];
 
         final double EPS = 1.e-3;

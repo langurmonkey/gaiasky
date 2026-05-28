@@ -80,17 +80,17 @@ public class QuaternionDouble implements Serializable {
     /**
      * @return the euclidean length of the specified quaternion
      */
-    public static double len(final double x,
-                             final double y,
-                             final double z,
-                             final double w) {
+    public static double len(double x,
+                             double y,
+                             double z,
+                             double w) {
         return FastMath.sqrt(x * x + y * y + z * z + w * w);
     }
 
-    public static double len2(final double x,
-                              final double y,
-                              final double z,
-                              final double w) {
+    public static double len2(double x,
+                              double y,
+                              double z,
+                              double w) {
         return x * x + y * y + z * z + w * w;
     }
 
@@ -108,14 +108,14 @@ public class QuaternionDouble implements Serializable {
      *
      * @return the dot product between the first and second quaternion.
      */
-    public static double dot(final double x1,
-                             final double y1,
-                             final double z1,
-                             final double w1,
-                             final double x2,
-                             final double y2,
-                             final double z2,
-                             final double w2) {
+    public static double dot(double x1,
+                             double y1,
+                             double z1,
+                             double w1,
+                             double x2,
+                             double y2,
+                             double z2,
+                             double w2) {
         return x1 * x2 + y1 * y2 + z1 * z2 + w1 * w2;
     }
 
@@ -232,19 +232,19 @@ public class QuaternionDouble implements Serializable {
     public QuaternionDouble setEulerAnglesRad(double yaw,
                                               double pitch,
                                               double roll) {
-        final double hr = roll * 0.5f;
-        final double shr = FastMath.sin(hr);
-        final double chr = FastMath.cos(hr);
-        final double hp = pitch * 0.5f;
-        final double shp = FastMath.sin(hp);
-        final double chp = FastMath.cos(hp);
-        final double hy = yaw * 0.5f;
-        final double shy = FastMath.sin(hy);
-        final double chy = FastMath.cos(hy);
-        final double chy_shp = chy * shp;
-        final double shy_chp = shy * chp;
-        final double chy_chp = chy * chp;
-        final double shy_shp = shy * shp;
+        double hr = roll * 0.5f;
+        double shr = FastMath.sin(hr);
+        double chr = FastMath.cos(hr);
+        double hp = pitch * 0.5f;
+        double shp = FastMath.sin(hp);
+        double chp = FastMath.cos(hp);
+        double hy = yaw * 0.5f;
+        double shy = FastMath.sin(hy);
+        double chy = FastMath.cos(hy);
+        double chy_shp = chy * shp;
+        double shy_chp = shy * chp;
+        double chy_chp = chy * chp;
+        double shy_shp = shy * shp;
 
         x = (chy_shp * chr) + (shy_chp * shr); // cos(yaw/2) * sin(pitch/2) * cos(roll/2) + sin(yaw/2) * cos(pitch/2) * sin(roll/2)
         y = (shy_chp * chr) - (chy_shp * shr); // sin(yaw/2) * cos(pitch/2) * cos(roll/2) - cos(yaw/2) * sin(pitch/2) * sin(roll/2)
@@ -259,7 +259,7 @@ public class QuaternionDouble implements Serializable {
      * @return positive (+1) for north pole, negative (-1) for south pole, zero (0) when no gimbal lock
      */
     public int getGimbalPole() {
-        final double t = y * x + z * w;
+        double t = y * x + z * w;
         return t > 0.499f ? 1 : (t < -0.499f ? -1 : 0);
     }
 
@@ -270,7 +270,7 @@ public class QuaternionDouble implements Serializable {
      * @return the rotation around the z axis in radians (between -PI and +PI)
      */
     public double getRollRad() {
-        final int pole = getGimbalPole();
+        int pole = getGimbalPole();
         return pole == 0 ? FastMath.atan2(2f * (w * z + y * x), 1f - 2f * (x * x + z * z)) : pole * 2f * FastMath.atan2(y, w);
     }
 
@@ -291,7 +291,7 @@ public class QuaternionDouble implements Serializable {
      * @return the rotation around the x axis in radians (between -(PI/2) and +(PI/2))
      */
     public double getPitchRad() {
-        final int pole = getGimbalPole();
+        int pole = getGimbalPole();
         return pole == 0 ? FastMath.asin(2f * (w * x - z * y)) : pole * MathUtilsDouble.PI * 0.5f;
     }
 
@@ -413,11 +413,11 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining
      */
-    public QuaternionDouble mul(final QuaternionDouble other) {
-        final double newX = this.w * other.x + this.x * other.w + this.y * other.z - this.z * other.y;
-        final double newY = this.w * other.y + this.y * other.w + this.z * other.x - this.x * other.z;
-        final double newZ = this.w * other.z + this.z * other.w + this.x * other.y - this.y * other.x;
-        final double newW = this.w * other.w - this.x * other.x - this.y * other.y - this.z * other.z;
+    public QuaternionDouble mul(QuaternionDouble other) {
+        double newX = this.w * other.x + this.x * other.w + this.y * other.z - this.z * other.y;
+        double newY = this.w * other.y + this.y * other.w + this.z * other.x - this.x * other.z;
+        double newZ = this.w * other.z + this.z * other.w + this.x * other.y - this.y * other.x;
+        double newW = this.w * other.w - this.x * other.x - this.y * other.y - this.z * other.z;
         this.x = newX;
         this.y = newY;
         this.z = newZ;
@@ -435,14 +435,14 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining
      */
-    public QuaternionDouble mul(final double x,
-                                final double y,
-                                final double z,
-                                final double w) {
-        final double newX = this.w * x + this.x * w + this.y * z - this.z * y;
-        final double newY = this.w * y + this.y * w + this.z * x - this.x * z;
-        final double newZ = this.w * z + this.z * w + this.x * y - this.y * x;
-        final double newW = this.w * w - this.x * x - this.y * y - this.z * z;
+    public QuaternionDouble mul(double x,
+                                double y,
+                                double z,
+                                double w) {
+        double newX = this.w * x + this.x * w + this.y * z - this.z * y;
+        double newY = this.w * y + this.y * w + this.z * x - this.x * z;
+        double newZ = this.w * z + this.z * w + this.x * y - this.y * x;
+        double newW = this.w * w - this.x * x - this.y * y - this.z * z;
         this.x = newX;
         this.y = newY;
         this.z = newZ;
@@ -458,10 +458,10 @@ public class QuaternionDouble implements Serializable {
      * @return This quaternion for chaining
      */
     public QuaternionDouble mulLeft(QuaternionDouble other) {
-        final double newX = other.w * this.x + other.x * this.w + other.y * this.z - other.z * y;
-        final double newY = other.w * this.y + other.y * this.w + other.z * this.x - other.x * z;
-        final double newZ = other.w * this.z + other.z * this.w + other.x * this.y - other.y * x;
-        final double newW = other.w * this.w - other.x * this.x - other.y * this.y - other.z * z;
+        double newX = other.w * this.x + other.x * this.w + other.y * this.z - other.z * y;
+        double newY = other.w * this.y + other.y * this.w + other.z * this.x - other.x * z;
+        double newZ = other.w * this.z + other.z * this.w + other.x * this.y - other.y * x;
+        double newW = other.w * this.w - other.x * this.x - other.y * this.y - other.z * z;
         this.x = newX;
         this.y = newY;
         this.z = newZ;
@@ -479,14 +479,14 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining
      */
-    public QuaternionDouble mulLeft(final double x,
-                                    final double y,
-                                    final double z,
-                                    final double w) {
-        final double newX = w * this.x + x * this.w + y * this.z - z * y;
-        final double newY = w * this.y + y * this.w + z * this.x - x * z;
-        final double newZ = w * this.z + z * this.w + x * this.y - y * x;
-        final double newW = w * this.w - x * this.x - y * this.y - z * z;
+    public QuaternionDouble mulLeft(double x,
+                                    double y,
+                                    double z,
+                                    double w) {
+        double newX = w * this.x + x * this.w + y * this.z - z * y;
+        double newY = w * this.y + y * this.w + z * this.x - x * z;
+        double newZ = w * this.z + z * this.w + x * this.y - y * x;
+        double newW = w * this.w - x * this.x - y * this.y - z * z;
         this.x = newX;
         this.y = newY;
         this.z = newZ;
@@ -504,8 +504,8 @@ public class QuaternionDouble implements Serializable {
      *
      * @return QuaternionDouble
      */
-    public QuaternionDouble mulInverse(final QuaternionDouble q1) {
-        final QuaternionDouble tempQuat = new QuaternionDouble(q1);
+    public QuaternionDouble mulInverse(QuaternionDouble q1) {
+        QuaternionDouble tempQuat = new QuaternionDouble(q1);
 
         tempQuat.inverse();
         this.mul(tempQuat);
@@ -526,8 +526,8 @@ public class QuaternionDouble implements Serializable {
      *
      * @return QuaternionDouble
      */
-    public QuaternionDouble mulLeftInverse(final QuaternionDouble q1) {
-        final QuaternionDouble tempQuat = new QuaternionDouble(q1);
+    public QuaternionDouble mulLeftInverse(QuaternionDouble q1) {
+        QuaternionDouble tempQuat = new QuaternionDouble(q1);
 
         tempQuat.inverse();
         this.mulLeft(tempQuat);
@@ -539,16 +539,16 @@ public class QuaternionDouble implements Serializable {
      *
      * @param matrix Matrix to fill
      */
-    public void toMatrix(final double[] matrix) {
-        final double xx = x * x;
-        final double xy = x * y;
-        final double xz = x * z;
-        final double xw = x * w;
-        final double yy = y * y;
-        final double yz = y * z;
-        final double yw = y * w;
-        final double zz = z * z;
-        final double zw = z * w;
+    public void toMatrix(double[] matrix) {
+        double xx = x * x;
+        double xy = x * y;
+        double xz = x * z;
+        double xw = x * w;
+        double yy = y * y;
+        double yz = y * z;
+        double yw = y * w;
+        double zz = z * z;
+        double zw = z * w;
         // Set matrix from quaternion
         matrix[Matrix4D.M00] = 1 - 2 * (yy + zz);
         matrix[Matrix4D.M01] = 2 * (xy - zw);
@@ -589,7 +589,7 @@ public class QuaternionDouble implements Serializable {
     /**
      * @return If this quaternion is an identity QuaternionDouble
      */
-    public boolean isIdentity(final double tolerance) {
+    public boolean isIdentity(double tolerance) {
         return MathUtilsDouble.isZero(x, tolerance) && MathUtilsDouble.isZero(y, tolerance) && MathUtilsDouble.isZero(z, tolerance) && MathUtilsDouble.isEqual(w, 1f,
                                                                                                                                                                tolerance);
     }
@@ -602,8 +602,8 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining.
      */
-    public QuaternionDouble setFromAxis(final Vector3D axis,
-                                        final double degrees) {
+    public QuaternionDouble setFromAxis(Vector3D axis,
+                                        double degrees) {
         return setFromAxis(axis.x, axis.y, axis.z, degrees);
     }
 
@@ -615,8 +615,8 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining.
      */
-    public QuaternionDouble setFromAxisRad(final Vector3D axis,
-                                           final double radians) {
+    public QuaternionDouble setFromAxisRad(Vector3D axis,
+                                           double radians) {
         return setFromAxisRad(axis.x, axis.y, axis.z, radians);
     }
 
@@ -630,10 +630,10 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining.
      */
-    public QuaternionDouble setFromAxis(final double x,
-                                        final double y,
-                                        final double z,
-                                        final double degrees) {
+    public QuaternionDouble setFromAxis(double x,
+                                        double y,
+                                        double z,
+                                        double degrees) {
         return setFromAxisRad(x, y, z, degrees * MathUtilsDouble.degreesToRadians);
     }
 
@@ -647,10 +647,10 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining.
      */
-    public QuaternionDouble setFromAxisRad(final double x,
-                                           final double y,
-                                           final double z,
-                                           final double radians) {
+    public QuaternionDouble setFromAxisRad(double x,
+                                           double y,
+                                           double z,
+                                           double radians) {
         double d = Vector3D.len(x, y, z);
         if (d == 0f)
             return idt();
@@ -849,9 +849,9 @@ public class QuaternionDouble implements Serializable {
                                         double zy,
                                         double zz) {
         if (normalizeAxes) {
-            final double lx = 1f / Vector3D.len(xx, xy, xz);
-            final double ly = 1f / Vector3D.len(yx, yy, yz);
-            final double lz = 1f / Vector3D.len(zx, zy, zz);
+            double lx = 1f / Vector3D.len(xx, xy, xz);
+            double ly = 1f / Vector3D.len(yx, yy, yz);
+            double lz = 1f / Vector3D.len(zx, zy, zz);
             xx *= lx;
             xy *= lx;
             xz *= lx;
@@ -864,7 +864,7 @@ public class QuaternionDouble implements Serializable {
         }
         // the trace is the sum of the diagonal elements; see
         // http://mathworld.wolfram.com/MatrixTrace.html
-        final double t = xx + yy + zz;
+        double t = xx + yy + zz;
 
         // we protect the division by s by ensuring that s>=1
         if (t >= 0) { // |w| >= .5
@@ -908,10 +908,10 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining
      */
-    public QuaternionDouble setFromCross(final Vector3D v1,
-                                         final Vector3D v2) {
-        final double dot = MathUtilsDouble.clamp(v1.dot(v2), -1f, 1f);
-        final double angle = FastMath.acos(dot);
+    public QuaternionDouble setFromCross(Vector3D v1,
+                                         Vector3D v2) {
+        double dot = MathUtilsDouble.clamp(v1.dot(v2), -1f, 1f);
+        double angle = FastMath.acos(dot);
         return setFromAxisRad(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x, angle);
     }
 
@@ -927,14 +927,14 @@ public class QuaternionDouble implements Serializable {
      *
      * @return This quaternion for chaining
      */
-    public QuaternionDouble setFromCross(final double x1,
-                                         final double y1,
-                                         final double z1,
-                                         final double x2,
-                                         final double y2,
-                                         final double z2) {
-        final double dot = MathUtilsDouble.clamp(Vector3D.dot(x1, y1, z1, x2, y2, z2), -1f, 1f);
-        final double angle = FastMath.acos(dot);
+    public QuaternionDouble setFromCross(double x1,
+                                         double y1,
+                                         double z1,
+                                         double x2,
+                                         double y2,
+                                         double z2) {
+        double dot = MathUtilsDouble.clamp(Vector3D.dot(x1, y1, z1, x2, y2, z2), -1f, 1f);
+        double angle = FastMath.acos(dot);
         return setFromAxisRad(y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2, angle);
     }
 
@@ -976,7 +976,7 @@ public class QuaternionDouble implements Serializable {
      */
     public void slerp(QuaternionDouble end,
                       double alpha) {
-        final double dot = dot(end);
+        double dot = dot(end);
         double absDot = dot < 0.f ? -dot : dot;
 
         // Set the first and second scale for the interpolation
@@ -987,8 +987,8 @@ public class QuaternionDouble implements Serializable {
         // warrant such calculations
         if ((1 - absDot) > 0.1) {// Get the angle between the 2 quaternions,
             // and then store the sin() of that angle
-            final double angle = FastMath.acos(absDot);
-            final double invSinTheta = 1f / FastMath.sin(angle);
+            double angle = FastMath.acos(absDot);
+            double invSinTheta = 1f / FastMath.sin(angle);
 
             // Calculate the scale for q1 and q2, according to the angle and
             // it's sine value
@@ -1091,7 +1091,7 @@ public class QuaternionDouble implements Serializable {
      *
      * @return the dot product of this and the other quaternion.
      */
-    public double dot(final QuaternionDouble other) {
+    public double dot(QuaternionDouble other) {
         return this.x * other.x + this.y * other.y + this.z * other.z + this.w * other.w;
     }
 
@@ -1105,10 +1105,10 @@ public class QuaternionDouble implements Serializable {
      *
      * @return the dot product of this and the other quaternion.
      */
-    public double dot(final double x,
-                      final double y,
-                      final double z,
-                      final double w) {
+    public double dot(double x,
+                      double y,
+                      double z,
+                      double w) {
         return this.x * x + this.y * y + this.z * z + this.w * w;
     }
 
@@ -1239,12 +1239,12 @@ public class QuaternionDouble implements Serializable {
      *
      * @see <a href="http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition">calculation</a>
      */
-    public void getSwingTwist(final double axisX,
-                              final double axisY,
-                              final double axisZ,
-                              final QuaternionDouble swing,
-                              final QuaternionDouble twist) {
-        final double d = Vector3D.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
+    public void getSwingTwist(double axisX,
+                              double axisY,
+                              double axisZ,
+                              QuaternionDouble swing,
+                              QuaternionDouble twist) {
+        double d = Vector3D.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
         twist.set(axisX * d, axisY * d, axisZ * d, this.w).nor();
         swing.set(twist).conjugate().mulLeft(this);
     }
@@ -1267,9 +1267,9 @@ public class QuaternionDouble implements Serializable {
      *
      * @see <a href="http://www.euclideanspace.com/maths/geometry/rotations/for/decomposition">calculation</a>
      */
-    public void getSwingTwist(final Vector3D axis,
-                              final QuaternionDouble swing,
-                              final QuaternionDouble twist) {
+    public void getSwingTwist(Vector3D axis,
+                              QuaternionDouble swing,
+                              QuaternionDouble twist) {
         getSwingTwist(axis.x, axis.y, axis.z, swing, twist);
     }
 
@@ -1282,11 +1282,11 @@ public class QuaternionDouble implements Serializable {
      *
      * @return the angle in radians of the rotation around the specified axis
      */
-    public double getAngleAroundRad(final double axisX,
-                                    final double axisY,
-                                    final double axisZ) {
-        final double d = Vector3D.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
-        final double l2 = QuaternionDouble.len2(axisX * d, axisY * d, axisZ * d, this.w);
+    public double getAngleAroundRad(double axisX,
+                                    double axisY,
+                                    double axisZ) {
+        double d = Vector3D.dot(this.x, this.y, this.z, axisX, axisY, axisZ);
+        double l2 = QuaternionDouble.len2(axisX * d, axisY * d, axisZ * d, this.w);
         return l2 == 0f ? 0f : (2.0 * FastMath.acos(this.w / FastMath.sqrt(l2)));
     }
 
@@ -1297,7 +1297,7 @@ public class QuaternionDouble implements Serializable {
      *
      * @return the angle in radians of the rotation around the specified axis
      */
-    public double getAngleAroundRad(final Vector3D axis) {
+    public double getAngleAroundRad(Vector3D axis) {
         return getAngleAroundRad(axis.x, axis.y, axis.z);
     }
 
@@ -1310,9 +1310,9 @@ public class QuaternionDouble implements Serializable {
      *
      * @return the angle in degrees of the rotation around the specified axis
      */
-    public double getAngleAround(final double axisX,
-                                 final double axisY,
-                                 final double axisZ) {
+    public double getAngleAround(double axisX,
+                                 double axisY,
+                                 double axisZ) {
         return getAngleAroundRad(axisX, axisY, axisZ) * MathUtilsDouble.radiansToDegrees;
     }
 
@@ -1323,7 +1323,7 @@ public class QuaternionDouble implements Serializable {
      *
      * @return the angle in degrees of the rotation around the specified axis
      */
-    public double getAngleAround(final Vector3D axis) {
+    public double getAngleAround(Vector3D axis) {
         return getAngleAround(axis.x, axis.y, axis.z);
     }
 

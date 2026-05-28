@@ -22,7 +22,7 @@ public class Hours extends ConcreteDuration {
      *
      * @param hours number of hours
      */
-    public Hours(final double hours) {
+    public Hours(double hours) {
         value = hours;
     }
 
@@ -31,7 +31,7 @@ public class Hours extends ConcreteDuration {
      *
      * @return hours expressed in nanosecs
      */
-    public static long asNanoSecs(final double hours) {
+    public static long asNanoSecs(double hours) {
         return FastMath.round(hours * Duration.NS_PER_HOUR);
     }
 
@@ -40,7 +40,7 @@ public class Hours extends ConcreteDuration {
      *
      * @return hours expressed in secs
      */
-    public static double asSecs(final double hours) {
+    public static double asSecs(double hours) {
         return hours * Duration.SECS_PER_HOUR;
     }
 
@@ -49,7 +49,7 @@ public class Hours extends ConcreteDuration {
      *
      * @return hours expressed in mins
      */
-    public static double asMins(final double hours) {
+    public static double asMins(double hours) {
         return hours * Duration.MINS_PER_HOUR;
     }
 
@@ -58,7 +58,7 @@ public class Hours extends ConcreteDuration {
      *
      * @return hours expressed in revs
      */
-    public static double asRevs(final double hours) {
+    public static double asRevs(double hours) {
         return hours / Duration.HOURS_PER_REV;
     }
 
@@ -67,7 +67,7 @@ public class Hours extends ConcreteDuration {
      *
      * @return hours expressed in days
      */
-    public static double asDays(final double hours) {
+    public static double asDays(double hours) {
         return hours / Duration.HOURS_PER_DAY;
     }
 
@@ -76,7 +76,7 @@ public class Hours extends ConcreteDuration {
      *
      * @return hours expressed in JulianYears
      */
-    public static double asJulianYears(final double hours) {
+    public static double asJulianYears(double hours) {
         return hours / Duration.HOURS_PER_JULIAN_YEAR;
     }
 
@@ -84,7 +84,7 @@ public class Hours extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#set(Duration)
      */
     @Override
-    public Duration set(final Duration d) {
+    public Duration set(Duration d) {
         value = d.asHours();
 
         return this;
@@ -150,7 +150,7 @@ public class Hours extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration add(final Duration d) {
+    public Duration add(Duration d) {
         value += d.asHours();
 
         return this;
@@ -160,7 +160,7 @@ public class Hours extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration sub(final Duration d) {
+    public Duration sub(Duration d) {
         value -= d.asHours();
 
         return this;

@@ -10,7 +10,7 @@ public class KHRTextureTransform {
 	public static final String EXT = "KHR_texture_transform";
 	
 	public float [] offset = {0f, 0f};
-	public float rotation = 0f;
+	public float rotation;
 	public float [] scale = {1f, 1f};
 	public Integer texCoord;
 }

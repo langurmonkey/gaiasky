@@ -19,7 +19,7 @@ public final class FilenameComparator implements Comparator<Path> {
             Pattern.compile("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
 
     @Override
-    public final int compare(Path p1, Path p2) {
+    public int compare(Path p1, Path p2) {
         // Optional "NULLS LAST" semantics:
         if (p1 == null || p2 == null)
             return p1 == null ? p2 == null ? 0 : -1 : 1;

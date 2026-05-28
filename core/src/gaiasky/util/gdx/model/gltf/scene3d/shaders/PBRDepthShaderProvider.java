@@ -17,7 +17,7 @@ import gaiasky.util.gdx.shader.provider.DepthIntShaderProvider;
 
 public class PBRDepthShaderProvider extends DepthIntShaderProvider
 {
-	private static String defaultVertexShader = null;
+	private static String defaultVertexShader;
 
 	public static String getDefaultVertexShader () {
 		if (defaultVertexShader == null)
@@ -25,7 +25,7 @@ public class PBRDepthShaderProvider extends DepthIntShaderProvider
 		return defaultVertexShader;
 	}
 
-	private static String defaultFragmentShader = null;
+	private static String defaultFragmentShader;
 
 	public static String getDefaultFragmentShader () {
 		if (defaultFragmentShader == null)
@@ -38,10 +38,10 @@ public class PBRDepthShaderProvider extends DepthIntShaderProvider
 		config.vertexShaderCode = getDefaultVertexShader();
 		config.fragmentShaderCode = getDefaultFragmentShader();
 		return config;
-	};
+	}
 
-	
-	public PBRDepthShaderProvider(Config config) {
+
+    public PBRDepthShaderProvider(Config config) {
 		super(config == null ? new Config() : config);
 		if(config.vertexShaderCode == null) config.vertexShaderCode = getDefaultVertexShader();
 		if(config.fragmentShaderCode == null) config.fragmentShaderCode = getDefaultFragmentShader();

@@ -234,12 +234,12 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
     }
 
     @Override
-    public void set_ambient_light(final float value) {
+    public void set_ambient_light(float value) {
         if (api.validator.checkNum(value, Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, "ambientLight"))
             api.base.post_runnable(() -> em.post(Event.AMBIENT_LIGHT_CMD, this, value));
     }
 
-    public void set_ambient_light(final int value) {
+    public void set_ambient_light(int value) {
         set_ambient_light((float) value);
     }
 
@@ -271,7 +271,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
     }
 
     @Override
-    public void set_star_brightness(final float value) {
+    public void set_star_brightness(float value) {
         if (api.validator.checkNum(value, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness")) em.post(Event.STAR_BRIGHTNESS_CMD,
                                                                                                              this,
                                                                                                              MathUtilsDouble.lint(value,
@@ -281,7 +281,7 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
                                                                                                                                   Constants.MAX_STAR_BRIGHTNESS));
     }
 
-    public void set_star_brightness(final int brightness) {
+    public void set_star_brightness(int brightness) {
         set_star_brightness((float) brightness);
     }
 
@@ -295,12 +295,12 @@ public class GraphicsModule extends APIModule implements GraphicsAPI {
     }
 
     @Override
-    public void set_point_size(final float size) {
+    public void set_point_size(float size) {
         if (api.validator.checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size"))
             em.post(Event.STAR_POINT_SIZE_CMD, this, size);
     }
 
-    public void set_point_size(final long size) {
+    public void set_point_size(long size) {
         set_point_size((float) size);
     }
 

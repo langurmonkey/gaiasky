@@ -477,7 +477,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
 
         mantLo = 0L;
         if ((doubleAsLong & DOUBLE_EXP_MASK) == 0) {
-            final int numOfZeros = Long.numberOfLeadingZeros(
+            int numOfZeros = Long.numberOfLeadingZeros(
                     doubleAsLong);
             exponent = EXPONENT_BIAS - EXP_0D - (numOfZeros - 12);
             mantHi = 0L;
@@ -523,7 +523,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
 
         // Shift the value left so that its highest non-zero bit get shifted out
         // it should become the implied unity
-        final int bitsToShift = Long.numberOfLeadingZeros(value) + 1;
+        int bitsToShift = Long.numberOfLeadingZeros(value) + 1;
         value = (bitsToShift == 64) ? 0 : value << bitsToShift;
         return fromUnbiasedExponent(negative, 64 - bitsToShift, value, 0);
     }
@@ -556,12 +556,12 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @return the value of this {@link QuadrupleImmutable} instance converted to an {@code int}.
      */
     public int intValue() {
-        final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // Unbiased exponent
+        long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS; // Unbiased exponent
         if (exp < 0 || isNaN()) return 0;
         if (exp >= 31)                                              // value <= Integer.MIN_VALUE || value > Integer.MAX_VALUE
             return negative ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        final int intValue = exp == 0 ? 1 : (1 << exp) | (int) (mantHi >>> 64 - exp);  // implicit unity | fractional part of the mantissa, shifted rightwards
+        int intValue = exp == 0 ? 1 : (1 << exp) | (int) (mantHi >>> 64 - exp);  // implicit unity | fractional part of the mantissa, shifted rightwards
         return negative ? -intValue : intValue;
     }
 
@@ -572,12 +572,12 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @return the value of this {@link QuadrupleImmutable} instance converted to a {@code long}.
      */
     public long longValue() {
-        final long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
+        long exp = (exponent & LOWER_32_BITS) - EXPONENT_BIAS;
         if (exp < 0 || isNaN()) return 0;
         if (exp >= 63)
             return negative ? Long.MIN_VALUE : Long.MAX_VALUE;
 
-        final long longValue = exp == 0 ? 1 : (1L << exp) | (mantHi >>> 64 - exp);
+        long longValue = exp == 0 ? 1 : (1L << exp) | (mantHi >>> 64 - exp);
         return negative ? -longValue : longValue;
     }
 
@@ -636,7 +636,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
 
         if (expD > EXP_0D)
             return negative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
-        final long lValue = ((long) (expD + EXP_0D) << 52) | dMant | (negative ? DOUBLE_SIGN_MASK : 0);
+        long lValue = ((long) (expD + EXP_0D) << 52) | dMant | (negative ? DOUBLE_SIGN_MASK : 0);
         return Double.longBitsToDouble(lValue);
     }
 
@@ -649,7 +649,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @return the reference to this object, which holds a new value that equals
      * the sum of its previous value and the value of the summand
      */
-    public QuadrupleImmutable add(final QuadrupleImmutable summand) {
+    public QuadrupleImmutable add(QuadrupleImmutable summand) {
         if (isNaN() || summand.isNaN()) return NAN;
 
         if (isInfinite()) {
@@ -933,7 +933,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
         // and returns additional 64 bits of the root
 
         if (absExp % 2 != 0) {                              // Exponent is odd,
-            final long[] multed = multBySqrt2(f.mantHi, f.mantLo,
+            long[] multed = multBySqrt2(f.mantHi, f.mantLo,
                                               thirdWord); // multiply this value by sqrt(2), fill mantissa with the new value
             f.mantHi = multed[0];
             f.mantLo = multed[1];
@@ -1080,7 +1080,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                 return 0;
             }
 
-            final long shiftedOutBit = shiftMantissa(exp2);
+            long shiftedOutBit = shiftMantissa(exp2);
 
             exp2 = 0;
             if (shiftedOutBit != 0)
@@ -1125,7 +1125,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private MutableBag addUnsigned(final MutableBag summand) {
+        private MutableBag addUnsigned(MutableBag summand) {
             if (exponent != 0 && summand.exponent != 0) {
                 if (exponent == summand.exponent)
                     return addWithSameExps(summand);
@@ -1148,9 +1148,9 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private MutableBag addWithSameExps(final MutableBag summand) {
-            final long carryUp = addMant(summand.mantHi, summand.mantLo);
-            final long shiftedOutBit = mantLo & 1;
+        private MutableBag addWithSameExps(MutableBag summand) {
+            long carryUp = addMant(summand.mantHi, summand.mantLo);
+            long shiftedOutBit = mantLo & 1;
             shiftMantissaRight(1);
 
             if (shiftedOutBit != 0 && ++mantLo == 0)
@@ -1170,7 +1170,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private MutableBag addWitDifferentExps(final MutableBag summand) {
+        private MutableBag addWitDifferentExps(MutableBag summand) {
             long greaterHi, greaterLo, exp2;
 
             if (Integer.compareUnsigned(exponent, summand.exponent) < 0) {
@@ -1186,7 +1186,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                 exp2 = summand.exponent;
             }
 
-            final int shift = exponent - (int) exp2;
+            int shift = exponent - (int) exp2;
             if (Integer.compareUnsigned(shift,
                                         129) > 0) {
                 mantHi = greaterHi;
@@ -1197,8 +1197,8 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
             if (shift == 129)
                 return greaterPlusLowerBit(greaterHi, greaterLo);
 
-            final long shiftedOutBit = shiftAndSetUnity(shift);
-            final long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
+            long shiftedOutBit = shiftAndSetUnity(shift);
+            long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
             if (carryUp != 0)
                 shiftAndCorrectExponent(shiftedOutBit);
 
@@ -1212,7 +1212,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          *
          * @return this instance with the new value (the sum of the two summands)
          */
-        private MutableBag addNormalAndSubnormal(final MutableBag summand) {
+        private MutableBag addNormalAndSubnormal(MutableBag summand) {
             long greaterHi;
             long greaterLo;
             long shiftedOutBit;
@@ -1230,7 +1230,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                 mantLo = summand.mantLo;
             }
 
-            final int shift = exponent - 1;
+            int shift = exponent - 1;
             int lz = Long.numberOfLeadingZeros(mantHi);
             if (lz == 64) lz = 64 + Long.numberOfLeadingZeros(mantLo);
             if (shift + lz > 128) {
@@ -1241,7 +1241,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
 
             shiftedOutBit = highestShiftedOutBit(shift);
             shiftMantissaRight(shift);
-            final long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
+            long carryUp = addAndRoundUp(greaterHi, greaterLo, shiftedOutBit);
 
             if (carryUp != 0)
                 shiftAndCorrectExponent(shiftedOutBit);
@@ -1330,7 +1330,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @return the value of the highest bit that was shifted out
          */
         private long shiftAndSetUnity(int shift) {
-            final long shiftedOutBit = (shift == 0) ? 0 :
+            long shiftedOutBit = (shift == 0) ? 0 :
                     (shift <= 64) ? 1 & (mantLo >>> shift - 1) :
                             1 & (mantHi >>> shift - 65);
             shiftMantissaRight(shift);
@@ -1376,7 +1376,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param dontRoundUpAnyMore non-zero value
          */
         private void shiftAndCorrectExponent(long dontRoundUpAnyMore) {
-            final long shiftedOutBit = dontRoundUpAnyMore != 0 ? 0 : (mantLo & 1);
+            long shiftedOutBit = dontRoundUpAnyMore != 0 ? 0 : (mantLo & 1);
             shiftMantissaRight(1);
             if (shiftedOutBit != 0)
                 addMant(0, 1);
@@ -1405,11 +1405,11 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          *
          * @param subtrahend the value to be subtracted
          */
-        private void subtractUnsigned(final MutableBag subtrahend) {
+        private void subtractUnsigned(MutableBag subtrahend) {
             long minuendLo, minuendHi;
             int lesserExp;
 
-            final int thisIsGreater = compareMagnitudeTo(subtrahend); // ignores signs
+            int thisIsGreater = compareMagnitudeTo(subtrahend); // ignores signs
             if (thisIsGreater == 0)                             // operands are equal in magnitude
             {
                 assignZero();
@@ -1457,7 +1457,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @return 1 if this instance is greater in magnitude than the {@code other} instance,
          * 0 if the argument is equal in magnitude to this instance, -1 if this instance is less in magnitude, than the argument
          */
-        public int compareMagnitudeTo(final MutableBag other) {
+        public int compareMagnitudeTo(MutableBag other) {
             // 20.10.24 18:44:39 Regarding NaNs, behave like doubles
             if (isNaN())
                 return other.isNaN() ? 0 : 1;
@@ -1488,7 +1488,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param lesserExp the exponent of the subtrahend
          */
         private void subtractNormals(long minuendLo, long minuendHi, int lesserExp) {
-            final int shift = exponent - lesserExp;
+            int shift = exponent - lesserExp;
             if (shift > 130) {
                 mantHi = minuendHi;
                 mantLo = minuendLo;
@@ -1544,7 +1544,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param minuendHi the higher 64 bits of the minuend
          */
         private void subtract_1e_129(long minuendLo, long minuendHi) {
-            final long subtrahendHi = mantHi, subtrahendLo = mantLo;
+            long subtrahendHi = mantHi, subtrahendLo = mantLo;
 
             if ((minuendHi | minuendLo) == 0) {
                 mantHi = mantLo = -1;
@@ -1572,7 +1572,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param shift     the difference between the exponents
          */
         private void subtractDifferentExp(long minuendLo, long minuendHi, int shift) {
-            final long shiftedOutBits = shiftMantissaRight(
+            long shiftedOutBits = shiftMantissaRight(
                     shift);
             setUnity(shift);
             long borrow =
@@ -1694,8 +1694,8 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param minuendHi the higher 64 bits of the mantissa of the minuend
          */
         private void subtractSubnormalFromNormal(long minuendLo, long minuendHi) {
-            final int shift = exponent - 1;
-            final int lz = numberOfLeadingZeros();
+            int shift = exponent - 1;
+            int lz = numberOfLeadingZeros();
 
             if (((shift & 0xFFFF_FF00) != 0) || (shift + lz > 129)) {
                 mantHi = minuendHi;
@@ -1703,7 +1703,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                 return;
             }
 
-            final long shiftedOutBits = shiftMantissaRight(
+            long shiftedOutBits = shiftMantissaRight(
                     shift);
             long borrow = Long.compareUnsigned(shiftedOutBits, HIGH_BIT) > 0 ? 1 : 0;
 
@@ -1808,7 +1808,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          */
         private void multUnsigned(QuadrupleImmutable factor) {
             // will use these buffers to hold unpacked mantissas of the factors (5 longs each, 4 x 32 bits + higher (implicit) unity)
-            final long[] factor1 = buffers.get().BUFFER_5x32_A, factor2 = buffers.get().BUFFER_5x32_B, product = buffers.get().BUFFER_10x32_A;
+            long[] factor1 = buffers.get().BUFFER_5x32_A, factor2 = buffers.get().BUFFER_5x32_B, product = buffers.get().BUFFER_10x32_A;
 
             long productExponent = Integer.toUnsignedLong(
                     exponent)
@@ -1826,7 +1826,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
             }
 
             multiplyBuffers(factor1, factor2, product);
-            final boolean isRoundedUp = roundBuffer(product);
+            boolean isRoundedUp = roundBuffer(product);
 
             productExponent = normalizeProduct(product, productExponent, isRoundedUp);
             if (productExponent > EXPONENT_OF_MAX_VALUE) {
@@ -1871,7 +1871,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
             }
 
             if (oneIsSubnormal) {
-                final int lz = numberOfLeadingZeros();
+                int lz = numberOfLeadingZeros();
                 productExponent -= lz;
                 if (productExponent < -129)
                     return productExponent;
@@ -1900,7 +1900,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                     "Factors' lengths must be equal to each other and twice less than the product's length";
 
             Arrays.fill(product, 0);
-            final int maxIdxFact = factor1.length - 1;
+            int maxIdxFact = factor1.length - 1;
             long sum = 0;
 
             for (int i = maxIdxFact; i >= 0; i--) {
@@ -2009,7 +2009,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param buffer the buffer of (at least) 6 longs, containing the mantissa of a Float128 value
          */
         private void shiftBuffRightWithRounding(long[] buffer) {
-            final long carry = buffer[5] & 1;
+            long carry = buffer[5] & 1;
             shiftBuffRightWithoutRounding(buffer);
             buffer[5] += carry;
             for (int i = 5; i >= 2; i--) {
@@ -2112,7 +2112,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                 return;
 
             boolean needToDivide = true;
-            final int[] divisorBuff = buffers.get().BUFFER_5x32_A_INT;
+            int[] divisorBuff = buffers.get().BUFFER_5x32_A_INT;
             if (exponent != 0 & divisor.exponent != 0) {
                 if (mantHi == divisor.mantHi && mantLo == divisor.mantLo) {
                     mantHi = mantLo = 0;
@@ -2223,7 +2223,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
             int shift = Long.numberOfLeadingZeros(mantHi);
             if (shift == 64)
                 shift += Long.numberOfLeadingZeros(mantLo);
-            final long result = shift;
+            long result = shift;
             shift++;
 
             if (shift <= 64) {
@@ -2248,8 +2248,8 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          *
          * @return (possibly adjusted) exponent of the quotient
          */
-        private long doDivide(long quotientExponent, final int[] divisor) {
-            final int[] dividend = buffers.get().BUFFER_10x32_A_INT;
+        private long doDivide(long quotientExponent, int[] divisor) {
+            int[] dividend = buffers.get().BUFFER_10x32_A_INT;
             quotientExponent = unpackMantissaTo(quotientExponent, divisor, dividend);
             divideBuffers(dividend, divisor, quotientExponent);
             return quotientExponent;
@@ -2267,7 +2267,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          *
          * @return (possibly decremented) exponent of the quotient
          */
-        private long unpackMantissaTo(long quotientExponent, final int[] divisor, final int[] dividend) {
+        private long unpackMantissaTo(long quotientExponent, int[] divisor, int[] dividend) {
             // The mantissa of this is normalized, the normalized mantissa of the divisor is in divisorBuff
             if (compareMantissaWith(divisor) < 0) {
                 unpackDoubledMantissaToBuff_10x32(dividend);
@@ -2292,7 +2292,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * or a negative value if the mantissa of this instance is less than the mantissa of the other Float128.
          */
         private int compareMantissaWith(int[] divisor) {
-            final int cmp = Long.compareUnsigned(mantHi, ((long) divisor[1] << 32) | (divisor[2] & LOWER_32_BITS));
+            int cmp = Long.compareUnsigned(mantHi, ((long) divisor[1] << 32) | (divisor[2] & LOWER_32_BITS));
             return cmp == 0 ? Long.compareUnsigned(mantLo, ((long) divisor[3] << 32) | (divisor[4] & LOWER_32_BITS)) : cmp;
         }
 
@@ -2347,9 +2347,9 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @param quotientExponent preliminary evaluated exponent of the quotient, may get adjusted
          */
         private void divideBuffers(int[] dividend, int[] divisor, long quotientExponent) {
-            final int[] quotientBuff = buffers.get().BUFFER_5x32_B_INT;
+            int[] quotientBuff = buffers.get().BUFFER_5x32_B_INT;
 
-            final long nextBit = divideArrays(dividend, divisor, quotientBuff);
+            long nextBit = divideArrays(dividend, divisor, quotientBuff);
 
             packMantissaFromWords_1to4(quotientBuff);
 
@@ -2377,13 +2377,13 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * <br>Covered
          */
         private static long divideArrays(int[] dividend, int[] divisor, int[] quotient) {
-            final long divisorHigh = ((long) divisor[0] << 32) | (divisor[1] & LOWER_32_BITS);
+            long divisorHigh = ((long) divisor[0] << 32) | (divisor[1] & LOWER_32_BITS);
             int offset = 0;
             quotient[offset++] = 1;
             subtractDivisor(divisor, dividend);
 
             do {
-                final long remainderHigh = ((long) dividend[offset + 1] << 32) | (dividend[offset + 2] & LOWER_32_BITS);
+                long remainderHigh = ((long) dividend[offset + 1] << 32) | (dividend[offset + 2] & LOWER_32_BITS);
 
                 long quotientWord = (dividend[offset] == 0) ?
                         divideUnsignedLongs(remainderHigh, divisorHigh) :
@@ -2418,16 +2418,15 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
         private static void subtractDivisor(int[] divisor, int[] remainder) {
             long carry = 0;
             for (int i = 5; i >= 1; i--) {
-                final long difference = (remainder[i] & LOWER_32_BITS) - (divisor[i - 1] & LOWER_32_BITS) + carry;
-                ;
+                long difference = (remainder[i] & LOWER_32_BITS) - (divisor[i - 1] & LOWER_32_BITS) + carry;
                 remainder[i] = (int) difference;
                 carry = difference >> 32;
             }
         }
 
         private static long divideUnsignedLongs(long dividend, long divisor) {
-            final long dividendHi = dividend >>> 16;
-            final long remainder = (dividendHi % divisor << 16) | (dividend & 0xFFFFL);
+            long dividendHi = dividend >>> 16;
+            long remainder = (dividendHi % divisor << 16) | (dividend & 0xFFFFL);
             return (dividendHi / divisor << 16) | (remainder / divisor);
         }
 
@@ -2443,9 +2442,9 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          */
         private static long divide65bits(long dividendHi, long dividendLo, long divisor) {
             dividendHi = dividendHi << 48 | dividendLo >>> 16;
-            final long quotientHi = dividendHi / divisor;
-            final long remainder = ((dividendHi % divisor) << 16) | (dividendLo & 0xFFFF);
-            final long quotientLo = remainder / divisor;
+            long quotientHi = dividendHi / divisor;
+            long remainder = ((dividendHi % divisor) << 16) | (dividendLo & 0xFFFF);
+            long quotientLo = remainder / divisor;
 
             return quotientHi << 16 | quotientLo;
         }
@@ -2471,7 +2470,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
 
             long difference = 0;
             for (int i = 4; i >= 0; i--) {
-                final long product = quotientWord * (divisor[i] & LOWER_32_BITS) + carry;
+                long product = quotientWord * (divisor[i] & LOWER_32_BITS) + carry;
                 difference = remainder[offset] - product;
                 remainder[offset--] = (int) difference;
                 carry = product >>> 32;
@@ -2493,7 +2492,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
             long carry = 0;
 
             for (int idx = 4; idx >= 0; idx--) {
-                final long sum = (remainder[offset] & LOWER_32_BITS) + (divisor[idx] & LOWER_32_BITS) + carry;
+                long sum = (remainder[offset] & LOWER_32_BITS) + (divisor[idx] & LOWER_32_BITS) + carry;
                 remainder[offset--] = (int) sum;
                 carry = sum >>> 32;
             }
@@ -2502,7 +2501,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
 
         private static boolean greaterThanHalfOfDivisor_3(int[] remainder, int[] divisor, int offset) {
             for (int idx = 0; idx < 4; idx++) {
-                final int cmp = Integer.compare(
+                int cmp = Integer.compare(
                         (remainder[offset] << 1) + (remainder[++offset] >>> 31) + Integer.MIN_VALUE,
                         // Doubled remainder
                         divisor[idx] + Integer.MIN_VALUE
@@ -2513,7 +2512,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
                 if (cmp < 0)
                     return false;
             }
-            final int cmp = Integer.compareUnsigned(
+            int cmp = Integer.compareUnsigned(
                     (remainder[offset] << 1),
                     divisor[4]
             );
@@ -2543,13 +2542,13 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * @return bits 128 -- 135 of the root in the high byte of the long result
          */
         private long sqrtMant() {
-            final long[] remainder = buffers.get().BUFFER_3x64_A;
-            final long[] rootX2 = buffers.get().BUFFER_3x64_B;
+            long[] remainder = buffers.get().BUFFER_3x64_A;
+            long[] rootX2 = buffers.get().BUFFER_3x64_B;
             Arrays.fill(rootX2, 0);
-            final long[] root = buffers.get().BUFFER_3x64_C;
+            long[] root = buffers.get().BUFFER_3x64_C;
             Arrays.fill(root, 0);
 
-            final long digit = findFirstDigit();
+            long digit = findFirstDigit();
 
             remainder[0] = mantHi - ((0x200 + digit) * digit << 48);
             remainder[1] = mantLo;
@@ -2580,7 +2579,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
          * to corresponding 8 bits of the sought root
          */
         private long findFirstDigit() {
-            final int sqrtDigit = (int) (mantHi >>> 48);
+            int sqrtDigit = (int) (mantHi >>> 48);
             int idx = Arrays.binarySearch(SQUARE_BYTES, sqrtDigit);
             if (idx < 0) idx = -idx - 2;
             return ROOT_BYTES[idx];
@@ -2617,13 +2616,13 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      *
      * @return the position of the next to be found
      */
-    private static int computeNextDigit(final long[] remainder, final long[] rootX2, final long[] root, int bitNumber) {
-        final long[] aux = buffers.get().BUFFER_3x64_D;
-        final long digit = findNextDigit(rootX2, remainder, aux,
+    private static int computeNextDigit(long[] remainder, long[] rootX2, long[] root, int bitNumber) {
+        long[] aux = buffers.get().BUFFER_3x64_D;
+        long digit = findNextDigit(rootX2, remainder, aux,
                                          bitNumber);
         addDigit(root, digit, bitNumber);
 
-        final boolean remainderIsEmpty = subtractBuff(aux,
+        boolean remainderIsEmpty = subtractBuff(aux,
                                                       remainder);
         if (remainderIsEmpty || bitNumber >= MAX_BITS_FOR_SQRT - 8)
             return Integer.MAX_VALUE;
@@ -2669,8 +2668,8 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @param rootBitNumber the position to place the most significant bit of the digit at, counting from MSB
      */
     private static void addDigit(long[] root, long digit, int rootBitNumber) {
-        final int buffIdx = rootBitNumber / 64;
-        final int bitIdx = rootBitNumber % 64;
+        int buffIdx = rootBitNumber / 64;
+        int bitIdx = rootBitNumber % 64;
         root[buffIdx] += digit << 56 - bitIdx;
     }
 
@@ -2721,8 +2720,8 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      * @param bitNumber the position to place the most significant bit of the digit at, counting from MSB
      */
     private static void addDigitToBuff(long[] buff, long digit, int bitNumber) { //
-        final int buffIdx = bitNumber / 64;
-        final int bitIdx = bitNumber % 64;
+        int buffIdx = bitNumber / 64;
+        int bitIdx = bitNumber % 64;
 
         if (bitIdx <= 64 - 8) {
             buff[buffIdx] += digit << 64 - 8 - bitIdx;
@@ -2780,10 +2779,10 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
     private static void multBufByDigit(long[] buff, long digit) {
         long carry = 0;
         for (int i = buff.length - 1; i >= 0; i--) {
-            final long prodLo = (buff[i] & LOWER_32_BITS) * digit + carry;
-            final long prodHi = (buff[i] >>> 32) * digit;
+            long prodLo = (buff[i] & LOWER_32_BITS) * digit + carry;
+            long prodHi = (buff[i] >>> 32) * digit;
             carry = prodHi >>> 32;
-            final long product = prodLo + (prodHi << 32);
+            long product = prodLo + (prodHi << 32);
             if (Long.compareUnsigned(product, (prodHi << 32)) < 0)
                 carry++;
             buff[i] = product;
@@ -2811,7 +2810,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
         buff464[2] = mantLo >>> 1 | mantHi << 63;
         buff464[3] = thirdWord >>> 1 | mantLo << 63;
 
-        final long[] product = multPacked3x64(
+        long[] product = multPacked3x64(
         );
 
         product[0] = product[1] << 2 | product[2] >>> 62;
@@ -2987,7 +2986,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
      */
     private static void multBuffBy10() {
         var buff1232 = buffers.get().BUFFER_12x32;
-        final int maxIdx = buff1232.length - 1;
+        int maxIdx = buff1232.length - 1;
         buff1232[0] &= LOWER_32_BITS;
         buff1232[maxIdx] *= 10;
         for (int i = maxIdx - 1; i >= 0; i--) {
@@ -3012,7 +3011,7 @@ public record QuadrupleImmutable(boolean negative, int exponent, long mantHi,
 
         for (int i = 5; i >= 0; i--) // compute partial 32-bit products
             for (int j = 5; j >= 0; j--) {
-                final long part = buff632a[i] * buff632b[j];
+                long part = buff632a[i] * buff632b[j];
                 buff1232[j + i + 1] += part & LOWER_32_BITS;
                 buff1232[j + i] += part >>> 32;
             }

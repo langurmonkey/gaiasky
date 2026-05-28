@@ -15,7 +15,7 @@ import net.jafama.FastMath;
  * This class helps send load progress events in a streamlined way.
  */
 public class UpdaterHelper {
-    private static Logger.Log logger = Logger.getLogger(UpdaterHelper.class);
+    private static final Logger.Log logger = Logger.getLogger(UpdaterHelper.class);
 
     private final String name;
     private final long count;

@@ -111,8 +111,8 @@ public class DirectionalShadowLight extends DirectionalLightEx implements Shadow
 	
 	public void begin() {
 		validate();
-		final int w = fbo.getWidth();
-		final int h = fbo.getHeight();
+		int w = fbo.getWidth();
+		int h = fbo.getHeight();
 		fbo.begin();
 		Gdx.gl.glViewport(0, 0, w, h);
 		Gdx.gl.glClearColor(1, 1, 1, 1);

@@ -33,7 +33,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter baseColorTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.BaseColorTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -53,7 +53,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter emissiveTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.EmissiveTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -63,7 +63,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter normalTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.NormalTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -73,7 +73,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter metallicRoughnessTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.MetallicRoughnessTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -116,7 +116,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter occlusionTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.OcclusionTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -127,7 +127,7 @@ public class PBRShader extends DefaultIntShader
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
 			PBRCubemapAttribute diffuseEnvAttribute = combinedAttributes.get(PBRCubemapAttribute.class, PBRCubemapAttribute.DiffuseEnv);
-			final int unit = shader.context.textureBinder.bind(diffuseEnvAttribute.textureDescription);
+			int unit = shader.context.textureBinder.bind(diffuseEnvAttribute.textureDescription);
 			shader.set(inputID, unit);
 		}
 		
@@ -138,7 +138,7 @@ public class PBRShader extends DefaultIntShader
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
 			PBRCubemapAttribute specularEnvAttribute = combinedAttributes.get(PBRCubemapAttribute.class, PBRCubemapAttribute.SpecularEnv);
-			final int unit = shader.context.textureBinder.bind(specularEnvAttribute.textureDescription);
+			int unit = shader.context.textureBinder.bind(specularEnvAttribute.textureDescription);
 			shader.set(inputID, unit);
 		}
 		
@@ -160,7 +160,7 @@ public class PBRShader extends DefaultIntShader
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
 			PBRTextureAttribute attribute = combinedAttributes.get(PBRTextureAttribute.class, PBRTextureAttribute.BRDFLUTTexture);
 			if(attribute != null){
-				final int unit = shader.context.textureBinder.bind(attribute.textureDescription);
+				int unit = shader.context.textureBinder.bind(attribute.textureDescription);
 				shader.set(inputID, unit);
 			}
 		}
@@ -218,7 +218,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter transmissionTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.TransmissionTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -264,7 +264,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter thicknessTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.ThicknessTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -292,7 +292,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter specularFactorTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.SpecularFactorTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -302,7 +302,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter specularColorTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.Specular))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -344,7 +344,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter iridescenceTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.IridescenceTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -353,7 +353,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter iridescenceThicknessTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.IridescenceThicknessTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -363,7 +363,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter transmissionSourceTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
 				.get(PBRTextureAttribute.TransmissionSourceTexture))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -387,7 +387,7 @@ public class PBRShader extends DefaultIntShader
 	public final static Setter specularMirrorTextureSetter = new LocalSetter() {
 		@Override
 		public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-			final int unit = shader.context.textureBinder.bind(((MirrorSourceAttribute)(combinedAttributes
+			int unit = shader.context.textureBinder.bind(((MirrorSourceAttribute)(combinedAttributes
 				.get(MirrorSourceAttribute.Type))).textureDescription);
 			shader.set(inputID, unit);
 		}
@@ -441,7 +441,7 @@ public class PBRShader extends DefaultIntShader
 		}
 	};
 
-	private static final PBRTextureAttribute transformTexture [] = {null, null};
+	private static final PBRTextureAttribute[] transformTexture = {null, null};
 
 	public final int u_metallicRoughness;
 	public final int u_occlusionStrength; 
@@ -470,11 +470,11 @@ public class PBRShader extends DefaultIntShader
 
 	private int u_ambientLight;
 	
-	private long textureCoordinateMapMask;
+	private final long textureCoordinateMapMask;
 
-	private long morphTargetsMask;
+	private final long morphTargetsMask;
 	
-	private int vertexColorLayers;
+	private final int vertexColorLayers;
 
 	public int u_emissive;
 
@@ -600,9 +600,9 @@ public class PBRShader extends DefaultIntShader
 	private int computeVertexColorLayers(IntRenderable renderable) {
 		int num = 0;
 		VertexAttributes vertexAttributes = renderable.meshPart.mesh.getVertexAttributes();
-		final int n = vertexAttributes.size();
+		int n = vertexAttributes.size();
 		for (int i = 0; i < n; i++) {
-			final VertexAttribute attr = vertexAttributes.get(i);
+			VertexAttribute attr = vertexAttributes.get(i);
 			if (attr.usage == VertexAttributes.Usage.ColorUnpacked) num++;
 		}
 		return num;
@@ -630,9 +630,9 @@ public class PBRShader extends DefaultIntShader
 	public long computeMorphTargetsMask(IntRenderable renderable){
 		int morphTargetsFlag = 0;
 		VertexAttributes vertexAttributes = renderable.meshPart.mesh.getVertexAttributes();
-		final int n = vertexAttributes.size();
+		int n = vertexAttributes.size();
 		for (int i = 0; i < n; i++) {
-			final VertexAttribute attr = vertexAttributes.get(i);
+			VertexAttribute attr = vertexAttributes.get(i);
 			if (attr.usage == PBRVertexAttributes.Usage.PositionTarget) morphTargetsFlag |= (1 << attr.unit);
 			if (attr.usage == PBRVertexAttributes.Usage.NormalTarget) morphTargetsFlag |= (1 << (attr.unit + 8));
 			if (attr.usage == PBRVertexAttributes.Usage.TangentTarget) morphTargetsFlag |= (1 << (attr.unit + 16));
@@ -640,7 +640,7 @@ public class PBRShader extends DefaultIntShader
 		return morphTargetsFlag;
 	}
 	
-	private static int[] allTextureTypes = {
+	private static final int[] allTextureTypes = {
 		PBRTextureAttribute.BaseColorTexture,
 		PBRTextureAttribute.EmissiveTexture,
 		PBRTextureAttribute.NormalTexture,
@@ -663,7 +663,7 @@ public class PBRShader extends DefaultIntShader
 		for(int textureType : allTextureTypes){
 			PBRTextureAttribute attribute = attributes.get(PBRTextureAttribute.class, textureType);
 			if(attribute != null){
-				mask |= (attribute.index & 1) << maskShift;
+				mask |= (long) (attribute.index & 1) << maskShift;
 			}
 			maskShift++;
 		}
@@ -744,17 +744,15 @@ public class PBRShader extends DefaultIntShader
 		}
 		
 		if(u_morphTargets1 >= 0){
-			if(renderable.userData instanceof WeightVector){
-				WeightVector weightVector = (WeightVector)renderable.userData;
-				program.setUniformf(u_morphTargets1, weightVector.get(0), weightVector.get(1), weightVector.get(2), weightVector.get(3));
+			if(renderable.userData instanceof WeightVector weightVector){
+                program.setUniformf(u_morphTargets1, weightVector.get(0), weightVector.get(1), weightVector.get(2), weightVector.get(3));
 			}else{
 				program.setUniformf(u_morphTargets1, 0, 0, 0, 0);
 			}
 		}
 		if(u_morphTargets2 >= 0){
-			if(renderable.userData instanceof WeightVector){
-				WeightVector weightVector = (WeightVector)renderable.userData;
-				program.setUniformf(u_morphTargets2, weightVector.get(4), weightVector.get(5), weightVector.get(6), weightVector.get(7));
+			if(renderable.userData instanceof WeightVector weightVector){
+                program.setUniformf(u_morphTargets2, weightVector.get(4), weightVector.get(5), weightVector.get(6), weightVector.get(7));
 			}else{
 				program.setUniformf(u_morphTargets2, 0, 0, 0, 0);
 			}

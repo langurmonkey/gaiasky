@@ -41,7 +41,7 @@ public class Camcorder implements IObserver {
     float time;
     private final AtomicReference<RecorderState> mode;
     private final AtomicReference<CameraPath> recordingPath, playingPath;
-    private double fpsLimitBackup = 0.0;
+    private double fpsLimitBackup;
     private long startMs;
     private final AtomicReference<String> currentFileName;
 
@@ -132,9 +132,9 @@ public class Camcorder implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case RECORD_CAMERA_CMD -> {
                 var state = (Boolean) data[0];

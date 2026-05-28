@@ -24,7 +24,7 @@ public interface CameraAPI {
      *
      * @param name The name of the new focus object.
      */
-    void focus_mode(final String name);
+    void focus_mode(String name);
 
     /**
      * Set the camera in focus mode with the focus object identified by the given
@@ -36,7 +36,7 @@ public interface CameraAPI {
      * @param wait Maximum time, in seconds, to wait for the camera to face the
      *             focus. If negative, the call waits until the camera transition is finished.
      */
-    void focus_mode(final String name, final float wait);
+    void focus_mode(String name, float wait);
 
     /**
      * Set the camera in focus mode with the focus object identified by the given <code>focusName</code>.
@@ -45,7 +45,7 @@ public interface CameraAPI {
      *
      * @param name The name of the new focus object.
      */
-    void focus_mode_instant(final String name);
+    void focus_mode_instant(String name);
 
     /**
      * Set the camera in focus mode with the focus object identified by the given <code>focusName</code>.
@@ -54,7 +54,7 @@ public interface CameraAPI {
      *
      * @param name The name of the new focus object.
      */
-    void focus_mode_instant_go(final String name);
+    void focus_mode_instant_go(String name);
 
     /**
      * This method blocks until the focus is the object indicated by the name.

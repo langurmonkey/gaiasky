@@ -39,7 +39,7 @@ public class IntModelBatch implements Disposable {
      * @param shaderProvider The {@link IntShaderProvider} to use, will be disposed when this ModelBatch is disposed.
      * @param sorter         The {@link RenderableSorter} to use.
      */
-    public IntModelBatch(final RenderContext context, final IntShaderProvider shaderProvider, final IntRenderableSorter sorter) {
+    public IntModelBatch(RenderContext context, IntShaderProvider shaderProvider, IntRenderableSorter sorter) {
         this.sorter = (sorter == null) ? new DefaultIntRenderableSorter() : sorter;
         this.ownContext = (context == null);
         this.context = (context == null) ? new RenderContext(new DefaultTextureBinder(DefaultTextureBinder.LRU, 1)) : context;
@@ -52,7 +52,7 @@ public class IntModelBatch implements Disposable {
      * @param context        The {@link RenderContext} to use.
      * @param shaderProvider The {@link IntShaderProvider} to use, will be disposed when this ModelBatch is disposed.
      */
-    public IntModelBatch(final RenderContext context, final IntShaderProvider shaderProvider) {
+    public IntModelBatch(RenderContext context, IntShaderProvider shaderProvider) {
         this(context, shaderProvider, null);
     }
 
@@ -62,7 +62,7 @@ public class IntModelBatch implements Disposable {
      * @param context The {@link RenderContext} to use.
      * @param sorter  The {@link IntRenderableSorter} to use.
      */
-    public IntModelBatch(final RenderContext context, final IntRenderableSorter sorter) {
+    public IntModelBatch(RenderContext context, IntRenderableSorter sorter) {
         this(context, null, sorter);
     }
 
@@ -71,7 +71,7 @@ public class IntModelBatch implements Disposable {
      *
      * @param context The {@link RenderContext} to use.
      */
-    public IntModelBatch(final RenderContext context) {
+    public IntModelBatch(RenderContext context) {
         this(context, null, null);
     }
 
@@ -80,7 +80,7 @@ public class IntModelBatch implements Disposable {
      *
      * @param shaderProvider The {@link IntShaderProvider} to use, will be disposed when this ModelBatch is disposed.
      **/
-    public IntModelBatch(final IntShaderProvider shaderProvider) {
+    public IntModelBatch(IntShaderProvider shaderProvider) {
         this(null, shaderProvider, null);
     }
 
@@ -90,7 +90,7 @@ public class IntModelBatch implements Disposable {
      * @param shaderProvider The {@link IntShaderProvider} to use, will be disposed when this ModelBatch is disposed.
      * @param sorter         The {@link IntRenderableSorter} to use.
      */
-    public IntModelBatch(final IntShaderProvider shaderProvider, final IntRenderableSorter sorter) {
+    public IntModelBatch(IntShaderProvider shaderProvider, IntRenderableSorter sorter) {
         this(null, shaderProvider, sorter);
     }
 
@@ -101,7 +101,7 @@ public class IntModelBatch implements Disposable {
      * @param vertexShaderCode   The vertex shader to use.
      * @param fragmentShaderCode The fragment shader to use.
      */
-    public IntModelBatch(final String vertexShaderCode, final String fragmentShaderCode) {
+    public IntModelBatch(String vertexShaderCode, String fragmentShaderCode) {
         this(null, new DefaultIntShaderProvider(vertexShaderCode, fragmentShaderCode), null);
     }
 
@@ -117,7 +117,7 @@ public class IntModelBatch implements Disposable {
      *
      * @param cam The {@link Camera} to be used when rendering and sorting.
      */
-    public void begin(final Camera cam) {
+    public void begin(Camera cam) {
         if (camera != null)
             throw new GdxRuntimeException("Call end() first.");
         camera = cam;
@@ -141,7 +141,7 @@ public class IntModelBatch implements Disposable {
      *
      * @param cam The new camera to use.
      */
-    public void setCamera(final Camera cam) {
+    public void setCamera(Camera cam) {
         if (camera == null)
             throw new GdxRuntimeException("Call begin() first.");
         if (renderables.size > 0)
@@ -183,7 +183,7 @@ public class IntModelBatch implements Disposable {
         sorter.sort(camera, renderables);
         IntShader currentShader = null;
         for (int i = 0; i < renderables.size; i++) {
-            final IntRenderable renderable = renderables.get(i);
+            IntRenderable renderable = renderables.get(i);
             if (currentShader != renderable.shader) {
                 if (currentShader != null)
                     currentShader.end();
@@ -227,7 +227,7 @@ public class IntModelBatch implements Disposable {
      *
      * @param renderable The {@link IntRenderable} to be added.
      */
-    public void render(final IntRenderable renderable) {
+    public void render(IntRenderable renderable) {
         renderable.shader = shaderProvider.getShader(renderable);
         renderable.meshPart.mesh.setAutoBind(false);
         renderables.add(renderable);
@@ -239,8 +239,8 @@ public class IntModelBatch implements Disposable {
      *
      * @param renderableProvider the renderable provider
      */
-    public void render(final IntRenderableProvider renderableProvider) {
-        final int offset = renderables.size;
+    public void render(IntRenderableProvider renderableProvider) {
+        int offset = renderables.size;
         renderableProvider.getRenderables(renderables, renderablesPool);
         for (int i = offset; i < renderables.size; i++) {
             IntRenderable renderable = renderables.get(i);
@@ -254,8 +254,8 @@ public class IntModelBatch implements Disposable {
      *
      * @param renderableProviders one or more renderable providers
      */
-    public <T extends IntRenderableProvider> void render(final Iterable<T> renderableProviders) {
-        for (final IntRenderableProvider renderableProvider : renderableProviders)
+    public <T extends IntRenderableProvider> void render(Iterable<T> renderableProviders) {
+        for (IntRenderableProvider renderableProvider : renderableProviders)
             render(renderableProvider);
     }
 
@@ -267,8 +267,8 @@ public class IntModelBatch implements Disposable {
      * @param renderableProvider the renderable provider
      * @param environment        the {@link Environment} to use for the renderables
      */
-    public void render(final IntRenderableProvider renderableProvider, final Environment environment) {
-        final int offset = renderables.size;
+    public void render(IntRenderableProvider renderableProvider, Environment environment) {
+        int offset = renderables.size;
         renderableProvider.getRenderables(renderables, renderablesPool);
         for (int i = offset; i < renderables.size; i++) {
             IntRenderable renderable = renderables.get(i);
@@ -285,8 +285,8 @@ public class IntModelBatch implements Disposable {
      * @param renderableProviders one or more renderable providers
      * @param environment         the {@link Environment} to use for the renderables
      */
-    public <T extends IntRenderableProvider> void render(final Iterable<T> renderableProviders, final Environment environment) {
-        for (final IntRenderableProvider renderableProvider : renderableProviders)
+    public <T extends IntRenderableProvider> void render(Iterable<T> renderableProviders, Environment environment) {
+        for (IntRenderableProvider renderableProvider : renderableProviders)
             render(renderableProvider, environment);
     }
 
@@ -298,8 +298,8 @@ public class IntModelBatch implements Disposable {
      * @param renderableProvider the renderable provider
      * @param shader             the shader to use for the renderables
      */
-    public void render(final IntRenderableProvider renderableProvider, final IntShader shader) {
-        final int offset = renderables.size;
+    public void render(IntRenderableProvider renderableProvider, IntShader shader) {
+        int offset = renderables.size;
         renderableProvider.getRenderables(renderables, renderablesPool);
         for (int i = offset; i < renderables.size; i++) {
             IntRenderable renderable = renderables.get(i);
@@ -316,8 +316,8 @@ public class IntModelBatch implements Disposable {
      * @param renderableProviders one or more renderable providers
      * @param shader              the shader to use for the renderables
      */
-    public <T extends IntRenderableProvider> void render(final Iterable<T> renderableProviders, final IntShader shader) {
-        for (final IntRenderableProvider renderableProvider : renderableProviders)
+    public <T extends IntRenderableProvider> void render(Iterable<T> renderableProviders, IntShader shader) {
+        for (IntRenderableProvider renderableProvider : renderableProviders)
             render(renderableProvider, shader);
     }
 
@@ -331,8 +331,8 @@ public class IntModelBatch implements Disposable {
      * @param environment        the {@link Environment} to use for the renderables
      * @param shader             the shader to use for the renderables
      */
-    public void render(final IntRenderableProvider renderableProvider, final Environment environment, final IntShader shader) {
-        final int offset = renderables.size;
+    public void render(IntRenderableProvider renderableProvider, Environment environment, IntShader shader) {
+        int offset = renderables.size;
         renderableProvider.getRenderables(renderables, renderablesPool);
         for (int i = offset; i < renderables.size; i++) {
             IntRenderable renderable = renderables.get(i);
@@ -352,8 +352,8 @@ public class IntModelBatch implements Disposable {
      * @param environment         the {@link Environment} to use for the renderables
      * @param shader              the shader to use for the renderables
      */
-    public <T extends IntRenderableProvider> void render(final Iterable<T> renderableProviders, final Environment environment, final IntShader shader) {
-        for (final IntRenderableProvider renderableProvider : renderableProviders)
+    public <T extends IntRenderableProvider> void render(Iterable<T> renderableProviders, Environment environment, IntShader shader) {
+        for (IntRenderableProvider renderableProvider : renderableProviders)
             render(renderableProvider, environment, shader);
     }
 

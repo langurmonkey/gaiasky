@@ -12,8 +12,8 @@ public class KHRMaterialsVolume {
 	
 	public static final String EXT = "KHR_materials_volume";
 	
-	public float thicknessFactor = 0f;
-	public GLTFTextureInfo thicknessTexture = null;
-	public Float attenuationDistance = null; // default +inf.
+	public float thicknessFactor;
+	public GLTFTextureInfo thicknessTexture;
+	public Float attenuationDistance; // default +inf.
 	public float [] attenuationColor = {1, 1, 1};
 }

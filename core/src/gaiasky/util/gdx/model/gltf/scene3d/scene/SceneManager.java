@@ -218,9 +218,8 @@ public class SceneManager implements Disposable {
 		PointLightsAttribute pla = environment.get(PointLightsAttribute.class, PointLightsAttribute.Type);
 		if(pla != null){
 			for(PointLight light : pla.lights){
-				if(light instanceof PointLightEx){
-					PointLightEx l = (PointLightEx) light;
-					if(l.range != null && !camera.frustum.sphereInFrustum(l.position, l.range)){
+				if(light instanceof PointLightEx l){
+                    if(l.range != null && !camera.frustum.sphereInFrustum(l.position, l.range)){
 						pointLights.lights.removeValue(l, true);
 					}
 				}
@@ -229,9 +228,8 @@ public class SceneManager implements Disposable {
 		SpotLightsAttribute sla = environment.get(SpotLightsAttribute.class, SpotLightsAttribute.Type);
 		if(sla != null){
 			for(SpotLight light : sla.lights){
-				if(light instanceof SpotLightEx){
-					SpotLightEx l = (SpotLightEx) light;
-					if(l.range != null && !camera.frustum.sphereInFrustum(l.position, l.range)){
+				if(light instanceof SpotLightEx l){
+                    if(l.range != null && !camera.frustum.sphereInFrustum(l.position, l.range)){
 						spotLights.lights.removeValue(l, true);
 					}
 				}
@@ -338,7 +336,7 @@ public class SceneManager implements Disposable {
 		if(dla != null){
 			for(DirectionalLight dl : dla.lights){
 				if(dl instanceof DirectionalLight){
-					return (DirectionalLight)dl;
+					return dl;
 				}
 			}
 		}

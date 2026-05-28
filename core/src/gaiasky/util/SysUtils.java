@@ -88,8 +88,8 @@ public class SysUtils {
         unix = OS.contains("unix");
         solaris = OS.contains("sunos");
 
-        final var sysInfo = new SystemInfo();
-        final var codeName = sysInfo.getOperatingSystem().getVersionInfo().getCodeName();
+        var sysInfo = new SystemInfo();
+        var codeName = sysInfo.getOperatingSystem().getVersionInfo().getCodeName();
         flatpak = codeName != null && codeName.contains("Flatpak");
 
         if (linux) {
@@ -620,7 +620,7 @@ public class SysUtils {
 
         Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
 
-        final Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
         ByteBuffer pixels = pixmap.getPixels();
 
         t.bind();

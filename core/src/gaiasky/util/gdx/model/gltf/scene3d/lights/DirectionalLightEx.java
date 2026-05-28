@@ -19,7 +19,7 @@ public class DirectionalLightEx extends DirectionalLight
 	public float intensity = 1f;
 	
 	@Override
-	public DirectionalLight set (final DirectionalLight copyFrom) {
+	public DirectionalLight set (DirectionalLight copyFrom) {
 		if(copyFrom instanceof DirectionalLightEx){
 			return set(((DirectionalLightEx) copyFrom).baseColor, copyFrom.direction, ((DirectionalLightEx)copyFrom).intensity);
 		}else{
@@ -71,7 +71,7 @@ public class DirectionalLightEx extends DirectionalLight
 	
 	@Override
 	public boolean equals(DirectionalLight other) {
-		return (other instanceof DirectionalLightEx) ? equals((DirectionalLightEx)other) : false;
+		return other instanceof DirectionalLightEx && equals((DirectionalLightEx) other);
 	}
 	
 	public boolean equals(DirectionalLightEx other) {

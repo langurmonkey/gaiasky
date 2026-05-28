@@ -22,7 +22,7 @@ public class DefaultIntRenderableSorter implements IntRenderableSorter, Comparat
     private Camera camera;
 
     @Override
-    public void sort(final Camera camera, final Array<IntRenderable> renderables) {
+    public void sort(Camera camera, Array<IntRenderable> renderables) {
         this.camera = camera;
         renderables.sort(this);
     }
@@ -37,13 +37,13 @@ public class DefaultIntRenderableSorter implements IntRenderableSorter, Comparat
     }
 
     @Override
-    public int compare(final IntRenderable o1, final IntRenderable o2) {
+    public int compare(IntRenderable o1, IntRenderable o2) {
         var ba1 = o1.material.has(BlendingAttribute.Type) ? ((BlendingAttribute) Objects.requireNonNull(o1.material.get(BlendingAttribute.Type))) : null;
         var ba2 =  o2.material.has(BlendingAttribute.Type) ? ((BlendingAttribute) Objects.requireNonNull(o2.material.get(BlendingAttribute.Type))) : null;
 
         // Compare blended attributes.
-        final boolean b1 = ba1 != null && ba1.blended;
-        final boolean b2 = ba2 != null && ba2.blended;
+        boolean b1 = ba1 != null && ba1.blended;
+        boolean b2 = ba2 != null && ba2.blended;
         if (b1 != b2) {
             return b1 ? 1 : -1;
         }
@@ -58,8 +58,8 @@ public class DefaultIntRenderableSorter implements IntRenderableSorter, Comparat
         // Local transform.
         getTranslation(o1.worldTransform, o1.meshPart.center, tmpV1);
         getTranslation(o2.worldTransform, o2.meshPart.center, tmpV2);
-        final float dst = (int) (1000f * camera.position.dst2(tmpV1)) - (int) (1000f * camera.position.dst2(tmpV2));
-        final int result = dst < 0 ? -1 : (dst > 0 ? 1 : 0);
+        float dst = (int) (1000f * camera.position.dst2(tmpV1)) - (int) (1000f * camera.position.dst2(tmpV2));
+        int result = dst < 0 ? -1 : (dst > 0 ? 1 : 0);
         return b1 ? -result : result;
     }
 }

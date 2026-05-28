@@ -213,74 +213,74 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void add_forward(final double value) {
+    public void add_forward(double value) {
         if (api.validator.checkNum(value, -100d, 100d, "cameraForward"))
             api.base.post_runnable(() -> em.post(Event.CAMERA_FWD, this, value));
     }
 
-    public void add_forward(final long value) {
+    public void add_forward(long value) {
         add_forward((double) value);
     }
 
     @Override
-    public void add_rotation(final double dx, final double dy) {
+    public void add_rotation(double dx, double dy) {
         if (api.validator.checkNum(dx, -100d, 100d, "deltaX")
                 && api.validator.checkNum(dy, -100d, 100d, "deltaY"))
             api.base.post_runnable(() -> em.post(Event.CAMERA_ROTATE, this, dx, dy));
     }
 
-    public void add_rotation(final double deltaX, final long deltaY) {
+    public void add_rotation(double deltaX, long deltaY) {
         add_rotation(deltaX, (double) deltaY);
     }
 
-    public void add_rotation(final long deltaX, final double deltaY) {
+    public void add_rotation(long deltaX, double deltaY) {
         add_rotation((double) deltaX, deltaY);
     }
 
     @Override
-    public void add_roll(final double value) {
+    public void add_roll(double value) {
         if (api.validator.checkNum(value, -100d, 100d, "roll")) api.base.post_runnable(() -> em.post(Event.CAMERA_ROLL, this, value));
     }
 
-    public void add_roll(final long roll) {
+    public void add_roll(long roll) {
         add_roll((double) roll);
     }
 
     @Override
-    public void add_turn(final double dx, final double dy) {
+    public void add_turn(double dx, double dy) {
         if (api.validator.checkNum(dx, -100d, 100d, "deltaX")
                 && api.validator.checkNum(dy, -100d, 100d, "deltaY")) {
             api.base.post_runnable(() -> em.post(Event.CAMERA_TURN, this, dx, dy));
         }
     }
 
-    public void add_turn(final double deltaX, final long deltaY) {
+    public void add_turn(double deltaX, long deltaY) {
         add_turn(deltaX, (double) deltaY);
     }
 
-    public void add_turn(final long deltaX, final double deltaY) {
+    public void add_turn(long deltaX, double deltaY) {
         add_turn((double) deltaX, deltaY);
     }
 
-    public void add_turn(final long deltaX, final long deltaY) {
+    public void add_turn(long deltaX, long deltaY) {
         add_turn((double) deltaX, (double) deltaY);
     }
 
     @Override
-    public void add_yaw(final double amount) {
+    public void add_yaw(double amount) {
         add_turn(amount, 0d);
     }
 
-    public void cameraYaw(final long amount) {
+    public void cameraYaw(long amount) {
         add_yaw((double) amount);
     }
 
     @Override
-    public void add_pitch(final double amount) {
+    public void add_pitch(double amount) {
         add_turn(0d, amount);
     }
 
-    public void add_pitch(final long amount) {
+    public void add_pitch(long amount) {
         add_pitch((double) amount);
     }
 
@@ -290,7 +290,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
     }
 
     @Override
-    public void speed_setting(final float speed) {
+    public void speed_setting(float speed) {
         if (api.validator.checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
             api.base.post_runnable(() -> em.post(Event.CAMERA_SPEED_CMD,
                                                  this,
@@ -303,7 +303,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    public void speed_setting(final int speed) {
+    public void speed_setting(int speed) {
         speed_setting((float) speed);
     }
 
@@ -320,7 +320,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    public void rotation_speed_setting(final int speed) {
+    public void rotation_speed_setting(int speed) {
         this.rotation_speed_setting((float) speed);
     }
 
@@ -338,7 +338,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
         }
     }
 
-    public void turning_speed_setting(final int speed) {
+    public void turning_speed_setting(int speed) {
         this.turning_speed_setting((float) speed);
     }
 

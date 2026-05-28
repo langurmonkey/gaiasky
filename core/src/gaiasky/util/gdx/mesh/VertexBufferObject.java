@@ -20,8 +20,8 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 public class VertexBufferObject implements IntVertexData {
-    boolean isDirty = false;
-    boolean isBound = false;
+    boolean isDirty;
+    boolean isBound;
     private VertexAttributes attributes;
     private FloatBuffer buffer;
     private ByteBuffer byteBuffer;
@@ -103,7 +103,7 @@ public class VertexBufferObject implements IntVertexData {
             throw new GdxRuntimeException("Only ByteBuffer is currently supported");
         this.ownsBuffer = ownsBuffer;
 
-        final int l = byteBuffer.limit();
+        int l = byteBuffer.limit();
         byteBuffer.limit(byteBuffer.capacity());
         buffer = byteBuffer.asFloatBuffer();
         byteBuffer.limit(l);
@@ -129,7 +129,7 @@ public class VertexBufferObject implements IntVertexData {
     @Override
     public void updateVertices(int targetOffset, float[] vertices, int sourceOffset, int count) {
         isDirty = true;
-        final int pos = byteBuffer.position();
+        int pos = byteBuffer.position();
         byteBuffer.position(targetOffset * 4);
         BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
         byteBuffer.position(pos);
@@ -167,7 +167,7 @@ public class VertexBufferObject implements IntVertexData {
 
     @Override
     public void bind(ExtShaderProgram shader, int[] locations) {
-        final GL20 gl = Gdx.gl20;
+        GL20 gl = Gdx.gl20;
 
         gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, bufferHandle);
         if (isDirty) {
@@ -176,11 +176,11 @@ public class VertexBufferObject implements IntVertexData {
             isDirty = false;
         }
 
-        final int numAttributes = attributes.size();
+        int numAttributes = attributes.size();
         if (locations == null) {
             for (int i = 0; i < numAttributes; i++) {
-                final VertexAttribute attribute = attributes.get(i);
-                final int location = shader.getAttributeLocation(attribute.alias);
+                VertexAttribute attribute = attributes.get(i);
+                int location = shader.getAttributeLocation(attribute.alias);
                 if (location < 0)
                     continue;
                 shader.enableVertexAttribute(location);
@@ -191,8 +191,8 @@ public class VertexBufferObject implements IntVertexData {
 
         } else {
             for (int i = 0; i < numAttributes; i++) {
-                final VertexAttribute attribute = attributes.get(i);
-                final int location = locations[i];
+                VertexAttribute attribute = attributes.get(i);
+                int location = locations[i];
                 if (location < 0)
                     continue;
                 shader.enableVertexAttribute(location);
@@ -210,21 +210,21 @@ public class VertexBufferObject implements IntVertexData {
      * @param shader the shader
      */
     @Override
-    public void unbind(final ExtShaderProgram shader) {
+    public void unbind(ExtShaderProgram shader) {
         unbind(shader, null);
     }
 
     @Override
-    public void unbind(final ExtShaderProgram shader, final int[] locations) {
-        final GL20 gl = Gdx.gl20;
-        final int numAttributes = attributes.size();
+    public void unbind(ExtShaderProgram shader, int[] locations) {
+        GL20 gl = Gdx.gl20;
+        int numAttributes = attributes.size();
         if (locations == null) {
             for (int i = 0; i < numAttributes; i++) {
                 shader.disableVertexAttribute(attributes.get(i).alias);
             }
         } else {
             for (int i = 0; i < numAttributes; i++) {
-                final int location = locations[i];
+                int location = locations[i];
                 if (location >= 0)
                     shader.disableVertexAttribute(location);
             }

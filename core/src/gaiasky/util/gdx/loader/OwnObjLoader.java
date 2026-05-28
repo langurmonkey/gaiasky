@@ -33,7 +33,7 @@ import java.util.Locale;
 public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameters> {
     private static final Logger.Log logger = Logger.getLogger(OwnObjLoader.class);
 
-    public static boolean logWarning = false;
+    public static boolean logWarning;
     final FloatArray verts = new FloatArray(300);
     final FloatArray norms = new FloatArray(300);
     final FloatArray uvs = new FloatArray(200);
@@ -160,19 +160,19 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             return null;
 
         // Get number of objects/groups remaining after removing empty ones
-        final int numGroups = groups.size;
+        int numGroups = groups.size;
 
-        final IntModelData data = new IntModelData();
+        IntModelData data = new IntModelData();
 
         for (int g = 0; g < numGroups; g++) {
             Group group = groups.get(g);
             IntArray faces = group.faces;
-            final int numElements = faces.size;
-            final int numFaces = group.numFaces;
-            final boolean hasNorms = group.hasNorms;
-            final boolean hasUVs = group.hasUVs;
+            int numElements = faces.size;
+            int numFaces = group.numFaces;
+            boolean hasNorms = group.hasNorms;
+            boolean hasUVs = group.hasUVs;
 
-            final float[] finalVerts = new float[(numFaces * 3) * (3 + (hasNorms ? 3 : 0) + (hasUVs ? 2 : 0))];
+            float[] finalVerts = new float[(numFaces * 3) * (3 + (hasNorms ? 3 : 0) + (hasUVs ? 2 : 0))];
 
             for (int i = 0, vi = 0; i < numElements; ) {
                 int vertIndex = faces.get(i++) * 3;
@@ -192,8 +192,8 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
                 }
             }
 
-            final int numIndices = numFaces * 3 >= Integer.MAX_VALUE ? 0 : numFaces * 3;
-            final int[] finalIndices = new int[numIndices];
+            int numIndices = numFaces * 3 >= Integer.MAX_VALUE ? 0 : numFaces * 3;
+            int[] finalIndices = new int[numIndices];
             // If there are too many vertices in a mesh, we can't use indices.
             if (numIndices > 0) {
                 for (int i = 0; i < numIndices; i++) {
@@ -266,7 +266,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
     private int getIndex(String index, int size) {
         if (index == null || index.isEmpty())
             return 0;
-        final int idx = Integer.parseInt(index);
+        int idx = Integer.parseInt(index);
         if (idx < 0)
             return size + idx;
         else

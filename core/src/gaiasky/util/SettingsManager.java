@@ -394,7 +394,7 @@ public class SettingsManager {
      * @param settings     The settings object to persist.
      * @param settingsFile The file to save the settings to.
      */
-    public void persist(final Settings settings, final File settingsFile) {
+    public void persist(Settings settings, File settingsFile) {
         try {
             boolean backup = settings.program.safeMode;
             if (settings.program.safeModeFlag) {

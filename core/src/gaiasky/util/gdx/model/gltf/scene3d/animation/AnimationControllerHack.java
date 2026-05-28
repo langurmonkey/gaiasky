@@ -39,7 +39,7 @@ public class AnimationControllerHack extends IntAnimationController {
             return this;
         }
 
-        public Transform set(final Vector3 t, final Quaternion r, final Vector3 s, final WeightVector w) {
+        public Transform set(Vector3 t, Quaternion r, Vector3 s, WeightVector w) {
             translation.set(t);
             rotation.set(r);
             scale.set(s);
@@ -48,15 +48,15 @@ public class AnimationControllerHack extends IntAnimationController {
             return this;
         }
 
-        public Transform set(final Transform other) {
+        public Transform set(Transform other) {
             return set(other.translation, other.rotation, other.scale, other.weights);
         }
 
-        public Transform lerp(final Transform target, final float alpha) {
+        public Transform lerp(Transform target, float alpha) {
             return lerp(target.translation, target.rotation, target.scale, target.weights, alpha);
         }
 
-        public Transform lerp(final Vector3 targetT, final Quaternion targetR, final Vector3 targetS, final WeightVector targetW, final float alpha) {
+        public Transform lerp(Vector3 targetT, Quaternion targetR, Vector3 targetS, WeightVector targetW, float alpha) {
             translation.lerp(targetT, alpha);
             rotation.slerp(targetR, alpha);
             scale.lerp(targetS, alpha);
@@ -64,7 +64,7 @@ public class AnimationControllerHack extends IntAnimationController {
             return this;
         }
 
-        public void toMatrix4(final Matrix4 out) {
+        public void toMatrix4(Matrix4 out) {
             out.set(translation, rotation, scale);
         }
 
@@ -90,7 +90,7 @@ public class AnimationControllerHack extends IntAnimationController {
         }
     };
     private final static ObjectMap<IntNode, Transform> transforms = new ObjectMap<>();
-    private boolean applying = false;
+    private boolean applying;
     public boolean calculateTransforms = true;
 
     /**
@@ -109,7 +109,7 @@ public class AnimationControllerHack extends IntAnimationController {
      * @param weight The blend weight of this animation relative to the previous applied animations.
      */
     @Override
-    protected void apply(final IntAnimation animation, final float time, final float weight) {
+    protected void apply(IntAnimation animation, float time, float weight) {
         if (!applying) throw new GdxRuntimeException("You must call begin() before adding an animation");
         applyAnimationPlus(transforms, transformPool, weight, animation, time);
     }
@@ -133,7 +133,7 @@ public class AnimationControllerHack extends IntAnimationController {
      * Apply a single animation to the {@link ModelInstance} and update the it to reflect the changes.
      */
     @Override
-    protected void applyAnimation(final IntAnimation animation, final float time) {
+    protected void applyAnimation(IntAnimation animation, float time) {
         if (applying) throw new GdxRuntimeException("Call end() first");
         applyAnimationPlus(null, null, 1.f, animation, time);
         if (calculateTransforms) target.calculateTransforms();
@@ -143,8 +143,8 @@ public class AnimationControllerHack extends IntAnimationController {
      * Apply two animations, blending the second onto to first using weight.
      */
     @Override
-    protected void applyAnimations(final IntAnimation anim1, final float time1, final IntAnimation anim2, final float time2,
-                                   final float weight) {
+    protected void applyAnimations(IntAnimation anim1, float time1, IntAnimation anim2, float time2,
+                                   float weight) {
         if (anim2 == null || weight == 0.f)
             applyAnimation(anim1, time1);
         else if (anim1 == null || weight == 1.f)
@@ -162,8 +162,8 @@ public class AnimationControllerHack extends IntAnimationController {
 
     private final static Transform tmpT = new Transform();
 
-    private static <T> int getFirstKeyframeIndexAtTime(final Array<NodeKeyframe<T>> arr, final float time) {
-        final int n = arr.size - 1;
+    private static <T> int getFirstKeyframeIndexAtTime(Array<NodeKeyframe<T>> arr, float time) {
+        int n = arr.size - 1;
         for (int i = 0; i < n; i++) {
             if (time >= arr.get(i).keytime && time <= arr.get(i + 1).keytime) {
                 return i;
@@ -172,7 +172,7 @@ public class AnimationControllerHack extends IntAnimationController {
         return n;
     }
 
-    private static Vector3 getTranslationAtTime(final IntNodeAnimation nodeAnim, final float time, final Vector3 out) {
+    private static Vector3 getTranslationAtTime(IntNodeAnimation nodeAnim, float time, Vector3 out) {
         if (nodeAnim.translation == null) return out.set(nodeAnim.node.translation);
         if (nodeAnim.translation.size == 1) return out.set(nodeAnim.translation.get(0).value);
 
@@ -184,23 +184,23 @@ public class AnimationControllerHack extends IntAnimationController {
         }
 
         if (interpolation == Interpolation.STEP) {
-            final NodeKeyframe<Vector3> firstKeyframe = nodeAnim.translation.get(index);
+            NodeKeyframe<Vector3> firstKeyframe = nodeAnim.translation.get(index);
             out.set(firstKeyframe.value);
         } else if (interpolation == Interpolation.LINEAR) {
-            final NodeKeyframe<Vector3> firstKeyframe = nodeAnim.translation.get(index);
+            NodeKeyframe<Vector3> firstKeyframe = nodeAnim.translation.get(index);
             out.set(firstKeyframe.value);
             if (++index < nodeAnim.translation.size) {
-                final NodeKeyframe<Vector3> secondKeyframe = nodeAnim.translation.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<Vector3> secondKeyframe = nodeAnim.translation.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
                 out.lerp(secondKeyframe.value, t);
             } else {
                 out.set(firstKeyframe.value);
             }
         } else if (interpolation == Interpolation.CUBICSPLINE) {
-            final NodeKeyframe<Vector3> firstKeyframe = nodeAnim.translation.get(index);
+            NodeKeyframe<Vector3> firstKeyframe = nodeAnim.translation.get(index);
             if (++index < nodeAnim.translation.size) {
-                final NodeKeyframe<Vector3> secondKeyframe = nodeAnim.translation.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<Vector3> secondKeyframe = nodeAnim.translation.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
 
                 CubicVector3 firstCV = (CubicVector3) firstKeyframe.value;
                 CubicVector3 secondCV = (CubicVector3) secondKeyframe.value;
@@ -258,7 +258,7 @@ public class AnimationControllerHack extends IntAnimationController {
     }
 
 
-    private static Quaternion getRotationAtTime(final IntNodeAnimation nodeAnim, final float time, final Quaternion out) {
+    private static Quaternion getRotationAtTime(IntNodeAnimation nodeAnim, float time, Quaternion out) {
         if (nodeAnim.rotation == null) return out.set(nodeAnim.node.rotation);
         if (nodeAnim.rotation.size == 1) return out.set(nodeAnim.rotation.get(0).value);
 
@@ -271,23 +271,23 @@ public class AnimationControllerHack extends IntAnimationController {
         }
 
         if (interpolation == Interpolation.STEP) {
-            final NodeKeyframe<Quaternion> firstKeyframe = nodeAnim.rotation.get(index);
+            NodeKeyframe<Quaternion> firstKeyframe = nodeAnim.rotation.get(index);
             out.set(firstKeyframe.value);
         } else if (interpolation == Interpolation.LINEAR) {
-            final NodeKeyframe<Quaternion> firstKeyframe = nodeAnim.rotation.get(index);
+            NodeKeyframe<Quaternion> firstKeyframe = nodeAnim.rotation.get(index);
             out.set(firstKeyframe.value);
             if (++index < nodeAnim.rotation.size) {
-                final NodeKeyframe<Quaternion> secondKeyframe = nodeAnim.rotation.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<Quaternion> secondKeyframe = nodeAnim.rotation.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
                 out.slerp(secondKeyframe.value, t);
             } else {
                 out.set(firstKeyframe.value);
             }
         } else if (interpolation == Interpolation.CUBICSPLINE) {
-            final NodeKeyframe<Quaternion> firstKeyframe = nodeAnim.rotation.get(index);
+            NodeKeyframe<Quaternion> firstKeyframe = nodeAnim.rotation.get(index);
             if (++index < nodeAnim.rotation.size) {
-                final NodeKeyframe<Quaternion> secondKeyframe = nodeAnim.rotation.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<Quaternion> secondKeyframe = nodeAnim.rotation.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
 
                 CubicQuaternion firstCV = (CubicQuaternion) firstKeyframe.value;
                 CubicQuaternion secondCV = (CubicQuaternion) secondKeyframe.value;
@@ -301,7 +301,7 @@ public class AnimationControllerHack extends IntAnimationController {
         return out;
     }
 
-    private static Vector3 getScalingAtTime(final IntNodeAnimation nodeAnim, final float time, final Vector3 out) {
+    private static Vector3 getScalingAtTime(IntNodeAnimation nodeAnim, float time, Vector3 out) {
         if (nodeAnim.scaling == null) return out.set(nodeAnim.node.scale);
         if (nodeAnim.scaling.size == 1) return out.set(nodeAnim.scaling.get(0).value);
 
@@ -314,23 +314,23 @@ public class AnimationControllerHack extends IntAnimationController {
         }
 
         if (interpolation == Interpolation.STEP) {
-            final NodeKeyframe<Vector3> firstKeyframe = nodeAnim.scaling.get(index);
+            NodeKeyframe<Vector3> firstKeyframe = nodeAnim.scaling.get(index);
             out.set(firstKeyframe.value);
         } else if (interpolation == Interpolation.LINEAR) {
-            final NodeKeyframe<Vector3> firstKeyframe = nodeAnim.scaling.get(index);
+            NodeKeyframe<Vector3> firstKeyframe = nodeAnim.scaling.get(index);
             out.set(firstKeyframe.value);
             if (++index < nodeAnim.scaling.size) {
-                final NodeKeyframe<Vector3> secondKeyframe = nodeAnim.scaling.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<Vector3> secondKeyframe = nodeAnim.scaling.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
                 out.lerp(secondKeyframe.value, t);
             } else {
                 out.set(firstKeyframe.value);
             }
         } else if (interpolation == Interpolation.CUBICSPLINE) {
-            final NodeKeyframe<Vector3> firstKeyframe = nodeAnim.scaling.get(index);
+            NodeKeyframe<Vector3> firstKeyframe = nodeAnim.scaling.get(index);
             if (++index < nodeAnim.scaling.size) {
-                final NodeKeyframe<Vector3> secondKeyframe = nodeAnim.scaling.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<Vector3> secondKeyframe = nodeAnim.scaling.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
 
                 CubicVector3 firstCV = (CubicVector3) firstKeyframe.value;
                 CubicVector3 secondCV = (CubicVector3) secondKeyframe.value;
@@ -343,7 +343,7 @@ public class AnimationControllerHack extends IntAnimationController {
         return out;
     }
 
-    private static WeightVector getMorphTargetAtTime(final NodeAnimationHack nodeAnim, final float time, final WeightVector out) {
+    private static WeightVector getMorphTargetAtTime(NodeAnimationHack nodeAnim, float time, WeightVector out) {
         if (nodeAnim.weights == null) return out.set();
         if (nodeAnim.weights.size == 1) return out.set(nodeAnim.weights.get(0).value);
 
@@ -353,23 +353,23 @@ public class AnimationControllerHack extends IntAnimationController {
         interpolation = nodeAnim.weightsMode;
 
         if (interpolation == Interpolation.STEP) {
-            final NodeKeyframe<WeightVector> firstKeyframe = nodeAnim.weights.get(index);
+            NodeKeyframe<WeightVector> firstKeyframe = nodeAnim.weights.get(index);
             out.set(firstKeyframe.value);
         } else if (interpolation == Interpolation.LINEAR) {
-            final NodeKeyframe<WeightVector> firstKeyframe = nodeAnim.weights.get(index);
+            NodeKeyframe<WeightVector> firstKeyframe = nodeAnim.weights.get(index);
             out.set(firstKeyframe.value);
             if (++index < nodeAnim.weights.size) {
-                final NodeKeyframe<WeightVector> secondKeyframe = nodeAnim.weights.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<WeightVector> secondKeyframe = nodeAnim.weights.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
                 out.lerp(secondKeyframe.value, t);
             } else {
                 out.set(firstKeyframe.value);
             }
         } else if (interpolation == Interpolation.CUBICSPLINE) {
-            final NodeKeyframe<WeightVector> firstKeyframe = nodeAnim.weights.get(index);
+            NodeKeyframe<WeightVector> firstKeyframe = nodeAnim.weights.get(index);
             if (++index < nodeAnim.weights.size) {
-                final NodeKeyframe<WeightVector> secondKeyframe = nodeAnim.weights.get(index);
-                final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+                NodeKeyframe<WeightVector> secondKeyframe = nodeAnim.weights.get(index);
+                float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
 
                 CubicWeightVector firstCV = (CubicWeightVector) firstKeyframe.value;
                 CubicWeightVector secondCV = (CubicWeightVector) secondKeyframe.value;
@@ -383,8 +383,8 @@ public class AnimationControllerHack extends IntAnimationController {
         return out;
     }
 
-    private static Transform getNodeAnimationTransform(final IntNodeAnimation nodeAnim, final float time) {
-        final Transform transform = tmpT;
+    private static Transform getNodeAnimationTransform(IntNodeAnimation nodeAnim, float time) {
+        Transform transform = tmpT;
         getTranslationAtTime(nodeAnim, time, transform.translation);
         getRotationAtTime(nodeAnim, time, transform.rotation);
         getScalingAtTime(nodeAnim, time, transform.scale);
@@ -393,10 +393,10 @@ public class AnimationControllerHack extends IntAnimationController {
         return transform;
     }
 
-    private static void applyNodeAnimationDirectly(final IntNodeAnimation nodeAnim, final float time) {
-        final IntNode node = nodeAnim.node;
+    private static void applyNodeAnimationDirectly(IntNodeAnimation nodeAnim, float time) {
+        IntNode node = nodeAnim.node;
         node.isAnimated = true;
-        final Transform transform = getNodeAnimationTransform(nodeAnim, time);
+        Transform transform = getNodeAnimationTransform(nodeAnim, time);
         transform.toMatrix4(node.localTransform);
         if (node instanceof NodePlus) {
             if (((NodePlus) node).weights != null) {
@@ -408,12 +408,12 @@ public class AnimationControllerHack extends IntAnimationController {
         }
     }
 
-    private static void applyNodeAnimationBlending(final IntNodeAnimation nodeAnim, final ObjectMap<IntNode, Transform> out,
-                                                   final Pool<Transform> pool, final float alpha, final float time) {
+    private static void applyNodeAnimationBlending(IntNodeAnimation nodeAnim, ObjectMap<IntNode, Transform> out,
+                                                   Pool<Transform> pool, float alpha, float time) {
 
-        final IntNode node = nodeAnim.node;
+        IntNode node = nodeAnim.node;
         node.isAnimated = true;
-        final Transform transform = getNodeAnimationTransform(nodeAnim, time);
+        Transform transform = getNodeAnimationTransform(nodeAnim, time);
 
         Transform t = out.get(node, null);
         if (t != null) {
@@ -432,18 +432,18 @@ public class AnimationControllerHack extends IntAnimationController {
     /**
      * Helper method to apply one animation to either an object map for blending or directly to the bones.
      */
-    protected static void applyAnimationPlus(final ObjectMap<IntNode, Transform> out, final Pool<Transform> pool, final float alpha,
-                                             final IntAnimation animation, final float time) {
+    protected static void applyAnimationPlus(ObjectMap<IntNode, Transform> out, Pool<Transform> pool, float alpha,
+                                             IntAnimation animation, float time) {
 
         if (out == null) {
-            for (final IntNodeAnimation nodeAnim : animation.nodeAnimations)
+            for (IntNodeAnimation nodeAnim : animation.nodeAnimations)
                 applyNodeAnimationDirectly(nodeAnim, time);
         } else {
-            for (final IntNode node : out.keys())
+            for (IntNode node : out.keys())
                 node.isAnimated = false;
-            for (final IntNodeAnimation nodeAnim : animation.nodeAnimations)
+            for (IntNodeAnimation nodeAnim : animation.nodeAnimations)
                 applyNodeAnimationBlending(nodeAnim, out, pool, alpha, time);
-            for (final Entry<IntNode, Transform> e : out.entries()) {
+            for (Entry<IntNode, Transform> e : out.entries()) {
                 if (!e.key.isAnimated) {
                     e.key.isAnimated = true;
                     e.value.lerp(e.key.translation, e.key.rotation, e.key.scale, ((NodePlus) e.key).weights, alpha);

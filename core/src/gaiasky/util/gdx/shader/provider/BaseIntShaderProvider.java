@@ -25,13 +25,13 @@ public abstract class BaseIntShaderProvider implements IntShaderProvider, IObser
             if (shader.canRender(renderable))
                 return shader;
         }
-        final IntShader shader = createShader(renderable);
+        IntShader shader = createShader(renderable);
         shader.init();
         shaders.add(shader);
         return shader;
     }
 
-    protected abstract IntShader createShader(final IntRenderable renderable);
+    protected abstract IntShader createShader(IntRenderable renderable);
 
     @Override
     public void dispose() {

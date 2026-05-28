@@ -51,7 +51,7 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @param model The {@link IntModel} to create an instance of.
      */
-    public IntModelInstance(final IntModel model) {
+    public IntModelInstance(IntModel model) {
         this(model, (String[]) null);
     }
 
@@ -60,7 +60,7 @@ public class IntModelInstance implements IntRenderableProvider {
      * @param nodeId         The ID of the root {@link IntNode} of the {@link IntModel} for the instance to contain
      * @param mergeTransform True to apply the source node transform to the instance transform, resetting the node transform.
      */
-    public IntModelInstance(final IntModel model, final String nodeId, boolean mergeTransform) {
+    public IntModelInstance(IntModel model, String nodeId, boolean mergeTransform) {
         this(model, null, nodeId, false, false, mergeTransform);
     }
 
@@ -70,7 +70,7 @@ public class IntModelInstance implements IntRenderableProvider {
      * @param nodeId         The ID of the root {@link IntNode} of the {@link IntModel} for the instance to contain
      * @param mergeTransform True to apply the source node transform to the instance transform, resetting the node transform.
      */
-    public IntModelInstance(final IntModel model, final Matrix4 transform, final String nodeId, boolean mergeTransform) {
+    public IntModelInstance(IntModel model, Matrix4 transform, String nodeId, boolean mergeTransform) {
         this(model, transform, nodeId, false, false, mergeTransform);
     }
 
@@ -82,7 +82,7 @@ public class IntModelInstance implements IntRenderableProvider {
      * @param parentTransform True to apply the parent's node transform to the instance (only applicable if recursive is true).
      * @param mergeTransform  True to apply the source node transform to the instance transform, resetting the node transform.
      */
-    public IntModelInstance(final IntModel model, final String nodeId, boolean parentTransform, boolean mergeTransform) {
+    public IntModelInstance(IntModel model, String nodeId, boolean parentTransform, boolean mergeTransform) {
         this(model, null, nodeId, true, parentTransform, mergeTransform);
     }
 
@@ -95,8 +95,8 @@ public class IntModelInstance implements IntRenderableProvider {
      * @param parentTransform True to apply the parent's node transform to the instance (only applicable if recursive is true).
      * @param mergeTransform  True to apply the source node transform to the instance transform, resetting the node transform.
      */
-    public IntModelInstance(final IntModel model, final Matrix4 transform, final String nodeId, boolean parentTransform,
-            boolean mergeTransform) {
+    public IntModelInstance(IntModel model, Matrix4 transform, String nodeId, boolean parentTransform,
+                            boolean mergeTransform) {
         this(model, transform, nodeId, true, parentTransform, mergeTransform);
     }
 
@@ -107,8 +107,8 @@ public class IntModelInstance implements IntRenderableProvider {
      * @param parentTransform True to apply the parent's node transform to the instance (only applicable if recursive is true).
      * @param mergeTransform  True to apply the source node transform to the instance transform, resetting the node transform.
      */
-    public IntModelInstance(final IntModel model, final String nodeId, boolean recursive, boolean parentTransform,
-            boolean mergeTransform) {
+    public IntModelInstance(IntModel model, String nodeId, boolean recursive, boolean parentTransform,
+                            boolean mergeTransform) {
         this(model, null, nodeId, recursive, parentTransform, mergeTransform);
     }
 
@@ -120,8 +120,8 @@ public class IntModelInstance implements IntRenderableProvider {
      * @param parentTransform True to apply the parent's node transform to the instance (only applicable if recursive is true).
      * @param mergeTransform  True to apply the source node transform to the instance transform, resetting the node transform.
      */
-    public IntModelInstance(final IntModel model, final Matrix4 transform, final String nodeId, boolean recursive,
-            boolean parentTransform, boolean mergeTransform) {
+    public IntModelInstance(IntModel model, Matrix4 transform, String nodeId, boolean recursive,
+                            boolean parentTransform, boolean mergeTransform) {
         this(model, transform, nodeId, recursive, parentTransform, mergeTransform, defaultShareKeyframes);
     }
 
@@ -133,8 +133,8 @@ public class IntModelInstance implements IntRenderableProvider {
      * @param parentTransform True to apply the parent's node transform to the instance (only applicable if recursive is true).
      * @param mergeTransform  True to apply the source node transform to the instance transform, resetting the node transform.
      */
-    public IntModelInstance(final IntModel model, final Matrix4 transform, final String nodeId, boolean recursive,
-            boolean parentTransform, boolean mergeTransform, boolean shareKeyframes) {
+    public IntModelInstance(IntModel model, Matrix4 transform, String nodeId, boolean recursive,
+                            boolean parentTransform, boolean mergeTransform, boolean shareKeyframes) {
         this.model = model;
         this.transform = transform == null ? new Matrix4() : transform;
         IntNode copy, node = model.getNode(nodeId, recursive);
@@ -152,12 +152,12 @@ public class IntModelInstance implements IntRenderableProvider {
     }
 
     /** Constructs a new IntModelInstance with only the specified nodes and materials of the given model. */
-    public IntModelInstance(final IntModel model, final String... rootNodeIds) {
+    public IntModelInstance(IntModel model, String... rootNodeIds) {
         this(model, null, rootNodeIds);
     }
 
     /** Constructs a new IntModelInstance with only the specified nodes and materials of the given model. */
-    public IntModelInstance(final IntModel model, final Matrix4 transform, final String... rootNodeIds) {
+    public IntModelInstance(IntModel model, Matrix4 transform, String... rootNodeIds) {
         this.model = model;
         this.transform = transform == null ? new Matrix4() : transform;
         if (rootNodeIds == null)
@@ -170,17 +170,17 @@ public class IntModelInstance implements IntRenderableProvider {
     }
 
     /** Constructs a new IntModelInstance with only the specified nodes and materials of the given model. */
-    public IntModelInstance(final IntModel model, final Array<String> rootNodeIds) {
+    public IntModelInstance(IntModel model, Array<String> rootNodeIds) {
         this(model, null, rootNodeIds);
     }
 
     /** Constructs a new IntModelInstance with only the specified nodes and materials of the given model. */
-    public IntModelInstance(final IntModel model, final Matrix4 transform, final Array<String> rootNodeIds) {
+    public IntModelInstance(IntModel model, Matrix4 transform, Array<String> rootNodeIds) {
         this(model, transform, rootNodeIds, defaultShareKeyframes);
     }
 
     /** Constructs a new IntModelInstance with only the specified nodes and materials of the given model. */
-    public IntModelInstance(final IntModel model, final Matrix4 transform, final Array<String> rootNodeIds, boolean shareKeyframes) {
+    public IntModelInstance(IntModel model, Matrix4 transform, Array<String> rootNodeIds, boolean shareKeyframes) {
         this.model = model;
         this.transform = transform == null ? new Matrix4() : transform;
         copyNodes(model.nodes, rootNodeIds);
@@ -190,19 +190,19 @@ public class IntModelInstance implements IntRenderableProvider {
     }
 
     /** Constructs a new IntModelInstance at the specified position. */
-    public IntModelInstance(final IntModel model, Vector3 position) {
+    public IntModelInstance(IntModel model, Vector3 position) {
         this(model);
         this.transform.setToTranslation(position);
     }
 
     /** Constructs a new IntModelInstance at the specified position. */
-    public IntModelInstance(final IntModel model, float x, float y, float z) {
+    public IntModelInstance(IntModel model, float x, float y, float z) {
         this(model);
         this.transform.setToTranslation(x, y, z);
     }
 
     /** Constructs a new IntModelInstance with the specified transform. */
-    public IntModelInstance(final IntModel model, Matrix4 transform) {
+    public IntModelInstance(IntModel model, Matrix4 transform) {
         this(model, transform, (String[]) null);
     }
 
@@ -212,12 +212,12 @@ public class IntModelInstance implements IntRenderableProvider {
     }
 
     /** Constructs a new IntModelInstance which is an copy of the specified IntModelInstance. */
-    public IntModelInstance(IntModelInstance copyFrom, final Matrix4 transform) {
+    public IntModelInstance(IntModelInstance copyFrom, Matrix4 transform) {
         this(copyFrom, transform, defaultShareKeyframes);
     }
 
     /** Constructs a new IntModelInstance which is an copy of the specified IntModelInstance. */
-    public IntModelInstance(IntModelInstance copyFrom, final Matrix4 transform, boolean shareKeyframes) {
+    public IntModelInstance(IntModelInstance copyFrom, Matrix4 transform, boolean shareKeyframes) {
         this.model = copyFrom.model;
         this.transform = transform == null ? new Matrix4() : transform;
         copyNodes(copyFrom.nodes);
@@ -233,16 +233,16 @@ public class IntModelInstance implements IntRenderableProvider {
 
     private void copyNodes(Array<IntNode> nodes) {
         for (int i = 0, n = nodes.size; i < n; ++i) {
-            final IntNode node = nodes.get(i);
+            IntNode node = nodes.get(i);
             this.nodes.add(node.copy());
         }
         invalidate();
     }
 
-    private void copyNodes(Array<IntNode> nodes, final String... nodeIds) {
+    private void copyNodes(Array<IntNode> nodes, String... nodeIds) {
         for (int i = 0, n = nodes.size; i < n; ++i) {
-            final IntNode node = nodes.get(i);
-            for (final String nodeId : nodeIds) {
+            IntNode node = nodes.get(i);
+            for (String nodeId : nodeIds) {
                 if (nodeId.equals(node.id)) {
                     this.nodes.add(node.copy());
                     break;
@@ -252,10 +252,10 @@ public class IntModelInstance implements IntRenderableProvider {
         invalidate();
     }
 
-    private void copyNodes(Array<IntNode> nodes, final Array<String> nodeIds) {
+    private void copyNodes(Array<IntNode> nodes, Array<String> nodeIds) {
         for (int i = 0, n = nodes.size; i < n; ++i) {
-            final IntNode node = nodes.get(i);
-            for (final String nodeId : nodeIds) {
+            IntNode node = nodes.get(i);
+            for (String nodeId : nodeIds) {
                 if (nodeId.equals(node.id)) {
                     this.nodes.add(node.copy());
                     break;
@@ -279,7 +279,7 @@ public class IntModelInstance implements IntRenderableProvider {
                 }
             }
             if (!materials.contains(part.material, true)) {
-                final int midx = materials.indexOf(part.material, false);
+                int midx = materials.indexOf(part.material, false);
                 if (midx < 0)
                     materials.add(part.material = part.material.copy());
                 else
@@ -301,13 +301,13 @@ public class IntModelInstance implements IntRenderableProvider {
         }
     }
 
-    private void copyAnimations(final Iterable<IntAnimation> source, boolean shareKeyframes) {
-        for (final IntAnimation anim : source) {
+    private void copyAnimations(Iterable<IntAnimation> source, boolean shareKeyframes) {
+        for (IntAnimation anim : source) {
             IntAnimation animation = new IntAnimation();
             animation.id = anim.id;
             animation.duration = anim.duration;
-            for (final IntNodeAnimation nanim : anim.nodeAnimations) {
-                final IntNode node = getNode(nanim.node.id);
+            for (IntNodeAnimation nanim : anim.nodeAnimations) {
+                IntNode node = getNode(nanim.node.id);
                 if (node == null)
                     continue;
                 IntNodeAnimation nodeAnim = new IntNodeAnimation();
@@ -319,17 +319,17 @@ public class IntModelInstance implements IntRenderableProvider {
                 } else {
                     if (nanim.translation != null) {
                         nodeAnim.translation = new Array<>();
-                        for (final NodeKeyframe<Vector3> kf : nanim.translation)
+                        for (NodeKeyframe<Vector3> kf : nanim.translation)
                             nodeAnim.translation.add(new NodeKeyframe<Vector3>(kf.keytime, kf.value));
                     }
                     if (nanim.rotation != null) {
                         nodeAnim.rotation = new Array<>();
-                        for (final NodeKeyframe<Quaternion> kf : nanim.rotation)
+                        for (NodeKeyframe<Quaternion> kf : nanim.rotation)
                             nodeAnim.rotation.add(new NodeKeyframe<>(kf.keytime, kf.value));
                     }
                     if (nanim.scaling != null) {
                         nodeAnim.scaling = new Array<>();
-                        for (final NodeKeyframe<Vector3> kf : nanim.scaling)
+                        for (NodeKeyframe<Vector3> kf : nanim.scaling)
                             nodeAnim.scaling.add(new NodeKeyframe<>(kf.keytime, kf.value));
                     }
                 }
@@ -355,16 +355,16 @@ public class IntModelInstance implements IntRenderableProvider {
     }
 
     /** @return The renderable of the first node's first part. */
-    public IntRenderable getRenderable(final IntRenderable out) {
+    public IntRenderable getRenderable(IntRenderable out) {
         return getRenderable(out, nodes.get(0));
     }
 
     /** @return The renderable of the node's first part. */
-    public IntRenderable getRenderable(final IntRenderable out, final IntNode node) {
+    public IntRenderable getRenderable(IntRenderable out, IntNode node) {
         return getRenderable(out, node, node.parts.get(0));
     }
 
-    public IntRenderable getRenderable(final IntRenderable out, final IntNode node, final IntNodePart nodePart) {
+    public IntRenderable getRenderable(IntRenderable out, IntNode node, IntNodePart nodePart) {
         nodePart.setRenderable(out);
         if (nodePart.bones == null && transform != null)
             out.worldTransform.set(transform).mul(node.globalTransform);
@@ -402,7 +402,7 @@ public class IntModelInstance implements IntRenderableProvider {
      * </p>
      */
     public void calculateTransforms() {
-        final int n = nodes.size;
+        int n = nodes.size;
         for (int i = 0; i < n; i++) {
             nodes.get(i).calculateTransforms(true);
         }
@@ -418,7 +418,7 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return the out parameter for chaining
      */
-    public BoundingBox calculateBoundingBox(final BoundingBox out) {
+    public BoundingBox calculateBoundingBox(BoundingBox out) {
         out.inf();
         return extendBoundingBox(out);
     }
@@ -431,8 +431,8 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return the out parameter for chaining
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out) {
-        final int n = nodes.size;
+    public BoundingBox extendBoundingBox(BoundingBox out) {
+        int n = nodes.size;
         for (int i = 0; i < n; i++)
             nodes.get(i).extendBoundingBox(out);
         return out;
@@ -443,7 +443,7 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return The {@link IntAnimation} with the specified id, or null if not available.
      */
-    public IntAnimation getAnimation(final String id) {
+    public IntAnimation getAnimation(String id) {
         return getAnimation(id, false);
     }
 
@@ -453,8 +453,8 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return The {@link IntAnimation} with the specified id, or null if not available.
      */
-    public IntAnimation getAnimation(final String id, boolean ignoreCase) {
-        final int n = animations.size;
+    public IntAnimation getAnimation(String id, boolean ignoreCase) {
+        int n = animations.size;
         IntAnimation animation;
         if (ignoreCase) {
             for (int i = 0; i < n; i++)
@@ -473,7 +473,7 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return The {@link Material} with the specified id, or null if not available.
      */
-    public Material getMaterial(final String id) {
+    public Material getMaterial(String id) {
         return getMaterial(id, true);
     }
 
@@ -483,8 +483,8 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return The {@link Material} with the specified id, or null if not available.
      */
-    public Material getMaterial(final String id, boolean ignoreCase) {
-        final int n = materials.size;
+    public Material getMaterial(String id, boolean ignoreCase) {
+        int n = materials.size;
         Material material;
         if (ignoreCase) {
             for (int i = 0; i < n; i++)
@@ -503,7 +503,7 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
-    public IntNode getNode(final String id) {
+    public IntNode getNode(String id) {
         return getNode(id, true);
     }
 
@@ -513,7 +513,7 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
-    public IntNode getNode(final String id, boolean recursive) {
+    public IntNode getNode(String id, boolean recursive) {
         return getNode(id, recursive, false);
     }
 
@@ -524,7 +524,7 @@ public class IntModelInstance implements IntRenderableProvider {
      *
      * @return The {@link IntNode} with the specified id, or null if not found.
      */
-    public IntNode getNode(final String id, boolean recursive, boolean ignoreCase) {
+    public IntNode getNode(String id, boolean recursive, boolean ignoreCase) {
         return IntNode.getNode(nodes, id, recursive, ignoreCase);
     }
 }

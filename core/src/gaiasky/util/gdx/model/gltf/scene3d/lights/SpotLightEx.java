@@ -20,7 +20,7 @@ public class SpotLightEx extends SpotLight {
 	public Float range;
 
 	@Override
-	public SpotLight set (final SpotLight copyFrom) {
+	public SpotLight set (SpotLight copyFrom) {
 		if(copyFrom instanceof SpotLightEx){
 			return set(copyFrom.color, copyFrom.position, copyFrom.direction, copyFrom.intensity, copyFrom.cutoffAngle, copyFrom.exponent, ((SpotLightEx)copyFrom).range);
 		}else{

@@ -36,8 +36,8 @@ public class OctreeNode implements ILineRenderable {
     private static final Vector3D auxD2 = new Vector3D();
     private static final Vector3D auxD3 = new Vector3D();
     private static final Vector3D auxD4 = new Vector3D();
-    public static int nOctantsObserved = 0;
-    public static int nObjectsObserved = 0;
+    public static int nOctantsObserved;
+    public static int nObjectsObserved;
     /**
      * Max depth of the structure this node belongs to.
      **/
@@ -775,7 +775,7 @@ public class OctreeNode implements ILineRenderable {
         return status;
     }
 
-    public void setStatus(final LoadStatus status) {
+    public void setStatus(LoadStatus status) {
         synchronized (this) {
             this.status = status;
         }

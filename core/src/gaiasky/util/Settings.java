@@ -125,7 +125,7 @@ public class Settings extends SettingsObject {
     public int configVersion;
     /** Initialization flag. **/
     @JsonIgnore
-    public boolean initialized = false;
+    public boolean initialized;
     @JsonIgnore
     public VersionSettings version;
     @JsonInclude(Include.NON_NULL)
@@ -859,7 +859,7 @@ public class Settings extends SettingsObject {
         /** Location of the default reflection skybox (cubemap). **/
         public String reflectionSkyboxLocation;
         /** Pull current cloud data for supported objects. **/
-        public boolean pullCloudData = false;
+        public boolean pullCloudData;
         /** Whether to use high accuracy mode in the calculations. Results in more precise locations for some objects. **/
         public boolean highAccuracy;
         /** Whether to use the real attitude of Gaia, or the analytical one (NSL). **/
@@ -1101,7 +1101,7 @@ public class Settings extends SettingsObject {
          * If this is activated, the internal format {@link GL30#GL_SRGB8_ALPHA8} is used only
          * when safe graphics mode is not active.
          **/
-        public boolean useSRGB = false;
+        public boolean useSRGB;
         /**
          * Resolution of the textures generated procedurally. These are the elevation, moisture,
          * diffuse, specular and normal textures procedurally generated from noise algorithms.
@@ -1121,7 +1121,7 @@ public class Settings extends SettingsObject {
             }
         }
 
-        public void setQuality(final String qualityString) {
+        public void setQuality(String qualityString) {
             this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
         }
 
@@ -1157,9 +1157,9 @@ public class Settings extends SettingsObject {
         }
 
         @Override
-        public void notify(final Event event,
+        public void notify(Event event,
                            Object source,
-                           final Object... data) {
+                           Object... data) {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case LIMIT_FPS_CMD -> {
@@ -1279,7 +1279,7 @@ public class Settings extends SettingsObject {
         @JsonIgnore
         public double distanceScaleVr = 1.0e4;
 
-        public void setVisibility(final Map<String, Object> map) {
+        public void setVisibility(Map<String, Object> map) {
             ComponentType[] cts = ComponentType.values();
             // Sort using the order of the {@link ComponentType} elements
             Comparator<String> componentTypeComparator = Comparator.comparingInt(s -> ComponentType.valueOf(s)
@@ -1297,9 +1297,9 @@ public class Settings extends SettingsObject {
         }
 
         @Override
-        public void notify(final Event event,
+        public void notify(Event event,
                            Object source,
-                           final Object... data) {
+                           Object... data) {
             if (isEnabled() && source != this) {
                 if (Objects.requireNonNull(event) == Event.TOGGLE_VISIBILITY_CMD) {
                     String key = (String) data[0];
@@ -1418,9 +1418,9 @@ public class Settings extends SettingsObject {
             }
 
             @Override
-            public void notify(final Event event,
+            public void notify(Event event,
                                Object source,
-                               final Object... data) {
+                               Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
                         case FOCUS_LOCK_CMD -> focusLock.position = (boolean) data[0];
@@ -1583,7 +1583,7 @@ public class Settings extends SettingsObject {
             /**
              * Default number of labels for particle groups.
              **/
-            public int numLabels = 0;
+            public int numLabels;
             /** Elongate particles in the direction of motion. **/
             public boolean motionTrails = true;
 
@@ -1728,9 +1728,9 @@ public class Settings extends SettingsObject {
                 this.pointSizeBak = pointSize;
             }
 
-            public void notify(final Event event,
+            public void notify(Event event,
                                Object source,
-                               final Object... data) {
+                               Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
                         case STAR_POINT_SIZE_CMD -> pointSize = (float) data[0];
@@ -1906,9 +1906,9 @@ public class Settings extends SettingsObject {
             public float number;
 
             @Override
-            public void notify(final Event event,
+            public void notify(Event event,
                                Object source,
-                               final Object... data) {
+                               Object... data) {
                 if (isEnabled() && source != this) {
                     if (event == Event.LABEL_SIZE_CMD) {
                         size = MathUtilsDouble.clamp((float) data[0], Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
@@ -1963,9 +1963,9 @@ public class Settings extends SettingsObject {
             public boolean arrowHeads;
 
             @Override
-            public void notify(final Event event,
+            public void notify(Event event,
                                Object source,
-                               final Object... data) {
+                               Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
                         case PM_NUM_FACTOR_CMD -> number = MathUtilsDouble.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR,
@@ -2004,7 +2004,7 @@ public class Settings extends SettingsObject {
             @Override
             public void apply() {
                 EventManager.publish(Event.PM_NUM_FACTOR_CMD, this, (float) number);
-                EventManager.publish(Event.PM_LEN_FACTOR_CMD, this, (float) length);
+                EventManager.publish(Event.PM_LEN_FACTOR_CMD, this, length);
                 EventManager.publish(Event.PM_COLOR_MODE_CMD, this, colorMode);
                 EventManager.publish(Event.PM_ARROWHEADS_CMD, this, arrowHeads);
             }
@@ -2074,9 +2074,9 @@ public class Settings extends SettingsObject {
             }
 
             @Override
-            public void notify(final Event event,
+            public void notify(Event event,
                                Object source,
-                               final Object... data) {
+                               Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
                         case AMBIENT_LIGHT_CMD -> ambient = (float) data[0];
@@ -2158,7 +2158,7 @@ public class Settings extends SettingsObject {
             public static class LineSettings extends SettingsObject implements IObserver {
                 public LineMode mode = LineMode.POLYLINE_QUADSTRIP;
                 public float width;
-                public float glWidthBias = 0;
+                public float glWidthBias;
 
                 @JsonIgnore
                 public boolean isNormalLineRenderer() {
@@ -2341,9 +2341,9 @@ public class Settings extends SettingsObject {
             public boolean home;
 
             @Override
-            public void notify(final Event event,
+            public void notify(Event event,
                                Object source,
-                               final Object... data) {
+                               Object... data) {
                 if (isEnabled() && source != this) {
                     switch (event) {
                         case CROSSHAIR_FOCUS_CMD -> focus = (boolean) data[0];
@@ -2422,8 +2422,8 @@ public class Settings extends SettingsObject {
         public boolean safeModeFlag;
         public boolean debugInfo;
         public boolean offlineMode;
-        public boolean shaderCache = false;
-        public boolean saveProceduralTextures = false;
+        public boolean shaderCache;
+        public boolean saveProceduralTextures;
         /** Show time in no-GUI mode. **/
         public boolean displayTimeNoUi = true;
         public MinimapSettings minimap;
@@ -2487,9 +2487,9 @@ public class Settings extends SettingsObject {
         }
 
         @Override
-        public void notify(final Event event,
+        public void notify(Event event,
                            Object source,
-                           final Object... data) {
+                           Object... data) {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case STEREOSCOPIC_CMD -> {
@@ -2703,7 +2703,7 @@ public class Settings extends SettingsObject {
         public static class MinimapSettings extends SettingsObject {
             public boolean active;
             public float size;
-            public boolean inWindow = false;
+            public boolean inWindow;
 
             @Override
             public MinimapSettings clone() {
@@ -2824,7 +2824,7 @@ public class Settings extends SettingsObject {
 
             public boolean projectionLines;
 
-            public void setOrigin(final String originString) {
+            public void setOrigin(String originString) {
                 try {
                     origin = OriginType.valueOf(originString.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
@@ -2833,7 +2833,7 @@ public class Settings extends SettingsObject {
                 }
             }
 
-            public void setStyle(final String styleString) {
+            public void setStyle(String styleString) {
                 try {
                     style = GridStyle.valueOf(styleString.toUpperCase(Locale.ROOT));
                 } catch (IllegalArgumentException e) {
@@ -3001,7 +3001,7 @@ public class Settings extends SettingsObject {
             public PlanetariumSettings planetarium;
             public float celestialSphereIndexOfRefraction;
 
-            public void setProjection(final String projectionString) {
+            public void setProjection(String projectionString) {
                 projection = CubemapProjection.valueOf(projectionString.toUpperCase(Locale.ROOT));
             }
 
@@ -3265,10 +3265,10 @@ public class Settings extends SettingsObject {
             public float scale;
             public long animationMs = 600;
             public boolean newUI = true;
-            public boolean expandOnMouseOver = false;
+            public boolean expandOnMouseOver;
             public boolean modeChangeInfo;
             /** Show notification messages at the bottom. **/
-            public boolean notifications = false;
+            public boolean notifications;
             public DistanceUnits distanceUnits;
 
             /**
@@ -3700,11 +3700,11 @@ public class Settings extends SettingsObject {
         public ScreenshotMode mode;
         public int[] resolution;
 
-        public void setFormat(final String formatString) {
+        public void setFormat(String formatString) {
             format = ImageFormat.valueOf(formatString.toUpperCase(Locale.ROOT));
         }
 
-        public void setMode(final String modeString) {
+        public void setMode(String modeString) {
             mode = ScreenshotMode.valueOf(modeString);
         }
 
@@ -3792,9 +3792,9 @@ public class Settings extends SettingsObject {
         }
 
         @Override
-        public void notify(final Event event,
+        public void notify(Event event,
                            Object source,
-                           final Object... data) {
+                           Object... data) {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case CONFIG_FRAME_OUTPUT_CMD -> {
@@ -3853,8 +3853,8 @@ public class Settings extends SettingsObject {
     public static class CamcorderSettings extends SettingsObject implements IObserver {
         public double targetFps = 60.0;
         public KeyframeSettings keyframe;
-        public boolean frameOutput = false;
-        public boolean hideUI = false;
+        public boolean frameOutput;
+        public boolean hideUI;
 
         @Override
         public void notify(Event event,
@@ -3915,7 +3915,7 @@ public class Settings extends SettingsObject {
             protected void setupListeners() {
             }
 
-            public void setPosition(final String positionString) {
+            public void setPosition(String positionString) {
                 position = getPathType(positionString);
             }
 
@@ -3955,7 +3955,7 @@ public class Settings extends SettingsObject {
         public UpscaleFilter upscaleFilter = UpscaleFilter.NEAREST;
         public GeometryWarpSettings warpingMesh;
 
-        public void setUpscaleFilter(final String upscaleFilterString) {
+        public void setUpscaleFilter(String upscaleFilterString) {
             upscaleFilter = UpscaleFilter.valueOf(upscaleFilterString.toUpperCase(Locale.ROOT));
         }
 
@@ -3974,9 +3974,9 @@ public class Settings extends SettingsObject {
         }
 
         @Override
-        public void notify(final Event event,
+        public void notify(Event event,
                            Object source,
-                           final Object... data) {
+                           Object... data) {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case ANTIALIASING_CMD -> antialiasing.type = (AntialiasType) data[0];
@@ -4149,7 +4149,7 @@ public class Settings extends SettingsObject {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class GeometryWarpSettings extends SettingsObject {
-            public String pfmFile = null;
+            public String pfmFile;
 
             @Override
             public GeometryWarpSettings clone() {
@@ -4312,7 +4312,7 @@ public class Settings extends SettingsObject {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class FilmGrainSettings extends SettingsObject {
-            public float intensity = 0.0f;
+            public float intensity;
 
             @Override
             public FilmGrainSettings clone() {
@@ -4442,7 +4442,7 @@ public class Settings extends SettingsObject {
             public ToneMapping type;
             public float exposure;
 
-            public void setType(final String typeString) {
+            public void setType(String typeString) {
                 type = ToneMapping.valueOf(typeString.toUpperCase(Locale.ROOT));
             }
 
@@ -4529,7 +4529,7 @@ public class Settings extends SettingsObject {
              */
             public ReprojectionMode mode;
 
-            public void setReprojection(final String reprojectionString) {
+            public void setReprojection(String reprojectionString) {
                 mode = ReprojectionMode.valueOf(reprojectionString.toUpperCase(Locale.ROOT));
             }
 
@@ -4585,27 +4585,27 @@ public class Settings extends SettingsObject {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RuntimeSettings extends SettingsObject implements IObserver {
-        public boolean openXr = false;
-        public boolean compute = false;
+        public boolean openXr;
+        public boolean compute;
         public boolean displayGui = true;
-        public boolean updatePause = false;
-        public boolean timeOn = false;
-        public boolean realTime = false;
+        public boolean updatePause;
+        public boolean timeOn;
+        public boolean realTime;
         public boolean inputEnabled = true;
-        public boolean recordCamera = false;
-        public boolean recordKeyframeCamera = false;
+        public boolean recordCamera;
+        public boolean recordKeyframeCamera;
 
         /** VR demo mode disables VR controller buttons and simplifies joystick movement. **/
-        public boolean vrDemoMode = false;
+        public boolean vrDemoMode;
         /** Mirror the VR view to the desktop. **/
         public boolean vrDesktopMirror = true;
         /** Display the VR GUI. **/
-        public boolean vrDisplayGui = false;
+        public boolean vrDisplayGui;
 
-        public boolean drawOctree = false;
-        public boolean relativisticAberration = false;
-        public boolean gravitationalWaves = false;
-        public boolean octreeLoadActive = false;
+        public boolean drawOctree;
+        public boolean relativisticAberration;
+        public boolean gravitationalWaves;
+        public boolean octreeLoadActive;
 
         // Max clock time, 5 Myr by default
         public long maxTimeMs = 5000000L * (long) Nature.Y_TO_MS;

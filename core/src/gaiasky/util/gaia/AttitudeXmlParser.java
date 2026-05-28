@@ -46,7 +46,7 @@ public class AttitudeXmlParser {
     }
 
     public static BinarySearchTree<AttitudeIntervalBean> parseFolder(String folder) {
-        final Array<FileHandle> list;
+        Array<FileHandle> list;
         try (Stream<Path> paths = Files.walk(Paths.get(GaiaSky.settings().data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).toList();
             list = new Array<>(false, ps.size());
@@ -186,7 +186,7 @@ public class AttitudeXmlParser {
             Epsl.Mode mode = name.equals("EPSL_F") ? Epsl.Mode.FOLLOWING : Epsl.Mode.PRECEDING;
             Epsl epsl = new Epsl(mode);
 
-            epsl.setRefTime((long) refEpochJ2010);
+            epsl.setRefTime(refEpochJ2010);
             epsl.setNuRef(precessionPhase.get(Quantity.Angle.AngleUnit.RAD));
             epsl.setOmegaRef(spinPhase.get(Quantity.Angle.AngleUnit.RAD));
             epsl.setXiRef(solarAspectAngle.get(Quantity.Angle.AngleUnit.RAD));

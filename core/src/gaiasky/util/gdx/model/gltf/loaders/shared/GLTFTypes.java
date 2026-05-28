@@ -86,7 +86,7 @@ public class GLTFTypes {
     }
 
     public static Quaternion map(Quaternion q, float[] fv, int offset) {
-        return q.set(fv[offset + 0], fv[offset + 1], fv[offset + 2], fv[offset + 3]);
+        return q.set(fv[offset], fv[offset + 1], fv[offset + 2], fv[offset + 3]);
     }
 
     public static Vector3 map(Vector3 v, float[] fv) {
@@ -94,27 +94,25 @@ public class GLTFTypes {
     }
 
     public static Vector3 map(Vector3 v, float[] fv, int offset) {
-        return v.set(fv[offset + 0], fv[offset + 1], fv[offset + 2]);
+        return v.set(fv[offset], fv[offset + 1], fv[offset + 2]);
     }
 
     public static CubicVector3 map(CubicVector3 v, float[] fv, int offset) {
-        v.tangentIn.set(fv[offset + 0], fv[offset + 1], fv[offset + 2]);
+        v.tangentIn.set(fv[offset], fv[offset + 1], fv[offset + 2]);
         v.set(fv[offset + 3], fv[offset + 4], fv[offset + 5]);
         v.tangentOut.set(fv[offset + 6], fv[offset + 7], fv[offset + 8]);
         return v;
     }
 
     public static CubicQuaternion map(CubicQuaternion v, float[] fv, int offset) {
-        v.tangentIn.set(fv[offset + 0], fv[offset + 1], fv[offset + 2], fv[offset + 3]);
+        v.tangentIn.set(fv[offset], fv[offset + 1], fv[offset + 2], fv[offset + 3]);
         v.set(fv[offset + 4], fv[offset + 5], fv[offset + 6], fv[offset + 7]);
         v.tangentOut.set(fv[offset + 8], fv[offset + 9], fv[offset + 10], fv[offset + 11]);
         return v;
     }
 
     public static WeightVector map(WeightVector w, float[] outputData, int offset) {
-        for (int i = 0; i < w.count; i++) {
-            w.values[i] = outputData[offset + i];
-        }
+        if (w.count >= 0) System.arraycopy(outputData, offset + 0, w.values, 0, w.count);
         return w;
     }
 
@@ -124,17 +122,11 @@ public class GLTFTypes {
      * a1,a2,...an,v1,v2,...vn,b1,b2,...bn
      */
     public static CubicWeightVector map(CubicWeightVector w, float[] outputData, int offset) {
-        for (int i = 0; i < w.count; i++) {
-            w.tangentIn.values[i] = outputData[offset + i];
-        }
+        if (w.count >= 0) System.arraycopy(outputData, offset + 0, w.tangentIn.values, 0, w.count);
         offset += w.count;
-        for (int i = 0; i < w.count; i++) {
-            w.values[i] = outputData[offset + i];
-        }
+        if (w.count >= 0) System.arraycopy(outputData, offset + 0, w.values, 0, w.count);
         offset += w.count;
-        for (int i = 0; i < w.count; i++) {
-            w.tangentOut.values[i] = outputData[offset + i];
-        }
+        if (w.count >= 0) System.arraycopy(outputData, offset + 0, w.tangentOut.values, 0, w.count);
         return w;
     }
 

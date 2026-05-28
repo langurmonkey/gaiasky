@@ -69,7 +69,7 @@ public class Bits {
      * @throws ArrayIndexOutOfBoundsException if index &lt; 0
      */
     public boolean get(int index) {
-        final int word = index >>> 6;
+        int word = index >>> 6;
         if (word >= bits.length)
             return false;
         return (bits[word] & (1L << (index & 0x3F))) != 0L;
@@ -85,7 +85,7 @@ public class Bits {
      * @throws ArrayIndexOutOfBoundsException if index &lt; 0
      */
     public boolean getAndClear(int index) {
-        final int word = index >>> 6;
+        int word = index >>> 6;
         if (word >= bits.length)
             return false;
         long oldBits = bits[word];
@@ -103,7 +103,7 @@ public class Bits {
      * @throws ArrayIndexOutOfBoundsException if index &lt; 0
      */
     public boolean getAndSet(int index) {
-        final int word = index >>> 6;
+        int word = index >>> 6;
         checkCapacity(word);
         long oldBits = bits[word];
         bits[word] |= 1L << (index & 0x3F);
@@ -116,7 +116,7 @@ public class Bits {
      * @throws ArrayIndexOutOfBoundsException if index &lt; 0
      */
     public void set(int index) {
-        final int word = index >>> 6;
+        int word = index >>> 6;
         checkCapacity(word);
         bits[word] |= 1L << (index & 0x3F);
     }
@@ -131,7 +131,7 @@ public class Bits {
 
     /** @param index the index of the bit to flip */
     public void flip(int index) {
-        final int word = index >>> 6;
+        int word = index >>> 6;
         checkCapacity(word);
         bits[word] ^= 1L << (index & 0x3F);
     }
@@ -150,7 +150,7 @@ public class Bits {
      * @throws ArrayIndexOutOfBoundsException if index &lt; 0
      */
     public void clear(int index) {
-        final int word = index >>> 6;
+        int word = index >>> 6;
         if (word >= bits.length)
             return;
         bits[word] &= ~(1L << (index & 0x3F));
@@ -392,7 +392,7 @@ public class Bits {
 
     @Override
     public int hashCode() {
-        final int word = length() >>> 6;
+        int word = length() >>> 6;
         int hash = 0;
         for (int i = 0; word >= i; i++) {
             hash = 127 * hash + Long.hashCode(bits[i]);

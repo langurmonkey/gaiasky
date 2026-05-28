@@ -22,7 +22,7 @@ public class IntIndexBufferObjectSubData implements IntIndexData {
     final int usage;
     int bufferHandle;
     boolean isDirty = true;
-    boolean isBound = false;
+    boolean isBound;
 
     /**
      * Creates a new IntIndexBufferObject.
@@ -122,7 +122,7 @@ public class IntIndexBufferObjectSubData implements IntIndexData {
     @Override
     public void updateIndices(int targetOffset, int[] indices, int offset, int count) {
         isDirty = true;
-        final int pos = byteBuffer.position();
+        int pos = byteBuffer.position();
         byteBuffer.position(targetOffset * 4);
         BufferUtils.copy(indices, offset, byteBuffer, count);
         byteBuffer.position(pos);

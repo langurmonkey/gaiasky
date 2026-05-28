@@ -55,7 +55,7 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
      * @param out  The vector to return the result.
      * @return The out vector if we could retrieve the position, or null if the time is out of range for the current data file.
      */
-    public Vector3Q position(Instant date, final Vector3Q out) {
+    public Vector3Q position(Instant date, Vector3Q out) {
         if (!initialize()) {
             // Something is wrong.
             return null;
@@ -66,8 +66,8 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
 
         final int positionTypeIndex = 0;
 
-        final ChebyshevCoefficients.Header positionHeader = this.data.header[positionTypeIndex];
-        final ChebyshevCoefficients.Coefficients positionCoefficients = this.data.coefficients[positionTypeIndex];
+        ChebyshevCoefficients.Header positionHeader = this.data.header[positionTypeIndex];
+        ChebyshevCoefficients.Coefficients positionCoefficients = this.data.coefficients[positionTypeIndex];
 
         // Evaluate the Chebyshev polynomials to compute the ephemeris
         return evaluateChebyshev(nanosecondsTcb, positionHeader, positionCoefficients, out);
@@ -87,9 +87,9 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
      * @param out            The vector to put the result.
      * @return The out vector if we could retrieve the position, or null if the time is out of range for the current data file.
      */
-    private Vector3Q evaluateChebyshev(final long nanosecondsTcb, final ChebyshevCoefficients.Header header,
-                                       final ChebyshevCoefficients.Coefficients coefficients,
-                                       final Vector3Q out) {
+    private Vector3Q evaluateChebyshev(long nanosecondsTcb, ChebyshevCoefficients.Header header,
+                                       ChebyshevCoefficients.Coefficients coefficients,
+                                       Vector3Q out) {
 
         // The index of the granule
         int iGranule;
@@ -100,11 +100,11 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
 
         if (header.isEquidistant) {
 
-            final long nanosecondsOffset = nanosecondsTcb - header.nanosecondsTcbBegin;
+            long nanosecondsOffset = nanosecondsTcb - header.nanosecondsTcbBegin;
 
             // Compute granule index directly
 
-            final double granuleLength = coefficients.nanoSecondsTcb[1] - coefficients.nanoSecondsTcb[0];
+            double granuleLength = coefficients.nanoSecondsTcb[1] - coefficients.nanoSecondsTcb[0];
             iGranule = (int) (nanosecondsOffset / granuleLength);
 
             // Compute argument [0,+1] for scaled Chebyshev polynomials within granule
@@ -128,9 +128,9 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
 
             // compute argument [0,+1] for scaled Chebyshev polynomials within granule
 
-            final long nanosecondsTcbLow = coefficients.nanoSecondsTcb[iGranule];
-            final long nanosecondsTcbHigh = coefficients.nanoSecondsTcb[iGranule + 1];
-            final long granuleLength = nanosecondsTcbHigh - nanosecondsTcbLow;
+            long nanosecondsTcbLow = coefficients.nanoSecondsTcb[iGranule];
+            long nanosecondsTcbHigh = coefficients.nanoSecondsTcb[iGranule + 1];
+            long granuleLength = nanosecondsTcbHigh - nanosecondsTcbLow;
             t = (nanosecondsTcb - nanosecondsTcbLow) / (double) granuleLength;
         }
 
@@ -140,15 +140,15 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
         }
 
         // Compute ephemeris
-        final double[] coefficientsX = coefficients.data[iGranule][0];
-        final double[] coefficientsY = coefficients.data[iGranule][1];
-        final double[] coefficientsZ = coefficients.data[iGranule][2];
+        double[] coefficientsX = coefficients.data[iGranule][0];
+        double[] coefficientsY = coefficients.data[iGranule][1];
+        double[] coefficientsZ = coefficients.data[iGranule][2];
 
         // Here we assume that the order of the Chebyshev polynomials is
         // the same for all three vector components -- this is OK, since we
         // explicitly tested for it while loading the data
 
-        final int nCoefficients = coefficientsX.length;
+        int nCoefficients = coefficientsX.length;
 
         // 0th order Chebyshev
         double t0 = 1.0;
@@ -164,7 +164,7 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
 
         // Higher orders Chebyshev recursively
         double tn;
-        final double tau = 2.0 * t1;
+        double tau = 2.0 * t1;
         for (int iCoefficient = 2; iCoefficient < nCoefficients; iCoefficient++) {
 
             tn = tau * t1 - t0;
@@ -189,9 +189,9 @@ public class ChebyshevEphemeris extends AbstractOrbitCoordinates {
      *                            TCB
      * @return the granule index
      */
-    private int binarySearch(final long nanosecondsTcb, final long[] nanosecondsTcbArray) {
+    private int binarySearch(long nanosecondsTcb, long[] nanosecondsTcbArray) {
 
-        final int nGranules = nanosecondsTcbArray.length;
+        int nGranules = nanosecondsTcbArray.length;
 
         int low = 0;
         int high = nGranules;

@@ -181,7 +181,7 @@ public class ColorUtils {
     public static void colormap_short_rainbow(float value, float[] rgba) {
         /* plot short rainbow RGB */
         float a = (1 - value) / 0.25f; //invert and group
-        final int X = (int) FastMath.floor(a); //this is the integer part
+        int X = (int) FastMath.floor(a); //this is the integer part
         float Y = (a - X); //fractional part from 0 to 1
 
         rgba[3] = 1;
@@ -227,7 +227,7 @@ public class ColorUtils {
             return;
         /* plot long rainbow RGB */
         float a = (1 - value) / 0.2f; //invert and group
-        final int X = (int) FastMath.floor(a); //this is the integer part
+        int X = (int) FastMath.floor(a); //this is the integer part
         float Y = (a - X); //fractional part from 0 to 1
 
         rgba[3] = 1;
@@ -570,7 +570,7 @@ public class ColorUtils {
         if (saturation == 0) {
             r = g = b = (int) (brightness * 255.0f + 0.5f);
         } else {
-            float h = (hue - (float) FastMath.floor(hue)) * 6.0f;
+            float h = (hue - FastMath.floor(hue)) * 6.0f;
             float f = h - (float) java.lang.Math.floor(h);
             float p = brightness * (1.0f - saturation);
             float q = brightness * (1.0f - saturation * f);

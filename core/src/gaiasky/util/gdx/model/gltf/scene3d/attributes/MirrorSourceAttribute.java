@@ -29,7 +29,7 @@ public class MirrorSourceAttribute extends Attribute
 		if (index != o.index)
 			return index - o.index;
 		MirrorSourceAttribute other = (MirrorSourceAttribute)o;
-		final int c = textureDescription.compareTo(other.textureDescription);
+		int c = textureDescription.compareTo(other.textureDescription);
 		if (c != 0) return c;
 		Vector3 otherNormal = other.normal;
 		if(!MathUtils.isEqual(normal.x, otherNormal.x)) return normal.x < otherNormal.x ? -1 : 1;

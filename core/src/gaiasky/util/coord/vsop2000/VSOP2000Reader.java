@@ -34,8 +34,8 @@ public class VSOP2000Reader {
      * @throws FileNotFoundException If the file is not found.
      */
     public VSOP2000Coordinate[] read(Path file) throws FileNotFoundException {
-        final VSOP2000Coordinate[] result = new VSOP2000Coordinate[3];
-        final Scanner s = new Scanner(file.toFile());
+        VSOP2000Coordinate[] result = new VSOP2000Coordinate[3];
+        Scanner s = new Scanner(file.toFile());
 
         // Read each coordinate, X:0, Y:1, Z:2.
         for (int ci = 0; ci < 3; ci++) {

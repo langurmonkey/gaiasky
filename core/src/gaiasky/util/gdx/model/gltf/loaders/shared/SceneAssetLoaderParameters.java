@@ -12,5 +12,5 @@ import gaiasky.util.gdx.model.gltf.scene3d.scene.SceneAsset;
 public class SceneAssetLoaderParameters extends AssetLoaderParameters<SceneAsset> {
 
 	/** load scene asset with underlying GLTF {@link SceneAsset#data} structure */
-	public boolean withData = false;
+	public boolean withData;
 }

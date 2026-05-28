@@ -86,7 +86,7 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
 
     static public class PFMTextureParameter extends OwnTextureParameter {
         /** Whether to compute the inverse mapping **/
-        public boolean invert = false;
+        public boolean invert;
         /** Either GL_RGB or GL_FLOAT **/
         public int internalFormat = GL20.GL_RGB;
 

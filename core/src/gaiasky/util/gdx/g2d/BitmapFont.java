@@ -504,7 +504,7 @@ public class BitmapFont implements Disposable {
         }
 
         /** The index to the texture page that holds this glyph. */
-        public int page = 0;
+        public int page;
 
         public int getKerning(char ch) {
             if (kerning != null) {
@@ -851,9 +851,8 @@ public class BitmapFont implements Disposable {
             float v = region.v;
             float regionWidth = region.getRegionWidth();
             float regionHeight = region.getRegionHeight();
-            if (region instanceof AtlasRegion) {
+            if (region instanceof AtlasRegion atlasRegion) {
                 // Compensate for whitespace stripped from left and top edges.
-                AtlasRegion atlasRegion = (AtlasRegion) region;
                 offsetX = atlasRegion.offsetX;
                 offsetY = atlasRegion.originalHeight - atlasRegion.packedHeight - atlasRegion.offsetY;
             }

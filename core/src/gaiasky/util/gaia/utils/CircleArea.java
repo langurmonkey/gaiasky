@@ -9,25 +9,21 @@ package gaiasky.util.gaia.utils;
 
 import net.jafama.FastMath;
 
-public class CircleArea implements Area {
+public record CircleArea(Place centre, double radius) implements Area {
 
     private final static double piHalf = FastMath.PI / 2.0;
 
     private final static double squareDegreesOfSphere = 129600.0 / FastMath.PI;
 
-    private final Place centre;
-
-    private final double radius;
-
     /**
      * Creates an instance of a CircleArea about a given centre and radius.
      *
-     * @param c the centre
-     * @param r the radius [rad]
+     * @param centre the centre
+     * @param radius the radius [rad]
      */
-    public CircleArea(Place c, double r) {
-        centre = new Place(c);
-        radius = r;
+    public CircleArea(Place centre, double radius) {
+        this.centre = new Place(centre);
+        this.radius = radius;
     }
 
     /**
@@ -76,14 +72,16 @@ public class CircleArea implements Area {
     /**
      * @return the centre
      */
-    public Place getCentre() {
+    @Override
+    public Place centre() {
         return this.centre;
     }
 
     /**
      * @return the radius
      */
-    public double getRadius() {
+    @Override
+    public double radius() {
         return this.radius;
     }
 

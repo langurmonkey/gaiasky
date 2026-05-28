@@ -259,9 +259,9 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
 
     static public class VolumeTextureParameter extends AssetLoaderParameters<VolumeTexture> {
         /** the format of the final Texture. Uses the source images format if null **/
-        public Pixmap.Format format = null;
+        public Pixmap.Format format;
         /** The {@link Texture3DData}, optional. **/
-        public Texture3DData data = null;
+        public Texture3DData data;
         /** Volume type. **/
         public VolumeType type;
         /** Volume bounds in world space **/

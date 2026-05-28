@@ -13,7 +13,7 @@ public class KHRMaterialsSpecular {
 	public static final String EXT = "KHR_materials_specular";
 	
 	public float specularFactor = 1f;
-	public GLTFTextureInfo specularTexture = null;
+	public GLTFTextureInfo specularTexture;
 	public float [] specularColorFactor = {1, 1, 1};
-	public GLTFTextureInfo specularColorTexture = null;
+	public GLTFTextureInfo specularColorTexture;
 }

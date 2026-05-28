@@ -17,25 +17,25 @@ import org.lwjgl.opengl.GL41;
 
 public class TessellationShader extends GroundShader {
 
-    public TessellationShader(final IntRenderable renderable, final TessellationShaderProvider.Config config, final String prefix, final String vertexShader, final String controlShader, final String evaluationShader, final String fragmentShader) {
+    public TessellationShader(IntRenderable renderable, TessellationShaderProvider.Config config, String prefix, String vertexShader, String controlShader, String evaluationShader, String fragmentShader) {
         this(renderable, config, new TessellationShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, controlShader), ShaderProgramProvider.getShaderCode(prefix, evaluationShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
-    public TessellationShader(final IntRenderable renderable, final TessellationShaderProvider.Config config, final TessellationShaderProgram shaderProgram) {
+    public TessellationShader(IntRenderable renderable, TessellationShaderProvider.Config config, TessellationShaderProgram shaderProgram) {
         super(renderable, config, shaderProgram);
     }
 
-    public TessellationShader(final IntRenderable renderable, final TessellationShaderProvider.Config config) {
+    public TessellationShader(IntRenderable renderable, TessellationShaderProvider.Config config) {
         this(renderable, config, createPrefix(renderable, config));
     }
 
-    public TessellationShader(final IntRenderable renderable, final TessellationShaderProvider.Config config, final String prefix) {
+    public TessellationShader(IntRenderable renderable, TessellationShaderProvider.Config config, String prefix) {
         this(renderable, config, prefix, config.vertexShaderCode, config.controlShader, config.evaluationShader, config.fragmentShaderCode);
     }
 
-    public static String createPrefix(final IntRenderable renderable, final TessellationShaderProvider.Config config) {
+    public static String createPrefix(IntRenderable renderable, TessellationShaderProvider.Config config) {
         String prefix = RelativisticShader.createPrefix(renderable, config);
-        final Bits mask = renderable.material.getMask();
+        Bits mask = renderable.material.getMask();
         // Atmosphere ground only if camera height is set
         if (mask.has(AtmosphereAttribute.CameraHeight))
             prefix += "#define atmosphereGround\n";
@@ -43,7 +43,7 @@ public class TessellationShader extends GroundShader {
     }
 
     @Override
-    public boolean canRender(final IntRenderable renderable) {
+    public boolean canRender(IntRenderable renderable) {
         return super.canRender(renderable) && this.shadowMap == (renderable.environment.shadowMap != null);
     }
 

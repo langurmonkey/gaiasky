@@ -26,7 +26,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
     protected final BaseJsonReader reader;
     private final Quaternion tempQ = new Quaternion();
 
-    public G3dModelLoader(final BaseJsonReader reader) {
+    public G3dModelLoader(BaseJsonReader reader) {
         this(reader, null);
     }
 
@@ -161,22 +161,22 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                 jsonMaterial.id = id;
 
                 // Read material colors
-                final JsonValue diffuse = material.get("diffuse");
+                JsonValue diffuse = material.get("diffuse");
                 if (diffuse != null)
                     jsonMaterial.diffuseColor = parseColor(diffuse);
-                final JsonValue ambient = material.get("ambient");
+                JsonValue ambient = material.get("ambient");
                 if (ambient != null)
                     jsonMaterial.ambientColor = parseColor(ambient);
-                final JsonValue emissive = material.get("emissive");
+                JsonValue emissive = material.get("emissive");
                 if (emissive != null)
                     jsonMaterial.emissiveColor = parseColor(emissive);
-                final JsonValue specular = material.get("specular");
+                JsonValue specular = material.get("specular");
                 if (specular != null)
                     jsonMaterial.specularColor = parseColor(specular);
-                final JsonValue reflection = material.get("reflection");
+                JsonValue reflection = material.get("reflection");
                 if (reflection != null)
                     jsonMaterial.reflectionColor = parseColor(reflection);
-                final JsonValue metallic = material.get("metallic");
+                JsonValue metallic = material.get("metallic");
                 if (metallic != null)
                     jsonMaterial.metallicColor = parseColor(metallic);
                 // Read shininess
@@ -221,7 +221,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
         }
     }
 
-    private int parseTextureUsage(final String value) {
+    private int parseTextureUsage(String value) {
         if (value.equalsIgnoreCase("AMBIENT"))
             return ModelTexture.USAGE_AMBIENT;
         else if (value.equalsIgnoreCase("BUMP"))
@@ -384,7 +384,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                 JsonValue keyframes = node.get("keyframes");
                 if (keyframes != null && keyframes.isArray()) {
                     for (JsonValue keyframe = keyframes.child; keyframe != null; keyframe = keyframe.next) {
-                        final float keytime = keyframe.getFloat("keytime", 0f) / 1000.f;
+                        float keytime = keyframe.getFloat("keytime", 0f) / 1000.f;
                         JsonValue translation = keyframe.get("translation");
                         if (translation != null && translation.size == 3) {
                             if (nodeAnim.translation == null)

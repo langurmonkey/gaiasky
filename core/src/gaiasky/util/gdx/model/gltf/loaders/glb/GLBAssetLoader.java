@@ -33,7 +33,7 @@ public class GLBAssetLoader  extends AsynchronousAssetLoader<SceneAsset, SceneAs
 	@Override
 	public SceneAsset loadSync(AssetManager manager, String fileName, FileHandle file,
 			SceneAssetLoaderParameters parameter) {
-		final boolean withData = parameter != null && parameter.withData;
+		boolean withData = parameter != null && parameter.withData;
 		return new GLBLoader().load(file, withData);
 	}
 

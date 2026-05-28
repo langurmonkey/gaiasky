@@ -28,7 +28,7 @@ public class Gti implements Comparable<Gti> {
      *
      * @throws RuntimeException Start is later than end
      */
-    public Gti(final long start, final long end) throws RuntimeException {
+    public Gti(long start, long end) throws RuntimeException {
         if (start > end) {
             throw new RuntimeException(
                     "Start time is later than end time");
@@ -49,7 +49,7 @@ public class Gti implements Comparable<Gti> {
      * @return boolean
      */
     @Override
-    public boolean equals(final Object t) {
+    public boolean equals(Object t) {
         if (t == null) {
             return false;
         }
@@ -100,7 +100,7 @@ public class Gti implements Comparable<Gti> {
      *
      * @throws RuntimeException If end time is before start time.
      */
-    public void setEnd(final long end) throws RuntimeException {
+    public void setEnd(long end) throws RuntimeException {
         if (end < this.start) {
             throw new RuntimeException(
                     "End time is earlier than start time");
@@ -125,7 +125,7 @@ public class Gti implements Comparable<Gti> {
      *
      * @throws RuntimeException If start time is after end time.
      */
-    public void setStart(final long start) throws RuntimeException {
+    public void setStart(long start) throws RuntimeException {
         if (start > this.end) {
             throw new RuntimeException(
                     "Start time is later than end time");
@@ -155,7 +155,7 @@ public class Gti implements Comparable<Gti> {
      *
      * @return true if inside
      */
-    public boolean isInside(final long time) {
+    public boolean isInside(long time) {
         return (time > this.start || time == this.start) && (time < this.end || time == this.end);
     }
 
@@ -168,7 +168,7 @@ public class Gti implements Comparable<Gti> {
      *
      * @return true if this GTI is earlier than the GTI passed in.
      */
-    public boolean isLessThan(final Gti i) {
+    public boolean isLessThan(Gti i) {
         if (this.start != i.getStart()) {
             return this.start < i.getStart();
         } else {
@@ -184,7 +184,7 @@ public class Gti implements Comparable<Gti> {
      * @return Integer indicating the comparison result. See {@link java.lang.Comparable#compareTo(Object)}.
      */
     @Override
-    public int compareTo(final Gti o) {
+    public int compareTo(Gti o) {
         if (this.start == o.getStart() &&
                 this.end == o.getEnd()) {
             return 0;

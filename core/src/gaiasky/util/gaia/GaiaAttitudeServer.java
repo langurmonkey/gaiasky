@@ -24,7 +24,7 @@ public class GaiaAttitudeServer implements OrientationServer {
     IAttitude dummyAttitude;
     Nsl37 nsl;
     // The previous attitude
-    AttitudeIntervalBean prevAttitude = null, current;
+    AttitudeIntervalBean prevAttitude, current;
     // The first activation date
     Instant initialDate;
     // List of attitudes in a BST sorted by activation date
@@ -84,7 +84,7 @@ public class GaiaAttitudeServer implements OrientationServer {
      *
      * @return The attitude
      */
-    public synchronized IAttitude getAttitude(final Instant date) {
+    public synchronized IAttitude getAttitude(Instant date) {
         IAttitude result;
         if (GaiaSky.settings().data.realGaiaAttitude) {
             // Find AttitudeType in timeSlots

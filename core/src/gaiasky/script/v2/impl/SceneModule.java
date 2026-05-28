@@ -624,7 +624,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         }
     }
 
-    public void set_label_color(String name, final List<?> color) {
+    public void set_label_color(String name, List<?> color) {
         set_label_color(name, api.dArray(color));
     }
 
@@ -644,7 +644,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_line_width_factor(final float factor) {
+    public void set_line_width_factor(float factor) {
         if (api.validator.checkNum(factor, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, "lineWidthFactor")) {
             api.base.post_runnable(() -> em.post(Event.LINE_WIDTH_CMD, this, factor));
         }
@@ -934,7 +934,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                 "orientation")
                 && api.validator.checkNum(size, 0, Double.MAX_VALUE, "size")
                 && api.validator.checkObjectName(obj_name)) {
-            final var shapeLc = shapeType.toLowerCase(Locale.ROOT);
+            var shapeLc = shapeType.toLowerCase(Locale.ROOT);
             api.base.post_runnable(() -> {
                 Entity trackingObject = get_focus_entity(obj_name);
                 float[] color = new float[]{r, g, b, a};

@@ -159,7 +159,7 @@ public interface UiAPI {
      * @param a    The alpha component of the color in [0,1].
      */
     void display_image(int id,
-                       final String path,
+                       String path,
                        float x,
                        float y,
                        float r,
@@ -183,7 +183,7 @@ public interface UiAPI {
      * @param color The color as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
     void display_image(int id,
-                       final String path,
+                       String path,
                        double x,
                        double y,
                        double[] color);
@@ -327,7 +327,7 @@ public interface UiAPI {
      *
      * @param msg The headline text.
      */
-    void set_headline_message(final String msg);
+    void set_headline_message(String msg);
 
     /**
      * Set the contents of the sub-header message. The sub-header message appears just below the headline message, in the middle of the screen,
@@ -335,7 +335,7 @@ public interface UiAPI {
      *
      * @param msg The sub-header text.
      */
-    void set_subhead_message(final String msg);
+    void set_subhead_message(String msg);
 
     /**
      * Clear the content of the headline message. After this method is called, the headline message disappears from screen.

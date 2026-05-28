@@ -45,8 +45,7 @@ public class PBRHDRColorAttribute extends Attribute
 		int cg = Float.compare(g, a.g);
 		if(cg != 0) return cg;
 		int cb = Float.compare(b, a.b);
-		if(cb != 0) return cb;
-		return 0;
-	}
+        return cb;
+    }
 
 }

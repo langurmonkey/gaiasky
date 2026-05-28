@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class ImageRenderer {
-    private static int sequenceNumber = 0;
+    private static int sequenceNumber;
 
     /**
      * Saves the current screen as an image to the given directory using the
@@ -67,14 +67,14 @@ public class ImageRenderer {
     private static Pixmap getScreenshot(int x, int y, int w, int h, boolean flipY) {
         Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1);
 
-        final Pixmap pixmap = new Pixmap(w, h, Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(w, h, Format.RGBA8888);
         ByteBuffer pixels = pixmap.getPixels();
         Gdx.gl.glReadPixels(x, y, w, h, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixels);
 
-        final int numBytes = w * h * 4;
+        int numBytes = w * h * 4;
         byte[] lines = new byte[numBytes];
         if (flipY) {
-            final int numBytesPerLine = w * 4;
+            int numBytesPerLine = w * 4;
             for (int i = 0; i < h; i++) {
                 pixels.position((h - i - 1) * numBytesPerLine);
                 pixels.get(lines, i * numBytesPerLine, numBytesPerLine);

@@ -14,11 +14,11 @@ public class PBRVolumeAttribute extends Attribute {
     public static final String Alias = "volume";
     public static final int Type = register(Alias);
 
-    public float thicknessFactor = 0f;
+    public float thicknessFactor;
     /**
      * a value of zero means positive infinity (no attenuation)
      */
-    public float attenuationDistance = 0f;
+    public float attenuationDistance;
     public final Color attenuationColor = new Color(Color.WHITE);
 
     public PBRVolumeAttribute() {

@@ -46,15 +46,15 @@ public class SAMPClient implements IObserver {
     private HubConnector conn;
     private TwoWayMap<String, Entity> idToNode;
     private Map<String, String> idToUrl;
-    private boolean preventProgrammaticEvents = false;
+    private boolean preventProgrammaticEvents;
 
-    public SAMPClient(final CatalogManager catalogManager) {
+    public SAMPClient(CatalogManager catalogManager) {
         super();
         this.catalogManager = catalogManager;
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.CATALOG_REMOVE, Event.DISPOSE);
     }
 
-    public void initialize(final Skin skin) {
+    public void initialize(Skin skin) {
         // Disable logging
         java.util.logging.Logger.getLogger("org.astrogrid.samp").setLevel(Level.OFF);
 
@@ -220,14 +220,14 @@ public class SAMPClient implements IObserver {
      *
      * @return Boolean indicating whether loading succeeded or not
      */
-    private boolean loadVOTable(final String url, final String id, final String name, final Skin skin) {
+    private boolean loadVOTable(String url, String id, String name, Skin skin) {
         logger.info("Loading VOTable: " + name + " from " + url);
         // Load selected file
         try {
             DataSource dataSource = new URLDataSource(new URI(url).toURL());
             Stage ui = GaiaSky.instance.mainGui.getGuiStage();
             String fileName = dataSource.getName();
-            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
+            DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
             Runnable doLoad = () -> {
                 try {
                     DatasetOptions datasetOptions = dld.generateDatasetOptions();
@@ -274,13 +274,12 @@ public class SAMPClient implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case FOCUS_CHANGED:
             if (!preventProgrammaticEvents) {
                 if (conn != null && conn.isConnected()) {
-                    if (data[0] instanceof FocusView) {
-                        var focus = (FocusView) data[0];
+                    if (data[0] instanceof FocusView focus) {
                         var entity = focus.getEntity();
                         if (focus.isSet()) {
                             var pg = focus.getSet();

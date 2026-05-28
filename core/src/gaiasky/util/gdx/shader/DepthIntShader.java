@@ -21,36 +21,36 @@ import java.util.Objects;
 
 public class DepthIntShader extends DefaultIntShader {
     private final static Attributes tmpAttributes = new Attributes();
-    private static String defaultVertexShader = null;
-    private static String defaultFragmentShader = null;
+    private static String defaultVertexShader;
+    private static String defaultFragmentShader;
     public final int numBones;
     public final int weights;
     private final FloatAttribute alphaTestAttribute;
 
-    public DepthIntShader(final IntRenderable renderable) {
+    public DepthIntShader(IntRenderable renderable) {
         this(renderable, new Config());
     }
-    public DepthIntShader(final IntRenderable renderable, final Config config) {
+    public DepthIntShader(IntRenderable renderable, Config config) {
         this(renderable, config, createPrefix(renderable, config));
     }
-    public DepthIntShader(final IntRenderable renderable, final Config config, final String prefix) {
+    public DepthIntShader(IntRenderable renderable, Config config, String prefix) {
         this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(),
                 config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
-    public DepthIntShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader,
-            final String fragmentShader) {
+    public DepthIntShader(IntRenderable renderable, Config config, String prefix, String vertexShader,
+                          String fragmentShader) {
         this(renderable, config, new ExtShaderProgram(prefix + vertexShader, prefix + fragmentShader));
     }
 
-    public DepthIntShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
+    public DepthIntShader(IntRenderable renderable, Config config, ExtShaderProgram shaderProgram) {
         super(renderable, config, shaderProgram);
-        final Attributes attributes = combineAttributes(renderable);
+        Attributes attributes = combineAttributes(renderable);
         this.numBones = renderable.bones == null ? 0 : config.numBones;
         int w = 0;
-        final int n = renderable.meshPart.mesh.getVertexAttributes().size();
+        int n = renderable.meshPart.mesh.getVertexAttributes().size();
         for (int i = 0; i < n; i++) {
-            final VertexAttribute attr = renderable.meshPart.mesh.getVertexAttributes().get(i);
+            VertexAttribute attr = renderable.meshPart.mesh.getVertexAttributes().get(i);
             if (attr.usage == Usage.BoneWeight)
                 w |= (1 << attr.unit);
         }
@@ -70,7 +70,7 @@ public class DepthIntShader extends DefaultIntShader {
         return defaultFragmentShader;
     }
 
-    public static String createPrefix(final IntRenderable renderable, final Config config) {
+    public static String createPrefix(IntRenderable renderable, Config config) {
         String prefix = DefaultIntShader.createPrefix(renderable, config);
         if (!config.depthBufferOnly)
             prefix += "#define PackedDepthFlag\n";
@@ -78,7 +78,7 @@ public class DepthIntShader extends DefaultIntShader {
     }
 
     // TODO: Move responsibility for combining attributes to IntRenderableProvider
-    private static Attributes combineAttributes(final IntRenderable renderable) {
+    private static Attributes combineAttributes(IntRenderable renderable) {
         tmpAttributes.clear();
         if (renderable.environment != null)
             tmpAttributes.set(renderable.environment);
@@ -89,20 +89,20 @@ public class DepthIntShader extends DefaultIntShader {
 
     @Override
     public boolean canRender(IntRenderable renderable) {
-        final Attributes attributes = combineAttributes(renderable);
+        Attributes attributes = combineAttributes(renderable);
         if (attributes.has(BlendingAttribute.Type)) {
             if (!attributes.has(TextureAttribute.Diffuse))
                 return false;
         }
-        final boolean skinned = ((renderable.meshPart.mesh.getVertexAttributes().getMask() & Usage.BoneWeight) == Usage.BoneWeight);
+        boolean skinned = ((renderable.meshPart.mesh.getVertexAttributes().getMask() & Usage.BoneWeight) == Usage.BoneWeight);
         if (skinned != (numBones > 0))
             return false;
         if (!skinned)
             return true;
         int w = 0;
-        final int n = renderable.meshPart.mesh.getVertexAttributes().size();
+        int n = renderable.meshPart.mesh.getVertexAttributes().size();
         for (int i = 0; i < n; i++) {
-            final VertexAttribute attr = renderable.meshPart.mesh.getVertexAttributes().get(i);
+            VertexAttribute attr = renderable.meshPart.mesh.getVertexAttributes().get(i);
             if (attr.usage == Usage.BoneWeight)
                 w |= (1 << attr.unit);
         }
@@ -112,9 +112,9 @@ public class DepthIntShader extends DefaultIntShader {
     @Override
     public void render(IntRenderable renderable, Attributes combinedAttributes) {
         if (combinedAttributes.has(BlendingAttribute.Type)) {
-            final BlendingAttribute blending = (BlendingAttribute) combinedAttributes.get(BlendingAttribute.Type);
+            BlendingAttribute blending = (BlendingAttribute) combinedAttributes.get(BlendingAttribute.Type);
             combinedAttributes.remove(BlendingAttribute.Type);
-            final boolean hasAlphaTest = combinedAttributes.has(FloatAttribute.AlphaTest);
+            boolean hasAlphaTest = combinedAttributes.has(FloatAttribute.AlphaTest);
             if (!hasAlphaTest)
                 combinedAttributes.set(alphaTestAttribute);
             assert blending != null;
@@ -128,7 +128,7 @@ public class DepthIntShader extends DefaultIntShader {
     }
 
     public static class Config extends DefaultIntShader.Config {
-        public boolean depthBufferOnly = false;
+        public boolean depthBufferOnly;
         public float defaultAlphaTest = 0.5f;
 
         public Config() {

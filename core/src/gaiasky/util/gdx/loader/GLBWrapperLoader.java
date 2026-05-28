@@ -55,6 +55,6 @@ public class GLBWrapperLoader extends AsynchronousAssetLoader<IntModel, GLBLoade
     }
 
     public static class GLBLoaderParameters extends AssetLoaderParameters<IntModel> {
-        public boolean withData = false;
+        public boolean withData;
     }
 }

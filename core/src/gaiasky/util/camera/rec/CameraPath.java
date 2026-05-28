@@ -128,11 +128,11 @@ public class CameraPath {
         times = new Array<>();
         data = new DoubleArray();
 
-        final var q = new QuaternionDouble();
-        final var q0 = new QuaternionDouble();
-        final var q1 = new QuaternionDouble();
-        final var v3d1 = new Vector3D();
-        final var v3d2 = new Vector3D();
+        var q = new QuaternionDouble();
+        var q0 = new QuaternionDouble();
+        var q1 = new QuaternionDouble();
+        var v3d1 = new Vector3D();
+        var v3d2 = new Vector3D();
 
         /* Frame counter */
         frameRate = GaiaSky.settings().camrecorder.targetFps;

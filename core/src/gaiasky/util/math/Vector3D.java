@@ -47,7 +47,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @param vec The vector
      */
-    public Vector3D(final Vector3D vec) {
+    public Vector3D(Vector3D vec) {
         this.set(vec);
     }
 
@@ -57,7 +57,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @param values The array
      */
-    public Vector3D(final double[] values) {
+    public Vector3D(double[] values) {
         this.set(values[0], values[1], values[2]);
     }
 
@@ -74,16 +74,16 @@ public class Vector3D implements VectorDouble<Vector3D> {
     }
 
     /** @return The euclidean length */
-    public static double len(final double x,
-                             final double y,
-                             final double z) {
+    public static double len(double x,
+                             double y,
+                             double z) {
         return FastMath.sqrt(x * x + y * y + z * z);
     }
 
     /** @return The squared Euclidean length */
-    private static double len2(final double x,
-                               final double y,
-                               final double z) {
+    private static double len2(double x,
+                               double y,
+                               double z) {
         return x * x + y * y + z * z;
     }
 
@@ -106,15 +106,15 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return outer product of <code>v</code> and <code>w</code>
      */
-    static public Vector3D crs(final Vector3D v,
-                               final Vector3D w) {
-        final Vector3D res = new Vector3D(v);
+    static public Vector3D crs(Vector3D v,
+                               Vector3D w) {
+        Vector3D res = new Vector3D(v);
 
         return res.crs(w);
     }
 
-    static public Vector3D cross(final Vector3D v,
-                                 final Vector3D w) {
+    static public Vector3D cross(Vector3D v,
+                                 Vector3D w) {
         return crs(v, w);
     }
 
@@ -148,29 +148,29 @@ public class Vector3D implements VectorDouble<Vector3D> {
         return this;
     }
 
-    public Vector3D set(final Vector3D vec) {
+    public Vector3D set(Vector3D vec) {
         if (vec != null)
             return this.set(vec.x, vec.y, vec.z);
         return this;
     }
 
-    public Vector3D set(final Vector3Q vec) {
+    public Vector3D set(Vector3Q vec) {
         if (vec != null)
             return this.set(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
         return this;
     }
 
-    public Vector3D set(final Vector3 vec) {
+    public Vector3D set(Vector3 vec) {
         if (vec != null)
             return this.set(vec.x, vec.y, vec.z);
         return this;
     }
 
-    public Vector3 put(final Vector3 vec) {
+    public Vector3 put(Vector3 vec) {
         return vec.set((float) this.x, (float) this.y, (float) this.z);
     }
 
-    public Vector3D put(final Vector3D vec) {
+    public Vector3D put(Vector3D vec) {
         return vec.set(this.x, this.y, this.z);
     }
 
@@ -181,7 +181,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return this vector for chaining
      */
-    public Vector3D set(final double[] values) {
+    public Vector3D set(double[] values) {
         return this.set(values[0], values[1], values[2]);
     }
 
@@ -192,7 +192,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return this vector for chaining
      */
-    public Vector3D set(final float[] values) {
+    public Vector3D set(float[] values) {
         return this.set(values[0], values[1], values[2]);
     }
 
@@ -230,21 +230,21 @@ public class Vector3D implements VectorDouble<Vector3D> {
         return new Vector3D(this);
     }
 
-    public Vector3D add(final Vector3D vec) {
+    public Vector3D add(Vector3D vec) {
         this.x += vec.x;
         this.y += vec.y;
         this.z += vec.z;
         return this;
     }
 
-    public Vector3D add(final Vector3Q vec) {
+    public Vector3D add(Vector3Q vec) {
         this.x += vec.x.doubleValue();
         this.y += vec.y.doubleValue();
         this.z += vec.z.doubleValue();
         return this;
     }
 
-    public Vector3D add(final Vector3 vec) {
+    public Vector3D add(Vector3 vec) {
         this.x += vec.x;
         this.y += vec.y;
         this.z += vec.z;
@@ -295,15 +295,15 @@ public class Vector3D implements VectorDouble<Vector3D> {
         return this.set(this.x + values, this.y + values, this.z + values);
     }
 
-    public Vector3D sub(final Vector3D vec) {
+    public Vector3D sub(Vector3D vec) {
         return this.sub(vec.x, vec.y, vec.z);
     }
 
-    public Vector3D sub(final Vector3Q vec) {
+    public Vector3D sub(Vector3Q vec) {
         return this.sub(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
     }
 
-    public Vector3D sub(final Vector3 vec) {
+    public Vector3D sub(Vector3 vec) {
         return this.sub(vec.x, vec.y, vec.z);
     }
 
@@ -343,7 +343,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
         return out.scl(scalar);
     }
 
-    public Vector3D scl(final Vector3D vec) {
+    public Vector3D scl(Vector3D vec) {
         return this.set(x * vec.x, y * vec.y, z * vec.z);
     }
 
@@ -405,21 +405,21 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return Whether this and the other vector are equal
      */
-    public boolean idt(final Vector3D vec) {
+    public boolean idt(Vector3D vec) {
         return x == vec.x && y == vec.y && z == vec.z;
     }
 
-    public double dst(final Vector3D vec) {
-        final double a = vec.x - x;
-        final double b = vec.y - y;
-        final double c = vec.z - z;
+    public double dst(Vector3D vec) {
+        double a = vec.x - x;
+        double b = vec.y - y;
+        double c = vec.z - z;
         return FastMath.sqrt(a * a + b * b + c * c);
     }
 
-    public double dst(final Vector3Q vec) {
-        final double a = vec.x.doubleValue() - x;
-        final double b = vec.y.doubleValue() - y;
-        final double c = vec.z.doubleValue() - z;
+    public double dst(Vector3Q vec) {
+        double a = vec.x.doubleValue() - x;
+        double b = vec.y.doubleValue() - y;
+        double c = vec.z.doubleValue() - z;
         return FastMath.sqrt(a * a + b * b + c * c);
     }
 
@@ -427,23 +427,23 @@ public class Vector3D implements VectorDouble<Vector3D> {
     public double dst(double x,
                       double y,
                       double z) {
-        final double a = x - this.x;
-        final double b = y - this.y;
-        final double c = z - this.z;
+        double a = x - this.x;
+        double b = y - this.y;
+        double c = z - this.z;
         return FastMath.sqrt(a * a + b * b + c * c);
     }
 
     public double dst2(Vector3Q vec) {
-        final double a = vec.x.doubleValue() - x;
-        final double b = vec.y.doubleValue() - y;
-        final double c = vec.z.doubleValue() - z;
+        double a = vec.x.doubleValue() - x;
+        double b = vec.y.doubleValue() - y;
+        double c = vec.z.doubleValue() - z;
         return a * a + b * b + c * c;
     }
 
     public double dst2(Vector3D vec) {
-        final double a = vec.x - x;
-        final double b = vec.y - y;
-        final double c = vec.z - z;
+        double a = vec.x - x;
+        double b = vec.y - y;
+        double c = vec.z - z;
         return a * a + b * b + c * c;
     }
 
@@ -459,24 +459,24 @@ public class Vector3D implements VectorDouble<Vector3D> {
     public double dst2(double x,
                        double y,
                        double z) {
-        final double a = x - this.x;
-        final double b = y - this.y;
-        final double c = z - this.z;
+        double a = x - this.x;
+        double b = y - this.y;
+        double c = z - this.z;
         return a * a + b * b + c * c;
     }
 
     public Vector3D nor() {
-        final double len2 = this.len2();
+        double len2 = this.len2();
         if (len2 == 0f || len2 == 1f)
             return this;
         return this.scl(1f / FastMath.sqrt(len2));
     }
 
-    public double dot(final Vector3D vector) {
+    public double dot(Vector3D vector) {
         return x * vector.x + y * vector.y + z * vector.z;
     }
 
-    public double dot(final Vector3Q vector) {
+    public double dot(Vector3Q vector) {
         return x * vector.x.doubleValue() + y * vector.y.doubleValue() + z * vector.z.doubleValue();
     }
 
@@ -502,7 +502,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D crs(final Vector3D vec) {
+    public Vector3D crs(Vector3D vec) {
         return this.set(y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x);
     }
 
@@ -544,23 +544,23 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D mul(final Matrix4D matrix) {
-        final double[] mat = matrix.val;
+    public Vector3D mul(Matrix4D matrix) {
+        double[] mat = matrix.val;
         return this.set(
                 x * mat[Matrix4D.M00] + y * mat[Matrix4D.M01] + z * mat[Matrix4D.M02] + mat[Matrix4D.M03],
                 x * mat[Matrix4D.M10] + y * mat[Matrix4D.M11] + z * mat[Matrix4D.M12] + mat[Matrix4D.M13],
                 x * mat[Matrix4D.M20] + y * mat[Matrix4D.M21] + z * mat[Matrix4D.M22] + mat[Matrix4D.M23]);
     }
 
-    public Vector3D mulLeft(final Matrix3 matrix) {
-        final float[] l_mat = matrix.val;
+    public Vector3D mulLeft(Matrix3 matrix) {
+        float[] l_mat = matrix.val;
         return this.set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M01] + z * l_mat[Matrix3.M02],
                         x * l_mat[Matrix3.M10] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M12],
                         x * l_mat[Matrix3.M20] + y * l_mat[Matrix3.M21] + z * l_mat[Matrix3.M22]);
     }
 
-    public Vector3D mulRight(final Matrix3 matrix) {
-        final float[] l_mat = matrix.val;
+    public Vector3D mulRight(Matrix3 matrix) {
+        float[] l_mat = matrix.val;
         return this.set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M10] + z * l_mat[Matrix3.M20],
                         x * l_mat[Matrix3.M01] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M21],
                         x * l_mat[Matrix3.M02] + y * l_mat[Matrix3.M12] + z * l_mat[Matrix3.M22]);
@@ -574,8 +574,8 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D traMul(final Matrix4D matrix) {
-        final double[] l_mat = matrix.val;
+    public Vector3D traMul(Matrix4D matrix) {
+        double[] l_mat = matrix.val;
         return this.set(
                 x * l_mat[Matrix4D.M00] + y * l_mat[Matrix4D.M10] + z * l_mat[Matrix4D.M20] + l_mat[Matrix4D.M30],
                 x * l_mat[Matrix4D.M01] + y * l_mat[Matrix4D.M11] + z * l_mat[Matrix4D.M21] + l_mat[Matrix4D.M31],
@@ -591,7 +591,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      * @return This vector for chaining
      */
     public Vector3D mul(Matrix3D matrix) {
-        final double[] l_mat = matrix.val;
+        double[] l_mat = matrix.val;
         return set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M01] + z * l_mat[Matrix3.M02],
                    x * l_mat[Matrix3.M10] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M12],
                    x * l_mat[Matrix3.M20] + y * l_mat[Matrix3.M21] + z * l_mat[Matrix3.M22]);
@@ -605,7 +605,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      * @return This vector for chaining
      */
     public Vector3D traMul(Matrix3D matrix) {
-        final double[] l_mat = matrix.val;
+        double[] l_mat = matrix.val;
         return set(x * l_mat[Matrix3.M00] + y * l_mat[Matrix3.M10] + z * l_mat[Matrix3.M20],
                    x * l_mat[Matrix3.M01] + y * l_mat[Matrix3.M11] + z * l_mat[Matrix3.M21],
                    x * l_mat[Matrix3.M02] + y * l_mat[Matrix3.M12] + z * l_mat[Matrix3.M22]);
@@ -616,7 +616,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D mul(final QuaternionDouble quat) {
+    public Vector3D mul(QuaternionDouble quat) {
         return quat.transform(this);
     }
 
@@ -629,9 +629,9 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D prj(final Matrix4D matrix) {
-        final double[] l_mat = matrix.val;
-        final double l_w = 1f
+    public Vector3D prj(Matrix4D matrix) {
+        double[] l_mat = matrix.val;
+        double l_w = 1f
                 / (x * l_mat[Matrix4D.M30] + y * l_mat[Matrix4D.M31] + z * l_mat[Matrix4D.M32] + l_mat[Matrix4D.M33]);
         return this.set(
                 (x * l_mat[Matrix4D.M00] + y * l_mat[Matrix4D.M01] + z * l_mat[Matrix4D.M02] + l_mat[Matrix4D.M03])
@@ -650,8 +650,8 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D rot(final Matrix4D matrix) {
-        final double[] l_mat = matrix.val;
+    public Vector3D rot(Matrix4D matrix) {
+        double[] l_mat = matrix.val;
         return this.set(x * l_mat[Matrix4D.M00] + y * l_mat[Matrix4D.M01] + z * l_mat[Matrix4D.M02],
                         x * l_mat[Matrix4D.M10] + y * l_mat[Matrix4D.M11] + z * l_mat[Matrix4D.M12],
                         x * l_mat[Matrix4D.M20] + y * l_mat[Matrix4D.M21] + z * l_mat[Matrix4D.M22]);
@@ -666,8 +666,8 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return The vector for chaining
      */
-    public Vector3D unrotate(final Matrix4D matrix) {
-        final double[] l_mat = matrix.val;
+    public Vector3D unrotate(Matrix4D matrix) {
+        double[] l_mat = matrix.val;
         return this.set(x * l_mat[Matrix4D.M00] + y * l_mat[Matrix4D.M10] + z * l_mat[Matrix4D.M20],
                         x * l_mat[Matrix4D.M01] + y * l_mat[Matrix4D.M11] + z * l_mat[Matrix4D.M21],
                         x * l_mat[Matrix4D.M02] + y * l_mat[Matrix4D.M12] + z * l_mat[Matrix4D.M22]);
@@ -684,8 +684,8 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return The vector for chaining
      */
-    public Vector3D untransform(final Matrix4D matrix) {
-        final double[] l_mat = matrix.val;
+    public Vector3D untransform(Matrix4D matrix) {
+        double[] l_mat = matrix.val;
         x -= l_mat[Matrix4D.M03];
         y -= l_mat[Matrix4D.M03];
         z -= l_mat[Matrix4D.M03];
@@ -736,7 +736,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D rotate(final Vector3D axis,
+    public Vector3D rotate(Vector3D axis,
                            double degrees) {
         tmpMat.setToRotation(axis, degrees);
         return this.mul(tmpMat);
@@ -750,7 +750,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining
      */
-    public Vector3D rotateRad(final Vector3D axis,
+    public Vector3D rotateRad(Vector3D axis,
                               double radians) {
         tmpMat.setToRotationRad(axis, radians);
         return this.mul(tmpMat);
@@ -782,7 +782,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
         return isUnit(0.000000001);
     }
 
-    public boolean isUnit(final double margin) {
+    public boolean isUnit(double margin) {
         return FastMath.abs(len2() - 1f) < margin;
     }
 
@@ -790,7 +790,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
         return x == 0 && y == 0 && z == 0;
     }
 
-    public boolean isZero(final double margin) {
+    public boolean isZero(double margin) {
         return len2() < margin;
     }
 
@@ -848,7 +848,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
     }
 
     @Override
-    public Vector3D lerp(final Vector3D vec,
+    public Vector3D lerp(Vector3D vec,
                          double alpha) {
         x += alpha * (vec.x - x);
         y += alpha * (vec.y - y);
@@ -872,24 +872,24 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return This vector for chaining.
      */
-    public Vector3D slerp(final Vector3D vec,
+    public Vector3D slerp(Vector3D vec,
                           double alpha) {
-        final double dot = dot(vec);
+        double dot = dot(vec);
         // If the inputs are too close for comfort, simply linearly interpolate.
         if (dot > 0.9995 || dot < -0.9995)
             return lerp(vec, alpha);
 
         // theta0 = angle between input vectors
-        final double theta0 = FastMath.acos(dot);
+        double theta0 = FastMath.acos(dot);
         // theta = angle between this vector and result
-        final double theta = theta0 * alpha;
+        double theta = theta0 * alpha;
 
-        final double st = FastMath.sin(theta);
-        final double tx = vec.x - x * dot;
-        final double ty = vec.y - y * dot;
-        final double tz = vec.z - z * dot;
-        final double l2 = tx * tx + ty * ty + tz * tz;
-        final double dl = st * ((l2 < 0.0001) ? 1d : 1d / FastMath.sqrt(l2));
+        double st = FastMath.sin(theta);
+        double tx = vec.x - x * dot;
+        double ty = vec.y - y * dot;
+        double tz = vec.z - z * dot;
+        double l2 = tx * tx + ty * ty + tz * tz;
+        double dl = st * ((l2 < 0.0001) ? 1d : 1d / FastMath.sqrt(l2));
 
         return scl(Math.cos(theta)).add(tx * dl, ty * dl, tz * dl).nor();
     }
@@ -923,7 +923,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
 
     public Vector3D clamp(double min,
                           double max) {
-        final double l2 = len2();
+        double l2 = len2();
         if (l2 == 0f)
             return this;
         if (l2 > max * max)
@@ -957,8 +957,8 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return vector modified in place
      */
-    public Vector3D scaleAdd(final double s,
-                             final Vector3D vec) {
+    public Vector3D scaleAdd(double s,
+                             Vector3D vec) {
         return this.add(vec.scl(s));
     }
 
@@ -990,7 +990,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return the rotated vector.
      */
-    public Vector3D rotateVectorByQuaternion(final QuaternionDouble q) {
+    public Vector3D rotateVectorByQuaternion(QuaternionDouble q) {
         QuaternionDouble oldVecQ = new QuaternionDouble(this.x, this.y, this.z, 0.0);
         QuaternionDouble newVecQ = q.cpy().mul(oldVecQ).mulInverse(q);
         this.x = newVecQ.x;
@@ -1046,7 +1046,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
     }
 
     @Override
-    public boolean epsilonEquals(final Vector3D vec,
+    public boolean epsilonEquals(Vector3D vec,
                                  double epsilon) {
         if (vec == null)
             return false;
@@ -1080,7 +1080,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      *
      * @return true if vector are equal, otherwise false
      */
-    public boolean epsilonEquals(final Vector3D vec) {
+    public boolean epsilonEquals(Vector3D vec) {
         return epsilonEquals(vec, MathUtils.FLOAT_ROUNDING_ERROR);
     }
 
@@ -1136,7 +1136,7 @@ public class Vector3D implements VectorDouble<Vector3D> {
      * the current direction cosine as a {@link Vector2D}
      */
     public Vector2D toSphericalCoordinates() {
-        final double xy = FastMath.sqrt((this.x * this.x) + (this.y * this.y));
+        double xy = FastMath.sqrt((this.x * this.x) + (this.y * this.y));
 
         if (xy <= 0.) {
             return new Vector2D(0., .5 * FastMath.PI

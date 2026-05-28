@@ -19,7 +19,7 @@ public abstract class Attribute implements Comparable<Attribute> {
     public final int index;
     private final int typeBit;
 
-    protected Attribute(final int index) {
+    protected Attribute(int index) {
         this.type = Bits.empty();
         this.index = index;
         this.type.set(index);
@@ -38,7 +38,7 @@ public abstract class Attribute implements Comparable<Attribute> {
     }
 
     /** @return The ID of the specified attribute type, or zero if not available */
-    public static Bits getAttributeType(final String alias) {
+    public static Bits getAttributeType(String alias) {
         for (int i = 0; i < types.size; i++) {
             if (types.get(i).compareTo(alias) == 0) {
                 Bits b = Bits.empty();
@@ -50,18 +50,18 @@ public abstract class Attribute implements Comparable<Attribute> {
     }
 
     /** @return The alias of the specified attribute type, or null if not available. */
-    public static String getAttributeAlias(final Bits type) {
+    public static String getAttributeAlias(Bits type) {
         int idx = type.nextSetBit(0);
         return (idx >= 0 && idx < types.size) ? types.get(idx) : null;
     }
 
     /** @return The index of the specified attribute type, or -1 if not available. */
-    public static int getAttributeIndex(final Bits type) {
+    public static int getAttributeIndex(Bits type) {
         return type.nextSetBit(0);
     }
 
     /** @return The index of the specified attribute alias, or -1 if not available. */
-    public static int getAttributeIndex(final String alias) {
+    public static int getAttributeIndex(String alias) {
         for (int i = 0; i < types.size; i++) {
             if (types.get(i).compareTo(alias) == 0) {
                 return i;
@@ -78,7 +78,7 @@ public abstract class Attribute implements Comparable<Attribute> {
      *
      * @return the index of the newly registered type, or the index of the existing type if the alias was already registered.
      */
-    protected static int register(final String alias) {
+    protected static int register(String alias) {
         int result = getAttributeIndex(alias);
         if (result >= 0)
             return result;

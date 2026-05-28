@@ -34,29 +34,29 @@ public class BaseIntAnimationController {
 			return this;
 		}
 
-		public Transform set (final Vector3 t, final Quaternion r, final Vector3 s) {
+		public Transform set (Vector3 t, Quaternion r, Vector3 s) {
 			translation.set(t);
 			rotation.set(r);
 			scale.set(s);
 			return this;
 		}
 
-		public Transform set (final Transform other) {
+		public Transform set (Transform other) {
 			return set(other.translation, other.rotation, other.scale);
 		}
 
-		public Transform lerp (final Transform target, final float alpha) {
+		public Transform lerp (Transform target, float alpha) {
 			return lerp(target.translation, target.rotation, target.scale, alpha);
 		}
 
-		public Transform lerp (final Vector3 targetT, final Quaternion targetR, final Vector3 targetS, final float alpha) {
+		public Transform lerp (Vector3 targetT, Quaternion targetR, Vector3 targetS, float alpha) {
 			translation.lerp(targetT, alpha);
 			rotation.slerp(targetR, alpha);
 			scale.lerp(targetS, alpha);
 			return this;
 		}
 
-		public Matrix4 toMatrix4 (final Matrix4 out) {
+		public Matrix4 toMatrix4 (Matrix4 out) {
 			return out.set(translation, rotation, scale);
 		}
 
@@ -78,13 +78,13 @@ public class BaseIntAnimationController {
 		}
 	};
 	private final static ObjectMap<IntNode, Transform> transforms = new ObjectMap<>();
-	private boolean applying = false;
+	private boolean applying;
 	/** The {@link IntModelInstance} on which the animations are being performed. */
 	public final IntModelInstance target;
 
 	/** Construct a new BaseAnimationController.
 	 * @param target The {@link IntModelInstance} on which the animations are being performed. */
-	public BaseIntAnimationController(final IntModelInstance target) {
+	public BaseIntAnimationController(IntModelInstance target) {
 		this.target = target;
 	}
 
@@ -97,7 +97,7 @@ public class BaseIntAnimationController {
 
 	/** Apply an animation, must be called between {{@link #begin()} and {{@link #end()}.
 	 * @param weight The blend weight of this animation relative to the previous applied animations. */
-	protected void apply (final IntAnimation animation, final float time, final float weight) {
+	protected void apply (IntAnimation animation, float time, float weight) {
 		if (!applying) throw new GdxRuntimeException("You must call begin() before adding an animation");
 		applyAnimation(transforms, transformPool, weight, animation, time);
 	}
@@ -115,15 +115,15 @@ public class BaseIntAnimationController {
 	}
 
 	/** Apply a single animation to the {@link IntModelInstance} and update the it to reflect the changes. */
-	protected void applyAnimation (final IntAnimation animation, final float time) {
+	protected void applyAnimation (IntAnimation animation, float time) {
 		if (applying) throw new GdxRuntimeException("Call end() first");
 		applyAnimation(null, null, 1.f, animation, time);
 		target.calculateTransforms();
 	}
 
 	/** Apply two animations, blending the second onto to first using weight. */
-	protected void applyAnimations (final IntAnimation anim1, final float time1, final IntAnimation anim2, final float time2,
-		final float weight) {
+	protected void applyAnimations (IntAnimation anim1, float time1, IntAnimation anim2, float time2,
+                                    float weight) {
 		if (anim2 == null || weight == 0.f)
 			applyAnimation(anim1, time1);
 		else if (anim1 == null || weight == 1.f)
@@ -144,8 +144,8 @@ public class BaseIntAnimationController {
 	 * @param arr Key frames ordered by time ascending
 	 * @param time Time to search
 	 * @return key frame index, 0 if time is out of key frames time range */
-	static <T> int getFirstKeyframeIndexAtTime (final Array<NodeKeyframe<T>> arr, final float time) {
-		final int lastIndex = arr.size - 1;
+	static <T> int getFirstKeyframeIndexAtTime (Array<NodeKeyframe<T>> arr, float time) {
+		int lastIndex = arr.size - 1;
 
 		// edges cases : time out of range always return first index
 		if (lastIndex <= 0 || time < arr.get(0).keytime || time > arr.get(lastIndex).keytime) {
@@ -169,75 +169,75 @@ public class BaseIntAnimationController {
 		return minIndex;
 	}
 
-	private static Vector3 getTranslationAtTime (final IntNodeAnimation nodeAnim, final float time, final Vector3 out) {
+	private static Vector3 getTranslationAtTime (IntNodeAnimation nodeAnim, float time, Vector3 out) {
 		if (nodeAnim.translation == null) return out.set(nodeAnim.node.translation);
 		if (nodeAnim.translation.size == 1) return out.set(nodeAnim.translation.get(0).value);
 
 		int index = getFirstKeyframeIndexAtTime(nodeAnim.translation, time);
-		final NodeKeyframe firstKeyframe = nodeAnim.translation.get(index);
+		NodeKeyframe firstKeyframe = nodeAnim.translation.get(index);
 		out.set((Vector3)firstKeyframe.value);
 
 		if (++index < nodeAnim.translation.size) {
-			final NodeKeyframe<Vector3> secondKeyframe = nodeAnim.translation.get(index);
-			final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+			NodeKeyframe<Vector3> secondKeyframe = nodeAnim.translation.get(index);
+			float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
 			out.lerp(secondKeyframe.value, t);
 		}
 		return out;
 	}
 
-	private static Quaternion getRotationAtTime (final IntNodeAnimation nodeAnim, final float time, final Quaternion out) {
+	private static Quaternion getRotationAtTime (IntNodeAnimation nodeAnim, float time, Quaternion out) {
 		if (nodeAnim.rotation == null) return out.set(nodeAnim.node.rotation);
 		if (nodeAnim.rotation.size == 1) return out.set(nodeAnim.rotation.get(0).value);
 
 		int index = getFirstKeyframeIndexAtTime(nodeAnim.rotation, time);
-		final NodeKeyframe firstKeyframe = nodeAnim.rotation.get(index);
+		NodeKeyframe firstKeyframe = nodeAnim.rotation.get(index);
 		out.set((Quaternion)firstKeyframe.value);
 
 		if (++index < nodeAnim.rotation.size) {
-			final NodeKeyframe<Quaternion> secondKeyframe = nodeAnim.rotation.get(index);
-			final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+			NodeKeyframe<Quaternion> secondKeyframe = nodeAnim.rotation.get(index);
+			float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
 			out.slerp(secondKeyframe.value, t);
 		}
 		return out;
 	}
 
-	private static Vector3 getScalingAtTime (final IntNodeAnimation nodeAnim, final float time, final Vector3 out) {
+	private static Vector3 getScalingAtTime (IntNodeAnimation nodeAnim, float time, Vector3 out) {
 		if (nodeAnim.scaling == null) return out.set(nodeAnim.node.scale);
 		if (nodeAnim.scaling.size == 1) return out.set(nodeAnim.scaling.get(0).value);
 
 		int index = getFirstKeyframeIndexAtTime(nodeAnim.scaling, time);
-		final NodeKeyframe firstKeyframe = nodeAnim.scaling.get(index);
+		NodeKeyframe firstKeyframe = nodeAnim.scaling.get(index);
 		out.set((Vector3)firstKeyframe.value);
 
 		if (++index < nodeAnim.scaling.size) {
-			final NodeKeyframe<Vector3> secondKeyframe = nodeAnim.scaling.get(index);
-			final float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
+			NodeKeyframe<Vector3> secondKeyframe = nodeAnim.scaling.get(index);
+			float t = (time - firstKeyframe.keytime) / (secondKeyframe.keytime - firstKeyframe.keytime);
 			out.lerp(secondKeyframe.value, t);
 		}
 		return out;
 	}
 
-	private static Transform getNodeAnimationTransform (final IntNodeAnimation nodeAnim, final float time) {
-		final Transform transform = tmpT;
+	private static Transform getNodeAnimationTransform (IntNodeAnimation nodeAnim, float time) {
+		Transform transform = tmpT;
 		getTranslationAtTime(nodeAnim, time, transform.translation);
 		getRotationAtTime(nodeAnim, time, transform.rotation);
 		getScalingAtTime(nodeAnim, time, transform.scale);
 		return transform;
 	}
 
-	private static void applyNodeAnimationDirectly (final IntNodeAnimation nodeAnim, final float time) {
-		final IntNode node = nodeAnim.node;
+	private static void applyNodeAnimationDirectly (IntNodeAnimation nodeAnim, float time) {
+		IntNode node = nodeAnim.node;
 		node.isAnimated = true;
-		final Transform transform = getNodeAnimationTransform(nodeAnim, time);
+		Transform transform = getNodeAnimationTransform(nodeAnim, time);
 		transform.toMatrix4(node.localTransform);
 	}
 
-	private static void applyNodeAnimationBlending (final IntNodeAnimation nodeAnim, final ObjectMap<IntNode, Transform> out,
-													final Pool<Transform> pool, final float alpha, final float time) {
+	private static void applyNodeAnimationBlending (IntNodeAnimation nodeAnim, ObjectMap<IntNode, Transform> out,
+                                                    Pool<Transform> pool, float alpha, float time) {
 
-		final IntNode node = nodeAnim.node;
+		IntNode node = nodeAnim.node;
 		node.isAnimated = true;
-		final Transform transform = getNodeAnimationTransform(nodeAnim, time);
+		Transform transform = getNodeAnimationTransform(nodeAnim, time);
 
 		Transform t = out.get(node, null);
 		if (t != null) {
@@ -254,18 +254,18 @@ public class BaseIntAnimationController {
 	}
 
 	/** Helper method to apply one animation to either an objectmap for blending or directly to the bones. */
-	protected static void applyAnimation (final ObjectMap<IntNode, Transform> out, final Pool<Transform> pool, final float alpha,
-		final IntAnimation animation, final float time) {
+	protected static void applyAnimation (ObjectMap<IntNode, Transform> out, Pool<Transform> pool, float alpha,
+                                          IntAnimation animation, float time) {
 
 		if (out == null) {
-			for (final IntNodeAnimation nodeAnim : animation.nodeAnimations)
+			for (IntNodeAnimation nodeAnim : animation.nodeAnimations)
 				applyNodeAnimationDirectly(nodeAnim, time);
 		} else {
-			for (final IntNode node : out.keys())
+			for (IntNode node : out.keys())
 				node.isAnimated = false;
-			for (final IntNodeAnimation nodeAnim : animation.nodeAnimations)
+			for (IntNodeAnimation nodeAnim : animation.nodeAnimations)
 				applyNodeAnimationBlending(nodeAnim, out, pool, alpha, time);
-			for (final Entry<IntNode, Transform> e : out.entries()) {
+			for (Entry<IntNode, Transform> e : out.entries()) {
 				if (!e.key.isAnimated) {
 					e.key.isAnimated = true;
 					e.value.lerp(e.key.translation, e.key.rotation, e.key.scale, alpha);
@@ -276,8 +276,8 @@ public class BaseIntAnimationController {
 
 	/** Remove the specified animation, by marking the affected nodes as not animated. When switching animation, this should be
 	 * call prior to applyAnimation(s). */
-	protected void removeAnimation (final IntAnimation animation) {
-		for (final IntNodeAnimation nodeAnim : animation.nodeAnimations) {
+	protected void removeAnimation (IntAnimation animation) {
+		for (IntNodeAnimation nodeAnim : animation.nodeAnimations) {
 			nodeAnim.node.isAnimated = false;
 		}
 	}

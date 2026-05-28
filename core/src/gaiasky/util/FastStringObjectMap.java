@@ -43,7 +43,7 @@ public class FastStringObjectMap<V> {
      */
     public V get(String key) {
         int index = indexOf(key);
-        return index != -1 ? (V) values[index] : null;
+        return index != -1 ? values[index] : null;
     }
 
     /**
@@ -98,7 +98,7 @@ public class FastStringObjectMap<V> {
         int index = indexOf(key);
         if (index == -1) return null;
 
-        V oldValue = (V) values[index];
+        V oldValue = values[index];
         keys[index] = null;
         values[index] = null;
         size--;
@@ -107,7 +107,7 @@ public class FastStringObjectMap<V> {
         index = (index + 1) % capacity;
         while (keys[index] != null) {
             String rehashKey = keys[index];
-            V rehashValue = (V) values[index];
+            V rehashValue = values[index];
             keys[index] = null;
             values[index] = null;
             size--;

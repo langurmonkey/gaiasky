@@ -84,11 +84,11 @@ public class CubemapLoader extends AsynchronousAssetLoader<OwnCubemap, CubemapPa
 
     static public class CubemapParameter extends AssetLoaderParameters<OwnCubemap> {
         /** the format of the final Texture. Uses the source images format if null **/
-        public Format format = null;
+        public Format format;
         /** The texture to put the {@link TextureData} in, optional. **/
-        public OwnCubemap cubemap = null;
+        public OwnCubemap cubemap;
         /** CubemapData for textures created on the fly, optional. When set, all format and genMipMaps are ignored */
-        public CubemapData cubemapData = null;
+        public CubemapData cubemapData;
         public TextureFilter minFilter = TextureFilter.Nearest;
         public TextureFilter magFilter = TextureFilter.Nearest;
         public TextureWrap wrapU = TextureWrap.ClampToEdge;

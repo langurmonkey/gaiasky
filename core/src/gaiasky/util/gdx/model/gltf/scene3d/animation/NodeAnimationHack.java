@@ -19,5 +19,5 @@ public class NodeAnimationHack extends IntNodeAnimation
 	public Interpolation scalingMode;
 	public Interpolation weightsMode;
 	
-	public Array<NodeKeyframe<WeightVector>> weights = null;
+	public Array<NodeKeyframe<WeightVector>> weights;
 }

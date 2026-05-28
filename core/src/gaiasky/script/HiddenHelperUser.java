@@ -51,11 +51,11 @@ public class HiddenHelperUser implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case SCENE_LOADED -> this.scene = (Scene) data[0];
         case NAVIGATE_TO_OBJECT -> {
-            final FocusView body;
+            FocusView body;
             if (data[0] instanceof String) {
                 var entity = scene.findFocus((String) data[0]);
                 view.setEntity(entity);
@@ -70,7 +70,7 @@ public class HiddenHelperUser implements IObserver {
             lastCommandTime = TimeUtils.millis();
         }
         case LAND_ON_OBJECT -> {
-            final FocusView body;
+            FocusView body;
             if (data[0] instanceof String) {
                 var entity = scene.findFocus((String) data[0]);
                 view.setEntity(entity);
@@ -85,7 +85,7 @@ public class HiddenHelperUser implements IObserver {
             lastCommandTime = TimeUtils.millis();
         }
         case LAND_AT_LOCATION_OF_OBJECT -> {
-            final FocusView body;
+            FocusView body;
             if (data[0] instanceof String) {
                 var entity = scene.findFocus((String) data[0]);
                 view.setEntity(entity);

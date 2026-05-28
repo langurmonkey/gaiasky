@@ -21,7 +21,7 @@ public class DirectionalLightsAttribute extends Attribute {
         lights = new Array<>(1);
     }
 
-    public DirectionalLightsAttribute(final DirectionalLightsAttribute copyFrom) {
+    public DirectionalLightsAttribute(DirectionalLightsAttribute copyFrom) {
         this();
         lights.addAll(copyFrom.lights);
     }

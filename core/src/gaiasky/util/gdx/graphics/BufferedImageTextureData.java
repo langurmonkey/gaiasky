@@ -24,9 +24,9 @@ public class BufferedImageTextureData implements TextureData {
     private static final Log logger = Logger.getLogger(BufferedImageTextureData.class);
     private final FileHandle file;
     private final boolean useMipMaps;
-    private BufferedImage image = null;
-    int width = 0;
-    int height = 0;
+    private BufferedImage image;
+    int width;
+    int height;
 
     public BufferedImageTextureData(FileHandle file, boolean useMipMaps) {
         this.file = file;

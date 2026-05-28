@@ -71,24 +71,24 @@ public class NslSun {
      * @param tNs time in [ns] since the time origin
      */
     public void setTime(long tNs) {
-        final double daysFromJ2000 = timeOriginDaysFromJ2000 + (double) tNs * Nature.NS_TO_D;
+        double daysFromJ2000 = timeOriginDaysFromJ2000 + (double) tNs * Nature.NS_TO_D;
 
         // Mean apparent Sun longitude:
-        final double xl = NOMINALSUN_MEANLONGITUDE_J2000
+        double xl = NOMINALSUN_MEANLONGITUDE_J2000
                 - ABERRATION_CONSTANT_J2000 / 3600.0
                 + NOMINALSUN_MEANLONGITUDERATE_J2000
                 * daysFromJ2000;
 
         // Mean Sun anomaly:
-        final double xm = NOMINALSUN_ORBITALMEANANOMALY_J2000
+        double xm = NOMINALSUN_ORBITALMEANANOMALY_J2000
                 + NOMINALSUN_ORBITALMEANANOMALYRATE_J2000
                 * daysFromJ2000;
 
-        final double sm = FastMath.sin(Math.toRadians(xm));
-        final double cm = FastMath.cos(Math.toRadians(xm));
+        double sm = FastMath.sin(Math.toRadians(xm));
+        double cm = FastMath.cos(Math.toRadians(xm));
 
         // Longitude accurate to O(e^3)
-        final double lon = xl + sm * (d2e + d5_2e2 * cm);
+        double lon = xl + sm * (d2e + d5_2e2 * cm);
 
         this.sLonDot = Math
                 .toRadians(NOMINALSUN_MEANLONGITUDERATE_J2000

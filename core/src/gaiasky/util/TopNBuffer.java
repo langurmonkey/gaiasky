@@ -12,7 +12,7 @@ package gaiasky.util;
  */
 public class TopNBuffer {
     private final int capacity;
-    private int size = 0;
+    private int size;
     private final int[] indices;
     private final double[] values;
 

@@ -15,15 +15,15 @@ import gaiasky.util.gdx.shader.TessellationShader;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
 public class TessellationShaderProvider extends DefaultIntShaderProvider {
-    public TessellationShaderProvider(final Config config) {
+    public TessellationShaderProvider(Config config) {
         super(config);
     }
 
-    public TessellationShaderProvider(final String vertexShader, final String controlShader, final String evaluationShader, final String fragmentShader) {
+    public TessellationShaderProvider(String vertexShader, String controlShader, String evaluationShader, String fragmentShader) {
         this(new Config(vertexShader, controlShader, evaluationShader, fragmentShader));
     }
 
-    public TessellationShaderProvider(final FileHandle vertexShader, final FileHandle controlShader, final FileHandle evaluationShader, final FileHandle fragmentShader) {
+    public TessellationShaderProvider(FileHandle vertexShader, FileHandle controlShader, FileHandle evaluationShader, FileHandle fragmentShader) {
         this(ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(controlShader), ShaderTemplatingLoader.load(evaluationShader), ShaderTemplatingLoader.load(fragmentShader));
     }
 
@@ -32,18 +32,18 @@ public class TessellationShaderProvider extends DefaultIntShaderProvider {
     }
 
     @Override
-    protected IntShader createShader(final IntRenderable renderable) {
+    protected IntShader createShader(IntRenderable renderable) {
         return new TessellationShader(renderable, (Config) config);
     }
 
     public static class Config extends DefaultIntShader.Config {
-        public String controlShader = null;
-        public String evaluationShader = null;
+        public String controlShader;
+        public String evaluationShader;
 
         public Config() {
         }
 
-        public Config(final String vertexShader, final String controlShader, final String evaluationShader, final String fragmentShader) {
+        public Config(String vertexShader, String controlShader, String evaluationShader, String fragmentShader) {
             super(vertexShader, fragmentShader);
             this.controlShader = controlShader;
             this.evaluationShader = evaluationShader;

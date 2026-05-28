@@ -5,7 +5,7 @@ package gaiasky.util.validator;
  */
 public class StringValidator extends CallbackValidator {
 
-    private Character[] banned;
+    private final Character[] banned;
 
     public StringValidator(IValidator parent, Character[] banned) {
         super(parent);

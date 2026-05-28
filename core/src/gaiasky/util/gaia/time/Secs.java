@@ -22,7 +22,7 @@ public class Secs extends ConcreteDuration {
      *
      * @param secs elapsed time [seconds]
      */
-    public Secs(final double secs) {
+    public Secs(double secs) {
         value = secs;
     }
 
@@ -31,7 +31,7 @@ public class Secs extends ConcreteDuration {
      *
      * @return Secs expressed in nanosec
      */
-    public static long asNanoSecs(final double secs) {
+    public static long asNanoSecs(double secs) {
         return FastMath.round(secs * Duration.NS_PER_SEC);
     }
 
@@ -40,7 +40,7 @@ public class Secs extends ConcreteDuration {
      *
      * @return Secs expressed in mins
      */
-    public static double asMins(final double secs) {
+    public static double asMins(double secs) {
         return secs / Duration.SECS_PER_MIN;
     }
 
@@ -49,7 +49,7 @@ public class Secs extends ConcreteDuration {
      *
      * @return Secs expressed in hours
      */
-    public static double asHours(final double secs) {
+    public static double asHours(double secs) {
         return secs / Duration.SECS_PER_HOUR;
     }
 
@@ -58,7 +58,7 @@ public class Secs extends ConcreteDuration {
      *
      * @return Secs expressed in days
      */
-    public static double asRevs(final double secs) {
+    public static double asRevs(double secs) {
         return secs / Duration.SECS_PER_REV;
     }
 
@@ -67,7 +67,7 @@ public class Secs extends ConcreteDuration {
      *
      * @return Secs expressed in days
      */
-    public static double asDays(final double secs) {
+    public static double asDays(double secs) {
         return secs / Duration.SECS_PER_DAY;
     }
 
@@ -76,7 +76,7 @@ public class Secs extends ConcreteDuration {
      *
      * @return Secs expressed in JulianYears
      */
-    public static double asJulianYears(final double secs) {
+    public static double asJulianYears(double secs) {
         return secs / Duration.SECS_PER_JULIAN_YEAR;
     }
 
@@ -84,7 +84,7 @@ public class Secs extends ConcreteDuration {
      * @see Duration#set(Duration)
      */
     @Override
-    public Duration set(final Duration d) {
+    public Duration set(Duration d) {
         value = d.asSecs();
 
         return this;
@@ -150,7 +150,7 @@ public class Secs extends ConcreteDuration {
      * @see Duration#sub(Duration)
      */
     @Override
-    public Duration add(final Duration d) {
+    public Duration add(Duration d) {
         value += d.asSecs();
 
         return this;
@@ -160,7 +160,7 @@ public class Secs extends ConcreteDuration {
      * @see Duration#sub(Duration)
      */
     @Override
-    public Duration sub(final Duration d) {
+    public Duration sub(Duration d) {
         value -= d.asSecs();
 
         return this;

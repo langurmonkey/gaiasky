@@ -54,8 +54,7 @@ public class JPGWriter {
 
     public static void write(FileHandle file, Pixmap pix) {
         try (FileImageOutputStream outputStream = new FileImageOutputStream(file.file())) {
-            final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-            ;
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
             writer.setOutput(outputStream);
             writer.write(null, new IIOImage(pixmapToBufferedImage(pix), null, null), jpegParams);
         } catch (IOException e) {

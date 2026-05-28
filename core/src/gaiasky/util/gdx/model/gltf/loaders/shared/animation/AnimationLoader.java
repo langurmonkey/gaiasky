@@ -65,7 +65,7 @@ public class AnimationLoader {
 			float[] inputData = dataResolver.readBufferFloat(glSampler.input);
 			float[] outputData = dataResolver.readBufferFloat(glSampler.output);
 
-			final Interpolation interpolation = GLTFTypes.mapInterpolation(glSampler.interpolation);
+			Interpolation interpolation = GLTFTypes.mapInterpolation(glSampler.interpolation);
 			
 			// case of cubic spline, we skip anchor vectors if cubic is disabled.
 			int dataOffset = 0;

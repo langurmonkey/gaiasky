@@ -20,18 +20,18 @@ public class SphereCreator extends ModelCreator {
     private static final VertexInfo vertTmp3 = new VertexInfo();
     private static IntArray tmpIndices = new IntArray();
 
-    public static void create(IntIntMeshBuilder builder, final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+    public static void create(IntIntMeshBuilder builder, Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         axisY.set(0, 1, 0);
         axisZ.set(0, 0, 1);
-        final float hw = width * 0.5f;
-        final float hh = height * 0.5f;
-        final float hd = depth * 0.5f;
-        final float auo = MathUtils.degreesToRadians * angleUFrom;
-        final float stepU = (MathUtils.degreesToRadians * (angleUTo - angleUFrom)) / divisionsU;
-        final float avo = MathUtils.degreesToRadians * angleVFrom;
-        final float stepV = (MathUtils.degreesToRadians * (angleVTo - angleVFrom)) / divisionsV;
-        final float us = 1f / divisionsU;
-        final float vs = 1f / divisionsV;
+        float hw = width * 0.5f;
+        float hh = height * 0.5f;
+        float hd = depth * 0.5f;
+        float auo = MathUtils.degreesToRadians * angleUFrom;
+        float stepU = (MathUtils.degreesToRadians * (angleUTo - angleUFrom)) / divisionsU;
+        float avo = MathUtils.degreesToRadians * angleVFrom;
+        float stepV = (MathUtils.degreesToRadians * (angleVTo - angleVFrom)) / divisionsV;
+        float us = 1f / divisionsU;
+        float vs = 1f / divisionsV;
         float u;
         float v;
         float angleU;
@@ -41,7 +41,7 @@ public class SphereCreator extends ModelCreator {
 
         if (tmpIndices == null)
             tmpIndices = new IntArray(divisionsU * 2);
-        final int s = divisionsU + 3;
+        int s = divisionsU + 3;
         tmpIndices.ensureCapacity(s);
         while (tmpIndices.size > s)
             tmpIndices.pop();
@@ -53,8 +53,8 @@ public class SphereCreator extends ModelCreator {
         for (int iv = 0; iv <= divisionsV; iv++) {
             angleV = avo + stepV * iv;
             v = vs * iv;
-            final float t = MathUtils.sin(angleV);
-            final float h = MathUtils.cos(angleV) * hh;
+            float t = MathUtils.sin(angleV);
+            float h = MathUtils.cos(angleV) * hh;
             for (int iu = 0; iu <= divisionsU; iu++) {
                 angleU = auo + stepU * iu;
                 u = 1f - us * iu;
@@ -70,7 +70,7 @@ public class SphereCreator extends ModelCreator {
 
                 curr1.uv.set(u, v);
                 tmpIndices.set(tempOffset, builder.vertex(curr1));
-                final int o = tempOffset + s;
+                int o = tempOffset + s;
                 if ((iv > 0) && (iu > 0))
                     if (!flipNormals) {
                         builder.rect(tmpIndices.get(tempOffset), tmpIndices.get((o - 1) % s), tmpIndices.get((o - (divisionsU + 2)) % s), tmpIndices.get((o - (divisionsU + 1)) % s));

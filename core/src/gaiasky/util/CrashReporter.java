@@ -152,7 +152,7 @@ public class CrashReporter {
 
     private static Path writeCrash(Log logger, Path crashDir, String dateString, Array<String> crashInfo) {
         Path crashReportFile = crashDir.resolve("gaiasky_crash_" + dateString + ".txt");
-        final BufferedWriter writer;
+        BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(crashReportFile.toFile()));
             crashInfo.forEach(str -> {

@@ -77,7 +77,7 @@ public class GaiaSkyExecutorService {
     }
 
     private static class DaemonThreadFactory implements ThreadFactory {
-        private int sequence = 0;
+        private int sequence;
 
         @Override
         public Thread newThread(Runnable r) {

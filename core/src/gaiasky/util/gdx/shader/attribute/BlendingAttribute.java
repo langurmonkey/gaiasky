@@ -47,7 +47,7 @@ public class BlendingAttribute extends Attribute {
         this.intrinsicOpacity = other.opacity;
     }
 
-    public BlendingAttribute(final boolean blended, final int sourceFunc, final int destFunc, final float opacity) {
+    public BlendingAttribute(boolean blended, int sourceFunc, int destFunc, float opacity) {
         super(Type);
         this.blended = blended;
         this.sourceFunction = sourceFunc;
@@ -56,28 +56,28 @@ public class BlendingAttribute extends Attribute {
         this.intrinsicOpacity = opacity;
     }
 
-    public BlendingAttribute(final int sourceFunc, final int destFunc, final float opacity) {
+    public BlendingAttribute(int sourceFunc, int destFunc, float opacity) {
         this(true, sourceFunc, destFunc, opacity);
     }
 
-    public BlendingAttribute(final int sourceFunc, final int destFunc) {
+    public BlendingAttribute(int sourceFunc, int destFunc) {
         this(sourceFunc, destFunc, 1.f);
     }
 
-    public BlendingAttribute(final boolean blended, final float opacity) {
+    public BlendingAttribute(boolean blended, float opacity) {
         this(blended, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, opacity);
     }
 
-    public BlendingAttribute(final float opacity) {
+    public BlendingAttribute(float opacity) {
         this(true, opacity);
     }
 
-    public BlendingAttribute(final BlendingAttribute copyFrom) {
+    public BlendingAttribute(BlendingAttribute copyFrom) {
         this(copyFrom == null || copyFrom.blended, copyFrom == null ? GL20.GL_SRC_ALPHA : copyFrom.sourceFunction,
              copyFrom == null ? GL20.GL_ONE_MINUS_SRC_ALPHA : copyFrom.destFunction, copyFrom == null ? 1.f : copyFrom.opacity);
     }
 
-    public static boolean is(final int index) {
+    public static boolean is(int index) {
         return index == Type;
     }
 

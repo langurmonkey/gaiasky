@@ -55,6 +55,6 @@ public class GLTFWrapperLoader extends AsynchronousAssetLoader<IntModel, GLTFLoa
     }
 
     public static class GLTFLoaderParameters extends AssetLoaderParameters<IntModel> {
-        public boolean withData = false;
+        public boolean withData;
     }
 }

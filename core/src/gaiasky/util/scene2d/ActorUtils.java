@@ -34,8 +34,7 @@ public class ActorUtils {
      */
     public static void keepWithinStage(Stage stage, Actor actor) {
         Camera camera = stage.getCamera();
-        if (camera instanceof OrthographicCamera) {
-            OrthographicCamera orthographicCamera = (OrthographicCamera) camera;
+        if (camera instanceof OrthographicCamera orthographicCamera) {
             float parentWidth = stage.getWidth();
             float parentHeight = stage.getHeight();
             if (actor.getX(Align.right) - camera.position.x > parentWidth / 2 / orthographicCamera.zoom)

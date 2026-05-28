@@ -22,7 +22,7 @@ public class JulianYears extends ConcreteDuration {
      *
      * @param years number of years
      */
-    public JulianYears(final double years) {
+    public JulianYears(double years) {
         value = years;
     }
 
@@ -31,7 +31,7 @@ public class JulianYears extends ConcreteDuration {
      *
      * @return JulianYears expressed in nanoSec
      */
-    public static long asNanoSecs(final double years) {
+    public static long asNanoSecs(double years) {
         return FastMath.round(years * Duration.NS_PER_JULIAN_YEAR);
     }
 
@@ -40,7 +40,7 @@ public class JulianYears extends ConcreteDuration {
      *
      * @return JulianYears expressed in secs
      */
-    public static double asSecs(final double years) {
+    public static double asSecs(double years) {
         return years * Duration.SECS_PER_JULIAN_YEAR;
     }
 
@@ -49,7 +49,7 @@ public class JulianYears extends ConcreteDuration {
      *
      * @return JulianYears expressed in mins
      */
-    public static double asMins(final double years) {
+    public static double asMins(double years) {
         return years * Duration.MINS_PER_JULIAN_YEAR;
     }
 
@@ -58,7 +58,7 @@ public class JulianYears extends ConcreteDuration {
      *
      * @return JulianYears expressed in hours.
      */
-    public static double asHours(final double years) {
+    public static double asHours(double years) {
         return years * Duration.HOURS_PER_JULIAN_YEAR;
     }
 
@@ -67,7 +67,7 @@ public class JulianYears extends ConcreteDuration {
      *
      * @return JulianYears expressed in revs.
      */
-    public static double asRevs(final double years) {
+    public static double asRevs(double years) {
         return years * Duration.REVS_PER_JULIAN_YEAR;
     }
 
@@ -76,7 +76,7 @@ public class JulianYears extends ConcreteDuration {
      *
      * @return JulianYears expressed in days
      */
-    public static double asDays(final double years) {
+    public static double asDays(double years) {
         return years * Duration.DAYS_PER_JULIAN_YEAR;
     }
 
@@ -84,7 +84,7 @@ public class JulianYears extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#set(Duration)
      */
     @Override
-    public Duration set(final Duration d) {
+    public Duration set(Duration d) {
         value = d.asJulianYears();
 
         return this;
@@ -150,7 +150,7 @@ public class JulianYears extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration add(final Duration d) {
+    public Duration add(Duration d) {
         value += d.asJulianYears();
 
         return this;
@@ -160,7 +160,7 @@ public class JulianYears extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration sub(final Duration d) {
+    public Duration sub(Duration d) {
         value -= d.asJulianYears();
 
         return this;

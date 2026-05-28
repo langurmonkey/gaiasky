@@ -59,10 +59,10 @@ public class ComputeShaderProgram implements Disposable {
     private String shaderCode;
     private String log;
     private int program;
-    private boolean isCompiled = false;
+    private boolean isCompiled;
     private final Map<String, Integer> uniforms = new HashMap<>();
     private final Map<String, Integer> uniformTypes = new HashMap<>(); // Track uniform types
-    private boolean using = false;
+    private boolean using;
 
     /** The local size X dimension. Must match the compute shader layout. **/
     private final static int localSizeX = 256;

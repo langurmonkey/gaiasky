@@ -55,13 +55,13 @@ public class SettingsMorph {
      * @param propertiesFile The location of the properties file.
      * @param yamlFile       The location to save the YAML settings file.
      */
-    public static void morphSettings(final Path propertiesFile, final Path yamlFile) throws IOException {
+    public static void morphSettings(Path propertiesFile, Path yamlFile) throws IOException {
         // Load properties file
         Properties p = new Properties();
         p.load(new FileInputStream(propertiesFile.toFile()));
 
         // Create settings
-        final var s = new Settings();
+        var s = new Settings();
 
         // Configuration version
         s.configVersion = i32("properties.version", p);
@@ -356,36 +356,36 @@ public class SettingsMorph {
         return ScreenshotMode.valueOf(value.toUpperCase(Locale.ROOT));
     }
 
-    private static float[] arr(final String key, final Properties properties) {
+    private static float[] arr(String key, Properties properties) {
         var arr = str(key, properties);
         return Parser.parseFloatArray(arr);
     }
 
-    private static String str(final String key, final Properties properties) {
+    private static String str(String key, Properties properties) {
         return properties.getProperty(key);
     }
 
-    private static boolean bool(final String key, final Properties properties) {
+    private static boolean bool(String key, Properties properties) {
         return Parser.parseBoolean(properties.getProperty(key));
     }
 
-    private static float f32(final String key, final Properties properties) {
+    private static float f32(String key, Properties properties) {
         return Parser.parseFloat(properties.getProperty(key));
     }
 
-    private static double f64(final String key, final Properties properties) {
+    private static double f64(String key, Properties properties) {
         return Parser.parseDouble(properties.getProperty(key));
     }
 
-    private static int i32(final String key, final Properties properties) {
+    private static int i32(String key, Properties properties) {
         return Parser.parseInt(properties.getProperty(key));
     }
 
-    private static long i64(final String key, final Properties properties) {
+    private static long i64(String key, Properties properties) {
         return Parser.parseLong(properties.getProperty(key));
     }
 
-    private static String escapeURL(final String url) {
+    private static String escapeURL(String url) {
         return url.replaceAll("\\\\", "");
     }
 }

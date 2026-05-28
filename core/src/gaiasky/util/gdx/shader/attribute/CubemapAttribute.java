@@ -40,7 +40,7 @@ public class CubemapAttribute extends Attribute {
 
     public final TextureDescriptor<OwnCubemap> textureDescription;
 
-    public CubemapAttribute(final int index) {
+    public CubemapAttribute(int index) {
         super(index);
         textureDescription = new TextureDescriptor<>();
     }
@@ -52,17 +52,17 @@ public class CubemapAttribute extends Attribute {
         return -1;
     }
 
-    public <T extends OwnCubemap> CubemapAttribute(final int index, final TextureDescriptor<T> textureDescription) {
+    public <T extends OwnCubemap> CubemapAttribute(int index, TextureDescriptor<T> textureDescription) {
         this(index);
         this.textureDescription.set(textureDescription);
     }
 
-    public CubemapAttribute(final int index, final OwnCubemap texture) {
+    public CubemapAttribute(int index, OwnCubemap texture) {
         this(index);
         textureDescription.texture = texture;
     }
 
-    public CubemapAttribute(final CubemapAttribute copyFrom) {
+    public CubemapAttribute(CubemapAttribute copyFrom) {
         this(copyFrom.index, copyFrom.textureDescription);
     }
 

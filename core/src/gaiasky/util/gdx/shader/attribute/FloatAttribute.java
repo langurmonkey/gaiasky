@@ -115,7 +115,7 @@ public class FloatAttribute extends Attribute {
     public int compareTo(Attribute o) {
         if (index != o.index)
             return index - o.index;
-        final float v = ((FloatAttribute) o).value;
+        float v = ((FloatAttribute) o).value;
         return MathUtils.isEqual(value, v) ? 0 : value < v ? -1 : 1;
     }
 }

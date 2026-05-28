@@ -241,7 +241,7 @@ public class MasterManager implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         int i;
         switch (event) {
         case TOGGLE_VISIBILITY_CMD:

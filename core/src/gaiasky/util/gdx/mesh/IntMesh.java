@@ -298,8 +298,8 @@ public class IntMesh implements Disposable {
      * @param start      the vertex to start with
      * @param count      the amount of vertices to transform
      */
-    public static void transform(final Matrix4 matrix,
-                                 final float[] vertices,
+    public static void transform(Matrix4 matrix,
+                                 float[] vertices,
                                  int vertexSize,
                                  int offset,
                                  int dimensions,
@@ -310,7 +310,7 @@ public class IntMesh implements Disposable {
         if (start < 0 || count < 1 || ((start + count) * vertexSize) > vertices.length)
             throw new IndexOutOfBoundsException("start = " + start + ", count = " + count + ", vertexSize = " + vertexSize + ", length = " + vertices.length);
 
-        final Vector3 tmp = new Vector3();
+        Vector3 tmp = new Vector3();
 
         int idx = offset + (start * vertexSize);
         switch (dimensions) {
@@ -351,8 +351,8 @@ public class IntMesh implements Disposable {
      * @param start      the vertex to start with
      * @param count      the amount of vertices to transform
      */
-    public static void transformUV(final Matrix3 matrix,
-                                   final float[] vertices,
+    public static void transformUV(Matrix3 matrix,
+                                   float[] vertices,
                                    int vertexSize,
                                    int offset,
                                    int start,
@@ -360,7 +360,7 @@ public class IntMesh implements Disposable {
         if (start < 0 || count < 1 || ((start + count) * vertexSize) > vertices.length)
             throw new IndexOutOfBoundsException("start = " + start + ", count = " + count + ", vertexSize = " + vertexSize + ", length = " + vertices.length);
 
-        final Vector2 tmp = new Vector2();
+        Vector2 tmp = new Vector2();
 
         int idx = offset + (start * vertexSize);
         for (int i = 0; i < count; i++) {
@@ -498,7 +498,7 @@ public class IntMesh implements Disposable {
                                float[] vertices,
                                int destOffset) {
         // TODO: Perhaps this method should be vertexSize aware??
-        final int max = getNumVertices() * getVertexSize() / 4;
+        int max = getNumVertices() * getVertexSize() / 4;
         if (count == -1) {
             count = max - srcOffset;
             if (count > vertices.length - destOffset)
@@ -675,7 +675,7 @@ public class IntMesh implements Disposable {
      *
      * @param shader the shader (does not bind the shader)
      */
-    public void bind(final ExtShaderProgram shader) {
+    public void bind(ExtShaderProgram shader) {
         bind(shader, null);
     }
 
@@ -686,8 +686,8 @@ public class IntMesh implements Disposable {
      * @param shader    the shader (does not bind the shader)
      * @param locations array containing the attribute locations.
      */
-    public void bind(final ExtShaderProgram shader,
-                     final int[] locations) {
+    public void bind(ExtShaderProgram shader,
+                     int[] locations) {
         vertices.bind(shader, locations);
         if (indices != null && indices.getNumIndices() > 0)
             indices.bind();
@@ -699,7 +699,7 @@ public class IntMesh implements Disposable {
      *
      * @param shader the shader (does not unbind the shader)
      */
-    public void unbind(final ExtShaderProgram shader) {
+    public void unbind(ExtShaderProgram shader) {
         unbind(shader, null);
     }
 
@@ -710,8 +710,8 @@ public class IntMesh implements Disposable {
      * @param shader    the shader (does not unbind the shader)
      * @param locations array containing the attribute locations.
      */
-    public void unbind(final ExtShaderProgram shader,
-                       final int[] locations) {
+    public void unbind(ExtShaderProgram shader,
+                       int[] locations) {
         vertices.unbind(shader, locations);
         if (indices != null && indices.getNumIndices() > 0)
             indices.unbind();
@@ -973,15 +973,15 @@ public class IntMesh implements Disposable {
      * @param bbox the bounding box to store the result in.
      */
     public void calculateBoundingBox(BoundingBox bbox) {
-        final int numVertices = getNumVertices();
+        int numVertices = getNumVertices();
         if (numVertices == 0)
             throw new GdxRuntimeException("No vertices defined");
 
-        final FloatBuffer verts = vertices.getBuffer();
+        FloatBuffer verts = vertices.getBuffer();
         bbox.inf();
-        final VertexAttribute posAttrib = getVertexAttribute(Usage.Position);
-        final int offset = posAttrib.offset / 4;
-        final int vertexSize = vertices.getAttributes().vertexSize / 4;
+        VertexAttribute posAttrib = getVertexAttribute(Usage.Position);
+        int offset = posAttrib.offset / 4;
+        int vertexSize = vertices.getAttributes().vertexSize / 4;
         int idx = offset;
 
         switch (posAttrib.numComponents) {
@@ -1015,7 +1015,7 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox calculateBoundingBox(final BoundingBox out,
+    public BoundingBox calculateBoundingBox(BoundingBox out,
                                             int offset,
                                             int count) {
         return extendBoundingBox(out.inf(), offset, count);
@@ -1030,10 +1030,10 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox calculateBoundingBox(final BoundingBox out,
+    public BoundingBox calculateBoundingBox(BoundingBox out,
                                             int offset,
                                             int count,
-                                            final Matrix4 transform) {
+                                            Matrix4 transform) {
         return extendBoundingBox(out.inf(), offset, count, transform);
     }
 
@@ -1046,7 +1046,7 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out,
+    public BoundingBox extendBoundingBox(BoundingBox out,
                                          int offset,
                                          int count) {
         return extendBoundingBox(out, offset, count, null);
@@ -1061,28 +1061,28 @@ public class IntMesh implements Disposable {
      *
      * @return the value specified by out.
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out,
+    public BoundingBox extendBoundingBox(BoundingBox out,
                                          int offset,
                                          int count,
-                                         final Matrix4 transform) {
-        final int numIndices = getNumIndices();
-        final int numVertices = getNumVertices();
-        final int max = numIndices == 0 ? numVertices : numIndices;
+                                         Matrix4 transform) {
+        int numIndices = getNumIndices();
+        int numVertices = getNumVertices();
+        int max = numIndices == 0 ? numVertices : numIndices;
         if (offset < 0 || count < 1 || offset + count > max)
             throw new GdxRuntimeException("Invalid part specified ( offset=" + offset + ", count=" + count + ", max=" + max + " )");
 
-        final FloatBuffer verts = vertices.getBuffer();
-        final IntBuffer index = indices.getBuffer();
-        final VertexAttribute posAttrib = getVertexAttribute(Usage.Position);
-        final int posoff = posAttrib.offset / 4;
-        final int vertexSize = vertices.getAttributes().vertexSize / 4;
-        final int end = offset + count;
+        FloatBuffer verts = vertices.getBuffer();
+        IntBuffer index = indices.getBuffer();
+        VertexAttribute posAttrib = getVertexAttribute(Usage.Position);
+        int posoff = posAttrib.offset / 4;
+        int vertexSize = vertices.getAttributes().vertexSize / 4;
+        int end = offset + count;
 
         switch (posAttrib.numComponents) {
         case 1:
             if (numIndices > 0) {
                 for (int i = offset; i < end; i++) {
-                    final int idx = index.get(i) * vertexSize + posoff;
+                    int idx = index.get(i) * vertexSize + posoff;
                     tmpV.set(verts.get(idx), 0, 0);
                     if (transform != null)
                         tmpV.mul(transform);
@@ -1090,7 +1090,7 @@ public class IntMesh implements Disposable {
                 }
             } else {
                 for (int i = offset; i < end; i++) {
-                    final int idx = i * vertexSize + posoff;
+                    int idx = i * vertexSize + posoff;
                     tmpV.set(verts.get(idx), 0, 0);
                     if (transform != null)
                         tmpV.mul(transform);
@@ -1101,7 +1101,7 @@ public class IntMesh implements Disposable {
         case 2:
             if (numIndices > 0) {
                 for (int i = offset; i < end; i++) {
-                    final int idx = index.get(i) * vertexSize + posoff;
+                    int idx = index.get(i) * vertexSize + posoff;
                     tmpV.set(verts.get(idx), verts.get(idx + 1), 0);
                     if (transform != null)
                         tmpV.mul(transform);
@@ -1109,7 +1109,7 @@ public class IntMesh implements Disposable {
                 }
             } else {
                 for (int i = offset; i < end; i++) {
-                    final int idx = i * vertexSize + posoff;
+                    int idx = i * vertexSize + posoff;
                     tmpV.set(verts.get(idx), verts.get(idx + 1), 0);
                     if (transform != null)
                         tmpV.mul(transform);
@@ -1120,7 +1120,7 @@ public class IntMesh implements Disposable {
         case 3:
             if (numIndices > 0) {
                 for (int i = offset; i < end; i++) {
-                    final int idx = index.get(i) * vertexSize + posoff;
+                    int idx = index.get(i) * vertexSize + posoff;
                     tmpV.set(verts.get(idx), verts.get(idx + 1), verts.get(idx + 2));
                     if (transform != null)
                         tmpV.mul(transform);
@@ -1128,7 +1128,7 @@ public class IntMesh implements Disposable {
                 }
             } else {
                 for (int i = offset; i < end; i++) {
-                    final int idx = i * vertexSize + posoff;
+                    int idx = i * vertexSize + posoff;
                     tmpV.set(verts.get(idx), verts.get(idx + 1), verts.get(idx + 2));
                     if (transform != null)
                         tmpV.mul(transform);
@@ -1151,55 +1151,55 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadiusSquared(final float centerX,
-                                        final float centerY,
-                                        final float centerZ,
+    public float calculateRadiusSquared(float centerX,
+                                        float centerY,
+                                        float centerZ,
                                         int offset,
                                         int count,
-                                        final Matrix4 transform) {
+                                        Matrix4 transform) {
         int numIndices = getNumIndices();
         if (offset < 0 || count < 1 || offset + count > numIndices)
             throw new GdxRuntimeException("Not enough indices");
 
-        final FloatBuffer verts = vertices.getBuffer();
-        final IntBuffer index = indices.getBuffer();
-        final VertexAttribute posAttrib = getVertexAttribute(Usage.Position);
-        final int posoff = posAttrib.offset / 4;
-        final int vertexSize = vertices.getAttributes().vertexSize / 4;
-        final int end = offset + count;
+        FloatBuffer verts = vertices.getBuffer();
+        IntBuffer index = indices.getBuffer();
+        VertexAttribute posAttrib = getVertexAttribute(Usage.Position);
+        int posoff = posAttrib.offset / 4;
+        int vertexSize = vertices.getAttributes().vertexSize / 4;
+        int end = offset + count;
 
         float result = 0;
 
         switch (posAttrib.numComponents) {
         case 1:
             for (int i = offset; i < end; i++) {
-                final int idx = index.get(i) * vertexSize + posoff;
+                int idx = index.get(i) * vertexSize + posoff;
                 tmpV.set(verts.get(idx), 0, 0);
                 if (transform != null)
                     tmpV.mul(transform);
-                final float r = tmpV.sub(centerX, centerY, centerZ).len2();
+                float r = tmpV.sub(centerX, centerY, centerZ).len2();
                 if (r > result)
                     result = r;
             }
             break;
         case 2:
             for (int i = offset; i < end; i++) {
-                final int idx = index.get(i) * vertexSize + posoff;
+                int idx = index.get(i) * vertexSize + posoff;
                 tmpV.set(verts.get(idx), verts.get(idx + 1), 0);
                 if (transform != null)
                     tmpV.mul(transform);
-                final float r = tmpV.sub(centerX, centerY, centerZ).len2();
+                float r = tmpV.sub(centerX, centerY, centerZ).len2();
                 if (r > result)
                     result = r;
             }
             break;
         case 3:
             for (int i = offset; i < end; i++) {
-                final int idx = index.get(i) * vertexSize + posoff;
+                int idx = index.get(i) * vertexSize + posoff;
                 tmpV.set(verts.get(idx), verts.get(idx + 1), verts.get(idx + 2));
                 if (transform != null)
                     tmpV.mul(transform);
-                final float r = tmpV.sub(centerX, centerY, centerZ).len2();
+                float r = tmpV.sub(centerX, centerY, centerZ).len2();
                 if (r > result)
                     result = r;
             }
@@ -1219,12 +1219,12 @@ public class IntMesh implements Disposable {
      *
      * @return the radius of the bounding sphere.
      */
-    public float calculateRadius(final float centerX,
-                                 final float centerY,
-                                 final float centerZ,
+    public float calculateRadius(float centerX,
+                                 float centerY,
+                                 float centerZ,
                                  int offset,
                                  int count,
-                                 final Matrix4 transform) {
+                                 Matrix4 transform) {
         return (float) FastMath.sqrt(calculateRadiusSquared(centerX, centerY, centerZ, offset, count, transform));
     }
 
@@ -1237,10 +1237,10 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final Vector3 center,
+    public float calculateRadius(Vector3 center,
                                  int offset,
                                  int count,
-                                 final Matrix4 transform) {
+                                 Matrix4 transform) {
         return calculateRadius(center.x, center.y, center.z, offset, count, transform);
     }
 
@@ -1255,9 +1255,9 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final float centerX,
-                                 final float centerY,
-                                 final float centerZ,
+    public float calculateRadius(float centerX,
+                                 float centerY,
+                                 float centerZ,
                                  int offset,
                                  int count) {
         return calculateRadius(centerX, centerY, centerZ, offset, count, null);
@@ -1272,7 +1272,7 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final Vector3 center,
+    public float calculateRadius(Vector3 center,
                                  int offset,
                                  int count) {
         return calculateRadius(center.x, center.y, center.z, offset, count, null);
@@ -1287,9 +1287,9 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final float centerX,
-                                 final float centerY,
-                                 final float centerZ) {
+    public float calculateRadius(float centerX,
+                                 float centerY,
+                                 float centerZ) {
         return calculateRadius(centerX, centerY, centerZ, 0, getNumIndices(), null);
     }
 
@@ -1300,7 +1300,7 @@ public class IntMesh implements Disposable {
      *
      * @return the squared radius of the bounding sphere.
      */
-    public float calculateRadius(final Vector3 center) {
+    public float calculateRadius(Vector3 center) {
         return calculateRadius(center.x, center.y, center.z, 0, getNumIndices(), null);
     }
 
@@ -1320,13 +1320,13 @@ public class IntMesh implements Disposable {
     public void scale(float scaleX,
                       float scaleY,
                       float scaleZ) {
-        final VertexAttribute posAttr = getVertexAttribute(Usage.Position);
-        final int offset = posAttr.offset / 4;
-        final int numComponents = posAttr.numComponents;
-        final int numVertices = getNumVertices();
-        final int vertexSize = getVertexSize() / 4;
+        VertexAttribute posAttr = getVertexAttribute(Usage.Position);
+        int offset = posAttr.offset / 4;
+        int numComponents = posAttr.numComponents;
+        int numVertices = getNumVertices();
+        int vertexSize = getVertexSize() / 4;
 
-        final float[] vertices = new float[numVertices * vertexSize];
+        float[] vertices = new float[numVertices * vertexSize];
         getVertices(vertices);
 
         int idx = offset;
@@ -1363,21 +1363,21 @@ public class IntMesh implements Disposable {
      *
      * @param matrix the transformation matrix
      */
-    public void transform(final Matrix4 matrix) {
+    public void transform(Matrix4 matrix) {
         transform(matrix, 0, getNumVertices());
     }
 
     // TODO: Protected for now, because transforming a portion works but still copies all vertices
-    public void transform(final Matrix4 matrix,
-                          final int start,
-                          final int count) {
-        final VertexAttribute posAttr = getVertexAttribute(Usage.Position);
-        final int posOffset = posAttr.offset / 4;
-        final int stride = getVertexSize() / 4;
-        final int numComponents = posAttr.numComponents;
-        final int numVertices = getNumVertices();
+    public void transform(Matrix4 matrix,
+                          int start,
+                          int count) {
+        VertexAttribute posAttr = getVertexAttribute(Usage.Position);
+        int posOffset = posAttr.offset / 4;
+        int stride = getVertexSize() / 4;
+        int numComponents = posAttr.numComponents;
+        int numVertices = getNumVertices();
 
-        final float[] vertices = new float[count * stride];
+        float[] vertices = new float[count * stride];
         getVertices(start * stride, count * stride, vertices);
         // getVertices(0, vertices.length, vertices);
         transform(matrix, vertices, stride, posOffset, numComponents, 0, count);
@@ -1391,20 +1391,20 @@ public class IntMesh implements Disposable {
      *
      * @param matrix the transformation matrix
      */
-    public void transformUV(final Matrix3 matrix) {
+    public void transformUV(Matrix3 matrix) {
         transformUV(matrix, 0, getNumVertices());
     }
 
     // TODO: Protected for now, because transforming a portion works but still copies all vertices
-    protected void transformUV(final Matrix3 matrix,
-                               final int start,
-                               final int count) {
-        final VertexAttribute posAttr = getVertexAttribute(Usage.TextureCoordinates);
-        final int offset = posAttr.offset / 4;
-        final int vertexSize = getVertexSize() / 4;
-        final int numVertices = getNumVertices();
+    protected void transformUV(Matrix3 matrix,
+                               int start,
+                               int count) {
+        VertexAttribute posAttr = getVertexAttribute(Usage.TextureCoordinates);
+        int offset = posAttr.offset / 4;
+        int vertexSize = getVertexSize() / 4;
+        int numVertices = getNumVertices();
 
-        final float[] vertices = new float[numVertices * vertexSize];
+        float[] vertices = new float[numVertices * vertexSize];
         // TODO: getVertices(vertices, start * vertexSize, count * vertexSize);
         getVertices(0, vertices.length, vertices);
         transformUV(matrix, vertices, vertexSize, offset, start, count);
@@ -1423,11 +1423,11 @@ public class IntMesh implements Disposable {
      */
     public IntMesh copy(boolean isStatic,
                         boolean removeDuplicates,
-                        final int[] usage) {
+                        int[] usage) {
         // TODO move this to a copy constructor?
         // TODO duplicate the buffers without double copying the data if possible.
         // TODO perhaps move this code to JNI if it turns out being too slow.
-        final int vertexSize = getVertexSize() / 4;
+        int vertexSize = getVertexSize() / 4;
         int numVertices = getNumVertices();
         float[] vertices = new float[numVertices * vertexSize];
         getVertices(0, vertices.length, vertices);
@@ -1474,15 +1474,17 @@ public class IntMesh implements Disposable {
                 float[] tmp = new float[vertices.length];
                 int size = 0;
                 for (int i = 0; i < numIndices; i++) {
-                    final int idx1 = indices[i] * vertexSize;
+                    int idx1 = indices[i] * vertexSize;
                     int newIndex = -1;
                     if (removeDuplicates) {
                         for (int j = 0; j < size && newIndex < 0; j++) {
-                            final int idx2 = j * newVertexSize;
+                            int idx2 = j * newVertexSize;
                             boolean found = true;
                             for (int k = 0; k < checks.length && found; k++) {
-                                if (tmp[idx2 + k] != vertices[idx1 + checks[k]])
+                                if (tmp[idx2 + k] != vertices[idx1 + checks[k]]) {
                                     found = false;
+                                    break;
+                                }
                             }
                             if (found)
                                 newIndex = j;
@@ -1491,7 +1493,7 @@ public class IntMesh implements Disposable {
                     if (newIndex > 0)
                         indices[i] = newIndex;
                     else {
-                        final int idx = size * newVertexSize;
+                        int idx = size * newVertexSize;
                         for (int j = 0; j < checks.length; j++)
                             tmp[idx + j] = vertices[idx1 + checks[j]];
                         indices[i] = size;

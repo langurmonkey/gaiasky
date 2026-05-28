@@ -22,7 +22,7 @@ public class Revs extends ConcreteDuration {
      *
      * @param revs number of revs
      */
-    public Revs(final double revs) {
+    public Revs(double revs) {
         value = revs;
     }
 
@@ -31,7 +31,7 @@ public class Revs extends ConcreteDuration {
      *
      * @return revs expressed in nanosecs
      */
-    public static long asNanoSecs(final double revs) {
+    public static long asNanoSecs(double revs) {
         return FastMath.round(revs * Duration.NS_PER_REV);
     }
 
@@ -40,7 +40,7 @@ public class Revs extends ConcreteDuration {
      *
      * @return revs expressed in secs
      */
-    public static double asSecs(final double revs) {
+    public static double asSecs(double revs) {
         return revs * Duration.SECS_PER_REV;
     }
 
@@ -49,7 +49,7 @@ public class Revs extends ConcreteDuration {
      *
      * @return revs expressed in mins
      */
-    public static double asMins(final double revs) {
+    public static double asMins(double revs) {
         return revs * Duration.MINS_PER_REV;
     }
 
@@ -58,7 +58,7 @@ public class Revs extends ConcreteDuration {
      *
      * @return hours expressed in revs.
      */
-    public static double asHours(final double revs) {
+    public static double asHours(double revs) {
         return revs * Duration.HOURS_PER_REV;
     }
 
@@ -67,7 +67,7 @@ public class Revs extends ConcreteDuration {
      *
      * @return revs expressed in days
      */
-    public static double asDays(final double revs) {
+    public static double asDays(double revs) {
         return revs / Duration.REVS_PER_DAY;
     }
 
@@ -76,7 +76,7 @@ public class Revs extends ConcreteDuration {
      *
      * @return revs expressed in JulianYears
      */
-    public static double asJulianYears(final double revs) {
+    public static double asJulianYears(double revs) {
         return revs / Duration.REVS_PER_JULIAN_YEAR;
     }
 
@@ -84,7 +84,7 @@ public class Revs extends ConcreteDuration {
      * @see Duration#set(Duration)
      */
     @Override
-    public Duration set(final Duration d) {
+    public Duration set(Duration d) {
         value = d.asRevs();
 
         return this;
@@ -150,7 +150,7 @@ public class Revs extends ConcreteDuration {
      * @see Duration#sub(Duration)
      */
     @Override
-    public Duration add(final Duration d) {
+    public Duration add(Duration d) {
         value += d.asRevs();
 
         return this;
@@ -160,7 +160,7 @@ public class Revs extends ConcreteDuration {
      * @see Duration#sub(Duration)
      */
     @Override
-    public Duration sub(final Duration d) {
+    public Duration sub(Duration d) {
         value -= d.asRevs();
 
         return this;

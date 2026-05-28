@@ -18,10 +18,10 @@ import gaiasky.util.gdx.shader.attribute.SpotLightsAttribute;
 public class LightUtils {
 
 	public static class LightsInfo{
-		public int dirLights = 0;
-		public int pointLights = 0;
-		public int spotLights = 0;
-		public int miscLights = 0;
+		public int dirLights;
+		public int pointLights;
+		public int spotLights;
+		public int miscLights;
 		
 		public void reset(){
 			dirLights = 0;

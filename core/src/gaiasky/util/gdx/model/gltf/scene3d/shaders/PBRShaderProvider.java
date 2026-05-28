@@ -36,7 +36,7 @@ public class PBRShaderProvider extends DefaultIntShaderProvider
 	
 	private static final LightsInfo lightsInfo = new LightsInfo();
 	
-	private static String defaultVertexShader = null;
+	private static String defaultVertexShader;
 
 	public static String getDefaultVertexShader () {
 		if (defaultVertexShader == null)
@@ -44,7 +44,7 @@ public class PBRShaderProvider extends DefaultIntShaderProvider
 		return defaultVertexShader;
 	}
 
-	private static String defaultFragmentShader = null;
+	private static String defaultFragmentShader;
 
 	public static String getDefaultFragmentShader () {
 		if (defaultFragmentShader == null)
@@ -58,13 +58,13 @@ public class PBRShaderProvider extends DefaultIntShaderProvider
 		config.vertexShaderCode = getDefaultVertexShader();
 		config.fragmentShaderCode = getDefaultFragmentShader();
 		return config;
-	};
-	
-	public static Config createDefaultDepthConfig() {
+	}
+
+    public static Config createDefaultDepthConfig() {
 		return PBRDepthShaderProvider.createDefaultConfig();
-	};
-	
-	public static PBRShaderProvider createDefault(int maxBones){
+	}
+
+    public static PBRShaderProvider createDefault(int maxBones){
 		PBRShaderConfig config = createDefaultConfig();
 		config.numBones = maxBones;
 		return createDefault(config);

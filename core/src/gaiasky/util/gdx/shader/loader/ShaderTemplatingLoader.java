@@ -46,7 +46,7 @@ public class ShaderTemplatingLoader {
     }
 
     public static String resolveIncludes(String in) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
         Scanner scanner = new Scanner(in);
         while (scanner.hasNextLine()) {

@@ -10,7 +10,7 @@ package gaiasky.util.validator;
 import gaiasky.util.color.ColorUtils;
 
 public class HexColorValidator implements IValidator {
-    private boolean alpha = false;
+    private boolean alpha;
 
     public HexColorValidator(boolean alpha) {
         this.alpha = alpha;

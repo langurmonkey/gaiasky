@@ -28,7 +28,7 @@ public abstract class AbstractAttitudeAnglesRates {
         setRate(0, rate);
     }
 
-    public void setFirstPair(final double angle, final double rate) {
+    public void setFirstPair(double angle, double rate) {
         setFirstAngle(angle);
         setFirstRate(rate);
     }

@@ -93,7 +93,7 @@ public class IcoSphereCreator extends ModelCreator {
      *
      * @param p The normalized point
      */
-    protected void addUV(final Vector3 p) {
+    protected void addUV(Vector3 p) {
         // UV
         float u = 0.5f + (float) (Math.atan2(p.z, p.y) / (Math.PI * 2.0));
         float v = 0.5f - (float) (Math.asin(p.x) / FastMath.PI);

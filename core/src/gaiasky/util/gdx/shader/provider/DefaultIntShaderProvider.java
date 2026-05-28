@@ -17,16 +17,16 @@ import gaiasky.util.gdx.shader.IntShader;
 public class DefaultIntShaderProvider extends BaseIntShaderProvider {
     public final DefaultIntShader.Config config;
 
-    public DefaultIntShaderProvider(final DefaultIntShader.Config config) {
+    public DefaultIntShaderProvider(DefaultIntShader.Config config) {
         this.config = (config == null) ? new DefaultIntShader.Config() : config;
         EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
-    public DefaultIntShaderProvider(final String vertexShaderCode, final String fragmentShaderCode) {
+    public DefaultIntShaderProvider(String vertexShaderCode, String fragmentShaderCode) {
         this(new DefaultIntShader.Config(vertexShaderCode, fragmentShaderCode));
     }
 
-    public DefaultIntShaderProvider(final FileHandle vertexShaderFile, final FileHandle fragmentShaderFile) {
+    public DefaultIntShaderProvider(FileHandle vertexShaderFile, FileHandle fragmentShaderFile) {
         this(vertexShaderFile.readString(), fragmentShaderFile.readString());
     }
 
@@ -35,7 +35,7 @@ public class DefaultIntShaderProvider extends BaseIntShaderProvider {
     }
 
     @Override
-    protected IntShader createShader(final IntRenderable renderable) {
+    protected IntShader createShader(IntRenderable renderable) {
         return new DefaultIntShader(renderable, config);
     }
 }

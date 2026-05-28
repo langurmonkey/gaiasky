@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class FileInfoInputStream extends FileInputStream {
 
-    private long bytesRead = 0;
+    private long bytesRead;
 
     public FileInfoInputStream(String file) throws FileNotFoundException {
         super(file);

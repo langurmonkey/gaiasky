@@ -69,9 +69,9 @@ public interface DataAPI {
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      *         <code>sync</code> is false.
      */
-    boolean load_dataset(final String name,
-                         final String path,
-                         final boolean sync);
+    boolean load_dataset(String name,
+                         String path,
+                         boolean sync);
 
     /**
      * Load a VOTable, FITS, CSV or JSON dataset file with the given name.
@@ -97,11 +97,11 @@ public interface DataAPI {
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or
      *         <code>sync</code> is false.
      */
-    boolean load_dataset(final String name,
-                         final String path,
-                         final DatasetCard.DatasetSourceType type,
-                         final DatasetOptions options,
-                         final boolean sync);
+    boolean load_dataset(String name,
+                         String path,
+                         DatasetCard.DatasetSourceType type,
+                         DatasetOptions options,
+                         boolean sync);
 
     /**
      * Load a star dataset from a VOTable, a CSV or a FITS file.

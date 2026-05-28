@@ -17,11 +17,11 @@ public class LinearDouble<T extends VectorDouble<T>> implements PathDouble<T> {
 
     public T[] controlPoints;
 
-    public LinearDouble(final T[] controlPoints) {
+    public LinearDouble(T[] controlPoints) {
         set(controlPoints);
     }
 
-    public LinearDouble<T> set(final T[] controlPoints) {
+    public LinearDouble<T> set(T[] controlPoints) {
         this.controlPoints = controlPoints;
         return this;
     }

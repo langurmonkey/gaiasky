@@ -44,10 +44,10 @@ public abstract class BaseIntShader implements IntShader {
      *
      * @return The ID of the uniform to use in this shader.
      */
-    public int register(final String alias, final Validator validator, final Setter setter) {
+    public int register(String alias, Validator validator, Setter setter) {
         if (locations != null)
             throw new GdxRuntimeException("Cannot register an uniform after initialization");
-        final int existing = getUniformID(alias);
+        int existing = getUniformID(alias);
         if (existing >= 0) {
             validators.set(existing, validator);
             setters.set(existing, setter);
@@ -59,29 +59,29 @@ public abstract class BaseIntShader implements IntShader {
         return uniforms.size - 1;
     }
 
-    public int register(final String alias, final Validator validator) {
+    public int register(String alias, Validator validator) {
         return register(alias, validator, null);
     }
 
-    public int register(final String alias, final Setter setter) {
+    public int register(String alias, Setter setter) {
         return register(alias, null, setter);
     }
 
-    public int register(final String alias) {
+    public int register(String alias) {
         return register(alias, null, null);
     }
 
-    public int register(final Uniform uniform, final Setter setter) {
+    public int register(Uniform uniform, Setter setter) {
         return register(uniform.alias, uniform, setter);
     }
 
-    public int register(final Uniform uniform) {
+    public int register(Uniform uniform) {
         return register(uniform, null);
     }
 
     /** @return the ID of the input or negative if not available. */
-    public int getUniformID(final String alias) {
-        final int n = uniforms.size;
+    public int getUniformID(String alias) {
+        int n = uniforms.size;
         for (int i = 0; i < n; i++)
             if (uniforms.get(i).equals(alias))
                 return i;
@@ -89,12 +89,12 @@ public abstract class BaseIntShader implements IntShader {
     }
 
     /** @return The input at the specified id. */
-    public String getUniformAlias(final int id) {
+    public String getUniformAlias(int id) {
         return uniforms.get(id);
     }
 
     /** Initialize this shader, causing all registered uniforms/attributes to be fetched. */
-    public void init(final ExtShaderProgram program, final IntRenderable renderable) {
+    public void init(ExtShaderProgram program, IntRenderable renderable) {
         if (locations != null) {
             throw new GdxRuntimeException("Already initialized");
         }
@@ -103,12 +103,12 @@ public abstract class BaseIntShader implements IntShader {
         }
         this.program = program;
 
-        final int n = uniforms.size;
+        int n = uniforms.size;
         locations = new int[n];
         for (int i = 0; i < n; i++) {
-            final String input = uniforms.get(i);
-            final Validator validator = validators.get(i);
-            final Setter setter = setters.get(i);
+            String input = uniforms.get(i);
+            Validator validator = validators.get(i);
+            Setter setter = setters.get(i);
             if (validator != null && !validator.validate(this, i, renderable))
                 locations[i] = -1;
             else {
@@ -126,11 +126,11 @@ public abstract class BaseIntShader implements IntShader {
             }
         }
         if (renderable != null) {
-            final VertexAttributes attrs = renderable.meshPart.mesh.getVertexAttributes();
-            final int c = attrs.size();
+            VertexAttributes attrs = renderable.meshPart.mesh.getVertexAttributes();
+            int c = attrs.size();
             for (int i = 0; i < c; i++) {
-                final VertexAttribute attr = attrs.get(i);
-                final int location = program.getAttributeLocation(attr.alias);
+                VertexAttribute attr = attrs.get(i);
+                int location = program.getAttributeLocation(attr.alias);
                 if (location >= 0)
                     attributes.put(attr.getKey(), location);
             }
@@ -148,9 +148,9 @@ public abstract class BaseIntShader implements IntShader {
                 setters.get(u).set(this, u, null, null);
     }
 
-    private final int[] getAttributeLocations(final VertexAttributes attrs) {
+    private final int[] getAttributeLocations(VertexAttributes attrs) {
         tempArray.clear();
-        final int n = attrs.size();
+        int n = attrs.size();
         for (int i = 0; i < n; i++) {
             tempArray.add(attributes.get(attrs.get(i).getKey(), -1));
         }
@@ -170,7 +170,7 @@ public abstract class BaseIntShader implements IntShader {
         render(renderable, combinedAttributes);
     }
 
-    public void render(IntRenderable renderable, final Attributes combinedAttributes) {
+    public void render(IntRenderable renderable, Attributes combinedAttributes) {
         for (int u, i = 0; i < localUniforms.size; ++i)
             if (setters.get(u = localUniforms.get(i)) != null)
                 setters.get(u).set(this, u, renderable, combinedAttributes);
@@ -214,113 +214,113 @@ public abstract class BaseIntShader implements IntShader {
     }
 
     /** Whether this IntShader instance implements the specified uniform, only valid after a call to init(). */
-    public final boolean has(final int inputID) {
+    public final boolean has(int inputID) {
         return inputID >= 0 && inputID < locations.length && locations[inputID] >= 0;
     }
 
-    public final int loc(final int inputID) {
+    public final int loc(int inputID) {
         return (inputID >= 0 && inputID < locations.length) ? locations[inputID] : -1;
     }
 
-    public final boolean set(final int uniform, final Matrix4 value) {
+    public final boolean set(int uniform, Matrix4 value) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformMatrix(locations[uniform], value);
         return true;
     }
 
-    public final boolean set(final int uniform, final Matrix3 value) {
+    public final boolean set(int uniform, Matrix3 value) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformMatrix(locations[uniform], value);
         return true;
     }
 
-    public final boolean set(final int uniform, final Vector3 value) {
+    public final boolean set(int uniform, Vector3 value) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformf(locations[uniform], value);
         return true;
     }
 
-    public final boolean set(final int uniform, final Vector2 value) {
+    public final boolean set(int uniform, Vector2 value) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformf(locations[uniform], value);
         return true;
     }
 
-    public final boolean set(final int uniform, final Color value) {
+    public final boolean set(int uniform, Color value) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformf(locations[uniform], value);
         return true;
     }
 
-    public final boolean set(final int uniform, final float value) {
+    public final boolean set(int uniform, float value) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformf(locations[uniform], value);
         return true;
     }
 
-    public final boolean set(final int uniform, final float v1, final float v2) {
+    public final boolean set(int uniform, float v1, float v2) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformf(locations[uniform], v1, v2);
         return true;
     }
 
-    public final boolean set(final int uniform, final float v1, final float v2, final float v3) {
+    public final boolean set(int uniform, float v1, float v2, float v3) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformf(locations[uniform], v1, v2, v3);
         return true;
     }
 
-    public final boolean set(final int uniform, final float v1, final float v2, final float v3, final float v4) {
+    public final boolean set(int uniform, float v1, float v2, float v3, float v4) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformf(locations[uniform], v1, v2, v3, v4);
         return true;
     }
 
-    public final boolean set(final int uniform, final int value) {
+    public final boolean set(int uniform, int value) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformi(locations[uniform], value);
         return true;
     }
 
-    public final boolean set(final int uniform, final int v1, final int v2) {
+    public final boolean set(int uniform, int v1, int v2) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformi(locations[uniform], v1, v2);
         return true;
     }
 
-    public final boolean set(final int uniform, final int v1, final int v2, final int v3) {
+    public final boolean set(int uniform, int v1, int v2, int v3) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformi(locations[uniform], v1, v2, v3);
         return true;
     }
 
-    public final boolean set(final int uniform, final int v1, final int v2, final int v3, final int v4) {
+    public final boolean set(int uniform, int v1, int v2, int v3, int v4) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformi(locations[uniform], v1, v2, v3, v4);
         return true;
     }
 
-    public final boolean set(final int uniform, final TextureDescriptor textureDesc) {
+    public final boolean set(int uniform, TextureDescriptor textureDesc) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformi(locations[uniform], context.textureBinder.bind(textureDesc));
         return true;
     }
 
-    public final boolean set(final int uniform, final GLTexture texture) {
+    public final boolean set(int uniform, GLTexture texture) {
         if (locations[uniform] < 0)
             return false;
         program.setUniformi(locations[uniform], context.textureBinder.bind(texture));
@@ -329,60 +329,49 @@ public abstract class BaseIntShader implements IntShader {
 
     public interface Validator {
         /** @return True if the input is valid for the renderable, false otherwise. */
-        boolean validate(final BaseIntShader shader, final int inputID, final IntRenderable renderable);
+        boolean validate(BaseIntShader shader, int inputID, IntRenderable renderable);
     }
 
     public interface Setter {
         /** @return True if the uniform only has to be set once per render call, false if the uniform must be set for each renderable. */
-        boolean isGlobal(final BaseIntShader shader, final int inputID);
+        boolean isGlobal(BaseIntShader shader, int inputID);
 
-        void set(final BaseIntShader shader, final int inputID, final IntRenderable renderable, final Attributes combinedAttributes);
+        void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes);
     }
 
     public abstract static class GlobalSetter implements Setter {
         @Override
-        public boolean isGlobal(final BaseIntShader shader, final int inputID) {
+        public boolean isGlobal(BaseIntShader shader, int inputID) {
             return true;
         }
     }
 
     public abstract static class LocalSetter implements Setter {
         @Override
-        public boolean isGlobal(final BaseIntShader shader, final int inputID) {
+        public boolean isGlobal(BaseIntShader shader, int inputID) {
             return false;
         }
     }
 
-    public static class Uniform implements Validator {
-        public final String alias;
-        public final Bits materialMask;
-        public final Bits environmentMask;
-        public final Bits overallMask;
+    public record Uniform(String alias, Bits materialMask, Bits environmentMask, Bits overallMask) implements Validator {
 
-        public Uniform(final String alias, final Bits materialMask, final Bits environmentMask, final Bits overallMask) {
-            this.alias = alias;
-            this.materialMask = materialMask;
-            this.environmentMask = environmentMask;
-            this.overallMask = overallMask;
-        }
+        public Uniform(String alias, Bits materialMask, Bits environmentMask) {
+                this(alias, materialMask, environmentMask, Bits.empty(128));
+            }
 
-        public Uniform(final String alias, final Bits materialMask, final Bits environmentMask) {
-            this(alias, materialMask, environmentMask, Bits.empty(128));
-        }
+            public Uniform(String alias, int overallIndex) {
+                this(alias, Bits.empty(128), Bits.empty(128), Bits.indices(overallIndex));
+            }
 
-        public Uniform(final String alias, final int overallIndex) {
-            this(alias, Bits.empty(128), Bits.empty(128), Bits.indices(overallIndex));
-        }
+            public Uniform(String alias) {
+                this(alias, Bits.empty(128), Bits.empty(128));
+            }
 
-        public Uniform(final String alias) {
-            this(alias, Bits.empty(128), Bits.empty(128));
+            public boolean validate(BaseIntShader shader, int inputID, IntRenderable renderable) {
+                Bits matFlags = (renderable != null && renderable.material != null) ? renderable.material.getMask() : Bits.empty();
+                Bits envFlags = (renderable != null && renderable.environment != null) ? renderable.environment.getMask() : Bits.empty();
+                return ((matFlags.copy().and(materialMask)).equals(materialMask)) && ((envFlags.copy().and(environmentMask)).equals(environmentMask))
+                        && (((matFlags.copy().or(envFlags)).and(overallMask)).equals(overallMask));
+            }
         }
-
-        public boolean validate(final BaseIntShader shader, final int inputID, final IntRenderable renderable) {
-            final Bits matFlags = (renderable != null && renderable.material != null) ? renderable.material.getMask() : Bits.empty();
-            final Bits envFlags = (renderable != null && renderable.environment != null) ? renderable.environment.getMask() : Bits.empty();
-            return ((matFlags.copy().and(materialMask)).equals(materialMask)) && ((envFlags.copy().and(environmentMask)).equals(environmentMask))
-                    && (((matFlags.copy().or(envFlags)).and(overallMask)).equals(overallMask));
-        }
-    }
 }

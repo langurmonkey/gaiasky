@@ -25,7 +25,7 @@ public class I18NBundle {
 
     private static final String DEFAULT_ENCODING = "UTF-8";
 
-    private static boolean simpleFormatter = false;
+    private static boolean simpleFormatter;
 
     /** The parent of this {@code I18NBundle} that is used if this bundle doesn't include the requested resource. */
     private I18NBundle parent;

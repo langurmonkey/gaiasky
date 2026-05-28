@@ -139,7 +139,7 @@ public class GLTFAssetLoader  extends AsynchronousAssetLoader<SceneAsset, SceneA
 	public SceneAsset loadSync(AssetManager manager, String fileName, FileHandle file,
 			SceneAssetLoaderParameters parameter) {
 		
-		final boolean withData = parameter != null && parameter.withData;
+		boolean withData = parameter != null && parameter.withData;
 		
 		textureResolver.loadTextures();
 		

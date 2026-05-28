@@ -19,21 +19,21 @@ import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 public class AtmosphereShaderProvider extends DefaultIntShaderProvider {
     public final Config config;
 
-    public AtmosphereShaderProvider(final Config config) {
+    public AtmosphereShaderProvider(Config config) {
         this.config = (config == null) ? new Config() : config;
         EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
-    public AtmosphereShaderProvider(final String vertexShader, final String fragmentShader) {
+    public AtmosphereShaderProvider(String vertexShader, String fragmentShader) {
         this(new Config(vertexShader, fragmentShader));
     }
 
-    public AtmosphereShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {
+    public AtmosphereShaderProvider(FileHandle vertexShader, FileHandle fragmentShader) {
         this(ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
     }
 
     @Override
-    protected IntShader createShader(final IntRenderable renderable) {
+    protected IntShader createShader(IntRenderable renderable) {
         return new AtmosphereShader(renderable, config);
     }
 

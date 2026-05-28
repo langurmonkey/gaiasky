@@ -84,7 +84,7 @@ public final class MathUtilsDouble {
                 return 0;
             return -PI / 2;
         }
-        final double atan, z = y / x;
+        double atan, z = y / x;
         if (Math.abs(z) < 1) {
             atan = z / (1 + 0.28 * z * z);
             if (x < 0)
@@ -585,9 +585,9 @@ public final class MathUtilsDouble {
     public static boolean fuzzyEquals(Double a,
                                       Double b,
                                       double epsilon) {
-        final double absA = FastMath.abs(a);
-        final double absB = FastMath.abs(b);
-        final double diff = FastMath.abs(a - b);
+        double absA = FastMath.abs(a);
+        double absB = FastMath.abs(b);
+        double diff = FastMath.abs(a - b);
 
         if (a.equals(b)) {
             // shortcut, handles infinities

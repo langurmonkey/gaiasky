@@ -437,11 +437,11 @@ public class BitmapFontCache {
     }
 
     private void addGlyph(BitmapFont.Glyph glyph, float x, float y, float color) {
-        final float scaleX = font.data.scaleX, scaleY = font.data.scaleY;
+        float scaleX = font.data.scaleX, scaleY = font.data.scaleY;
         x += glyph.xoffset * scaleX;
         y += glyph.yoffset * scaleY;
         float width = glyph.width * scaleX, height = glyph.height * scaleY;
-        final float u = glyph.u, u2 = glyph.u2, v = glyph.v, v2 = glyph.v2;
+        float u = glyph.u, u2 = glyph.u2, v = glyph.v, v2 = glyph.v2;
 
         if (integer) {
             x = FastMath.round(x);
@@ -449,16 +449,16 @@ public class BitmapFontCache {
             width = FastMath.round(width);
             height = FastMath.round(height);
         }
-        final float x2 = x + width, y2 = y + height;
+        float x2 = x + width, y2 = y + height;
 
-        final int page = glyph.page;
+        int page = glyph.page;
         int idx = this.idx[page];
         this.idx[page] += 20;
 
         if (pageGlyphIndices != null)
             pageGlyphIndices[page].add(glyphCount++);
 
-        final float[] vertices = pageVertices[page];
+        float[] vertices = pageVertices[page];
         vertices[idx++] = x;
         vertices[idx++] = y;
         vertices[idx++] = color;

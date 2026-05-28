@@ -75,7 +75,7 @@ public class IntMeshPart {
      * @param size   The size (in total number of vertices) of the part.
      * @param type   The primitive type of the part (e.g. GL_TRIANGLES, GL_LINE_STRIP, etc.).
      */
-    public IntMeshPart(final String id, final IntMesh mesh, final int offset, final int size, final int type) {
+    public IntMeshPart(String id, IntMesh mesh, int offset, int size, int type) {
         set(id, mesh, offset, size, type);
     }
 
@@ -84,7 +84,7 @@ public class IntMeshPart {
      *
      * @param copyFrom The MeshPart to copy.
      */
-    public IntMeshPart(final IntMeshPart copyFrom) {
+    public IntMeshPart(IntMeshPart copyFrom) {
         set(copyFrom);
     }
 
@@ -95,7 +95,7 @@ public class IntMeshPart {
      *
      * @return this MeshPart, for chaining
      */
-    public IntMeshPart set(final IntMeshPart other) {
+    public IntMeshPart set(IntMeshPart other) {
         this.id = other.id;
         this.mesh = other.mesh;
         this.offset = other.offset;
@@ -112,7 +112,7 @@ public class IntMeshPart {
      *
      * @return this MeshPart, for chaining.
      */
-    public IntMeshPart set(final String id, final IntMesh mesh, final int offset, final int size, final int type) {
+    public IntMeshPart set(String id, IntMesh mesh, int offset, int size, int type) {
         this.id = id;
         this.mesh = mesh;
         this.offset = offset;
@@ -145,13 +145,13 @@ public class IntMeshPart {
      *
      * @return True when this IntMeshPart equals the other IntMeshPart (ignoring the {@link #id} member), false otherwise.
      */
-    public boolean equals(final IntMeshPart other) {
+    public boolean equals(IntMeshPart other) {
         return other == this
                 || (other != null && other.mesh == mesh && other.primitiveType == primitiveType && other.offset == offset && other.size == size);
     }
 
     @Override
-    public boolean equals(final Object arg0) {
+    public boolean equals(Object arg0) {
         if (arg0 == null)
             return false;
         if (arg0 == this)

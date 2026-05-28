@@ -56,7 +56,7 @@ public class PBRTextureAttribute extends TextureAttribute
 	public final static int SpecularColorTexture = register(SpecularColorTextureAlias);
 	
 
-	public float rotationUV = 0f;
+	public float rotationUV;
 	
 	public PBRTextureAttribute(int type) {
 		super(type);
@@ -151,9 +151,8 @@ public class PBRTextureAttribute extends TextureAttribute
 	public int compareTo(Attribute o) {
 		int r = super.compareTo(o);
 		if(r != 0) return r;
-		if(o instanceof PBRTextureAttribute){
-			PBRTextureAttribute other = (PBRTextureAttribute)o;
-			if(!MathUtils.isEqual(rotationUV, other.rotationUV)) return rotationUV < other.rotationUV ? -1 : 1;
+		if(o instanceof PBRTextureAttribute other){
+            if(!MathUtils.isEqual(rotationUV, other.rotationUV)) return rotationUV < other.rotationUV ? -1 : 1;
 		}
 		return 0;
 	}

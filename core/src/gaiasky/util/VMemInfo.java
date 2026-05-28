@@ -23,7 +23,7 @@ public class VMemInfo {
     private static final Log logger = Logger.getLogger(VMemInfo.class);
 
     private static IGraphicsDeviceInfo graphicsDeviceInfo;
-    private static boolean crash = false;
+    private static boolean crash;
 
     public static void initialize() {
         String extensions = GlobalResources.getGLExtensions().toLowerCase(Locale.ROOT);

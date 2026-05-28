@@ -49,25 +49,25 @@ public class UiModule extends APIModule implements UiAPI {
     }
 
     @Override
-    public void display_message(final int id,
-                                final String msg,
-                                final float x,
-                                final float y,
-                                final float r,
-                                final float g,
-                                final float b,
-                                final float a,
-                                final float size) {
+    public void display_message(int id,
+                                String msg,
+                                float x,
+                                float y,
+                                float r,
+                                float g,
+                                float b,
+                                float a,
+                                float size) {
         api.base.post_runnable(() -> em.post(Event.ADD_CUSTOM_MESSAGE, this, id, msg, x, y, r, g, b, a, size));
     }
 
     @Override
-    public void display_message(final int id,
-                                final String msg,
-                                final double x,
-                                final double y,
-                                final double[] color,
-                                final double size) {
+    public void display_message(int id,
+                                String msg,
+                                double x,
+                                double y,
+                                double[] color,
+                                double size) {
         if (api.validator.checkNotNull(color, "color")
                 && api.validator.checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
@@ -75,60 +75,60 @@ public class UiModule extends APIModule implements UiAPI {
         }
     }
 
-    public void display_message(final int id, final String message, final double x, final double y, final List<?> color, final double fontSize) {
+    public void display_message(int id, String message, double x, double y, List<?> color, double fontSize) {
         display_message(id, message, x, y, api.dArray(color), fontSize);
     }
 
-    public void display_message(final int id,
-                                final String message,
-                                final float x,
-                                final float y,
-                                final float r,
-                                final float g,
-                                final float b,
-                                final float a,
-                                final int fontSize) {
+    public void display_message(int id,
+                                String message,
+                                float x,
+                                float y,
+                                float r,
+                                float g,
+                                float b,
+                                float a,
+                                int fontSize) {
         display_message(id, message, x, y, r, g, b, a, (float) fontSize);
     }
 
     @Override
-    public void display_text(final int id,
-                             final String msg,
-                             final float x,
-                             final float y,
-                             final float max_w,
-                             final float max_h,
-                             final float r,
-                             final float g,
-                             final float b,
-                             final float a,
-                             final float size) {
+    public void display_text(int id,
+                             String msg,
+                             float x,
+                             float y,
+                             float max_w,
+                             float max_h,
+                             float r,
+                             float g,
+                             float b,
+                             float a,
+                             float size) {
         api.base.post_runnable(() -> em.post(Event.ADD_CUSTOM_TEXT, this, id, msg, x, y, max_w, max_h, r, g, b, a, size));
     }
 
-    public void display_text(final int id,
-                             final String text,
-                             final float x,
-                             final float y,
-                             final float maxWidth,
-                             final float maxHeight,
-                             final float r,
-                             final float g,
-                             final float b,
-                             final float a,
-                             final int fontSize) {
+    public void display_text(int id,
+                             String text,
+                             float x,
+                             float y,
+                             float maxWidth,
+                             float maxHeight,
+                             float r,
+                             float g,
+                             float b,
+                             float a,
+                             int fontSize) {
         display_text(id, text, x, y, maxWidth, maxHeight, r, g, b, a, (float) fontSize);
     }
 
     @Override
-    public void display_image(final int id,
-                              final String path,
-                              final float x,
-                              final float y,
-                              final float r,
-                              final float g,
-                              final float b,
-                              final float a) {
+    public void display_image(int id,
+                              String path,
+                              float x,
+                              float y,
+                              float r,
+                              float g,
+                              float b,
+                              float a) {
         api.base.post_runnable(() -> {
             Texture tex = getTexture(path);
             em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y, r, g, b, a);
@@ -136,19 +136,19 @@ public class UiModule extends APIModule implements UiAPI {
     }
 
     @Override
-    public void display_image(final int id, final String path, final double x, final double y, final double[] color) {
+    public void display_image(int id, String path, double x, double y, double[] color) {
         if (api.validator.checkNotNull(color, "color") && api.validator.checkLengths(color, 3, 4, "color")) {
             float a = color.length > 3 ? (float) color[3] : 1f;
             display_image(id, path, (float) x, (float) y, (float) color[0], (float) color[1], (float) color[2], a);
         }
     }
 
-    public void display_image(final int id, final String path, final double x, final double y, final List<?> color) {
+    public void display_image(int id, String path, double x, double y, List<?> color) {
         display_image(id, path, x, y, api.dArray(color));
     }
 
     @Override
-    public void display_image(final int id, final String path, final float x, final float y) {
+    public void display_image(int id, String path, float x, float y) {
         api.base.post_runnable(() -> {
             Texture tex = getTexture(path);
             em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y);
@@ -161,16 +161,16 @@ public class UiModule extends APIModule implements UiAPI {
     }
 
     @Override
-    public void remove_object(final int id) {
+    public void remove_object(int id) {
         api.base.post_runnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[]{id}));
     }
 
     @Override
-    public void remove_objects(final int[] ids) {
+    public void remove_objects(int[] ids) {
         api.base.post_runnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) ids));
     }
 
-    public void remove_objects(final List<?> ids) {
+    public void remove_objects(List<?> ids) {
         remove_objects(api.iArray(ids));
     }
 
@@ -261,12 +261,12 @@ public class UiModule extends APIModule implements UiAPI {
     }
 
     @Override
-    public void set_headline_message(final String msg) {
+    public void set_headline_message(String msg) {
         api.base.post_runnable(() -> em.post(Event.POST_HEADLINE_MESSAGE, this, msg));
     }
 
     @Override
-    public void set_subhead_message(final String msg) {
+    public void set_subhead_message(String msg) {
         api.base.post_runnable(() -> em.post(Event.POST_SUBHEAD_MESSAGE, this, msg));
     }
 
@@ -320,7 +320,7 @@ public class UiModule extends APIModule implements UiAPI {
     @Override
     public void preload_textures(String[] paths) {
         initializeTextures();
-        for (final String path : paths) {
+        for (String path : paths) {
             // This only works in async mode!
             api.base.post_runnable(() -> api.assetManager.load(path, Texture.class));
             while (!api.assetManager.isLoaded(path)) {

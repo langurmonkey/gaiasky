@@ -150,8 +150,8 @@ public class DownloadHelper {
             if (age > Constants.getPartFileMaxAgeMs() && to.exists()) {
                 to.delete();
             }
-            final boolean resume = to.exists() && to.name().endsWith(".part");
-            final long startSize;
+            boolean resume = to.exists() && to.name().endsWith(".part");
+            long startSize;
 
             if (resume) {
                 startSize = to.file().length();
@@ -253,7 +253,7 @@ public class DownloadHelper {
                                    Runnable cancel) {
         // Send the request, listen for the response
         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
-            private boolean cancelled = false;
+            private boolean cancelled;
 
             @Override
             public void handleHttpResponse(HttpResponse httpResponse) {
@@ -297,7 +297,7 @@ public class DownloadHelper {
                             read += count;
 
                             // Compute progress value.
-                            final double progressValue = ((double) (startSize + read) / (double) totalLength) * 100;
+                            double progressValue = ((double) (startSize + read) / (double) totalLength) * 100;
 
                             // Compute speed.
                             long currentTimeMs = System.currentTimeMillis();
@@ -338,7 +338,7 @@ public class DownloadHelper {
                                         read += count;
 
                                         // Compute progress value.
-                                        final double progressValue = ((double) read / (double) length) * 100;
+                                        double progressValue = ((double) read / (double) length) * 100;
 
                                         // Compute speed.
                                         long currentTimeMs = System.currentTimeMillis();

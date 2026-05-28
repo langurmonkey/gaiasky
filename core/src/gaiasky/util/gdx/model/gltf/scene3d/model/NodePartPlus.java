@@ -16,7 +16,7 @@ public class NodePartPlus extends IntNodePart {
      */
     public WeightVector morphTargets;
 
-    public IntRenderable setRenderable(final IntRenderable out) {
+    public IntRenderable setRenderable(IntRenderable out) {
         out.material = material;
         out.meshPart.set(meshPart);
         out.bones = bones;

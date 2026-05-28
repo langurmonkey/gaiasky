@@ -112,7 +112,7 @@ public class SVTManager implements IObserver {
     private FloatBuffer floatBuffer;
 
     // Are the textures displaying in the UI already?
-    private boolean DEBUG_UI_VIEW = false;
+    private boolean DEBUG_UI_VIEW;
 
     public SVTManager() {
         super();
@@ -134,7 +134,7 @@ public class SVTManager implements IObserver {
      *
      * @param tileDetectionBuffer The tile detection buffer data.
      */
-    public void updateObservedTiles(final FloatBuffer tileDetectionBuffer) {
+    public void updateObservedTiles(FloatBuffer tileDetectionBuffer) {
         observedTiles.clear();
         int size = tileDetectionBuffer.capacity() / 4;
         tileDetectionBuffer.rewind();
@@ -310,7 +310,7 @@ public class SVTManager implements IObserver {
         }
 
         if (DEBUG_UI_VIEW && (addedTiles > 0 || removedTiles > 0)) {
-            final var lastTile = finalTile;
+            var lastTile = finalTile;
             GaiaSky.postRunnable(() -> {
                 // Create UI views with SVT cache and indirection textures.
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.05f);

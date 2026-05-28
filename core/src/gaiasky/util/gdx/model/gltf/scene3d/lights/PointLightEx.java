@@ -17,7 +17,7 @@ public class PointLightEx extends PointLight {
 	public Float range;
 	
 	@Override
-	public PointLight set (final PointLight copyFrom) {
+	public PointLight set (PointLight copyFrom) {
 		if(copyFrom instanceof PointLightEx){
 			return set(copyFrom.color, copyFrom.position, copyFrom.intensity, ((PointLightEx)copyFrom).range);
 		}else{

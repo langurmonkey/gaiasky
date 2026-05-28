@@ -52,8 +52,8 @@ public class IntNode {
      *
      * @return The node with the specified id, or null if not found.
      */
-    public static IntNode getNode(final Array<IntNode> nodes, final String id, boolean recursive, boolean ignoreCase) {
-        final int n = nodes.size;
+    public static IntNode getNode(Array<IntNode> nodes, String id, boolean recursive, boolean ignoreCase) {
+        int n = nodes.size;
         IntNode node;
         if (ignoreCase) {
             for (int i = 0; i < n; i++)
@@ -113,10 +113,10 @@ public class IntNode {
     }
 
     public void calculateBoneTransforms(boolean recursive) {
-        for (final IntNodePart part : parts) {
+        for (IntNodePart part : parts) {
             if (part.invBoneBindTransforms == null || part.bones == null || part.invBoneBindTransforms.size != part.bones.length)
                 continue;
-            final int n = part.invBoneBindTransforms.size;
+            int n = part.invBoneBindTransforms.size;
             for (int i = 0; i < n; i++)
                 part.bones[i].set(part.invBoneBindTransforms.keys[i].globalTransform).mul(part.invBoneBindTransforms.values[i]);
         }
@@ -128,13 +128,13 @@ public class IntNode {
     }
 
     /** Calculate the bounding box of this Node. This is a potential slow operation, it is advised to cache the result. */
-    public BoundingBox calculateBoundingBox(final BoundingBox out) {
+    public BoundingBox calculateBoundingBox(BoundingBox out) {
         out.inf();
         return extendBoundingBox(out);
     }
 
     /** Calculate the bounding box of this Node. This is a potential slow operation, it is advised to cache the result. */
-    public BoundingBox calculateBoundingBox(final BoundingBox out, boolean transform) {
+    public BoundingBox calculateBoundingBox(BoundingBox out, boolean transform) {
         out.inf();
         return extendBoundingBox(out, transform);
     }
@@ -143,7 +143,7 @@ public class IntNode {
      * Extends the bounding box with the bounds of this Node. This is a potential slow operation, it is advised to cache the
      * result.
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out) {
+    public BoundingBox extendBoundingBox(BoundingBox out) {
         return extendBoundingBox(out, true);
     }
 
@@ -151,19 +151,19 @@ public class IntNode {
      * Extends the bounding box with the bounds of this Node. This is a potential slow operation, it is advised to cache the
      * result.
      */
-    public BoundingBox extendBoundingBox(final BoundingBox out, boolean transform) {
-        final int partCount = parts.size;
+    public BoundingBox extendBoundingBox(BoundingBox out, boolean transform) {
+        int partCount = parts.size;
         for (int i = 0; i < partCount; i++) {
-            final IntNodePart part = parts.get(i);
+            IntNodePart part = parts.get(i);
             if (part.enabled) {
-                final IntMeshPart meshPart = part.meshPart;
+                IntMeshPart meshPart = part.meshPart;
                 if (transform)
                     meshPart.mesh.extendBoundingBox(out, meshPart.offset, meshPart.size, globalTransform);
                 else
                     meshPart.mesh.extendBoundingBox(out, meshPart.offset, meshPart.size);
             }
         }
-        final int childCount = children.size;
+        int childCount = children.size;
         for (int i = 0; i < childCount; i++)
             children.get(i).extendBoundingBox(out);
         return out;
@@ -205,7 +205,7 @@ public class IntNode {
      *
      * @return The child node at the specified index
      */
-    public IntNode getChild(final int index) {
+    public IntNode getChild(int index) {
         return children.get(index);
     }
 
@@ -214,7 +214,7 @@ public class IntNode {
      *
      * @return The node with the specified id, or null if not found.
      */
-    public IntNode getChild(final String id, boolean recursive, boolean ignoreCase) {
+    public IntNode getChild(String id, boolean recursive, boolean ignoreCase) {
         return getNode(children, id, recursive, ignoreCase);
     }
 
@@ -226,7 +226,7 @@ public class IntNode {
      *
      * @return the zero-based index of the child
      */
-    public <T extends IntNode> int addChild(final T child) {
+    public <T extends IntNode> int addChild(T child) {
         return insertChild(-1, child);
     }
 
@@ -238,7 +238,7 @@ public class IntNode {
      *
      * @return the zero-based index of the first added child
      */
-    public <T extends IntNode> int addChildren(final Iterable<T> nodes) {
+    public <T extends IntNode> int addChildren(Iterable<T> nodes) {
         return insertChildren(-1, nodes);
     }
 
@@ -252,7 +252,7 @@ public class IntNode {
      *
      * @return the zero-based index of the child
      */
-    public <T extends IntNode> int insertChild(int index, final T child) {
+    public <T extends IntNode> int insertChild(int index, T child) {
         for (IntNode p = this; p != null; p = p.getParent()) {
             if (p == child)
                 throw new GdxRuntimeException("Cannot add a parent as a child");
@@ -279,7 +279,7 @@ public class IntNode {
      *
      * @return the zero-based index of the first inserted child
      */
-    public <T extends IntNode> int insertChildren(int index, final Iterable<T> nodes) {
+    public <T extends IntNode> int insertChildren(int index, Iterable<T> nodes) {
         if (index < 0 || index > children.size)
             index = children.size;
         int i = index;
@@ -297,7 +297,7 @@ public class IntNode {
      *
      * @return Whether the removal was successful.
      */
-    public <T extends IntNode> boolean removeChild(final T child) {
+    public <T extends IntNode> boolean removeChild(T child) {
         if (!children.removeValue(child, true))
             return false;
         child.parent = null;

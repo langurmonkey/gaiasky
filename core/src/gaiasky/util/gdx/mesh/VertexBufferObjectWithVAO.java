@@ -29,8 +29,8 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
     final boolean isStatic;
     final int usage;
     int bufferHandle;
-    boolean isDirty = false;
-    boolean isBound = false;
+    boolean isDirty;
+    boolean isBound;
     int vaoHandle = -1;
     IntArray cachedLocations = new IntArray();
 
@@ -105,7 +105,7 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
     @Override
     public void updateVertices(int targetOffset, float[] vertices, int sourceOffset, int count) {
         isDirty = true;
-        final int pos = byteBuffer.position();
+        int pos = byteBuffer.position();
         byteBuffer.position(targetOffset * 4);
         BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
         byteBuffer.position(pos);
@@ -139,7 +139,7 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
 
     private void bindAttributes(ExtShaderProgram shader, int[] locations) {
         boolean stillValid = this.cachedLocations.size != 0;
-        final int numAttributes = attributes.size();
+        int numAttributes = attributes.size();
 
         if (stillValid) {
             if (locations == null) {
@@ -209,12 +209,12 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
      * @param shader the shader
      */
     @Override
-    public void unbind(final ExtShaderProgram shader) {
+    public void unbind(ExtShaderProgram shader) {
         unbind(shader, null);
     }
 
     @Override
-    public void unbind(final ExtShaderProgram shader, final int[] locations) {
+    public void unbind(ExtShaderProgram shader, int[] locations) {
         GL30 gl = Gdx.gl30;
         gl.glBindVertexArray(0);
         isBound = false;

@@ -10,8 +10,8 @@ import gaiasky.util.gdx.model.gltf.data.GLTFEntity;
 
 public class GLTFAccessor extends GLTFEntity {
 	public Integer bufferView;
-	public boolean normalized = false;
-	public int byteOffset = 0, componentType, count;
+	public boolean normalized;
+	public int byteOffset, componentType, count;
 	public String type;
 	public float [] min;
 	public float [] max;

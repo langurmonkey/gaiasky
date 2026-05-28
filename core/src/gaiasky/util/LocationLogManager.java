@@ -80,11 +80,11 @@ public class LocationLogManager implements IObserver {
     /**
      * Adds a new record with the given object, camera and time
      */
-    public void addRecord(final IFocus object, final ICamera camera, final ITimeFrameProvider time) {
+    public void addRecord(IFocus object, ICamera camera, ITimeFrameProvider time) {
         if (object != null) {
-            final Instant entryTime = Instant.now();
-            final Instant simulationTime = time.getTime();
-            final String name = object.getClosestLocalizedName();
+            Instant entryTime = Instant.now();
+            Instant simulationTime = time.getTime();
+            String name = object.getClosestLocalizedName();
 
             // Check if the new record is already in the 10 most recent items
             boolean found = false;
@@ -98,7 +98,7 @@ public class LocationLogManager implements IObserver {
 
             if (!found) {
                 // Create record
-                final LocationRecord record = new LocationRecord();
+                LocationRecord record = new LocationRecord();
                 record.name = name;
                 record.entryTime = entryTime;
                 record.simulationTime = simulationTime;
@@ -119,7 +119,7 @@ public class LocationLogManager implements IObserver {
     @Override
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.CAMERA_NEW_CLOSEST) {
-            final IFocus closest = (IFocus) data[0];
+            IFocus closest = (IFocus) data[0];
             this.addRecord(closest, GaiaSky.instance.getICamera(), GaiaSky.instance.time);
 
         }

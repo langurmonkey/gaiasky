@@ -97,9 +97,9 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     /** The current primitiveType */
     private int primitiveType;
     /** The UV range used when building */
-    private float uMin = 0, uMax = 1, vMin = 0, vMax = 1;
+    private float uMin, uMax = 1, vMin, vMax = 1;
     private float[] vertex;
-    private boolean vertexTransformationEnabled = false;
+    private boolean vertexTransformationEnabled;
     private int lastIndex = -1;
 
     /**
@@ -107,7 +107,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
      *              TextureCoordinates is supported.
      */
     public static VertexAttributes createAttributes(Bits usage) {
-        final Array<VertexAttribute> attrs = new Array<>();
+        Array<VertexAttribute> attrs = new Array<>();
         if (usage.get(Usage.Position))
             attrs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
         if (usage.get(Usage.ColorUnpacked))
@@ -122,7 +122,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             attrs.add(new VertexAttribute(Usage.BiNormal, 3, ShaderProgram.BINORMAL_ATTRIBUTE));
         if (usage.get(Usage.TextureCoordinates))
             attrs.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
-        final VertexAttribute[] attributes = new VertexAttribute[attrs.size];
+        VertexAttribute[] attributes = new VertexAttribute[attrs.size];
         for (int i = 0; i < attributes.length; i++)
             attributes[i] = attrs.get(i);
         return new VertexAttributes(attributes);
@@ -134,12 +134,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
      * @param attributes bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal
      *                   and TextureCoordinates is supported.
      */
-    public void begin(final Bits attributes) {
+    public void begin(Bits attributes) {
         begin(createAttributes(attributes), 0);
     }
 
     /** Begin building a mesh. Call {@link #part(String, int)} to start a {@link IntMeshPart}. */
-    public void begin(final VertexAttributes attributes) {
+    public void begin(VertexAttributes attributes) {
         begin(attributes, 0);
     }
 
@@ -149,12 +149,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
      * @param attributes bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal
      *                   and TextureCoordinates is supported.
      */
-    public void begin(final Bits attributes, int primitiveType) {
+    public void begin(Bits attributes, int primitiveType) {
         begin(createAttributes(attributes), primitiveType);
     }
 
     /** Begin building a mesh */
-    public void begin(final VertexAttributes attributes, int primitiveType) {
+    public void begin(VertexAttributes attributes, int primitiveType) {
         if (this.attributes != null)
             throw new RuntimeException("Call end() first");
         this.attributes = attributes;
@@ -198,7 +198,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     /** Starts a new MeshPart. The mesh part is not usable until end() is called */
-    public IntMeshPart part(final String id, int primitiveType) {
+    public IntMeshPart part(String id, int primitiveType) {
         if (this.attributes == null)
             throw new RuntimeException("Call begin() first");
         endpart();
@@ -219,7 +219,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             throw new RuntimeException("Call begin() first");
         endpart();
 
-        final IntMesh mesh = new IntMesh(true, vertices.size / stride, indices.size, attributes);
+        IntMesh mesh = new IntMesh(true, vertices.size / stride, indices.size, attributes);
         mesh.setVertices(vertices.items, 0, vertices.size);
         mesh.setIndices(indices.items, 0, indices.size);
 
@@ -245,7 +245,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     private Vector3 tmp(float x, float y, float z) {
-        final Vector3 result = vectorPool.obtain().set(x, y, z);
+        Vector3 result = vectorPool.obtain().set(x, y, z);
         vectorArray.add(result);
         return result;
     }
@@ -255,7 +255,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     private Matrix4 tmp() {
-        final Matrix4 result = matrices4Pool.obtain().idt();
+        Matrix4 result = matrices4Pool.obtain().idt();
         matrices4Array.add(result);
         return result;
     }
@@ -274,7 +274,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void setColor(final Color color) {
+    public void setColor(Color color) {
         colorSet = color != null;
         if (colorSet) {
             this.color.set(color);
@@ -407,7 +407,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         return lastIndex;
     }
 
-    private final void addVertex(final float[] values, final int offset) {
+    private final void addVertex(float[] values, int offset) {
         vertices.addAll(values, offset, stride);
         lastIndex = (vindex++);
     }
@@ -493,32 +493,32 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public int vertex(final float... values) {
-        final int n = values.length - stride;
+    public int vertex(float... values) {
+        int n = values.length - stride;
         for (int i = 0; i <= n; i += stride)
             addVertex(values, i);
         return lastIndex;
     }
 
     @Override
-    public int vertex(final VertexInfo info) {
+    public int vertex(VertexInfo info) {
         return vertex(info.hasPosition ? info.position : null, info.hasNormal ? info.normal : null, info.hasTangent ? info.tangent : null, info.hasBinormal ? info.binormal : null, info.hasColor ? info.color : null, info.hasUV ? info.uv : null);
     }
 
     @Override
-    public void index(final int value) {
+    public void index(int value) {
         indices.add(value);
     }
 
     @Override
-    public void index(final int value1, final int value2) {
+    public void index(int value1, int value2) {
         ensureIndices(2);
         indices.add(value1);
         indices.add(value2);
     }
 
     @Override
-    public void index(final int value1, final int value2, final int value3) {
+    public void index(int value1, int value2, int value3) {
         ensureIndices(3);
         indices.add(value1);
         indices.add(value2);
@@ -526,7 +526,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void index(final int value1, final int value2, final int value3, final int value4) {
+    public void index(int value1, int value2, int value3, int value4) {
         ensureIndices(4);
         indices.add(value1);
         indices.add(value2);
@@ -647,11 +647,11 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         }
         ensureRectangles((divisionsV + 1) * (divisionsU + 1), divisionsV * divisionsU);
         for (int u = 0; u <= divisionsU; u++) {
-            final float alphaU = (float) u / (float) divisionsU;
+            float alphaU = (float) u / (float) divisionsU;
             vertTmp5.set(corner00).lerp(corner10, alphaU);
             vertTmp6.set(corner01).lerp(corner11, alphaU);
             for (int v = 0; v <= divisionsV; v++) {
-                final int idx = vertex(vertTmp7.set(vertTmp5).lerp(vertTmp6, (float) v / (float) divisionsV));
+                int idx = vertex(vertTmp7.set(vertTmp5).lerp(vertTmp6, (float) v / (float) divisionsV));
                 if (u > 0 && v > 0)
                     rect(idx - divisionsV - 2, idx - 1, idx, idx - divisionsV - 1);
             }
@@ -676,14 +676,14 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     @Override
     public void box(VertexInfo corner000, VertexInfo corner010, VertexInfo corner100, VertexInfo corner110, VertexInfo corner001, VertexInfo corner011, VertexInfo corner101, VertexInfo corner111, boolean flip) {
         ensureVertices(8);
-        final int i000 = vertex(corner000);
-        final int i100 = vertex(corner100);
-        final int i110 = vertex(corner110);
-        final int i010 = vertex(corner010);
-        final int i001 = vertex(corner001);
-        final int i101 = vertex(corner101);
-        final int i111 = vertex(corner111);
-        final int i011 = vertex(corner011);
+        int i000 = vertex(corner000);
+        int i100 = vertex(corner100);
+        int i110 = vertex(corner110);
+        int i010 = vertex(corner010);
+        int i001 = vertex(corner001);
+        int i101 = vertex(corner101);
+        int i111 = vertex(corner111);
+        int i011 = vertex(corner011);
 
         if (primitiveType == GL20.GL_LINES) {
             ensureIndices(24);
@@ -797,13 +797,13 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void circle(float radius, int divisions, final Vector3 center, final Vector3 normal) {
+    public void circle(float radius, int divisions, Vector3 center, Vector3 normal) {
         circle(radius, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z);
     }
 
 
     @Override
-    public void circle(float radius, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal) {
+    public void circle(float radius, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal) {
         circle(radius, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z, tangent.x, tangent.y, tangent.z, binormal.x, binormal.y, binormal.z);
     }
 
@@ -818,12 +818,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void circle(float radius, int divisions, final Vector3 center, final Vector3 normal, float angleFrom, float angleTo) {
+    public void circle(float radius, int divisions, Vector3 center, Vector3 normal, float angleFrom, float angleTo) {
         circle(radius, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z, angleFrom, angleTo);
     }
 
     @Override
-    public void circle(float radius, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal, float angleFrom, float angleTo) {
+    public void circle(float radius, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal, float angleFrom, float angleTo) {
         circle(radius, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z, tangent.x, tangent.y, tangent.z, binormal.x, binormal.y, binormal.z, angleFrom, angleTo);
     }
 
@@ -838,12 +838,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal) {
+    public void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal) {
         ellipse(width, height, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z);
     }
 
     @Override
-    public void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal) {
+    public void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal) {
         ellipse(width, height, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z, tangent.x, tangent.y, tangent.z, binormal.x, binormal.y, binormal.z);
     }
 
@@ -858,12 +858,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal, float angleFrom, float angleTo) {
+    public void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal, float angleFrom, float angleTo) {
         ellipse(width, height, 0f, 0f, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z, angleFrom, angleTo);
     }
 
     @Override
-    public void ellipse(float width, float height, int divisions, final Vector3 center, final Vector3 normal, final Vector3 tangent, final Vector3 binormal, float angleFrom, float angleTo) {
+    public void ellipse(float width, float height, int divisions, Vector3 center, Vector3 normal, Vector3 tangent, Vector3 binormal, float angleFrom, float angleTo) {
         ellipse(width, height, 0f, 0f, divisions, center.x, center.y, center.z, normal.x, normal.y, normal.z, tangent.x, tangent.y, tangent.z, binormal.x, binormal.y, binormal.z, angleFrom, angleTo);
     }
 
@@ -905,12 +905,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             ensureRectangles((divisions + 1) * 2, divisions + 1);
         }
 
-        final float ao = MathUtils.degreesToRadians * angleFrom;
-        final float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
-        final Vector3 sxEx = tempV1.set(tangentX, tangentY, tangentZ).scl(width * 0.5f);
-        final Vector3 syEx = tempV2.set(binormalX, binormalY, binormalZ).scl(height * 0.5f);
-        final Vector3 sxIn = tempV3.set(tangentX, tangentY, tangentZ).scl(innerWidth * 0.5f);
-        final Vector3 syIn = tempV4.set(binormalX, binormalY, binormalZ).scl(innerHeight * 0.5f);
+        float ao = MathUtils.degreesToRadians * angleFrom;
+        float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
+        Vector3 sxEx = tempV1.set(tangentX, tangentY, tangentZ).scl(width * 0.5f);
+        Vector3 syEx = tempV2.set(binormalX, binormalY, binormalZ).scl(height * 0.5f);
+        Vector3 sxIn = tempV3.set(tangentX, tangentY, tangentZ).scl(innerWidth * 0.5f);
+        Vector3 syIn = tempV4.set(binormalX, binormalY, binormalZ).scl(innerHeight * 0.5f);
         VertexInfo currIn = vertTmp3.set(null, null, null, null);
         currIn.hasUV = currIn.hasPosition = currIn.hasNormal = true;
         currIn.uv.set(.5f, .5f);
@@ -921,15 +921,15 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         currEx.uv.set(.5f, .5f);
         currEx.position.set(centerX, centerY, centerZ);
         currEx.normal.set(normalX, normalY, normalZ);
-        final int center = vertex(currEx);
+        int center = vertex(currEx);
         float angle = 0f;
-        final float us = 0.5f * (innerWidth / width);
-        final float vs = 0.5f * (innerHeight / height);
+        float us = 0.5f * (innerWidth / width);
+        float vs = 0.5f * (innerHeight / height);
         int i1, i2 = 0, i3 = 0, i4 = 0;
         for (int i = 0; i <= divisions; i++) {
             angle = ao + step * i;
-            final float x = MathUtils.cos(angle);
-            final float y = MathUtils.sin(angle);
+            float x = MathUtils.cos(angle);
+            float y = MathUtils.sin(angle);
             currEx.position.set(centerX, centerY, centerZ).add(sxEx.x * x + syEx.x * y, sxEx.y * x + syEx.y * y, sxEx.z * x + syEx.z * y);
             currEx.uv.set(.5f + .5f * x, .5f + .5f * y);
             i1 = vertex(currEx);
@@ -968,12 +968,12 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     /** Add a cylinder */
     public void cylinder(float width, float height, float depth, int divisions, float angleFrom, float angleTo, boolean close) {
-        final float hw = width * 0.5f;
-        final float hh = height * 0.5f;
-        final float hd = depth * 0.5f;
-        final float ao = MathUtils.degreesToRadians * angleFrom;
-        final float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
-        final float us = 1f / divisions;
+        float hw = width * 0.5f;
+        float hh = height * 0.5f;
+        float hd = depth * 0.5f;
+        float ao = MathUtils.degreesToRadians * angleFrom;
+        float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
+        float us = 1f / divisions;
         float u;
         float angle;
         VertexInfo curr1 = vertTmp3.set(null, null, null, null);
@@ -1016,18 +1016,18 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public void cone(float width, float height, float depth, int divisions, float angleFrom, float angleTo) {
         ensureTriangles(divisions + 2, divisions);
 
-        final float hw = width * 0.5f;
-        final float hh = height * 0.5f;
-        final float hd = depth * 0.5f;
-        final float ao = MathUtils.degreesToRadians * angleFrom;
-        final float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
-        final float us = 1f / divisions;
+        float hw = width * 0.5f;
+        float hh = height * 0.5f;
+        float hd = depth * 0.5f;
+        float ao = MathUtils.degreesToRadians * angleFrom;
+        float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
+        float us = 1f / divisions;
         float u = 0f;
         float angle = 0f;
         VertexInfo curr1 = vertTmp3.set(null, null, null, null);
         curr1.hasUV = curr1.hasPosition = curr1.hasNormal = true;
         VertexInfo curr2 = vertTmp4.set(null, null, null, null).setPos(0, hh, 0).setNor(0, 1, 0).setUV(0.5f, 0);
-        final int base = vertex(curr2);
+        int base = vertex(curr2);
         int i1, i2 = 0;
         for (int i = 0; i <= divisions; i++) {
             angle = ao + step * i;
@@ -1048,18 +1048,18 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public void cone(float width, float height, float depth, int divisions, int hdivisions, float angleFrom, float angleTo) {
         ensureTriangles(divisions * hdivisions + 2, divisions);
 
-        final float hw = width * 0.5f;
-        final float hh = height * 0.5f;
-        final float hd = depth * 0.5f;
-        final float ao = MathUtils.degreesToRadians * angleFrom;
-        final float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
-        final float us = 1f / divisions;
+        float hw = width * 0.5f;
+        float hh = height * 0.5f;
+        float hd = depth * 0.5f;
+        float ao = MathUtils.degreesToRadians * angleFrom;
+        float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
+        float us = 1f / divisions;
         float u = 0f;
         float angle = 0f;
         VertexInfo curr1 = vertTmp3.set(null, null, null, null);
         curr1.hasUV = curr1.hasPosition = curr1.hasNormal = true;
         VertexInfo curr2 = vertTmp4.set(null, null, null, null).setPos(0, hh, 0).setNor(0, 1, 0).setUV(0.5f, 0);
-        final int base = vertex(curr2);
+        int base = vertex(curr2);
         int i1, i2 = 0;
         for (int i = 0; i <= divisions; i++) {
             angle = ao + step * i;
@@ -1082,7 +1082,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV) {
+    public void sphere(Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV) {
         sphere(transform, width, height, depth, divisionsU, divisionsV, 0, 360, 0, 180);
     }
 
@@ -1092,7 +1092,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+    public void sphere(Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         sphere(transform, width, height, depth, divisionsU, divisionsV, false, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
 
@@ -1100,7 +1100,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public void capsule(float radius, float height, int divisions) {
         if (height < 2f * radius)
             throw new GdxRuntimeException("Height must be at least twice the radius");
-        final float d = 2f * radius;
+        float d = 2f * radius;
         cylinder(d, height - d, d, divisions, 0, 360, false);
         sphere(matTmp1.setToTranslation(0, .5f * (height - d), 0), d, d, d, divisions, divisions, 0, 360, 0, 90);
         sphere(matTmp1.setToTranslation(0, -.5f * (height - d), 0), d, d, d, divisions, divisions, 0, 360, 90, 180);
@@ -1232,18 +1232,18 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     }
 
     @Override
-    public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
+    public void sphere(Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         SphereCreator.create(this, transform, width, height, depth, divisionsU, divisionsV, flipNormals, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
 
     @Override
     public void cylinder(float width, float height, float depth, int divisions, float angleFrom, float angleTo, boolean close, boolean flipNormals) {
-        final float hw = width * 0.5f;
-        final float hh = height * 0.5f;
-        final float hd = depth * 0.5f;
-        final float ao = MathUtils.degreesToRadians * angleFrom;
-        final float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
-        final float us = 1f / divisions;
+        float hw = width * 0.5f;
+        float hh = height * 0.5f;
+        float hd = depth * 0.5f;
+        float ao = MathUtils.degreesToRadians * angleFrom;
+        float step = (MathUtils.degreesToRadians * (angleTo - angleFrom)) / divisions;
+        float us = 1f / divisions;
         float u = 0f;
         float angle = 0f;
         VertexInfo curr1 = vertTmp3.set(null, null, null, null);

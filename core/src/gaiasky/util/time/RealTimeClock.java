@@ -19,7 +19,7 @@ public class RealTimeClock implements ITimeFrameProvider {
     private double dt;
     /** Current number of milliseconds from epoch (1970-01-01T00:00Z (ISO)). **/
     private long time;
-    private double lastUpdate = 0;
+    private double lastUpdate;
 
     public RealTimeClock() {
         time = Instant.now().toEpochMilli();

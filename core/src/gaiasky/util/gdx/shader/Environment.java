@@ -26,14 +26,14 @@ public class Environment extends Attributes {
         super();
     }
 
-    public Environment add(final BaseLight... lights) {
-        for (final BaseLight light : lights)
+    public Environment add(BaseLight... lights) {
+        for (BaseLight light : lights)
             add(light);
         return this;
     }
 
-    public Environment add(final Array<BaseLight> lights) {
-        for (final BaseLight light : lights)
+    public Environment add(Array<BaseLight> lights) {
+        for (BaseLight light : lights)
             add(light);
         return this;
     }
@@ -74,14 +74,14 @@ public class Environment extends Attributes {
         return this;
     }
 
-    public Environment remove(final BaseLight... lights) {
-        for (final BaseLight light : lights)
+    public Environment remove(BaseLight... lights) {
+        for (BaseLight light : lights)
             remove(light);
         return this;
     }
 
-    public Environment remove(final Array<BaseLight> lights) {
-        for (final BaseLight light : lights)
+    public Environment remove(Array<BaseLight> lights) {
+        for (BaseLight light : lights)
             remove(light);
         return this;
     }

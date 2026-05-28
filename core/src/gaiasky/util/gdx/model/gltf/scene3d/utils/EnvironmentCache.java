@@ -27,7 +27,7 @@ public class EnvironmentCache extends Environment {
 	 * fast way to replace an attribute without sorting
 	 */
 	public void replaceCache(Attribute attribute) {
-		final int idx = indexOf(attribute.index);
+		int idx = indexOf(attribute.index);
 		this.attributes.set(idx, attribute);
 	}
 }

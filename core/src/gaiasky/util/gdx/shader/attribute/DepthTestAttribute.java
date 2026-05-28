@@ -32,7 +32,7 @@ public class DepthTestAttribute extends Attribute {
         this(GL20.GL_LEQUAL, depthMask);
     }
 
-    public DepthTestAttribute(final int depthFunc) {
+    public DepthTestAttribute(int depthFunc) {
         this(depthFunc, true);
     }
 
@@ -48,7 +48,7 @@ public class DepthTestAttribute extends Attribute {
         this(Type, depthFunc, depthRangeNear, depthRangeFar, depthMask);
     }
 
-    public DepthTestAttribute(final int index, int depthFunc, float depthRangeNear, float depthRangeFar, boolean depthMask) {
+    public DepthTestAttribute(int index, int depthFunc, float depthRangeNear, float depthRangeFar, boolean depthMask) {
         super(index);
         this.depthFunc = depthFunc;
         this.depthRangeNear = depthRangeNear;
@@ -56,11 +56,11 @@ public class DepthTestAttribute extends Attribute {
         this.depthMask = depthMask;
     }
 
-    public DepthTestAttribute(final DepthTestAttribute rhs) {
+    public DepthTestAttribute(DepthTestAttribute rhs) {
         this(rhs.index, rhs.depthFunc, rhs.depthRangeNear, rhs.depthRangeFar, rhs.depthMask);
     }
 
-    public DepthTestAttribute(final com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute other) {
+    public DepthTestAttribute(com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute other) {
         this(Type, other.depthFunc, other.depthRangeNear, other.depthRangeFar, other.depthMask);
     }
 

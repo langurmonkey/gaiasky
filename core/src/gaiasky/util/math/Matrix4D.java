@@ -486,10 +486,10 @@ public class Matrix4D implements Serializable {
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4D set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
-        final double xs = quaternionX * 2f, ys = quaternionY * 2f, zs = quaternionZ * 2f;
-        final double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
-        final double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
-        final double yy = quaternionY * ys, yz = quaternionY * zs, zz = quaternionZ * zs;
+        double xs = quaternionX * 2f, ys = quaternionY * 2f, zs = quaternionZ * 2f;
+        double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
+        double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
+        double yy = quaternionY * ys, yz = quaternionY * zs, zz = quaternionZ * zs;
 
         val[M00] = (1.0f - (yy + zz));
         val[M01] = (xy - wz);
@@ -554,10 +554,10 @@ public class Matrix4D implements Serializable {
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4D set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW, double scaleX, double scaleY, double scaleZ) {
-        final double xs = quaternionX * 2f, ys = quaternionY * 2f, zs = quaternionZ * 2f;
-        final double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
-        final double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
-        final double yy = quaternionY * ys, yz = quaternionY * zs, zz = quaternionZ * zs;
+        double xs = quaternionX * 2f, ys = quaternionY * 2f, zs = quaternionZ * 2f;
+        double wx = quaternionW * xs, wy = quaternionW * ys, wz = quaternionW * zs;
+        double xx = quaternionX * xs, xy = quaternionX * ys, xz = quaternionX * zs;
+        double yy = quaternionY * ys, yz = quaternionY * zs, zz = quaternionZ * zs;
 
         val[M00] = scaleX * (1.0f - (yy + zz));
         val[M01] = scaleY * (xy - wz);
@@ -1063,7 +1063,7 @@ public class Matrix4D implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together
      */
-    public Matrix4D setToRotation(final Vector3D v1, final Vector3D v2) {
+    public Matrix4D setToRotation(Vector3D v1, Vector3D v2) {
         return set(quat.setFromCross(v1, v2));
     }
 
@@ -1079,7 +1079,7 @@ public class Matrix4D implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together
      */
-    public Matrix4D setToRotation(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
+    public Matrix4D setToRotation(double x1, double y1, double z1, double x2, double y2, double z2) {
         return set(quat.setFromCross(x1, y1, z1, x2, y2, z2));
     }
 
@@ -1546,7 +1546,7 @@ public class Matrix4D implements Serializable {
      *
      * @return This matrix for the purpose of chaining methods together
      */
-    public Matrix4D rotate(final Vector3D v1, final Vector3D v2) {
+    public Matrix4D rotate(Vector3D v1, Vector3D v2) {
         return rotate(quat.setFromCross(v1, v2));
     }
 

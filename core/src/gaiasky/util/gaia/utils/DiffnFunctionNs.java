@@ -14,5 +14,5 @@ public interface DiffnFunctionNs {
      *
      * @return double[] derivatives of y with respect to time
      */
-    double[] derivn(final long t, final double[] y);
+    double[] derivn(long t, double[] y);
 }

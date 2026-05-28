@@ -30,7 +30,7 @@ import java.time.Instant;
  */
 public class DatasetCard {
     private static final Log logger = Logger.getLogger(DatasetCard.class);
-    private static int colorIndexSequence = 0;
+    private static int colorIndexSequence;
     private final FocusView view;
 
     /** Dataset key. A dataset may have multiple cards, in this case all point to the same dataset. **/
@@ -52,10 +52,10 @@ public class DatasetCard {
     public float[] hlColor;
     public float hlSizeFactor;
     public boolean hlAllVisible;
-    public int hlCmapIndex = 0;
+    public int hlCmapIndex;
     public float hlCmapAlpha = 1f;
     public IAttribute hlCmapAttribute;
-    public double hlCmapMin = 0, hlCmapMax = 0;
+    public double hlCmapMin, hlCmapMax;
 
     // The filtering object. May be null.
     public Filter filter;

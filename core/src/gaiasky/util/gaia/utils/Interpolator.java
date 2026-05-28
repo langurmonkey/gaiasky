@@ -29,7 +29,7 @@ public class Interpolator {
      *
      * @return array with interpolated function value at x and its derivative
      */
-    public static double[] hermite3(final double x, final double x0, final double y0, final double yp0, final double x1, final double y1, final double yp1) {
+    public static double[] hermite3(double x, double x0, double y0, double yp0, double x1, double y1, double yp1) {
         double dx = x1 - x0;
         double ddx = (yp0 + yp1 - 2.0 * (y1 - y0) / dx) / dx;
         double c = ((yp1 - yp0) / dx - 3.0 * ddx) / 2.0;
@@ -41,7 +41,7 @@ public class Interpolator {
 
     }
 
-    public static double[] linear(final double x, final double x0, final double y0, final double x1, final double y1) {
+    public static double[] linear(double x, double x0, double y0, double x1, double y1) {
         double y = MathUtilsDouble.lint(x, x0, x1, y0, y1);
         double yprima = (y1 - y0) / (x1 - x0);
         return new double[] { y, yprima };
@@ -79,7 +79,7 @@ public class Interpolator {
      * element and the average attitude quaternion rate [1/timeUnit] as
      * the second element
      */
-    public static QuaternionDouble[] qHermiteAverage(final double ta, final double tb, final double[] t, final int indx, final QuaternionDouble[] q, final QuaternionDouble[] qDot) {
+    public static QuaternionDouble[] qHermiteAverage(double ta, double tb, double[] t, int indx, QuaternionDouble[] q, QuaternionDouble[] qDot) {
 
         QuaternionDouble qAve;
         QuaternionDouble qDotAve;
@@ -259,7 +259,7 @@ public class Interpolator {
      * Remove by GT 18.0.
      */
     @Deprecated
-    public static int findLeftIndex(final long[] xa, final int xaLength, final long x) {
+    public static int findLeftIndex(long[] xa, int xaLength, long x) {
         int kLo = 0;
         int kHi = xaLength - 1;
 
@@ -274,7 +274,7 @@ public class Interpolator {
 
         // Indices must differ by at least 1
         while ((kHi - kLo) > 1) {
-            final int k = (kHi + kLo) >>> 1;
+            int k = (kHi + kLo) >>> 1;
             if (xa[k] > x) {
                 kHi = k;
             } else {

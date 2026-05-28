@@ -30,9 +30,9 @@ public class PBRDepthShader extends DepthIntShader
 	protected long computeMorphTargetsMask(IntRenderable renderable){
 		int morphTargetsFlag = 0;
 		VertexAttributes vertexAttributes = renderable.meshPart.mesh.getVertexAttributes();
-		final int n = vertexAttributes.size();
+		int n = vertexAttributes.size();
 		for (int i = 0; i < n; i++) {
-			final VertexAttribute attr = vertexAttributes.get(i);
+			VertexAttribute attr = vertexAttributes.get(i);
 			if (attr.usage == PBRVertexAttributes.Usage.PositionTarget) morphTargetsFlag |= (1 << attr.unit);
 		}
 		return morphTargetsFlag;
@@ -59,17 +59,15 @@ public class PBRDepthShader extends DepthIntShader
 	public void render(IntRenderable renderable, Attributes combinedAttributes) {
 		
 		if(u_morphTargets1 >= 0){
-			if(renderable.userData instanceof WeightVector){
-				WeightVector weightVector = (WeightVector)renderable.userData;
-				program.setUniformf(u_morphTargets1, weightVector.get(0), weightVector.get(1), weightVector.get(2), weightVector.get(3));
+			if(renderable.userData instanceof WeightVector weightVector){
+                program.setUniformf(u_morphTargets1, weightVector.get(0), weightVector.get(1), weightVector.get(2), weightVector.get(3));
 			}else{
 				program.setUniformf(u_morphTargets1, 0, 0, 0, 0);
 			}
 		}
 		if(u_morphTargets2 >= 0){
-			if(renderable.userData instanceof WeightVector){
-				WeightVector weightVector = (WeightVector)renderable.userData;
-				program.setUniformf(u_morphTargets2, weightVector.get(4), weightVector.get(5), weightVector.get(6), weightVector.get(7));
+			if(renderable.userData instanceof WeightVector weightVector){
+                program.setUniformf(u_morphTargets2, weightVector.get(4), weightVector.get(5), weightVector.get(6), weightVector.get(7));
 			}else{
 				program.setUniformf(u_morphTargets2, 0, 0, 0, 0);
 			}

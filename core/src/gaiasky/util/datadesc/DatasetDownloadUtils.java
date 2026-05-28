@@ -164,7 +164,7 @@ public class DatasetDownloadUtils {
             long current = System.currentTimeMillis();
             long elapsed = current - last;
             if (elapsed > 250) {
-                final var source = entry;
+                var source = entry;
                 GaiaSky.postRunnable(() -> {
                     float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
                     String progressString = I18n.msg("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
@@ -187,7 +187,7 @@ public class DatasetDownloadUtils {
         }
     }
 
-    public static  boolean isEnabled(final Dataset dataset) {
+    public static  boolean isEnabled(Dataset dataset) {
         return isPathIn(GaiaSky.settings().data.dataFile(dataset.checkStr), GaiaSky.settings().data.dataFiles);
     }
 

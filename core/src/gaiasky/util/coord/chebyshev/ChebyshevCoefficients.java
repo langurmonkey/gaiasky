@@ -45,7 +45,7 @@ public class ChebyshevCoefficients {
 		 * @param nanosecondsTcbBegin the start time in nanoseconds TCB
 		 * @param nanosecondsTcbEnd   the end time in nanoseconds TCB
 		 */
-		public Header(final int nGranules, final boolean isEquidistant, final long nanosecondsTcbBegin, final long nanosecondsTcbEnd) {
+		public Header(int nGranules, boolean isEquidistant, long nanosecondsTcbBegin, long nanosecondsTcbEnd) {
 
 			this.nGranules = nGranules;
 			this.isEquidistant = isEquidistant;
@@ -63,7 +63,7 @@ public class ChebyshevCoefficients {
 		 * @return <code>true</code> if this and the given
 		 *         <code>{@link Header}</code> are equal
 		 */
-		public boolean equals(final Header header) {
+		public boolean equals(Header header) {
 
 			if (this.nGranules != header.nGranules) {
 				return false;
@@ -104,7 +104,7 @@ public class ChebyshevCoefficients {
 		 *                       <code>[granule][dimension][coefficient]</code> for the
 		 *                       positions
 		 */
-		public Coefficients(final long[] nanoSecondsTcb, final double[][][] data) {
+		public Coefficients(long[] nanoSecondsTcb, double[][][] data) {
 
 			this.nanoSecondsTcb = nanoSecondsTcb;
 			this.data = data;

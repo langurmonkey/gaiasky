@@ -25,11 +25,11 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     public BSplineDouble() {
     }
 
-    public BSplineDouble(final T[] controlPoints, final boolean continuous) {
+    public BSplineDouble(T[] controlPoints, boolean continuous) {
         set(controlPoints, DEFAULT_DEGREE, continuous);
     }
 
-    public BSplineDouble(final T[] controlPoints, final int degree, final boolean continuous) {
+    public BSplineDouble(T[] controlPoints, int degree, boolean continuous) {
         set(controlPoints, degree, continuous);
     }
 
@@ -43,8 +43,8 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T cubic(final T out, final double t, final T[] points, final boolean continuous,
-                                                      final T tmp) {
+    public static <T extends VectorDouble<T>> T cubic(T out, double t, T[] points, boolean continuous,
+                                                      T tmp) {
         return cubic_derivative(out, t, points, continuous, tmp);
     }
 
@@ -58,9 +58,9 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T cubic_derivative(final T out, final double t, final T[] points,
-                                                                 final boolean continuous, final T tmp) {
-        final int n = continuous ? points.length : points.length - 3;
+    public static <T extends VectorDouble<T>> T cubic_derivative(T out, double t, T[] points,
+                                                                 boolean continuous, T tmp) {
+        int n = continuous ? points.length : points.length - 3;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -79,12 +79,12 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T cubic(final T out, final int i, final double u, final T[] points,
-                                                      final boolean continuous, final T tmp) {
-        final int n = points.length;
-        final double dt = 1f - u;
-        final double t2 = u * u;
-        final double t3 = t2 * u;
+    public static <T extends VectorDouble<T>> T cubic(T out, int i, double u, T[] points,
+                                                      boolean continuous, T tmp) {
+        int n = points.length;
+        double dt = 1f - u;
+        double t2 = u * u;
+        double t3 = t2 * u;
         out.set(points[i]).scl((3f * t3 - 6f * t2 + 4f) * d6);
         if (continuous || i > 0)
             out.add(tmp.set(points[(n + i - 1) % n]).scl(dt * dt * dt * d6));
@@ -107,12 +107,12 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T cubic_derivative(final T out, final int i, final double u, final T[] points,
-                                                                 final boolean continuous, final T tmp) {
-        final int n = points.length;
-        final double dt = 1f - u;
-        final double t2 = u * u;
-        final double t3 = t2 * u;
+    public static <T extends VectorDouble<T>> T cubic_derivative(T out, int i, double u, T[] points,
+                                                                 boolean continuous, T tmp) {
+        int n = points.length;
+        double dt = 1f - u;
+        double t2 = u * u;
+        double t3 = t2 * u;
         out.set(points[i]).scl(1.5f * t2 - 2 * u);
         if (continuous || i > 0)
             out.add(tmp.set(points[(n + i - 1) % n]).scl(-0.5f * dt * dt));
@@ -134,9 +134,9 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T calculate(final T out, final double t, final T[] points, final int degree,
-                                                          final boolean continuous, final T tmp) {
-        final int n = continuous ? points.length : points.length - degree;
+    public static <T extends VectorDouble<T>> T calculate(T out, double t, T[] points, int degree,
+                                                          boolean continuous, T tmp) {
+        int n = continuous ? points.length : points.length - degree;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -154,9 +154,9 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T derivative(final T out, final double t, final T[] points, final int degree,
-                                                           final boolean continuous, final T tmp) {
-        final int n = continuous ? points.length : points.length - degree;
+    public static <T extends VectorDouble<T>> T derivative(T out, double t, T[] points, int degree,
+                                                           boolean continuous, T tmp) {
+        int n = continuous ? points.length : points.length - degree;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -175,8 +175,8 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T calculate(final T out, final int i, final double u, final T[] points, final int degree,
-                                                          final boolean continuous, final T tmp) {
+    public static <T extends VectorDouble<T>> T calculate(T out, int i, double u, T[] points, int degree,
+                                                          boolean continuous, T tmp) {
         if (degree == 3) {
             return cubic(out, i, u, points, continuous, tmp);
         }
@@ -195,15 +195,15 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
      * @param tmp        A temporary vector used for the calculation
      * @return The value of out
      */
-    public static <T extends VectorDouble<T>> T derivative(final T out, final int i, final double u, final T[] points, final int degree,
-                                                           final boolean continuous, final T tmp) {
+    public static <T extends VectorDouble<T>> T derivative(T out, int i, double u, T[] points, int degree,
+                                                           boolean continuous, T tmp) {
         if (degree == 3) {
             return cubic_derivative(out, i, u, points, continuous, tmp);
         }
         return out;
     }
 
-    public BSplineDouble set(final T[] controlPoints, final int degree, final boolean continuous) {
+    public BSplineDouble set(T[] controlPoints, int degree, boolean continuous) {
         if (tmp == null)
             tmp = controlPoints[0].cpy();
         if (tmp2 == null)
@@ -228,7 +228,7 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
 
     @Override
     public T valueAt(T out, double t) {
-        final int n = spanCount;
+        int n = spanCount;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -236,13 +236,13 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     }
 
     /** @return The value of the spline at position u of the specified span */
-    public T valueAt(final T out, final int span, final double u) {
+    public T valueAt(T out, int span, double u) {
         return calculate(out, continuous ? span : (span + (int) (degree * 0.5)), u, controlPoints, degree, continuous, tmp);
     }
 
     @Override
-    public T derivativeAt(final T out, final double t) {
-        final int n = spanCount;
+    public T derivativeAt(T out, double t) {
+        int n = spanCount;
         double u = t * n;
         int i = (t >= 1f) ? (n - 1) : (int) u;
         u -= i;
@@ -250,24 +250,24 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
     }
 
     /** @return The derivative of the spline at position u of the specified span */
-    public T derivativeAt(final T out, final int span, final double u) {
+    public T derivativeAt(T out, int span, double u) {
         return derivative(out, continuous ? span : (span + (int) (degree * 0.5)), u, controlPoints, degree, continuous, tmp);
     }
 
     /** @return The span closest to the specified value */
-    public int nearest(final T in) {
+    public int nearest(T in) {
         return nearest(in, 0, spanCount);
     }
 
     /** @return The span closest to the specified value, restricting to the specified spans. */
-    public int nearest(final T in, int start, final int count) {
+    public int nearest(T in, int start, int count) {
         while (start < 0)
             start += spanCount;
         int result = start % spanCount;
         double dst = in.dst2(knots.get(result));
         for (int i = 1; i < count; i++) {
-            final int idx = (start + i) % spanCount;
-            final double d = in.dst2(knots.get(idx));
+            int idx = (start + i) % spanCount;
+            double d = in.dst2(knots.get(idx));
             if (d < dst) {
                 dst = d;
                 result = idx;
@@ -281,17 +281,17 @@ public class BSplineDouble<T extends VectorDouble<T>> implements PathDouble<T> {
         return approximate(v, nearest(v));
     }
 
-    public double approximate(final T in, int start, final int count) {
+    public double approximate(T in, int start, int count) {
         return approximate(in, nearest(in, start, count));
     }
 
-    public double approximate(final T in, final int near) {
+    public double approximate(T in, int near) {
         int n = near;
-        final T nearest = knots.get(n);
-        final T previous = knots.get(n > 0 ? n - 1 : spanCount - 1);
-        final T next = knots.get((n + 1) % spanCount);
-        final double dstPrev2 = in.dst2(previous);
-        final double dstNext2 = in.dst2(next);
+        T nearest = knots.get(n);
+        T previous = knots.get(n > 0 ? n - 1 : spanCount - 1);
+        T next = knots.get((n + 1) % spanCount);
+        double dstPrev2 = in.dst2(previous);
+        double dstNext2 = in.dst2(next);
         T P1, P2, P3;
         if (dstNext2 < dstPrev2) {
             P1 = nearest;

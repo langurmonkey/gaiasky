@@ -28,7 +28,7 @@ public class GtiList extends ArrayList<Gti> {
      * @param start T
      * @param end   T
      */
-    public void add(final long start, final long end) throws RuntimeException {
+    public void add(long start, long end) throws RuntimeException {
         this.add(new Gti(start, end));
     }
 
@@ -40,8 +40,8 @@ public class GtiList extends ArrayList<Gti> {
      * @return first GTI object in which the time is found, null
      * otherwise
      */
-    public Gti inside(final long time) {
-        for (final Gti t : this) {
+    public Gti inside(long time) {
+        for (Gti t : this) {
             if (t.isInside(time)) {
                 return t;
             }
@@ -74,7 +74,7 @@ public class GtiList extends ArrayList<Gti> {
      *
      * @param list list to combine with
      */
-    public void or(final GtiList list) throws RuntimeException {
+    public void or(GtiList list) throws RuntimeException {
         this.addAll(list);
         this.state = State.UNKNOWN;
         this.reduce();
@@ -94,18 +94,18 @@ public class GtiList extends ArrayList<Gti> {
      *
      * @param list List to combine with
      */
-    public void and(final GtiList list) throws RuntimeException {
-        final GtiList l1 = this;
-        final GtiList l2 = list;
+    public void and(GtiList list) throws RuntimeException {
+        GtiList l1 = this;
+        GtiList l2 = list;
 
         // Reduce the sets first
         l1.reduce();
         l2.reduce();
 
-        final int n1 = l1.size();
-        final int n2 = l2.size();
+        int n1 = l1.size();
+        int n2 = l2.size();
 
-        final GtiList resList = new GtiList();
+        GtiList resList = new GtiList();
 
         int actn2 = 0;
 
@@ -123,10 +123,10 @@ public class GtiList extends ArrayList<Gti> {
                 //	
                 Gti newGti;
 
-                final long l1Start = l1.get(n).getStart();
-                final long l1End = l1.get(n).getEnd();
-                final long l2Start = l2.get(actn2).getStart();
-                final long l2End = l2.get(actn2).getEnd();
+                long l1Start = l1.get(n).getStart();
+                long l1End = l1.get(n).getEnd();
+                long l2Start = l2.get(actn2).getStart();
+                long l2End = l2.get(actn2).getEnd();
 
                 if (l1Start > l2Start) {
                     newGti = new Gti(l1Start, l1Start);
@@ -176,21 +176,21 @@ public class GtiList extends ArrayList<Gti> {
         // sort first
         this.sortIt();
 
-        final int nGtis = this.size();
+        int nGtis = this.size();
 
         if (nGtis == 0) {
             return;
         }
 
         int nNewGtis = 0;
-        final GtiList newGtiList = new GtiList();
+        GtiList newGtiList = new GtiList();
         newGtiList.state = State.REDUCED;
         newGtiList.add(this.get(0)); // copy first GTI
 
         for (int n = 1; n < nGtis; n++) {
-            final long newStart = this.get(n).getStart();
-            final long newEnd = this.get(n).getEnd();
-            final long end = newGtiList.get(nNewGtis).getEnd();
+            long newStart = this.get(n).getStart();
+            long newEnd = this.get(n).getEnd();
+            long end = newGtiList.get(nNewGtis).getEnd();
 
             if (newStart > end) {
                 //
@@ -221,7 +221,7 @@ public class GtiList extends ArrayList<Gti> {
     public double getOntime() {
         double time = 0.0;
 
-        for (final Gti i : this) {
+        for (Gti i : this) {
             time += i.getDuration().asSecs();
         }
 
@@ -251,9 +251,9 @@ public class GtiList extends ArrayList<Gti> {
      */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        for (final Gti i : this) {
+        for (Gti i : this) {
             sb.append(i);
             sb.append('\n');
         }

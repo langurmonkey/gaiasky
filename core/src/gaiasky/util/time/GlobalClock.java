@@ -146,7 +146,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
      */
     public void update(double dt) {
         this.dt = dt;
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         dt = settings.runtime.timeOn ? this.dt : 0;
 
         if (dt != 0) {
@@ -226,7 +226,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case TARGET_TIME_CMD -> {
                 if (data.length > 0) {
@@ -249,7 +249,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 Instant newinstant = ((Instant) data[0]);
                 long newt = newinstant.toEpochMilli();
                 boolean updt = false;
-                final var settings = GaiaSky.settings();
+                var settings = GaiaSky.settings();
                 if (newt > settings.runtime.maxTimeMs) {
                     newt = settings.runtime.maxTimeMs;
                     logger.info("Time overflow, set to maximum (" + (settings.runtime.maxTimeMs * Nature.MS_TO_Y) + " years)");

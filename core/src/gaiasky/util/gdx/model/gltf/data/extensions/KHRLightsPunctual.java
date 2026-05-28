@@ -23,7 +23,7 @@ abstract public class KHRLightsPunctual {
 	
 	
 	public static class GLTFSpotLight {
-		public float innerConeAngle = 0;
+		public float innerConeAngle;
 		public float outerConeAngle = MathUtils.PI / 4f;
 	}
 

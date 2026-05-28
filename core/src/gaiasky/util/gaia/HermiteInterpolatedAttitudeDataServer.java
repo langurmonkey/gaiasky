@@ -54,7 +54,7 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
      * @see gaiasky.util.gaia.BaseAttitudeDataServer#getAttitude(long)
      */
     @Override
-    public IAttitude getAttitudeNative(final long t) throws RuntimeException {
+    public IAttitude getAttitudeNative(long t) throws RuntimeException {
 
         int left = AttitudeUtils.findLeftIndexVar(t, tNs, 0);
         if (left < 0 || left > nT - 2) {

@@ -22,7 +22,7 @@ public class Mins extends ConcreteDuration {
      *
      * @param mins number of mins [minutes]
      */
-    public Mins(final double mins) {
+    public Mins(double mins) {
         value = mins;
     }
 
@@ -31,7 +31,7 @@ public class Mins extends ConcreteDuration {
      *
      * @return Minutes expressed in nanoSec
      */
-    public static long asNanoSecs(final double mins) {
+    public static long asNanoSecs(double mins) {
         return FastMath.round(mins * Duration.NS_PER_MIN);
     }
 
@@ -40,7 +40,7 @@ public class Mins extends ConcreteDuration {
      *
      * @return Mins expressed in secs
      */
-    public static double asSecs(final double mins) {
+    public static double asSecs(double mins) {
         return mins * Duration.SECS_PER_MIN;
     }
 
@@ -49,7 +49,7 @@ public class Mins extends ConcreteDuration {
      *
      * @return Mins expressed in hours
      */
-    public static double asHours(final double mins) {
+    public static double asHours(double mins) {
         return mins / Duration.MINS_PER_HOUR;
     }
 
@@ -58,7 +58,7 @@ public class Mins extends ConcreteDuration {
      *
      * @return Mins expressed in revs
      */
-    public static double asRevs(final double mins) {
+    public static double asRevs(double mins) {
         return mins / Duration.MINS_PER_REV;
     }
 
@@ -67,7 +67,7 @@ public class Mins extends ConcreteDuration {
      *
      * @return Mins expressed in days
      */
-    public static double asDays(final double mins) {
+    public static double asDays(double mins) {
         return mins / Duration.MINS_PER_DAY;
     }
 
@@ -76,7 +76,7 @@ public class Mins extends ConcreteDuration {
      *
      * @return Mins expressed in JulianYears
      */
-    public static double asJulianYears(final double mins) {
+    public static double asJulianYears(double mins) {
         return mins / Duration.MINS_PER_JULIAN_YEAR;
     }
 
@@ -84,7 +84,7 @@ public class Mins extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#set(Duration)
      */
     @Override
-    public Duration set(final Duration d) {
+    public Duration set(Duration d) {
         value = d.asMins();
 
         return this;
@@ -150,7 +150,7 @@ public class Mins extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration add(final Duration d) {
+    public Duration add(Duration d) {
         value += d.asMins();
 
         return this;
@@ -160,7 +160,7 @@ public class Mins extends ConcreteDuration {
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
-    public Duration sub(final Duration d) {
+    public Duration sub(Duration d) {
         value -= d.asMins();
 
         return this;

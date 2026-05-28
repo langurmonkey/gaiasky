@@ -52,7 +52,7 @@ public class PBRShaderConfig extends DefaultIntShader.Config
 	public float gamma = DEFAULT_GAMMA;
 	
 	/** string to prepend to shaders (version), automatic if null */
-	public String glslVersion = null;
+	public String glslVersion;
 
 	/** Max vertex color layers. Default {@link PBRShader} only use 1 layer,
 	 * custom shaders can implements more.
@@ -63,5 +63,5 @@ public class PBRShaderConfig extends DefaultIntShader.Config
 	 * Some custom GLSL code to inject in shaders.
 	 * If not null it will be added after #version 
 	 */
-	public String prefix = null;
+	public String prefix;
 }

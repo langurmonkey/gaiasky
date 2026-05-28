@@ -26,8 +26,8 @@ public class VertexBufferObjectSubData implements IntVertexData {
     final boolean isStatic;
     final int usage;
     int bufferHandle;
-    boolean isDirty = false;
-    boolean isBound = false;
+    boolean isDirty;
+    boolean isBound;
 
     /**
      * Constructs a new interleaved VertexBufferObject.
@@ -118,7 +118,7 @@ public class VertexBufferObjectSubData implements IntVertexData {
     public void updateVertices(int targetOffset, float[] vertices, int sourceOffset, int count) {
         isDirty = true;
         if (isDirect) {
-            final int pos = byteBuffer.position();
+            int pos = byteBuffer.position();
             byteBuffer.position(targetOffset * 4);
             BufferUtils.copy(vertices, sourceOffset, count, byteBuffer);
             byteBuffer.position(pos);
@@ -134,13 +134,13 @@ public class VertexBufferObjectSubData implements IntVertexData {
      * @param shader the shader
      */
     @Override
-    public void bind(final ExtShaderProgram shader) {
+    public void bind(ExtShaderProgram shader) {
         bind(shader, null);
     }
 
     @Override
-    public void bind(final ExtShaderProgram shader, final int[] locations) {
-        final GL20 gl = Gdx.gl20;
+    public void bind(ExtShaderProgram shader, int[] locations) {
+        GL20 gl = Gdx.gl20;
 
         gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, bufferHandle);
         if (isDirty) {
@@ -149,11 +149,11 @@ public class VertexBufferObjectSubData implements IntVertexData {
             isDirty = false;
         }
 
-        final int numAttributes = attributes.size();
+        int numAttributes = attributes.size();
         if (locations == null) {
             for (int i = 0; i < numAttributes; i++) {
-                final VertexAttribute attribute = attributes.get(i);
-                final int location = shader.getAttributeLocation(attribute.alias);
+                VertexAttribute attribute = attributes.get(i);
+                int location = shader.getAttributeLocation(attribute.alias);
                 if (location < 0)
                     continue;
                 shader.enableVertexAttribute(location);
@@ -163,8 +163,8 @@ public class VertexBufferObjectSubData implements IntVertexData {
             }
         } else {
             for (int i = 0; i < numAttributes; i++) {
-                final VertexAttribute attribute = attributes.get(i);
-                final int location = locations[i];
+                VertexAttribute attribute = attributes.get(i);
+                int location = locations[i];
                 if (location < 0)
                     continue;
                 shader.enableVertexAttribute(location);
@@ -182,21 +182,21 @@ public class VertexBufferObjectSubData implements IntVertexData {
      * @param shader the shader
      */
     @Override
-    public void unbind(final ExtShaderProgram shader) {
+    public void unbind(ExtShaderProgram shader) {
         unbind(shader, null);
     }
 
     @Override
-    public void unbind(final ExtShaderProgram shader, final int[] locations) {
-        final GL20 gl = Gdx.gl20;
-        final int numAttributes = attributes.size();
+    public void unbind(ExtShaderProgram shader, int[] locations) {
+        GL20 gl = Gdx.gl20;
+        int numAttributes = attributes.size();
         if (locations == null) {
             for (int i = 0; i < numAttributes; i++) {
                 shader.disableVertexAttribute(attributes.get(i).alias);
             }
         } else {
             for (int i = 0; i < numAttributes; i++) {
-                final int location = locations[i];
+                int location = locations[i];
                 if (location >= 0)
                     shader.disableVertexAttribute(location);
             }

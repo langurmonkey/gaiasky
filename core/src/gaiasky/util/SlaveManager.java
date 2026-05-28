@@ -44,11 +44,11 @@ public class SlaveManager {
     public int xResolution, yResolution;
     public float yaw, pitch, roll, upAngle, downAngle, rightAngle, leftAngle;
     public float cameraFov;
-    private boolean initialized = false;
+    private boolean initialized;
 
     public SlaveManager() {
         super();
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         if (settings.program.net.slave.active && settings.program.net.master.active) {
             logger.error("Can't be master and slave at the same time!");
             return;

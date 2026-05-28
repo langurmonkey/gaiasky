@@ -36,7 +36,7 @@ public class ScreenshotsManager implements IObserver {
     private final IGui renderGui;
     public IFileImageRenderer frameRenderer, screenshotRenderer;
 
-    public ScreenshotsManager(final GaiaSky gaiaSky, final SceneRenderer sceneRenderer, final GlobalResources globalResources) {
+    public ScreenshotsManager(GaiaSky gaiaSky, SceneRenderer sceneRenderer, GlobalResources globalResources) {
         super();
         this.gaiaSky = gaiaSky;
         this.sceneRenderer = sceneRenderer;
@@ -59,7 +59,7 @@ public class ScreenshotsManager implements IObserver {
 
     public void renderFrame() {
         gaiaSky.getCameraManager().backupCamera();
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         if (settings.frame.active) {
             switch (settings.frame.mode) {
             case SIMPLE -> frameRenderer.saveScreenshot(settings.frame.location, settings.frame.prefix, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true, settings.frame.format, settings.frame.quality);
@@ -74,9 +74,9 @@ public class ScreenshotsManager implements IObserver {
         gaiaSky.getCameraManager().restoreCamera();
     }
 
-    private void renderScreenshot(final int width, final int height, final String directory) {
+    private void renderScreenshot(int width, int height, String directory) {
         gaiaSky.getCameraManager().backupCamera();
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         String file = null;
         String filename = getCurrentTimeStamp() + "_" + SCREENSHOT_FILENAME;
         switch (settings.screenshot.mode) {
@@ -167,7 +167,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case RENDER_FRAME:
             renderFrame();
