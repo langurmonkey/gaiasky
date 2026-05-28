@@ -28,8 +28,8 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
     protected final AtomicBoolean active;
     protected ICamera iCamera;
     /** Minimum time after key press before polling starts. **/
-    protected long minPollInterval = 0;
-    protected long lastPollTime = 0;
+    protected long minPollInterval;
+    protected long lastPollTime;
     private final CLIArgs cliArgs;
 
     protected AbstractMouseKbdListener(GestureListener gl,
@@ -169,7 +169,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
         }
     }
 
-    private String getButtonString(final int button) {
+    private String getButtonString(int button) {
         return switch (button) {
             case Buttons.RIGHT -> "RIGHT";
             case Buttons.LEFT -> "LEFT";

@@ -38,14 +38,14 @@ public class RESTServer {
      * "Shutdown already triggered" flag. {@link Spark#stop()} can be called multiple times
      * (multiple events), but only processed once.
      */
-    private static boolean shutdownTriggered = false;
+    private static boolean shutdownTriggered;
     /**
      * Activated flag. Calling API methods generally requires the GUI to be fully
      * started and all objects initialized, indicated by the "activated" flag. This
      * flag is set true through the {@link RESTServer#activate()} method that needs to be called
      * externally once the GUI is ready.
      */
-    private static boolean activated = false;
+    private static boolean activated;
 
     /**
      * Prints startup warning and current log level of SimpleLogger.

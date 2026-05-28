@@ -100,7 +100,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     /**
      * Current movement multiplier state.
      **/
-    private boolean movementMultiplierState = false;
+    private boolean movementMultiplierState;
     /**
      * The key for rolling the camera.
      **/
@@ -125,7 +125,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     /**
      * We're dragging or selecting a keyframe.
      **/
-    private boolean keyframeBeingDragged = false;
+    private boolean keyframeBeingDragged;
     private int touched;
     private boolean multiTouch;
     /**
@@ -141,7 +141,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     /** Key register **/
     private final KeyRegister register;
 
-    protected MainMouseKbdListener(final GaiaGestureListener gestureListener,
+    protected MainMouseKbdListener(GaiaGestureListener gestureListener,
                                    NaturalCamera camera) {
         super(gestureListener, camera);
         this.camera = camera;
@@ -164,7 +164,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         this.lastDrag = new Vector2();
     }
 
-    public MainMouseKbdListener(final NaturalCamera camera) {
+    public MainMouseKbdListener(NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
         EventManager.instance.subscribe(this,
                                         Event.TOUCH_DOWN,
@@ -251,10 +251,10 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean touchDown(final int screenX,
-                             final int screenY,
-                             final int pointer,
-                             final int button) {
+    public boolean touchDown(int screenX,
+                             int screenY,
+                             int pointer,
+                             int button) {
         if (isActive()) {
             if (GaiaSky.settings().runtime.inputEnabled) {
                 touched |= (1 << pointer);
@@ -289,18 +289,18 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public boolean touchUp(final int screenX,
-                           final int screenY,
-                           final int pointer,
-                           final int button) {
+    public boolean touchUp(int screenX,
+                           int screenY,
+                           int pointer,
+                           int button) {
         if (isActive()) {
             EventManager.publish(Event.INPUT_EVENT, this, button);
             if (GaiaSky.settings().runtime.inputEnabled) {
                 touched &= ~(1 << pointer);
                 multiTouch = !MathUtils.isPowerOfTwo(touched);
                 if (button == this.button && button == leftMouseButton) {
-                    final long currentTime = TimeUtils.millis();
-                    final long lastLeftTime = lastClickTime;
+                    long currentTime = TimeUtils.millis();
+                    long lastLeftTime = lastClickTime;
 
                     GaiaSky.postRunnable(() -> {
                         // 5% of width pixels distance.
@@ -433,8 +433,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     return result;
 
                 var fpsScale = getFpsScale();
-                final double deltaX = fpsScale * (screenX - startX) / Gdx.graphics.getWidth();
-                final double deltaY = fpsScale * (startY - screenY) / Gdx.graphics.getHeight();
+                double deltaX = fpsScale * (screenX - startX) / Gdx.graphics.getWidth();
+                double deltaY = fpsScale * (startY - screenY) / Gdx.graphics.getHeight();
                 startX = screenX;
                 startY = screenY;
                 return processDrag(screenX, screenY, deltaX, deltaY, button);
@@ -596,9 +596,9 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
             case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);

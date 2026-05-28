@@ -70,7 +70,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
     }
 
     @Override
-    public boolean buttonUp(Controller controller, final int buttonCode) {
+    public boolean buttonUp(Controller controller, int buttonCode) {
         logger.debug("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
         SpacecraftView sc = cam.getSpacecraftView();
 

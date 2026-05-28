@@ -26,9 +26,9 @@ import org.lwjgl.glfw.GLFW;
  */
 public class GameMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
     private final NaturalCamera camera;
-    private float prevX = 0, prevY = 0;
-    private float dx = 0, dy = 0;
-    private boolean prevValid = false;
+    private float prevX, prevY;
+    private float dx, dy;
+    private boolean prevValid;
 
     public GameMouseKbdListener(GameGestureListener l, NaturalCamera naturalCamera) {
         super(l, naturalCamera);
@@ -201,7 +201,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case MOUSE_CAPTURE_CMD -> setMouseCapture((Boolean) data[0]);
         case MOUSE_CAPTURE_TOGGLE -> toggleMouseCapture();

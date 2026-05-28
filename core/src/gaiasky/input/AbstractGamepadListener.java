@@ -48,13 +48,13 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     /** Is this listener active? **/
     protected final AtomicBoolean active = new AtomicBoolean(true);
     /** Reference to the last gaming controller that registered an input. **/
-    protected Controller lastControllerUsed = null;
+    protected Controller lastControllerUsed;
     /** Gamepad mappings instance. **/
     protected IGamepadMappings mappings;
     /** Last axis event time. **/
-    protected long lastAxisEvtTime = 0;
+    protected long lastAxisEvtTime;
     /** Last button poll time. **/
-    protected long lastButtonPollTime = 0;
+    protected long lastButtonPollTime;
     /** CLI arguments. **/
     private final CLIArgs cliArgs;
 
@@ -241,7 +241,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.RELOAD_CONTROLLER_MAPPINGS) {
             mappings = AbstractGamepadMappings.readGamepadMappings((String) data[0]);
         }

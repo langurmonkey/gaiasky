@@ -49,7 +49,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
     }
 
     @Override
-    public boolean buttonDown(Controller controller, final int buttonCode) {
+    public boolean buttonDown(Controller controller, int buttonCode) {
         if (active.get()) {
             super.buttonDown(controller, buttonCode);
             logger.debug("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
