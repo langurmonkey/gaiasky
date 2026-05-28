@@ -25,7 +25,7 @@ public final class Bloom extends PostProcessorEffect {
     private final BlurFilter blurFilter;
     private final ThresholdFilter thresholdFilter;
     private final CombineFilter combineFilter;
-    private boolean blending = false;
+    private boolean blending;
     private int sFactor, dFactor;
 
     public Bloom(int fboWidth, int fboHeight) {

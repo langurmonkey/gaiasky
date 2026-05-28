@@ -11,7 +11,7 @@ import gaiasky.render.util.ShaderLoader;
 
 public final class ThresholdFilter extends Filter<ThresholdFilter> {
 
-    private float threshold = 0;
+    private float threshold;
 
     public ThresholdFilter() {
         super(ShaderLoader.fromFile("screenspace", "threshold"));

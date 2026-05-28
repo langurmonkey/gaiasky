@@ -31,9 +31,9 @@ import java.util.function.IntSupplier;
 public final class PostProcessor implements Disposable {
     private static final Array<PingPongBuffer> buffers = new Array<>(2);
     /** Enable pipeline state queries: beware the pipeline can stall! */
-    public static boolean EnableQueryStates = false;
+    public static boolean EnableQueryStates;
     public static PostProcessor currentPostProcessor;
-    private static PipelineState pipelineState = null;
+    private static PipelineState pipelineState;
     private static Format pixmapFormat;
     private final PingPongBuffer composite;
     private final ItemsManager<PostProcessorEffect> effectsManager = new ItemsManager<>();
@@ -50,7 +50,7 @@ public final class PostProcessor implements Disposable {
     private boolean enabled;
     private boolean capturing;
     private boolean hasCaptured;
-    private PostProcessorListener listener = null;
+    private PostProcessorListener listener;
 
     /** Construct a new PostProcessor with FBO dimensions set to the size of the screen */
     public PostProcessor(RenderType rt, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {

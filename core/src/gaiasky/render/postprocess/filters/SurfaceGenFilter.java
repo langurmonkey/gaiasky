@@ -12,7 +12,7 @@ import gaiasky.render.util.ShaderLoader;
 
 public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
     private Texture lut, emissive;
-    float lutHueShift = 0;
+    float lutHueShift;
     float lutSaturation = 1;
 
     public SurfaceGenFilter(boolean normalMap, boolean emissiveMap) {

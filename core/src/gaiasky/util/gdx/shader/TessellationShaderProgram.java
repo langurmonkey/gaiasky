@@ -11,7 +11,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import gaiasky.render.GaiaSkyShaderCompileException;
+import gaiasky.render.ShaderCompilationException;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import org.lwjgl.opengl.GL41;
@@ -114,7 +114,7 @@ public class TessellationShaderProgram extends ExtShaderProgram {
                 fetchUniforms();
                 addManagedShader(Gdx.app, this);
             } else {
-                throw new GaiaSkyShaderCompileException(this);
+                throw new ShaderCompilationException(this);
             }
 
         }

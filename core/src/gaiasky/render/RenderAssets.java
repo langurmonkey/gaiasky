@@ -66,7 +66,7 @@ public class RenderAssets {
 
     private final boolean compute;
 
-    public RenderAssets(final GlobalResources globalResources) {
+    public RenderAssets(GlobalResources globalResources) {
         this.globalResources = globalResources;
         this.compute = GaiaSky.settings().runtime.compute;
     }
@@ -599,9 +599,9 @@ public class RenderAssets {
         return result;
     }
 
-    private ShaderProgram[] fetchShaderProgram(final AssetManager manager,
-                                               final AssetDescriptor<ShaderProgram>[] descriptors,
-                                               final String... names) {
+    private ShaderProgram[] fetchShaderProgram(AssetManager manager,
+                                               AssetDescriptor<ShaderProgram>[] descriptors,
+                                               String... names) {
         int n = descriptors.length;
         ShaderProgram[] shaders = new ShaderProgram[n];
 
@@ -614,9 +614,9 @@ public class RenderAssets {
         return shaders;
     }
 
-    private ExtShaderProgram[] fetchShaderProgramExt(final AssetManager manager,
-                                                     final AssetDescriptor<ExtShaderProgram>[] descriptors,
-                                                     final String... names) {
+    private ExtShaderProgram[] fetchShaderProgramExt(AssetManager manager,
+                                                     AssetDescriptor<ExtShaderProgram>[] descriptors,
+                                                     String... names) {
         int n = descriptors.length;
         ExtShaderProgram[] shaders = new ExtShaderProgram[n];
 
@@ -629,9 +629,9 @@ public class RenderAssets {
         return shaders;
     }
 
-    private ExtShaderProgram fetchShaderProgramExt(final AssetManager manager,
-                                                   final String descriptor,
-                                                   final String name) {
+    private ExtShaderProgram fetchShaderProgramExt(AssetManager manager,
+                                                   String descriptor,
+                                                   String name) {
         ExtShaderProgram shader = manager.get(descriptor);
         if (!shader.isLazy() && !shader.isCompiled()) {
             logger.error(I18n.msg("notif.shader.compile.fail.log", name, shader.getLog()));

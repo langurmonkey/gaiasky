@@ -14,11 +14,11 @@ import gaiasky.util.gdx.shader.TessellationShaderProgram;
 import gaiasky.util.i18n.I18n;
 
 /**
- * A shader failed to compile.
+ * Exception thrown when a shader fails to compile.
  */
-public class GaiaSkyShaderCompileException extends RuntimeException {
+public class ShaderCompilationException extends RuntimeException {
 
-    public GaiaSkyShaderCompileException(ComputeShaderProgram program) {
+    public ShaderCompilationException(ComputeShaderProgram program) {
         super(getMessage(program));
 
         // Write all shaders.
@@ -26,7 +26,7 @@ public class GaiaSkyShaderCompileException extends RuntimeException {
 
     }
 
-    public GaiaSkyShaderCompileException(ExtShaderProgram program) {
+    public ShaderCompilationException(ExtShaderProgram program) {
         super(getMessage(program));
 
         // Write all shaders.
@@ -42,8 +42,8 @@ public class GaiaSkyShaderCompileException extends RuntimeException {
     }
 
     private static String getMessage(ComputeShaderProgram program) {
-        final String nl = System.lineSeparator();
-        final StringBuilder buff = new StringBuilder();
+        String nl = System.lineSeparator();
+        StringBuilder buff = new StringBuilder();
         if (program.getName() == null || program.getName().isEmpty()) {
             buff.append(I18n.msg("notif.shader.compile.fail")).append(nl);
         } else {
@@ -58,8 +58,8 @@ public class GaiaSkyShaderCompileException extends RuntimeException {
     }
 
     private static String getMessage(ExtShaderProgram program) {
-        final String nl = System.lineSeparator();
-        final StringBuilder buff = new StringBuilder();
+        String nl = System.lineSeparator();
+        StringBuilder buff = new StringBuilder();
         if (program.getName() == null || program.getName().isEmpty()) {
             buff.append(I18n.msg("notif.shader.compile.fail")).append(nl);
         } else {

@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 public final class LensFlareFilter extends Filter<LensFlareFilter> {
     private final Vector2 viewport;
     private float[] lightPositions;
-    private int nLights = 0;
+    private int nLights;
     private final Vector3 color;
     private float intensity;
 

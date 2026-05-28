@@ -54,7 +54,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
         }
     }
 
-    public float[] initializeList(final float[] list,
+    public float[] initializeList(float[] list,
                                   int size) {
         if (list == null) {
             return new float[size];
@@ -84,7 +84,7 @@ public class LightPositionUpdater implements RenderSystemRunnable {
                     ICamera camera) {
         synchronized (lock) {
             int size = renderables.size();
-            final var settings = GaiaSky.settings();
+            var settings = GaiaSky.settings();
             if (GaiaSky.instance.getPostProcessor().isLightScatterEnabled() ||
                     GaiaSky.instance.getPostProcessor().isLensFlareEnabled()) {
                 // Compute light positions for light scattering or light

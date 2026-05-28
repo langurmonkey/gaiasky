@@ -27,11 +27,11 @@ public abstract class Filter3<T> implements Disposable {
     protected static final int u_texture1 = 1;
     protected static final int u_texture2 = 2;
     protected static final int u_texture3 = 3;
-    protected Texture inputTexture = null;
-    protected FrameBuffer inputBuffer = null;
-    protected FrameBuffer outputBuffer = null;
+    protected Texture inputTexture;
+    protected FrameBuffer inputBuffer;
+    protected FrameBuffer outputBuffer;
     protected ShaderProgram program;
-    private boolean programBegan = false;
+    private boolean programBegan;
     protected String vertexShaderName, fragmentShaderName, defines;
 
     protected Filter3(String vertex, String fragment, String defines) {

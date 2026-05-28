@@ -37,7 +37,7 @@ public interface IRenderMode extends Disposable {
      * @param tw New target (screen) width.
      * @param th New target (screen) height.
      */
-    void resize(final int rw, final int rh, final int tw, final int th);
+    void resize(int rw, int rh, int tw, int th);
 
     RenderingContext getRenderingContext();
 

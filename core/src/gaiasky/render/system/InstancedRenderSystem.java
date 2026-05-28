@@ -71,7 +71,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         /** Vertex size in floats (4-bytes). **/
         public int modelVertexSize;
         /** Number of indices. **/
-        public int numIndices = 0;
+        public int numIndices;
         public float[] vertices;
         public int[] indices;
         public float[] instanceAttributes;

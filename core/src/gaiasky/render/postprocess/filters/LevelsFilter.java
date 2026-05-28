@@ -17,7 +17,7 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     private final ShaderProgram programToneMappingACES;
     private final ShaderProgram programToneMappingUncharted;
     private final ShaderProgram programToneMappingFilmic;
-    private float brightness = 0.0f;
+    private float brightness;
     private float contrast = 1.0f;
     private float saturation = 1.0f;
     private float hue = 1.0f;

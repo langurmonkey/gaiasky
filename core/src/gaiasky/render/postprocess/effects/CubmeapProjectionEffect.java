@@ -124,7 +124,7 @@ public final class CubmeapProjectionEffect extends PostProcessorEffect {
         }
 
         public CubemapProjection getNext(Function<CubemapProjection, Boolean> supplier) {
-            final int n = CubemapProjection.values().length;
+            int n = CubemapProjection.values().length;
             int i = this.ordinal();
             while (true) {
                 i = (i + 1) % n;

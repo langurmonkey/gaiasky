@@ -15,7 +15,7 @@ public interface IFadeObject {
      *
      * @return The fade in distances in internal units.
      */
-    public Vector2D getFadeIn();
+    Vector2D getFadeIn();
 
     /**
      * Sets the near and far fade in distances.
@@ -23,14 +23,14 @@ public interface IFadeObject {
      * @param nearPc Near fade in distance in parsecs.
      * @param farPc  Far fade in distance in parsecs.
      */
-    public void setFadeIn(double nearPc, double farPc);
+    void setFadeIn(double nearPc, double farPc);
 
     /**
      * Gets the fade out distances.
      *
      * @return The fade out distances in internal units.
      */
-    public Vector2D getFadeOut();
+    Vector2D getFadeOut();
 
     /**
      * Sets the near and far fade out distances.
@@ -38,5 +38,5 @@ public interface IFadeObject {
      * @param nearPc Near fade out distance in parsecs.
      * @param farPc  Far fade out distance in parsecs.
      */
-    public void setFadeOut(double nearPc, double farPc);
+    void setFadeOut(double nearPc, double farPc);
 }

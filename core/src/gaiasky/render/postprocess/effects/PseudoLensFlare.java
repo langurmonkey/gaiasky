@@ -26,7 +26,7 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     private final BiasFilter biasFilter;
     private final CombineFilter combineFilter;
     private Settings settings;
-    private boolean blending = false;
+    private boolean blending;
     private int sFactor, dFactor;
 
     public PseudoLensFlare(int fboWidth, int fboHeight) {

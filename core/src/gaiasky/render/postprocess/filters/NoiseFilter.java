@@ -38,9 +38,9 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
     /** Apply absolute value function. **/
     private boolean turbulence = true;
     /** Convert the fBm to ridge noise. **/
-    private boolean ridge = false;
+    private boolean ridge;
     /** Number of terraces to use in the height profile. Set to 0 to disable. **/
-    private int numTerraces = 0;
+    private int numTerraces;
     /** Exponent of terraces. Must be odd. The lower it is, the smoother the terrace transitions. **/
     private float terraceExp = 17.0f;
     /** Create different noise patterns in each of the different RGB channels. **/

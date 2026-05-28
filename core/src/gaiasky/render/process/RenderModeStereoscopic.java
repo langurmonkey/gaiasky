@@ -49,7 +49,7 @@ import java.util.Set;
 public class RenderModeStereoscopic extends RenderModeAbstract implements IRenderMode, IObserver {
 
     /** Current separation, for smoothing. **/
-    private double sep = 0.0;
+    private double sep;
 
     /**
      * Viewport to use in stereoscopic mode
@@ -71,7 +71,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
      **/
     Map<Integer, FrameBuffer> fb3D;
 
-    public RenderModeStereoscopic(final SpriteBatch spriteBatch) {
+    public RenderModeStereoscopic(SpriteBatch spriteBatch) {
         super();
         // INIT VIEWPORT
         stretchViewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -454,7 +454,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case SCREENSHOT_SIZE_UPDATE, FRAME_SIZE_UPDATE -> GaiaSky.postRunnable(this::clearFrameBufferMap);
             case SHADER_RELOAD_CMD -> GaiaSky.postRunnable(anaglyphEffect::updateShaders);

@@ -601,7 +601,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     .getFullBuffer()
                     .begin();
 
-        } catch (GdxRuntimeException | GaiaSkyShaderCompileException gre) {
+        } catch (GdxRuntimeException | ShaderCompilationException gre) {
             // Escalate.
             throw gre;
         } catch (Exception e) {

@@ -25,10 +25,10 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class CrtMonitor extends PostProcessorEffect {
     private final CrtScreenFilter crt;
     private final CombineFilter combineFilter;
-    private PingPongBuffer pingPongBuffer = null;
-    private FrameBuffer buffer = null;
+    private PingPongBuffer pingPongBuffer;
+    private FrameBuffer buffer;
     private BlurFilter blurFilter;
-    private boolean blending = false;
+    private boolean blending;
     private int sFactor, dFactor;
 
     // the effect is designed to work on the whole screen area, no small/mid size tricks!

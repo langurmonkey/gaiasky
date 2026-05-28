@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.render.GaiaSkyShaderCompileException;
+import gaiasky.render.ShaderCompilationException;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
@@ -132,7 +132,7 @@ public class ComputeShaderProgram implements Disposable {
         if (isCompiled) {
             fetchUniforms();
         } else {
-            throw new GaiaSkyShaderCompileException(this);
+            throw new ShaderCompilationException(this);
         }
     }
 

@@ -63,9 +63,9 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
     private Vector2 lastSize;
 
-    public RenderModeOpenXR(final Scene scene,
-                            final XrDriver xrDriver,
-                            final ExtSpriteBatch spriteBatch) {
+    public RenderModeOpenXR(Scene scene,
+                            XrDriver xrDriver,
+                            ExtSpriteBatch spriteBatch) {
         super();
         this.scene = scene;
         this.driver = xrDriver;

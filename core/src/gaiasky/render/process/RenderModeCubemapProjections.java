@@ -154,7 +154,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (!GaiaSky.settings().runtime.openXr) {
             switch (event) {
             case CUBEMAP_CMD -> {
@@ -225,7 +225,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     }
 
     private void saveFrameBufferToImage(FrameBuffer fb, Path location, String filename) {
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         fb.begin();
         ImageRenderer.renderToImageGl20(location.toString(), filename, fb.getWidth(), fb.getHeight(), settings.screenshot.format, settings.screenshot.quality);
         fb.end();
@@ -235,7 +235,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         if (file != null && Files.exists(file)) {
             var warp = WarpMeshReader.readWarpMeshAscii(Gdx.files.absolute(file.toString()));
             geometryWarp = new WarpingMesh(warp, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            logger.info("Spherical mirror geometry warp initialized with: " + file.toString());
+            logger.info("Spherical mirror geometry warp initialized with: " + file);
         }
     }
 }

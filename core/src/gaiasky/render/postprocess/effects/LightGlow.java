@@ -23,7 +23,7 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class LightGlow extends PostProcessorEffect {
     private final GlowFilter glow;
     private Settings settings;
-    private boolean blending = false;
+    private boolean blending;
     private int sFactor, dFactor;
 
     public LightGlow(int width, int height) {
@@ -128,15 +128,10 @@ public final class LightGlow extends PostProcessorEffect {
         glow.rebind();
     }
 
-    public static class Settings {
-        public final String name;
-
-        public Settings(String name) {
-            this.name = name;
-        }
+    public record Settings(String name) {
 
         public Settings(Settings other) {
-            this.name = other.name;
+                this(other.name);
+            }
         }
-    }
 }

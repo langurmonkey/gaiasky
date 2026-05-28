@@ -11,5 +11,5 @@ import gaiasky.scene.record.BillboardDataset;
 
 public interface IBillboardDatasetProvider {
 
-    public BillboardDataset[] getDatasets();
+    BillboardDataset[] getDatasets();
 }

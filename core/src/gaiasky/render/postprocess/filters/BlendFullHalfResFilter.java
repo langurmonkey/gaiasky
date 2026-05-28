@@ -14,9 +14,9 @@ import gaiasky.render.util.ShaderLoader;
 
 public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter> {
 
-    private Texture half = null;
-    private Texture fullDepth = null;
-    private Texture halfDepth = null;
+    private Texture half;
+    private Texture fullDepth;
+    private Texture halfDepth;
     private final Vector2 zFarK = new Vector2();
 
     public BlendFullHalfResFilter() {

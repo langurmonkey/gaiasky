@@ -35,7 +35,7 @@ public class ScreenModeCmd implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.SCREEN_MODE_CMD) {
             boolean toFullScreen = GaiaSky.settings().graphics.fullScreen.active;
             if (toFullScreen) {

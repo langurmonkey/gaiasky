@@ -21,7 +21,7 @@ public abstract class PostProcessorEffect implements Disposable {
      * Array of disposables.
      **/
     protected Array<Disposable> disposables = new Array<>(1);
-    protected boolean disposed = false;
+    protected boolean disposed;
 
     /**
      * Concrete objects shall be responsible to recreate or rebind its own resources whenever its needed, usually when the OpenGL
@@ -32,7 +32,7 @@ public abstract class PostProcessorEffect implements Disposable {
     /**
      * Concrete objects shall implement its own rendering, given the source and destination buffers.
      */
-    public abstract void render(final FrameBuffer src, final FrameBuffer dest, final GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half);
+    public abstract void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half);
 
     /**
      * Whether this effect is enabled and should be processed.

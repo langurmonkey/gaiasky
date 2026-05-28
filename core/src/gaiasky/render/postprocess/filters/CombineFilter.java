@@ -14,7 +14,7 @@ import gaiasky.render.util.ShaderLoader;
 public final class CombineFilter extends Filter<CombineFilter> {
 
     private float s1i, s1s, s2i, s2s;
-    private Texture inputTexture2 = null;
+    private Texture inputTexture2;
 
     public CombineFilter() {
         super(ShaderLoader.fromFile("screenspace", "combine"));

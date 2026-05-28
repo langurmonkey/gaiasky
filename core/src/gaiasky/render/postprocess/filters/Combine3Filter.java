@@ -14,8 +14,8 @@ import gaiasky.render.util.ShaderLoader;
 public final class Combine3Filter extends Filter<Combine3Filter> {
 
     private float s1i, s1s, s2i, s2s, s3i, s3s;
-    private Texture inputTexture2 = null;
-    private Texture inputTexture3 = null;
+    private Texture inputTexture2;
+    private Texture inputTexture3;
 
     public Combine3Filter() {
         super(ShaderLoader.fromFile("screenspace", "combine3"));

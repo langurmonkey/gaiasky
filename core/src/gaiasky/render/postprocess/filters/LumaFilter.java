@@ -17,7 +17,7 @@ public class LumaFilter extends Filter<LumaFilter> {
     private final ShaderProgram programLuma;
     private final ShaderProgram programAvg;
     private final ShaderProgram programMax;
-    private float lodLevel = 0;
+    private float lodLevel;
     public LumaFilter() {
         super(ShaderLoader.fromFile("screenspace", "luma", "#define LUMA"));
         programLuma = program;

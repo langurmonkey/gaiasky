@@ -20,7 +20,7 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
     private final Vector2 zFarK = new Vector2();
     private final Matrix4 projViewInverse = new Matrix4();
     private final Matrix4 prevProjView = new Matrix4();
-    private Texture depthTexture = null;
+    private Texture depthTexture;
     private float blurScale;
     private int samples;
 

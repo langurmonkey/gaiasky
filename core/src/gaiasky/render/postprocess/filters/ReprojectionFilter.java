@@ -14,7 +14,7 @@ import net.jafama.FastMath;
 public final class ReprojectionFilter extends Filter<ReprojectionFilter> {
     private final Vector2 viewport;
     private float fov;
-    private int mode = 0;
+    private int mode;
 
     public ReprojectionFilter(float width, float height) {
         super(ShaderLoader.fromFile("screenspace", "reprojection"));

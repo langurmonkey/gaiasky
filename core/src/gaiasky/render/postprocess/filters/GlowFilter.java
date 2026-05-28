@@ -25,11 +25,11 @@ public final class GlowFilter extends Filter<GlowFilter> {
     private float[] lightPositions;
     private float[] lightViewAngles;
     private float[] lightColors;
-    private int nLights = 0;
+    private int nLights;
     private int nSamples = 30;
     private float textureScale = 1f;
     private float spiralScale = 1f;
-    private float orientation = 0f;
+    private float orientation;
     private float backBufferScale = 1f;
 
     // Contains a pre pass texture which is used to compute occlusion.

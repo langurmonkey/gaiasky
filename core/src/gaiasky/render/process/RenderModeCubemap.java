@@ -42,7 +42,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
     // Flags
     protected boolean zPosFlag, zNegFlag, xPosFlag, xNegFlag, yPosFlag, yNegFlag;
 
-    protected float angleFromZenith = 0;
+    protected float angleFromZenith;
 
     protected RenderModeCubemap() {
         super();

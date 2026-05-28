@@ -17,7 +17,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import gaiasky.render.GaiaSkyShaderCompileException;
+import gaiasky.render.ShaderCompilationException;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.SysUtils;
@@ -406,7 +406,7 @@ public class ExtShaderProgram implements Disposable {
                 fetchUniforms();
                 addManagedShader(Gdx.app, this);
             } else {
-                throw new GaiaSkyShaderCompileException(this);
+                throw new ShaderCompilationException(this);
             }
         }
     }
