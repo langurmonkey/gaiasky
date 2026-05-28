@@ -20,7 +20,7 @@ public class MinimapWindow extends GenericDialog {
     private final MinimapWidget minimap;
     private OwnLabel mapName;
 
-    public MinimapWindow(final Stage stage, final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
+    public MinimapWindow(Stage stage, Skin skin, ShaderProgram shapeShader, ShaderProgram spriteShader) {
         super(I18n.msg("gui.minimap.title"), skin, stage);
         minimap = new MinimapWidget(skin, shapeShader, spriteShader);
 

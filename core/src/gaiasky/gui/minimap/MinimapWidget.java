@@ -37,7 +37,7 @@ public class MinimapWidget implements Disposable {
     int sideShort, sideShort2;
     private IMinimapScale current;
 
-    public MinimapWidget(final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
+    public MinimapWidget(Skin skin, ShaderProgram shapeShader, ShaderProgram spriteShader) {
         side = (int) (1.4f * GaiaSky.settings().program.minimap.size);
         side2 = side / 2;
         sideShort = (int) (0.7f * GaiaSky.settings().program.minimap.size);

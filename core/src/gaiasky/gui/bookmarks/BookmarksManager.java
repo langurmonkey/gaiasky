@@ -368,9 +368,9 @@ public class BookmarksManager implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case BOOKMARKS_ADD -> {
                 Object d0 = data[0];
@@ -655,7 +655,7 @@ public class BookmarksManager implements IObserver {
                     settings.runtime.setParent(settings);
                     return settings;
                 } catch (IOException e) {
-                    logger.error(String.format("Could not load settings file: %s", settingsFile.toAbsolutePath().toString()), e);
+                    logger.error(String.format("Could not load settings file: %s", settingsFile.toAbsolutePath()), e);
                 }
             }
             return null;

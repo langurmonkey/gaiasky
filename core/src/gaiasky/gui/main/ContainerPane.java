@@ -18,7 +18,7 @@ import gaiasky.util.scene2d.Separator;
  */
 public class ContainerPane extends Table {
 
-    public ContainerPane(Skin skin, String title, final Actor actor) {
+    public ContainerPane(Skin skin, String title, Actor actor) {
         super(skin);
         final float pad10 = 10f;
 

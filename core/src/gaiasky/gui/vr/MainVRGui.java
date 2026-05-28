@@ -83,10 +83,10 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     Vector3Q relativePosition = new Vector3Q();
     // 5 pointers
     Vector2 pointer = new Vector2(Float.NaN, Float.NaN);
-    boolean triggerPressed = false;
-    boolean mouseHit = false;
+    boolean triggerPressed;
+    boolean mouseHit;
     boolean vr;
-    boolean visible = false;
+    boolean visible;
 
     ShapeRenderer shapeRenderer;
     SpriteBatch batch;
@@ -612,7 +612,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                              int button) {
         if (!vr) {
             if (button == Input.Buttons.LEFT && mouseHit) {
-                stage.touchDown((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, button);
+                stage.touchDown((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, Input.Buttons.LEFT);
                 triggerPressed = true;
                 return true;
             }
@@ -627,7 +627,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                            int button) {
         if (!vr) {
             if (button == Input.Buttons.LEFT && mouseHit) {
-                stage.touchUp((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, button);
+                stage.touchUp((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, Input.Buttons.LEFT);
                 triggerPressed = false;
                 return true;
             }

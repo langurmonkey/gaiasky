@@ -79,8 +79,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
     Array<XrControllerDevice> controllers;
     Vector2 lastSize = new Vector2();
 
-    private boolean positionSet = false;
-    private boolean renderToScreen = false;
+    private boolean positionSet;
+    private boolean renderToScreen;
 
     public StandaloneVRGui(XrDriver xrDriver, Class<T> guiClass, Skin skin, XrInputListener listener) {
         this.driver = xrDriver;

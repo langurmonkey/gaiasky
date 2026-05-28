@@ -53,7 +53,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
     protected OwnSliderPlus warpSlider;
     protected double[] timeWarpVector;
     // Guard to know when to fire warp events
-    protected boolean warpGuard = false;
+    protected boolean warpGuard;
 
     public TimeComponent(Skin skin, Stage stage) {
         super(skin, stage);
@@ -263,7 +263,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
                 // Update input time

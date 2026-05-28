@@ -125,12 +125,12 @@ public abstract class AbstractGui implements IObserver, IGui {
     }
 
     @Override
-    public void resize(final int width, final int height) {
+    public void resize(int width, int height) {
         GaiaSky.postRunnable(() -> resizeImmediate(width, height));
     }
 
     @Override
-    public void resizeImmediate(final int width, final int height) {
+    public void resizeImmediate(int width, int height) {
         stage.getViewport().update(width, height, true);
         rebuildGui();
     }
@@ -161,7 +161,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         // Empty by default
     }
 

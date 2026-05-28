@@ -49,7 +49,7 @@ import java.util.function.Function;
 public class ProceduralGenerationWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(ProceduralGenerationWindow.class);
     // Selected tab persists across windows
-    private static int lastTabSelected = 0;
+    private static int lastTabSelected;
 
     private Entity target;
     private final FocusView view;
@@ -68,7 +68,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
      **/
     private boolean surfaceEnabled;
 
-    private int genCloudNum = 0, genSurfaceNum = 0;
+    private int genCloudNum, genSurfaceNum;
 
     public ProceduralGenerationWindow(FocusView target,
                                       Stage stage,
@@ -135,7 +135,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         group.align(Align.left);
 
         // SURFACE TAB
-        final Button tabSurface = this.surfaceEnabled ? new OwnTextButton(I18n.msg("gui.procedural.surface"), skin, "toggle-big") : null;
+        Button tabSurface = this.surfaceEnabled ? new OwnTextButton(I18n.msg("gui.procedural.surface"), skin, "toggle-big") : null;
         if (this.surfaceEnabled) {
             tabSurface.pad(pad10);
             tabSurface.setWidth(tabWidth);
@@ -143,13 +143,13 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         }
 
         // CLOUDS TAB
-        final Button tabClouds = new OwnTextButton(I18n.msg("gui.procedural.cloud"), skin, "toggle-big");
+        Button tabClouds = new OwnTextButton(I18n.msg("gui.procedural.cloud"), skin, "toggle-big");
         tabClouds.pad(pad10);
         tabClouds.setWidth(tabWidth);
         group.addActor(tabClouds);
 
         // ATMOSPHERE TAB
-        final Button tabAtmosphere = new OwnTextButton(I18n.msg("gui.procedural.atmosphere"), skin, "toggle-big");
+        Button tabAtmosphere = new OwnTextButton(I18n.msg("gui.procedural.atmosphere"), skin, "toggle-big");
         tabAtmosphere.pad(pad10);
         tabAtmosphere.setWidth(tabWidth);
         group.addActor(tabAtmosphere);
@@ -160,7 +160,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         Stack tabContent = new Stack();
 
         // SURFACE
-        final Table contentSurface = this.surfaceEnabled ? new Table(skin) : null;
+        Table contentSurface = this.surfaceEnabled ? new Table(skin) : null;
         if (this.surfaceEnabled) {
             contentSurface.setWidth(tabContentWidth);
             contentSurface.align(Align.top | Align.left);
@@ -169,14 +169,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         }
 
         // CLOUDS
-        final Table contentClouds = new Table(skin);
+        Table contentClouds = new Table(skin);
         contentClouds.setWidth(tabContentWidth);
         contentClouds.align(Align.top | Align.left);
         buildContentClouds(contentClouds);
         tabContent.addActor(contentClouds);
 
         // ATMOSPHERE
-        final Table contentAtmosphere = new Table(skin);
+        Table contentAtmosphere = new Table(skin);
         contentAtmosphere.setWidth(tabContentWidth);
         contentAtmosphere.align(Align.top | Align.left);
         buildContentAtmosphere(contentAtmosphere);

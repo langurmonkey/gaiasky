@@ -184,7 +184,7 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         font.draw(sb, I18n.msg("gui.minimap.gc"), side2 + px(4), side2 - px(4));
         font.setColor(textmc);
         for (int i = 4000; i <= 16000; i += 4000) {
-            font.draw(sb, "" + (i / 1000) + I18n.msg("gui.unit.kpc"), side2 + px(4), (16000f + i) * side / 32000f - px(6));
+            font.draw(sb, (i / 1000) + I18n.msg("gui.unit.kpc"), side2 + px(4), (16000f + i) * side / 32000f - px(6));
         }
 
         font.draw(sb, "0" + I18n.msg("gui.unit.deg"), side2 - px(15), side - px(5));

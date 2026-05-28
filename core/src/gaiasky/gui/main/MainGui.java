@@ -103,7 +103,7 @@ public class MainGui extends AbstractGui {
      * @param unitsPerPixel   The units per pixel to use, as a floating point number.
      * @param globalResources Reference to the {@link GlobalResources} object.
      */
-    public MainGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources) {
+    public MainGui(Skin skin, Graphics graphics, Float unitsPerPixel, GlobalResources globalResources) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.globalResources = globalResources;
@@ -111,7 +111,7 @@ public class MainGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(final AssetManager assetManager, final SpriteBatch sb) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
@@ -241,7 +241,7 @@ public class MainGui extends AbstractGui {
                 || (Instant.now().toEpochMilli() -
                 GaiaSky.settings().program.update.lastCheck.toEpochMilli() > UpdateSettings.VERSION_CHECK_INTERVAL_MS)) {
             // Start check for new versions.
-            final Timer.Task t = getVersionCheckTask();
+            Timer.Task t = getVersionCheckTask();
             Timer.schedule(t, 10);
         }
 
@@ -394,7 +394,7 @@ public class MainGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case SHOW_PROCEDURAL_GEN_CMD -> {
                 var planet = (FocusView) data[0];
@@ -416,7 +416,7 @@ public class MainGui extends AbstractGui {
             }
             case SHOW_PROCEDURAL_GALAXY_CMD -> {
                 var focus = (FocusView) data[0];
-                final GalaxyMorphology morphology = data.length == 1 ? GalaxyMorphology.Sb : (GalaxyMorphology) data[1];
+                GalaxyMorphology morphology = data.length == 1 ? GalaxyMorphology.Sb : (GalaxyMorphology) data[1];
 
                 if (focus == null || !focus.isValid() || !focus.isBillboardDataset()) {
                     focus = null;
@@ -613,7 +613,7 @@ public class MainGui extends AbstractGui {
                 pointerYCoord.setVisible(display);
             }
             case CONTEXT_MENU_CMD -> {
-                final var candidate = (Entity) data[0];
+                var candidate = (Entity) data[0];
                 var screenX = (int) data[1];
                 var screenY = (int) data[2];
                 FocusView focusView = null;

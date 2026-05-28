@@ -84,7 +84,7 @@ public class BatchDownloadWindow extends GenericDialog {
         info.setAlignment(Align.center);
         content.add(info).colspan(2).padBottom(pad34).row();
 
-        final var status = new OwnLabel("idle", skin);
+        var status = new OwnLabel("idle", skin);
 
         for (var d : datasets) {
             var name = new OwnLabel(d.name, skin, "header-s");
@@ -156,9 +156,9 @@ public class BatchDownloadWindow extends GenericDialog {
             try {
                 double readMb = (double) read / 1e6d;
                 double totalMb = (double) total / 1e6d;
-                final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.downloading", nf.format(progress));
+                String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.downloading", nf.format(progress));
                 double mbPerSecond = speed / 1000d;
-                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
+                String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
                 // Since we are downloading on a background thread, post a runnable to touch UI.
                 GaiaSky.postRunnable(() -> {
                     EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
@@ -170,9 +170,9 @@ public class BatchDownloadWindow extends GenericDialog {
         ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
             double readMb = (double) read / 1e6d;
             double totalMb = (double) total / 1e6d;
-            final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksum.check", nf.format(progress));
+            String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksum.check", nf.format(progress));
             double mbPerSecond = speed / 1000d;
-            final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
+            String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI.
             GaiaSky.postRunnable(() -> {
                 EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
@@ -189,7 +189,7 @@ public class BatchDownloadWindow extends GenericDialog {
             if (digest != null && dataset.sha256 != null) {
                 String serverDigest = dataset.sha256;
                 try {
-                    final var ok = serverDigest.equals(digest);
+                    var ok = serverDigest.equals(digest);
                     if (ok) {
                         logger.info(I18n.msg("gui.download.checksum.ok", name));
                     } else {
@@ -225,8 +225,8 @@ public class BatchDownloadWindow extends GenericDialog {
                 }
             }
 
-            final String errorMessage = errorMsg;
-            final int numErrors = errors;
+            String errorMessage = errorMsg;
+            int numErrors = errors;
             // Done.
             GaiaSky.postRunnable(() -> {
                 currentDownloads.remove(dataset.key);
@@ -268,7 +268,7 @@ public class BatchDownloadWindow extends GenericDialog {
         };
 
         // Download.
-        final Net.HttpRequest request = DownloadHelper.downloadFile(url,
+        Net.HttpRequest request = DownloadHelper.downloadFile(url,
                                                                     tempDownload,
                                                                     GaiaSky.settings().program.offlineMode,
                                                                     progressDownload,

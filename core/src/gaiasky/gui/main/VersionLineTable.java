@@ -42,7 +42,7 @@ public class VersionLineTable extends Table {
         content.pad(2f, pad16, 2f, pad16);
         content.top().left();
 
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
 
         String style = vr ? "hud" : "hud-med";
 

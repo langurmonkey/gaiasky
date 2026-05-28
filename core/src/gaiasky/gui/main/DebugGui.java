@@ -32,7 +32,7 @@ public class DebugGui extends AbstractGui {
      * @param graphics      The graphics instance.
      * @param unitsPerPixel The units per pixel value.
      */
-    public DebugGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public DebugGui(Skin skin, Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }

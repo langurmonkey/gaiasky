@@ -77,15 +77,15 @@ public class WelcomeGui extends AbstractGui {
     private AboutWindow aboutWindow;
     private PreferencesWindow preferencesWindow;
     private FileHandle dataDescriptor;
-    private boolean downloadError = false;
+    private boolean downloadError;
     private Texture bgTex;
     private DatasetGroup serverDatasets;
     private Array<Button> buttonList;
-    private int currentSelected = 0;
+    private int currentSelected;
     private PopupNotificationsInterface popupInterface;
     private WelcomeGuiKbdListener kbdListener;
     private Table datasetsContainer;
-    private boolean preventRecommended = false;
+    private boolean preventRecommended;
     private float dsScrollY;
 
     /**
@@ -94,11 +94,11 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible.
      * @param vrStatus    The status of VR.
      */
-    public WelcomeGui(final Skin skin,
-                      final Graphics graphics,
-                      final Float unitsPerPixel,
-                      final boolean skipWelcome,
-                      final XrLoadStatus vrStatus) {
+    public WelcomeGui(Skin skin,
+                      Graphics graphics,
+                      Float unitsPerPixel,
+                      boolean skipWelcome,
+                      XrLoadStatus vrStatus) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.skipWelcome = skipWelcome;
@@ -272,9 +272,9 @@ public class WelcomeGui extends AbstractGui {
         }
     }
 
-    private void testMirrorConnectionChain(final int index, Runnable success, Runnable fail) {
+    private void testMirrorConnectionChain(int index, Runnable success, Runnable fail) {
         var mirrors = GaiaSky.settings().program.url.dataMirrors;
-        final var n = mirrors.length;
+        var n = mirrors.length;
         DownloadHelper.testConnection(mirrors[index] + "index.html",
                                       (url) -> {
                                           logger.info("Selected data mirror: " + url);
@@ -291,9 +291,9 @@ public class WelcomeGui extends AbstractGui {
                                       });
     }
 
-    private void testDataDescMirrorConnectionChain(final int index, Runnable success, Runnable fail) {
+    private void testDataDescMirrorConnectionChain(int index, Runnable success, Runnable fail) {
         var mirrors = GaiaSky.settings().program.url.dataDescriptors;
-        final var n = mirrors.length;
+        var n = mirrors.length;
         DownloadHelper.testConnection(mirrors[index],
                                       (url) -> {
                                           logger.info("Selected data descriptor mirror: " + url);
@@ -462,8 +462,8 @@ public class WelcomeGui extends AbstractGui {
                 .row();
 
 
-        final int numLocalDatasets = localDatasets.get().datasets.size() + (baseDataPresent ? 1 : 0);
-        final boolean regularStart = numLocalDatasets > 0 || preventRecommended;
+        int numLocalDatasets = localDatasets.get().datasets.size() + (baseDataPresent ? 1 : 0);
+        boolean regularStart = numLocalDatasets > 0 || preventRecommended;
 
         if (regularStart) {
             // Regular Welcome screen options: Start Gaia Sky, Dataset Manager, Dataset List
@@ -831,7 +831,7 @@ public class WelcomeGui extends AbstractGui {
         }
         datasets.pack();
 
-        final var datasetsScroll = getOwnScrollPane(datasets);
+        var datasetsScroll = getOwnScrollPane(datasets);
         datasetsTable.add(datasetsScroll)
                 .top()
                 .left();
@@ -1143,7 +1143,7 @@ public class WelcomeGui extends AbstractGui {
 
     private Set<String> removeNonExistent() {
         Set<String> toRemove = new HashSet<>();
-        final FileHandleResolver dataResolver = fileName -> GaiaSky.settings().data.dataFileHandle(fileName);
+        FileHandleResolver dataResolver = fileName -> GaiaSky.settings().data.dataFileHandle(fileName);
         for (String f : GaiaSky.settings().data.dataFiles) {
             // File name with no extension
             FileHandle fh = dataResolver.resolve(f);
@@ -1254,9 +1254,9 @@ public class WelcomeGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case UI_RELOAD_CMD -> {
                 GaiaSky.postRunnable(() -> {
@@ -1491,7 +1491,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     @Override
-    public void resize(final int width, final int height) {
+    public void resize(int width, int height) {
         if (preferencesWindow != null) {
             preferencesWindow.resize(width, height);
         }

@@ -378,7 +378,7 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
                         var tf = new OwnTextField(valueCapped, skin);
                         tf.setWidth(450f);
                         tf.setErrorColor(ColorUtils.gRedC);
-                        final Image applyImage = new Image(skin.getDrawable("iconic-check"));
+                        Image applyImage = new Image(skin.getDrawable("iconic-check"));
                         var button = new OwnTextIconButton("", applyImage, skin);
                         button.addListener(new OwnTextTooltip(I18n.msg("gui.debug.object.setval"), skin));
                         button.addListener((event) -> {

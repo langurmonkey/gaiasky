@@ -261,7 +261,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.SLAVE_CONNECTION_EVENT) {
             int idx = (Integer) data[0];
             boolean status = (Boolean) data[2];

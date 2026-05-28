@@ -233,9 +233,9 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         if (Objects.requireNonNull(event) == Event.RESET_VISUAL_SETTINGS_DEFAULTS) {
             resetVisualSettingsDefaults(source);
         }

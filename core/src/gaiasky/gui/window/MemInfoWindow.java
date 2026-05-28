@@ -47,7 +47,7 @@ public class MemInfoWindow extends GenericDialog {
             memInfoStr.append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n\n");
         }
 
-        final OwnScrollPane memInfoScroll = getOwnScrollPane(memInfoStr, taWidth);
+        OwnScrollPane memInfoScroll = getOwnScrollPane(memInfoStr, taWidth);
 
         content.add(memInfoScroll).padBottom(pad).row();
 

@@ -61,7 +61,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
     private Entity entityFull, entityHalf;
     private final FocusView viewFull, viewHalf;
     private GalaxyMorphology morphology;
-    private boolean morphologyChanged = false;
+    private boolean morphologyChanged;
     private OwnSelectBox<GalaxyMorphology> morphologyBox;
 
     private Matrix4 m = new Matrix4();
@@ -416,7 +416,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
     }
 
-    private void generateRandom(final GalaxyMorphology gm, final long seed) {
+    private void generateRandom(GalaxyMorphology gm, long seed) {
         var pair = gen.generateGalaxy(gm, seed);
         var full = pair.getFirst();
         var half = pair.getSecond();

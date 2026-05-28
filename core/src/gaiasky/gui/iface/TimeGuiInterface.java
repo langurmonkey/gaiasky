@@ -35,7 +35,7 @@ public class TimeGuiInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel date;
     private final OwnLabel time;
 
-    public TimeGuiInterface(final Skin skin) {
+    public TimeGuiInterface(Skin skin) {
         super(skin);
 
         timeZone = GaiaSky.settings().program.timeZone.getTimeZone();

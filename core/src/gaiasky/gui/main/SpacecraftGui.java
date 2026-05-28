@@ -100,7 +100,7 @@ public class SpacecraftGui extends AbstractGui {
     private float indicatorw, indicatorh, indicatorx, indicatory;
     private boolean thrustEvents = true;
 
-    public SpacecraftGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public SpacecraftGui(Skin skin, Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         aux3f1 = new Vector3();
@@ -582,13 +582,13 @@ public class SpacecraftGui extends AbstractGui {
     }
 
     @Override
-    public void resizeImmediate(final int width, final int height) {
+    public void resizeImmediate(int width, int height) {
         stage.getViewport().update(width, height, true);
         rebuildGui();
     }
 
     @Override
-    public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
+    public void notify(gaiasky.event.Event event, Object source, Object... data) {
         switch (event) {
             case SPACECRAFT_LOADED -> {
                 this.sc = (Entity) data[0];

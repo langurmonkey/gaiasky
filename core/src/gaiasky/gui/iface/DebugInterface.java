@@ -59,7 +59,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final DecimalFormat memFormatter;
     private final DecimalFormat timeFormatter;
     private boolean maximized;
-    private boolean showDynRes = false;
+    private boolean showDynRes;
 
     public DebugInterface(Skin skin, Object lock) {
         super(skin);
@@ -171,7 +171,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         add(toggleSize).right().row();
 
         /* GRAPHICS DEVICE */
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         HorizontalGroup deviceGroup = new HorizontalGroup();
         deviceGroup.space(pad05);
         String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);
@@ -338,9 +338,9 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         synchronized (lock) {
-            final boolean debug = GaiaSky.settings().program.debugInfo;
+            boolean debug = GaiaSky.settings().program.debugInfo;
             switch (event) {
                 case DEBUG_TIME -> {
                     if (debug && data.length > 0) {

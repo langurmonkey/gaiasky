@@ -65,7 +65,7 @@ import java.util.List;
 public class GamepadGui extends AbstractGui {
     private static final Logger.Log logger = Logger.getLogger(GamepadGui.class);
 
-    private boolean initialized = false;
+    private boolean initialized;
     private final Table content, menu;
     // Contains a matrix (column major) of actors for each tab
     private final List<Actor[][]> model;
@@ -110,10 +110,10 @@ public class GamepadGui extends AbstractGui {
     private Cell<Container>[] bookmarkColumns;
     private final int maxBookmarkDepth = 4;
 
-    private static int selectedTab = 0;
-    private int fi = 0, fj = 0;
+    private static int selectedTab;
+    private int fi, fj;
 
-    public GamepadGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final boolean vrMode) {
+    public GamepadGui(Skin skin, Graphics graphics, Float unitsPerPixel, boolean vrMode) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.em = EventManager.instance;
@@ -139,7 +139,7 @@ public class GamepadGui extends AbstractGui {
         filterView = new FilterView();
     }
 
-    public GamepadGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public GamepadGui(Skin skin, Graphics graphics, Float unitsPerPixel) {
         this(skin, graphics, unitsPerPixel, false);
     }
 
@@ -406,11 +406,11 @@ public class GamepadGui extends AbstractGui {
         camT.setSize(tw1, th);
         CameraManager cam = GaiaSky.instance.getCameraManager();
 
-        final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
+        Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
         if (!vr) {
             // Camera mode
-            final int cameraModes = CameraMode.values().length;
-            final CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
+            int cameraModes = CameraMode.values().length;
+            CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
             for (int i = 0; i < cameraModes; i++) {
                 cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
             }
@@ -433,7 +433,7 @@ public class GamepadGui extends AbstractGui {
             camT.add(cameraMode).left().padBottom(pad20).row();
 
             // Cinematic
-            final Label cinematicLabel = new Label(I18n.msg("gui.camera.cinematic"), skin, "header-raw");
+            Label cinematicLabel = new Label(I18n.msg("gui.camera.cinematic"), skin, "header-raw");
             cinematic = new OwnCheckBox("", skin, 0f);
             cameraModel[0][1] = cinematic;
             cinematic.setChecked(GaiaSky.settings().scene.camera.cinematic);
@@ -448,7 +448,7 @@ public class GamepadGui extends AbstractGui {
             camT.add(cinematic).left().padBottom(pad20).row();
 
             // FOV
-            final Label fovLabel = new Label(I18n.msg("gui.camera.fov"), skin, "header-raw");
+            Label fovLabel = new Label(I18n.msg("gui.camera.fov"), skin, "header-raw");
             fovSlider = new OwnSliderPlus("", Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin, "header-raw");
             cameraModel[0][2] = fovSlider;
             fovSlider.setValueSuffix("°");
@@ -467,14 +467,14 @@ public class GamepadGui extends AbstractGui {
             camT.add(cameraModeLabel).left().padBottom(pad20).row();
 
             var focusString = camera.getMode().isFocus() ? camera.getFocus().getLocalizedName() : "-";
-            final Label focusLabel = new Label(I18n.msg("camera.FOCUS_MODE"), skin, "header-raw");
+            Label focusLabel = new Label(I18n.msg("camera.FOCUS_MODE"), skin, "header-raw");
             cameraFocusLabel = new OwnLabel(focusString, skin, "header");
             camT.add(focusLabel).right().padBottom(pad20).padRight(pad20);
             camT.add(cameraFocusLabel).left().padBottom(pad20).row();
         }
 
         // Speed
-        final Label speedLabel = new Label(I18n.msg("gui.camera.speed"), skin, "header-raw");
+        Label speedLabel = new Label(I18n.msg("gui.camera.speed"), skin, "header-raw");
         OwnSliderPlus camSpeedSlider = new OwnSliderPlus("",
                                                          Constants.MIN_SLIDER,
                                                          Constants.MAX_SLIDER,
@@ -492,7 +492,7 @@ public class GamepadGui extends AbstractGui {
         camT.add(camSpeedSlider).left().padBottom(pad20).row();
 
         // Rot
-        final Label rotationLabel = new Label(I18n.msg("gui.rotation.speed"), skin, "header-raw");
+        Label rotationLabel = new Label(I18n.msg("gui.rotation.speed"), skin, "header-raw");
         OwnSliderPlus camRotSlider = new OwnSliderPlus("",
                                                        Constants.MIN_SLIDER,
                                                        Constants.MAX_SLIDER,
@@ -510,7 +510,7 @@ public class GamepadGui extends AbstractGui {
         camT.add(camRotSlider).left().padBottom(pad20).row();
 
         // Turn
-        final Label turnLabel = new Label(I18n.msg("gui.turn.speed"), skin, "header-raw");
+        Label turnLabel = new Label(I18n.msg("gui.turn.speed"), skin, "header-raw");
         OwnSliderPlus camTurnSlider = new OwnSliderPlus("",
                                                         Constants.MIN_SLIDER,
                                                         Constants.MAX_SLIDER,
@@ -576,11 +576,11 @@ public class GamepadGui extends AbstractGui {
             // Mode buttons
             Table modeButtons = new Table(skin);
 
-            final Image icon3d = new Image(skin.getDrawable("3d-icon"));
+            Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             cameraModel[0][9] = button3d;
             button3d.setChecked(GaiaSky.settings().program.modeStereo.active);
-            final String[] hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode", true);
+            String[] hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode", true);
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
             button3d.addListener(event -> {
@@ -601,11 +601,11 @@ public class GamepadGui extends AbstractGui {
             });
             modeButtons.add(button3d).padRight(pad20);
 
-            final Image iconDome = new Image(skin.getDrawable("dome-icon"));
+            Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
             cameraModel[1][9] = buttonDome;
             buttonDome.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPlanetariumOn());
-            final String[] hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium", true);
+            String[] hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium", true);
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
             buttonDome.addListener(event -> {
@@ -627,12 +627,12 @@ public class GamepadGui extends AbstractGui {
             });
             modeButtons.add(buttonDome).padRight(pad20);
 
-            final Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
+            Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
             cameraModel[2][9] = buttonCubemap;
             buttonCubemap.setProgrammaticChangeEvents(false);
             buttonCubemap.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPanoramaOn());
-            final String[] hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360", true);
+            String[] hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360", true);
             buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
             buttonCubemap.addListener(event -> {
@@ -654,12 +654,12 @@ public class GamepadGui extends AbstractGui {
             });
             modeButtons.add(buttonCubemap).padRight(pad20);
 
-            final Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
+            Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
             buttonOrthoSphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
             cameraModel[3][9] = buttonOrthoSphere;
             buttonOrthoSphere.setProgrammaticChangeEvents(false);
             buttonOrthoSphere.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isOrthosphereOn());
-            final String[] hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere", true);
+            String[] hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere", true);
             buttonOrthoSphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
             buttonOrthoSphere.setName("orthosphere");
             buttonOrthoSphere.addListener(event -> {
@@ -760,8 +760,8 @@ public class GamepadGui extends AbstractGui {
 
         int di = 0, dj = 0;
         for (int i = 0; i < visibilityEntities.length; i++) {
-            final ComponentType ct = visibilityEntities[i];
-            final String name = ct.getName();
+            ComponentType ct = visibilityEntities[i];
+            String name = ct.getName();
             if (name != null) {
                 Button button;
                 if (ct.style != null) {
@@ -839,7 +839,7 @@ public class GamepadGui extends AbstractGui {
                 controlsT.add(noControllers).padBottom(pad10).row();
                 controlsModel[0][0] = new OwnTextButton("", skin, "toggle-big");
             } else {
-                final var controllerName = controller.getName();
+                var controllerName = controller.getName();
                 Table controllerTable = new Table(skin);
 
                 OwnLabel detectedController = new OwnLabel(I18n.msg("gui.controller.detected"), skin, "header-raw");
@@ -1123,7 +1123,7 @@ public class GamepadGui extends AbstractGui {
         Table sysT = new Table(skin);
 
         // Debug info panel
-        final Label debugLabel = new Label(I18n.msg("gui.system.debuginfo"), skin, "header-raw");
+        Label debugLabel = new Label(I18n.msg("gui.system.debuginfo"), skin, "header-raw");
         debugInfo = new OwnCheckBox("", skin, 0f);
         systemModel[0][0] = debugInfo;
         debugInfo.setChecked(GaiaSky.settings().program.debugInfo);
@@ -1346,7 +1346,7 @@ public class GamepadGui extends AbstractGui {
 
             // Add listener to folders.
             if (node.isTypeFolder()) {
-                final int rowIndex = row;
+                int rowIndex = row;
                 button.addListener((event) -> {
                     if (event instanceof ChangeEvent) {
                         selectInRow(columnIndex, rowIndex, true);
@@ -1700,7 +1700,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (initialized) {
             switch (event) {
                 case SCENE_LOADED -> this.scene = (Scene) data[0];
@@ -1738,7 +1738,7 @@ public class GamepadGui extends AbstractGui {
                 case CAMERA_MODE_CMD -> {
                     if (cameraMode != null && source != cameraMode && !vr) {
                         // Update camera mode selection
-                        final var mode = (CameraMode) data[0];
+                        var mode = (CameraMode) data[0];
                         var cModes = cameraMode.getItems();
                         CameraComboBoxBean selected = null;
                         for (var cameraModeBean : cModes) {
@@ -1753,7 +1753,7 @@ public class GamepadGui extends AbstractGui {
                             cameraMode.getSelection().setProgrammaticChangeEvents(true);
                         }
                     } else if (cameraModeLabel != null) {
-                        final var mode = (CameraMode) data[0];
+                        var mode = (CameraMode) data[0];
                         cameraModeLabel.setText(mode.toStringI18n());
                         if (mode != CameraMode.FOCUS_MODE && cameraFocusLabel != null) {
                             cameraFocusLabel.setText("-");
@@ -1785,8 +1785,8 @@ public class GamepadGui extends AbstractGui {
                 }
                 case CUBEMAP_CMD -> {
                     if (!vr) {
-                        final CubemapProjection proj = (CubemapProjection) data[1];
-                        final boolean enable = (boolean) data[0];
+                        CubemapProjection proj = (CubemapProjection) data[1];
+                        boolean enable = (boolean) data[0];
                         if (proj.isPanorama() && source != buttonCubemap && buttonCubemap != null) {
                             buttonCubemap.setProgrammaticChangeEvents(false);
                             buttonCubemap.setChecked(enable);
@@ -2079,7 +2079,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     @Override
-    public void resizeImmediate(final int width, final int height) {
+    public void resizeImmediate(int width, int height) {
         stage.getViewport().update(width, height, true);
         if (content.isVisible() && content.hasParent()) {
             rebuildGui();

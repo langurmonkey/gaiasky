@@ -51,7 +51,7 @@ public class ArchiveViewWindow extends GenericDialog {
     private float pad;
 
     private FocusView st;
-    private boolean updating = false;
+    private boolean updating;
 
     public ArchiveViewWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.data.catalog", "Gaia", "?"), skin, stage);
@@ -136,7 +136,7 @@ public class ArchiveViewWindow extends GenericDialog {
         getTAPData(Constants.URL_HIP_JSON_SOURCE + hip, true, "json", listener);
     }
 
-    private void getTAPData(String url, boolean hip, final String format, final GaiaDataListener listener) {
+    private void getTAPData(String url, boolean hip, String format, GaiaDataListener listener) {
         HttpRequest request = new HttpRequest(HttpMethods.GET);
         request.setUrl(url);
         request.setTimeOut(5000);
@@ -182,9 +182,9 @@ public class ArchiveViewWindow extends GenericDialog {
         return answer;
     }
 
-    private String slurp(final InputStream is, final int bufferSize) {
-        final char[] buffer = new char[bufferSize];
-        final StringBuilder out = new StringBuilder();
+    private String slurp(InputStream is, int bufferSize) {
+        char[] buffer = new char[bufferSize];
+        StringBuilder out = new StringBuilder();
         try (Reader in = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             for (; ; ) {
                 int rsz = in.read(buffer, 0, buffer.length);
@@ -269,7 +269,7 @@ public class ArchiveViewWindow extends GenericDialog {
             this.st = st;
         }
 
-        public void ok(final String[][] data, boolean hip) {
+        public void ok(String[][] data, boolean hip) {
             GaiaSky.postRunnable(() -> {
 
                 HorizontalGroup links = new HorizontalGroup();

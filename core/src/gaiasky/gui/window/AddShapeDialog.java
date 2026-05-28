@@ -42,7 +42,7 @@ public class AddShapeDialog extends GenericDialog {
     // has not been manually edited
     private boolean canRecomputeName = true;
 
-    public AddShapeDialog(final String title, final IFocus object, final String objectName, final Skin skin, final Stage ui) {
+    public AddShapeDialog(String title, IFocus object, String objectName, Skin skin, Stage ui) {
         super(title, skin, ui);
         this.objectName = objectName;
         this.object = object;

@@ -19,7 +19,7 @@ public class MinimapInterface extends TableGuiInterface {
     private final MinimapWidget minimap;
     private final OwnLabel mapName;
 
-    public MinimapInterface(final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
+    public MinimapInterface(Skin skin, ShaderProgram shapeShader, ShaderProgram spriteShader) {
         super(skin);
         minimap = new MinimapWidget(skin, shapeShader, spriteShader);
 

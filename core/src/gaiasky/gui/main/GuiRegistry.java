@@ -113,13 +113,13 @@ public class GuiRegistry implements IObserver {
     /**
      * Global input multiplexer.
      **/
-    private InputMultiplexer inputMultiplexer = null;
+    private InputMultiplexer inputMultiplexer;
 
     /**
      * Create new GUI registry object.
      */
-    public GuiRegistry(final Skin skin,
-                       final Scene scene) {
+    public GuiRegistry(Skin skin,
+                       Scene scene) {
         super();
         this.skin = skin;
         this.scene = scene;
@@ -340,7 +340,7 @@ public class GuiRegistry implements IObserver {
         if (releaseNotesVersion < GaiaSky.settings().version.versionNumber) {
             Path releaseNotesFile = SysUtils.getReleaseNotesFile();
             if (Files.exists(releaseNotesFile)) {
-                final Task releaseNotesTask = new Task() {
+                Task releaseNotesTask = new Task() {
                     @Override
                     public void run() {
                         Stage ui = current.getGuiStage();
@@ -360,9 +360,9 @@ public class GuiRegistry implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         if (current != null) {
             Stage stage = current.getGuiStage();
             // Treats windows that can appear in any GUI.
@@ -652,16 +652,16 @@ public class GuiRegistry implements IObserver {
                                         try {
                                             if (file.getFileName().toString().contains("gaiasky")) {
                                                 // Just use the script.
-                                                final ArrayList<String> command = new ArrayList<>();
+                                                ArrayList<String> command = new ArrayList<>();
                                                 command.add(file.toString());
-                                                final ProcessBuilder builder = new ProcessBuilder(command);
+                                                ProcessBuilder builder = new ProcessBuilder(command);
                                                 builder.start();
                                             } else if (file.getFileName().toString().contains("gradlew")) {
                                                 // Gradle script.
-                                                final ArrayList<String> command = new ArrayList<>();
+                                                ArrayList<String> command = new ArrayList<>();
                                                 command.add(file.toString());
                                                 command.add("core:run");
-                                                final ProcessBuilder builder = new ProcessBuilder(command);
+                                                ProcessBuilder builder = new ProcessBuilder(command);
                                                 builder.start();
                                             }
                                             break;

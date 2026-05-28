@@ -26,7 +26,7 @@ import gaiasky.util.validator.LengthValidator;
 import gaiasky.util.validator.StringValidator;
 
 public class BookmarkNameDialog extends GenericDialog implements IObserver {
-    private static int SEQ_NUM = 0;
+    private static int SEQ_NUM;
 
     private OwnTextField bookmarkName;
     private OwnLabel errorText;

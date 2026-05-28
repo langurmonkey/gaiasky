@@ -37,7 +37,7 @@ public class FrameOutputGui extends AbstractGui {
 
     protected DateTimeFormatter df;
 
-    public FrameOutputGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public FrameOutputGui(Skin skin, Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }
@@ -80,7 +80,7 @@ public class FrameOutputGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         synchronized (lock) {
             if (Objects.requireNonNull(event) == Event.TIME_CHANGE_INFO) {
                 time.setText(df.format((Instant) data[0]));

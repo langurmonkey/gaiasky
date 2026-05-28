@@ -83,11 +83,11 @@ public class DateDialog extends GenericDialog {
         HorizontalGroup tabGroup = new HorizontalGroup();
         tabGroup.align(Align.center);
         float tabWidth = 300f;
-        final OwnTextButton tabUTC = new OwnTextButton(I18n.msg("gui.time.time.zone", timeZone.getDisplayName(TextStyle.SHORT, I18n.locale)), skin,
+        OwnTextButton tabUTC = new OwnTextButton(I18n.msg("gui.time.time.zone", timeZone.getDisplayName(TextStyle.SHORT, I18n.locale)), skin,
                                                        "toggle-big");
         tabUTC.pad(pad10);
         tabUTC.setWidth(tabWidth);
-        final OwnTextButton tabJD = new OwnTextButton(I18n.msg("gui.time.julian"), skin, "toggle-big");
+        OwnTextButton tabJD = new OwnTextButton(I18n.msg("gui.time.julian"), skin, "toggle-big");
         tabJD.pad(pad10);
         tabJD.setWidth(tabWidth);
         tabGroup.addActor(tabUTC);
@@ -99,11 +99,11 @@ public class DateDialog extends GenericDialog {
                 .row();
 
         // Content
-        final Table contentUTC = new Table(skin);
+        Table contentUTC = new Table(skin);
         contentUTC.align(Align.top);
         contentUTC.pad(pad18);
 
-        final Table contentJD = new Table(skin);
+        Table contentJD = new Table(skin);
         contentJD.align(Align.top);
         contentJD.pad(pad18);
 

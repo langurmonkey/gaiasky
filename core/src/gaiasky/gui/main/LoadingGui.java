@@ -55,7 +55,7 @@ public class LoadingGui extends AbstractGui {
     private long lastTipTime;
     private long funnyTextTime = 1400;
 
-    public LoadingGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
+    public LoadingGui(Skin skin, Graphics graphics, Float unitsPerPixel, Boolean vr) {
         super(graphics, unitsPerPixel);
         this.vr = vr;
         this.skin = skin;
@@ -66,7 +66,7 @@ public class LoadingGui extends AbstractGui {
         interfaces = new Array<>();
         float pad32 = 32f;
         float pad10 = 10f;
-        final var settings = GaiaSky.settings();
+        var settings = GaiaSky.settings();
         // User interface.
         Viewport vp;
         if (vr) {
@@ -247,7 +247,7 @@ public class LoadingGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         // Empty by default
         if (Objects.requireNonNull(event) == Event.UI_SCALE_RECOMPUTE_CMD) {
             int height;

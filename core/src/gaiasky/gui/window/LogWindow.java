@@ -41,7 +41,7 @@ public class LogWindow extends GenericDialog {
     private ScrollPane scroll;
 
     // Current number of messages in window
-    private int numMessages = 0;
+    private int numMessages;
 
     private float w, h, pad;
 

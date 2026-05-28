@@ -53,7 +53,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private final String controllerName;
 
     /** Saved file, at the end, if any. **/
-    public Path savedFile = null;
+    public Path savedFile;
     private Texture controller;
     /** For each button/axis we have the texture, the location in pixels and the name. **/
     private Map<GamepadInput, Trio<Texture, float[], String>> inputInfo;
@@ -545,7 +545,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
     }
 
     public enum GamepadInput {
@@ -596,7 +596,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
      * Listens to gamepad input events in order to configure the axes and buttons.
      */
     private class GamepadConfigListener extends ScreenGamepadListener {
-        boolean capturingAxis = false;
+        boolean capturingAxis;
         long lastT = System.currentTimeMillis();
         long lastAxisT = System.currentTimeMillis();
         long minDelayT = 500;

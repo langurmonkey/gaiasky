@@ -130,8 +130,8 @@ public class DataInfoWindow extends GenericDialog {
         String tag;
         long incomeTime = -1L;
         long startTime = -1L;
-        boolean isCompleted = false;
-        boolean isCancelled = false;
+        boolean isCompleted;
+        boolean isCancelled;
     }
 
     /** Current requests. **/
@@ -385,19 +385,19 @@ public class DataInfoWindow extends GenericDialog {
         }
     }
 
-    private void urlCheckRedirectLocalization(final String base, final String name, final String[] suffixes, LinkListener listener) {
-        final AtomicInteger index = new AtomicInteger(0);
+    private void urlCheckRedirectLocalization(String base, String name, String[] suffixes, LinkListener listener) {
+        AtomicInteger index = new AtomicInteger(0);
         urlCheckRedirectLocalization(base, name, suffixes, index, listener);
     }
 
-    private void urlCheckRedirectLocalization(final String base,
-                                              final String name,
-                                              final String[] suffixes,
-                                              final AtomicInteger index,
+    private void urlCheckRedirectLocalization(String base,
+                                              String name,
+                                              String[] suffixes,
+                                              AtomicInteger index,
                                               LinkListener listener) {
         if (index.get() < suffixes.length) {
-            final var fullName = name + suffixes[index.get()];
-            final var url = base + encodeWikipediaTitle(fullName);
+            var fullName = name + suffixes[index.get()];
+            var url = base + encodeWikipediaTitle(fullName);
 
             sendTrackedRequest(url, "base", new HttpResponseListener() {
                 @Override
@@ -449,7 +449,7 @@ public class DataInfoWindow extends GenericDialog {
         }
     }
 
-    private void redirectStep(final String name, RedirectListener listener) {
+    private void redirectStep(String name, RedirectListener listener) {
         var url = getWikipediaRedirectURL(name);
         sendTrackedRequest(url, "redirect", new HttpResponseListener() {
             @Override
@@ -468,7 +468,7 @@ public class DataInfoWindow extends GenericDialog {
                         if (newName != null && !newName.isEmpty()) {
                             listener.ok(encodeWikipediaTitle(newName));
                         } else {
-                            logger.warn("We found a redirect, but could not get target: " + redirects.toString());
+                            logger.warn("We found a redirect, but could not get target: " + redirects);
                             logger.warn("We proceed with the default name: " + name);
                             listener.ok(name);
                         }
@@ -497,7 +497,7 @@ public class DataInfoWindow extends GenericDialog {
         });
     }
 
-    private void langlinksStep(final String langlinksUrl, final String urlEnglish, LinkListener listener) {
+    private void langlinksStep(String langlinksUrl, String urlEnglish, LinkListener listener) {
         sendTrackedRequest(langlinksUrl, "langlinks", new HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -686,7 +686,7 @@ public class DataInfoWindow extends GenericDialog {
     }
 
     private void addCoordinates(FocusView object) {
-        final String deg = I18n.msg("gui.unit.deg");
+        String deg = I18n.msg("gui.unit.deg");
         var focusRA = new OwnLabel("", skin, contentStyle);
         var focusDEC = new OwnLabel("", skin, contentStyle);
         Vector2D posSph = object.getPosSph();
@@ -803,7 +803,7 @@ public class DataInfoWindow extends GenericDialog {
      * @param wikiName The Wikipedia name of the object.
      * @param listener The listener, for callbacks.
      */
-    private void fetchWikipediaData(final String wikiName, final String languageCode, final WikiDataListener listener) {
+    private void fetchWikipediaData(String wikiName, String languageCode, WikiDataListener listener) {
         getJSONData(getWikipediaAPISummaryURL(languageCode) + encodeWikipediaTitle(wikiName), listener);
     }
 
@@ -813,7 +813,7 @@ public class DataInfoWindow extends GenericDialog {
      * @param url      The URL to use.
      * @param listener The callback listener.
      */
-    private void getJSONData(String url, final WikiDataListener listener) {
+    private void getJSONData(String url, WikiDataListener listener) {
 
         if (GaiaSky.settings().program.offlineMode) {
             listener.ko(I18n.msg("gui.system.offlinemode.tooltip"));

@@ -50,12 +50,12 @@ public class StereoGui extends AbstractGui {
 
     protected DecimalFormat nf;
 
-    public StereoGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public StereoGui(Skin skin, Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }
 
-    public void initialize(final AssetManager assetManager, final SpriteBatch sb) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
@@ -189,7 +189,7 @@ public class StereoGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.STEREO_PROFILE_CMD) {
             StereoProfile newProfile = (StereoProfile) data[0];
             notificationsTwo.setVisible(!newProfile.isAnaglyph());

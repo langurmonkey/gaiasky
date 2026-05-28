@@ -217,7 +217,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
         proceduralPlanet = new OwnTextIconButton("", skin, "generate");
         proceduralPlanet.addListener((event) -> {
-            var view = (FocusView) currentFocus;
+            var view = currentFocus;
             if (currentFocus != null && Mapper.atmosphere.has(view.getEntity()) && event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralPlanet, currentFocus);
                 return true;
@@ -228,7 +228,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
         proceduralGalaxy = new OwnTextIconButton("", skin, "generate");
         proceduralGalaxy.addListener((event) -> {
-            var view = (FocusView) currentFocus;
+            var view = currentFocus;
             var bb = Mapper.billboardSet.get(view.getEntity());
             if (currentFocus != null && bb != null && bb.procedural && event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_PROCEDURAL_GALAXY_CMD, proceduralGalaxy, currentFocus);
@@ -423,12 +423,12 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         EventManager.instance.removeAllSubscriptions(this);
     }
 
-    private EventListener lastRefreshListener = null;
+    private EventListener lastRefreshListener;
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
-        final String deg = I18n.msg("gui.unit.deg");
-        final var settings = GaiaSky.settings();
+    public void notify(Event event, Object source, Object... data) {
+        String deg = I18n.msg("gui.unit.deg");
+        var settings = GaiaSky.settings();
         switch (event) {
         case FOCUS_CHANGED -> {
             if (data[0] instanceof String) {
@@ -699,7 +699,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             focusDEC.setText(nf.format((double) data[3] % 360) + deg);
         }
         case CAMERA_MOTION_UPDATE -> {
-            final Vector3Q campos = (Vector3Q) data[0];
+            Vector3Q campos = (Vector3Q) data[0];
             double velInternalPerSecond = (double) data[1] * Constants.KM_TO_U * Nature.S_TO_H;
             Pair<Double, String> velStr = GlobalResources.doubleToVelocityString(velInternalPerSecond, GaiaSky.settings().program.ui.distanceUnits);
             camVel.setText(GlobalResources.formatNumber(velStr.getFirst()) + " " + velStr.getSecond());
@@ -707,8 +707,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             camDistSol.setText(GlobalResources.formatNumber(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
         }
         case CAMERA_TRACKING_OBJECT_UPDATE -> {
-            final IFocus trackingObject = (IFocus) data[0];
-            final String trackingName = (String) data[1];
+            IFocus trackingObject = (IFocus) data[0];
+            String trackingName = (String) data[1];
             if (trackingObject == null && trackingName == null) {
                 camTracking.setText("-");
             } else {
@@ -717,7 +717,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         }
         case CAMERA_MODE_CMD -> {
             // Update camera mode selection
-            final CameraMode mode = (CameraMode) data[0];
+            CameraMode mode = (CameraMode) data[0];
             if (mode.equals(CameraMode.FOCUS_MODE)) {
                 displayInfo(focusInfoCell, focusInfo);
             } else {

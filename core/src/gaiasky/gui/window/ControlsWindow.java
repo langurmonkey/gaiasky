@@ -51,7 +51,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected VerticalGroup mainVertical;
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
-    protected OwnTextIconButton buttonMinimap = null;
+    protected OwnTextIconButton buttonMinimap;
     protected TiledDrawable separator;
 
     /**
@@ -68,7 +68,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
      **/
     private Map<String, CollapsiblePane> panes;
 
-    public ControlsWindow(final String title, final Skin skin, final Stage ui, final CatalogManager catalogManager) {
+    public ControlsWindow(String title, Skin skin, Stage ui, CatalogManager catalogManager) {
         super(title, skin);
         this.setName(title);
         this.skin = skin;
@@ -345,7 +345,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case GUI_SCROLL_POSITION_CMD -> this.windowScroll.setScrollY((float) data[0]);
             case GUI_FOLD_CMD -> {

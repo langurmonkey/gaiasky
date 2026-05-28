@@ -48,7 +48,7 @@ public class DatasetLoadWindow extends GenericDialog {
     private Path lastOpenLocation;
     private final FocusView view;
     private FilePickerComponent filePicker;
-    private Dataset selectedDataset = null;
+    private Dataset selectedDataset;
     private final Table contentExisting, contentFile, datasetsTable;
 
     public DatasetLoadWindow(Stage stage, Skin skin) {
@@ -78,10 +78,10 @@ public class DatasetLoadWindow extends GenericDialog {
         var tabGroup = new HorizontalGroup();
         tabGroup.left();
 
-        final var tabExisting = new OwnTextButton(I18n.msg("gui.dsload.existing"), skin, "toggle-big");
+        var tabExisting = new OwnTextButton(I18n.msg("gui.dsload.existing"), skin, "toggle-big");
         tabExisting.pad(pad10);
         tabExisting.setWidth(tabWidth);
-        final var tabFile = new OwnTextButton(I18n.msg("gui.dsload.file"), skin, "toggle-big");
+        var tabFile = new OwnTextButton(I18n.msg("gui.dsload.file"), skin, "toggle-big");
         tabFile.pad(pad10);
         tabFile.setWidth(tabWidth);
 
@@ -292,7 +292,7 @@ public class DatasetLoadWindow extends GenericDialog {
                                 }
                             });
                         } else {
-                            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName,
+                            DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName,
                                                                                 fileName,
                                                                                 skin,
                                                                                 stage);

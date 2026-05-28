@@ -256,7 +256,7 @@ public class KeyBindings {
         BooleanRunnable masterWithSlaves = MasterManager::hasSlaves;
 
         // about action
-        final Runnable runnableAbout = () -> EventManager.publish(Event.SHOW_ABOUT_ACTION, this);
+        Runnable runnableAbout = () -> EventManager.publish(Event.SHOW_ABOUT_ACTION, this);
 
         // help dialog
         addAction(new ProgramAction("action.help", runnableAbout, noCleanMode));
@@ -265,7 +265,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.help", runnableAbout, noCleanMode));
 
         // show quit
-        final Runnable runnableQuit = () -> {
+        Runnable runnableQuit = () -> {
             // Quit action
             EventManager.publish(Event.SHOW_QUIT_ACTION, this);
         };
@@ -469,7 +469,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.debugmode", () -> EventManager.publish(Event.SHOW_DEBUG_CMD, this), noCleanMode));
 
         // Search dialog
-        final Runnable runnableSearch = () -> EventManager.publish(Event.SHOW_SEARCH_ACTION, this);
+        Runnable runnableSearch = () -> EventManager.publish(Event.SHOW_SEARCH_ACTION, this);
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // Toggle particle fade

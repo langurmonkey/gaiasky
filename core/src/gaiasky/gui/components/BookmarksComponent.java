@@ -524,9 +524,9 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case FOCUS_CHANGED -> {
                 if (updateSelection) {

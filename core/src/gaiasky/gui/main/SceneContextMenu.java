@@ -63,15 +63,15 @@ public class SceneContextMenu extends ContextMenu {
     // Short name of candidate
     private String candidateNameShort;
     // Added items
-    private int nItems = 0;
+    private int nItems;
 
-    public SceneContextMenu(final Skin skin,
-                            final String styleName,
-                            final int screenX,
-                            final int screenY,
-                            final FocusView candidate,
-                            final CatalogManager catalogManager,
-                            final Scene scene) {
+    public SceneContextMenu(Skin skin,
+                            String styleName,
+                            int screenX,
+                            int screenY,
+                            FocusView candidate,
+                            CatalogManager catalogManager,
+                            Scene scene) {
         super(skin, styleName);
         this.skin = skin;
         this.screenX = (int) (screenX / GaiaSky.settings().program.ui.scale);
@@ -149,7 +149,7 @@ public class SceneContextMenu extends ContextMenu {
             MenuItem noTrack = new MenuItem(I18n.msg("context.notrack", candidateNameShort), skin, skin.getDrawable("iconic-delete"));
             noTrack.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.CAMERA_TRACKING_OBJECT_CMD, noTrack, (Object) null, (Object) null);
+                    EventManager.publish(Event.CAMERA_TRACKING_OBJECT_CMD, noTrack, null, null);
                 }
                 return false;
             });
@@ -262,8 +262,8 @@ public class SceneContextMenu extends ContextMenu {
                                                new Matrix4(),
                                                lonlat);
             if (ok) {
-                final Double pointerLon = lonlat[0];
-                final Double pointerLat = lonlat[1];
+                Double pointerLon = lonlat[0];
+                Double pointerLat = lonlat[1];
                 // Add mouse pointer
                 MenuItem landOnPointer = new MenuItem(I18n.msg("context.landatpointer", candidateNameShort), skin, skin.getDrawable("land-on"));
                 landOnPointer.addListener(event -> {
@@ -343,7 +343,7 @@ public class SceneContextMenu extends ContextMenu {
                 if (!ruler.hasObject0() && !ruler.hasObject1()) {
                     // No objects attached
                     rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
-                    final MenuItem ra = rulerAttach0;
+                    MenuItem ra = rulerAttach0;
                     rulerAttach0.addListener((ev) -> {
                         if (ev instanceof ChangeEvent) {
                             EventManager.publish(Event.RULER_ATTACH_0, ra, candidateName);
@@ -354,7 +354,7 @@ public class SceneContextMenu extends ContextMenu {
                 } else if (ruler.hasObject0() && !ruler.hasObject1()) {
                     // Only 0 is attached
                     rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
-                    final MenuItem ra = rulerAttach1;
+                    MenuItem ra = rulerAttach1;
                     rulerAttach1.addListener((ev) -> {
                         if (ev instanceof ChangeEvent) {
                             EventManager.publish(Event.RULER_ATTACH_1, ra, candidateName);
@@ -365,7 +365,7 @@ public class SceneContextMenu extends ContextMenu {
                 } else {
                     // All attached, show both
                     rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
-                    final MenuItem ra0 = rulerAttach0;
+                    MenuItem ra0 = rulerAttach0;
                     rulerAttach0.addListener((ev) -> {
                         if (ev instanceof ChangeEvent) {
                             GaiaSky.postRunnable(() -> {
@@ -376,7 +376,7 @@ public class SceneContextMenu extends ContextMenu {
                         return false;
                     });
                     rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
-                    final MenuItem ra1 = rulerAttach1;
+                    MenuItem ra1 = rulerAttach1;
                     rulerAttach1.addListener((ev) -> {
                         if (ev instanceof ChangeEvent) {
                             GaiaSky.postRunnable(() -> {

@@ -48,7 +48,7 @@ public class MessagesInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         synchronized (lock) {
             switch (event) {
             case POST_HEADLINE_MESSAGE:

@@ -52,7 +52,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
     private Map<XrControllerDevice, Entity> xrControllerToModel;
     /** All VR devices that are selecting right now. **/
     private final Set<XrControllerDevice> selecting = ConcurrentHashMap.newKeySet(2);
-    private long selectingTime = 0;
+    private long selectingTime;
     private long lastAxisMovedFrame = Long.MIN_VALUE;
 
     /** Reference to runtime settings to check the state of {@link RuntimeSettings#vrDemoMode}. **/

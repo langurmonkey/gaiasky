@@ -71,15 +71,15 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         float buttonPadVert = 6f;
         int visTableCols = 4;
         int row = 1;
-        final Table visibilityTable = new Table(skin);
+        Table visibilityTable = new Table(skin);
 
         visibilityTable.setName("visibility table");
         visibilityTable.top().center();
         visibilityButtonMap = new HashMap<>();
         if (visibilityEntities != null) {
             for (int i = 0; i < visibilityEntities.length; i++) {
-                final ComponentType ct = visibilityEntities[i];
-                final String name = ct.getName();
+                ComponentType ct = visibilityEntities[i];
+                String name = ct.getName();
                 if (name != null) {
                     Button button;
                     if (ct.style != null) {
@@ -261,7 +261,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case TOGGLE_VISIBILITY_CMD -> {
                 String key = (String) data[0];

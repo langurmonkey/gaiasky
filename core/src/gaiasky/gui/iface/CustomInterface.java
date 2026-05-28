@@ -78,7 +78,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         float unitsPerPixel = GaiaSky.instance.getUnitsPerPixel();
         float width = Gdx.graphics.getWidth() * unitsPerPixel;
         float height = Gdx.graphics.getHeight() * unitsPerPixel;

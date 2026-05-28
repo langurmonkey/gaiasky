@@ -51,14 +51,14 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     long msTimeout;
     Label message1, message2;
     Cell<Label> c1, c2;
-    boolean displaying = false;
-    boolean permanent = false;
+    boolean displaying;
+    boolean permanent;
     boolean multiple;
     boolean writeDates = true;
     /** Whether to show the notification sources. **/
-    boolean showSources = false;
+    boolean showSources;
     /** Ignore {@link Settings.ProgramSettings.UiSettings#notifications} setting for this instance. **/
-    boolean ignoreDisplaySetting = false;
+    boolean ignoreDisplaySetting;
 
     /**
      * Initializes the notifications interface.
@@ -202,7 +202,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         synchronized (lock) {
             switch (event) {
                 case SHOW_NOTIFICATIONS_CMD -> {

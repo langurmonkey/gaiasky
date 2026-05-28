@@ -35,7 +35,7 @@ public class WelcomeGuiVR extends AbstractGui {
     private Table center, bottom;
     private final WelcomeGui wg;
 
-    public WelcomeGuiVR(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
+    public WelcomeGuiVR(Skin skin, Graphics graphics, Float unitsPerPixel, Boolean vr) {
         super(graphics, unitsPerPixel);
         wg = (WelcomeGui) GaiaSky.instance.welcomeGui;
         this.skin = skin;

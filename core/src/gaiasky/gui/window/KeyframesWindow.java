@@ -122,17 +122,17 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Last loaded/saved keyframe file name
      **/
-    private String lastKeyframeFileName = null;
+    private String lastKeyframeFileName;
     /**
      * Last saved camera path file name
      **/
-    private String lastCameraFileName = null;
+    private String lastCameraFileName;
     /**
      * Model object to represent the path
      **/
     private final Entity keyframesPathEntity;
     private final Keyframes keyframesComponent;
-    private long lastMs = 0L;
+    private long lastMs;
     private Color colorBak;
 
     /**
@@ -433,7 +433,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     return true;
                 }
                 String suggestedName = lastKeyframeFileName == null ? df.format(new Date()) + "_keyframes.gkf" : lastKeyframeFileName;
-                final FileNameWindow fnw = getFileNameWindow(suggestedName);
+                FileNameWindow fnw = getFileNameWindow(suggestedName);
                 fnw.show(stage);
                 return true;
             }
@@ -618,7 +618,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 }
 
                 Keyframe kf = new Keyframe(name, cPos, cDir, cUp, cTarget, cTime, secsAfter, false);
-                final boolean insert = index >= 0 && index != manager.keyframes.size();
+                boolean insert = index >= 0 && index != manager.keyframes.size();
                 if (!insert) {
                     synchronized (manager.keyframes) {
                         manager.keyframes.add(kf);
@@ -1436,9 +1436,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
         case KEYFRAME_ADD -> addKeyframe();
         case KEYFRAME_PLAY_FRAME -> {

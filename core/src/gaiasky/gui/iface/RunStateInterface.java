@@ -33,7 +33,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
     private final Image frameOutputImg;
     private final OwnTextIconButton cancelCamera;
     private final OwnTextIconButton bgLoading;
-    private boolean loadingPaused = false;
+    private boolean loadingPaused;
 
     public RunStateInterface(Skin skin, boolean horizontal) {
         super(skin);
@@ -98,7 +98,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case INPUT_ENABLED_CMD:
             GaiaSky.postRunnable(() -> {

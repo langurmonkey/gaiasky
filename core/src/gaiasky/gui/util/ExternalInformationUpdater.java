@@ -51,7 +51,7 @@ public class ExternalInformationUpdater {
         this.pad = pad;
     }
 
-    public void update(final FocusView focus) {
+    public void update(FocusView focus) {
         GaiaSky.postRunnable(() -> {
             if (focus != null) {
                 logger.debug("Looking up network resources for '" + focus.getName() + "'");

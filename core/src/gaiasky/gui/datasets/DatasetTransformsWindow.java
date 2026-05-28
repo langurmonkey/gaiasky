@@ -226,7 +226,7 @@ public class DatasetTransformsWindow extends GenericDialog {
                 buttons.add(rubbish);
 
                 // Type
-                final int idx = index;
+                int idx = index;
                 OwnSelectBox<TransformComboBoxBean> type = new OwnSelectBox<>(skin, "big");
                 type.setWidth(selectWidth);
                 type.setItems(transformTypes);

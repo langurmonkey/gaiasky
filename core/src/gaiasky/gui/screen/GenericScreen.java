@@ -124,7 +124,7 @@ public abstract class GenericScreen extends Table implements IScreen {
     /** If this dialog has tabs, this list holds them. **/
     protected Array<TextButton> tabButtons;
     /** Currently selected tab **/
-    protected int selectedTab = 0;
+    protected int selectedTab;
     /** Actual actor for each tab. **/
     protected Array<Group> tabContents;
     /** Tab contents stack. **/
@@ -139,8 +139,8 @@ public abstract class GenericScreen extends Table implements IScreen {
     // Backup active mouse/keyboard listeners before entering this dialog.
     protected Set<AbstractMouseKbdListener> backupMouseKbdListeners = new HashSet<>();
     // Backup of the gamepad listeners present before entering this dialog.
-    protected Set<ControllerListener> backupGamepadListeners = null;
-    private String acceptText = null, cancelText = null;
+    protected Set<ControllerListener> backupGamepadListeners;
+    private String acceptText, cancelText;
     private String acceptStyle = "default", cancelStyle = "default";
     private Actor previousKeyboardFocus, previousScrollFocus;
 

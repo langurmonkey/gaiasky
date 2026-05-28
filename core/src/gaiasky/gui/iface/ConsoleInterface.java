@@ -61,11 +61,11 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel prompt;
     int historyIndex = -1;
     float pad = 10f;
-    private boolean captureNotification = false;
+    private boolean captureNotification;
 
     private Logger.LoggerLevel level;
     private String message;
-    private boolean initialized = false;
+    private boolean initialized;
 
     private final String green = "\033[32m";
     private final String yellow = "\033[33m";
@@ -73,7 +73,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private final String reset = "\033[0m";
 
 
-    public ConsoleInterface(final Skin skin, final ConsoleManager manager) {
+    public ConsoleInterface(Skin skin, ConsoleManager manager) {
         super(skin);
         this.manager = manager;
 
@@ -254,9 +254,9 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
 
     private final Vector2 vec2 = new Vector2();
 
-    private void addOutput(String messageText, final MsgType type) {
+    private void addOutput(String messageText, MsgType type) {
         if (messageText != null) {
-            final int maxLen = (int) (outputScroll.getWidth() * 0.045);
+            int maxLen = (int) (outputScroll.getWidth() * 0.045);
             var text = TextUtils.breakCharacters(messageText, maxLen);
             ConsoleManager.Message msg = new ConsoleManager.Message(text, type, Instant.now());
             addMessageWidget(msg);
@@ -296,7 +296,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
     private Actor constructMessage(Message msg) {
         var currCol = Color.WHITE;
         int segments = 0;
-        final int maxLen = (int) (outputScroll.getWidth() * 0.055);
+        int maxLen = (int) (outputScroll.getWidth() * 0.055);
 
         // Initial vertical and horizontal groups' layout.
         Table vg = new Table(getSkin());
@@ -421,7 +421,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
         var modeStr = false;
         StringBuilder curr = new StringBuilder();
         for (var i = 0; i < n; i++) {
-            final var c = params.charAt(i);
+            var c = params.charAt(i);
             switch (c) {
                 case '"' -> {
                     if (modeStr) {
@@ -666,7 +666,7 @@ public class ConsoleInterface extends TableGuiInterface implements IObserver {
             if (matched == 0) {
                 addOutputError(String.format("%s: could not match command", cmd));
 
-                final var commandName = manager.shortcutMap().get(cmd);
+                var commandName = manager.shortcutMap().get(cmd);
                 var candidates = manager.methodMap().keySet().stream().filter(a -> a.equalsIgnoreCase(commandName)).toList();
                 if (!candidates.isEmpty()) {
                     addOutputInfo("Possible candidates:");

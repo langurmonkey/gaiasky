@@ -64,7 +64,7 @@ public class SearchDialog extends GenericDialog {
     private Table candidates;
     private int cIdx = -1;
 
-    public SearchDialog(Skin skin, Stage ui, final Scene scene, boolean suggestions) {
+    public SearchDialog(Skin skin, Stage ui, Scene scene, boolean suggestions) {
         super(I18n.msg("gui.objects.search"), skin, ui);
         this.scene = scene;
         this.aux = new Vector2();

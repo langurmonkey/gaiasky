@@ -44,8 +44,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     protected float space8, space4, space2;
     protected Cell<?> elementsCell;
     /** Currently selected component type. **/
-    protected String currentComponentType = null;
-    protected ComponentType currentCt = null;
+    protected String currentComponentType;
+    protected ComponentType currentCt;
     protected Map<String, CheckBox> cbMap;
 
     public IndividualVisibilityWindow(Scene scene, Stage stage, Skin skin) {
@@ -75,7 +75,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     protected void build() {
         content.clear();
 
-        final String cct = currentComponentType;
+        String cct = currentComponentType;
         // Components
         float buttonPadHor = 14f;
         float buttonPadVert = 8f;
@@ -97,8 +97,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         ComponentType[] visibilityEntities = ComponentType.values();
         int j = 0;
-        for (final ComponentType ct : visibilityEntities) {
-            final String name = ct.getName();
+        for (ComponentType ct : visibilityEntities) {
+            String name = ct.getName();
             if (name != null && componentFilter(ct)) {
                 Button button;
                 if (ct.style != null) {
@@ -172,11 +172,11 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 && ct != ComponentType.Systems;
     }
 
-    private boolean filter(final String[] names, final String filter) {
+    private boolean filter(String[] names, String filter) {
         if (filter == null || filter.isEmpty())
             return true;
 
-        for (final String name : names) {
+        for (String name : names) {
             if (name.toLowerCase(Locale.ROOT)
                     .contains(filter))
                 return true;
@@ -184,8 +184,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         return false;
     }
 
-    private void addObjects(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct,
-                            final String filter) {
+    private void addObjects(VerticalGroup objectsGroup, List<OwnCheckBox> checkBoxes, ComponentType ct,
+                            String filter) {
         // Locations and labels are special cases.
         if (ct == ComponentType.Locations) {
             // Locations are grouped by object.
@@ -198,7 +198,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         }
     }
 
-    private void addObjectsLabels(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final String filter) {
+    private void addObjectsLabels(VerticalGroup objectsGroup, List<OwnCheckBox> checkBoxes, String filter) {
         objectsGroup.clear();
         checkBoxes.clear();
         Array<Entity> objects = new Array<>();
@@ -269,7 +269,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
     }
 
-    private void addObjectsLocations(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final String filter) {
+    private void addObjectsLocations(VerticalGroup objectsGroup, List<OwnCheckBox> checkBoxes, String filter) {
         objectsGroup.clear();
         checkBoxes.clear();
         Array<Entity> objects = new Array<>();
@@ -430,8 +430,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         objectsGroup.pack();
     }
 
-    private void addObjectsRegular(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct,
-                                   final String filter) {
+    private void addObjectsRegular(VerticalGroup objectsGroup, List<OwnCheckBox> checkBoxes, ComponentType ct,
+                                   String filter) {
         objectsGroup.clear();
         checkBoxes.clear();
         Array<Entity> objects = new Array<>();
@@ -504,15 +504,15 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         objectsGroup.pack();
     }
 
-    private Group visibilitySwitcher(final ComponentType ct, final String title, final String id) {
+    private Group visibilitySwitcher(ComponentType ct, String title, String id) {
         float componentWidth = 495f;
 
         // Objects
-        final VerticalGroup objectsGroup = new VerticalGroup();
+        VerticalGroup objectsGroup = new VerticalGroup();
         objectsGroup.space(space4);
         objectsGroup.left();
         objectsGroup.columnLeft();
-        final List<OwnCheckBox> checkBoxes = new ArrayList<>();
+        List<OwnCheckBox> checkBoxes = new ArrayList<>();
         addObjects(objectsGroup, checkBoxes, ct, null);
 
         OwnScrollPane scrollPane = new OwnScrollPane(objectsGroup, skin, "minimalist-nobg");

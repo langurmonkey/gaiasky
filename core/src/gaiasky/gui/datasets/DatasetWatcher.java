@@ -95,7 +95,7 @@ public class DatasetWatcher implements IObserver {
                         }
                     }
                     case DATASET_DOWNLOAD_FINISH_INFO -> {
-                        final int status = (Integer) data[1];
+                        int status = (Integer) data[1];
                         String messageKey = switch (status) {
                             case 0 -> "gui.download.status.found";
                             case 1 -> "gui.download.status.failed";
