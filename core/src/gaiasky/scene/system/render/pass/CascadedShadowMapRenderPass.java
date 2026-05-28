@@ -59,7 +59,7 @@ public class CascadedShadowMapRenderPass extends RenderPass {
     private static boolean DEBUG_UI_VIEW = false;
     private static final int NUM_UI_VIEW = 9;
 
-    public CascadedShadowMapRenderPass(final SceneRenderer sceneRenderer) {
+    public CascadedShadowMapRenderPass(SceneRenderer sceneRenderer) {
         super(sceneRenderer);
         this.modelRenderer = new ModelEntityRenderSystem(sceneRenderer);
         this.cascadeShadowMap = new CascadeShadowMap(CASCADE_COUNT);

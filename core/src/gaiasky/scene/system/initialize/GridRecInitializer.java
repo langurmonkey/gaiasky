@@ -101,13 +101,13 @@ public class GridRecInitializer extends AbstractInitSystem {
 
     private void initAnnotations(GridRecursive gr) {
         gr.annotations = new ArrayList<>();
-        annotation(gr, 1d * Constants.M_TO_U, "1 " + I18n.msg("gui.unit.m"));
+        annotation(gr, Constants.M_TO_U, "1 " + I18n.msg("gui.unit.m"));
         annotation(gr, 50d * Constants.M_TO_U, "50 " + I18n.msg("gui.unit.m"));
         annotation(gr, 100d * Constants.M_TO_U, "100 " + I18n.msg("gui.unit.m"));
         annotation(gr, 200d * Constants.M_TO_U, "200 " + I18n.msg("gui.unit.m"));
         annotation(gr, 500d * Constants.M_TO_U, "500 " + I18n.msg("gui.unit.m"));
 
-        annotation(gr, 1d * Constants.KM_TO_U, "1 " + I18n.msg("gui.unit.km"));
+        annotation(gr, Constants.KM_TO_U, "1 " + I18n.msg("gui.unit.km"));
         annotation(gr, 10d * Constants.KM_TO_U, "10 " + I18n.msg("gui.unit.km"));
         annotation(gr, 100d * Constants.KM_TO_U, "100 " + I18n.msg("gui.unit.km"));
         annotation(gr, 250d * Constants.KM_TO_U, "250 " + I18n.msg("gui.unit.km"));
@@ -124,7 +124,7 @@ public class GridRecInitializer extends AbstractInitSystem {
 
         annotation(gr, 0.1d * Constants.AU_TO_U, "0.1 " + I18n.msg("gui.unit.au"));
         annotation(gr, 0.5d * Constants.AU_TO_U, "0.5 " + I18n.msg("gui.unit.au"));
-        annotation(gr, 1d * Constants.AU_TO_U, "1 " + I18n.msg("gui.unit.au"));
+        annotation(gr, Constants.AU_TO_U, "1 " + I18n.msg("gui.unit.au"));
         annotation(gr, 2d * Constants.AU_TO_U, "2 " + I18n.msg("gui.unit.au"));
         annotation(gr, 5d * Constants.AU_TO_U, "5 " + I18n.msg("gui.unit.au"));
         annotation(gr, 10d * Constants.AU_TO_U, "10 " + I18n.msg("gui.unit.au"));
@@ -136,10 +136,10 @@ public class GridRecInitializer extends AbstractInitSystem {
         annotation(gr, 10000d * Constants.AU_TO_U, "10000 " + I18n.msg("gui.unit.au"));
         annotation(gr, 50000d * Constants.AU_TO_U, "50000 " + I18n.msg("gui.unit.au"));
 
-        annotation(gr, 1d * Constants.LY_TO_U, "1 " + I18n.msg("gui.unit.ly"));
+        annotation(gr, Constants.LY_TO_U, "1 " + I18n.msg("gui.unit.ly"));
         annotation(gr, 2d * Constants.LY_TO_U, "2 " + I18n.msg("gui.unit.ly"));
 
-        annotation(gr, 1d * Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.pc"));
+        annotation(gr, Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.pc"));
         annotation(gr, 2.5d * Constants.PC_TO_U, "2.5 " + I18n.msg("gui.unit.pc"));
         annotation(gr, 5d * Constants.PC_TO_U, "5 " + I18n.msg("gui.unit.pc"));
         annotation(gr, 10d * Constants.PC_TO_U, "10 " + I18n.msg("gui.unit.pc"));

@@ -215,7 +215,7 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
             if (source instanceof Render)
                 GaiaSky.postRunnable(this::reset);

@@ -562,7 +562,7 @@ public class LabelEntityRenderSystem {
 
 
         // Horizon
-        final float stepAngle = 360f / (divisionsUV * lod);
+        float stepAngle = 360f / (divisionsUV * lod);
 
         // Labels at 1 parsec.
         float distToCamera = (float) (1 * Constants.PC_TO_U);

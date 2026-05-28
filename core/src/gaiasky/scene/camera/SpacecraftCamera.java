@@ -353,7 +353,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case SPACECRAFT_LOADED -> {
             sc = (Entity) data[0];

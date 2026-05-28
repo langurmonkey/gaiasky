@@ -47,7 +47,6 @@ public class BackgroundUpdater extends AbstractUpdateSystem {
         var model = Mapper.model.get(entity);
 
         String transformName = transform.transformName;
-        ;
         Matrix4 localTransform = graph.localTransform;
 
         localTransform.idt();

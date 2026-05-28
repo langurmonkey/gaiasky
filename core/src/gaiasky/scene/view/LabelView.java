@@ -322,7 +322,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             shader.setUniformf("u_pos", pos);
 
             // Enable or disable blending
-            ((I3DTextRenderable) this).textDepthBuffer();
+            this.textDepthBuffer();
 
             DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }

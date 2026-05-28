@@ -196,8 +196,8 @@ public class BillboardProceduralCPURenderer extends InstancedRenderSystem implem
                 if (bd.getGenStatus() == GenStatus.NOT_STARTED) {
                     // Start generation in the CPU.
                     bd.setGenStatus(GenStatus.RUNNING);
-                    final var index = i;
-                    final Runnable genTask = () -> {
+                    var index = i;
+                    Runnable genTask = () -> {
                         try {
                             var generator = new CPUGalGenFallback(body.size);
                             var data = generator.generate(bd, (int) set.seed + index);
@@ -308,7 +308,7 @@ public class BillboardProceduralCPURenderer extends InstancedRenderSystem implem
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
             var renderable = (Render) data[0];
             var bb = Mapper.billboardSet.get(renderable.getEntity());

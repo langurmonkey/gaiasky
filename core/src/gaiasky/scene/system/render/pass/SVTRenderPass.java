@@ -73,7 +73,7 @@ public class SVTRenderPass extends RenderPass {
 
     private boolean DEBUG_UI_VIEW = false;
 
-    public SVTRenderPass(final SceneRenderer sceneRenderer) {
+    public SVTRenderPass(SceneRenderer sceneRenderer) {
         super(sceneRenderer);
         this.view = new ModelView();
         this.candidates = new Array<>();
@@ -153,7 +153,7 @@ public class SVTRenderPass extends RenderPass {
     @Override
     protected void renderPass(ICamera camera, Object... params) {
         // We use three stages.
-        final long f = GaiaSky.instance.frames % 5;
+        long f = GaiaSky.instance.frames % 5;
         switch ((int) f) {
             case 0 -> stage0();
             case 1 -> stage1(camera);

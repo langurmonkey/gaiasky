@@ -102,8 +102,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
         float y = h / 2;
         float width = -w;
         float height = -h;
-        final float fx2 = x + width;
-        final float fy2 = y + height;
+        float fx2 = x + width;
+        float fy2 = y + height;
         final float u = 1;
         final float v = 1;
         final float u2 = 0;
@@ -177,7 +177,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.BILLBOARD_TEXTURE_IDX_CMD) {
             GaiaSky.postRunnable(() -> setBillboardTexture(GaiaSky.settings().scene.star.getStarTexture()));
         }

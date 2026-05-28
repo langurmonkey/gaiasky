@@ -45,7 +45,7 @@ public class LightGlowRenderPass extends RenderPass {
     // Debug occlusion texture.
     private boolean DEBUG_UI_VIEW = false;
 
-    public LightGlowRenderPass(final SceneRenderer sceneRenderer) {
+    public LightGlowRenderPass(SceneRenderer sceneRenderer) {
         super(sceneRenderer);
         this.stars = new ArrayList<>();
         this.lpu = new LightPositionUpdater();

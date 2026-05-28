@@ -445,7 +445,7 @@ public class ModelInitializer extends AbstractInitSystem {
      *
      * @param machine The machine definition.
      */
-    private void setToMachine(final MachineDefinition machine, final boolean initialize, Body body, Model
+    private void setToMachine(MachineDefinition machine, boolean initialize, Body body, Model
             model, ModelScaffolding scaffolding, MotorEngine engine) {
         model.model = machine.getModel();
         engine.thrustMagnitude = machine.getPower() * MotorEngine.thrustBase;

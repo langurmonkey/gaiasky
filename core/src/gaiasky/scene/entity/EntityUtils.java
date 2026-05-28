@@ -30,7 +30,7 @@ public class EntityUtils {
      *
      * @return The vector with the position.
      */
-    public static Vector3Q getAbsolutePosition(final Entity entity, Vector3Q out) {
+    public static Vector3Q getAbsolutePosition(Entity entity, Vector3Q out) {
         if (entity != null) {
             var body = Mapper.body.get(entity);
             out.set(body.pos);
@@ -55,7 +55,7 @@ public class EntityUtils {
      *
      * @return The vector with the position.
      */
-    public static Vector3D getAbsolutePosition(final Entity entity, Vector3D out) {
+    public static Vector3D getAbsolutePosition(Entity entity, Vector3D out) {
         if (entity != null) {
             var body = Mapper.body.get(entity);
             body.pos.put(out);

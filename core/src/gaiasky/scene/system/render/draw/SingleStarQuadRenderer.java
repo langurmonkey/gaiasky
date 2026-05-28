@@ -209,7 +209,7 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case STAR_BASE_LEVEL_CMD -> {
             triComponent.updateStarOpacityLimits((float) data[0], GaiaSky.settings().scene.star.opacity[1]);

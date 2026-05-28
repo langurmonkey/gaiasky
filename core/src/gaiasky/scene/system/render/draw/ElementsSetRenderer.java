@@ -395,9 +395,9 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
             if (source instanceof Render render) {
                 int offset = getOffset(render);

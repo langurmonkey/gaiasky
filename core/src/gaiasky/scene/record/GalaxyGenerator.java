@@ -188,7 +188,7 @@ public class GalaxyGenerator {
      * @return A couple of {@link BillboardDataset} arrays, the first being the full-resolution channel, and the second being the half-resolution
      *         channel.
      */
-    public Pair<BillboardDataset[], BillboardDataset[]> generateGalaxy(GalaxyMorphology gm, final long seed) {
+    public Pair<BillboardDataset[], BillboardDataset[]> generateGalaxy(GalaxyMorphology gm, long seed) {
         rand.setSeed(seed);
         if (gm == null) {
             gm = GalaxyMorphology.values()[rand.nextInt(GalaxyMorphology.values().length)];

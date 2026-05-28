@@ -32,7 +32,7 @@ public class Archetype {
     private final Set<Class<? extends Component>> components;
 
     @SafeVarargs
-    public Archetype(final Engine engine, final Archetype parent, final String name, Class<? extends Component>... componentClasses) {
+    public Archetype(Engine engine, Archetype parent, String name, Class<? extends Component>... componentClasses) {
         this.engine = engine;
         this.parent = parent;
         int lastIndex = name.lastIndexOf('.');
@@ -43,7 +43,7 @@ public class Archetype {
     }
 
     @SafeVarargs
-    public Archetype(final Engine engine, final String name, Class<? extends Component>... componentClasses) {
+    public Archetype(Engine engine, String name, Class<? extends Component>... componentClasses) {
         this(engine, null, name, componentClasses);
     }
 

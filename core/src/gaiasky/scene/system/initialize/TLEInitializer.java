@@ -58,12 +58,12 @@ public class TLEInitializer extends AbstractInitSystem {
             synchronized (lock) {
                 var base = Mapper.base.get(entity);
 
-                final var now = Instant.now();
-                final var tle = Mapper.tle.get(entity);
-                final var fileName = TextUtils.sanitizeFilename(tle.nameTLE + "-TLE.json");
-                final var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
+                var now = Instant.now();
+                var tle = Mapper.tle.get(entity);
+                var fileName = TextUtils.sanitizeFilename(tle.nameTLE + "-TLE.json");
+                var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
                 var ignored = cacheDir.toFile().mkdirs();
-                final var filePath = cacheDir.resolve(fileName);
+                var filePath = cacheDir.resolve(fileName);
                 var mustUpdate = false;
                 if (Files.exists(filePath)) {
                     // Check date.

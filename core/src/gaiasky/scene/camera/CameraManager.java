@@ -447,7 +447,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case CAMERA_MODE_CMD -> {
                 CameraMode newCameraMode = (CameraMode) data[0];

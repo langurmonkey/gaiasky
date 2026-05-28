@@ -46,15 +46,15 @@ public class SceneObserver implements IObserver {
         switch (event) {
             case PER_OBJECT_VISIBILITY_CMD -> {
                 if (data[0] instanceof FocusView focusView) {
-                    final String name = (String) data[1];
-                    final boolean state = (boolean) data[2];
+                    String name = (String) data[1];
+                    boolean state = (boolean) data[2];
 
                     focusView.setVisible(state, name.toLowerCase(Locale.ROOT).strip());
                     logger.info(I18n.msg("notif.visibility.object.set", focusView.getName(), I18n.msg("gui." + state)));
                 } else if (data[0] instanceof Entity entity) {
                     view.setEntity(entity);
-                    final String name = (String) data[1];
-                    final boolean state = (boolean) data[2];
+                    String name = (String) data[1];
+                    boolean state = (boolean) data[2];
 
                     view.setVisible(state, name.toLowerCase(Locale.ROOT).strip());
                     logger.info(I18n.msg("notif.visibility.object.set", view.getName(), I18n.msg("gui." + state)));
@@ -71,8 +71,8 @@ public class SceneObserver implements IObserver {
                     focusView = fv;
                 }
                 if (focusView != null) {
-                    final var name = (String) data[1];
-                    final var state = (LabelDisplay) data[2];
+                    var name = (String) data[1];
+                    var state = (LabelDisplay) data[2];
 
                     focusView.setLabelDisplay(state, name);
                     logger.info(I18n.msg("notif.object.property", "labelDisplay", name, state.localizedName()));
@@ -91,7 +91,7 @@ public class SceneObserver implements IObserver {
                 LabelEntityRenderSystem.removeIncludeRegex();
             }
             case LABEL_COLOR_CMD -> {
-                final Entity entity = (Entity) data[0];
+                Entity entity = (Entity) data[0];
                 String name = (String) data[1];
                 float[] labelColor = (float[]) data[2];
 

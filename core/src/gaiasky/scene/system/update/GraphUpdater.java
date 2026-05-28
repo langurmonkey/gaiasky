@@ -112,7 +112,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
     public void update(Entity entity,
                        ITimeFrameProvider time,
-                       final Vector3Q parentTranslation,
+                       Vector3Q parentTranslation,
                        float opacity) {
         processed++;
         var graph = Mapper.graph.get(entity);

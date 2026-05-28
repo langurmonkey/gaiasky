@@ -225,8 +225,8 @@ public class CPUGalGenFallback {
             List<Callable<Void>> tasks = new ArrayList<>();
 
             for (int start = 0; start < count; start += chunkSize) {
-                final int chunkStart = start;
-                final int chunkEnd = Math.min(start + chunkSize, count);
+                int chunkStart = start;
+                int chunkEnd = Math.min(start + chunkSize, count);
 
                 tasks.add(() -> {
                     for (int i = chunkStart; i < chunkEnd; i++) {

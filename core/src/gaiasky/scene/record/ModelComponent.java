@@ -1016,9 +1016,9 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         if (event == Event.ECLIPSES_CMD) {
             boolean active = (Boolean) data[0];
             if (!active) {

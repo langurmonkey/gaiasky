@@ -745,8 +745,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             heightGenerated.set(true);
             GaiaSky.postRunnable(() -> {
                 // 1ST FRAME - CREATE NOISE.
-                final int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
-                final int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
+                int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
+                int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
                 logger.info(I18n.msg("gui.procedural.info.generate",
                                      I18n.msg("gui.procedural.surface"),
                                      Integer.toString(N),
@@ -1363,9 +1363,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case ELEVATION_TYPE_CMD -> {
                 if (this.hasHeight() && this.material != null) {

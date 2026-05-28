@@ -97,7 +97,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     protected void renderObject(ExtShaderProgram shaderProgram,
                                 ICamera camera,
                                 IRenderable renderable) {
-        final Render render = (Render) renderable;
+        Render render = (Render) renderable;
         var base = Mapper.base.get(render.entity);
         var set = Mapper.starSet.get(render.entity);
         var hl = Mapper.highlight.get(render.entity);
@@ -230,9 +230,9 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case STAR_BASE_LEVEL_CMD -> {
                 triComponent.updateStarOpacityLimits((float) data[0], GaiaSky.settings().scene.star.opacity[1]);

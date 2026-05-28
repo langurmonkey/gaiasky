@@ -95,9 +95,9 @@ public class BillboardEntityRenderSystem implements IObserver {
     }
 
 
-    private Matrix4 mat = new Matrix4();
-    private Vector3 vec1 = new Vector3();
-    private Vector3 vec2 = new Vector3(0, 1, 0);
+    private final Matrix4 mat = new Matrix4();
+    private final Vector3 vec1 = new Vector3();
+    private final Vector3 vec2 = new Vector3(0, 1, 0);
 
     private void renderCloseUpStar(StarSet set,
                                    Highlight highlight,
@@ -271,8 +271,8 @@ public class BillboardEntityRenderSystem implements IObserver {
         boolean isStar = Mapper.hip.has(entity);
         boolean isModel = !isStar && Mapper.model.has(entity);
 
-        final float fuzzySize = getRenderSizeCelestial(camera, entity, body, sa, scaffolding, extra);
-        final float radius = (float) (extra != null ? extra.radius : (body.size / (2d)) * scaffolding.sizeScaleFactor);
+        float fuzzySize = getRenderSizeCelestial(camera, entity, body, sa, scaffolding, extra);
+        float radius = (float) (extra != null ? extra.radius : (body.size / (2d)) * scaffolding.sizeScaleFactor);
 
         Vector3 billboardPosition = graph.translation.put(F31);
         if (isModel) {

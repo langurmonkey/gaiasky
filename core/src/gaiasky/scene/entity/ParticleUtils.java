@@ -66,7 +66,7 @@ public class ParticleUtils {
         }
     }
 
-    public double getVariableSizeScaling(final StarSet set, final int idx) {
+    public double getVariableSizeScaling(StarSet set, int idx) {
         IParticleRecord ipr = set.pointData.get(idx);
         if (ipr.isVariable()) {
             double[] times = ipr.variTimes();
@@ -127,7 +127,7 @@ public class ParticleUtils {
      * @return The result of the filter evaluation, true if the particle passed the filtering, false otherwise
      */
     public boolean filter(int index, ParticleSet particleSet, DatasetDescription datasetDescription) {
-        final DatasetCard datasetCard = datasetDescription.datasetCard;
+        DatasetCard datasetCard = datasetDescription.datasetCard;
         if (datasetCard != null && datasetCard.filter != null) {
             return datasetCard.filter.evaluate(particleSet.get(index));
         }
@@ -152,7 +152,7 @@ public class ParticleUtils {
      * @param manager The asset manager.
      * @param model   The model component.
      */
-    public void initModel(final AssetManager manager, final Model model) {
+    public void initModel(AssetManager manager, Model model) {
         if (model == null) {
             throw new RuntimeException("The incoming star model component can't be null!");
         }

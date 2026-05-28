@@ -450,7 +450,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         switch (m) {
             case FOCUS_MODE:
                 if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow() && focus.isFocusable()) {
-                    final double appMagCamera, appMagEarth;
+                    double appMagCamera, appMagEarth;
                     synchronized (updateLock) {
                         focusBak = focus;
                         this.focus.getAbsolutePosition(aux4b);
@@ -519,9 +519,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         aux4b.add(dx);
 
                         // Surface mode.
-                        final Vector3Q camObj = aux1b.set(aux4b)
+                        Vector3Q camObj = aux1b.set(aux4b)
                                 .sub(pos);
-                        final double distFromFocus = camObj.lenDouble();
+                        double distFromFocus = camObj.lenDouble();
 
                         // Surface mode activates when we're at 1.8 radii from the focus object, and it is a planet. Camera can't be tracking an object.
                         surfaceModeFlag.set(
@@ -602,9 +602,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     if (gravity && (closestBody.getEntity() != null) && closestBody.isPlanet() && !currentMouseKbdListener.isKeyPressed(
                             Input.Keys.SPACE)) {
                         // Add gravity to force, pulling to the closest body
-                        final Vector3Q camObj = closestBody.getAbsolutePosition(aux1b)
+                        Vector3Q camObj = closestBody.getAbsolutePosition(aux1b)
                                 .sub(pos);
-                        final double dist = camObj.lenDouble();
+                        double dist = camObj.lenDouble();
                         // Gravity acts only at twice the radius, in planets
                         if (dist < closestBody.getRadius() * 2d) {
                             force.add(camObj.nor()
@@ -1141,7 +1141,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Updates the direction vector using the pitch, yaw and roll forces.
      */
     private void updateRotation(double dt,
-                                final Vector3Q rotationCenter) {
+                                Vector3Q rotationCenter) {
         // Add position to compensate for coordinates centered on camera
         // rotationCenter.add(pos);
         if (updatePosition(vertical, dt)) {
@@ -1219,7 +1219,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param turnVelocity The velocity at which to turn
      */
     private void directionToTarget(double dt,
-                                   final Vector3Q target,
+                                   Vector3Q target,
                                    double turnVelocity) {
         desired.set(target)
                 .sub(pos)
@@ -1248,7 +1248,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      *
      * @param target The position of the target
      */
-    private void directionToTrackingObject(final Vector3Q target) {
+    private void directionToTrackingObject(Vector3Q target) {
         desired.set(target)
                 .sub(pos)
                 .nor();
@@ -1429,7 +1429,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             smoothedDistance = 0;
         }
         smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, 5.0);
-        final var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
+        var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
 
         return smoothedDistance >= 0 ? (Math.max(distanceMap,
                                                  min) * GaiaSky.settings().scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
@@ -1445,9 +1445,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void notify(final Event event,
+    public void notify(Event event,
                        Object source,
-                       final Object... data) {
+                       Object... data) {
         switch (event) {
             case SCENE_LOADED -> {
                 this.scene = (Scene) data[0];
@@ -1563,7 +1563,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             case GO_TO_OBJECT_CMD -> {
                 if (this.focus != null && this.focus.isValid()) {
-                    final IFocus f = this.focus;
+                    IFocus f = this.focus;
                     GaiaSky.postRunnable(() -> {
                         setTrackingObject(null, null);
                         // Position camera near focus
@@ -1657,8 +1657,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 }
             }
             case CAMERA_TRACKING_OBJECT_CMD -> {
-                final Entity newTrackingObject = (Entity) data[0];
-                final String newTrackingName = (String) data[1];
+                Entity newTrackingObject = (Entity) data[0];
+                String newTrackingName = (String) data[1];
                 synchronized (updateLock) {
                     this.setTrackingObject(newTrackingObject,
                                            newTrackingName != null ? newTrackingName.toLowerCase(Locale.ROOT) : null);
@@ -1679,7 +1679,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param rotationAxis   the axis to rotate around
      * @param angle          the angle, in degrees
      */
-    public void rotateAround(final Vector3Q rotationCenter,
+    public void rotateAround(Vector3Q rotationCenter,
                              Vector3D rotationAxis,
                              double angle) {
         rotate(rotationAxis, angle);
@@ -2277,8 +2277,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return currentMouseKbdListener;
     }
 
-    private void setTrackingObject(final Entity trackingObject,
-                                   final String trackingName) {
+    private void setTrackingObject(Entity trackingObject,
+                                   String trackingName) {
         this.trackingObject.setEntity(trackingObject);
         this.trackingName = trackingName;
         EventManager.publish(Event.CAMERA_TRACKING_OBJECT_UPDATE, this, new FocusView(trackingObject), trackingName);

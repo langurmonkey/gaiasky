@@ -172,7 +172,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
         setInGpu(render, true);
     }
 
-    private ColorGenerator getColorGenerator(final ChannelType type) {
+    private ColorGenerator getColorGenerator(ChannelType type) {
         return type == ChannelType.DUST ? dustColorGenerator : starColorGenerator;
     }
 
@@ -284,7 +284,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
             IRenderable renderable = (IRenderable) data[0];
             int offset = getOffset(renderable);

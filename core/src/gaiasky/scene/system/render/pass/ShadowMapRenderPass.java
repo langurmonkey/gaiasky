@@ -68,7 +68,7 @@ public class ShadowMapRenderPass extends RenderPass {
     private Vector3D aux1d, aux2d, aux3d;
     private Vector3Q aux1b, aux2b;
 
-    public ShadowMapRenderPass(final SceneRenderer sceneRenderer) {
+    public ShadowMapRenderPass(SceneRenderer sceneRenderer) {
         super(sceneRenderer);
         this.modelRenderer = new ModelEntityRenderSystem(sceneRenderer);
     }
@@ -207,7 +207,7 @@ public class ShadowMapRenderPass extends RenderPass {
             cameraLightGlobal.update(false);
 
             // Render model depth map to global frame buffer.
-            final var fb = globalFrameBuffer == null ? newShadowMapFrameBuffer(null) : globalFrameBuffer;
+            var fb = globalFrameBuffer == null ? newShadowMapFrameBuffer(null) : globalFrameBuffer;
 
             fb.begin();
             Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -277,7 +277,7 @@ public class ShadowMapRenderPass extends RenderPass {
                 cameraLightIndividual.update(false);
 
                 // Render model depth map to frame buffer.
-                final var fb = scaffolding.shadowMapFb == null ? newShadowMapFrameBuffer(candidate) : scaffolding.shadowMapFb;
+                var fb = scaffolding.shadowMapFb == null ? newShadowMapFrameBuffer(candidate) : scaffolding.shadowMapFb;
 
                 scaffolding.shadowMapFb = fb;
                 if (GLOBAL_SM) {
@@ -445,7 +445,7 @@ public class ShadowMapRenderPass extends RenderPass {
             renderShadowMapGlobal(models, camera);
         }
 
-        final int shadowNRender = (GaiaSky.settings().program.modeStereo.active || GaiaSky.settings().runtime.openXr) ?
+        int shadowNRender = (GaiaSky.settings().program.modeStereo.active || GaiaSky.settings().runtime.openXr) ?
                 2 :
                 GaiaSky.settings().program.modeCubemap.active ? 6 : 1;
 

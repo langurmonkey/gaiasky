@@ -211,9 +211,9 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                     // Send request.
                     var fileName = FilenameUtils.getName(urlObject.getPath());
                     fileName = TextUtils.sanitizeFilename(name + "-" + fileName);
-                    final var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
+                    var cacheDir = SysUtils.getDataCacheDir(GaiaSky.settings().data.location);
                     var ignored = cacheDir.toFile().mkdirs();
-                    final var filePath = cacheDir.resolve(fileName);
+                    var filePath = cacheDir.resolve(fileName);
                     var f = new FileHandle(filePath.toFile());
 
                     DownloadHelper.downloadFile(url, f, GaiaSky.settings().program.offlineMode, null, null, (digest) -> {
@@ -343,8 +343,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             generated.set(true);
             GaiaSky.postRunnable(() -> {
 
-                final int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
-                final int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
+                int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
+                int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
                 long start = TimeUtils.millis();
                 logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.cloud"), N, M));
 

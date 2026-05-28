@@ -89,6 +89,6 @@ public class VolumeDataset {
         HII,
         GALAXY,
         POINT,
-        OTHER;
+        OTHER
     }
 }

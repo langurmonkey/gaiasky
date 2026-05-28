@@ -122,7 +122,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      */
     private final RenderGroup[] autonomousGroups = new RenderGroup[]{PARTICLE_EFFECTS};
 
-    public SceneRenderer(final XrDriver xrDriver, final GlobalResources globalResources) {
+    public SceneRenderer(XrDriver xrDriver, GlobalResources globalResources) {
         super();
         this.xrDriver = xrDriver;
         this.globalResources = globalResources;
@@ -198,7 +198,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return renderLists;
     }
 
-    public void doneLoading(final AssetManager manager) {
+    public void doneLoading(AssetManager manager) {
         // Prepare render assets.
         renderAssets.doneLoading(manager);
 
@@ -213,7 +213,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // Set reference
         visible = new ComponentTypes();
-        final ComponentType[] types = ComponentType.values();
+        ComponentType[] types = ComponentType.values();
         for (int i = 0; i < GaiaSky.settings().scene.visibility.size(); i++) {
             if (GaiaSky.settings().scene.visibility.get(types[i].toString())) {
                 visible.set(ComponentType.values()[i].ordinal());
@@ -255,7 +255,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     }
 
-    private AbstractRenderSystem initializeRenderSystem(final RenderGroup rg) {
+    private AbstractRenderSystem initializeRenderSystem(RenderGroup rg) {
         AbstractRenderSystem system = null;
         switch (rg) {
             case SKYBOX -> // SKYBOX - (MW panorama, CMWB)
@@ -506,14 +506,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param fb     The frame buffer. Null to render to screen.
      * @param ppb    The post process bean.
      */
-    public void render(final ICamera camera,
-                       final double t,
-                       final int rw,
-                       final int rh,
-                       final int tw,
-                       final int th,
-                       final FrameBuffer fb,
-                       final PostProcessBean ppb) {
+    public void render(ICamera camera,
+                       double t,
+                       int rw,
+                       int rh,
+                       int tw,
+                       int th,
+                       FrameBuffer fb,
+                       PostProcessBean ppb) {
 
         if (rendering.get()) {
             // Init render mode (stereo, 360, etc.) if necessary.
@@ -710,7 +710,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, final Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
             case TOGGLE_VISIBILITY_CMD -> {
                 ComponentType ct = ComponentType.getFromKey((String) data[0]);
@@ -807,7 +807,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param rw New render buffer width.
      * @param rh New render buffer height.
      */
-    public void resize(final int tw, final int th, final int rw, final int rh) {
+    public void resize(int tw, int th, int rw, int rh) {
         resize(tw, th, rw, rh, false);
     }
 
@@ -820,7 +820,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param rh              New render buffer height.
      * @param resizeRenderSys Also resize all render systems.
      */
-    public void resize(final int tw, final int th, final int rw, final int rh, boolean resizeRenderSys) {
+    public void resize(int tw, int th, int rw, int rh, boolean resizeRenderSys) {
         if (resizeRenderSys) {
             resizeRenderSystems(tw, th);
         }
@@ -836,7 +836,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param tw New target (screen) width.
      * @param th New target (screen) height.
      */
-    public void resizeRenderSystems(final int tw, final int th) {
+    public void resizeRenderSystems(int tw, int th) {
         var systems = renderSystems.values();
         for (IRenderSystem rendSys : systems) {
             rendSys.resize(tw, th);
@@ -929,16 +929,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return xrDriver;
     }
 
-    public FrameBuffer getFrameBuffer(final int w, final int h) {
-        final int key = getKey(w, h);
+    public FrameBuffer getFrameBuffer(int w, int h) {
+        int key = getKey(w, h);
         if (!frameBufferMap.containsKey(key)) {
-            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, Format.RGB888, true);
+            FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, Format.RGB888, true);
             frameBufferMap.put(key, fb);
         }
         return frameBufferMap.get(key);
     }
 
-    private int getKey(final int w, final int h) {
+    private int getKey(int w, int h) {
         return 31 * h + w;
     }
 
