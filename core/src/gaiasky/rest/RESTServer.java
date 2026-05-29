@@ -17,6 +17,7 @@ import gaiasky.script.v2.impl.APIv2;
 import gaiasky.script.v2.meta.ModuleDesc;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Pair;
 import spark.Spark;
 
 import java.lang.reflect.Method;
@@ -217,6 +218,52 @@ public class RESTServer {
         }
     }
 
+    private static Pair<Method, Boolean> matchParameters(Array<Method> matchMethods,
+                                                         String cmd,
+                                                         Set<String> queryParams) {
+        Method matchMethod = null;
+        boolean methodNameMatches = false;
+        for (int i = 0; i < matchMethods.size; i++) {
+            Method m = matchMethods.get(i);
+            logger.debug("match check cmd={} with method={}...", cmd, m.getName());
+
+            // name matches, but parameters may be different
+            if (m.getName().equals(cmd)) {
+                logger.debug("  [+] name matches");
+                methodNameMatches = true;
+                Parameter[] methodParams = matchMethods.get(i).getParameters();
+
+                // check number of parameters
+                boolean numParametersMatch = methodParams.length == queryParams.size();
+                if (!numParametersMatch) {
+                    logger.debug(" [+] number of parameters does not match");
+                    continue; // not the right method
+                }
+
+                // check if parameters present (and optionally type fits?)
+                boolean allMethodParamsFullfilled = true;
+
+                int pi = 0;
+                for (Parameter p : methodParams) {
+                    if (!queryParams.contains(p.getName()) && !queryParams.contains("arg" + pi)) {
+                        allMethodParamsFullfilled = false;
+                        logger.debug("  [+] method parameters not present");
+                        break; // no need to continue checking
+                    }
+                    pi++;
+                    // could test for parameter type here...
+                }
+
+                if (allMethodParamsFullfilled) {
+                    logger.debug("  [+] all method parameters present");
+                    matchMethod = m;
+                    break; // no need to continue checking: the first match
+                }
+            }
+        }
+        return new Pair<>(matchMethod, methodNameMatches);
+    }
+
     /**
      * Handles the API call.
      * <p>
@@ -268,8 +315,6 @@ public class RESTServer {
 
         /* Method matching (name and parameters) */
         logger.debug("Method matching...");
-        Method matchMethod = null;
-        boolean methodNameMatches = false;
 
         if (!apiv1Methods.containsKey(cmd)) {
             /* No match: could not find matching method */
@@ -283,45 +328,9 @@ public class RESTServer {
         }
 
         Array<Method> matchMethods = apiv1Methods.get(cmd);
-
-        for (int i = 0; i < matchMethods.size; i++) {
-            Method m = matchMethods.get(i);
-            logger.debug("match check cmd={} with method={}...", cmd, m.getName());
-
-            // name matches, but parameters may be different
-            if (m.getName().equals(cmd)) {
-                logger.debug("  [+] name matches");
-                methodNameMatches = true;
-                Parameter[] methodParams = matchMethods.get(i).getParameters();
-
-                // check number of parameters
-                boolean numParametersMatch = methodParams.length == queryParams.size();
-                if (!numParametersMatch) {
-                    logger.debug(" [+] number of parameters does not match");
-                    continue; // not the right method
-                }
-
-                // check if parameters present (and optionally type fits?)
-                boolean allMethodParamsFullfilled = true;
-
-                int pi = 0;
-                for (Parameter p : methodParams) {
-                    if (!queryParams.contains(p.getName()) && !queryParams.contains("arg" + pi)) {
-                        allMethodParamsFullfilled = false;
-                        logger.debug("  [+] method parameters not present");
-                        break; // no need to continue checking
-                    }
-                    pi++;
-                    // could test for parameter type here...
-                }
-
-                if (allMethodParamsFullfilled) {
-                    logger.debug("  [+] all method parameters present");
-                    matchMethod = m;
-                    break; // no need to continue checking: the first match
-                }
-            }
-        }
+        var matched = matchParameters(matchMethods, cmd,  queryParams);
+        var matchMethod = matched.getFirst();
+        var methodNameMatches = matched.getSecond();
 
         /* Handle matching result */
         if (matchMethod != null) {
@@ -502,8 +511,6 @@ public class RESTServer {
 
         /* Method matching (name and parameters) */
         logger.debug("Method matching...");
-        Method matchMethod = null;
-        boolean methodNameMatches = false;
 
         if (module.methodMap() == null || !module.methodMap().containsKey(cmd)) {
             // Check if it is a module path, and serve help.
@@ -527,45 +534,9 @@ public class RESTServer {
         }
 
         Array<Method> matchMethods = module.methodMap().get(cmd);
-
-        for (int i = 0; i < matchMethods.size; i++) {
-            Method m = matchMethods.get(i);
-            logger.debug("match check cmd={} with method={}...", cmd, m.getName());
-
-            // name matches, but parameters may be different
-            if (m.getName().equals(cmd)) {
-                logger.debug("  [+] name matches");
-                methodNameMatches = true;
-                Parameter[] methodParams = matchMethods.get(i).getParameters();
-
-                // check number of parameters
-                boolean numParametersMatch = methodParams.length == queryParams.size();
-                if (!numParametersMatch) {
-                    logger.debug(" [+] number of parameters does not match");
-                    continue; // not the right method
-                }
-
-                // check if parameters present (and optionally type fits?)
-                boolean allMethodParamsFullfilled = true;
-
-                int pi = 0;
-                for (Parameter p : methodParams) {
-                    if (!queryParams.contains(p.getName()) && !queryParams.contains("arg" + pi)) {
-                        allMethodParamsFullfilled = false;
-                        logger.debug("  [+] method parameters not present");
-                        break; // no need to continue checking
-                    }
-                    pi++;
-                    // could test for parameter type here...
-                }
-
-                if (allMethodParamsFullfilled) {
-                    logger.debug("  [+] all method parameters present");
-                    matchMethod = m;
-                    break; // no need to continue checking: the first match
-                }
-            }
-        }
+        var matched = matchParameters(matchMethods, cmd,  queryParams);
+        var matchMethod = matched.getFirst();
+        var methodNameMatches = matched.getSecond();
 
         /* Handle matching result */
         if (matchMethod != null) {
