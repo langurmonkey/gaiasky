@@ -39,25 +39,24 @@
 
   <releases>
 
-    <release version="3.7.2" date="2026-04-13" urgency="high">
-      <url>https://gaiasky.space/news/2026/gaiasky_3.7.2</url>
+    <release version="3.7.3" date="2026-06-02" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.7.3</url>
       <description>
-        <p>This release contains many new features:</p>
+        <p>This release focuses on QoL improvements, and contains several important bugfixes:</p>
         <ul>
-          <li>New shading types for particle groups: PLAIN, BILLBOARD SHADING, SPHERICAL SHADING.</li>
-          <li>Orbital element groups merged with particle groups.</li>
-          <li>New astroids/SSO FPR dataset with realistic shading and textures.</li>
-          <li>New Saturn rings dataset with 1.5 million rock and dust particles.</li>
-          <li>Customizable anaglyph 3D colors.</li>
-          <li>Initial attempt to handle name conflicts transparently.</li>
-          <li>New translations: Simplified Chinese, Italian, Japanese.</li>
-          <li>Migration to GDX-Freetype library for font rendering.</li>
-          <li>Logarithmic sliders.</li>
-          <li>OptFlowCam improvements all-around.</li>
-          <li>Separate star and light glow textures. Add visual feedback to setting in preferences window.</li>
-          <li>Polar mask to star glow effect.</li>
+          <li>Redesigned "Load dataset" dialog with two tabs: "Load installed dataset" and "Load file".</li>
+          <li>Added support for server dataset images and mission dataset selection (sets time and camera focus).</li>
+          <li>New line shading method using screen-space derivatives for higher quality.</li>
+          <li>Added limb fade to cloud layer based on screen-space pixel counts.</li>
+          <li>Added PBR support in Wavefront .mtl files and intrinsic opacity for materials.</li>
+          <li>Extensive refactoring of settings handling (removed static references).</li>
+          <li>Fixed crash with asterisks in Windows paths (shader cache).</li>
+          <li>Fixed shader positioning bugs in model-based particle sets.</li>
+          <li>Fixed color picker crash and various dataset widget resizing issues.</li>
+          <li>Japanese translation is now fully complete.</li>
+          <li>Complete migration of Gradle build scripts to Kotlin DSL.</li>
+          <li>Updated to LibGDX 1.14.1.</li>
         </ul>
-        <p>The release also contains many new features. Check out official release notes for more info.</p>
       </description>
       </release>
     </releases>
