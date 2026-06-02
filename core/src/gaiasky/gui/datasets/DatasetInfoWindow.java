@@ -12,9 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.GaiaSky;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.gui.window.GenericDialog;
 import gaiasky.util.DatasetCard;
-import gaiasky.data.util.GlobalResources;
 import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnImage;
@@ -48,7 +48,7 @@ public class DatasetInfoWindow extends GenericDialog {
             var dataset = ci.dd;
             // Max 3 images.
             // 1:1 aspect, no larger than 800^2 px.
-            int n = Math.min(3, dataset.images.length);
+            int n = dataset.images != null ? Math.min(3, dataset.images.length) : 0;
             Table imagesTable = null;
             for (int i = 0; i < n; i++) {
                 var img = dataset.images[i];
