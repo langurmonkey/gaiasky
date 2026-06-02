@@ -46,19 +46,21 @@ public class LocUpdater extends AbstractUpdateSystem {
         var label = Mapper.label.get(entity);
 
         Entity papa = graph.parent;
-        var pBody = Mapper.body.get(papa);
-        var pGraph = Mapper.graph.get(papa);
+        if (papa != null) {
+            var pBody = Mapper.body.get(papa);
+            var pGraph = Mapper.graph.get(papa);
 
-        updater.setToLocalTransform(papa, pBody, pGraph, pBody.size, loc.distFactor, graph.localTransform, false);
+            updater.setToLocalTransform(papa, pBody, pGraph, pBody.size, loc.distFactor, graph.localTransform, false);
 
-        loc.location3d.set(0, 0, -.5f);
-        // Latitude [-90..90]
-        loc.location3d.rotate(loc.location.y, 1, 0, 0);
-        // Longitude [0..360]
-        loc.location3d.rotate(loc.location.x + 90, 0, 1, 0);
+            loc.location3d.set(0, 0, -.5f);
+            // Latitude [-90..90]
+            loc.location3d.rotate(loc.location.y, 1, 0, 0);
+            // Longitude [0..360]
+            loc.location3d.rotate(loc.location.x + 90, 0, 1, 0);
 
-        loc.location3d.mul(graph.localTransform);
+            loc.location3d.mul(graph.localTransform);
 
-        label.labelPosition.set(loc.location3d).add(cam.getPos());
+            label.labelPosition.set(loc.location3d).add(cam.getPos());
+        }
     }
 }
