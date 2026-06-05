@@ -1,3 +1,55 @@
+<a name="3.7.3"></a>
+## [3.7.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.7.3) (2026-06-02)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.7.2...3.7.3)
+
+### Bug Fixes
+- Dataset images table not created if the dataset has no images. 
+- Guard entity's parent behind null check in case we update an entity before adding it to the graph. 
+- Shader position errors in model-based particle sets like star clusters. 
+- Connect ray-marching component attribute `additional` to shader attribute `u_additional`. Part of [#905](https://codeberg.org/gaiasky/gaiasky/issues/905). 
+- Expanding/collapsing dataset widgets resizes scroll pane and component pane correctly. 
+- Add scroll pane to datasets component, as it can grow beyond screen bounds. 
+- Consolidate parser used in color picker to avoid inconsistent accepted formats that led to a crash. Fixes [#910](https://codeberg.org/gaiasky/gaiasky/issues/910). 
+- Clarify information about shader cache in translation files. 
+- Enable separate activation of gravitational waves and relativistic aberration effects. 
+- Make sure bookmarks manager has an up-to-date bookmark list before reloading the component view. 
+- Asterisk is not allowed in Windows paths, leading to a crash when the shader cache is enabled. Fixes [#907](https://codeberg.org/gaiasky/gaiasky/issues/907). 
+- Uninitialized star textures in main post-processor reload due to settings bookmark. 
+- Take into account activation check boxes in fade in/out validators for datasets. 
+
+### Build System
+- Update to libGDX 1.14.1. Requires changes in `PoolManager` initialization. 
+- Complete migration of Gradle build scripts to Kotlin DSL, including settings script. 
+
+### Code Refactoring
+- Extract method matching logic in REST server to function. 
+- Huge refactor in star/particle groups and internal initialization state. 
+- Big refactor in dataset metadata and related utilities. Add `provides` attribute to datasets. 
+- Big refactor in how settings are handled. This removed all static references to the settings and settings manager objects, and keeps a single regular reference in the main `GaiaSky` class. Settings manager objects were also refactored to be created on the fly whenever needed. Creation cost is now nil. Given the all-encompassing nature of this refactor, new bugs may have been introduced, so please report if found. 
+
+### Documentation
+- Add class-level javadoc comments to `gaiasky.gui.components` classes. 
+
+### Features
+- Add cloud limb fade based on screen-space pixel counts. This prevents clouds to appear overly flat at the edges of planets. 
+- Proofread & mended Japanese translation by Hiromasa Yauchi. 
+- Add dataset type icons to datasets component. 
+- Loading datasets from list implemented. More work still needed. 
+- Refactor file picker, extract file picker component so that it can be reused without a generic dialog. 
+- Add a proper history stack to file picker. 
+- Improve layout of datasets component, add button to load dataset (still not functional). 
+- Add updater helper to dispatch update events. Fix double index initialization issue in star and particle groups loaded on the fly. Add update callbacks to star and particle loaders. 
+- Add support for server dataset images in dataset manager. Part of [#908](https://codeberg.org/gaiasky/gaiasky/issues/908). 
+- Improve treatment of spacecrafts and missions that include dataset cards. Missions now can be 'selected', which means that the time is set to the start of the mission, and the spacecraft is set as the focus. Part of [#908](https://codeberg.org/gaiasky/gaiasky/issues/908). 
+- New line shading that uses screen-space rate of change instead of a power function for higher quality line rendering. 
+- Add Wavefront extension to handle packed PBR textures (occlusion, roughness, metallic) as `map_PBR`. 
+- Add intrinsic opacity to materials, and use it in the default model sorter for proper transparency ordering. 
+- Started properly supporting PBR in wavefront `.mtl` material files. Some models may look strange until they are updated. 
+- Support camelCase names for dataset description properties like `nObjects`, `numObjects`, `sizeBytes`, `releaseNotes`, etc. 
+
+### Performance Improvements
+- Performance improvement in I18n and I18NBundle 
+
 <a name="3.7.2"></a>
 ## [3.7.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.7.2) (2026-04-08)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.7.1...3.7.2)
