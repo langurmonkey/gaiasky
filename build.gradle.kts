@@ -14,7 +14,7 @@ allprojects {
     apply(plugin = "idea")
 
     extra.set("appName", "GaiaSky")
-    extra.set("gdxVersion", "1.14.1")
+    extra.set("gdxVersion", "1.14.2")
     extra.set("gdxcontrollersVersion", "2.2.3")
     extra.set("lwjglVersion", "3.3.3")
     extra.set("jcommanderVersion", "2.+")
