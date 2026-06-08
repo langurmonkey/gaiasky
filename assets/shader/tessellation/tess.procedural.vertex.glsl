@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef positionFlag
     in vec3 a_position;
-#endif //positionFlag
+#endif
 
 #if defined(positionFlag)
     vec4 g_position = vec4(a_position, 1.0);
@@ -20,7 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef colorFlag
     in vec4 a_color;
-#endif //colorFlag
+#endif
 
 #define pushColor(value) v_data.color = value
 
@@ -28,14 +28,14 @@
     vec4 g_color = a_color;
 #else
     vec4 g_color = vec4(1.0, 1.0, 1.0, 1.0);
-#endif // colorFlag
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef normalFlag
     in vec3 a_normal;
-#endif //normalFlag
+#endif
 
 #define pushNormalValue(value) v_data.normal = (value)
 #if defined(normalFlag)
@@ -50,33 +50,33 @@ vec3 g_normal = vec3(0.0, 0.0, 1.0);
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef binormalFlag
     in vec3 a_binormal;
-#endif //binormalFlag
+#endif
 
 #if defined(binormalFlag)
     vec3 g_binormal = a_binormal;
 #else
     vec3 g_binormal = vec3(0.0, 1.0, 0.0);
-#endif // binormalFlag
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TANGENT ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef tangentFlag
     in vec3 a_tangent;
-#endif //tangentFlagvec3
+#endif
 
 #if defined(tangentFlag)
     vec3 g_tangent = a_tangent;
 #else
     vec3 g_tangent = vec3(1.0, 0.0, 0.0);
-#endif // tangentFlag
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TEXCOORD0 ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef texCoord0Flag
     #ifndef texCoordsFlag
-	#define texCoordsFlag
+    #define texCoordsFlag
     #endif
     in vec2 a_texCoord0;
 #endif
@@ -87,10 +87,11 @@ vec3 g_normal = vec3(0.0, 0.0, 1.0);
     vec2 g_texCoord0 = a_texCoord0;
 #else
     vec2 g_texCoord0 = vec2(0.0, 0.0);
-#endif // texCoord0Flag
+#endif
 
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
+uniform mat4 u_worldTrans;
 uniform mat3 u_normalMatrix;
 uniform float u_vrScale;
 // Use this slot for VROffset
@@ -104,31 +105,11 @@ uniform vec3 u_vrOffset = vec3(0.0);
     #include <shader/lib/geometry.glsl>
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////
-//////////RELATIVISTIC EFFECTS - VERTEX
-////////////////////////////////////////////////////////////////////////////////////
-#ifdef relativisticEffects
-    #include <shader/lib/relativity.glsl>
-#endif // relativisticEffects
-
-
-////////////////////////////////////////////////////////////////////////////////////
-//////////GRAVITATIONAL WAVES - VERTEX
-////////////////////////////////////////////////////////////////////////////////////
-#ifdef gravitationalWaves
-    #include <shader/lib/gravwaves.glsl>
-#endif // gravitationalWaves
-
 #ifdef blendedFlag
     uniform float u_opacity;
 #else
     const float u_opacity = 1.0;
 #endif
-
-#ifdef bumpTextureFlag
-    uniform sampler2D u_bumpTexture;
-#endif
-
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
     #define textureFlag
@@ -141,7 +122,6 @@ uniform vec3 u_vrOffset = vec3(0.0);
 #if defined(specularFlag) || defined(fogFlag)
     #define cameraPositionFlag
 #endif
-
 
 #if defined(normalFlag) && defined(binormalFlag) && defined(tangentFlag)
     #define calculateTangentVectors() nop()
@@ -174,14 +154,14 @@ uniform vec3 u_vrOffset = vec3(0.0);
 
 #ifdef ambientLightFlag
     #ifndef ambientFlag
-	#define ambientFlag
+    #define ambientFlag
     #endif
     uniform vec3 u_ambientLight;
 #endif
 
 #ifdef ambientCubemapFlag
     uniform vec3 u_ambientCubemap[6];
-#endif // ambientCubemapFlag
+#endif
 
 // OUTPUT
 struct VertexData {
@@ -195,72 +175,75 @@ struct VertexData {
     vec3 shadowMapUv;
     #ifdef shadowMapGlobalFlag
     vec3 shadowMapUvGlobal;
-    #endif // shadowMapGlobalFlag
+    #endif
     #ifdef numCSM
     vec3 csmLightSpacePos[numCSM];
-    #endif // numCSM
-    #endif // shadowMapFlag
+    #endif
+    #endif
     vec3 fragPosWorld;
     #ifdef reflectionCubemapFlag
     vec3 reflect;
-    #endif // reflectionCubemapFlag
+    #endif
     mat3 tbn;
 };
 out VertexData v_data;
 
 void main() {
-    prepareAtmosphericScattering(0.0);
+    prepareAtmosphericScattering();
 
     v_data.opacity = u_opacity;
 
-    // Location in world coordinates (world origin is at the camera)
-    vec4 pos = g_position;
+    // Output model-space position (no world transform).
+    // The tessellation eval shader will apply noise displacement
+    // and then the world transform.
+    gl_Position = g_position;
 
-    v_data.fragPosWorld = pos.xyz;
-    gl_Position = pos;
+    // For shadow map UVs and other world-space calculations,
+    // we still compute world-space position for the vertex data
+    vec4 worldPos = u_worldTrans * g_position;
+    v_data.fragPosWorld = worldPos.xyz;
 
     #ifdef shadowMapFlag
-    getShadowMapUv(pos, v_data.shadowMapUv);
+    getShadowMapUv(worldPos, v_data.shadowMapUv);
     #ifdef shadowMapGlobalFlag
-    getShadowMapUvGlobal(pos, v_data.shadowMapUvGlobal);
-    #endif // shadowMapGlobalFlag
+    getShadowMapUvGlobal(worldPos, v_data.shadowMapUvGlobal);
+    #endif
     #ifdef numCSM
-    getCsmLightSpacePos(pos, v_data.csmLightSpacePos);
-    #endif // numCSM
-    #endif // shadowMapFlag
+    getCsmLightSpacePos(worldPos, v_data.csmLightSpacePos);
+    #endif
+    #endif
 
     // Tangent space transform
     calculateTangentVectors();
     g_normal = normalize(u_normalMatrix * g_normal);
     g_binormal = normalize(u_normalMatrix * g_binormal);
     g_tangent = normalize(u_normalMatrix * g_tangent);
-    
+
     mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
     v_data.tbn = TBN;
 
     #ifdef ambientLightFlag
-	v_data.ambientLight = u_ambientLight;
+    v_data.ambientLight = u_ambientLight;
     #else
-	v_data.ambientLight = vec3(0.0);
-    #endif // ambientLightFlag
+    v_data.ambientLight = vec3(0.0);
+    #endif
 
     #ifdef ambientCubemapFlag
-	vec3 squaredNormal = g_normal * g_normal;
-	vec3 isPositive = step(0.0, g_normal);
-	v_data.ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
-	squaredNormal.y * mix(u_ambientCubemap[2], u_ambientCubemap[3], isPositive.y) +
-	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
-    #endif // ambientCubemapFlag
+    vec3 squaredNormal = g_normal * g_normal;
+    vec3 isPositive = step(0.0, g_normal);
+    v_data.ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
+    squaredNormal.y * mix(u_ambientCubemap[2], u_ambientCubemap[3], isPositive.y) +
+    squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
+    #endif
 
-    // Camera is at origin, view direction is inverse of vertex position
-    v_data.viewDir = normalize(normalize(pos.xyz - u_vrOffset) * TBN);
+    // Camera is at origin in world space, view direction uses world position
+    v_data.viewDir = normalize(normalize(worldPos.xyz - u_vrOffset) * TBN);
 
     #ifdef reflectionCubemapFlag
     #ifndef normalTextureFlag
-        // Only if normal map not present, otherwise we perturb the normal in the fragment shader
-    	v_data.reflect = reflect(pos.xyz - u_vrOffset, g_normal);
-    #endif // normalTextureFlag
-    #endif // reflectionCubemapFlag
+    v_data.reflect = reflect(worldPos.xyz - u_vrOffset, g_normal);
+    #endif
+    #endif
 
     pushNormal();
     pushColor(g_color);
