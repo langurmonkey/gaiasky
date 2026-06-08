@@ -25,9 +25,17 @@ public sealed abstract class NamedComponent implements IComponent, Disposable pe
             this.name = name.toLowerCase(Locale.ROOT).replaceAll("\\s+", "_");
     }
 
-    protected Map<String, Object> createModelParameters(long quality, double diameter, boolean flip) {
+    protected Map<String, Object> createUVSphereParameters(long quality, double diameter, boolean flip) {
         Map<String, Object> params = new HashMap<>();
         params.put("quality", quality);
+        params.put("diameter", diameter);
+        params.put("flip", flip);
+        return params;
+    }
+
+    protected Map<String, Object> createIcoSphereParameters(long recursion, double diameter, boolean flip) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("recursion", recursion);
         params.put("diameter", diameter);
         params.put("flip", flip);
         return params;

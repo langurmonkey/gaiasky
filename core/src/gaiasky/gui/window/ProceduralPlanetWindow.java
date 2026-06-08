@@ -46,8 +46,8 @@ import java.util.function.Function;
 /**
  * Interface to the procedural generation system for planetary surfaces, atmospheres and cloud layers.
  */
-public class ProceduralGenerationWindow extends GenericDialog implements IObserver {
-    private static final Log logger = Logger.getLogger(ProceduralGenerationWindow.class);
+public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
+    private static final Log logger = Logger.getLogger(ProceduralPlanetWindow.class);
     // Selected tab persists across windows
     private static int lastTabSelected;
 
@@ -70,9 +70,9 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     private int genCloudNum, genSurfaceNum;
 
-    public ProceduralGenerationWindow(FocusView target,
-                                      Stage stage,
-                                      Skin skin) {
+    public ProceduralPlanetWindow(FocusView target,
+                                  Stage stage,
+                                  Skin skin) {
         super(I18n.msg("gui.procedural.title", target.getLocalizedName()), skin, stage);
         this.target = target.getEntity();
         this.view = new FocusView(target.getEntity());

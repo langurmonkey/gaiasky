@@ -48,7 +48,7 @@ import java.text.DecimalFormat;
 /**
  * Interface to the procedural generation of galaxies using billboard datasets and compute shaders.
  */
-public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
+public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
     private final static int SLIDER_STEPS = 1_000;
     private static final float pad5 = 5f;
     /** Saves the scroll position for each (full-res) entity. **/
@@ -66,7 +66,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
 
     private Matrix4 m = new Matrix4();
 
-    public GalaxyGenerationWindow(FocusView target, Scene scene, Stage stage, Skin skin) {
+    public ProceduralGalaxyWindow(FocusView target, Scene scene, Stage stage, Skin skin) {
         super("", skin, stage);
         this.scene = scene;
         this.viewFull = new FocusView();
@@ -84,7 +84,7 @@ public class GalaxyGenerationWindow extends GenericDialog implements IObserver {
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
     }
 
-    public GalaxyGenerationWindow(String newName, GalaxyMorphology morphology, Scene scene, Stage stage, Skin skin) {
+    public ProceduralGalaxyWindow(String newName, GalaxyMorphology morphology, Scene scene, Stage stage, Skin skin) {
         super("", skin, stage);
         this.scene = scene;
         this.morphology = morphology;

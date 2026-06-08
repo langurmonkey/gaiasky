@@ -407,7 +407,7 @@ public class MainGui extends AbstractGui {
                         if (!w.isVisible())
                             w.setVisible(true);
                     } else {
-                        ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
+                        ProceduralPlanetWindow proceduralWindow = new ProceduralPlanetWindow(planet, stage, skin);
                         proceduralWindow.setName("procedural-window");
                         proceduralWindow.show(stage);
                     }
@@ -441,7 +441,7 @@ public class MainGui extends AbstractGui {
                         protected boolean accept() {
                             var w = findActor("procedural-gal-window");
                             // Only one instance
-                            if (w != null && w.hasParent() && w instanceof GalaxyGenerationWindow ggw) {
+                            if (w != null && w.hasParent() && w instanceof ProceduralGalaxyWindow ggw) {
                                 if (!w.isVisible()) {
                                     ggw.reinitialize(null);
                                     w.setVisible(true);
@@ -450,7 +450,7 @@ public class MainGui extends AbstractGui {
                                 if (nameField.getText() != null && !nameField.getText().isEmpty()) {
                                     name = nameField.getText();
                                 }
-                                GalaxyGenerationWindow window = new GalaxyGenerationWindow(name, morphology, scene, stage, skin);
+                                ProceduralGalaxyWindow window = new ProceduralGalaxyWindow(name, morphology, scene, stage, skin);
                                 window.setName("procedural-gal-window");
                                 window.show(stage);
                             }
@@ -474,11 +474,11 @@ public class MainGui extends AbstractGui {
                 } else {
                     var w = findActor("procedural-gal-window");
                     // Only one instance
-                    if (w != null && w.hasParent() && w instanceof GalaxyGenerationWindow ggw) {
+                    if (w != null && w.hasParent() && w instanceof ProceduralGalaxyWindow ggw) {
                         ggw.reinitialize(focus);
                         w.setVisible(true);
                     } else {
-                        GalaxyGenerationWindow window = new GalaxyGenerationWindow(focus, scene, stage, skin);
+                        ProceduralGalaxyWindow window = new ProceduralGalaxyWindow(focus, scene, stage, skin);
                         window.setName("procedural-gal-window");
                         window.show(stage);
                     }

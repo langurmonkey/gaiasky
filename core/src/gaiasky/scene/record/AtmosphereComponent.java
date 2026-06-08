@@ -382,7 +382,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Samples
         setSamples((long) rand.nextInt(14, 18));
         // Params
-        setParams(createModelParameters(200L, 2.0, true));
+        setParams(createUVSphereParameters(200L, 2.0, true));
     }
 
     public void copyFrom(AtmosphereComponent other) {

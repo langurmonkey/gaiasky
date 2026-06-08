@@ -527,7 +527,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.75, 0.2), 0.0, 1.0);
         }
         // Params
-        setParams(createModelParameters(400L, 1.0, false));
+        setParams(createUVSphereParameters(400L, 1.0, false));
         // Noise
         if (nc != null) {
             nc.dispose();
