@@ -84,6 +84,7 @@ uniform sampler2D u_svtCacheTexture;
 #include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
+uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
@@ -183,8 +184,9 @@ void main(void){
     float h = fetchHeight(o_data.texCoords).r;
     o_fragHeight = h * u_heightScale * u_elevationMultiplier;
     vec3 dh = o_data.normal * o_fragHeight;
-    pos += vec4(dh, 0.0);
 
+    pos = u_worldTrans * pos;
+    pos += vec4(dh, 0.0);
 
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
@@ -194,8 +196,7 @@ void main(void){
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    vec4 gpos = u_projViewTrans * pos;
-    gl_Position = gpos;
+    gl_Position = u_projViewTrans * pos;
 
     // Plumbing
     o_fragPosition = pos.xyz;

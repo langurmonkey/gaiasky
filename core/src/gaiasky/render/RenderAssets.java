@@ -198,48 +198,48 @@ public class RenderAssets {
                                           definesColMap);
 
         // Add shaders to load (with providers)
-        manager.load("per-vertex-lighting",
+        manager.load("simple",
                      GroundShaderProvider.class,
                      new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
-        manager.load("per-vertex-lighting-additive", RelativisticShaderProvider.class,
+        manager.load("simple-additive", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.additive.fragment.glsl"));
         manager.load("per-vertex-diffuse", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.diffuse.fragment.glsl"));
-        manager.load("per-vertex-lighting-grid", RelativisticShaderProvider.class,
+        manager.load("simple-grid", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/grid.fragment.glsl"));
-        manager.load("per-vertex-lighting-recgrid", RelativisticShaderProvider.class,
+        manager.load("simple-recgrid", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/gridrec.fragment.glsl"));
-        manager.load("per-vertex-lighting-starsurface", RelativisticShaderProvider.class,
+        manager.load("simple-starsurface", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
-        manager.load("per-vertex-lighting-thruster", GroundShaderProvider.class,
+        manager.load("simple-thruster", GroundShaderProvider.class,
                      new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/thruster.fragment.glsl"));
 
-        manager.load("per-pixel-lighting",
+        manager.load("pbr",
                      GroundShaderProvider.class,
                      new GroundShaderProviderParameter("shader/pbr.vertex.glsl", "shader/pbr.fragment.glsl"));
-        manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class,
+        manager.load("pbr-tessellation", TessellationShaderProvider.class,
                      new TessellationShaderProviderParameter("shader/tessellation/tess.pbr.vertex.glsl", "shader/tessellation/tess.pbr.control.glsl",
                                                              "shader/tessellation/tess.pbr.eval.glsl", "shader/tessellation/tess.pbr.fragment.glsl"));
-        manager.load("per-pixel-lighting-dust",
+        manager.load("pbr-dust",
                      GroundShaderProvider.class,
                      new GroundShaderProviderParameter("shader/pbr.vertex.glsl", "shader/dust.fragment.glsl"));
-        manager.load("per-pixel-lighting-depth", RelativisticShaderProvider.class,
+        manager.load("pbr-depth", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/depth.fragment.glsl"));
-        manager.load("per-pixel-lighting-depth-tessellation", TessellationShaderProvider.class,
+        manager.load("pbr-depth-tessellation", TessellationShaderProvider.class,
                      new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
                                                              "shader/tessellation/tess.depth.control.glsl",
                                                              "shader/tessellation/tess.simple.eval.glsl",
                                                              "shader/tessellation/tess.depth.fragment.glsl"));
-        manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class,
+        manager.load("pbr-opaque", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/opaque.fragment.glsl"));
-        manager.load("per-pixel-lighting-opaque-tessellation", TessellationShaderProvider.class,
+        manager.load("pbr-opaque-tessellation", TessellationShaderProvider.class,
                      new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
                                                              "shader/tessellation/tess.simple.control.glsl",
                                                              "shader/tessellation/tess.simple.eval.glsl",
                                                              "shader/tessellation/tess.opaque.fragment.glsl"));
-        manager.load("per-pixel-lighting-svtdetection", RelativisticShaderProvider.class,
+        manager.load("pbr-svtdetection", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/svt.detection.fragment.glsl"));
-        manager.load("per-pixel-lighting-svtdetection-tessellation", TessellationShaderProvider.class,
+        manager.load("pbr-svtdetection-tessellation", TessellationShaderProvider.class,
                      new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
                                                              "shader/tessellation/tess.simple.control.glsl",
                                                              "shader/tessellation/tess.simple.eval.glsl",
@@ -384,24 +384,24 @@ public class RenderAssets {
         orbitElemShaders = fetchShaderProgramExt(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
 
         // Per-vertex lighting shaders
-        IntShaderProvider perVertexLighting = manager.get("per-vertex-lighting");
-        IntShaderProvider perVertexLightingAdditive = manager.get("per-vertex-lighting-additive");
-        IntShaderProvider perVertexDiffuse = manager.get("per-vertex-diffuse");
-        IntShaderProvider perVertexLightingGrid = manager.get("per-vertex-lighting-grid");
-        IntShaderProvider perVertexLightingRecGrid = manager.get("per-vertex-lighting-recgrid");
-        IntShaderProvider perVertexLightingStarSurface = manager.get("per-vertex-lighting-starsurface");
-        IntShaderProvider perVertexLightingThruster = manager.get("per-vertex-lighting-thruster");
+        IntShaderProvider simpleLighting = manager.get("simple");
+        IntShaderProvider simpleLightingAdditive = manager.get("simple-additive");
+        IntShaderProvider simpleDiffuse = manager.get("per-vertex-diffuse");
+        IntShaderProvider simpleLightingGrid = manager.get("simple-grid");
+        IntShaderProvider simpleLightingRecGrid = manager.get("simple-recgrid");
+        IntShaderProvider simpleLightingStarSurface = manager.get("simple-starsurface");
+        IntShaderProvider simpleLightingThruster = manager.get("simple-thruster");
 
         // Per-pixel lighting shaders
-        IntShaderProvider perPixelLighting = manager.get("per-pixel-lighting");
-        TessellationShaderProvider perPixelLightingTessellation = manager.get("per-pixel-lighting-tessellation");
-        IntShaderProvider perPixelLightingDust = manager.get("per-pixel-lighting-dust");
-        IntShaderProvider perPixelLightingDepth = manager.get("per-pixel-lighting-depth");
-        IntShaderProvider perPixelLightingDepthTessellation = manager.get("per-pixel-lighting-depth-tessellation");
-        IntShaderProvider perPixelLightingOpaque = manager.get("per-pixel-lighting-opaque");
-        TessellationShaderProvider perPixelLightingOpaqueTessellation = manager.get("per-pixel-lighting-opaque-tessellation");
-        IntShaderProvider perPixelLightingSvtDetection = manager.get("per-pixel-lighting-svtdetection");
-        IntShaderProvider perPixelLightingSvtDetectionTessellation = manager.get("per-pixel-lighting-svtdetection-tessellation");
+        IntShaderProvider pbrLighting = manager.get("pbr");
+        TessellationShaderProvider pbrLightingTessellation = manager.get("pbr-tessellation");
+        IntShaderProvider pbrLightingDust = manager.get("pbr-dust");
+        IntShaderProvider pbrLightingDepth = manager.get("pbr-depth");
+        IntShaderProvider pbrLightingDepthTessellation = manager.get("pbr-depth-tessellation");
+        IntShaderProvider pbrLightingOpaque = manager.get("pbr-opaque");
+        TessellationShaderProvider pbrLightingOpaqueTessellation = manager.get("pbr-opaque-tessellation");
+        IntShaderProvider pbrLightingSvtDetection = manager.get("pbr-svtdetection");
+        IntShaderProvider pbrLightingSvtDetectionTessellation = manager.get("pbr-svtdetection-tessellation");
 
         // Others
         IntShaderProvider skybox = manager.get("skybox");
@@ -413,23 +413,23 @@ public class RenderAssets {
             galGenShader = manager.get("galgen.comp.glsl");
 
         // Create model batches
-        mbVertexLighting = new IntModelBatch(perVertexLighting);
-        mbVertexLightingAdditive = new IntModelBatch(perVertexLightingAdditive);
-        mbVertexDiffuse = new IntModelBatch(perVertexDiffuse);
-        mbVertexLightingStarSurface = new IntModelBatch(perVertexLightingStarSurface);
-        mbVertexLightingThruster = new IntModelBatch(perVertexLightingThruster);
-        mbVertexLightingGrid = new IntModelBatch(perVertexLightingGrid);
-        mbVertexLightingRecGrid = new IntModelBatch(perVertexLightingRecGrid);
+        mbVertexLighting = new IntModelBatch(simpleLighting);
+        mbVertexLightingAdditive = new IntModelBatch(simpleLightingAdditive);
+        mbVertexDiffuse = new IntModelBatch(simpleDiffuse);
+        mbVertexLightingStarSurface = new IntModelBatch(simpleLightingStarSurface);
+        mbVertexLightingThruster = new IntModelBatch(simpleLightingThruster);
+        mbVertexLightingGrid = new IntModelBatch(simpleLightingGrid);
+        mbVertexLightingRecGrid = new IntModelBatch(simpleLightingRecGrid);
 
-        mbPixelLighting = new IntModelBatch(perPixelLighting);
-        mbPixelLightingDust = new IntModelBatch(perPixelLightingDust);
-        mbPixelLightingDepth = new IntModelBatch(perPixelLightingDepth);
-        mbPixelLightingOpaque = new IntModelBatch(perPixelLightingOpaque);
-        mbPixelLightingSvtDetection = new IntModelBatch(perPixelLightingSvtDetection);
-        mbPixelLightingTessellation = new IntModelBatch(perPixelLightingTessellation);
-        mbPixelLightingOpaqueTessellation = new IntModelBatch(perPixelLightingOpaqueTessellation);
-        mbPixelLightingSvtDetectionTessellation = new IntModelBatch(perPixelLightingSvtDetectionTessellation);
-        mbPixelLightingDepthTessellation = new IntModelBatch(perPixelLightingDepthTessellation);
+        mbPixelLighting = new IntModelBatch(pbrLighting);
+        mbPixelLightingDust = new IntModelBatch(pbrLightingDust);
+        mbPixelLightingDepth = new IntModelBatch(pbrLightingDepth);
+        mbPixelLightingOpaque = new IntModelBatch(pbrLightingOpaque);
+        mbPixelLightingSvtDetection = new IntModelBatch(pbrLightingSvtDetection);
+        mbPixelLightingTessellation = new IntModelBatch(pbrLightingTessellation);
+        mbPixelLightingOpaqueTessellation = new IntModelBatch(pbrLightingOpaqueTessellation);
+        mbPixelLightingSvtDetectionTessellation = new IntModelBatch(pbrLightingSvtDetectionTessellation);
+        mbPixelLightingDepthTessellation = new IntModelBatch(pbrLightingDepthTessellation);
 
         mbSkybox = new IntModelBatch(skybox);
         mbAtmosphere = new IntModelBatch(atmosphere);
