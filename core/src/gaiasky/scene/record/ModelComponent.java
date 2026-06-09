@@ -1110,7 +1110,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         // Type
         setType("sphere");
         // Parameters
-        setParams(createUVSphereParameters(4, 1.0, false));
+        setParams(createUVSphereParameters(1000, 1.0, false));
         // Material
         MaterialComponent mtc = new MaterialComponent();
         // Randomize material.
