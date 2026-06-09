@@ -12,10 +12,7 @@ import gaiasky.util.gdx.IntModelBuilder;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.Material;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Caches models of type {@link IntModel} by type and parameters.
@@ -43,8 +40,8 @@ public class ModelCache {
             mat = model.materials.first();
         } else {
             mat = new Material();
-            switch (shape) {
-                case "sphere" -> {
+            switch (shape.toLowerCase(Locale.ROOT)) {
+                case "sphere", "uvsphere" -> {
                     var quality = params.containsKey("quality")? ((Long) params.get("quality")).intValue() : ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                     var oblateness = params.containsKey("oblateness") ? ((Double) params.get("oblateness")).floatValue() : 0f;
