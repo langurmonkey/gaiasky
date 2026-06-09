@@ -118,19 +118,19 @@ public class LightGlowRenderPass extends RenderPass {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // Render models.
-            renderAssets.mbPixelLightingOpaque.begin(camera.getCamera());
+            renderAssets.mbPBROpaque.begin(camera.getCamera());
             for (IRenderable model : models) {
-                sceneRenderer.renderModel(model, renderAssets.mbPixelLightingOpaque);
+                sceneRenderer.renderModel(model, renderAssets.mbPBROpaque);
             }
-            renderAssets.mbPixelLightingOpaque.end();
+            renderAssets.mbPBROpaque.end();
 
             // Render tessellated models.
             if (!modelsTess.isEmpty()) {
-                renderAssets.mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
+                renderAssets.mbPBRTessellationOpaque.begin(camera.getCamera());
                 for (IRenderable model : modelsTess) {
-                    sceneRenderer.renderModel(model, renderAssets.mbPixelLightingOpaqueTessellation);
+                    sceneRenderer.renderModel(model, renderAssets.mbPBRTessellationOpaque);
                 }
-                renderAssets.mbPixelLightingOpaqueTessellation.end();
+                renderAssets.mbPBRTessellationOpaque.end();
             }
 
             // Render billboard stars.

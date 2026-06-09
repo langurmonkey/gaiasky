@@ -105,8 +105,8 @@ public class CascadedShadowMapRenderPass extends RenderPass {
 
             for (DirectionalShadowLight light : cascadeShadowMap.lights) {
                 light.begin();
-                renderDepth(light, camera, renderAssets.mbPixelLightingDepth, models);
-                renderDepth(light, camera, renderAssets.mbPixelLightingDepthTessellation, modelsTess);
+                renderDepth(light, camera, renderAssets.mbPBRDepth, models);
+                renderDepth(light, camera, renderAssets.mbPBRTessellationDepth, modelsTess);
                 light.end();
             }
             if (DEBUG_UI_VIEW) {

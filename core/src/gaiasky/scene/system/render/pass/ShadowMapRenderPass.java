@@ -214,11 +214,11 @@ public class ShadowMapRenderPass extends RenderPass {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // No tessellation
-            renderAssets.mbPixelLightingDepth.begin(cameraLightGlobal);
+            renderAssets.mbPBRDepth.begin(cameraLightGlobal);
             for (var entity : candidates) {
-                modelRenderer.render(((Render) entity).entity, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                modelRenderer.render(((Render) entity).entity, renderAssets.mbPBRDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
             }
-            renderAssets.mbPixelLightingDepth.end();
+            renderAssets.mbPBRDepth.end();
 
             fb.end();
 
@@ -292,9 +292,9 @@ public class ShadowMapRenderPass extends RenderPass {
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // No tessellation
-                renderAssets.mbPixelLightingDepth.begin(cameraLightIndividual);
-                modelRenderer.render(candidate, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
-                renderAssets.mbPixelLightingDepth.end();
+                renderAssets.mbPBRDepth.begin(cameraLightIndividual);
+                modelRenderer.render(candidate, renderAssets.mbPBRDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                renderAssets.mbPBRDepth.end();
 
                 // Save frame buffer and combined matrix
                 scaffolding.shadow = shadowNRender;
@@ -401,9 +401,9 @@ public class ShadowMapRenderPass extends RenderPass {
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // Tessellation
-                renderAssets.mbPixelLightingDepthTessellation.begin(cameraLightIndividual);
-                modelRenderer.render(candidate, renderAssets.mbPixelLightingDepthTessellation, camera, 1, 0, rc, RenderGroup.MODEL_PIX, true);
-                renderAssets.mbPixelLightingDepthTessellation.end();
+                renderAssets.mbPBRTessellationDepth.begin(cameraLightIndividual);
+                modelRenderer.render(candidate, renderAssets.mbPBRTessellationDepth, camera, 1, 0, rc, RenderGroup.MODEL_PIX, true);
+                renderAssets.mbPBRTessellationDepth.end();
 
                 // Save frame buffer and combined matrix
                 scaffolding.shadow = shadowNRender;

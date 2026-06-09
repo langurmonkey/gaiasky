@@ -193,10 +193,10 @@ public class SVTRenderPass extends RenderPass {
 
         // Non-tessellated models.
         if (!candidates.isEmpty() || !candidatesCloud.isEmpty()) {
-            renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
+            renderAssets.mbPBRSvtDetection.begin(camera.getCamera());
             for (var candidate : candidates) {
                 pushBlend(candidate);
-                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
+                sceneRenderer.renderModel(candidate, renderAssets.mbPBRSvtDetection);
                 popBlend(candidate);
                 rendered++;
             }
@@ -206,23 +206,23 @@ public class SVTRenderPass extends RenderPass {
                 var m = Mapper.model.get(e);
                 var c = Mapper.cloud.get(e);
                 if (c.cloud.hasSVT()) {
-                    sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
+                    sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPBRSvtDetection, 1f, 0);
                     rendered++;
                 }
             }
-            renderAssets.mbPixelLightingSvtDetection.end();
+            renderAssets.mbPBRSvtDetection.end();
         }
 
         // Tessellated models.
         if (!candidatesTess.isEmpty()) {
-            renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
+            renderAssets.mbPBRTessellationSvtDetection.begin(camera.getCamera());
             for (var candidate : candidatesTess) {
                 pushBlend(candidate);
-                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
+                sceneRenderer.renderModel(candidate, renderAssets.mbPBRTessellationSvtDetection);
                 popBlend(candidate);
                 rendered++;
             }
-            renderAssets.mbPixelLightingSvtDetectionTessellation.end();
+            renderAssets.mbPBRTessellationSvtDetection.end();
         }
 
         frameBuffer.end();

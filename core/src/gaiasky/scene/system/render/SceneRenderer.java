@@ -189,9 +189,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    private List newRenderLists() {
+    private List<List<IRenderable>> newRenderLists() {
         RenderGroup[] renderGroups = values();
-        var renderLists = (new ArrayList<>(renderGroups.length));
+        List<List<IRenderable>> renderLists = (new ArrayList<>(renderGroups.length));
         for (int i = 0; i < renderGroups.length; i++) {
             renderLists.add((new ArrayList<>(20)));
         }
@@ -269,12 +269,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case MODEL_VERT_GRID -> {
                 // MODEL GRID - (Ecl, Eq, Gal grids)
-                system = new ModelRenderer(this, MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
+                system = new ModelRenderer(this, MODEL_VERT_GRID, alphas, renderAssets.mbSimpleGrid);
                 system.addPostRunnables(clearDepthR);
             }
             case MODEL_VERT_RECGRID -> {
                 // RECURSIVE GRID
-                system = new ModelRenderer(this, MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
+                system = new ModelRenderer(this, MODEL_VERT_RECGRID, alphas, renderAssets.mbSimpleRecGrid);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
             case LINE -> system = getLineCPURenderSystem();
@@ -285,19 +285,19 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
             case MODEL_PIX_DUST -> // MODELS DUST AND MESH
-                    system = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
+                    system = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPBRDust);
             case MODEL_VERT_ADDITIVE -> system = new ModelRenderer(this,
                                                                    MODEL_VERT_ADDITIVE,
                                                                    alphas,
-                                                                   renderAssets.mbVertexLightingAdditive);
+                                                                   renderAssets.mbSimpleAdditive);
             case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY (meses)
-                    system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
+                    system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPBR);
             case MODEL_DIFFUSE -> system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
             case MODEL_PIX -> // MODEL PER-PIXEL-LIGHTING
-                    system = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPixelLighting);
+                    system = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPBR);
             case MODEL_PIX_TESS -> {
                 // MODEL PER-PIXEL-LIGHTING-TESSELLATION
-                system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
+                system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPBRTessellation);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
             case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this,
@@ -358,7 +358,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             }
             case MODEL_VERT_STAR -> // MODEL STARS
-                    system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
+                    system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbSimpleStarSurface);
             case FONT_LABEL -> // LABELS
                     system = new TextRenderer(this,
                                               FONT_LABEL,
@@ -415,7 +415,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case MODEL_CLOUD -> // MODEL CLOUDS
                     system = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
             case MODEL_PIX_TRANSPARENT -> // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
-                    system = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPixelLighting);
+                    system = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPBR);
             case LINE_LATE -> {
                 // LINE LATE (TRANSPARENCIES)
                 system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineCpuShaders);
@@ -429,7 +429,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(regularBlendR);
             }
             case MODEL_SCENE_UI -> // MODEL PER-PIXEL-LIGHTING USED FOR SCENE UIs (VR)
-                    system = new ModelRenderer(this, MODEL_SCENE_UI, alphas, renderAssets.mbPixelLighting);
+                    system = new ModelRenderer(this, MODEL_SCENE_UI, alphas, renderAssets.mbPBR);
             case SPRITE -> {
                 system = new SpriteRenderer(this, SPRITE, alphas, globalResources.getSpriteShader());
                 system.addPreRunnables(regularBlendR, noDepthTestR);
