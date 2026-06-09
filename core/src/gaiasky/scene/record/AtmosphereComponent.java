@@ -448,7 +448,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Wavelengths
         setWavelengths(new double[]{gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1)});
         // Kr
-        setM_Kr(rand.nextDouble(0.002f, 0.0069f));
+        setM_Kr(rand.nextDouble(0.007f, 0.027f));
         // Km
         setM_Km(rand.nextDouble(0.001f, 0.0079f));
         // eSun
