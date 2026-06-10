@@ -21,6 +21,9 @@ uniform float fScaleDepth; /* The scale depth (i.e. the altitude at which the at
 uniform float fScaleOverScaleDepth; /* fScale / fScaleDepth*/
 uniform float fAlpha; /* Atmosphere effect opacity */
 uniform float fG; /* Mie asymmetry factor */
+uniform vec3 v3O3InvWavelength; /* Ozone absorption cross-section per channel */
+uniform float fO3PeakHeight; /* Ozone peak altitude (normalized units) */
+uniform float fO3Width; /* Ozone layer width (normalized units) */
 
 uniform int nSamples;
 
@@ -97,7 +100,11 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
         float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
         float fScatter = fDepth * fTemp - fCameraOffset;
 
-        v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
+        // Ozone density (Gaussian profile centered at fO3PeakHeight above surface).
+        float fO3Height = fHeight - fInnerRadius;
+        float fO3Density = exp(-((fO3Height - fO3PeakHeight) * (fO3Height - fO3PeakHeight)) / (fO3Width * fO3Width));
+
+        v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI) - fO3Density * fScaledLength * v3O3InvWavelength);
         v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
         v3SamplePoint += v3SampleRay;
     }
@@ -105,6 +112,7 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.5;
     float heightNormalized = clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
     float fadeFactor = smoothstep(0.5, 1.0, heightNormalized);
+    fadeFactor = 1.0;
 
     vec3 direction = v3CameraPos - v3Pos;
     float fCos = dot(-v3LightPos, normalize(direction));
@@ -180,7 +188,13 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
         float fLightAngle = dot(v3LightPos, v3SamplePoint) / fHeight;
         float fCameraAngle = dot(v3Ray, v3SamplePoint) / fHeight;
         float fScatter = (fStartOffset + fDepth * (scale(fLightAngle) - scale(fCameraAngle)));
-        vec3 v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
+
+        // Ozone density (Gaussian profile centered at fO3PeakHeight above surface).
+        float fO3Height = fHeight - fInnerRadius;
+        float fO3Density = exp(-((fO3Height - fO3PeakHeight) * (fO3Height - fO3PeakHeight)) / (fO3Width * fO3Width));
+        float fO3Extinction = fO3Density * fScaledLength;
+
+        vec3 v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI) - fO3Extinction * v3O3InvWavelength);
 
         v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
         v3SamplePoint += v3SampleRay;

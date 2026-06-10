@@ -156,6 +156,33 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         mat.set(new Vector3Attribute(Vector3Attribute.LightPos, new Vector3()));
         mat.set(new Vector3Attribute(Vector3Attribute.InvWavelength,
                                      new Vector3(1.0f / m_fWavelength4[0], 1.0f / m_fWavelength4[1], 1.0f / m_fWavelength4[2])));
+
+        // Ozone (O3) parameters.
+        // Ozone absorption cross-section scaling for the Chappuis band (450-750 nm).
+        // These are relative absorption coefficients for RGB channels.
+        // Reference: https://en.wikipedia.org/wiki/Ozone#/media/File:Ozone_absorption_coefficient_visible.png
+        // O3 absorption peaks around 600nm (orange-red), affects green slightly, blue minimally.
+        // Note: Unlike Rayleigh scattering, ozone absorption is NOT proportional to 1/λ^4.
+        // These coefficients are tuned to produce a subtle pink/purple horizon effect at twilight.
+        // Red (600nm peak): strongest absorption, Green (540nm): moderate, Blue (450nm): minimal.
+        // The values are scaled to produce an optical depth of ~0.15 for red at peak, giving e^-0.15 ≈ 14% attenuation.
+        float o3Strength = 0.35f;
+        float o3Red = o3Strength * 5.0f;
+        float o3Green = o3Strength * 1.5f;
+        float o3Blue = o3Strength * 0.1f;
+
+        mat.set(new Vector3Attribute(Vector3Attribute.O3InvWavelength,
+                new Vector3(o3Red, o3Green, o3Blue)));
+
+        // Ozone layer parameters (in normalized units where inner radius = 1.0).
+        // Ozone layer is in the stratosphere, roughly 15-35 km altitude above the surface.
+        // Peak at about 25 km above surface.
+        float planetRadiusKm = (planetSize / 2f) * (float) Constants.U_TO_KM;
+        float o3PeakHeightRel = 25.0f / planetRadiusKm;  // ~25 km above surface in normalized units
+        float o3WidthRel = 20.0f / planetRadiusKm;       // ~20 km layer width in normalized units (widened to hit more samples)
+
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.O3PeakHeight, o3PeakHeightRel));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.O3Width, o3WidthRel));
     }
 
     public void removeAtmosphericScattering(Material mat) {

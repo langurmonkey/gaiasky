@@ -38,6 +38,10 @@ public class AtmosphereAttribute extends FloatAttribute {
     public static final int FogDensity = register(FogDensityAlias);
     public static final String GAlias = "g";
     public static final int G = register(GAlias);
+    public static final String O3PeakHeightAlias = "o3PeakHeight";
+    public static final int O3PeakHeight = register(O3PeakHeightAlias);
+    public static final String O3WidthAlias = "o3Width";
+    public static final int O3Width = register(O3WidthAlias);
 
     public AtmosphereAttribute(int index) {
         super(index);

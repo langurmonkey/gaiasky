@@ -38,6 +38,9 @@ public class GroundShader extends RelativisticShader {
     public final int v3LightPos;
     public final int v3CameraPos;
     public final int v3InvWavelength;
+    public final int v3O3InvWavelength;
+    public final int fO3PeakHeight;
+    public final int fO3Width;
     public GroundShader(IntRenderable renderable, Config config) {
         this(renderable, config, createPrefix(renderable, config));
     }
@@ -73,6 +76,9 @@ public class GroundShader extends RelativisticShader {
         v3CameraPos = register(Inputs.cameraPos, Setters.cameraPos);
         v3LightPos = register(Inputs.lightPos, Setters.lightPos);
         v3InvWavelength = register(Inputs.invWavelength, Setters.invWavelength);
+        v3O3InvWavelength = register(Inputs.o3InvWavelength, Setters.o3InvWavelength);
+        fO3PeakHeight = register(Inputs.o3PeakHeight, Setters.o3PeakHeight);
+        fO3Width = register(Inputs.o3Width, Setters.o3Width);
 
     }
 
@@ -113,6 +119,9 @@ public class GroundShader extends RelativisticShader {
         public final static Uniform lightPos = new Uniform("v3LightPos");
         public final static Uniform cameraPos = new Uniform("v3CameraPos");
         public final static Uniform invWavelength = new Uniform("v3InvWavelength");
+        public final static Uniform o3InvWavelength = new Uniform("v3O3InvWavelength");
+        public final static Uniform o3PeakHeight = new Uniform("fO3PeakHeight");
+        public final static Uniform o3Width = new Uniform("fO3Width");
     }
 
     public static class Setters extends RelativisticShader.Setters {
@@ -356,6 +365,45 @@ public class GroundShader extends RelativisticShader {
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.InvWavelength))
                     shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.InvWavelength)))).value);
+            }
+        };
+
+        public final static Setter o3InvWavelength = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.O3InvWavelength))
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.O3InvWavelength)))).value);
+            }
+        };
+
+        public final static Setter o3PeakHeight = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(AtmosphereAttribute.O3PeakHeight))
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.O3PeakHeight)))).value);
+            }
+        };
+
+        public final static Setter o3Width = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(AtmosphereAttribute.O3Width))
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.O3Width)))).value);
             }
         };
 
