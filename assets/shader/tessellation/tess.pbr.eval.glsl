@@ -84,7 +84,6 @@ uniform sampler2D u_svtCacheTexture;
 #include <shader/lib/gravwaves.glsl>
 #endif// gravitationalWaves
 
-uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
