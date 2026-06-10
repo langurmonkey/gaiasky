@@ -36,7 +36,7 @@ out float v_eclipseFactor;
 #endif// eclipsingBodyFlag
 
 void main(void) {
-    prepareAtmosphericScattering();
+    prepareAtmosphericScattering(0.0);
     vec4 pos = u_worldTrans * vec4(a_position, 1.0);
 
     #ifdef relativisticEffects

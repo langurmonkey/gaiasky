@@ -306,7 +306,6 @@ vec3 calcNormal(vec2 p, vec2 dp) {
 #endif // heightTexture/Cubemap/SVT
 
 void main() {
-    prepareAtmosphericScattering();
 
     // Tangent space transform
     calculateTangentVectors();
@@ -333,6 +332,9 @@ void main() {
     vec3 dh = g_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
     #endif // heightFlag
+
+    // Prepare vertex for atmospheric scattering
+    prepareAtmosphericScattering(o_fragHeight);
 
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);

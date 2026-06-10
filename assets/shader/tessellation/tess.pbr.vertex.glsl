@@ -210,7 +210,7 @@ struct VertexData {
 out VertexData v_data;
 
 void main() {
-    prepareAtmosphericScattering();
+    prepareAtmosphericScattering(0.0);
 
     v_data.opacity = u_opacity;
 

@@ -209,7 +209,7 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     vec4 tonedAtmosphere;
     tonedAtmosphere.rgb = vec3(1.0) - exp((rayleighColor + mieColor) * -exposureSky);
 
-    float lma = luma(tonedAtmosphere.rbg);
+    float lma = luma(tonedAtmosphere.rgb);
     float scl = smoothstep(0.05, 0.2, lma);
     tonedAtmosphere.a = (heightNormalized * (1.0 - fadeFactor) + lma * fadeFactor) * scl * fAlpha;
     return tonedAtmosphere;
