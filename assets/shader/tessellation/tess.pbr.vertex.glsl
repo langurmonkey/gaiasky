@@ -90,6 +90,7 @@ vec3 g_normal = vec3(0.0, 0.0, 1.0);
 #endif // texCoord0Flag
 
 // Uniforms which are always available
+uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 uniform mat3 u_normalMatrix;
 uniform float u_vrScale;
@@ -124,11 +125,6 @@ uniform vec3 u_vrOffset = vec3(0.0);
 #else
     const float u_opacity = 1.0;
 #endif
-
-#ifdef bumpTextureFlag
-    uniform sampler2D u_bumpTexture;
-#endif
-
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
     #define textureFlag
@@ -214,7 +210,15 @@ void main() {
     v_data.opacity = u_opacity;
 
     // Location in world coordinates (world origin is at the camera)
-    vec4 pos = g_position;
+    vec4 pos = u_worldTrans * g_position;
+
+    #ifdef relativisticEffects
+        pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
+    #endif // relativisticEffects
+
+    #ifdef gravitationalWaves
+        pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    #endif // gravitationalWaves
 
     v_data.fragPosWorld = pos.xyz;
     gl_Position = pos;
