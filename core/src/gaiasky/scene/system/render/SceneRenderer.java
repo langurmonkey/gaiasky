@@ -300,6 +300,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPBRTessellation);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
+            case MODEL_PROCEDURAL_TESS -> {
+                // MODEL PROCEDURAL TESSELLATION
+                system = new TessellationRenderer(this, MODEL_PROCEDURAL_TESS, alphas, renderAssets.mbPBRTessellationProcedural);
+                system.addPreRunnables(regularBlendR, depthTestR);
+            }
             case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this,
                                                                       BILLBOARD_GROUP,
                                                                       alphas,
