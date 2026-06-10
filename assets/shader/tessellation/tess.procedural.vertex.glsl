@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef positionFlag
     in vec3 a_position;
-#endif
+#endif //positionFlag
 
 #if defined(positionFlag)
     vec4 g_position = vec4(a_position, 1.0);
@@ -20,7 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef colorFlag
     in vec4 a_color;
-#endif
+#endif //colorFlag
 
 #define pushColor(value) v_data.color = value
 
@@ -28,14 +28,14 @@
     vec4 g_color = a_color;
 #else
     vec4 g_color = vec4(1.0, 1.0, 1.0, 1.0);
-#endif
+#endif // colorFlag
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef normalFlag
     in vec3 a_normal;
-#endif
+#endif //normalFlag
 
 #define pushNormalValue(value) v_data.normal = (value)
 #if defined(normalFlag)
@@ -50,33 +50,33 @@ vec3 g_normal = vec3(0.0, 0.0, 1.0);
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef binormalFlag
     in vec3 a_binormal;
-#endif
+#endif //binormalFlag
 
 #if defined(binormalFlag)
     vec3 g_binormal = a_binormal;
 #else
     vec3 g_binormal = vec3(0.0, 1.0, 0.0);
-#endif
+#endif // binormalFlag
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TANGENT ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef tangentFlag
     in vec3 a_tangent;
-#endif
+#endif //tangentFlagvec3
 
 #if defined(tangentFlag)
     vec3 g_tangent = a_tangent;
 #else
     vec3 g_tangent = vec3(1.0, 0.0, 0.0);
-#endif
+#endif // tangentFlag
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TEXCOORD0 ATTRIBUTE - VERTEX
 ///////////////////////////////////////////////////////////////////////////////////
 #ifdef texCoord0Flag
     #ifndef texCoordsFlag
-    #define texCoordsFlag
+	#define texCoordsFlag
     #endif
     in vec2 a_texCoord0;
 #endif
@@ -87,7 +87,7 @@ vec3 g_normal = vec3(0.0, 0.0, 1.0);
     vec2 g_texCoord0 = a_texCoord0;
 #else
     vec2 g_texCoord0 = vec2(0.0, 0.0);
-#endif
+#endif // texCoord0Flag
 
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
@@ -154,14 +154,14 @@ uniform vec3 u_vrOffset = vec3(0.0);
 
 #ifdef ambientLightFlag
     #ifndef ambientFlag
-    #define ambientFlag
+	#define ambientFlag
     #endif
     uniform vec3 u_ambientLight;
 #endif
 
 #ifdef ambientCubemapFlag
     uniform vec3 u_ambientCubemap[6];
-#endif
+#endif // ambientCubemapFlag
 
 // OUTPUT
 struct VertexData {
@@ -175,15 +175,15 @@ struct VertexData {
     vec3 shadowMapUv;
     #ifdef shadowMapGlobalFlag
     vec3 shadowMapUvGlobal;
-    #endif
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
     vec3 csmLightSpacePos[numCSM];
-    #endif
-    #endif
+    #endif // numCSM
+    #endif // shadowMapFlag
     vec3 fragPosWorld;
     #ifdef reflectionCubemapFlag
     vec3 reflect;
-    #endif
+    #endif // reflectionCubemapFlag
     mat3 tbn;
 };
 out VertexData v_data;
@@ -207,11 +207,11 @@ void main() {
     getShadowMapUv(worldPos, v_data.shadowMapUv);
     #ifdef shadowMapGlobalFlag
     getShadowMapUvGlobal(worldPos, v_data.shadowMapUvGlobal);
-    #endif
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
     getCsmLightSpacePos(worldPos, v_data.csmLightSpacePos);
-    #endif
-    #endif
+    #endif // numCSM
+    #endif // shadowMapFlag
 
     // Tangent space transform
     calculateTangentVectors();
@@ -223,18 +223,18 @@ void main() {
     v_data.tbn = TBN;
 
     #ifdef ambientLightFlag
-    v_data.ambientLight = u_ambientLight;
+	v_data.ambientLight = u_ambientLight;
     #else
-    v_data.ambientLight = vec3(0.0);
-    #endif
+	v_data.ambientLight = vec3(0.0);
+    #endif // ambientLightFlag
 
     #ifdef ambientCubemapFlag
-    vec3 squaredNormal = g_normal * g_normal;
-    vec3 isPositive = step(0.0, g_normal);
-    v_data.ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
-    squaredNormal.y * mix(u_ambientCubemap[2], u_ambientCubemap[3], isPositive.y) +
-    squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
-    #endif
+	vec3 squaredNormal = g_normal * g_normal;
+	vec3 isPositive = step(0.0, g_normal);
+	v_data.ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
+	squaredNormal.y * mix(u_ambientCubemap[2], u_ambientCubemap[3], isPositive.y) +
+	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
+    #endif // ambientCubemapFlag
 
     // Camera is at origin in world space, view direction uses world position
     v_data.viewDir = normalize(normalize(worldPos.xyz - u_vrOffset) * TBN);

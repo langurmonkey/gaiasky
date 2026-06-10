@@ -18,13 +18,13 @@ layout (triangles) in;
 uniform sampler2D u_svtCacheTexture;
 #endif
 
-#ifdef svtFlag
-    #include <shader/lib/svt.glsl>
-#endif // svtFlag
-
 #ifdef cubemapFlag
     #include <shader/lib/cubemap.glsl>
 #endif // cubemapFlag
+
+#ifdef svtFlag
+    #include <shader/lib/svt.glsl>
+#endif // svtFlag
 
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////// RELATIVISTIC EFFECTS
@@ -40,9 +40,8 @@ uniform sampler2D u_svtCacheTexture;
 #include <shader/lib/gravwaves.glsl>
 #endif
 
-// --- Uniforms ---
-uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
+uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
 uniform float u_elevationMultiplier;
@@ -70,15 +69,15 @@ struct VertexData {
     vec3 shadowMapUv;
     #ifdef shadowMapGlobalFlag
     vec3 shadowMapUvGlobal;
-    #endif
+    #endif // shadowMapGlobalFlag
     #ifdef numCSM
     vec3 csmLightSpacePos[numCSM];
-    #endif
-    #endif
+    #endif // numCSM
+    #endif // shadowMapFlag
     vec3 fragPosWorld;
     #ifdef reflectionCubemapFlag
     vec3 reflect;
-    #endif
+    #endif // reflectionCubemapFlag
     mat3 tbn;
 };
 
@@ -86,13 +85,13 @@ struct VertexData {
 in VertexData l_data[gl_MaxPatchVertices];
 #ifdef atmosphereGround
 in vec3 l_position[gl_MaxPatchVertices];
-#endif
+#endif // atmosphereGround
 
 // OUTPUT
 out VertexData o_data;
 #ifdef atmosphereGround
 out vec3 o_position;
-#endif
+#endif // atmosphereGround
 out vec3 o_normalTan;
 out vec3 o_fragPosition;
 // Raw elevation in [0,1] range (before scaling, after water clamping)
@@ -157,14 +156,13 @@ void main(void) {
     // Apply world transform AFTER noise evaluation and displacement
     pos = u_worldTrans * pos;
 
-    // --- Now apply relativistic effects and gravitational waves in world-space ---
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
-    #endif
+    #endif// relativisticEffects
 
     #ifdef gravitationalWaves
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
-    #endif
+    #endif// gravitationalWaves
 
     gl_Position = u_projViewTrans * pos;
 
@@ -176,8 +174,8 @@ void main(void) {
     o_data.fragPosWorld = u * l_data[0].fragPosWorld + v * l_data[1].fragPosWorld + w * l_data[2].fragPosWorld;
     o_data.ambientLight = u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight;
     #ifdef reflectionCubemapFlag
-    o_data.reflect = u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect;
-    #endif
+        o_data.reflect = u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect;
+    #endif // reflectionCubemapFlag
 
     #ifdef atmosphereGround
     o_position = u * l_position[0] + v * l_position[1] + w * l_position[2];
