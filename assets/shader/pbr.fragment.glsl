@@ -99,15 +99,6 @@ uniform samplerCube u_aoCubemap;
 uniform sampler2D u_occlusionMetallicRoughnessTexture;
 #endif
 
-// HEIGHT
-#ifdef heightTextureFlag
-uniform sampler2D u_heightTexture;
-#endif
-
-#ifdef heightCubemapFlag
-uniform samplerCube u_heightCubemap;
-#endif
-
 // REFLECTION
 #ifdef reflectionCubemapFlag
 uniform samplerCube u_reflectionCubemap;
@@ -306,15 +297,6 @@ uniform float u_shininess;
 #else
     #define fetchColorAmbientOcclusion(texCoord) 1.0
 #endif // ambient occlusion
-
-// HEIGHT
-#if defined(svtIndirectionHeightTextureFlag)
-    #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
-#elif defined(heightCubemapFlag)
-    #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
-#elif defined(heightTextureFlag)
-    #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
-#endif// height
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
     #define directionalLightsFlag

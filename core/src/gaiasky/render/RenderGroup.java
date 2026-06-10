@@ -95,6 +95,10 @@ public enum RenderGroup {
      **/
     MODEL_PIX_TESS(1900),
     /**
+     * Procedural generation with tessellation.
+     */
+    MODEL_PROCEDURAL_TESS(1910),
+    /**
      * Model star.
      **/
     MODEL_VERT_STAR(2100),

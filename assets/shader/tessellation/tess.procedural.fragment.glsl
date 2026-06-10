@@ -36,23 +36,6 @@ uniform sampler2D u_svtCacheTexture;
 #include <shader/lib/cubemap.glsl>
 #endif
 
-// COLOR EMISSIVE
-#if defined(emissiveTextureFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
-#elif defined(emissiveColorFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
-#endif
-
-#if defined(svtIndirectionEmissiveTextureFlag)
-    #define fetchColorEmissive(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionEmissiveTexture, texCoord))
-#elif defined(emissiveCubemapFlag)
-    #define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
-#elif defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-    #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
-#else
-    #define fetchColorEmissive(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
-#endif
-
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
     #define directionalLightsFlag
 #endif
@@ -109,7 +92,7 @@ in vec3 o_position;
 #endif
 
 in vec3 o_normalTan;
-in float o_fragHeight;
+// o_fragHeight and o_fragPosition are declared by atmfog.glsl when atmosphereGround is defined
 in float o_fragElevation;
 in float o_fragMoisture;
 in float o_fragTemperature;
@@ -148,7 +131,8 @@ void main() {
         specular = 1.0; // Water is specular
     }
 
-    vec4 emissive = fetchColorEmissive(texCoords);
+    // TODO generate emissive
+    vec4 emissive = vec4(0.0, 0.0, 0.0, 0.0);
     vec3 ambient = o_data.ambientLight;
 
     #if defined(atmosphereGround) || defined(atmosphereObject)

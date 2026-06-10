@@ -245,17 +245,19 @@ uniform float u_shininess;
 
 // COLOR METALLIC
 #if defined(svtIndirectionMetallicTextureFlag)
-    #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
+    #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord)).rgb
 #elif defined(metallicCubemapFlag)
-    #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
+    #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord)).rgb
 #elif defined(metallicTextureFlag)
-    #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
+    #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord).rgb
 #elif defined(occlusionMetallicRoughnessTextureFlag) && defined(metallicColorFlag)
     #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b) * u_metallicColor.rgb
 #elif defined(occlusionMetallicRoughnessTextureFlag)
     #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b)
 #elif defined(metallicColorFlag)
-    #define fetchColorMetallic(texCoord) u_metallicColor
+    #define fetchColorMetallic(texCoord) u_metallicColor.rgb
+#else
+    #define fetchColorMetallic(texCoord) vec3(0.0, 0.0, 0.0)
 #endif // metallic
 
 // COLOR ROUGHNESS
@@ -382,6 +384,7 @@ void main() {
         vec3 night = vec3(0.0);
     #endif // atmosphereGround
 
+    // AO
     float ambientOcclusion = 1.0;
     #if !defined(occlusionCloudsFlag)
         ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
@@ -451,7 +454,7 @@ void main() {
         vec4 outlineColor = eclipseColor(o_data.fragPosWorld, lightDirection, normalVector.xyz, outline, diffractionTint, eclshdw);
     #endif // eclipsingBodyFlag
 
-    // Reflection
+    // Reflection (metallic and roughness values)
     vec3 reflectionColor = vec3(0.0);
 
     float roughnessValue = 0.5; // Default
@@ -464,11 +467,12 @@ void main() {
             vec3 roughness3 = fetchColorRoughness(texCoords);
             roughnessValue = roughness3.r;
         #elif defined(shininessFlag)
-            roughnessValue = 1.0 - u_shininess;
+            roughnessValue = clamp(sqrt(2.0 / (u_shininess + 2.0)), 0.0, 1.0);
         #endif // roughness
 
         // Fetch Metallic
-        metallicValue = fetchColorMetallic(texCoords).r;
+        vec3 fetchedMetallic = fetchColorMetallic(texCoords);
+        metallicValue = fetchedMetallic.r;
 
         // Handle Environment Reflections (Indirect Specular)
         #ifdef reflectionCubemapFlag
@@ -600,13 +604,13 @@ void main() {
         vec3 baseScattering = vec3(0.0);
     #endif // diffuseScatteringColorFlag
 
-    // Final color equation
+    // Clamp self-shadow
     selfShadow = pow(clamp(selfShadow, 0.0, 1.0), 1.0);
 
-    // 1. Calculate the Indirect (Ambient) part
+    // Calculate the Indirect (Ambient) part
     vec3 ambientTerm = diffuse.rgb * finalAmbient;
 
-    // 2. Calculate the Direct part (Accumulated from light loops)
+    // Calculate the Direct part (Accumulated from light loops)
     // Note: diffuseColor at this point is just (kD / PI) * LightColor * NdotL
     vec3 directDiffuseTerm = diffuse.rgb * diffuseColor;
 
