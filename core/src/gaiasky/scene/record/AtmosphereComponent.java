@@ -54,6 +54,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public Vector3 fogColor;
     public float m_eSun = 10f;
     public int samples = 23;
+    public float o3Strength = 0.25f;
 
     // Model parameters
     public Map<String, Object> params;
@@ -166,7 +167,6 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // These coefficients are tuned to produce a subtle pink/purple horizon effect at twilight.
         // Red (600nm peak): strongest absorption, Green (540nm): moderate, Blue (450nm): minimal.
         // The values are scaled to produce an optical depth of ~0.15 for red at peak, giving e^-0.15 ≈ 14% attenuation.
-        float o3Strength = 0.35f;
         float o3Red = o3Strength * 5.0f;
         float o3Green = o3Strength * 1.5f;
         float o3Blue = o3Strength * 0.1f;
@@ -345,6 +345,14 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
     public void setNumSamples(Long samples) {
         this.samples = samples.intValue();
+    }
+
+    public void setO3Strength(Double o3Strength){
+        this.o3Strength = o3Strength.floatValue();
+    }
+
+    public void setO3strength(Double o3Strength){
+        this.setO3Strength(o3Strength);
     }
 
     public void setFogDensity(Double fogDensity) {

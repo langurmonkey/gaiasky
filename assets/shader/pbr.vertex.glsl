@@ -331,10 +331,11 @@ void main() {
     o_fragHeight = h * u_heightScale * u_elevationMultiplier;
     vec3 dh = g_normal * o_fragHeight;
     pos += vec4(dh, 0.0);
+    prepareAtmosphericScattering(o_fragHeight);
+    #else
+    prepareAtmosphericScattering(0.0);
     #endif // heightFlag
 
-    // Prepare vertex for atmospheric scattering
-    prepareAtmosphericScattering(o_fragHeight);
 
     #ifdef relativisticEffects
     pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
