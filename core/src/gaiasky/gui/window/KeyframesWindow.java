@@ -142,7 +142,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Cell that contains the timeline slider.
      */
-    private Cell timelineCell;
+    private Cell<OwnSlider> timelineCell;
     /**
      * Timeline slider widget.
      */

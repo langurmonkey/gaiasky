@@ -16,6 +16,9 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagNoProcess;
 import gaiasky.util.math.Vector3Q;
 
+/**
+ * Utilities to construct verts objects to function as part of keyframe visuals (points, lines, etc.).
+ */
 public class KeyframeUtils {
 
     public KeyframeUtils(Scene scene) {
@@ -27,6 +30,7 @@ public class KeyframeUtils {
         var base = Mapper.base.get(entity);
         base.setName(name);
         base.ct = ct;
+        base.initialized = true;
 
         var body = Mapper.body.get(entity);
         body.setColor(color);
