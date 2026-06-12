@@ -7,16 +7,18 @@
 
 package gaiasky.util.i18n;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
-import java.nio.file.Path;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
+/**
+ * The I18n system manages the translations.
+ */
 public class I18n {
     private static final Log logger = Logger.getLogger(I18n.class);
 
@@ -24,44 +26,22 @@ public class I18n {
     public static I18NBundle objects;
     public static Locale locale;
 
-    /**
-     * Initializes the i18n system with the main and the objects bundle.
-     * The main bundle contains the application messages. The objects bundle
-     * contains the object names.
-     */
-    public static void initialize() {
-        if (messages == null || objects == null) {
-            if (!forceInit(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"))) {
-                logger.warn("I18n resource not found.");
-            }
-        }
-    }
-
-    public static void initialize(Path main, Path objects) {
-        if (forceInit(Gdx.files.absolute(main.toAbsolutePath()
-                                                 .toString()), Gdx.files.absolute(objects.toAbsolutePath()
-                                                                                          .toString()))) {
+    public static void initialize(Settings settings, FileHandle main, FileHandle objects) {
+        if (!forceInit(settings, main, objects)) {
             logger.warn("I18n resource not found.");
         }
     }
 
-    public static void initialize(FileHandle main, FileHandle objects) {
-        if (!forceInit(main, objects)) {
-            logger.warn("I18n resource not found.");
-        }
-    }
-
-    public static boolean forceInit(FileHandle main, FileHandle objects) {
-        if (GaiaSky.instance == null
-                || GaiaSky.settings() == null
-                || GaiaSky.settings().program == null
-                || GaiaSky.settings().program.locale == null
-                || GaiaSky.settings().program.locale.isEmpty()) {
-            // Use system default
+    public static boolean forceInit(Settings settings, FileHandle main, FileHandle objects) {
+        if (settings == null
+                || settings.program == null
+                || settings.program.locale == null
+                || settings.program.locale.isEmpty()) {
+            // Use system default.
             locale = Locale.getDefault();
         } else {
-            locale = getLocaleFromLanguageTag(GaiaSky.settings().program.locale);
-            // Set as default locale
+            // Get locale from settings.
+            locale = getLocaleFromLanguageTag(settings.program.locale);
             Locale.setDefault(locale);
         }
 

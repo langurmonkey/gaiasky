@@ -460,9 +460,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         time = settings.runtime.realTime ? real : clock;
         t = 0;
 
-        // Initialize i18n.
-        I18n.initialize();
-
         // Tooltips.
         TooltipManager.getInstance().initialTime = 1f;
         TooltipManager.getInstance()
@@ -1407,6 +1404,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * @return Reference to the settings object.
      */
     public static Settings settings() {
+        if (instance == null) {
+            return null;
+        }
         return instance.settings;
     }
 

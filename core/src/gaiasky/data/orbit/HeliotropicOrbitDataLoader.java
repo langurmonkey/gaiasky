@@ -53,7 +53,7 @@ public class HeliotropicOrbitDataLoader {
             var settings = manager.loadSettings(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
             new GaiaSky(new GaiaSkyDesktop.CLIArgs(), settings);
 
-            I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"), new FileHandle(ASSETS_LOC + "/i18n/objects"));
+            I18n.initialize(settings, new FileHandle(ASSETS_LOC + "/i18n/gsbundle"), new FileHandle(ASSETS_LOC + "/i18n/objects"));
 
             String inputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.heliotropic.csv";
             String outputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.dat";

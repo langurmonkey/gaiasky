@@ -3219,7 +3219,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         boolean reloadUI = reloadLang || settings.program.minimap.size != minimapSize.getValue() || settings.program.ui.newUI != newUI.isChecked();
 
         settings.program.locale = languageBean.locale.toLanguageTag();
-        I18n.forceInit(new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"),
+        I18n.forceInit(settings,
+                       new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"),
                        new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
 
         // UI theme

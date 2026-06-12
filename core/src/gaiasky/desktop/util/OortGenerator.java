@@ -23,6 +23,7 @@ import gaiasky.util.math.Vector3D;
 import java.io.*;
 
 public class OortGenerator {
+    static Logger.Log logger = Logger.getLogger(OortGenerator.class);
 
     /** Whether to write the results to disk **/
     private static final boolean writeFile = true;
@@ -41,13 +42,14 @@ public class OortGenerator {
             var settings = manager.loadSettings(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
             new GaiaSky(new GaiaSkyDesktop.CLIArgs(), settings);
 
-            I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/gsbundle"),
+            I18n.initialize(settings,
+                            new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/gsbundle"),
                             new FileHandle(System.getenv("PROJECTS") + "/gaiasky/assets/i18n/objects"));
 
             // Add notif watch
             new ConsoleLogger();
 
-            Array<double[]> oort = null;
+            Array<double[]> oort;
 
             oort = generateOort();
 
@@ -56,7 +58,7 @@ public class OortGenerator {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -109,22 +111,22 @@ public class OortGenerator {
         if (fh.isDirectory()) {
             throw new RuntimeException("File is directory: " + filePath);
         }
-        f.createNewFile();
-
-        FileWriter fw = new FileWriter(filePath);
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write("#X Y Z");
-        bw.newLine();
-
-        for (int i = 0; i < oort.size; i++) {
-            double[] particle = oort.get(i);
-            bw.write(particle[0] + " " + particle[1] + " " + particle[2]);
+        if (f.createNewFile()) {
+            FileWriter fw = new FileWriter(filePath);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write("#X Y Z");
             bw.newLine();
+
+            for (int i = 0; i < oort.size; i++) {
+                double[] particle = oort.get(i);
+                bw.write(particle[0] + " " + particle[1] + " " + particle[2]);
+                bw.newLine();
+            }
+
+            bw.close();
+
+            Logger.getLogger(OortGenerator.class).info("File written to " + filePath);
         }
-
-        bw.close();
-
-        Logger.getLogger(OortGenerator.class).info("File written to " + filePath);
     }
 
 }

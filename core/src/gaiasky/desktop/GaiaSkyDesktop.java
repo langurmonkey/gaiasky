@@ -203,7 +203,8 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Initialize I18n.
-            I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"),
+            I18n.initialize(gsd.settings,
+                            Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"),
                             Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
 
             // -v or --version
