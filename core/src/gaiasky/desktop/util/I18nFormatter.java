@@ -84,8 +84,8 @@ public class I18nFormatter {
                         outputProperties.setProperty((String) key, val);
                     } else {
                         // Keep it (1), or comment it (2).
-                        //outputProperties.setProperty((String) key, val);
-                        missing.put((String) key, TextUtils.escape(props0.getProperty((String) key)));
+                        outputProperties.setProperty((String) key, val);
+                        //missing.put((String) key, TextUtils.escape(props0.getProperty((String) key)));
                     }
                 } else {
                     // Use default (English), commented
