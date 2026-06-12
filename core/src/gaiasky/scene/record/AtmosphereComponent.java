@@ -55,6 +55,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public float m_eSun = 10f;
     public int samples = 23;
     public float o3Strength = 0.25f;
+    public float mieAsymmetryG = 0.76f;
+    public float scaleDepth = 0.25f;
 
     // Model parameters
     public Map<String, Object> params;
@@ -110,7 +112,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         float m_Kr4PI = m_Kr * 4.0f * (float) FastMath.PI;
         float m_Km4PI = m_Km * 4.0f * (float) FastMath.PI;
         float m_ESun = m_eSun; // Sun brightness (almost) constant
-        float m_g = 0.76f; // The Mie phase asymmetry factor
+        float m_g = mieAsymmetryG; // The Mie phase asymmetry factor
 
         // Normalization factor is inner radius * 100f.
         float normFactor = 2f / planetSize;
@@ -118,8 +120,9 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         //m_fOuterRadius = this.size * normFactor;
         m_fOuterRadius = 1.025f;
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
-        float m_fScaleDepth = 0.25f;
-        float m_fScale = 1.0f / (m_fAtmosphereHeight);
+        // Clamp scale depth to prevent division by zero or near-zero values.
+        float m_fScaleDepth = Math.max(scaleDepth, 0.01f);
+        float m_fScale = 1.0f / (Math.max(m_fAtmosphereHeight, 0.001f));
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
         double[] m_fWavelength = wavelengths;
@@ -355,6 +358,22 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         this.setO3Strength(o3Strength);
     }
 
+    public void setMieAsymmetryG(Double mieAsymmetryG){
+        this.mieAsymmetryG = mieAsymmetryG.floatValue();
+    }
+
+    public void setMieasymmetryg(Double mieAsymmetryG){
+        this.setMieAsymmetryG(mieAsymmetryG);
+    }
+
+    public void setScaleDepth(Double scaleDepth){
+        this.scaleDepth = scaleDepth.floatValue();
+    }
+
+    public void setScaledepth(Double scaleDepth){
+        this.setScaleDepth(scaleDepth);
+    }
+
     public void setFogDensity(Double fogDensity) {
         this.fogDensity = MathUtils.clamp(fogDensity.floatValue(),
                                           Constants.MIN_ATM_FOG_DENSITY,
@@ -430,6 +449,9 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         this.fogDensity = other.fogDensity;
         this.fogColor = new Vector3(other.fogColor);
         this.samples = other.samples;
+        this.o3Strength = other.o3Strength;
+        this.mieAsymmetryG = other.mieAsymmetryG;
+        this.scaleDepth = other.scaleDepth;
     }
 
     public void print(Log log) {
@@ -439,6 +461,9 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         log.debug("Fog density: " + fogDensity);
         log.debug("Fog color: " + fogColor);
         log.debug("Samples: " + samples);
+        log.debug("O3 strength: " + o3Strength);
+        log.debug("Mie asymmetry g: " + mieAsymmetryG);
+        log.debug("Scale depth: " + scaleDepth);
     }
 
     @Override

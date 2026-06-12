@@ -111,7 +111,7 @@ public class GroundShader extends RelativisticShader {
         public final static Uniform scaleDepth = new Uniform("fScaleDepth");
         public final static Uniform scaleOverScaleDepth = new Uniform("fScaleOverScaleDepth");
         public final static Uniform nSamples = new Uniform("nSamples");
-        public final static Uniform g = new Uniform("g");
+        public final static Uniform g = new Uniform("fG");
         public final static Uniform fogDensity = new Uniform("u_fogDensity");
         public final static Uniform fogColor = new Uniform("u_fogCol");
 

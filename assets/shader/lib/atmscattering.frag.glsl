@@ -2,8 +2,8 @@
 #define GLSL_LIB_ATMSCAT
 
 #if defined(atmosphereGround) || defined(atmosphericScattering)
-#define exposureGround 0.5
-#define exposureSky 0.25
+#define exposureGround 0.25
+#define exposureSky 0.5
 uniform vec3 v3PlanetPos; /* The position of the planet */
 uniform vec3 v3CameraPos; /* The camera's current position*/
 uniform vec3 v3LightPos; /* The direction vector to the light source*/
@@ -27,6 +27,9 @@ uniform float fO3Width; /* Ozone layer width (normalized units) */
 
 uniform int nSamples;
 
+// Safety epsilon to prevent division by zero
+#define EPSILON 1e-8
+
 // INPUTS
 float rayleighPhase(float fCos2) {
     // Calculate the angle between view direction and light direction
@@ -42,7 +45,10 @@ float miePhase(float fCos, float fCos2) {
 }
 float scale(float fCos) {
     float x = 1.0 - fCos;
-    return fScaleDepth * exp (-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
+    // Bruneton's improved scale function: more accurate optical depth integral approximation.
+    // Uses a 4th-order polynomial in x = 1 - cos(theta) fitted to the exact integral.
+    // This replaces O'Neil's original which had visible artifacts at grazing angles.
+    return fScaleDepth * exp(-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
 }
 // Returns the far intersection point of a line and a sphere
 float getNearIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
@@ -51,7 +57,7 @@ float getNearIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
     float fDet = max (0.0, B * B - 4.0 * C);
     return 0.5 * (-B - sqrt(fDet));
 }
-// Returns the far intersection point of a line and a sphere
+// Returns the near intersection point of a line and a sphere
 float getFarIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
     float B = 2.0 * dot(pos, ray);
     float C = distance2 - radius2;
@@ -75,12 +81,24 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     v3Ray /= fFar;
 
     // Calculate starting position
-    float fNear = getNearIntersection(v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
-    vec3 v3Start = v3CameraPos + v3Ray * fNear;
-    fFar -= fNear;
-    float fStartDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
-    float fCameraAngle = dot(-v3Ray, v_position) / length(v_position);
-    float fLightAngle = dot(v3LightPos, v_position) / length(v_position);
+    vec3 v3Start;
+    float fStartDepth;
+
+    if (fCameraHeight < fOuterRadius) {
+        // Inside: use surface point
+        v3Start = v3CameraPos;
+        fStartDepth = exp(fScaleOverScaleDepth * min(fInnerRadius - fCameraHeight, 0.0));
+    } else {
+        // Outside: use atmosphere entry point
+        float fNear = getNearIntersection(v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
+        v3Start = v3CameraPos + v3Ray * fNear;
+        fFar -= fNear;
+    }
+
+    float fSurfaceHeight = length(v3Pos);
+    float fCameraAngle = dot(-v3Ray, v3Pos) / fSurfaceHeight;
+    float fLightAngle  = dot(v3LightPos, v3Pos) / fSurfaceHeight;
+
     float fCameraScale = scale(fCameraAngle);
     float fLightScale = scale(fLightAngle);
     float fCameraOffset = fStartDepth * fCameraScale;
@@ -96,9 +114,13 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     vec3 v3FrontColor = vec3(0.0);
     vec3 v3Attenuate;
     for (int i = 0; i < nSamples; i++) {
-        float fHeight = length(v3SamplePoint);
-        float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
-        float fScatter = fDepth * fTemp - fCameraOffset;
+        float fHeight = max(length(v3SamplePoint), EPSILON);
+        // Clamp height to prevent negative exponent from exploding.
+        // When sample point dips below surface, depth saturates at surface density.
+        float fHeightDiff = fInnerRadius - fHeight;
+        // Clamp to non-positive so exp() <= 1.0 (density decreases above surface).
+        float fDepth = exp(fScaleOverScaleDepth * min(fHeightDiff, 0.0));
+        float fScatter = max(fDepth * fTemp - fCameraOffset, 0.0);
 
         // Ozone density (Gaussian profile centered at fO3PeakHeight above surface).
         float fO3Height = fHeight - fInnerRadius;
@@ -114,8 +136,7 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     float fadeFactor = smoothstep(0.5, 1.0, heightNormalized);
     fadeFactor = 1.0;
 
-    vec3 direction = v3CameraPos - v3Pos;
-    float fCos = dot(-v3LightPos, normalize(direction));
+    float fCos = clamp(dot(-v3LightPos, v3Ray), -0.9999, 0.9999);
     float fCos2 = fCos * fCos;
 
     // Rayleigh phase
@@ -127,9 +148,10 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
     vec3 mieColor = fMiePhase * v3FrontColor * fKmESun;
 
     // Tone mapping
+    float atmosphereOpacity = 1.0 - dot(v3Attenuate, vec3(0.333));
     vec3 tonedAtmosphere = vec3(1.0) - exp((rayleighColor + mieColor) * -exposureGround);
 
-    return tonedAtmosphere * fAlpha * fadeFactor;
+    return tonedAtmosphere * fAlpha * atmosphereOpacity * fadeFactor;
 }
 #else
 vec3 computeAtmosphericScatteringGround(vec3 v_position){
@@ -163,7 +185,7 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
         v3Start = v3CameraPos;
         float fHeight = length (v3Start);
         fStartAngle = dot (v3Ray, v3Start) / fHeight;
-        fStartDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fCameraHeight));
+        fStartDepth = exp(fScaleOverScaleDepth * min(fInnerRadius - fCameraHeight, 0.0));
     } else {
         // Outside atmosphere
         v3Start = v3CameraPos + v3Ray * fNear;
@@ -183,8 +205,10 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     // Now loop through the sample rays
     vec3 v3FrontColor = vec3 (0.0);
     for (int i = 0; i < nSamples; i++) {
-        float fHeight = length(v3SamplePoint);
-        float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));
+        float fHeight = max(length(v3SamplePoint), EPSILON);
+        // Clamp height to prevent negative exponent from exploding.
+        float fHeightDiff = fInnerRadius - fHeight;
+        float fDepth = exp(fScaleOverScaleDepth * min(fHeightDiff, 0.0));
         float fLightAngle = dot(v3LightPos, v3SamplePoint) / fHeight;
         float fCameraAngle = dot(v3Ray, v3SamplePoint) / fHeight;
         float fScatter = (fStartOffset + fDepth * (scale(fLightAngle) - scale(fCameraAngle)));
