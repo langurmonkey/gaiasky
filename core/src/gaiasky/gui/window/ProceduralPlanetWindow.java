@@ -1041,6 +1041,21 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         content.add(km).left().padBottom(pad18).padRight(pad10);
         content.add(kmTooltip).left().padBottom(pad18).row();
 
+        // O3
+        OwnSliderPlus o3 = new OwnSliderPlus(I18n.msg("gui.procedural.o3strength"), 0.0f, 4.0f, 0.1f, skin);
+        o3.setWidth(fieldWidthTotal);
+        o3.setNumberFormatter(nf);
+        o3.setValue(ac.o3Strength);
+        o3.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                ac.o3Strength = o3.getMappedValue();
+            }
+        });
+        content.add(o3).left().padBottom(pad18).padRight(pad10);
+        content.add().left().padBottom(pad18).row();
+
         // Fog density
         OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
                                                      Constants.MIN_ATM_FOG_DENSITY,

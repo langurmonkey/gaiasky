@@ -204,18 +204,25 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     public void initialize(boolean mesh) {
-        FileHandle model = modelFile != null ? GaiaSky.settings().data.dataFileHandle(modelFile) : null;
+        FileHandle model;
+        var settings = GaiaSky.settings();
+        assert settings != null;
+        if (modelFile != null) {
+            model = settings.data.dataFileHandle(modelFile);
+        } else {
+            model = null;
+        }
         if (mesh) {
-            if (!GaiaSky.settings().scene.initialization.lazyMesh && modelFile != null && model.exists()) {
-                AssetBean.addAsset(GaiaSky.settings().data.dataFile(modelFile), IntModel.class);
+            if (!settings.scene.initialization.lazyMesh && modelFile != null && model.exists()) {
+                AssetBean.addAsset(settings.data.dataFile(modelFile), IntModel.class);
             }
         } else {
             if (modelFile != null && model.exists()) {
-                AssetBean.addAsset(GaiaSky.settings().data.dataFile(modelFile), IntModel.class);
+                AssetBean.addAsset(settings.data.dataFile(modelFile), IntModel.class);
             }
         }
 
-        if ((forceInit || !GaiaSky.settings().scene.initialization.lazyTexture) && mtc != null) {
+        if ((forceInit || !settings.scene.initialization.lazyTexture) && mtc != null) {
             mtc.initialize(name);
             mtc.texLoading = true;
         }

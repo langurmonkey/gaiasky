@@ -420,7 +420,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         Random rand = new Random(seed);
         // Size
         double bodyRadiusKm = bodyRadius * Constants.U_TO_KM;
-        setSize(bodyRadiusKm + bodyRadiusKm * 0.025);
+        setSize(bodyRadiusKm + bodyRadiusKm * 0.015);
         // Wavelengths
         setWavelengths(new double[]{gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1)});
         // Kr
@@ -428,13 +428,15 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Km
         setM_Km(rand.nextDouble(0.001f, 0.0079f));
         // eSun
-        setM_eSun(gaussian(rand, 10.0, 2.0, 8.0));
+        setM_eSun(gaussian(rand, 16.0, 2.0, 8.0));
         // Fog density
         setFogdensity(gaussian(rand, 0.6, 0.3, 0.01));
         // Fog color
         setFogcolor(new double[]{0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5});
+        // O3 strength
+        setO3Strength(gaussian(rand, 0.4, 0.1, 0.1));
         // Samples
-        setSamples((long) rand.nextInt(14, 18));
+        setSamples((long) rand.nextInt(6, 10));
         // Params
         setParams(createUVSphereParameters(200L, 2.0, true));
     }
