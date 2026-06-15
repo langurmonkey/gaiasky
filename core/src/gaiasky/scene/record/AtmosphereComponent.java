@@ -52,8 +52,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public float m_Kr, m_Km;
     public float fogDensity = 0.3f;
     public Vector3 fogColor;
-    public float m_eSun = 10f;
-    public int samples = 23;
+    public float m_eSun = 20f;
+    public int samples = 10;
     public float o3Strength = 0.25f;
     public float mieAsymmetryG = 0.76f;
     public float scaleDepth = 0.25f;
@@ -122,7 +122,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
         // Clamp scale depth to prevent division by zero or near-zero values.
         float m_fScaleDepth = Math.max(scaleDepth, 0.01f);
-        float m_fScale = 1.0f / (Math.max(m_fAtmosphereHeight, 0.001f));
+        float m_fScale = 1.0f / (Math.max(m_fAtmosphereHeight, 0.000001f));
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
         double[] m_fWavelength = wavelengths;
@@ -263,7 +263,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
         if (!ground && camHeightGr < m_fAtmosphereHeight) {
             // Camera inside atmosphere
-            m_ESun += atmFactor * 100f;
+            m_ESun *= (1f + atmFactor);
         }
 
         // These are here to get the desired effect inside the atmosphere

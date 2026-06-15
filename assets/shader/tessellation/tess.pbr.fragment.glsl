@@ -613,26 +613,40 @@ void main() {
     // Calculate scattering effect
     vec3 shadedScattering = baseScattering * shadowMap;
 
-    // Final color equation
-    fragColor = vec4(
-            (directDiffuseTerm * selfShadow) + // Direct light effects
-            (specularColor * selfShadow) +     // Shaded Specular
-            shadedScattering +                 // Diffuse scattering
-            ambientTerm +                      // Unshaded Ambient
-            finalReflection +                  // Unshaded Indirect Specular
-            shadowColor +                      // Night lights
-            emissive.rgb,                      // Glow
-            texAlpha * o_data.opacity
-    );
-
-    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
+    // Final color computation
+    vec3 surfaceDayLighting = (directDiffuseTerm * selfShadow) +
+                                (specularColor * selfShadow) +
+                                shadedScattering +
+                                ambientTerm +
+                                finalReflection;
+    vec3 surfaceEmission = shadowColor + emissive.rgb;
 
     #ifdef atmosphereGround
-        vec3 atmosphereColor = computeAtmosphericScatteringGround(o_position);
-        fragColor.rgb = clamp(fragColor.rgb + atmosphereColor, 0.0, 1.0);
+        vec3 atmGlow = vec3(0.0);
+        vec3 atmTransmittance = vec3(1.0);
+
+        // Extract raw atmospheric properties along this ray
+        computeAtmosphericScatteringGround(o_position, atmGlow, atmTransmittance);
+
+        // Final composite math:
+        // - Day lighting is heavily choked by atmospheric thickness (attenuated).
+        // - Emission/Night lights scale inversely with daytime transmittance so they shine cleanly on the night side.
+        // - Atmospheric scattering glow is added over everything.
+        vec3 finalRGB = (surfaceDayLighting * atmTransmittance) +
+        (surfaceEmission * max(atmTransmittance, vec3(0.3))) +
+        atmGlow;
+
+        fragColor = vec4(finalRGB, texAlpha * o_data.opacity);
+
         #if defined(heightFlag)
             fragColor.rgb = applyFog(fragColor.rgb, V, L0 * -1.0, NL0);
         #endif // heightFlag
+    #else
+        // Fallback standard blending if atmosphere is toggled off
+        fragColor = vec4(
+                surfaceDayLighting + surfaceEmission,
+                texAlpha * o_data.opacity
+        );
     #endif // atmosphereGround
 
     #ifdef eclipsingBodyFlag
@@ -659,6 +673,7 @@ void main() {
         normalBuffer = vec4(normalVector.xyz, 1.0);
     #endif // ssrFlag
 
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

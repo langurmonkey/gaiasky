@@ -1,6 +1,5 @@
 #version 330 core
 
-
 #include <shader/lib/logdepthbuff.glsl>
 
 uniform vec2 u_cameraNearFar;
@@ -16,8 +15,6 @@ layout (location = 1) out vec4 layerBuffer;
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
-
-#include <shader/lib/luma.glsl>
 
 #include <shader/lib/atmscattering.frag.glsl>
 in vec3 v_position;
