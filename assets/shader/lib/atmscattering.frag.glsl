@@ -93,6 +93,7 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
         float fNear = getNearIntersection(v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
         v3Start = v3CameraPos + v3Ray * fNear;
         fFar -= fNear;
+        fStartDepth = exp(-1.0 / fScaleDepth);
     }
 
     float fSurfaceHeight = length(v3Pos);
@@ -125,8 +126,9 @@ vec3 computeAtmosphericScatteringGround(vec3 v_position) {
         // Ozone density (Gaussian profile centered at fO3PeakHeight above surface).
         float fO3Height = fHeight - fInnerRadius;
         float fO3Density = exp(-((fO3Height - fO3PeakHeight) * (fO3Height - fO3PeakHeight)) / (fO3Width * fO3Width));
+        float fO3Extinction = fO3Density * fScaledLength;
 
-        v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI) - fO3Density * fScaledLength * v3O3InvWavelength);
+        v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI) - fO3Extinction * v3O3InvWavelength);
         v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
         v3SamplePoint += v3SampleRay;
     }
