@@ -53,7 +53,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public float fogDensity = 0.3f;
     public Vector3 fogColor;
     public float m_eSun = 20f;
-    public int samples = 10;
+    public int samples = 8;
     public float o3Strength = 0.25f;
     public float mieAsymmetryG = 0.76f;
     public float scaleDepth = 0.25f;
@@ -436,7 +436,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // O3 strength
         setO3Strength(gaussian(rand, 0.4, 0.1, 0.1));
         // Samples
-        setSamples((long) rand.nextInt(6, 10));
+        setSamples(10);
         // Params
         setParams(createUVSphereParameters(200L, 2.0, true));
     }

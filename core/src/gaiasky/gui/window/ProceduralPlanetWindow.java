@@ -1076,7 +1076,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         content.add(fogDensityTooltip).left().padBottom(pad18).row();
 
         // Num samples
-        OwnSliderPlus samples = new OwnSliderPlus(I18n.msg("gui.procedural.samples"), 2, 50, 1, skin);
+        OwnSliderPlus samples = new OwnSliderPlus(I18n.msg("gui.procedural.samples"), 3, 15, 1, skin);
         samples.setWidth(fieldWidthTotal);
         samples.setValue(ac.samples);
         samples.addListener(new ChangeListener() {
