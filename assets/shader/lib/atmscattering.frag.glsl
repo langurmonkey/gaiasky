@@ -106,7 +106,9 @@ void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out v
     float fCameraHeight2 = fCameraHeight * fCameraHeight;
     float fOuterRadius2 = fOuterRadius * fOuterRadius;
 
-    vec3 v3Pos = normalize(v_position) * fInnerRadius;
+    vec3 v3VisualRay = normalize(v_position);
+
+    vec3 v3Pos = v3VisualRay * fInnerRadius;
     vec3 v3Ray = v3Pos - v3CameraPos;
     float fFar = length(v3Ray);
     v3Ray /= fFar;
@@ -123,7 +125,7 @@ void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out v
     vec3 v3Attenuate;
     vec3 v3FrontColor = integrateAtmosphere(v3Start, v3Ray, fFar, v3Attenuate);
 
-    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, 0.9999);
+    float fCos = clamp(dot(v3LightPos, v3VisualRay), -0.9999, 0.9999);
     float fCos2 = fCos * fCos;
 
     vec3 rayleighColor = rayleighPhase(fCos2) * v3FrontColor * (v3InvWavelength * fKrESun);
@@ -149,8 +151,10 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     float fCameraHeight2 = fCameraHeight * fCameraHeight;
     float fOuterRadius2 = fOuterRadius * fOuterRadius;
 
-    // Sky sphere uses the outer radius bounding shell
-    vec3 v3Pos = normalize(v_position) * fOuterRadius;
+    vec3 v3VisualRay = normalize(v_position);
+
+    // Sky sphere uses the outer radius bounding shell.
+    vec3 v3Pos = v3VisualRay * fOuterRadius;
     vec3 v3Ray = v3Pos - v3CameraPos;
     float fFar = length(v3Ray);
     v3Ray /= fFar;
@@ -167,8 +171,7 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     vec3 v3Attenuate;
     vec3 v3FrontColor = integrateAtmosphere(v3Start, v3Ray, fFar, v3Attenuate);
 
-    // Match directional winding of sky geometry (-v3LightPos)
-    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, 0.9999);
+    float fCos = clamp(dot(v3LightPos, v3VisualRay), -0.9999, 0.9999);
     float fCos2 = fCos * fCos;
 
     vec3 rayleighColor = rayleighPhase(fCos2) * v3FrontColor * (v3InvWavelength * fKrESun);
@@ -176,15 +179,16 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
 
     vec4 tonedAtmosphere = vec4(vec3(1.0) - exp((rayleighColor + mieColor) * -exposure), 1.0);
 
-    // inner goes to half the height of the atmosphere.
+    // Inner goes to half the height of the atmosphere.
     float inner = fInnerRadius + (fOuterRadius - fInnerRadius) * 0.1;
-    // current height, normalized in [0,1], with 1 at the atmosphere half height and 0 in space.
+    // Current height, normalized in [0,1], with 1 at the atmosphere half height and 0 in space.
     float heightNormalized = 1.0 - clamp(((fCameraHeight - inner) / (fOuterRadius - inner)), 0.0, 1.0);
     float fadeFactor = smoothstep(0.1, 1.0, 1.0 - heightNormalized);
     float lma = luma(tonedAtmosphere.rgb);
     float scl = smoothstep(0.2, 0.5, lma);
 
     tonedAtmosphere.a = (heightNormalized * (1.0 - fadeFactor) + lma * fadeFactor) * scl * fAlpha;
+
     return tonedAtmosphere;
 }
 #else
