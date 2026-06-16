@@ -6,26 +6,26 @@
 
 #define exposure 2.0           /* Tone-mapping exposure for the atmosphere */
 
-uniform vec3 v3PlanetPos;       /* Planet position relative to camera origin */
-uniform vec3 v3CameraPos;       /* Camera position in normalized coordinates (inner radius = 1) */
-uniform vec3 v3LightPos;        /* Unit vector towards the sun */
-uniform vec3 v3InvWavelength;   /* 1 / pow(wavelength, 4) for Rayleigh scattering */
+uniform vec3 v3PlanetPos; /* Planet position relative to camera origin */
+uniform vec3 v3CameraPos; /* Camera position in normalized coordinates (inner radius = 1) */
+uniform vec3 v3LightPos; /* Unit vector towards the sun */
+uniform vec3 v3InvWavelength; /* 1 / pow(wavelength, 4) for Rayleigh scattering */
 
-uniform float fCameraHeight;    /* Camera distance from planet center in normalized units */
-uniform float fOuterRadius;     /* Outer atmosphere boundary (inner radius + atmosphere height) */
-uniform float fInnerRadius;     /* Planet surface radius (always 1.0 in normalized coords) */
-uniform float fKrESun;          /* Rayleigh scattering coefficient × solar intensity */
-uniform float fKmESun;          /* Mie scattering coefficient × solar intensity */
-uniform float fKr4PI;           /* Rayleigh extinction coefficient × 4π */
-uniform float fKm4PI;           /* Mie extinction coefficient × 4π */
-uniform float fScale;           /* 1.0 / atmosphere height (in normalized units) */
-uniform float fScaleDepth;      /* Atmospheric scale depth (normalized, controls density falloff) */
+uniform float fCameraHeight; /* Camera distance from planet center in normalized units */
+uniform float fOuterRadius; /* Outer atmosphere boundary (inner radius + atmosphere height) */
+uniform float fInnerRadius; /* Planet surface radius (always 1.0 in normalized coords) */
+uniform float fKrESun; /* Rayleigh scattering coefficient × solar intensity */
+uniform float fKmESun; /* Mie scattering coefficient × solar intensity */
+uniform float fKr4PI; /* Rayleigh extinction coefficient × 4π */
+uniform float fKm4PI; /* Mie extinction coefficient × 4π */
+uniform float fScale; /* 1.0 / atmosphere height (in normalized units) */
+uniform float fScaleDepth; /* Atmospheric scale depth (normalized, controls density falloff) */
 uniform float fScaleOverScaleDepth; /* fScale / fScaleDepth — combined density gradient factor */
-uniform float fAlpha;           /* Overall opacity multiplier */
-uniform float fG;               /* Mie phase asymmetry factor */
+uniform float fAlpha; /* Overall opacity multiplier */
+uniform float fG; /* Mie phase asymmetry factor */
 uniform vec3 v3O3InvWavelength; /* Ozone absorption coefficients per RGB channel */
-uniform float fO3PeakHeight;    /* Ozone layer peak altitude (normalized, height above surface) */
-uniform float fO3Width;         /* Ozone layer Gaussian width (normalized) */
+uniform float fO3PeakHeight; /* Ozone layer peak altitude (normalized, height above surface) */
+uniform float fO3Width; /* Ozone layer Gaussian width (normalized) */
 
 uniform int nSamples;
 
@@ -37,7 +37,7 @@ float rayleighPhase(float fCos2) {
 
 float miePhase(float fCos, float fCos2) {
     float g2 = fG * fG;
-    return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow(1.0 + g2 - 2.0 * fG * fCos, 1.5);
+    return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow(max(1.0 + g2 - 2.0 * fG * fCos, EPSILON), 1.5);
 }
 
 // Bruneton's polynomial approximation of the Chapman function.
@@ -92,10 +92,13 @@ vec3 integrateAtmosphere(vec3 v3Start, vec3 v3Ray, float fFar, out vec3 v3OutAtt
         float fO3Height = fHeight - fInnerRadius;
         float fO3Density = exp(-((fO3Height - fO3PeakHeight) * (fO3Height - fO3PeakHeight)) / (fO3Width * fO3Width));
         float fO3Extinction = fO3Density * fScaledLength;
+        float fO3LightDepth = fO3Extinction * scale(fLightAngle);
         fO3CameraDepth += fO3Extinction;
+        float fO3Scatter = fO3LightDepth + fO3CameraDepth;
 
         // Combined attenuation: Rayleigh + Mie scattering + Ozone absorption
-        v3CurrentAttenuation = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI) - (fO3CameraDepth * v3O3InvWavelength));
+        v3CurrentAttenuation = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI)
+                                - (fO3Scatter * v3O3InvWavelength));
 
         // Accumulate inscattered light along the ray
         v3FrontColor += v3CurrentAttenuation * (fDepth * fScaledLength);
@@ -107,7 +110,6 @@ vec3 integrateAtmosphere(vec3 v3Start, vec3 v3Ray, float fFar, out vec3 v3OutAtt
 }
 #endif // atmosphereGround || atmosphericScattering
 
-
 // GROUND SHADER
 // Computes the atmospheric glow and transmittance for a point on the
 // planet's surface. The ray goes from the camera to the surface point.
@@ -116,11 +118,8 @@ void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out v
     float fCameraHeight2 = fCameraHeight * fCameraHeight;
     float fOuterRadius2 = fOuterRadius * fOuterRadius;
 
-    // Direction from planet center to the surface point
-    vec3 v3VisualRay = normalize(v_position);
-
     // Surface point in normalized coordinates
-    vec3 v3Pos = v3VisualRay * fInnerRadius;
+    vec3 v3Pos = normalize(v_position) * fInnerRadius;
     // Ray from camera to surface point
     vec3 v3Ray = v3Pos - v3CameraPos;
     float fFar = length(v3Ray);
@@ -141,7 +140,7 @@ void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out v
     vec3 v3FrontColor = integrateAtmosphere(v3Start, v3Ray, fFar, v3Attenuate);
 
     // Phase functions for the viewing angle
-    float fCos = clamp(dot(v3LightPos, v3VisualRay), -0.9999, 0.9999);
+    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, 0.9999);
     float fCos2 = fCos * fCos;
 
     vec3 rayleighColor = rayleighPhase(fCos2) * v3FrontColor * (v3InvWavelength * fKrESun);
@@ -152,12 +151,11 @@ void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out v
     outTransmittance = v3Attenuate;
 }
 #else
-void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out vec3 outTransmittance){
+void computeAtmosphericScatteringGround(vec3 v_position, out vec3 outGlow, out vec3 outTransmittance) {
     outGlow = vec3(0.0);
     outTransmittance = vec3(1.0);
 }
 #endif
-
 
 // SKY SHADER
 // Computes the sky dome color for a given view direction. The ray
@@ -214,7 +212,9 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     return tonedAtmosphere;
 }
 #else
-vec4 computeAtmosphericScattering(vec3 v_position){ return vec4(0.0); }
+vec4 computeAtmosphericScattering(vec3 v_position) {
+    return vec4(0.0);
+}
 #endif
 
 #endif // ATMSCAT

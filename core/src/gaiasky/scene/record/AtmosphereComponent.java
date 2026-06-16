@@ -105,7 +105,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         transform.setToTranslation(localTransform).scl(size);
     }
 
-    private void addOzoneUniforms(Material mat, float fScale){
+    private void addOzoneUniforms(Material mat, float fScale) {
         // Ozone layer parameters (in normalized units where inner radius = 1.0).
         // The ozone layer resides in the stratosphere, roughly 15-35 km above the surface,
         // with peak concentration at ~25 km. Modeled as a Gaussian centered at this altitude.
@@ -120,7 +120,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // by the integrated Gaussian area (width * sqrt(pi)), scaled by m_fScale to match
         // the shader's integration coordinate system (where sample length = 1/nSamples).
         // Green and blue are scaled by the Chappuis band cross-section ratios (1.0 : 0.3 : 0.02).
-        float o3Scale =o3OpticalDepth / (fScale * o3WidthRel * (float) FastMath.sqrt(FastMath.PI));
+        float o3Scale = o3OpticalDepth / (2.0f * fScale * o3WidthRel * (float) FastMath.sqrt(FastMath.PI));
 
         // O3 red, green and blue.
         var o3RGB = aux.set(o3Scale, o3Scale * 0.3f, o3Scale * 0.02f);
@@ -367,33 +367,34 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
      * Sets the ozone vertical optical depth at red (Chappuis band, ~600 nm peak).
      * Earth reference value: ~0.025.
      */
-    public void setO3OpticalDepth(Double o3OpticalDepth){
+    public void setO3OpticalDepth(Double o3OpticalDepth) {
         this.o3OpticalDepth = o3OpticalDepth.floatValue();
     }
 
     /**
      * Legacy setter — maps the old 'o3Strength' JSON key to o3OpticalDepth.
      * In JSON files, use 'o3OpticalDepth' for clarity.
+     *
      * @deprecated Use {@link #setO3OpticalDepth(Double)} instead.
      */
     @Deprecated
-    public void setO3strength(Double o3Strength){
+    public void setO3strength(Double o3Strength) {
         this.setO3OpticalDepth(o3Strength);
     }
 
-    public void setMieAsymmetryG(Double mieAsymmetryG){
+    public void setMieAsymmetryG(Double mieAsymmetryG) {
         this.mieAsymmetryG = mieAsymmetryG.floatValue();
     }
 
-    public void setMieasymmetryg(Double mieAsymmetryG){
+    public void setMieasymmetryg(Double mieAsymmetryG) {
         this.setMieAsymmetryG(mieAsymmetryG);
     }
 
-    public void setScaleDepth(Double scaleDepth){
+    public void setScaleDepth(Double scaleDepth) {
         this.scaleDepth = scaleDepth.floatValue();
     }
 
-    public void setScaledepth(Double scaleDepth){
+    public void setScaledepth(Double scaleDepth) {
         this.setScaleDepth(scaleDepth);
     }
 
