@@ -166,11 +166,8 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     float fCameraHeight2 = fCameraHeight * fCameraHeight;
     float fOuterRadius2 = fOuterRadius * fOuterRadius;
 
-    // Direction from planet center to the sky dome vertex
-    vec3 v3VisualRay = normalize(v_position);
-
     // Sky dome vertex on the outer atmosphere shell
-    vec3 v3Pos = v3VisualRay * fOuterRadius;
+    vec3 v3Pos = normalize(v_position) * fOuterRadius;
     // Ray from camera to sky dome vertex
     vec3 v3Ray = v3Pos - v3CameraPos;
     float fFar = length(v3Ray);
@@ -191,7 +188,7 @@ vec4 computeAtmosphericScattering(vec3 v_position) {
     vec3 v3FrontColor = integrateAtmosphere(v3Start, v3Ray, fFar, v3Attenuate);
 
     // Phase functions for the viewing angle
-    float fCos = clamp(dot(v3LightPos, v3VisualRay), -0.9999, 0.9999);
+    float fCos = clamp(dot(v3LightPos, v3Ray), -0.9999, 0.9999);
     float fCos2 = fCos * fCos;
 
     vec3 rayleighColor = rayleighPhase(fCos2) * v3FrontColor * (v3InvWavelength * fKrESun);
