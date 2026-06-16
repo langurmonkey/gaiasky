@@ -402,7 +402,12 @@ public class FilePickerComponent extends Table {
 
     public Path getResult() {
         if (result == null || result.isEmpty()) return currentDir;
-        Path resolved = currentDir.resolve(result).normalize();
+        Path resolved;
+        if (this.fileBrowsingEnabled) {
+            resolved = currentDir.resolve(result).normalize();
+        } else {
+            resolved = currentDir;
+        }
         return Files.exists(resolved) ? resolved : currentDir.resolve(result);
     }
 
