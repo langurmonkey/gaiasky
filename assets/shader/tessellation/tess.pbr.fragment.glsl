@@ -633,8 +633,8 @@ void main() {
         // - Emission/Night lights scale inversely with daytime transmittance so they shine cleanly on the night side.
         // - Atmospheric scattering glow is added over everything.
         vec3 finalRGB = (surfaceDayLighting * atmTransmittance) +
-        (surfaceEmission * max(atmTransmittance, vec3(0.3))) +
-        atmGlow;
+                        surfaceEmission +
+                        atmGlow;
 
         fragColor = vec4(finalRGB, texAlpha * o_data.opacity);
 
