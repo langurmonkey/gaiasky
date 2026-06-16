@@ -53,9 +53,12 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public float fogDensity = 0.3f;
     public Vector3 fogColor;
     public float m_eSun = 20f;
-    public int samples = 8;
-    public float o3Strength = 0.25f;
+    public int samples = 10;
+    /** Ozone vertical optical depth at red (Chappuis band, ~600 nm peak). **/
+    public float o3OpticalDepth = 0.025f;
+    /** Mie phase function asymmetry factor g (range: [-1, 1]; positive = forward scattering). **/
     public float mieAsymmetryG = 0.76f;
+    /** Normalized atmospheric scale depth (fraction of inner radius). Controls density falloff with altitude. **/
     public float scaleDepth = 0.25f;
 
     // Model parameters
@@ -102,6 +105,31 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         transform.setToTranslation(localTransform).scl(size);
     }
 
+    private void addOzoneUniforms(Material mat, float fScale){
+        // Ozone layer parameters (in normalized units where inner radius = 1.0).
+        // The ozone layer resides in the stratosphere, roughly 15-35 km above the surface,
+        // with peak concentration at ~25 km. Modeled as a Gaussian centered at this altitude.
+        float planetRadiusKm = (planetSize / 2f) * (float) Constants.U_TO_KM;
+        float o3PeakHeightRel = 25.0f / planetRadiusKm;  // ~25 km above surface in normalized units
+        float o3WidthRel = 20.0f / planetRadiusKm;        // ~20 km Gaussian sigma (width) in normalized units
+
+        // Ozone absorption scaling for the Chappuis band (450-750 nm).
+        // Unlike Rayleigh scattering, ozone absorption is NOT proportional to 1/lambda^4.
+        // o3OpticalDepth is the physical vertical optical depth at red (~600 nm peak).
+        // The formula converts this to a per-unit-length extinction coefficient by dividing
+        // by the integrated Gaussian area (width * sqrt(pi)), scaled by m_fScale to match
+        // the shader's integration coordinate system (where sample length = 1/nSamples).
+        // Green and blue are scaled by the Chappuis band cross-section ratios (1.0 : 0.3 : 0.02).
+        float o3Scale =o3OpticalDepth / (fScale * o3WidthRel * (float) FastMath.sqrt(FastMath.PI));
+
+        // O3 red, green and blue.
+        var o3RGB = aux.set(o3Scale, o3Scale * 0.3f, o3Scale * 0.02f);
+
+        mat.set(new Vector3Attribute(Vector3Attribute.O3InvWavelength, o3RGB));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.O3PeakHeight, o3PeakHeightRel));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.O3Width, o3WidthRel));
+    }
+
     /**
      * Sets up the atmospheric scattering parameters to the given material
      *
@@ -109,22 +137,27 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
      */
     public void setUpAtmosphericScatteringMaterial(Material mat) {
         float camHeight = 1f;
-        float m_Kr4PI = m_Kr * 4.0f * (float) FastMath.PI;
-        float m_Km4PI = m_Km * 4.0f * (float) FastMath.PI;
-        float m_ESun = m_eSun; // Sun brightness (almost) constant
-        float m_g = mieAsymmetryG; // The Mie phase asymmetry factor
+        float m_Kr4PI = m_Kr * 4.0f * (float) FastMath.PI;    // Rayleigh extinction coefficient (includes 4π factor from scattering cross-section)
+        float m_Km4PI = m_Km * 4.0f * (float) FastMath.PI;    // Mie extinction coefficient (includes 4π factor)
+        float m_ESun = m_eSun; // Sun brightness scaling factor
+        float m_g = mieAsymmetryG; // Mie phase function asymmetry factor (positive = forward scattering peak)
 
-        // Normalization factor is inner radius * 100f.
+        // Normalization factor scales the planet so that inner radius = 1.0.
         float normFactor = 2f / planetSize;
         m_fInnerRadius = (planetSize / 2f) * normFactor;
-        //m_fOuterRadius = this.size * normFactor;
+        // Outer radius fixed at 1.025 in normalized units (2.5% above surface).
+        // This sets the atmosphere shell thickness relative to the planet.
         m_fOuterRadius = 1.025f;
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
         // Clamp scale depth to prevent division by zero or near-zero values.
         float m_fScaleDepth = Math.max(scaleDepth, 0.01f);
+        // Inverse of normalized atmosphere height -- used to normalize sample step lengths
+        // in the shader integration loop (step = ray_length / nSamples * fScale).
         float m_fScale = 1.0f / (Math.max(m_fAtmosphereHeight, 0.000001f));
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
+        // Rayleigh scattering cross-section proprotional to 1/wavelength^4. Compute wavelengths to the 4th power
+        // so the shader can use 1/wavelength^4 for the Rayleigh scattering coefficient.
         double[] m_fWavelength = wavelengths;
         float[] m_fWavelength4 = new float[3];
         m_fWavelength4[0] = (float) FastMath.pow(m_fWavelength[0], 4.0);
@@ -161,31 +194,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         mat.set(new Vector3Attribute(Vector3Attribute.InvWavelength,
                                      new Vector3(1.0f / m_fWavelength4[0], 1.0f / m_fWavelength4[1], 1.0f / m_fWavelength4[2])));
 
-        // Ozone (O3) parameters.
-        // Ozone absorption cross-section scaling for the Chappuis band (450-750 nm).
-        // These are relative absorption coefficients for RGB channels.
-        // Reference: https://en.wikipedia.org/wiki/Ozone#/media/File:Ozone_absorption_coefficient_visible.png
-        // O3 absorption peaks around 600nm (orange-red), affects green slightly, blue minimally.
-        // Note: Unlike Rayleigh scattering, ozone absorption is NOT proportional to 1/λ^4.
-        // These coefficients are tuned to produce a subtle pink/purple horizon effect at twilight.
-        // Red (600nm peak): strongest absorption, Green (540nm): moderate, Blue (450nm): minimal.
-        // The values are scaled to produce an optical depth of ~0.15 for red at peak, giving e^-0.15 ≈ 14% attenuation.
-        float o3Red = o3Strength * 5.0f;
-        float o3Green = o3Strength * 1.5f;
-        float o3Blue = o3Strength * 0.1f;
-
-        mat.set(new Vector3Attribute(Vector3Attribute.O3InvWavelength,
-                new Vector3(o3Red, o3Green, o3Blue)));
-
-        // Ozone layer parameters (in normalized units where inner radius = 1.0).
-        // Ozone layer is in the stratosphere, roughly 15-35 km altitude above the surface.
-        // Peak at about 25 km above surface.
-        float planetRadiusKm = (planetSize / 2f) * (float) Constants.U_TO_KM;
-        float o3PeakHeightRel = 25.0f / planetRadiusKm;  // ~25 km above surface in normalized units
-        float o3WidthRel = 20.0f / planetRadiusKm;       // ~20 km layer width in normalized units (widened to hit more samples)
-
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.O3PeakHeight, o3PeakHeightRel));
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.O3Width, o3WidthRel));
+        addOzoneUniforms(mat, m_fScale);
     }
 
     public void removeAtmosphericScattering(Material mat) {
@@ -251,18 +260,19 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
             aux3.sub(aux1);
         }
 
-        // Normalization factor is inner radius.
+        // Normalization factor scales camera position to normalized units (inner radius = 1.0).
         float normFactor = 2f / planetSize;
         // Normalize planet pos
         aux3.scl(normFactor);
-        // Distance to planet
+        // Distance to planet center in normalized units
         float camHeight = (float) (aux3.len());
         float m_ESun = m_eSun;
         float camHeightGr = camHeight - m_fInnerRadius;
         float atmFactor = (m_fAtmosphereHeight - camHeightGr) / m_fAtmosphereHeight;
 
         if (!ground && camHeightGr < m_fAtmosphereHeight) {
-            // Camera inside atmosphere
+            // Camera inside atmosphere: boost sun brightness to compensate for
+            // missing in-scattered light from the atmosphere dome behind the camera.
             m_ESun *= (1f + atmFactor);
         }
 
@@ -316,6 +326,9 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.Alpha))).value = alpha;
         // Number of samples
         ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.nSamples))).value = samples;
+
+        // Add ozone
+        addOzoneUniforms(mat, 1.0f / (Math.max(m_fAtmosphereHeight, 0.000001f)));
     }
 
     public void setQuality(Long quality) {
@@ -350,12 +363,22 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         this.samples = samples.intValue();
     }
 
-    public void setO3Strength(Double o3Strength){
-        this.o3Strength = o3Strength.floatValue();
+    /**
+     * Sets the ozone vertical optical depth at red (Chappuis band, ~600 nm peak).
+     * Earth reference value: ~0.025.
+     */
+    public void setO3OpticalDepth(Double o3OpticalDepth){
+        this.o3OpticalDepth = o3OpticalDepth.floatValue();
     }
 
+    /**
+     * Legacy setter — maps the old 'o3Strength' JSON key to o3OpticalDepth.
+     * In JSON files, use 'o3OpticalDepth' for clarity.
+     * @deprecated Use {@link #setO3OpticalDepth(Double)} instead.
+     */
+    @Deprecated
     public void setO3strength(Double o3Strength){
-        this.setO3Strength(o3Strength);
+        this.setO3OpticalDepth(o3Strength);
     }
 
     public void setMieAsymmetryG(Double mieAsymmetryG){
@@ -433,10 +456,10 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         setFogdensity(gaussian(rand, 0.6, 0.3, 0.01));
         // Fog color
         setFogcolor(new double[]{0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5});
-        // O3 strength
-        setO3Strength(gaussian(rand, 0.4, 0.1, 0.1));
+        // O3 optical depth at red (Chappuis band)
+        setO3OpticalDepth(gaussian(rand, 0.05, 0.03, 0.0));
         // Samples
-        setSamples(10);
+        setSamples(10L);
         // Params
         setParams(createUVSphereParameters(200L, 2.0, true));
     }
@@ -451,7 +474,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         this.fogDensity = other.fogDensity;
         this.fogColor = new Vector3(other.fogColor);
         this.samples = other.samples;
-        this.o3Strength = other.o3Strength;
+        this.o3OpticalDepth = other.o3OpticalDepth;
         this.mieAsymmetryG = other.mieAsymmetryG;
         this.scaleDepth = other.scaleDepth;
     }
@@ -463,7 +486,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         log.debug("Fog density: " + fogDensity);
         log.debug("Fog color: " + fogColor);
         log.debug("Samples: " + samples);
-        log.debug("O3 strength: " + o3Strength);
+        log.debug("O3 optical depth: " + o3OpticalDepth);
         log.debug("Mie asymmetry g: " + mieAsymmetryG);
         log.debug("Scale depth: " + scaleDepth);
     }
