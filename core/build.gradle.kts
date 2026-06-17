@@ -610,6 +610,7 @@ tasks.register("prepareInstall4jScript") {
         val distName = coreExtra("distName") as String
         val baseDir = project.rootDir
         val tagRev = coreExtra("tagRev") as String
+        val tag = coreExtra("tag") as String
 
         copy {
             from("installerscripts/template.install4j")
@@ -620,7 +621,7 @@ tasks.register("prepareInstall4jScript") {
         ant.withGroovyBuilder {
             "replace"("file" to "$packageDir/$distName.install4j", "token" to "@gs-release-folder@", "value" to distDir)
             "replace"("file" to "$packageDir/$distName.install4j", "token" to "@gs-git-folder@", "value" to baseDir.absolutePath)
-            "replace"("file" to "$packageDir/$distName.install4j", "token" to "@version-tag@", "value" to tagRev)
+            "replace"("file" to "$packageDir/$distName.install4j", "token" to "@version-tag@", "value" to tag)
         }
     }
 }

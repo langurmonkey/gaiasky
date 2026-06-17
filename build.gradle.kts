@@ -112,9 +112,11 @@ project(":core") {
 
     // Set some build variables
     val baseDir = System.getProperty("user.dir")
+    val tag = "${extra.get("tag")}"
     val tagRev = "${extra.get("tag")}.${extra.get("rev")}"
 
     extra.set("baseDir", baseDir)
+    extra.set("tag", tag)
     extra.set("tagRev", tagRev)
     extra.set("distName", "gaiasky-$tagRev")
     extra.set("releasesDir", "$baseDir/releases")
