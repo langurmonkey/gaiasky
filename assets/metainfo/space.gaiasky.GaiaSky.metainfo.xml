@@ -39,23 +39,21 @@
 
   <releases>
 
-    <release version="3.7.3" date="2026-06-02" urgency="high">
-      <url>https://gaiasky.space/news/2026/gaiasky_3.7.3</url>
+    <release version="3.7.4" date="2026-06-17" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.7.4</url>
       <description>
-        <p>This release focuses on QoL improvements, and contains several important bugfixes:</p>
+        <p>This release presents an overhaul in the atmospheric scattering model and includes important bugfixes for the keyframe system:</p>
         <ul>
-          <li>Redesigned "Load dataset" dialog with two tabs: "Load installed dataset" and "Load file".</li>
-          <li>Added support for server dataset images and mission dataset selection (sets time and camera focus).</li>
-          <li>New line shading method using screen-space derivatives for higher quality.</li>
-          <li>Added limb fade to cloud layer based on screen-space pixel counts.</li>
-          <li>Added PBR support in Wavefront .mtl files and intrinsic opacity for materials.</li>
-          <li>Extensive refactoring of settings handling (removed static references).</li>
-          <li>Fixed crash with asterisks in Windows paths (shader cache).</li>
-          <li>Fixed shader positioning bugs in model-based particle sets.</li>
-          <li>Fixed color picker crash and various dataset widget resizing issues.</li>
-          <li>Japanese translation is now fully complete.</li>
-          <li>Complete migration of Gradle build scripts to Kotlin DSL.</li>
-          <li>Updated to LibGDX 1.14.1.</li>
+          <li>Unify atmospheric scattering ground and sky paths that uses Burneton's approximation for the density scale.</li>
+          <li>Use glow and transmittance for correct blending.</li>
+          <li>Consider terrain elevation in scattering calculations.</li>
+          <li>Add ozone absorption to atmospheric scattering, and expose it in the procedural planet generation dialog.</li>
+          <li>Fix keyframe lines and points being invisible.</li>
+          <li>Fix locale initialization.</li>
+          <li>Fix compute shader support check by adding SSBO extension lookup.</li>
+          <li>Fix dependency on Java >=26 in AUR package.</li>
+          <li>Fix directory selection in file picker.</li>
+          <li>Update to libGDX 1.14.2.</li>
         </ul>
       </description>
       </release>
