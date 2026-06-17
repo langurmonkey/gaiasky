@@ -159,6 +159,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {
+            assert GaiaSky.settings() != null : "Settings instance is null";
             // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
             // Initialize tessellated.
@@ -312,6 +313,7 @@ public class ModelInitializer extends AbstractInitSystem {
         scaffolding.locThresholdLabel = 1000.0f;
         scaffolding.locVaMultiplier = 2.8f;
 
+        assert GaiaSky.settings() != null : "Settings instance is null";
         sa.thresholdPoint = FastMath.toRadians(0.30);
         sa.thresholdLabel = (Math.toRadians(1e-6) / GaiaSky.settings().scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
         if (isBillboardGal) {
@@ -340,7 +342,7 @@ public class ModelInitializer extends AbstractInitSystem {
                 var cloud = Mapper.cloud.get(entity);
                 if (model.model.mtc != null && cloud.cloud != null) {
                     // Do not add cloud occlusion with current configuration if clouds are pulled from URL.
-                    if (!TextUtils.isValidURL(cloud.cloud.url)) {
+                    if (!(TextUtils.isValidURL(cloud.cloud.url) && GaiaSky.settings().data.pullCloudData)) {
                         if (cloud.cloud.diffuseSvt != null && cloud.cloud.svtParams != null) {
                             // Cloud shadows unsupported with SVT.
                             // This is because we can't ensure that the cloud SVT is exactly the same (levels, size, etc.) as the
@@ -412,6 +414,7 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     public void initializeSatellite(ModelScaffolding scaffolding, SolidAngle sa, Label label) {
+        assert GaiaSky.settings() != null : "Settings instance is null";
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e18;
         sa.thresholdPoint = thPoint / 3.3e10;
