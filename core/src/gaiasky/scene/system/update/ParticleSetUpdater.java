@@ -95,6 +95,8 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
                                         .loadJsonDataset(name, path.toString(), beanSelected, true));
                                 set.proximityLoaded.add(idxNearest);
                                 found = true;
+                                // We found and loaded the file. No need to check further names.
+                                break;
                             }
                         }
                         if (!found) {
