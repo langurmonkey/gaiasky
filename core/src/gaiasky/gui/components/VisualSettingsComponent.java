@@ -18,19 +18,12 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
-import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnSliderReset;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -49,17 +42,28 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         super(skin, stage);
     }
 
+    private final float STAR_BRIGHTNESS_DEFAULT = 2.22f;
+    private final float STAR_BR_POWER_DEFAULT = 1f;
+    private final float STAR_GLOW_FACTOR_DEFAULT = 0.035f;
+    private final float POINT_SIZE_DEFAULT = 3f;
+    private final float STAR_BASE_LEVEL_DEFAULT = 0.0f;
+    private final float AMBIENT_LIGHT_DEFAULT = 0.0f;
+    private final float LABEL_SIZE_DEFAULT = 1.3f;
+    private final float LINE_WIDTH_DEFAULT = 1.0f;
+    private final float ELEVATION_DEFAULT = 1.0f;
+
+
     @Override
     public void initialize(float componentWidth) {
         /* Star brightness */
         var starBrightness = new OwnSliderReset(I18n.msg("gui.star.brightness"),
-                                                           Constants.MIN_SLIDER,
-                                                           Constants.MAX_SLIDER,
-                                                           Constants.SLIDER_STEP_TINY,
-                                                           Constants.MIN_STAR_BRIGHTNESS,
-                                                           Constants.MAX_STAR_BRIGHTNESS,
-                                                           2.22f,
-                                                           skin);
+                                                Constants.MIN_SLIDER,
+                                                Constants.MAX_SLIDER,
+                                                Constants.SLIDER_STEP_TINY,
+                                                Constants.MIN_STAR_BRIGHTNESS,
+                                                Constants.MAX_STAR_BRIGHTNESS,
+                                                STAR_BRIGHTNESS_DEFAULT,
+                                                skin);
         starBrightness.setTooltip(I18n.msg("gui.star.brightness.info"));
         starBrightness.setWidth(componentWidth);
         starBrightness.setDisplayValueMapped(false);
@@ -68,11 +72,11 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Star brightness power */
         var starBrightnessPow = new OwnSliderReset(I18n.msg("gui.star.brightness.pow"),
-                                                                Constants.MIN_STAR_BRIGHTNESS_POW,
-                                                                Constants.MAX_STAR_BRIGHTNESS_POW,
-                                                                Constants.SLIDER_STEP_WEENY,
-                                                                1f,
-                                                                skin);
+                                                   Constants.MIN_STAR_BRIGHTNESS_POW,
+                                                   Constants.MAX_STAR_BRIGHTNESS_POW,
+                                                   Constants.SLIDER_STEP_WEENY,
+                                                   STAR_BR_POWER_DEFAULT,
+                                                   skin);
         starBrightnessPow.setTooltip(I18n.msg("gui.star.brightness.pow.info"));
         starBrightnessPow.setWidth(componentWidth);
         starBrightnessPow.setValue(GaiaSky.settings().scene.star.power);
@@ -80,11 +84,11 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Star glow factor */
         var starGlowFactor = new OwnSliderReset(I18n.msg("gui.star.glowfactor"),
-                                                           Constants.MIN_STAR_GLOW_FACTOR,
-                                                           Constants.MAX_STAR_GLOW_FACTOR,
-                                                           Constants.SLIDER_STEP_WEENY,
-                                                           0.035f,
-                                                           skin);
+                                                Constants.MIN_STAR_GLOW_FACTOR,
+                                                Constants.MAX_STAR_GLOW_FACTOR,
+                                                Constants.SLIDER_STEP_WEENY,
+                                                STAR_GLOW_FACTOR_DEFAULT,
+                                                skin);
         starGlowFactor.setTooltip(I18n.msg("gui.star.glowfactor.info"));
         starGlowFactor.setWidth(componentWidth);
         starGlowFactor.setMappedValue(GaiaSky.settings().scene.star.glowFactor);
@@ -92,11 +96,11 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Point size */
         var pointSize = new OwnSliderReset(I18n.msg("gui.star.size"),
-                                                      Constants.MIN_STAR_POINT_SIZE,
-                                                      Constants.MAX_STAR_POINT_SIZE,
-                                                      Constants.SLIDER_STEP_TINY,
-                                                      3f,
-                                                      skin);
+                                           Constants.MIN_STAR_POINT_SIZE,
+                                           Constants.MAX_STAR_POINT_SIZE,
+                                           Constants.SLIDER_STEP_TINY,
+                                           POINT_SIZE_DEFAULT,
+                                           skin);
         pointSize.setTooltip(I18n.msg("gui.star.size.info"));
         pointSize.setWidth(componentWidth);
         pointSize.setMappedValue(GaiaSky.settings().scene.star.pointSize);
@@ -104,11 +108,11 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Star min opacity */
         var starBaseLevel = new OwnSliderReset(I18n.msg("gui.star.opacity"),
-                                                          Constants.MIN_STAR_MIN_OPACITY,
-                                                          Constants.MAX_STAR_MIN_OPACITY,
-                                                          Constants.SLIDER_STEP_TINY,
-                                                          0f,
-                                                          skin);
+                                               Constants.MIN_STAR_MIN_OPACITY,
+                                               Constants.MAX_STAR_MIN_OPACITY,
+                                               Constants.SLIDER_STEP_TINY,
+                                               STAR_BASE_LEVEL_DEFAULT,
+                                               skin);
         starBaseLevel.setTooltip(I18n.msg("gui.star.opacity.info"));
         starBaseLevel.setWidth(componentWidth);
         starBaseLevel.setMappedValue(GaiaSky.settings().scene.star.opacity[0]);
@@ -116,46 +120,46 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
         /* Ambient light */
         var ambientLight = new OwnSliderReset(I18n.msg("gui.light.ambient"),
-                                                         Constants.MIN_AMBIENT_LIGHT,
-                                                         Constants.MAX_AMBIENT_LIGHT,
-                                                         Constants.SLIDER_STEP_TINY,
-                                                         0f,
-                                                         skin);
+                                              Constants.MIN_AMBIENT_LIGHT,
+                                              Constants.MAX_AMBIENT_LIGHT,
+                                              Constants.SLIDER_STEP_TINY,
+                                              AMBIENT_LIGHT_DEFAULT,
+                                              skin);
         ambientLight.setWidth(componentWidth);
         ambientLight.setMappedValue(GaiaSky.settings().scene.renderer.ambient);
         ambientLight.connect(Event.AMBIENT_LIGHT_CMD);
 
         /* Label size */
         var labelSize = new OwnSliderReset(I18n.msg("gui.label.size"),
-                                                      Constants.MIN_LABEL_SIZE,
-                                                      Constants.MAX_LABEL_SIZE,
-                                                      Constants.SLIDER_STEP_TINY,
-                                                      1.3f,
-                                                      skin);
+                                           Constants.MIN_LABEL_SIZE,
+                                           Constants.MAX_LABEL_SIZE,
+                                           Constants.SLIDER_STEP_TINY,
+                                           LABEL_SIZE_DEFAULT,
+                                           skin);
         labelSize.setWidth(componentWidth);
         labelSize.setMappedValue(GaiaSky.settings().scene.label.size);
         labelSize.connect(Event.LABEL_SIZE_CMD);
 
         /* Line width */
         var lineWidth = new OwnSliderReset(I18n.msg("gui.line.width"),
-                                                      Constants.MIN_LINE_WIDTH,
-                                                      Constants.MAX_LINE_WIDTH,
-                                                      Constants.SLIDER_STEP_TINY,
-                                                      Constants.MIN_LINE_WIDTH,
-                                                      Constants.MAX_LINE_WIDTH,
-                                                      1f,
-                                                      skin);
+                                           Constants.MIN_LINE_WIDTH,
+                                           Constants.MAX_LINE_WIDTH,
+                                           Constants.SLIDER_STEP_TINY,
+                                           Constants.MIN_LINE_WIDTH,
+                                           Constants.MAX_LINE_WIDTH,
+                                           LINE_WIDTH_DEFAULT,
+                                           skin);
         lineWidth.setWidth(componentWidth);
         lineWidth.setMappedValue(GaiaSky.settings().scene.renderer.line.width);
         lineWidth.connect(Event.LINE_WIDTH_CMD);
 
         /* Elevation multiplier */
         var elevMult = new OwnSliderReset(I18n.msg("gui.elevation.multiplier"),
-                                                     Constants.MIN_ELEVATION_MULT,
-                                                     Constants.MAX_ELEVATION_MULT,
-                                                     Constants.SLIDER_STEP_TINY,
-                                                     1f,
-                                                     skin);
+                                          Constants.MIN_ELEVATION_MULT,
+                                          Constants.MAX_ELEVATION_MULT,
+                                          Constants.SLIDER_STEP_TINY,
+                                          ELEVATION_DEFAULT,
+                                          skin);
         elevMult.setWidth(componentWidth);
         elevMult.setValue((float) MathUtilsDouble.roundAvoid(GaiaSky.settings().scene.renderer.elevation.multiplier, 1));
         elevMult.connect(Event.ELEVATION_MULTIPLIER_CMD);
@@ -195,41 +199,17 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
     }
 
     private void resetVisualSettingsDefaults(Object source) {
-        try {
-            Path confFolder = Settings.assetsPath("conf");
-            Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(GaiaSky.settings().runtime.openXr));
-            Yaml yaml = new Yaml();
-            Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
-
-            float br = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
-            float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
-            float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
-            float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
-            float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).getFirst(
-            )).floatValue();
-            float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
-            float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
-            float lw = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("line")).get(
-                    "width")).floatValue();
-            float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get(
-                    "elevation")).get(
-                    "multiplier")).floatValue();
-
-            // Post events to reset all.
-            EventManager m = EventManager.instance;
-            m.post(Event.STAR_BRIGHTNESS_CMD, source, br);
-            m.post(Event.STAR_BRIGHTNESS_POW_CMD, source, pow);
-            m.post(Event.STAR_GLOW_FACTOR_CMD, source, glo);
-            m.post(Event.STAR_POINT_SIZE_CMD, source, ss);
-            m.post(Event.STAR_BASE_LEVEL_CMD, source, pam);
-            m.post(Event.AMBIENT_LIGHT_CMD, source, amb);
-            m.post(Event.LABEL_SIZE_CMD, source, ls);
-            m.post(Event.LINE_WIDTH_CMD, source, lw);
-            m.post(Event.ELEVATION_MULTIPLIER_CMD, source, em);
-
-        } catch (IOException e) {
-            logger.error(e, "Error loading default configuration file");
-        }
+        // Post events to reset all.
+        EventManager m = EventManager.instance;
+        m.post(Event.STAR_BRIGHTNESS_CMD, source, STAR_BRIGHTNESS_DEFAULT);
+        m.post(Event.STAR_BRIGHTNESS_POW_CMD, source, STAR_BR_POWER_DEFAULT);
+        m.post(Event.STAR_GLOW_FACTOR_CMD, source, STAR_GLOW_FACTOR_DEFAULT);
+        m.post(Event.STAR_POINT_SIZE_CMD, source, POINT_SIZE_DEFAULT);
+        m.post(Event.STAR_BASE_LEVEL_CMD, source, STAR_BASE_LEVEL_DEFAULT);
+        m.post(Event.AMBIENT_LIGHT_CMD, source, AMBIENT_LIGHT_DEFAULT);
+        m.post(Event.LABEL_SIZE_CMD, source, LABEL_SIZE_DEFAULT);
+        m.post(Event.LINE_WIDTH_CMD, source, LINE_WIDTH_DEFAULT);
+        m.post(Event.ELEVATION_MULTIPLIER_CMD, source, ELEVATION_DEFAULT);
     }
 
     @Override
