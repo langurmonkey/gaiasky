@@ -159,7 +159,6 @@ public class ModelInitializer extends AbstractInitSystem {
 
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {
-            assert GaiaSky.settings() != null : "Settings instance is null";
             // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
             // Initialize tessellated.
@@ -313,7 +312,6 @@ public class ModelInitializer extends AbstractInitSystem {
         scaffolding.locThresholdLabel = 1000.0f;
         scaffolding.locVaMultiplier = 2.8f;
 
-        assert GaiaSky.settings() != null : "Settings instance is null";
         sa.thresholdPoint = FastMath.toRadians(0.30);
         sa.thresholdLabel = (Math.toRadians(1e-6) / GaiaSky.settings().scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
         if (isBillboardGal) {
@@ -414,7 +412,6 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     public void initializeSatellite(ModelScaffolding scaffolding, SolidAngle sa, Label label) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e18;
         sa.thresholdPoint = thPoint / 3.3e10;

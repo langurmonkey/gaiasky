@@ -158,7 +158,8 @@ public class BillboardEntityRenderSystem implements IObserver {
             }
             computedSize = (size * (dist / radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM);
         }
-        computedSize *= GaiaSky.settings().scene.star.pointSize * GaiaSky.settings().scene.star.glowFactor;
+        var settings = GaiaSky.settings();
+        computedSize *= settings.scene.star.pointSize * settings.scene.star.glowFactor;
 
         return computedSize;
     }
@@ -232,10 +233,11 @@ public class BillboardEntityRenderSystem implements IObserver {
                 extra.computedSize *= (dist / extra.radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM;
             }
 
-            extra.computedSize *= GaiaSky.settings().scene.star.pointSize
-                    * (star ?
-                    GaiaSky.settings().scene.star.glowFactor
-                    : 0.2 / (Constants.DISTANCE_SCALE_FACTOR != 1 ? 200.0 : 1.0));
+            var pointSize = GaiaSky.settings().scene.star.pointSize;
+            var scaleType = star ? GaiaSky.settings().scene.star.glowFactor : 0.2 / (Constants.DISTANCE_SCALE_FACTOR != 1 ? 200.0 : 1.0);
+            var scaleGlow = GaiaSky.settings().postprocess.lightGlow.active ? 1f : 3.5f;
+
+            extra.computedSize *= pointSize * scaleType * scaleGlow;
             return (float) (extra.computedSize * extra.primitiveRenderScale);
         } else if (Mapper.fade.has(entity)) {
             // Regular billboards

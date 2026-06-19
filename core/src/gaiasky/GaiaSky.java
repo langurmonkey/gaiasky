@@ -1404,9 +1404,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * @return Reference to the settings object.
      */
     public static Settings settings() {
-        if (instance == null) {
-            return null;
-        }
+        assert instance != null : "Gaia Sky instance is null";
+        assert instance.settings != null : "Settings instance is null";
         return instance.settings;
     }
 

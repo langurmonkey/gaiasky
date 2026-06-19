@@ -126,7 +126,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     private void initialize(boolean force) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         if (!GaiaSky.settings().scene.initialization.lazyTexture || force) {
             this.generated.set(false);
             if (TextUtils.isValidURL(url) && GaiaSky.settings().data.pullCloudData) {
@@ -192,7 +191,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         // CREATE CLOUD MODEL
         mc.instance = new IntModelInstance(cloudModel, this.localTransform);
 
-        assert GaiaSky.settings() != null : "Settings instance is null";
         if (!GaiaSky.settings().scene.initialization.lazyTexture) {
             initMaterial(null);
         }
@@ -202,7 +200,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     public void touch(Model model) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         if (GaiaSky.settings().scene.initialization.lazyTexture) {
 
             if (!texLoading) {
@@ -323,7 +320,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         svt.doneLoading(null);
         // Set ID.
         svt.id = id;
@@ -346,7 +342,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         if (!generated.get()) {
             generated.set(true);
             GaiaSky.postRunnable(() -> {
-                assert GaiaSky.settings() != null : "Settings instance is null";
 
                 int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
                 int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
@@ -468,7 +463,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     }
 
     public void setDiffuse(String diffuse) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.diffuse = GaiaSky.settings().data.dataFile(diffuse);
     }
 

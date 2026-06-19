@@ -67,7 +67,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
     private void initializeLookUpTables() {
         if (lookUpTextures.isEmpty()) {
-            assert GaiaSky.settings() != null : "Settings instance is null";
             var dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
             var sep = File.separatorChar;
             try (var paths = Files.list(dataPath)) {
@@ -663,7 +662,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     private void addSVTAttributes(Material material,
                                   VirtualTextureComponent svt,
                                   int id) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         svt.doneLoading(null);
         // Set ID.
         svt.id = id;
@@ -688,7 +686,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
     private void addHeightTex(Texture heightTex) {
         if (heightTex != null && material != null) {
-            assert GaiaSky.settings() != null : "Settings instance is null";
             heightSize.set(heightTex.getWidth(), heightTex.getHeight());
             material.set(new TextureAttribute(TextureAttribute.Height, heightTex));
             material.set(new FloatAttribute(FloatAttribute.HeightScale, heightScale));
@@ -750,7 +747,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         } else {
             heightGenerated.set(true);
             GaiaSky.postRunnable(() -> {
-                assert GaiaSky.settings() != null : "Settings instance is null";
                 // 1ST FRAME - CREATE NOISE.
                 int N = GaiaSky.settings().graphics.proceduralGenerationResolution[0];
                 int M = GaiaSky.settings().graphics.proceduralGenerationResolution[1];
@@ -922,12 +918,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setDiffuse(String diffuse) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.diffuse = GaiaSky.settings().data.dataFile(diffuse);
     }
 
     public void setSpecular(String specular) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.specular = GaiaSky.settings().data.dataFile(specular);
     }
 
@@ -954,7 +948,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setNormal(String normal) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.normal = GaiaSky.settings().data.dataFile(normal);
     }
 
@@ -967,7 +960,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setEmissive(String emissive) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.emissive = GaiaSky.settings().data.dataFile(emissive);
     }
 
@@ -1004,7 +996,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setRingDiffuse(String ringDiffuse) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.ring = GaiaSky.settings().data.dataFile(ringDiffuse);
     }
 
@@ -1013,7 +1004,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setRingNormal(String ringNormal) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.ringnormal = GaiaSky.settings().data.dataFile(ringNormal);
     }
 
@@ -1032,7 +1022,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setHeight(String height) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.height = GaiaSky.settings().data.dataFile(height);
     }
 
@@ -1098,7 +1087,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setMetallic(String metallic) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.metallic = GaiaSky.settings().data.dataFile(metallic);
     }
 
@@ -1112,7 +1100,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setRoughness(String roughness) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.roughness = GaiaSky.settings().data.dataFile(roughness);
     }
 
@@ -1121,42 +1108,34 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void setAo(String ao) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.ao = GaiaSky.settings().data.dataFile(ao);
     }
 
     public void setOcclusionMetallicRoughness(String texture) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.occlusionMetallicRoughness = GaiaSky.settings().data.dataFile(texture);
     }
 
     public void setTexture0(String texture0) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.texture0 = GaiaSky.settings().data.dataFile(texture0);
     }
 
     public void setTexture1(String texture1) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.texture1 = GaiaSky.settings().data.dataFile(texture1);
     }
 
     public void setVolume0(String tex) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.volume0 = GaiaSky.settings().data.dataFile(tex);
     }
 
     public void setVolume1(String tex) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.volume1 = GaiaSky.settings().data.dataFile(tex);
     }
 
     public void setVolume2(String tex) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.volume2 = GaiaSky.settings().data.dataFile(tex);
     }
 
     public void setVolume3(String tex) {
-        assert GaiaSky.settings() != null : "Settings instance is null";
         this.volume3 = GaiaSky.settings().data.dataFile(tex);
     }
 
@@ -1406,7 +1385,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                                             ((TextureAttribute) Objects.requireNonNull(this.material.get(TextureAttribute.Height))).textureDescription.texture);
                                 } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
                                     if (!height.endsWith(Constants.GEN_KEYWORD)) {
-                                        assert GaiaSky.settings() != null : "Settings instance is null";
                                         Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
                                         if (!GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
                                             initializeElevationData(tex);
