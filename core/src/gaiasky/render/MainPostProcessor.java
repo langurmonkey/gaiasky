@@ -32,12 +32,15 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
 import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
+import gaiasky.util.SlaveManager;
+import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.i18n.I18n;
@@ -224,7 +227,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackBufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
-        lightGlow.setEnabledOptions(true, true);
+        lightGlow.setEnabledOptions(false, true);
         ppb.add(lightGlow);
         updateGlow(ppb, settings.graphics.quality);
 
@@ -278,7 +281,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
             var pseudoLensFlare = new PseudoLensFlare((int) (width * lensFlareSettings.fboScale),
-                                                                  (int) (height * lensFlareSettings.fboScale));
+                                                      (int) (height * lensFlareSettings.fboScale));
             pseudoLensFlare.setGhosts(lensFlareSettings.numGhosts);
             pseudoLensFlare.setHaloWidth(lensFlareSettings.haloWidth);
             pseudoLensFlare.setLensColorTexture(lensColor);
@@ -850,7 +853,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     // Actually load the effect if we are running (dynamic load).
                     var loaded = false;
                     if (pps != null && pps.length > 0) {
-                    for (int i = 0; i < RenderType.values().length; i++) {
+                        for (int i = 0; i < RenderType.values().length; i++) {
                             var ppb = pps[i];
                             if (ppb != null && !ppb.has(name, RaymarchObject.class)) {
                                 // Add it.
@@ -1030,10 +1033,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         if (cameraMotion != null) {
                             cameraMotion.setEnabled(enabled);
                         }
-                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightglow != null) {
-                            lightglow.setNSamples(enabled ? 1 : GaiaSky.settings().postprocess.lightGlow.samples);
-                            lightglow.setTextureScale(getGlowTextureScale(GaiaSky.settings().scene.star.brightness,
+                        LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightGlow != null && lightGlow.isEnabledInCubemap()) {
+                            lightGlow.setNSamples(enabled ? 1 : GaiaSky.settings().postprocess.lightGlow.samples);
+                            lightGlow.setTextureScale(getGlowTextureScale(GaiaSky.settings().scene.star.brightness,
                                                                           GaiaSky.settings().scene.star.glowFactor,
                                                                           GaiaSky.settings().scene.star.pointSize,
                                                                           GaiaSky.instance.cameraManager.getFovFactor(),

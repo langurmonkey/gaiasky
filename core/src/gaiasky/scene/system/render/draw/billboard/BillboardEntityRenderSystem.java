@@ -235,7 +235,9 @@ public class BillboardEntityRenderSystem implements IObserver {
 
             var pointSize = GaiaSky.settings().scene.star.pointSize;
             var scaleType = star ? GaiaSky.settings().scene.star.glowFactor : 0.2 / (Constants.DISTANCE_SCALE_FACTOR != 1 ? 200.0 : 1.0);
-            var scaleGlow = GaiaSky.settings().postprocess.lightGlow.active ? 1f : 3.5f;
+            // Light glow is off or cubemap is off (which means glow is off)
+            var scaleGlow = GaiaSky.settings().postprocess.lightGlow.active
+                            && !GaiaSky.settings().program.modeCubemap.active ? 1f : 3.5f;
 
             extra.computedSize *= pointSize * scaleType * scaleGlow;
             return (float) (extra.computedSize * extra.primitiveRenderScale);
