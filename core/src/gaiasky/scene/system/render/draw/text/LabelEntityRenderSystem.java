@@ -510,7 +510,8 @@ public class LabelEntityRenderSystem {
         }
         float solidAngle = (float) ((radius / distToCamera) * GaiaSky.settings().scene.star.brightness * 100f);
 
-        var visibleCamera = camera.isVisible(solidAngle, starPosition.put(D32), distToCamera);
+        // In any of the cubemap modes, we consider all labels visible to avoid seams between cubemap sides.
+        var visibleCamera = GaiaSky.settings().program.modeCubemap.active || camera.isVisible(solidAngle, starPosition.put(D32), distToCamera);
         if (visibleCamera && (forceLabel || solidAngle > thresholdLabel)) {
             Vector3D labelPosition = D32.set(starPosition);
             textPosition(camera, labelPosition, distToCamera, solidAngle / 100f, radius);
