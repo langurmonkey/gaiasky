@@ -129,10 +129,9 @@ public class DecalUtils {
                                   float y,
                                   float z,
                                   float size,
-                                  float rotationCenter,
                                   ICamera camera,
                                   boolean faceCamera) {
-        drawFont3D(font, batch, text, x, y, z, size, rotationCenter, camera, faceCamera, -1, -1);
+        drawFont3D(font, batch, text, x, y, z, size, camera, faceCamera, -1, -1);
     }
 
     /**
@@ -149,7 +148,6 @@ public class DecalUtils {
      * @param y              The y coordinate.
      * @param z              The z coordinate.
      * @param size           The scale of the font.
-     * @param rotationCenter Angles to rotate around center.
      * @param cam            The camera.
      * @param faceCamera     Whether to apply bill-boarding.
      * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
@@ -162,7 +160,6 @@ public class DecalUtils {
                                   float y,
                                   float z,
                                   double size,
-                                  float rotationCenter,
                                   ICamera cam,
                                   boolean faceCamera,
                                   float minSizeDegrees,
@@ -180,14 +177,16 @@ public class DecalUtils {
             size = MathUtils.clamp(size, (float) minSize, (float) maxSize);
         }
 
-        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up, qAux);
+        // If faceCamera is false (cubemap), we use a global direction.
+        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(),
+                                                   faceCamera ? camera.up : tmp.set(0, 1, 0),
+                                                   qAux);
         float sizeF = (float) size;
         batch.getTransformMatrix()
                 .set(camera.combined)
                 .translate(x, y, z)
                 .rotate(rotation)
                 .rotate(0, 1, 0, 180)
-                .rotate(0, 0, 1, rotationCenter)
                 .scale(sizeF, sizeF, sizeF);
         // Force matrices to be set to shader
         batch.setProjectionMatrix(idt);
@@ -220,7 +219,7 @@ public class DecalUtils {
                                   float scale,
                                   ICamera camera,
                                   boolean faceCamera) {
-        drawFont3D(font, batch, text, position.x, position.y, position.z, scale, 0, camera, faceCamera);
+        drawFont3D(font, batch, text, position.x, position.y, position.z, scale, camera, faceCamera);
     }
 
     public static void drawFont2D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position) {

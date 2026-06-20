@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.GlobalResources;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IParticleRecord;
@@ -24,7 +23,10 @@ import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.DecalUtils;
+import gaiasky.util.Logger;
+import gaiasky.util.Pair;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.color.ColorUtils;
@@ -837,23 +839,12 @@ public class LabelEntityRenderSystem {
 
             size *= GaiaSky.settings().scene.label.size;
 
-            float rot = 0;
-            if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
-                Vector3 v1 = F31;
-                Vector3 v2 = F32;
-                camera.getCamera()
-                        .project(v1.set((float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z));
-                v1.z = 0f;
-                v2.set(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, 0f);
-                rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90f : -90f);
-            }
-
             shader.setUniformf("u_pos", labelPosition);
 
             // Enable or disable blending
             view.textDepthBuffer();
 
-            DecalUtils.drawFont3D(font, batch, labelText, (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z, size, rot,
+            DecalUtils.drawFont3D(font, batch, labelText, (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z, size,
                                   camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }
     }

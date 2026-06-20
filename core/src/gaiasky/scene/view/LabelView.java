@@ -309,22 +309,12 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
             size *= GaiaSky.settings().scene.label.size;
 
-            float rot = 0;
-            if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
-                Vector3 v1 = F31;
-                Vector3 v2 = F32;
-                camera.getCamera().project(v1.set((float) pos.x, (float) pos.y, (float) pos.z));
-                v1.z = 0f;
-                v2.set(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, 0f);
-                rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90f : -90f);
-            }
-
             shader.setUniformf("u_pos", pos);
 
             // Enable or disable blending
             this.textDepthBuffer();
 
-            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
+            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }
     }
 }
