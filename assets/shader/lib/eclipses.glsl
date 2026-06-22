@@ -2,7 +2,11 @@
 #define GLSL_LIB_ECLIPSES
 
 #ifdef eclipsingBodyFlag
+
+#ifndef GLSL_VR_SCALE
+#define GLSL_VR_SCALE
 uniform float u_vrScale;
+#endif //GLSL_VR_SCALE
 uniform int u_eclipseOutlines;
 uniform float u_eclipsingBodyRadius;
 uniform vec3 u_eclipsingBodyPos;

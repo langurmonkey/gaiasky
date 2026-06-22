@@ -32,6 +32,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
+import gaiasky.scene.component.Body;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -907,7 +908,6 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
         eclipsingBodies.clear();
         // Look down at children (only moons).
-        String me = Mapper.base.get(entity).getName();
         if (graph.children != null && !graph.children.isEmpty()) {
             for (var child : graph.children) {
                 var base = Mapper.base.get(child);
@@ -940,7 +940,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         var graph = Mapper.graph.get(eclipsingBody);
 
         setVector3Attribute(mat, Vector3Attribute.EclipsingBodyPos, graph.translation.put(aux));
-        setFloatAttribute(mat, FloatAttribute.EclipsingBodyRadius, (float) (body.size * 0.5));
+        setFloatAttribute(mat, FloatAttribute.EclipsingBodyRadius, body.size * 0.5f);
         if (GaiaSky.settings().scene.renderer.eclipses.outlines) {
             setIntAttribute(mat, IntAttribute.EclipseOutlines, 1);
         } else {
@@ -958,6 +958,12 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             mat.remove(IntAttribute.EclipseOutlines);
         }
 
+    }
+
+    public void updateCloudUniforms(Body body) {
+        for (Material mat : instance.materials) {
+            setFloatAttribute(mat, FloatAttribute.Generic1, body.size * 0.5f);
+        }
     }
 
     public void updateRelativisticEffects(ICamera camera) {

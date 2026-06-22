@@ -13,6 +13,9 @@ in vec2 v_texCoord0;
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
+uniform float u_kmToU;
+// The radius of the planet goes in here
+uniform float u_generic1;
 
 // Varyings computed in the vertex shader
 in float v_opacity;
@@ -63,6 +66,11 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
 
 // Eclipses.
 #include <shader/lib/eclipses.glsl>
+// VR scale
+#ifndef GLSL_VR_SCALE
+#define GLSL_VR_SCALE
+uniform float u_vrScale;
+#endif //GLSL_VR_SCALE
 
 //////////////////////////////////////////////////////
 ////// DIRECTIONAL LIGHTS
@@ -95,6 +103,7 @@ uniform PointLight u_pointLights[numPointLights];
 
 in vec3 v_viewDir;
 in vec3 v_fragPosWorld;
+in float v_fragDist;
 in mat3 v_tbn;
 
 layout(location = 0) out vec4 fragColor;
@@ -108,18 +117,15 @@ layout(location = 1) out vec4 layerBuffer;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-// Uniform: how many pixels of fade at the silhouette
-const int FADE_PIXELS = 25;
-float cloudLimbFade(vec3 viewDir, vec3 normal) {
-
+float cloudLimbFade(vec3 viewDir, vec3 normal, float fadePixels) {
     // The rim value at the silhouette
-    float rim = 1.0 - max(0.0, dot(viewDir, normal));
+    float rim = 1.0 - max(0.0001, dot(viewDir, normal));
 
     // How many rim-units per pixel, right now, at this fragment
     float rimPerPixel = fwidth(rim);
 
-    // Fade over the last FADE_PIXELS pixels
-    float fadeStart = 1.0 - rimPerPixel * float(FADE_PIXELS);
+    // Fade over the last pixels
+    float fadeStart = 1.0 - rimPerPixel * fadePixels;
     float factor = 1.0 - smoothstep(fadeStart, 1.0, rim);
 
     return factor;
@@ -189,9 +195,18 @@ void main() {
         fragColor.rgb = eclipseBlend(fragColor.rgb, diffractionTint, eclshdw);
     #endif // eclipsingBodyFlag
 
-    // Cloud limb fade
-    float cloudLimbFade = cloudLimbFade(v_viewDir, v_normal);
+    // Cloud limb fade. Compute fade pixels according to vertex distance, with maximum fade of 25 px.
+    // Extract the radius of the cloud shell from the world transformation. Usually wt[0,0] = wt[1,1] = wt[2,2], as
+    // the same scale is used for x, y, and z. Generi1 has the radius in internal units.
+    float toKm = 1.0 / u_kmToU;
+    float radiusKm = u_generic1 * toKm;
+    float distKm = v_fragDist * toKm;
+    float fadePixels = (1.0 - smoothstep(radiusKm / 6.0, radiusKm * 1.5, distKm)) * 25.0;
+    float cloudLimbFade = cloudLimbFade(normalize(v_viewDir), normalize(v_normal), fadePixels);
     fragColor *= cloudLimbFade;
+
+    fragColor.a = 1.0;
+
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
     layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);

@@ -634,12 +634,15 @@ public class ModelEntityRenderSystem {
                              float alpha,
                              double t) {
         // Update cull face depending on distance.
-        cloud.cloud.updateCullFace(Mapper.body.get(entity).distToCamera);
+        var body = Mapper.body.get(entity);
+        cloud.cloud.updateCullFace(body.distToCamera);
         cloud.cloud.touch(model);
         ICamera cam = GaiaSky.instance.getICamera();
         cloud.cloud.mc.updateRelativisticEffects(cam);
         cloud.cloud.mc.updateBlendMode(alpha * base.opacity);
         cloud.cloud.mc.updateEclipsingBodyUniforms(entity);
+        cloud.cloud.mc.updateCloudUniforms(body);
+
         batch.render(cloud.cloud.mc.instance, model.model.env);
     }
 

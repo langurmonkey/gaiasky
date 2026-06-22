@@ -135,7 +135,6 @@ uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 uniform vec4 u_cameraPosition;
 uniform mat3 u_normalMatrix;
-uniform float u_vrScale;
 
 // Other uniforms
 out float v_opacity;
@@ -244,6 +243,7 @@ uniform DirectionalLight u_dirLights[numDirectionalLights];
 
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
+out float v_fragDist;
 out mat3 v_tbn;
 
 void main() {
@@ -267,6 +267,7 @@ void main() {
     #endif // gravitationalWaves
 
     v_fragPosWorld = pos.xyz;
+    v_fragDist = length(pos.xyz);
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 

@@ -474,12 +474,16 @@ public class ModelInitializer extends AbstractInitSystem {
         if (atmosphereComponent != null) {
             // Initialize atmosphere model
             atmosphereComponent.doneLoading(modelComponent.instance.materials.first(), size);
+            // Set units.
+            atmosphereComponent.mc.setUnits(Constants.KM_TO_U);
         }
     }
 
     private void initializeClouds(AssetManager manager, CloudComponent cloudComponent) {
         if (cloudComponent != null) {
             cloudComponent.doneLoading(manager);
+            // Set units.
+            cloudComponent.mc.setUnits(Constants.KM_TO_U);
         }
     }
 }
