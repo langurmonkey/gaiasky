@@ -75,7 +75,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     public CameraInfoInterface(Skin skin, boolean vr) {
         super(skin);
         this.setBackground("bg-pane");
-        this.maximized = true;
+        this.maximized = false;
         this.skin = skin;
         this.content = new Table(skin);
         // Widget width
@@ -359,7 +359,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         rulerInfo.add(rulerDist).left();
 
         // MINIMIZE/MAXIMIZE
-        Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
+        Link toggleSize = new Link(maximized ? "▼" : "▲", skin, null);
         var toggleSizeTooltip = new OwnTextTooltip(I18n.msg("gui.minimize.pane"), skin);
         toggleSize.addListener(toggleSizeTooltip);
         toggleSize.addListener(new ClickListener() {
@@ -369,7 +369,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     maximized = false;
                     content.addAction(Actions.sequence(Actions.alpha(1f), Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()), Actions.run(() -> {
                         contentCell.setActor(null);
-                        toggleSize.setText("(+)");
+                        toggleSize.setText("▲");
                         toggleSizeTooltip.setText(I18n.msg("gui.maximize.pane"));
                     })));
                 } else {
@@ -377,7 +377,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     maximized = true;
                     contentCell.setActor(content);
                     content.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds()), Actions.run(() -> {
-                        toggleSize.setText("(-)");
+                        toggleSize.setText("▼");
                         toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
                     })));
                 }

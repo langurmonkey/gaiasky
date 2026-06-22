@@ -118,7 +118,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         /* MINIMIZE/MAXIMIZE */
         extra = new Table(skin);
 
-        var toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
+        var toggleSize = new Link(maximized ? "▲" : "▼", skin, null);
         var toggleSizeTooltip = new OwnTextTooltip(I18n.msg("gui.maximize.pane"), skin);
         toggleSize.addListener(toggleSizeTooltip);
         toggleSize.addListener(new ClickListener() {
@@ -131,7 +131,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                             Actions.fadeOut(GaiaSky.settings().program.ui.getAnimationSeconds()),
                             Actions.run(() -> {
                                 extraCell.setActor(null);
-                                toggleSize.setText("(+)");
+                                toggleSize.setText("▼");
                                 toggleSizeTooltip.setText(I18n.msg("gui.maximize.pane"));
                             })
                     ));
@@ -143,7 +143,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                             Actions.alpha(0f),
                             Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds()),
                             Actions.run(() -> {
-                                toggleSize.setText("(-)");
+                                toggleSize.setText("▲");
                                 toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
                             })
                     ));
@@ -153,7 +153,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         });
 
         /* Object debug window link */
-        var odwLink =new Link("α", skin, null);
+        var odwLink =new Link("⊙", skin, null);
         odwLink.addListener(new OwnTextTooltip("Debug individual objects...", skin));
         odwLink.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
