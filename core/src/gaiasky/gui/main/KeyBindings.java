@@ -27,9 +27,6 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -261,13 +258,21 @@ public class KeyBindings {
         // help dialog
         addAction(new ProgramAction("action.help", runnableAbout, noCleanMode));
 
-        // help dialog
-        addAction(new ProgramAction("action.help", runnableAbout, noCleanMode));
-
         // show quit
         Runnable runnableQuit = () -> {
-            // Quit action
-            EventManager.publish(Event.SHOW_QUIT_ACTION, this);
+            // First, close open pane (if any).
+            var closed = false;
+            var gui = GaiaSky.instance.getGuiRegistry();
+            if (gui.current instanceof MainGui mg) {
+                if (mg.controlsInterface != null) {
+                    closed = mg.controlsInterface.closeOpenPane();
+                }
+            }
+
+            // Quit action, only if we did not close a pane.
+            if (!closed) {
+                EventManager.publish(Event.SHOW_QUIT_ACTION, this);
+            }
         };
 
         // run quit action

@@ -56,7 +56,12 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
      **/
     private final ObjectMap<String, OwnTextButton> buttonMap;
 
-    public ControlsInterface(Skin skin, Stage stage, Scene scene, CatalogManager catalogManager, ComponentTypes.ComponentType[] visibilityEntities, boolean[] visible) {
+    public ControlsInterface(Skin skin,
+                             Stage stage,
+                             Scene scene,
+                             CatalogManager catalogManager,
+                             ComponentTypes.ComponentType[] visibilityEntities,
+                             boolean[] visible) {
         super(skin);
 
         this.paneMap = new ObjectMap<>();
@@ -82,43 +87,71 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         // TIME.
         TimeComponent timeComponent = new TimeComponent(skin, stage);
         timeComponent.initialize(getContentWidth());
-        createComponentButton(skin, I18n.msg("gui.time"), timeComponent);
+        createComponentButton(skin,
+                              I18n.msg("gui.time"),
+                              timeComponent);
 
         // CAMERA.
         CameraComponent cameraComponent = new CameraComponent(skin, stage);
         cameraComponent.initialize(getContentWidth());
-        createComponentButton(skin, pad10 * 6f, "menu-camera", I18n.msg("gui.camera"), cameraComponent, "action.expandcollapse.pane/gui.camera");
+        createComponentButton(skin,
+                              pad10 * 6f,
+                              "menu-camera",
+                              I18n.msg("gui.camera"),
+                              cameraComponent,
+                              "action.expandcollapse.pane/gui.camera");
 
         // TYPE VISIBILITY.
         VisibilityComponent visibilityComponent = new VisibilityComponent(skin, stage);
         visibilityComponent.setVisibilityEntitites(visibilityEntities, visible);
         visibilityComponent.initialize(getContentWidth());
         createComponentButton(skin,
-                              pad10 * 12f, "menu-types", I18n.msg("gui.visibility"), visibilityComponent, "action.expandcollapse.pane/gui.visibility");
+                              pad10 * 12f,
+                              "menu-types",
+                              I18n.msg("gui.visibility"),
+                              visibilityComponent,
+                              "action.expandcollapse.pane/gui.visibility");
 
         // VISUALS.
         VisualSettingsComponent visualSettingsComponent = new VisualSettingsComponent(skin, stage);
         visualSettingsComponent.initialize(getContentWidth());
         createComponentButton(skin,
-                              pad10 * 17.5f, "menu-visuals", I18n.msg("gui.lighting"), visualSettingsComponent, "action.expandcollapse.pane/gui.lighting");
+                              pad10 * 17.5f,
+                              "menu-visuals",
+                              I18n.msg("gui.lighting"),
+                              visualSettingsComponent,
+                              "action.expandcollapse.pane/gui.lighting");
 
         // DATASETS.
         DatasetsComponent datasetsComponent = new DatasetsComponent(skin, stage, catalogManager);
         datasetsComponent.initialize(getContentWidth());
         createComponentButton(skin,
-                              pad10 * 23f, "menu-datasets", I18n.msg("gui.dataset.title"), datasetsComponent, "action.expandcollapse.pane/gui.dataset.title");
+                              pad10 * 23f,
+                              "menu-datasets",
+                              I18n.msg("gui.dataset.title"),
+                              datasetsComponent,
+                              "action.expandcollapse.pane/gui.dataset.title");
 
         // LOCATION LOG.
         LocationLogComponent locationLogComponent = new LocationLogComponent(skin, stage);
         locationLogComponent.initialize(getContentWidth());
-        createComponentButton(skin, pad10 * 29f, "menu-location-log", I18n.msg("gui.locationlog"), locationLogComponent, null);
+        createComponentButton(skin,
+                              pad10 * 29f,
+                              "menu-location-log",
+                              I18n.msg("gui.locationlog"),
+                              locationLogComponent,
+                              null);
 
         // BOOKMARKS.
         BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, stage);
         bookmarksComponent.setScene(scene);
         bookmarksComponent.initialize(getContentWidth());
         createComponentButton(skin,
-                              pad10 * 35f, "menu-bookmarks", I18n.msg("gui.bookmarks"), bookmarksComponent, "action.expandcollapse.pane/gui.bookmarks");
+                              pad10 * 35f,
+                              "menu-bookmarks",
+                              I18n.msg("gui.bookmarks"),
+                              bookmarksComponent,
+                              "action.expandcollapse.pane/gui.bookmarks");
 
         // Spacing
         tableButtons.add().left().growY().row();
@@ -220,10 +253,12 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         add(tableComponents).left().top().padTop(pad10 * 8f);
 
         EventManager.instance.subscribe(this, Event.GUI_FOLD_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
-                Event.EXPAND_COLLAPSE_PANE_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD);
+                                        Event.EXPAND_COLLAPSE_PANE_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD);
     }
 
-    private void createComponentButton(Skin skin, String title, GuiComponent component) {
+    private void createComponentButton(Skin skin,
+                                       String title,
+                                       GuiComponent component) {
         createComponentButton(skin, 0f, "menu-time", title, component, "action.expandcollapse.pane/gui.time");
     }
 
@@ -240,11 +275,17 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                 Actions.run(activeComponentCell::clearActor)
         ));
     }
+
     /** Reference to the task that closes the current pane. **/
     private Timer.Task closeTask;
 
 
-    private void createComponentButton(Skin skin, float padTop, String buttonStyle, String title, GuiComponent component, String action) {
+    private void createComponentButton(Skin skin,
+                                       float padTop,
+                                       String buttonStyle,
+                                       String title,
+                                       GuiComponent component,
+                                       String action) {
         OwnTextIconButton button = new OwnTextIconButton("", skin, buttonStyle);
         button.setSize(buttonWidth, buttonHeight);
         button.align(Align.center);
@@ -255,7 +296,9 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         if (GaiaSky.settings().program.ui.expandOnMouseOver) {
             pane.addListener(new InputListener() {
                 @Override
-                public boolean mouseMoved(InputEvent event, float x, float y) {
+                public boolean mouseMoved(InputEvent event,
+                                          float x,
+                                          float y) {
                     // Cancel previous close task.
                     if (closeTask != null) {
                         closeTask.cancel();
@@ -294,7 +337,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
             button.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     if (button.isChecked()) {
-                        //Add pane.
+                        // Add pane.
                         pane.clearActions();
                         activeComponentCell.clearActor();
                         selectComponentButton(button);
@@ -318,7 +361,11 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         } else {
             button.addListener(new InputListener() {
                 @Override
-                public void enter(InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
+                public void enter(InputEvent event,
+                                  float x,
+                                  float y,
+                                  int pointer,
+                                  @Null Actor fromActor) {
                     if (pointer != -1) return;
                     Actor actor = event.getListenerActor();
                     if (fromActor != null && fromActor.isDescendantOf(actor)) return;
@@ -358,6 +405,29 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
     }
 
     /**
+     * Closes the currently open pane (if any).
+     *
+     * @return True if a pane was closed.
+     */
+    public boolean closeOpenPane() {
+        var keys = paneMap.keys();
+        if (activeComponentCell != null) {
+            for (var key : keys) {
+                var pane = paneMap.get(key);
+                if (pane != null && activeComponentCell.getActor() == pane) {
+                    // Close pane.
+                    var button = buttonMap.get(key);
+                    button.setChecked(false);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * Content width. To be used in all components.
      *
      * @return The width of the content.
@@ -377,7 +447,9 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         switch (event) {
             case GUI_FOLD_CMD -> {
                 // We try to keep compatibility with the old window.

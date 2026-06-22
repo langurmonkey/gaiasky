@@ -326,9 +326,10 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 } else if (button == this.button && button == rightMouseButton) {
                     if (keyframeBeingDragged) {
                         keyframeBeingDragged = false;
-                    } else if (gesture.dst(screenX,
-                                           screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(
-                            Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
+                    } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST
+                            && getKeyframesPathObject() != null
+                            && getKeyframesPathObject().isSelected()
+                            && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                         Objects.requireNonNull(getKeyframesPathObject()).unselect();
                     } else {

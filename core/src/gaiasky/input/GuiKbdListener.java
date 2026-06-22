@@ -21,6 +21,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.util.GuiUtils;
 
+/**
+ * Abstract keyboard listener for all GUIs.
+ */
 public abstract class GuiKbdListener extends AbstractMouseKbdListener {
 
     protected final Stage stage;

@@ -627,9 +627,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             OwnLabel aaLabel = new OwnLabel(I18n.msg("gui.aa"), skin);
             aaLabel.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
-            ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.aa.no"), 0), new ComboBoxBean(I18n.msg("gui.aa.fxaa"),
-                                                                                                                 -1), new ComboBoxBean(I18n.msg(
-                    "gui.aa.nfaa"), -2)};
+            ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean<>(I18n.msg("gui.aa.no"), 0),
+                    new ComboBoxBean<>(I18n.msg("gui.aa.fxaa"), -1),
+                    new ComboBoxBean<>(I18n.msg("gui.aa.nfaa"), -2)};
             antiAlias = new OwnSelectBox<>(skin);
             antiAlias.setItems(aas);
             antiAlias.setWidth(selectWidth);
@@ -642,8 +642,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // LINE RENDERER
             OwnLabel lrLabel = new OwnLabel(I18n.msg("gui.linerenderer"), skin);
             ComboBoxBean[] lineRenderers = new ComboBoxBean[]{new ComboBoxBean(I18n.msg("gui.linerenderer.quads"),
-                                                                               LineMode.POLYLINE_QUADSTRIP.ordinal()), new ComboBoxBean(I18n.msg(
-                    "gui.linerenderer.lines"), LineMode.GL_LINES.ordinal())};
+                                                                               LineMode.POLYLINE_QUADSTRIP.ordinal()),
+                    new ComboBoxBean(I18n.msg("gui.linerenderer.lines"), LineMode.GL_LINES.ordinal())};
             lineRenderer = new OwnSelectBox<>(skin);
             lineRenderer.setItems(lineRenderers);
             lineRenderer.setWidth(selectWidth);
@@ -3109,7 +3109,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, 0.0);
         }
 
-        restartDialog = restartDialog || GaiaSky.settings().data.realGaiaAttitude != real.isChecked();
+        restartDialog = restartDialog || settings.data.realGaiaAttitude != real.isChecked();
 
         // Line renderer
         boolean reloadLineRenderer = settings.scene.renderer.line.mode != LineMode.values()[lineRenderer.getSelected().value];
