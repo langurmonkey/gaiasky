@@ -74,25 +74,22 @@ public final class CubmeapProjectionEffect extends PostProcessorEffect {
     }
 
     public enum CubemapProjection {
+        // Common panorama modes
         EQUIRECTANGULAR,
         CYLINDRICAL,
         HAMMER,
         ORTHOGRAPHIC,
+
+        // Orthosphere modes
         ORTHOSPHERE,
         ORTHOSPHERE_CROSSEYE,
+
+        // Planetarium: Domemaster and spherical mirror
         AZIMUTHAL_EQUIDISTANT,
         SPHERICAL_MIRROR;
 
         public boolean isPlanetarium() {
             return isAzimuthalEquidistant() || isSphericalMirror();
-        }
-
-        public boolean isDomeMaster() {
-            return isAzimuthalEquidistant();
-        }
-
-        public boolean isFisheye() {
-            return isAzimuthalEquidistant();
         }
 
         public boolean isAzimuthalEquidistant() {

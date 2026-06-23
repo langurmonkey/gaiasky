@@ -2493,10 +2493,21 @@ public class Settings extends SettingsObject {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case STEREOSCOPIC_CMD -> {
-                        modeStereo.active = (boolean) (Boolean) data[0];
-                        if (modeStereo.active && modeCubemap.active) {
-                            modeStereo.active = false;
-                            EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
+                        modeStereo.active = (Boolean)data[0] && !getRoot().runtime.openXr;
+                        // Post message to screen.
+                        if (modeStereo.active) {
+                            var keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
+                            var keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
+                            var mpi = new ModePopupInfo();
+                            mpi.title = I18n.msg("gui.stereo.title");
+                            mpi.header = I18n.msg("gui.stereo.notice.header");
+
+                            mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
+                            mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
+
+                            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
+                        } else {
+                            EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
                         }
                     }
                     case STEREO_PROFILE_CMD -> modeStereo.profile = (StereoProfile) data[0];
@@ -2505,7 +2516,7 @@ public class Settings extends SettingsObject {
                         if (modeCubemap.active) {
                             modeCubemap.projection = (CubemapProjection) data[1];
 
-                            // Post a message to the screen
+                            // Post message to screen.
                             ModePopupInfo mpi = new ModePopupInfo();
                             if (modeCubemap.projection.isPanorama()) {
                                 String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.360");

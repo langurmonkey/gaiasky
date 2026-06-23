@@ -33,7 +33,10 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.*;
+import gaiasky.util.Logger;
+import gaiasky.util.MasterManager;
+import gaiasky.util.Pair;
+import gaiasky.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnLabel;
@@ -104,10 +107,6 @@ public class GuiRegistry implements IObserver {
      * Task to remove the information pop-up.
      **/
     private Task removePopup;
-    /**
-     * Last open location.
-     */
-    private Path lastOpenLocation;
     /* Slave config window. */
     private SlaveConfigWindow slaveConfigWindow;
     /**
@@ -448,12 +447,12 @@ public class GuiRegistry implements IObserver {
                     }
                 }
                 case SHOW_LOAD_DATASET_ACTION -> {
-                   if (datasetLoadWindow == null) {
-                       datasetLoadWindow = new DatasetLoadWindow(stage, skin);
-                   } else {
-                       datasetLoadWindow.reload();
-                   }
-                   datasetLoadWindow.show(stage);
+                    if (datasetLoadWindow == null) {
+                        datasetLoadWindow = new DatasetLoadWindow(stage, skin);
+                    } else {
+                        datasetLoadWindow.reload();
+                    }
+                    datasetLoadWindow.show(stage);
                 }
                 case SHOW_KEYFRAMES_WINDOW_ACTION -> {
                     if (keyframesWindow == null) {
@@ -655,17 +654,25 @@ public class GuiRegistry implements IObserver {
                                                 ArrayList<String> command = new ArrayList<>();
                                                 command.add(file.toString());
                                                 ProcessBuilder builder = new ProcessBuilder(command);
-                                                builder.start();
+                                                try (Process process = builder.start()) {
+                                                    logger.debug("Created process with pid: " + process.pid());
+                                                } catch (IOException e) {
+                                                    logger.error(e, "Error running process: " + builder.command());
+                                                }
                                             } else if (file.getFileName().toString().contains("gradlew")) {
                                                 // Gradle script.
                                                 ArrayList<String> command = new ArrayList<>();
                                                 command.add(file.toString());
                                                 command.add("core:run");
                                                 ProcessBuilder builder = new ProcessBuilder(command);
-                                                builder.start();
+                                                try (Process process = builder.start()) {
+                                                    logger.debug("Created process with pid: " + process.pid());
+                                                } catch (IOException e) {
+                                                    logger.error(e, "Error running process: " + builder.command());
+                                                }
                                             }
                                             break;
-                                        } catch (IOException e) {
+                                        } catch (Exception e) {
                                             logger.error(e, "Error running Gaia Sky");
                                         }
                                     }

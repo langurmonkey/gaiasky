@@ -29,6 +29,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.data.OctreeLoader;
 import gaiasky.data.api.OrientationServer;
 import gaiasky.data.util.*;
+import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
 import gaiasky.desktop.GaiaSkyDesktop.CLIArgs;
 import gaiasky.event.Event;
@@ -56,7 +57,6 @@ import gaiasky.script.ConsoleManager;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
-import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.Camcorder;
@@ -174,7 +174,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     /**
      * The user interfaces.
      */
-    public IGui welcomeGui, loadingGui, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui, mainVRGui, timeGui;
+    public IGui welcomeGui, loadingGui, mainGui, spacecraftGui, debugGui, crashGui, gamepadGui, mainVRGui, timeGui;
     public StandaloneVRGui<?> welcomeGuiVR, loadingGuiVR;
 
     /**
@@ -380,10 +380,11 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     /**
      * Creates an instance of Gaia Sky.
      *
-     * @param cliArgs         The command line arguments for this run.
-     * @param settings        The {@link Settings} instance.
+     * @param cliArgs  The command line arguments for this run.
+     * @param settings The {@link Settings} instance.
      */
-    public GaiaSky(final CLIArgs cliArgs, Settings settings) {
+    public GaiaSky(final CLIArgs cliArgs,
+                   Settings settings) {
         super();
         assert cliArgs != null : "CLI arguments can't be null";
 
@@ -549,12 +550,14 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new XrInputListener() {
 
                 @Override
-                public boolean showUI(boolean value, XrControllerDevice device) {
+                public boolean showUI(boolean value,
+                                      XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean accept(boolean value, XrControllerDevice device) {
+                public boolean accept(boolean value,
+                                      XrControllerDevice device) {
                     if (value) {
                         return proceedToLoading(device);
                     }
@@ -562,7 +565,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 @Override
-                public boolean cameraMode(boolean value, XrControllerDevice device) {
+                public boolean cameraMode(boolean value,
+                                          XrControllerDevice device) {
                     if (value) {
                         return proceedToLoading(device);
                     }
@@ -570,17 +574,20 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 @Override
-                public boolean rotate(boolean value, XrControllerDevice device) {
+                public boolean rotate(boolean value,
+                                      XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean move(Vector2 value, XrControllerDevice device) {
+                public boolean move(Vector2 value,
+                                    XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean select(float value, XrControllerDevice device) {
+                public boolean select(float value,
+                                      XrControllerDevice device) {
                     return false;
                 }
 
@@ -989,9 +996,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         spacecraftGui = new SpacecraftGui(globalResources.getSkin(), graphics, unitsPerPixel);
         spacecraftGui.initialize(assetManager, globalResources.getSpriteBatch());
 
-        stereoGui = new StereoGui(globalResources.getSkin(), graphics, unitsPerPixel);
-        stereoGui.initialize(assetManager, globalResources.getSpriteBatch());
-
         gamepadGui = new GamepadGui(globalResources.getSkin(), graphics, unitsPerPixel);
         gamepadGui.initialize(assetManager, globalResources.getSpriteBatch());
 
@@ -1003,7 +1007,6 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             guis.add(mainGui);
             guis.add(debugGui);
             guis.add(spacecraftGui);
-            guis.add(stereoGui);
             guis.add(gamepadGui);
             guis.add(timeGui);
         }
@@ -1028,13 +1031,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         for (IGui gui : guis)
             gui.doneLoading(assetManager);
 
-        if (settings.program.modeStereo.active) {
-            guiRegistry.set(stereoGui);
-            guiRegistry.setPrevious(mainGui);
-        } else {
-            guiRegistry.set(mainGui);
-            guiRegistry.setPrevious(null);
-        }
+        guiRegistry.set(mainGui);
+        guiRegistry.setPrevious(null);
+
         guiRegistry.registerGui(debugGui);
         guiRegistry.addProcessor(debugGui);
 
@@ -1310,7 +1309,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     }
 
     @Override
-    public void resize(final int width, final int height) {
+    public void resize(final int width,
+                       final int height) {
         if (width != 0 && height != 0) {
             // Recompute UI scale with new height.
             EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this, height);
@@ -1342,7 +1342,11 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         }
     }
 
-    public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis,
+    public void resizeImmediate(final int width,
+                                final int height,
+                                boolean resizePostProcessors,
+                                boolean resizeRenderSys,
+                                boolean resizeGuis,
                                 boolean resizeScreenConf) {
         try {
             final var renderWidth = (int) FastMath.round(width * settings.graphics.backBufferScale);
@@ -1401,6 +1405,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
     /**
      * Returns a reference to the current settings object.
+     *
      * @return Reference to the settings object.
      */
     public static Settings settings() {
@@ -1493,7 +1498,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
+    public void notify(final Event event,
+                       Object source,
+                       final Object... data) {
         switch (event) {
             case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
                 reinitialiseGUI1();
@@ -1531,48 +1538,33 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             }
             case CAMERA_MODE_CMD -> { // Register/unregister GUI.
                 final var mode = (CameraMode) data[0];
-                if (settings.program.modeStereo.active) {
-                    guiRegistry.change(stereoGui);
-                } else if (mode == CameraMode.SPACECRAFT_MODE) {
+                if (mode == CameraMode.SPACECRAFT_MODE) {
                     guiRegistry.change(spacecraftGui);
                 } else {
                     guiRegistry.change(mainGui);
                 }
             }
             case STEREOSCOPIC_CMD -> {
-                if (!isVR()) {
-                    final boolean stereoMode = (Boolean) data[0];
-                    if (stereoMode && guiRegistry.current != stereoGui) {
-                        guiRegistry.change(stereoGui);
-                    } else if (!stereoMode && guiRegistry.previous != null && guiRegistry.previous != stereoGui && guiRegistry.previous != spacecraftGui) {
-                        // From stereo mode we can only go back to main GUI mode.
-                        IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
-                        guiRegistry.change(guiRegistry.previous, prev);
-                    }
-
-                    // Disable dynamic resolution.
-                    // Post a message to the screen.
-                    if (stereoMode) {
-                        resetDynamicResolution();
-
-                        var keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
-                        var keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
-                        final var mpi = new ModePopupInfo();
-                        mpi.title = I18n.msg("gui.stereo.title");
-                        mpi.header = I18n.msg("gui.stereo.notice.header");
-
-                        mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
-                        mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
-
-                        EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
-                    } else {
-                        EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
-                    }
+                final boolean modeStereo = (Boolean) data[0];
+                var doCheck = source != Event.CUBEMAP_CMD;
+                if (doCheck && modeStereo && settings.program.modeCubemap.active) {
+                    // Disable cubemap mode.
+                    EventManager.publish(Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD, false, settings.program.modeCubemap.projection);
+                }
+                // Disable dynamic resolution.
+                if (!isVR() && modeStereo) {
+                    resetDynamicResolution();
                 }
             }
             case CUBEMAP_CMD -> {
-                var cubemapMode = (Boolean) data[0];
-                if (!isVR() && cubemapMode) {
+                final boolean modeCubemap = (Boolean) data[0];
+                var doCheck = source != Event.STEREOSCOPIC_CMD;
+                if (doCheck && modeCubemap && settings.program.modeStereo.active) {
+                    // Disable stereao mode.
+                    EventManager.publish(Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, false);
+                }
+                // Disable dynamic resolution.
+                if (!isVR() && modeCubemap) {
                     resetDynamicResolution();
                 }
             }
@@ -1681,13 +1673,15 @@ public final class GaiaSky implements ApplicationListener, IObserver {
 
     }
 
-    public void applyUIScale(int height, IGui gui) {
+    public void applyUIScale(int height,
+                             IGui gui) {
         if (gui != null) {
             gui.updateUnitsPerPixel(1f / getUIScale(height));
         }
     }
 
-    public void applyUIScale(int height, List<IGui> guis) {
+    public void applyUIScale(int height,
+                             List<IGui> guis) {
         if (guis != null) {
             unitsPerPixel = 1f / getUIScale(height);
             for (IGui gui : guis) {
@@ -1730,7 +1724,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * @param key      The key to identify the runnable.
      * @param runnable The runnable to park.
      */
-    public void parkUpdateRunnable(final String key, final Runnable runnable) {
+    public void parkUpdateRunnable(final String key,
+                                   final Runnable runnable) {
         parkRunnable(key, runnable, parkedUpdateRunnablesMap, parkedUpdateRunnables);
     }
 
@@ -1741,7 +1736,8 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * @param key      The key to identify the runnable.
      * @param runnable The runnable to park.
      */
-    public void parkCameraRunnable(final String key, final Runnable runnable) {
+    public void parkCameraRunnable(final String key,
+                                   final Runnable runnable) {
         parkRunnable(key, runnable, parkedCameraRunnablesMap, parkedCameraRunnables);
     }
 
@@ -1753,7 +1749,10 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * @param map       The map to use.
      * @param runnables The runnables list.
      */
-    public void parkRunnable(final String key, final Runnable runnable, final Map<String, Runnable> map, final Array<Runnable> runnables) {
+    public void parkRunnable(final String key,
+                             final Runnable runnable,
+                             final Map<String, Runnable> map,
+                             final Array<Runnable> runnables) {
         map.put(key, runnable);
         runnables.add(runnable);
     }
@@ -1768,7 +1767,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         removeRunnable(key, parkedCameraRunnablesMap, parkedCameraRunnables);
     }
 
-    private void removeRunnable(final String key, final Map<String, Runnable> map, final Array<Runnable> runnables) {
+    private void removeRunnable(final String key,
+                                final Map<String, Runnable> map,
+                                final Array<Runnable> runnables) {
         if (map.containsKey(key)) {
             final var r = map.get(key);
             if (r != null) {
@@ -1825,7 +1826,11 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * @param level    The logger level.
      * @param t        The throwable, if any.
      */
-    public static void popupNotification(String message, float duration, Object source, Logger.LoggerLevel level, Throwable t) {
+    public static void popupNotification(String message,
+                                         float duration,
+                                         Object source,
+                                         Logger.LoggerLevel level,
+                                         Throwable t) {
         EventManager.publish(Event.POST_POPUP_NOTIFICATION, source, message, duration);
         if (t != null) {
             logger.log(level, message, t.getLocalizedMessage());
@@ -1842,7 +1847,9 @@ public final class GaiaSky implements ApplicationListener, IObserver {
      * @param duration The popup duration, in seconds.
      * @param source   The source object of the message.
      */
-    public static void popupNotification(String message, float duration, Object source) {
+    public static void popupNotification(String message,
+                                         float duration,
+                                         Object source) {
         popupNotification(message, duration, source, Logger.LoggerLevel.INFO, null);
     }
 }

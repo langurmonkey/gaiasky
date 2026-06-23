@@ -416,44 +416,98 @@ public class KeyBindings {
                                     fullGuiCondition,
                                     noCleanMode));
 
+        // Toggle stereoscopic mode
+        addAction(new ProgramAction("action.toggle/element.stereomode",
+                                    () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !GaiaSky.settings().program.modeStereo.active)));
+
+        // Switch stereoscopic profile
+        addAction(new ProgramAction("action.switchstereoprofile", () -> {
+            int newidx = GaiaSky.settings().program.modeStereo.profile.ordinal();
+            newidx = (newidx + 1) % values().length;
+            EventManager.publish(Event.STEREO_PROFILE_CMD, this, values()[newidx]);
+        }, noPanorama, noPlanetarium, noOrthoSphere));
+
+
         // Toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
-            boolean enable = !GaiaSky.settings().program.modeCubemap.active || !GaiaSky.settings().program.modeCubemap.isPlanetariumOn();
-            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
-        }, noPanorama, noOrthoSphere));
+            var program = GaiaSky.settings().program;
+            // Enable mode if either cubemap is not active, or is active and the mode is not the one we want.
+            boolean enable = !program.modeCubemap.active || !program.modeCubemap.isPlanetariumOn();
+            // Stop if we need to enable and cubemap is active.
+            boolean stop = enable && program.modeCubemap.active;
+            if (stop) {
+                EventManager.publish(Event.CUBEMAP_CMD, this, false, program.modeCubemap.projection);
+            }
+
+            // We use the current projection only if it is in our mode.
+            var newProjection = program.modeCubemap.projection;
+            if (!newProjection.isPlanetarium()) {
+                newProjection = CubemapProjection.AZIMUTHAL_EQUIDISTANT;
+            }
+            EventManager.publish(Event.CUBEMAP_CMD, this, enable, newProjection);
+        }));
 
         // Toggle planetarium projection
         addAction(new ProgramAction("action.toggle/element.planetarium.projection", () -> {
-            if (GaiaSky.settings().program.modeCubemap.isPlanetariumOn()) {
-                int newProjectionIndex = GaiaSky.settings().program.modeCubemap.projection.getNextPlanetariumProjection().ordinal();
+            var program = GaiaSky.settings().program;
+            if (program.modeCubemap.isPlanetariumOn()) {
+                int newProjectionIndex = program.modeCubemap.projection.getNextPlanetariumProjection().ordinal();
                 EventManager.publish(Event.PLANETARIUM_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
         }, noPanorama, noOrthoSphere));
 
         // Toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
-            boolean enable = !GaiaSky.settings().program.modeCubemap.active || !GaiaSky.settings().program.modeCubemap.isPanoramaOn();
-            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.EQUIRECTANGULAR);
-        }, noPlanetarium, noOrthoSphere));
+            var program = GaiaSky.settings().program;
+            // Enable mode if either cubemap is not active, or is active and the mode is not the one we want.
+            boolean enable = !program.modeCubemap.active || !program.modeCubemap.isPanoramaOn();
+            // Stop if we need to enable and cubemap is active.
+            boolean stop = enable && program.modeCubemap.active;
+            if (stop) {
+                EventManager.publish(Event.CUBEMAP_CMD, this, false, program.modeCubemap.projection);
+            }
+
+            // We use the current projection only if it is in our mode.
+            var newProjection = program.modeCubemap.projection;
+            if (!newProjection.isPanorama()) {
+                newProjection = CubemapProjection.EQUIRECTANGULAR;
+            }
+            EventManager.publish(Event.CUBEMAP_CMD, this, enable, newProjection);
+        }));
 
         // Toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
-            if (GaiaSky.settings().program.modeCubemap.isPanoramaOn()) {
-                int newProjectionIndex = GaiaSky.settings().program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
+            var program = GaiaSky.settings().program;
+            if (program.modeCubemap.isPanoramaOn()) {
+                int newProjectionIndex = program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
         }, noPlanetarium, noOrthoSphere));
 
         // Toggle orthosphere mode
         addAction(new ProgramAction("action.toggle/element.orthosphere", () -> {
-            boolean enable = !GaiaSky.settings().program.modeCubemap.active || !GaiaSky.settings().program.modeCubemap.isOrthosphereOn();
-            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.ORTHOSPHERE);
-        }, noPlanetarium, noPanorama));
+            var program = GaiaSky.settings().program;
+            // Enable mode if either cubemap is not active, or is active and the mode is not the one we want.
+            boolean enable = !program.modeCubemap.active || !program.modeCubemap.isOrthosphereOn();
+            // Stop if we need to enable and cubemap is active.
+            boolean stop = enable && program.modeCubemap.active;
+            if (stop) {
+                EventManager.publish(Event.CUBEMAP_CMD, this, false, program.modeCubemap.projection);
+            }
+
+            // We use the current projection only if it is in our mode.
+            var newProjection = program.modeCubemap.projection;
+            if (!newProjection.isOrthosphere()) {
+                newProjection = CubemapProjection.ORTHOSPHERE;
+            }
+            EventManager.publish(Event.CUBEMAP_CMD, this, enable, newProjection);
+        }));
 
         // Toggle orthosphere profile
         addAction(new ProgramAction("action.toggle/element.orthosphere.profile", () -> {
-            if (GaiaSky.settings().program.modeCubemap.isOrthosphereOn()) {
-                int newProfileIndex = GaiaSky.settings().program.modeCubemap.projection.getNextOrthosphereProfile().ordinal();
+            var program = GaiaSky.settings().program;
+            if (program.modeCubemap.isOrthosphereOn()) {
+                int newProfileIndex = program.modeCubemap.projection.getNextOrthosphereProfile().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProfileIndex]);
             }
         }));
@@ -480,17 +534,6 @@ public class KeyBindings {
         // Toggle particle fade
         addAction(new ProgramAction("action.toggle/element.octreeparticlefade",
                                     () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, !GaiaSky.settings().scene.octree.fade)));
-
-        // Toggle stereoscopic mode
-        addAction(new ProgramAction("action.toggle/element.stereomode",
-                                    () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !GaiaSky.settings().program.modeStereo.active)));
-
-        // Switch stereoscopic profile
-        addAction(new ProgramAction("action.switchstereoprofile", () -> {
-            int newidx = GaiaSky.settings().program.modeStereo.profile.ordinal();
-            newidx = (newidx + 1) % values().length;
-            EventManager.publish(Event.STEREO_PROFILE_CMD, this, values()[newidx]);
-        }));
 
         // Toggle clean (no GUI) mode
         addAction(new ProgramAction("action.toggle/element.cleanmode",
