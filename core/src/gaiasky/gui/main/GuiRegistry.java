@@ -654,10 +654,16 @@ public class GuiRegistry implements IObserver {
                                                 ArrayList<String> command = new ArrayList<>();
                                                 command.add(file.toString());
                                                 ProcessBuilder builder = new ProcessBuilder(command);
-                                                try (Process process = builder.start()) {
+                                                Process process = null;
+                                                try {
+                                                    process = builder.start();
                                                     logger.debug("Created process with pid: " + process.pid());
                                                 } catch (IOException e) {
                                                     logger.error(e, "Error running process: " + builder.command());
+                                                } finally {
+                                                    if (process != null) {
+                                                        process.destroy();
+                                                    }
                                                 }
                                             } else if (file.getFileName().toString().contains("gradlew")) {
                                                 // Gradle script.
@@ -665,10 +671,16 @@ public class GuiRegistry implements IObserver {
                                                 command.add(file.toString());
                                                 command.add("core:run");
                                                 ProcessBuilder builder = new ProcessBuilder(command);
-                                                try (Process process = builder.start()) {
+                                                Process process = null;
+                                                try {
+                                                    process = builder.start();
                                                     logger.debug("Created process with pid: " + process.pid());
                                                 } catch (IOException e) {
                                                     logger.error(e, "Error running process: " + builder.command());
+                                                } finally {
+                                                    if (process != null) {
+                                                        process.destroy();
+                                                    }
                                                 }
                                             }
                                             break;
