@@ -387,9 +387,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
                 }
             }
             case TOGGLE_EXPANDCOLLAPSE_PANE_CMD -> {
-                String name = (String) data[0];
-                CollapsiblePane pane = panes.get(name);
-                pane.togglePane();
+                for (var d : data){
+                    if (d instanceof String name) {
+                        CollapsiblePane pane = panes.get(name);
+                        pane.togglePane();
+                    }
+                }
             }
             case MINIMAP_DISPLAY_CMD -> {
                 boolean show = (Boolean) data[0];

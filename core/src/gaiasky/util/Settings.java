@@ -2505,7 +2505,7 @@ public class Settings extends SettingsObject {
                             mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
                             mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
 
-                            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
+                            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 6f);
                         } else {
                             EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
                         }
@@ -2542,10 +2542,10 @@ public class Settings extends SettingsObject {
                                 mpi.title = I18n.msg("gui.orthosphere.title");
                                 mpi.header = I18n.msg("gui.orthosphere.notice.header");
                                 mpi.addMapping(I18n.msg("gui.orthosphere.notice.back"), keysStrToggle);
-                                mpi.addMapping(I18n.msg("gui.orthosphere.notice.profile"), keysStrProfile);
+                                mpi.addMapping(I18n.msg("gui.orthosphere.notice.projection"), keysStrProfile);
                             }
 
-                            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 10f);
+                            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 6f);
                         } else {
                             EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                             EventManager.publish(Event.FOV_CMD, this, GaiaSky.instance.cameraManager.getCamera().fieldOfView);
@@ -2560,7 +2560,7 @@ public class Settings extends SettingsObject {
                         if (modeCubemap.projection.isSphericalMirror() && modeCubemap.planetarium.sphericalMirrorWarp == null) {
                             modeCubemap.projection = CubemapProjection.AZIMUTHAL_EQUIDISTANT;
                             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this,
-                                                 I18n.msg("gui.planetarium.sphericalmirror.nowarpfile"), 10f);
+                                                 I18n.msg("gui.planetarium.sphericalmirror.nowarpfile"), 6f);
                         } else {
                             logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
                         }

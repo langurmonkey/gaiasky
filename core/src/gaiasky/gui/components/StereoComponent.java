@@ -117,10 +117,10 @@ public class StereoComponent extends GuiComponent implements IObserver {
          */
         Table t = new Table(skin);
         t.add(profileLabel).left().padBottom(pad9).row();
-        t.add(profile).left().padBottom(pad20).row();
+        t.add(profile).left().padBottom(pad30).row();
         t.add(k).left().padBottom(pad9).row();
         t.add(ipd).left().padBottom(pad9).row();
-        t.add(screenDistance).left().padBottom(pad20).row();
+        t.add(screenDistance).left().padBottom(pad30).row();
         t.add(backButton).left();
 
         component = t;

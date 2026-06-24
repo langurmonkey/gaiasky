@@ -486,7 +486,7 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                               "menu-stereo",
                               I18n.msg("gui.stereo"),
                               component,
-                              null,
+                              "action.expandcollapse.pane/gui.modes",
                               true);
 
     }
@@ -500,33 +500,33 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         // Planetarium, panorama, or orthosphere view
         if (projection.isPlanetarium()) {
             PlanetariumComponent component = new PlanetariumComponent(skin, stage);
-            component.initialize(getContentWidth());
+            component.initialize(getContentWidth(), projection);
             createComponentButton(skin,
                                   pad10 * 41f,
                                   "menu-planetarium",
                                   I18n.msg("gui.planetarium"),
                                   component,
-                                  null,
+                                  "action.expandcollapse.pane/gui.modes",
                                   true);
         } else if (projection.isPanorama()) {
             PanoramaComponent component = new PanoramaComponent(skin, stage);
-            component.initialize(getContentWidth());
+            component.initialize(getContentWidth(), projection);
             createComponentButton(skin,
                                   pad10 * 41f,
                                   "menu-panorama",
                                   I18n.msg("gui.360"),
                                   component,
-                                  null,
+                                  "action.expandcollapse.pane/gui.modes",
                                   true);
         } else if (projection.isOrthosphere()) {
             OrthosphereComponent component = new OrthosphereComponent(skin, stage);
-            component.initialize(getContentWidth());
+            component.initialize(getContentWidth(), projection);
             createComponentButton(skin,
                                   pad10 * 41f,
                                   "menu-orthosphere",
                                   I18n.msg("gui.orthosphere"),
                                   component,
-                                  null,
+                                  "action.expandcollapse.pane/gui.modes",
                                   true);
 
         }
@@ -609,10 +609,13 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                 }
             }
             case TOGGLE_EXPANDCOLLAPSE_PANE_CMD -> {
-                String name = (String) data[0];
-                if (buttonMap.containsKey(name)) {
-                    Button button = buttonMap.get(name);
-                    button.setChecked(!button.isChecked());
+                for (var d : data) {
+                    if (d instanceof String name) {
+                        if (buttonMap.containsKey(name)) {
+                            Button button = buttonMap.get(name);
+                            button.setChecked(!button.isChecked());
+                        }
+                    }
                 }
             }
             case EXPAND_COLLAPSE_PANE_CMD -> {

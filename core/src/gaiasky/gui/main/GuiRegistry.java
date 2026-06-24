@@ -567,7 +567,9 @@ public class GuiRegistry implements IObserver {
                             if (mpi.warn != null && !mpi.warn.isEmpty()) {
                                 modeChangeInfoPopup.add(new OwnLabel(mpi.warn, skin, "default-pink")).left().padTop(pad10).padBottom(pad5).row();
                             }
-                            OwnTextButton closeButton = new OwnTextButton(I18n.msg("gui.ok") + " [esc]", skin);
+                            OwnTextButton closeButton = new OwnTextButton(I18n.msg("gui.ok"), skin);
+                            OwnLabel escKey = new OwnLabel(" [" + I18n.msg("key.Escape") + "]", skin, "hotkey");
+                            closeButton.add(escKey);
                             closeButton.pad(pad3, pad10, pad3, pad10);
                             closeButton.addListener(event1 -> {
                                 if (event1 instanceof ChangeEvent) {

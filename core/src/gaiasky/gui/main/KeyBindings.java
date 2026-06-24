@@ -75,7 +75,8 @@ public class KeyBindings {
         return mappingsInv;
     }
 
-    private void addMapping(ProgramAction action, int... keyCodes) {
+    private void addMapping(ProgramAction action,
+                            int... keyCodes) {
         TreeSet<Integer> keys = new TreeSet<>();
         for (int key : keyCodes) {
             keys.add(key);
@@ -162,11 +163,14 @@ public class KeyBindings {
         return null;
     }
 
-    public String[] getStringKeys(String actionId, boolean allSets) {
+    public String[] getStringKeys(String actionId,
+                                  boolean allSets) {
         return getStringKeys(actionId, "+", allSets);
     }
 
-    public String[] getStringKeys(String actionId, String join, boolean allSets) {
+    public String[] getStringKeys(String actionId,
+                                  String join,
+                                  boolean allSets) {
         if (allSets) {
             var keySets = getAllKeys(actionId);
             if (keySets != null && !keySets.isEmpty()) {
@@ -191,7 +195,8 @@ public class KeyBindings {
         }
     }
 
-    private String getStringKeys(TreeSet<Integer> keys, String join) {
+    private String getStringKeys(TreeSet<Integer> keys,
+                                 String join) {
         if (keys != null) {
             StringBuilder sb = new StringBuilder();
             Iterator<Integer> it = keys.descendingIterator();
@@ -581,6 +586,16 @@ public class KeyBindings {
                                     () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "BookmarksComponent"),
                                     noCleanMode));
 
+        // Expand/collapse stereo/cubemap pane
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.modes",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
+                                                               this,
+                                                               "StereoComponent",
+                                                               "PanoramaComponent",
+                                                               "PlanetariumComponent",
+                                                               "OrthosphereComponent"),
+                                    noCleanMode));
+
         // Toggle mouse capture
         addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.publish(Event.MOUSE_CAPTURE_TOGGLE, this)));
 
@@ -720,7 +735,10 @@ public class KeyBindings {
          **/
         private final BooleanRunnable[] conditions;
 
-        ProgramAction(String actionId, Runnable action, long maxKeyDownTimeMs, BooleanRunnable... conditions) {
+        ProgramAction(String actionId,
+                      Runnable action,
+                      long maxKeyDownTimeMs,
+                      BooleanRunnable... conditions) {
             this.actionId = actionId;
             // Set action name
             String actionName;
@@ -740,7 +758,9 @@ public class KeyBindings {
             this.maxKeyDownTimeMs = maxKeyDownTimeMs;
         }
 
-        ProgramAction(String actionId, Runnable action, BooleanRunnable... conditions) {
+        ProgramAction(String actionId,
+                      Runnable action,
+                      BooleanRunnable... conditions) {
             this(actionId, action, 10000L, conditions);
         }
 

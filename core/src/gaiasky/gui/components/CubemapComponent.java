@@ -16,6 +16,8 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.main.KeyBindings;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -27,6 +29,7 @@ public abstract class CubemapComponent extends GuiComponent {
 
     protected String key;
     protected Button backButton;
+    protected int enumOffset;
 
     /**
      * Factor to apply to the default component width.
@@ -38,15 +41,21 @@ public abstract class CubemapComponent extends GuiComponent {
                             String key) {
         super(skin, stage);
         this.key = key;
+        setEnumOffset();
     }
 
+    protected abstract void setEnumOffset();
 
     @Override
-    public void initialize(float componentWidth) {
+    public void initialize(float unused) {
+        // UNUSED!
+    }
+
+    public void initialize(float componentWidth, CubemapProjection projection) {
         KeyBindings kb = KeyBindings.instance;
         var modeCubemap = GaiaSky.settings().program.modeCubemap;
 
-        initializeComponent(componentWidth * widthMultiplier);
+        initializeComponent(componentWidth * widthMultiplier, projection);
 
         // Go back button
         backButton = new OwnTextIconButton(I18n.msg("gui." + key + ".notice.back"), skin, "back");
@@ -76,7 +85,7 @@ public abstract class CubemapComponent extends GuiComponent {
 
     }
 
-    public abstract void initializeComponent(float componentWidth);
+    public abstract void initializeComponent(float componentWidth, CubemapProjection projection);
 
     public abstract void addToTable(Table t);
 

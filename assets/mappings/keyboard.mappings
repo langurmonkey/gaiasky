@@ -1,4 +1,4 @@
-#v3060301
+#v3070401
 # This file contains the key mappings for Gaia Sky.
 
 # Each line contains an action=keys pair, where action is the
@@ -186,6 +186,8 @@ action.expandcollapse.pane/gui.lighting     = L
 action.expandcollapse.pane/gui.dataset.title= D
 # doc: Bookmarks pane
 action.expandcollapse.pane/gui.bookmarks    = B
+# doc: Render mode panes (Stereoscopic, Planetarium, Panorama, Orthosphere)
+action.expandcollapse.pane/gui.modes        = M
 
 # Master/slave
 # doc: Show replica configuration dialog

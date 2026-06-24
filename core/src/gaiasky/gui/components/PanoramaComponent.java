@@ -11,12 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
+import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnSelectBox;
 
 /**
@@ -24,7 +25,7 @@ import gaiasky.util.scene2d.OwnSelectBox;
  */
 public class PanoramaComponent extends CubemapComponent implements IObserver {
 
-    protected OwnSelectBox<ComboBoxBean<CubemapProjection>> projection;
+    protected OwnSelectBox<ComboBoxBean<CubemapProjection>> projectionBox;
 
     public PanoramaComponent(Skin skin,
                              Stage stage) {
@@ -33,20 +34,25 @@ public class PanoramaComponent extends CubemapComponent implements IObserver {
     }
 
 
+    @Override
+    protected void setEnumOffset() {
+        enumOffset = CubemapProjection.EQUIRECTANGULAR.ordinal();
+    }
 
     @Override
-    public void initializeComponent(float componentWidth) {
-
-        // Stereo profile
-        projection = new OwnSelectBox<>(skin);
+    public void initializeComponent(float componentWidth,
+                                    CubemapProjection projection) {
+        // Projection
+        projectionBox = new OwnSelectBox<>(skin);
 
         var values = ComboBoxBean.getValues(CubemapProjection.getPanoramaProjections());
-        projection.setItems(values);
-        projection.setWidth(componentWidth);
-        projection.setSelectedIndex(GaiaSky.settings().program.modeCubemap.projection.ordinal());
-        projection.addListener((event) -> {
+        projectionBox.setItems(values);
+        projectionBox.setWidth(componentWidth);
+        if (projection.isPanorama())
+            projectionBox.setSelectedIndex(projection.ordinal() - enumOffset);
+        projectionBox.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
-                EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, projection, projection.getSelected().value);
+                EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, projectionBox, projectionBox.getSelected().value);
             }
             return false;
         });
@@ -54,17 +60,22 @@ public class PanoramaComponent extends CubemapComponent implements IObserver {
 
     @Override
     public void addToTable(Table t) {
-        t.add(projection).left().padBottom(pad9).row();
+        var label = new OwnLabel(I18n.msg("gui." + key + ".notice.projection"), skin);
+        t.add(label).left().padBottom(pad9).row();
+        t.add(projectionBox).left().padBottom(pad30).row();
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
-       if (event == Event.CUBEMAP_PROJECTION_CMD) {
-           if (source != projection) {
-               var projection = (CubemapProjection) data[0];
-               this.projection.setSelectedIndex(projection.ordinal());
-           }
-       }
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
+        if (event == Event.CUBEMAP_PROJECTION_CMD) {
+            if (source != projectionBox) {
+                var projection = (CubemapProjection) data[0];
+                if (projection.isPanorama())
+                    this.projectionBox.setSelectedIndex(projection.ordinal() - enumOffset);
+            }
+        }
     }
 
 

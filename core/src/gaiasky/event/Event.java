@@ -1456,7 +1456,7 @@ public enum Event {
     TIME_WARP_CHANGED_INFO,
 
     /**
-     * Toggles the collapsed state of a GUI pane. Contains its name.
+     * Toggles the collapsed state of one or more GUI panes. Contains the names of all panes to affect.
      */
     TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
     /**
