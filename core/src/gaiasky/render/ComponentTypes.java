@@ -92,15 +92,15 @@ public class ComponentTypes extends Bits {
         MilkyWay("icon-elem-milkyway"),
         Galaxies("icon-elem-galaxies"),
 
+        Pulsars("icon-elem-pulsars"),
         Nebulae("icon-elem-nebulae"),
         Meshes("icon-elem-meshes"),
         Systems("icon-elem-systems"),
-        Labels("icon-elem-labels"),
 
+        Labels("icon-elem-labels"),
         Orbits("icon-elem-orbits"),
         Locations("icon-elem-locations"),
         Countries("icon-elem-countries"),
-        Ruler("icon-elem-ruler"),
 
         Equatorial("icon-elem-equatorial"),
         Ecliptic("icon-elem-ecliptic"),
@@ -112,11 +112,12 @@ public class ComponentTypes extends Bits {
         Atmospheres("icon-elem-atmospheres"),
         Clouds("icon-elem-clouds"),
 
-        Effects("icon-elem-effects"),
-        Axes("icon-elem-axes"),
-        VelocityVectors("icon-elem-arrows"),
         Keyframes("icon-elem-keyframes"),
+        VelocityVectors("icon-elem-arrows"),
+        Ruler("icon-elem-ruler"),
+        Axes("icon-elem-axes"),
 
+        Effects("icon-elem-effects"),
         Others("icon-elem-others"),
 
         // ALWAYS LAST
