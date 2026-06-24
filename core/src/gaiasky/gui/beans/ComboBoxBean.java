@@ -7,6 +7,7 @@
 
 package gaiasky.gui.beans;
 
+import com.badlogic.gdx.utils.Array;
 import gaiasky.util.LocalizedEnum;
 
 /**
@@ -34,6 +35,13 @@ public class ComboBoxBean<T> {
         ComboBoxBean<T>[] result = new ComboBoxBean[values.length];
         for (int i = 0; i < values.length; i++) {
             result[i] = new ComboBoxBean<>(values[i].localizedName(), values[i]);
+        }
+        return result;
+    }
+    public static <T extends Enum<T> & LocalizedEnum> ComboBoxBean<T>[] getValues(Array<T> values) {
+        ComboBoxBean<T>[] result = new ComboBoxBean[values.size];
+        for (int i = 0; i < values.size; i++) {
+            result[i] = new ComboBoxBean<>(values.get(i).localizedName(), values.get(i));
         }
         return result;
     }

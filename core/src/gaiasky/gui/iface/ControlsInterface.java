@@ -26,6 +26,7 @@ import gaiasky.gui.components.*;
 import gaiasky.gui.main.ContainerPane;
 import gaiasky.gui.main.KeyBindings;
 import gaiasky.render.ComponentTypes;
+import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.Scene;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.i18n.I18n;
@@ -39,9 +40,18 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  */
 public class ControlsInterface extends TableGuiInterface implements IObserver {
 
+    final float pad10 = 10f;
+    final float pad20 = 20f;
+
+    private final Skin skin;
+    private final Stage stage;
     private final Table tableComponentButtons;
     private final Cell<Actor> activeComponentCell;
+    private Cell<Actor> modeCell;
+
+    // Bottom-left buttons.
     private final OwnTextIconButton buttonLoad, buttonSettings, buttonLog, buttonHelp, buttonQuit;
+    // Top-left buttons.
     private final Array<OwnTextButton> componentButtons;
     private final OwnTextIconButton buttonMinimap;
 
@@ -63,12 +73,12 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                              ComponentTypes.ComponentType[] visibilityEntities,
                              boolean[] visible) {
         super(skin);
+        this.skin = skin;
+        this.stage = stage;
 
         this.paneMap = new ObjectMap<>();
         this.buttonMap = new ObjectMap<>();
 
-        final float pad10 = 10f;
-        final float pad20 = 20f;
 
         componentButtons = new Array<>(7);
 
@@ -152,6 +162,9 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                               I18n.msg("gui.bookmarks"),
                               bookmarksComponent,
                               "action.expandcollapse.pane/gui.bookmarks");
+
+        // MODE PANE (STEREO, PANORAMA, ...)
+        updateModePane();
 
         // Spacing
         tableButtons.add().left().growY().row();
@@ -252,8 +265,15 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         add(tableButtons).left().top().growY();
         add(tableComponents).left().top().padTop(pad10 * 8f);
 
-        EventManager.instance.subscribe(this, Event.GUI_FOLD_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
-                                        Event.EXPAND_COLLAPSE_PANE_CMD, Event.MINIMAP_DISPLAY_CMD, Event.MINIMAP_TOGGLE_CMD);
+        EventManager.instance.subscribe(this,
+                                        Event.GUI_FOLD_CMD,
+                                        Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD,
+                                        Event.EXPAND_COLLAPSE_PANE_CMD,
+                                        Event.MINIMAP_DISPLAY_CMD,
+                                        Event.MINIMAP_TOGGLE_CMD,
+                                        Event.STEREOSCOPIC_CMD,
+                                        Event.CUBEMAP_CMD);
+
     }
 
     private void createComponentButton(Skin skin,
@@ -279,18 +299,37 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
     /** Reference to the task that closes the current pane. **/
     private Timer.Task closeTask;
 
-
     private void createComponentButton(Skin skin,
                                        float padTop,
                                        String buttonStyle,
                                        String title,
                                        GuiComponent component,
                                        String action) {
+        createComponentButton(skin, padTop, buttonStyle, title, component, action, false);
+    }
+
+    private void createComponentButton(Skin skin,
+                                       float padTop,
+                                       String buttonStyle,
+                                       String title,
+                                       GuiComponent component,
+                                       String action,
+                                       boolean useModeCell) {
         OwnTextIconButton button = new OwnTextIconButton("", skin, buttonStyle);
         button.setSize(buttonWidth, buttonHeight);
         button.align(Align.center);
         componentButtons.add(button);
-        tableComponentButtons.add(button).left().top().padBottom((float) 10.0).row();
+        if (useModeCell) {
+            if (modeCell != null) {
+                modeCell.setActor(button);
+            } else {
+                modeCell = tableComponentButtons.add(button);
+                modeCell.left().top().padBottom((float) 10.0).row();
+            }
+
+        } else {
+            tableComponentButtons.add(button).left().top().padBottom((float) 10.0).row();
+        }
 
         ContainerPane pane = new ContainerPane(skin, title, component.getActor());
         if (GaiaSky.settings().program.ui.expandOnMouseOver) {
@@ -393,7 +432,6 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                 }
             });
         }
-
     }
 
     private void selectComponentButton(OwnTextButton button) {
@@ -424,6 +462,98 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
         }
 
         return false;
+    }
+
+    private void updateModePane() {
+        var cubemap = GaiaSky.settings().program.modeCubemap;
+        var stereo = GaiaSky.settings().program.modeStereo;
+
+        if (stereo.active) {
+            addStereoModePane();
+        } else if (cubemap.active) {
+            addCubemapModePane(GaiaSky.settings().program.modeCubemap.projection);
+        } else {
+            removeStereoModePane();
+            removeCubemapModePane(GaiaSky.settings().program.modeCubemap.projection);
+        }
+    }
+
+    private void addStereoModePane() {
+        StereoComponent component = new StereoComponent(skin, stage);
+        component.initialize(getContentWidth());
+        createComponentButton(skin,
+                              pad10 * 41f,
+                              "menu-stereo",
+                              I18n.msg("gui.stereo"),
+                              component,
+                              null,
+                              true);
+
+    }
+
+    private void removeStereoModePane() {
+        String key = StereoComponent.class.getSimpleName();
+        removeButtonAndPane(key);
+    }
+
+    private void addCubemapModePane(CubemapProjection projection) {
+        // Planetarium, panorama, or orthosphere view
+        if (projection.isPlanetarium()) {
+            PlanetariumComponent component = new PlanetariumComponent(skin, stage);
+            component.initialize(getContentWidth());
+            createComponentButton(skin,
+                                  pad10 * 41f,
+                                  "menu-planetarium",
+                                  I18n.msg("gui.planetarium"),
+                                  component,
+                                  null,
+                                  true);
+        } else if (projection.isPanorama()) {
+            PanoramaComponent component = new PanoramaComponent(skin, stage);
+            component.initialize(getContentWidth());
+            createComponentButton(skin,
+                                  pad10 * 41f,
+                                  "menu-panorama",
+                                  I18n.msg("gui.360"),
+                                  component,
+                                  null,
+                                  true);
+        } else if (projection.isOrthosphere()) {
+            OrthosphereComponent component = new OrthosphereComponent(skin, stage);
+            component.initialize(getContentWidth());
+            createComponentButton(skin,
+                                  pad10 * 41f,
+                                  "menu-orthosphere",
+                                  I18n.msg("gui.orthosphere"),
+                                  component,
+                                  null,
+                                  true);
+
+        }
+    }
+
+    private void removeCubemapModePane(CubemapProjection projection) {
+        // Planetarium, panorama, or orthosphere view
+        if (projection.isPlanetarium()) {
+            removeButtonAndPane(PlanetariumComponent.class.getSimpleName());
+        } else if (projection.isPanorama()) {
+            removeButtonAndPane(PanoramaComponent.class.getSimpleName());
+        } else if (projection.isOrthosphere()) {
+            removeButtonAndPane(OrthosphereComponent.class.getSimpleName());
+        }
+    }
+
+    private void removeButtonAndPane(String key) {
+        var button = buttonMap.get(key);
+        var component = paneMap.get(key);
+
+        if (button != null && button.hasParent()) {
+            button.remove();
+            component.remove();
+            componentButtons.removeValue(button, true);
+            buttonMap.remove(key);
+            paneMap.remove(key);
+        }
     }
 
 
@@ -500,6 +630,23 @@ public class ControlsInterface extends TableGuiInterface implements IObserver {
                 }
             }
             case MINIMAP_TOGGLE_CMD -> buttonMinimap.setCheckedNoFire(!buttonMinimap.isChecked());
+            case STEREOSCOPIC_CMD -> {
+                var enable = (Boolean) data[0];
+                if (enable) {
+                    addStereoModePane();
+                } else {
+                    removeStereoModePane();
+                }
+            }
+            case CUBEMAP_CMD -> {
+                var enable = (Boolean) data[0];
+                var projection = (CubemapProjection) data[1];
+                if (enable) {
+                    addCubemapModePane(projection);
+                } else {
+                    removeCubemapModePane(projection);
+                }
+            }
             default -> {
             }
         }

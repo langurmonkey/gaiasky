@@ -8,16 +8,21 @@
 package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.CubemapProjectionsFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.util.LocalizedEnum;
+import gaiasky.util.i18n.I18n;
 
+import java.util.Locale;
 import java.util.function.Function;
 
 public final class CubmeapProjectionEffect extends PostProcessorEffect {
     private final CubemapProjectionsFilter filter;
 
-    public CubmeapProjectionEffect(float w, float h) {
+    public CubmeapProjectionEffect(float w,
+                                   float h) {
         filter = new CubemapProjectionsFilter(w, h);
         disposables.add(filter);
     }
@@ -27,11 +32,17 @@ public final class CubmeapProjectionEffect extends PostProcessorEffect {
         filter.rebind();
     }
 
-    public void setSides(FrameBuffer xpositive, FrameBuffer xnegative, FrameBuffer ypositive, FrameBuffer ynegative, FrameBuffer zpositive, FrameBuffer znegative) {
+    public void setSides(FrameBuffer xpositive,
+                         FrameBuffer xnegative,
+                         FrameBuffer ypositive,
+                         FrameBuffer ynegative,
+                         FrameBuffer zpositive,
+                         FrameBuffer znegative) {
         filter.setSides(xpositive, xnegative, ypositive, ynegative, zpositive, znegative);
     }
 
-    public void setViewportSize(float w, float h) {
+    public void setViewportSize(float w,
+                                float h) {
         filter.setViewportSize(w, h);
     }
 
@@ -60,7 +71,10 @@ public final class CubmeapProjectionEffect extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
+    public void render(FrameBuffer src,
+                       FrameBuffer dest,
+                       GaiaSkyFrameBuffer full,
+                       GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
         filter.setInput(src).setOutput(dest).render();
     }
@@ -73,7 +87,7 @@ public final class CubmeapProjectionEffect extends PostProcessorEffect {
         filter.setProjection(projection);
     }
 
-    public enum CubemapProjection {
+    public enum CubemapProjection implements LocalizedEnum {
         // Common panorama modes
         EQUIRECTANGULAR,
         CYLINDRICAL,
@@ -130,6 +144,43 @@ public final class CubmeapProjectionEffect extends PostProcessorEffect {
                     return proj;
                 }
             }
+        }
+
+        public static Array<CubemapProjection> getPanoramaProjections() {
+            Array<CubemapProjection> result = new Array<>();
+            var values = CubemapProjection.values();
+            for (var value : values) {
+                if (value.isPanorama()) {
+                    result.add(value);
+                }
+            }
+            return result;
+        }
+
+        public static Array<CubemapProjection> getPlanetariumProjections() {
+            Array<CubemapProjection> result = new Array<>();
+            var values = CubemapProjection.values();
+            for (var value : values) {
+                if (value.isPlanetarium()) {
+                    result.add(value);
+                }
+            }
+            return result;
+        }
+
+        public static Array<CubemapProjection> getOrthosphereProjections() {
+            Array<CubemapProjection> result = new Array<>();
+            var values = CubemapProjection.values();
+            for (var value : values) {
+                if (value.isOrthosphere()) {
+                    result.add(value);
+                }
+            }
+            return result;
+        }
+
+        public String localizedName() {
+            return I18n.get("gui.cubemap.projection." + name().toLowerCase(Locale.ROOT));
         }
     }
 

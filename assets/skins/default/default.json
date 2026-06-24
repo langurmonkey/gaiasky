@@ -255,6 +255,30 @@
       "up": "default-round",
       "imageUp": "map-icon"
     },
+    "menu-stereo": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "3d-icon"
+    },
+    "menu-panorama": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "cubemap-icon"
+    },
+    "menu-planetarium": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "iconic-dome"
+    },
+    "menu-orthosphere": {
+      "down": "default-round-down",
+      "checked": "default-round-down",
+      "up": "default-round",
+      "imageUp": "orthosphere-icon"
+    },
     "select-all": {
       "imageUp": "iconic-check"
     },

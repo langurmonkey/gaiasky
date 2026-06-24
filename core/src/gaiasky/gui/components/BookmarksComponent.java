@@ -50,7 +50,6 @@ import java.util.Set;
  * that navigates the camera to the bookmarked position and orientation.
  */
 public class BookmarksComponent extends GuiComponent implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(BookmarksComponent.class);
 
     static private final Vector2 tmpCoords = new Vector2();
     private final Drawable folderIcon;

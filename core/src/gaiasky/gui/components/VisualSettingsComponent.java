@@ -35,7 +35,6 @@ import java.util.Objects;
  * to their defaults by reading from the internal configuration file.
  */
 public class VisualSettingsComponent extends GuiComponent implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(VisualSettingsComponent.class);
 
     public VisualSettingsComponent(Skin skin,
                                    Stage stage) {

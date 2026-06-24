@@ -155,7 +155,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private Table controllersTable;
     // Backup values.
     private ToneMapping toneMappingBak;
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak, lensFlareBak, filmGrainBak, stereoKBak, stereoIpdBak, stereoSdBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak,
+            lensFlareBak, filmGrainBak, stereoKBak, stereoIpdBak, stereoSdBak, plApertureBak, plAngleBak;
     private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
     private float[] accentColorBak;
     private int FXAAQuality, FXAAQualityBak;
@@ -163,11 +164,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private UpscaleFilter upscaleFilterBak;
     private AtomicBoolean vsyncValue;
 
-    public PreferencesWindow(Stage stage, Skin skin, GlobalResources globalResources) {
+    public PreferencesWindow(Stage stage,
+                             Skin skin,
+                             GlobalResources globalResources) {
         this(stage, skin, globalResources, false);
     }
 
-    public PreferencesWindow(Stage stage, Skin skin, GlobalResources globalResources, boolean welcomeScreen) {
+    public PreferencesWindow(Stage stage,
+                             Skin skin,
+                             GlobalResources globalResources,
+                             boolean welcomeScreen) {
         super(I18n.msg("gui.settings") + " - " + GaiaSky.settings().version.version + " - " + I18n.msg("gui.build", GaiaSky.settings().version.build),
               skin,
               stage);
@@ -189,7 +195,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.instance.subscribe(this, Event.INVERT_Y_CMD, Event.INVERT_X_CMD, Event.WINDOW_RESOLUTION_INFO);
     }
 
-    private OwnTextIconButton createTab(String title, Image img, Skin skin) {
+    private OwnTextIconButton createTab(String title,
+                                        Image img,
+                                        Skin skin) {
         OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), Align.left, img, skin, "toggle-big");
         tab.addListener(new OwnTextTooltip(title, skin));
         tab.pad(pad10);
@@ -205,7 +213,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
      * @param content   The content group.
      * @param padTop    Padding to the above element.
      */
-    private void addContentGroup(Table container, Label title, WidgetGroup content, float padTop) {
+    private void addContentGroup(Table container,
+                                 Label title,
+                                 WidgetGroup content,
+                                 float padTop) {
         container.add(title).left().padTop(padTop).row();
         container.add(new Separator(skin, "small")).bottom().left().expandX().fillX().padBottom(pad20).row();
         container.add(content).left().row();
@@ -218,7 +229,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
      * @param title     The title label.
      * @param content   The content group.
      */
-    private void addContentGroup(Table container, Label title, WidgetGroup content) {
+    private void addContentGroup(Table container,
+                                 Label title,
+                                 WidgetGroup content) {
         addContentGroup(container, title, content, pad34 * 2f);
     }
 
@@ -313,7 +326,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             low.setWidth(buttonWidth);
             low.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
                     /* PRESET LOW */
 
                     // Low graphics quality.
@@ -351,7 +365,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             medium.setWidth(buttonWidth);
             medium.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
                     /* PRESET MEDIUM */
 
                     // Normal graphics quality.
@@ -381,7 +396,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             high.setWidth(buttonWidth);
             high.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
                     /* PRESET HIGH */
 
                     // Normal graphics quality.
@@ -2408,6 +2424,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         plAperture.setTooltip(I18n.msg("gui.planetarium.aperture"));
         plAperture.setValueLabelTransform((value) -> String.format("%.1f°", value));
         plAperture.setValue(settings.program.modeCubemap.planetarium.aperture);
+        plAperture.connect(Event.PLANETARIUM_APERTURE_CMD);
         plAperture.setWidth(sliderWidth);
 
         // Skew angle
@@ -2416,6 +2433,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         plAngle.setTooltip(I18n.msg("gui.planetarium.angle"));
         plAngle.setValueLabelTransform((value) -> String.format("%.1f°", value));
         plAngle.setValue(settings.program.modeCubemap.planetarium.angle);
+        plAngle.connect(Event.PLANETARIUM_ANGLE_CMD);
         plAngle.setWidth(sliderWidth);
 
         // Info
@@ -2844,7 +2862,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         populateWidthHeight(force, widthField, heightField, Gdx.graphics);
     }
 
-    private void populateWidthHeight(boolean force, OwnTextField w, OwnTextField h, Graphics g) {
+    private void populateWidthHeight(boolean force,
+                                     OwnTextField w,
+                                     OwnTextField h,
+                                     Graphics g) {
         if (force || w != null && w.getText().isBlank()) {
             w.setText(Integer.toString(MathUtils.clamp(g.getWidth(), 100, 10000)));
         }
@@ -2860,7 +2881,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    public GenericDialog show(Stage stage, Action action) {
+    public GenericDialog show(Stage stage,
+                              Action action) {
         GenericDialog result = super.show(stage, action);
         updateBackupValues();
         populateWidthHeight(true);
@@ -2884,13 +2906,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         enableComponents(fullscreen, fullScreenResolutions);
     }
 
-    private void setSlider(OwnSliderReset slider, float value) {
+    private void setSlider(OwnSliderReset slider,
+                           float value) {
         slider.setProgrammaticChangeEvents(false);
         slider.setValue(value);
         slider.setProgrammaticChangeEvents(true);
     }
 
-    private void setCheckBox(CheckBox cb, boolean checked) {
+    private void setCheckBox(CheckBox cb,
+                             boolean checked) {
         cb.setProgrammaticChangeEvents(false);
         cb.setChecked(checked);
         cb.setProgrammaticChangeEvents(true);
@@ -2920,6 +2944,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         stereoIpdBak = (float) settings.program.modeStereo.ipd;
         stereoSdBak = (float) settings.program.modeStereo.screenDistance;
         accentColorBak = Arrays.copyOf(settings.program.ui.accentColor, 3);
+        plApertureBak = (float) settings.program.modeCubemap.planetarium.aperture;
+        plAngleBak = settings.program.modeCubemap.planetarium.angle;
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -3351,18 +3377,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (newResolution != settings.program.modeCubemap.faceResolution)
             EventManager.publish(Event.CUBEMAP_RESOLUTION_CMD, this, newResolution);
 
-        // Planetarium aperture
-        float ap = plAperture.getValue();
-        if (ap != settings.program.modeCubemap.planetarium.aperture) {
-            EventManager.publish(Event.PLANETARIUM_APERTURE_CMD, this, ap);
-        }
-
-        // Planetarium angle
-        float pa = plAngle.getValue();
-        if (pa != settings.program.modeCubemap.planetarium.angle) {
-            EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, pa);
-        }
-
         // Spherical mirror projection warp mesh file
         if (settings.program.modeCubemap.planetarium.sphericalMirrorWarp != meshWarpFilePath) {
             EventManager.publish(Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, this, meshWarpFilePath);
@@ -3463,6 +3477,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.STEREO_IPD_CMD, this, stereoIpdBak);
         EventManager.publish(Event.STEREO_SCREEN_DIST_CMD, this, stereoSdBak);
         EventManager.publish(Event.UI_ACCENT_COLOR_CMD, this, (Object) accentColorBak);
+        EventManager.publish(Event.PLANETARIUM_APERTURE_CMD, this, plApertureBak);
+        EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, plAngleBak);
     }
 
     private void reloadLanguage() {
@@ -3516,7 +3532,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         return (int) (Math.log(x.getAACode()) / FastMath.log(2) + 1e-10) + 2;
     }
 
-    private int idxLang(String code, Array<LangComboBoxBean> langs) {
+    private int idxLang(String code,
+                        Array<LangComboBoxBean> langs) {
         if (code == null || code.isEmpty()) {
             code = I18n.messages.getLocale().toLanguageTag();
         }
@@ -3553,12 +3570,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         return str;
     }
 
-    public void resize(int width, int height) {
+    public void resize(int width,
+                       int height) {
         populateWidthHeight(true);
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         switch (event) {
             case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateGamepadsList(controllersTable);
             case INVERT_X_CMD -> {
