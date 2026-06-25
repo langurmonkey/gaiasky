@@ -980,13 +980,14 @@ public enum Event {
      */
     RAYMARCHING_CMD,
     /**
-     * Push new additional data to ray marching shader. Contains the name and the additional vector.
+     * Update the opacity of ray marching effects.
+     *
      * <ol start='0'>
      * <li>name [string]</li>
-     * <li>additional[float4]</li>
+     * <li>opacity[float]</li>
      * </ol>
      */
-    RAYMARCHING_ADDITIONAL_CMD,
+    RAYMARCHING_OPACITY_CMD,
 
     /**
      * SAMP information

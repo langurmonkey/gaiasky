@@ -61,7 +61,6 @@ public class Scene {
 
     /** Holds all initialization systems. **/
     private Array<AbstractInitSystem> initializers;
-    private IndexInitializer indexInitializer;
     /** Holds all update systems. **/
     private Array<EntityUpdater> updaters;
     /** Holds all extract systems. **/
@@ -441,8 +440,7 @@ public class Scene {
     public void extractEntity(Entity entity) {
         if (extractors != null) {
             for (AbstractExtractSystem system : extractors) {
-                if (system.getFamily()
-                        .matches(entity)) {
+                if (system.getFamily().matches(entity)) {
                     system.extract(entity);
                 }
             }

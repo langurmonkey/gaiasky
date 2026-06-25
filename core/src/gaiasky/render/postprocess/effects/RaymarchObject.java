@@ -21,10 +21,6 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class RaymarchObject extends PostProcessorEffect {
     private final RaymarchingFilter filter;
 
-    public RaymarchObject(String fragmentShader, float viewportWidth, float viewportHeight) {
-        this(fragmentShader, (int) viewportWidth, (int) viewportHeight);
-    }
-
     public RaymarchObject(String fragmentShader, int viewportWidth, int viewportHeight) {
         super();
         filter = new RaymarchingFilter(fragmentShader, viewportWidth, viewportHeight);
@@ -57,6 +53,10 @@ public final class RaymarchObject extends PostProcessorEffect {
 
     public void setSize(float size) {
         filter.setSize(size);
+    }
+
+    public void setOpacity(float opacity) {
+        filter.setOpacity(opacity);
     }
 
     public void setZfarK(float zfar, float k) {

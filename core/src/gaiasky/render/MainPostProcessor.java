@@ -160,7 +160,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                         Event.UPSCALE_FILTER_CMD,
                                         Event.CHROMATIC_ABERRATION_CMD,
                                         Event.FILM_GRAIN_CMD,
-                                        Event.SHADER_RELOAD_CMD);
+                                        Event.SHADER_RELOAD_CMD,
+                                        Event.RAYMARCHING_OPACITY_CMD);
     }
 
     public void initializeOffScreenPostProcessors() {
@@ -867,6 +868,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         logger.debug("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
                     }
                 } else {
+                    // Activate/deactivate
                     var rmTime = getRaymarchingTime();
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
@@ -892,9 +894,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            case RAYMARCHING_ADDITIONAL_CMD -> {
+            case RAYMARCHING_OPACITY_CMD -> {
                 var name = (String) data[0];
-                var additional = (float[]) data[1];
+                var opacity = (float) data[1];
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
@@ -903,7 +905,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         if (rms != null) {
                             PostProcessorEffect ppe = rms.get(name);
                             if (ppe != null)
-                                ((RaymarchObject) ppe).setAdditional(additional);
+                                ((RaymarchObject) ppe).setOpacity(opacity);
                         }
                     }
                 }

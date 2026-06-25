@@ -49,13 +49,16 @@ public class DatasetDescriptionUpdater extends AbstractUpdateSystem {
         var graph = Mapper.graph.get(entity);
         if (graph != null && graph.children != null && graph.children.size > 0) {
             for (var child : graph.children) {
-                if (enable) {
-                    // Remove no-process tag.
-                    child.remove(TagNoProcess.class);
-                } else {
-                    // Add no-process tag.
-                    var engine = getEngine();
-                    child.add(engine != null ? engine.createComponent(TagNoProcess.class) : new TagNoProcess());
+                // Exclude raymarching entities, they need to be processing all the time.
+                if (!Mapper.raymarching.has(child)) {
+                    if (enable) {
+                        // Remove no-process tag.
+                        child.remove(TagNoProcess.class);
+                    } else {
+                        // Add no-process tag.
+                        var engine = getEngine();
+                        child.add(engine != null ? engine.createComponent(TagNoProcess.class) : new TagNoProcess());
+                    }
                 }
             }
         }

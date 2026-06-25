@@ -25,7 +25,13 @@ public class GridRecursiveRadio extends EntityRadio {
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.TOGGLE_VISIBILITY_CMD) {
             ComponentType ct = ComponentType.getFromKey((String) data[0]);
-            if (ct != null && GaiaSky.settings().scene.visibility.get(ct.toString())) {
+            boolean enabled;
+            if(data.length > 1) {
+                enabled = (Boolean) data[1];
+            } else {
+                enabled = !GaiaSky.settings().scene.visibility.get(ct.toString());
+            }
+            if (ct != null && enabled) {
                 var body = Mapper.body.get(entity);
                 var model = Mapper.model.get(entity);
                 var transform = Mapper.transform.get(entity);

@@ -73,7 +73,7 @@ public class Families {
         billboardGalaxies = Family.all(TagBillboardGalaxy.class).exclude(TagNoProcess.class).get();
         proceduralTriggers = Family.all(ProceduralTrigger.class).exclude(TagNoProcess.class).get();
         axes = Family.all(Axis.class).exclude(TagNoProcess.class).get();
-        raymarchings = Family.all(Raymarching.class).exclude(TagNoProcess.class).get();
+        raymarchings = Family.all(Raymarching.class).get();
         invisibles = Family.all(TagInvisible.class).exclude(TagNoProcess.class).get();
         catalogInfos = Family.all(DatasetDescription.class).exclude(TagNoProcess.class).get();
         gridRecs = Family.all(GridRecursive.class).exclude(TagNoProcess.class).get();

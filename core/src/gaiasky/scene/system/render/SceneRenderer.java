@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -36,7 +37,6 @@ import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.IRenderSystem;
 import gaiasky.render.system.LightPositionUpdater;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.draw.*;
@@ -46,7 +46,6 @@ import gaiasky.scene.system.render.pass.RenderPass;
 import gaiasky.scene.system.render.pass.SVTRenderPass;
 import gaiasky.scene.system.render.pass.ShadowMapRenderPass;
 import gaiasky.util.Constants;
-import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.IntModelBatch;
@@ -80,11 +79,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     /** Light position updater runnable. **/
     private final LightPositionUpdater lpu;
     /**
-     * Contains the flags representing each type's visibility
+     * Contains the flags representing each type's visibility.
      **/
     public ComponentTypes visible;
     /**
-     * Contains the last update time of each of the flags
+     * Contains the last update time for each of the flags.
      **/
     public long[] times;
     /**
@@ -100,11 +99,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private List<RenderGroup> renderGroups;
     private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, depthWritesR, clearDepthR;
     /**
-     * The particular current scene graph renderer
+     * The particular current scene graph renderer.
      **/
     private IRenderMode renderMode;
     /**
-     * Renderers vector, with 0 = normal, 1 = stereoscopic, 2 = FOV, 3 = cubemap
+     * Renderers vector, with 0 = normal, 1 = stereoscopic, 2 = FOV, 3 = cubemap.
      **/
     private IRenderMode[] sgrList;
     /**
@@ -122,7 +121,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      */
     private final RenderGroup[] autonomousGroups = new RenderGroup[]{PARTICLE_EFFECTS};
 
-    public SceneRenderer(XrDriver xrDriver, GlobalResources globalResources) {
+    public SceneRenderer(XrDriver xrDriver,
+                         GlobalResources globalResources) {
         super();
         this.xrDriver = xrDriver;
         this.globalResources = globalResources;
@@ -480,7 +480,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    public void renderModel(IRenderable r, IntModelBatch batch) {
+    public void renderModel(IRenderable r,
+                            IntModelBatch batch) {
         if (r instanceof Render render) {
             if (Mapper.model.has(render.entity)) {
                 modelEntityRenderSystem.renderOpaque(render.entity, batch, (float) 1, false);
@@ -553,7 +554,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param t             The time in seconds since the start.
      * @param renderContext The render context.
      */
-    public void renderScene(ICamera camera, double t, RenderingContext renderContext) {
+    public void renderScene(ICamera camera,
+                            double t,
+                            RenderingContext renderContext) {
         try {
             var pp = renderContext.ppb.pp;
 
@@ -634,7 +637,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * This must be called when all the rendering for the current frame has
      * finished.
      */
-    private void resetRenderLists(List<List<IRenderable>> renderLists, boolean addStub) {
+    private void resetRenderLists(List<List<IRenderable>> renderLists,
+                                  boolean addStub) {
         // Clear lists to get them ready for update pass.
         for (var rg : values()) {
             renderLists.get(rg.ordinal())
@@ -649,6 +653,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
     }
 
+
     /**
      * Checks if a given component type is on
      *
@@ -658,6 +663,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      */
     public boolean isOn(ComponentType comp) {
         return visible.get(comp.ordinal()) || alphas[comp.ordinal()] > 0;
+    }
+
+    /**
+     * Same as {@link #isOn(ComponentType)}, but it does not take into account the alpha fading factor.
+     *
+     * @param comp The component
+     *
+     * @return Whether the component is strictly visible
+     */
+    public boolean isVisible(ComponentType comp) {
+        return visible.get(comp.ordinal());
     }
 
     /**
@@ -681,6 +697,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
         }
         return allOn;
+    }
+
+    /**
+     * Same as {@link #allOn(ComponentTypes)}, but it does not take into account the alpha fading factors.
+     *
+     * @param comp The components.
+     *
+     * @return Whether the components are all strictly visible.
+     */
+    public boolean allVisible(ComponentTypes comp) {
+        return comp.isEmpty() || comp.allSetLike(visible);
     }
 
     /**
@@ -710,7 +737,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         switch (event) {
             case TOGGLE_VISIBILITY_CMD -> {
                 ComponentType ct = ComponentType.getFromKey((String) data[0]);
@@ -754,7 +783,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 }
             }
             case CAMERA_MODE_CMD -> {
-                CameraMode cm = (CameraMode) data[0];
                 if (GaiaSky.settings().runtime.openXr) renderMode = sgrList[SGR_OPENXR_IDX];
                 else if (GaiaSky.settings().program.modeStereo.active) renderMode = sgrList[SGR_STEREO_IDX];
                 else if (GaiaSky.settings().program.modeCubemap.active) renderMode = sgrList[SGR_CUBEMAP_IDX];
@@ -779,7 +807,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      *
      * @return The alpha value.
      */
-    private float calculateAlpha(ComponentType type, double t) {
+    private float calculateAlpha(ComponentType type,
+                                 double t) {
         int ordinal = type.ordinal();
         long diff = (long) (t * 1000f) - times[ordinal];
         if (diff > GaiaSky.settings().scene.fadeMs) {
@@ -807,7 +836,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param rw New render buffer width.
      * @param rh New render buffer height.
      */
-    public void resize(int tw, int th, int rw, int rh) {
+    public void resize(int tw,
+                       int th,
+                       int rw,
+                       int rh) {
         resize(tw, th, rw, rh, false);
     }
 
@@ -820,7 +852,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param rh              New render buffer height.
      * @param resizeRenderSys Also resize all render systems.
      */
-    public void resize(int tw, int th, int rw, int rh, boolean resizeRenderSys) {
+    public void resize(int tw,
+                       int th,
+                       int rw,
+                       int rh,
+                       boolean resizeRenderSys) {
         if (resizeRenderSys) {
             resizeRenderSystems(tw, th);
         }
@@ -836,7 +872,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param tw New target (screen) width.
      * @param th New target (screen) height.
      */
-    public void resizeRenderSystems(int tw, int th) {
+    public void resizeRenderSystems(int tw,
+                                    int th) {
         var systems = renderSystems.values();
         for (IRenderSystem rendSys : systems) {
             rendSys.resize(tw, th);
@@ -929,7 +966,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return xrDriver;
     }
 
-    public FrameBuffer getFrameBuffer(int w, int h) {
+    public FrameBuffer getFrameBuffer(int w,
+                                      int h) {
         int key = getKey(w, h);
         if (!frameBufferMap.containsKey(key)) {
             FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, Format.RGB888, true);
@@ -938,7 +976,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return frameBufferMap.get(key);
     }
 
-    private int getKey(int w, int h) {
+    private int getKey(int w,
+                       int h) {
         return 31 * h + w;
     }
 

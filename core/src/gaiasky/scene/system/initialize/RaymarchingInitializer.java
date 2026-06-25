@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
@@ -22,13 +23,14 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.data.util.GlobalResources;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 
 public class RaymarchingInitializer extends AbstractInitSystem {
 
-    public RaymarchingInitializer(boolean setUp, Family family, int priority) {
+    public RaymarchingInitializer(boolean setUp,
+                                  Family family,
+                                  int priority) {
         super(setUp, family, priority);
     }
 
@@ -75,6 +77,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex,
@@ -99,13 +102,32 @@ public class RaymarchingInitializer extends AbstractInitSystem {
                 if (raymarching.additionalTexStrUnpacked != null) {
                     if (AssetBean.manager().isLoaded(raymarching.additionalTexStrUnpacked)) {
                         raymarching.additionalTexture = AssetBean.manager().get(raymarching.additionalTexStrUnpacked);
-                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, raymarching.additional, raymarching.additionalTexture);
+                        EventManager.publish(Event.RAYMARCHING_CMD,
+                                             this,
+                                             base.getName(),
+                                             false,
+                                             entity,
+                                             raymarching.raymarchingShader,
+                                             raymarching.additional,
+                                             raymarching.additionalTexture);
                     } else {
                         logger.warn("Could not load texture: " + raymarching.additionalTexStr);
-                        EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, raymarching.additional);
+                        EventManager.publish(Event.RAYMARCHING_CMD,
+                                             this,
+                                             base.getName(),
+                                             false,
+                                             entity,
+                                             raymarching.raymarchingShader,
+                                             raymarching.additional);
                     }
                 } else {
-                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, raymarching.additional);
+                    EventManager.publish(Event.RAYMARCHING_CMD,
+                                         this,
+                                         base.getName(),
+                                         false,
+                                         entity,
+                                         raymarching.raymarchingShader,
+                                         raymarching.additional);
                 }
 
                 // Set up label

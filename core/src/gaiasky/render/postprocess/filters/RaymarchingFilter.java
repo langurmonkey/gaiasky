@@ -24,6 +24,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private Matrix4 frustumCorners;
     private final Matrix4 invView;
     private final Matrix4 combined;
+    private float opacity;
     private float timeSecs;
     // VR scaling.
     private final float distanceScale;
@@ -66,6 +67,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.combined = new Matrix4();
         this.additional = new float[4];
         this.distanceScale = (float) Constants.DISTANCE_SCALE_FACTOR;
+        this.opacity = 1;
         this.size = 1;
         rebind();
     }
@@ -94,6 +96,11 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     public void setCombined(Matrix4 viewProjection) {
         this.combined.set(viewProjection);
         setParam(Param.Combined, this.combined);
+    }
+
+    public void setOpacity(float opacity) {
+        this.opacity = opacity;
+        setParam(Param.Opacity, this.opacity);
     }
 
     public void setPos(Vector3 pos) {
@@ -154,10 +161,6 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         }
     }
 
-    public Vector2 getViewportSize() {
-        return viewport;
-    }
-
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
@@ -172,6 +175,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.Pos, pos);
         setParams(Param.Time, timeSecs);
         setParams(Param.Size, size);
+        setParams(Param.Opacity, opacity);
         setParams(Param.DistanceScale, distanceScale);
         setParamsv(Param.Additional, additional, 0, 4);
         endParams();
@@ -194,6 +198,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         TextureAdditional("u_texture2", 0),
         Time("u_time", 1),
         Size("u_size", 1),
+        Opacity("u_opacity", 1),
         DistanceScale("u_distScale", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),

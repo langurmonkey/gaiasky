@@ -44,6 +44,16 @@ public interface ISceneRenderer {
     void doneLoading(AssetManager manager);
 
     /**
+     * Computes the alpha of this component types by multiplying the alphas
+     * of all components
+     *
+     * @param comp The components
+     *
+     * @return The alpha value
+     */
+    float alpha(ComponentTypes comp);
+
+    /**
      * Checks if a given component type is on.
      *
      * @param comp The component.
@@ -53,6 +63,15 @@ public interface ISceneRenderer {
     boolean isOn(ComponentType comp);
 
     /**
+     * Same as {@link #isOn(ComponentType)}, but it does not take into account the alpha fading factor.
+     *
+     * @param comp The component
+     *
+     * @return Whether the component is strictly visible
+     */
+    boolean isVisible(ComponentType comp);
+
+    /**
      * Checks if the component types are all on.
      *
      * @param comp The components.
@@ -60,6 +79,15 @@ public interface ISceneRenderer {
      * @return Whether the components are all on.
      */
     boolean allOn(ComponentTypes comp);
+
+    /**
+     * Same as {@link #allOn(ComponentTypes)}, but it does not take into account the alpha fading factors.
+     *
+     * @param comp The components.
+     *
+     * @return Whether the components are all strictly visible.
+     */
+    boolean allVisible(ComponentTypes comp);
 
     /**
      * Gets the current render process.

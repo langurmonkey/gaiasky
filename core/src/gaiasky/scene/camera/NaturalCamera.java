@@ -43,7 +43,10 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.DecalUtils;
+import gaiasky.util.MasterManager;
+import gaiasky.util.SlaveManager;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
@@ -962,7 +965,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         vel.setZero();
     }
 
-    protected void updateVelocity(double dt, double multiplier, double speedScaling) {
+    protected void updateVelocity(double dt,
+                                  double multiplier,
+                                  double speedScaling) {
 
         boolean cinematic = GaiaSky.settings().scene.camera.cinematic;
         // Calculate velocity if coming from gamepad
@@ -1353,15 +1358,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      *
      * @return The distance scale to compute the camera speed scaling factor.
      */
-    private double computeDistanceScale(double distance, double smoothingDistance0, double smoothingDistance1) {
+    private double computeDistanceScale(double distance,
+                                        double smoothingDistance0,
+                                        double smoothingDistance1) {
         if (getMode().isFocus()) {
             var focusDistance = focus.getDistToCamera() + MIN_DIST;
             // Compute interpolation value between focus and closest star.
             var a = distance < smoothingDistance0 ?
                     0.0
                     : (distance > smoothingDistance1 ?
-                    1.0 :
-                    (distance - smoothingDistance0) / (smoothingDistance1 - smoothingDistance0));
+                       1.0 :
+                       (distance - smoothingDistance0) / (smoothingDistance1 - smoothingDistance0));
             return MathUtilsDouble.mix(distance, focusDistance, a);
         } else {
             return distance;
@@ -1376,7 +1383,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double getClosestBodyDistance() {
         return closestBody != null ?
                 (closestBody.getDistToCamera() - (closestBody.getElevationAt(pos, false) + MIN_DIST))
-                        * (closestBody.isBillboard() ? 15.0 : 1.0)
+                * (closestBody.isBillboard() ? 15.0 : 1.0)
                 : 1.0e40;
     }
 
@@ -1645,8 +1652,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     setCenterFocus((Boolean) data[0]);
                 }
             }
-            case CONTROLLER_CONNECTED_INFO ->
-                    GaiaSky.settings().controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
+            case CONTROLLER_CONNECTED_INFO -> GaiaSky.settings().controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
             case CONTROLLER_DISCONNECTED_INFO -> {
                 // Empty.
             }
