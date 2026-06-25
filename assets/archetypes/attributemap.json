@@ -864,6 +864,10 @@
           "proximityThresholdRad"
         ]
       },
+      "proximityLoadOnFocus": {
+        "description": "If set to true, loading of proximity descriptors (see ``proximityDescriptorsLocation``) also happens on focus. This means that the corresponding descriptor file is loaded when the user selects and focuses the particle. Defaults to ``true``.",
+        "unit": "Boolean"
+      },
       "epochJd:ParticleGroup": {
         "description": "The epoch for the positions of this particle group as a Julian date.",
         "unit": "Double",

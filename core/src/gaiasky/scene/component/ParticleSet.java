@@ -157,10 +157,12 @@ public class ParticleSet implements Component, IDisposable {
     public String proximityDescriptorsLocation;
     /** The path for proximity loading. **/
     public Path proximityDescriptorsPath;
-    /** Threshold solid angle when loading happens. About 4 degrees (0.069 rad). **/
-    public double proximityThreshold = 0.064;
     /** Flag that indicates whether this particle set has proximity loading. **/
     public boolean proximityLoadingFlag = false;
+    /** Flag that indicates whether loading should also happen on focus. **/
+    public boolean proximityLoadOnFocus = true;
+    /** Threshold solid angle when loading happens. About 4 degrees (0.064 rad). **/
+    public double proximityThreshold = 0.064;
     /** Set that contains the indexes of the particles whose descriptors have already been loaded. **/
     public IntSet proximityLoaded;
     /** Contains the indices of the particles whose descriptors are not present. **/
@@ -732,6 +734,10 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setDescriptorsLocation(String loc) {
         setProximityDescriptorsLocation(loc);
+    }
+
+    public void setProximityLoadOnFocus(Boolean proxLoadOnFocus) {
+        this.proximityLoadOnFocus = proxLoadOnFocus;
     }
 
     public void setProximityThreshold(Double thRadians) {
