@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class OwnCubemap extends GLTexture {
     final static Map<Application, Array<OwnCubemap>> managedCubemaps = new HashMap<>();
-    private static AssetManager assetManager;
+    private AssetManager assetManager;
     protected CubemapData data;
 
     /** Construct a Cubemap based on the given CubemapData. */
@@ -110,7 +110,7 @@ public class OwnCubemap extends GLTexture {
     }
 
     /** Invalidate all managed cubemaps. This is an internal method. Do not use it! */
-    public static void invalidateAllCubemaps(Application app) {
+    public void invalidateAllCubemaps(Application app) {
         Array<OwnCubemap> managedCubemapArray = managedCubemaps.get(app);
         if (managedCubemapArray == null)
             return;
@@ -176,8 +176,8 @@ public class OwnCubemap extends GLTexture {
      *
      * @param manager the asset manager.
      */
-    public static void setAssetManager(AssetManager manager) {
-        OwnCubemap.assetManager = manager;
+    public void setAssetManager(AssetManager manager) {
+        assetManager = manager;
     }
 
     public static String getManagedStatus() {

@@ -1185,7 +1185,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public void icosphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int startFace, int nfaces) {
         ensureTriangles(10 * (int) FastMath.pow(2, 2 * divisions - 1));
         IcoSphereCreator isc = new IcoSphereCreator();
-        isc.create(radius, divisions, flipNormals, hardEdges);
+        isc.create(radius, divisions, flipNormals, hardEdges, 0f);
 
         for (int j = startFace; j < startFace + nfaces && j < isc.faces.size(); j++) {
             IFace face = isc.faces.get(j);

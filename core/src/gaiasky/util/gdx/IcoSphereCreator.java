@@ -10,6 +10,8 @@ package gaiasky.util.gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
+import gaiasky.util.Logger;
+import gaiasky.util.math.StdRandom;
 import net.jafama.FastMath;
 
 import java.io.File;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class IcoSphereCreator extends ModelCreator {
+    private static final Logger.Log logger = Logger.getLogger(IcoSphereCreator.class);
 
     private Map<Long, Integer> middlePointIndexCache;
 
@@ -33,10 +36,10 @@ public class IcoSphereCreator extends ModelCreator {
     }
 
     public static void main(String[] args) {
-        boolean flipNormals = true;
+        boolean flipNormals = false;
         IcoSphereCreator isc = new IcoSphereCreator();
-        int recursion = 2;
-        isc.create(1, recursion, flipNormals);
+        int recursion = 6;
+        isc.create(1, recursion, flipNormals, 0.005f);
         try {
             File file = File.createTempFile("icosphere_" + recursion + "_", ".obj");
             OutputStream os = new FileOutputStream(file);
@@ -48,7 +51,7 @@ public class IcoSphereCreator extends ModelCreator {
             System.out.println("Faces: " + isc.faces.size());
             System.out.println("Model written in: " + file.getAbsolutePath());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -60,12 +63,29 @@ public class IcoSphereCreator extends ModelCreator {
      *
      * @return Vertex index.
      */
-    protected int vertex(Vector3 p, float radius) {
+    protected int vertex(Vector3 p,
+                         float radius) {
+        return vertex(p, radius, 0f);
+    }
+
+    /**
+     * Adds a vertex and its UV mapping.
+     *
+     * @param p      The point.
+     * @param radius The radius.
+     * @param jitter Jitter to apply to the position.
+     *
+     * @return Vertex index.
+     */
+    protected int vertex(Vector3 p,
+                         float radius,
+                         float jitter) {
+        addJitter(p, jitter);
         p.nor();
 
         addUV(p);
         // Vertex is p times the radius
-        vertices.add(p.scl(radius));
+        vertices.add(p.scl(radius + getJitter(jitter)));
 
         // Normal.
         var normal = p.cpy().nor();
@@ -119,7 +139,10 @@ public class IcoSphereCreator extends ModelCreator {
     }
 
     // return index of point in the middle of p1 and p2
-    private int getMiddlePoint(int p1, int p2, float radius) {
+    private int getMiddlePoint(int p1,
+                               int p2,
+                               float radius,
+                               float jitter) {
         // first check if we have it already
         boolean firstIsSmaller = p1 < p2;
         long smallerIndex = firstIsSmaller ? p1 : p2;
@@ -135,13 +158,27 @@ public class IcoSphereCreator extends ModelCreator {
         Vector3 point2 = this.vertices.get(p2 - 1);
         Vector3 middle = new Vector3((point1.x + point2.x) / 2.0f, (point1.y + point2.y) / 2.0f, (point1.z + point2.z) / 2.0f);
 
+        addJitter(middle, jitter);
         middle.nor();
+
         // add vertex makes sure point is on unit sphere
-        int i = vertex(middle, radius);
+        int i = vertex(middle, radius + getJitter(jitter));
 
         // store it, return index
         this.middlePointIndexCache.put(key, i);
         return i;
+    }
+
+    private void addJitter(Vector3 v,
+                           float jitter) {
+        // Add jitter to x, y, and z.
+        v.x = v.x + (float) StdRandom.gaussian(0.0, jitter);
+        v.y = v.y + (float) StdRandom.gaussian(0.0, jitter);
+        v.z = v.z + (float) StdRandom.gaussian(0.0, jitter);
+    }
+
+    private float getJitter(float jitter) {
+        return (float) StdRandom.gaussian(0.0, jitter);
     }
 
     private IntArray detectWrappedUVCoordinates() {
@@ -161,8 +198,15 @@ public class IcoSphereCreator extends ModelCreator {
         return indices;
     }
 
-    public IcoSphereCreator create(float radius, int recursionLevel) {
-        return create(radius, recursionLevel, false);
+    public IcoSphereCreator create(float radius,
+                                   int recursionLevel) {
+        return create(radius, recursionLevel, false, 0f);
+    }
+
+    public IcoSphereCreator create(float radius,
+                                   int recursionLevel,
+                                   float jitter) {
+        return create(radius, recursionLevel, false, jitter);
     }
 
     /**
@@ -171,11 +215,15 @@ public class IcoSphereCreator extends ModelCreator {
      * @param radius      The radius of the sphere.
      * @param divisions   The number of divisions, it must be bigger than 0.
      * @param flipNormals Whether to flip normals or not.
+     * @param jitter      Jitter to add to the vertex positions. In [0,1].
      *
      * @return This creator
      */
-    public IcoSphereCreator create(float radius, int divisions, boolean flipNormals) {
-        return create(radius, divisions, flipNormals, false);
+    public IcoSphereCreator create(float radius,
+                                   int divisions,
+                                   boolean flipNormals,
+                                   float jitter) {
+        return create(radius, divisions, flipNormals, false, jitter);
     }
 
     /**
@@ -189,7 +237,11 @@ public class IcoSphereCreator extends ModelCreator {
      *
      * @return This creator
      */
-    public IcoSphereCreator create(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
+    public IcoSphereCreator create(float radius,
+                                   int divisions,
+                                   boolean flipNormals,
+                                   boolean hardEdges,
+                                   float jitter) {
         if (divisions < 1)
             throw new AssertionError("Recursion level must be greater than 0");
         this.flipNormals = flipNormals;
@@ -199,20 +251,20 @@ public class IcoSphereCreator extends ModelCreator {
         // create 12 vertices of a icosahedron
         float t = (float) ((1.0 + FastMath.sqrt(5.0)) / 2.0);
 
-        vertex(new Vector3(-1, t, 0), radius);
-        vertex(new Vector3(1, t, 0), radius);
-        vertex(new Vector3(-1, -t, 0), radius);
-        vertex(new Vector3(1, -t, 0), radius);
+        vertex(new Vector3(-1, t, 0), radius, jitter);
+        vertex(new Vector3(1, t, 0), radius, jitter);
+        vertex(new Vector3(-1, -t, 0), radius, jitter);
+        vertex(new Vector3(1, -t, 0), radius, jitter);
 
-        vertex(new Vector3(0, -1, t), radius);
-        vertex(new Vector3(0, 1, t), radius);
-        vertex(new Vector3(0, -1, -t), radius);
-        vertex(new Vector3(0, 1, -t), radius);
+        vertex(new Vector3(0, -1, t), radius, jitter);
+        vertex(new Vector3(0, 1, t), radius, jitter);
+        vertex(new Vector3(0, -1, -t), radius, jitter);
+        vertex(new Vector3(0, 1, -t), radius, jitter);
 
-        vertex(new Vector3(t, 0, -1), radius);
-        vertex(new Vector3(t, 0, 1), radius);
-        vertex(new Vector3(-t, 0, -1), radius);
-        vertex(new Vector3(-t, 0, 1), radius);
+        vertex(new Vector3(t, 0, -1), radius, jitter);
+        vertex(new Vector3(t, 0, 1), radius, jitter);
+        vertex(new Vector3(-t, 0, -1), radius, jitter);
+        vertex(new Vector3(-t, 0, 1), radius, jitter);
 
         // create 20 triangles of the icosahedron
         List<IFace> faces = new ArrayList<>();
@@ -248,15 +300,15 @@ public class IcoSphereCreator extends ModelCreator {
         // refine triangles
         for (int i = 1; i < divisions; i++) {
             List<IFace> faces2 = new ArrayList<>();
-            for (IFace tri : faces) {
+            for (IFace face : faces) {
                 // replace triangle by 4 triangles
-                int a = getMiddlePoint(tri.v()[0], tri.v()[1], radius);
-                int b = getMiddlePoint(tri.v()[1], tri.v()[2], radius);
-                int c = getMiddlePoint(tri.v()[2], tri.v()[0], radius);
+                int a = getMiddlePoint(face.v()[0], face.v()[1], radius, jitter);
+                int b = getMiddlePoint(face.v()[1], face.v()[2], radius, jitter);
+                int c = getMiddlePoint(face.v()[2], face.v()[0], radius, jitter);
 
-                addFace(faces2, flipNormals, tri.v()[0], a, c);
-                addFace(faces2, flipNormals, tri.v()[1], b, a);
-                addFace(faces2, flipNormals, tri.v()[2], c, b);
+                addFace(faces2, flipNormals, face.v()[0], a, c);
+                addFace(faces2, flipNormals, face.v()[1], b, a);
+                addFace(faces2, flipNormals, face.v()[2], c, b);
                 addFace(faces2, flipNormals, a, b, c);
             }
             faces = faces2;
