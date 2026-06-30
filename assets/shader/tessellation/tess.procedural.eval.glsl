@@ -84,6 +84,7 @@ struct VertexData {
 // INPUT — gl_Position from control shader is MODEL-space
 in VertexData l_data[gl_MaxPatchVertices];
 #ifdef atmosphereGround
+uniform float fInnerRadius; /* The inner (planetary) radius*/
 in vec3 l_position[gl_MaxPatchVertices];
 #endif // atmosphereGround
 
@@ -178,7 +179,9 @@ void main(void) {
     #endif // reflectionCubemapFlag
 
     #ifdef atmosphereGround
-    o_position = u * l_position[0] + v * l_position[1] + w * l_position[2];
+        o_position = (u * l_position[0] + v * l_position[1] + w * l_position[2]);
+        // Add displacement
+        o_position = o_position * (1.0 + o_fragHeight / fInnerRadius);
     #endif
 
     #ifdef shadowMapFlag
