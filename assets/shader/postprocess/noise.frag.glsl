@@ -1,11 +1,13 @@
 // Noise generation shader.
 // Creates a noise pattern in the red channel for elevation, and another in the green channel for moisture.
 #version 330 core
+precision highp float;
 
 #include <shader/lib/luma.glsl>
 #include <shader/lib/noise/common.glsl>
 #include <shader/lib/noise/white.glsl>
 #include <shader/lib/noise/simplex.glsl>
+#include <shader/lib/noise/erosion.glsl>
 #include <shader/lib/noise/perlin.glsl>
 #include <shader/lib/noise/curl.glsl>
 #include <shader/lib/noise/voronoi.glsl>
@@ -51,9 +53,10 @@ uniform int u_channels;
 // Noise type
 // 0- PERLIN
 // 1- SIMPLEX
-// 2- VORONOI
-// 3- CURL
-// 4- WHITE
+// 2- EROSION
+// 3- VORONOI
+// 4- CURL
+// 5- WHITE
 uniform int u_type;
 
 
@@ -72,7 +75,8 @@ float terraces(float h, int n_terraces, float smoothness) {
     return (round(h) + 0.5 * clamp(pow(2.0 * (h - round(h)), smoothness), 0.0, 1.0)) / n_terraces;
 }
 
-float noise(vec3 p,
+float noise(vec2 uv,
+            vec3 p,
             int type,
             float power,
             bool ridge,
@@ -114,6 +118,12 @@ float noise(vec3 p,
     } else if (type == 4) {
         // WHITE
         value = gln_wfbm(p, opts);
+        
+    } else if (type == 5) {
+        // EROSION
+        // We use UV coordinates!
+        value = gln_efbm(uv * scale.x, opts);
+
     }
 
     // Set in range.
@@ -142,7 +152,8 @@ void main() {
         sin(phi)
     );
 
-    float val_ch1 = noise(p, u_type, u_power, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_range, u_seed);
+    vec2 uv = xy / u_viewport.x;
+    float val_ch1 = noise(uv, p, u_type, u_power, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_range, u_seed);
 
     if (u_channels <= 1) {
         // Channel 1 (elevation).
@@ -150,13 +161,13 @@ void main() {
 
     } else {
         // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, 1.0, u_ridge, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 2.023);
+        float val_ch2 = noise(uv, p, 0, 1.0, u_ridge, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 2.023);
         if (u_channels == 2) {
             // Channel 2 (moisture).
             fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
         } else {
             // Channel 3 (temperature).
-            float val_ch3 = noise(p, u_type, 2.0, false, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 1.4325);
+            float val_ch3 = noise(uv, p, u_type, 2.0, false, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 1.4325);
             fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
         }
     }
@@ -164,9 +175,9 @@ void main() {
     #ifdef extraTarget
     // Generate emission pattern with white channel.
     // High-scale: voronoi.
-    float voronoi = noise(p, 2, 1.0, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
+    float voronoi = noise(uv, p, 2, 1.0, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
     // Low-scale: regular noise.
-    float val_ch4 = noise(p, u_type, 1.7, false, 0, 0.0, u_scale, u_octaves, vec2(-0.4, 1.0), u_seed + 1.4325);
+    float val_ch4 = noise(uv, p, u_type, 1.7, false, 0, 0.0, u_scale, u_octaves, vec2(-0.4, 1.0), u_seed + 1.4325);
     val_ch4 = voronoi * step(0.1, val_ch1) * val_ch4;
     emissionColor = vec4(val_ch4, val_ch4 * 0.8, val_ch4 * 0.6, 1.0);
     #endif // extraTarget

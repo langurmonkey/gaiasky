@@ -57,10 +57,11 @@ public final class NoiseFilter extends Filter<NoiseFilter> {
      *   <li>Voronoi</li>
      *   <li>Curl</li>
      *   <li>White</li>
+     *   <li>Erosion</li>
      * </ol>
      */
     public enum NoiseType {
-        PERLIN, SIMPLEX, VORONOI, CURL, WHITE
+        PERLIN, SIMPLEX, VORONOI, CURL, WHITE, EROSION
     }
 
     private NoiseType type = NoiseType.SIMPLEX;
