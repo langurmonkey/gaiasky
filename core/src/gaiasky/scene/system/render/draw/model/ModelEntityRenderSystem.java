@@ -588,6 +588,9 @@ public class ModelEntityRenderSystem {
             if (shadow) {
                 prepareShadowEnvironment(model, scaffolding);
             }
+            if (renderGroup == RenderGroup.MODEL_PROCEDURAL_TESS) {
+                model.model.updateProceduralAttributes();
+            }
             model.model.updateEclipsingBodyUniforms(entity);
             model.model.update(alpha * base.opacity, relativistic);
             model.model.updateSizeKm(body.size);

@@ -11,7 +11,7 @@ layout (triangles) in;
 
 // NOISE
 #include <shader/lib/noise/common.glsl>
-#include <shader/lib/noise/simplex.glsl>
+#include <shader/lib/noise/perlin.glsl>
 
 // SVT
 #ifdef svtCacheTextureFlag
@@ -48,12 +48,27 @@ uniform float u_elevationMultiplier;
 uniform float u_vrScale;
 
 // Noise options for elevation (height)
-uniform gln_tFBMOpts u_elevationOpts;
+uniform float u_elevationSeed;
+uniform float u_elevationAmplitude;
+uniform float u_elevationPersistence;
+uniform float u_elevationFrequency;
+uniform float u_elevationLacunarity;
+uniform vec3  u_elevationScale;
+uniform float u_elevationPower;
+uniform int   u_elevationOctaves;
+uniform bool  u_elevationTurbulence;
+uniform bool  u_elevationRidge;
 // Noise options for moisture
-uniform gln_tFBMOpts u_moistureOpts;
-// Noise options for temperature (optional)
-uniform gln_tFBMOpts u_temperatureOpts;
-uniform bool u_hasTemperature;
+uniform float u_moistureSeed;
+uniform float u_moistureAmplitude;
+uniform float u_moisturePersistence;
+uniform float u_moistureFrequency;
+uniform float u_moistureLacunarity;
+uniform vec3  u_moistureScale;
+uniform float u_moisturePower;
+uniform int   u_moistureOctaves;
+uniform bool  u_moistureTurbulence;
+uniform bool  u_moistureRidge;
 
 // Water level: everything at or below this elevation is water
 uniform float u_waterLevel;
@@ -104,25 +119,29 @@ out float o_fragTemperature;
 
 // --- Noise evaluation functions ---
 
-float evaluateElevation(vec3 modelPos) {
-    float n = gln_sfbm(modelPos, u_elevationOpts);
-    // Map from [-1,1] to [0,1]
-    n = gln_normalize(n);
+float evaluateElevation(vec3 point) {
+    gln_tFBMOpts opts = gln_tFBMOpts(
+            u_elevationSeed, u_elevationAmplitude, u_elevationPersistence,
+            u_elevationFrequency, u_elevationLacunarity, u_elevationScale,
+            u_elevationPower, u_elevationOctaves, u_elevationTurbulence,
+            u_elevationRidge
+    );
+    float elevation = clamp(gln_pfbm(point, opts), 0.0, 1.0);
     // Clamp water level: everything at or below u_waterLevel becomes flat water
-    if (n <= u_waterLevel) {
-        n = u_waterLevel;
+    if (elevation <= u_waterLevel) {
+        elevation = u_waterLevel;
     }
-    return n;
+    return elevation;
 }
 
-float evaluateMoisture(vec3 modelPos) {
-    float n = gln_sfbm(modelPos, u_moistureOpts);
-    return gln_normalize(n);
-}
-
-float evaluateTemperature(vec3 modelPos) {
-    float n = gln_sfbm(modelPos, u_temperatureOpts);
-    return gln_normalize(n);
+float evaluateMoisture(vec3 point) {
+    gln_tFBMOpts opts = gln_tFBMOpts(
+            u_moistureSeed, u_moistureAmplitude, u_moisturePersistence,
+            u_moistureFrequency, u_moistureLacunarity, u_moistureScale,
+            u_moisturePower, u_moistureOctaves, u_moistureTurbulence,
+            u_moistureRidge
+    );
+    return gln_pfbm(point, opts);
 }
 
 void main(void) {
@@ -135,9 +154,9 @@ void main(void) {
 
     // Interpolate other attributes
     o_data.texCoords = u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords;
-    o_data.normal = normalize(u * l_data[0].normal + v * l_data[1].normal + w * l_data[2].normal);
+    o_data.normal = normalize(modelPos);
 
-    // --- Procedural height ---
+    // Procedural height
     float elevation = evaluateElevation(modelPos);
     o_fragElevation = elevation;
     o_fragHeight = elevation * u_heightScale * u_elevationMultiplier;
@@ -146,13 +165,8 @@ void main(void) {
     vec3 dh = o_data.normal * o_fragHeight;
     vec4 pos = vec4(modelPos + dh, 1.0);
 
-    // --- Moisture ---
+    // Moisture
     o_fragMoisture = evaluateMoisture(modelPos);
-
-    // --- Temperature (optional) ---
-    #ifdef temperatureFlag
-    o_fragTemperature = evaluateTemperature(modelPos);
-    #endif
 
     // Apply world transform AFTER noise evaluation and displacement
     pos = u_worldTrans * pos;

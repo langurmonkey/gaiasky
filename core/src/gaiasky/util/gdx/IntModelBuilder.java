@@ -632,7 +632,7 @@ public class IntModelBuilder {
      * Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
      *
-     * @param material
+     * @param material      The material instance.
      * @param capLength     is the height of the cap in percentage, must be in (0,1)
      * @param stemThickness is the percentage of stem diameter compared to cap diameter,
      *                      must be in (0,1]
@@ -735,20 +735,8 @@ public class IntModelBuilder {
     public IntModel createIcoSphere(float radius, int recursion, boolean flipNormals, boolean hardEdges, int primitiveType, Material material, Bits attributes) {
         begin();
         int nfaces = (int) (10 * FastMath.pow(2, 2 * recursion - 1));
-        if (nfaces * 3 <= Integer.MAX_VALUE) {
-            // All in one part
-            part("icosphere", primitiveType, attributes, material).icosphere(radius, recursion, flipNormals, hardEdges);
-        } else {
-            // Separate in more than one part
-            int maxfaces = Integer.MAX_VALUE / 3;
-            int chunks = nfaces / maxfaces + 1;
-            for (int i = 0; i < chunks; i++) {
-                // Chunk i
-                int startFace = i * maxfaces;
-                part("icosphere", primitiveType, attributes, material).icosphere(radius, recursion, flipNormals, hardEdges, startFace, maxfaces);
-            }
-
-        }
+        // All in one part
+        part("icosphere", primitiveType, attributes, material).icosphere(radius, recursion, flipNormals, hardEdges);
         return end();
     }
 

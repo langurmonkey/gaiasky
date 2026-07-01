@@ -31,6 +31,11 @@ public class Vector3Attribute extends Attribute {
     public static final String O3InvWavelengthAlias = "o3InvWavelength";
     public static final int O3InvWavelength = register(O3InvWavelengthAlias);
 
+    public static final String ElevationScaleAlias = "elevationScale";
+    public static final int ElevationScale = register(ElevationScaleAlias);
+    public static final String MoistureScaleAlias = "moistureScale";
+    public static final int MoistureScale = register(MoistureScaleAlias);
+
     public static final String EclipsingBodyPosAlias = "eclipsingBodyPos";
     public static final int EclipsingBodyPos = register(EclipsingBodyPosAlias);
 
@@ -62,6 +67,13 @@ public class Vector3Attribute extends Attribute {
     public Vector3Attribute(int index, Vector3 value) {
         super(index);
         this.value = value;
+    }
+    public Vector3Attribute(int index, double[] value) {
+        super(index);
+        this.value = new Vector3();
+        this.value.x = (float) value[0];
+        this.value.y = (float) value[1];
+        this.value.z = (float) value[2];
     }
 
     @Override

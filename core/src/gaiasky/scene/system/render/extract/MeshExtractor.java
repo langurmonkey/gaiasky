@@ -9,7 +9,6 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 
@@ -31,7 +30,7 @@ public class MeshExtractor extends AbstractExtractSystem {
         if (mustRender(base)) {
             switch (mesh.shading) {
                 case ADDITIVE -> addToRender(render, RenderGroup.MODEL_VERT_ADDITIVE);
-                case REGULAR -> addToRender(render, RenderGroup.MODEL_PIX_EARLY);
+                case REGULAR -> addToRender(render, RenderGroup.MODEL_PBR_EARLY);
                 case DUST -> addToRender(render, RenderGroup.MODEL_PIX_DUST);
             }
 

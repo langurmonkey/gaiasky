@@ -71,6 +71,38 @@ public class FloatAttribute extends Attribute {
     public static final String Generic2Alias = "generic2";
     public static final int Generic2 = register(Generic2Alias);
 
+    // Elevation noise
+    public static final String ElevationSeedAlias = "elevationSeed";
+    public static final int ElevationSeed = register(ElevationSeedAlias);
+    public static final String ElevationAmplitudeAlias = "elevationAmplitude";
+    public static final int ElevationAmplitude = register(ElevationAmplitudeAlias);
+    public static final String ElevationPersistenceAlias = "elevationPersistence";
+    public static final int ElevationPersistence = register(ElevationPersistenceAlias);
+    public static final String ElevationFrequencyAlias = "elevationFrequency";
+    public static final int ElevationFrequency = register(ElevationFrequencyAlias);
+    public static final String ElevationLacunarityAlias = "elevationLacunarity";
+    public static final int ElevationLacunarity = register(ElevationLacunarityAlias);
+    public static final String ElevationPowerAlias = "elevationPower";
+    public static final int ElevationPower = register(ElevationPowerAlias);
+
+    // Moisture noise
+    public static final String MoistureSeedAlias = "moistureSeed";
+    public static final int MoistureSeed = register(MoistureSeedAlias);
+    public static final String MoistureAmplitudeAlias = "moistureAmplitude";
+    public static final int MoistureAmplitude = register(MoistureAmplitudeAlias);
+    public static final String MoisturePersistenceAlias = "moisturePersistence";
+    public static final int MoisturePersistence = register(MoisturePersistenceAlias);
+    public static final String MoistureFrequencyAlias = "moistureFrequency";
+    public static final int MoistureFrequency = register(MoistureFrequencyAlias);
+    public static final String MoistureLacunarityAlias = "moistureLacunarity";
+    public static final int MoistureLacunarity = register(MoistureLacunarityAlias);
+    public static final String MoisturePowerAlias = "moisturePower";
+    public static final int MoisturePower = register(MoisturePowerAlias);
+
+    public static final String WaterLevelAlias = "waterLevel";
+    public static final int WaterLevel = register(WaterLevelAlias);
+
+
     public float value;
 
     public FloatAttribute(int index) {

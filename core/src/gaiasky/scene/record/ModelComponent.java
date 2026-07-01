@@ -564,6 +564,39 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
+    public void updateProceduralAttributes() {
+        var nc = mtc.nc;
+
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            setFloatAttribute(mat, FloatAttribute.WaterLevel, 0.1f);
+            setFloatAttribute(mat, FloatAttribute.HeightScale, mtc.heightScale * 10.0f);
+
+            setFloatAttribute(mat, FloatAttribute.ElevationSeed, nc.seed);
+            setFloatAttribute(mat, FloatAttribute.ElevationAmplitude, (float) nc.amplitude);
+            setFloatAttribute(mat, FloatAttribute.ElevationPersistence, (float) nc.persistence);
+            setFloatAttribute(mat, FloatAttribute.ElevationFrequency, (float) nc.frequency);
+            setFloatAttribute(mat, FloatAttribute.ElevationLacunarity, (float) nc.lacunarity);
+            setFloatAttribute(mat, FloatAttribute.ElevationPower, (float) nc.power);
+            setIntAttribute(mat, IntAttribute.ElevationOctaves, nc.octaves);
+            setBoolAttribute(mat, IntAttribute.ElevationRidge, nc.ridge);
+            setBoolAttribute(mat, IntAttribute.ElevationTurbulence, nc.turbulence);
+            setVector3Attribute(mat, Vector3Attribute.ElevationScale, nc.scale);
+
+            setFloatAttribute(mat, FloatAttribute.MoistureSeed, 321f);
+            setFloatAttribute(mat, FloatAttribute.MoistureAmplitude, 1.0f);
+            setFloatAttribute(mat, FloatAttribute.MoisturePersistence, 0.5f);
+            setFloatAttribute(mat, FloatAttribute.MoistureFrequency, 1.0f);
+            setFloatAttribute(mat, FloatAttribute.MoistureLacunarity, 2.0f);
+            setFloatAttribute(mat, FloatAttribute.MoisturePower, 1.0f);
+            setIntAttribute(mat, IntAttribute.MoistureOctaves, 3);
+            setIntAttribute(mat, IntAttribute.MoistureRidge, 1);
+            setIntAttribute(mat, IntAttribute.MoistureTurbulence, 1);
+            setVector3Attribute(mat, Vector3Attribute.MoistureScale, aux.set(3, 3, 3));
+        }
+    }
+
     private boolean sizeSet = false;
 
     public void updateSizeKm(double sizeInternal) {
@@ -761,6 +794,16 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
+    public void setBoolAttribute(Material mat,
+                                 int attribute,
+                                 boolean value) {
+        if (!mat.has(attribute)) {
+            mat.set(new IntAttribute(attribute, value ? 1 : 0));
+        } else {
+            ((IntAttribute) Objects.requireNonNull(mat.get(attribute))).value = value ? 1 : 0;
+        }
+    }
+
     public void setFloatAttribute(Material mat,
                                   int attribute,
                                   float value) {
@@ -778,6 +821,18 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             mat.set(new Vector3Attribute(attribute, value));
         } else {
             ((Vector3Attribute) Objects.requireNonNull(mat.get(attribute))).value.set(value);
+        }
+    }
+    public void setVector3Attribute(Material mat,
+                                    int attribute,
+                                    double[] value) {
+        if (!mat.has(attribute)) {
+            mat.set(new Vector3Attribute(attribute, value));
+        } else {
+            var val = ((Vector3Attribute) Objects.requireNonNull(mat.get(attribute))).value;
+            val.x = (float) value[0];
+            val.y = (float) value[1];
+            val.z = (float) value[2];
         }
     }
 
@@ -1171,7 +1226,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
-    public void updateTimes(double sessionTime, double simuTime) {
+    public void updateTimes(double sessionTime,
+                            double simuTime) {
         updateSessionTime(sessionTime);
         updateSimuTime(simuTime);
     }

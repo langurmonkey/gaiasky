@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static gaiasky.render.RenderGroup.MODEL_PIX;
-import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
+import static gaiasky.render.RenderGroup.MODEL_PBR;
+import static gaiasky.render.RenderGroup.MODEL_PBR_TESS;
 
 /**
  * Render pass for the sparse virtual textures. The operation is distributed over 5 consecutive frames
@@ -142,7 +142,7 @@ public class SVTRenderPass extends RenderPass {
         });
     }
 
-    private final RenderGroup[] renderGroups = new RenderGroup[]{MODEL_PIX, MODEL_PIX_TESS};
+    private final RenderGroup[] renderGroups = new RenderGroup[]{MODEL_PBR, MODEL_PBR_TESS};
 
     /**
      * We distribute the operation into five frames to distribute the load a bit.

@@ -41,7 +41,7 @@ public enum RenderGroup {
     /**
      * PBR, per-pixel lighting (early in the rendering pipeline).
      **/
-    MODEL_PIX_EARLY(600),
+    MODEL_PBR_EARLY(600),
     /**
      * Per-vertex lighting (early in the rendering pipeline).
      **/
@@ -89,11 +89,11 @@ public enum RenderGroup {
     /**
      * PBR, per-pixel lighting.
      **/
-    MODEL_PIX(1800),
+    MODEL_PBR(1800),
     /**
      * Tessellated model.
      **/
-    MODEL_PIX_TESS(1900),
+    MODEL_PBR_TESS(1900),
     /**
      * Procedural generation with tessellation.
      */
@@ -113,7 +113,7 @@ public enum RenderGroup {
     /**
      * Using normal shader for per-pixel lighting, rendered late for items with transparency.
      **/
-    MODEL_PIX_TRANSPARENT(2120),
+    MODEL_PBR_TRANSPARENT(2120),
     /**
      * Label.
      **/
