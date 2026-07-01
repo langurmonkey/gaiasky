@@ -171,12 +171,10 @@ void main(void){
     float w = gl_TessCoord.z;
 
     vec4 pos = (u * gl_in[0].gl_Position +
-    v * gl_in[1].gl_Position +
-    w * gl_in[2].gl_Position);
+                v * gl_in[1].gl_Position +
+                w * gl_in[2].gl_Position);
 
     o_data.texCoords = (u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords);
-
-    // Normal to apply height
     o_data.normal = normalize(u * l_data[0].normal + v * l_data[1].normal + w * l_data[2].normal);
 
     // Use height texture to move vertex along normal.

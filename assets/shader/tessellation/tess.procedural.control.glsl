@@ -76,11 +76,10 @@ void main(){
     #define id gl_InvocationID
     float level = 0;
     if(id == 0){
-        // Use model-space positions from gl_in[].gl_Position
-        // (these are model-space since vertex shader does not apply u_worldTrans)
-        vec3 m0 = gl_in[0].gl_Position.xyz;
-        vec3 m1 = gl_in[1].gl_Position.xyz;
-        vec3 m2 = gl_in[2].gl_Position.xyz;
+        // We need the world-space coordinates here!
+        vec3 m0 = v_data[0].fragPosWorld;
+        vec3 m1 = v_data[1].fragPosWorld;
+        vec3 m2 = v_data[2].fragPosWorld;
 
         // OUTER
         gl_TessLevelOuter[2] = tessellationLevel(center(m0, m1));

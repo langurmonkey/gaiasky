@@ -1176,9 +1176,9 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public void randomizeAll(long seed,
                              double size) {
         // Type
-        setType("sphere");
+        setType("icosphere");
         // Parameters
-        setParams(createUVSphereParameters(1000, 1.0, false));
+        setParams(createIcoSphereParameters(10, 1.0, false));
         // Material
         MaterialComponent mtc = new MaterialComponent();
         // Randomize material.
