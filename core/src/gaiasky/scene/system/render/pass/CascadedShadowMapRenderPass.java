@@ -28,8 +28,8 @@ import gaiasky.util.math.Vector3Q;
 
 import java.util.List;
 
-import static gaiasky.render.RenderGroup.MODEL_PIX;
-import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
+import static gaiasky.render.RenderGroup.MODEL_PBR;
+import static gaiasky.render.RenderGroup.MODEL_PBR_TESS;
 
 public class CascadedShadowMapRenderPass extends RenderPass {
     /** Number of cascade buffers. */
@@ -75,8 +75,8 @@ public class CascadedShadowMapRenderPass extends RenderPass {
         var renderAssets = sceneRenderer.getRenderAssets();
 
         // Get models.
-        List<IRenderable> models = sceneRenderer.getRenderListsFull().get(MODEL_PIX.ordinal());
-        List<IRenderable> modelsTess = sceneRenderer.getRenderListsFull().get(MODEL_PIX_TESS.ordinal());
+        List<IRenderable> models = sceneRenderer.getRenderListsFull().get(MODEL_PBR.ordinal());
+        List<IRenderable> modelsTess = sceneRenderer.getRenderListsFull().get(MODEL_PBR_TESS.ordinal());
 
         // Prepare base light camera: direction and up.
         IFocus l = camera.getCloseLightSource(0);
@@ -136,7 +136,7 @@ public class CascadedShadowMapRenderPass extends RenderPass {
             var entity = ((Render) r).entity;
             var model = Mapper.model.get(entity);
             if (model.model.hasPointLight(0)) {
-                modelRenderer.render(entity, batch, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                modelRenderer.render(entity, batch, camera, 1, 0, null, RenderGroup.MODEL_PBR, false);
                 // Set properties to environment.
                 model.model.env.set(cascadeShadowMap.attribute);
                 model.model.env.shadowMap = light;

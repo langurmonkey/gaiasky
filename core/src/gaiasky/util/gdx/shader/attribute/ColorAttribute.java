@@ -81,68 +81,92 @@ public class ColorAttribute extends Attribute {
         this(copyFrom.index, copyFrom.color);
     }
 
-    public final static ColorAttribute createAmbient(Color color) {
+    public static ColorAttribute createAmbient(Color color) {
         return new ColorAttribute(Ambient, color);
     }
 
-    public final static ColorAttribute createAmbient(float r, float g, float b, float a) {
+    public static ColorAttribute createAmbient(float r,
+                                               float g,
+                                               float b,
+                                               float a) {
         return new ColorAttribute(Ambient, r, g, b, a);
     }
 
-    public final static ColorAttribute createDiffuse(Color color) {
+    public static ColorAttribute createDiffuse(Color color) {
         return new ColorAttribute(Diffuse, color);
     }
 
-    public final static ColorAttribute createDiffuse(float r, float g, float b, float a) {
+    public static ColorAttribute createDiffuse(float r,
+                                               float g,
+                                               float b,
+                                               float a) {
         return new ColorAttribute(Diffuse, r, g, b, a);
     }
 
-    public final static ColorAttribute createSpecular(Color color) {
+    public static ColorAttribute createSpecular(Color color) {
         return new ColorAttribute(Specular, color);
     }
 
-    public final static ColorAttribute createSpecular(float r, float g, float b, float a) {
+    public static ColorAttribute createSpecular(float r,
+                                                float g,
+                                                float b,
+                                                float a) {
         return new ColorAttribute(Specular, r, g, b, a);
     }
 
-    public final static ColorAttribute createMetallic(Color color) {
+    public static ColorAttribute createMetallic(Color color) {
         return new ColorAttribute(Metallic, color);
     }
 
-    public final static ColorAttribute createMetallic(float r, float g, float b, float a) {
+    public static ColorAttribute createMetallic(float r,
+                                                float g,
+                                                float b,
+                                                float a) {
         return new ColorAttribute(Metallic, r, g, b, a);
     }
 
-    public final static ColorAttribute createRoughness(Color color) {
+    public static ColorAttribute createRoughness(Color color) {
         return new ColorAttribute(Roughness, color);
     }
 
-    public final static ColorAttribute createRoughness(float r, float g, float b, float a) {
+    public static ColorAttribute createRoughness(float r,
+                                                 float g,
+                                                 float b,
+                                                 float a) {
         return new ColorAttribute(Roughness, r, g, b, a);
     }
 
 
-    public final static ColorAttribute createEmissive(Color color) {
+    public static ColorAttribute createEmissive(Color color) {
         return new ColorAttribute(Emissive, color);
     }
 
-    public final static ColorAttribute createEmissive(float r, float g, float b, float a) {
+    public static ColorAttribute createEmissive(float r,
+                                                float g,
+                                                float b,
+                                                float a) {
         return new ColorAttribute(Emissive, r, g, b, a);
     }
 
-    public final static ColorAttribute createAmbientLight(Color color) {
+    public static ColorAttribute createAmbientLight(Color color) {
         return new ColorAttribute(AmbientLight, color);
     }
 
-    public final static ColorAttribute createAmbientLight(float r, float g, float b, float a) {
+    public static ColorAttribute createAmbientLight(float r,
+                                                    float g,
+                                                    float b,
+                                                    float a) {
         return new ColorAttribute(AmbientLight, r, g, b, a);
     }
 
-    public final static ColorAttribute createFog(Color color) {
+    public static ColorAttribute createFog(Color color) {
         return new ColorAttribute(Fog, color);
     }
 
-    public final static ColorAttribute createFog(float r, float g, float b, float a) {
+    public static ColorAttribute createFog(float r,
+                                           float g,
+                                           float b,
+                                           float a) {
         return new ColorAttribute(Fog, r, g, b, a);
     }
 

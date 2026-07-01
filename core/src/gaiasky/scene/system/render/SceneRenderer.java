@@ -290,14 +290,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                                    MODEL_VERT_ADDITIVE,
                                                                    alphas,
                                                                    renderAssets.mbSimpleAdditive);
-            case MODEL_PIX_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY (meses)
-                    system = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPBR);
+            case MODEL_PBR_EARLY -> // MODEL PER-PIXEL-LIGHTING EARLY (meses)
+                    system = new ModelRenderer(this, MODEL_PBR_EARLY, alphas, renderAssets.mbPBR);
             case MODEL_DIFFUSE -> system = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
-            case MODEL_PIX -> // MODEL PER-PIXEL-LIGHTING
-                    system = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPBR);
-            case MODEL_PIX_TESS -> {
+            case MODEL_PBR -> // MODEL PER-PIXEL-LIGHTING
+                    system = new ModelRenderer(this, MODEL_PBR, alphas, renderAssets.mbPBR);
+            case MODEL_PBR_TESS -> {
                 // MODEL PER-PIXEL-LIGHTING-TESSELLATION
-                system = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPBRTessellation);
+                system = new TessellationRenderer(this, MODEL_PBR_TESS, alphas, renderAssets.mbPBRTessellation);
                 system.addPreRunnables(regularBlendR, depthTestR);
             }
             case MODEL_PROCEDURAL_TESS -> {
@@ -419,8 +419,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     };
             case MODEL_CLOUD -> // MODEL CLOUDS
                     system = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
-            case MODEL_PIX_TRANSPARENT -> // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
-                    system = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPBR);
+            case MODEL_PBR_TRANSPARENT -> // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
+                    system = new ModelRenderer(this, MODEL_PBR_TRANSPARENT, alphas, renderAssets.mbPBR);
             case LINE_LATE -> {
                 // LINE LATE (TRANSPARENCIES)
                 system = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineCpuShaders);

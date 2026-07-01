@@ -38,7 +38,7 @@ import net.jafama.FastMath;
 
 import java.util.*;
 
-import static gaiasky.render.RenderGroup.MODEL_PIX;
+import static gaiasky.render.RenderGroup.MODEL_PBR;
 
 public class ShadowMapRenderPass extends RenderPass {
     /** Number of *shadow casting* lights supported. */
@@ -216,7 +216,7 @@ public class ShadowMapRenderPass extends RenderPass {
             // No tessellation
             renderAssets.mbPBRDepth.begin(cameraLightGlobal);
             for (var entity : candidates) {
-                modelRenderer.render(((Render) entity).entity, renderAssets.mbPBRDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                modelRenderer.render(((Render) entity).entity, renderAssets.mbPBRDepth, camera, 1, 0, null, RenderGroup.MODEL_PBR, false);
             }
             renderAssets.mbPBRDepth.end();
 
@@ -293,7 +293,7 @@ public class ShadowMapRenderPass extends RenderPass {
 
                 // No tessellation
                 renderAssets.mbPBRDepth.begin(cameraLightIndividual);
-                modelRenderer.render(candidate, renderAssets.mbPBRDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+                modelRenderer.render(candidate, renderAssets.mbPBRDepth, camera, 1, 0, null, RenderGroup.MODEL_PBR, false);
                 renderAssets.mbPBRDepth.end();
 
                 // Save frame buffer and combined matrix
@@ -402,7 +402,7 @@ public class ShadowMapRenderPass extends RenderPass {
 
                 // Tessellation
                 renderAssets.mbPBRTessellationDepth.begin(cameraLightIndividual);
-                modelRenderer.render(candidate, renderAssets.mbPBRTessellationDepth, camera, 1, 0, rc, RenderGroup.MODEL_PIX, true);
+                modelRenderer.render(candidate, renderAssets.mbPBRTessellationDepth, camera, 1, 0, rc, RenderGroup.MODEL_PBR, true);
                 renderAssets.mbPBRTessellationDepth.end();
 
                 // Save frame buffer and combined matrix
@@ -432,7 +432,7 @@ public class ShadowMapRenderPass extends RenderPass {
          */
         // Normal models: PIX and PIX_TRANSPARENT.
         var renderListsFull = sceneRenderer.getRenderListsFull();
-        List<IRenderable> models = renderListsFull.get(MODEL_PIX.ordinal());
+        List<IRenderable> models = renderListsFull.get(MODEL_PBR.ordinal());
         //models.addAll(renderListsFull.get(MODEL_PIX_TRANSPARENT.ordinal()));
 
         // TESSELLATED MODELS.

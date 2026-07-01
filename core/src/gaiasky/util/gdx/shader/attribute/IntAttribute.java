@@ -10,8 +10,25 @@ package gaiasky.util.gdx.shader.attribute;
 public class IntAttribute extends Attribute {
     public static final String CullFaceAlias = "cullface";
     public static final int CullFace = register(CullFaceAlias);
+
     public static final String EclipseOutlinesAlias = "eclipseOutlines";
     public static final int EclipseOutlines = register(EclipseOutlinesAlias);
+
+
+    public static final String ElevationOctavesAlias = "elevationOctaves";
+    public static final int ElevationOctaves = register(ElevationOctavesAlias);
+    public static final String MoistureOctavesAlias = "moistureOctaves";
+    public static final int MoistureOctaves = register(MoistureOctavesAlias);
+
+    public static final String ElevationTurbulenceAlias = "elevationTurbulence";
+    public static final int ElevationTurbulence = register(ElevationTurbulenceAlias);
+    public static final String ElevationRidgeAlias = "elevationRidge";
+    public static final int ElevationRidge = register(ElevationRidgeAlias);
+    public static final String MoistureTurbulenceAlias = "moistureTurbulence";
+    public static final int MoistureTurbulence = register(MoistureTurbulenceAlias);
+    public static final String MoistureRidgeAlias = "moistureRidge";
+    public static final int MoistureRidge = register(MoistureRidgeAlias);
+
     public int value;
 
     public IntAttribute(int index) {

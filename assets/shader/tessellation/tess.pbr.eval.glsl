@@ -165,17 +165,16 @@ out float o_fragHeight;
     }
 #endif // heightTexture/Cubemap/SVT
 
-void main(void) {
+void main(void){
     float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
     float w = gl_TessCoord.z;
 
-    // Fetch pos in world coordinates
     vec4 pos = (u * gl_in[0].gl_Position +
     v * gl_in[1].gl_Position +
     w * gl_in[2].gl_Position);
 
-    o_data.texCoords = u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords;
+    o_data.texCoords = (u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords);
 
     // Normal to apply height
     o_data.normal = normalize(u * l_data[0].normal + v * l_data[1].normal + w * l_data[2].normal);
@@ -184,24 +183,32 @@ void main(void) {
     float h = fetchHeight(o_data.texCoords).r;
     o_fragHeight = h * u_heightScale * u_elevationMultiplier;
     vec3 dh = o_data.normal * o_fragHeight;
-
     pos += vec4(dh, 0.0);
 
-    // To view space.
-    gl_Position = u_projViewTrans * pos;
+
+    #ifdef relativisticEffects
+        pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
+    #endif// relativisticEffects
+
+    #ifdef gravitationalWaves
+        pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    #endif// gravitationalWaves
+
+    vec4 gpos = u_projViewTrans * pos;
+    gl_Position = gpos;
 
     // Plumbing
     o_fragPosition = pos.xyz;
     #if !defined(normalTextureFlag) && !defined(normalCubemapFlag) && !defined(svtIndirectionNormalTextureFlag)
     o_normalTan = calcNormal(o_data.texCoords, vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y));
     #endif // !normalTextureFlag && !normalCubemapFlag && !normalSVT
-    o_data.opacity = u * l_data[0].opacity + v * l_data[1].opacity + w * l_data[2].opacity;
-    o_data.color = u * l_data[0].color + v * l_data[1].color + w * l_data[2].color;
-    o_data.viewDir = u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir;
-    o_data.fragPosWorld = u * l_data[0].fragPosWorld + v * l_data[1].fragPosWorld + w * l_data[2].fragPosWorld;
-    o_data.ambientLight = u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight;
+    o_data.opacity = (u * l_data[0].opacity + v * l_data[1].opacity + w * l_data[2].opacity);
+    o_data.color = (u * l_data[0].color + v * l_data[1].color + w * l_data[2].color);
+    o_data.viewDir = (u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir);
+    o_data.fragPosWorld = (u * l_data[0].fragPosWorld + v * l_data[1].fragPosWorld + w * l_data[2].fragPosWorld);
+    o_data.ambientLight = (u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight);
     #ifdef reflectionCubemapFlag
-        o_data.reflect = u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect;
+        o_data.reflect = (u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect);
     #endif // reflectionCubemapFlag
 
     #ifdef atmosphereGround
@@ -211,16 +218,16 @@ void main(void) {
     #endif
 
     #ifdef shadowMapFlag
-    o_data.shadowMapUv = u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv;
+        o_data.shadowMapUv = (u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv);
         #ifdef shadowMapGlobalFlag
-    o_data.shadowMapUvGlobal = u * l_data[0].shadowMapUvGlobal + v * l_data[1].shadowMapUvGlobal + w * l_data[2].shadowMapUvGlobal;
-        #endif
+            o_data.shadowMapUvGlobal = (u * l_data[0].shadowMapUvGlobal + v * l_data[1].shadowMapUvGlobal + w * l_data[2].shadowMapUvGlobal);
+        #endif // shadowMapGlobalFlag
         #ifdef numCSM
-    for (int i = 0; i < numCSM; i++) {
-        o_data.csmLightSpacePos[i] = u * l_data[0].csmLightSpacePos[i] + v * l_data[1].csmLightSpacePos[i] + w * l_data[2].csmLightSpacePos[i];
-    }
-        #endif
-    #endif
+            for (int i = 0; i < numCSM; i++) {
+                o_data.csmLightSpacePos[i] = (u * l_data[0].csmLightSpacePos[i] + v * l_data[1].csmLightSpacePos[i] + w * l_data[2].csmLightSpacePos[i]);
+            }
+        #endif // numCSM
+    #endif // shadowMapFlag
 
     o_data.tbn = (u * l_data[0].tbn + v * l_data[1].tbn + w * l_data[2].tbn);
 }

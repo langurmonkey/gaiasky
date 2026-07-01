@@ -123,7 +123,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                 // Atmosphere (only planets)
                 if (atmosphere != null &&
                         atmosphere.atmosphere != null &&
-                        isInRender(render, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) &&
+                        isInRender(render, RenderGroup.MODEL_PBR, RenderGroup.MODEL_PBR_TESS) &&
                         !coord.timeOverflow) {
                     addToRender(render, RenderGroup.MODEL_ATM);
                 }
@@ -131,7 +131,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                 // Cloud (only planets)
                 if (cloud != null &&
                         cloud.cloud != null &&
-                        isInRender(render, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) &&
+                        isInRender(render, RenderGroup.MODEL_PBR, RenderGroup.MODEL_PBR_TESS) &&
                         !coord.timeOverflow) {
                     addToRender(render, RenderGroup.MODEL_CLOUD);
                 }
@@ -146,10 +146,18 @@ public class ModelExtractor extends AbstractExtractSystem {
         if (rt != null && rt.renderGroup != null) {
             rg = rt.renderGroup;
         } else {
-            var transparency = model.model.hasIntrinsicTransparency();
-            rg = needsTessellation(model) ? RenderGroup.MODEL_PIX_TESS : (transparency ? RenderGroup.MODEL_PIX_TRANSPARENT : RenderGroup.MODEL_PIX);
+            if (isProcedural(model)) {
+                rg = RenderGroup.MODEL_PROCEDURAL_TESS;
+            } else {
+                var transparency = model.model.hasIntrinsicTransparency();
+                rg = needsTessellation(model) ? RenderGroup.MODEL_PBR_TESS : (transparency ? RenderGroup.MODEL_PBR_TRANSPARENT : RenderGroup.MODEL_PBR);
+            }
         }
         addToRender(render, rg);
+    }
+
+    private boolean isProcedural(Model model){
+        return model.model.mtc != null && model.model.mtc.nc != null;
     }
 
     private boolean needsTessellation(Model model) {

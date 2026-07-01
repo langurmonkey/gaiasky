@@ -95,8 +95,8 @@ public class LightGlowRenderPass extends RenderPass {
             }
 
             // Get all models.
-            List<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
-            List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
+            List<IRenderable> models = renderLists.get(MODEL_PBR.ordinal());
+            List<IRenderable> modelsTess = renderLists.get(MODEL_PBR_TESS.ordinal());
 
             // VR controllers.
             if (GaiaSky.settings().runtime.openXr) {
