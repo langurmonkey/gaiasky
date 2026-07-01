@@ -150,7 +150,9 @@ void main(void) {
     float w = gl_TessCoord.z;
 
     // Interpolate MODEL-space position from gl_in[].gl_Position
-    vec3 modelPos = u * gl_in[0].gl_Position.xyz + v * gl_in[1].gl_Position.xyz + w * gl_in[2].gl_Position.xyz;
+    vec3 modelPos = u * gl_in[0].gl_Position.xyz +
+                    v * gl_in[1].gl_Position.xyz +
+                    w * gl_in[2].gl_Position.xyz;
 
     // Interpolate other attributes
     o_data.texCoords = u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords;
@@ -186,7 +188,7 @@ void main(void) {
     o_data.opacity = u * l_data[0].opacity + v * l_data[1].opacity + w * l_data[2].opacity;
     o_data.color = u * l_data[0].color + v * l_data[1].color + w * l_data[2].color;
     o_data.viewDir = u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir;
-    o_data.fragPosWorld = u * l_data[0].fragPosWorld + v * l_data[1].fragPosWorld + w * l_data[2].fragPosWorld;
+    o_data.fragPosWorld = pos.xyz;
     o_data.ambientLight = u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight;
     #ifdef reflectionCubemapFlag
         o_data.reflect = u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect;

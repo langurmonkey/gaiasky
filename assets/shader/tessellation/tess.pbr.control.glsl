@@ -76,9 +76,14 @@ void main(){
     float level = 0;
     if(id == 0){
         // OUTER
-        gl_TessLevelOuter[2] = tessellationLevel(center(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz));
-        gl_TessLevelOuter[0] = tessellationLevel(center(gl_in[1].gl_Position.xyz, gl_in[2].gl_Position.xyz));
-        gl_TessLevelOuter[1] = tessellationLevel(center(gl_in[2].gl_Position.xyz, gl_in[0].gl_Position.xyz));
+        vec3 m0 = gl_in[0].gl_Position.xyz;
+        vec3 m1 = gl_in[1].gl_Position.xyz;
+        vec3 m2 = gl_in[2].gl_Position.xyz;
+
+        // OUTER
+        gl_TessLevelOuter[2] = tessellationLevel(center(m0, m1));
+        gl_TessLevelOuter[0] = tessellationLevel(center(m1, m2));
+        gl_TessLevelOuter[1] = tessellationLevel(center(m2, m0));
 
         // INNER
         level = tessellationLevel(center(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz, gl_in[2].gl_Position.xyz));
