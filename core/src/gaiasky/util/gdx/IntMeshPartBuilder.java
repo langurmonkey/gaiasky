@@ -243,6 +243,9 @@ public interface IntMeshPartBuilder {
     /** Add an octahedronsphere **/
     void octahedronsphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int startFace, int nfaces);
 
+    /** Add a cube sphere **/
+    void cubesphere(float radius, int divisions, boolean flipNormals, boolean hardEdges);
+
     /** Add a capsule */
     void capsule(float radius, float height, int divisions);
 

@@ -40,6 +40,21 @@ public sealed abstract class NamedComponent implements IComponent, Disposable pe
         params.put("flip", flip);
         return params;
     }
+    protected Map<String, Object> createOctahedronSphereParameters(long divisions, double diameter, boolean flip) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("divisions", divisions);
+        params.put("diameter", diameter);
+        params.put("flip", flip);
+        return params;
+    }
+
+    protected Map<String, Object> createCubeSphereParameters(long divisions, double diameter, boolean flip) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("divisions", divisions);
+        params.put("diameter", diameter);
+        params.put("flip", flip);
+        return params;
+    }
 
     protected double gaussian(Random rand, double mean, double sigma) {
         return rand.nextGaussian() * sigma + mean;

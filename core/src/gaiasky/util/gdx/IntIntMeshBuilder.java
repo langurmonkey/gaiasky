@@ -20,7 +20,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.Bits;
-import gaiasky.util.gdx.ModelCreator.IFace;
+import gaiasky.util.gdx.creators.*;
+import gaiasky.util.gdx.creators.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
 import net.jafama.FastMath;
@@ -1224,6 +1225,29 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             triangle(tri[0], tri[1], tri[2]);
         }
 
+    }
+
+    @Override
+    public void cubesphere(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
+        ensureTriangles(12 * divisions * divisions);
+        CubeSphereCreator csc = new CubeSphereCreator();
+        csc.create(radius, divisions, flipNormals);
+
+        for (IFace face : csc.faces) {
+            int[] tri = new int[3];
+            for (int i = 0; i < 3; i++) {
+                VertexInfo v = vertTmp1.set(
+                        csc.vertices.get(face.v()[i] - 1),
+                        csc.normals.get(face.n()[i] - 1),
+                        csc.tangents.get(face.t()[i] - 1),
+                        csc.binormals.get(face.b()[i] - 1),
+                        null,
+                        csc.uv.get(face.v()[i] - 1));
+                int idx = vertex(v);
+                tri[i] = idx;
+            }
+            triangle(tri[0], tri[1], tri[2]);
+        }
     }
 
     @Override

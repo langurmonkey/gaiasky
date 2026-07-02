@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util.gdx;
+package gaiasky.util.gdx.creators;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
+import gaiasky.util.gdx.IntIntMeshBuilder;
 import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;
 
 public class SphereCreator extends ModelCreator {

@@ -56,6 +56,13 @@ public class ModelCache {
                     model = mb.createIcoSphere(diameter / 2.0f, recursion, flip, false, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
+                case "cubesphere" -> {
+                    var divisions = ((Long) params.get("divisions")).intValue();
+                    var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
+                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    model = mb.createCubeSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
+                    modelCache.put(key, model);
+                }
                 case "octahedronsphere" -> {
                     var divisions = ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;

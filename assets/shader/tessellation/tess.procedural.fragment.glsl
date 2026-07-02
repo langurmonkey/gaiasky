@@ -128,7 +128,7 @@ void main() {
     //vec4 diffuse = texture(u_biomeLUT, vec2(moisture, 1.0 - elevation));
 
     vec4 diffuse;
-    if (elevation <= u_waterLevel + 0.001) {
+    if (elevation <= u_waterLevel + 0.0001) {
         // Blue
         diffuse = vec4(0.1, 0.12, 0.6, 1.0);
     } else {
@@ -138,8 +138,8 @@ void main() {
 
     // Specular: water is reflective
     vec3 specular = vec3(0.0);
-    if (elevation <= u_waterLevel + 0.001) {
-        specular = vec3(1.0); // Water is specular
+    if (elevation <= u_waterLevel + 0.0001) {
+        specular = vec3(0.5); // Water is specular
     }
 
     // TODO generate emissive

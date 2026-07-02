@@ -768,6 +768,31 @@ public class IntModelBuilder {
     }
 
     /**
+     * Convenience method to create a model with a single node containing a
+     * cube-sphere shape. The resources the Material might contain are not
+     * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
+     * the model.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
+     */
+    public IntModel createCubeSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, Material material, Bits attributes) {
+        return createCubeSphere(radius, divisions, flipNormals, hardEdges, GL20.GL_TRIANGLES, material, attributes);
+    }
+
+    /**
+     * Creates a cube-sphere.
+     *
+     * @return The model
+     */
+    public IntModel createCubeSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int primitiveType, Material material, Bits attributes) {
+        begin();
+        part("cubesphere", primitiveType, attributes, material).cubesphere(radius, divisions, flipNormals, hardEdges);
+        return end();
+    }
+
+    /**
      * Convenience method to create a ring model. The resources the Materials might contain are not
      * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
      * the model.
