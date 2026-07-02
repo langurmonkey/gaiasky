@@ -28,8 +28,6 @@ public class IcoSphereCreator extends ModelCreator {
 
     private Map<Long, Integer> middlePointIndexCache;
 
-    Vector3 aux1 = new Vector3(), aux2 = new Vector3();
-
     public IcoSphereCreator() {
         super();
         this.name = "Icosphere";
@@ -83,7 +81,9 @@ public class IcoSphereCreator extends ModelCreator {
         addJitter(p, jitter);
         p.nor();
 
-        addUV(p);
+        // No UV mapping for procedural planets — constant UV to avoid seams.
+        uv.add(new Vector2(0.5f, 0.5f));
+
         // Vertex is p times the radius
         vertices.add(p.scl(radius + getJitter(jitter)));
 
@@ -91,43 +91,13 @@ public class IcoSphereCreator extends ModelCreator {
         var normal = p.cpy().nor();
         normals.add(normal);
 
-        // Tangent.
-        aux1.set(normal).crs(Vector3.Z);
-        aux2.set(normal).crs(Vector3.Y);
-        var tangent = aux2;
-        if (aux1.len() > aux2.len()) {
-            tangent = aux1;
-        }
-        tangent = tangent.cpy().nor();
-        tangents.add(tangent);
-
-        // Binormal.
-        var binormal = aux1.set(normal).crs(tangent).cpy().nor();
-        binormals.add(binormal);
+        // Tangent and binormal are unused for procedural planets
+        // (the tessellation eval shader reconstructs TBN from geometry).
+        // Set them to identity to avoid any weird interpolations.
+        tangents.add(new Vector3(1.0f, 0.0f, 0.0f));
+        binormals.add(new Vector3(0.0f, 1.0f, 0.0f));
 
         return index++;
-    }
-
-    /**
-     * Implements the spherical UV mapping
-     *
-     * @param p The normalized point
-     */
-    protected void addUV(Vector3 p) {
-        // UV
-        float u = 0.5f + (float) (Math.atan2(p.z, p.y) / (Math.PI * 2.0));
-        float v = 0.5f - (float) (Math.asin(p.x) / FastMath.PI);
-
-        if (p.equals(new Vector3(1, 0, 0))) {
-            u = 0.5f;
-            v = 1f;
-        }
-        if (p.equals(new Vector3(-1, 0, 0))) {
-            u = 0.5f;
-            v = 0f;
-        }
-
-        uv.add(new Vector2(u, v));
     }
 
     private void addNormals() {

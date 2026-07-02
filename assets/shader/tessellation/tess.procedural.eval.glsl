@@ -154,14 +154,29 @@ void main(void) {
                     v * gl_in[1].gl_Position.xyz +
                     w * gl_in[2].gl_Position.xyz;
 
+    vec3 sphereNormal = normalize(modelPos);
+
     // Interpolate other attributes
     o_data.texCoords = u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords;
-    o_data.normal = normalize(modelPos);
+    o_data.normal = sphereNormal;
 
     // Procedural height
     float elevation = evaluateElevation(modelPos);
     o_fragElevation = elevation;
     o_fragHeight = elevation * u_heightScale * u_elevationMultiplier;
+
+    // Compute surface normal from noise displacement gradient
+    float eps = 0.001;
+    vec3 tangent = normalize(cross(sphereNormal, abs(sphereNormal.y) < 0.99
+        ? vec3(0.0, 1.0, 0.0)
+        : vec3(1.0, 0.0, 0.0)));
+    vec3 bitangent = cross(sphereNormal, tangent);
+    float h_t = evaluateElevation(modelPos + tangent * eps);
+    float h_b = evaluateElevation(modelPos + bitangent * eps);
+    float scale = u_heightScale * u_elevationMultiplier;
+    float dhdu = (h_t - elevation) / eps * scale;
+    float dhdv = (h_b - elevation) / eps * scale;
+    vec3 displacedNormal = normalize(sphereNormal - tangent * dhdu - bitangent * dhdv);
 
     // Displace along normal in model-space
     vec3 dh = o_data.normal * o_fragHeight;
@@ -185,6 +200,7 @@ void main(void) {
 
     // Plumbing
     o_fragPosition = pos.xyz;
+    // o_normalTan is computed after o_data.tbn is set (see end of main())
     o_data.opacity = u * l_data[0].opacity + v * l_data[1].opacity + w * l_data[2].opacity;
     o_data.color = u * l_data[0].color + v * l_data[1].color + w * l_data[2].color;
     o_data.viewDir = u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir;
@@ -212,5 +228,16 @@ void main(void) {
         #endif
     #endif
 
-    o_data.tbn = u * l_data[0].tbn + v * l_data[1].tbn + w * l_data[2].tbn;
+    // Build TBN from geometry-based tangent/bitangent (no UV seams).
+    // The tangent and bitangent were computed above from the sphere normal.
+    vec3 worldTangent = normalize(mat3(u_worldTrans) * tangent);
+    vec3 worldBitangent = normalize(mat3(u_worldTrans) * bitangent);
+    vec3 worldNormal = normalize(mat3(u_worldTrans) * displacedNormal);
+    o_data.tbn = mat3(worldTangent, worldBitangent, worldNormal);
+
+    // Convert displaced normal to tangent space
+    o_normalTan = worldNormal * o_data.tbn;
+
+    // Override viewDir with geometry-based TBN (replaces the vertex-shader-interpolated value)
+    o_data.viewDir = normalize(normalize(o_fragPosition) * o_data.tbn);
 }
