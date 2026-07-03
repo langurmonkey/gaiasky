@@ -158,31 +158,13 @@ public class CatalogManager implements IObserver {
             }
             case CATALOG_POINT_SIZE_SCALING_CMD -> {
                 DatasetCard ci;
-                String dsName;
-                dsName = (String) data[0];
+                String dsName = (String) data[0];
                 double scaling = (Double) data[1];
                 if (nameMap.containsKey(dsName)) {
                     ci = nameMap.get(dsName);
                     if (ci.entity != null) {
                         var hl = Mapper.highlight.get(ci.entity);
                         hl.pointscaling = (float) scaling;
-                        hl.dirty = true;
-                        // Sink down the tree.
-                        var oc = Mapper.octant.get(ci.entity);
-                        if (oc != null && oc.octant != null) {
-                            var l = new ArrayList<OctreeNode>(oc.octant.numChildrenRec);
-                            oc.octant.addChildrenToList(l);
-                            for (var node : l) {
-                                if (node.objects != null && !node.objects.isEmpty()) {
-                                    for (var object : node.objects) {
-                                        var ov = (OctreeObjectView) object;
-                                        if (ov != null && ov.getEntity() != null && Mapper.highlight.has(ov.getEntity())) {
-                                            Mapper.highlight.get(ov.getEntity()).dirty = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }

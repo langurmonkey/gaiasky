@@ -171,10 +171,8 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
              */
             curr = meshes.get(getOffset(render));
             if (curr != null) {
-                if (hl.dirty) {
-                    triComponent.updatePointScale(utils.getDatasetSizeFactor(render.entity, hl, desc));
-                    hl.dirty = false;
-                }
+                var datasetPointScale = utils.getDatasetSizeFactor(render.entity, hl, desc);
+                triComponent.updateSizeAggregate();
 
                 if (triComponent.starTex != null) {
                     triComponent.starTex.bind(0);
@@ -182,7 +180,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                 }
 
                 triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
+                shaderProgram.setUniformf("u_alphaSizeBr", triComponent.alphaSizeBr[0], triComponent.alphaSizeBr[1] * datasetPointScale, triComponent.alphaSizeBr[2]);
 
                 // Fixed size.
                 shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));

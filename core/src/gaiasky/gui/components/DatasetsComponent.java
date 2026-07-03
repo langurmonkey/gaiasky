@@ -494,7 +494,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             sizeScaling.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     double val = sizeScaling.getMappedValue();
-                    EventManager.publish(Event.CATALOG_POINT_SIZE_SCALING_CMD, sizeScaling, ci.name, val);
+                    EventManager.publish(Event.CATALOG_POINT_SIZE_SCALING_CMD, this, ci.name, val);
                     return true;
                 }
                 return false;

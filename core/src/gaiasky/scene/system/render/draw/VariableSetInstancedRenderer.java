@@ -193,10 +193,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
              */
             curr = meshes.get(getOffset(render));
             if (curr != null) {
-                if (hl.dirty) {
-                    triComponent.updatePointScale(utils.getDatasetSizeFactor(render.entity, hl, desc));
-                    hl.dirty = false;
-                }
+                var datasetPointScale = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
                 // Bind data texture (variability)
                 Texture varTex = variabilityTextures.get(render);
@@ -214,7 +211,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 }
 
                 triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
+                shaderProgram.setUniformf("u_alphaSizeBr", triComponent.alphaSizeBr[0], triComponent.alphaSizeBr[1] * datasetPointScale, triComponent.alphaSizeBr[2]);
 
                 // Fixed size.
                 shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));

@@ -34,9 +34,6 @@ public class Highlight implements Component {
     // Point size scaling
     public float pointscaling = 1;
 
-    // Dirty flag: attributes have changed, point scale must be recomputed.
-    public boolean dirty = true;
-
     public boolean isHighlighted() {
         return highlighted;
     }
@@ -71,6 +68,5 @@ public class Highlight implements Component {
 
     public void setPointScaling(Double pointScaling) {
         this.pointscaling = pointScaling.floatValue();
-        this.dirty = true;
     }
 }
