@@ -66,6 +66,9 @@ public class OctahedronSphereCreator extends ModelCreator {
                 int idx = normals.size();
                 face.setNormals(idx - 3, idx - 2, idx - 1);
             }
+            // Identity tangents/binormals — the tessellation shader reconstructs TBN from geometry.
+            face.setTangents(face.v()[0], face.v()[1], face.v()[2]);
+            face.setBinormals(face.v()[0], face.v()[1], face.v()[2]);
         }
     }
 
@@ -97,8 +100,8 @@ public class OctahedronSphereCreator extends ModelCreator {
     }
 
     public OctahedronSphereCreator create(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
-        if (divisions < 0 || divisions > 6) //-V6007
-            throw new AssertionError("Divisions must be in [0..6]");
+        if (divisions < 0 || divisions > 7)
+            throw new AssertionError("Divisions must be in [0..7]");
         this.flipNormals = flipNormals;
         this.hardEdges = hardEdges;
         this.middlePointIndexCache = new HashMap<>();

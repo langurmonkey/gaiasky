@@ -763,7 +763,6 @@ public class IntModelBuilder {
         begin();
         // All in one part
         part("octahedronsphere", primitiveType, attributes, material).octahedronsphere(radius, divisions, flipNormals, hardEdges);
-        part("octahedronsphere", primitiveType, attributes, material).octahedronsphere(radius, divisions, flipNormals, hardEdges);
         return end();
     }
 

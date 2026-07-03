@@ -342,7 +342,7 @@ public interface IntMeshPartBuilder {
             if (hasTangent)
                 tangent.set(tan);
             if (hasBinormal)
-                tangent.set(bin);
+                binormal.set(bin);
             if (hasColor)
                 color.set(col);
             if (hasUV)
