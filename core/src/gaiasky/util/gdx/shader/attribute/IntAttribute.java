@@ -14,6 +14,8 @@ public class IntAttribute extends Attribute {
     public static final String EclipseOutlinesAlias = "eclipseOutlines";
     public static final int EclipseOutlines = register(EclipseOutlinesAlias);
 
+    public static final String NoiseTypeAlias = "noiseType";
+    public static final int NoiseType = register(NoiseTypeAlias);
 
     public static final String ElevationOctavesAlias = "elevationOctaves";
     public static final int ElevationOctaves = register(ElevationOctavesAlias);

@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL41;
 import java.util.Objects;
 
 public class TessellationShader extends GroundShader {
+    public final int u_noiseType;
 
     // Noise uniforms for the evaluation shader (procedural planets)
     public final int u_elevationSeed;
@@ -54,6 +55,8 @@ public class TessellationShader extends GroundShader {
 
     public TessellationShader(IntRenderable renderable, TessellationShaderProvider.Config config, TessellationShaderProgram shaderProgram) {
         super(renderable, config, shaderProgram);
+
+        u_noiseType = register(Inputs.noiseType, Setters.noiseType);
 
         // Elevation noise
         u_elevationSeed = register(Inputs.elevationSeed, Setters.elevationSeed);
@@ -110,6 +113,8 @@ public class TessellationShader extends GroundShader {
     }
 
     public static class Inputs extends GroundShader.Inputs {
+        public final static Uniform noiseType = new Uniform("u_noiseType", IntAttribute.NoiseType);
+
         // Elevation noise
         public final static Uniform elevationSeed = new Uniform("u_elevationSeed", FloatAttribute.ElevationSeed);
         public final static Uniform elevationAmplitude = new Uniform("u_elevationAmplitude", FloatAttribute.ElevationAmplitude);
@@ -138,6 +143,13 @@ public class TessellationShader extends GroundShader {
     }
 
     public static class Setters extends GroundShader.Setters {
+        public final static Setter noiseType = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(IntAttribute.NoiseType))
+                    shader.set(inputID, ((IntAttribute) Objects.requireNonNull(combinedAttributes.get(IntAttribute.NoiseType))).value);
+            }
+        };
         // Elevation noise
         public final static Setter elevationSeed = new LocalSetter() {
             @Override

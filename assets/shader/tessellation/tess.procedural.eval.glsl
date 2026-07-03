@@ -10,8 +10,14 @@ layout (triangles) in;
 #endif
 
 // NOISE
+#include <shader/lib/luma.glsl>
 #include <shader/lib/noise/common.glsl>
+#include <shader/lib/noise/white.glsl>
+#include <shader/lib/noise/simplex.glsl>
+#include <shader/lib/noise/erosion.glsl>
 #include <shader/lib/noise/perlin.glsl>
+#include <shader/lib/noise/curl.glsl>
+#include <shader/lib/noise/voronoi.glsl>
 
 // SVT
 #ifdef svtCacheTextureFlag
@@ -48,6 +54,8 @@ uniform float u_elevationMultiplier;
 uniform float u_vrScale;
 
 // Noise options for elevation (height)
+uniform int u_noiseType = 0;
+
 uniform float u_elevationSeed;
 uniform float u_elevationAmplitude;
 uniform float u_elevationPersistence;
@@ -58,6 +66,7 @@ uniform float u_elevationPower;
 uniform int   u_elevationOctaves;
 uniform bool  u_elevationTurbulence;
 uniform bool  u_elevationRidge;
+
 // Noise options for moisture
 uniform float u_moistureSeed;
 uniform float u_moistureAmplitude;
@@ -118,15 +127,96 @@ out float o_fragMoisture;
 out float o_fragTemperature;
 
 // --- Noise evaluation functions ---
+float terraces(float h, int n_terraces, float smoothness) {
+    if (n_terraces <= 0) {
+        return h;
+    }
+    h = h * n_terraces;
+    return (round(h) + 0.5 * clamp(pow(2.0 * (h - round(h)), smoothness), 0.0, 1.0)) / n_terraces;
+}
 
-float evaluateElevation(vec3 point) {
-    gln_tFBMOpts opts = gln_tFBMOpts(
-            u_elevationSeed, u_elevationAmplitude, u_elevationPersistence,
-            u_elevationFrequency, u_elevationLacunarity, u_elevationScale,
-            u_elevationPower, u_elevationOctaves, u_elevationTurbulence,
-            u_elevationRidge
+float noise(vec2 uv,
+        vec3 p,
+        int type,
+        float persistence,
+        float freq,
+        float lacunarity,
+        float power,
+        bool ridge,
+        bool turbulence,
+        int n_terraces,
+        float terrace_exp,
+        vec3 scale,
+        int octaves,
+        vec2 range,
+        float seed) {
+    // Fill up opts.
+    gln_tFBMOpts opts = gln_tFBMOpts(seed,
+            1.0,
+            persistence,
+            freq,
+            lacunarity,
+            scale,
+            power,
+            octaves,
+            turbulence,
+            ridge);
+
+    float value = 0.0;
+    if (type == 0) {
+        // PERLIN
+        value = gln_pfbm(p, opts);
+
+    } else if (type == 1) {
+        // SIMPLEX
+        value = gln_sfbm(p, opts);
+
+    } else if (type == 2) {
+        // VORONOI
+        value = gln_vfbm(p, opts);
+
+    } else if (type == 3) {
+        // CURL
+        value = gln_cfbm(p, opts);
+
+    } else if (type == 4) {
+        // WHITE
+        value = gln_wfbm(p, opts);
+
+    } else if (type == 5) {
+        // EROSION
+        // We use UV coordinates!
+        value = gln_efbm(uv * scale.x, opts);
+
+    }
+
+    // Set in range.
+    value = clamp(gln_map(value, 0.0, 1.0, range.x, range.y), 0.0, 1.0);
+
+    // Terraces.
+    value = terraces(value, n_terraces, terrace_exp);
+
+    return value;
+
+}
+
+float evaluateElevation(vec3 point, vec2 uv) {
+    float elevation = noise(uv,
+                            point,
+                            u_noiseType,
+                            u_elevationPersistence,
+                            u_elevationFrequency,
+                            u_elevationLacunarity,
+                            u_elevationPower,
+                            u_elevationRidge,
+                            u_elevationTurbulence,
+                            0,
+                            1.0,
+                            u_elevationScale,
+                            u_elevationOctaves,
+                            vec2(0.0, 1.0),
+                            u_elevationSeed
     );
-    float elevation = clamp(gln_pfbm(point, opts), 0.0, 1.0);
     // Clamp water level: everything at or below u_waterLevel becomes flat water
     if (elevation <= u_waterLevel) {
         elevation = u_waterLevel;
@@ -134,14 +224,25 @@ float evaluateElevation(vec3 point) {
     return elevation;
 }
 
-float evaluateMoisture(vec3 point) {
-    gln_tFBMOpts opts = gln_tFBMOpts(
-            u_moistureSeed, u_moistureAmplitude, u_moisturePersistence,
-            u_moistureFrequency, u_moistureLacunarity, u_moistureScale,
-            u_moisturePower, u_moistureOctaves, u_moistureTurbulence,
-            u_moistureRidge
+float evaluateMoisture(vec3 point, vec2 uv) {
+    // Perlin noise for moisture.
+    float moisture = noise(uv,
+                            point,
+                            0,
+                            u_moisturePersistence,
+                            u_moistureFrequency,
+                            u_moistureLacunarity,
+                            u_moisturePower,
+                            u_elevationRidge,
+                            u_elevationTurbulence,
+                            0,
+                            1.0,
+                            u_moistureScale,
+                            u_moistureOctaves,
+                            vec2(0.0, 1.0),
+                            u_moistureSeed
     );
-    return gln_pfbm(point, opts);
+    return moisture;
 }
 
 void main(void) {
@@ -161,7 +262,7 @@ void main(void) {
     o_data.normal = sphereNormal;
 
     // Procedural height
-    float elevation = evaluateElevation(modelPos);
+    float elevation = evaluateElevation(modelPos, o_data.texCoords);
     o_fragElevation = elevation;
     o_fragHeight = elevation * u_heightScale * u_elevationMultiplier;
 
@@ -171,8 +272,8 @@ void main(void) {
         ? vec3(0.0, 1.0, 0.0)
         : vec3(1.0, 0.0, 0.0)));
     vec3 bitangent = cross(sphereNormal, tangent);
-    float h_t = evaluateElevation(modelPos + tangent * eps);
-    float h_b = evaluateElevation(modelPos + bitangent * eps);
+    float h_t = evaluateElevation(modelPos + tangent * eps, o_data.texCoords + vec2(eps, 0.0));
+    float h_b = evaluateElevation(modelPos + bitangent * eps, o_data.texCoords + vec2(0.0, eps));
     float scale = u_heightScale * u_elevationMultiplier;
     float dhdu = (h_t - elevation) / eps * scale;
     float dhdv = (h_b - elevation) / eps * scale;
@@ -183,7 +284,7 @@ void main(void) {
     vec4 pos = vec4(modelPos + dh, 1.0);
 
     // Moisture
-    o_fragMoisture = evaluateMoisture(modelPos);
+    o_fragMoisture = evaluateMoisture(modelPos, o_data.texCoords);
 
     // Apply world transform AFTER noise evaluation and displacement
     pos = u_worldTrans * pos;

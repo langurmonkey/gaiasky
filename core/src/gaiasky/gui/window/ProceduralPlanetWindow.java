@@ -715,9 +715,9 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     }
                 }
             }
-            Texture newLutTexture = new Texture(p);
+            var newLutTexture = new Texture(p);
             newLutTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-            Image img = new Image(newLutTexture);
+            var img = new OwnImage(newLutTexture, false);
             img.setScaling(Scaling.fill);
             lutImageCell.setActor(img);
             lutImageCell.size(260, 260);

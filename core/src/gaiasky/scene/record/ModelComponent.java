@@ -573,6 +573,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             setFloatAttribute(mat, FloatAttribute.WaterLevel, 0.1f);
             setFloatAttribute(mat, FloatAttribute.HeightScale, mtc.heightScale * 10.0f);
 
+
+            setIntAttribute(mat, IntAttribute.NoiseType, nc.type.ordinal());
             setFloatAttribute(mat, FloatAttribute.ElevationSeed, nc.seed);
             setFloatAttribute(mat, FloatAttribute.ElevationAmplitude, (float) nc.amplitude);
             setFloatAttribute(mat, FloatAttribute.ElevationPersistence, (float) nc.persistence);
