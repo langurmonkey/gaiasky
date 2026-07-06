@@ -22,8 +22,8 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
-import gaiasky.util.gdx.shader.Environment;
-import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.render.gdx.shader.Environment;
+import gaiasky.render.gdx.shader.attribute.ColorAttribute;
 import net.jafama.FastMath;
 
 /**

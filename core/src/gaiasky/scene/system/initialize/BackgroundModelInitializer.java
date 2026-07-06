@@ -26,7 +26,7 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.render.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.math.Matrix4D;
 
 /**

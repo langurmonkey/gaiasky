@@ -26,8 +26,8 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.view.BillboardView;
 import gaiasky.util.comp.DistanceEntityComparator;
-import gaiasky.util.gdx.mesh.IntMesh;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.mesh.IntMesh;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 

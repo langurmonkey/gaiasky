@@ -10,8 +10,8 @@ package gaiasky.render.api;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.draw.TextRenderer;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.g2d.ExtSpriteBatch;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3D;
 
 public interface I3DTextRenderable extends IRenderable {

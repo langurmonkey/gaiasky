@@ -14,9 +14,9 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.postprocess.effects.Noise;
+import gaiasky.render.postprocess.effects.Biome;
 import gaiasky.render.postprocess.effects.SurfaceGen;
-import gaiasky.render.postprocess.filters.NoiseFilter.NoiseType;
+import gaiasky.render.postprocess.filters.BiomeFilter.NoiseType;
 import gaiasky.util.Logger.Log;
 import net.jafama.FastMath;
 
@@ -68,32 +68,32 @@ public final class NoiseComponent extends NamedComponent {
         return (float) (seed / FastMath.pow(10L, s.length()));
     }
 
-    private Noise getNoiseEffect(int N, int M, int channels, int targets) {
-        Noise noise = new Noise(N, M, targets);
-        noise.setScale(scale);
-        noise.setType(type);
-        noise.setSeed(seed);
-        noise.setOctaves(octaves);
-        noise.setAmplitude(amplitude);
-        noise.setPersistence(persistence);
-        noise.setFrequency(frequency);
-        noise.setLacunarity(lacunarity);
-        noise.setPower(power);
-        noise.setRange((float) range[0], (float) range[1]);
-        noise.setTurbulence(turbulence);
-        noise.setRidge(ridge);
-        noise.setNumTerraces(numTerraces);
-        noise.setTerraceExp(terracesExp);
-        noise.setChannels(channels);
-        return noise;
+    private Biome getNoiseEffect(int N, int M, int channels, int targets) {
+        Biome biome = new Biome(N, M, targets);
+        biome.setScale(scale);
+        biome.setType(type);
+        biome.setSeed(seed);
+        biome.setOctaves(octaves);
+        biome.setAmplitude(amplitude);
+        biome.setPersistence(persistence);
+        biome.setFrequency(frequency);
+        biome.setLacunarity(lacunarity);
+        biome.setPower(power);
+        biome.setRange((float) range[0], (float) range[1]);
+        biome.setTurbulence(turbulence);
+        biome.setRidge(ridge);
+        biome.setNumTerraces(numTerraces);
+        biome.setTerraceExp(terracesExp);
+        biome.setChannels(channels);
+        return biome;
     }
 
     public FrameBuffer generateNoise(int N, int M, int channels, int targets, float[] color) {
         fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, targets);
 
-        Noise noise = getNoiseEffect(N, M, channels, targets);
-        noise.setColor(color);
-        noise.render(null, fbNoise);
+        Biome biome = getNoiseEffect(N, M, channels, targets);
+        biome.setColor(color);
+        biome.render(null, fbNoise);
 
         return fbNoise;
     }
@@ -113,7 +113,7 @@ public final class NoiseComponent extends NamedComponent {
 
         // 2 channels: height, moisture, temperature (optional).
         // Emissive map is an additional render target.
-        Noise biomeNoise = getNoiseEffect(N, M, 2, genEmissiveMap ? 2 : 1);
+        Biome biomeNoise = getNoiseEffect(N, M, 2, genEmissiveMap ? 2 : 1);
         fbBiome.begin();
         biomeNoise.render(null, fbBiome);
         fbBiome.end();

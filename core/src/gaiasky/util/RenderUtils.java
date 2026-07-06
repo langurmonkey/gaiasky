@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.GaiaSky;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.graphics.TextureView;
+import gaiasky.render.gdx.g2d.ExtSpriteBatch;
+import gaiasky.render.gdx.graphics.TextureView;
 
 /**
  * Contains common functions used by render systems.

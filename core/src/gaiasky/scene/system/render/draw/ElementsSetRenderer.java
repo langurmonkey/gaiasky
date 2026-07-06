@@ -36,7 +36,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Nature;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL41;

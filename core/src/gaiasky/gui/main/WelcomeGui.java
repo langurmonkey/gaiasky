@@ -46,7 +46,7 @@ import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.datadesc.DatasetGroup;
 import gaiasky.util.datadesc.DatasetUtils;
 import gaiasky.util.datadesc.DatasetType;
-import gaiasky.util.gdx.loader.OwnTextureLoader;
+import gaiasky.render.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.vr.openxr.XrLoadStatus;

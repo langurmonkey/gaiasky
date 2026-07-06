@@ -24,11 +24,11 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.gdx.shader.Material;
-import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
-import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.shader.Material;
+import gaiasky.render.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.render.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.math.Vector3D;
 
 import java.util.HashMap;

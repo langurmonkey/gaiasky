@@ -24,8 +24,8 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.PointView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.mesh.IntMesh;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.mesh.IntMesh;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3D;
 import org.lwjgl.opengl.GL30;
 

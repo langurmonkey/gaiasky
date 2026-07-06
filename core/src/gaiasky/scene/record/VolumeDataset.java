@@ -11,8 +11,8 @@ import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.render.BlendMode;
 import gaiasky.data.util.GlobalResources;
-import gaiasky.util.gdx.graphics.VolumeTexture;
-import gaiasky.util.gdx.loader.VolumeTextureLoader;
+import gaiasky.render.gdx.graphics.VolumeTexture;
+import gaiasky.render.gdx.loader.VolumeTextureLoader;
 
 import java.util.Locale;
 

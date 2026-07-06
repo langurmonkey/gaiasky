@@ -43,7 +43,7 @@ import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
 import gaiasky.util.datadesc.DatasetGroup;
 import gaiasky.util.datadesc.DatasetUtils;
-import gaiasky.util.gdx.loader.WarpMeshReader;
+import gaiasky.render.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;

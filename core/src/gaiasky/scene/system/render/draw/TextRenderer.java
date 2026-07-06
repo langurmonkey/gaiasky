@@ -16,9 +16,9 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.gdx.g2d.BitmapFont;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.g2d.BitmapFont;
+import gaiasky.render.gdx.g2d.ExtSpriteBatch;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 

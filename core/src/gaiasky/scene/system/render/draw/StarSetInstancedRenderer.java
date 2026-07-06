@@ -28,7 +28,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 /**
  * Renders star sets as instanced triangles.

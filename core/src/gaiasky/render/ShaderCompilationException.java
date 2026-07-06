@@ -8,9 +8,9 @@
 package gaiasky.render;
 
 import gaiasky.util.SysUtils;
-import gaiasky.util.gdx.shader.ComputeShaderProgram;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.gdx.shader.TessellationShaderProgram;
+import gaiasky.render.gdx.shader.ComputeShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.TessellationShaderProgram;
 import gaiasky.util.i18n.I18n;
 
 /**

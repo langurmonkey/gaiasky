@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.render.postprocess.util.FullscreenMesh;
 import gaiasky.render.util.ShaderLoader;
-import gaiasky.util.gdx.loader.PFMData;
-import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
+import gaiasky.render.gdx.loader.PFMData;
+import gaiasky.render.gdx.loader.WarpMeshReader.WarpMesh;
 
 public final class WarpingMeshFilter extends Filter<WarpingMeshFilter> {
     private final FullscreenMesh mesh;

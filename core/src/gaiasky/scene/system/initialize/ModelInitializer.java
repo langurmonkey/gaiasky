@@ -39,8 +39,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.SpacecraftCoordinates;
-import gaiasky.util.gdx.shader.Material;
-import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
+import gaiasky.render.gdx.shader.Material;
+import gaiasky.render.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
@@ -205,7 +205,7 @@ public class ModelInitializer extends AbstractInitSystem {
             // Billboards -- add depth test attribute, set to false.
             if (model != null && model.model != null && model.model.instance != null) {
                 // Disable depth test.
-                Array<gaiasky.util.gdx.shader.Material> mats = model.model.instance.materials;
+                Array<Material> mats = model.model.instance.materials;
                 for (Material mat : mats) {
                     mat.set(new DepthTestAttribute(false));
                 }

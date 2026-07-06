@@ -30,7 +30,7 @@ import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.KeplerianElements;
-import gaiasky.util.gdx.model.IntModel;
+import gaiasky.render.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import net.jafama.FastMath;

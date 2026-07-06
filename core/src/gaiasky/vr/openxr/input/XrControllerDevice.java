@@ -10,7 +10,7 @@ package gaiasky.vr.openxr.input;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.model.IntModelInstance;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.XrHelper;
 import gaiasky.vr.openxr.input.actions.*;

@@ -23,7 +23,7 @@ import gaiasky.render.postprocess.filters.CopyFilter;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.loader.WarpMeshReader;
+import gaiasky.render.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.screenshot.ImageRenderer;
 

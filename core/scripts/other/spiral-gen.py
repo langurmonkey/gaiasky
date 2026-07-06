@@ -46,8 +46,8 @@ class SpiralArmSimulator:
         u2 = np.random.random(size)
         return np.sqrt(-2.0 * np.log(u1)) * np.cos(2.0 * np.pi * u2)
     
-    def noise(self, x):
-        """Simple 1D noise function"""
+    def biome(self, x):
+        """Simple 1D biome function"""
         return np.sin(x * 12.9898 + 78.233) * 43758.5453 % 1.0
 
     def should_place_particle(self, spiralAngle, r, armIndex):
@@ -63,8 +63,8 @@ class SpiralArmSimulator:
         base_pattern = (np.sin((spiralAngle + arm_phase) * clump_freq1) + 
                        np.cos((spiralAngle + arm_phase) * clump_freq2) + 1.0) / 2.0
     
-        # Add some random noise to break perfect patterns
-        random_noise = np.random.random() * 0.3 - 0.15  # ±0.15 noise
+        # Add some random biome to break perfect patterns
+        random_noise = np.random.random() * 0.3 - 0.15  # ±0.15 biome
         base_pattern = np.clip(base_pattern + random_noise, 0.0, 1.0)
     
         # Apply bias

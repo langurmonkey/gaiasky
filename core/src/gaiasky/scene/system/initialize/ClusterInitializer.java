@@ -30,14 +30,14 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.ModelCache;
-import gaiasky.util.gdx.IntMeshPartBuilder;
-import gaiasky.util.gdx.IntModelBuilder;
-import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.gdx.shader.Environment;
-import gaiasky.util.gdx.shader.Material;
-import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
-import gaiasky.util.gdx.shader.attribute.ColorAttribute;
-import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.render.gdx.IntMeshPartBuilder;
+import gaiasky.render.gdx.IntModelBuilder;
+import gaiasky.render.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.shader.Environment;
+import gaiasky.render.gdx.shader.Material;
+import gaiasky.render.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.render.gdx.shader.attribute.ColorAttribute;
+import gaiasky.render.gdx.shader.attribute.FloatAttribute;
 import net.jafama.FastMath;
 
 /**

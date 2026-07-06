@@ -30,7 +30,7 @@
 -  [OSHI](https://oshi.ooo).
 -  [Apache Commons IO](https://commons.apache.org/proper/commons-io).
 -  [MCXR](https://github.com/mcxr-org), used as inspiration for the OpenXR abstraction layer on top of LWJGL 3.
--  [gl-noise](https://github.com/FarazzShaikh/glNoise), for the base implementation of GLSL noise, later modified by us. MIT license.
+-  [gl-biome](https://github.com/FarazzShaikh/glNoise), for the base implementation of GLSL biome, later modified by us. MIT license.
 - Wolfgang Löffler for the base implementation of the ephemeris based on Chebyshev polynomials.
 - [starnet++](https://www.starnetastro.com), used to remove stars from some of the nebulae images.
 

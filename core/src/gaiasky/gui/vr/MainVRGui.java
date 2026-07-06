@@ -48,7 +48,7 @@ import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.StaticCoordinates;
-import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+import gaiasky.render.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;

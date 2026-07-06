@@ -609,7 +609,7 @@ There are a huge quantity of bug fixes in this release:
 - add 'volumes and effects' catalog type. 
 - increase default quality of FXAA filter, provide a simpler implementation (disabled by default), and enable hot shader reloading for FXAA effect. 
 - enable `"flip"` attribute for `box`es/`cube`s in mesh builders. 
-- apply noise function to aurora cylinder vertices over time. 
+- apply biome function to aurora cylinder vertices over time. 
 - separate simulation time from scene time in shaders, improve aurora effect. 
 - add `"cameraCollision"` attribute to bodies. 
 - add support for auroras. 
@@ -688,7 +688,7 @@ There are a huge quantity of bug fixes in this release:
 - bad truncation leads to some SVTs not working properly. Fixes [#778](https://codeberg.org/gaiasky/gaiasky/issues/778).
 
 ### Features
-- use noise library for star surface shader.
+- use biome library for star surface shader.
 
 <a name="3.6.3"></a>
 ## [3.6.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.6.3) (2024-07-12)
@@ -716,7 +716,7 @@ There are a huge quantity of bug fixes in this release:
 - change antialiasing settings from only type to type and quality.
 - add tooltip with hotkeys to cinematic camera checkbox.
 - automatic DPI scaling to support multi-DPI configurations.
-- add initial amplitude to noise parametrization in procedural generation.
+- add initial amplitude to biome parametrization in procedural generation.
 - improve camera velocity display units in camera info pane.
 - divide procedural generation in 4 consecutive frames. Add emission generation as an extra (optional) channel.
 - use normal map when elevation type is 'None' in procedural generation.
@@ -724,7 +724,7 @@ There are a huge quantity of bug fixes in this release:
 - new splash image based on NASA exoplanets.
 - improve layout of procedural generation window.
 - add procedural generation button to camera info interface.
-- surface generation presets (Earth-like, gas giant, rocky planet, etc.), and hide noise parameters in collapsible pane.
+- surface generation presets (Earth-like, gas giant, rocky planet, etc.), and hide biome parameters in collapsible pane.
 - add procedurally generated texture resolution to configuration and preferences window. 
 - replace CPU-based procedural generation with shader-based, which is orders of magnitude faster. 
 - improve cloud color and atmospheric fog density randomizers. 
@@ -1068,7 +1068,7 @@ There are a huge quantity of bug fixes in this release:
 ### Features
 - add film grain filter (disabled by default).
 - set a maximum age for .part download files of 6 hours.
-- improve recursive grid with travelling pulses and a noise mask.
+- improve recursive grid with travelling pulses and a biome mask.
 - add 'animate' setting to recursive grid preferences to toggle animation on and off.
 - add checkbox to control recursive grid animation.
 - add initial notice about Gaia Sky contacting the server to get the dataset updates list.
@@ -3080,7 +3080,7 @@ pixels instead of a normalized value between 0 and 100.
 - initialise elevation data structures asynchronously.
 - CPU generation of height data.
 - add tessellation quality control.
-- noise-based height.
+- biome-based height.
 - new scripting calls: cameraYaw/Pitch.
 - handle server down event correctly.
 - data downloader checks for updates.
@@ -3102,7 +3102,7 @@ pixels instead of a normalized value between 0 and 100.
 - add game mode - WASD+mouse.
 - add physically based fog to atmospheres.
 - add Uncharted and Filmic tone mapping types.
-- add color noise parameter to particle groups.
+- add color biome parameter to particle groups.
 - parallax mapping.
 - improve light glow performance and visual quality.
 - add ACES tone mapping type.
@@ -3627,7 +3627,7 @@ pixels instead of a normalized value between 0 and 100.
 - add Saturn moons [#139](https://codeberg.org/gaiasky/gaiasky/issues/139).
 - revamp debug info [#138](https://codeberg.org/gaiasky/gaiasky/issues/138).
 - add non cinematic camera mode [#135](https://codeberg.org/gaiasky/gaiasky/issues/135).
-- discard current star shader based on noise and use texture instead [#134](https://codeberg.org/gaiasky/gaiasky/issues/134).
+- discard current star shader based on biome and use texture instead [#134](https://codeberg.org/gaiasky/gaiasky/issues/134).
 - apply screen mode without restart [#128](https://codeberg.org/gaiasky/gaiasky/issues/128).
 - make network checker (Simbad, wiki) asynchronous [#127](https://codeberg.org/gaiasky/gaiasky/issues/127).
 - deprecate current swing-based preferences [#125](https://codeberg.org/gaiasky/gaiasky/issues/125).

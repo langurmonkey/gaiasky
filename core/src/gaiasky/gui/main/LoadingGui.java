@@ -29,7 +29,7 @@ import gaiasky.gui.vr.FixedScreenViewport;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.TextUtils;
 import gaiasky.util.TipsGenerator;
-import gaiasky.util.gdx.loader.OwnTextureLoader;
+import gaiasky.render.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;

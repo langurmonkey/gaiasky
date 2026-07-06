@@ -48,7 +48,7 @@ import gaiasky.util.DecalUtils;
 import gaiasky.util.MasterManager;
 import gaiasky.util.SlaveManager;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gdx.g2d.Sprite;
+import gaiasky.render.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.QuaternionDouble;

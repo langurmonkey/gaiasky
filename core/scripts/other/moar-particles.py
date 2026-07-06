@@ -115,7 +115,7 @@ def spawn_dust_particles(input_file, output_file, multiplier=5, position_spread=
         
         # Generate new particles around this one
         for _ in range(multiplier):
-            # Add Gaussian noise to position (more realistic than uniform)
+            # Add Gaussian biome to position (more realistic than uniform)
             new_x = x + random.gauss(0, position_spread)
             new_y = y + random.gauss(0, position_spread)
             new_z = z + random.gauss(0, position_spread * 0.5)  # less spread in Z
@@ -164,7 +164,7 @@ def spawn_dust_particles_spiral_aware(input_file, output_file, multiplier=5,
         
         # Generate new particles
         for _ in range(multiplier):
-            # Add noise in cylindrical coordinates (preserves spiral structure better)
+            # Add biome in cylindrical coordinates (preserves spiral structure better)
             new_r = max(0.01, r + random.gauss(0, radial_spread))
             new_theta = theta + random.gauss(0, angular_spread)
             new_z = z + random.gauss(0, height_spread)

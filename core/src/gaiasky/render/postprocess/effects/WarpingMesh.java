@@ -12,8 +12,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.WarpingMeshFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
-import gaiasky.util.gdx.loader.PFMData;
-import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
+import gaiasky.render.gdx.loader.PFMData;
+import gaiasky.render.gdx.loader.WarpMeshReader.WarpMesh;
 
 public final class WarpingMesh extends PostProcessorEffect {
     private final WarpingMeshFilter warpFilter;

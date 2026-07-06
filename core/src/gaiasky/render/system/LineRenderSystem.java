@@ -21,8 +21,8 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.mesh.IntMesh;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.mesh.IntMesh;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;

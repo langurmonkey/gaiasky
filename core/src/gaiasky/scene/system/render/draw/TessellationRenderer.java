@@ -15,7 +15,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.render.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;
 
 import java.util.List;

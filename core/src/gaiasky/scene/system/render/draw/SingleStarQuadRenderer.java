@@ -29,7 +29,7 @@ import gaiasky.scene.view.RenderView;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 

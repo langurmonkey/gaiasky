@@ -15,8 +15,8 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.AffineTransformations;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.util.gdx.mesh.IntMesh;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.mesh.IntMesh;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 import java.util.HashMap;
 import java.util.HashSet;

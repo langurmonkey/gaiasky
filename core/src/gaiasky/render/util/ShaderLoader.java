@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaiasky.GaiaSky;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
+import gaiasky.render.gdx.shader.loader.ShaderTemplatingLoader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

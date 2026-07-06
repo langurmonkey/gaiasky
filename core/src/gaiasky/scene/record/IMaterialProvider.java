@@ -7,7 +7,7 @@
 
 package gaiasky.scene.record;
 
-import gaiasky.util.gdx.shader.Material;
+import gaiasky.render.gdx.shader.Material;
 
 public interface IMaterialProvider {
 

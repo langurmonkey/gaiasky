@@ -1,0 +1,41 @@
+/*
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
+package gaiasky.render.gdx.shader.provider;
+
+import com.badlogic.gdx.files.FileHandle;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.render.gdx.IntRenderable;
+import gaiasky.render.gdx.shader.DepthIntShader;
+import gaiasky.render.gdx.shader.IntShader;
+
+public class DepthIntShaderProvider extends BaseIntShaderProvider {
+    public final DepthIntShader.Config config;
+
+    public DepthIntShaderProvider(DepthIntShader.Config config) {
+        this.config = (config == null) ? new DepthIntShader.Config() : config;
+        EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
+    }
+
+    public DepthIntShaderProvider(String vertexShader, String fragmentShader) {
+        this(new DepthIntShader.Config(vertexShader, fragmentShader));
+    }
+
+    public DepthIntShaderProvider(FileHandle vertexShader, FileHandle fragmentShader) {
+        this(vertexShader.readString(), fragmentShader.readString());
+    }
+
+    public DepthIntShaderProvider() {
+        this(null);
+    }
+
+    @Override
+    protected IntShader createShader(IntRenderable renderable) {
+        return new DepthIntShader(renderable, config);
+    }
+}

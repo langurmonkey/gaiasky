@@ -13,7 +13,7 @@ import gaiasky.event.Event;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.render.gdx.shader.attribute.ColorAttribute;
 
 public class GridRecursiveRadio extends EntityRadio {
 

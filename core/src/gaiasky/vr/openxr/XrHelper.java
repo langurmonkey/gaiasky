@@ -7,8 +7,8 @@
 package gaiasky.vr.openxr;
 
 import gaiasky.GaiaSky;
-import gaiasky.util.gdx.loader.OwnObjLoader;
-import gaiasky.util.gdx.model.IntModel;
+import gaiasky.render.gdx.loader.OwnObjLoader;
+import gaiasky.render.gdx.model.IntModel;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import net.jafama.FastMath;
 import org.lwjgl.PointerBuffer;

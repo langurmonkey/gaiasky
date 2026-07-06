@@ -32,7 +32,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import net.jafama.FastMath;
 
 import java.util.Random;

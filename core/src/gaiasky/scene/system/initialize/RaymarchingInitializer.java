@@ -23,7 +23,7 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.gdx.loader.OwnTextureLoader;
+import gaiasky.render.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 
 public class RaymarchingInitializer extends AbstractInitSystem {

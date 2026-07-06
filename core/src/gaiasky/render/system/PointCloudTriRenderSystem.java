@@ -11,7 +11,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Pair;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 public abstract class PointCloudTriRenderSystem extends PointCloudRenderSystem implements IObserver {
 

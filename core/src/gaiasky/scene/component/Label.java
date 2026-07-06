@@ -16,8 +16,8 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Consumers.Consumer7;
 import gaiasky.util.LocalizedEnum;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.g2d.ExtSpriteBatch;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3Q;
 

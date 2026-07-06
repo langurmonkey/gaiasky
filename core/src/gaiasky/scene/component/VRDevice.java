@@ -14,7 +14,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.model.IntModelInstance;
 import gaiasky.util.math.Vector3D;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 

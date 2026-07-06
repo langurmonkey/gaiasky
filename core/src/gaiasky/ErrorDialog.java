@@ -27,7 +27,7 @@ import gaiasky.util.FontFactory;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.TextUtils;
-import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
+import gaiasky.render.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 

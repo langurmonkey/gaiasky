@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
+package gaiasky.render.gdx.loader;
+
+import com.badlogic.gdx.assets.AssetDescriptor;
+import com.badlogic.gdx.assets.AssetLoaderParameters;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
+import gaiasky.render.gdx.loader.GLBWrapperLoader.GLBLoaderParameters;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.model.gltf.loaders.glb.GLBAssetLoader;
+import gaiasky.render.gdx.model.gltf.loaders.shared.SceneAssetLoaderParameters;
+import gaiasky.render.gdx.model.gltf.scene3d.scene.SceneAsset;
+
+public class GLBWrapperLoader extends AsynchronousAssetLoader<IntModel, GLBLoaderParameters> {
+
+    private final GLBAssetLoader glbAssetLoader;
+
+    public GLBWrapperLoader(FileHandleResolver resolver) {
+        super(resolver);
+        glbAssetLoader = new GLBAssetLoader(resolver);
+    }
+
+    @Override
+    public void loadAsync(AssetManager manager, String fileName, FileHandle file, GLBLoaderParameters parameter) {
+        glbAssetLoader.loadAsync(manager, fileName, file, convertParameters(parameter));
+    }
+
+    @Override
+    public IntModel loadSync(AssetManager manager, String fileName, FileHandle file, GLBLoaderParameters parameter) {
+        SceneAsset scene = glbAssetLoader.loadSync(manager, fileName, file, convertParameters(parameter));
+        return scene.scene.model;
+    }
+
+    @Override
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, GLBLoaderParameters parameter) {
+        return glbAssetLoader.getDependencies(fileName, file, convertParameters(parameter));
+    }
+
+    public SceneAssetLoaderParameters convertParameters(GLBLoaderParameters parameter) {
+        if (parameter == null) {
+            return null;
+        }
+        var result = new SceneAssetLoaderParameters();
+        result.withData = parameter.withData;
+        return result;
+    }
+
+    public static class GLBLoaderParameters extends AssetLoaderParameters<IntModel> {
+        public boolean withData;
+    }
+}

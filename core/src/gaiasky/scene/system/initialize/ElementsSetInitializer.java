@@ -24,7 +24,7 @@ import gaiasky.scene.entity.ElementsSetRadio;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
-import gaiasky.util.gdx.TextureArrayLoader;
+import gaiasky.render.gdx.TextureArrayLoader;
 import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3Q;
 

@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
+import gaiasky.render.gdx.loader.WarpMeshReader.WarpMesh;
 
 public class FullscreenMesh {
     private final Mesh mesh;

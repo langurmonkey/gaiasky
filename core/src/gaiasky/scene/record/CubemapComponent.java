@@ -17,8 +17,8 @@ import gaiasky.data.AssetBean;
 import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.OwnCubemap;
-import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
+import gaiasky.render.gdx.OwnCubemap;
+import gaiasky.render.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.i18n.I18n;
 
 public class CubemapComponent implements Disposable {

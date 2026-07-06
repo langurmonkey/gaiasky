@@ -9,7 +9,7 @@ package gaiasky.render.api;
 
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
-import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.render.gdx.IntModelBatch;
 
 public interface IModelRenderable extends IRenderable {
 

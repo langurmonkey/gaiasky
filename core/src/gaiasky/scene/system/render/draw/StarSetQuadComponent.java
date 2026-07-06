@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import gaiasky.GaiaSky;
 import gaiasky.scene.component.Highlight;
 import gaiasky.util.Constants;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 /**
  * Helper class for rendering star sets as quads. It manages shader uniforms for star appearance such as brightness and point size.

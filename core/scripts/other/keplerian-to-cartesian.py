@@ -297,7 +297,7 @@ def generate_anisotropic_clouds(state_array, n_particles=100, sigma_cross_km=500
         nhat /= np.linalg.norm(nhat)
         bhat = np.cross(vhat, nhat)
 
-        # Generate Gaussian noise along these axes
+        # Generate Gaussian biome along these axes
         deltas = (rng.normal(0, sigma_along * 0.5, size=(n_particles, 1)) * vhat +
                   rng.normal(0, sigma_cross_km, size=(n_particles, 1)) * nhat +
                   rng.normal(0, sigma_cross_km, size=(n_particles, 1)) * bhat)

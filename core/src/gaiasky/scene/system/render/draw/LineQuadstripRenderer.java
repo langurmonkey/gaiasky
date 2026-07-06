@@ -15,7 +15,7 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;

@@ -16,9 +16,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.util.gdx.g2d.BitmapFont;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.g2d.Sprite;
+import gaiasky.render.gdx.g2d.BitmapFont;
+import gaiasky.render.gdx.g2d.ExtSpriteBatch;
+import gaiasky.render.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 

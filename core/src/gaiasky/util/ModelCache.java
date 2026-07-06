@@ -7,10 +7,10 @@
 
 package gaiasky.util;
 
-import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;
-import gaiasky.util.gdx.IntModelBuilder;
-import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.gdx.shader.Material;
+import gaiasky.render.gdx.IntMeshPartBuilder.VertexInfo;
+import gaiasky.render.gdx.IntModelBuilder;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.shader.Material;
 
 import java.util.*;
 

@@ -26,7 +26,7 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
-import gaiasky.util.gdx.TextureArrayLoader;
+import gaiasky.render.gdx.TextureArrayLoader;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;

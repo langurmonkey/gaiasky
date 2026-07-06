@@ -14,7 +14,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Consumers.Consumer10;
-import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.render.gdx.IntModelBatch;
 
 public class Model implements Component {
 

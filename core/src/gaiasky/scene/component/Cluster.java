@@ -11,7 +11,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.util.gdx.model.IntModel;
+import gaiasky.render.gdx.model.IntModel;
 
 public class Cluster implements Component, ICopy {
 

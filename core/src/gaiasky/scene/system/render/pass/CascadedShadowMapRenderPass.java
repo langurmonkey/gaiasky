@@ -21,9 +21,9 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
-import gaiasky.util.gdx.model.gltf.scene3d.scene.CascadeShadowMap;
+import gaiasky.render.gdx.IntModelBatch;
+import gaiasky.render.gdx.model.gltf.scene3d.lights.DirectionalShadowLight;
+import gaiasky.render.gdx.model.gltf.scene3d.scene.CascadeShadowMap;
 import gaiasky.util.math.Vector3Q;
 
 import java.util.List;

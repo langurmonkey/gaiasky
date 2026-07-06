@@ -20,7 +20,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.Logger;
-import gaiasky.util.gdx.g2d.Sprite;
+import gaiasky.render.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3D;
 
 import java.util.HashMap;

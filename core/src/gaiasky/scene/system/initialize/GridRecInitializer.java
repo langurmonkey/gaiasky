@@ -25,7 +25,7 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.render.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector2D;
 import gaiasky.util.math.Vector3D;

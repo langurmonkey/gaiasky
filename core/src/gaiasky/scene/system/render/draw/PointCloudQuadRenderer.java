@@ -12,7 +12,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.system.PointCloudRenderSystem;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Pair;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 
 public abstract class PointCloudQuadRenderer extends PointCloudRenderSystem implements IObserver {
 

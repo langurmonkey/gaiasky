@@ -29,7 +29,7 @@ import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
 import net.jafama.FastMath;
