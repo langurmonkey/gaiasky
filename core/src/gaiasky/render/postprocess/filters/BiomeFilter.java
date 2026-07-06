@@ -85,7 +85,7 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     public void updateProgram() {
         super.updateProgram(ShaderLoader.fromFile(
                 "screenspace",
-                "noise",
+                "biome",
                 targets > 1 ? "#define extraTarget\n" : ""));
     }
 
