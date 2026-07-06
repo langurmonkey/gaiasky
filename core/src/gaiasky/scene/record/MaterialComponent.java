@@ -741,6 +741,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     private synchronized void initializeGenElevationData() {
+       textureBasedGeneration();
+    }
+
+    private  void textureBasedGeneration() {
         if (heightGenerated.get()) {
             addHeightTex(heightTex);
         } else {
