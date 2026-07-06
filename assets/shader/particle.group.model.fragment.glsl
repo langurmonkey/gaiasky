@@ -7,6 +7,8 @@
 uniform float u_zfar;
 uniform float u_k;
 uniform sampler2DArray u_textures;
+// 0-fragColor, 1-layerBuffer
+uniform int u_renderTarget;
 
 // INPUT
 in vec4 v_col;
@@ -31,15 +33,21 @@ vec4 textured() {
 }
 
 void main() {
+    vec4 finalColor;
     if (v_textureIndex < 0.0) {
         // Use color
-        fragColor = programmatic();
+        finalColor = programmatic();
     } else {
         // Use texture
-        fragColor = textured();
+        finalColor = textured();
     }
     gl_FragDepth = getDepthValue(u_zfar, u_k);
-    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
+
+    if (u_renderTarget == 0) {
+        fragColor = finalColor;
+    } else {
+        layerBuffer = finalColor;
+    }
 
     #ifdef ssrFlag
     ssrBuffers();

@@ -304,6 +304,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
                 shaderProgram.setUniformi("u_shadingStyle", set.shadingStyle.ordinal());
 
+                // Render target.
+                shaderProgram.setUniformi("u_renderTarget", set.renderTarget.layerId);
+
                 // Affine transformations.
                 addAffineTransformUniforms(shaderProgram, Mapper.affine.get(render.entity));
 

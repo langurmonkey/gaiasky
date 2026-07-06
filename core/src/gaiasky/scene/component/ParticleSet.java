@@ -168,6 +168,26 @@ public class ParticleSet implements Component, IDisposable {
     /** Contains the indices of the particles whose descriptors are not present. **/
     public IntSet proximityMissing;
 
+    public enum RenderTarget {
+        SCENE_LAYER(0),
+        EXTRA_LAYER(1);
+
+        public final int layerId;
+
+        RenderTarget(int layerId) {
+            this.layerId = layerId;
+        }
+    }
+
+    /**
+     * Render target for the particles of this set.
+     * <ol start=0>
+     * <li>The default scene buffer, affected by post-processing effects.</li>
+     * <li>The layer buffer, which contains labels and lines, unaffected by post-processing effects.</li>
+     * </ol>
+     */
+    public RenderTarget renderTarget = RenderTarget.SCENE_LAYER;
+
     /**
      * Profile decay of the particles in the shader, when using quads and plain {@link ShadingType}.
      */
@@ -476,7 +496,6 @@ public class ParticleSet implements Component, IDisposable {
     }
 
 
-
     public void setMeanPosition(double[] pos) {
         this.meanPosition = new Vector3D(pos[0], pos[1], pos[2]);
     }
@@ -543,6 +562,27 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setProfileDecay(Double profileDecay) {
         this.profileDecay = profileDecay.floatValue();
+    }
+
+    public void setRenderTarget(String renderTarget) {
+        try {
+            var rt = renderTarget.toUpperCase(Locale.ROOT).replace(" ", "_");
+            this.renderTarget = RenderTarget.valueOf(rt);
+        } catch (IllegalArgumentException e) {
+            Logger.getLogger(this.getClass()
+                                     .getSimpleName())
+                    .error("Error setting render target: " + renderTarget, e);
+        }
+    }
+
+    public void setRenderTarget(Long renderTarget) {
+       try {
+          this.renderTarget = RenderTarget.values()[Math.toIntExact(renderTarget)];
+       } catch (IllegalArgumentException e) {
+           Logger.getLogger(this.getClass()
+                                    .getSimpleName())
+                   .error("Error setting render target: " + renderTarget, e);
+       }
     }
 
     /**
@@ -677,7 +717,8 @@ public class ParticleSet implements Component, IDisposable {
         this.numLabels = FastMath.toIntExact(numLabels);
     }
 
-    public void updateNumLabelsValue(int n, Entity e) {
+    public void updateNumLabelsValue(int n,
+                                     Entity e) {
         int newNumLabels = FastMath.min(n, pointData.size());
         if (newNumLabels != numLabels) {
             setNumLabels((long) newNumLabels);
@@ -1183,7 +1224,8 @@ public class ParticleSet implements Component, IDisposable {
         return hasName(candidate, false);
     }
 
-    public boolean hasName(String candidate, boolean matchCase) {
+    public boolean hasName(String candidate,
+                           boolean matchCase) {
         if (focus == null || focus.names() == null) {
             return false;
         } else {

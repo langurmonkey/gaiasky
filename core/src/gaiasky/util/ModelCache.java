@@ -45,7 +45,7 @@ public class ModelCache {
             mat = new Material();
             switch (shape) {
                 case "sphere" -> {
-                    var quality = ((Long) params.get("quality")).intValue();
+                    var quality = params.containsKey("quality")? ((Long) params.get("quality")).intValue() : ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                     var oblateness = params.containsKey("oblateness") ? ((Double) params.get("oblateness")).floatValue() : 0f;
                     var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;

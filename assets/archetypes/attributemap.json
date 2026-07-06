@@ -739,6 +739,10 @@
         "description": "Number of labels to render for this particle group. Defaults to the configuration setting.",
         "unit": "Integer"
       },
+      "renderTarget": {
+        "description": "Render target for the particles of this set. |brsp| **Possible values are:** |ul| |li| ``SCENE_LAYER`` -- the regular scene buffer, affected by post-processing effects. |eli| |li| ``EXTRA_LAYER`` -- the layer used by labels and lines, unaffected by post-processing effects. |eli| |eul|",
+        "unit": "String"
+      },
       "profileDecay:ParticleGroup": {
         "description": "The profile decay of the particles in the shader, when using the default shading type, ``shadingType``=``PLAIN``. Controls how sudden is the color and intensity fall-off from the center.",
         "unit": "Double",

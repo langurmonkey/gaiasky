@@ -6,12 +6,19 @@
 uniform float u_falloff;
 uniform float u_zfar;
 uniform float u_k;
+// 0-fragColor, 1-layerBuffer
+uniform int u_renderTarget;
+// Texture array
 uniform sampler2DArray u_textures;
+// Ambient light
 uniform float u_ambientLight;
+// Diffuse scattering attribute
 uniform float u_diffuseScattering = 0.0;
+// Light intensity
 uniform float u_lightIntensity;
 // 0-off, 1-billboard lighting, 2-spherical lighting
 uniform int u_shadingType = 0;
+// Spherical power
 uniform float u_sphericalPower;
 
 // INPUT
@@ -198,17 +205,23 @@ vec4 textured() {
 }
 
 void main() {
+    vec4 finalColor;
     if (v_textureIndex < 0.0) {
         float dist = distance(vec2(0.5), v_uv) * 2.0;
         if (dist > 1.0) {
             discard;
         }
-        fragColor = programmatic(dist);
+        finalColor = programmatic(dist);
     } else {
-        fragColor = textured();
+        finalColor = textured();
     }
     gl_FragDepth = getDepthValue(u_zfar, u_k);
-    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
+
+    if (u_renderTarget == 0) {
+        fragColor = finalColor;
+    } else {
+        layerBuffer = finalColor;
+    }
 
     // Add outline
     //if (v_uv.x > 0.99 || v_uv.x < 0.01 || v_uv.y > 0.99 || v_uv.y < 0.01) {
