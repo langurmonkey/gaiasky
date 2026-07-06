@@ -21,6 +21,12 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
+import gaiasky.render.gdx.graphics.VolumeTexture;
+import gaiasky.render.gdx.loader.OwnTextureLoader.OwnTextureParameter;
+import gaiasky.render.gdx.loader.PFMTextureLoader.PFMTextureParameter;
+import gaiasky.render.gdx.loader.VolumeTextureLoader;
+import gaiasky.render.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.shader.Material;
 import gaiasky.render.gdx.shader.attribute.*;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.Constants;
@@ -29,12 +35,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.SysUtils;
-import gaiasky.render.gdx.graphics.VolumeTexture;
-import gaiasky.render.gdx.loader.OwnTextureLoader.OwnTextureParameter;
-import gaiasky.render.gdx.loader.PFMTextureLoader.PFMTextureParameter;
-import gaiasky.render.gdx.loader.VolumeTextureLoader;
-import gaiasky.render.gdx.model.IntModelInstance;
-import gaiasky.render.gdx.shader.Material;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.svt.SVTManager;
 import net.jafama.FastMath;
@@ -64,6 +64,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     /** Reflection cubemap for all materials. **/
     @SuppressWarnings("GDXJavaStaticResource")
     public static final CubemapComponent sharedReflectionCubemap = new CubemapComponent();
+
+    private final boolean newProcedural = true;
 
     private void initializeLookUpTables() {
         if (lookUpTextures.isEmpty()) {
@@ -741,10 +743,18 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     private synchronized void initializeGenElevationData() {
-       textureBasedGeneration();
+        if (newProcedural) {
+            shaderBasedGeneration();
+        } else {
+            textureBasedGeneration();
+        }
     }
 
-    private  void textureBasedGeneration() {
+    private void shaderBasedGeneration() {
+        heightGenerated.set(true);
+    }
+
+    private void textureBasedGeneration() {
         if (heightGenerated.get()) {
             addHeightTex(heightTex);
         } else {
@@ -1345,7 +1355,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         disposeCubemap(manager, material, CubemapAttribute.MetallicCubemap, metallicCubemap);
         disposeCubemap(manager, material, CubemapAttribute.HeightCubemap, heightCubemap);
         disposeCubemap(manager, material, CubemapAttribute.AmbientOcclusionCubemap, aoCubemap);
-        disposeCubemap(manager,material, CubemapAttribute.ReflectionCubemap, sharedReflectionCubemap);
+        disposeCubemap(manager, material, CubemapAttribute.ReflectionCubemap, sharedReflectionCubemap);
         texLoading = false;
         texInitialised = false;
     }
@@ -1532,7 +1542,8 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setNoise(nc);
     }
 
-    private String randomBiomeLut(Random rand, String... names) {
+    private String randomBiomeLut(Random rand,
+                                  String... names) {
         Array<String> candidates = new Array<>(names.length);
 
         for (var name : names) {

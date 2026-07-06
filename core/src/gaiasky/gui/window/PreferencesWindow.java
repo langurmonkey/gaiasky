@@ -37,13 +37,13 @@ import gaiasky.gui.main.GSKeys;
 import gaiasky.gui.main.GamepadMappings;
 import gaiasky.gui.main.KeyBindings;
 import gaiasky.gui.main.KeyBindings.ProgramAction;
+import gaiasky.render.gdx.loader.WarpMeshReader;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
 import gaiasky.util.datadesc.DatasetGroup;
 import gaiasky.util.datadesc.DatasetUtils;
-import gaiasky.render.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;
@@ -411,7 +411,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     lensFlare.setValue(1f);
                     GaiaSky.settings().postprocess.lensFlare.type = LensFlareType.COMPLEX;
                     // Tessellation elevation representation.
-                    elevationSb.setSelectedIndex(ElevationType.TESSELLATION.ordinal());
+                    elevationSb.setSelectedIndex(settings.runtime.tessellation ? ElevationType.TESSELLATION.ordinal() : ElevationType.REGULAR.ordinal());
                     // 6 shadows, 2048.
                     shadowsCb.setChecked(true);
                     nShadows.setSelectedIndex(5);
@@ -783,14 +783,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // ELEVATION TYPE
             OwnLabel elevationTypeLabel = new OwnLabel(I18n.msg("gui.elevation.type"), skin);
-            ElevationComboBoxBean[] ecbb = new ElevationComboBoxBean[ElevationType.values().length];
+            int tn = settings.runtime.tessellation ? ElevationType.values().length : ElevationType.values().length -1;
+            ElevationComboBoxBean[] elevationValues = new ElevationComboBoxBean[tn];
             int i = 0;
             for (ElevationType et : ElevationType.values()) {
-                ecbb[i] = new ElevationComboBoxBean(I18n.msg("gui.elevation.type." + et.toString().toLowerCase(Locale.ROOT)), et);
+                if (et == ElevationType.TESSELLATION && !settings.runtime.tessellation) {
+                    continue;
+                }
+                elevationValues[i] = new ElevationComboBoxBean(I18n.msg("gui.elevation.type." + et.toString().toLowerCase(Locale.ROOT)), et);
                 i++;
             }
             elevationSb = new OwnSelectBox<>(skin);
-            elevationSb.setItems(ecbb);
+            elevationSb.setItems(elevationValues);
             elevationSb.setWidth(selectWidth);
             elevationSb.setSelectedIndex(GaiaSky.settings().scene.renderer.elevation.type.ordinal());
             elevationSb.addListener((event) -> {
@@ -805,11 +809,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // TESSELLATION QUALITY
             tessQualityLabel = new OwnLabel(I18n.msg("gui.elevation.tessellation.quality"), skin);
-            tessQualityLabel.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
+            tessQualityLabel.setDisabled(!settings.scene.renderer.elevation.type.isTessellation() || !settings.runtime.tessellation);
 
             tessQuality = new OwnSliderReset("", Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, 1.5f, skin);
             tessQuality.setTooltip(I18n.msg("gui.elevation.tessellation.quality"));
-            tessQuality.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
+            tessQuality.setDisabled(!settings.scene.renderer.elevation.type.isTessellation() || !settings.runtime.tessellation);
             tessQuality.setWidth(sliderWidth);
             tessQuality.setValue((float) settings.scene.renderer.elevation.quality);
 

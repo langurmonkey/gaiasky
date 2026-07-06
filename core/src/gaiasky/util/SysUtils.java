@@ -913,5 +913,15 @@ public class SysUtils {
                     || (GL.getCapabilities().GL_ARB_compute_shader && GL.getCapabilities().GL_ARB_shader_storage_buffer_object))
                 && maxBlocks > 0;
     }
+
+    /**
+     * Checks if tessellation shaders (OpenGL 4.0) are supported. This method <strong>must</strong> run on the main thread.
+     * Otherwise, it will crash.
+     *
+     * @return True if tessellation shaders are supported, false otherwise.
+     */
+    public static boolean isTessellationSupported() {
+        return (GL.getCapabilities().OpenGL40 || GL.getCapabilities().GL_ARB_tessellation_shader);
+    }
 }
 

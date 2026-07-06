@@ -4598,6 +4598,7 @@ public class Settings extends SettingsObject {
     public static class RuntimeSettings extends SettingsObject implements IObserver {
         public boolean openXr;
         public boolean compute;
+        public boolean tessellation;
         public boolean displayGui = true;
         public boolean updatePause;
         public boolean timeOn;
