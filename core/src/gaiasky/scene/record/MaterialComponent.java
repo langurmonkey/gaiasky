@@ -751,7 +751,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     private void shaderBasedGeneration() {
-        heightGenerated.set(true);
+        if (!heightGenerated.get()) {
+            heightGenerated.set(true);
+        }
     }
 
     private void textureBasedGeneration() {

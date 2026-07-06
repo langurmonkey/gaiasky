@@ -15,12 +15,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.render.gdx.shader.provider.*;
-import gaiasky.render.util.ShaderLoader;
 import gaiasky.data.util.GlobalResources;
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
-import gaiasky.util.TextUtils;
 import gaiasky.render.gdx.IntModelBatch;
 import gaiasky.render.gdx.g2d.BitmapFont;
 import gaiasky.render.gdx.g2d.ExtSpriteBatch;
@@ -32,7 +27,12 @@ import gaiasky.render.gdx.shader.loader.ComputeShaderLoader;
 import gaiasky.render.gdx.shader.loader.GroundShaderProviderLoader.GroundShaderProviderParameter;
 import gaiasky.render.gdx.shader.loader.RelativisticShaderProviderLoader.RelativisticShaderProviderParameter;
 import gaiasky.render.gdx.shader.loader.TessellationShaderProviderLoader.TessellationShaderProviderParameter;
+import gaiasky.render.gdx.shader.provider.*;
 import gaiasky.render.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParameter;
+import gaiasky.render.util.ShaderLoader;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 
 /**
@@ -65,10 +65,12 @@ public class RenderAssets {
             billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, galDesc, spriteDesc, billboardDesc;
 
     private final boolean compute;
+    private final boolean tessellation;
 
     public RenderAssets(GlobalResources globalResources) {
         this.globalResources = globalResources;
         this.compute = GaiaSky.settings().runtime.compute;
+        this.tessellation = GaiaSky.settings().runtime.tessellation;
     }
 
     /**
@@ -125,9 +127,11 @@ public class RenderAssets {
                                    defines);
         billboardGroupDesc = loadShaderExt(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl",
                                            TextUtils.concatAll("billboard.group", names), defines);
-        if (compute)
+        if (compute) {
             billboardProceduralDesc = loadShaderExt(manager, "shader/billboard.proc.vertex.glsl", "shader/billboard.group.fragment.glsl",
                                                     TextUtils.concatAll("billboard.proc", names), defines);
+        }
+
         billboardProceduralCpuDesc = loadShaderExt(manager, "shader/billboard.proc.cpu.vertex.glsl", "shader/billboard.group.fragment.glsl",
                                                    TextUtils.concatAll("billboard.proc.cpu", names), defines);
         pointDesc = loadShaderExt(manager,
@@ -155,6 +159,7 @@ public class RenderAssets {
                                             TextUtils.concatAll("line.quad.gpu", names),
                                             defines);
         }
+
         primitiveGpuDesc = loadShaderExt(manager,
                                          "shader/line.gpu.vertex.glsl",
                                          "shader/line.gpu.fragment.glsl",
@@ -217,37 +222,44 @@ public class RenderAssets {
         manager.load("pbr",
                      GroundShaderProvider.class,
                      new GroundShaderProviderParameter("shader/pbr.vertex.glsl", "shader/pbr.fragment.glsl"));
-        manager.load("pbr-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.pbr.vertex.glsl", "shader/tessellation/tess.pbr.control.glsl",
-                                                             "shader/tessellation/tess.pbr.eval.glsl", "shader/tessellation/tess.pbr.fragment.glsl"));
-        manager.load("pbr-procedural-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.procedural.vertex.glsl", "shader/tessellation/tess.procedural.control.glsl",
-                                                             "shader/tessellation/tess.procedural.eval.glsl", "shader/tessellation/tess.procedural.fragment.glsl"));
         manager.load("pbr-dust",
                      GroundShaderProvider.class,
                      new GroundShaderProviderParameter("shader/pbr.vertex.glsl", "shader/dust.fragment.glsl"));
         manager.load("pbr-depth", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/depth.fragment.glsl"));
-        manager.load("pbr-depth-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
-                                                             "shader/tessellation/tess.depth.control.glsl",
-                                                             "shader/tessellation/tess.simple.eval.glsl",
-                                                             "shader/tessellation/tess.depth.fragment.glsl"));
+
         manager.load("pbr-opaque", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/opaque.fragment.glsl"));
-        manager.load("pbr-opaque-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
-                                                             "shader/tessellation/tess.simple.control.glsl",
-                                                             "shader/tessellation/tess.simple.eval.glsl",
-                                                             "shader/tessellation/tess.opaque.fragment.glsl"));
         manager.load("pbr-svtdetection", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/pbr.vertex.glsl", "shader/svt.detection.fragment.glsl"));
-        manager.load("pbr-svtdetection-tessellation", TessellationShaderProvider.class,
-                     new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
-                                                             "shader/tessellation/tess.simple.control.glsl",
-                                                             "shader/tessellation/tess.simple.eval.glsl",
-                                                             "shader/tessellation/tess.svt.detection.fragment.glsl"));
 
+        if (tessellation) {
+            manager.load("pbr-tessellation", TessellationShaderProvider.class,
+                         new TessellationShaderProviderParameter("shader/tessellation/tess.pbr.vertex.glsl",
+                                                                 "shader/tessellation/tess.pbr.control.glsl",
+                                                                 "shader/tessellation/tess.pbr.eval.glsl",
+                                                                 "shader/tessellation/tess.pbr.fragment.glsl"));
+            manager.load("pbr-procedural-tessellation", TessellationShaderProvider.class,
+                         new TessellationShaderProviderParameter("shader/tessellation/tess.procedural.vertex.glsl",
+                                                                 "shader/tessellation/tess.procedural.control.glsl",
+                                                                 "shader/tessellation/tess.procedural.eval.glsl",
+                                                                 "shader/tessellation/tess.procedural.fragment.glsl"));
+            manager.load("pbr-depth-tessellation", TessellationShaderProvider.class,
+                         new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
+                                                                 "shader/tessellation/tess.depth.control.glsl",
+                                                                 "shader/tessellation/tess.simple.eval.glsl",
+                                                                 "shader/tessellation/tess.depth.fragment.glsl"));
+            manager.load("pbr-opaque-tessellation", TessellationShaderProvider.class,
+                         new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
+                                                                 "shader/tessellation/tess.simple.control.glsl",
+                                                                 "shader/tessellation/tess.simple.eval.glsl",
+                                                                 "shader/tessellation/tess.opaque.fragment.glsl"));
+            manager.load("pbr-svtdetection-tessellation", TessellationShaderProvider.class,
+                         new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
+                                                                 "shader/tessellation/tess.simple.control.glsl",
+                                                                 "shader/tessellation/tess.simple.eval.glsl",
+                                                                 "shader/tessellation/tess.svt.detection.fragment.glsl"));
+        }
         manager.load("skybox",
                      RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/skybox.vertex.glsl", "shader/skybox.fragment.glsl"));
@@ -260,11 +272,11 @@ public class RenderAssets {
         manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
 
         // Compute shaders
-        if (compute)
+        if (compute) {
             manager.load("galgen.comp.glsl",
                          ComputeShaderProgram.class,
                          new ComputeShaderLoader.ComputeShaderParameter("compute.galgen", "shader/compute/galgen.comp.glsl"));
-
+        }
 
         // Add fonts to load
         BitmapFontParameter bfp = new BitmapFontParameter();
@@ -339,8 +351,9 @@ public class RenderAssets {
         /*
          * BILLBOARD GROUP (PROCEDURAL)
          */
-        if (compute)
+        if (compute) {
             billboardProceduralShaders = fetchShaderProgramExt(manager, billboardProceduralDesc, TextUtils.concatAll("billboard.proc", names));
+        }
 
         /*
          * BILLBOARD GROUP (PROCEDURAL CPU)
@@ -397,24 +410,33 @@ public class RenderAssets {
 
         // Per-pixel lighting shaders
         IntShaderProvider pbr = manager.get("pbr");
-        TessellationShaderProvider pbrTessellation = manager.get("pbr-tessellation");
-        TessellationShaderProvider pbrProceduralTessellation = manager.get("pbr-procedural-tessellation");
         IntShaderProvider pbrDust = manager.get("pbr-dust");
         IntShaderProvider pbrDepth = manager.get("pbr-depth");
-        TessellationShaderProvider pbrDepthTessellation = manager.get("pbr-depth-tessellation");
         IntShaderProvider pbrOpaque = manager.get("pbr-opaque");
-        TessellationShaderProvider pbrOpaqueTessellation = manager.get("pbr-opaque-tessellation");
         IntShaderProvider pbrSvtDetection = manager.get("pbr-svtdetection");
-        TessellationShaderProvider pbrSvtDetectionTessellation = manager.get("pbr-svtdetection-tessellation");
 
         // Others
         IntShaderProvider skybox = manager.get("skybox");
         IntShaderProvider atmosphere = manager.get("atmosphere");
         IntShaderProvider cloud = manager.get("cloud");
 
+        if (tessellation) {
+            TessellationShaderProvider pbrTessellation = manager.get("pbr-tessellation");
+            TessellationShaderProvider pbrProceduralTessellation = manager.get("pbr-procedural-tessellation");
+            TessellationShaderProvider pbrDepthTessellation = manager.get("pbr-depth-tessellation");
+            TessellationShaderProvider pbrOpaqueTessellation = manager.get("pbr-opaque-tessellation");
+            TessellationShaderProvider pbrSvtDetectionTessellation = manager.get("pbr-svtdetection-tessellation");
+            mbPBRTessellation = new IntModelBatch(pbrTessellation);
+            mbPBRTessellationProcedural = new IntModelBatch(pbrProceduralTessellation);
+            mbPBRTessellationOpaque = new IntModelBatch(pbrOpaqueTessellation);
+            mbPBRTessellationSvtDetection = new IntModelBatch(pbrSvtDetectionTessellation);
+            mbPBRTessellationDepth = new IntModelBatch(pbrDepthTessellation);
+        }
+
         // Compute
-        if (compute)
+        if (compute) {
             galGenShader = manager.get("galgen.comp.glsl");
+        }
 
         // Create model batches
         mbSimple = new IntModelBatch(simple);
@@ -430,11 +452,6 @@ public class RenderAssets {
         mbPBRDepth = new IntModelBatch(pbrDepth);
         mbPBROpaque = new IntModelBatch(pbrOpaque);
         mbPBRSvtDetection = new IntModelBatch(pbrSvtDetection);
-        mbPBRTessellation = new IntModelBatch(pbrTessellation);
-        mbPBRTessellationProcedural = new IntModelBatch(pbrProceduralTessellation);
-        mbPBRTessellationOpaque = new IntModelBatch(pbrOpaqueTessellation);
-        mbPBRTessellationSvtDetection = new IntModelBatch(pbrSvtDetectionTessellation);
-        mbPBRTessellationDepth = new IntModelBatch(pbrDepthTessellation);
 
         mbSkybox = new IntModelBatch(skybox);
         mbAtmosphere = new IntModelBatch(atmosphere);
