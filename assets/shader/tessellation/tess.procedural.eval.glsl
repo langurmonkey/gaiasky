@@ -82,6 +82,11 @@ uniform bool  u_moistureRidge;
 // Water level: everything at or below this elevation is water
 uniform float u_waterLevel;
 
+// Water/land in height texture
+#ifdef heightTextureFlag
+uniform sampler2D u_heightTexture;
+#endif // heightTextureFlag
+
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
@@ -261,9 +266,22 @@ void main(void) {
     o_data.texCoords = u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords;
     o_data.normal = sphereNormal;
 
-    // Procedural height
-    float elevation = evaluateElevation(modelPos, o_data.texCoords);
-    o_fragElevation = elevation;
+
+    float elevation;
+    #ifdef TODOheightTextureFlag
+        elevation = texture(u_heightTexture, o_data.texCoords * u_elevationScale.xy).r;
+    #else
+        elevation = evaluateElevation(modelPos, o_data.texCoords);
+    #endif // hightTextureFlag
+
+    if (elevation >= u_waterLevel) {
+        // Terrain
+        o_fragElevation = elevation;
+    } else {
+        // Water
+        elevation = u_waterLevel;
+        o_fragElevation = elevation;
+    }
     o_fragHeight = elevation * u_heightScale * u_elevationMultiplier;
 
     // Compute surface normal from noise displacement gradient
@@ -272,8 +290,14 @@ void main(void) {
         ? vec3(0.0, 1.0, 0.0)
         : vec3(1.0, 0.0, 0.0)));
     vec3 bitangent = cross(sphereNormal, tangent);
-    float h_t = evaluateElevation(modelPos + tangent * eps, o_data.texCoords + vec2(eps, 0.0));
-    float h_b = evaluateElevation(modelPos + bitangent * eps, o_data.texCoords + vec2(0.0, eps));
+    float h_t, h_b;
+    if (elevation >= u_waterLevel) {
+        h_t = evaluateElevation(modelPos + tangent * eps, o_data.texCoords + vec2(eps, 0.0));
+        h_b = evaluateElevation(modelPos + bitangent * eps, o_data.texCoords + vec2(0.0, eps));
+    } else {
+        h_t = elevation;
+        h_b = elevation;
+    }
     float scale = u_heightScale * u_elevationMultiplier;
     float dhdu = (h_t - elevation) / eps * scale;
     float dhdv = (h_b - elevation) / eps * scale;
@@ -284,7 +308,8 @@ void main(void) {
     vec4 pos = vec4(modelPos + dh, 1.0);
 
     // Moisture
-    o_fragMoisture = evaluateMoisture(modelPos, o_data.texCoords);
+    //o_fragMoisture = evaluateMoisture(modelPos, o_data.texCoords);
+    o_fragMoisture = 0.5;
 
     // Apply world transform AFTER noise evaluation and displacement
     pos = u_worldTrans * pos;

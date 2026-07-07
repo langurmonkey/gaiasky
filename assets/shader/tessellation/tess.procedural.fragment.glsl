@@ -10,33 +10,21 @@ uniform sampler2D u_biomeLUT;
 // Water level
 uniform float u_waterLevel;
 
-// Emissive
-#ifdef emissiveColorFlag
-uniform vec4 u_emissiveColor;
-#endif
-#ifdef emissiveTextureFlag
-uniform sampler2D u_emissiveTexture;
-#include <shader/lib/luma.glsl>
-#endif
+// Biome lut in diffuse texture
+#ifdef diffuseTextureFlag
+uniform sampler2D u_diffuseTexture;
+#endif // diffuseTextureFlag
+
+// Water/land in height texture
+#ifdef heightTextureFlag
+uniform sampler2D u_heightTexture;
+#endif // heightTextureFlag
+
 
 // ECLIPSES
 #include <shader/lib/eclipses.glsl>
 // SHADOW MAPPING
 #include <shader/lib/shadowmap.frag.glsl>
-
-#ifdef svtCacheTextureFlag
-uniform sampler2D u_svtCacheTexture;
-#endif
-
-// CUBEMAPS
-#ifdef cubemapFlag
-#include <shader/lib/cubemap.glsl>
-#endif // cubemapFlag
-
-// SVT
-#ifdef svtFlag
-#include <shader/lib/svt.glsl>
-#endif // svtFlag
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
@@ -123,18 +111,21 @@ void main() {
     float elevation = o_fragElevation;
     float moisture = o_fragMoisture;
 
+    vec4 diffuse;
+    #ifdef TODOdiffuseTextureFlag
     // Sample LUT for diffuse color
     // LUT: X = moisture, Y = 1 - elevation (so water is at bottom)
-    //vec4 diffuse = texture(u_biomeLUT, vec2(moisture, 1.0 - elevation));
-
-    vec4 diffuse;
+    vec4 lut = texture(u_diffuseTexture, vec2(moisture, 1.0 - elevation));
+    diffuse = lut;
+    #else
     if (elevation <= u_waterLevel + 0.0001) {
         // Blue
-        diffuse = vec4(0.1, 0.12, 0.6, 1.0);
+        diffuse = vec4(0.1, 0.32, 0.8, 1.0);
     } else {
         // Green
-        diffuse = vec4(0.02, 0.5, 0.11, 1.0);
+        diffuse = vec4(0.02, 0.7, 0.21, 1.0);
     }
+    #endif // diffuseTextureFlag
 
     // Specular: water is reflective
     vec3 specular = vec3(0.0);
@@ -209,7 +200,7 @@ void main() {
     vec3 F_env = vec3(0.0);
     #ifdef metallicFlag
     // Fetch Roughness
-    #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
+    #if defined(roughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
     vec3 roughness3 = fetchColorRoughness(texCoords);
     roughnessValue = roughness3.r;
     #elif defined(shininessFlag)

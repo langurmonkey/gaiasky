@@ -570,9 +570,10 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
-            setFloatAttribute(mat, FloatAttribute.WaterLevel, 0.1f);
-            setFloatAttribute(mat, FloatAttribute.HeightScale, mtc.heightScale * 10.0f);
 
+            setFloatAttribute(mat, FloatAttribute.ElevationMultiplier, (float) GaiaSky.settings().scene.renderer.elevation.multiplier);
+            setFloatAttribute(mat, FloatAttribute.WaterLevel, nc.waterLevel);
+            setFloatAttribute(mat, FloatAttribute.HeightScale, mtc.heightScale * 10.0f);
 
             setIntAttribute(mat, IntAttribute.NoiseType, nc.type.ordinal());
             setFloatAttribute(mat, FloatAttribute.ElevationSeed, nc.seed);
@@ -1178,9 +1179,9 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public void randomizeAll(long seed,
                              double size) {
         // Type
-        setType("cubesphere");
+        setType("uvsphere");
         // Parameters
-        setParams(createCubeSphereParameters(130, 1.0, false));
+        setParams(createUVSphereParameters(600, 1.0, false));
         // Material
         MaterialComponent mtc = new MaterialComponent();
         // Randomize material.

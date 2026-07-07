@@ -111,18 +111,6 @@ uniform vec3 u_vrOffset = vec3(0.0);
     const float u_opacity = 1.0;
 #endif
 
-#if defined(diffuseTextureFlag) || defined(specularTextureFlag)
-    #define textureFlag
-#endif
-
-#if defined(specularTextureFlag) || defined(specularColorFlag)
-    #define specularFlag
-#endif
-
-#if defined(specularFlag) || defined(fogFlag)
-    #define cameraPositionFlag
-#endif
-
 #if defined(normalFlag) && defined(binormalFlag) && defined(tangentFlag)
     #define calculateTangentVectors() nop()
 #elif defined(normalFlag) && defined(binormalFlag)

@@ -753,6 +753,11 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     private void shaderBasedGeneration() {
         if (!heightGenerated.get()) {
             heightGenerated.set(true);
+            var t = GaiaSky.settings().data.dataFileHandle("$data/default-data/tex/noise/Craters/Craters 14 - 512x512.png");
+            if (t.exists()) {
+                heightTex = new Texture(t);
+                addHeightTex(heightTex);
+            }
         }
     }
 

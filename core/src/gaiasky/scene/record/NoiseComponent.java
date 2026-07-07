@@ -37,12 +37,12 @@ public final class NoiseComponent extends NamedComponent {
     public float seed = 0f;
     public boolean turbulence = true;
     public boolean ridge = true;
-    public int numTerraces = 0;
-    public float terracesExp = 17.0f;
+
+    public float waterLevel = 0.2f;
 
     public boolean genEmissiveMap = false;
 
-    public FrameBuffer fbNoise, fbBiome, fbSurface;
+    public FrameBuffer fbNoise, fbBiome, fbMask, fbSurface;
 
     /** Open windows with the resulting frame buffers. **/
     private static boolean DEBUG_UI_VIEW = false;
@@ -52,7 +52,9 @@ public final class NoiseComponent extends NamedComponent {
     }
 
 
-    private FrameBuffer createFrameBuffer(int N, int M, int numColorTargets) {
+    private FrameBuffer createFrameBuffer(int N,
+                                          int M,
+                                          int numColorTargets) {
         GLFrameBuffer.FrameBufferBuilder builder = new GLFrameBuffer.FrameBufferBuilder(N, M);
 
         for (int i = 0; i < numColorTargets; i++) {
@@ -68,7 +70,10 @@ public final class NoiseComponent extends NamedComponent {
         return (float) (seed / FastMath.pow(10L, s.length()));
     }
 
-    private Biome getNoiseEffect(int N, int M, int channels, int targets) {
+    private Biome getNoiseEffect(int N,
+                                 int M,
+                                 int channels,
+                                 int targets) {
         Biome biome = new Biome(N, M, targets);
         biome.setScale(scale);
         biome.setType(type);
@@ -82,13 +87,15 @@ public final class NoiseComponent extends NamedComponent {
         biome.setRange((float) range[0], (float) range[1]);
         biome.setTurbulence(turbulence);
         biome.setRidge(ridge);
-        biome.setNumTerraces(numTerraces);
-        biome.setTerraceExp(terracesExp);
         biome.setChannels(channels);
         return biome;
     }
 
-    public FrameBuffer generateNoise(int N, int M, int channels, int targets, float[] color) {
+    public FrameBuffer generateNoise(int N,
+                                     int M,
+                                     int channels,
+                                     int targets,
+                                     float[] color) {
         fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, targets);
 
         Biome biome = getNoiseEffect(N, M, channels, targets);
@@ -96,6 +103,29 @@ public final class NoiseComponent extends NamedComponent {
         biome.render(null, fbNoise);
 
         return fbNoise;
+    }
+
+    /**
+     * Generates the mask, which is a single low-resolution texture for the water/land areas.
+     *
+     * @param N The width in pixels.
+     * @param M The height in pixels.
+     *
+     * @return The mask buffer.
+     */
+    public synchronized FrameBuffer generateMask(int N,
+                                                 int M) {
+        // Biome noise (height, moisture).
+        fbMask = fbMask != null ? fbMask : createFrameBuffer(N, M, 1);
+
+        // 1 channels: water/land.
+        // Emissive map is an additional render target.
+        Biome biomeNoise = getNoiseEffect(N, M, 1, 1);
+        fbMask.begin();
+        biomeNoise.render(null, fbMask);
+        fbMask.end();
+
+        return fbMask;
     }
 
     /**
@@ -107,7 +137,8 @@ public final class NoiseComponent extends NamedComponent {
      *
      * @return The biome frame buffer, with two render targets.
      */
-    public synchronized FrameBuffer generateBiome(int N, int M) {
+    public synchronized FrameBuffer generateBiome(int N,
+                                                  int M) {
         // Biome noise (height, moisture).
         fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, genEmissiveMap ? 2 : 1);
 
@@ -140,7 +171,8 @@ public final class NoiseComponent extends NamedComponent {
      *
      * @return The frame buffer with all the render targets.
      */
-    public synchronized FrameBuffer generateSurface(int N, int M,
+    public synchronized FrameBuffer generateSurface(int N,
+                                                    int M,
                                                     String biomeLut,
                                                     float biomeHueShift,
                                                     float biomeSaturation,
@@ -233,18 +265,6 @@ public final class NoiseComponent extends NamedComponent {
         this.power = power;
     }
 
-    public void setNumTerraces(Long numTerraces) {
-        this.numTerraces = numTerraces.intValue();
-    }
-
-    public void setTerracesExp(Double terracesExp) {
-        this.terracesExp = terracesExp.floatValue();
-    }
-
-    public void setTerraceSmoothness(Double terracesExp) {
-        setTerracesExp(terracesExp);
-    }
-
     public void setRange(double[] range) {
         this.range = range;
     }
@@ -265,6 +285,10 @@ public final class NoiseComponent extends NamedComponent {
         this.ridge = t;
     }
 
+    public void setWaterLevel(Double value) {
+        this.waterLevel = value.floatValue();
+    }
+
 
     public void copyFrom(NoiseComponent other) {
         this.seed = other.seed;
@@ -275,30 +299,24 @@ public final class NoiseComponent extends NamedComponent {
         this.frequency = other.frequency;
         this.lacunarity = other.lacunarity;
         this.octaves = other.octaves;
-        this.numTerraces = other.numTerraces;
-        this.terracesExp = other.terracesExp;
         this.range = Arrays.copyOf(other.range, other.range.length);
         this.power = other.power;
         this.turbulence = other.turbulence;
         this.ridge = other.ridge;
         this.genEmissiveMap = other.genEmissiveMap;
+        this.waterLevel = other.waterLevel;
     }
 
     public void randomizeAll(Random rand) {
         randomizeAll(rand, false);
     }
 
-    public void randomizeAll(Random rand, boolean clouds) {
+    public void randomizeAll(Random rand,
+                             boolean clouds) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        int d = rand.nextInt(3);
-        if (clouds) {
-            // Type for clouds: PERLIN, SIMPLEX or CURL.
-            d = d == 2 ? 3 : d;
-        } else {
-            // PERLIN, SIMPLEX, VORONOI or CURL
-        }
+        int d = rand.nextInt(2);
         setType(NoiseType.values()[d].name());
         // Scale.
         double scaleFac = type == NoiseType.CURL ? 2.5 : 1;
@@ -342,13 +360,6 @@ public final class NoiseComponent extends NamedComponent {
                 setOctaves(rand.nextLong(1, 9));
             }
         }
-        // Terraces.
-        if (!clouds && rand.nextBoolean()) {
-            setNumTerraces(rand.nextLong(3, 7));
-            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
-        } else {
-            setNumTerraces(0L);
-        }
         // Range.
         double minRange;
         double maxRange;
@@ -372,13 +383,15 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(10) == 9;
+        // Water level.
+        setWaterLevel(gaussian(rand, 0.1, 0.02, 0.0, 0.4));
     }
 
     public void randomizeRockyPlanet(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX, CURL, VORONOI.
-        setType(NoiseType.values()[rand.nextInt(4)].name());
+        // Type: PERLIN, SIMPLEX
+        setType(NoiseType.values()[rand.nextInt(2)].name());
         // Same scale for all.
         double scale = rand.nextDouble(8.0, 15.0);
         setScale(new double[]{scale, scale, scale});
@@ -392,13 +405,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
         setOctaves((long) rand.nextInt(4, 9));
-        // Terraces.
-        if (rand.nextBoolean()) {
-            setNumTerraces(rand.nextLong(3, 7));
-            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
-        } else {
-            setNumTerraces(0L);
-        }
         // Range.
         setRange(new double[]{
                 rand.nextDouble(0.1, 0.3),
@@ -411,13 +417,44 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(3) < 2);
         // Emission.
         genEmissiveMap = rand.nextInt(20) == 19;
+        // Water level.
+        setWaterLevel(gaussian(rand, 0.05, 0.01, 0.0, 0.1));
+    }
+
+    public void randomizeMask(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Simplex.
+        setType(NoiseType.SIMPLEX.name());
+        // Scale.
+        double scale = rand.nextDouble(3.0, 8.0);
+        setScale(new double[]{scale, scale, scale});
+        // Persistence.
+        setPersistence(rand.nextDouble(0.2, 0.5));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.01, 0.15));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(3.0, 5.0));
+        // Octaves.
+        setOctaves((long) rand.nextInt(3, 6));
+
+        // Range.
+        setRange(new double[]{
+                rand.nextDouble(-0.5, 0.0),
+                rand.nextDouble(0.8, 1.5)});
+        // Power.
+        setPower(rand.nextDouble(0.5, 1.6));
+        // Turbulence.
+        setTurbulence(rand.nextInt(4) == 3);
+        // Ridge.
+        setRidge(turbulence && rand.nextInt(4) < 3);
     }
 
     public void randomizeEarthLike(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX, CURL, VORONOI.
-        setType(NoiseType.values()[rand.nextInt(4)].name());
+        // Type: PERLIN, SIMPLEX
+        setType(NoiseType.values()[rand.nextInt(2)].name());
         // Same scale for all.
         double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
@@ -431,13 +468,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
         setOctaves((long) rand.nextInt(5, 9));
-        // Terraces.
-        if (rand.nextBoolean()) {
-            setNumTerraces(rand.nextLong(3, 7));
-            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
-        } else {
-            setNumTerraces(0L);
-        }
         // Range.
         setRange(new double[]{
                 rand.nextDouble(-0.5, 0.0),
@@ -455,8 +485,8 @@ public final class NoiseComponent extends NamedComponent {
     public void randomizeSnowPlanet(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX, CURL, VORONOI.
-        setType(NoiseType.values()[rand.nextInt(4)].name());
+        // Type: PERLIN, SIMPLEX
+        setType(NoiseType.values()[rand.nextInt(2)].name());
         // Same scale for all.
         double scale = rand.nextDouble(4.0, 8.0);
         setScale(new double[]{scale, scale, scale});
@@ -470,13 +500,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(2.0, 5.0));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(3, 8));
-        // Terraces.
-        if (rand.nextInt(5) == 4) {
-            setNumTerraces(rand.nextLong(3, 7));
-            setTerracesExp((double) rand.nextLong(1, 13) * 2.0 - 1);
-        } else {
-            setNumTerraces(0L);
-        }
         // Range.
         setRange(new double[]{
                 rand.nextDouble(-0.4, 0.0),
@@ -495,16 +518,9 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        // Type: all but WHITE. VORONOI is rare.
-        if (rand.nextInt(20) < 17) {
-            // PERLIN, SIMPLEX or CURL
-            int d = rand.nextInt(3);
-            d = d == 2 ? 3 : d;
-            setType(NoiseType.values()[d].name());
-        } else {
-            // VORONOI
-            setType(NoiseType.VORONOI.name());
-        }
+        // PERLIN, SIMPLEX
+        int d = rand.nextInt(2);
+        setType(NoiseType.values()[d].name());
         // Scale.
         double scaleFac = type == NoiseType.CURL ? 2.5 : 1;
         // XY small, Z large.
@@ -525,8 +541,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(0.1, 3.0));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(1, 4));
-        // Terraces.
-        setNumTerraces(0L);
         // Range.
         setRange(new double[]{0.4, rand.nextDouble(0.9, 1.3)});
         // Power.
@@ -548,8 +562,6 @@ public final class NoiseComponent extends NamedComponent {
         log.debug("Frequency: " + frequency);
         log.debug("Lacunarity: " + lacunarity);
         log.debug("Octaves: " + octaves);
-        log.debug("Terraces: " + numTerraces);
-        log.debug("Terraces exponent: " + terracesExp);
         log.debug("Range: " + Arrays.toString(range));
         log.debug("Power: " + power);
         log.debug("Turbulence: " + turbulence);

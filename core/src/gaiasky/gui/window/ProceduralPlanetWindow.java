@@ -493,6 +493,22 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(scaleGroup).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(scaleTooltip).left().padBottom(pad18).row();
 
+        // WaterLevel.
+        OwnSliderPlus waterLevel = new OwnSliderPlus("Water level", 0.0f, 0.7f, 0.01f, skin);
+        waterLevel.setWidth(fieldWidthNoise);
+        waterLevel.setValue((float) nc.waterLevel);
+        waterLevel.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                nc.waterLevel = waterLevel.getMappedValue();
+            }
+        });
+        OwnImageButton waterLevelTooltip = new OwnImageButton(skin, "tooltip");
+        waterLevelTooltip.addListener(new OwnTextTooltip("The water level", skin));
+        noiseTable.add(waterLevel).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(waterLevelTooltip).left().padBottom(pad18).row();
+
         // Persistence.
         OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
         persistence.setWidth(fieldWidthNoise);
@@ -557,72 +573,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(octaves).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(octavesTooltip).left().padBottom(pad18).row();
 
-        // Terraces.
-        OwnSliderPlus terraces = new OwnSliderPlus(I18n.msg("gui.procedural.terraces"), 0, 8, 1, skin);
-        terraces.setWidth(fieldWidthNoise);
-        terraces.setValue(nc.numTerraces);
-        terraces.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                nc.numTerraces = (int) terraces.getMappedValue();
-            }
-        });
-        OwnImageButton terracesTooltip = new OwnImageButton(skin, "tooltip");
-        terracesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.terraces"), skin));
-        noiseTable.add(terraces).colspan(2).left().padBottom(pad18).padRight(pad10);
-        noiseTable.add(terracesTooltip).left().padBottom(pad18).row();
-
-        // Terraces exponent.
-        OwnSliderPlus terracesExp = new OwnSliderPlus(I18n.msg("gui.procedural.terraces.exp"), 1, 13, 1, skin);
-        terracesExp.setWidth(fieldWidthNoise);
-        terracesExp.setValue(nc.terracesExp);
-        terracesExp.setValueLabelTransform((value) -> String.valueOf(value * 2.0 - 1.0));
-        terracesExp.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                nc.terracesExp = terracesExp.getMappedValue() * 2f - 1f;
-            }
-        });
-        OwnImageButton terracesExpTooltip = new OwnImageButton(skin, "tooltip");
-        terracesExpTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.terraces.exp"), skin));
-        noiseTable.add(terracesExp).colspan(2).left().padBottom(pad18).padRight(pad10);
-        noiseTable.add(terracesExpTooltip).left().padBottom(pad18).row();
-
-        // Range.
-        OwnSliderPlus rangeMin = new OwnSliderPlus(I18n.msg("gui.procedural.range", "[min]"), -2f, 0.0f, 0.1f, skin);
-        rangeMin.setWidth(fieldWidthNoise / 2f - pad10);
-        rangeMin.setValue((float) nc.range[0]);
-        rangeMin.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                nc.range[0] = rangeMin.getMappedValue();
-            }
-        });
-        OwnSliderPlus rangeMax = new OwnSliderPlus(I18n.msg("gui.procedural.range", "[max]"), 0.5f, 2.0f, 0.1f, skin);
-        rangeMax.setWidth(fieldWidthNoise / 2f - pad10);
-        rangeMax.setValue((float) nc.range[1]);
-        rangeMax.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                nc.range[1] = rangeMax.getMappedValue();
-            }
-        });
-
-        HorizontalGroup rangeGroup = new HorizontalGroup();
-        rangeGroup.space(pad10 * 2f);
-        rangeGroup.addActor(rangeMin);
-        rangeGroup.addActor(rangeMax);
-        OwnImageButton rangeTooltip = new OwnImageButton(skin, "tooltip");
-        rangeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.range"), skin));
-        noiseTable.add(rangeGroup).colspan(2).left().padBottom(pad18).padRight(pad10);
-        noiseTable.add(rangeTooltip).left().padBottom(pad18).row();
-
         // Power.
-        OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.1f, 8f, 0.1f, skin);
+        OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.1f, 1f, 0.1f, skin);
         power.setWidth(fieldWidthNoise);
         power.setValue((float) nc.power);
         power.addListener(new ChangeListener() {
@@ -818,7 +770,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             updateLutImage(lookUpTables);
 
             // Height scale
-            OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 80.0f, 0.1f, skin);
+            OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 300.0f, 0.1f, skin);
             heightScale.setWidth(fieldWidthTotal - 100f);
             heightScale.setValueSuffix(" km");
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
