@@ -14,6 +14,8 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagNoProcess;
+import gaiasky.scene.view.VertsView;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3Q;
 
 /**
@@ -21,11 +23,22 @@ import gaiasky.util.math.Vector3Q;
  */
 public class KeyframeUtils {
 
-    public KeyframeUtils(Scene scene) {
+    final VertsView vertsView;
+    public KeyframeUtils() {
+        vertsView = new VertsView();
     }
 
-    public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean arrowCaps) {
-        var entity = scene.archetypes().get(className).createEntity();
+    public Entity newVerts(Scene scene,
+                           String name,
+                           ComponentTypes ct,
+                           String archetypeName,
+                           float[] color,
+                           RenderGroup rg,
+                           boolean closedLoop,
+                           float primitiveSize,
+                           boolean arrowCaps,
+                           double trailMap) {
+        var entity = scene.archetypes().get(archetypeName).createEntity();
 
         var base = Mapper.base.get(entity);
         base.setName(name);
@@ -34,11 +47,34 @@ public class KeyframeUtils {
 
         var body = Mapper.body.get(entity);
         body.setColor(color);
+        body.setLabelColor(color);
+        body.setSizeKm(50.0);
 
-        var verts = Mapper.verts.get(entity);
-        verts.renderGroup = rg;
-        verts.primitiveSize = primitiveSize;
-        verts.glPrimitive = rg.isPoint() ? GL20.GL_POINTS : GL20.GL_LINE_STRIP;
+        synchronized (vertsView) {
+            vertsView.setEntity(entity);
+            vertsView.setPrimitiveSize(primitiveSize);
+            vertsView.setRenderGroup(rg);
+            vertsView.setClosedLoop(closedLoop);
+            vertsView.setGlPrimitive(rg.isPoint() ? GL20.GL_POINTS : GL20.GL_LINE_STRIP);
+        }
+
+        var trajectory = Mapper.trajectory.get(entity);
+        if (trajectory != null) {
+            if (trailMap < 0) {
+                // Trail disabled.
+                trajectory.orbitTrail = false;
+                trajectory.setTrailMap(trailMap);
+            } else {
+                trailMap = MathUtilsDouble.clamp(trailMap, 0.0, 1.0);
+                trajectory.orbitTrail = true;
+                trajectory.setTrailMap(trailMap);
+            }
+        }
+
+        var arrow = Mapper.arrow.get(entity);
+        if (arrow != null) {
+            arrow.arrowCap = arrowCaps;
+        }
 
         var graph = Mapper.graph.get(entity);
         graph.translation = new Vector3Q();
@@ -48,16 +84,31 @@ public class KeyframeUtils {
         // Then, add no-process tag.
         entity.add(scene.engine.createComponent(TagNoProcess.class));
 
-        var arrow = Mapper.arrow.get(entity);
-        if (arrow != null) {
-            arrow.arrowCap = arrowCaps;
-        }
-
         return entity;
     }
 
-    public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize) {
-        return newVerts(scene, name, ct, className, color, rg, closedLoop, primitiveSize, false);
+    public Entity newVerts(Scene scene,
+                           String name,
+                           ComponentTypes ct,
+                           String archetypeName,
+                           float[] color,
+                           RenderGroup rg,
+                           boolean closedLoop,
+                           float primitiveSize,
+                           boolean arrowCaps) {
+        return newVerts(scene, name, ct, archetypeName, color, rg, closedLoop, primitiveSize, arrowCaps, -1);
+
+    }
+
+    public Entity newVerts(Scene scene,
+                           String name,
+                           ComponentTypes ct,
+                           String archetypeName,
+                           float[] color,
+                           RenderGroup rg,
+                           boolean closedLoop,
+                           float primitiveSize) {
+        return newVerts(scene, name, ct, archetypeName, color, rg, closedLoop, primitiveSize, false);
     }
 
     public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean blend, boolean depth) {
@@ -69,4 +120,5 @@ public class KeyframeUtils {
 
         return entity;
     }
+
 }

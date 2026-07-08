@@ -9,6 +9,7 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 
 /**
@@ -27,6 +28,6 @@ public class VertsUpdater extends AbstractUpdateSystem {
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
         var graph = Mapper.graph.get(entity);
-        graph.translation.setToTranslation(graph.localTransform);
+        graph.translation.set(GaiaSky.instance.getCameraManager().getInversePos());
     }
 }

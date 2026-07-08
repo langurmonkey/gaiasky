@@ -29,7 +29,7 @@ public class KeyframeInitializer extends AbstractInitSystem {
     public KeyframeInitializer(Scene scene, boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
         this.scene = scene;
-        this.utils = new KeyframeUtils(scene);
+        this.utils = new KeyframeUtils();
     }
 
     @Override

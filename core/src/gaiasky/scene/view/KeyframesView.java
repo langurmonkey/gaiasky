@@ -49,7 +49,7 @@ public class KeyframesView extends BaseView {
         this.scene = scene;
         this.verts = new VertsView();
         this.focus = new FocusView();
-        this.utils = new KeyframeUtils(scene);
+        this.utils = new KeyframeUtils();
     }
 
     @Override

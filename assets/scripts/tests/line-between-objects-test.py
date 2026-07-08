@@ -16,8 +16,6 @@ gs.cameraStop()
 
 gs.stopSimulationTime()
 
-gs.setCameraFocusInstantAndGo("Earth")
-
 gs.print("We will now add lines between the positions of Earth-Moon, Earth-Sun, Earth-Mercury and Arcturus-Achernar")
 gs.print("You will have 30 seconds to observe and explore the system before we remove the lines and end the script")
 
@@ -35,9 +33,7 @@ gs.addPolyline("Line1", concat(earthp, solp), [ .2, 1., .2, .8 ], 2 )
 gs.addPolyline("Line2", concat(earthp, mercuryp), [ 2., .2, 1., .8 ], 3 )
 gs.addPolyline("Line3", concat(arcturusp, achernarp), [ 1., 1., .2, .8 ], 2 )
 
-gs.print("Lines added, you have 30 seconds")
-
-gs.sleep(30)
+input("Press any key to remove the lines and end the script")
 
 gs.print("Removing lines and ending")
 gs.removeModelObject("Line0")

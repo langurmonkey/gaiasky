@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.data.orientation.QuaternionNlerpOrientationServer;
 import gaiasky.data.orientation.QuaternionSlerpOrientationServer;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -30,7 +31,9 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.AttitudeComponent;
 import gaiasky.scene.component.Label.LabelDisplay;
+import gaiasky.scene.component.tag.TagNoProcess;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.KeyframeUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.ModelComponent;
@@ -38,7 +41,6 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.script.v2.api.SceneAPI;
 import gaiasky.util.Constants;
-import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.*;
@@ -58,10 +60,10 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     /** Focus view. **/
     private final FocusView focusView;
-    /** Verts view. **/
-    private final VertsView vertsView;
     /** Utilities to deal with trajectories. **/
     private TrajectoryUtils trajectoryUtils;
+    /** Utils to create lines and more. **/
+    private final KeyframeUtils utils;
 
     /** Auxiliary vector. **/
     private final Vector3Q aux3b1 = new Vector3Q();
@@ -72,10 +74,13 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
      * @param api  Reference to the API class.
      * @param name Name of the module.
      */
-    public SceneModule(EventManager em, APIv2 api, String name) {
+    public SceneModule(EventManager em,
+                       APIv2 api,
+                       String name) {
         super(em, api, name);
         this.focusView = new FocusView();
-        this.vertsView = new VertsView();
+
+        this.utils = new KeyframeUtils();
 
         // Subscribe to events.
         em.subscribe(this, Event.SCENE_LOADED);
@@ -87,7 +92,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public FocusView get_object(String name, double timeout) {
+    public FocusView get_object(String name,
+                                double timeout) {
         if (api.validator.checkObjectName(name, timeout)) {
             Entity object = get_entity(name, timeout);
             return new FocusView(object);
@@ -101,7 +107,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public VertsView get_line_object(String name, double timeout) {
+    public VertsView get_line_object(String name,
+                                     double timeout) {
         if (api.validator.checkObjectName(name, timeout)) {
             Entity object = get_entity(name, timeout);
             if (Mapper.verts.has(object)) {
@@ -120,7 +127,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public Entity get_entity(String name, double timeout) {
+    public Entity get_entity(String name,
+                             double timeout) {
         Entity obj = scene.getEntity(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -146,11 +154,12 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     @Override
     public Entity get_non_index_entity(String name) {
-       return get_non_index_entity(name, 0);
+        return get_non_index_entity(name, 0);
     }
 
     @Override
-    public Entity get_non_index_entity(String name, double timeout) {
+    public Entity get_non_index_entity(String name,
+                                       double timeout) {
         Entity obj = scene.getNonIndexEntity(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -209,7 +218,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public double[] get_object_position(String name, String units) {
+    public double[] get_object_position(String name,
+                                        String units) {
         if (api.validator.checkObjectName(name) && api.validator.checkDistanceUnits(units)) {
             Entity entity = get_entity(name);
             focusView.setEntity(entity);
@@ -227,7 +237,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public double[] get_object_predicted_position(String name, String units) {
+    public double[] get_object_predicted_position(String name,
+                                                  String units) {
         if (api.validator.checkObjectName(name) && api.validator.checkDistanceUnits(units)) {
             Entity entity = get_entity(name);
             focusView.setEntity(entity);
@@ -240,51 +251,66 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_object_posiiton(String name, double[] pos) {
+    public void set_object_posiiton(String name,
+                                    double[] pos) {
         set_object_posiiton(name, pos, "internal");
     }
 
     @Override
-    public void set_object_posiiton(String name, double[] pos, String units) {
+    public void set_object_posiiton(String name,
+                                    double[] pos,
+                                    String units) {
         if (api.validator.checkObjectName(name)) {
             set_object_posiiton(get_object(name), pos, units);
         }
 
     }
 
-    public void set_object_posiiton(String name, List<?> position) {
+    public void set_object_posiiton(String name,
+                                    List<?> position) {
         set_object_posiiton(name, position, "internal");
     }
 
-    public void set_object_posiiton(String name, List<?> position, String units) {
+    public void set_object_posiiton(String name,
+                                    List<?> position,
+                                    String units) {
         set_object_posiiton(name, api.dArray(position), units);
     }
 
     @Override
-    public void set_object_posiiton(FocusView object, double[] pos) {
+    public void set_object_posiiton(FocusView object,
+                                    double[] pos) {
         set_object_posiiton(object, pos, "internal");
     }
 
     @Override
-    public void set_object_posiiton(FocusView object, double[] pos, String units) {
+    public void set_object_posiiton(FocusView object,
+                                    double[] pos,
+                                    String units) {
         set_object_posiiton(object.getEntity(), pos, units);
     }
 
-    public void set_object_posiiton(FocusView object, List<?> position) {
+    public void set_object_posiiton(FocusView object,
+                                    List<?> position) {
         set_object_posiiton(object, position, "internal");
     }
 
-    public void set_object_posiiton(FocusView object, List<?> position, String units) {
+    public void set_object_posiiton(FocusView object,
+                                    List<?> position,
+                                    String units) {
         set_object_posiiton(object, api.dArray(position), units);
     }
 
     @Override
-    public void set_object_posiiton(Entity object, double[] pos) {
+    public void set_object_posiiton(Entity object,
+                                    double[] pos) {
         set_object_posiiton(object, pos, "internal");
     }
 
     @Override
-    public void set_object_posiiton(Entity object, double[] pos, String units) {
+    public void set_object_posiiton(Entity object,
+                                    double[] pos,
+                                    String units) {
         if (api.validator.checkNotNull(object, "object")
                 && api.validator.checkLength(pos, 3, "position")
                 && api.validator.checkDistanceUnits(units)) {
@@ -299,7 +325,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_object_coordinates_provider(String name, IPythonCoordinatesProvider provider) {
+    public void set_object_coordinates_provider(String name,
+                                                IPythonCoordinatesProvider provider) {
         if (api.validator.checkObjectName(name) && api.validator.checkNotNull(provider, "provider")) {
             var object = get_object(name);
             if (api.validator.checkNotNull(object.getEntity(), "object")) {
@@ -331,12 +358,14 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
     }
 
-    public void set_object_posiiton(Entity object, List<?> position) {
+    public void set_object_posiiton(Entity object,
+                                    List<?> position) {
         set_object_posiiton(object, api.dArray(position));
     }
 
     @Override
-    public void set_component_type_visibility(String key, boolean visible) {
+    public void set_component_type_visibility(String key,
+                                              boolean visible) {
         if (api.validator.checkCtKeyNull(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentTypes.ComponentType[] cts = ComponentTypes.ComponentType.values();
@@ -389,7 +418,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public boolean set_object_visibility(String name, boolean visible) {
+    public boolean set_object_visibility(String name,
+                                         boolean visible) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
 
@@ -415,7 +445,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_object_size_scaling(String name, double factor) {
+    public void set_object_size_scaling(String name,
+                                        double factor) {
         if (api.validator.checkObjectName(name)) {
             Entity object = get_entity(name);
             set_object_size_scaling(object, factor);
@@ -429,7 +460,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
      * @param object        The {@link Entity}.
      * @param scalingFactor The scaling factor.
      */
-    public void set_object_size_scaling(Entity object, double scalingFactor) {
+    public void set_object_size_scaling(Entity object,
+                                        double scalingFactor) {
         if (api.validator.checkNotNull(object, "Entity")) {
             if (Mapper.modelScaffolding.has(object)) {
                 var scaffolding = Mapper.modelScaffolding.get(object);
@@ -445,7 +477,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_orbit_coordinates_scaling(String name, double factor) {
+    public void set_orbit_coordinates_scaling(String name,
+                                              double factor) {
         int modified = 0;
         String className, objectName;
         if (name.contains(":")) {
@@ -527,7 +560,9 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
 
-    private boolean setObjectQuaternionOrientation(String name, String file, boolean slerp) {
+    private boolean setObjectQuaternionOrientation(String name,
+                                                   String file,
+                                                   boolean slerp) {
         if (api.validator.checkObjectName(name)) {
             var entity = get_object(name);
             if (Mapper.orientation.has(entity.getEntity())) {
@@ -561,12 +596,14 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public boolean set_object_quaternion_slerp_orientation(String name, String path) {
+    public boolean set_object_quaternion_slerp_orientation(String name,
+                                                           String path) {
         return setObjectQuaternionOrientation(name, path, true);
     }
 
     @Override
-    public boolean set_object_quaternion_nlerp_orientation(String name, String path) {
+    public boolean set_object_quaternion_nlerp_orientation(String name,
+                                                           String path) {
         return setObjectQuaternionOrientation(name, path, false);
     }
 
@@ -582,7 +619,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_force_display_label(String name, boolean force) {
+    public void set_force_display_label(String name,
+                                        boolean force) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
             em.post(Event.LABEL_DISPLAY_CMD, this, obj, name, force ? LabelDisplay.ALWAYS : LabelDisplay.AUTO);
@@ -609,7 +647,8 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_mute_label(String name, boolean mute) {
+    public void set_mute_label(String name,
+                               boolean mute) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
             em.post(Event.LABEL_DISPLAY_CMD, this, obj, name, mute ? LabelDisplay.NEVER : LabelDisplay.AUTO);
@@ -617,14 +656,16 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void set_label_color(String name, double[] color) {
+    public void set_label_color(String name,
+                                double[] color) {
         if (api.validator.checkObjectName(name)) {
             Entity obj = get_entity(name);
             em.post(Event.LABEL_COLOR_CMD, this, obj, name, GlobalResources.toFloatArray(color));
         }
     }
 
-    public void set_label_color(String name, List<?> color) {
+    public void set_label_color(String name,
+                                List<?> color) {
         set_label_color(name, api.dArray(color));
     }
 
@@ -715,49 +756,79 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
     }
 
     @Override
-    public void add_trajectory_line(String name, double[] points, double[] color) {
+    public void add_trajectory_line(String name,
+                                    double[] points,
+                                    double[] color) {
         var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
-    public void add_trajectory_line(String name, List<?> points, List<?> color) {
+    public void add_trajectory_line(String name,
+                                    List<?> points,
+                                    List<?> color) {
         var ignored = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "Orbit");
     }
 
     @Override
-    public void add_trajectory_line(String name, double[] points, double[] color, double trail) {
+    public void add_trajectory_line(String name,
+                                    double[] points,
+                                    double[] color,
+                                    double trail) {
         var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trail, "Orbit");
     }
 
-    public void add_trajectory_line(String name, List<?> points, List<?> color, double trailMap) {
+    public void add_trajectory_line(String name,
+                                    List<?> points,
+                                    List<?> color,
+                                    double trailMap) {
         add_trajectory_line(name, api.dArray(points), api.dArray(color), trailMap);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color) {
+    public void add_polyline(String name,
+                             double[] points,
+                             double[] color) {
         add_polyline(name, points, color, 1f);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color) {
         add_polyline(name, points, color, 1f);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double width) {
+    public void add_polyline(String name,
+                             double[] points,
+                             double[] color,
+                             double width) {
         add_polyline(name, points, color, width, false);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double width, boolean caps) {
+    public void add_polyline(String name,
+                             double[] points,
+                             double[] color,
+                             double width,
+                             boolean caps) {
         add_polyline(name, points, color, width, GL20.GL_LINE_STRIP, caps);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double width, int primitive) {
+    public void add_polyline(String name,
+                             double[] points,
+                             double[] color,
+                             double width,
+                             int primitive) {
         add_polyline(name, points, color, width, primitive, false);
     }
 
     @Override
-    public void add_polyline(String name, double[] points, double[] color, double width, int primitive, boolean caps) {
+    public void add_polyline(String name,
+                             double[] points,
+                             double[] color,
+                             double width,
+                             int primitive,
+                             boolean caps) {
         addLineObject(name, points, color, width, primitive, caps, -1f, "Polyline");
     }
 
@@ -784,48 +855,26 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                                                                                                                                            1,
                                                                                                                                            3,
                                                                                                                                            "primitive")) {
-            var archetype = scene.archetypes().get(archetypeName);
-            var entity = archetype.createEntity();
+            var entity = utils.newVerts(scene,
+                                        name,
+                                        new ComponentTypes(ComponentTypes.ComponentType.Orbits),
+                                        archetypeName,
+                                        GlobalResources.toFloatArray(color),
+                                        RenderGroup.LINE,
+                                        false,
+                                        (float) lineWidth,
+                                        arrowCaps,
+                                        trailMap);
 
-            var base = Mapper.base.get(entity);
-            base.setName(name);
-            base.setComponentType(ComponentTypes.ComponentType.Orbits);
-
-            var body = Mapper.body.get(entity);
-            body.setColor(color);
-            body.setLabelColor(color);
-            body.setSizePc(100d);
-
-            var line = Mapper.line.get(entity);
-            line.lineWidth = (float) lineWidth;
-
-            var arrow = Mapper.arrow.get(entity);
-            arrow.arrowCap = arrowCaps;
-
-            synchronized (vertsView) {
-                vertsView.setEntity(entity);
-                vertsView.setPrimitiveSize((float) lineWidth);
-                vertsView.setPoints(points);
-                vertsView.setRenderGroup(arrowCaps ? RenderGroup.LINE : RenderGroup.LINE_GPU);
-                vertsView.setClosedLoop(false);
-                vertsView.setGlPrimitive(primitive);
-            }
-
-            var trajectory = Mapper.trajectory.get(entity);
-            if (trajectory != null) {
-                if (trailMap < 0) {
-                    // Trail disabled.
-                    trajectory.orbitTrail = false;
-                    trajectory.setTrailMap(trailMap);
-                } else {
-                    trailMap = MathUtilsDouble.clamp(trailMap, 0.0, 1.0);
-                    trajectory.orbitTrail = true;
-                    trajectory.setTrailMap(trailMap);
-                }
-            }
-
+            // Add parent name, remove no-process tag.
             var graph = Mapper.graph.get(entity);
             graph.setParent(Scene.ROOT_NAME);
+            entity.remove(TagNoProcess.class);
+
+            // Set data.
+            VertsView view = new VertsView(entity);
+            view.setPoints(points);
+            view.setGlPrimitive(GL20.GL_LINES);
 
             scene.initializeEntity(entity);
             scene.setUpEntity(entity);
@@ -837,43 +886,82 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         return null;
     }
 
-    public void add_polyline(String name, double[] points, double[] color, int lineWidth) {
+    public void add_polyline(String name,
+                             double[] points,
+                             double[] color,
+                             int lineWidth) {
         add_polyline(name, points, color, (float) lineWidth);
     }
 
-    public void add_polyline(String name, double[] points, double[] color, int lineWidth, int primitive) {
+    public void add_polyline(String name,
+                             double[] points,
+                             double[] color,
+                             int lineWidth,
+                             int primitive) {
         add_polyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             float lineWidth) {
         add_polyline(name, api.dArray(points), api.dArray(color), lineWidth);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth, boolean arrowCaps) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             float lineWidth,
+                             boolean arrowCaps) {
         add_polyline(name, api.dArray(points), api.dArray(color), lineWidth, arrowCaps);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth, int primitive) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             float lineWidth,
+                             int primitive) {
         add_polyline(name, api.dArray(points), api.dArray(color), lineWidth, primitive);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, float lineWidth, int primitive, boolean arrowCaps) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             float lineWidth,
+                             int primitive,
+                             boolean arrowCaps) {
         add_polyline(name, api.dArray(points), api.dArray(color), lineWidth, primitive, arrowCaps);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             int lineWidth) {
         add_polyline(name, points, color, (float) lineWidth);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth, boolean arrowCaps) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             int lineWidth,
+                             boolean arrowCaps) {
         add_polyline(name, points, color, (float) lineWidth, arrowCaps);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth, int primitive) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             int lineWidth,
+                             int primitive) {
         add_polyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void add_polyline(String name, List<?> points, List<?> color, int lineWidth, int primitive, boolean arrowCaps) {
+    public void add_polyline(String name,
+                             List<?> points,
+                             List<?> color,
+                             int lineWidth,
+                             int primitive,
+                             boolean arrowCaps) {
         add_polyline(name, points, color, (float) lineWidth, primitive, arrowCaps);
     }
 
@@ -1027,9 +1115,12 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
      * @param pos    The position of the galaxy.
      *
      * @return The full- and half-resolution entities that conform the galaxy, in a pair. The first one is the full-resolution, and the second
-     *         one is the half-resolution.
+     * one is the half-resolution.
      */
-    public Pair<Entity, Entity> createNewProceduralGalaxy(String name, double radius, Vector3Q pos, GalaxyGenerator.GalaxyMorphology morphology) {
+    public Pair<Entity, Entity> createNewProceduralGalaxy(String name,
+                                                          double radius,
+                                                          Vector3Q pos,
+                                                          GalaxyGenerator.GalaxyMorphology morphology) {
         var generator = new GalaxyGenerator();
         var channels = generator.generateGalaxy(morphology, 123L);
         var full = channels.getFirst();
@@ -1112,7 +1203,9 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         if (Objects.requireNonNull(event) == Event.SCENE_LOADED) {
             this.scene = (Scene) data[0];
             this.focusView.setScene(this.scene);
