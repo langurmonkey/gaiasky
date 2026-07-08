@@ -66,11 +66,13 @@ public class RenderAssets {
 
     private final boolean compute;
     private final boolean tessellation;
+    private final boolean shaderMethod;
 
     public RenderAssets(GlobalResources globalResources) {
         this.globalResources = globalResources;
         this.compute = GaiaSky.settings().runtime.compute;
         this.tessellation = GaiaSky.settings().runtime.tessellation;
+        this.shaderMethod = GaiaSky.settings().scene.renderer.elevation.shaderMethod;
     }
 
     /**
@@ -239,11 +241,13 @@ public class RenderAssets {
                                                                  "shader/tessellation/tess.pbr.control.glsl",
                                                                  "shader/tessellation/tess.pbr.eval.glsl",
                                                                  "shader/tessellation/tess.pbr.fragment.glsl"));
-            manager.load("pbr-procedural-tessellation", TessellationShaderProvider.class,
-                         new TessellationShaderProviderParameter("shader/tessellation/tess.procedural.vertex.glsl",
-                                                                 "shader/tessellation/tess.procedural.control.glsl",
-                                                                 "shader/tessellation/tess.procedural.eval.glsl",
-                                                                 "shader/tessellation/tess.procedural.fragment.glsl"));
+            if (shaderMethod) {
+                manager.load("pbr-procedural-tessellation", TessellationShaderProvider.class,
+                             new TessellationShaderProviderParameter("shader/tessellation/tess.procedural.vertex.glsl",
+                                                                     "shader/tessellation/tess.procedural.control.glsl",
+                                                                     "shader/tessellation/tess.procedural.eval.glsl",
+                                                                     "shader/tessellation/tess.procedural.fragment.glsl"));
+            }
             manager.load("pbr-depth-tessellation", TessellationShaderProvider.class,
                          new TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl",
                                                                  "shader/tessellation/tess.depth.control.glsl",
@@ -422,15 +426,18 @@ public class RenderAssets {
 
         if (tessellation) {
             TessellationShaderProvider pbrTessellation = manager.get("pbr-tessellation");
-            TessellationShaderProvider pbrProceduralTessellation = manager.get("pbr-procedural-tessellation");
             TessellationShaderProvider pbrDepthTessellation = manager.get("pbr-depth-tessellation");
             TessellationShaderProvider pbrOpaqueTessellation = manager.get("pbr-opaque-tessellation");
             TessellationShaderProvider pbrSvtDetectionTessellation = manager.get("pbr-svtdetection-tessellation");
             mbPBRTessellation = new IntModelBatch(pbrTessellation);
-            mbPBRTessellationProcedural = new IntModelBatch(pbrProceduralTessellation);
             mbPBRTessellationOpaque = new IntModelBatch(pbrOpaqueTessellation);
             mbPBRTessellationSvtDetection = new IntModelBatch(pbrSvtDetectionTessellation);
             mbPBRTessellationDepth = new IntModelBatch(pbrDepthTessellation);
+
+            if (shaderMethod) {
+                TessellationShaderProvider pbrProceduralTessellation = manager.get("pbr-procedural-tessellation");
+                mbPBRTessellationProcedural = new IntModelBatch(pbrProceduralTessellation);
+            }
         }
 
         // Compute

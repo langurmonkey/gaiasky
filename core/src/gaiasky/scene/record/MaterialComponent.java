@@ -65,8 +65,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     @SuppressWarnings("GDXJavaStaticResource")
     public static final CubemapComponent sharedReflectionCubemap = new CubemapComponent();
 
-    private final boolean newProcedural = true;
-
     private void initializeLookUpTables() {
         if (lookUpTextures.isEmpty()) {
             var dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
@@ -743,7 +741,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     private synchronized void initializeGenElevationData() {
-        if (newProcedural) {
+        if (GaiaSky.settings().scene.renderer.elevation.shaderMethod) {
             shaderBasedGeneration();
         } else {
             textureBasedGeneration();

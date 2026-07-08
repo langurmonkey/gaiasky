@@ -146,7 +146,7 @@ public class ModelExtractor extends AbstractExtractSystem {
         if (rt != null && rt.renderGroup != null) {
             rg = rt.renderGroup;
         } else {
-            if (isProcedural(model)) {
+            if (GaiaSky.settings().scene.renderer.elevation.shaderMethod && isProcedural(model)) {
                 rg = RenderGroup.MODEL_PROCEDURAL_TESS;
             } else {
                 var transparency = model.model.hasIntrinsicTransparency();

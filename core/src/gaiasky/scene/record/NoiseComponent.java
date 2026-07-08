@@ -77,6 +77,7 @@ public final class NoiseComponent extends NamedComponent {
         Biome biome = new Biome(N, M, targets);
         biome.setScale(scale);
         biome.setType(type);
+        biome.setWaterLevel(waterLevel);
         biome.setSeed(seed);
         biome.setOctaves(octaves);
         biome.setAmplitude(amplitude);
@@ -186,6 +187,7 @@ public final class NoiseComponent extends NamedComponent {
 
         var surfaceGen = new SurfaceGen(generateNormalMap, genEmissiveMap);
         surfaceGen.setLutTexture(lut);
+        surfaceGen.setWaterLevel(waterLevel);
         surfaceGen.setLutHueShift(biomeHueShift);
         surfaceGen.setLutSaturation(biomeSaturation);
         if (genEmissiveMap) {
@@ -269,6 +271,11 @@ public final class NoiseComponent extends NamedComponent {
         this.range = range;
     }
 
+    public void setRange(Double bottom,
+                         Double top) {
+        this.range = new double[]{bottom, top};
+    }
+
     public void setSeed(Long seed) {
         this.seed = toFloatSeed(seed);
     }
@@ -316,10 +323,9 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        int d = rand.nextInt(2);
-        setType(NoiseType.values()[d].name());
+        setType(NoiseType.values()[rand.nextInt(2)].name());
         // Scale.
-        double scaleFac = type == NoiseType.CURL ? 2.5 : 1;
+        double scaleFac = 1;
         double baseSize = FastMath.abs(gaussian(rand, 4.0, 1.0, 0.5));
         if (clouds) {
             // XY small, Z large.
@@ -338,8 +344,6 @@ public final class NoiseComponent extends NamedComponent {
         scale[0] *= scaleFac;
         scale[1] *= scaleFac;
         scale[2] *= scaleFac;
-        // Amplitude.
-        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.2));
         // Persistence.
         setPersistence(gaussian(rand, 0.5, 0.07, 0.3));
         // Frequency.
@@ -350,27 +354,16 @@ public final class NoiseComponent extends NamedComponent {
         }
         // Lacunarity.
         setLacunarity(gaussian(rand, 2.0, 2.0, 1.5));
-        // Octaves [1,8].
-        if (type == NoiseType.VORONOI) {
-            setOctaves((long) rand.nextInt(1, 3));
+        // Octaves.
+        if (clouds) {
+            // Clouds
+            setOctaves(6L);
         } else {
-            if (clouds) {
-                setOctaves(rand.nextLong(4, 9));
-            } else {
-                setOctaves(rand.nextLong(1, 9));
-            }
+            // Terrain
+            setOctaves(5L);
         }
         // Range.
-        double minRange;
-        double maxRange;
-        if (clouds) {
-            minRange = gaussian(rand, 0.0, 0.2, -0.2);
-            maxRange = FastMath.abs(rand.nextDouble(0.7, 1.7));
-        } else {
-            minRange = gaussian(rand, 0.0, 0.3);
-            maxRange = 0.5 + FastMath.abs(rand.nextDouble());
-        }
-        setRange(new double[]{minRange, maxRange});
+        setRange(new double[]{0, 1});
         // Power.
         if (clouds) {
             setPower(gaussian(rand, 1.0, 1.0, 0.5));
@@ -390,13 +383,11 @@ public final class NoiseComponent extends NamedComponent {
     public void randomizeRockyPlanet(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX
+        // Type.
         setType(NoiseType.values()[rand.nextInt(2)].name());
         // Same scale for all.
         double scale = rand.nextDouble(8.0, 15.0);
         setScale(new double[]{scale, scale, scale});
-        // Amplitude.
-        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.2));
         // Persistence.
         setPersistence(rand.nextDouble(0.4, 0.6));
         // Frequency.
@@ -406,9 +397,7 @@ public final class NoiseComponent extends NamedComponent {
         // Octaves.
         setOctaves((long) rand.nextInt(4, 9));
         // Range.
-        setRange(new double[]{
-                rand.nextDouble(0.1, 0.3),
-                rand.nextDouble(0.7, 2.0)});
+        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.1));
         // Turbulence.
@@ -439,9 +428,7 @@ public final class NoiseComponent extends NamedComponent {
         setOctaves((long) rand.nextInt(3, 6));
 
         // Range.
-        setRange(new double[]{
-                rand.nextDouble(-0.5, 0.0),
-                rand.nextDouble(0.8, 1.5)});
+        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.6));
         // Turbulence.
@@ -453,13 +440,11 @@ public final class NoiseComponent extends NamedComponent {
     public void randomizeEarthLike(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX
+        // Type.
         setType(NoiseType.values()[rand.nextInt(2)].name());
         // Same scale for all.
         double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
-        // Amplitude.
-        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.0));
         // Persistence.
         setPersistence(rand.nextDouble(0.2, 0.5));
         // Frequency.
@@ -469,9 +454,7 @@ public final class NoiseComponent extends NamedComponent {
         // Octaves.
         setOctaves((long) rand.nextInt(5, 9));
         // Range.
-        setRange(new double[]{
-                rand.nextDouble(-0.5, 0.0),
-                rand.nextDouble(0.8, 1.5)});
+        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.6));
         // Turbulence.
@@ -490,8 +473,6 @@ public final class NoiseComponent extends NamedComponent {
         // Same scale for all.
         double scale = rand.nextDouble(4.0, 8.0);
         setScale(new double[]{scale, scale, scale});
-        // Amplitude.
-        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.0));
         // Persistence.
         setPersistence(rand.nextDouble(0.2, 0.5));
         // Frequency.
@@ -501,9 +482,7 @@ public final class NoiseComponent extends NamedComponent {
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(3, 8));
         // Range.
-        setRange(new double[]{
-                rand.nextDouble(-0.4, 0.0),
-                rand.nextDouble(1.0, 1.5)});
+        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.8));
         // Turbulence.
@@ -522,7 +501,7 @@ public final class NoiseComponent extends NamedComponent {
         int d = rand.nextInt(2);
         setType(NoiseType.values()[d].name());
         // Scale.
-        double scaleFac = type == NoiseType.CURL ? 2.5 : 1;
+        double scaleFac = 1;
         // XY small, Z large.
         setScale(new double[]{
                 FastMath.abs(gaussian(rand, 1.0, 1.0, 0.2)),
@@ -531,8 +510,6 @@ public final class NoiseComponent extends NamedComponent {
         scale[0] *= scaleFac;
         scale[1] *= scaleFac;
         scale[2] *= scaleFac;
-        // Amplitude.
-        setAmplitude(gaussian(rand, 1.0, 0.3, 0.8, 1.2));
         // Persistence.
         setPersistence(rand.nextDouble(0.4, 0.6));
         // Frequency.
@@ -542,7 +519,7 @@ public final class NoiseComponent extends NamedComponent {
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(1, 4));
         // Range.
-        setRange(new double[]{0.4, rand.nextDouble(0.9, 1.3)});
+        setRange(new double[]{0, 1});
         // Power.
         setPower(0.1);
         // Turbulence.
@@ -557,7 +534,7 @@ public final class NoiseComponent extends NamedComponent {
         log.debug("Seed: " + seed);
         log.debug("Scale: " + Arrays.toString(scale));
         log.debug("Noise type: " + type);
-        log.debug("Amplitude: " + amplitude);
+        log.debug("Water level" + waterLevel);
         log.debug("Persistence: " + persistence);
         log.debug("Frequency: " + frequency);
         log.debug("Lacunarity: " + lacunarity);

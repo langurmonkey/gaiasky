@@ -6,6 +6,8 @@
 #include <shader/lib/luma.glsl>
 #include <shader/lib/sampleblur.glsl>
 
+// Water level
+uniform float u_waterLevel;
 // Biome texture (elevation in x, moisture in y).
 uniform sampler2D u_texture0;
 // LUT.
@@ -41,6 +43,9 @@ void main() {
     #endif // emissiveMapFlag
 
     // Query LUT.
+    if (height <= u_waterLevel) {
+        height = 0.0001;
+    }
     vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
     vec4 c = rgba;
     // Manipulate hue and saturation.
@@ -53,7 +58,7 @@ void main() {
     hsv.y = hsv.y * (1.0 - emissive);
     hsv.z = hsv.z * mix(1.0, ((random(v_texCoords.xy * 100.0) * 0.3 + 1.4) - emissive), emissive);
     #endif // emissiveMapFlag
-    // Back to RGB.
+    // Back to RGB, rotated.
     rgba.rgb = hsv2rgb(hsv);
 
     // Diffuse.

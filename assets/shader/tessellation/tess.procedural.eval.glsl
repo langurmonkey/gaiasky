@@ -12,12 +12,8 @@ layout (triangles) in;
 // NOISE
 #include <shader/lib/luma.glsl>
 #include <shader/lib/noise/common.glsl>
-#include <shader/lib/noise/white.glsl>
 #include <shader/lib/noise/simplex.glsl>
-#include <shader/lib/noise/erosion_fast.glsl>
 #include <shader/lib/noise/perlin.glsl>
-#include <shader/lib/noise/curl.glsl>
-#include <shader/lib/noise/voronoi.glsl>
 
 // SVT
 #ifdef svtCacheTextureFlag
@@ -140,8 +136,7 @@ float terraces(float h, int n_terraces, float smoothness) {
     return (round(h) + 0.5 * clamp(pow(2.0 * (h - round(h)), smoothness), 0.0, 1.0)) / n_terraces;
 }
 
-float noise(vec2 uv,
-        vec3 p,
+float noise(vec3 p,
         int type,
         float persistence,
         float freq,
@@ -176,23 +171,6 @@ float noise(vec2 uv,
         // SIMPLEX
         value = gln_sfbm(p, opts);
 
-    } else if (type == 2) {
-        // VORONOI
-        value = gln_vfbm(p, opts);
-
-    } else if (type == 3) {
-        // CURL
-        value = gln_cfbm(p, opts);
-
-    } else if (type == 4) {
-        // WHITE
-        value = gln_wfbm(p, opts);
-
-    } else if (type == 5) {
-        // EROSION
-        // We use UV coordinates!
-        value = gln_efbm(uv * scale.x, opts);
-
     }
 
     // Set in range.
@@ -205,9 +183,8 @@ float noise(vec2 uv,
 
 }
 
-float evaluateElevation(vec3 point, vec2 uv) {
-    float elevation = noise(uv,
-                            point,
+float evaluateElevation(vec3 point) {
+    float elevation = noise(point,
                             u_noiseType,
                             u_elevationPersistence,
                             u_elevationFrequency,
@@ -229,10 +206,9 @@ float evaluateElevation(vec3 point, vec2 uv) {
     return elevation;
 }
 
-float evaluateMoisture(vec3 point, vec2 uv) {
+float evaluateMoisture(vec3 point) {
     // Perlin noise for moisture.
-    float moisture = noise(uv,
-                            point,
+    float moisture = noise(point,
                             0,
                             u_moisturePersistence,
                             u_moistureFrequency,
@@ -271,7 +247,7 @@ void main(void) {
     #ifdef TODOheightTextureFlag
         elevation = texture(u_heightTexture, o_data.texCoords * u_elevationScale.xy).r;
     #else
-        elevation = evaluateElevation(modelPos, o_data.texCoords);
+        elevation = evaluateElevation(modelPos);
     #endif // hightTextureFlag
 
     if (elevation >= u_waterLevel) {
@@ -308,7 +284,7 @@ void main(void) {
     vec4 pos = vec4(modelPos + dh, 1.0);
 
     // Moisture
-    //o_fragMoisture = evaluateMoisture(modelPos, o_data.texCoords);
+    //o_fragMoisture = evaluateMoisture(modelPos);
     o_fragMoisture = 0.5;
 
     // Apply world transform AFTER noise evaluation and displacement

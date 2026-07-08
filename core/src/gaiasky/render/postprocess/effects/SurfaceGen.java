@@ -16,7 +16,8 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class SurfaceGen extends PostProcessorEffect {
     private final SurfaceGenFilter filter;
 
-    public SurfaceGen(boolean normalMap, boolean emissiveMap) {
+    public SurfaceGen(boolean normalMap,
+                      boolean emissiveMap) {
         filter = new SurfaceGenFilter(normalMap, emissiveMap);
         disposables.add(filter);
     }
@@ -27,6 +28,10 @@ public final class SurfaceGen extends PostProcessorEffect {
 
     public void setEmissiveTexture(Texture emissive) {
         filter.setEmissiveTexture(emissive);
+    }
+
+    public void setWaterLevel(float waterLevel) {
+        filter.setWaterLevel(waterLevel);
     }
 
     public void setLutHueShift(float lutHueShift) {
@@ -44,7 +49,10 @@ public final class SurfaceGen extends PostProcessorEffect {
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
+    public void render(FrameBuffer src,
+                       FrameBuffer dest,
+                       GaiaSkyFrameBuffer full,
+                       GaiaSkyFrameBuffer half) {
         restoreViewport(dest);
         filter.setInput(src).setOutput(dest).render();
     }

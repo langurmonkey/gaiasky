@@ -44,6 +44,10 @@ public final class Biome extends PostProcessorEffect {
         filter.setScale(scale);
     }
 
+    public void setWaterLevel(float waterLevel) {
+        filter.setWaterLevel(waterLevel);
+    }
+
     public void setSeed(float seed) {
         filter.setSeed(seed);
     }

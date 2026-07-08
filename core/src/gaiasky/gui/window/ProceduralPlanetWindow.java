@@ -496,7 +496,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         // WaterLevel.
         OwnSliderPlus waterLevel = new OwnSliderPlus("Water level", 0.0f, 0.7f, 0.01f, skin);
         waterLevel.setWidth(fieldWidthNoise);
-        waterLevel.setValue((float) nc.waterLevel);
+        waterLevel.setValue(nc.waterLevel);
         waterLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -770,7 +770,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             updateLutImage(lookUpTables);
 
             // Height scale
-            OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 300.0f, 0.1f, skin);
+            OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 100.0f, 0.1f, skin);
             heightScale.setWidth(fieldWidthTotal - 100f);
             heightScale.setValueSuffix(" km");
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));

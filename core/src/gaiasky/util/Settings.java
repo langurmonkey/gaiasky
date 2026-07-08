@@ -2264,6 +2264,11 @@ public class Settings extends SettingsObject {
                 public ElevationType type;
                 public double multiplier;
                 public double quality;
+                /**
+                 * Use the shader-based implementation of the procedural generation and tessellation.
+                 */
+                @JsonIgnore
+                public boolean shaderMethod = false;
 
                 public void setType(String typeString) {
                     // Parallax mapping discontinued after 3.5.5-2.

@@ -302,8 +302,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case MODEL_PROCEDURAL_TESS -> {
                 // MODEL PROCEDURAL TESSELLATION
-                system = new TessellationRenderer(this, MODEL_PROCEDURAL_TESS, alphas, renderAssets.mbPBRTessellationProcedural);
-                system.addPreRunnables(regularBlendR, depthTestR);
+                if (GaiaSky.settings().scene.renderer.elevation.shaderMethod) {
+                    system = new TessellationRenderer(this, MODEL_PROCEDURAL_TESS, alphas, renderAssets.mbPBRTessellationProcedural);
+                    system.addPreRunnables(regularBlendR, depthTestR);
+                }
             }
             case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this,
                                                                       BILLBOARD_GROUP,
