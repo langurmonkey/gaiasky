@@ -14,7 +14,7 @@ layout (triangles) in;
 #include <shader/lib/noise/common.glsl>
 #include <shader/lib/noise/white.glsl>
 #include <shader/lib/noise/simplex.glsl>
-#include <shader/lib/noise/erosion.glsl>
+#include <shader/lib/noise/erosion_fast.glsl>
 #include <shader/lib/noise/perlin.glsl>
 #include <shader/lib/noise/curl.glsl>
 #include <shader/lib/noise/voronoi.glsl>

@@ -141,10 +141,10 @@ public class Archetypes {
                     Class<? extends Component>[] components = new Class[componentsString.length];
                     int j = 0;
                     for (String componentString : componentsString) {
-                        componentString = componentString.replace("*", "");
+                        var replaced = componentString.replace("*", "");
                         try {
-                            var packageName = componentString.startsWith("Tag") ? "gaiasky.scene.component.tag." : "gaiasky.scene.component.";
-                            var clazz = (Class<? extends Component>) Class.forName(packageName + componentString);
+                            var packageName = replaced.startsWith("Tag") ? "gaiasky.scene.component.tag." : "gaiasky.scene.component.";
+                            var clazz = (Class<? extends Component>) Class.forName(packageName + replaced);
                             components[j] = clazz;
                         } catch (Exception e) {
                             throw new RuntimeException(e);
