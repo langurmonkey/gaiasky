@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
 import gaiasky.util.TextUtils;
 
-public class OwnTextHotkeyTooltip extends Tooltip<Table> {
+public class OwnTextHotkeyTooltip extends Tooltip<Table> implements ITextTooltip {
     private final OwnLabel label;
     private HorizontalGroup groupHotkeys;
 
@@ -81,4 +81,9 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
         getContainer().maxWidth(style.wrapWidth);
     }
 
+    public void setText(String newText) {
+        if(label != null) {
+            label.setText(newText);
+        }
+    }
 }

@@ -666,7 +666,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                                 cpd.setColor(pick);
                             }
                         });
-                        c.addListener(new TextTooltip(Arrays.toString(pick), skin));
+                        c.addListener(new OwnTextTooltip(Arrays.toString(pick), skin));
                         if (i % (n / 4) == 0) {
                             coltable.add(c).size(size).pad(cpad).row();
                         } else {

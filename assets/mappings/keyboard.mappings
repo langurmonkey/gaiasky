@@ -188,6 +188,8 @@ action.expandcollapse.pane/gui.dataset.title= D
 action.expandcollapse.pane/gui.bookmarks    = B
 # doc: Render mode panes (Stereoscopic, Planetarium, Panorama, Orthosphere)
 action.expandcollapse.pane/gui.modes        = M
+# doc: Camera info pane
+action.expandcollapse.pane/gui.caminfo      = N
 
 # Master/slave
 # doc: Show replica configuration dialog

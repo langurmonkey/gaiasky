@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Tooltip;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import gaiasky.util.TextUtils;
 
-public class OwnTextTooltip extends Tooltip<Label> {
+public class OwnTextTooltip extends Tooltip<Label> implements ITextTooltip {
     private final OwnLabel label;
 
     public OwnTextTooltip(String text, Skin skin, int breakSpaces) {

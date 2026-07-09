@@ -596,6 +596,11 @@ public class KeyBindings {
                                                                "OrthosphereComponent"),
                                     noCleanMode));
 
+        // Expand/collapse camera info pane
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.caminfo",
+                                    () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "CameraInfoPane"),
+                                    noCleanMode));
+
         // Toggle mouse capture
         addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.publish(Event.MOUSE_CAPTURE_TOGGLE, this)));
 
