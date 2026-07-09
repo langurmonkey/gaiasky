@@ -72,6 +72,7 @@ float terraces(float h, int n_terraces, float smoothness) {
 float noise(vec3 p,
             int type,
             float power,
+            bool turbulence,
             bool ridge,
             int n_terraces,
             float terrace_exp,
@@ -88,7 +89,7 @@ float noise(vec3 p,
                                      scale,
                                      power,
                                      octaves,
-                                     u_turbulence,
+                                     turbulence,
                                      ridge);
 
     float value = 0.0;
@@ -102,8 +103,10 @@ float noise(vec3 p,
 
     }
 
-    // Set in range.
-    value = clamp(value, 0.0, 1.0);
+    // Set in [0,1] range.
+    if (!turbulence && !ridge) {
+        value = gln_map(value, -1.0, 1.0, 0.0, 1.0);
+    }
 
     // Terraces.
     value = terraces(value, n_terraces, terrace_exp);
@@ -128,7 +131,7 @@ void main() {
         sin(phi)
     );
 
-    float val_ch1 = noise(p, u_type, u_power, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_range, u_seed);
+    float val_ch1 = noise(p, u_type, u_power, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_range, u_seed);
     val_ch1 = max(u_waterLevel, val_ch1);
 
     if (u_channels <= 1) {
@@ -137,13 +140,13 @@ void main() {
 
     } else {
         // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, 1.0, u_ridge, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 2.023);
+        float val_ch2 = noise(p, 0, 1.0, u_turbulence, u_ridge, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 2.023);
         if (u_channels == 2) {
             // Channel 2 (moisture).
             fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
         } else {
             // Channel 3 (temperature).
-            float val_ch3 = noise(p, u_type, 2.0, false, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 1.4325);
+            float val_ch3 = noise(p, u_type, 2.0, false, false, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 1.4325);
             fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
         }
     }
@@ -151,9 +154,9 @@ void main() {
     #ifdef extraTarget
     // Generate emission pattern with white channel.
     // High-scale: voronoi.
-    float emi = noise(p, 1, 1.0, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
+    float emi = noise(p, 1, 1.0, false, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
     // Low-scale: regular noise.
-    float val_ch4 = noise(p, u_type, 1.7, false, 0, 0.0, u_scale, u_octaves, vec2(-0.4, 1.0), u_seed + 1.4325);
+    float val_ch4 = noise(p, u_type, 1.7, false, false, 0, 0.0, u_scale, u_octaves, vec2(-0.4, 1.0), u_seed + 1.4325);
     val_ch4 = emi * step(u_waterLevel, val_ch1) * val_ch4;
     emissionColor = vec4(val_ch4, val_ch4 * 0.8, val_ch4 * 0.6, 1.0);
     #endif // extraTarget

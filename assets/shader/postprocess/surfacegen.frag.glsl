@@ -43,26 +43,31 @@ void main() {
     #endif // emissiveMapFlag
 
     // Query LUT.
+    vec4 c;
     if (height <= u_waterLevel) {
-        height = 0.0001;
-    }
-    vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
-    vec4 c = rgba;
-    // Manipulate hue and saturation.
-    vec3 hsv = rgb2hsv(rgba.rgb);
-    // Hue.
-    hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
-    // Saturation.
-    hsv.y = hsv.y * u_lutSaturation;
-    #ifdef emissiveMapFlag
-    hsv.y = hsv.y * (1.0 - emissive);
-    hsv.z = hsv.z * mix(1.0, ((random(v_texCoords.xy * 100.0) * 0.3 + 1.4) - emissive), emissive);
-    #endif // emissiveMapFlag
-    // Back to RGB, rotated.
-    rgba.rgb = hsv2rgb(hsv);
+        diffuseColor = vec4(0.1, 0.12, 0.7, 1.0);
+        c = diffuseColor;
+    } else {
+        vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
+        c = rgba;
+        // Manipulate hue and saturation.
+        vec3 hsv = rgb2hsv(rgba.rgb);
+        // Hue.
+        hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
+        // Saturation.
+        hsv.y = hsv.y * u_lutSaturation;
 
-    // Diffuse.
-    diffuseColor = rgba;
+        #ifdef emissiveMapFlag
+        hsv.y = hsv.y * (1.0 - emissive);
+        hsv.z = hsv.z * mix(1.0, ((random(v_texCoords.xy * 100.0) * 0.3 + 1.4) - emissive), emissive);
+        #endif // emissiveMapFlag
+
+        // Back to RGB, rotated.
+        rgba.rgb = hsv2rgb(hsv);
+
+        // Diffuse.
+        diffuseColor = rgba;
+    }
 
     // Specular.
     float waterFac = smoothstep(0.1, 0.05, height);
