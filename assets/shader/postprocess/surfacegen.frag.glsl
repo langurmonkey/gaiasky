@@ -43,37 +43,34 @@ void main() {
     #endif // emissiveMapFlag
 
     // Query LUT.
-    vec4 c;
-    if (height <= u_waterLevel) {
-        diffuseColor = vec4(0.1, 0.12, 0.7, 1.0);
-        c = diffuseColor;
-    } else {
-        vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
-        c = rgba;
-        // Manipulate hue and saturation.
-        vec3 hsv = rgb2hsv(rgba.rgb);
-        // Hue.
-        hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
-        // Saturation.
-        hsv.y = hsv.y * u_lutSaturation;
-
-        #ifdef emissiveMapFlag
-        hsv.y = hsv.y * (1.0 - emissive);
-        hsv.z = hsv.z * mix(1.0, ((random(v_texCoords.xy * 100.0) * 0.3 + 1.4) - emissive), emissive);
-        #endif // emissiveMapFlag
-
-        // Back to RGB, rotated.
-        rgba.rgb = hsv2rgb(hsv);
-
-        // Diffuse.
-        diffuseColor = rgba;
+    float epsilon = 1.0 / 255.0; // One quantization step for 8-bit textures
+    if (height <= u_waterLevel + epsilon) {
+        height = 0.0;
     }
 
+    vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - height));
+    vec4 c = rgba;
+    // Manipulate hue and saturation.
+    vec3 hsv = rgb2hsv(rgba.rgb);
+    // Hue.
+    hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
+    // Saturation.
+    hsv.y = hsv.y * u_lutSaturation;
+
+    #ifdef emissiveMapFlag
+    hsv.y = hsv.y * (1.0 - emissive);
+    hsv.z = hsv.z * mix(1.0, ((random(v_texCoords.xy * 100.0) * 0.3 + 1.4) - emissive), emissive);
+    #endif // emissiveMapFlag
+
+    // Back to RGB, rotated.
+    rgba.rgb = hsv2rgb(hsv);
+
+    // Diffuse.
+    diffuseColor = rgba;
+
     // Specular.
-    float waterFac = smoothstep(0.1, 0.05, height);
-    bool water = height < 0.1 || (c.b / c.r > 3.4 && c.b / c.g > 3.4);
+    float waterFac = smoothstep(u_waterLevel, u_waterLevel - 0.05, height);
     float snowFac = smoothstep(0.9, 0.99, luma(diffuseColor.rgb));
-    bool snow = luma(diffuseColor.rgb) > 0.9;
 
     specularColor = vec4(vec3(waterFac + snowFac), 1.0);
 

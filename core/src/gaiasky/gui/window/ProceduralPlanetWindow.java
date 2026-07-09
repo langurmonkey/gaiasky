@@ -494,7 +494,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(scaleTooltip).left().padBottom(pad18).row();
 
         // WaterLevel.
-        OwnSliderPlus waterLevel = new OwnSliderPlus("Water level", 0.0f, 0.7f, 0.01f, skin);
+        OwnSliderPlus waterLevel = new OwnSliderPlus("Water level", 0.0f, 1.0f, 0.01f, skin);
         waterLevel.setWidth(fieldWidthNoise);
         waterLevel.setValue(nc.waterLevel);
         waterLevel.addListener(new ChangeListener() {
@@ -509,23 +509,23 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(waterLevel).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(waterLevelTooltip).left().padBottom(pad18).row();
 
-        // Persistence.
-        OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
-        persistence.setWidth(fieldWidthNoise);
-        persistence.setValue((float) nc.persistence);
-        persistence.addListener(new ChangeListener() {
+        // Octaves (recursive detail).
+        OwnSliderPlus octaves = new OwnSliderPlus(I18n.msg("gui.procedural.octaves"), 1, 8, 1, skin);
+        octaves.setWidth(fieldWidthNoise);
+        octaves.setValue(nc.octaves);
+        octaves.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
                                 Actor actor) {
-                nc.persistence = persistence.getMappedValue();
+                nc.octaves = (int) octaves.getMappedValue();
             }
         });
-        OwnImageButton persistenceTooltip = new OwnImageButton(skin, "tooltip");
-        persistenceTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.persistence"), skin));
-        noiseTable.add(persistence).colspan(2).left().padBottom(pad18).padRight(pad10);
-        noiseTable.add(persistenceTooltip).left().padBottom(pad18).row();
+        OwnImageButton octavesTooltip = new OwnImageButton(skin, "tooltip");
+        octavesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.octaves"), skin));
+        noiseTable.add(octaves).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(octavesTooltip).left().padBottom(pad18).row();
 
-        // Frequency.
+        // Frequency (continent size).
         OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency"), 0.01f, 3.0f, 0.01f, skin);
         frequency.setWidth(fieldWidthNoise);
         frequency.setValue((float) nc.frequency);
@@ -541,7 +541,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(frequency).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(frequencyTooltip).left().padBottom(pad18).row();
 
-        // Lacunarity.
+        // Lacunarity (subdivision rate).
         OwnSliderPlus lacunarity = new OwnSliderPlus(I18n.msg("gui.procedural.lacunarity"), 0.1f, 5.0f, 0.1f, skin);
         lacunarity.setWidth(fieldWidthNoise);
         lacunarity.setValue((float) nc.lacunarity);
@@ -557,21 +557,21 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(lacunarity).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(lacunarityTooltip).left().padBottom(pad18).row();
 
-        // Octaves.
-        OwnSliderPlus octaves = new OwnSliderPlus(I18n.msg("gui.procedural.octaves"), 1, 8, 1, skin);
-        octaves.setWidth(fieldWidthNoise);
-        octaves.setValue(nc.octaves);
-        octaves.addListener(new ChangeListener() {
+        // Persistence (elevation coarseness).
+        OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
+        persistence.setWidth(fieldWidthNoise);
+        persistence.setValue((float) nc.persistence);
+        persistence.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
                                 Actor actor) {
-                nc.octaves = (int) octaves.getMappedValue();
+                nc.persistence = persistence.getMappedValue();
             }
         });
-        OwnImageButton octavesTooltip = new OwnImageButton(skin, "tooltip");
-        octavesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.octaves"), skin));
-        noiseTable.add(octaves).colspan(2).left().padBottom(pad18).padRight(pad10);
-        noiseTable.add(octavesTooltip).left().padBottom(pad18).row();
+        OwnImageButton persistenceTooltip = new OwnImageButton(skin, "tooltip");
+        persistenceTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.persistence"), skin));
+        noiseTable.add(persistence).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(persistenceTooltip).left().padBottom(pad18).row();
 
         // Power.
         OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.1f, 1f, 0.1f, skin);

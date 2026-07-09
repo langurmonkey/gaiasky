@@ -42,14 +42,14 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     /** Convert the fBm to ridge noise. **/
     private boolean ridge;
     /** Number of terraces to use in the height profile. Set to 0 to disable. **/
-    private int numTerraces;
+    private int numTerraces = 0;
     /** Exponent of terraces. Must be odd. The lower it is, the smoother the terrace transitions. **/
     private float terraceExp = 17.0f;
     /** Create different noise patterns in each of the different RGB channels. **/
     private int channels = 1;
 
     /** Number of extra render targets. If &lt 1, we use 2 targets, the default noise, and an emission channel.  **/
-    private int targets = 1;
+    private final int targets;
 
     /**
      * <p>The type of noise:</p>

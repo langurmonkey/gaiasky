@@ -122,5 +122,5 @@ float gln_efbm(vec2 p, gln_tFBMOpts opts) {
         maximum += amplitude;
     }
 
-    return pow(result / maximum, opts.power);
+    #include <shader/lib/noise/fbm_end.glsl>
 }

@@ -83,5 +83,5 @@ float gln_vfbm(vec3 v, gln_tFBMOpts opts) {
     #include <shader/lib/noise/fbm.glsl>
   }
 
-  return pow(result / maximum, opts.power);
+  #include <shader/lib/noise/fbm_end.glsl>
 }

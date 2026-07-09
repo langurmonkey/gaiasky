@@ -61,14 +61,6 @@ layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 emissionColor;
 #endif // extraTarget
 
-float terraces(float h, int n_terraces, float smoothness) {
-    if (n_terraces <= 0) {
-        return h;
-    }
-    h = h * n_terraces;
-    return (round(h) + 0.5 * clamp(pow(2.0 * (h - round(h)), smoothness), 0.0, 1.0)) / n_terraces;
-}
-
 float noise(vec3 p,
             int type,
             float power,
@@ -102,14 +94,6 @@ float noise(vec3 p,
         value = gln_sfbm(p, opts);
 
     }
-
-    // Set in [0,1] range.
-    if (!turbulence && !ridge) {
-        value = gln_map(value, -1.0, 1.0, 0.0, 1.0);
-    }
-
-    // Terraces.
-    value = terraces(value, n_terraces, terrace_exp);
 
     return value;
 
@@ -154,7 +138,7 @@ void main() {
     #ifdef extraTarget
     // Generate emission pattern with white channel.
     // High-scale: voronoi.
-    float emi = noise(p, 1, 1.0, false, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
+    float emi = noise(p, 1, 1.8, false, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
     // Low-scale: regular noise.
     float val_ch4 = noise(p, u_type, 1.7, false, false, 0, 0.0, u_scale, u_octaves, vec2(-0.4, 1.0), u_seed + 1.4325);
     val_ch4 = emi * step(u_waterLevel, val_ch1) * val_ch4;
