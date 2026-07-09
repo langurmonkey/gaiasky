@@ -24,10 +24,6 @@ public final class Biome extends PostProcessorEffect {
         filter.setViewportSize(width, height);
     }
 
-    public void setRange(float a, float b) {
-        filter.setRange(a, b);
-    }
-
     public void setColor(float[] color) {
         filter.setColor(color[0], color[1], color[2], color[3]);
     }

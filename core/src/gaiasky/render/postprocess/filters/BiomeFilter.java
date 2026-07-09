@@ -17,8 +17,6 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     private final Vector2 viewport;
     /** Noise scale in x, y and z. **/
     private final Vector3 scale = new Vector3(1, 1, 1);
-    /** Final range of the noise values for the elevation channel. The other channels default to [0, 1]. **/
-    private final Vector2 range = new Vector2(0, 1);
     /** Color. **/
     private final Vector4 color = new Vector4(1, 1, 1, 1);
     /** Water level. **/
@@ -95,11 +93,6 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     public void setColor(float r, float g, float b, float a) {
         this.color.set(r, g, b, a);
         setParam(Param.Color, this.color);
-    }
-
-    public void setRange(float a, float b) {
-        this.range.set(a, b);
-        setParam(Param.Range, this.range);
     }
 
     public void setScale(float scaleX, float scaleY, float scaleZ) {
@@ -186,7 +179,6 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         // Re-implement super to batch every parameter
         setParams(Param.Texture, u_texture0);
         setParams(Param.Viewport, this.viewport);
-        setParams(Param.Range, this.range);
         setParams(Param.Color, this.color);
         setParams(Param.Scale, this.scale);
         setParams(Param.Seed, this.seed);
@@ -223,7 +215,6 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         Persistence("u_persistence", 0),
         Frequency("u_frequency", 0),
         Lacunarity("u_lacunarity", 0),
-        Range("u_range", 2),
         Color("u_color", 4),
         Scale("u_scale", 3),
         WaterLevel("u_waterLevel", 0),

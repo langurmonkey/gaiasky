@@ -19,8 +19,6 @@ uniform float u_waterLevel;
 uniform vec3 u_scale;
 // Noise color.
 uniform vec4 u_color;
-// Final range of the noise values for the first channel. Channels 2 and 3 default to [0, 1].
-uniform vec2 u_range;
 // Noise seed.
 uniform float u_seed;
 // The initial amplitude.
@@ -70,7 +68,6 @@ float noise(vec3 p,
             float terrace_exp,
             vec3 scale,
             int octaves,
-            vec2 range,
             float seed) {
     // Fill up opts.
     gln_tFBMOpts opts = gln_tFBMOpts(seed,
@@ -115,8 +112,8 @@ void main() {
         sin(phi)
     );
 
-    float val_ch1 = noise(p, u_type, u_power, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_range, u_seed);
-    val_ch1 = max(u_waterLevel, val_ch1);
+    float val_ch1_original = noise(p, u_type, u_power, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_seed);
+    float val_ch1 = max(u_waterLevel, val_ch1_original);
 
     if (u_channels <= 1) {
         // Channel 1 (elevation).
@@ -124,24 +121,24 @@ void main() {
 
     } else {
         // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, 1.0, u_turbulence, u_ridge, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 2.023);
+        float val_ch2 = noise(p, 0, 1.0, u_turbulence, u_ridge, 0, 0.0, u_scale, u_octaves, u_seed + 2.023);
         if (u_channels == 2) {
             // Channel 2 (moisture).
             fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
         } else {
             // Channel 3 (temperature).
-            float val_ch3 = noise(p, u_type, 2.0, false, false, 0, 0.0, u_scale, u_octaves, vec2(0.0, 1.0), u_seed + 1.4325);
+            float val_ch3 = noise(p, u_type, 2.0, false, false, 0, 0.0, u_scale, u_octaves, u_seed + 1.4325);
             fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
         }
     }
 
     #ifdef extraTarget
     // Generate emission pattern with white channel.
-    // High-scale: voronoi.
-    float emi = noise(p, 1, 1.8, false, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, vec2(-0.8, 1.0), u_seed + 1.4325) * 4.5;
-    // Low-scale: regular noise.
-    float val_ch4 = noise(p, u_type, 1.7, false, false, 0, 0.0, u_scale, u_octaves, vec2(-0.4, 1.0), u_seed + 1.4325);
-    val_ch4 = emi * step(u_waterLevel, val_ch1) * val_ch4;
+    // High-scale
+    float emi = noise(p, 1, 3.0, false, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, u_seed + 1.4325) * 4.5;
+    // Low-scale
+    float val_ch4 = noise(p, u_type, 2.7, false, false, 0, 0.0, u_scale, u_octaves, u_seed + 1.4325);
+    val_ch4 = emi  * val_ch4 * step(u_waterLevel, val_ch1_original);
     emissionColor = vec4(val_ch4, val_ch4 * 0.8, val_ch4 * 0.6, 1.0);
     #endif // extraTarget
 }

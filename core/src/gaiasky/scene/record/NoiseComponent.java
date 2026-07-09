@@ -32,7 +32,6 @@ public final class NoiseComponent extends NamedComponent {
     public double persistence = 0.5;
     public double frequency = 2.34;
     public double lacunarity = 2.0;
-    public double[] range = new double[]{0.0, 1.0};
     public NoiseType type = NoiseType.SIMPLEX;
     public float seed = 0f;
     public boolean turbulence = true;
@@ -85,7 +84,6 @@ public final class NoiseComponent extends NamedComponent {
         biome.setFrequency(frequency);
         biome.setLacunarity(lacunarity);
         biome.setPower(power);
-        biome.setRange((float) range[0], (float) range[1]);
         biome.setTurbulence(turbulence);
         biome.setRidge(ridge);
         biome.setChannels(channels);
@@ -267,15 +265,6 @@ public final class NoiseComponent extends NamedComponent {
         this.power = power;
     }
 
-    public void setRange(double[] range) {
-        this.range = range;
-    }
-
-    public void setRange(Double bottom,
-                         Double top) {
-        this.range = new double[]{bottom, top};
-    }
-
     public void setSeed(Long seed) {
         this.seed = toFloatSeed(seed);
     }
@@ -306,7 +295,6 @@ public final class NoiseComponent extends NamedComponent {
         this.frequency = other.frequency;
         this.lacunarity = other.lacunarity;
         this.octaves = other.octaves;
-        this.range = Arrays.copyOf(other.range, other.range.length);
         this.power = other.power;
         this.turbulence = other.turbulence;
         this.ridge = other.ridge;
@@ -362,8 +350,6 @@ public final class NoiseComponent extends NamedComponent {
             // Terrain
             setOctaves(5L);
         }
-        // Range.
-        setRange(new double[]{0, 1});
         // Power.
         if (clouds) {
             setPower(gaussian(rand, 1.0, 1.0, 0.5));
@@ -396,8 +382,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
         setOctaves((long) rand.nextInt(4, 9));
-        // Range.
-        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.1));
         // Turbulence.
@@ -426,9 +410,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
         setOctaves((long) rand.nextInt(3, 6));
-
-        // Range.
-        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.6));
         // Turbulence.
@@ -453,8 +434,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
         setOctaves((long) rand.nextInt(5, 9));
-        // Range.
-        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.6));
         // Turbulence.
@@ -481,8 +460,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(2.0, 5.0));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(3, 8));
-        // Range.
-        setRange(new double[]{0, 1});
         // Power.
         setPower(rand.nextDouble(0.5, 1.8));
         // Turbulence.
@@ -518,8 +495,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(0.1, 3.0));
         // Octaves [1,4].
         setOctaves((long) rand.nextInt(1, 4));
-        // Range.
-        setRange(new double[]{0, 1});
         // Power.
         setPower(0.1);
         // Turbulence.
@@ -539,7 +514,6 @@ public final class NoiseComponent extends NamedComponent {
         log.debug("Frequency: " + frequency);
         log.debug("Lacunarity: " + lacunarity);
         log.debug("Octaves: " + octaves);
-        log.debug("Range: " + Arrays.toString(range));
         log.debug("Power: " + power);
         log.debug("Turbulence: " + turbulence);
         log.debug("Ridge: " + ridge);

@@ -574,7 +574,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(persistenceTooltip).left().padBottom(pad18).row();
 
         // Power.
-        OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.1f, 1f, 0.1f, skin);
+        OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.01f, 2f, 0.01f, skin);
         power.setWidth(fieldWidthNoise);
         power.setValue((float) nc.power);
         power.addListener(new ChangeListener() {
