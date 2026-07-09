@@ -409,14 +409,13 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 addDiffuseTex(tex);
             }
         }
-        // Copy diffuse color
-        if (diffuseCol != null) {
+        // Add diffuse color only when we have no diffuse texture!
+        if (diffuseCol != null && (diffuseUnpacked == null || colorIfTexture)) {
             diffuseColor = new float[4];
             diffuseColor[0] = diffuseCol[0];
             diffuseColor[1] = diffuseCol[1];
             diffuseColor[2] = diffuseCol[2];
             diffuseColor[3] = diffuseCol[3];
-            // Add diffuse colour
             material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
         }
 
