@@ -411,6 +411,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         // Noise group table.
         Table noiseTable = new Table(skin);
 
+        String suffix = clouds ? "" : ".terrain";
+
         // Seed.
         FloatValidator lv = new FloatValidator(-10000f, 10000f);
         OwnTextField seedField = new OwnTextField(Float.toString(nc.seed), skin);
@@ -494,8 +496,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(scaleGroup).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(scaleTooltip).left().padBottom(pad18).row();
 
-        // WaterLevel.
-        OwnSliderPlus waterLevel = new OwnSliderPlus("Water level", 0.0f, 1.0f, 0.01f, skin);
+        // Base level.
+        OwnSliderPlus waterLevel = new OwnSliderPlus(I18n.msg("gui.procedural.base" + suffix), 0.0f, 1.0f, 0.01f, skin);
         waterLevel.setWidth(fieldWidthNoise);
         waterLevel.setValue(nc.baseLevel);
         waterLevel.addListener(new ChangeListener() {
@@ -506,7 +508,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             }
         });
         OwnImageButton waterLevelTooltip = new OwnImageButton(skin, "tooltip");
-        waterLevelTooltip.addListener(new OwnTextTooltip("The water level", skin));
+        waterLevelTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.base"), skin));
         noiseTable.add(waterLevel).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(waterLevelTooltip).left().padBottom(pad18).row();
 
@@ -527,7 +529,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(octavesTooltip).left().padBottom(pad18).row();
 
         // Frequency (continent size).
-        OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency"), 0.01f, 3.0f, 0.01f, skin);
+        OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency" + suffix), 0.01f, 3.0f, 0.01f, skin);
         frequency.setWidth(fieldWidthNoise);
         frequency.setValue((float) nc.frequency);
         frequency.addListener(new ChangeListener() {
@@ -559,7 +561,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(lacunarityTooltip).left().padBottom(pad18).row();
 
         // Persistence (elevation coarseness).
-        OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence"), 0.01f, 0.9f, 0.01f, skin);
+        OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence" + suffix), 0.01f, 0.9f, 0.01f, skin);
         persistence.setWidth(fieldWidthNoise);
         persistence.setValue((float) nc.persistence);
         persistence.addListener(new ChangeListener() {
@@ -574,25 +576,28 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(persistence).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(persistenceTooltip).left().padBottom(pad18).row();
 
-        // Power.
-        OwnSliderPlus power = new OwnSliderPlus(I18n.msg("gui.procedural.power"), 0.01f, 2f, 0.01f, skin);
-        power.setWidth(fieldWidthNoise);
-        power.setValue((float) nc.power);
-        power.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                nc.power = power.getMappedValue();
-            }
-        });
-        OwnImageButton powerTooltip = new OwnImageButton(skin, "tooltip");
-        powerTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.power"), skin));
-        noiseTable.add(power).colspan(2).left().padBottom(pad18).padRight(pad10);
-        noiseTable.add(powerTooltip).left().padBottom(pad18).row();
-
-        // Ridge and turbulence.
+        // Smoothing, turbulence, and ridge.
+        OwnCheckBox smoothing = new OwnCheckBox("Smoothing", skin, pad10);
         OwnCheckBox turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
         OwnCheckBox ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
+
+        // Smoothing.
+        smoothing.setChecked(nc.smoothing);
+        smoothing.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        nc.smoothing = smoothing.isChecked();
+                    }
+                }
+        );
+        OwnImageButton smoothingTooltip = new OwnImageButton(skin, "tooltip");
+        smoothingTooltip.addListener(new OwnTextTooltip("Apply a smoothstep function (sigmoid-like) to the result", skin));
+
+        noiseTable.add(smoothing).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(smoothingTooltip).left().padBottom(pad18).row();
+
 
         // Turbulence.
         turbulence.setChecked(nc.turbulence);

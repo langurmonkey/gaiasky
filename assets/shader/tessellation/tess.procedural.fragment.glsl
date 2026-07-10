@@ -7,8 +7,8 @@ uniform float u_cameraK;
 // LUT for diffuse color lookup (moisture X, elevation Y)
 uniform sampler2D u_biomeLUT;
 
-// Water level
-uniform float u_waterLevel;
+// Base level
+uniform float u_baseLevel;
 
 // Biome lut in diffuse texture
 #ifdef diffuseTextureFlag
@@ -118,7 +118,7 @@ void main() {
     vec4 lut = texture(u_diffuseTexture, vec2(moisture, 1.0 - elevation));
     diffuse = lut;
     #else
-    if (elevation <= u_waterLevel + 0.0001) {
+    if (elevation <= u_baseLevel + 0.0001) {
         // Blue
         diffuse = vec4(0.1, 0.32, 0.8, 1.0);
     } else {
@@ -129,7 +129,7 @@ void main() {
 
     // Specular: water is reflective
     vec3 specular = vec3(0.0);
-    if (elevation <= u_waterLevel + 0.0001) {
+    if (elevation <= u_baseLevel + 0.0001) {
         specular = vec3(0.5); // Water is specular
     }
 

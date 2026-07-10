@@ -96,7 +96,7 @@ float gln_erosion(vec2 p) {
  */
 float gln_efbm(vec2 p, gln_tFBMOpts opts) {
     float result = 0.0;
-    float amplitude = opts.amplitude;
+    float amplitude = 1.0;
     float frequency = opts.frequency;
     float maximum = amplitude;
 

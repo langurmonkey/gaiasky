@@ -84,16 +84,12 @@ public final class Biome extends PostProcessorEffect {
         filter.setLacunarity(lacunarity);
     }
 
-    public void setPower(double power) {
-        filter.setPower((float) power);
-    }
-
-    public void setPower(float power) {
-        filter.setPower(power);
-    }
-
     public void setOctaves(int octaves) {
         filter.setOctaves(octaves);
+    }
+
+    public void setSmoothing(boolean smoothing) {
+        filter.setSmoothing(smoothing);
     }
 
     public void setTurbulence(boolean turbulence) {

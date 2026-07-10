@@ -21,18 +21,16 @@ uniform vec3 u_scale;
 uniform vec4 u_color;
 // Noise seed.
 uniform float u_seed;
-// The initial amplitude.
-uniform float u_amplitude;
 // The persistence, factor by which the amplitude decreases in successive layers.
 uniform float u_persistence;
 // The initial frequency.
 uniform float u_frequency;
 // The lacunarity, factor by which the frequency increases in successive layers.
 uniform float u_lacunarity;
-// The power, the exponent to apply to the generated noise in a power function.
-uniform float u_power;
 // The number of octaves (layers) of noise.
 uniform int u_octaves;
+// Whether to apply smoothstep to the elevation or not.
+uniform bool u_smoothing;
 // Whether to apply an absolute value funciton.
 uniform bool u_turbulence;
 // Enable/disable ridge noise in fBm. Only when turbulence is on.
@@ -61,7 +59,6 @@ layout (location = 1) out vec4 emissionColor;
 
 float noise(vec3 p,
             int type,
-            float power,
             bool turbulence,
             bool ridge,
             int n_terraces,
@@ -71,12 +68,10 @@ float noise(vec3 p,
             float seed) {
     // Fill up opts.
     gln_tFBMOpts opts = gln_tFBMOpts(seed,
-                                     u_amplitude,
                                      u_persistence,
                                      u_frequency,
                                      u_lacunarity,
                                      scale,
-                                     power,
                                      octaves,
                                      turbulence,
                                      ridge);
@@ -112,7 +107,10 @@ void main() {
         sin(phi)
     );
 
-    float val_ch1_original = noise(p, u_type, u_power, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_seed);
+    float val_ch1_original = noise(p, u_type, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_seed);
+    if (u_smoothing) {
+        val_ch1_original = smoothstep(0.0, 1.0, val_ch1_original);
+    }
     float val_ch1 = val_ch1_original * smoothstep(u_baseLevel * 0.8, u_baseLevel, val_ch1_original);
 
     // Only one channel for clouds.

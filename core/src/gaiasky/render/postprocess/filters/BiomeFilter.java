@@ -31,10 +31,10 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     private float frequency = 1.0f;
     /** Factor by which successive noise octaves increase in frequency. This is in [1, n). **/
     private float lacunarity = 2f;
-    /** Exponent to apply to the generated noise in a power function. **/
-    private float power = 1.3f;
     /** Number of octaves. **/
     private int octaves = 4;
+    /** Apply smoothing function or not. **/
+    private boolean smoothing = false;
     /** Apply absolute value function. **/
     private boolean turbulence = true;
     /** Convert the fBm to ridge noise. **/
@@ -54,10 +54,11 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
      * <ol>
      *   <li>Perlin</li>
      *   <li>Simplex</li>
+     *   <li>Voronoi</li>
      * </ol>
      */
     public enum NoiseType {
-        PERLIN, SIMPLEX
+        PERLIN, SIMPLEX, VORONOI
     }
 
     private NoiseType type = NoiseType.SIMPLEX;
@@ -138,14 +139,14 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParam(Param.Lacunarity, this.lacunarity);
     }
 
-    public void setPower(float power) {
-        this.power = power;
-        setParam(Param.Power, this.power);
-    }
-
     public void setOctaves(int octaves) {
         this.octaves = octaves;
         setParam(Param.Octaves, this.octaves);
+    }
+
+    public void setSmoothing(boolean smoothing) {
+        this.smoothing = smoothing;
+        setParam(Param.Smoothing, this.smoothing);
     }
 
     public void setTurbulence(boolean turbulence) {
@@ -191,8 +192,8 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParams(Param.Persistence, this.persistence);
         setParams(Param.Frequency, this.frequency);
         setParams(Param.Lacunarity, this.lacunarity);
-        setParams(Param.Power, this.power);
         setParams(Param.Octaves, this.octaves);
+        setParams(Param.Smoothing, this.smoothing);
         setParams(Param.Turbulence, this.turbulence);
         setParams(Param.Ridge, this.ridge);
         setParams(Param.NumTerraces, this.numTerraces);
@@ -224,6 +225,7 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         BaseLevel("u_baseLevel", 0),
         Power("u_power", 0),
         Octaves("u_octaves", 0),
+        Smoothing("u_smoothing", 0),
         Turbulence("u_turbulence", 0),
         Ridge("u_ridge", 0),
         NumTerraces("u_numTerraces", 0),

@@ -572,27 +572,23 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             Material mat = instance.materials.get(i);
 
             setFloatAttribute(mat, FloatAttribute.ElevationMultiplier, (float) GaiaSky.settings().scene.renderer.elevation.multiplier);
-            setFloatAttribute(mat, FloatAttribute.WaterLevel, nc.baseLevel);
+            setFloatAttribute(mat, FloatAttribute.BaseLevel, nc.baseLevel);
             setFloatAttribute(mat, FloatAttribute.HeightScale, mtc.heightScale * 10.0f);
 
             setIntAttribute(mat, IntAttribute.NoiseType, nc.type.ordinal());
             setFloatAttribute(mat, FloatAttribute.ElevationSeed, nc.seed);
-            setFloatAttribute(mat, FloatAttribute.ElevationAmplitude, (float) nc.amplitude);
             setFloatAttribute(mat, FloatAttribute.ElevationPersistence, (float) nc.persistence);
             setFloatAttribute(mat, FloatAttribute.ElevationFrequency, (float) nc.frequency);
             setFloatAttribute(mat, FloatAttribute.ElevationLacunarity, (float) nc.lacunarity);
-            setFloatAttribute(mat, FloatAttribute.ElevationPower, (float) nc.power);
             setIntAttribute(mat, IntAttribute.ElevationOctaves, nc.octaves);
             setBoolAttribute(mat, IntAttribute.ElevationRidge, nc.ridge);
             setBoolAttribute(mat, IntAttribute.ElevationTurbulence, nc.turbulence);
             setVector3Attribute(mat, Vector3Attribute.ElevationScale, nc.scale);
 
             setFloatAttribute(mat, FloatAttribute.MoistureSeed, 321f);
-            setFloatAttribute(mat, FloatAttribute.MoistureAmplitude, 1.0f);
             setFloatAttribute(mat, FloatAttribute.MoisturePersistence, 0.5f);
             setFloatAttribute(mat, FloatAttribute.MoistureFrequency, 1.0f);
             setFloatAttribute(mat, FloatAttribute.MoistureLacunarity, 2.0f);
-            setFloatAttribute(mat, FloatAttribute.MoisturePower, 1.0f);
             setIntAttribute(mat, IntAttribute.MoistureOctaves, 3);
             setIntAttribute(mat, IntAttribute.MoistureRidge, 1);
             setIntAttribute(mat, IntAttribute.MoistureTurbulence, 1);
@@ -1179,9 +1175,9 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public void randomizeAll(long seed,
                              double size) {
         // Type
-        setType("uvsphere");
+        setType("octahedronsphere");
         // Parameters
-        setParams(createUVSphereParameters(600, 1.0, false));
+        setParams(createOctahedronSphereParameters(8, 1.0, false));
         // Material
         MaterialComponent mtc = new MaterialComponent();
         // Randomize material.

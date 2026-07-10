@@ -96,7 +96,7 @@ float gln_perlin(vec3 P) {
 float gln_pfbm(vec3 p, gln_tFBMOpts opts) {
   p += (opts.seed * 100.0);
   float result = 0.0;
-  float amplitude = opts.amplitude;
+  float amplitude = 1.0;
   float frequency = opts.frequency;
   float maximum = amplitude;
 

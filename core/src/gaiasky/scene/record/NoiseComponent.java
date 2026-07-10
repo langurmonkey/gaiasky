@@ -26,7 +26,6 @@ import java.util.Random;
 
 public final class NoiseComponent extends NamedComponent {
     public double[] scale = new double[]{1.0, 1.0, 1.0};
-    public double power = 1.0;
     public int octaves = 4;
     public double amplitude = 1.0;
     public double persistence = 0.5;
@@ -36,6 +35,7 @@ public final class NoiseComponent extends NamedComponent {
     public float seed = 0f;
     public boolean turbulence = true;
     public boolean ridge = true;
+    public boolean smoothing = true;
 
     public float baseLevel = 0.2f;
 
@@ -84,7 +84,7 @@ public final class NoiseComponent extends NamedComponent {
         biome.setPersistence(persistence);
         biome.setFrequency(frequency);
         biome.setLacunarity(lacunarity);
-        biome.setPower(power);
+        biome.setSmoothing(smoothing);
         biome.setTurbulence(turbulence);
         biome.setRidge(ridge);
         biome.setChannels(channels);
@@ -219,14 +219,6 @@ public final class NoiseComponent extends NamedComponent {
         }
     }
 
-    public void setFractalType(String ignoredFractalType) {
-        // Void.
-    }
-
-    public void setFractaltype(String fractalType) {
-        setFractalType(fractalType);
-    }
-
     public void setScale(Double scale) {
         this.scale[0] = scale;
         this.scale[1] = scale;
@@ -262,16 +254,16 @@ public final class NoiseComponent extends NamedComponent {
         this.lacunarity = lacunarity;
     }
 
-    public void setPower(Double power) {
-        this.power = power;
-    }
-
     public void setSeed(Long seed) {
         this.seed = toFloatSeed(seed);
     }
 
     public void setSeed(Double seed) {
         this.seed = seed.floatValue();
+    }
+
+    public void setSmoothing(Boolean t) {
+        this.smoothing = t;
     }
 
     public void setTurbulence(Boolean t) {
@@ -296,7 +288,6 @@ public final class NoiseComponent extends NamedComponent {
         this.frequency = other.frequency;
         this.lacunarity = other.lacunarity;
         this.octaves = other.octaves;
-        this.power = other.power;
         this.turbulence = other.turbulence;
         this.ridge = other.ridge;
         this.genEmissiveMap = other.genEmissiveMap;
@@ -316,6 +307,8 @@ public final class NoiseComponent extends NamedComponent {
         setTurbulence(turbulence);
         // Ridge.
         setRidge(turbulence && rand.nextBoolean());
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
 
         // Type.
         setType(NoiseType.values()[rand.nextInt(2)].name());
@@ -337,8 +330,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(gaussian(rand, 2.0, 2.0, 1.5));
         // Octaves.
         setOctaves(5L);
-        // Power.
-        setPower(gaussian(rand, 2.0, 2.0, 0.2));
         // Base level.
         setBaseLevel(gaussian(rand, 0.1, 0.04, 0.01, turbulence ? 0.25 : 0.4));
         // Emission.
@@ -359,6 +350,9 @@ public final class NoiseComponent extends NamedComponent {
         setTurbulence(turbulence);
         // Ridge.
         setRidge(ridge);
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
+
         // Type.
         setType(NoiseType.values()[rand.nextInt(2)].name());
         // Scale.
@@ -378,8 +372,6 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(uniform(rand, 3.0, 5.0));
         // Octaves.
         setOctaves(6L);
-        // Power.
-        setPower(1.0);
         // Base level.
         if (turbulence && ridge) {
             setBaseLevel(gaussian(rand, 0.6, 0.15, 0.4, 0.8));
@@ -409,13 +401,13 @@ public final class NoiseComponent extends NamedComponent {
         // Lacunarity.
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
-        setOctaves((long) rand.nextInt(4, 9));
-        // Power.
-        setPower(rand.nextDouble(0.5, 1.1));
+        setOctaves(5L);
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence && rand.nextInt(3) < 2);
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(20) == 19;
         // Base level.
@@ -442,12 +434,12 @@ public final class NoiseComponent extends NamedComponent {
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
         setOctaves((long) rand.nextInt(3, 6));
-        // Power.
-        setPower(rand.nextDouble(0.5, 1.6));
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence && rand.nextInt(4) < 3);
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
     }
 
     /**
@@ -469,13 +461,13 @@ public final class NoiseComponent extends NamedComponent {
         // Lacunarity.
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
-        setOctaves((long) rand.nextInt(5, 9));
-        // Power.
-        setPower(rand.nextDouble(0.5, 1.6));
+        setOctaves(5L);
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence && rand.nextInt(4) < 3);
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(4) == 3;
         // Base level.
@@ -501,13 +493,13 @@ public final class NoiseComponent extends NamedComponent {
         // Lacunarity.
         setLacunarity(rand.nextDouble(2.0, 5.0));
         // Octaves [1,4].
-        setOctaves((long) rand.nextInt(3, 8));
-        // Power.
-        setPower(rand.nextDouble(0.5, 1.8));
+        setOctaves(5L);
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence && rand.nextInt(4) < 3);
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(15) == 14;
         // Base level.
@@ -542,13 +534,13 @@ public final class NoiseComponent extends NamedComponent {
         // Lacunarity.
         setLacunarity(rand.nextDouble(0.1, 3.0));
         // Octaves [1,4].
-        setOctaves((long) rand.nextInt(1, 4));
-        // Power.
-        setPower(0.1);
+        setOctaves(4L);
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
         setRidge(turbulence && rand.nextBoolean());
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(10) == 9;
         // Base level.
@@ -564,7 +556,7 @@ public final class NoiseComponent extends NamedComponent {
         log.debug("Frequency: " + frequency);
         log.debug("Lacunarity: " + lacunarity);
         log.debug("Octaves: " + octaves);
-        log.debug("Power: " + power);
+        log.debug("Smoothing: " + smoothing);
         log.debug("Turbulence: " + turbulence);
         log.debug("Ridge: " + ridge);
         log.debug("Emission: " + genEmissiveMap);

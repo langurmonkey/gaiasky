@@ -1,19 +1,5 @@
-// #name: Worley
+// #name: Voronoi
 // #deps: Luma
-
-/**
- * @typedef {struct} gln_tVornoiOpts    Options for Voronoi Noise generators.
- * @property {float} seed               Seed for PRNG generation.
- * @property {float} distance           Size of each generated cell
- * @property {vec3} scale               "Zoom level" of generated noise.
- * @property {boolean} invert           Invert generated noise.
- */
-struct gln_tVoronoiOpts {
-  float seed;
-  float distance;
-  vec3 scale;
-  bool invert;
-};
 
 /**
  * Generates 3D Voronoi Noise.
@@ -59,16 +45,16 @@ float gln_voronoi(in vec3 point) {
 /**
  * Generates Fractional Brownian motion (fBm) from 3D Voronoi noise.
  *
- * @name gln_wfbm
+ * @name gln_vfbm
  * @function
  * @param {vec3} v               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Simplex Noise.
+ * @param {gln_tFBMOpts} opts    Options for generating Voronoi Noise.
  * @return {float}               Value of fBm at point "p".
  */
-float gln_vfbm(vec3 v, gln_tFBMOpts opts) {
-  v += opts.seed * 2.0;
+float gln_vfbm(vec3 p, gln_tFBMOpts opts) {
+  p += (opts.seed * 100.0);
   float result = 0.0;
-  float amplitude = opts.amplitude;
+  float amplitude = 1.0;
   float frequency = opts.frequency;
   float maximum = amplitude;
 
@@ -76,12 +62,14 @@ float gln_vfbm(vec3 v, gln_tFBMOpts opts) {
     if (i >= opts.octaves)
     break;
 
-    vec3 p = v * frequency * opts.scale;
+    vec3 p = p * frequency * opts.scale;
 
     float noiseVal = gln_voronoi(p);
 
     #include <shader/lib/noise/fbm.glsl>
   }
 
-  #include <shader/lib/noise/fbm_end.glsl>
+  // Voronoi is already in [0,1].
+  float value = result / maximum;
+  return value;
 }

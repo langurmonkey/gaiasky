@@ -53,30 +53,26 @@ uniform float u_vrScale;
 uniform int u_noiseType = 0;
 
 uniform float u_elevationSeed;
-uniform float u_elevationAmplitude;
 uniform float u_elevationPersistence;
 uniform float u_elevationFrequency;
 uniform float u_elevationLacunarity;
 uniform vec3  u_elevationScale;
-uniform float u_elevationPower;
 uniform int   u_elevationOctaves;
 uniform bool  u_elevationTurbulence;
 uniform bool  u_elevationRidge;
 
 // Noise options for moisture
 uniform float u_moistureSeed;
-uniform float u_moistureAmplitude;
 uniform float u_moisturePersistence;
 uniform float u_moistureFrequency;
 uniform float u_moistureLacunarity;
 uniform vec3  u_moistureScale;
-uniform float u_moisturePower;
 uniform int   u_moistureOctaves;
 uniform bool  u_moistureTurbulence;
 uniform bool  u_moistureRidge;
 
-// Water level: everything at or below this elevation is water
-uniform float u_waterLevel;
+// Base level: everything at or below this elevation is water
+uniform float u_baseLevel;
 
 // Water/land in height texture
 #ifdef heightTextureFlag
@@ -141,7 +137,6 @@ float noise(vec3 p,
         float persistence,
         float freq,
         float lacunarity,
-        float power,
         bool ridge,
         bool turbulence,
         int n_terraces,
@@ -152,12 +147,10 @@ float noise(vec3 p,
         float seed) {
     // Fill up opts.
     gln_tFBMOpts opts = gln_tFBMOpts(seed,
-            1.0,
             persistence,
             freq,
             lacunarity,
             scale,
-            power,
             octaves,
             turbulence,
             ridge);
@@ -189,7 +182,6 @@ float evaluateElevation(vec3 point) {
                             u_elevationPersistence,
                             u_elevationFrequency,
                             u_elevationLacunarity,
-                            u_elevationPower,
                             u_elevationRidge,
                             u_elevationTurbulence,
                             0,
@@ -200,8 +192,8 @@ float evaluateElevation(vec3 point) {
                             u_elevationSeed
     );
     // Clamp water level: everything at or below u_waterLevel becomes flat water
-    if (elevation <= u_waterLevel) {
-        elevation = u_waterLevel;
+    if (elevation <= u_baseLevel) {
+        elevation = u_baseLevel;
     }
     return elevation;
 }
@@ -213,7 +205,6 @@ float evaluateMoisture(vec3 point) {
                             u_moisturePersistence,
                             u_moistureFrequency,
                             u_moistureLacunarity,
-                            u_moisturePower,
                             u_elevationRidge,
                             u_elevationTurbulence,
                             0,
@@ -250,12 +241,12 @@ void main(void) {
         elevation = evaluateElevation(modelPos);
     #endif // hightTextureFlag
 
-    if (elevation >= u_waterLevel) {
+    if (elevation >= u_baseLevel) {
         // Terrain
         o_fragElevation = elevation;
     } else {
         // Water
-        elevation = u_waterLevel;
+        elevation = u_baseLevel;
         o_fragElevation = elevation;
     }
     o_fragHeight = elevation * u_heightScale * u_elevationMultiplier;
@@ -267,7 +258,7 @@ void main(void) {
         : vec3(1.0, 0.0, 0.0)));
     vec3 bitangent = cross(sphereNormal, tangent);
     float h_t, h_b;
-    if (elevation >= u_waterLevel) {
+    if (elevation >= u_baseLevel) {
         h_t = evaluateElevation(modelPos + tangent * eps, o_data.texCoords + vec2(eps, 0.0));
         h_b = evaluateElevation(modelPos + bitangent * eps, o_data.texCoords + vec2(0.0, eps));
     } else {

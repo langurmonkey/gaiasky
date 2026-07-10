@@ -4,5 +4,4 @@ float value = result / maximum;
 if (!opts.turbulence && !opts.ridge) {
     value = gln_map(value, -1.0, 1.0, 0.0, 1.0);
 }
-if (opts.power == 1.0) return value;
-return pow(value, opts.power);
+return value;

@@ -8,26 +8,22 @@ vec4 _taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 /**
  * @typedef {struct} gln_tFBMOpts   Options for fBm generators.
  * @property {float} seed           Seed for PRNG generation.
- * @property {float} amplitude      Initial amplitude.
  * @property {float} persistence    Factor by which successive layers of noise
  *                                  decrease in amplitude.
  * @property {float} frequency      Initial frequency.
  * @property {float} lacunarity     Factor by which successive layers of noise
  *                                  increase in frequency.
  * @property {vec3} scale           Noise scale in (x, y[, z]).
- * @property {float} power          Exponent to apply to the generated noise in a power function.
  * @property {int} octaves          Number of layers of noise to stack.
  * @property {boolean} turbulence   Enable absolute value.
  * @property {boolean} ridge        Convert the fBm to Ridge Noise.
  */
 struct gln_tFBMOpts {
     float seed;
-    float amplitude;
     float persistence;
     float frequency;
     float lacunarity;
     vec3 scale;
-    float power;
     int octaves;
     bool turbulence;
     bool ridge;
