@@ -19,8 +19,8 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     private final Vector3 scale = new Vector3(1, 1, 1);
     /** Color. **/
     private final Vector4 color = new Vector4(1, 1, 1, 1);
-    /** Water level. **/
-    private float waterLevel = 0.1f;
+    /** Base level. **/
+    private float baseLevel = 0.1f;
     /** RNG seed. **/
     private float seed = 1.23456f;
     /** The initial amplitude of the noise function. **/
@@ -62,14 +62,18 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
 
     private NoiseType type = NoiseType.SIMPLEX;
 
-    public BiomeFilter(int viewportWidth, int viewportHeight, int targets) {
-        this(new Vector2(viewportWidth, viewportHeight), targets);
+    public BiomeFilter(int viewportWidth, int viewportHeight, int targets, String shader) {
+        this(new Vector2(viewportWidth, viewportHeight), targets, shader);
     }
 
     public BiomeFilter(Vector2 viewportSize, int targets) {
+       this(viewportSize, targets, "biome");
+    }
+
+    public BiomeFilter(Vector2 viewportSize, int targets, String shader) {
         super(ShaderLoader.fromFile(
                 "screenspace",
-                "biome",
+                shader,
                 targets > 1 ? "#define extraTarget\n" : ""));
         this.targets = targets;
         this.viewport = viewportSize;
@@ -100,9 +104,9 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParam(Param.Scale, this.scale);
     }
 
-    public void setWaterLevel(float waterLevel) {
-        this.waterLevel = waterLevel;
-        setParam(Param.WaterLevel, this.waterLevel);
+    public void setBaseLevel(float baseLevel) {
+        this.baseLevel = baseLevel;
+        setParam(Param.BaseLevel, this.baseLevel);
     }
 
     public void setScale(float scale) {
@@ -182,7 +186,7 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParams(Param.Color, this.color);
         setParams(Param.Scale, this.scale);
         setParams(Param.Seed, this.seed);
-        setParams(Param.WaterLevel, this.waterLevel);
+        setParams(Param.BaseLevel, this.baseLevel);
         setParams(Param.Amplitude, this.amplitude);
         setParams(Param.Persistence, this.persistence);
         setParams(Param.Frequency, this.frequency);
@@ -217,7 +221,7 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         Lacunarity("u_lacunarity", 0),
         Color("u_color", 4),
         Scale("u_scale", 3),
-        WaterLevel("u_waterLevel", 0),
+        BaseLevel("u_baseLevel", 0),
         Power("u_power", 0),
         Octaves("u_octaves", 0),
         Turbulence("u_turbulence", 0),

@@ -30,8 +30,8 @@ public final class SurfaceGen extends PostProcessorEffect {
         filter.setEmissiveTexture(emissive);
     }
 
-    public void setWaterLevel(float waterLevel) {
-        filter.setWaterLevel(waterLevel);
+    public void setBaseLevel(float baseLevel) {
+        filter.setBaseLevel(baseLevel);
     }
 
     public void setLutHueShift(float lutHueShift) {

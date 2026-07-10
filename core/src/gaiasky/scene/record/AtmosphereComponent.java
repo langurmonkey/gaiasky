@@ -13,6 +13,12 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.shader.Material;
+import gaiasky.render.gdx.shader.attribute.AtmosphereAttribute;
+import gaiasky.render.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.render.gdx.shader.attribute.Vector3Attribute;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.component.GraphNode;
@@ -23,12 +29,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.render.gdx.model.IntModel;
-import gaiasky.render.gdx.model.IntModelInstance;
-import gaiasky.render.gdx.shader.Material;
-import gaiasky.render.gdx.shader.attribute.AtmosphereAttribute;
-import gaiasky.render.gdx.shader.attribute.BlendingAttribute;
-import gaiasky.render.gdx.shader.attribute.Vector3Attribute;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
@@ -105,7 +105,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         transform.setToTranslation(localTransform).scl(size);
     }
 
-    private void addOzoneUniforms(Material mat, float fScale) {
+    private void addOzoneUniforms(Material mat,
+                                  float fScale) {
         // Ozone layer parameters (in normalized units where inner radius = 1.0).
         // The ozone layer resides in the stratosphere, roughly 15-35 km above the surface,
         // with peak concentration at ~25 km. Modeled as a Gaussian centered at this altitude.
@@ -444,7 +445,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         Random rand = new Random(seed);
         // Size
         double bodyRadiusKm = bodyRadius * Constants.U_TO_KM;
-        setSize(bodyRadiusKm + bodyRadiusKm * 0.015);
+        double atmosphereHeightKm = Math.min(240, bodyRadiusKm * 0.015);
+        setSize(bodyRadiusKm + atmosphereHeightKm);
         // Wavelengths
         setWavelengths(new double[]{gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1)});
         // Kr

@@ -6,8 +6,8 @@
 #include <shader/lib/luma.glsl>
 #include <shader/lib/sampleblur.glsl>
 
-// Water level
-uniform float u_waterLevel;
+// Base level
+uniform float u_baseLevel;
 // Biome texture (elevation in x, moisture in y).
 uniform sampler2D u_texture0;
 // LUT.
@@ -44,7 +44,7 @@ void main() {
 
     // Query LUT.
     float epsilon = 1.0 / 255.0; // One quantization step for 8-bit textures
-    if (height <= u_waterLevel + epsilon) {
+    if (height <= u_baseLevel + epsilon) {
         height = 0.0;
     }
 
@@ -69,7 +69,7 @@ void main() {
     diffuseColor = rgba;
 
     // Specular.
-    float waterFac = smoothstep(u_waterLevel, u_waterLevel - 0.05, height);
+    float waterFac = smoothstep(u_baseLevel, u_baseLevel - 0.05, height);
     float snowFac = smoothstep(0.9, 0.99, luma(diffuseColor.rgb));
 
     specularColor = vec4(vec3(waterFac + snowFac), 1.0);

@@ -403,7 +403,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
     }
 
     private void addNoiseGroup(Table content,
-                               NoiseComponent nc) {
+                               NoiseComponent nc,
+                               boolean clouds) {
 
         var fieldWidthNoise = fieldWidthAll + 250f;
 
@@ -496,12 +497,12 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         // WaterLevel.
         OwnSliderPlus waterLevel = new OwnSliderPlus("Water level", 0.0f, 1.0f, 0.01f, skin);
         waterLevel.setWidth(fieldWidthNoise);
-        waterLevel.setValue(nc.waterLevel);
+        waterLevel.setValue(nc.baseLevel);
         waterLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
                                 Actor actor) {
-                nc.waterLevel = waterLevel.getMappedValue();
+                nc.baseLevel = waterLevel.getMappedValue();
             }
         });
         OwnImageButton waterLevelTooltip = new OwnImageButton(skin, "tooltip");
@@ -802,7 +803,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             scrollContent.add(emissionTooltip).left().padBottom(pad34).row();
 
             // Noise
-            addNoiseGroup(scrollContent, mtc.nc);
+            addNoiseGroup(scrollContent, mtc.nc, false);
 
             var scrollPane = scrollPane(scrollContent);
 
@@ -820,7 +821,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         clc = new CloudComponent();
         if (initClc == null) {
             // Generate random
-            clc.randomizeAll(rand.nextLong(), view.getSize());
+            clc.randomizeAll(rand.nextLong(), view.getRadius());
         } else {
             // Copy existing
             clc.copyFrom(initClc);
@@ -859,7 +860,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         scrollContent.add(cloudGroup).left().expandX().padBottom(pad18).padRight(pad10).row();
 
         // Noise
-        addNoiseGroup(scrollContent, clc.nc);
+        addNoiseGroup(scrollContent, clc.nc, true);
 
         var scrollPane = scrollPane(scrollContent);
 
@@ -1134,7 +1135,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
     protected Boolean randomizeClouds(Boolean rebuild) {
         this.initClc = new CloudComponent();
-        this.initClc.randomizeAll(rand.nextLong(), view.getSize());
+        this.initClc.randomizeAll(rand.nextLong(), view.getRadius());
 
         if (rebuild) {
             // Others are the same

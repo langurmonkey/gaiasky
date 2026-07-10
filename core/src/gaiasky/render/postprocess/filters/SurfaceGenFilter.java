@@ -14,7 +14,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
     private Texture lut, emissive;
     float lutHueShift;
     float lutSaturation = 1;
-    float waterLevel = 0.1f;
+    float baseLevel = 0.1f;
 
     public SurfaceGenFilter(boolean normalMap, boolean emissiveMap) {
         super(ShaderLoader.fromFile(
@@ -38,9 +38,9 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
         setParam(Param.TextureEmissive, u_texture2);
     }
 
-    public void setWaterLevel(float waterLevel) {
-        this.waterLevel = waterLevel;
-        setParam(Param.WaterLevel, this.waterLevel);
+    public void setBaseLevel(float baseLevel) {
+        this.baseLevel = baseLevel;
+        setParam(Param.BaseLevel, this.baseLevel);
     }
 
     public void setLutHueShift(float hs) {
@@ -61,7 +61,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
         setParams(Param.TextureLut, u_texture1);
         if (emissive != null)
             setParams(Param.TextureEmissive, u_texture2);
-        setParams(Param.WaterLevel, this.waterLevel);
+        setParams(Param.BaseLevel, this.baseLevel);
         setParams(Param.LutSaturation, lutSaturation);
         setParams(Param.LutHueShift, lutHueShift);
 
@@ -84,7 +84,7 @@ public final class SurfaceGenFilter extends Filter<SurfaceGenFilter> {
         TextureLut("u_texture1", 0),
         TextureEmissive("u_texture2", 0),
 
-        WaterLevel("u_waterLevel", 0),
+        BaseLevel("u_baseLevel", 0),
         LutSaturation("u_lutSaturation", 0),
         LutHueShift("u_lutHueShift", 0);
         // @formatter:on

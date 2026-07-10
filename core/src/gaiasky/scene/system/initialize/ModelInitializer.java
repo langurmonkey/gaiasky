@@ -394,7 +394,7 @@ public class ModelInitializer extends AbstractInitSystem {
         if (isRandomizeCloud(scaffolding)) {
             // Ignore current cloud component (if any) and create a random one
             cloud.cloud = new CloudComponent();
-            cloud.cloud.randomizeAll(scaffolding.getSeed("cloud"), body.size);
+            cloud.cloud.randomizeAll(scaffolding.getSeed("cloud"), body.size / 2.0);
             logger.debug("============CLOUD===========");
             cloud.cloud.print(logger);
         }

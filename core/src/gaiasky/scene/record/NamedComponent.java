@@ -9,6 +9,7 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.math.StdRandom;
 import net.jafama.FastMath;
 
 import java.util.HashMap;
@@ -67,5 +68,11 @@ public sealed abstract class NamedComponent implements IComponent, Disposable pe
 
     protected double gaussian(Random rand, double mean, double sigma, double min, double max) {
         return MathUtilsDouble.clamp(rand.nextGaussian() * sigma + mean, min, max);
+    }
+
+    protected double uniform(Random rand, double min, double max) {
+        if (!(min < max))
+            throw new IllegalArgumentException("Invalid range");
+        return min + rand.nextDouble() * (max - min);
     }
 }

@@ -37,7 +37,7 @@ public final class NoiseComponent extends NamedComponent {
     public boolean turbulence = true;
     public boolean ridge = true;
 
-    public float waterLevel = 0.2f;
+    public float baseLevel = 0.2f;
 
     public boolean genEmissiveMap = false;
 
@@ -72,11 +72,12 @@ public final class NoiseComponent extends NamedComponent {
     private Biome getNoiseEffect(int N,
                                  int M,
                                  int channels,
-                                 int targets) {
-        Biome biome = new Biome(N, M, targets);
+                                 int targets,
+                                 String shader) {
+        Biome biome = new Biome(N, M, targets, shader);
         biome.setScale(scale);
         biome.setType(type);
-        biome.setWaterLevel(waterLevel);
+        biome.setBaseLevel(baseLevel);
         biome.setSeed(seed);
         biome.setOctaves(octaves);
         biome.setAmplitude(amplitude);
@@ -90,14 +91,14 @@ public final class NoiseComponent extends NamedComponent {
         return biome;
     }
 
-    public FrameBuffer generateNoise(int N,
-                                     int M,
-                                     int channels,
-                                     int targets,
-                                     float[] color) {
+    public FrameBuffer generateClouds(int N,
+                                      int M,
+                                      float[] color) {
+        int targets = 1;
+        int channels = 1;
         fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, targets);
 
-        Biome biome = getNoiseEffect(N, M, channels, targets);
+        Biome biome = getNoiseEffect(N, M, channels, targets, "biome-clouds");
         biome.setColor(color);
         biome.render(null, fbNoise);
 
@@ -119,7 +120,7 @@ public final class NoiseComponent extends NamedComponent {
 
         // 1 channels: water/land.
         // Emissive map is an additional render target.
-        Biome biomeNoise = getNoiseEffect(N, M, 1, 1);
+        Biome biomeNoise = getNoiseEffect(N, M, 1, 1, "biome");
         fbMask.begin();
         biomeNoise.render(null, fbMask);
         fbMask.end();
@@ -143,7 +144,7 @@ public final class NoiseComponent extends NamedComponent {
 
         // 2 channels: height, moisture, temperature (optional).
         // Emissive map is an additional render target.
-        Biome biomeNoise = getNoiseEffect(N, M, 2, genEmissiveMap ? 2 : 1);
+        Biome biomeNoise = getNoiseEffect(N, M, 2, genEmissiveMap ? 2 : 1, "biome");
         fbBiome.begin();
         biomeNoise.render(null, fbBiome);
         fbBiome.end();
@@ -185,7 +186,7 @@ public final class NoiseComponent extends NamedComponent {
 
         var surfaceGen = new SurfaceGen(generateNormalMap, genEmissiveMap);
         surfaceGen.setLutTexture(lut);
-        surfaceGen.setWaterLevel(waterLevel);
+        surfaceGen.setBaseLevel(baseLevel);
         surfaceGen.setLutHueShift(biomeHueShift);
         surfaceGen.setLutSaturation(biomeSaturation);
         if (genEmissiveMap) {
@@ -281,8 +282,8 @@ public final class NoiseComponent extends NamedComponent {
         this.ridge = t;
     }
 
-    public void setWaterLevel(Double value) {
-        this.waterLevel = value.floatValue();
+    public void setBaseLevel(Double value) {
+        this.baseLevel = value.floatValue();
     }
 
 
@@ -299,73 +300,100 @@ public final class NoiseComponent extends NamedComponent {
         this.turbulence = other.turbulence;
         this.ridge = other.ridge;
         this.genEmissiveMap = other.genEmissiveMap;
-        this.waterLevel = other.waterLevel;
+        this.baseLevel = other.baseLevel;
     }
 
-    public void randomizeAll(Random rand) {
-        randomizeAll(rand, false);
-    }
-
-    public void randomizeAll(Random rand,
-                             boolean clouds) {
+    /**
+     * Randomizes the noise component for terrain generation.
+     * @param rand The RNG.
+     */
+    public void randomizeForTerrain(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
+
+        // Turbulence.
+        boolean turbulence = rand.nextInt(3) == 2;
+        setTurbulence(turbulence);
+        // Ridge.
+        setRidge(turbulence && rand.nextBoolean());
+
         // Type.
         setType(NoiseType.values()[rand.nextInt(2)].name());
         // Scale.
-        double scaleFac = 1;
         double baseSize = FastMath.abs(gaussian(rand, 4.0, 1.0, 0.5));
-        if (clouds) {
-            // XY small, Z large.
-            double xyScale = gaussian(rand, 5.0, 4.0, 3.0);
-            setScale(new double[]{
-                    FastMath.abs(xyScale),
-                    FastMath.abs(xyScale),
-                    FastMath.abs(gaussian(rand, 11.0, 2.0, xyScale + 2.0))});
-        } else if (rand.nextBoolean()) {
-            // Single scale.
+        if (rand.nextBoolean()) {
+            // Same scale to all
             setScale(baseSize);
         } else {
             // Different scales.
             setScale(new double[]{baseSize + rand.nextDouble() * 0.5, baseSize + rand.nextDouble() * 0.5, baseSize + 0.4 * rand.nextDouble()});
         }
-        scale[0] *= scaleFac;
-        scale[1] *= scaleFac;
-        scale[2] *= scaleFac;
+
         // Persistence.
         setPersistence(gaussian(rand, 0.5, 0.07, 0.3));
         // Frequency.
-        if (clouds) {
-            setFrequency(gaussian(rand, 1.0, 2.0, 0.6));
-        } else {
-            setFrequency(gaussian(rand, 0.5, 2.0, 0.01));
-        }
+        setFrequency(gaussian(rand, 0.5, 2.0, 0.01));
         // Lacunarity.
         setLacunarity(gaussian(rand, 2.0, 2.0, 1.5));
         // Octaves.
-        if (clouds) {
-            // Clouds
-            setOctaves(6L);
-        } else {
-            // Terrain
-            setOctaves(5L);
-        }
+        setOctaves(5L);
         // Power.
-        if (clouds) {
-            setPower(gaussian(rand, 1.0, 1.0, 0.5));
-        } else {
-            setPower(gaussian(rand, 2.0, 2.0, 0.2));
-        }
-        // Turbulence.
-        setTurbulence(rand.nextInt(4) == 3);
-        // Ridge.
-        setRidge(turbulence && rand.nextBoolean());
+        setPower(gaussian(rand, 2.0, 2.0, 0.2));
+        // Base level.
+        setBaseLevel(gaussian(rand, 0.1, 0.04, 0.01, turbulence ? 0.25 : 0.4));
         // Emission.
         genEmissiveMap = rand.nextInt(10) == 9;
-        // Water level.
-        setWaterLevel(gaussian(rand, 0.1, 0.02, 0.0, 0.4));
+
     }
 
+    /**
+     * Randomizes the noise component for cloud generation.
+     * @param rand The RNG.
+     */
+    public void randomizeForClouds(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Turbulence.
+        boolean turbulence = rand.nextBoolean();
+        boolean ridge = turbulence && rand.nextBoolean();
+        setTurbulence(turbulence);
+        // Ridge.
+        setRidge(ridge);
+        // Type.
+        setType(NoiseType.values()[rand.nextInt(2)].name());
+        // Scale.
+        // XY small, Z large sometimes.
+        double xyScale = FastMath.abs(gaussian(rand, 3.0, 1.0, 1.5, 6.0));
+        double zScale = FastMath.abs(gaussian(rand, 12.0, 1.0, 10.0, 14.0));
+        setScale(new double[]{
+                xyScale,
+                xyScale,
+                rand.nextBoolean() ? zScale : xyScale});
+
+        // Persistence.
+        setPersistence(uniform(rand, 0.65, 0.9));
+        // Frequency.
+        setFrequency(uniform(rand, 0.2, 0.6));
+        // Lacunarity.
+        setLacunarity(uniform(rand, 3.0, 5.0));
+        // Octaves.
+        setOctaves(6L);
+        // Power.
+        setPower(1.0);
+        // Base level.
+        if (turbulence && ridge) {
+            setBaseLevel(gaussian(rand, 0.6, 0.15, 0.4, 0.8));
+        } else if (turbulence) {
+            setBaseLevel(gaussian(rand, 0.3, 0.15, 0.18, 0.45));
+        } else {
+            setBaseLevel(gaussian(rand, 0.5, 0.15, 0.36, 0.7));
+        }
+    }
+
+    /**
+     * Randomizes the noise component parameters to generate a rocky planet.
+     * @param rand The RNG.
+     */
     public void randomizeRockyPlanet(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
@@ -390,10 +418,14 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(3) < 2);
         // Emission.
         genEmissiveMap = rand.nextInt(20) == 19;
-        // Water level.
-        setWaterLevel(gaussian(rand, 0.05, 0.01, 0.0, 0.1));
+        // Base level.
+        setBaseLevel(gaussian(rand, 0.05, 0.01, 0.0, 0.1));
     }
 
+    /**
+     * Randomizes the noise component parameters for a high-level land/sea mask.
+     * @param rand The RNG.
+     */
     public void randomizeMask(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
@@ -418,6 +450,10 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(4) < 3);
     }
 
+    /**
+     * Randomizes the noise component parameters to generate an Earth-like planet.
+     * @param rand The RNG.
+     */
     public void randomizeEarthLike(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
@@ -442,8 +478,14 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(4) < 3);
         // Emission.
         genEmissiveMap = rand.nextInt(4) == 3;
+        // Base level.
+        setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
     }
 
+    /**
+     * Randomizes the noise component parameters to generate a Snow planet.
+     * @param rand The RNG.
+     */
     public void randomizeSnowPlanet(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
@@ -468,8 +510,14 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(4) < 3);
         // Emission.
         genEmissiveMap = rand.nextInt(15) == 14;
+        // Base level.
+        setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
     }
 
+    /**
+     * Randomizes the noise component parameters to generate a Gas giant.
+     * @param rand The RNG.
+     */
     public void randomizeGasGiant(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
@@ -503,13 +551,15 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(10) == 9;
+        // Base level.
+        setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
     }
 
     public void print(Log log) {
         log.debug("Seed: " + seed);
         log.debug("Scale: " + Arrays.toString(scale));
         log.debug("Noise type: " + type);
-        log.debug("Water level" + waterLevel);
+        log.debug("Base level" + baseLevel);
         log.debug("Persistence: " + persistence);
         log.debug("Frequency: " + frequency);
         log.debug("Lacunarity: " + lacunarity);

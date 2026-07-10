@@ -572,7 +572,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             Material mat = instance.materials.get(i);
 
             setFloatAttribute(mat, FloatAttribute.ElevationMultiplier, (float) GaiaSky.settings().scene.renderer.elevation.multiplier);
-            setFloatAttribute(mat, FloatAttribute.WaterLevel, nc.waterLevel);
+            setFloatAttribute(mat, FloatAttribute.WaterLevel, nc.baseLevel);
             setFloatAttribute(mat, FloatAttribute.HeightScale, mtc.heightScale * 10.0f);
 
             setIntAttribute(mat, IntAttribute.NoiseType, nc.type.ordinal());

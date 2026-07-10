@@ -781,7 +781,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                         case 4 -> nc.randomizeRockyPlanet(rand);
                         case 5 -> nc.randomizeGasGiant(rand);
                         case 6, 7, 8 -> nc.randomizeSnowPlanet(rand);
-                        case 9 -> nc.randomizeAll(rand);
+                        case 9 -> nc.randomizeForTerrain(rand);
                     }
                 }
 
@@ -1506,7 +1506,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         if (other.nc != null) {
             this.nc.copyFrom(other.nc);
         } else {
-            this.nc.randomizeAll(new Random());
+            this.nc.randomizeForTerrain(new Random());
         }
     }
 
@@ -1522,7 +1522,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
         // Biome LUT.
         setBiomelut(lookUpTextures.get(rand.nextInt(lookUpTextures.size)));
-        if (rand.nextBoolean()) {
+        if (rand.nextFloat() < 0.25f) {
             // Actually roll the dice for hue shift.
             setBiomeHueShift(rand.nextDouble() * 360.0);
         } else {
@@ -1536,14 +1536,14 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             setBiomeSaturation(rand.nextDouble(0.0, 0.5));
         }
         // Height scale.
-        setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
+        setHeightScale(gaussian(rand, 30.0, 10.0, 1.0, 80.0));
 
         // Noise.
         if (nc != null) {
             nc.dispose();
         }
         NoiseComponent nc = new NoiseComponent();
-        nc.randomizeAll(rand);
+        nc.randomizeForTerrain(rand);
         setNoise(nc);
     }
 

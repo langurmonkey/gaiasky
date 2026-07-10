@@ -26,15 +26,15 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
+import gaiasky.render.gdx.loader.OwnTextureLoader.OwnTextureParameter;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.shader.Material;
 import gaiasky.render.gdx.shader.attribute.*;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.component.Model;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.render.gdx.loader.OwnTextureLoader.OwnTextureParameter;
-import gaiasky.render.gdx.model.IntModel;
-import gaiasky.render.gdx.model.IntModelInstance;
-import gaiasky.render.gdx.shader.Material;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
@@ -120,7 +120,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         aux3 = new Vector3D();
     }
 
-    public void initialize(String name, boolean force) {
+    public void initialize(String name,
+                           boolean force) {
         super.initialize(name);
         this.initialize(force);
     }
@@ -319,7 +320,9 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     }
 
-    private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
+    private void addSVTAttributes(Material material,
+                                  VirtualTextureComponent svt,
+                                  int id) {
         svt.doneLoading(null);
         // Set ID.
         svt.id = id;
@@ -351,9 +354,9 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
-                    nc.randomizeAll(noiseRandom, true);
+                    nc.randomizeForClouds(noiseRandom);
                 }
-                FrameBuffer cloudFb = nc.generateNoise(N, M, 1, 1, color);
+                FrameBuffer cloudFb = nc.generateClouds(N, M, color);
                 // Write to disk if necessary.
                 if (GaiaSky.settings().program.saveProceduralTextures) {
                     SysUtils.saveProceduralGLTexture(cloudFb.getColorBufferTexture(), this.name + "-cloud", Settings.ImageFormat.JPG);
@@ -382,7 +385,12 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         }
     }
 
-    public void disposeTexture(AssetManager manager, Material material, String name, String nameUnpacked, int texAttributeIndex, Texture tex) {
+    public void disposeTexture(AssetManager manager,
+                               Material material,
+                               String name,
+                               String nameUnpacked,
+                               int texAttributeIndex,
+                               Texture tex) {
         if (name != null && manager != null && manager.isLoaded(nameUnpacked)) {
             unload(material, texAttributeIndex);
             manager.unload(nameUnpacked);
@@ -393,7 +401,10 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         }
     }
 
-    public void disposeCubemap(AssetManager manager, Material mat, int attributeIndex, CubemapComponent cubemap) {
+    public void disposeCubemap(AssetManager manager,
+                               Material mat,
+                               int attributeIndex,
+                               CubemapComponent cubemap) {
         if (cubemap != null && cubemap.isLoaded(manager)) {
             unload(material, attributeIndex);
             manager.unload(cubemap.cmBack);
@@ -423,7 +434,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         }
     }
 
-    private void unload(Material mat, int attrIndex) {
+    private void unload(Material mat,
+                        int attrIndex) {
         if (mat != null) {
             Attribute attr = mat.get(attrIndex);
             mat.remove(attrIndex);
@@ -501,30 +513,33 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
      * Creates a random cloud component using the given seed and the base
      * body size. Generates a random cloud texture.
      *
-     * @param seed         The seed to use.
-     * @param bodyDiameter The body diameter in internal units.
+     * @param seed       The seed to use.
+     * @param bodyRadius The body radius in internal units.
      */
-    public void randomizeAll(long seed, double bodyDiameter) {
+    public void randomizeAll(long seed,
+                             double bodyRadius) {
         Random rand = new Random(seed);
 
         // Size
-        double bodyDiameterKm = bodyDiameter * Constants.U_TO_KM;
-        setSize(bodyDiameterKm + bodyDiameterKm * 0.005);
+        double bodyRadiusKm = bodyRadius * Constants.U_TO_KM;
+        double cloudsHeightKm = Math.min(100, bodyRadiusKm * 0.005);
+        // Diameter!
+        setSize((bodyRadiusKm + cloudsHeightKm) * 2.0);
         // Cloud
         setDiffuse("generate");
         // Color
-        if (rand.nextDouble() > 0.3) {
+        if (rand.nextDouble() > 0.6) {
             // White.
             color[0] = 1f;
             color[1] = 1f;
             color[2] = 1f;
-            color[3] = 0.8f;
+            color[3] = 1f;
         } else {
             // Gaussian around white-ish.
             color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
             color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
             color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
-            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.75, 0.2), 0.0, 1.0);
+            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
         }
         // Params
         setParams(createUVSphereParameters(400L, 1.0, false));
@@ -533,7 +548,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             nc.dispose();
         }
         NoiseComponent nc = new NoiseComponent();
-        nc.randomizeAll(rand, true);
+        nc.randomizeForClouds(rand);
         setNoise(nc);
     }
 
@@ -551,7 +566,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         if (other.nc != null)
             this.nc.copyFrom(other.nc);
         else
-            this.nc.randomizeAll(new Random());
+            this.nc.randomizeForClouds(new Random());
     }
 
     public void print(Log log) {

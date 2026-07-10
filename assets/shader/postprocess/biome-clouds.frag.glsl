@@ -113,32 +113,8 @@ void main() {
     );
 
     float val_ch1_original = noise(p, u_type, u_power, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_seed);
-    float val_ch1 = max(u_baseLevel, val_ch1_original);
+    float val_ch1 = val_ch1_original * smoothstep(u_baseLevel * 0.8, u_baseLevel, val_ch1_original);
 
-    if (u_channels <= 1) {
-        // Channel 1 (elevation).
-        fragColor = vec4((vec3(val_ch1) * u_color.rgb) * u_color.a, 1.0);
-
-    } else {
-        // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, 1.0, u_turbulence, u_ridge, 0, 0.0, u_scale, u_octaves, u_seed + 2.023);
-        if (u_channels == 2) {
-            // Channel 2 (moisture).
-            fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
-        } else {
-            // Channel 3 (temperature).
-            float val_ch3 = noise(p, u_type, 2.0, false, false, 0, 0.0, u_scale, u_octaves, u_seed + 1.4325);
-            fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
-        }
-    }
-
-    #ifdef extraTarget
-    // Generate emission pattern with white channel.
-    // High-scale
-    float emi = noise(p, 1, 3.0, false, false, 0, 0.0, vec3(10.0, 10.0, 10.0), 4, u_seed + 1.4325) * 4.5;
-    // Low-scale
-    float val_ch4 = noise(p, u_type, 2.7, false, false, 0, 0.0, u_scale, u_octaves, u_seed + 1.4325);
-    val_ch4 = emi  * val_ch4 * step(u_baseLevel, val_ch1_original);
-    emissionColor = vec4(val_ch4, val_ch4 * 0.8, val_ch4 * 0.6, 1.0);
-    #endif // extraTarget
+    // Only one channel for clouds.
+    fragColor = vec4((vec3(val_ch1) * u_color.rgb) * u_color.a, 1.0);
 }

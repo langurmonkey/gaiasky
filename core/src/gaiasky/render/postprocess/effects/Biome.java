@@ -15,9 +15,13 @@ import gaiasky.render.util.GaiaSkyFrameBuffer;
 public final class Biome extends PostProcessorEffect {
     private final BiomeFilter filter;
 
-    public Biome(int viewportWidth, int viewportHeight, int targets) {
-        filter = new BiomeFilter(viewportWidth, viewportHeight, targets);
+    public Biome(int viewportWidth, int viewportHeight, int targets, String shader) {
+        filter = new BiomeFilter(viewportWidth, viewportHeight, targets, shader);
         disposables.add(filter);
+
+    }
+    public Biome(int viewportWidth, int viewportHeight, int targets) {
+        this(viewportWidth, viewportHeight, targets, "biome");
     }
 
     public void setViewportSize(int width, int height) {
@@ -40,8 +44,8 @@ public final class Biome extends PostProcessorEffect {
         filter.setScale(scale);
     }
 
-    public void setWaterLevel(float waterLevel) {
-        filter.setWaterLevel(waterLevel);
+    public void setBaseLevel(float baseLevel) {
+        filter.setBaseLevel(baseLevel);
     }
 
     public void setSeed(float seed) {
