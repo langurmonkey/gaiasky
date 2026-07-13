@@ -697,12 +697,18 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     private void addDiffuseTex(Texture diffuseTex) {
         if (diffuseTex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Diffuse, diffuseTex));
+            if (!colorIfTexture) {
+                material.remove(ColorAttribute.Diffuse);
+            }
         }
     }
 
     private void addSpecularTex(Texture specularTex) {
         if (specularTex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Specular, specularTex));
+            if (!colorIfTexture) {
+                material.remove(ColorAttribute.Specular);
+            }
         }
     }
 
@@ -715,6 +721,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     private void addEmissiveTex(Texture emissiveTex) {
         if (emissiveTex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Emissive, emissiveTex));
+            if (!colorIfTexture) {
+                material.remove(ColorAttribute.Emissive);
+            }
         }
     }
 

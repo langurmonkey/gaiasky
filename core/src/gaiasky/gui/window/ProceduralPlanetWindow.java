@@ -512,6 +512,24 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(waterLevel).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(waterLevelTooltip).left().padBottom(pad18).row();
 
+        // Remap.
+        OwnCheckBox remap = new OwnCheckBox(I18n.msg("gui.procedural.remap"), skin, pad10);
+        remap.setChecked(nc.remap);
+        remap.addListener(
+                new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        nc.remap = remap.isChecked();
+                    }
+                }
+        );
+        OwnImageButton remapTooltip = new OwnImageButton(skin, "tooltip");
+        remapTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.remap"), skin));
+
+        noiseTable.add(remap).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(remapTooltip).left().padBottom(pad18).row();
+
         // Octaves (recursive detail).
         OwnSliderPlus octaves = new OwnSliderPlus(I18n.msg("gui.procedural.octaves"), 1, 8, 1, skin);
         octaves.setWidth(fieldWidthNoise);
@@ -577,7 +595,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(persistenceTooltip).left().padBottom(pad18).row();
 
         // Smoothing, turbulence, and ridge.
-        OwnCheckBox smoothing = new OwnCheckBox("Smoothing", skin, pad10);
+        OwnCheckBox smoothing = new OwnCheckBox(I18n.msg("gui.procedural.smoothing"), skin, pad10);
         OwnCheckBox turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
         OwnCheckBox ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
 
@@ -593,7 +611,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 }
         );
         OwnImageButton smoothingTooltip = new OwnImageButton(skin, "tooltip");
-        smoothingTooltip.addListener(new OwnTextTooltip("Apply a smoothstep function (sigmoid-like) to the result", skin));
+        smoothingTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.smoothing"), skin));
 
         noiseTable.add(smoothing).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(smoothingTooltip).left().padBottom(pad18).row();

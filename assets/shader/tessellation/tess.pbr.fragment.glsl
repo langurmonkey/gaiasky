@@ -174,7 +174,7 @@ uniform float u_shininess;
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-    #define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord) * u_diffuseColor
+    #define fetchColorDiffuseTD(texCoord, defaultValue) mix(texture(u_diffuseTexture, texCoord), u_diffuseColor, 0.3)
 #elif defined(diffuseTextureFlag)
     #define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord)
 #elif defined(diffuseColorFlag)

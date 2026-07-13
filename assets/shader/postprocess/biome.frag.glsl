@@ -16,6 +16,8 @@ uniform sampler2D u_texture0;
 uniform vec2 u_viewport;
 // Base level.
 uniform float u_baseLevel;
+// Remap values to [0,1] after base level operation.
+uniform bool u_remap;
 // Scale in x, y and z.
 uniform vec3 u_scale;
 // Noise color.
@@ -117,7 +119,14 @@ void main() {
         val_ch1_original = smoothstep(0.0, 1.0, val_ch1_original);
     }
 
-    float val_ch1 = max(u_baseLevel, val_ch1_original);
+    float val_ch1;
+    if (u_remap) {
+        // Remap after base level. Base level is at 0.
+        val_ch1 = gln_map(val_ch1_original, u_baseLevel, 1.0, 0.0, 1.0);
+    } else {
+        // Clamp.
+        val_ch1 = max(u_baseLevel, val_ch1_original);
+    }
 
 
     if (u_channels <= 1) {

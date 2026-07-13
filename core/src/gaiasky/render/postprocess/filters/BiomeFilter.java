@@ -21,6 +21,8 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     private final Vector4 color = new Vector4(1, 1, 1, 1);
     /** Base level. **/
     private float baseLevel = 0.1f;
+    /** Remap to [0,1] after base level operation. **/
+    private boolean remap = false;
     /** RNG seed. **/
     private float seed = 1.23456f;
     /** The initial amplitude of the noise function. **/
@@ -110,6 +112,11 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParam(Param.BaseLevel, this.baseLevel);
     }
 
+    public void setRemap(boolean remap) {
+        this.remap = remap;
+        setParam(Param.Remap, this.remap);
+    }
+
     public void setScale(float scale) {
         setScale(scale, scale, scale);
     }
@@ -188,6 +195,7 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParams(Param.Scale, this.scale);
         setParams(Param.Seed, this.seed);
         setParams(Param.BaseLevel, this.baseLevel);
+        setParams(Param.Remap, this.remap);
         setParams(Param.Amplitude, this.amplitude);
         setParams(Param.Persistence, this.persistence);
         setParams(Param.Frequency, this.frequency);
@@ -223,6 +231,7 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         Color("u_color", 4),
         Scale("u_scale", 3),
         BaseLevel("u_baseLevel", 0),
+        Remap("u_remap", 0),
         Power("u_power", 0),
         Octaves("u_octaves", 0),
         Smoothing("u_smoothing", 0),

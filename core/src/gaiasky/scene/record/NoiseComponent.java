@@ -37,7 +37,10 @@ public final class NoiseComponent extends NamedComponent {
     public boolean ridge = true;
     public boolean smoothing = true;
 
+    /** Base level for noise. Strip everything below, then remap or clamp result. **/
     public float baseLevel = 0.2f;
+    /** Remap after base level operation. **/
+    public boolean remap = false;
 
     public boolean genEmissiveMap = false;
 
@@ -78,6 +81,7 @@ public final class NoiseComponent extends NamedComponent {
         biome.setScale(scale);
         biome.setType(type);
         biome.setBaseLevel(baseLevel);
+        biome.setRemap(remap);
         biome.setSeed(seed);
         biome.setOctaves(octaves);
         biome.setAmplitude(amplitude);
@@ -186,7 +190,8 @@ public final class NoiseComponent extends NamedComponent {
 
         var surfaceGen = new SurfaceGen(generateNormalMap, genEmissiveMap);
         surfaceGen.setLutTexture(lut);
-        surfaceGen.setBaseLevel(baseLevel);
+        // If we remapped the result after the base level operation, the base level is automatically 0.
+        surfaceGen.setBaseLevel(remap ? 0 : baseLevel);
         surfaceGen.setLutHueShift(biomeHueShift);
         surfaceGen.setLutSaturation(biomeSaturation);
         if (genEmissiveMap) {
@@ -278,6 +283,10 @@ public final class NoiseComponent extends NamedComponent {
         this.baseLevel = value.floatValue();
     }
 
+    public void setRemap(Boolean remap) {
+        this.remap = remap;
+    }
+
 
     public void copyFrom(NoiseComponent other) {
         this.seed = other.seed;
@@ -292,10 +301,12 @@ public final class NoiseComponent extends NamedComponent {
         this.ridge = other.ridge;
         this.genEmissiveMap = other.genEmissiveMap;
         this.baseLevel = other.baseLevel;
+        this.remap = other.remap;
     }
 
     /**
      * Randomizes the noise component for terrain generation.
+     *
      * @param rand The RNG.
      */
     public void randomizeForTerrain(Random rand) {
@@ -332,6 +343,8 @@ public final class NoiseComponent extends NamedComponent {
         setOctaves(5L);
         // Base level.
         setBaseLevel(gaussian(rand, 0.1, 0.04, 0.01, turbulence ? 0.25 : 0.4));
+        //Remap.
+        setRemap(rand.nextBoolean());
         // Emission.
         genEmissiveMap = rand.nextInt(10) == 9;
 
@@ -339,6 +352,7 @@ public final class NoiseComponent extends NamedComponent {
 
     /**
      * Randomizes the noise component for cloud generation.
+     *
      * @param rand The RNG.
      */
     public void randomizeForClouds(Random rand) {
@@ -380,10 +394,13 @@ public final class NoiseComponent extends NamedComponent {
         } else {
             setBaseLevel(gaussian(rand, 0.5, 0.15, 0.36, 0.7));
         }
+        //Remap.
+        setRemap(rand.nextBoolean());
     }
 
     /**
      * Randomizes the noise component parameters to generate a rocky planet.
+     *
      * @param rand The RNG.
      */
     public void randomizeRockyPlanet(Random rand) {
@@ -412,10 +429,13 @@ public final class NoiseComponent extends NamedComponent {
         genEmissiveMap = rand.nextInt(20) == 19;
         // Base level.
         setBaseLevel(gaussian(rand, 0.05, 0.01, 0.0, 0.1));
+        //Remap.
+        setRemap(rand.nextBoolean());
     }
 
     /**
      * Randomizes the noise component parameters for a high-level land/sea mask.
+     *
      * @param rand The RNG.
      */
     public void randomizeMask(Random rand) {
@@ -444,6 +464,7 @@ public final class NoiseComponent extends NamedComponent {
 
     /**
      * Randomizes the noise component parameters to generate an Earth-like planet.
+     *
      * @param rand The RNG.
      */
     public void randomizeEarthLike(Random rand) {
@@ -472,10 +493,13 @@ public final class NoiseComponent extends NamedComponent {
         genEmissiveMap = rand.nextInt(4) == 3;
         // Base level.
         setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
+        //Remap.
+        setRemap(rand.nextBoolean());
     }
 
     /**
      * Randomizes the noise component parameters to generate a Snow planet.
+     *
      * @param rand The RNG.
      */
     public void randomizeSnowPlanet(Random rand) {
@@ -504,10 +528,13 @@ public final class NoiseComponent extends NamedComponent {
         genEmissiveMap = rand.nextInt(15) == 14;
         // Base level.
         setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
+        //Remap.
+        setRemap(rand.nextBoolean());
     }
 
     /**
      * Randomizes the noise component parameters to generate a Gas giant.
+     *
      * @param rand The RNG.
      */
     public void randomizeGasGiant(Random rand) {
@@ -545,6 +572,8 @@ public final class NoiseComponent extends NamedComponent {
         genEmissiveMap = rand.nextInt(10) == 9;
         // Base level.
         setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
+        //Remap.
+        setRemap(rand.nextBoolean());
     }
 
     public void print(Log log) {
@@ -552,6 +581,7 @@ public final class NoiseComponent extends NamedComponent {
         log.debug("Scale: " + Arrays.toString(scale));
         log.debug("Noise type: " + type);
         log.debug("Base level" + baseLevel);
+        log.debug("Remap?" + remap);
         log.debug("Persistence: " + persistence);
         log.debug("Frequency: " + frequency);
         log.debug("Lacunarity: " + lacunarity);

@@ -48,6 +48,10 @@ public final class Biome extends PostProcessorEffect {
         filter.setBaseLevel(baseLevel);
     }
 
+    public void setRemap(boolean remap) {
+        filter.setRemap(remap);
+    }
+
     public void setSeed(float seed) {
         filter.setSeed(seed);
     }

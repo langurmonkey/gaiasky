@@ -100,8 +100,8 @@ public class OctahedronSphereCreator extends ModelCreator {
     }
 
     public OctahedronSphereCreator create(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
-        if (divisions < 0 || divisions > 7)
-            throw new AssertionError("Divisions must be in [0..7]");
+        if (divisions < 0 || divisions > 9)
+            throw new AssertionError("Divisions must be in [0..9]");
         this.flipNormals = flipNormals;
         this.hardEdges = hardEdges;
         this.middlePointIndexCache = new HashMap<>();
