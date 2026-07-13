@@ -7,24 +7,26 @@
 
 package gaiasky.render.postprocess.effects;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
-import gaiasky.render.postprocess.filters.BiomeFilter;
+import gaiasky.render.postprocess.filters.CloudsFilter;
+import gaiasky.render.postprocess.filters.ProceduralSurfaceFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 
-public final class Biome extends PostProcessorEffect {
-    private final BiomeFilter filter;
+public final class ProceduralSurface extends PostProcessorEffect {
+    private final ProceduralSurfaceFilter filter;
 
-    public Biome(int viewportWidth, int viewportHeight, int targets, String shader) {
-        filter = new BiomeFilter(viewportWidth, viewportHeight, targets, shader);
+    public ProceduralSurface(int viewportWidth,
+                             int viewportHeight,
+                             boolean normalMap,
+                             boolean emissiveMap) {
+        filter = new ProceduralSurfaceFilter(viewportWidth, viewportHeight, normalMap, emissiveMap);
         disposables.add(filter);
-
-    }
-    public Biome(int viewportWidth, int viewportHeight, int targets) {
-        this(viewportWidth, viewportHeight, targets, "biome");
     }
 
-    public void setViewportSize(int width, int height) {
+    public void setViewportSize(int width,
+                                int height) {
         filter.setViewportSize(width, height);
     }
 
@@ -36,7 +38,9 @@ public final class Biome extends PostProcessorEffect {
         filter.setScale((float) scale[0], (float) scale[1], (float) scale[2]);
     }
 
-    public void setScale(float scaleX, float scaleY, float scaleZ) {
+    public void setScale(float scaleX,
+                         float scaleY,
+                         float scaleZ) {
         filter.setScale(scaleX, scaleY, scaleZ);
     }
 
@@ -54,14 +58,6 @@ public final class Biome extends PostProcessorEffect {
 
     public void setSeed(float seed) {
         filter.setSeed(seed);
-    }
-
-    public void setAmplitude(double amplitude) {
-        filter.setAmplitude((float) amplitude);
-    }
-
-    public void setAmplitude(float amplitude) {
-        filter.setAmplitude(amplitude);
     }
 
     public void setPersistence(double persistence) {
@@ -104,20 +100,24 @@ public final class Biome extends PostProcessorEffect {
         filter.setRidge(ridge);
     }
 
-    public void setNumTerraces(int numTerraces) {
-        filter.setNumTerraces(numTerraces);
-    }
-
-    public void setTerraceExp(float terraceExp) {
-        filter.setTerraceExp(terraceExp);
-    }
-
     public void setChannels(int channels) {
         filter.setChannels(channels);
     }
 
-    public void setType(BiomeFilter.NoiseType type) {
+    public void setType(CloudsFilter.NoiseType type) {
         filter.setType(type);
+    }
+
+    public void setLutTexture(Texture lut) {
+        filter.setLutTexture(lut);
+    }
+
+    public void setLutHueShift(float lutHueShift) {
+        filter.setLutHueShift(lutHueShift);
+    }
+
+    public void setLutSaturation(float lutSaturation) {
+        filter.setLutSaturation(lutSaturation);
     }
 
     @Override
@@ -125,12 +125,16 @@ public final class Biome extends PostProcessorEffect {
         filter.rebind();
     }
 
-    public void render(FrameBuffer src, FrameBuffer dest) {
+    public void render(FrameBuffer src,
+                       FrameBuffer dest) {
         restoreViewport(dest);
         filter.setInput(src).setOutput(dest).render();
     }
 
     @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
+    public void render(FrameBuffer src,
+                       FrameBuffer dest,
+                       GaiaSkyFrameBuffer full,
+                       GaiaSkyFrameBuffer half) {
     }
 }

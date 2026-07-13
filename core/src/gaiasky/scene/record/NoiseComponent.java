@@ -12,11 +12,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaiasky.GaiaSky;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
-import gaiasky.render.postprocess.effects.Biome;
-import gaiasky.render.postprocess.effects.SurfaceGen;
-import gaiasky.render.postprocess.filters.BiomeFilter.NoiseType;
+import gaiasky.render.postprocess.effects.Clouds;
+import gaiasky.render.postprocess.effects.ProceduralSurface;
+import gaiasky.render.postprocess.filters.CloudsFilter.NoiseType;
 import gaiasky.util.Logger.Log;
 import net.jafama.FastMath;
 
@@ -27,7 +25,6 @@ import java.util.Random;
 public final class NoiseComponent extends NamedComponent {
     public double[] scale = new double[]{1.0, 1.0, 1.0};
     public int octaves = 4;
-    public double amplitude = 1.0;
     public double persistence = 0.5;
     public double frequency = 2.34;
     public double lacunarity = 2.0;
@@ -45,9 +42,6 @@ public final class NoiseComponent extends NamedComponent {
     public boolean genEmissiveMap = false;
 
     public FrameBuffer fbNoise, fbBiome, fbMask, fbSurface;
-
-    /** Open windows with the resulting frame buffers. **/
-    private static boolean DEBUG_UI_VIEW = false;
 
     public NoiseComponent() {
         super();
@@ -72,19 +66,18 @@ public final class NoiseComponent extends NamedComponent {
         return (float) (seed / FastMath.pow(10L, s.length()));
     }
 
-    private Biome getNoiseEffect(int N,
-                                 int M,
-                                 int channels,
-                                 int targets,
-                                 String shader) {
-        Biome biome = new Biome(N, M, targets, shader);
+    private Clouds getNoiseEffect(int N,
+                                  int M,
+                                  int channels,
+                                  int targets,
+                                  String shader) {
+        Clouds biome = new Clouds(N, M, targets, shader);
         biome.setScale(scale);
         biome.setType(type);
         biome.setBaseLevel(baseLevel);
         biome.setRemap(remap);
         biome.setSeed(seed);
         biome.setOctaves(octaves);
-        biome.setAmplitude(amplitude);
         biome.setPersistence(persistence);
         biome.setFrequency(frequency);
         biome.setLacunarity(lacunarity);
@@ -102,9 +95,9 @@ public final class NoiseComponent extends NamedComponent {
         int channels = 1;
         fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, targets);
 
-        Biome biome = getNoiseEffect(N, M, channels, targets, "biome-clouds");
-        biome.setColor(color);
-        biome.render(null, fbNoise);
+        Clouds clouds = getNoiseEffect(N, M, channels, targets, "clouds");
+        clouds.setColor(color);
+        clouds.render(null, fbNoise);
 
         return fbNoise;
     }
@@ -124,7 +117,7 @@ public final class NoiseComponent extends NamedComponent {
 
         // 1 channels: water/land.
         // Emissive map is an additional render target.
-        Biome biomeNoise = getNoiseEffect(N, M, 1, 1, "biome");
+        Clouds biomeNoise = getNoiseEffect(N, M, 1, 1, "biome");
         fbMask.begin();
         biomeNoise.render(null, fbMask);
         fbMask.end();
@@ -133,87 +126,57 @@ public final class NoiseComponent extends NamedComponent {
     }
 
     /**
-     * Generates the biome, which is a set of two textures in a frame buffer. The first render target in the frame
-     * buffer is the elevation, the second is the moisture, and the third the emission.
-     *
-     * @param N The width in pixels.
-     * @param M The height in pixels.
-     *
-     * @return The biome frame buffer, with two render targets.
-     */
-    public synchronized FrameBuffer generateBiome(int N,
-                                                  int M) {
-        // Biome noise (height, moisture).
-        fbBiome = fbBiome != null ? fbBiome : createFrameBuffer(N, M, genEmissiveMap ? 2 : 1);
-
-        // 2 channels: height, moisture, temperature (optional).
-        // Emissive map is an additional render target.
-        Biome biomeNoise = getNoiseEffect(N, M, 2, genEmissiveMap ? 2 : 1, "biome");
-        fbBiome.begin();
-        biomeNoise.render(null, fbBiome);
-        fbBiome.end();
-
-        return fbBiome;
-    }
-
-    /**
-     * <p>
-     * Generates the surface textures with this noise component. The main render target contains the diffuse texture,
-     * the second render target contains the specular texture, and the third render target optionally contains the
-     * normal texture.
-     * </p><p>
-     * Note that for this function to succeed, {@link NoiseComponent#generateBiome(int, int)} must have been
-     * called beforehand, and {@link NoiseComponent#fbBiome} must be available.
-     * </p>
+     * Generates the procedural surface (merged old biome and surface shaders).
      *
      * @param N                 The width in pixels.
      * @param M                 The height in pixels.
-     * @param biomeLut          The biome look up table (LUT) path.
-     * @param biomeHueShift     The LUT hue shift as an angle in degrees.
-     * @param biomeSaturation   The LUT saturation value.
+     * @param biomeLUT          LUT for the biome.
+     * @param channels          The number of noise channels (1: elevation, 2: moisture, 3: temperature).
      * @param generateNormalMap Whether to generate a normal map.
      *
      * @return The frame buffer with all the render targets.
      */
-    public synchronized FrameBuffer generateSurface(int N,
-                                                    int M,
-                                                    String biomeLut,
-                                                    float biomeHueShift,
-                                                    float biomeSaturation,
-                                                    boolean generateNormalMap) {
+    public synchronized FrameBuffer generateProceduralSurface(int N,
+                                                              int M,
+                                                              String biomeLUT,
+                                                              float lutHueShift,
+                                                              float lutSaturation,
+                                                              int channels,
+                                                              boolean generateNormalMap) {
 
-        // Gen surface with 2 color targets (diffuse, specular).
-        // We use 3 color targets if we need to generate the normal map.
-        Texture lut = new Texture(GaiaSky.settings().data.dataFileHandle(biomeLut));
+        // Number of render targets.
+        int targets = 4; // Biome, diffuse, specular, emissive.
+        if (generateNormalMap) targets++; // Normal.
+
+        // LUT texture.
+        Texture lut = new Texture(GaiaSky.settings().data.dataFileHandle(biomeLUT));
         lut.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, generateNormalMap ? 3 : 2);
 
-        var surfaceGen = new SurfaceGen(generateNormalMap, genEmissiveMap);
-        surfaceGen.setLutTexture(lut);
-        // If we remapped the result after the base level operation, the base level is automatically 0.
-        surfaceGen.setBaseLevel(remap ? 0 : baseLevel);
-        surfaceGen.setLutHueShift(biomeHueShift);
-        surfaceGen.setLutSaturation(biomeSaturation);
-        if (genEmissiveMap) {
-            surfaceGen.setEmissiveTexture(fbBiome.getTextureAttachments().get(1));
-        }
+        // Frame buffer.
+        fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, targets);
+
+        var effect = new ProceduralSurface(N, M, generateNormalMap, genEmissiveMap);
+        effect.setLutTexture(lut);
+        effect.setLutHueShift(lutHueShift);
+        effect.setLutSaturation(lutSaturation);
+        effect.setScale(scale);
+        effect.setType(type);
+        effect.setBaseLevel(baseLevel);
+        effect.setRemap(remap);
+        effect.setSeed(seed);
+        effect.setOctaves(octaves);
+        effect.setPersistence(persistence);
+        effect.setFrequency(frequency);
+        effect.setLacunarity(lacunarity);
+        effect.setSmoothing(smoothing);
+        effect.setTurbulence(turbulence);
+        effect.setRidge(ridge);
+        effect.setChannels(channels);
         fbSurface.begin();
-        surfaceGen.render(fbBiome, fbSurface, null, null);
+        effect.render(null, fbSurface);
         fbSurface.end();
 
-        if (DEBUG_UI_VIEW) {
-
-            // Create UI views.
-            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Biome", fbBiome.getColorBufferTexture(), 1f);
-            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Diffuse", fbSurface.getColorBufferTexture(), 1f);
-            EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Specular", fbSurface.getTextureAttachments().get(1), 1f);
-            if (generateNormalMap)
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "Normal", fbSurface.getTextureAttachments().get(2), 1f);
-            DEBUG_UI_VIEW = false;
-        }
-
         return fbSurface;
-
     }
 
     public void setType(String noiseType) {
@@ -241,10 +204,6 @@ public final class NoiseComponent extends NamedComponent {
      */
     public void setOctaves(Long octaves) {
         this.octaves = FastMath.min(9, octaves.intValue());
-    }
-
-    public void setAmplitude(Double amplitude) {
-        this.amplitude = amplitude;
     }
 
     public void setPersistence(Double persistence) {
@@ -292,7 +251,6 @@ public final class NoiseComponent extends NamedComponent {
         this.seed = other.seed;
         this.scale = Arrays.copyOf(other.scale, other.scale.length);
         this.type = other.type;
-        this.amplitude = other.amplitude;
         this.persistence = other.persistence;
         this.frequency = other.frequency;
         this.lacunarity = other.lacunarity;
@@ -334,7 +292,7 @@ public final class NoiseComponent extends NamedComponent {
         }
 
         // Persistence.
-        setPersistence(gaussian(rand, 0.5, 0.07, 0.3));
+        setPersistence(gaussian(rand, 0.5, 0.1, 0.3));
         // Frequency.
         setFrequency(gaussian(rand, 0.5, 2.0, 0.01));
         // Lacunarity.
@@ -478,7 +436,7 @@ public final class NoiseComponent extends NamedComponent {
         double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
         // Persistence.
-        setPersistence(rand.nextDouble(0.2, 0.5));
+        setPersistence(rand.nextDouble(0.2, 0.8));
         // Frequency.
         setFrequency(rand.nextDouble(0.01, 0.35));
         // Lacunarity.

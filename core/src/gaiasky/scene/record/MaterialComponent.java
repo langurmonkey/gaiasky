@@ -753,7 +753,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         if (GaiaSky.settings().scene.renderer.elevation.shaderMethod) {
             shaderBasedGeneration();
         } else {
-            textureBasedGeneration();
+            textureBasedGenerationMerged();
         }
     }
 
@@ -768,7 +768,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         }
     }
 
-    private void textureBasedGeneration() {
+    private void textureBasedGenerationMerged() {
         if (heightGenerated.get()) {
             addHeightTex(heightTex);
         } else {
@@ -795,97 +795,94 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 }
 
                 GaiaSky.postRunnable(() -> {
-                    // 2ND FRAME - BIOME.
-                    FrameBuffer fbBiome = nc.generateBiome(N, M);
+                    // 2ND FRAME - GENERATE.
+                    FrameBuffer fbPlanet = nc.generateProceduralSurface(N,
+                                                                        M,
+                                                                        biomeLUT,
+                                                                        biomeHueShift,
+                                                                        biomeSaturation,
+                                                                        2,
+                                                                        GaiaSky.settings().scene.renderer.elevation.type.isNone());
 
                     GaiaSky.postRunnable(() -> {
-                        // 3RD FRAME - SURFACE.
-                        FrameBuffer fbSurface = nc.generateSurface(N, M,
-                                                                   biomeLUT,
-                                                                   biomeHueShift,
-                                                                   biomeSaturation,
-                                                                   GaiaSky.settings().scene.renderer.elevation.type.isNone());
+                        // 3TH FRAME - ADD TEXTURES TO MATERIAL.
+                        int nAttachments = fbPlanet.getTextureAttachments().size;
 
-                        GaiaSky.postRunnable(() -> {
-                            // 4TH FRAME - ADD TEXTURES TO MATERIAL.
-                            int nBiomeAttachments = fbBiome.getTextureAttachments().size;
-                            int nSurfaceAttachments = fbSurface.getTextureAttachments().size;
+                        Texture heightT = fbPlanet.getColorBufferTexture();
+                        Texture diffuseT = fbPlanet.getTextureAttachments().get(1);
+                        Texture specularT = fbPlanet.getTextureAttachments().get(2);
+                        Texture emissiveT = fbPlanet.getTextureAttachments().get(3);
+                        Texture normalT = nAttachments > 4 ? fbPlanet.getTextureAttachments().get(4) : null;
 
-                            Texture heightT = fbBiome.getColorBufferTexture();
-                            Texture emissiveT = nBiomeAttachments > 1 ? fbBiome.getTextureAttachments().get(1) : null;
-                            Texture diffuseT = fbSurface.getColorBufferTexture();
-                            Texture specularT = fbSurface.getTextureAttachments().get(1);
-                            Texture normalT = nSurfaceAttachments > 2 ? fbSurface.getTextureAttachments().get(2) : null;
+                        boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
+                        boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
+                        boolean cNormal = normal != null && normal.endsWith(Constants.GEN_KEYWORD);
+                        boolean cEmissive = emissive != null && emissive.endsWith(Constants.GEN_KEYWORD);
+                        // TODO implement metallic texture generation
+                        //boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
 
-                            boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
-                            boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
-                            boolean cNormal = normal != null && normal.endsWith(Constants.GEN_KEYWORD);
-                            boolean cEmissive = emissive != null && emissive.endsWith(Constants.GEN_KEYWORD);
-                            // TODO implement metallic texture generation
-                            //boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
-
-                            // BIOME: HEIGHT and MOISTURE.
-                            if (heightT != null) {
-                                // Create texture, populate material
-                                if (!GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
-                                    heightData = new HeightDataPixmap(heightT, null);
-                                    heightTex = heightT;
-                                    addHeightTex(heightTex);
-                                }
+                        // BIOME: HEIGHT and MOISTURE.
+                        if (heightT != null) {
+                            // Create texture, populate material
+                            if (!GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
+                                heightData = new HeightDataPixmap(heightT, null);
+                                heightTex = heightT;
+                                addHeightTex(heightTex);
                             }
+                        }
 
-                            // DIFFUSE.
-                            if (cDiffuse) {
-                                if (diffuseT != null) {
-                                    diffuseTex = diffuseT;
-                                    addDiffuseTex(diffuseTex);
-                                }
+                        // DIFFUSE.
+                        if (cDiffuse) {
+                            if (diffuseT != null) {
+                                diffuseTex = diffuseT;
+                                addDiffuseTex(diffuseTex);
                             }
+                        }
 
-                            // SPECULAR.
-                            if (cSpecular) {
-                                if (specularT != null) {
-                                    specularTex = specularT;
-                                    addSpecularTex(specularTex);
-                                }
+                        // SPECULAR.
+                        if (cSpecular) {
+                            if (specularT != null) {
+                                specularTex = specularT;
+                                addSpecularTex(specularTex);
                             }
+                        }
 
-                            // NORMAL.
-                            if (cNormal) {
-                                if (normalT != null) {
-                                    normalTex = normalT;
-                                    addNormalTex(normalTex);
-                                }
+                        // NORMAL.
+                        if (cNormal) {
+                            if (normalT != null) {
+                                normalTex = normalT;
+                                addNormalTex(normalTex);
                             }
+                        }
 
-                            // EMISSIVE.
-                            if (cEmissive) {
-                                if (emissiveT != null) {
-                                    emissiveTex = emissiveT;
-                                    addEmissiveTex(emissiveTex);
-                                }
+                        // EMISSIVE.
+                        if (cEmissive) {
+                            if (emissiveT != null) {
+                                emissiveTex = emissiveT;
+                                addEmissiveTex(emissiveTex);
                             }
+                        }
 
-                            // Save textures to disk as image files.
-                            if (GaiaSky.settings().program.saveProceduralTextures) {
-                                SysUtils.saveProceduralGLTextures(new Texture[]{
-                                                                          heightT,
-                                                                          diffuseT,
-                                                                          specularT,
-                                                                          normalT,
-                                                                          emissiveT},
-                                                                  new String[]{
-                                                                          name + "-biome",
-                                                                          name + "-diffuse",
-                                                                          name + "-specular",
-                                                                          name + "-normal",
-                                                                          name + "-emissive"},
-                                                                  Settings.ImageFormat.JPG);
-                            }
-                        });
+                        // Save textures to disk as image files.
+                        if (GaiaSky.settings().program.saveProceduralTextures) {
+                            SysUtils.saveProceduralGLTextures(new Texture[]{
+                                                                      heightT,
+                                                                      diffuseT,
+                                                                      specularT,
+                                                                      normalT,
+                                                                      emissiveT},
+                                                              new String[]{
+                                                                      name + "-biome",
+                                                                      name + "-diffuse",
+                                                                      name + "-specular",
+                                                                      name + "-normal",
+                                                                      name + "-emissive"},
+                                                              Settings.ImageFormat.JPG);
+                        }
                     });
                 });
             });
+
         }
     }
 

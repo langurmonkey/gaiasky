@@ -7,12 +7,21 @@
 
 package gaiasky.render.postprocess.filters;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Vector4;
+import gaiasky.render.postprocess.filters.CloudsFilter.NoiseType;
 import gaiasky.render.util.ShaderLoader;
 
-public final class BiomeFilter extends Filter<BiomeFilter> {
+public final class ProceduralSurfaceFilter extends Filter<ProceduralSurfaceFilter> {
+    /** LUT texture. **/
+    private Texture lut;
+    /** LUT hue shift. **/
+    float lutHueShift;
+    /** LUT saturation. **/
+    float lutSaturation = 1;
+
     /** Viewport size. **/
     private final Vector2 viewport;
     /** Noise scale in x, y and z. **/
@@ -25,8 +34,6 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     private boolean remap = false;
     /** RNG seed. **/
     private float seed = 1.23456f;
-    /** The initial amplitude of the noise function. **/
-    private float amplitude = 1.0f;
     /** Factor by which successive noise octaves decrease in amplitude. This is in (0, 1). **/
     private float persistence = 0.5f;
     /** The initial frequency of the noise function. **/
@@ -41,44 +48,31 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     private boolean turbulence = true;
     /** Convert the fBm to ridge noise. **/
     private boolean ridge;
-    /** Number of terraces to use in the height profile. Set to 0 to disable. **/
-    private int numTerraces = 0;
-    /** Exponent of terraces. Must be odd. The lower it is, the smoother the terrace transitions. **/
-    private float terraceExp = 17.0f;
     /** Create different noise patterns in each of the different RGB channels. **/
     private int channels = 1;
 
-    /** Number of extra render targets. If &lt 1, we use 2 targets, the default noise, and an emission channel.  **/
-    private final int targets;
+    private final boolean genNormalMap, genEmissiveMap;
 
-    /**
-     * <p>The type of noise:</p>
-     * <ol>
-     *   <li>Perlin</li>
-     *   <li>Simplex</li>
-     *   <li>Voronoi</li>
-     * </ol>
-     */
-    public enum NoiseType {
-        PERLIN, SIMPLEX, VORONOI
-    }
 
     private NoiseType type = NoiseType.SIMPLEX;
 
-    public BiomeFilter(int viewportWidth, int viewportHeight, int targets, String shader) {
-        this(new Vector2(viewportWidth, viewportHeight), targets, shader);
+    public ProceduralSurfaceFilter(int viewportWidth,
+                                   int viewportHeight,
+                                   boolean normalMap,
+                                   boolean emissiveMap) {
+        this(new Vector2(viewportWidth, viewportHeight), normalMap, emissiveMap);
     }
 
-    public BiomeFilter(Vector2 viewportSize, int targets) {
-       this(viewportSize, targets, "biome");
-    }
-
-    public BiomeFilter(Vector2 viewportSize, int targets, String shader) {
+    public ProceduralSurfaceFilter(Vector2 viewportSize,
+                                   boolean normalMap,
+                                   boolean emissiveMap) {
         super(ShaderLoader.fromFile(
                 "screenspace",
-                shader,
-                targets > 1 ? "#define extraTarget\n" : ""));
-        this.targets = targets;
+                "proceduralsurface",
+                (normalMap ? "#define normalMapFlag\n" : "") +
+                        (emissiveMap ? "#define emissiveMapFlag\n" : "")));
+        this.genNormalMap = normalMap;
+        this.genEmissiveMap = emissiveMap;
         this.viewport = viewportSize;
 
         rebind();
@@ -88,21 +82,28 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     public void updateProgram() {
         super.updateProgram(ShaderLoader.fromFile(
                 "screenspace",
-                "biome",
-                targets > 1 ? "#define extraTarget\n" : ""));
+                "proceduralsurface",
+                (genNormalMap ? "#define normalMapFlag\n" : "") +
+                        (genEmissiveMap ? "#define emissiveMapFlag\n" : "")));
     }
 
-    public void setViewportSize(float width, float height) {
+    public void setViewportSize(float width,
+                                float height) {
         this.viewport.set(width, height);
         setParam(Param.Viewport, this.viewport);
     }
 
-    public void setColor(float r, float g, float b, float a) {
+    public void setColor(float r,
+                         float g,
+                         float b,
+                         float a) {
         this.color.set(r, g, b, a);
         setParam(Param.Color, this.color);
     }
 
-    public void setScale(float scaleX, float scaleY, float scaleZ) {
+    public void setScale(float scaleX,
+                         float scaleY,
+                         float scaleZ) {
         this.scale.set(scaleX, scaleY, scaleZ);
         setParam(Param.Scale, this.scale);
     }
@@ -124,11 +125,6 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     public void setSeed(float seed) {
         this.seed = seed;
         setParam(Param.Seed, this.seed);
-    }
-
-    public void setAmplitude(float a) {
-        this.amplitude = a;
-        setParam(Param.Amplitude, this.amplitude);
     }
 
     public void setPersistence(float p) {
@@ -166,16 +162,6 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParam(Param.Ridge, this.ridge);
     }
 
-    public void setNumTerraces(int nt) {
-        this.numTerraces = nt;
-        setParam(Param.NumTerraces, this.numTerraces);
-    }
-
-    public void setTerraceExp(float te) {
-        this.terraceExp = te;
-        setParam(Param.TerraceExp, this.terraceExp);
-    }
-
     public void setChannels(int channels) {
         this.channels = channels;
         setParam(Param.Channels, this.channels);
@@ -186,17 +172,30 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParam(Param.Type, this.type.ordinal());
     }
 
+    public void setLutTexture(Texture lut) {
+        this.lut = lut;
+        setParam(Param.TextureLut, u_texture1);
+    }
+
+    public void setLutHueShift(float hs) {
+        this.lutHueShift = hs;
+        setParam(Param.LutHueShift, lutHueShift);
+    }
+
+    public void setLutSaturation(float hs) {
+        this.lutSaturation = hs;
+        setParam(Param.LutSaturation, lutSaturation);
+    }
+
     @Override
     public void rebind() {
         // Re-implement super to batch every parameter
-        setParams(Param.Texture, u_texture0);
         setParams(Param.Viewport, this.viewport);
         setParams(Param.Color, this.color);
         setParams(Param.Scale, this.scale);
         setParams(Param.Seed, this.seed);
         setParams(Param.BaseLevel, this.baseLevel);
         setParams(Param.Remap, this.remap);
-        setParams(Param.Amplitude, this.amplitude);
         setParams(Param.Persistence, this.persistence);
         setParams(Param.Frequency, this.frequency);
         setParams(Param.Lacunarity, this.lacunarity);
@@ -204,10 +203,11 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         setParams(Param.Smoothing, this.smoothing);
         setParams(Param.Turbulence, this.turbulence);
         setParams(Param.Ridge, this.ridge);
-        setParams(Param.NumTerraces, this.numTerraces);
-        setParams(Param.TerraceExp, this.terraceExp);
         setParams(Param.Channels, this.channels);
         setParams(Param.Type, this.type.ordinal());
+        setParams(Param.TextureLut, u_texture1);
+        setParams(Param.LutSaturation, lutSaturation);
+        setParams(Param.LutHueShift, lutHueShift);
 
         endParams();
     }
@@ -216,15 +216,14 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
     protected void onBeforeRender() {
         if (inputTexture != null)
             inputTexture.bind(u_texture0);
+        if (lut != null)
+            lut.bind(u_texture1);
     }
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture("u_texture0", 0),
-
         Viewport("u_viewport", 2),
         Seed("u_seed", 0),
-        Amplitude("u_amplitude", 0),
         Persistence("u_persistence", 0),
         Frequency("u_frequency", 0),
         Lacunarity("u_lacunarity", 0),
@@ -232,21 +231,22 @@ public final class BiomeFilter extends Filter<BiomeFilter> {
         Scale("u_scale", 3),
         BaseLevel("u_baseLevel", 0),
         Remap("u_remap", 0),
-        Power("u_power", 0),
         Octaves("u_octaves", 0),
         Smoothing("u_smoothing", 0),
         Turbulence("u_turbulence", 0),
         Ridge("u_ridge", 0),
-        NumTerraces("u_numTerraces", 0),
-        TerraceExp("u_terraceExp", 0),
         Channels("u_channels", 0),
-        Type("u_type", 0);
+        Type("u_type", 0),
+        TextureLut("u_texture1", 0),
+        LutSaturation("u_lutSaturation", 0),
+        LutHueShift("u_lutHueShift", 0);
         // @formatter:on
 
         private final String mnemonic;
         private final int elementSize;
 
-        Param(String mnemonic, int arrayElementSize) {
+        Param(String mnemonic,
+              int arrayElementSize) {
             this.mnemonic = mnemonic;
             this.elementSize = arrayElementSize;
         }
