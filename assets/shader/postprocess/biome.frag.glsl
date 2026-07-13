@@ -38,11 +38,6 @@ uniform bool u_smoothing;
 uniform bool u_turbulence;
 // Enable/disable ridge noise in fBm. Only when turbulence is on.
 uniform bool u_ridge;
-// Number of terraces in the height profile. 0 to disable.
-uniform int u_numTerraces;
-// Exponent for the terraces profile. Must be odd.
-uniform float u_terraceExp;
-// Different noise patterns in different channels.
 // <= 1 - in red.
 // == 2 - in red and green.
 // >= 3 - in red, green and blue.
@@ -65,8 +60,6 @@ float noise(vec3 p,
         float frequency,
         bool turbulence,
         bool ridge,
-        int n_terraces,
-        float terrace_exp,
         vec3 scale,
         int octaves,
         float seed) {
@@ -114,7 +107,7 @@ void main() {
             sin(phi)
     );
 
-    float val_ch1_original = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_seed);
+    float val_ch1_original = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
         val_ch1_original = smoothstep(0.0, 1.0, val_ch1_original);
     }
@@ -135,13 +128,13 @@ void main() {
 
     } else {
         // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, 0.5, u_turbulence, u_ridge, 0, 0.0, u_scale, u_octaves, u_seed + 0.023);
+        float val_ch2 = noise(p, 0, 0.5, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
         if (u_channels == 2) {
             // Channel 2 (moisture).
             fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
         } else {
             // Channel 3 (temperature).
-            float val_ch3 = noise(p, u_type, u_frequency, false, false, 0, 0.0, u_scale, u_octaves, u_seed + 0.4325);
+            float val_ch3 = noise(p, u_type, u_frequency, false, false, u_scale, u_octaves, u_seed + 0.4325);
             fragColor = vec4(val_ch1, val_ch2, val_ch3, 1.0);
         }
     }
@@ -149,7 +142,7 @@ void main() {
     #ifdef extraTarget
     // Generate emission pattern with white channel.
     // High-scale
-    float emi = noise(p, u_type, u_frequency * 0.5, false, false, 0, 0.0, vec3(8.0, 8.0, 8.0), 5, u_seed + 0.1325);
+    float emi = noise(p, u_type, u_frequency * 0.5, false, false, vec3(8.0, 8.0, 8.0), 5, u_seed + 0.1325);
     emi = emi * smoothstep(0.55, 0.7, emi) * 0.6;
     emi = emi * step(u_baseLevel, val_ch1_original);
     float r = gln_rand(xy + emi) * 0.2 + 0.8;

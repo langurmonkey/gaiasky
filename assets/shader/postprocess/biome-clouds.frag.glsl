@@ -37,10 +37,6 @@ uniform bool u_smoothing;
 uniform bool u_turbulence;
 // Enable/disable ridge noise in fBm. Only when turbulence is on.
 uniform bool u_ridge;
-// Number of terraces in the height profile. 0 to disable.
-uniform int u_numTerraces;
-// Exponent for the terraces profile. Must be odd.
-uniform float u_terraceExp;
 // Different noise patterns in different channels.
 // <= 1 - in red.
 // == 2 - in red and green.
@@ -63,8 +59,6 @@ float noise(vec3 p,
             int type,
             bool turbulence,
             bool ridge,
-            int n_terraces,
-            float terrace_exp,
             vec3 scale,
             int octaves,
             float seed) {
@@ -109,7 +103,7 @@ void main() {
         sin(phi)
     );
 
-    float val_ch1_original = noise(p, u_type, u_turbulence, u_ridge, u_numTerraces, u_terraceExp, u_scale, u_octaves, u_seed);
+    float val_ch1_original = noise(p, u_type, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
         val_ch1_original = smoothstep(0.0, 1.0, val_ch1_original);
     }
