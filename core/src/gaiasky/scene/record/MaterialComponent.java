@@ -786,10 +786,10 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 if (nc == null) {
                     nc = new NoiseComponent();
                     switch (rand.nextInt(10)) {
-                        case 0, 1, 2, 3 -> nc.randomizeEarthLike(rand);
-                        case 4 -> nc.randomizeRockyPlanet(rand);
-                        case 5 -> nc.randomizeGasGiant(rand);
-                        case 6, 7, 8 -> nc.randomizeSnowPlanet(rand);
+                        case 0, 1, 2, 3, 4 -> nc.randomizeEarthLike(rand);
+                        case 5 -> nc.randomizeRockyPlanet(rand);
+                        case 6 -> nc.randomizeGasGiant(rand);
+                        case 7, 8 -> nc.randomizeSnowPlanet(rand);
                         case 9 -> nc.randomizeForTerrain(rand);
                     }
                 }
@@ -840,7 +840,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                                     diffuseTex = diffuseT;
                                     addDiffuseTex(diffuseTex);
                                 }
-                                material.set(new ColorAttribute(ColorAttribute.Diffuse, 1f, 1f, 1f, 1f));
                             }
 
                             // SPECULAR.

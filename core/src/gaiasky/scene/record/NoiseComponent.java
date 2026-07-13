@@ -358,9 +358,11 @@ public final class NoiseComponent extends NamedComponent {
     public void randomizeForClouds(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Turbulence.
-        boolean turbulence = rand.nextBoolean();
-        boolean ridge = turbulence && rand.nextBoolean();
+        // Turbulence (7/10 probability).
+        int turbP = rand.nextInt(10);
+        boolean turbulence = turbP < 7;
+        // Ridge (2/7 probability).
+        boolean ridge = turbulence && turbP < 2;
         setTurbulence(turbulence);
         // Ridge.
         setRidge(ridge);
@@ -376,7 +378,7 @@ public final class NoiseComponent extends NamedComponent {
         setScale(new double[]{
                 xyScale,
                 xyScale,
-                rand.nextBoolean() ? zScale : xyScale});
+                !turbulence && rand.nextBoolean() ? zScale : xyScale});
 
         // Persistence.
         setPersistence(uniform(rand, 0.65, 0.9));

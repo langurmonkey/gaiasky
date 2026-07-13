@@ -546,8 +546,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(octaves).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(octavesTooltip).left().padBottom(pad18).row();
 
-        // Frequency (continent size).
-        OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency" + suffix), 0.01f, 3.0f, 0.01f, skin);
+        // Frequency (continent fragmentation).
+        OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency" + suffix), 0.01f, 1.0f, 0.01f, skin);
         frequency.setWidth(fieldWidthNoise);
         frequency.setValue((float) nc.frequency);
         frequency.addListener(new ChangeListener() {

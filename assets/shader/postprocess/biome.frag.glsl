@@ -135,7 +135,7 @@ void main() {
 
     } else {
         // Perlin always (0) in moisture (channel 2).
-        float val_ch2 = noise(p, 0, u_frequency, u_turbulence, u_ridge, 0, 0.0, u_scale, u_octaves, u_seed + 0.023);
+        float val_ch2 = noise(p, 0, 0.5, u_turbulence, u_ridge, 0, 0.0, u_scale, u_octaves, u_seed + 0.023);
         if (u_channels == 2) {
             // Channel 2 (moisture).
             fragColor = vec4(val_ch1, val_ch2, 0.0, 1.0);
