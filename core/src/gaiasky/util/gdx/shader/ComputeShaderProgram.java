@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
+import gaiasky.GaiaSky;
 import gaiasky.render.ShaderCompilationException;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
@@ -73,7 +74,7 @@ public class ComputeShaderProgram implements Disposable {
         this.shaderFile = shaderFile;
         this.shaderCode = shaderCode;
 
-        if (!SysUtils.isComputeShaderSupported()) {
+        if (!GaiaSky.settings().runtime.compute) {
             logger.warn("Compute shaders require OpenGL 4.3+ or ARB_compute_shader extension");
         } else {
             compile();
@@ -90,7 +91,7 @@ public class ComputeShaderProgram implements Disposable {
         // Mark compiled false.
         isCompiled = false;
         // Recompile.
-        if (!SysUtils.isComputeShaderSupported()) {
+        if (!GaiaSky.settings().runtime.compute) {
             logger.warn("Compute shaders require OpenGL 4.3+ or ARB_compute_shader extension");
         } else {
             compile();
