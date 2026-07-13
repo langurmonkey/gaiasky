@@ -95,7 +95,6 @@ public class ComputeShaderProgram implements Disposable {
         } else {
             compile();
         }
-        compile();
     }
 
     public String getName() {
