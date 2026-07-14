@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.CloudsFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.render.util.NoiseType;
 
 public final class Clouds extends PostProcessorEffect {
     private final CloudsFilter filter;
@@ -100,7 +101,7 @@ public final class Clouds extends PostProcessorEffect {
         filter.setChannels(channels);
     }
 
-    public void setType(CloudsFilter.NoiseType type) {
+    public void setType(NoiseType type) {
         filter.setType(type);
     }
 

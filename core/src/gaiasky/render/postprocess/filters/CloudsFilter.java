@@ -10,6 +10,7 @@ package gaiasky.render.postprocess.filters;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Vector4;
+import gaiasky.render.util.NoiseType;
 import gaiasky.render.util.ShaderLoader;
 
 public final class CloudsFilter extends Filter<CloudsFilter> {
@@ -45,17 +46,6 @@ public final class CloudsFilter extends Filter<CloudsFilter> {
     /** Number of extra render targets. If &lt 1, we use 2 targets, the default noise, and an emission channel.  **/
     private final int targets;
 
-    /**
-     * <p>The type of noise:</p>
-     * <ol>
-     *   <li>Perlin</li>
-     *   <li>Simplex</li>
-     *   <li>Voronoi</li>
-     * </ol>
-     */
-    public enum NoiseType {
-        PERLIN, SIMPLEX, VORONOI
-    }
 
     private NoiseType type = NoiseType.SIMPLEX;
 

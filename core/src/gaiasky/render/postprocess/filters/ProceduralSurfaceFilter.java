@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Vector4;
-import gaiasky.render.postprocess.filters.CloudsFilter.NoiseType;
+import gaiasky.render.util.NoiseType;
 import gaiasky.render.util.ShaderLoader;
 
 public final class ProceduralSurfaceFilter extends Filter<ProceduralSurfaceFilter> {

@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaiasky.GaiaSky;
 import gaiasky.render.postprocess.effects.Clouds;
 import gaiasky.render.postprocess.effects.ProceduralSurface;
-import gaiasky.render.postprocess.filters.CloudsFilter.NoiseType;
+import gaiasky.render.util.NoiseType;
 import gaiasky.util.Logger.Log;
 import net.jafama.FastMath;
 

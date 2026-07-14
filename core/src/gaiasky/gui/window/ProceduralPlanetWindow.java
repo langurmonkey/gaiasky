@@ -23,7 +23,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.postprocess.filters.CloudsFilter.NoiseType;
+import gaiasky.render.util.NoiseType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.record.*;
 import gaiasky.scene.view.FocusView;

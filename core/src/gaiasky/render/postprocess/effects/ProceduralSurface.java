@@ -13,6 +13,7 @@ import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.CloudsFilter;
 import gaiasky.render.postprocess.filters.ProceduralSurfaceFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
+import gaiasky.render.util.NoiseType;
 
 public final class ProceduralSurface extends PostProcessorEffect {
     private final ProceduralSurfaceFilter filter;
@@ -104,7 +105,7 @@ public final class ProceduralSurface extends PostProcessorEffect {
         filter.setChannels(channels);
     }
 
-    public void setType(CloudsFilter.NoiseType type) {
+    public void setType(NoiseType type) {
         filter.setType(type);
     }
 

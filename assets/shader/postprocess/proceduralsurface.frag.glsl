@@ -60,6 +60,11 @@ layout (location = 3) out vec4 fragEmission;
 layout (location = 4) out vec4 fragNormal;
 #endif // normalMapFlag
 
+// Noise types
+#define PERLIN 0
+#define SIMPLEX 1
+#define VORONOI 2
+
 float random(vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
@@ -99,7 +104,7 @@ float noise(vec3 p,
 
 vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLevel) {
     float epsilon = 1.0 / 255.0; // One quantization step for 8-bit textures
-    if (elevation <= u_baseLevel + epsilon) {
+    if (elevation <= baseLevel + epsilon) {
         elevation = 0.0;
     }
 
@@ -194,33 +199,35 @@ void main() {
     fragBiome = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Elevation (channel 1)
-    float elevation_original = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
+    float elevation_noise = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
-        elevation_original = smoothstep(0.0, 1.0, elevation_original);
+        elevation_noise = smoothstep(0.0, 1.0, elevation_noise);
     }
 
     float elevation;
     if (u_remap) {
-        elevation = gln_map(elevation_original, baseLevel, 1.0, 0.0, 1.0);
+        elevation = gln_map(elevation_noise, baseLevel, 1.0, 0.0, 1.0);
         // In remap mode, base level gets mapped to 0.
         baseLevel = 0.0;
     } else {
-        elevation = max(baseLevel, elevation_original);
+        elevation = max(baseLevel, elevation_noise);
     }
     fragBiome.r = elevation;
 
     // Moisture (channel 2)
     float moisture = 0.0;
     if (u_channels >= 2) {
-        float moisture_original = noise(p + vec3(0.1, -0.4, 0.2), 0, 0.5, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
-        moisture = gln_map(moisture_original, baseLevel, 1.0, 0.0, 1.0);
+        moisture = noise(p + vec3(0.1, -0.4, 0.2), SIMPLEX, 0.5, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
         fragBiome.g = moisture;
     }
 
     // Temperature (channel 3)
     float temperature = 0.0;
     if (u_channels >= 3) {
-        temperature = noise(p, u_type, u_frequency, false, false, u_scale, u_octaves, u_seed + 0.4325);
+        const float LATITUDE_INFLUENCE = 0.8;
+        float latitudeFactor = 1.0 - abs(phi) / (gln_PI * 0.5); // 1 at equator, 0 at poles
+        float noiseTemperature = noise(p, u_type, u_frequency, false, false, u_scale, u_octaves, u_seed + 0.4325);
+        temperature = mix(noiseTemperature, latitudeFactor, LATITUDE_INFLUENCE);
         fragBiome.b = temperature;
     }
 
@@ -234,7 +241,7 @@ void main() {
 
     // Specular
     float epsilon = 1.0 / 255.0;
-    float waterFac = smoothstep(baseLevel, baseLevel - 0.05, elevation);
+    float waterFac = 1.0 - smoothstep(baseLevel - 0.05, baseLevel, elevation);
     float snowFac = smoothstep(0.9, 0.99, luma(fragDiffuse.rgb));
     fragSpecular = vec4(vec3(waterFac + snowFac), 1.0);
 
@@ -250,11 +257,11 @@ void main() {
 
     // Emission (procedural, from noise)
     #ifdef emissiveMapFlag
-    float emi = noise(p, 0, 0.16, false, false, vec3(8.0, 8.0, 8.0), 5, u_seed + 0.1325);
+    float emi = noise(p, SIMPLEX, 0.16, false, false, vec3(8.0, 8.0, 8.0), 5, u_seed + 0.1325);
     emi = emi * smoothstep(0.55, 0.9, emi) * 2.0;
-    emi = emi * noise(p + vec3(0.1, -0.1, 0.3), 2, 1.6, true, true, vec3(14.0), 1, u_seed);
+    emi = emi * noise(p + vec3(0.1, -0.1, 0.3), VORONOI, 1.6, true, true, vec3(14.0), 1, u_seed);
     // Not on water!
-    emi = emi * step(baseLevel, elevation_original);
+    emi = emi * step(baseLevel, elevation_noise);
     float r = gln_rand(xy + emi) * 0.2 + 0.8;
     float g = gln_rand(xy + emi) * 0.2 + 0.7;
     float b = gln_rand(xy + emi) * 0.2 + 0.5;
