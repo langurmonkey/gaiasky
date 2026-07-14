@@ -123,59 +123,12 @@ vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLe
     return rgba.rgb;
 }
 
-// Procedural diffuse color from elevation, moisture and temperature.
-vec3 diffuseProcedural(float elevation, float moisture, float temperature, float baseLevel) {
-    float epsilon = 1.0 / 255.0;
-
-    vec3 waterColor = vec3(0.2, 0.4, 0.8);
-    vec3 deepWaterColor = vec3(0.0, 0.1, 0.5);
-
-    // Water.
-    if (elevation <= baseLevel + epsilon) {
-        float depth = 1.0 - (elevation / baseLevel);
-        return mix(waterColor, deepWaterColor, clamp(depth * 2.0, 0.0, 1.0));
-    }
-
-    // Land: normalize height above water to [0, 1].
-    float h = (elevation - baseLevel) / (1.0 - baseLevel);
-    h = clamp(h, 0.0, 1.0);
-
-    // Low elevation: vegetation / desert
-    // Moisture controls the green vs. brown gradient.
-    vec3 low = mix(
-        vec3(0.76, 0.70, 0.50),  // dry: sandy/savanna
-        vec3(0.12, 0.45, 0.10),  // wet: forest green
-        moisture
-    );
-
-    // Mid elevation: rock / scrub
-    vec3 mid = vec3(0.48, 0.40, 0.30);
-
-    // High elevation: rock / snow
-    vec3 highBase = vec3(0.55, 0.50, 0.42);
-    vec3 snow = vec3(0.92, 0.93, 0.95);
-    vec3 high = mix(highBase, snow, smoothstep(0.65, 0.95, h));
-
-    // Blend by height.
-    vec3 color;
-    if (h < 0.35) {
-        color = mix(low, mid, h / 0.35);
-    } else if (h < 0.70) {
-        color = mix(mid, high, (h - 0.35) / 0.35);
-    } else {
-        color = high;
-    }
-
-    // Temperature influence: cold → desaturate and darken.
-    // temperature is in [0, 1], 0 = cold, 1 = warm.
-    float coldness = 1.0 - temperature;
-    color = mix(color * 0.5, color, temperature);
-
-    // Very cold: add frost/ice tint.
-    vec3 frost = vec3(0.85, 0.88, 0.92);
-    color = mix(color, frost, smoothstep(0.0, 0.15, coldness) * (1.0 - h * 0.5));
-
-    return color;
+// Converts spherical coordinates to a cartesian point in 3D (radius 1).
+vec3 sphericalToCartesian(float phi, float theta) {
+    float cosPhi = cos(phi);
+    return vec3(cosPhi * cos(theta),
+            cosPhi * sin(theta),
+            sin(phi));
 }
 
 void main() {
@@ -185,12 +138,8 @@ void main() {
     float phi = (-gln_PI / 2.0) + xy.y * phiStep;
     float thetaStep = gln_PI * 2.0 / u_viewport.x;
     float theta = xy.x * thetaStep;
-    float cosPhi = cos(phi);
-    vec3 p = vec3(
-            cosPhi * cos(theta),
-            cosPhi * sin(theta),
-            sin(phi)
-    );
+    vec3 p = sphericalToCartesian(phi, theta);
+
     float baseLevel = u_baseLevel;
 
     ///
@@ -248,10 +197,26 @@ void main() {
     // Normal
     #ifdef normalMapFlag
     float normalScale = 4.0;
-    float dx = dFdx(elevation) * normalScale;
-    float dy = dFdy(elevation) * normalScale;
+
+    // Use the same angular step as the pixel grid so slope estimates
+    // stay consistent with texel density instead of an arbitrary epsilon.
+    float dPhi = phiStep;
+    float dTheta = thetaStep;
+
+    vec3 pThetaPlus = sphericaltoCartesian(phi, theta + dTheta);
+    vec3 pPhiPlus   = sphericaltoCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
+
+    float elevTheta = noise(pThetaPlus, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
+    float elevPhi   = noise(pPhiPlus,   u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
+    if (u_smoothing) {
+        elevTheta = smoothstep(0.0, 1.0, elevTheta);
+        elevPhi   = smoothstep(0.0, 1.0, elevPhi);
+    }
+
+    float dx = (elevTheta - elevation_original) / dTheta * normalScale;
+    float dy = (elevPhi   - elevation_original) / dPhi   * normalScale;
     float dz = 1.0;
-    vec3 normal = normalize(vec3(dx, dy, dz));
+    vec3 normal = normalize(vec3(-dx, -dy, dz));
     fragNormal = vec4(normal.x * 0.5 + 0.5, normal.y * 0.5 + 0.5, normal.z, 1.0);
     #endif // normalMapFlag
 

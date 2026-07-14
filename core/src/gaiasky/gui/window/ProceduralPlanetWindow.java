@@ -804,25 +804,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
             // LUT
             Path dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
-            Array<String> lookUpTables = new Array<>();
-            try (var stream = Files.list(dataPath)) {
-                java.util.List<Path> l = stream.filter(f -> f.getFileName().toString().startsWith("biome_lut")
-                                                       && (f.toString().endsWith(".png") || f.toString().endsWith(".jpg"))).toList();
-                var subPath = Path.of("default-data", "tex", "lut").toString();
-                for (Path p : l) {
-                    String name = p.toString();
-                    lookUpTables.add(Constants.DATA_LOCATION_TOKEN + name.substring(name.indexOf(subPath)).replace("\\", "/"));
-                }
-            } catch (Exception ignored) {
-            }
-            if (lookUpTables.isEmpty()) {
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_earthlike.png");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_alien.png");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_desert.png");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_ice.png");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_lava.png");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_rocky.png");
-            }
+            Array<String> lookUpTables = MaterialComponent.getLookUpTextures();
+
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);
             lookUpTablesBox.setWidth(fieldWidth + 80f);

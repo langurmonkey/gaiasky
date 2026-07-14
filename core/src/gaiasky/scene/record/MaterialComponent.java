@@ -65,7 +65,12 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     @SuppressWarnings("GDXJavaStaticResource")
     public static final CubemapComponent sharedReflectionCubemap = new CubemapComponent();
 
-    private void initializeLookUpTables() {
+    public static Array<String> getLookUpTextures() {
+        initializeLookUpTables();
+        return lookUpTextures;
+    }
+
+    private static void initializeLookUpTables() {
         if (lookUpTextures.isEmpty()) {
             var dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
             var sep = File.separatorChar;
@@ -83,13 +88,13 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             } catch (Exception ignored) {
             }
             if (lookUpTextures.isEmpty()) {
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_earthlike.png");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_desert.png");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_alien.png");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_ice.png");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_rocky.png");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_tropical.png");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_lava.png");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_earthlike.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_desert.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_alien.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_ice.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_rocky.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_tropical.jpg");
+                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_lava.jpg");
             }
         }
     }
