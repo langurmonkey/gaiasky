@@ -35,6 +35,7 @@ import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
+import org.lwjgl.system.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -133,7 +134,11 @@ public class GaiaSkyDesktop implements IObserver {
      * @param args CLI arguments (see {@link CLIArgs}).
      */
     public static void main(String[] args) {
+        // Set main thread name.
         Thread.currentThread().setName(Constants.MAIN_THREAD_NAME);
+        // Use modern memory backend for LWJGL3 based on java.lang.foreign.
+        Configuration.MEMORY_BACKEND.set("ffm");
+
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         cliArgs = new CLIArgs();
         JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
