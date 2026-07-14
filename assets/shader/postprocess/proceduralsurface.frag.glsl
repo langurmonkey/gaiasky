@@ -194,25 +194,26 @@ void main() {
     fragBiome = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Elevation (channel 1)
-    float val_ch1_original = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
+    float elevation_original = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
-        val_ch1_original = smoothstep(0.0, 1.0, val_ch1_original);
+        elevation_original = smoothstep(0.0, 1.0, elevation_original);
     }
 
     float elevation;
     if (u_remap) {
-        elevation = gln_map(val_ch1_original, baseLevel, 1.0, 0.0, 1.0);
+        elevation = gln_map(elevation_original, baseLevel, 1.0, 0.0, 1.0);
         // In remap mode, base level gets mapped to 0.
         baseLevel = 0.0;
     } else {
-        elevation = max(baseLevel, val_ch1_original);
+        elevation = max(baseLevel, elevation_original);
     }
     fragBiome.r = elevation;
 
     // Moisture (channel 2)
     float moisture = 0.0;
     if (u_channels >= 2) {
-        moisture = noise(p, 0, 0.5, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
+        float moisture_original = noise(p + vec3(0.1, -0.4, 0.2), 0, 0.5, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
+        moisture = gln_map(moisture_original, baseLevel, 1.0, 0.0, 1.0);
         fragBiome.g = moisture;
     }
 
@@ -249,9 +250,11 @@ void main() {
 
     // Emission (procedural, from noise)
     #ifdef emissiveMapFlag
-    float emi = noise(p, u_type, u_frequency * 2.0, false, false, vec3(8.0, 8.0, 8.0), 5, u_seed + 0.1325);
-    emi = emi * smoothstep(0.55, 0.7, emi) * 0.3;
-    emi = emi * step(baseLevel, val_ch1_original);
+    float emi = noise(p, 0, 0.16, false, false, vec3(8.0, 8.0, 8.0), 5, u_seed + 0.1325);
+    emi = emi * smoothstep(0.55, 0.9, emi) * 2.0;
+    emi = emi * noise(p + vec3(0.1, -0.1, 0.3), 2, 1.6, true, true, vec3(14.0), 1, u_seed);
+    // Not on water!
+    emi = emi * step(baseLevel, elevation_original);
     float r = gln_rand(xy + emi) * 0.2 + 0.8;
     float g = gln_rand(xy + emi) * 0.2 + 0.7;
     float b = gln_rand(xy + emi) * 0.2 + 0.5;

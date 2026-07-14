@@ -525,6 +525,30 @@
     },
     "clipboard": {
       "imageUp": "iconic-clipboard"
+    },
+    "planet-earth": {
+      "imageUp": "planet-earth"
+    },
+    "planet-alien": {
+      "imageUp": "planet-alien"
+    },
+    "planet-desert": {
+      "imageUp": "planet-desert"
+    },
+    "planet-gasgiant": {
+      "imageUp": "planet-gasgiant"
+    },
+    "planet-ice": {
+      "imageUp": "planet-ice"
+    },
+    "planet-lava": {
+      "imageUp": "planet-lava"
+    },
+    "planet-tropical": {
+      "imageUp": "planet-tropical"
+    },
+    "planet-rocky": {
+      "imageUp": "planet-rocky"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
@@ -701,7 +725,7 @@
     },
     "reload-s": {
       "imageUp": "reload-s"
-    },
+    }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
     "default": {

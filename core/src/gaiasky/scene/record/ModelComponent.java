@@ -1185,7 +1185,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         switch (rnd.nextInt(5)) {
             case 0 -> mtc.randomizeAll(seed);
             case 1 -> mtc.randomizeEarthLike(seed);
-            case 2 -> mtc.randomizeColdPlanet(seed);
+            case 2 -> mtc.randomizeFrozenPlanet(seed);
             case 3 -> mtc.randomizeRockyPlanet(seed);
             case 4 -> mtc.randomizeGasGiant(seed);
         }

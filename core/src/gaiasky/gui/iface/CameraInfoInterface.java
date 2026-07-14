@@ -590,7 +590,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     HorizontalGroup currGroup = new HorizontalGroup();
                     for (int i = 0; i < names.length; i++) {
                         String name = names[i];
-                        String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
+                        String nameCapped = TextUtils.capString(name, focusFieldMaxLength - 4);
                         OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
                         if (nameCapped.length() != name.length())
                             nl.addListener(new OwnTextTooltip(name, skin));

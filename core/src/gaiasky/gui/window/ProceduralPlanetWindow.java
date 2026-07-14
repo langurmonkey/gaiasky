@@ -286,28 +286,19 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
     private void addLocalButtons(Table content,
                                  Function<Boolean, Boolean> gasGiantFunc,
                                  Function<Boolean, Boolean> earthLikeFunc,
-                                 Function<Boolean, Boolean> coldPlanetFunc,
-                                 Function<Boolean, Boolean> rockyPlanetFunc
+                                 Function<Boolean, Boolean> desertFunc,
+                                 Function<Boolean, Boolean> tropicalFunc,
+                                 Function<Boolean, Boolean> iceWorldFunc,
+                                 Function<Boolean, Boolean> rockyPlanetFunc,
+                                 Function<Boolean, Boolean> moltenLavaFunc,
+                                 Function<Boolean, Boolean> alienFunc
     ) {
-        float w = 220f;
-
-        // Gas giant
-        OwnTextButton gasGiant = new OwnTextButton(I18n.msg("gui.procedural.button.gasgiant"), skin);
-        gasGiant.setWidth(w);
-        gasGiant.setColor(ColorUtils.gBlueC);
-        gasGiant.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                gasGiantFunc.apply(true);
-            }
-        });
-        gasGiant.pad(pad10, pad20, pad10, pad20);
-        gasGiant.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.gasgiant"), skin));
+        float w = 90f;
+        float h = 70f;
 
         // Earth like
-        OwnTextButton earthLike = new OwnTextButton(I18n.msg("gui.procedural.button.earthlike"), skin);
-        earthLike.setWidth(w);
+        OwnTextButton earthLike = new OwnTextIconButton("", skin, "planet-earth");
+        earthLike.setSize(w, h);
         earthLike.setColor(ColorUtils.gBlueC);
         earthLike.addListener(new ChangeListener() {
             @Override
@@ -317,25 +308,67 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             }
         });
         earthLike.pad(pad10, pad20, pad10, pad20);
-        earthLike.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.earthlike"), skin));
+        earthLike.setTooltip(I18n.msg("gui.procedural.button.earthlike"));
 
-        // Snow world
-        OwnTextButton snowWorld = new OwnTextButton(I18n.msg("gui.procedural.button.snow"), skin);
-        snowWorld.setWidth(w);
-        snowWorld.setColor(ColorUtils.gBlueC);
-        snowWorld.addListener(new ChangeListener() {
+        // Desert
+        OwnTextButton desert = new OwnTextIconButton("", skin, "planet-desert");
+        desert.setSize(w, h);
+        desert.setColor(ColorUtils.gBlueC);
+        desert.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
                                 Actor actor) {
-                coldPlanetFunc.apply(true);
+                desertFunc.apply(true);
             }
         });
-        snowWorld.pad(pad10, pad20, pad10, pad20);
-        snowWorld.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.snow"), skin));
+        desert.pad(pad10, pad20, pad10, pad20);
+        desert.setTooltip(I18n.msg("gui.procedural.button.desert"));
+
+        // Tropical islands
+        OwnTextButton tropicalIslands = new OwnTextIconButton("", skin, "planet-tropical");
+        tropicalIslands.setSize(w, h);
+        tropicalIslands.setColor(ColorUtils.gBlueC);
+        tropicalIslands.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                tropicalFunc.apply(true);
+            }
+        });
+        tropicalIslands.pad(pad10, pad20, pad10, pad20);
+        tropicalIslands.setTooltip(I18n.msg("gui.procedural.button.tropical"));
+
+        // Gas giant
+        OwnTextButton gasGiant = new OwnTextIconButton("", skin, "planet-gasgiant");
+        gasGiant.setSize(w, h);
+        gasGiant.setColor(ColorUtils.gBlueC);
+        gasGiant.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                gasGiantFunc.apply(true);
+            }
+        });
+        gasGiant.pad(pad10, pad20, pad10, pad20);
+        gasGiant.setTooltip(I18n.msg("gui.procedural.button.gasgiant"));
+
+        // Frozen world
+        OwnTextButton frozenWorld = new OwnTextIconButton("", skin, "planet-ice");
+        frozenWorld.setSize(w, h);
+        frozenWorld.setColor(ColorUtils.gBlueC);
+        frozenWorld.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                iceWorldFunc.apply(true);
+            }
+        });
+        frozenWorld.pad(pad10, pad20, pad10, pad20);
+        frozenWorld.setTooltip(I18n.msg("gui.procedural.button.ice"));
 
         // Rocky planet
-        OwnTextButton rockyPlanet = new OwnTextButton(I18n.msg("gui.procedural.button.rocky"), skin);
-        rockyPlanet.setWidth(w);
+        OwnTextButton rockyPlanet = new OwnTextIconButton("", skin, "planet-rocky");
+        rockyPlanet.setSize(w, h);
         rockyPlanet.setColor(ColorUtils.gBlueC);
         rockyPlanet.addListener(new ChangeListener() {
             @Override
@@ -345,13 +378,45 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             }
         });
         rockyPlanet.pad(pad10, pad20, pad10, pad20);
-        rockyPlanet.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.rocky"), skin));
+        rockyPlanet.setTooltip(I18n.msg("gui.procedural.button.rocky"));
+
+        // Molten lava world
+        OwnTextButton moltenLava = new OwnTextIconButton("", skin, "planet-lava");
+        moltenLava.setSize(w, h);
+        moltenLava.setColor(ColorUtils.gBlueC);
+        moltenLava.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                moltenLavaFunc.apply(true);
+            }
+        });
+        moltenLava.pad(pad10, pad20, pad10, pad20);
+        moltenLava.setTooltip(I18n.msg("gui.procedural.button.lava"));
+
+        // Molten lava world
+        OwnTextButton alienPlanet = new OwnTextIconButton("", skin, "planet-alien");
+        alienPlanet.setSize(w, h);
+        alienPlanet.setColor(ColorUtils.gBlueC);
+        alienPlanet.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                alienFunc.apply(true);
+            }
+        });
+        alienPlanet.pad(pad10, pad20, pad10, pad20);
+        alienPlanet.setTooltip(I18n.msg("gui.procedural.button.alien"));
 
         Table bt = new Table(skin);
         bt.add(earthLike).pad(5f);
-        bt.add(snowWorld).pad(5f);
+        bt.add(desert).pad(5f);
+        bt.add(tropicalIslands).pad(5f);
+        bt.add(frozenWorld).pad(5f);
         bt.add(rockyPlanet).pad(5f);
+        bt.add(moltenLava).pad(5f);
         bt.add(gasGiant).pad(5f);
+        bt.add(alienPlanet).pad(5f);
 
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.space(pad20);
@@ -723,8 +788,12 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             addLocalButtons(content,
                             this::randomizeSurfaceGasGiant,
                             this::randomizeSurfaceEarthLike,
-                            this::randomizeSurfaceColdPlanet,
-                            this::randomizeSurfaceRockyPlanet);
+                            this::randomizeSurfaceDesert,
+                            this::randomizeSurfaceTropical,
+                            this::randomizeSurfaceFrozen,
+                            this::randomizeSurfaceRockyPlanet,
+                            this::randomizeSurfaceLava,
+                            this::randomizeSurfaceAlien);
 
             // Add generate and randomize buttons
             genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
@@ -737,7 +806,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             Path dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
             Array<String> lookUpTables = new Array<>();
             try (var stream = Files.list(dataPath)) {
-                java.util.List<Path> l = stream.filter(f -> f.toString().endsWith("-lut.png") || f.toString().endsWith("-lut.jpg")).toList();
+                java.util.List<Path> l = stream.filter(f -> f.getFileName().toString().startsWith("biome_lut")
+                                                       && (f.toString().endsWith(".png") || f.toString().endsWith(".jpg"))).toList();
                 var subPath = Path.of("default-data", "tex", "lut").toString();
                 for (Path p : l) {
                     String name = p.toString();
@@ -746,8 +816,12 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             } catch (Exception ignored) {
             }
             if (lookUpTables.isEmpty()) {
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-lut.jpg");
-                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome-smooth-lut.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_earthlike.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_alien.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_desert.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_ice.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_lava.png");
+                lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_rocky.png");
             }
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);
@@ -774,7 +848,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
             // Hue shift
             hueShift = new OwnSliderPlus(I18n.msg("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, skin);
-            hueShift.setWidth(fieldWidthTotal - 100f);
+            hueShift.setWidth(fieldWidthTotal);
             hueShift.setValueSuffix("°");
             hueShift.setValue(mtc.biomeHueShift);
             hueShift.addListener(new ChangeListener() {
@@ -787,8 +861,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             });
             OwnImageButton hueShiftTooltip = new OwnImageButton(skin, "tooltip");
             hueShiftTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.hueshift"), skin));
-            scrollContent.add(hueShift).colspan(2).left().padBottom(pad34).padRight(pad10);
-            scrollContent.add(hueShiftTooltip).left().padBottom(pad34).row();
+            scrollContent.add(hueShift).colspan(2).left().padBottom(pad18).padRight(pad10);
+            scrollContent.add(hueShiftTooltip).left().padBottom(pad18).row();
 
             // Initial update
             updateLutImage(lookUpTables);
@@ -1081,7 +1155,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             case 0, 1, 2, 3 -> initMtc.randomizeEarthLike(rand.nextLong());
             case 4 -> initMtc.randomizeRockyPlanet(rand.nextLong());
             case 5, 6 -> initMtc.randomizeGasGiant(rand.nextLong());
-            case 7, 8 -> initMtc.randomizeColdPlanet(rand.nextLong());
+            case 7, 8 -> initMtc.randomizeFrozenPlanet(rand.nextLong());
             case 9 -> initMtc.randomizeAll(rand.nextLong());
         }
 
@@ -1126,9 +1200,39 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         return generateSurface(false);
     }
 
-    protected Boolean randomizeSurfaceColdPlanet(Boolean rebuild) {
+    protected Boolean randomizeSurfaceDesert(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
-        this.initMtc.randomizeColdPlanet(rand.nextLong());
+        this.initMtc.randomizeDesert(rand.nextLong());
+
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
+
+            rebuild();
+        }
+
+        return generateSurface(false);
+    }
+
+    protected Boolean randomizeSurfaceTropical(Boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeTropical(rand.nextLong());
+
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
+
+            rebuild();
+        }
+
+        return generateSurface(false);
+    }
+
+    protected Boolean randomizeSurfaceFrozen(Boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeFrozenPlanet(rand.nextLong());
 
         if (rebuild) {
             // Others are the same
@@ -1144,6 +1248,36 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
     protected Boolean randomizeSurfaceRockyPlanet(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
         this.initMtc.randomizeRockyPlanet(rand.nextLong());
+
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
+
+            rebuild();
+        }
+
+        return generateSurface(false);
+    }
+
+    protected Boolean randomizeSurfaceLava(Boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeLava(rand.nextLong());
+
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
+
+            rebuild();
+        }
+
+        return generateSurface(false);
+    }
+
+    protected Boolean randomizeSurfaceAlien(Boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeAlien(rand.nextLong());
 
         if (rebuild) {
             // Others are the same

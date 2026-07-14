@@ -458,6 +458,112 @@ public final class NoiseComponent extends NamedComponent {
     }
 
     /**
+     * Randomizes the noise component parameters to generate an alien planet.
+     *
+     * @param rand The RNG.
+     */
+    public void randomizeAlien(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Type.
+        setType(NoiseType.values()[rand.nextInt(2)].name());
+        // Scale.
+        double scale = rand.nextDouble(3.0, 8.0);
+        double scaleZ = rand.nextDouble(8.0, 14.0);
+        setScale(new double[]{scale, scale, rand.nextInt(8) < 3 ? scale : scaleZ});
+        // Persistence.
+        setPersistence(rand.nextDouble(0.2, 0.8));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.01, 0.35));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(3.0, 5.0));
+        // Octaves.
+        setOctaves(5L);
+        // Turbulence.
+        setTurbulence(rand.nextInt(4) == 3);
+        // Ridge.
+        setRidge(turbulence && rand.nextInt(4) < 3);
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
+        // Emission.
+        genEmissiveMap = true;
+        // Base level.
+        setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
+        //Remap.
+        setRemap(rand.nextBoolean());
+    }
+
+    /**
+     * Randomizes the noise component parameters to generate a desert planet.
+     *
+     * @param rand The RNG.
+     */
+    public void randomizeDesert(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Type.
+        setType(NoiseType.values()[rand.nextInt(2)].name());
+        // Same scale for all.
+        double scale = rand.nextDouble(5.0, 9.0);
+        setScale(new double[]{scale, scale, scale});
+        // Persistence.
+        setPersistence(rand.nextDouble(0.1, 0.3));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.05, 0.25));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(4.0, 7.0));
+        // Octaves.
+        setOctaves(5L);
+        // Turbulence.
+        setTurbulence(true);
+        // Ridge.
+        setRidge(turbulence && rand.nextInt(10) < 3);
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
+        // Emission.
+        genEmissiveMap = rand.nextInt(4) == 3;
+        // Base level.
+        setBaseLevel(0.0);
+        // Remap.
+        setRemap(rand.nextBoolean());
+    }
+
+    /**
+     * Randomizes the noise component parameters to generate a tropical island planet.
+     *
+     * @param rand The RNG.
+     */
+    public void randomizeTropical(Random rand) {
+        // Seed.
+        setSeed(rand.nextDouble(2.0));
+        // Type.
+        setType(NoiseType.values()[rand.nextInt(2)].name());
+        // Same scale for all.
+        double scale = rand.nextDouble(5.0, 9.0);
+        setScale(new double[]{scale, scale, scale});
+        // Persistence.
+        setPersistence(rand.nextDouble(0.2, 0.8));
+        // Frequency.
+        setFrequency(rand.nextDouble(0.2, 0.55));
+        // Lacunarity.
+        setLacunarity(rand.nextDouble(4.0, 7.0));
+        // Octaves.
+        setOctaves(5L);
+        // Turbulence.
+        setTurbulence(rand.nextBoolean());
+        // Ridge.
+        setRidge(turbulence && rand.nextBoolean());
+        // Smoothing.
+        setSmoothing(rand.nextBoolean());
+        // Emission.
+        genEmissiveMap = rand.nextInt(4) == 3;
+        // Base level.
+        setBaseLevel(rand.nextDouble(0.3, 0.7));
+        // Remap.
+        setRemap(rand.nextBoolean());
+    }
+
+    /**
      * Randomizes the noise component parameters to generate a Snow planet.
      *
      * @param rand The RNG.

@@ -448,13 +448,13 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         double atmosphereHeightKm = Math.min(240, bodyRadiusKm * 0.015);
         setSize(bodyRadiusKm + atmosphereHeightKm);
         // Wavelengths
-        setWavelengths(new double[]{gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1)});
+        setWavelengths(new double[]{gaussian(rand, 0.6, 0.05), gaussian(rand, 0.54, 0.05), gaussian(rand, 0.45, 0.05)});
         // Kr
-        setM_Kr(rand.nextDouble(0.002f, 0.01f));
+        setM_Kr(rand.nextDouble(0.001f, 0.004f));
         // Km
         setM_Km(rand.nextDouble(0.001f, 0.0079f));
         // eSun
-        setM_eSun(gaussian(rand, 16.0, 2.0, 8.0));
+        setM_eSun(gaussian(rand, 11.0, 1.0, 5.0));
         // Fog density
         setFogdensity(gaussian(rand, 0.6, 0.3, 0.01));
         // Fog color
@@ -462,7 +462,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // O3 optical depth at red (Chappuis band)
         setO3OpticalDepth(gaussian(rand, 0.05, 0.03, 0.0));
         // Samples
-        setSamples(10L);
+        setSamples(8L);
         // Params
         setParams(createUVSphereParameters(200L, 2.0, true));
     }
