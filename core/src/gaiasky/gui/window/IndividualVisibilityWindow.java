@@ -104,6 +104,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 if (ct.style != null) {
                     Image icon = new Image(skin.getDrawable(ct.style));
                     button = new OwnTextIconButton("", icon, skin, "toggle");
+                    button.setSize(60f, 60f);
                 } else {
                     continue;
                 }
@@ -443,8 +444,10 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         for (Entity object : objects) {
             // Omit stars with no proper names and particle groups
             var base = Mapper.base.get(object);
+            var graph = Mapper.graph.get(object);
             var name = base.getName();
-            if (name != null
+            if (graph != null && graph.parent != null
+                    && name != null
                     && !GlobalResources.isNumeric(name)
                     && !exception(ct, object)
                     && filter(base.names, filter)
@@ -505,7 +508,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     }
 
     private Group visibilitySwitcher(ComponentType ct, String title, String id) {
-        float componentWidth = 495f;
+        float componentWidth = 500f;
 
         // Objects
         VerticalGroup objectsGroup = new VerticalGroup();
@@ -525,7 +528,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         scrollPane.setWidth(componentWidth);
 
         // Filter
-        OwnTextField filter = new OwnTextField("", skin);
+        var filter = new OwnTextField("", skin);
         filter.setWidth(componentWidth);
         filter.setMessageText(I18n.msg("gui.dataset.filter"));
         filter.addListener((event) -> {
@@ -575,8 +578,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 .width(100f);
 
         VerticalGroup group = new VerticalGroup();
-        group.left();
-        group.columnLeft();
+        group.center();
+        group.columnCenter();
         group.space(space8);
 
         group.addActor(header);

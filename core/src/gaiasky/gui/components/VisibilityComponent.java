@@ -85,6 +85,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     if (ct.style != null) {
                         Image icon = new Image(skin.getDrawable(ct.style));
                         button = new OwnTextIconButton("", Align.center, icon, skin, "toggle");
+                        button.setSize(60f, 60f);
                     } else {
                         continue;
                     }

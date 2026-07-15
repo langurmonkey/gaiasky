@@ -767,6 +767,7 @@ public class GamepadGui extends AbstractGui {
                 if (ct.style != null) {
                     Image icon = new Image(skin.getDrawable(ct.style));
                     button = new OwnTextIconButton("", icon, skin, "toggle");
+                    button.setSize(105f, 105f);
                 } else {
                     continue;
                 }
