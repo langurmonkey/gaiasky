@@ -18,6 +18,8 @@ uniform sampler3D u_texture1;
 uniform float u_lutHueShift;
 // LUT saturation value.
 uniform float u_lutSaturation;
+// Influence of the latitude on the temperature.
+uniform float u_latitudeInfluence = 0.8;
 
 // Viewport dimensions.
 uniform vec2 u_viewport;
@@ -171,12 +173,11 @@ void main() {
     // Temperature (channel 3)
     float temperature = 0.5;
     if (u_channels >= 3) {
-        const float LATITUDE_INFLUENCE = 0.8;
         float latitudeFactor = 1.0 - abs(phi) / (gln_PI * 0.5); // 1 at equator, 0 at poles
-        latitudeFactor = smoothstep(0.0, 0.7, latitudeFactor);
-        float tempFreq = min(u_frequency * 0.5, 0.2);
+        latitudeFactor = smoothstep(0.2, 1.0, latitudeFactor);
+        float tempFreq = min(u_frequency * 0.7, 0.5);
         float noiseTemperature = noise(p, u_type, tempFreq, false, false, u_scale, u_octaves, u_seed + 0.4325);
-        temperature = mix(noiseTemperature, latitudeFactor, LATITUDE_INFLUENCE);
+        temperature = mix(noiseTemperature, latitudeFactor, u_latitudeInfluence);
         fragBiome.b = temperature;
     }
 

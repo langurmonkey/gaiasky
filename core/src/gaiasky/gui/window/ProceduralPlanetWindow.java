@@ -123,7 +123,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         this.textWidth = 220f;
         this.fieldWidth = 500f;
         this.fieldWidthAll = 750f;
-        this.fieldWidthTotal = 950f;
+        this.fieldWidthTotal = 1000f;
         this.scrollPaneHeight = 600f;
         float tabContentWidth = 400f;
         float tabWidth = 240f;
@@ -726,8 +726,6 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(ridge).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(ridgeTooltip).left().padBottom(pad18).row();
 
-
-        content.add(new OwnLabel(I18n.msg("gui.procedural.noise.params"), skin, "hud-header")).left().padBottom(pad34).row();
         content.add(noiseTable).colspan(3).center().padBottom(pad34).row();
     }
 
@@ -807,7 +805,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);
-            lookUpTablesBox.setWidth(fieldWidth + 80f);
+            lookUpTablesBox.setWidth(fieldWidth);
             lookUpTablesBox.setSelected(mtc.biomeLUT);
             lookUpTablesBox.addListener(new ChangeListener() {
                 @Override
@@ -851,7 +849,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
             // Height scale
             OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 100.0f, 0.1f, skin);
-            heightScale.setWidth(fieldWidthTotal - 100f);
+            heightScale.setWidth(fieldWidthTotal);
             heightScale.setValueSuffix(" km");
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
             heightScale.addListener(new ChangeListener() {
@@ -862,9 +860,25 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 }
             });
             OwnImageButton heightScaleTooltip = new OwnImageButton(skin, "tooltip");
-            heightScaleTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.heightscale"), skin));
-            scrollContent.add(heightScale).colspan(2).left().padBottom(pad34).padRight(pad10);
-            scrollContent.add(heightScaleTooltip).left().padBottom(pad34).row();
+            heightScaleTooltip.setTooltip(I18n.msg("gui.procedural.info.heightscale"));
+            scrollContent.add(heightScale).colspan(2).left().padBottom(pad18).padRight(pad10);
+            scrollContent.add(heightScaleTooltip).left().padBottom(pad18).row();
+
+            // Latitude influence
+            OwnSliderPlus latitudeInfluence = new OwnSliderPlus(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.05f, skin);
+            latitudeInfluence.setWidth(fieldWidthTotal);
+            latitudeInfluence.setValue(mtc.nc.latitudeInfluence);
+            latitudeInfluence.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    mtc.nc.latitudeInfluence = latitudeInfluence.getValue();
+                }
+            });
+            OwnImageButton latitudeTooltip = new OwnImageButton(skin, "tooltip");
+            latitudeTooltip.setTooltip(I18n.msg("gui.procedural.info.latitude_influence"));
+            scrollContent.add(latitudeInfluence).colspan(2).left().padBottom(pad18).padRight(pad10);
+            scrollContent.add(latitudeTooltip).left().padBottom(pad18).row();
 
             // Generate emission.
             OwnCheckBox emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
@@ -877,9 +891,9 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 }
             });
             OwnImageButton emissionTooltip = new OwnImageButton(skin, "tooltip");
-            emissionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.emission"), skin));
-            scrollContent.add(emission).colspan(2).left().padBottom(pad34).padRight(pad10);
-            scrollContent.add(emissionTooltip).left().padBottom(pad34).row();
+            emissionTooltip.setTooltip(I18n.msg("gui.procedural.info.emission"));
+            scrollContent.add(emission).colspan(2).left().padBottom(pad18).padRight(pad10);
+            scrollContent.add(emissionTooltip).left().padBottom(pad18).row();
 
             // Noise
             addNoiseGroup(scrollContent, mtc.nc, false);
@@ -928,15 +942,14 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         });
 
         OwnLabel cloudColorLabel = new OwnLabel(I18n.msg("gui.procedural.cloudcolor"), skin);
-        cloudColorLabel.setWidth(textWidth);
+        cloudColorLabel.setWidth(textWidth + 112f);
         OwnImageButton cloudColorTooltip = new OwnImageButton(skin, "tooltip");
         cloudColorTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.cloudcolor"), skin));
-        HorizontalGroup cloudGroup = new HorizontalGroup();
-        cloudGroup.space(pad20);
-        cloudGroup.addActor(cloudColor);
-        cloudGroup.addActor(cloudColorTooltip);
-        scrollContent.add(cloudColorLabel).left().padRight(pad18).padBottom(pad18);
-        scrollContent.add(cloudGroup).left().expandX().padBottom(pad18).padRight(pad10).row();
+        Table cloudGroup = new Table(skin);
+        cloudGroup.add(cloudColorLabel).padRight(pad18).padBottom(pad18);
+        cloudGroup.add(cloudColor).padRight(535f).padBottom(pad18);
+        cloudGroup.add(cloudColorTooltip).right().padBottom(pad18).row();
+        scrollContent.add(cloudGroup).left().padBottom(pad18).row();
 
         // Noise
         addNoiseGroup(scrollContent, clc.nc, true);

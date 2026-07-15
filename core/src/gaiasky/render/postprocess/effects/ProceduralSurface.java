@@ -122,6 +122,10 @@ public final class ProceduralSurface extends PostProcessorEffect {
         filter.setLutSaturation(lutSaturation);
     }
 
+    public void setLatitudeInfluence(float latitudeInfluence) {
+        filter.setLatitudeInfluence(latitudeInfluence);
+    }
+
     @Override
     public void rebind() {
         filter.rebind();

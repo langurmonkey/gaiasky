@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.util.i18n.I18n;
 
 import java.util.Objects;
 
@@ -128,6 +129,10 @@ public class OwnImageButton extends ImageButton implements ProgrammaticButton {
         baseColor.set(r, g, b, a);
         if (getImage() != null)
             getImage().setColor(r, g, b, a);
+    }
+
+    public void setTooltip(String tooltipText) {
+        addListener(new OwnTextTooltip(tooltipText, getSkin()));
     }
 
 }

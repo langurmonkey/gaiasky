@@ -8,7 +8,6 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaiasky.render.postprocess.effects.Clouds;
@@ -35,6 +34,8 @@ public final class NoiseComponent extends NamedComponent {
 
     /** Base level for noise. Strip everything below, then remap or clamp result. **/
     public float baseLevel = 0.2f;
+    /** Latitude influence on the temperature. Only for procedural surfaces (no clouds). **/
+    public float latitudeInfluence = 0.8f;
     /** Remap after base level operation. **/
     public boolean remap = false;
 
@@ -65,11 +66,11 @@ public final class NoiseComponent extends NamedComponent {
         return (float) (seed / FastMath.pow(10L, s.length()));
     }
 
-    private Clouds getNoiseEffect(int N,
-                                  int M,
-                                  int channels,
-                                  int targets,
-                                  String shader) {
+    private Clouds getCloudsEffect(int N,
+                                   int M,
+                                   int channels,
+                                   int targets,
+                                   String shader) {
         Clouds biome = new Clouds(N, M, targets, shader);
         biome.setScale(scale);
         biome.setType(type);
@@ -94,7 +95,7 @@ public final class NoiseComponent extends NamedComponent {
         int channels = 1;
         fbMain = fbMain != null ? fbMain : createFrameBuffer(N, M, targets);
 
-        Clouds clouds = getNoiseEffect(N, M, channels, targets, "clouds");
+        Clouds clouds = getCloudsEffect(N, M, channels, targets, "clouds");
         clouds.setColor(color);
         clouds.render(null, fbMain);
 
@@ -116,7 +117,7 @@ public final class NoiseComponent extends NamedComponent {
 
         // 1 channels: water/land.
         // Emissive map is an additional render target.
-        Clouds biomeNoise = getNoiseEffect(N, M, 1, 1, "biome");
+        Clouds biomeNoise = getCloudsEffect(N, M, 1, 1, "biome");
         fbMask.begin();
         biomeNoise.render(null, fbMask);
         fbMask.end();
@@ -169,6 +170,7 @@ public final class NoiseComponent extends NamedComponent {
         effect.setSmoothing(smoothing);
         effect.setTurbulence(turbulence);
         effect.setRidge(ridge);
+        effect.setLatitudeInfluence(latitudeInfluence);
         effect.setChannels(channels);
         fbMain.begin();
         effect.render(null, fbMain);

@@ -25,6 +25,8 @@ public final class ProceduralSurfaceFilter extends Filter<ProceduralSurfaceFilte
 
     /** Viewport size. **/
     private final Vector2 viewport;
+    /** Latitude influence on the temperature. **/
+    private float latitudeInfluence = 0.8f;
     /** Noise scale in x, y and z. **/
     private final Vector3 scale = new Vector3(1, 1, 1);
     /** Color. **/
@@ -188,10 +190,16 @@ public final class ProceduralSurfaceFilter extends Filter<ProceduralSurfaceFilte
         setParam(Param.LutSaturation, lutSaturation);
     }
 
+    public void setLatitudeInfluence(float li) {
+        this.latitudeInfluence = li;
+        setParam(Param.LatitudeInfluence, latitudeInfluence);
+    }
+
     @Override
     public void rebind() {
         // Re-implement super to batch every parameter
         setParams(Param.Viewport, this.viewport);
+        setParams(Param.LatitudeInfluence, this.latitudeInfluence);
         setParams(Param.Color, this.color);
         setParams(Param.Scale, this.scale);
         setParams(Param.Seed, this.seed);
@@ -224,6 +232,7 @@ public final class ProceduralSurfaceFilter extends Filter<ProceduralSurfaceFilte
     public enum Param implements Parameter {
         // @formatter:off
         Viewport("u_viewport", 2),
+        LatitudeInfluence("u_latitudeInfluence", 0),
         Seed("u_seed", 0),
         Persistence("u_persistence", 0),
         Frequency("u_frequency", 0),
