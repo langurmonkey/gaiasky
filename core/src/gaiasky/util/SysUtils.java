@@ -910,8 +910,8 @@ public class SysUtils {
         GL30.glGetIntegerv(GL43.GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, params);
         int maxBlocks = params.get(0);
         return (GL.getCapabilities().OpenGL43
-                || (GL.getCapabilities().GL_ARB_compute_shader && GL.getCapabilities().GL_ARB_shader_storage_buffer_object && maxBlocks > 0)
-        );
+                    || (GL.getCapabilities().GL_ARB_compute_shader && GL.getCapabilities().GL_ARB_shader_storage_buffer_object))
+                && maxBlocks > 0;
     }
 }
 
