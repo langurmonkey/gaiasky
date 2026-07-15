@@ -13,7 +13,7 @@ precision highp float;
 #include <shader/lib/noise/voronoi.glsl>
 
 // LUT texture
-uniform sampler2D u_texture1;
+uniform sampler3D u_texture1;
 // LUT hue shift.
 uniform float u_lutHueShift;
 // LUT saturation value.
@@ -103,24 +103,22 @@ float noise(vec3 p,
 }
 
 vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLevel) {
-    float epsilon = 1.0 / 255.0; // One quantization step for 8-bit textures
+    float epsilon = 1.0 / 255.0;
     if (elevation <= baseLevel + epsilon) {
         elevation = 0.0;
     }
+    elevation = clamp(elevation, 0.0, 1.0);
+    moisture = clamp(moisture, 0.0, 1.0);
+    temperature = clamp(temperature, 0.0, 1.0);
 
-    vec4 rgba = texture(u_texture1, vec2(moisture, 1.0 - elevation));
-    vec4 c = rgba;
-    // Manipulate hue and saturation.
+    vec4 rgba = texture(u_texture1, vec3(moisture, 1.0 - elevation, temperature));
+
+    // Rotate hue, apply saturation.
     vec3 hsv = rgb2hsv(rgba.rgb);
-    // Hue.
     hsv.x = mod(hsv.x * 360.0 + u_lutHueShift, 360.0) / 360.0;
-    // Saturation.
-    hsv.y = hsv.y * u_lutSaturation;
-
-    // Back to RGB, rotated.
-    rgba.rgb = hsv2rgb(hsv);
-
-    return rgba.rgb;
+    hsv.y = clamp(hsv.y * u_lutSaturation, 0.0, 1.0);
+    // Back to RGB.
+    return hsv2rgb(hsv);
 }
 
 // Converts spherical coordinates to a cartesian point in 3D (radius 1).
@@ -171,11 +169,13 @@ void main() {
     }
 
     // Temperature (channel 3)
-    float temperature = 0.0;
+    float temperature = 0.5;
     if (u_channels >= 3) {
         const float LATITUDE_INFLUENCE = 0.8;
         float latitudeFactor = 1.0 - abs(phi) / (gln_PI * 0.5); // 1 at equator, 0 at poles
-        float noiseTemperature = noise(p, u_type, u_frequency, false, false, u_scale, u_octaves, u_seed + 0.4325);
+        latitudeFactor = smoothstep(0.0, 0.7, latitudeFactor);
+        float tempFreq = min(u_frequency * 0.5, 0.2);
+        float noiseTemperature = noise(p, u_type, tempFreq, false, false, u_scale, u_octaves, u_seed + 0.4325);
         temperature = mix(noiseTemperature, latitudeFactor, LATITUDE_INFLUENCE);
         fragBiome.b = temperature;
     }
@@ -204,17 +204,17 @@ void main() {
     float dTheta = thetaStep;
 
     vec3 pThetaPlus = sphericaltoCartesian(phi, theta + dTheta);
-    vec3 pPhiPlus   = sphericaltoCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
+    vec3 pPhiPlus = sphericaltoCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
 
     float elevTheta = noise(pThetaPlus, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
-    float elevPhi   = noise(pPhiPlus,   u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
+    float elevPhi = noise(pPhiPlus, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
         elevTheta = smoothstep(0.0, 1.0, elevTheta);
-        elevPhi   = smoothstep(0.0, 1.0, elevPhi);
+        elevPhi = smoothstep(0.0, 1.0, elevPhi);
     }
 
     float dx = (elevTheta - elevation_original) / dTheta * normalScale;
-    float dy = (elevPhi   - elevation_original) / dPhi   * normalScale;
+    float dy = (elevPhi - elevation_original) / dPhi * normalScale;
     float dz = 1.0;
     vec3 normal = normalize(vec3(-dx, -dy, dz));
     fragNormal = vec4(normal.x * 0.5 + 0.5, normal.y * 0.5 + 0.5, normal.z, 1.0);

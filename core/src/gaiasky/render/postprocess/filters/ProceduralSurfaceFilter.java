@@ -8,6 +8,7 @@
 package gaiasky.render.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture3D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Vector4;
@@ -16,7 +17,7 @@ import gaiasky.render.util.ShaderLoader;
 
 public final class ProceduralSurfaceFilter extends Filter<ProceduralSurfaceFilter> {
     /** LUT texture. **/
-    private Texture lut;
+    private Texture3D lut;
     /** LUT hue shift. **/
     float lutHueShift;
     /** LUT saturation. **/
@@ -172,7 +173,7 @@ public final class ProceduralSurfaceFilter extends Filter<ProceduralSurfaceFilte
         setParam(Param.Type, this.type.ordinal());
     }
 
-    public void setLutTexture(Texture lut) {
+    public void setLutTexture(Texture3D lut) {
         this.lut = lut;
         setParam(Param.TextureLut, u_texture1);
     }

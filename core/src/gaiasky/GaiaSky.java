@@ -54,6 +54,7 @@ import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
+import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.ConsoleManager;
@@ -1080,9 +1081,15 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         // Flush frames.
         EventManager.publish(Event.FLUSH_FRAMES, this);
 
-        // Dispose all.
+        // Dispose all GUIs.
         if (guis != null) for (IGui gui : guis)
             gui.dispose();
+
+        // Dispose LUT Manager.
+        var lutManager = MaterialComponent.getLUTManager();
+        if (lutManager != null) {
+            lutManager.dispose();
+        }
 
         EventManager.publish(Event.DISPOSE, this);
         ModelCache.cache.dispose();

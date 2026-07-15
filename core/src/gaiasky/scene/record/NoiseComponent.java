@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
-import gaiasky.GaiaSky;
 import gaiasky.render.postprocess.effects.Clouds;
 import gaiasky.render.postprocess.effects.ProceduralSurface;
 import gaiasky.render.util.NoiseType;
@@ -41,7 +40,7 @@ public final class NoiseComponent extends NamedComponent {
 
     public boolean genEmissiveMap = false;
 
-    public FrameBuffer fbNoise, fbBiome, fbMask, fbSurface;
+    public FrameBuffer fbMask, fbMain;
 
     public NoiseComponent() {
         super();
@@ -93,13 +92,13 @@ public final class NoiseComponent extends NamedComponent {
                                       float[] color) {
         int targets = 1;
         int channels = 1;
-        fbNoise = fbNoise != null ? fbNoise : createFrameBuffer(N, M, targets);
+        fbMain = fbMain != null ? fbMain : createFrameBuffer(N, M, targets);
 
         Clouds clouds = getNoiseEffect(N, M, channels, targets, "clouds");
         clouds.setColor(color);
-        clouds.render(null, fbNoise);
+        clouds.render(null, fbMain);
 
-        return fbNoise;
+        return fbMain;
     }
 
     /**
@@ -148,12 +147,11 @@ public final class NoiseComponent extends NamedComponent {
         int targets = 4; // Biome, diffuse, specular, emissive.
         if (generateNormalMap) targets++; // Normal.
 
-        // LUT texture.
-        Texture lut = new Texture(GaiaSky.settings().data.dataFileHandle(biomeLUT));
-        lut.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        // LUT 3D texture.
+        var lut = MaterialComponent.getLUTManager().getLUT3D(biomeLUT);
 
         // Frame buffer.
-        fbSurface = fbSurface != null ? fbSurface : createFrameBuffer(N, M, targets);
+        fbMain = fbMain != null ? fbMain : createFrameBuffer(N, M, targets);
 
         var effect = new ProceduralSurface(N, M, generateNormalMap, genEmissiveMap);
         effect.setLutTexture(lut);
@@ -172,11 +170,11 @@ public final class NoiseComponent extends NamedComponent {
         effect.setTurbulence(turbulence);
         effect.setRidge(ridge);
         effect.setChannels(channels);
-        fbSurface.begin();
-        effect.render(null, fbSurface);
-        fbSurface.end();
+        fbMain.begin();
+        effect.render(null, fbMain);
+        fbMain.end();
 
-        return fbSurface;
+        return fbMain;
     }
 
     public void setType(String noiseType) {
@@ -660,17 +658,13 @@ public final class NoiseComponent extends NamedComponent {
 
     @Override
     public void dispose() {
-        if (fbSurface != null) {
-            fbSurface.dispose();
-            fbSurface = null;
+        if (fbMain != null) {
+            fbMain.dispose();
+            fbMain = null;
         }
-        if (fbBiome != null) {
-            fbBiome.dispose();
-            fbBiome = null;
-        }
-        if (fbNoise != null) {
-            fbNoise.dispose();
-            fbNoise = null;
+        if (fbMask != null) {
+            fbMask.dispose();
+            fbMask = null;
         }
     }
 }

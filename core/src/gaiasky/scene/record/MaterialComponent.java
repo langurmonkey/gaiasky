@@ -29,20 +29,14 @@ import gaiasky.render.gdx.model.IntModelInstance;
 import gaiasky.render.gdx.shader.Material;
 import gaiasky.render.gdx.shader.attribute.*;
 import gaiasky.scene.api.IUpdatable;
-import gaiasky.util.Constants;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.ElevationType;
-import gaiasky.util.SysUtils;
+import gaiasky.render.util.BiomeLUTManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.svt.SVTManager;
 import net.jafama.FastMath;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -58,45 +52,20 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      **/
     private static final OwnTextureParameter textureParamsMipMap, textureParams;
     private static final PFMTextureParameter pfmTextureParams;
-    /** Biome look-up texture list. **/
-    private static final Array<String> lookUpTextures = new Array<>();
+
+    private static final BiomeLUTManager lutManager = new BiomeLUTManager(GaiaSky.settings().data.dataPath("default-data/tex/lut"));
 
     /** Reflection cubemap for all materials. **/
     @SuppressWarnings("GDXJavaStaticResource")
     public static final CubemapComponent sharedReflectionCubemap = new CubemapComponent();
 
-    public static Array<String> getLookUpTextures() {
-        initializeLookUpTables();
-        return lookUpTextures;
+    public static BiomeLUTManager getLUTManager() {
+        lutManager.loadAll();
+        return lutManager;
     }
 
-    private static void initializeLookUpTables() {
-        if (lookUpTextures.isEmpty()) {
-            var dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
-            var sep = File.separatorChar;
-            try (var paths = Files.list(dataPath)) {
-                List<Path> l = paths.filter(
-                        f -> f.getFileName().toString().startsWith("biome_lut_")
-                                && (f.getFileName().toString().endsWith(".png") || f.getFileName().toString().endsWith(".jpg"))
-                ).toList();
-                for (Path p : l) {
-                    String name = p.toString();
-                    lookUpTextures.add(Constants.DATA_LOCATION_TOKEN
-                                               + name.substring(name.indexOf("default-data" + sep + "tex" + sep + "lut" + sep))
-                            .replaceAll("\\\\", "/"));
-                }
-            } catch (Exception ignored) {
-            }
-            if (lookUpTextures.isEmpty()) {
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_earthlike.jpg");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_desert.jpg");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_alien.jpg");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_ice.jpg");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_rocky.jpg");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_tropical.jpg");
-                lookUpTextures.add(Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_lava.jpg");
-            }
-        }
+    private static void initializeBiomeLUTManager() {
+        lutManager.loadAll();
     }
 
     // Default height scale is 4 km.
@@ -147,12 +116,19 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     // Cubemaps.
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap,
             roughnessCubemap, metallicCubemap, aoCubemap;
-    // AO texture.
+    /** AO texture. **/
     public Texture aoTexture;
-    // Occlusion clouds: ambient occlusion uses the cloud texture.
+    /** Occlusion clouds: ambient occlusion uses the cloud texture. **/
     public boolean occlusionClouds = false;
-    // Biome lookup texture.
-    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "default-data/tex/lut/biome_lut_earthlike.png";
+    /**
+     * Biome lookup texture name.
+     * This is the name stripped of suffixes and prefixes. Examples:
+     * <p>
+     * biome_lut_earthlike_00.jpg -> earthlike
+     * <p>
+     * biome_lut_desert_03.jpg -> desert
+      */
+    public String biomeLUT = "earthlike";
     public float biomeHueShift = 0;
     public float biomeSaturation = 1;
     /**
@@ -810,7 +786,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                                                                         biomeLUT,
                                                                         biomeHueShift,
                                                                         biomeSaturation,
-                                                                        2,
+                                                                        3,
                                                                         GaiaSky.settings().scene.renderer.elevation.type.isNone());
 
                     GaiaSky.postRunnable(() -> {
@@ -1525,7 +1501,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeAll(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1535,7 +1511,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setEmissive("generate");
 
         // Biome LUT.
-        setBiomeLUT(lookUpTextures.get(rand.nextInt(lookUpTextures.size)));
+        setBiomeLUT(lutManager.getPresetNames().get(rand.nextInt(lutManager.getSize())));
         if (rand.nextFloat() < 0.25f) {
             // Actually roll the dice for hue shift.
             setBiomeHueShift(rand.nextDouble() * 360.0);
@@ -1564,20 +1540,26 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     private String randomBiomeLut(Random rand,
                                   String... names) {
         Array<String> candidates = new Array<>(names.length);
+        var lutNames = lutManager.getPresetNames();
 
         for (var name : names) {
-            for (var lut : lookUpTextures) {
+            for (var lut : lutNames) {
                 if (lut.contains(name)) {
                     candidates.add(lut);
                     break;
                 }
             }
         }
-        return candidates.get(rand.nextInt(candidates.size));
+        if (candidates.isEmpty()) {
+            logger.error("Could not find any of the given names in the LUT manager: " + TextUtils.arrayToStr(names));
+            return "earthlike";
+        } else {
+            return candidates.get(rand.nextInt(candidates.size));
+        }
     }
 
     public void randomizeRockyPlanet(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1586,7 +1568,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "biome_lut_rocky"));
+        setBiomeLUT(randomBiomeLut(rand, "rocky"));
 
         if (rand.nextBoolean()) {
             // In [340, 20] - close to home.
@@ -1609,7 +1591,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeEarthLike(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1618,7 +1600,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "biome_lut_tropical", "biome_lut_earthlike"));
+        setBiomeLUT(randomBiomeLut(rand, "tropical", "earthlike"));
 
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-20.0, 20.0) + 360.0) % 360.0);
@@ -1636,7 +1618,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeDesert(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1645,7 +1627,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "biome_lut_desert"));
+        setBiomeLUT(randomBiomeLut(rand, "desert"));
 
         setBiomeHueShift(0.0);
         // Saturation.
@@ -1662,7 +1644,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeTropical(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1671,7 +1653,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "biome_lut_tropical", "biome_lut_earthlike"));
+        setBiomeLUT(randomBiomeLut(rand, "tropical", "earthlike"));
 
         setBiomeHueShift(0.0);
         // Saturation.
@@ -1688,7 +1670,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeLava(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1697,7 +1679,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "biome_lut_lava"));
+        setBiomeLUT(randomBiomeLut(rand, "lava"));
 
         setBiomeHueShift(0.0);
         // Saturation.
@@ -1714,7 +1696,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeAlien(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1723,7 +1705,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "biome_lut_alien"));
+        setBiomeLUT(randomBiomeLut(rand, "alien"));
 
         // Between 70 and 200.
         setBiomeHueShift((rand.nextDouble(70.0, 200.0)));
@@ -1741,7 +1723,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeFrozenPlanet(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1750,7 +1732,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "biome_lut_ice"));
+        setBiomeLUT(randomBiomeLut(rand, "ice"));
 
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);
@@ -1768,7 +1750,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     public void randomizeGasGiant(long seed) {
-        initializeLookUpTables();
+        initializeBiomeLUTManager();
 
         var rand = new Random(seed);
         setHeight("generate");
@@ -1777,7 +1759,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(lookUpTextures.get(rand.nextInt(lookUpTextures.size)));
+        setBiomeLUT(lutManager.getPresetNames().get(rand.nextInt(lutManager.getSize())));
         // Actually roll the dice for hue shift.
         setBiomehueshift(rand.nextDouble() * 360.0);
         // Saturation.

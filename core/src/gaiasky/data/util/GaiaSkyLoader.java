@@ -17,12 +17,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
+import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.render.MainPostProcessor;
+import gaiasky.scene.record.MaterialComponent;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
-import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.LocationLogManager;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
@@ -38,7 +39,10 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
+    public void loadAsync(AssetManager manager,
+                          String fileName,
+                          FileHandle file,
+                          GaiaSkyLoaderParameters parameter) {
         assets = new GaiaSkyAssets();
 
         // First stage async.
@@ -84,15 +88,25 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
     }
 
     @Override
-    public GaiaSkyAssets loadSync(AssetManager manager, String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
+    public GaiaSkyAssets loadSync(AssetManager manager,
+                                  String fileName,
+                                  FileHandle file,
+                                  GaiaSkyLoaderParameters parameter) {
         // First stage sync.
         assets.svtManager.doneLoading(manager);
         assets.postProcessor.doneLoading(manager);
+
+        // Preload the biome LUTs if NASA exoplanet archive is enabled.
+        if (GaiaSky.settings().data.isEnabled("nasa-exoplanet-archive")) {
+            MaterialComponent.getLUTManager();
+        }
         return assets;
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
+    public Array<AssetDescriptor> getDependencies(String fileName,
+                                                  FileHandle file,
+                                                  GaiaSkyLoaderParameters parameter) {
         return null;
     }
 

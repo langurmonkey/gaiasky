@@ -19,14 +19,30 @@ public class FastStringObjectMap<V> {
     private int size;
     private int capacity;
     private int threshold;
+    private final int initialCapacity;
+
+    /**
+     * Constructs a new map with the default initial capacity.
+     */
+    public FastStringObjectMap() {
+        this(DEFAULT_CAPACITY);
+    }
 
     /**
      * Constructs a new map with the specified initial capacity.
      *
      * @param initialCapacity the initial capacity
      */
-    @SuppressWarnings("unchecked")
     public FastStringObjectMap(int initialCapacity) {
+        this.initialCapacity = initialCapacity;
+        clear();
+    }
+
+    /**
+     * Clears the map, and re-initializes it with the original initial capacity.
+     */
+    @SuppressWarnings("unchecked")
+    public void clear() {
         capacity = Math.max(DEFAULT_CAPACITY, initialCapacity);
         keys = new String[capacity];
         values = (V[]) new Object[capacity];
@@ -39,6 +55,7 @@ public class FastStringObjectMap<V> {
      * Returns the value associated with the specified key, or null if not found.
      *
      * @param key the key
+     *
      * @return the associated value, or null if the key is not present
      */
     public V get(String key) {
@@ -50,10 +67,11 @@ public class FastStringObjectMap<V> {
      * Associates the specified value with the specified key in the map.
      * If the key already exists, its value will be overwritten.
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      */
-    public void put(String key, V value) {
+    public void put(String key,
+                    V value) {
         if (size >= threshold) {
             resize(capacity * 2);
         }
@@ -72,6 +90,7 @@ public class FastStringObjectMap<V> {
      * Checks if the map contains the specified key.
      *
      * @param key the key to check
+     *
      * @return true if the key is present, false otherwise
      */
     public boolean containsKey(String key) {
@@ -92,6 +111,7 @@ public class FastStringObjectMap<V> {
      * Removes the mapping for the specified key from this map if present.
      *
      * @param key the key whose mapping is to be removed
+     *
      * @return the previous value associated with the key, or null if none
      */
     public V remove(String key) {

@@ -944,6 +944,24 @@ public class Settings extends SettingsObject {
         }
 
         /**
+         * Checks whether the dataset with the given key is enabled. This method works by checking
+         * if any of the currently enabled dataset descriptor file paths contains the key. If the key
+         * is very lenient, it will most probably return true, so be sure to set a correct key.
+         *
+         * @param datasetKey The dataset key to look up.
+         *
+         * @return True if the dataset is currently enabled, false otherwise.
+         */
+        public boolean isEnabled(String datasetKey) {
+            for (String pathStr : dataFiles) {
+                if (pathStr.contains(datasetKey)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
          * Adds the given dataset descriptor file to the list of enabled JSON files.
          *
          * @param dataset The dataset descriptor file pointer.
@@ -1015,7 +1033,9 @@ public class Settings extends SettingsObject {
         }
 
         @Override
-        public void notify(Event event, Object source, Object... data) {
+        public void notify(Event event,
+                           Object source,
+                           Object... data) {
             if (event == Event.PULL_CLOUD_DATA_CMD && source != this) {
                 pullCloudData = (Boolean) data[0];
             }
@@ -2185,7 +2205,9 @@ public class Settings extends SettingsObject {
                 }
 
                 @Override
-                public void notify(Event event, Object source, Object... data) {
+                public void notify(Event event,
+                                   Object source,
+                                   Object... data) {
                     if (isEnabled() && source != this) {
                         if (Objects.requireNonNull(event) == Event.LINE_WIDTH_CMD)
                             width = MathUtilsDouble.clamp((float) data[0], Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH);
@@ -2498,7 +2520,7 @@ public class Settings extends SettingsObject {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case STEREOSCOPIC_CMD -> {
-                        modeStereo.active = (Boolean)data[0] && !getRoot().runtime.openXr;
+                        modeStereo.active = (Boolean) data[0] && !getRoot().runtime.openXr;
                         // Post message to screen.
                         if (modeStereo.active) {
                             var keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
@@ -2996,7 +3018,9 @@ public class Settings extends SettingsObject {
             }
 
             @Override
-            public void notify(Event event, Object source, Object... data) {
+            public void notify(Event event,
+                               Object source,
+                               Object... data) {
                 if (source != this) {
                     switch (event) {
                         case STEREO_K_CMD -> this.k = (float) data[0];
@@ -3349,7 +3373,9 @@ public class Settings extends SettingsObject {
             }
 
             @Override
-            public void notify(Event event, Object source, Object... data) {
+            public void notify(Event event,
+                               Object source,
+                               Object... data) {
                 if (source != this && event == Event.UI_ACCENT_COLOR_CMD) {
                     var newColor = (float[]) data[0];
                     System.arraycopy(newColor, 0, this.accentColor, 0, this.accentColor.length);

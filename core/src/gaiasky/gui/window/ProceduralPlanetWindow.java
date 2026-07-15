@@ -37,8 +37,6 @@ import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import net.jafama.FastMath;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.function.Function;
@@ -736,7 +734,9 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
     private void updateLutImage(Array<String> luts) {
         if (lutImageCell != null) {
             lutImageCell.clearActor();
-            Pixmap p = new Pixmap(GaiaSky.settings().data.dataFileHandle(luts.get(luts.indexOf(mtc.biomeLUT, false))));
+            var manager = MaterialComponent.getLUTManager();
+            var path = manager.getLUTPath(mtc.biomeLUT);
+            Pixmap p = new Pixmap(path);
             int w = p.getWidth();
             int h = p.getHeight();
             if (hueShift != null) {
@@ -803,8 +803,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             Table scrollContent = new Table(skin);
 
             // LUT
-            Path dataPath = GaiaSky.settings().data.dataPath("default-data/tex/lut");
-            Array<String> lookUpTables = MaterialComponent.getLookUpTextures();
+            Array<String> lookUpTables = MaterialComponent.getLUTManager().getPresetNames();
 
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);

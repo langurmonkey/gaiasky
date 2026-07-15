@@ -8,6 +8,7 @@
 package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture3D;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
 import gaiasky.render.postprocess.filters.CloudsFilter;
@@ -109,7 +110,7 @@ public final class ProceduralSurface extends PostProcessorEffect {
         filter.setType(type);
     }
 
-    public void setLutTexture(Texture lut) {
+    public void setLutTexture(Texture3D lut) {
         filter.setLutTexture(lut);
     }
 
