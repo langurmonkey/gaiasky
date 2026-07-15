@@ -56,7 +56,7 @@ public class ColorUtils {
     public static float[] oDarkGray = new float[]{0.3f, 0.3f, 0.3f, 1f};
     public static Color oDarkGrayC = getCol(oDarkGray);
     public static float[] oCyan = new float[]{0f, 230f / 255f, 1f, 1f};
-    public static Color oCyanC = getCol(ddMagenta);
+    public static Color oCyanC = getCol(oCyan);
     /**
      * Highlight color array for datasets
      **/

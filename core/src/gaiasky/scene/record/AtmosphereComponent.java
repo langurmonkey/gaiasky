@@ -433,22 +433,47 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         this.params = params;
     }
 
-    /**
-     * Creates a random atmosphere component using the given seed and the base
-     * body size.
-     *
-     * @param seed       The seed to use.
-     * @param bodyRadius The body size in internal units.
-     */
+    public void randomizeWhite(long seed,
+                               double bodyRadius) {
+        randomizeAll(seed, bodyRadius);
+
+        // Recompute wavelengths.
+        Random rand = new Random(seed);
+        double r, g, b;
+        var min = 0.4;
+        var max = 1.0;
+        r = MathUtils.clamp(gaussian(rand, 0.5, 0.05), min, max);
+        g = r + gaussian(rand, 0.05, 0.005, 0.0, 0.1);
+        b = r + gaussian(rand, 0.05, 0.005, 0.0, 0.1);;
+        setWavelengths(new double[]{r, g, b});
+    }
+
     public void randomizeAll(long seed,
-                             double bodyRadius) {
+                             double bodyRadius,
+                             boolean regularScattering,
+                             double redMask,
+                             double greenMask,
+                             double blueMask) {
         Random rand = new Random(seed);
         // Size
         double bodyRadiusKm = bodyRadius * Constants.U_TO_KM;
         double atmosphereHeightKm = Math.min(240, bodyRadiusKm * 0.015);
         setSize(bodyRadiusKm + atmosphereHeightKm);
-        // Wavelengths
-        setWavelengths(new double[]{gaussian(rand, 0.6, 0.05), gaussian(rand, 0.54, 0.05), gaussian(rand, 0.45, 0.05)});
+        // Wavelengths: apply scattering coefficient masks
+        double r, g, b;
+        var min = 0.4;
+        var max = 1.0;
+        if (regularScattering) {
+            r = MathUtils.clamp(uniform(rand, 0.6, 1.0) * redMask, min, max);
+            g = MathUtils.clamp(uniform(rand, 0.6, 1.0) * greenMask, min, max);
+            b = MathUtils.clamp(uniform(rand, 0.6, 1.0) * blueMask, min, max);
+        } else {
+            r = MathUtils.clamp(gaussian(rand, 0.5, 0.05) * redMask, min, max);
+            g = MathUtils.clamp(gaussian(rand, 0.5, 0.05) * greenMask, min, max);
+            b = MathUtils.clamp(gaussian(rand, 0.5, 0.05) * blueMask, min, max);
+
+        }
+        setWavelengths(new double[]{r, g, b});
         // Kr
         setM_Kr(rand.nextDouble(0.001f, 0.004f));
         // Km
@@ -465,6 +490,19 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         setSamples(8L);
         // Params
         setParams(createUVSphereParameters(200L, 2.0, true));
+
+    }
+
+    /**
+     * Creates a random atmosphere component using the given seed and the base
+     * body size.
+     *
+     * @param seed       The seed to use.
+     * @param bodyRadius The body size in internal units.
+     */
+    public void randomizeAll(long seed,
+                             double bodyRadius) {
+        randomizeAll(seed, bodyRadius, false, 1, 1, 1);
     }
 
     public void copyFrom(AtmosphereComponent other) {

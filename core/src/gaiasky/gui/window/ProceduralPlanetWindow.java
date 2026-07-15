@@ -423,6 +423,133 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
     }
 
+    private void addLocalButtons(Table content,
+                                 Function<Boolean, Boolean> blueFunc,
+                                 Function<Boolean, Boolean> redFunc,
+                                 Function<Boolean, Boolean> greenFunc,
+                                 Function<Boolean, Boolean> whiteFunc,
+                                 Function<Boolean, Boolean> magentaFunc,
+                                 Function<Boolean, Boolean> yellowFunc,
+                                 Function<Boolean, Boolean> cyanFunc
+    ) {
+        float w = 90f;
+        float h = 70f;
+
+
+        // White
+        var planet = new OwnImage(skin.getDrawable("icon-planet"), false);
+        OwnTextButton white = new OwnTextIconButton("", planet, skin);
+        white.setSize(w, h);
+        white.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                whiteFunc.apply(true);
+            }
+        });
+        white.pad(pad10, pad20, pad10, pad20);
+
+        // Blue
+        planet = new OwnImage(skin.getDrawable("icon-planet"), false);
+        var blue = new OwnTextIconButton("", planet, skin);
+        blue.setSize(w, h);
+        blue.setIconColor(ColorUtils.gBlueC);
+        blue.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                blueFunc.apply(true);
+            }
+        });
+        blue.pad(pad10, pad20, pad10, pad20);
+
+        // Red
+        planet = new OwnImage(skin.getDrawable("icon-planet"), false);
+        var red = new OwnTextIconButton("", planet, skin);
+        red.setSize(w, h);
+        red.setIconColor(ColorUtils.gRedC);
+        red.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                redFunc.apply(true);
+            }
+        });
+        red.pad(pad10, pad20, pad10, pad20);
+
+        // Green
+        planet = new OwnImage(skin.getDrawable("icon-planet"), false);
+        var green = new OwnTextIconButton("", planet, skin);
+        green.setSize(w, h);
+        green.setIconColor(ColorUtils.gGreenC);
+        green.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                greenFunc.apply(true);
+            }
+        });
+        green.pad(pad10, pad20, pad10, pad20);
+
+        // Magenta
+        planet = new OwnImage(skin.getDrawable("icon-planet"), false);
+        var magenta = new OwnTextIconButton("", planet, skin);
+        magenta.setSize(w, h);
+        magenta.setIconColor(ColorUtils.ddMagentaC);
+        magenta.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                magentaFunc.apply(true);
+            }
+        });
+        magenta.pad(pad10, pad20, pad10, pad20);
+
+        // Yellow
+        planet = new OwnImage(skin.getDrawable("icon-planet"), false);
+        var yellow = new OwnTextIconButton("", planet, skin);
+        yellow.setSize(w, h);
+        yellow.setIconColor(ColorUtils.gYellowC);
+        yellow.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                yellowFunc.apply(true);
+            }
+        });
+        yellow.pad(pad10, pad20, pad10, pad20);
+
+        // Cyan
+        planet = new OwnImage(skin.getDrawable("icon-planet"), false);
+        var cyan = new OwnTextIconButton("", planet, skin);
+        cyan.setSize(w, h);
+        cyan.setIconColor(ColorUtils.oCyanC);
+        cyan.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                cyanFunc.apply(true);
+            }
+        });
+        cyan.pad(pad10, pad20, pad10, pad20);
+
+
+        Table bt = new Table(skin);
+        bt.add(white).pad(5f);
+        bt.add(blue).pad(5f);
+        bt.add(red).pad(5f);
+        bt.add(green).pad(5f);
+        bt.add(yellow).pad(5f);
+        bt.add(cyan).pad(5f);
+        bt.add(magenta).pad(5f);
+
+        HorizontalGroup buttonGroup = new HorizontalGroup();
+        buttonGroup.space(pad20);
+        buttonGroup.addActor(bt);
+
+        content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
+    }
+
     private OwnTextButton addLocalButtons(Table content,
                                           String key,
                                           Function<Boolean, Boolean> generateFunc,
@@ -972,6 +1099,15 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         // Title
         content.add(new OwnLabel(I18n.msg("gui.procedural.param.atm"), skin, "hud-header")).colspan(3).left().padBottom(pad34).row();
 
+        addLocalButtons(content,
+                        this::randomizeBlueAtmosphere,
+                        this::randomizeRedAtmosphere,
+                        this::randomizeGreenAtmosphere,
+                        this::randomizeWhiteAtmosphere,
+                        this::randomizeMagentaAtmosphere,
+                        this::randomizeYellowAtmosphere,
+                        this::randomizeCyanAtmosphere);
+
         // Add button group
         addLocalButtons(content, "gui.procedural.atmosphere", this::generateAtmosphere, this::randomizeAtmosphere, 3);
 
@@ -1300,9 +1436,60 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         return generateClouds(false);
     }
 
+    protected Boolean randomizeBlueAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphere(rebuild, true, 1.4, 1.2, 0.7);
+    }
+
+    protected Boolean randomizeGreenAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphere(rebuild, true, 1.3, 0.5, 1.2);
+    }
+
+    protected Boolean randomizeRedAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphere(rebuild, true, 0.7, 1.2, 1.3);
+    }
+
+    protected Boolean randomizeYellowAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphere(rebuild, true, 0.7, 0.63, 1.4);
+    }
+
+    protected Boolean randomizeMagentaAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphere(rebuild, true, 0.5, 1.4, 0.6);
+    }
+
+    protected Boolean randomizeCyanAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphere(rebuild, true, 1.4, 0.6, 0.7);
+    }
+
+    protected Boolean randomizeWhiteAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphereWhite(rebuild);
+    }
+
     protected Boolean randomizeAtmosphere(Boolean rebuild) {
+        return randomizeAtmosphere(rebuild, false, 1, 1, 1);
+    }
+
+    protected Boolean randomizeAtmosphere(Boolean rebuild,
+                                          boolean regularScattering,
+                                          double redMask,
+                                          double greenMask,
+                                          double blueMask) {
         this.initAc = new AtmosphereComponent();
-        this.initAc.randomizeAll(rand.nextLong(), view.getRadius());
+        this.initAc.randomizeAll(rand.nextLong(), view.getRadius(), regularScattering, redMask, greenMask, blueMask);
+
+        if (rebuild) {
+            // Others are the same
+            this.initMtc = this.mtc;
+            this.initClc = this.clc;
+
+            rebuild();
+        }
+
+        return generateAtmosphere(false);
+    }
+
+    protected Boolean randomizeAtmosphereWhite(Boolean rebuild) {
+        this.initAc = new AtmosphereComponent();
+        this.initAc.randomizeWhite(rand.nextLong(), view.getRadius());
 
         if (rebuild) {
             // Others are the same
