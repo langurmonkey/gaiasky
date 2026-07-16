@@ -23,49 +23,79 @@ public class OwnTextIconButton extends OwnTextButton implements ProgrammaticButt
     private float space = -1;
     private int contentAlign = Align.center;
 
-    public OwnTextIconButton(String text, Skin skin, String styleName) {
+    private float iconWidth = 30f;
+    private float iconHeight = 30f;
+
+    public OwnTextIconButton(String text,
+                             Skin skin,
+                             String styleName) {
         super(text, skin);
         this.skin = skin;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), "default");
     }
 
-    public OwnTextIconButton(String text, int contentAlign, Skin skin, String styleName) {
+    public OwnTextIconButton(String text,
+                             int contentAlign,
+                             Skin skin,
+                             String styleName) {
         super(text, skin);
         this.skin = skin;
         this.contentAlign = contentAlign;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), "default");
     }
 
-    public OwnTextIconButton(String text, Skin skin, String styleName, String textButtonStyle) {
+    public OwnTextIconButton(String text,
+                             Skin skin,
+                             String styleName,
+                             String textButtonStyle) {
         super(text, skin);
         this.skin = skin;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), textButtonStyle);
     }
 
-    public OwnTextIconButton(String text, int align, Skin skin, String styleName, String textButtonStyle) {
+    public OwnTextIconButton(String text,
+                             int align,
+                             Skin skin,
+                             String styleName,
+                             String textButtonStyle) {
         super(text, skin);
         this.skin = skin;
         this.contentAlign = align;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), textButtonStyle);
     }
 
-    public OwnTextIconButton(String text, Image up, Skin skin) {
+    public OwnTextIconButton(String text,
+                             Image up,
+                             Skin skin) {
         super(text, skin);
         this.skin = skin;
         setIcon(up);
     }
 
-    public OwnTextIconButton(String text, Image up, Skin skin, String styleName) {
+    public OwnTextIconButton(String text,
+                             Image up,
+                             Skin skin,
+                             String styleName) {
         super(text, skin, styleName);
         this.skin = skin;
         setIcon(up);
     }
 
-    public OwnTextIconButton(String text, int contentAlign, Image up, Skin skin, String styleName) {
+    public OwnTextIconButton(String text,
+                             int contentAlign,
+                             Image up,
+                             Skin skin,
+                             String styleName) {
         super(text, skin, styleName);
         this.skin = skin;
         this.contentAlign = contentAlign;
         setIcon(up);
+    }
+
+    public void setIconSize(float w, float h) {
+        this.iconWidth = w;
+        this.iconHeight = h;
+        setIcon(icon);
     }
 
     public void setContentAlign(int align) {
@@ -82,7 +112,8 @@ public class OwnTextIconButton extends OwnTextButton implements ProgrammaticButt
         setIcon(this.icon);
     }
 
-    public void setStyle(TextButtonStyle style, String defaultTextButtonStyle) {
+    public void setStyle(TextButtonStyle style,
+                         String defaultTextButtonStyle) {
         if (!(style instanceof TextIconButtonStyle))
             throw new IllegalArgumentException("style must be an ImageButtonStyle.");
 
@@ -134,19 +165,20 @@ public class OwnTextIconButton extends OwnTextButton implements ProgrammaticButt
         if (Align.isRight(contentAlign)) {
             this.align(contentAlign);
             add(getLabel()).align(contentAlign).padRight(space <= 0 ? (getLabel().getText().size > 0 ? 12.8f : 1f) : space);
-            add(this.icon).align(contentAlign).pad(pad);
+            add(this.icon).size(iconWidth, iconHeight).align(contentAlign).pad(pad);
         } else {
             this.align(contentAlign);
-            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().size > 0 ? 12.8f : 1f) : space);
+            add(this.icon).size(iconWidth, iconHeight).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().size > 0 ? 12.8f : 1f) : space);
             add(getLabel()).align(contentAlign).padRight(pad);
         }
     }
 
-    public void setIconColor (Color color) {
+    public void setIconColor(Color color) {
         icon.setColor(color);
     }
 
-    public void draw(Batch batch, float parentAlpha) {
+    public void draw(Batch batch,
+                     float parentAlpha) {
         updateImage();
         super.draw(batch, parentAlpha);
     }
@@ -157,7 +189,8 @@ public class OwnTextIconButton extends OwnTextButton implements ProgrammaticButt
         public TextIconButtonStyle() {
         }
 
-        public TextIconButtonStyle(TextButtonStyle def, TextIconButtonStyle style) {
+        public TextIconButtonStyle(TextButtonStyle def,
+                                   TextIconButtonStyle style) {
             super(def);
             Drawable imageUp = style.imageUp;
             Drawable imageDown = style.imageDown;

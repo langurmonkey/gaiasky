@@ -271,7 +271,7 @@
       "down": "default-round-down",
       "checked": "default-round-down",
       "up": "default-round",
-      "imageUp": "iconic-dome"
+      "imageUp": "dome-icon"
     },
     "menu-orthosphere": {
       "down": "default-round-down",
@@ -385,7 +385,7 @@
       "imageUp": "iconic-reload"
     },
     "preferences": {
-      "imageUp": "prefs-icon"
+      "imageUp": "gear"
     },
     "map": {
       "imageUp": "map-icon"
@@ -412,7 +412,7 @@
       "imageUp": "iconic-info"
     },
     "generate": {
-      "imageUp": "iconic-wrench"
+      "imageUp": "wrench"
     },
     "quit": {
       "down": "default-round-down",
@@ -677,7 +677,7 @@
       "imageChecked": "highlight-on"
     },
     "prefs": {
-      "imageUp": "prefs-icon"
+      "imageUp": "gear"
     },
     "rubbish-bin-s": {
       "imageUp": "bin-s-icon",

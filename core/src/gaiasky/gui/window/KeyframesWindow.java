@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -704,9 +705,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private void addMediaControlsToTable(Table table) {
         table.setWidth(1250f);
+        float bw = 30f;
 
         // Skip back.
         skipBack = new OwnImageButton(skin, "media-skip-backward");
+        skipBack.setSize(bw, bw);
         skipBack.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // To first.
@@ -716,8 +719,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         skipBack.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.start"), skin));
+
         // Step back.
         stepBack = new OwnImageButton(skin, "media-step-backward");
+        stepBack.setSize(bw, bw);
         stepBack.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // To previous.
@@ -727,8 +732,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         stepBack.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.skip.backward"), skin));
+
         // Play/pause.
         playPause = new OwnImageButton(skin, "media-play-pause");
+        playPause.setSize(bw, bw);
         playPause.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (playPause.isChecked()) {
@@ -747,8 +754,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         playPause.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.play.pause"), skin));
+
         // Step forward.
         stepForward = new OwnImageButton(skin, "media-step-forward");
+        stepForward.setSize(bw, bw);
         stepForward.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // To previous.
@@ -758,8 +767,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         stepForward.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.skip.forward"), skin));
+
         // Skip forward.
         skipForward = new OwnImageButton(skin, "media-skip-forward");
+        skipForward.setSize(bw, bw);
         skipForward.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // To previous.
@@ -965,7 +976,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                               Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth(240f);
+        nameL.setWidth(290f);
         // Keyframes with target are yellow.
         if (kf.target != null) {
             nameL.setColor(ColorUtils.gYellowC);
@@ -1029,7 +1040,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Up
         OwnTextIconButton moveUp = new OwnTextIconButton("", skin, "caret-up");
-        moveUp.setSize(buttonSize * 0.8f, buttonSize * 0.8f);
+        moveUp.setSize(buttonSize * 0.7f, buttonSize * 0.7f);
+        moveUp.setIconSize(buttonSize * 0.3f, buttonSize * 0.3f);
         moveUp.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.up"), skin));
         moveUp.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1055,7 +1067,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Down
         OwnTextIconButton moveDown = new OwnTextIconButton("", skin, "caret-down");
-        moveDown.setSize(buttonSize * 0.8f, buttonSize * 0.8f);
+        moveDown.setSize(buttonSize * 0.7f, buttonSize * 0.7f);
+        moveDown.setIconSize(buttonSize * 0.3f, buttonSize * 0.3f);
         moveDown.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.down"), skin));
         moveDown.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1092,33 +1105,33 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         // Clock - time
         Image clockImg = new Image(skin.getDrawable("clock"));
-        clockImg.addListener(new OwnTextTooltip(dateFormat.format(kf.time), skin));
         clockImg.setScale(0.7f);
+        clockImg.addListener(new OwnTextTooltip(dateFormat.format(kf.time), skin));
         clockImg.setOrigin(Align.center);
         addHighlightListener(clockImg, kf);
         table.add(clockImg).width(clockImg.getWidth()).left().padRight(3f).padBottom(pad10);
 
         // Target
-        Image targetImg = new Image(skin.getDrawable("iconic-target"));
-        targetImg.setScale(0.7f);
-        targetImg.setOrigin(Align.center);
-        addHighlightListener(targetImg, kf);
+        var targetLabel = new OwnLabel("⊙", skin);
+        addHighlightListener(targetLabel, kf);
         if (kf.target != null) {
-            targetImg.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.target", kf.target.toString()), skin));
-            targetImg.setColor(ColorUtils.gYellowC);
+            targetLabel.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.target", kf.target.toString()), skin));
+            targetLabel.setColor(ColorUtils.gYellowC);
         } else {
-            targetImg.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.target.no"), skin));
-            targetImg.setColor(ColorUtils.oDarkGrayC);
+            targetLabel.addListener(new OwnTextTooltip(I18n.msg("gui.keyframes.target.no"), skin));
+            targetLabel.setColor(ColorUtils.oDarkGrayC);
         }
-        table.add(targetImg).width(targetImg.getWidth()).left().padRight(pad18).padBottom(pad10);
+        table.add(targetLabel).left().padRight(pad10).padBottom(pad10);
 
-        // Frame name
+        // Frame name.
         addFrameName(kf, index, table);
 
-        var bs = buttonSize * 1.1f;
+        var bs = buttonSize;
+        var is = bs * 0.7f;
         // Go to.
         OwnTextIconButton goTo = new OwnTextIconButton("", skin, "go-to");
         goTo.setSize(bs, bs);
+        goTo.setIconSize(is, is);
         goTo.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.goto"), skin));
         goTo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1134,6 +1147,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Set to current camera.
         OwnTextIconButton setCurrent = new OwnTextIconButton("", skin, "camera-slr");
         setCurrent.setSize(bs, bs);
+        setCurrent.setIconSize(is, is);
         setCurrent.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.setcurrent"), skin));
         setCurrent.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1164,6 +1178,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Seam.
         OwnTextIconButton seam = new OwnTextIconButton("", skin, "seam", "toggle");
         seam.setSize(bs, bs);
+        seam.setIconSize(is, is);
         seam.setChecked(kf.seam);
         seam.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seam"), skin));
         seam.addListener((event) -> {
@@ -1196,6 +1211,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Add after
         OwnTextIconButton addKeyframe = new OwnTextIconButton("", skin, "add");
         addKeyframe.setSize(bs, bs);
+        addKeyframe.setIconSize(is, is);
         addKeyframe.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.add.after"), skin));
         addKeyframe.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -1265,6 +1281,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Rubbish
         OwnTextIconButton rubbish = new OwnTextIconButton("", skin, "rubbish");
         rubbish.setSize(bs, bs);
+        rubbish.setIconSize(is, is);
         rubbish.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.remove"), skin));
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {

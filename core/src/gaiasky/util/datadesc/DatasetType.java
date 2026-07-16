@@ -26,7 +26,7 @@ public class DatasetType {
 
     static {
         iconMap = new HashMap<>();
-        iconMap.put("other", "icon-elem-others");
+        iconMap.put("other", "icon-database");
         iconMap.put("data-pack", "icon-elem-others");
         iconMap.put("catalog-lod", "icon-elem-stars");
         iconMap.put("catalog-gaia", "icon-elem-stars");
@@ -38,7 +38,7 @@ public class DatasetType {
         iconMap.put("mesh", "icon-elem-meshes");
         iconMap.put("spacecraft", "icon-elem-satellites");
         iconMap.put("system", "iconic-target");
-        iconMap.put("texture-pack", "icon-elem-moons");
+        iconMap.put("texture-pack", "icon-texture");
         iconMap.put("virtualtex-pack", "iconic-image");
         iconMap.put("volume", "icon-elem-nebulae");
     }

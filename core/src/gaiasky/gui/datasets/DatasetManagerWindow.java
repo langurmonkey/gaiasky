@@ -83,6 +83,10 @@ public class DatasetManagerWindow extends GenericDialog {
     private OwnScrollPane leftScroll;
     private int selectedIndex;
     private DatasetWatcher rightPaneWatcher;
+    /** Icon width. **/
+    private final float w = 40f;
+    /** Icon height. **/
+    private final float h = 40f;
 
     public DatasetManagerWindow(Stage stage, Skin skin, DatasetGroup serverDd) {
         this(stage, skin, serverDd, true, I18n.msg("gui.close"));
@@ -432,6 +436,7 @@ public class DatasetManagerWindow extends GenericDialog {
             if (mode == DatasetMode.INSTALLED) {
                 // Select all.
                 var selectAll = new OwnImageButton(skin, "select-all");
+                selectAll.setSize(w, h);
                 selectAll.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         for (var checkBox : groupCheckBoxes) {
@@ -447,6 +452,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
                 // Select none.
                 var selectNone = new OwnImageButton(skin, "select-none");
+                selectNone.setSize(w, h);
                 selectNone.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         for (var checkBox : groupCheckBoxes) {
@@ -468,7 +474,7 @@ public class DatasetManagerWindow extends GenericDialog {
             }
 
             var paneImage = new OwnImage(skin.getDrawable(type.getIcon()));
-            paneImage.setSize(45f, 45f);
+            paneImage.setSize(w, h);
             String typeString;
             if (I18n.hasMessage("gui.download.type." + type.typeStr)) {
                 typeString = I18n.msg("gui.download.type." + type.typeStr);
@@ -491,10 +497,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
                 // Type icon.
                 var typeImage = new OwnImage(skin.getDrawable(type.getIcon()));
-                float scl = 0.7f;
-                float iw = typeImage.getWidth();
-                float ih = typeImage.getHeight();
-                typeImage.setSize(iw * scl, ih * scl);
+                typeImage.setSize(w, h);
                 typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
                 // Title.
@@ -513,6 +516,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     // Server datasets.
                     // Add download/update button.
                     var install = new OwnTextIconButton("", skin, "install");
+                    install.setIconSize(w * 0.8f, h * 0.8f);
                     install.setContentAlign(Align.center);
                     install.addListener(new OwnTextTooltip(I18n.msg(dataset.outdated ? "gui.download.update" : "gui.download.install"), skin));
                     install.addListener((event) -> {
@@ -773,10 +777,7 @@ public class DatasetManagerWindow extends GenericDialog {
             // Type icon.
             var dType = dataset.type != null ? dataset.type : "other";
             var typeImage = new OwnImage(skin.getDrawable(DatasetType.getTypeIcon(dType)));
-            var scl = 0.7f;
-            var iw = typeImage.getWidth();
-            var ih = typeImage.getHeight();
-            typeImage.setSize(iw * scl, ih * scl);
+            typeImage.setSize(w, h);
             typeImage.addListener(new OwnTextTooltip(dType, skin, 10));
 
             // Title.
@@ -1119,6 +1120,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 Pair<Dataset, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
                 HttpRequest request = pair.getSecond();
                 cancelDownloadButton = new OwnTextIconButton(I18n.msg("gui.download.cancel"), skin, "quit");
+                cancelDownloadButton.setIconSize(w, h);
                 cancelDownloadButton.pad(14.4f);
                 cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
                 cancelDownloadButton.addListener(new ChangeListener() {

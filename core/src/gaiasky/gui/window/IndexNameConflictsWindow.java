@@ -135,7 +135,7 @@ public class IndexNameConflictsWindow extends GenericDialog {
             c = new OwnLabel(TextUtils.capString(ci.name, 20), skin);
             c.setColor(ColorUtils.gYellowC);
             c.setTooltip(I18n.msg("gui.conflicts.tooltip.dataset") + ": " + ci.name);
-            var i = new OwnImage(skin.getDrawable("iconic-cubemap"));
+            var i = new OwnImage(skin.getDrawable("cubemap-icon"));
             et.add(i).padRight(3f);
         } else {
             // Use parent.

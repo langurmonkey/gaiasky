@@ -64,12 +64,15 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private OwnScrollPane scroll;
     private OwnLabel noDatasetsLabel;
     private float componentWidth;
+    /** Icon size. **/
+    private float iw;
 
 
     public DatasetsComponent(Skin skin,
                              Stage stage,
                              CatalogManager catalogManager) {
         super(skin, stage);
+        this.iw = 32f;
         this.catalogManager = catalogManager;
         groupMap = new ConcurrentHashMap<>();
         imageMap = new ConcurrentHashMap<>();
@@ -287,6 +290,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         Table controls = new Table(skin);
 
         var visibilityButton = new OwnImageButton(skin, "eye-toggle");
+        visibilityButton.setSize(iw, iw);
         visibilityButton.setCheckedNoFire(!ci.isVisible(true));
         visibilityButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.toggle"), skin));
         visibilityButton.addListener(event -> {
@@ -298,6 +302,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         var highlightButton = new OwnImageButton(skin, "highlight-ds-s");
+        highlightButton.setSize(iw, iw);
         highlightButton.setCheckedNoFire(ci.highlighted);
         highlightButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight"), skin));
         highlightButton.addListener(event -> {
@@ -309,6 +314,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         var goToButton = new OwnImageButton(skin, "go-to");
+        goToButton.setSize(iw, iw);
         goToButton.setCheckedNoFire(!ci.isVisible(true));
         goToButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.mission.goto"), skin));
         goToButton.addListener(event -> {
@@ -321,6 +327,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
 
         var filtersButton = new OwnImageButton(skin, "filter");
+        filtersButton.setSize(iw, iw);
         filtersButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.filter"), skin));
         filtersButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -331,6 +338,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         var visualSettingsButton = new OwnImageButton(skin, "bolt");
+        visualSettingsButton.setSize(iw, iw);
         visualSettingsButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.visuals"), skin));
         visualSettingsButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -341,6 +349,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         var transformsButton = new OwnImageButton(skin, "matrix");
+        transformsButton.setSize(iw, iw);
         transformsButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.transforms"), skin));
         transformsButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -350,7 +359,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        float bw = iw * 0.7f;
+
         var infoButton = new OwnTextIconButton("", skin, "info");
+        infoButton.setIconSize(bw, bw);
         infoButton.setPad(0);
         infoButton.setIconColor(ColorUtils.gBlueC);
         infoButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.info"), skin));
@@ -363,6 +375,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         var rubbishButton = new OwnTextIconButton("", skin, "rubbish");
+        rubbishButton.setIconSize(bw, bw);
         rubbishButton.setPad(0);
         rubbishButton.setIconColor(ColorUtils.gRedC);
         rubbishButton.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.remove"), skin));
@@ -378,21 +391,21 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         imageMap.put(ci.name, new ProgrammaticButton[]{visibilityButton, highlightButton});
         if (ci.isHighlightable()) {
             controls.add(visibilityButton).padRight(pad6);
-            controls.add(highlightButton).padRight(pad30);
+            controls.add(highlightButton).padRight(pad20);
             controls.add(visualSettingsButton).padRight(pad6);
             if (ci.hasParticleAttributes()) {
                 controls.add(filtersButton).padRight(pad6);
             }
         } else {
-            controls.add(visibilityButton).padRight(pad30);
+            controls.add(visibilityButton).padRight(pad20);
         }
         // Can only add arbitrary transformations to star and particle sets (and octrees).
         if (ci.hasParticleAttributes()) {
-            controls.add(transformsButton).padRight(pad30);
+            controls.add(transformsButton).padRight(pad20);
         }
         // Go to object for mission datasets.
         if (ci.isMission()) {
-            controls.add(goToButton).padRight(pad30);
+            controls.add(goToButton).padRight(pad20);
         }
 
         controls.add(infoButton).padRight(pad3);
@@ -443,7 +456,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         float pad = 4.8f;
         if (ci.isHighlightable()) {
             t.add(controls).left().padBottom(pad);
-            t.add(cp).right().size(28.8f).padRight(pad6).padBottom(pad).row();
+            t.add(cp).right().size(28.8f).padBottom(pad).padRight(pad6).row();
         } else {
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }

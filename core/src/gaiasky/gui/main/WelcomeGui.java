@@ -800,6 +800,7 @@ public class WelcomeGui extends AbstractGui {
                         var typeIcon = new OwnImage(skin.getDrawable(DatasetType.getTypeIcon(ds.type)));
                         typeIcon.setSize(30f, 30f);
                         var disable = new OwnTextIconButton("", skin, "select-none");
+                        disable.setIconSize(25f, 25f);
                         disable.setSize(40f, 35f);
                         disable.addListener(new OwnTextTooltip(I18n.msg("gui.download.disable") + " " + ds.name, skin, 40));
                         disable.addListener(new ChangeListener() {
@@ -863,9 +864,12 @@ public class WelcomeGui extends AbstractGui {
         screenMode.add(screenModeButton);
 
         // Bottom icons
+        float bw = 60f;
+        float bh = 60f;
 
         // About button
         OwnTextIconButton about = new OwnTextIconButton("", skin, "help");
+        about.setSize(bw, bh);
         about.addListener(new OwnTextTooltip(I18n.msg("gui.help.about"), skin, 10));
         about.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -883,6 +887,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Preferences button
         OwnTextIconButton preferences = new OwnTextIconButton("", skin, "preferences");
+        preferences.setSize(bw, bh);
         preferences.addListener(new OwnTextTooltip(I18n.msg("gui.preferences"), skin, 10));
         preferences.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -900,6 +905,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Exit button
         OwnTextIconButton exit = new OwnTextIconButton("", skin, "quit");
+        exit.setSize(bw, bh);
         exit.addListener(new OwnTextTooltip(I18n.msg("context.quit"), skin, 10));
         exit.addListener((event) -> {
             if (event instanceof ChangeEvent) {

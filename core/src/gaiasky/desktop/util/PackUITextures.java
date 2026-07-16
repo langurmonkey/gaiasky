@@ -16,20 +16,18 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker;
  */
 public class PackUITextures {
     public static void main(String[] args) {
-        TexturePacker.Settings x2settings = new TexturePacker.Settings();
-        x2settings.scale[0] = 1.5f;
-        x2settings.jpegQuality = 0.95f;
-        x2settings.paddingX = 2;
-        x2settings.paddingY = 2;
-        x2settings.filterMag = Texture.TextureFilter.Linear;
-        x2settings.filterMin = Texture.TextureFilter.Linear;
+        TexturePacker.Settings settings = new TexturePacker.Settings();
+        settings.scale[0] = 1.5f;
+        settings.jpegQuality = 0.95f;
+        settings.filterMag = Texture.TextureFilter.Linear;
+        settings.filterMin = Texture.TextureFilter.Linear;
 
         // Use current path variable
         String gs = (new java.io.File("")).getAbsolutePath();
 
         try {
             // Process
-            TexturePacker.process(x2settings, gs + "/assets/skins/raw/source/", gs + String.format("/assets/skins/%s/", "default"), "default");
+            TexturePacker.process(settings, gs + "/assets/skins/raw/source/", gs + String.format("/assets/skins/%s/", "default"), "default");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

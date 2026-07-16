@@ -71,7 +71,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     protected HorizontalGroup focusActionsGroup;
     protected FocusView currentFocus;
     DecimalFormat nf;
-    float pad1, pad3, pad5, pad10, pad15, bw;
+    float pad1, pad3, pad5, pad10, pad15, bw, iw;
     private ExternalInformationUpdater externalInfoUpdater;
     private boolean maximized;
 
@@ -98,7 +98,10 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         pad5 = 8f;
         pad3 = 4.8f;
         pad1 = 1.6f;
+        // Button size.
         bw = 41f;
+        // Icon size.
+        iw = 32f;
 
         focusInfo = new Table();
         Table cameraInfo = new Table();
@@ -175,6 +178,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
         // Bookmark
         bookmark = new OwnImageButton(skin, "bookmark");
+        bookmark.setSize(iw, iw);
         bookmark.addListener(new OwnTextTooltip(I18n.msg("gui.bookmark"), skin));
         bookmark.addListener(event -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
@@ -247,6 +251,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         proceduralGalaxy.addListener(new OwnTextTooltip(I18n.msg("gui.ui.procedural"), skin));
 
         objectVisibility = new OwnImageButton(skin, "eye-toggle");
+        objectVisibility.setSize(iw, iw);
         objectVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
@@ -261,6 +266,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         });
 
         forceLabel = new OwnImageButton(skin, "label-toggle");
+        forceLabel.setSize(iw, iw);
         forceLabel.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility

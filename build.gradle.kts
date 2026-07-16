@@ -143,7 +143,7 @@ project(":core") {
         // Helper to get extra properties
         fun property(name: String): String = project.extra.get(name) as String
 
-        compileOnly("com.badlogicgames.gdx:gdx-tools:${property("gdxVersion")}")
+        implementation("com.badlogicgames.gdx:gdx-tools:${property("gdxVersion")}")
 
         implementation("org.lwjgl:lwjgl-openxr:${property("lwjglVersion")}")
         implementation("org.lwjgl:lwjgl-glfw:${property("lwjglVersion")}")

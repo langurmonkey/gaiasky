@@ -43,7 +43,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected OwnSliderReset fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
     protected CheckBox focusLock, orientationLock, cinematic;
     protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonMaster;
-    protected OwnImageButton recCamera, recKeyframeCamera, playCamera;
+    protected OwnImageButton recCamera, keyframesEditor, playCamera;
     protected boolean fovFlag = true;
     private boolean fieldLock;
 
@@ -54,9 +54,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize(float componentWidth) {
+        float iw = 32f;
 
         // Record camera button.
         recCamera = new OwnImageButton(skin, "rec");
+        recCamera.setSize(iw, iw);
         recCamera.setName("recCam");
         recCamera.setChecked(GaiaSky.settings().runtime.recordCamera);
         recCamera.addListener(event -> {
@@ -78,20 +80,22 @@ public class CameraComponent extends GuiComponent implements IObserver {
         recCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.reccamera"), skin));
 
         // Record camera (keyframes).
-        recKeyframeCamera = new OwnImageButton(skin, "rec-key");
-        recKeyframeCamera.setName("recKeyframeCamera");
-        recKeyframeCamera.setChecked(GaiaSky.settings().runtime.recordKeyframeCamera);
-        recKeyframeCamera.addListener(event -> {
+        keyframesEditor = new OwnImageButton(skin, "rec-key");
+        keyframesEditor.setSize(iw, iw);
+        keyframesEditor.setName("recKeyframeCamera");
+        keyframesEditor.setChecked(GaiaSky.settings().runtime.recordKeyframeCamera);
+        keyframesEditor.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_KEYFRAMES_WINDOW_ACTION, recKeyframeCamera);
+                EventManager.publish(Event.SHOW_KEYFRAMES_WINDOW_ACTION, keyframesEditor);
                 return true;
             }
             return false;
         });
-        recKeyframeCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.reccamerakeyframe"), skin));
+        keyframesEditor.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.reccamerakeyframe"), skin));
 
         // Play camera button.
         playCamera = new OwnImageButton(skin, "play");
+        playCamera.setSize(iw, iw);
         playCamera.setName("playCam");
         playCamera.setChecked(false);
         playCamera.addListener(event -> {
@@ -113,7 +117,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraPathGroup.setWidth(componentWidth);
         cameraPathGroup.add(new Separator(skin, "gray")).center().growX().padRight(pad8);
         cameraPathGroup.add(recCamera).center().padRight(pad4);
-        cameraPathGroup.add(recKeyframeCamera).center().padRight(pad4);
+        cameraPathGroup.add(keyframesEditor).center().padRight(pad4);
         cameraPathGroup.add(playCamera).center().padRight(pad8);
         cameraPathGroup.add(new Separator(skin, "gray")).center().growX();
 

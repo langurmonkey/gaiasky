@@ -264,8 +264,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnTextIconButton tabFrames = createTab(I18n.msg("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin);
         OwnTextIconButton tabCamera = createTab(I18n.msg("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin);
         OwnTextIconButton tabStereo = createTab(I18n.msg("gui.stereo.title"), new Image(skin.getDrawable("3d-icon")), skin);
-        OwnTextIconButton tab360 = createTab(I18n.msg("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin);
-        OwnTextIconButton tabPlanetarium = createTab(I18n.msg("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin);
+        OwnTextIconButton tab360 = createTab(I18n.msg("gui.360.title"), new Image(skin.getDrawable("cubemap-icon")), skin);
+        OwnTextIconButton tabPlanetarium = createTab(I18n.msg("gui.planetarium.title"), new Image(skin.getDrawable("dome-icon")), skin);
         OwnTextIconButton tabData = createTab(I18n.msg("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin);
         OwnTextIconButton tabSystem = createTab(I18n.msg("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin);
 

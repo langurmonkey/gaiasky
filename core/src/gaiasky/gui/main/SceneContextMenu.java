@@ -290,7 +290,7 @@ public class SceneContextMenu extends ContextMenu {
 
             MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort),
                                                       skin,
-                                                      skin.getDrawable("iconic-fork"));
+                                                      skin.getDrawable("gear"));
             proceduralSurface.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralSurface, candidate);
