@@ -145,6 +145,36 @@ vec2 computeElevation(vec3 p, float baseLevel) {
     } else {
         elevation = max(baseLevel, elevation_noise);
     }
+
+    float plainsHeight = 0.0;  // 0.0 = no plains, 0.5 = half the land is plains
+    float plainsSlope  = 0.1;   // e.g. 0.1 = very gentle rise
+
+    if (plainsHeight > 0.0) {
+        // Normalize above-water elevation to [0, 1]
+        float t = (elevation - baseLevel) / max(1.0 - baseLevel, 0.001);
+        t = clamp(t, 0.0, 1.0);
+
+        float plainsMaxElevation = plainsHeight * plainsSlope;
+        float mountainRange = 1.0 - plainsMaxElevation;
+        float mountainSlope = mountainRange / max(1.0 - plainsHeight, 0.001);
+
+        float remapped;
+        float blend = 0.05; // transition width
+        if (t <= plainsHeight - blend) {
+            remapped = t * plainsSlope;
+        } else if (t >= plainsHeight + blend) {
+            remapped = plainsMaxElevation + (t - plainsHeight) * mountainSlope;
+        } else {
+            // Smooth blend at the transition
+            float a = (t - (plainsHeight - blend)) / (2.0 * blend);
+            float plainsVal = t * plainsSlope;
+            float mountainVal = plainsMaxElevation + (t - plainsHeight) * mountainSlope;
+            remapped = mix(plainsVal, mountainVal, smoothstep(0.0, 1.0, a));
+        }
+
+        elevation = baseLevel + remapped * (1.0 - baseLevel);
+    }
+    
     return vec2(elevation, baseLevel);
 }
 
