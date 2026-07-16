@@ -86,6 +86,7 @@ public class MainGui extends AbstractGui {
     protected LoadProgressInterface loadProgressInterface;
     protected LocationInfoInterface locationInfoInterface;
     protected LogWindow logWindow;
+    protected ProceduralPlanetWindow proceduralPlanetWindow;
     protected DataInfoWindow dataInfoWindow;
     protected ArchiveViewWindow archiveViewWindow;
     protected DecimalFormat nf;
@@ -401,15 +402,13 @@ public class MainGui extends AbstractGui {
 
                 // Check for cubemap textures, for they are incompatible with the procedural generation.
                 if (Mapper.model.has(planet.getEntity())) {
-                    var w = findActor("procedural-window");
                     // Only one instance
-                    if (w != null && w.hasParent()) {
-                        if (!w.isVisible())
-                            w.setVisible(true);
+                    if (proceduralPlanetWindow != null) {
+                        proceduralPlanetWindow.show(stage);
                     } else {
-                        ProceduralPlanetWindow proceduralWindow = new ProceduralPlanetWindow(planet, stage, skin);
-                        proceduralWindow.setName("procedural-window");
-                        proceduralWindow.show(stage);
+                        proceduralPlanetWindow = new ProceduralPlanetWindow(planet, stage, skin);
+                        proceduralPlanetWindow.setName("procedural-window");
+                        proceduralPlanetWindow.show(stage, 60f, 60f);
                     }
                 }
 

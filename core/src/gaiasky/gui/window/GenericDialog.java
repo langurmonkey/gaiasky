@@ -519,10 +519,16 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
      * default fadeIn action.
      */
     public GenericDialog show(Stage stage) {
+        return show(stage, -1, -1);
+    }
+
+    public GenericDialog show(Stage stage, float x, float y) {
         show(stage, Actions.sequence(
                 Actions.alpha(0f),
                 Actions.fadeIn(0.6f, Interpolation.fade)));
-        if (lastPosX >= 0 && lastPosY >= 0) {
+        if (x >= 0 && y >= 0) {
+            setPosition(Math.round(x), FastMath.round(y));
+        } else if (lastPosX >= 0 && lastPosY >= 0) {
             setPosition(Math.round(lastPosX), FastMath.round(lastPosY));
         } else {
             setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), FastMath.round((stage.getHeight() - getHeight()) / 2f));
@@ -533,16 +539,6 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
     }
 
     protected void showDialogHook(Stage stage) {
-    }
-
-    /**
-     * {@link #pack() Packs} the dialog and adds it to the stage at the specified position.
-     */
-    public GenericDialog show(Stage stage, float x, float y) {
-        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(GaiaSky.settings().program.ui.getAnimationSeconds(), Interpolation.fade)));
-        setPosition(Math.round(x), FastMath.round(y));
-        setKeyboardFocus();
-        return this;
     }
 
     /**

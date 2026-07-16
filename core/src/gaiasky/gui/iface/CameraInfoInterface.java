@@ -597,8 +597,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 focusNames.clearChildren();
                 String[] names = view.getNames();
                 if (names != null && names.length > 0) {
-                    for (int i = 0; i < names.length; i++) {
-                        String name = names[i];
+                    for (String name : names) {
                         String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
                         OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
                         if (nameCapped.length() != name.length())
