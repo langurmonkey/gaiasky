@@ -412,7 +412,7 @@
       "imageUp": "iconic-info"
     },
     "generate": {
-      "imageUp": "wrench"
+      "imageUp": "planet-earth"
     },
     "quit": {
       "down": "default-round-down",
@@ -525,6 +525,12 @@
     },
     "clipboard": {
       "imageUp": "iconic-clipboard"
+    },
+    "dice": {
+      "imageUp": "dice-icon"
+    },
+    "wrench": {
+      "imageUp": "wrench"
     },
     "planet-earth": {
       "imageUp": "planet-earth"

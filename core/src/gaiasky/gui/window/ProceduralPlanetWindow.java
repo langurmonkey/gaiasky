@@ -281,23 +281,37 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
     }
 
-    private void addLocalButtons(Table content,
-                                 Function<Boolean, Boolean> gasGiantFunc,
-                                 Function<Boolean, Boolean> earthLikeFunc,
-                                 Function<Boolean, Boolean> desertFunc,
-                                 Function<Boolean, Boolean> tropicalFunc,
-                                 Function<Boolean, Boolean> iceWorldFunc,
-                                 Function<Boolean, Boolean> rockyPlanetFunc,
-                                 Function<Boolean, Boolean> moltenLavaFunc,
-                                 Function<Boolean, Boolean> alienFunc
+    private final float w = 100f;
+    private final float h = 80f;
+
+    private void addSurfacePresets(Table content,
+                                   Function<Boolean, Boolean> randomizeFunc,
+                                   Function<Boolean, Boolean> gasGiantFunc,
+                                   Function<Boolean, Boolean> earthLikeFunc,
+                                   Function<Boolean, Boolean> desertFunc,
+                                   Function<Boolean, Boolean> tropicalFunc,
+                                   Function<Boolean, Boolean> iceWorldFunc,
+                                   Function<Boolean, Boolean> rockyPlanetFunc,
+                                   Function<Boolean, Boolean> moltenLavaFunc,
+                                   Function<Boolean, Boolean> alienFunc
     ) {
-        float w = 90f;
-        float h = 70f;
+        // Randomize
+        var randomize = new OwnTextIconButton("", skin, "dice");
+        randomize.setSize(w, h);
+        randomize.setIconColor(ColorUtils.gYellowC);
+        randomize.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                randomizeFunc.apply(true);
+            }
+        });
+        randomize.pad(pad10, pad20, pad10, pad20);
+        randomize.setTooltip(I18n.msg("gui.procedural.info.button.randomize", I18n.msg("gui.procedural.surface")));
 
         // Earth like
-        OwnTextButton earthLike = new OwnTextIconButton("", skin, "planet-earth");
+        var earthLike = new OwnTextIconButton("", skin, "planet-earth");
         earthLike.setSize(w, h);
-        earthLike.setColor(ColorUtils.gBlueC);
         earthLike.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -309,9 +323,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         earthLike.setTooltip(I18n.msg("gui.procedural.button.earthlike"));
 
         // Desert
-        OwnTextButton desert = new OwnTextIconButton("", skin, "planet-desert");
+        var desert = new OwnTextIconButton("", skin, "planet-desert");
         desert.setSize(w, h);
-        desert.setColor(ColorUtils.gBlueC);
         desert.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -323,9 +336,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         desert.setTooltip(I18n.msg("gui.procedural.button.desert"));
 
         // Tropical islands
-        OwnTextButton tropicalIslands = new OwnTextIconButton("", skin, "planet-tropical");
+        var tropicalIslands = new OwnTextIconButton("", skin, "planet-tropical");
         tropicalIslands.setSize(w, h);
-        tropicalIslands.setColor(ColorUtils.gBlueC);
         tropicalIslands.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -337,9 +349,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         tropicalIslands.setTooltip(I18n.msg("gui.procedural.button.tropical"));
 
         // Gas giant
-        OwnTextButton gasGiant = new OwnTextIconButton("", skin, "planet-gasgiant");
+        var gasGiant = new OwnTextIconButton("", skin, "planet-gasgiant");
         gasGiant.setSize(w, h);
-        gasGiant.setColor(ColorUtils.gBlueC);
         gasGiant.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -351,9 +362,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         gasGiant.setTooltip(I18n.msg("gui.procedural.button.gasgiant"));
 
         // Frozen world
-        OwnTextButton frozenWorld = new OwnTextIconButton("", skin, "planet-ice");
+        var frozenWorld = new OwnTextIconButton("", skin, "planet-ice");
         frozenWorld.setSize(w, h);
-        frozenWorld.setColor(ColorUtils.gBlueC);
         frozenWorld.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -365,9 +375,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         frozenWorld.setTooltip(I18n.msg("gui.procedural.button.ice"));
 
         // Rocky planet
-        OwnTextButton rockyPlanet = new OwnTextIconButton("", skin, "planet-rocky");
+        var rockyPlanet = new OwnTextIconButton("", skin, "planet-rocky");
         rockyPlanet.setSize(w, h);
-        rockyPlanet.setColor(ColorUtils.gBlueC);
         rockyPlanet.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -379,9 +388,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         rockyPlanet.setTooltip(I18n.msg("gui.procedural.button.rocky"));
 
         // Molten lava world
-        OwnTextButton moltenLava = new OwnTextIconButton("", skin, "planet-lava");
+        var moltenLava = new OwnTextIconButton("", skin, "planet-lava");
         moltenLava.setSize(w, h);
-        moltenLava.setColor(ColorUtils.gBlueC);
         moltenLava.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -393,9 +401,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         moltenLava.setTooltip(I18n.msg("gui.procedural.button.lava"));
 
         // Molten lava world
-        OwnTextButton alienPlanet = new OwnTextIconButton("", skin, "planet-alien");
+        var alienPlanet = new OwnTextIconButton("", skin, "planet-alien");
         alienPlanet.setSize(w, h);
-        alienPlanet.setColor(ColorUtils.gBlueC);
         alienPlanet.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -407,6 +414,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         alienPlanet.setTooltip(I18n.msg("gui.procedural.button.alien"));
 
         Table bt = new Table(skin);
+        bt.add(randomize).pad(5f).padRight(15f);
         bt.add(earthLike).pad(5f);
         bt.add(desert).pad(5f);
         bt.add(tropicalIslands).pad(5f);
@@ -423,22 +431,60 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
     }
 
-    private void addLocalButtons(Table content,
-                                 Function<Boolean, Boolean> blueFunc,
-                                 Function<Boolean, Boolean> redFunc,
-                                 Function<Boolean, Boolean> greenFunc,
-                                 Function<Boolean, Boolean> whiteFunc,
-                                 Function<Boolean, Boolean> magentaFunc,
-                                 Function<Boolean, Boolean> yellowFunc,
-                                 Function<Boolean, Boolean> cyanFunc
+    private void addCloudPresets(Table content,
+                                 Function<Boolean, Boolean> randomizeFunc
     ) {
-        float w = 90f;
-        float h = 70f;
+        // Randomize
+        var randomize = new OwnTextIconButton("", skin, "dice");
+        randomize.setSize(w, h);
+        randomize.setIconColor(ColorUtils.gYellowC);
+        randomize.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                randomizeFunc.apply(true);
+            }
+        });
+        randomize.pad(pad10, pad20, pad10, pad20);
+        randomize.setTooltip(I18n.msg("gui.procedural.info.button.randomize", I18n.msg("gui.procedural.cloud")));
 
+        Table bt = new Table(skin);
+        bt.add(randomize).pad(5f);
+
+        HorizontalGroup buttonGroup = new HorizontalGroup();
+        buttonGroup.space(pad20);
+        buttonGroup.addActor(bt);
+
+        content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
+    }
+
+    private void addAtmospherePresets(Table content,
+                                      Function<Boolean, Boolean> randomizeFunc,
+                                      Function<Boolean, Boolean> blueFunc,
+                                      Function<Boolean, Boolean> redFunc,
+                                      Function<Boolean, Boolean> greenFunc,
+                                      Function<Boolean, Boolean> whiteFunc,
+                                      Function<Boolean, Boolean> magentaFunc,
+                                      Function<Boolean, Boolean> yellowFunc,
+                                      Function<Boolean, Boolean> cyanFunc
+    ) {
+        // Randomize
+        var randomize = new OwnTextIconButton("", skin, "dice");
+        randomize.setSize(w, h);
+        randomize.setIconColor(ColorUtils.gYellowC);
+        randomize.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                randomizeFunc.apply(true);
+            }
+        });
+        randomize.pad(pad10, pad20, pad10, pad20);
+        randomize.setTooltip(I18n.msg("gui.procedural.info.button.randomize", I18n.msg("gui.procedural.atmosphere")));
 
         // White
         var planet = new OwnImage(skin.getDrawable("icon-planet"), false);
-        OwnTextButton white = new OwnTextIconButton("", planet, skin);
+        var white = new OwnTextIconButton("", planet, skin);
         white.setSize(w, h);
         white.addListener(new ChangeListener() {
             @Override
@@ -535,6 +581,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
 
         Table bt = new Table(skin);
+        bt.add(randomize).pad(5f).padRight(15f);
         bt.add(white).pad(5f);
         bt.add(blue).pad(5f);
         bt.add(red).pad(5f);
@@ -550,28 +597,15 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         content.add(buttonGroup).center().colspan(2).padBottom(pad34).row();
     }
 
-    private OwnTextButton addLocalButtons(Table content,
-                                          String key,
-                                          Function<Boolean, Boolean> generateFunc,
-                                          Function<Boolean, Boolean> randomizeFunc,
-                                          int colspan) {
+    private OwnTextButton addGenButton(Table content,
+                                       String key,
+                                       Function<Boolean, Boolean> generateFunc,
+                                       int colspan) {
         String name = I18n.msg(key);
 
-        // Randomize button
-        var randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", name), skin, "random");
-        randomize.setColor(ColorUtils.gYellowC);
-        randomize.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                randomizeFunc.apply(true);
-            }
-        });
-        randomize.pad(pad10, pad20, pad10, pad20);
-        randomize.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.button.randomize", name), skin));
-
         // Generate button
-        var generate = new OwnTextIconButton(I18n.msg("gui.procedural.generate", name), skin, "generate");
+        var generate = new OwnTextIconButton(I18n.msg("gui.procedural.generate", name), skin, "wrench");
+        generate.setSize(w * 4f, h);
         generate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -585,9 +619,8 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.space(pad20);
         buttonGroup.addActor(generate);
-        buttonGroup.addActor(randomize);
 
-        content.add(buttonGroup).center().colspan(colspan).padBottom(pad18).row();
+        content.add(buttonGroup).center().colspan(colspan).padBottom(pad34).row();
 
         return generate;
     }
@@ -906,24 +939,28 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 // Copy existing
                 mtc.copyFrom(initMtc);
             }
-            // Title
-            content.add(new OwnLabel(I18n.msg("gui.procedural.param.surface"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
+            // Presets
+            content.add(new OwnLabel(I18n.msg("gui.procedural.presets"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
 
             // Add button group with presets.
-            addLocalButtons(content,
-                            this::randomizeSurfaceGasGiant,
-                            this::randomizeSurfaceEarthLike,
-                            this::randomizeSurfaceDesert,
-                            this::randomizeSurfaceTropical,
-                            this::randomizeSurfaceFrozen,
-                            this::randomizeSurfaceRockyPlanet,
-                            this::randomizeSurfaceLava,
-                            this::randomizeSurfaceAlien);
+            addSurfacePresets(content,
+                              this::randomizeSurface,
+                              this::randomizeSurfaceGasGiant,
+                              this::randomizeSurfaceEarthLike,
+                              this::randomizeSurfaceDesert,
+                              this::randomizeSurfaceTropical,
+                              this::randomizeSurfaceFrozen,
+                              this::randomizeSurfaceRockyPlanet,
+                              this::randomizeSurfaceLava,
+                              this::randomizeSurfaceAlien);
+
+            content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
+
+            // Parameters
+            content.add(new OwnLabel(I18n.msg("gui.procedural.param.surface"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
 
             // Add generate and randomize buttons
-            genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::generateSurface, this::randomizeSurface, 2);
-
-            content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad10).padTop(pad18).row();
+            genSurfaceButton = addGenButton(content, "gui.procedural.surface", this::generateSurface, 2);
 
             Table scrollContent = new Table(skin);
 
@@ -1028,7 +1065,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             var scrollPane = scrollPane(scrollContent);
 
             content.add(scrollPane).colspan(2).center().top().row();
-            content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad10).row();
+            content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
 
         } else {
             // Error!
@@ -1047,13 +1084,19 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             clc.copyFrom(initClc);
             clc.setDiffuse("generate");
         }
-        // Title
+        // Presets
+        content.add(new OwnLabel(I18n.msg("gui.procedural.presets"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
+
+        // Add button group with presets.
+        addCloudPresets(content, this::randomizeClouds);
+
+        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
+
+        // Parameters
         content.add(new OwnLabel(I18n.msg("gui.procedural.param.cloud"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
 
         // Add button group
-        genCloudsButton = addLocalButtons(content, "gui.procedural.cloud", this::generateClouds, this::randomizeClouds, 2);
-
-        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).padTop(pad18).row();
+        genCloudsButton = addGenButton(content, "gui.procedural.cloud", this::generateClouds, 2);
 
         Table scrollContent = new Table(skin);
 
@@ -1096,22 +1139,26 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             // Copy existing
             ac.copyFrom(initAc);
         }
-        // Title
+        // Presets
+        content.add(new OwnLabel(I18n.msg("gui.procedural.presets"), skin, "hud-header")).colspan(2).left().padBottom(pad34).row();
+
+        addAtmospherePresets(content,
+                             this::randomizeAtmosphere,
+                             this::randomizeBlueAtmosphere,
+                             this::randomizeRedAtmosphere,
+                             this::randomizeGreenAtmosphere,
+                             this::randomizeWhiteAtmosphere,
+                             this::randomizeMagentaAtmosphere,
+                             this::randomizeYellowAtmosphere,
+                             this::randomizeCyanAtmosphere);
+
+        content.add(new Separator(skin, "gray")).center().colspan(2).growX().padBottom(pad34).row();
+
+        // Parameters
         content.add(new OwnLabel(I18n.msg("gui.procedural.param.atm"), skin, "hud-header")).colspan(3).left().padBottom(pad34).row();
 
-        addLocalButtons(content,
-                        this::randomizeBlueAtmosphere,
-                        this::randomizeRedAtmosphere,
-                        this::randomizeGreenAtmosphere,
-                        this::randomizeWhiteAtmosphere,
-                        this::randomizeMagentaAtmosphere,
-                        this::randomizeYellowAtmosphere,
-                        this::randomizeCyanAtmosphere);
-
         // Add button group
-        addLocalButtons(content, "gui.procedural.atmosphere", this::generateAtmosphere, this::randomizeAtmosphere, 3);
-
-        content.add(new Separator(skin, "gray")).center().colspan(3).growX().padBottom(pad34).padTop(pad18).row();
+        addGenButton(content, "gui.procedural.atmosphere", this::generateAtmosphere, 3);
 
         // Wavelengths
         OwnSliderPlus wavelength0 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "0"), 0.4f, 1.0f, 0.01f, skin);
