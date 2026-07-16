@@ -63,8 +63,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Vector3Q posQ;
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
-    protected Button goTo, landOn, landAt, bookmark, refreshOrbit, proceduralPlanet, proceduralGalaxy;
-    protected OwnImageButton objectVisibility, forceLabel;
+    protected OwnTextIconButton goTo, landOn, landAt, refreshOrbit, proceduralPlanet, proceduralGalaxy;
+    protected OwnImageButton objectVisibility, forceLabel, bookmark;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC, camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel, rulerName, rulerName0, rulerName1, rulerDist;
     protected Link toggleSize;
     protected ITextTooltip toggleSizeTooltip;
@@ -101,7 +101,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         // Button size.
         bw = 41f;
         // Icon size.
-        iw = 32f;
+        iw = 30f;
 
         focusInfo = new Table();
         Table cameraInfo = new Table();
@@ -190,8 +190,12 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             return false;
         });
 
+        float bw = iw * 0.9f;
+        float btw = iw * 1.3f;
         // GoTo, LandOn and LandAt
         goTo = new OwnTextIconButton("", skin, "go-to");
+        goTo.setSize(btw, btw);
+        goTo.setIconSize(bw, bw);
         goTo.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 EventManager.publish(Event.NAVIGATE_TO_OBJECT, goTo, currentFocus);
@@ -204,6 +208,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         goTo.setDisabled(!isGoToEnabled());
 
         landOn = new OwnTextIconButton("", skin, "land-on");
+        landOn.setSize(btw, btw);
+        landOn.setIconSize(bw, bw);
         landOn.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 EventManager.publish(Event.LAND_ON_OBJECT, landOn, currentFocus);
@@ -215,6 +221,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         landOn.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.landon"), skin));
 
         landAt = new OwnTextIconButton("", skin, "land-at");
+        landAt.setSize(btw, btw);
+        landAt.setIconSize(bw, bw);
         landAt.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LAND_AT_LOCATION_CMD, landAt, currentFocus);
@@ -228,6 +236,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         // This is filled later on.
 
         proceduralPlanet = new OwnTextIconButton("", skin, "generate");
+        proceduralPlanet.setSize(btw, btw);
+        proceduralPlanet.setIconSize(bw, bw);
         proceduralPlanet.addListener((event) -> {
             var view = currentFocus;
             if (currentFocus != null && Mapper.atmosphere.has(view.getEntity()) && event instanceof ChangeEvent) {
@@ -239,6 +249,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         proceduralPlanet.addListener(new OwnTextTooltip(I18n.msg("gui.ui.procedural"), skin));
 
         proceduralGalaxy = new OwnTextIconButton("", skin, "generate");
+        proceduralGalaxy.setSize(btw, btw);
+        proceduralGalaxy.setIconSize(bw, bw);
         proceduralGalaxy.addListener((event) -> {
             var view = currentFocus;
             var bb = Mapper.billboardSet.get(view.getEntity());
@@ -266,7 +278,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         });
 
         forceLabel = new OwnImageButton(skin, "label-toggle");
-        forceLabel.setSize(iw, iw);
+        forceLabel.setSize(iw * 0.9f, iw * 0.9f);
         forceLabel.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
@@ -276,13 +288,6 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             }
             return false;
         });
-
-        goTo.setSize(bw, bw);
-        landOn.setSize(bw, bw);
-        landAt.setSize(bw, bw);
-        refreshOrbit.setSize(bw, bw);
-        proceduralPlanet.setSize(bw, bw);
-        proceduralGalaxy.setSize(bw, bw);
 
         focusActionsGroup = new HorizontalGroup();
         focusActionsGroup.space(pad5);
@@ -358,7 +363,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
             pointerInfo.add(lonLatLabel).left();
             pointerInfo.add(pointerLonLat).expandX().left().padLeft(pad5).row();
             pointerInfo.add(viewImgBtn).left().padRight(pad3).padBottom(pad10);
-            pointerInfo.add(RADECViewLabel).left();
+            pointerInfo.add(RADECViewLabel).left().padBottom(pad10);
             pointerInfo.add(viewRADEC).expandX().left().padLeft(pad5).padBottom(pad10);
         }
 
@@ -513,7 +518,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 if (id.isEmpty()) {
                     id = "-";
                 }
-                var idString = TextUtils.capString(id, focusFieldMaxLength);
+                var idString = TextUtils.capString(id, focusFieldMaxLength - 4);
 
                 boolean planet = Mapper.atmosphere.has(view.getEntity());
                 focusActionsGroup.removeActor(landOn);
@@ -592,28 +597,14 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                 focusNames.clearChildren();
                 String[] names = view.getNames();
                 if (names != null && names.length > 0) {
-                    int chars = 0;
-                    HorizontalGroup currGroup = new HorizontalGroup();
                     for (int i = 0; i < names.length; i++) {
                         String name = names[i];
-                        String nameCapped = TextUtils.capString(name, focusFieldMaxLength - 4);
+                        String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
                         OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
                         if (nameCapped.length() != name.length())
                             nl.addListener(new OwnTextTooltip(name, skin));
-                        currGroup.addActor(nl);
-                        chars += nameCapped.length() + 1;
-                        if (i < names.length - 1) {
-                            currGroup.addActor(new OwnLabel(", ", skin));
-                            chars++;
-                        }
-                        if (i < names.length - 1 && chars > 14) {
-                            focusNames.add(currGroup).left().row();
-                            currGroup = new HorizontalGroup();
-                            chars = 0;
-                        }
+                        focusNames.add(nl).left().row();
                     }
-                    if (chars > 0)
-                        focusNames.add(currGroup).left();
                 } else {
                     focusNames.add(new OwnLabel("-", skin));
                 }

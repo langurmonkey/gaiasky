@@ -131,23 +131,7 @@ vec3 sphericalToCartesian(float phi, float theta) {
             sin(phi));
 }
 
-void main() {
-    // Sample point on sphere surface.
-    vec2 xy = v_texCoords * u_viewport;
-    float phiStep = gln_PI / (u_viewport.y - 1);
-    float phi = (-gln_PI / 2.0) + xy.y * phiStep;
-    float thetaStep = gln_PI * 2.0 / u_viewport.x;
-    float theta = xy.x * thetaStep;
-    vec3 p = sphericalToCartesian(phi, theta);
-
-    float baseLevel = u_baseLevel;
-
-    ///
-    /// BIOME GEN (elevation, moisture, temperature)
-    ///
-    fragBiome = vec4(0.0, 0.0, 0.0, 1.0);
-
-    // Elevation (channel 1)
+vec2 computeElevation(vec3 p, float baseLevel) {
     float elevation_noise = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
         elevation_noise = smoothstep(0.0, 1.0, elevation_noise);
@@ -161,6 +145,30 @@ void main() {
     } else {
         elevation = max(baseLevel, elevation_noise);
     }
+    return vec2(elevation, baseLevel);
+}
+
+void main() {
+    // Sample point on sphere surface.
+    vec2 xy = v_texCoords * u_viewport;
+    float dPhi = gln_PI / (u_viewport.y - 1);
+    float phi = (-gln_PI / 2.0) + xy.y * dPhi;
+    float dTheta = gln_PI * 2.0 / u_viewport.x;
+    float theta = xy.x * dTheta;
+    vec3 p = sphericalToCartesian(phi, theta);
+
+    float baseLevel = u_baseLevel;
+
+    ///
+    /// BIOME GEN (elevation, moisture, temperature)
+    ///
+    fragBiome = vec4(0.0, 0.0, 0.0, 1.0);
+
+    // Elevation (channel 1)
+    vec2 elv = computeElevation(p, u_baseLevel);
+    float elevation = elv.x;
+    baseLevel = elv.y;
+    float waterMask = step(baseLevel, elevation);
     fragBiome.r = elevation;
 
     // Moisture (channel 2)
@@ -181,6 +189,8 @@ void main() {
         fragBiome.b = temperature;
     }
 
+
+
     ///
     /// TEXTURE GEN (diffuse, specular, normal, emission)
     ///
@@ -195,29 +205,21 @@ void main() {
     float snowFac = smoothstep(0.9, 0.99, luma(fragDiffuse.rgb));
     fragSpecular = vec4(vec3(waterFac + snowFac), 1.0);
 
-    // Normal
+
+    // Normal map
     #ifdef normalMapFlag
-    float normalScale = 4.0;
+    // Compute slope from finite differences
+    vec3 pThetaPlus = sphericalToCartesian(phi, theta + dTheta);
+    vec3 pPhiPlus = sphericalToCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
 
-    // Use the same angular step as the pixel grid so slope estimates
-    // stay consistent with texel density instead of an arbitrary epsilon.
-    float dPhi = phiStep;
-    float dTheta = thetaStep;
+    float elevTheta = computeElevation(pThetaPlus, u_baseLevel).x;
+    float elevPhi = computeElevation(pPhiPlus, u_baseLevel).x;
 
-    vec3 pThetaPlus = sphericaltoCartesian(phi, theta + dTheta);
-    vec3 pPhiPlus = sphericaltoCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
+    float dx = (elevTheta - elevation) / dTheta;
+    float dy = (elevPhi - elevation) / dPhi;
 
-    float elevTheta = noise(pThetaPlus, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
-    float elevPhi = noise(pPhiPlus, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
-    if (u_smoothing) {
-        elevTheta = smoothstep(0.0, 1.0, elevTheta);
-        elevPhi = smoothstep(0.0, 1.0, elevPhi);
-    }
-
-    float dx = (elevTheta - elevation_original) / dTheta * normalScale;
-    float dy = (elevPhi - elevation_original) / dPhi * normalScale;
-    float dz = 1.0;
-    vec3 normal = normalize(vec3(-dx, -dy, dz));
+    float normalScale = 0.004;
+    vec3 normal = normalize(vec3(-dx * normalScale * waterMask, -dy * normalScale * waterMask, 1.0));
     fragNormal = vec4(normal.x * 0.5 + 0.5, normal.y * 0.5 + 0.5, normal.z, 1.0);
     #endif // normalMapFlag
 
@@ -227,7 +229,7 @@ void main() {
     emi = emi * smoothstep(0.55, 0.9, emi) * 2.0;
     emi = emi * noise(p + vec3(0.1, -0.1, 0.3), VORONOI, 1.6, true, true, vec3(14.0), 1, u_seed);
     // Not on water!
-    emi = emi * step(baseLevel, elevation_noise);
+    emi = emi * waterMask;
     float r = gln_rand(xy + emi) * 0.2 + 0.8;
     float g = gln_rand(xy + emi) * 0.2 + 0.7;
     float b = gln_rand(xy + emi) * 0.2 + 0.5;
