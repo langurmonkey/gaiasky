@@ -370,6 +370,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                     if (model != null
                             && model.model != null
                             && model.model.mtc != null
+                            && model.model.mtc.getMaterial() != null
                             && GaiaSky.instance.sceneRenderer.visible.get(ComponentTypes.ComponentType.Clouds.ordinal())) {
                         // Add occlusion clouds attributes.
                         model.model.mtc.getMaterial().remove(OcclusionCloudsAttribute.Type);

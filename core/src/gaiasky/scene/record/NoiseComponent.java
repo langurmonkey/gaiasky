@@ -24,7 +24,7 @@ public final class NoiseComponent extends NamedComponent {
     public double[] scale = new double[]{1.0, 1.0, 1.0};
     public int octaves = 4;
     public double persistence = 0.5;
-    public double frequency = 2.34;
+    public double frequency = 1.0;
     public double lacunarity = 2.0;
     public NoiseType type = NoiseType.SIMPLEX;
     public float seed = 0f;

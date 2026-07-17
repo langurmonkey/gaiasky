@@ -57,7 +57,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
     private AtmosphereComponent initAc, ac;
     private float fieldWidth, fieldWidthAll, fieldWidthTotal, textWidth, scrollPaneHeight;
     private boolean updateTabSelected = true;
-    private OwnSliderPlus hueShift;
+    private OwnSliderReset hueShift;
     private Texture currentLutTexture;
     private Cell<?> lutImageCell;
     private OwnTextButton genCloudsButton, genSurfaceButton;
@@ -227,7 +227,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         tabs.setChecked(((TextButton) tabs.getButtons().get(selectedTab)).getText().toString());
 
         // Randomize button
-        OwnTextButton randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin, "random", "big");
+        var randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin, "random", "big");
         randomize.setColor(ColorUtils.gYellowC);
         randomize.addListener(new ChangeListener() {
             @Override
@@ -241,11 +241,11 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         content.add(randomize).center().padBottom(pad34).row();
 
         // Resolution
-        OwnSliderPlus pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"),
-                                                       Constants.PG_RESOLUTION_MIN,
-                                                       Constants.PG_RESOLUTION_MAX,
-                                                       1,
-                                                       skin);
+        var pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"),
+                                             Constants.PG_RESOLUTION_MIN,
+                                             Constants.PG_RESOLUTION_MAX,
+                                             1,
+                                             skin);
         pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
         pgResolution.setWidth(fieldWidthTotal + 50f);
         pgResolution.setValue(GaiaSky.settings().graphics.proceduralGenerationResolution[1]);
@@ -720,7 +720,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(scaleTooltip).left().padBottom(pad18).row();
 
         // Base level.
-        OwnSliderPlus waterLevel = new OwnSliderPlus(I18n.msg("gui.procedural.base" + suffix), 0.0f, 1.0f, 0.01f, skin);
+        var waterLevel = new OwnSliderReset(I18n.msg("gui.procedural.base" + suffix), 0.0f, 1.0f, 0.01f, 0.2f, skin);
         waterLevel.setWidth(fieldWidthNoise);
         waterLevel.setValue(nc.baseLevel);
         waterLevel.addListener(new ChangeListener() {
@@ -736,7 +736,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(waterLevelTooltip).left().padBottom(pad18).row();
 
         // Remap.
-        OwnCheckBox remap = new OwnCheckBox(I18n.msg("gui.procedural.remap"), skin, pad10);
+        var remap = new OwnCheckBox(I18n.msg("gui.procedural.remap"), skin, pad10);
         remap.setChecked(nc.remap);
         remap.addListener(
                 new ChangeListener() {
@@ -754,7 +754,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(remapTooltip).left().padBottom(pad18).row();
 
         // Octaves (recursive detail).
-        OwnSliderPlus octaves = new OwnSliderPlus(I18n.msg("gui.procedural.octaves"), 1, 8, 1, skin);
+        var octaves = new OwnSliderReset(I18n.msg("gui.procedural.octaves"), 1, 8, 1, clouds ? 6 : 5, skin);
         octaves.setWidth(fieldWidthNoise);
         octaves.setValue(nc.octaves);
         octaves.addListener(new ChangeListener() {
@@ -770,7 +770,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(octavesTooltip).left().padBottom(pad18).row();
 
         // Frequency (continent fragmentation).
-        OwnSliderPlus frequency = new OwnSliderPlus(I18n.msg("gui.procedural.frequency" + suffix), 0.01f, 1.0f, 0.01f, skin);
+        var frequency = new OwnSliderReset(I18n.msg("gui.procedural.frequency" + suffix), 0.01f, 1.0f, 0.01f, 1.0f, skin);
         frequency.setWidth(fieldWidthNoise);
         frequency.setValue((float) nc.frequency);
         frequency.addListener(new ChangeListener() {
@@ -786,7 +786,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(frequencyTooltip).left().padBottom(pad18).row();
 
         // Lacunarity (subdivision rate).
-        OwnSliderPlus lacunarity = new OwnSliderPlus(I18n.msg("gui.procedural.lacunarity"), 0.1f, 5.0f, 0.1f, skin);
+        var lacunarity = new OwnSliderReset(I18n.msg("gui.procedural.lacunarity"), 0.1f, 5.0f, 0.1f, 2.0f, skin);
         lacunarity.setWidth(fieldWidthNoise);
         lacunarity.setValue((float) nc.lacunarity);
         lacunarity.addListener(new ChangeListener() {
@@ -802,7 +802,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(lacunarityTooltip).left().padBottom(pad18).row();
 
         // Persistence (elevation coarseness).
-        OwnSliderPlus persistence = new OwnSliderPlus(I18n.msg("gui.procedural.persistence" + suffix), 0.01f, 0.9f, 0.01f, skin);
+        var persistence = new OwnSliderReset(I18n.msg("gui.procedural.persistence" + suffix), 0.01f, 0.9f, 0.01f, 0.5f, skin);
         persistence.setWidth(fieldWidthNoise);
         persistence.setValue((float) nc.persistence);
         persistence.addListener(new ChangeListener() {
@@ -819,7 +819,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
         if (!clouds) {
             // Plains.
-            OwnSliderPlus plainsHeight = new OwnSliderPlus(I18n.msg("gui.procedural.plains.height"), 0.01f, 0.8f, 0.01f, skin);
+            var plainsHeight = new OwnSliderReset(I18n.msg("gui.procedural.plains.height"), 0.01f, 0.8f, 0.01f, 0.1f, skin);
             plainsHeight.setWidth(fieldWidthNoise / 2f - pad10 * 1.1f);
             plainsHeight.setValue(nc.plainsHeight);
             plainsHeight.addListener(new ChangeListener() {
@@ -829,7 +829,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     nc.plainsHeight = plainsHeight.getMappedValue();
                 }
             });
-            OwnSliderPlus plainsSlope = new OwnSliderPlus(I18n.msg("gui.procedural.plains.slope"), 0.05f, 0.5f, 0.01f, skin);
+            var plainsSlope = new OwnSliderReset(I18n.msg("gui.procedural.plains.slope"), 0.05f, 0.5f, 0.01f, 0.2f, skin);
             plainsSlope.setWidth(fieldWidthNoise / 2f - pad10 * 1.1f);
             plainsSlope.setValue(nc.plainsSlope);
             plainsSlope.addListener(new ChangeListener() {
@@ -853,9 +853,9 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         }
 
         // Smoothing, turbulence, and ridge.
-        OwnCheckBox smoothing = new OwnCheckBox(I18n.msg("gui.procedural.smoothing"), skin, pad10);
-        OwnCheckBox turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
-        OwnCheckBox ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
+        var smoothing = new OwnCheckBox(I18n.msg("gui.procedural.smoothing"), skin, pad10);
+        var turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
+        var ridge = new OwnCheckBox(I18n.msg("gui.procedural.ridge"), skin, pad10);
 
         // Smoothing.
         smoothing.setChecked(nc.smoothing);
@@ -868,7 +868,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     }
                 }
         );
-        OwnImageButton smoothingTooltip = new OwnImageButton(skin, "tooltip");
+        var smoothingTooltip = new OwnImageButton(skin, "tooltip");
         smoothingTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.smoothing"), skin));
 
         noiseTable.add(smoothing).colspan(2).left().padBottom(pad18).padRight(pad10);
@@ -892,7 +892,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     }
                 }
         );
-        OwnImageButton turbulenceTooltip = new OwnImageButton(skin, "tooltip");
+        var turbulenceTooltip = new OwnImageButton(skin, "tooltip");
         turbulenceTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.turbulence"), skin));
 
         noiseTable.add(turbulence).colspan(2).left().padBottom(pad18).padRight(pad10);
@@ -915,7 +915,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     }
                 }
         );
-        OwnImageButton ridgeTooltip = new OwnImageButton(skin, "tooltip");
+        var ridgeTooltip = new OwnImageButton(skin, "tooltip");
         ridgeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.ridge"), skin));
 
         noiseTable.add(ridge).colspan(2).left().padBottom(pad18).padRight(pad10);
@@ -1015,9 +1015,10 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 }
             });
 
-            OwnLabel lookUpTablesLabel = new OwnLabel(I18n.msg("gui.procedural.lut"), skin);
+            var lookUpTablesLabel = new OwnLabel(I18n.msg("gui.procedural.lut"), skin);
             lookUpTablesLabel.setWidth(textWidth);
-            OwnImageButton lutTooltip = new OwnImageButton(skin, "tooltip");
+
+            var lutTooltip = new OwnImageButton(skin, "tooltip");
             lutTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.lut"), skin));
             scrollContent.add(lookUpTablesLabel).left().padBottom(pad18).padRight(pad18);
             scrollContent.add(lookUpTablesBox).left().padBottom(pad18).padRight(pad10);
@@ -1026,7 +1027,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             lutImageCell.colspan(3).padBottom(pad18).row();
 
             // Hue shift
-            hueShift = new OwnSliderPlus(I18n.msg("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, skin);
+            hueShift = new OwnSliderReset(I18n.msg("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, 0.0f, skin);
             hueShift.setWidth(fieldWidthTotal);
             hueShift.setValueSuffix("°");
             hueShift.setValue(mtc.biomeHueShift);
@@ -1038,7 +1039,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     updateLutImage(lookUpTables);
                 }
             });
-            OwnImageButton hueShiftTooltip = new OwnImageButton(skin, "tooltip");
+            var hueShiftTooltip = new OwnImageButton(skin, "tooltip");
             hueShiftTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.hueshift"), skin));
             scrollContent.add(hueShift).colspan(2).left().padBottom(pad18).padRight(pad10);
             scrollContent.add(hueShiftTooltip).left().padBottom(pad18).row();
@@ -1047,7 +1048,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             updateLutImage(lookUpTables);
 
             // Height scale
-            OwnSliderPlus heightScale = new OwnSliderPlus(I18n.msg("gui.procedural.heightscale"), 1.0f, 100.0f, 0.1f, skin);
+            var heightScale = new OwnSliderReset(I18n.msg("gui.procedural.heightscale"), 1.0f, 100.0f, 0.1f, 10f, skin);
             heightScale.setWidth(fieldWidthTotal);
             heightScale.setValueSuffix(" km");
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
@@ -1058,13 +1059,13 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     mtc.heightScale = (float) (heightScale.getMappedValue() * Constants.KM_TO_U);
                 }
             });
-            OwnImageButton heightScaleTooltip = new OwnImageButton(skin, "tooltip");
+            var heightScaleTooltip = new OwnImageButton(skin, "tooltip");
             heightScaleTooltip.setTooltip(I18n.msg("gui.procedural.info.heightscale"));
             scrollContent.add(heightScale).colspan(2).left().padBottom(pad18).padRight(pad10);
             scrollContent.add(heightScaleTooltip).left().padBottom(pad18).row();
 
             // Latitude influence
-            OwnSliderPlus latitudeInfluence = new OwnSliderPlus(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.05f, skin);
+            var latitudeInfluence = new OwnSliderReset(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.05f, 0.8f, skin);
             latitudeInfluence.setWidth(fieldWidthTotal);
             latitudeInfluence.setValue(mtc.nc.latitudeInfluence);
             latitudeInfluence.addListener(new ChangeListener() {
@@ -1074,13 +1075,13 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                     mtc.nc.latitudeInfluence = latitudeInfluence.getValue();
                 }
             });
-            OwnImageButton latitudeTooltip = new OwnImageButton(skin, "tooltip");
+            var latitudeTooltip = new OwnImageButton(skin, "tooltip");
             latitudeTooltip.setTooltip(I18n.msg("gui.procedural.info.latitude_influence"));
             scrollContent.add(latitudeInfluence).colspan(2).left().padBottom(pad18).padRight(pad10);
             scrollContent.add(latitudeTooltip).left().padBottom(pad18).row();
 
             // Generate emission.
-            OwnCheckBox emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
+            var emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
             emission.setChecked(mtc.nc.genEmissiveMap);
             emission.addListener(new ChangeListener() {
                 @Override
@@ -1136,7 +1137,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         Table scrollContent = new Table(skin);
 
         // Cloud color
-        ColorPicker cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
+        var cloudColor = new ColorPicker(new float[]{clc.color[0], clc.color[1], clc.color[2], clc.color[3]}, stage, skin);
         cloudColor.setSize(128f, 128f);
         cloudColor.setNewColorRunnable(() -> {
             float[] col = cloudColor.getPickedColorArray();
@@ -1146,11 +1147,11 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             clc.color[3] = col[3];
         });
 
-        OwnLabel cloudColorLabel = new OwnLabel(I18n.msg("gui.procedural.cloudcolor"), skin);
+        var cloudColorLabel = new OwnLabel(I18n.msg("gui.procedural.cloudcolor"), skin);
         cloudColorLabel.setWidth(textWidth + 112f);
-        OwnImageButton cloudColorTooltip = new OwnImageButton(skin, "tooltip");
+        var cloudColorTooltip = new OwnImageButton(skin, "tooltip");
         cloudColorTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.cloudcolor"), skin));
-        Table cloudGroup = new Table(skin);
+        var cloudGroup = new Table(skin);
         cloudGroup.add(cloudColorLabel).padRight(pad18).padBottom(pad18);
         cloudGroup.add(cloudColor).padRight(535f).padBottom(pad18);
         cloudGroup.add(cloudColorTooltip).right().padBottom(pad18).row();
@@ -1196,7 +1197,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         addGenButton(content, "gui.procedural.atmosphere", this::generateAtmosphere, 3);
 
         // Wavelengths
-        OwnSliderPlus wavelength0 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "0"), 0.4f, 1.0f, 0.01f, skin);
+        var wavelength0 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "0"), 0.4f, 1.0f, 0.01f, skin);
         wavelength0.setWidth(fieldWidthTotal / 3f - pad10 * 1.3f);
         wavelength0.setValue((float) ac.wavelengths[0]);
         wavelength0.addListener(new ChangeListener() {
@@ -1206,7 +1207,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.wavelengths[0] = wavelength0.getMappedValue();
             }
         });
-        OwnSliderPlus wavelength1 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "1"), 0.4f, 1.0f, 0.01f, skin);
+        var wavelength1 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "1"), 0.4f, 1.0f, 0.01f, skin);
         wavelength1.setWidth(fieldWidthTotal / 3f - pad10 * 1.3f);
         wavelength1.setValue((float) ac.wavelengths[1]);
         wavelength1.addListener(new ChangeListener() {
@@ -1216,7 +1217,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.wavelengths[1] = wavelength1.getMappedValue();
             }
         });
-        OwnSliderPlus wavelength2 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "2"), 0.4f, 1.0f, 0.01f, skin);
+        var wavelength2 = new OwnSliderPlus(I18n.msg("gui.procedural.wavelength", "2"), 0.4f, 1.0f, 0.01f, skin);
         wavelength2.setWidth(fieldWidthTotal / 3f - pad10 * 1.3f);
         wavelength2.setValue((float) ac.wavelengths[2]);
         wavelength2.addListener(new ChangeListener() {
@@ -1227,18 +1228,18 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             }
         });
 
-        HorizontalGroup wavelengthGroup = new HorizontalGroup();
+        var wavelengthGroup = new HorizontalGroup();
         wavelengthGroup.space(pad10 * 2f);
         wavelengthGroup.addActor(wavelength0);
         wavelengthGroup.addActor(wavelength1);
         wavelengthGroup.addActor(wavelength2);
-        OwnImageButton wavelengthTooltip = new OwnImageButton(skin, "tooltip");
+        var wavelengthTooltip = new OwnImageButton(skin, "tooltip");
         wavelengthTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.wavelength"), skin));
         content.add(wavelengthGroup).left().padBottom(pad18).padRight(pad10);
         content.add(wavelengthTooltip).left().padBottom(pad18).row();
 
         // eSun
-        OwnSliderPlus eSun = new OwnSliderPlus(I18n.msg("gui.procedural.esun"), -1.0f, 30.0f, 0.1f, skin);
+        var eSun = new OwnSliderReset(I18n.msg("gui.procedural.esun"), -1.0f, 30.0f, 0.1f, 12f, skin);
         eSun.setWidth(fieldWidthTotal);
         eSun.setValue(ac.m_eSun);
         eSun.addListener(new ChangeListener() {
@@ -1248,14 +1249,14 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.m_eSun = eSun.getMappedValue();
             }
         });
-        OwnImageButton esunTooltip = new OwnImageButton(skin, "tooltip");
+        var esunTooltip = new OwnImageButton(skin, "tooltip");
         esunTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.esun"), skin));
         content.add(eSun).left().padBottom(pad18).padRight(pad10);
         content.add(esunTooltip).left().padBottom(pad18).row();
 
         DecimalFormat nf = new DecimalFormat("#0.0000##");
         // Kr
-        OwnSliderPlus kr = new OwnSliderPlus(I18n.msg("gui.procedural.kr"), 0.0f, 0.03f, 0.0001f, skin);
+        var kr = new OwnSliderReset(I18n.msg("gui.procedural.kr"), 0.0f, 0.03f, 0.0001f, 0.0041f, skin);
         kr.setWidth(fieldWidthTotal);
         kr.setNumberFormatter(nf);
         kr.setValue(ac.m_Kr);
@@ -1266,13 +1267,13 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.m_Kr = kr.getMappedValue();
             }
         });
-        OwnImageButton krTooltip = new OwnImageButton(skin, "tooltip");
+        var krTooltip = new OwnImageButton(skin, "tooltip");
         krTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.kr"), skin));
         content.add(kr).left().padBottom(pad18).padRight(pad10);
         content.add(krTooltip).left().padBottom(pad18).row();
 
         // Kr
-        OwnSliderPlus km = new OwnSliderPlus(I18n.msg("gui.procedural.km"), 0.0f, 0.01f, 0.0001f, skin);
+        var km = new OwnSliderReset(I18n.msg("gui.procedural.km"), 0.0f, 0.01f, 0.0001f, 0.001f, skin);
         km.setWidth(fieldWidthTotal);
         km.setNumberFormatter(nf);
         km.setValue(ac.m_Km);
@@ -1283,13 +1284,13 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.m_Km = km.getMappedValue();
             }
         });
-        OwnImageButton kmTooltip = new OwnImageButton(skin, "tooltip");
+        var kmTooltip = new OwnImageButton(skin, "tooltip");
         kmTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.km"), skin));
         content.add(km).left().padBottom(pad18).padRight(pad10);
         content.add(kmTooltip).left().padBottom(pad18).row();
 
         // O3 optical depth
-        OwnSliderPlus o3 = new OwnSliderPlus(I18n.msg("gui.procedural.o3depth"), 0.0f, 0.3f, 0.001f, skin);
+        var o3 = new OwnSliderReset(I18n.msg("gui.procedural.o3depth"), 0.0f, 0.3f, 0.001f, 0.025f, skin);
         o3.setWidth(fieldWidthTotal);
         o3.setNumberFormatter(nf);
         o3.setValue(ac.o3OpticalDepth);
@@ -1300,16 +1301,18 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.o3OpticalDepth = o3.getMappedValue();
             }
         });
-        OwnImageButton o3Tooltip = new OwnImageButton(skin, "tooltip");
+        var o3Tooltip = new OwnImageButton(skin, "tooltip");
         o3Tooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.o3depth"), skin));
         content.add(o3).left().padBottom(pad18).padRight(pad10);
         content.add(o3Tooltip).left().padBottom(pad18).row();
 
         // Fog density
-        OwnSliderPlus fogDensity = new OwnSliderPlus(I18n.msg("gui.procedural.fogdensity"),
-                                                     Constants.MIN_ATM_FOG_DENSITY,
-                                                     Constants.MAX_ATM_FOG_DENSITY,
-                                                     Constants.SLIDER_STEP_TINY, skin);
+        var fogDensity = new OwnSliderReset(I18n.msg("gui.procedural.fogdensity"),
+                                            Constants.MIN_ATM_FOG_DENSITY,
+                                            Constants.MAX_ATM_FOG_DENSITY,
+                                            Constants.SLIDER_STEP_TINY,
+                                            0.3f,
+                                            skin);
         fogDensity.setWidth(fieldWidthTotal);
         fogDensity.setValue(ac.fogDensity);
         fogDensity.addListener(new ChangeListener() {
@@ -1319,13 +1322,13 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.fogDensity = fogDensity.getMappedValue();
             }
         });
-        OwnImageButton fogDensityTooltip = new OwnImageButton(skin, "tooltip");
+        var fogDensityTooltip = new OwnImageButton(skin, "tooltip");
         fogDensityTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.fogdensity"), skin));
         content.add(fogDensity).left().padBottom(pad18).padRight(pad10);
         content.add(fogDensityTooltip).left().padBottom(pad18).row();
 
         // Num samples
-        OwnSliderPlus samples = new OwnSliderPlus(I18n.msg("gui.procedural.samples"), 3, 15, 1, skin);
+        var samples = new OwnSliderReset(I18n.msg("gui.procedural.samples"), 3, 15, 1, 10, skin);
         samples.setWidth(fieldWidthTotal);
         samples.setValue(ac.samples);
         samples.addListener(new ChangeListener() {
@@ -1335,24 +1338,24 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 ac.samples = (int) samples.getValue();
             }
         });
-        OwnImageButton samplesTooltip = new OwnImageButton(skin, "tooltip");
+        var samplesTooltip = new OwnImageButton(skin, "tooltip");
         samplesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.samples"), skin));
         content.add(samples).left().padBottom(pad18).padRight(pad10);
         content.add(samplesTooltip).left().padBottom(pad18).row();
 
         // Fog color
-        ColorPicker fogColor = new ColorPicker(new float[]{ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f}, stage, skin);
+        var fogColor = new ColorPicker(new float[]{ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f}, stage, skin);
         fogColor.setNewColorRunnable(() -> {
             float[] col = fogColor.getPickedColorArray();
             ac.fogColor.x = col[0];
             ac.fogColor.y = col[1];
             ac.fogColor.z = col[2];
         });
-        OwnLabel fogColorLabel = new OwnLabel(I18n.msg("gui.procedural.fogcolor"), skin);
+        var fogColorLabel = new OwnLabel(I18n.msg("gui.procedural.fogcolor"), skin);
         fogColorLabel.setWidth(textWidth);
-        OwnImageButton fogColorTooltip = new OwnImageButton(skin, "tooltip");
+        var fogColorTooltip = new OwnImageButton(skin, "tooltip");
         fogColorTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.fogcolor"), skin));
-        HorizontalGroup fogColorGroup = new HorizontalGroup();
+        var fogColorGroup = new HorizontalGroup();
         fogColorGroup.space(pad18);
         fogColorGroup.addActor(fogColorLabel);
         fogColorGroup.addActor(fogColor);
