@@ -1192,12 +1192,15 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         MaterialComponent mtc = new MaterialComponent();
         // Randomize material.
         Random rnd = new Random(seed);
-        switch (rnd.nextInt(5)) {
+        switch (rnd.nextInt(23)) {
             case 0 -> mtc.randomizeAll(seed);
-            case 1 -> mtc.randomizeEarthLike(seed);
-            case 2 -> mtc.randomizeFrozenPlanet(seed);
-            case 3 -> mtc.randomizeRockyPlanet(seed);
-            case 4 -> mtc.randomizeGasGiant(seed);
+            case 1,2,3,4,5 -> mtc.randomizeEarthLike(seed);
+            case 6,7,8 -> mtc.randomizeFrozenPlanet(seed);
+            case 9,10,11 -> mtc.randomizeDesert(seed);
+            case 12,13,14 -> mtc.randomizeRockyPlanet(seed);
+            case 15,16 -> mtc.randomizeGasGiant(seed);
+            case 17,18,19 -> mtc.randomizeTropical(seed);
+            case 20,21,22 -> mtc.randomizeLava(seed);
         }
 
         // Set to model
