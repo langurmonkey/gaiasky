@@ -136,6 +136,7 @@ public class IndexNameConflictsWindow extends GenericDialog {
             c.setColor(ColorUtils.gYellowC);
             c.setTooltip(I18n.msg("gui.conflicts.tooltip.dataset") + ": " + ci.name);
             var i = new OwnImage(skin.getDrawable("cubemap-icon"));
+            i.setSize(30f, 30f);
             et.add(i).padRight(3f);
         } else {
             // Use parent.
@@ -143,13 +144,14 @@ public class IndexNameConflictsWindow extends GenericDialog {
             c.setColor(ColorUtils.gGreenC);
             c.setTooltip(I18n.msg("gui.conflicts.tooltip.parent") + ": " + parent);
             var i = new OwnImage(skin.getDrawable("iconic-fork"));
+            i.setSize(30f, 30f);
             i.setOrigin(Align.center);
             i.setRotation(180);
             et.add(i).padRight(3f);
         }
         et.add(c).left();
 
-        t.add(et).left().padRight(pad10).padBottom(pad10 / 2f);
+        t.add(et).minWidth(350f).left().padRight(pad10).padBottom(pad10 / 2f);
 
 
     }
