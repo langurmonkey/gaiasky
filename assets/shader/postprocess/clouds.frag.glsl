@@ -3,12 +3,6 @@
 #version 330 core
 precision highp float;
 
-#include <shader/lib/luma.glsl>
-#include <shader/lib/noise/common.glsl>
-#include <shader/lib/noise/simplex.glsl>
-#include <shader/lib/noise/perlin.glsl>
-#include <shader/lib/noise/voronoi.glsl>
-
 // Blank texture.
 uniform sampler2D u_texture0;
 
@@ -60,6 +54,7 @@ layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 emissionColor;
 #endif // extraTarget
 
+#include <shader/lib/luma.glsl>
 #include <shader/lib/procgen/procgen.glsl>
 
 void main() {

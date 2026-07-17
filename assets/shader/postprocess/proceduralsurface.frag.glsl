@@ -5,13 +5,6 @@
 #version 330 core
 precision highp float;
 
-#include <shader/lib/colors.glsl>
-#include <shader/lib/luma.glsl>
-#include <shader/lib/noise/common.glsl>
-#include <shader/lib/noise/simplex.glsl>
-#include <shader/lib/noise/perlin.glsl>
-#include <shader/lib/noise/voronoi.glsl>
-
 // LUT texture
 uniform sampler3D u_texture1;
 // LUT hue shift.
@@ -66,6 +59,9 @@ layout (location = 3) out vec4 fragEmission;
 layout (location = 4) out vec4 fragNormal;
 #endif // normalMapFlag
 
+#include <shader/lib/colors.glsl>
+#include <shader/lib/luma.glsl>
+
 #include <shader/lib/procgen/procgen.glsl>
 
 vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLevel) {
@@ -98,6 +94,16 @@ void main() {
     float theta = xy.x * dTheta;
     vec3 p = sphericalToCartesian(phi, theta);
 
+    // Warping.
+    vec3 warp = vec3(0.0);
+    float warpStrength = 0.0;
+    if (warpStrength > 0.001) {
+        float warpFreq = 4.0;
+        warp.x = noise(p, SIMPLEX, warpFreq, false, false, vec3(1.0), 1, u_seed + 0.32) * warpStrength;
+        warp.y = noise(p, SIMPLEX, warpFreq, false, false, vec3(1.0), 1, u_seed + 0.121) * warpStrength;
+        warp.z = noise(p, SIMPLEX, warpFreq, false, false, vec3(1.0), 1, u_seed - 0.421) * warpStrength;
+    }
+
     float baseLevel = u_baseLevel;
 
     ///
@@ -106,7 +112,7 @@ void main() {
     fragBiome = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Elevation (channel 1)
-    vec2 elv = computeElevation(p, u_baseLevel);
+    vec2 elv = computeElevation(p + warp, u_baseLevel);
     float elevation = elv.x;
     baseLevel = elv.y;
     float waterMask = step(baseLevel + EPSILON, elevation);
@@ -115,7 +121,7 @@ void main() {
     // Moisture (channel 2)
     float moisture = 0.0;
     if (u_channels >= 2) {
-        moisture = noise(p + vec3(0.1, -0.4, 0.2), SIMPLEX, 0.5, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
+        moisture = noise(p - warp, SIMPLEX, 0.5, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
         fragBiome.g = moisture;
     }
 

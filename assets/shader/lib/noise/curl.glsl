@@ -127,33 +127,3 @@ float gln_curl(vec3 p) {
     return luma(normalize(vec3(x, y, z) * divisor));
     //return acos(dot(normalize(vec3( x , y , z ) * divisor), vec3(1.0, 0.0, 0.0))) / gln_PI;
 }
-
-/**
- * Generates 3D Fractional Brownian motion (fBm) from Curl Noise.
- *
- * @name gln_pfbm
- * @function
- * @param {vec3} p               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Perlin Noise.
- * @return {float}               Value of fBm at point "p".
- */
-float gln_cfbm(vec3 p, gln_tFBMOpts opts) {
-    p += (opts.seed * 100.0);
-    float result = 0.0;
-    float amplitude = 1.0;
-    float frequency = opts.frequency;
-    float maximum = amplitude;
-
-    for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-        if (i >= opts.octaves)
-        break;
-
-        vec3 p = p * frequency * opts.scale;
-
-        float noiseVal = gln_curl(p);
-
-        #include <shader/lib/noise/fbm.glsl>
-    }
-
-    #include <shader/lib/noise/fbm_end.glsl>
-}

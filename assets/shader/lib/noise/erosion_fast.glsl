@@ -164,36 +164,3 @@ vec3 erosion12(vec2 p) {
 float gln_erosion(vec2 p) {
     return erosion12(p).x;
 }
-
-/**
- * Fast fBm using the fade-approach erosion noise. Same signature/usage
- * pattern as your original gln_efbm.
- */
-float gln_efbm(vec2 p, gln_tFBMOpts opts) {
-    float result = 0.0;
-    float amplitude = 1.0;
-    float frequency = opts.frequency;
-    float maximum = amplitude;
-
-    for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-        if (i >= opts.octaves) break;
-
-        vec2 pp = p * frequency * opts.scale.xy;
-        float noiseVal = gln_erosion(pp);
-
-        if (opts.turbulence && !opts.ridge) {
-            result += abs(noiseVal) * amplitude;
-        } else if (opts.ridge) {
-            noiseVal = pow(1.0 - abs(noiseVal), 2.0);
-            result += noiseVal * amplitude;
-        } else {
-            result += noiseVal * amplitude;
-        }
-
-        frequency *= opts.lacunarity;
-        amplitude *= opts.persistence;
-        maximum += amplitude;
-    }
-
-    #include <shader/lib/noise/fbm_end.glsl>
-}

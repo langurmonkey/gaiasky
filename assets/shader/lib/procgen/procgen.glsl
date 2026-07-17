@@ -1,10 +1,11 @@
 #ifndef GLSL_LIB_PROCGEN
 #define GLSL_LIB_PROCGEN
 
-// Noise types
-#define PERLIN 0
-#define SIMPLEX 1
-#define VORONOI 2
+#include <shader/lib/noise/common.glsl>
+#include <shader/lib/noise/simplex.glsl>
+#include <shader/lib/noise/perlin.glsl>
+#include <shader/lib/noise/voronoi.glsl>
+#include <shader/lib/noise/fbm.glsl>
 
 float noise(vec3 p,
         int type,
@@ -17,23 +18,14 @@ float noise(vec3 p,
     // Fill up opts.
     gln_tFBMOpts opts = gln_tFBMOpts(seed,
             u_persistence,
-            u_frequency,
+            frequency,
             u_lacunarity,
             scale,
             octaves,
             turbulence,
             ridge);
 
-    float value = 0.0;
-    if (type == PERLIN) {
-        value = gln_pfbm(p, opts);
-    } else if (type == SIMPLEX) {
-        value = gln_sfbm(p, opts);
-    } else if (type == VORONOI) {
-        value = gln_vfbm(p, opts);
-    }
-
-    return value;
+    return gln_fbm(p, opts, type);
 }
 
 // Converts spherical coordinates to a cartesian point in 3D (radius 1).

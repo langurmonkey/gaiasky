@@ -80,33 +80,3 @@ float gln_simplex(vec3 v) {
   return 42.0 *
          dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
-
-/**
- * Generates 3D Fractional Brownian motion (fBm) from Simplex Noise.
- *
- * @name gln_sfbm
- * @function
- * @param {vec3} v               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Simplex Noise.
- * @return {float}               Value of fBm at point "p".
- */
-float gln_sfbm(vec3 v, gln_tFBMOpts opts) {
-  v += (opts.seed * 100.0);
-  float result = 0.0;
-  float amplitude = 1.0;
-  float frequency = opts.frequency;
-  float maximum = amplitude;
-
-  for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-    if (i >= opts.octaves)
-      break;
-
-    vec3 p = v * frequency * opts.scale;
-
-    float noiseVal = gln_simplex(p);
-
-    #include <shader/lib/noise/fbm.glsl>
-  }
-
-  #include <shader/lib/noise/fbm_end.glsl>
-}

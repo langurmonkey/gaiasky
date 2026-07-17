@@ -41,35 +41,3 @@ float gln_voronoi(in vec3 point) {
 
   return pow(luma(clamp(vec3(sqrt(res), abs(id)), 0.0, 1.0)), 2.0);
 }
-
-/**
- * Generates Fractional Brownian motion (fBm) from 3D Voronoi noise.
- *
- * @name gln_vfbm
- * @function
- * @param {vec3} v               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Voronoi Noise.
- * @return {float}               Value of fBm at point "p".
- */
-float gln_vfbm(vec3 p, gln_tFBMOpts opts) {
-  p += (opts.seed * 100.0);
-  float result = 0.0;
-  float amplitude = 1.0;
-  float frequency = opts.frequency;
-  float maximum = amplitude;
-
-  for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-    if (i >= opts.octaves)
-    break;
-
-    vec3 p = p * frequency * opts.scale;
-
-    float noiseVal = gln_voronoi(p);
-
-    #include <shader/lib/noise/fbm.glsl>
-  }
-
-  // Voronoi is already in [0,1].
-  float value = result / maximum;
-  return value;
-}

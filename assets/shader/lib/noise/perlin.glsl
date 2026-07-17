@@ -83,33 +83,3 @@ float gln_perlin(vec3 P) {
   float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
   return 2.2 * n_xyz;
 }
-
-/**
- * Generates 3D Fractional Brownian motion (fBm) from Perlin Noise.
- *
- * @name gln_pfbm
- * @function
- * @param {vec3} p               Point to sample fBm at.
- * @param {gln_tFBMOpts} opts    Options for generating Perlin Noise.
- * @return {float}               Value of fBm at point "p".
- */
-float gln_pfbm(vec3 p, gln_tFBMOpts opts) {
-  p += (opts.seed * 100.0);
-  float result = 0.0;
-  float amplitude = 1.0;
-  float frequency = opts.frequency;
-  float maximum = amplitude;
-
-  for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
-    if (i >= opts.octaves)
-      break;
-
-    vec3 p = p * frequency * opts.scale;
-
-    float noiseVal = gln_perlin(p);
-
-    #include <shader/lib/noise/fbm.glsl>
-  }
-
-  #include <shader/lib/noise/fbm_end.glsl>
-}

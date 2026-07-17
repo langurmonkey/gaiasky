@@ -1,2 +1,3 @@
 gl-Noise project: https://github.com/FarazzShaikh/glNoise
 License: MIT
+Modified by: tsagrista
