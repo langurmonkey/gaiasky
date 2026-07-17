@@ -87,6 +87,8 @@ vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLe
     return hsv2rgb(hsv);
 }
 
+#define EPSILON 1.0 / 255.0
+
 void main() {
     // Sample point on sphere surface.
     vec2 xy = v_texCoords * u_viewport;
@@ -107,7 +109,7 @@ void main() {
     vec2 elv = computeElevation(p, u_baseLevel);
     float elevation = elv.x;
     baseLevel = elv.y;
-    float waterMask = step(baseLevel, elevation);
+    float waterMask = step(baseLevel + EPSILON, elevation);
     fragBiome.r = elevation;
 
     // Moisture (channel 2)
@@ -137,10 +139,8 @@ void main() {
     fragDiffuse = vec4(diffuse, 1.0);
 
     // Specular
-    float epsilon = 1.0 / 255.0;
-    float waterFac = 1.0 - smoothstep(baseLevel - 0.05, baseLevel, elevation);
-    float snowFac = smoothstep(0.9, 0.99, luma(fragDiffuse.rgb));
-    fragSpecular = vec4(vec3(waterFac + snowFac), 1.0);
+    float waterFac = 1.0 - waterMask;
+    fragSpecular = vec4(waterFac, waterFac, waterFac, 1.0);
 
 
     // Normal map
@@ -163,14 +163,21 @@ void main() {
     // Emission (procedural, from noise)
     #ifdef emissiveMapFlag
     float emi = noise(p, SIMPLEX, 0.16, false, false, vec3(8.0, 8.0, 8.0), 5, u_seed + 0.1325);
-    emi = emi * smoothstep(0.55, 0.9, emi) * 2.0;
+    emi = emi * smoothstep(0.45, 0.8, emi) * 2.0;
     emi = emi * noise(p + vec3(0.1, -0.1, 0.3), VORONOI, 1.6, true, true, vec3(14.0), 1, u_seed);
     // Not on water!
     emi = emi * waterMask;
+    // Some color.
     float r = gln_rand(xy + emi) * 0.2 + 0.8;
-    float g = gln_rand(xy + emi) * 0.2 + 0.7;
-    float b = gln_rand(xy + emi) * 0.2 + 0.5;
+    float g = gln_rand(xy - emi) * 0.2 + 0.7;
+    float b = gln_rand(xy + emi * 1.5) * 0.2 + 0.5;
     fragEmission = vec4(emi * r, emi * g, emi * b, 1.0);
+
+    if (emi > 0.2) {
+        float d = (0.8 - emi + 0.2) * (gln_rand(xy) * 0.4 + 0.4);
+
+        fragDiffuse.rgb = vec3(d);
+    }
     #else
     fragEmission = vec4(0.0, 0.0, 0.0, 1.0);
     #endif // emissiveMapFlag
