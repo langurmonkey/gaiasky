@@ -12,7 +12,6 @@
  * float n = gln_voronoi(position.xyz);
  */
 float gln_voronoi(in vec3 point) {
-  point *= 5.0;
   vec3 p = floor(point);
   vec3 f = fract(point);
 

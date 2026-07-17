@@ -125,5 +125,4 @@ float gln_curl(vec3 p) {
 
     const float divisor = 1.0 / (2.0 * e);
     return luma(normalize(vec3(x, y, z) * divisor));
-    //return acos(dot(normalize(vec3( x , y , z ) * divisor), vec3(1.0, 0.0, 0.0))) / gln_PI;
 }

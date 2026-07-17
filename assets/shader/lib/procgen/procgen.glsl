@@ -9,7 +9,9 @@
 
 float noise(vec3 p,
         int type,
+        float persistence,
         float frequency,
+        float lacunarity,
         bool turbulence,
         bool ridge,
         vec3 scale,
@@ -17,9 +19,9 @@ float noise(vec3 p,
         float seed) {
     // Fill up opts.
     gln_tFBMOpts opts = gln_tFBMOpts(seed,
-            u_persistence,
+            persistence,
             frequency,
-            u_lacunarity,
+            lacunarity,
             scale,
             octaves,
             turbulence,
@@ -37,7 +39,7 @@ vec3 sphericalToCartesian(float phi, float theta) {
 }
 
 vec2 computeElevation(vec3 p, float baseLevel) {
-    float elevation_noise = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
+    float elevation_noise = noise(p, u_type, u_persistence, u_frequency, u_lacunarity, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
         elevation_noise = smoothstep(0.0, 1.0, elevation_noise);
     }
