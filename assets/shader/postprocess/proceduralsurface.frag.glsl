@@ -142,8 +142,7 @@ void main() {
     float waterFac = 1.0 - waterMask;
     fragSpecular = vec4(waterFac, waterFac, waterFac, 1.0);
 
-
-    // Normal map
+    // Normal
     #ifdef normalMapFlag
     // Compute slope from finite differences
     vec3 pThetaPlus = sphericalToCartesian(phi, theta + dTheta);
