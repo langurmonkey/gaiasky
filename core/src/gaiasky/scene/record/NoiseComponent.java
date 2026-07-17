@@ -39,6 +39,12 @@ public final class NoiseComponent extends NamedComponent {
     /** Remap after base level operation. **/
     public boolean remap = false;
 
+    /** The height at which plains end, in the [0,1] range. **/
+    public float plainsHeight = 0.0f;
+    /** Slope of plains. Lower values produce flatter plains, while higher values produce steeper plains. **/
+    public float plainsSlope = 0.2f;
+
+    /** Generate emissive map (lights). **/
     public boolean genEmissiveMap = false;
 
     public FrameBuffer fbMask, fbMain;
@@ -84,7 +90,8 @@ public final class NoiseComponent extends NamedComponent {
         biome.setSmoothing(smoothing);
         biome.setTurbulence(turbulence);
         biome.setRidge(ridge);
-        biome.setChannels(channels);
+        biome.setPlainsHeight(plainsHeight);
+        biome.setPlainsSlope(plainsSlope);
         return biome;
     }
 
@@ -171,6 +178,8 @@ public final class NoiseComponent extends NamedComponent {
         effect.setTurbulence(turbulence);
         effect.setRidge(ridge);
         effect.setLatitudeInfluence(latitudeInfluence);
+        effect.setPlainsHeight(plainsHeight);
+        effect.setPlainsSlope(plainsSlope);
         effect.setChannels(channels);
         fbMain.begin();
         effect.render(null, fbMain);
@@ -246,6 +255,22 @@ public final class NoiseComponent extends NamedComponent {
         this.remap = remap;
     }
 
+    public void setLatitudeInfluence(Double value) {
+        this.latitudeInfluence = value.floatValue();
+    }
+
+    public void setPlainsHeight(Double value) {
+        this.plainsHeight = value.floatValue();
+    }
+
+    public void setPlainsSlope(Double value) {
+        this.plainsSlope = value.floatValue();
+    }
+
+    public void setGenEmissiveMap(Boolean value) {
+        genEmissiveMap = value;
+    }
+
 
     public void copyFrom(NoiseComponent other) {
         this.seed = other.seed;
@@ -260,6 +285,9 @@ public final class NoiseComponent extends NamedComponent {
         this.genEmissiveMap = other.genEmissiveMap;
         this.baseLevel = other.baseLevel;
         this.remap = other.remap;
+        this.latitudeInfluence = other.latitudeInfluence;
+        this.plainsHeight = other.plainsHeight;
+        this.plainsSlope = other.plainsSlope;
     }
 
     /**
@@ -280,7 +308,7 @@ public final class NoiseComponent extends NamedComponent {
         setSmoothing(rand.nextBoolean());
 
         // Type.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        setType(NoiseType.values()[rand.nextInt(3)].name());
         // Scale.
         double baseSize = FastMath.abs(gaussian(rand, 4.0, 1.0, 0.5));
         if (rand.nextBoolean()) {
@@ -292,7 +320,7 @@ public final class NoiseComponent extends NamedComponent {
         }
 
         // Persistence.
-        setPersistence(gaussian(rand, 0.5, 0.1, 0.3));
+        setPersistence(gaussian(rand, 0.6, 0.1, 0.3));
         // Frequency.
         setFrequency(gaussian(rand, 0.5, 2.0, 0.01));
         // Lacunarity.
@@ -302,9 +330,14 @@ public final class NoiseComponent extends NamedComponent {
         // Base level.
         setBaseLevel(gaussian(rand, 0.1, 0.04, 0.01, turbulence ? 0.25 : 0.4));
         //Remap.
-        setRemap(rand.nextBoolean());
+        setRemap(rand.nextDouble() > 0.2);
+        // Latitude influence.
+        setLatitudeInfluence(uniform(rand, 0.4, 0.6));
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.6));
+        setPlainsSlope(uniform(rand, 0.05, 0.3));
         // Emission.
-        genEmissiveMap = rand.nextInt(10) == 9;
+        setGenEmissiveMap(rand.nextInt(10) == 9);
 
     }
 
@@ -328,7 +361,8 @@ public final class NoiseComponent extends NamedComponent {
         setSmoothing(rand.nextBoolean());
 
         // Type.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        setType(NoiseType.values()[rand.nextInt(3)].name());
+
         // Scale.
         // XY small, Z large sometimes.
         double xyScale = FastMath.abs(gaussian(rand, 3.0, 1.0, 1.5, 6.0));
@@ -354,8 +388,11 @@ public final class NoiseComponent extends NamedComponent {
         } else {
             setBaseLevel(gaussian(rand, 0.5, 0.15, 0.36, 0.7));
         }
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.2));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
         //Remap.
-        setRemap(rand.nextBoolean());
+        setRemap(rand.nextDouble() > 0.1);
     }
 
     /**
@@ -367,12 +404,12 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        setType(NoiseType.values()[rand.nextInt(3)].name());
         // Same scale for all.
         double scale = rand.nextDouble(8.0, 15.0);
         setScale(new double[]{scale, scale, scale});
         // Persistence.
-        setPersistence(rand.nextDouble(0.4, 0.6));
+        setPersistence(rand.nextDouble(0.6, 0.9));
         // Frequency.
         setFrequency(rand.nextDouble(0.01, 0.6));
         // Lacunarity.
@@ -385,12 +422,15 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(3) < 2);
         // Smoothing.
         setSmoothing(rand.nextBoolean());
-        // Emission.
-        genEmissiveMap = rand.nextInt(20) == 19;
         // Base level.
         setBaseLevel(gaussian(rand, 0.05, 0.01, 0.0, 0.1));
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.6));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
         //Remap.
-        setRemap(rand.nextBoolean());
+        setRemap(rand.nextDouble() > 0.2);
+        // Emission.
+        setGenEmissiveMap(rand.nextInt(20) == 19);
     }
 
     /**
@@ -431,12 +471,12 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        setType(NoiseType.values()[rand.nextInt(3)].name());
         // Same scale for all.
         double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
         // Persistence.
-        setPersistence(rand.nextDouble(0.2, 0.8));
+        setPersistence(rand.nextDouble(0.6, 0.9));
         // Frequency.
         setFrequency(rand.nextDouble(0.01, 0.35));
         // Lacunarity.
@@ -449,12 +489,17 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(4) < 3);
         // Smoothing.
         setSmoothing(rand.nextBoolean());
-        // Emission.
-        genEmissiveMap = rand.nextInt(4) == 3;
         // Base level.
         setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
+        // Latitude influence.
+        setLatitudeInfluence(uniform(rand, 0.65, 0.85));
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.6));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
         //Remap.
-        setRemap(rand.nextBoolean());
+        setRemap(rand.nextDouble() > 0.2);
+        // Emission.
+        setGenEmissiveMap(rand.nextInt(4) == 3);
     }
 
     /**
@@ -466,13 +511,13 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        setType(NoiseType.values()[rand.nextInt(3)].name());
         // Scale.
         double scale = rand.nextDouble(3.0, 8.0);
         double scaleZ = rand.nextDouble(8.0, 14.0);
         setScale(new double[]{scale, scale, rand.nextInt(8) < 3 ? scale : scaleZ});
         // Persistence.
-        setPersistence(rand.nextDouble(0.2, 0.8));
+        setPersistence(rand.nextDouble(0.5, 0.9));
         // Frequency.
         setFrequency(rand.nextDouble(0.01, 0.35));
         // Lacunarity.
@@ -485,12 +530,17 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(4) < 3);
         // Smoothing.
         setSmoothing(rand.nextBoolean());
-        // Emission.
-        genEmissiveMap = true;
         // Base level.
         setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
-        //Remap.
-        setRemap(rand.nextBoolean());
+        // Latitude influence.
+        setLatitudeInfluence(0.5);
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.6));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
+        // Remap.
+        setRemap(rand.nextDouble() > 0.2);
+        // Emission.
+        setGenEmissiveMap(true);
     }
 
     /**
@@ -502,12 +552,12 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        setType(NoiseType.values()[rand.nextInt(3)].name());
         // Same scale for all.
         double scale = rand.nextDouble(5.0, 9.0);
         setScale(new double[]{scale, scale, scale});
         // Persistence.
-        setPersistence(rand.nextDouble(0.1, 0.3));
+        setPersistence(rand.nextDouble(0.45, 0.8));
         // Frequency.
         setFrequency(rand.nextDouble(0.05, 0.25));
         // Lacunarity.
@@ -520,12 +570,17 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(10) < 3);
         // Smoothing.
         setSmoothing(rand.nextBoolean());
-        // Emission.
-        genEmissiveMap = rand.nextInt(4) == 3;
         // Base level.
         setBaseLevel(0.0);
+        // Latitude influence.
+        setLatitudeInfluence(uniform(rand, 0.4, 0.65));
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.1, 0.7));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
         // Remap.
-        setRemap(rand.nextBoolean());
+        setRemap(rand.nextDouble() > 0.2);
+        // Emission.
+        setGenEmissiveMap(rand.nextInt(4) == 3);
     }
 
     /**
@@ -537,12 +592,12 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        setType(NoiseType.values()[rand.nextInt(3)].name());
         // Same scale for all.
         double scale = rand.nextDouble(5.0, 9.0);
         setScale(new double[]{scale, scale, scale});
         // Persistence.
-        setPersistence(rand.nextDouble(0.2, 0.8));
+        setPersistence(rand.nextDouble(0.6, 0.95));
         // Frequency.
         setFrequency(rand.nextDouble(0.2, 0.55));
         // Lacunarity.
@@ -555,12 +610,15 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextBoolean());
         // Smoothing.
         setSmoothing(rand.nextBoolean());
-        // Emission.
-        genEmissiveMap = rand.nextInt(4) == 3;
         // Base level.
         setBaseLevel(rand.nextDouble(0.3, 0.7));
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.5));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
         // Remap.
-        setRemap(rand.nextBoolean());
+        setRemap(rand.nextDouble() > 0.2);
+        // Emission.
+        setGenEmissiveMap(rand.nextInt(4) == 3);
     }
 
     /**
@@ -571,8 +629,8 @@ public final class NoiseComponent extends NamedComponent {
     public void randomizeSnowPlanet(Random rand) {
         // Seed.
         setSeed(rand.nextDouble(2.0));
-        // Type: PERLIN, SIMPLEX
-        setType(NoiseType.values()[rand.nextInt(2)].name());
+        // Type.
+        setType(NoiseType.values()[rand.nextInt(3)].name());
         // Same scale for all.
         double scale = rand.nextDouble(4.0, 8.0);
         setScale(new double[]{scale, scale, scale});
@@ -590,12 +648,15 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextInt(4) < 3);
         // Smoothing.
         setSmoothing(rand.nextBoolean());
-        // Emission.
-        genEmissiveMap = rand.nextInt(15) == 14;
         // Base level.
         setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
-        //Remap.
-        setRemap(rand.nextBoolean());
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.5));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
+        // Remap.
+        setRemap(rand.nextDouble() > 0.2);
+        // Emission.
+        setGenEmissiveMap(rand.nextInt(15) == 14);
     }
 
     /**
@@ -607,8 +668,7 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        // PERLIN, SIMPLEX
-        int d = rand.nextInt(2);
+        int d = rand.nextInt(3);
         setType(NoiseType.values()[d].name());
         // Scale.
         double scaleFac = 1;
@@ -634,12 +694,15 @@ public final class NoiseComponent extends NamedComponent {
         setRidge(turbulence && rand.nextBoolean());
         // Smoothing.
         setSmoothing(rand.nextBoolean());
-        // Emission.
-        genEmissiveMap = rand.nextInt(10) == 9;
         // Base level.
         setBaseLevel(gaussian(rand, 0.25, 0.1, 0.0, 0.5));
+        // Plains.
+        setPlainsHeight(uniform(rand, 0.0, 0.2));
+        setPlainsSlope(uniform(rand, 0.05, 0.2));
         //Remap.
-        setRemap(rand.nextBoolean());
+        setRemap(rand.nextDouble() > 0.2);
+        // Emission.
+        setGenEmissiveMap(rand.nextInt(10) == 9);
     }
 
     public void print(Log log) {
@@ -656,6 +719,8 @@ public final class NoiseComponent extends NamedComponent {
         log.debug("Turbulence: " + turbulence);
         log.debug("Ridge: " + ridge);
         log.debug("Emission: " + genEmissiveMap);
+        log.debug("Latitude influence: " + latitudeInfluence);
+        log.debug("Plains height/slope: " + plainsHeight + "/" + plainsSlope);
     }
 
     @Override

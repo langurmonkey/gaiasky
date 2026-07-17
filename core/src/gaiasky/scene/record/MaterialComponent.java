@@ -770,12 +770,13 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 Random rand = new Random();
                 if (nc == null) {
                     nc = new NoiseComponent();
-                    switch (rand.nextInt(10)) {
+                    switch (rand.nextInt(12)) {
                         case 0, 1, 2, 3, 4 -> nc.randomizeEarthLike(rand);
                         case 5 -> nc.randomizeRockyPlanet(rand);
                         case 6 -> nc.randomizeGasGiant(rand);
                         case 7, 8 -> nc.randomizeSnowPlanet(rand);
-                        case 9 -> nc.randomizeForTerrain(rand);
+                        case 9, 10 -> nc.randomizeTropical(rand);
+                        case 11 -> nc.randomizeForTerrain(rand);
                     }
                 }
 
@@ -1600,7 +1601,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         setSpecular("generate");
         setEmissive("generate");
 
-        setBiomeLUT(randomBiomeLut(rand, "tropical", "earthlike"));
+        setBiomeLUT(randomBiomeLut(rand, "earthlike"));
 
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-20.0, 20.0) + 360.0) % 360.0);
@@ -1692,6 +1693,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         }
         NoiseComponent nc = new NoiseComponent();
         nc.randomizeEarthLike(rand);
+        nc.setLatitudeInfluence(0.5);
         setNoise(nc);
     }
 
@@ -1746,6 +1748,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         }
         NoiseComponent nc = new NoiseComponent();
         nc.randomizeEarthLike(rand);
+        nc.setLatitudeInfluence(0.6);
         setNoise(nc);
     }
 

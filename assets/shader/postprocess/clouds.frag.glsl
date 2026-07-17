@@ -7,6 +7,7 @@ precision highp float;
 #include <shader/lib/noise/common.glsl>
 #include <shader/lib/noise/simplex.glsl>
 #include <shader/lib/noise/perlin.glsl>
+#include <shader/lib/noise/voronoi.glsl>
 
 // Blank texture.
 uniform sampler2D u_texture0;
@@ -43,10 +44,14 @@ uniform bool u_ridge;
 // >= 3 - in red, green and blue.
 uniform int u_channels;
 // Noise type
-// 0- PERLIN
-// 1- SIMPLEX
+// 0 - PERLIN
+// 1 - SIMPLEX
+// 2 - VORONOI
 uniform int u_type;
-
+// Plains
+// x - height
+// y - slope
+uniform vec2 u_plains;
 
 in vec2 v_texCoords;
 
@@ -55,37 +60,7 @@ layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 emissionColor;
 #endif // extraTarget
 
-float noise(vec3 p,
-            int type,
-            bool turbulence,
-            bool ridge,
-            vec3 scale,
-            int octaves,
-            float seed) {
-    // Fill up opts.
-    gln_tFBMOpts opts = gln_tFBMOpts(seed,
-                                     u_persistence,
-                                     u_frequency,
-                                     u_lacunarity,
-                                     scale,
-                                     octaves,
-                                     turbulence,
-                                     ridge);
-
-    float value = 0.0;
-    if (type == 0) {
-        // PERLIN
-        value = gln_pfbm(p, opts);
-
-    } else if (type == 1) {
-        // SIMPLEX
-        value = gln_sfbm(p, opts);
-
-    }
-
-    return value;
-
-}
+#include <shader/lib/procgen/procgen.glsl>
 
 void main() {
     // Sample point.
@@ -95,27 +70,10 @@ void main() {
     float phi = (-gln_PI / 2.0) + xy.y * phiStep;
     float thetaStep = gln_PI * 2.0 / u_viewport.x;
     float theta = xy.x * thetaStep;
-    float cosPhi = cos(phi);
-    // P is a point in the sphere.
-    vec3 p = vec3(
-        cosPhi * cos(theta),
-        cosPhi * sin(theta),
-        sin(phi)
-    );
+    vec3 p = sphericalToCartesian(phi, theta);
 
-    float val_ch1_original = noise(p, u_type, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
-    if (u_smoothing) {
-        val_ch1_original = smoothstep(0.0, 1.0, val_ch1_original);
-    }
-    float val_ch1;
-    if (u_remap) {
-        // Remap after base level. Base level is at 0.
-        val_ch1 = gln_map(val_ch1_original, u_baseLevel, 1.0, 0.0, 1.0);
-    } else {
-        // Clamp.
-        val_ch1 = val_ch1_original * smoothstep(u_baseLevel * 0.8, u_baseLevel, val_ch1_original);
-    }
+    float clouds = computeElevation(p, u_baseLevel).x;
 
     // Only one channel for clouds.
-    fragColor = vec4((vec3(val_ch1) * u_color.rgb) * u_color.a, 1.0);
+    fragColor = vec4((vec3(clouds) * u_color.rgb) * u_color.a, 1.0);
 }

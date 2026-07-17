@@ -7,73 +7,85 @@
 
 package gaiasky.render.postprocess.filters;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Vector4;
 import gaiasky.render.util.NoiseType;
 import gaiasky.render.util.ShaderLoader;
 
-public final class CloudsFilter extends Filter<CloudsFilter> {
+public class NoiseFilter extends Filter<NoiseFilter> {
     /** Viewport size. **/
-    private final Vector2 viewport;
+    protected final Vector2 viewport;
     /** Noise scale in x, y and z. **/
-    private final Vector3 scale = new Vector3(1, 1, 1);
+    protected final Vector3 scale = new Vector3(1, 1, 1);
     /** Color. **/
-    private final Vector4 color = new Vector4(1, 1, 1, 1);
+    protected final Vector4 color = new Vector4(1, 1, 1, 1);
     /** Base level. **/
-    private float baseLevel = 0.1f;
+    protected float baseLevel = 0.1f;
     /** Remap to [0,1] after base level operation. **/
-    private boolean remap = false;
+    protected boolean remap = false;
     /** RNG seed. **/
-    private float seed = 1.23456f;
+    protected float seed = 1.23456f;
     /** Factor by which successive noise octaves decrease in amplitude. This is in (0, 1). **/
-    private float persistence = 0.5f;
+    protected float persistence = 0.5f;
     /** The initial frequency of the noise function. **/
-    private float frequency = 1.0f;
+    protected float frequency = 1.0f;
     /** Factor by which successive noise octaves increase in frequency. This is in [1, n). **/
-    private float lacunarity = 2f;
+    protected float lacunarity = 2f;
     /** Number of octaves. **/
-    private int octaves = 4;
+    protected int octaves = 4;
     /** Apply smoothing function or not. **/
-    private boolean smoothing = false;
+    protected boolean smoothing = false;
     /** Apply absolute value function. **/
-    private boolean turbulence = true;
+    protected boolean turbulence = true;
     /** Convert the fBm to ridge noise. **/
-    private boolean ridge;
+    protected boolean ridge;
     /** Create different noise patterns in each of the different RGB channels. **/
-    private int channels = 1;
+    protected int channels = 1;
+    /**
+     * Plains parameters:
+     * <ul>
+     *     <li>
+     *        Height - flatten the areas between base level and this level, in [0,1].
+     *     </li>
+     *     <li>
+     *        Slope - the slope of the plains.
+     *     </li>
+     * </ul>
+     **/
+    protected final Vector2 plains = new Vector2(0.0f, 0.1f);
 
-    /** Number of extra render targets. If &lt 1, we use 2 targets, the default noise, and an emission channel.  **/
-    private final int targets;
+    /** The noise type. **/
+    protected NoiseType type = NoiseType.SIMPLEX;
 
-
-    private NoiseType type = NoiseType.SIMPLEX;
-
-    public CloudsFilter(int viewportWidth, int viewportHeight, int targets, String shader) {
+    public NoiseFilter(int viewportWidth, int viewportHeight, int targets, String shader) {
         this(new Vector2(viewportWidth, viewportHeight), targets, shader);
     }
 
-    public CloudsFilter(Vector2 viewportSize, int targets) {
+    public NoiseFilter(Vector2 viewportSize, int targets) {
        this(viewportSize, targets, "biome");
     }
 
-    public CloudsFilter(Vector2 viewportSize, int targets, String shader) {
+    public NoiseFilter(Vector2 viewportSize, int targets, String shader) {
         super(ShaderLoader.fromFile(
                 "screenspace",
-                shader,
-                targets > 1 ? "#define extraTarget\n" : ""));
-        this.targets = targets;
+                shader ));
         this.viewport = viewportSize;
 
         rebind();
+    }
+
+    public NoiseFilter(ShaderProgram program, Vector2 viewportSize){
+        super(program);
+        this.viewport = viewportSize;
     }
 
     @Override
     public void updateProgram() {
         super.updateProgram(ShaderLoader.fromFile(
                 "screenspace",
-                "biome",
-                targets > 1 ? "#define extraTarget\n" : ""));
+                "biome"));
     }
 
     public void setViewportSize(float width, float height) {
@@ -155,10 +167,18 @@ public final class CloudsFilter extends Filter<CloudsFilter> {
         setParam(Param.Type, this.type.ordinal());
     }
 
-    @Override
-    public void rebind() {
+    public void setPlainsHeight(float ph) {
+        this.plains.x = ph;
+        setParam(Param.Plains, plains);
+    }
+
+    public void setPlainsSlope(float ps) {
+        this.plains.y = ps;
+        setParam(Param.Plains, plains);
+    }
+
+    protected void rebindNoEnd(){
         // Re-implement super to batch every parameter
-        setParams(Param.Texture, u_texture0);
         setParams(Param.Viewport, this.viewport);
         setParams(Param.Color, this.color);
         setParams(Param.Scale, this.scale);
@@ -172,8 +192,14 @@ public final class CloudsFilter extends Filter<CloudsFilter> {
         setParams(Param.Smoothing, this.smoothing);
         setParams(Param.Turbulence, this.turbulence);
         setParams(Param.Ridge, this.ridge);
+        setParams(Param.Plains, this.plains);
         setParams(Param.Channels, this.channels);
         setParams(Param.Type, this.type.ordinal());
+    }
+
+    @Override
+    public void rebind() {
+        rebindNoEnd();
 
         endParams();
     }
@@ -203,6 +229,7 @@ public final class CloudsFilter extends Filter<CloudsFilter> {
         Smoothing("u_smoothing", 0),
         Turbulence("u_turbulence", 0),
         Ridge("u_ridge", 0),
+        Plains("u_plains", 2),
         Channels("u_channels", 0),
         Type("u_type", 0);
         // @formatter:on

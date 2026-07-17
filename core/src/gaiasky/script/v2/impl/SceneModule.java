@@ -1084,7 +1084,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
                 var model = Mapper.model.get(newShape);
                 model.model = new ModelComponent();
-                model.model.type = shapeLc;
+                model.model.modelType = shapeLc;
                 model.model.setPrimitiveType(primitiveInt);
                 model.model.setParams(params);
                 model.model.setStaticLight(true);

@@ -9,15 +9,15 @@ package gaiasky.render.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
-import gaiasky.render.postprocess.filters.CloudsFilter;
+import gaiasky.render.postprocess.filters.NoiseFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 import gaiasky.render.util.NoiseType;
 
 public final class Clouds extends PostProcessorEffect {
-    private final CloudsFilter filter;
+    private final NoiseFilter filter;
 
     public Clouds(int viewportWidth, int viewportHeight, int targets, String shader) {
-        filter = new CloudsFilter(viewportWidth, viewportHeight, targets, shader);
+        filter = new NoiseFilter(viewportWidth, viewportHeight, targets, shader);
         disposables.add(filter);
 
     }
@@ -103,6 +103,14 @@ public final class Clouds extends PostProcessorEffect {
 
     public void setType(NoiseType type) {
         filter.setType(type);
+    }
+
+    public void setPlainsHeight(float plainsHeight) {
+        filter.setPlainsHeight(plainsHeight);
+    }
+
+    public void setPlainsSlope(float plainsSlope) {
+        filter.setPlainsSlope(plainsSlope);
     }
 
     @Override

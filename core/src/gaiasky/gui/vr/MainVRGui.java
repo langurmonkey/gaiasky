@@ -501,7 +501,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
                     var model = Mapper.model.get(entity);
                     model.model = new ModelComponent();
-                    model.model.type = "surface";
+                    model.model.modelType = "surface";
                     model.modelSize = 1;
                     model.model.setPrimitiveType(GL20.GL_TRIANGLES);
                     model.model.setParams(params);

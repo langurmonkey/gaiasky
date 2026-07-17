@@ -1221,10 +1221,10 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
                 VertexInfo v = vertTmp1.set(
                         osc.vertices.get(face.v()[i]),
                         osc.normals.get(face.n()[i]),
+                        osc.tangents.get(face.t()[i]),
+                        osc.binormals.get(face.b()[i]),
                         null,
-                        null,
-                        null,
-                        null);
+                        osc.uv.get(face.v()[i]));
                 int idx = vertex(v);
                 tri[i] = idx;
             }

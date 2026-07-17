@@ -817,6 +817,41 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         noiseTable.add(persistence).colspan(2).left().padBottom(pad18).padRight(pad10);
         noiseTable.add(persistenceTooltip).left().padBottom(pad18).row();
 
+        if (!clouds) {
+            // Plains.
+            OwnSliderPlus plainsHeight = new OwnSliderPlus(I18n.msg("gui.procedural.plains.height"), 0.01f, 0.8f, 0.01f, skin);
+            plainsHeight.setWidth(fieldWidthNoise / 2f - pad10 * 1.1f);
+            plainsHeight.setValue(nc.plainsHeight);
+            plainsHeight.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    nc.plainsHeight = plainsHeight.getMappedValue();
+                }
+            });
+            OwnSliderPlus plainsSlope = new OwnSliderPlus(I18n.msg("gui.procedural.plains.slope"), 0.05f, 0.5f, 0.01f, skin);
+            plainsSlope.setWidth(fieldWidthNoise / 2f - pad10 * 1.1f);
+            plainsSlope.setValue(nc.plainsSlope);
+            plainsSlope.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    nc.plainsSlope = plainsSlope.getMappedValue();
+                }
+            });
+
+            HorizontalGroup plainsGroup = new HorizontalGroup();
+            plainsGroup.space(pad10 * 2f);
+            plainsGroup.addActor(plainsHeight);
+            plainsGroup.addActor(plainsSlope);
+            OwnImageButton plainsTooltip = new OwnImageButton(skin, "tooltip");
+            plainsTooltip.addListener(new OwnTextTooltip(
+                    I18n.msg("gui.procedural.info.plains"),
+                    skin));
+            noiseTable.add(plainsGroup).colspan(2).left().padBottom(pad18).padRight(pad10);
+            noiseTable.add(plainsTooltip).left().padBottom(pad18).row();
+        }
+
         // Smoothing, turbulence, and ridge.
         OwnCheckBox smoothing = new OwnCheckBox(I18n.msg("gui.procedural.smoothing"), skin, pad10);
         OwnCheckBox turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
@@ -1484,7 +1519,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
     }
 
     protected Boolean randomizeBlueAtmosphere(Boolean rebuild) {
-        return randomizeAtmosphere(rebuild, true, 1.4, 1.2, 0.7);
+        return randomizeAtmosphere(rebuild, true, 1.3, 0.9, 0.7);
     }
 
     protected Boolean randomizeGreenAtmosphere(Boolean rebuild) {

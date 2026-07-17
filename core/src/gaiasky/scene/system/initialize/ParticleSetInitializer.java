@@ -259,7 +259,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var parent = graph.parent;
         if (parent != null && Mapper.model.has(parent)) {
             var model = Mapper.model.get(parent);
-            if (model.model != null && model.model.type != null && model.model.type.equalsIgnoreCase("ring")) {
+            if (model.model != null && model.model.modelType != null && model.model.modelType.equalsIgnoreCase("ring")) {
                 model.model.ringDataset = true;
             }
         }

@@ -28,6 +28,12 @@ import gaiasky.event.Observer;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.model.IntModelInstance;
+import gaiasky.render.gdx.model.data.OwnModelMaterial;
+import gaiasky.render.gdx.model.gltf.scene3d.model.ModelInstanceHack;
+import gaiasky.render.gdx.shader.Environment;
+import gaiasky.render.gdx.shader.Material;
 import gaiasky.render.gdx.shader.attribute.*;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IUpdatable;
@@ -37,12 +43,6 @@ import gaiasky.scene.component.Body;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.render.gdx.model.IntModel;
-import gaiasky.render.gdx.model.IntModelInstance;
-import gaiasky.render.gdx.model.data.OwnModelMaterial;
-import gaiasky.render.gdx.model.gltf.scene3d.model.ModelInstanceHack;
-import gaiasky.render.gdx.shader.Environment;
-import gaiasky.render.gdx.shader.Material;
 import gaiasky.util.i18n.I18n;
 
 import java.util.*;
@@ -75,8 +75,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public boolean forceInit = false;
     public IntModelInstance instance;
     public Environment env;
-    public Map<String, Object> params;
-    public String type, modelFile;
+    public Map<String, Object> modelParams;
+    public String modelType, modelFile;
     public double scale = 1d;
     public boolean culling = true;
     public boolean tessellated = false;
@@ -346,13 +346,13 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             }
             // Add skybox to materials.
             addReflectionCubemapAttribute(model.materials);
-        } else if (type != null) {
+        } else if (modelType != null) {
             // We actually need to create the model.
             Bits attributes = Bits.indices(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates);
-            if (params.containsKey("attributes")) {
-                attributes = Bits.indices(((Long) params.get("attributes")).intValue());
+            if (modelParams.containsKey("attributes")) {
+                attributes = Bits.indices(((Long) modelParams.get("attributes")).intValue());
             }
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, attributes, primitiveType);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(modelType, modelParams, attributes, primitiveType);
             model = pair.getFirst();
             materials = pair.getSecond();
         } else {
@@ -360,7 +360,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             if (modelFile != null) {
                 logger.error(new RuntimeException("Error loading model: " + modelFile));
             } else {
-                logger.error(new RuntimeException("Error loading model type: " + type + " (" + params.toString() + ")"));
+                logger.error(new RuntimeException("Error loading model type: " + modelType + " (" + modelParams.toString() + ")"));
             }
         }
         // Clear base material
@@ -665,7 +665,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             // Read-write depth test.
             case ALPHA, COLOR, NONE -> {
                 depthTestReadWrite();
-                if (type != null && type.equals("ring")) {
+                if (modelType != null && modelType.equals("ring")) {
                     // Second material (ring) depth test read only.
                     setDepthTestRing();
                 }
@@ -822,6 +822,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             ((Vector3Attribute) Objects.requireNonNull(mat.get(attribute))).value.set(value);
         }
     }
+
     public void setVector3Attribute(Material mat,
                                     int attribute,
                                     double[] value) {
@@ -853,11 +854,15 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     /**
      * Sets the type of the model to construct.
      *
-     * @param type The type. Currently supported types are
-     *             sphere|cylinder|ring|disc.
+     * @param modelType The type. Currently supported types are
+     *             sphere|cubesphere|cylinder|ring|disc.
      */
-    public void setType(String type) {
-        this.type = type;
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
+    }
+
+    public void setType(String modelType) {
+        setModelType(modelType);
     }
 
     public void setMaterial(MaterialComponent mtc) {
@@ -885,8 +890,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         setStaticLight(lightLevel);
     }
 
-    public void setParams(Map<String, Object> params) {
-        this.params = params;
+    public void setParams(Map<String, Object> modelParams) {
+        this.modelParams = modelParams;
     }
 
     public void setScale(Double scale) {
@@ -1162,7 +1167,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     public String toString() {
-        return Objects.requireNonNullElseGet(modelFile, () -> "{" + type + ", params: " + (params != null ? params.toString() : "null") + "}");
+        return Objects.requireNonNullElseGet(modelFile, () -> "{" + modelType + ", params: " + (modelParams != null ? modelParams.toString() : "null") + "}");
     }
 
     /**
@@ -1177,7 +1182,12 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         // Type
         setType("cubesphere");
         // Parameters
-        setParams(createCubeSphereParameters(120, 1.0, false));
+        switch (modelType) {
+            case "icosphere" -> setParams(createIcoSphereParameters(8, 1.0, false));
+            case "cubesphere" -> setParams(createCubeSphereParameters(200, 1.0, false));
+            case "octahedronsphere" -> setParams(createOctahedronSphereParameters(8, 1.0, false));
+            default -> setParams(createUVSphereParameters(600, 1.0, false));
+        }
         // Material
         MaterialComponent mtc = new MaterialComponent();
         // Randomize material.

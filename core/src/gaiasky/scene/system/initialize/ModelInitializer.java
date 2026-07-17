@@ -59,19 +59,19 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     public static void initializeModelSize(Model model) {
-        if (model.model != null && model.model.params != null) {
-            if (model.model.params.containsKey("diameter")) {
-                model.modelSize = (Double) model.model.params.get("diameter");
-            } else if (model.model.params.containsKey("size")) {
-                model.modelSize = (Double) model.model.params.get("size");
-            } else if (model.model.params.containsKey("width")) {
-                model.modelSize = (Double) model.model.params.get("width");
-            } else if (model.model.params.containsKey("height")) {
-                model.modelSize = (Double) model.model.params.get("height");
-            } else if (model.model.params.containsKey("depth")) {
-                model.modelSize = (Double) model.model.params.get("depth");
-            } else if (model.model.params.containsKey("side")) {
-                model.modelSize = (Double) model.model.params.get("side");
+        if (model.model != null && model.model.modelParams != null) {
+            if (model.model.modelParams.containsKey("diameter")) {
+                model.modelSize = (Double) model.model.modelParams.get("diameter");
+            } else if (model.model.modelParams.containsKey("size")) {
+                model.modelSize = (Double) model.model.modelParams.get("size");
+            } else if (model.model.modelParams.containsKey("width")) {
+                model.modelSize = (Double) model.model.modelParams.get("width");
+            } else if (model.model.modelParams.containsKey("height")) {
+                model.modelSize = (Double) model.model.modelParams.get("height");
+            } else if (model.model.modelParams.containsKey("depth")) {
+                model.modelSize = (Double) model.model.modelParams.get("depth");
+            } else if (model.model.modelParams.containsKey("side")) {
+                model.modelSize = (Double) model.model.modelParams.get("side");
             }
         }
     }

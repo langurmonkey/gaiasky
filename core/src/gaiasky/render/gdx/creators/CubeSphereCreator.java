@@ -154,14 +154,24 @@ public class CubeSphereCreator extends ModelCreator {
     }
 
     /**
-     * Appends a new vertex (with identity tangent/binormal, per the tessellation
-     * shader convention used elsewhere in this class) and returns its index.
+     * Appends a new vertex (with geometry-derived tangent/binormal aligned to
+     * the UV directions, matching {@link SphereCreator}'s convention for correct
+     * TBN in pbr.vertex.glsl) and returns its index.
      */
     private int addVertex(Vector3 position, Vector3 normal, float u, float v) {
         vertices.add(position);
         normals.add(normal);
-        tangents.add(new Vector3(1.0f, 0.0f, 0.0f));
-        binormals.add(new Vector3(0.0f, 1.0f, 0.0f));
+
+        // Tangent = westward (U direction), binormal = southward (V direction).
+        // Both match SphereCreator's convention for correct TBN in pbr.vertex.glsl.
+        // Tangent follows the texture U direction: cross(up, normal) = westward.
+        // Binormal follows the texture V direction: cross(tangent, normal) = southward.
+        Vector3 tangent = new Vector3(Vector3.Y).crs(normal).nor();
+        if (tangent.isZero(0.0001f)) tangent.set(1f, 0f, 0f);
+        Vector3 binormal = new Vector3(tangent).crs(normal).nor();
+        tangents.add(tangent);
+        binormals.add(binormal);
+
         uv.add(new Vector2(u, v));
         return index++;
     }

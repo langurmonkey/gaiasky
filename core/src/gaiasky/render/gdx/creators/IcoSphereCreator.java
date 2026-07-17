@@ -7,6 +7,7 @@
 
 package gaiasky.render.gdx.creators;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
@@ -81,8 +82,13 @@ public class IcoSphereCreator extends ModelCreator {
         addJitter(p, jitter);
         p.nor();
 
-        // No UV mapping for procedural planets — constant UV to avoid seams.
-        uv.add(new Vector2(0.5f, 0.5f));
+        // Spherical UV projection.
+        float lon = (float) Math.atan2(p.z, p.x); // (-pi, pi]
+        if (lon < 0) lon += MathUtils.PI2;       // -> [0, 2pi)
+        float colat = (float) Math.acos(MathUtils.clamp(p.y, -1f, 1f)); // [0, pi]
+        float u = 1f - lon / MathUtils.PI2;
+        float v = colat / MathUtils.PI;
+        uv.add(new Vector2(u, v));
 
         // Vertex is p times the radius
         vertices.add(p.scl(radius + getJitter(jitter)));
@@ -91,11 +97,14 @@ public class IcoSphereCreator extends ModelCreator {
         var normal = p.cpy().nor();
         normals.add(normal);
 
-        // Tangent and binormal are unused for procedural planets
-        // (the tessellation eval shader reconstructs TBN from geometry).
-        // Set them to identity to avoid any weird interpolations.
-        tangents.add(new Vector3(1.0f, 0.0f, 0.0f));
-        binormals.add(new Vector3(0.0f, 1.0f, 0.0f));
+        // Tangent/binormal aligned with UV directions (U=westward, V=southward),
+        // matching SphereCreator's convention for correct TBN in pbr.vertex.glsl.
+        Vector3 east = new Vector3(normal).crs(Vector3.Y).nor();
+        if (east.isZero(0.0001f)) east.set(1f, 0f, 0f);
+        Vector3 binormal = new Vector3(normal).crs(east).nor(); // southward = V direction
+        Vector3 tangent = new Vector3(normal).crs(binormal).nor(); // westward = U direction
+        tangents.add(tangent);
+        binormals.add(binormal);
 
         return index++;
     }

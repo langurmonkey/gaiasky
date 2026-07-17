@@ -51,6 +51,10 @@ uniform bool u_ridge;
 uniform int u_channels;
 // Noise type: 0 = PERLIN, 1 = SIMPLEX, 2 = VORONOI.
 uniform int u_type;
+// Plains height and slope.
+// - height: plains are between baseLevel and this value.
+// - slope: low values create flat plains, while higher values progressively erase them.
+uniform vec2 u_plains = vec2(0.4, 0.2);
 
 in vec2 v_texCoords;
 
@@ -62,47 +66,7 @@ layout (location = 3) out vec4 fragEmission;
 layout (location = 4) out vec4 fragNormal;
 #endif // normalMapFlag
 
-// Noise types
-#define PERLIN 0
-#define SIMPLEX 1
-#define VORONOI 2
-
-float random(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-}
-
-float noise(vec3 p,
-        int type,
-        float frequency,
-        bool turbulence,
-        bool ridge,
-        vec3 scale,
-        int octaves,
-        float seed) {
-    // Fill up opts.
-    gln_tFBMOpts opts = gln_tFBMOpts(seed,
-            u_persistence,
-            frequency,
-            u_lacunarity,
-            scale,
-            octaves,
-            turbulence,
-            ridge);
-
-    float value = 0.0;
-    if (type == 0) {
-        // PERLIN
-        value = gln_pfbm(p, opts);
-    } else if (type == 1) {
-        // SIMPLEX
-        value = gln_sfbm(p, opts);
-    } else if (type == 2) {
-        // VORONOI
-        value = gln_vfbm(p, opts);
-    }
-
-    return value;
-}
+#include <shader/lib/procgen/procgen.glsl>
 
 vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLevel) {
     float epsilon = 1.0 / 255.0;
@@ -121,61 +85,6 @@ vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLe
     hsv.y = clamp(hsv.y * u_lutSaturation, 0.0, 1.0);
     // Back to RGB.
     return hsv2rgb(hsv);
-}
-
-// Converts spherical coordinates to a cartesian point in 3D (radius 1).
-vec3 sphericalToCartesian(float phi, float theta) {
-    float cosPhi = cos(phi);
-    return vec3(cosPhi * cos(theta),
-            cosPhi * sin(theta),
-            sin(phi));
-}
-
-vec2 computeElevation(vec3 p, float baseLevel) {
-    float elevation_noise = noise(p, u_type, u_frequency, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
-    if (u_smoothing) {
-        elevation_noise = smoothstep(0.0, 1.0, elevation_noise);
-    }
-
-    float elevation;
-    if (u_remap) {
-        elevation = gln_map(elevation_noise, baseLevel, 1.0, 0.0, 1.0);
-        // In remap mode, base level gets mapped to 0.
-        baseLevel = 0.0;
-    } else {
-        elevation = max(baseLevel, elevation_noise);
-    }
-
-    float plainsHeight = 0.0;  // 0.0 = no plains, 0.5 = half the land is plains
-    float plainsSlope  = 0.1;   // e.g. 0.1 = very gentle rise
-
-    if (plainsHeight > 0.0) {
-        // Normalize above-water elevation to [0, 1]
-        float t = (elevation - baseLevel) / max(1.0 - baseLevel, 0.001);
-        t = clamp(t, 0.0, 1.0);
-
-        float plainsMaxElevation = plainsHeight * plainsSlope;
-        float mountainRange = 1.0 - plainsMaxElevation;
-        float mountainSlope = mountainRange / max(1.0 - plainsHeight, 0.001);
-
-        float remapped;
-        float blend = 0.05; // transition width
-        if (t <= plainsHeight - blend) {
-            remapped = t * plainsSlope;
-        } else if (t >= plainsHeight + blend) {
-            remapped = plainsMaxElevation + (t - plainsHeight) * mountainSlope;
-        } else {
-            // Smooth blend at the transition
-            float a = (t - (plainsHeight - blend)) / (2.0 * blend);
-            float plainsVal = t * plainsSlope;
-            float mountainVal = plainsMaxElevation + (t - plainsHeight) * mountainSlope;
-            remapped = mix(plainsVal, mountainVal, smoothstep(0.0, 1.0, a));
-        }
-
-        elevation = baseLevel + remapped * (1.0 - baseLevel);
-    }
-    
-    return vec2(elevation, baseLevel);
 }
 
 void main() {
@@ -212,14 +121,12 @@ void main() {
     float temperature = 0.5;
     if (u_channels >= 3) {
         float latitudeFactor = 1.0 - abs(phi) / (gln_PI * 0.5); // 1 at equator, 0 at poles
-        latitudeFactor = smoothstep(0.2, 1.0, latitudeFactor);
+        latitudeFactor = smoothstep(0.1, 0.6, latitudeFactor);
         float tempFreq = min(u_frequency * 0.7, 0.5);
         float noiseTemperature = noise(p, u_type, tempFreq, false, false, u_scale, u_octaves, u_seed + 0.4325);
         temperature = mix(noiseTemperature, latitudeFactor, u_latitudeInfluence);
         fragBiome.b = temperature;
     }
-
-
 
     ///
     /// TEXTURE GEN (diffuse, specular, normal, emission)

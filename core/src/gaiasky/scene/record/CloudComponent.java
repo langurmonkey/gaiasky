@@ -101,8 +101,10 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     // Virtual texture.
     public VirtualTextureComponent diffuseSvt;
     public Map<Object, Object> svtParams;
-    // Model parameters
-    public Map<String, Object> params;
+    /** Mode type. **/
+    public String modelType = "sphere";
+    /** Model parameters. **/
+    public Map<String, Object> modelParams;
     Vector3 aux;
     Vector3D aux3;
     private AssetManager manager;
@@ -177,8 +179,8 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere",
-                                                                               params,
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(modelType,
+                                                                               modelParams,
                                                                                Bits.indices(Usage.Position,
                                                                                             Usage.Normal,
                                                                                             Usage.Tangent,
@@ -466,8 +468,16 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         this.localTransform = localTransform;
     }
 
-    public void setParams(Map<String, Object> params) {
-        this.params = params;
+    public void setType(String type) {
+        setModelType(type);
+    }
+
+    public void setModelType(String type) {
+        this.modelType = type;
+    }
+
+    public void setParams(Map<String, Object> modelParams) {
+        this.modelParams = modelParams;
     }
 
     public void setCloud(String diffuse) {
@@ -528,7 +538,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         // Cloud
         setDiffuse("generate");
         // Color
-        if (rand.nextDouble() > 0.6) {
+        if (rand.nextDouble() > 0.4) {
             // White.
             color[0] = 1f;
             color[1] = 1f;
@@ -536,13 +546,20 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             color[3] = 1f;
         } else {
             // Gaussian around white-ish.
-            color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
-            color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
-            color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
-            color[3] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.1), 0.0, 1.0);
+            color[0] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.05), 0.0, 1.0);
+            color[1] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.05), 0.0, 1.0);
+            color[2] = (float) MathUtils.clamp(rand.nextGaussian(0.95, 0.05), 0.0, 1.0);
+            color[3] = 1f;
         }
+        // Type
+        setType("cubesphere");
         // Params
-        setParams(createUVSphereParameters(400L, 1.0, false));
+        switch (modelType) {
+            case "icosphere" -> setParams(createIcoSphereParameters(7, 1.0, false));
+            case "cubesphere" -> setParams(createCubeSphereParameters(100, 1.0, false));
+            case "octahedronsphere" -> setParams(createOctahedronSphereParameters(7, 1.0, false));
+            default -> setParams(createUVSphereParameters(400, 1.0, false));
+        }
         // Noise
         if (nc != null) {
             nc.dispose();
@@ -555,7 +572,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     public void copyFrom(CloudComponent other) {
         this.size = other.size;
         this.diffuse = other.diffuse;
-        this.params = other.params;
+        this.modelParams = other.modelParams;
         this.diffuseCubemap = other.diffuseCubemap;
         this.diffuseSvt = other.diffuseSvt;
         this.svtParams = other.svtParams;

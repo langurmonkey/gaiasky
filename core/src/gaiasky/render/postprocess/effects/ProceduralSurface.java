@@ -7,11 +7,9 @@
 
 package gaiasky.render.postprocess.effects;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture3D;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.postprocess.PostProcessorEffect;
-import gaiasky.render.postprocess.filters.CloudsFilter;
 import gaiasky.render.postprocess.filters.ProceduralSurfaceFilter;
 import gaiasky.render.util.GaiaSkyFrameBuffer;
 import gaiasky.render.util.NoiseType;
@@ -124,6 +122,14 @@ public final class ProceduralSurface extends PostProcessorEffect {
 
     public void setLatitudeInfluence(float latitudeInfluence) {
         filter.setLatitudeInfluence(latitudeInfluence);
+    }
+
+    public void setPlainsHeight(float plainsHeight) {
+        filter.setPlainsHeight(plainsHeight);
+    }
+
+    public void setPlainsSlope(float plainsSlope) {
+        filter.setPlainsSlope(plainsSlope);
     }
 
     @Override
