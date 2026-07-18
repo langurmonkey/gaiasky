@@ -863,7 +863,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 nc.warpStrength = warpStrength.getMappedValue();
             }
         });
-        var warpFrequency = new OwnSliderReset(I18n.msg("gui.procedural.warp.frequency"), 0.5f, 5.0f, 0.01f, 0.5f, skin);
+        var warpFrequency = new OwnSliderReset(I18n.msg("gui.procedural.warp.frequency"), 0.1f, 5.0f, 0.01f, 1.0f, skin);
         warpFrequency.setWidth(fieldWidthNoise / 2f - pad10 * 1.1f);
         warpFrequency.setValue(nc.warpFrequency);
         warpFrequency.addListener(new ChangeListener() {

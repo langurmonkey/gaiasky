@@ -47,7 +47,7 @@ public final class NoiseComponent extends NamedComponent {
     /** Strength of the domain warping. **/
     public float warpStrength = 0.0f;
     /** Frequency of the warp noise. **/
-    public float warpFrequency = 0.5f;
+    public float warpFrequency = 1.0f;
 
     /** Generate emissive map (lights). **/
     public boolean genEmissiveMap = false;
@@ -351,8 +351,8 @@ public final class NoiseComponent extends NamedComponent {
         setPlainsSlope(uniform(rand, 0.05, 0.3));
         // Warp.
         if (rand.nextBoolean()) {
-            setWarpStrength(uniform(rand, 0.01, 1.0));
-            setWarpFrequency(uniform(rand, 0.01, 1.0));
+            setWarpStrength(uniform(rand, 0.5, 1.5));
+            setWarpFrequency(uniform(rand, 0.6, 2.0));
         }
         // Emission.
         setGenEmissiveMap(rand.nextInt(10) == 9);
@@ -411,8 +411,8 @@ public final class NoiseComponent extends NamedComponent {
         setPlainsSlope(uniform(rand, 0.05, 0.2));
         // Warp.
         if (rand.nextBoolean()) {
-            setWarpStrength(uniform(rand, 0.01, 1.0));
-            setWarpFrequency(uniform(rand, 0.01, 1.0));
+            setWarpStrength(uniform(rand, 0.5, 1.5));
+            setWarpFrequency(uniform(rand, 0.6, 2.0));
         }
         //Remap.
         setRemap(rand.nextDouble() > 0.1);
@@ -453,7 +453,7 @@ public final class NoiseComponent extends NamedComponent {
         // Warp.
         if (rand.nextBoolean()) {
             setWarpStrength(uniform(rand, 0.01, 1.0));
-            setWarpFrequency(uniform(rand, 0.01, 1.0));
+            setWarpFrequency(uniform(rand, 0.5, 1.0));
         }
         //Remap.
         setRemap(rand.nextDouble() > 0.2);
@@ -526,8 +526,8 @@ public final class NoiseComponent extends NamedComponent {
         setPlainsSlope(uniform(rand, 0.05, 0.2));
         // Warp.
         if (rand.nextBoolean()) {
-            setWarpStrength(uniform(rand, 0.01, 1.0));
-            setWarpFrequency(uniform(rand, 0.01, 1.0));
+            setWarpStrength(uniform(rand, 0.5, 1.5));
+            setWarpFrequency(uniform(rand, 0.6, 2.0));
         }
         //Remap.
         setRemap(rand.nextDouble() > 0.2);
@@ -569,7 +569,7 @@ public final class NoiseComponent extends NamedComponent {
         setLatitudeInfluence(0.5);
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.6));
-        setPlainsSlope(uniform(rand, 0.05, 0.2));
+        setPlainsSlope(uniform(rand, 0.5, 0.2));
         // Remap.
         setRemap(rand.nextDouble() > 0.2);
         // Emission.
@@ -734,8 +734,8 @@ public final class NoiseComponent extends NamedComponent {
         setPlainsSlope(uniform(rand, 0.05, 0.2));
         // Warp.
         if (rand.nextBoolean()) {
-            setWarpStrength(uniform(rand, 0.2, 3.0));
-            setWarpFrequency(uniform(rand, 0.3, 3.0));
+            setWarpStrength(uniform(rand, 0.6, 3.0));
+            setWarpFrequency(uniform(rand, 1.0, 3.0));
         }
         //Remap.
         setRemap(rand.nextDouble() > 0.2);

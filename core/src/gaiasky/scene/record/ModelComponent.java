@@ -1184,7 +1184,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         // Parameters
         switch (modelType) {
             case "icosphere" -> setParams(createIcoSphereParameters(8, 1.0, false));
-            case "cubesphere" -> setParams(createCubeSphereParameters(100, 1.0, false));
+            case "cubesphere" -> setParams(createCubeSphereParameters(200, 1.0, false));
             case "octahedronsphere" -> setParams(createOctahedronSphereParameters(8, 1.0, false));
             default -> setParams(createUVSphereParameters(600, 1.0, false));
         }
