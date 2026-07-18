@@ -501,7 +501,8 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(3)].name());
+        var type = NoiseType.values()[rand.nextInt(3)];
+        setType(type.name());
         // Same scale for all.
         double scale = rand.nextDouble(3.0, 8.0);
         setScale(new double[]{scale, scale, scale});
@@ -520,7 +521,7 @@ public final class NoiseComponent extends NamedComponent {
         // Smoothing.
         setSmoothing(rand.nextBoolean());
         // Base level.
-        setBaseLevel(uniform(rand, 0.25, 0.65));
+        setBaseLevel(type == NoiseType.VORONOI ? rand.nextDouble(0.65, 0.85) : rand.nextDouble(0.25, 0.65));
         // Latitude influence.
         setLatitudeInfluence(uniform(rand, 0.65, 0.85));
         // Plains.
@@ -571,7 +572,7 @@ public final class NoiseComponent extends NamedComponent {
         setLatitudeInfluence(0.5);
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.6));
-        setPlainsSlope(uniform(rand, 0.5, 0.2));
+        setPlainsSlope(uniform(rand, 0.05, 0.12));
         // Remap.
         setRemap(rand.nextDouble() > 0.2);
         // Emission.
@@ -627,7 +628,8 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(3)].name());
+        var type = NoiseType.values()[rand.nextInt(3)];
+        setType(type.name());
         // Same scale for all.
         double scale = rand.nextDouble(5.0, 9.0);
         setScale(new double[]{scale, scale, scale});
@@ -646,7 +648,7 @@ public final class NoiseComponent extends NamedComponent {
         // Smoothing.
         setSmoothing(rand.nextBoolean());
         // Base level.
-        setBaseLevel(rand.nextDouble(0.3, 0.7));
+        setBaseLevel(type == NoiseType.VORONOI ? rand.nextDouble(0.65, 0.9) : rand.nextDouble(0.3, 0.7));
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.5));
         setPlainsSlope(uniform(rand, 0.05, 0.2));
