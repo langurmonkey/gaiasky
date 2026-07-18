@@ -136,6 +136,11 @@ public class GaiaSkyDesktop implements IObserver {
     public static void main(String[] args) {
         // Set main thread name.
         Thread.currentThread().setName(Constants.MAIN_THREAD_NAME);
+        if (SysUtils.getJavaVersion() >= 26.0) {
+            // Use modern memory backend for LWJGL3 based on java.lang.foreign for Java 26+.
+            // For Java 25 and below, let LWJGL3 decide.
+            Configuration.MEMORY_BACKEND.set("ffm");
+        }
 
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         cliArgs = new CLIArgs();
@@ -385,7 +390,25 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
+    private static boolean needsX11Workaround() {
+        String sessionType = System.getenv("XDG_SESSION_TYPE");
+        String waylandDisplay = System.getenv("WAYLAND_DISPLAY");
+        boolean wayland = "wayland".equalsIgnoreCase(sessionType)
+                || (waylandDisplay != null && !waylandDisplay.isEmpty());
+        if (!wayland) {
+            return false;
+        }
+        return "nvidia".equalsIgnoreCase(System.getenv("__GLX_VENDOR_LIBRARY_NAME"))
+                || Files.exists(Path.of("/proc/driver/nvidia/version"));
+    }
+
     private void init() {
+        if (SysUtils.isLinux() && needsX11Workaround()) {
+            org.lwjgl.glfw.GLFW.glfwInitHint(
+                    org.lwjgl.glfw.GLFW.GLFW_PLATFORM,
+                    org.lwjgl.glfw.GLFW.GLFW_PLATFORM_X11
+            );
+        }
         launchMainApp();
     }
 
