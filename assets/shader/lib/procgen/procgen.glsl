@@ -39,6 +39,16 @@ vec3 sphericalToCartesian(float phi, float theta) {
 }
 
 vec2 computeElevation(vec3 p, float baseLevel) {
+    // Warping.
+    vec3 warp = vec3(0.0);
+    if (u_warp.x > 0.001) {
+        float warpFreq = 2.0;
+        warp.x = noise(p, SIMPLEX, 0.5, u_warp.y, 2.0, false, false, vec3(1.0), 3, u_seed + 0.32) * u_warp.x;
+        warp.y = noise(p, SIMPLEX, 0.5, u_warp.y, 2.0, false, false, vec3(1.0), 3, u_seed + 0.121) * u_warp.x;
+        warp.z = noise(p, SIMPLEX, 0.5, u_warp.y, 2.0, false, false, vec3(1.0), 3, u_seed - 0.421) * u_warp.x;
+    }
+    p = p + warp;
+
     float elevation_noise = noise(p, u_type, u_persistence, u_frequency, u_lacunarity, u_turbulence, u_ridge, u_scale, u_octaves, u_seed);
     if (u_smoothing) {
         elevation_noise = smoothstep(0.0, 1.0, elevation_noise);

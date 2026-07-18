@@ -44,6 +44,11 @@ public final class NoiseComponent extends NamedComponent {
     /** Slope of plains. Lower values produce flatter plains, while higher values produce steeper plains. **/
     public float plainsSlope = 0.2f;
 
+    /** Strength of the domain warping. **/
+    public float warpStrength = 0.0f;
+    /** Frequency of the warp noise. **/
+    public float warpFrequency = 0.5f;
+
     /** Generate emissive map (lights). **/
     public boolean genEmissiveMap = false;
 
@@ -74,10 +79,8 @@ public final class NoiseComponent extends NamedComponent {
 
     private Clouds getCloudsEffect(int N,
                                    int M,
-                                   int channels,
-                                   int targets,
                                    String shader) {
-        Clouds biome = new Clouds(N, M, targets, shader);
+        Clouds biome = new Clouds(N, M, shader);
         biome.setScale(scale);
         biome.setType(type);
         biome.setBaseLevel(baseLevel);
@@ -92,17 +95,17 @@ public final class NoiseComponent extends NamedComponent {
         biome.setRidge(ridge);
         biome.setPlainsHeight(plainsHeight);
         biome.setPlainsSlope(plainsSlope);
+        biome.setWarpStrength(warpStrength);
+        biome.setWarpFrequency(warpFrequency);
         return biome;
     }
 
     public FrameBuffer generateClouds(int N,
                                       int M,
                                       float[] color) {
-        int targets = 1;
-        int channels = 1;
-        fbMain = fbMain != null ? fbMain : createFrameBuffer(N, M, targets);
+        fbMain = fbMain != null ? fbMain : createFrameBuffer(N, M, 1);
 
-        Clouds clouds = getCloudsEffect(N, M, channels, targets, "clouds");
+        Clouds clouds = getCloudsEffect(N, M, "clouds");
         clouds.setColor(color);
         clouds.render(null, fbMain);
 
@@ -124,7 +127,7 @@ public final class NoiseComponent extends NamedComponent {
 
         // 1 channels: water/land.
         // Emissive map is an additional render target.
-        Clouds biomeNoise = getCloudsEffect(N, M, 1, 1, "biome");
+        Clouds biomeNoise = getCloudsEffect(N, M, "biome");
         fbMask.begin();
         biomeNoise.render(null, fbMask);
         fbMask.end();
@@ -180,6 +183,8 @@ public final class NoiseComponent extends NamedComponent {
         effect.setLatitudeInfluence(latitudeInfluence);
         effect.setPlainsHeight(plainsHeight);
         effect.setPlainsSlope(plainsSlope);
+        effect.setWarpStrength(warpStrength);
+        effect.setWarpFrequency(warpFrequency);
         effect.setChannels(channels);
         fbMain.begin();
         effect.render(null, fbMain);
@@ -267,6 +272,14 @@ public final class NoiseComponent extends NamedComponent {
         this.plainsSlope = value.floatValue();
     }
 
+    public void setWarpStrength(Double value) {
+        this.warpStrength = value.floatValue();
+    }
+
+    public void setWarpFrequency(Double value) {
+        this.warpFrequency = value.floatValue();
+    }
+
     public void setGenEmissiveMap(Boolean value) {
         genEmissiveMap = value;
     }
@@ -336,6 +349,11 @@ public final class NoiseComponent extends NamedComponent {
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.6));
         setPlainsSlope(uniform(rand, 0.05, 0.3));
+        // Warp.
+        if (rand.nextBoolean()) {
+            setWarpStrength(uniform(rand, 0.01, 1.0));
+            setWarpFrequency(uniform(rand, 0.01, 1.0));
+        }
         // Emission.
         setGenEmissiveMap(rand.nextInt(10) == 9);
 
@@ -391,6 +409,11 @@ public final class NoiseComponent extends NamedComponent {
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.2));
         setPlainsSlope(uniform(rand, 0.05, 0.2));
+        // Warp.
+        if (rand.nextBoolean()) {
+            setWarpStrength(uniform(rand, 0.01, 1.0));
+            setWarpFrequency(uniform(rand, 0.01, 1.0));
+        }
         //Remap.
         setRemap(rand.nextDouble() > 0.1);
     }
@@ -427,6 +450,11 @@ public final class NoiseComponent extends NamedComponent {
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.6));
         setPlainsSlope(uniform(rand, 0.05, 0.2));
+        // Warp.
+        if (rand.nextBoolean()) {
+            setWarpStrength(uniform(rand, 0.01, 1.0));
+            setWarpFrequency(uniform(rand, 0.01, 1.0));
+        }
         //Remap.
         setRemap(rand.nextDouble() > 0.2);
         // Emission.
@@ -496,6 +524,11 @@ public final class NoiseComponent extends NamedComponent {
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.6));
         setPlainsSlope(uniform(rand, 0.05, 0.2));
+        // Warp.
+        if (rand.nextBoolean()) {
+            setWarpStrength(uniform(rand, 0.01, 1.0));
+            setWarpFrequency(uniform(rand, 0.01, 1.0));
+        }
         //Remap.
         setRemap(rand.nextDouble() > 0.2);
         // Emission.
@@ -699,6 +732,11 @@ public final class NoiseComponent extends NamedComponent {
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.2));
         setPlainsSlope(uniform(rand, 0.05, 0.2));
+        // Warp.
+        if (rand.nextBoolean()) {
+            setWarpStrength(uniform(rand, 0.2, 3.0));
+            setWarpFrequency(uniform(rand, 0.3, 3.0));
+        }
         //Remap.
         setRemap(rand.nextDouble() > 0.2);
         // Emission.

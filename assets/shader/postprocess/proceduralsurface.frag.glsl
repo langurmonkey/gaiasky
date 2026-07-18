@@ -48,6 +48,10 @@ uniform int u_type;
 // - height: plains are between baseLevel and this value.
 // - slope: low values create flat plains, while higher values progressively erase them.
 uniform vec2 u_plains = vec2(0.4, 0.2);
+// Domain warping.
+// - strength: how much warping is applied.
+// - frequency: frequency of the warping noise.
+uniform vec2 u_warp = vec2(0.0, 0.1);
 
 in vec2 v_texCoords;
 
@@ -94,16 +98,6 @@ void main() {
     float theta = xy.x * dTheta;
     vec3 p = sphericalToCartesian(phi, theta);
 
-    // Warping.
-    vec3 warp = vec3(0.0);
-    float warpStrength = 0.0;
-    if (warpStrength > 0.001) {
-        float warpFreq = 2.0;
-        warp.x = noise(p, SIMPLEX, 0.5, warpFreq, 2.0, false, false, vec3(1.0), 3, u_seed + 0.32) * warpStrength;
-        warp.y = noise(p, SIMPLEX, 0.5, warpFreq, 2.0, false, false, vec3(1.0), 3, u_seed + 0.121) * warpStrength;
-        warp.z = noise(p, SIMPLEX, 0.5, warpFreq, 2.0, false, false, vec3(1.0), 3, u_seed - 0.421) * warpStrength;
-    }
-
     float baseLevel = u_baseLevel;
 
     ///
@@ -112,7 +106,7 @@ void main() {
     fragBiome = vec4(0.0, 0.0, 0.0, 1.0);
 
     // Elevation (channel 1)
-    vec2 elv = computeElevation(p + warp, u_baseLevel);
+    vec2 elv = computeElevation(p, u_baseLevel);
     float elevation = elv.x;
     baseLevel = elv.y;
     float waterMask = step(baseLevel + EPSILON, elevation);
@@ -121,7 +115,7 @@ void main() {
     // Moisture (channel 2)
     float moisture = 0.0;
     if (u_channels >= 2) {
-        moisture = noise(p - warp, SIMPLEX, 0.5, 0.5, 2.0, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
+        moisture = noise(p, SIMPLEX, 0.5, 0.5, 2.0, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
         fragBiome.g = moisture;
     }
 

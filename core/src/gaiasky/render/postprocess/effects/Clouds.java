@@ -16,13 +16,13 @@ import gaiasky.render.util.NoiseType;
 public final class Clouds extends PostProcessorEffect {
     private final NoiseFilter filter;
 
-    public Clouds(int viewportWidth, int viewportHeight, int targets, String shader) {
-        filter = new NoiseFilter(viewportWidth, viewportHeight, targets, shader);
+    public Clouds(int viewportWidth, int viewportHeight, String shader) {
+        filter = new NoiseFilter(viewportWidth, viewportHeight, 1, shader);
         disposables.add(filter);
 
     }
-    public Clouds(int viewportWidth, int viewportHeight, int targets) {
-        this(viewportWidth, viewportHeight, targets, "clouds");
+    public Clouds(int viewportWidth, int viewportHeight) {
+        this(viewportWidth, viewportHeight, "clouds");
     }
 
     public void setViewportSize(int width, int height) {
@@ -111,6 +111,14 @@ public final class Clouds extends PostProcessorEffect {
 
     public void setPlainsSlope(float plainsSlope) {
         filter.setPlainsSlope(plainsSlope);
+    }
+
+    public void setWarpStrength(float warpStrength) {
+        filter.setWarpStrength(warpStrength);
+    }
+
+    public void setWarpFrequency(float warpFrequency) {
+        filter.setWarpFrequency(warpFrequency);
     }
 
     @Override

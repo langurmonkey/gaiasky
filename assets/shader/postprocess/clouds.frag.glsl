@@ -42,10 +42,14 @@ uniform int u_channels;
 // 1 - SIMPLEX
 // 2 - VORONOI
 uniform int u_type;
-// Plains
-// x - height
-// y - slope
-uniform vec2 u_plains;
+// Plains height and slope.
+// - height: plains are between baseLevel and this value.
+// - slope: low values create flat plains, while higher values progressively erase them.
+uniform vec2 u_plains = vec2(0.0, 0.2);
+// Domain warping.
+// - strength: how much warping is applied.
+// - frequency: frequency of the warping noise.
+uniform vec2 u_warp = vec2(0.0, 0.1);
 
 in vec2 v_texCoords;
 

@@ -132,6 +132,14 @@ public final class ProceduralSurface extends PostProcessorEffect {
         filter.setPlainsSlope(plainsSlope);
     }
 
+    public void setWarpStrength(float warpStrength) {
+        filter.setWarpStrength(warpStrength);
+    }
+
+    public void setWarpFrequency(float warpFrequency) {
+        filter.setWarpFrequency(warpFrequency);
+    }
+
     @Override
     public void rebind() {
         filter.rebind();

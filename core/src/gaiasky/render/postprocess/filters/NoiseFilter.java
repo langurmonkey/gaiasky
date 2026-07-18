@@ -55,6 +55,18 @@ public class NoiseFilter extends Filter<NoiseFilter> {
      * </ul>
      **/
     protected final Vector2 plains = new Vector2(0.0f, 0.1f);
+    /**
+     * Domain warping:
+     * <ul>
+     *     <li>
+     *        Strength - how much warping is applied, in [0,1].
+     *     </li>
+     *     <li>
+     *        Frequency - frequency of the warping noise.
+     *     </li>
+     * </ul>
+     **/
+    protected final Vector2 warp = new Vector2(0.0f, 0.1f);
 
     /** The noise type. **/
     protected NoiseType type = NoiseType.SIMPLEX;
@@ -177,6 +189,16 @@ public class NoiseFilter extends Filter<NoiseFilter> {
         setParam(Param.Plains, plains);
     }
 
+    public void setWarpStrength(float ws) {
+        this.warp.x = ws;
+        setParam(Param.Warp, warp);
+    }
+
+    public void setWarpFrequency(float wf) {
+        this.warp.y = wf;
+        setParam(Param.Warp, warp);
+    }
+
     protected void rebindNoEnd(){
         // Re-implement super to batch every parameter
         setParams(Param.Viewport, this.viewport);
@@ -193,6 +215,7 @@ public class NoiseFilter extends Filter<NoiseFilter> {
         setParams(Param.Turbulence, this.turbulence);
         setParams(Param.Ridge, this.ridge);
         setParams(Param.Plains, this.plains);
+        setParams(Param.Warp, this.warp);
         setParams(Param.Channels, this.channels);
         setParams(Param.Type, this.type.ordinal());
     }
@@ -230,6 +253,7 @@ public class NoiseFilter extends Filter<NoiseFilter> {
         Turbulence("u_turbulence", 0),
         Ridge("u_ridge", 0),
         Plains("u_plains", 2),
+        Warp("u_warp", 2),
         Channels("u_channels", 0),
         Type("u_type", 0);
         // @formatter:on

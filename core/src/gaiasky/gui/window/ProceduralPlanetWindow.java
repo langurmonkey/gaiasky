@@ -852,6 +852,39 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             noiseTable.add(plainsTooltip).left().padBottom(pad18).row();
         }
 
+        // Warping.
+        var warpStrength = new OwnSliderReset(I18n.msg("gui.procedural.warp.strength"), 0.0f, 2.0f, 0.01f, 0.0f, skin);
+        warpStrength.setWidth(fieldWidthNoise / 2f - pad10 * 1.1f);
+        warpStrength.setValue(nc.warpStrength);
+        warpStrength.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                nc.warpStrength = warpStrength.getMappedValue();
+            }
+        });
+        var warpFrequency = new OwnSliderReset(I18n.msg("gui.procedural.warp.frequency"), 0.5f, 5.0f, 0.01f, 0.5f, skin);
+        warpFrequency.setWidth(fieldWidthNoise / 2f - pad10 * 1.1f);
+        warpFrequency.setValue(nc.warpFrequency);
+        warpFrequency.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                nc.warpFrequency = warpFrequency.getMappedValue();
+            }
+        });
+
+        HorizontalGroup warpGroup = new HorizontalGroup();
+        warpGroup.space(pad10 * 2f);
+        warpGroup.addActor(warpStrength);
+        warpGroup.addActor(warpFrequency);
+        OwnImageButton warpTooltip = new OwnImageButton(skin, "tooltip");
+        warpTooltip.addListener(new OwnTextTooltip(
+                I18n.msg("gui.procedural.info.warp"),
+                skin));
+        noiseTable.add(warpGroup).colspan(2).left().padBottom(pad18).padRight(pad10);
+        noiseTable.add(warpTooltip).left().padBottom(pad18).row();
+
         // Smoothing, turbulence, and ridge.
         var smoothing = new OwnCheckBox(I18n.msg("gui.procedural.smoothing"), skin, pad10);
         var turbulence = new OwnCheckBox(I18n.msg("gui.procedural.turbulence"), skin, pad10);
