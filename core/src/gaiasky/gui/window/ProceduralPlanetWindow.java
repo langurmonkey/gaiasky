@@ -1098,7 +1098,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             scrollContent.add(heightScaleTooltip).left().padBottom(pad18).row();
 
             // Latitude influence
-            var latitudeInfluence = new OwnSliderReset(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.05f, 0.8f, skin);
+            var latitudeInfluence = new OwnSliderReset(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.01f, 0.8f, skin);
             latitudeInfluence.setWidth(fieldWidthTotal);
             latitudeInfluence.setValue(mtc.nc.latitudeInfluence);
             latitudeInfluence.addListener(new ChangeListener() {

@@ -429,7 +429,8 @@ public final class NoiseComponent extends NamedComponent {
         // Seed.
         setSeed(rand.nextDouble(2.0));
         // Type.
-        setType(NoiseType.values()[rand.nextInt(3)].name());
+        var type = rand.nextBoolean() ? NoiseType.CRATER : NoiseType.values()[rand.nextInt(3)];
+        setType(type.name());
         // Same scale for all.
         double scale = rand.nextDouble(8.0, 15.0);
         setScale(new double[]{scale, scale, scale});
@@ -440,7 +441,7 @@ public final class NoiseComponent extends NamedComponent {
         // Lacunarity.
         setLacunarity(rand.nextDouble(3.0, 5.0));
         // Octaves.
-        setOctaves(5L);
+        setOctaves(type == NoiseType.CRATER ? 4L : 5L);
         // Turbulence.
         setTurbulence(rand.nextInt(4) == 3);
         // Ridge.
@@ -448,7 +449,13 @@ public final class NoiseComponent extends NamedComponent {
         // Smoothing.
         setSmoothing(rand.nextBoolean());
         // Base level.
-        setBaseLevel(gaussian(rand, 0.05, 0.01, 0.0, 0.1));
+        if (type == NoiseType.CRATER) {
+            setBaseLevel(uniform(rand, 0.25, 0.45));
+        } else {
+            setBaseLevel(gaussian(rand, 0.2, 0.05, 0.0, 0.4));
+        }
+        // Latitude influence.
+        setLatitudeInfluence(uniform(rand, 0.2, 0.55));
         // Plains.
         setPlainsHeight(uniform(rand, 0.0, 0.6));
         setPlainsSlope(uniform(rand, 0.05, 0.2));

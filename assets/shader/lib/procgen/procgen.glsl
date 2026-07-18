@@ -5,6 +5,7 @@
 #include <shader/lib/noise/simplex.glsl>
 #include <shader/lib/noise/perlin.glsl>
 #include <shader/lib/noise/voronoi.glsl>
+#include <shader/lib/noise/crater.glsl>
 #include <shader/lib/noise/fbm.glsl>
 
 float noise(vec3 p,

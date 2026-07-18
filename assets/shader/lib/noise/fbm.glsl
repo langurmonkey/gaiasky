@@ -5,6 +5,7 @@
 #define PERLIN 0
 #define SIMPLEX 1
 #define VORONOI 2
+#define CRATER 3
 
 float gln_fbm(vec3 p, gln_tFBMOpts opts, int type) {
     p += (opts.seed * 100.0);
@@ -15,7 +16,8 @@ float gln_fbm(vec3 p, gln_tFBMOpts opts, int type) {
         float noiseVal;
         if (type == PERLIN) noiseVal = gln_perlin(p);
         else if (type == SIMPLEX) noiseVal = gln_simplex(p);
-        else noiseVal = gln_voronoi(p);
+        else if (type == VORONOI) noiseVal = gln_voronoi(p);
+        else if (type == CRATER) noiseVal = gln_crater(p);
 
         if (opts.turbulence && !opts.ridge) {
             result += abs(noiseVal) * amplitude;

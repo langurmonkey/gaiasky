@@ -13,8 +13,9 @@ package gaiasky.render.util;
  *   <li>Perlin</li>
  *   <li>Simplex</li>
  *   <li>Voronoi</li>
+ *   <li>Crater</li>
  * </ol>
  */
 public enum NoiseType {
-    PERLIN, SIMPLEX, VORONOI
+    PERLIN, SIMPLEX, VORONOI, CRATER
 }
