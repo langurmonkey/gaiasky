@@ -1,7 +1,7 @@
-float hash1(vec3 p) {
+float hash1_crater(vec3 p) {
     return fract(sin(dot(p, vec3(41.3, 289.1, 158.7))) * 43758.5453123);
 }
-vec3 hash3(vec3 p) {
+vec3 hash3_crater(vec3 p) {
     vec3 q = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
             dot(p, vec3(269.5, 183.3, 246.1)),
             dot(p, vec3(113.5, 271.9, 124.6)));
@@ -41,12 +41,12 @@ float gln_crater(vec3 p) {
         vec3 off = vec3(float(xi), float(yi), float(zi)) * sgn;
         vec3 neighbor = cell + off;
 
-        float exists = step(1.0 - CRATER_DENSITY, hash1(neighbor + 17.3));
+        float exists = step(1.0 - CRATER_DENSITY, hash1_crater(neighbor + 17.3));
         if (exists < 0.5) continue;
 
-        vec3 jitter = hash3(neighbor);
+        vec3 jitter = hash3_crater(neighbor);
         vec3 center = neighbor + 0.15 + jitter * 0.7;
-        float radius = mix(0.18, 0.40, hash1(neighbor + 5.1));
+        float radius = mix(0.18, 0.40, hash1_crater(neighbor + 5.1));
 
         float d = length(p - center);
         float t = d / radius;

@@ -89,6 +89,20 @@ vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLe
 
 #define EPSILON 1.0 / 255.0
 
+#ifdef emissiveMapFlag
+float cityMask(vec3 p, float elevation, float waterMask) {
+    // Low-frequency simplex/fbm for region-scale placement (which
+    // "areas" of the planet get urbanized at all).
+    float m = noise(p * 1.5, SIMPLEX, 0.5, 2.3, 2.0, false, false, vec3(1.0), 5, u_seed);
+    m = smoothstep(0.6, 0.63, m); // soft edge instead of a hard cut
+
+    // Don't build underwater or high in the mountains -- keep to a "habitable" elevation band.
+    float elevGate = waterMask * (1.0 - smoothstep(0.1, 0.2, elevation));
+
+    return m * elevGate;
+}
+#endif // emissiveMapFlag
+
 void main() {
     // Sample point on sphere surface.
     vec2 xy = v_texCoords * u_viewport;
@@ -161,21 +175,21 @@ void main() {
 
     // Emission (procedural, from noise)
     #ifdef emissiveMapFlag
-    float emi = noise(p, SIMPLEX, 0.5, 0.16, 2.0, false, false, vec3(8.0, 8.0, 8.0), 3, u_seed + 0.1325);
-    emi = emi * smoothstep(0.45, 0.8, emi) * 2.0;
-    emi = emi * noise(p, VORONOI, 0.5, 1.6, 2.0, true, true, vec3(14.0), 1, u_seed);
-    // Not on water!
-    emi = emi * waterMask;
+    float emissiveMask = cityMask(p, elevation, waterMask);
+    float emi = noise(p, BLOCKY, 0.5, 5.0, 1.5, false, false, vec3(8.0), 4, u_seed + 0.1325);
+    float city = emi * emissiveMask;
+
     // Some color.
-    float r = gln_rand(xy + emi) * 0.2 + 0.8;
-    float g = gln_rand(xy - emi) * 0.2 + 0.7;
-    float b = gln_rand(xy + emi * 1.5) * 0.2 + 0.5;
-    fragEmission = vec4(emi * r, emi * g, emi * b, 1.0);
+    float r = gln_rand(xy + city) * 0.1 + 0.9;
+    float g = gln_rand(xy - city) * 0.1 + 0.8;
+    float b = gln_rand(xy + city * 1.5) * 0.2 + 0.5;
+    fragEmission = vec4(city * r, city * g, city * b, 1.0);
 
-    if (emi > 0.2) {
-        float d = (0.8 - emi + 0.2) * (gln_rand(xy) * 0.4 + 0.4);
+    if (emissiveMask > 0.0) {
+        float d = city;
 
-        fragDiffuse.rgb = vec3(d);
+        fragDiffuse.rgb = max(fragDiffuse.rgb - vec3(d), vec3(0.0));
+
     }
     #else
     fragEmission = vec4(0.0, 0.0, 0.0, 1.0);
