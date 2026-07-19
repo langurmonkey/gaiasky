@@ -233,6 +233,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         landAt.addListener(new OwnTextTooltip(I18n.msg("gui.focusinfo.landat"), skin));
 
         refreshOrbit = new OwnTextIconButton("", skin, "reload");
+        refreshOrbit.setSize(btw, btw);
+        refreshOrbit.setIconSize(bw, bw);
         // This is filled later on.
 
         proceduralPlanet = new OwnTextIconButton("", skin, "generate");

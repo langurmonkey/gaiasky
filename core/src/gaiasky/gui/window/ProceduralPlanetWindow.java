@@ -957,7 +957,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         content.add(noiseTable).colspan(3).center().padBottom(pad34).row();
     }
 
-    private void updateLutImage(Array<String> luts) {
+    private void updateLutImage() {
         if (lutImageCell != null) {
             lutImageCell.clearActor();
             var manager = MaterialComponent.getLUTManager();
@@ -987,7 +987,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             var img = new OwnImage(newLutTexture, false);
             img.setScaling(Scaling.fill);
             lutImageCell.setActor(img);
-            lutImageCell.size(260, 260);
+            lutImageCell.size(330f, 330f);
             if (currentLutTexture != null) {
                 currentLutTexture.dispose();
             }
@@ -1030,38 +1030,40 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             // Add generate and randomize buttons
             genSurfaceButton = addGenButton(content, "gui.procedural.surface", this::generateSurface, 2);
 
-            Table scrollContent = new Table(skin);
+            // Two-column layout: left (controls) + right (LUT image + checkbox)
+            Table leftCol = new Table(skin);
+            Table rightCol = new Table(skin);
 
-            // LUT
             Array<String> lookUpTables = MaterialComponent.getLUTManager().getPresetNames();
 
+            // --- LEFT COLUMN ---
+
+            // LUT select box
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);
-            lookUpTablesBox.setWidth(fieldWidth);
+            lookUpTablesBox.setWidth(fieldWidthAll / 3f + 60f);
             lookUpTablesBox.setSelected(mtc.biomeLUT);
             lookUpTablesBox.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
                     mtc.biomeLUT = lookUpTablesBox.getSelected();
-                    updateLutImage(lookUpTables);
+                    updateLutImage();
                 }
             });
 
             var lookUpTablesLabel = new OwnLabel(I18n.msg("gui.procedural.lut"), skin);
-            lookUpTablesLabel.setWidth(textWidth);
+            lookUpTablesLabel.setWidth(fieldWidthAll / 3f + 50f);
 
             var lutTooltip = new OwnImageButton(skin, "tooltip");
             lutTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.lut"), skin));
-            scrollContent.add(lookUpTablesLabel).left().padBottom(pad18).padRight(pad18);
-            scrollContent.add(lookUpTablesBox).left().padBottom(pad18).padRight(pad10);
-            scrollContent.add(lutTooltip).left().padBottom(pad18).row();
-            lutImageCell = scrollContent.add();
-            lutImageCell.colspan(3).padBottom(pad18).row();
+            leftCol.add(lookUpTablesLabel).left().padBottom(pad18).padRight(pad18);
+            leftCol.add(lookUpTablesBox).left().padBottom(pad18).padRight(pad10);
+            leftCol.add(lutTooltip).left().padBottom(pad18).row();
 
             // Hue shift
             hueShift = new OwnSliderReset(I18n.msg("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, 0.0f, skin);
-            hueShift.setWidth(fieldWidthTotal);
+            hueShift.setWidth(fieldWidthAll * 2f / 3f + 120f);
             hueShift.setValueSuffix("°");
             hueShift.setValue(mtc.biomeHueShift);
             hueShift.addListener(new ChangeListener() {
@@ -1069,20 +1071,17 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 public void changed(ChangeEvent event,
                                     Actor actor) {
                     mtc.biomeHueShift = hueShift.getMappedValue();
-                    updateLutImage(lookUpTables);
+                    updateLutImage();
                 }
             });
             var hueShiftTooltip = new OwnImageButton(skin, "tooltip");
             hueShiftTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.hueshift"), skin));
-            scrollContent.add(hueShift).colspan(2).left().padBottom(pad18).padRight(pad10);
-            scrollContent.add(hueShiftTooltip).left().padBottom(pad18).row();
-
-            // Initial update
-            updateLutImage(lookUpTables);
+            leftCol.add(hueShift).colspan(2).left().padBottom(pad34 * 2f).padRight(pad10);
+            leftCol.add(hueShiftTooltip).left().padBottom(pad34 * 2f).row();
 
             // Height scale
             var heightScale = new OwnSliderReset(I18n.msg("gui.procedural.heightscale"), 1.0f, 100.0f, 0.1f, 10f, skin);
-            heightScale.setWidth(fieldWidthTotal);
+            heightScale.setWidth(fieldWidthAll * 2f / 3f + 120f);
             heightScale.setValueSuffix(" km");
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
             heightScale.addListener(new ChangeListener() {
@@ -1094,8 +1093,38 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             });
             var heightScaleTooltip = new OwnImageButton(skin, "tooltip");
             heightScaleTooltip.setTooltip(I18n.msg("gui.procedural.info.heightscale"));
-            scrollContent.add(heightScale).colspan(2).left().padBottom(pad18).padRight(pad10);
-            scrollContent.add(heightScaleTooltip).left().padBottom(pad18).row();
+            leftCol.add(heightScale).colspan(2).left().padBottom(pad18).padRight(pad10);
+            leftCol.add(heightScaleTooltip).left().padBottom(pad18).row();
+
+            // Emission checkbox
+            var emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
+            emission.setChecked(mtc.nc.genEmissiveMap);
+            emission.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    mtc.nc.genEmissiveMap = emission.isChecked();
+                }
+            });
+            OwnImageButton emissionTooltip = new OwnImageButton(skin, "tooltip");
+            emissionTooltip.setTooltip(I18n.msg("gui.procedural.info.emission"));
+            leftCol.add(emission).colspan(2).left().padBottom(pad18).padRight(pad10);
+            leftCol.add(emissionTooltip).left().padBottom(pad18).row();
+
+            // --- RIGHT COLUMN ---
+
+            // LUT image
+            lutImageCell = rightCol.add();
+            lutImageCell.size(fieldWidthAll / 3f, fieldWidthAll / 3f).padBottom(pad18).row();
+
+            // Initial update
+            updateLutImage();
+
+
+            // Stitch left and right columns together
+            Table scrollContent = new Table(skin);
+            scrollContent.add(leftCol).top().left().padRight(pad34);
+            scrollContent.add(rightCol).top().left().row();
 
             // Latitude influence
             var latitudeInfluence = new OwnSliderReset(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.01f, 0.8f, skin);
@@ -1112,21 +1141,6 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             latitudeTooltip.setTooltip(I18n.msg("gui.procedural.info.latitude_influence"));
             scrollContent.add(latitudeInfluence).colspan(2).left().padBottom(pad18).padRight(pad10);
             scrollContent.add(latitudeTooltip).left().padBottom(pad18).row();
-
-            // Generate emission.
-            var emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
-            emission.setChecked(mtc.nc.genEmissiveMap);
-            emission.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event,
-                                    Actor actor) {
-                    mtc.nc.genEmissiveMap = emission.isChecked();
-                }
-            });
-            OwnImageButton emissionTooltip = new OwnImageButton(skin, "tooltip");
-            emissionTooltip.setTooltip(I18n.msg("gui.procedural.info.emission"));
-            scrollContent.add(emission).colspan(2).left().padBottom(pad18).padRight(pad10);
-            scrollContent.add(emissionTooltip).left().padBottom(pad18).row();
 
             // Noise
             addNoiseGroup(scrollContent, mtc.nc, false);
