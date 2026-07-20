@@ -809,6 +809,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
                         // BIOME: HEIGHT and MOISTURE.
                         if (heightT != null) {
+                            if (heightTex != null) {
+                                heightTex.dispose();
+                            }
                             // Create texture, populate material
                             if (!GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
                                 heightData = new HeightDataPixmap(heightT, null);
@@ -830,6 +833,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
                         // SPECULAR.
                         if (cSpecular) {
+                            if (specularTex != null) {
+                                specularTex.dispose();
+                            }
                             if (specularT != null) {
                                 specularTex = specularT;
                                 addSpecularTex(specularTex);
@@ -838,6 +844,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
                         // NORMAL.
                         if (cNormal) {
+                            if (normalTex != null) {
+                                normalTex.dispose();
+                            }
                             if (normalT != null) {
                                 normalTex = normalT;
                                 addNormalTex(normalTex);
@@ -846,6 +855,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
                         // EMISSIVE.
                         if (cEmissive) {
+                            if (emissiveTex != null) {
+                                emissiveTex.dispose();
+                            }
                             if (emissiveT != null) {
                                 emissiveTex = emissiveT;
                                 addEmissiveTex(emissiveTex);
