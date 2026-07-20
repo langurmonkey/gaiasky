@@ -176,7 +176,7 @@ void main() {
     // Emission (procedural, from noise)
     #ifdef emissiveMapFlag
     float emissiveMask = cityMask(p, elevation, waterMask);
-    float emi = noise(p, BLOCKY, 0.5, 5.0, 1.5, false, false, vec3(8.0), 4, u_seed + 0.1325);
+    float emi = noise(p, BLOCKY, 0.5, 6.0, 1.5, false, false, vec3(8.0), 2, u_seed + 0.1325);
     float city = emi * emissiveMask;
 
     // Some color.
