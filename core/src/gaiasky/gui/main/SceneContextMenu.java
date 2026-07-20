@@ -25,8 +25,8 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.DatasetCard;
 import gaiasky.util.CatalogManager;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.TextUtils;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
@@ -286,19 +286,23 @@ public class SceneContextMenu extends ContextMenu {
             });
             addItem(landOnCoord);
 
-            addSeparator();
+            // Only add if we have a material.
+            var model = Mapper.model.get(candidate.getEntity());
+            if (model != null && model.model != null && model.model.mtc != null) {
+                addSeparator();
 
-            MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort),
-                                                      skin,
-                                                      skin.getDrawable("planet-earth"));
-            proceduralSurface.addListener(event -> {
-                if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralSurface, candidate);
-                    return true;
-                }
-                return false;
-            });
-            addItem(proceduralSurface);
+                MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort),
+                                                          skin,
+                                                          skin.getDrawable("planet-earth"));
+                proceduralSurface.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.publish(Event.SHOW_PROCEDURAL_GEN_CMD, proceduralSurface, candidate);
+                        return true;
+                    }
+                    return false;
+                });
+                addItem(proceduralSurface);
+            }
 
         }
 

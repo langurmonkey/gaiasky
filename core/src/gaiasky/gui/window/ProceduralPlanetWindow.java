@@ -103,7 +103,9 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         this.initClc = Mapper.cloud.get(this.target).cloud;
         this.initAc = Mapper.atmosphere.get(this.target).atmosphere;
         this.setModal(false);
-        this.surfaceEnabled = initMtc.diffuseCubemap == null &&
+        this.surfaceEnabled =
+                initMtc != null &&
+                initMtc.diffuseCubemap == null &&
                 initMtc.specularCubemap == null &&
                 initMtc.heightCubemap == null &&
                 initMtc.emissiveCubemap == null;

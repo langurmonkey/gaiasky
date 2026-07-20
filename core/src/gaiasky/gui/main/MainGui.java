@@ -401,7 +401,10 @@ public class MainGui extends AbstractGui {
                 var planet = (FocusView) data[0];
 
                 // Check for cubemap textures, for they are incompatible with the procedural generation.
-                if (Mapper.model.has(planet.getEntity())) {
+                var model = Mapper.model.get(planet.getEntity());
+                if (model != null &&
+                    model.model != null &&
+                    model.model.mtc != null) {
                     // Only one instance
                     if (proceduralPlanetWindow != null) {
                         proceduralPlanetWindow.show(stage);
