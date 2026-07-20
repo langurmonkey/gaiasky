@@ -128,9 +128,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      * <p>
      * biome_lut_desert_03.jpg -> desert
       */
-    public String biomeLUT = "earthlike";
-    public float biomeHueShift = 0;
-    public float biomeSaturation = 1;
+    public String lut = "earthlike";
+    public float lutHueShift = 0f;
+    public float lutSaturation = 0.5f;
     /**
      * Add also color even if texture is present
      **/
@@ -784,9 +784,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                     // 2ND FRAME - GENERATE.
                     FrameBuffer fbPlanet = nc.generateProceduralSurface(N,
                                                                         M,
-                                                                        biomeLUT,
-                                                                        biomeHueShift,
-                                                                        biomeSaturation,
+                                                                        lut,
+                                                                        lutHueShift,
+                                                                        lutSaturation,
                                                                         3,
                                                                         GaiaSky.settings().scene.renderer.elevation.type.isNone());
 
@@ -1062,24 +1062,36 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         this.nc = noise;
     }
 
+    public void setLUT(String biomeLookupTex) {
+        this.lut = biomeLookupTex;
+    }
+
     public void setBiomelut(String biomeLookupTex) {
-        this.setBiomeLUT(biomeLookupTex);
+        this.setLUT(biomeLookupTex);
     }
 
     public void setBiomeLUT(String biomeLookupTex) {
-        this.biomeLUT = biomeLookupTex;
+        this.setLUT(biomeLookupTex);
+    }
+
+    public void setLUTHueShift(Double hueShift) {
+        this.lutHueShift = hueShift.floatValue();
     }
 
     public void setBiomehueshift(Double hueShift) {
-        this.setBiomeHueShift(hueShift);
+        this.setLUTHueShift(hueShift);
     }
 
     public void setBiomeHueShift(Double hueShift) {
-        this.biomeHueShift = hueShift.floatValue();
+        this.setLUTHueShift(hueShift);
+    }
+
+    public void setLUTSaturation(Double saturation) {
+        this.lutSaturation = saturation.floatValue();
     }
 
     public void setBiomeSaturation(Double saturation) {
-        this.biomeSaturation = saturation.floatValue();
+        setLUTSaturation(saturation);
     }
 
     /**
@@ -1487,9 +1499,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         this.emissive = other.emissive;
         this.metallic = other.metallic;
         this.roughness = other.roughness;
-        this.biomeLUT = other.biomeLUT;
-        this.biomeHueShift = other.biomeHueShift;
-        this.biomeSaturation = other.biomeSaturation;
+        this.lut = other.lut;
+        this.lutHueShift = other.lutHueShift;
+        this.lutSaturation = other.lutSaturation;
         this.heightScale = other.heightScale;
         this.texture0 = other.texture0;
         this.texture1 = other.texture1;
@@ -1522,7 +1534,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         }
         // Saturation.
         if (rand.nextInt(6) < 5) {
-            setBiomeSaturation(rand.nextDouble(0.5, 1.0));
+            setBiomeSaturation(rand.nextDouble(0.3, 0.7));
         } else {
             setBiomeSaturation(rand.nextDouble(0.0, 0.5));
         }
@@ -1579,7 +1591,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             setBiomeHueShift(rand.nextDouble(100.0, 140.0));
         }
         // Saturation.
-        setBiomeSaturation(rand.nextDouble(0.0, 0.5));
+        setBiomeSaturation(rand.nextDouble(0.3, 0.7));
         // Height scale
         setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
         // Noise
@@ -1606,7 +1618,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-20.0, 20.0) + 360.0) % 360.0);
         // Saturation.
-        setBiomeSaturation(rand.nextDouble(0.8, 1.0));
+        setBiomeSaturation(rand.nextDouble(0.3, 0.6));
         // Height scale
         setHeightScale(gaussian(rand, 40.0, 10.0, 5.0, 80.0));
         // Noise
@@ -1632,7 +1644,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
         setBiomeHueShift(0.0);
         // Saturation.
-        setBiomeSaturation(rand.nextDouble(0.6, 1.0));
+        setBiomeSaturation(rand.nextDouble(0.3, 0.6));
         // Height scale
         setHeightScale(gaussian(rand, 40.0, 10.0, 5.0, 80.0));
         // Noise
@@ -1658,7 +1670,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
         setBiomeHueShift(0.0);
         // Saturation.
-        setBiomeSaturation(rand.nextDouble(0.6, 1.0));
+        setBiomeSaturation(rand.nextDouble(0.3, 0.6));
         // Height scale
         setHeightScale(gaussian(rand, 40.0, 10.0, 5.0, 80.0));
         // Noise
@@ -1684,7 +1696,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
         setBiomeHueShift(0.0);
         // Saturation.
-        setBiomeSaturation(1.0);
+        setBiomeSaturation(0.5);
         // Height scale
         setHeightScale(gaussian(rand, 40.0, 10.0, 5.0, 80.0));
         // Noise
@@ -1712,7 +1724,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         // Between 70 and 200.
         setBiomeHueShift((rand.nextDouble(70.0, 200.0)));
         // Saturation.
-        setBiomeSaturation(rand.nextDouble(0.5, 1.0));
+        setBiomeSaturation(rand.nextDouble(0.3, 0.6));
         // Height scale
         setHeightScale(gaussian(rand, 40.0, 10.0, 5.0, 80.0));
         // Noise
@@ -1739,7 +1751,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         // Choose randomly in [0, 30] and [330, 360].
         setBiomeHueShift((rand.nextDouble(-30.0, 30.0) + 360.0) % 360.0);
         // Saturation.
-        setBiomeSaturation(rand.nextDouble(0.8, 1.0));
+        setBiomeSaturation(rand.nextDouble(0.3, 0.6));
         // Height scale
         setHeightScale(gaussian(rand, 30.0, 40.0, 1.0, 80.0));
         // Noise
@@ -1766,7 +1778,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         // Actually roll the dice for hue shift.
         setBiomehueshift(rand.nextDouble() * 360.0);
         // Saturation.
-        setBiomeSaturation(rand.nextDouble(0.7, 1.0));
+        setBiomeSaturation(rand.nextDouble(0.35, 0.7));
         setHeightScale(1.0);
         // Noise
         if (nc != null) {
@@ -1782,9 +1794,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         log.debug("Diffuse: " + diffuse);
         log.debug("Specular: " + specular);
         log.debug("Normal: " + normal);
-        log.debug("LUT: " + biomeLUT);
-        log.debug("Biome hue shift: " + biomeHueShift);
-        log.debug("Biome saturation: " + biomeSaturation);
+        log.debug("LUT: " + lut);
+        log.debug("Biome hue shift: " + lutHueShift);
+        log.debug("Biome saturation: " + lutSaturation);
         log.debug("Height scale: " + heightScale);
         log.debug("---Noise---");
         if (nc != null) {

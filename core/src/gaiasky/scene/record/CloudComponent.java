@@ -533,7 +533,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
 
         // Size
         double bodyRadiusKm = bodyRadius * Constants.U_TO_KM;
-        double cloudsHeightKm = Math.min(100, bodyRadiusKm * 0.005);
+        double cloudsHeightKm = Math.min(100, bodyRadiusKm * 0.009);
         // Diameter!
         setSize((bodyRadiusKm + cloudsHeightKm) * 2.0);
         // Cloud

@@ -93,8 +93,8 @@ vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLe
 float cityMask(vec3 p, float elevation, float waterMask) {
     // Low-frequency simplex/fbm for region-scale placement (which
     // "areas" of the planet get urbanized at all).
-    float m = noise(p * 1.5, SIMPLEX, 0.5, 2.3, 2.0, false, false, vec3(1.0), 5, u_seed);
-    m = smoothstep(0.6, 0.63, m); // soft edge instead of a hard cut
+    float m = noise(p * 1.5, SIMPLEX, 0.5, 1.3, 2.0, false, false, vec3(1.0), 5, u_seed);
+    m = smoothstep(0.5, 0.85, m); // soft edge instead of a hard cut
 
     // Don't build underwater or high in the mountains -- keep to a "habitable" elevation band.
     float elevGate = waterMask * (1.0 - smoothstep(0.1, 0.2, elevation));
@@ -188,7 +188,7 @@ void main() {
     if (emissiveMask > 0.0) {
         float d = city;
 
-        fragDiffuse.rgb = max(fragDiffuse.rgb - vec3(d), vec3(0.0));
+        fragDiffuse.rgb = mix(fragDiffuse.rgb, vec3(d), emissiveMask * 1.7);
 
     }
     #else

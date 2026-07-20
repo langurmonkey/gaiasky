@@ -33,6 +33,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.SysUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
 import net.jafama.FastMath;
@@ -57,7 +58,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
     private AtmosphereComponent initAc, ac;
     private float fieldWidth, fieldWidthAll, fieldWidthTotal, textWidth, scrollPaneHeight;
     private boolean updateTabSelected = true;
-    private OwnSliderReset hueShift;
+    private OwnSliderReset lutHueShift, lutSaturation;
     private Texture currentLutTexture;
     private Cell<?> lutImageCell;
     private OwnTextButton genCloudsButton, genSurfaceButton;
@@ -226,6 +227,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         }
         tabs.setChecked(((TextButton) tabs.getButtons().get(selectedTab)).getText().toString());
 
+        var bottomTable = new Table(skin);
         // Randomize button
         var randomize = new OwnTextIconButton(I18n.msg("gui.procedural.randomize", I18n.msg("gui.procedural.all")), skin, "random", "big");
         randomize.setColor(ColorUtils.gYellowC);
@@ -238,7 +240,6 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         });
         randomize.pad(pad10, pad20, pad10, pad20);
 
-        content.add(randomize).center().padBottom(pad34).row();
 
         // Resolution
         var pgResolution = new OwnSliderPlus(I18n.msg("gui.ui.procedural.resolution"),
@@ -247,7 +248,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                                              1,
                                              skin);
         pgResolution.setValueLabelTransform((value) -> value.intValue() * 2 + "x" + value.intValue());
-        pgResolution.setWidth(fieldWidthTotal + 50f);
+        pgResolution.setWidth(fieldWidthTotal / 2f + 270f);
         pgResolution.setValue(GaiaSky.settings().graphics.proceduralGenerationResolution[1]);
         pgResolution.addListener(new ChangeListener() {
             @Override
@@ -258,9 +259,13 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
                 EventManager.publish(Event.PROCEDURAL_GENERATION_RESOLUTION_CMD, this, pgWidth, pgHeight);
             }
         });
-        content.add(pgResolution).right().padBottom(pad18).row();
 
-        // Save textures
+        // Add bottom controls.
+        bottomTable.add(randomize).left().padRight(pad34);
+        bottomTable.add(pgResolution).left();
+        content.add(bottomTable).colspan(2).left().padBottom(pad34).row();
+
+        // Save textures checkbox.
         OwnCheckBox saveTextures = new OwnCheckBox(I18n.msg("gui.procedural.savetextures"), skin, pad10);
         saveTextures.setChecked(GaiaSky.settings().program.saveProceduralTextures);
         saveTextures.addListener(new ChangeListener() {
@@ -961,20 +966,22 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
         if (lutImageCell != null) {
             lutImageCell.clearActor();
             var manager = MaterialComponent.getLUTManager();
-            var path = manager.getLUTPath(mtc.biomeLUT);
+            var path = manager.getLUTPath(mtc.lut);
             Pixmap p = new Pixmap(path);
             int w = p.getWidth();
             int h = p.getHeight();
-            if (hueShift != null) {
-                float hue = hueShift.getMappedValue();
+            if (lutHueShift != null) {
+                float hue = lutHueShift.getMappedValue();
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
                         Color col = new Color(p.getPixel(x, y));
                         float[] rgb = new float[]{col.r, col.g, col.b, 1f};
                         if (hue != 0) {
-                            // Shift hue of lookup table by an amount in degrees
+                            // Shift hue of lookup table by an amount in degrees.
                             float[] hsb = ColorUtils.rgbToHsb(rgb);
                             hsb[0] = ((hsb[0] * 360f + hue) % 360f) / 360f;
+                            // Apply saturation.
+                            hsb[1] = MathUtilsDouble.clamp(hsb[1] * lutSaturation.getMappedValue(), 0f, 1f);
                             rgb = ColorUtils.hsbToRgb(hsb);
                         }
                         col.set(rgb[0], rgb[1], rgb[2], 1f);
@@ -987,7 +994,7 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             var img = new OwnImage(newLutTexture, false);
             img.setScaling(Scaling.fill);
             lutImageCell.setActor(img);
-            lutImageCell.size(330f, 330f);
+            lutImageCell.size(310f, 310f);
             if (currentLutTexture != null) {
                 currentLutTexture.dispose();
             }
@@ -1042,12 +1049,12 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             OwnSelectBox<String> lookUpTablesBox = new OwnSelectBox<>(skin);
             lookUpTablesBox.setItems(lookUpTables);
             lookUpTablesBox.setWidth(fieldWidthAll / 3f + 60f);
-            lookUpTablesBox.setSelected(mtc.biomeLUT);
+            lookUpTablesBox.setSelected(mtc.lut);
             lookUpTablesBox.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
-                    mtc.biomeLUT = lookUpTablesBox.getSelected();
+                    mtc.lut = lookUpTablesBox.getSelected();
                     updateLutImage();
                 }
             });
@@ -1061,27 +1068,44 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             leftCol.add(lookUpTablesBox).left().padBottom(pad18).padRight(pad10);
             leftCol.add(lutTooltip).left().padBottom(pad18).row();
 
-            // Hue shift
-            hueShift = new OwnSliderReset(I18n.msg("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, 0.0f, skin);
-            hueShift.setWidth(fieldWidthAll * 2f / 3f + 120f);
-            hueShift.setValueSuffix("°");
-            hueShift.setValue(mtc.biomeHueShift);
-            hueShift.addListener(new ChangeListener() {
+            // LUT hue shift
+            lutHueShift = new OwnSliderReset(I18n.msg("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, 0.0f, skin);
+            lutHueShift.setWidth(fieldWidthAll * 2f / 3f + 154f);
+            lutHueShift.setValueSuffix("°");
+            lutHueShift.setValue(mtc.lutHueShift);
+            lutHueShift.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event,
                                     Actor actor) {
-                    mtc.biomeHueShift = hueShift.getMappedValue();
+                    mtc.lutHueShift = lutHueShift.getMappedValue();
                     updateLutImage();
                 }
             });
             var hueShiftTooltip = new OwnImageButton(skin, "tooltip");
             hueShiftTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.hueshift"), skin));
-            leftCol.add(hueShift).colspan(2).left().padBottom(pad34 * 2f).padRight(pad10);
-            leftCol.add(hueShiftTooltip).left().padBottom(pad34 * 2f).row();
+            leftCol.add(lutHueShift).colspan(2).left().padBottom(pad18).padRight(pad10);
+            leftCol.add(hueShiftTooltip).left().padBottom(pad18).row();
+
+            // LUT saturation
+            lutSaturation = new OwnSliderReset(I18n.msg("gui.procedural.saturation"), 0.0f, 2.0f, 0.01f, 1.0f, skin);
+            lutSaturation.setWidth(fieldWidthAll * 2f / 3f + 154f);
+            lutSaturation.setValue(mtc.lutSaturation);
+            lutSaturation.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    mtc.lutSaturation = lutSaturation.getMappedValue();
+                    updateLutImage();
+                }
+            });
+            var lutSaturationTooltip = new OwnImageButton(skin, "tooltip");
+            lutSaturationTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.saturation"), skin));
+            leftCol.add(lutSaturation).colspan(2).left().padBottom(pad34 * 1.5f).padRight(pad10);
+            leftCol.add(lutSaturationTooltip).left().padBottom(pad34 * 1.5f).row();
 
             // Height scale
             var heightScale = new OwnSliderReset(I18n.msg("gui.procedural.heightscale"), 1.0f, 100.0f, 0.1f, 10f, skin);
-            heightScale.setWidth(fieldWidthAll * 2f / 3f + 120f);
+            heightScale.setWidth(fieldWidthAll * 2f / 3f + 154f);
             heightScale.setValueSuffix(" km");
             heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
             heightScale.addListener(new ChangeListener() {
@@ -1095,6 +1119,22 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
             heightScaleTooltip.setTooltip(I18n.msg("gui.procedural.info.heightscale"));
             leftCol.add(heightScale).colspan(2).left().padBottom(pad18).padRight(pad10);
             leftCol.add(heightScaleTooltip).left().padBottom(pad18).row();
+
+            // Latitude influence
+            var latitudeInfluence = new OwnSliderReset(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.01f, 0.8f, skin);
+            latitudeInfluence.setWidth(fieldWidthAll * 2f / 3f + 154f);
+            latitudeInfluence.setValue(mtc.nc.latitudeInfluence);
+            latitudeInfluence.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    mtc.nc.latitudeInfluence = latitudeInfluence.getValue();
+                }
+            });
+            var latitudeTooltip = new OwnImageButton(skin, "tooltip");
+            latitudeTooltip.setTooltip(I18n.msg("gui.procedural.info.latitude_influence"));
+            leftCol.add(latitudeInfluence).colspan(2).left().padBottom(pad18).padRight(pad10);
+            leftCol.add(latitudeTooltip).left().padBottom(pad18).row();
 
             // Emission checkbox
             var emission = new OwnCheckBox(I18n.msg("gui.procedural.emission"), skin, pad10);
@@ -1123,24 +1163,9 @@ public class ProceduralPlanetWindow extends GenericDialog implements IObserver {
 
             // Stitch left and right columns together
             Table scrollContent = new Table(skin);
-            scrollContent.add(leftCol).top().left().padRight(pad34);
-            scrollContent.add(rightCol).top().left().row();
+            scrollContent.add(leftCol).top().left().padRight(pad34).padBottom(pad34);
+            scrollContent.add(rightCol).center().left().padBottom(pad34).row();
 
-            // Latitude influence
-            var latitudeInfluence = new OwnSliderReset(I18n.msg("gui.procedural.latitude_influence"), 0.0f, 1.0f, 0.01f, 0.8f, skin);
-            latitudeInfluence.setWidth(fieldWidthTotal);
-            latitudeInfluence.setValue(mtc.nc.latitudeInfluence);
-            latitudeInfluence.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event,
-                                    Actor actor) {
-                    mtc.nc.latitudeInfluence = latitudeInfluence.getValue();
-                }
-            });
-            var latitudeTooltip = new OwnImageButton(skin, "tooltip");
-            latitudeTooltip.setTooltip(I18n.msg("gui.procedural.info.latitude_influence"));
-            scrollContent.add(latitudeInfluence).colspan(2).left().padBottom(pad18).padRight(pad10);
-            scrollContent.add(latitudeTooltip).left().padBottom(pad18).row();
 
             // Noise
             addNoiseGroup(scrollContent, mtc.nc, false);

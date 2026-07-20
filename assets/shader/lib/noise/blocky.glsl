@@ -70,8 +70,8 @@ float street_dist(vec3 p, float freq, float streetWidth) {
 
 float gln_blocky(vec3 p, float freq, float warp) {
     float streetWidth = 0.1;
-    float density = 0.55;
-    float warpAmount = 0.1;
+    float density = 2.3;
+    float warpAmount = 0.02;
     vec3 wp = warpDomain(p, freq, warpAmount);
 
     float h = block_value(wp, freq);
