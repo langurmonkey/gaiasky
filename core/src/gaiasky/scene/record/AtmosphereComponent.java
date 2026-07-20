@@ -53,7 +53,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     public float fogDensity = 0.3f;
     public Vector3 fogColor;
     public float m_eSun = 20f;
-    public int samples = 10;
+    public int samples = 6;
     /** Ozone vertical optical depth at red (Chappuis band, ~600 nm peak). **/
     public float o3OpticalDepth = 0.025f;
     /** Mie phase function asymmetry factor g (range: [-1, 1]; positive = forward scattering). **/
@@ -157,7 +157,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         float m_fScale = 1.0f / (Math.max(m_fAtmosphereHeight, 0.000001f));
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
 
-        // Rayleigh scattering cross-section proprotional to 1/wavelength^4. Compute wavelengths to the 4th power
+        // Rayleigh scattering cross-section proportional to 1/wavelength^4. Compute wavelengths to the 4th power
         // so the shader can use 1/wavelength^4 for the Rayleigh scattering coefficient.
         double[] m_fWavelength = wavelengths;
         float[] m_fWavelength4 = new float[3];
@@ -182,7 +182,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.ScaleDepth, m_fScaleDepth));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.ScaleOverScaleDepth, m_fScaleOverScaleDepth));
 
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.nSamples, samples));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.nSamples, FastMath.min(6, samples)));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.FogDensity, fogDensity));
         mat.set(new Vector3Attribute(Vector3Attribute.FogColor, fogColor));
@@ -326,7 +326,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Alpha value
         ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.Alpha))).value = alpha;
         // Number of samples
-        ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.nSamples))).value = samples;
+        ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.nSamples))).value = FastMath.min(6, samples);
 
         // Add ozone
         addOzoneUniforms(mat, 1.0f / (Math.max(m_fAtmosphereHeight, 0.000001f)));
@@ -487,7 +487,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // O3 optical depth at red (Chappuis band)
         setO3OpticalDepth(gaussian(rand, 0.05, 0.03, 0.0));
         // Samples
-        setSamples(8L);
+        setSamples(6L);
         // Params
         setParams(createUVSphereParameters(200L, 2.0, true));
 

@@ -819,6 +819,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
                         // DIFFUSE.
                         if (cDiffuse) {
+                            if (diffuseTex != null) {
+                                diffuseTex.dispose();
+                            }
                             if (diffuseT != null) {
                                 diffuseTex = diffuseT;
                                 addDiffuseTex(diffuseTex);

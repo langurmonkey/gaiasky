@@ -158,18 +158,29 @@ void main() {
 
     // Normal
     #ifdef normalMapFlag
-    // Compute slope from finite differences
-    vec3 pThetaPlus = sphericalToCartesian(phi, theta + dTheta);
-    vec3 pPhiPlus = sphericalToCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
+    float normalScale = 0.003;
+    vec3 normal;
+    if (true) {
+        // Compute slope from finite differences
+        vec3 pThetaPlus = sphericalToCartesian(phi, theta + dTheta);
+        vec3 pPhiPlus = sphericalToCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
 
-    float elevTheta = computeElevation(pThetaPlus, u_baseLevel).x;
-    float elevPhi = computeElevation(pPhiPlus, u_baseLevel).x;
+        float elevTheta = computeElevation(pThetaPlus, u_baseLevel).x;
+        float elevPhi = computeElevation(pPhiPlus, u_baseLevel).x;
 
-    float dx = (elevTheta - elevation) / dTheta;
-    float dy = (elevPhi - elevation) / dPhi;
+        float dx = (elevTheta - elevation) / dTheta;
+        float dy = (elevPhi - elevation) / dPhi;
 
-    float normalScale = 0.004;
-    vec3 normal = normalize(vec3(-dx * normalScale * waterMask, -dy * normalScale * waterMask, 1.0));
+        normal = normalize(vec3(-dx * normalScale * waterMask, -dy * normalScale * waterMask, 1.0));
+    } else {
+        float dx = dFdx(elevation) / dTheta;
+        float dy = dFdy(elevation) / dPhi;
+        normal = normalize(vec3(
+                -dx * normalScale * waterMask,
+                -dy * normalScale * waterMask,
+                1.0
+        ));
+    }
     fragNormal = vec4(normal.x * 0.5 + 0.5, normal.y * 0.5 + 0.5, normal.z, 1.0);
     #endif // normalMapFlag
 

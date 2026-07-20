@@ -68,7 +68,9 @@ float street_dist(vec3 p, float freq, float streetWidth) {
     return min(min(d.x, d.y), d.z) - streetWidth * 0.5;
 }
 
-float gln_blocky(vec3 p, float freq, float warp) {
+float gln_blocky_expensive(vec3 p) {
+    const float freq = 3.0;
+    const float warp = 0.4;
     float streetWidth = 0.1;
     float density = 2.3;
     float warpAmount = 0.02;
@@ -84,4 +86,19 @@ float gln_blocky(vec3 p, float freq, float warp) {
     float tier = floor(h * tiers) / tiers;
 
     return mask * tier;
+}
+
+// Signed distance to the nearest 3D grid boundary plane (on any of the
+// x/y/z axes). Negative = inside a line, 0 = exactly on the boundary,
+// positive = deeper into a cell (up to ~0.5 - lineWidth*0.5 at cell center).
+// freq controls grid density, lineWidth controls line thickness (both in
+// the same units as 1/freq, i.e. lineWidth=0.08 means lines are 8% of a
+// cell wide).
+float gln_blocky(vec3 p) {
+    const float freq = 3.0;
+    const float lineWidth = 0.04;
+
+    vec3 f = fract(p * freq);
+    vec3 d = min(f, 1.0 - f);
+    return min(min(d.x, d.y), d.z) - lineWidth * 1.5;
 }

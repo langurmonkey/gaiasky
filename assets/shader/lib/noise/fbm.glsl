@@ -19,7 +19,7 @@ float gln_fbm(vec3 p, gln_tFBMOpts opts, int type) {
         else if (type == SIMPLEX) noiseVal = gln_simplex(p);
         else if (type == VORONOI) noiseVal = gln_voronoi(p);
         else if (type == CRATER) noiseVal = gln_crater(p);
-        else if (type == BLOCKY) noiseVal = gln_blocky(p, frequency, amplitude);
+        else if (type == BLOCKY) noiseVal = gln_blocky(p);
 
         if (opts.turbulence && !opts.ridge) {
             result += abs(noiseVal) * amplitude;
