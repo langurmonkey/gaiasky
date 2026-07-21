@@ -68,8 +68,8 @@ float street_dist(vec3 p, float freq, float streetWidth) {
     return min(min(d.x, d.y), d.z) - streetWidth * 0.5;
 }
 
-float gln_blocky_expensive(vec3 p) {
-    const float freq = 3.0;
+float gln_blockye(vec3 p) {
+    const float freq = 4.0;
     const float warp = 0.4;
     float streetWidth = 0.1;
     float density = 2.3;
@@ -95,10 +95,10 @@ float gln_blocky_expensive(vec3 p) {
 // the same units as 1/freq, i.e. lineWidth=0.08 means lines are 8% of a
 // cell wide).
 float gln_blocky(vec3 p) {
-    const float freq = 3.0;
+    const float freq = 4.0;
     const float lineWidth = 0.04;
 
     vec3 f = fract(p * freq);
-    vec3 d = min(f, 1.0 - f);
-    return min(min(d.x, d.y), d.z) - lineWidth * 1.5;
+    vec3 d = min(f, 4.9 - f);
+    return min(min(d.x, d.y), d.z) - lineWidth;
 }

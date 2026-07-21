@@ -68,6 +68,13 @@ layout (location = 4) out vec4 fragNormal;
 
 #include <shader/lib/procgen/procgen.glsl>
 
+// Comment out the next line to use dFdx and dFdy
+// instead of central differences to compute the
+// elevation derivatives for the normal map.
+// The central differences method is much more accurate,
+// but more expensive to compute.
+//#define centralDiffsFlag
+
 vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLevel) {
     float epsilon = 1.0 / 255.0;
     if (elevation <= baseLevel + epsilon) {
@@ -159,8 +166,7 @@ void main() {
     // Normal
     #ifdef normalMapFlag
     float normalScale = 0.003;
-    vec3 normal;
-    if (true) {
+    #ifdef centralDiffsFlag
         // Compute slope from finite differences
         vec3 pThetaPlus = sphericalToCartesian(phi, theta + dTheta);
         vec3 pPhiPlus = sphericalToCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
@@ -171,16 +177,16 @@ void main() {
         float dx = (elevTheta - elevation) / dTheta;
         float dy = (elevPhi - elevation) / dPhi;
 
-        normal = normalize(vec3(-dx * normalScale * waterMask, -dy * normalScale * waterMask, 1.0));
-    } else {
+        vec3 normal = normalize(vec3(-dx * normalScale * waterMask, -dy * normalScale * waterMask, 1.0));
+    #else
         float dx = dFdx(elevation) / dTheta;
         float dy = dFdy(elevation) / dPhi;
-        normal = normalize(vec3(
+        vec3 normal = normalize(vec3(
                 -dx * normalScale * waterMask,
                 -dy * normalScale * waterMask,
                 1.0
         ));
-    }
+    #endif // centralDiffsFlag
     fragNormal = vec4(normal.x * 0.5 + 0.5, normal.y * 0.5 + 0.5, normal.z, 1.0);
     #endif // normalMapFlag
 
