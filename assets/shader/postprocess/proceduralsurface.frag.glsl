@@ -22,8 +22,6 @@ uniform float u_baseLevel;
 uniform bool u_remap;
 // Noise scale in x, y and z.
 uniform vec3 u_scale;
-// Noise color.
-uniform vec4 u_color;
 // Noise seed.
 uniform float u_seed;
 // Persistence, factor by which the amplitude decreases in successive layers.
@@ -136,7 +134,7 @@ void main() {
     // Moisture (channel 2)
     float moisture = 0.0;
     if (u_channels >= 2) {
-        moisture = noise(p, SIMPLEX, 0.5, 0.5, 2.0, u_turbulence, u_ridge, u_scale, u_octaves, u_seed + 0.023);
+        moisture = clamp(noise(p, SIMPLEX, 0.5, 2.0, 2.0, false, false, vec3(1.0), 2, u_seed + 0.023) + 0.4, 0.0, 1.0);
         fragBiome.g = moisture;
     }
 
@@ -145,8 +143,7 @@ void main() {
     if (u_channels >= 3) {
         float latitudeFactor = 1.0 - abs(phi) / (gln_PI * 0.5); // 1 at equator, 0 at poles
         latitudeFactor = smoothstep(0.1, 0.6, latitudeFactor);
-        float tempFreq = min(u_frequency * 0.7, 0.5);
-        float noiseTemperature = noise(p, u_type, 0.5, tempFreq, 2.0, false, false, u_scale, u_octaves, u_seed + 0.4325);
+        float noiseTemperature = noise(p, SIMPLEX, 0.6, 2.0, 2.0, false, false, vec3(1.0), 2, u_seed + 0.4325);
         temperature = mix(noiseTemperature, latitudeFactor, u_latitudeInfluence);
         fragBiome.b = temperature;
     }
@@ -165,9 +162,9 @@ void main() {
 
     // Normal
     #ifdef normalMapFlag
-    float normalScale = 0.003;
     #ifdef centralDiffsFlag
         // Compute slope from finite differences
+        float normalScale = 0.0015;
         vec3 pThetaPlus = sphericalToCartesian(phi, theta + dTheta);
         vec3 pPhiPlus = sphericalToCartesian(min(phi + dPhi, gln_PI * 0.5), theta);
 
@@ -179,6 +176,7 @@ void main() {
 
         vec3 normal = normalize(vec3(-dx * normalScale * waterMask, -dy * normalScale * waterMask, 1.0));
     #else
+        float normalScale = 0.0025;
         float dx = dFdx(elevation) / dTheta;
         float dy = dFdy(elevation) / dPhi;
         vec3 normal = normalize(vec3(
