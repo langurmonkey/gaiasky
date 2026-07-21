@@ -49,12 +49,18 @@ public class SpriteEntityRenderSystem {
         var spriteDefault = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-default"));
         var spriteFlag = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-flag"));
         var spriteCity = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-city"));
+        var spriteTown = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-town"));
+        var spriteLandmark = new Sprite(GaiaSky.instance.getGlobalResources().getTexture("loc-marker-landmark"));
         this.spriteMap.put("default", spriteDefault);
         this.spriteMap.put("loc-marker-default", spriteDefault);
         this.spriteMap.put("flag", spriteFlag);
         this.spriteMap.put("loc-marker-flag", spriteFlag);
         this.spriteMap.put("city", spriteCity);
         this.spriteMap.put("loc-marker-city", spriteCity);
+        this.spriteMap.put("town", spriteTown);
+        this.spriteMap.put("loc-marker-town", spriteTown);
+        this.spriteMap.put("landmark", spriteLandmark);
+        this.spriteMap.put("loc-marker-landmark", spriteLandmark);
     }
 
     private Sprite getSprite(String name) {
@@ -103,12 +109,12 @@ public class SpriteEntityRenderSystem {
                         (float) pos.x,
                         (float) pos.y,
                         (float) pos.z,
-                        0.0001d,
+                        0.001f,
                         1f,
                         camera,
                         true,
-                        0.017f,
-                        0.035f);
+                        0.010f,
+                        0.013f);
 
                 // Check mouse collision.
                 var loc = Mapper.loc.get(entity);
