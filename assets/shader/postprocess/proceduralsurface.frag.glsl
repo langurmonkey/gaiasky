@@ -74,14 +74,6 @@ layout (location = 4) out vec4 fragNormal;
 //#define centralDiffsFlag
 
 vec3 diffuseLUT(float elevation, float moisture, float temperature, float baseLevel) {
-    float epsilon = 1.0 / 255.0;
-    if (elevation <= baseLevel + epsilon) {
-        elevation = 0.0;
-    }
-    elevation = clamp(elevation, 0.0, 1.0);
-    moisture = clamp(moisture, 0.0, 1.0);
-    temperature = clamp(temperature, 0.0, 1.0);
-
     vec4 rgba = texture(u_texture1, vec3(moisture, 1.0 - elevation, temperature));
 
     // Rotate hue, apply saturation.

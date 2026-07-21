@@ -528,7 +528,7 @@ public final class NoiseComponent extends NamedComponent {
         // Smoothing.
         setSmoothing(rand.nextBoolean());
         // Base level.
-        setBaseLevel(type == NoiseType.VORONOI ? rand.nextDouble(0.65, 0.85) : rand.nextDouble(0.25, 0.65));
+        setBaseLevel(type == NoiseType.VORONOI ? rand.nextDouble(0.35, 0.6) : rand.nextDouble(0.25, 0.65));
         // Latitude influence.
         setLatitudeInfluence(uniform(rand, 0.65, 0.85));
         // Plains.
