@@ -24,13 +24,18 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 // Extension properties
-val mainClassName by extra("gaiasky.desktop.GaiaSkyDesktop")
-val workDir by extra(file("../"))
-val assetsDir by extra(file("${workDir}/assets"))
-val tmpDir by extra(file("/tmp/gaiasky-gradle/"))
+val mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
+val workDir = file("../")
+val assetsDir = file("$workDir/assets")
+val tmpDir = file("/tmp/gaiasky-gradle/")
 tmpDir.mkdirs()
+var jreArchive = "jre-archive.tar.gz"
 
-val jreArchive by extra("jre-archive.tar.gz")
+extra.set("mainClassName", mainClassName)
+extra.set("workDir", workDir)
+extra.set("assetsDir", assetsDir)
+extra.set("tmpDir", tmpDir)
+extra.set("jreArchive", jreArchive)
 
 val coreProject = project(":core")
 
@@ -609,7 +614,6 @@ tasks.register("prepareInstall4jScript") {
         val distDir = coreExtra("distDir") as String
         val distName = coreExtra("distName") as String
         val baseDir = project.rootDir
-        val tagRev = coreExtra("tagRev") as String
         val tag = coreExtra("tag") as String
 
         copy {
