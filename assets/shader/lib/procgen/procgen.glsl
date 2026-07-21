@@ -79,7 +79,7 @@ vec2 computeElevation(vec3 p, float baseLevel) {
         float mountainSlope = mountainRange / max(1.0 - plainsHeight, 0.001);
 
         float remapped;
-        float blend = 0.05; // transition width
+        float blend = plainsHeight * 0.1; // transition width ~10% of plains area
         if (t <= plainsHeight - blend) {
             remapped = t * plainsSlope;
         } else if (t >= plainsHeight + blend) {
