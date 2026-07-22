@@ -37,40 +37,52 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
                              float deltaTime) {
         // The numbers in the beams should not depend on internal units!
         var vr = Mapper.vr.get(entity);
-        vr.beamP0.set(0, -0.01f, 0);
-        vr.beamP1.set(0, (float) (-0.42), (float) (-0.6));
-        vr.beamP2.set(0, (float) (-700), (float) (-1000));
-        vr.beamPn.set(0, (float) (-7000), (float) (-10000));
+        if (vr != null) {
+            vr.beamP0.set(0, -0.01f, 0);
+            vr.beamP1.set(0, (float) (-0.42), (float) (-0.6));
+            vr.beamP2.set(0, (float) (-700), (float) (-1000));
+            vr.beamPn.set(0, (float) (-7000), (float) (-10000));
 
-        if (vr.hitUI) {
-            if (vr.interacting) {
-                // Shorten beam to intersection point.
-                vr.beamP1.set(vr.intersection);
-                vr.beamP2.set(vr.intersection);
-            } else {
-                // Cut beam completely.
-                aux.set(vr.beamP1).sub(vr.beamP0).nor().scl(0.001);
-                vr.beamP1.set(vr.beamP0).add(aux);
+            if (vr.hitUI) {
+                if (vr.interacting) {
+                    // Shorten beam to intersection point.
+                    vr.beamP1.set(vr.intersection);
+                    vr.beamP2.set(vr.intersection);
+                } else {
+                    // Cut beam completely.
+                    aux.set(vr.beamP1).sub(vr.beamP0).nor().scl(0.001);
+                    vr.beamP1.set(vr.beamP0).add(aux);
 
-                aux.set(vr.beamP2).sub(vr.beamP0).nor().scl(0.002);
-                vr.beamP2.set(vr.beamP0).add(aux);
+                    aux.set(vr.beamP2).sub(vr.beamP0).nor().scl(0.002);
+                    vr.beamP2.set(vr.beamP0).add(aux);
+                }
+            }
+
+            if (vr.device.isActive()) {
+                // Set model to device transform.
+                deviceTransform.set(vr.device.aimTransform);
+                vr.beamP0.mul(deviceTransform);
+                if (!vr.hitUI || !vr.interacting) {
+                    vr.beamP1.mul(deviceTransform);
+                    vr.beamP2.mul(deviceTransform);
+                }
+                vr.beamPn.mul(deviceTransform);
+            }
+
+            // Intersection sphere.
+            if (vr.intersection != null) {
+                vr.intersectionModel.transform.idt().translate((float) vr.intersection.x, (float) vr.intersection.y, (float) vr.intersection.z).scale(
+                        0.01f,
+                        0.01f,
+                        0.01f);
             }
         }
 
-        if (vr.device.isActive()) {
-            // Set model to device transform.
-            deviceTransform.set(vr.device.aimTransform);
-            vr.beamP0.mul(deviceTransform);
-            if(!vr.hitUI || !vr.interacting) {
-                vr.beamP1.mul(deviceTransform);
-                vr.beamP2.mul(deviceTransform);
+        if (Mapper.tagVRUI.has(entity)) {
+            var scaffolding = Mapper.modelScaffolding.get(entity);
+            if (scaffolding != null) {
+                scaffolding.fadeOpacity = 1f;
             }
-            vr.beamPn.mul(deviceTransform);
-        }
-
-        // Intersection sphere.
-        if (vr.intersection != null) {
-            vr.intersectionModel.transform.idt().translate((float) vr.intersection.x, (float) vr.intersection.y, (float) vr.intersection.z).scale(0.01f, 0.01f, 0.01f);
         }
 
     }

@@ -44,6 +44,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.component.tag.TagNoClosest;
+import gaiasky.scene.component.tag.TagVRUI;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.camera.CameraUtils;
@@ -459,6 +460,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
                     // Add tags.
                     entity.add(new TagNoClosest());
+                    entity.add(new TagVRUI());
 
                     var base = Mapper.base.get(entity);
                     base.setName("VRUI");
@@ -541,7 +543,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                         var body = Mapper.body.get(entity);
                         body.setSize(0.95);
                         if (vr) {
-                            body.pos.set(camera.getPos().cpy().add(camera.getCamera().position).add(dir.scl(0.9)));
+                            body.pos.set(camera.getPos().cpy().sub(camera.getCamera().position).add(dir.scl(4.5)));
                         } else {
                             body.pos.set(camera.getPos().cpy().add(dir.scl(2.0 * Constants.KM_TO_U)));
                         }
