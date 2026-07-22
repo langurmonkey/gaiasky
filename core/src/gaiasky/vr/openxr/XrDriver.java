@@ -167,7 +167,7 @@ public class XrDriver implements Disposable {
                     .createFlags(0)
                     .applicationInfo(XrApplicationInfo.calloc(stack)
                                              .applicationName(stack.UTF8(GaiaSky.settings().getApplicationName(false)))
-                                             .apiVersion(XR_CURRENT_API_VERSION))
+                                             .apiVersion(XR_API_VERSION_1_0))
                     .enabledApiLayerNames(wantedLayers)
                     .enabledExtensionNames(wantedExtensions);
 
