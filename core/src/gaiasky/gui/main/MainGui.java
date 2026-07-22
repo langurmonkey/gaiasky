@@ -262,12 +262,14 @@ public class MainGui extends AbstractGui {
                     if (versionNumber > GaiaSky.settings().version.versionNumber) {
                         logger.info(I18n.msg("gui.newversion.available", GaiaSky.settings().version.version, tagVersion));
                         // There's a new version!
-                        UpdatePopup newVersion = new UpdatePopup(tagVersion, stage, skin);
-                        newVersion.pack();
-                        float ww = newVersion.getWidth();
-                        float margin = 8f;
-                        newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
-                        stage.addActor(newVersion);
+                        GaiaSky.postRunnable(()-> {
+                            UpdatePopup newVersion = new UpdatePopup(tagVersion, stage, skin);
+                            newVersion.pack();
+                            float ww = newVersion.getWidth();
+                            float margin = 8f;
+                            newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
+                            stage.addActor(newVersion);
+                        });
                     } else {
                         // No new version
                         logger.info(I18n.msg("gui.newversion.nonew", GaiaSky.settings().program.update.getLastCheckedString()));
