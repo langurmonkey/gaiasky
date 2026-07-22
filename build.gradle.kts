@@ -15,8 +15,8 @@ allprojects {
 
     extra.set("appName", "GaiaSky")
     extra.set("gdxVersion", "1.14.2")
-    extra.set("gdxcontrollersVersion", "2.2.3")
-    extra.set("lwjglVersion", "3.4.2")
+    extra.set("gdxcontrollersVersion", "2.2.4")
+    extra.set("lwjglVersion", "3.3.4")
     extra.set("jcommanderVersion", "2.+")
     extra.set("slf4jVersion", "2.0.+")
     extra.set("sparkjavaVersion", "2.9.+")
