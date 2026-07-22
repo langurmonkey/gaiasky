@@ -569,7 +569,7 @@ public class InteractiveCameraModule extends APIModule implements InteractiveCam
                     graph.setParent(Scene.ROOT_NAME);
                     scene.initializeEntity(invisible);
                     scene.setUpEntity(invisible);
-                    EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, invisible, true);
+                    EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, invisible, false);
                 }
                 Entity invisible = scene.getEntity(nameStub);
 
