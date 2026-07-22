@@ -49,16 +49,8 @@ public class VRDeviceInitializer extends AbstractInitSystem {
         if (Mapper.vr.has(entity)) {
             initializeVRDevice(entity);
         }
-
-        if (Mapper.tagVRUI.has(entity)) {
-            initializeVRUI(entity);
-        }
-
     }
 
-    private void initializeVRUI(Entity entity) {
-
-    }
 
     private void initializeVRDevice(Entity entity) {
         // VR device.

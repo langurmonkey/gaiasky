@@ -19,6 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.ISceneRenderer;
+import gaiasky.render.gdx.shader.attribute.TextureAttribute;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.ICamera;
@@ -230,6 +231,11 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         scene.initializeEntity(entity);
         scene.setUpEntity(entity);
         scene.engine.addEntity(entity);
+        // Remove plain color.
+        var mat = model.model.instance.materials.get(0);
+        if (mat != null) {
+            mat.remove(ColorAttribute.Diffuse);
+        }
         EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, entity, false);
         return entity;
     }

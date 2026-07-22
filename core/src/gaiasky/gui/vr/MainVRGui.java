@@ -37,6 +37,7 @@ import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.gdx.shader.attribute.ColorAttribute;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -510,10 +511,11 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                     scene.initializeEntity(entity);
                     scene.setUpEntity(entity);
 
-                    // Set texture.
+                    // Set texture, remove color set during initialization.
                     var mat = model.model.instance.materials.get(0);
                     if (mat != null) {
                         mat.set(TextureAttribute.createDiffuse(buffer.getColorBufferTexture()));
+                        mat.remove(ColorAttribute.Diffuse);
                     }
                     this.entity = entity;
 
