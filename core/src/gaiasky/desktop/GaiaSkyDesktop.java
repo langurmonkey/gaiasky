@@ -136,11 +136,6 @@ public class GaiaSkyDesktop implements IObserver {
     public static void main(String[] args) {
         // Set main thread name.
         Thread.currentThread().setName(Constants.MAIN_THREAD_NAME);
-        if (SysUtils.getJavaVersion() >= 26.0) {
-            // Use modern memory backend for LWJGL3 based on java.lang.foreign for Java 26+.
-            // For Java 25 and below, let LWJGL3 decide.
-            Configuration.MEMORY_BACKEND.set("ffm");
-        }
 
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         cliArgs = new CLIArgs();
