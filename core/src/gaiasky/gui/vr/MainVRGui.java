@@ -228,11 +228,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     private int processDevice(VRDevice device,
                               Vector3D beamP0,
                               Vector3D beamP1) {
-
-        ICamera cam = GaiaSky.instance.getICamera();
-
         var intersects = IntersectorDouble.intersectLineSegmentPlane(beamP0, beamP1, normal, point, intersection3D);
-
         if (intersects) {
             // Use inverse transform to position on ZX plane.
             intersection2D.set(intersection3D).mul(inverse);
@@ -280,7 +276,6 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                 var camera = GaiaSky.instance.getICamera();
                 var body = Mapper.body.get(entity);
                 var coord = Mapper.coordinates.get(entity);
-                var affine = Mapper.affine.get(entity);
                 // Update VR UI position.
                 body.pos.set(camera.getPos()).add(relativePosition);
                 ((StaticCoordinates) coord.coordinates).setPosition(body.pos);

@@ -131,6 +131,7 @@ public class XrControllerDevice {
     private void processShowUIAction(BoolAction action,
                                      XrInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
+
             listener.showUI(action.currentState, action.getControllerDevice());
         }
     }
