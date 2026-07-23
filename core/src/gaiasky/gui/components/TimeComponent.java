@@ -123,7 +123,10 @@ public class TimeComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        float bw = 25f;
+
         stepForward = new OwnImageButton(skin, "media-skip-forward");
+        stepForward.setSize(bw, bw);
         stepForward.setName("plus");
         stepForward.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -137,6 +140,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         stepForward.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime", true), skin));
 
         playPause = new OwnImageButton(skin, "media-play-pause");
+        playPause.setSize(bw, bw);
         playPause.setChecked(GaiaSky.settings().runtime.timeOn);
         playPause.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -149,6 +153,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         playPause.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.playstop"), timeHotkey, skin));
 
         stepBackward = new OwnImageButton(skin, "media-skip-backward");
+        stepBackward.setSize(bw, bw);
         stepBackward.setName("minus");
         stepBackward.addListener(event -> {
             if (event instanceof ChangeEvent) {
