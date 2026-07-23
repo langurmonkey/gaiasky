@@ -39,21 +39,20 @@
 
   <releases>
 
-    <release version="3.7.4" date="2026-06-17" urgency="high">
-      <url>https://gaiasky.space/news/2026/gaiasky_3.7.4</url>
+    <release version="3.8.0" date="2026-07-23" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.8.0</url>
       <description>
-        <p>This release presents an overhaul in the atmospheric scattering model and includes important bugfixes for the keyframe system:</p>
+        <p>This release brings a major update of the procedural planet generation system, new high-resolution icons, and many bug fixes:</p>
         <ul>
-          <li>Unify atmospheric scattering ground and sky paths that uses Burneton's approximation for the density scale.</li>
-          <li>Use glow and transmittance for correct blending.</li>
-          <li>Consider terrain elevation in scattering calculations.</li>
-          <li>Add ozone absorption to atmospheric scattering, and expose it in the procedural planet generation dialog.</li>
-          <li>Fix keyframe lines and points being invisible.</li>
-          <li>Fix locale initialization.</li>
-          <li>Fix compute shader support check by adding SSBO extension lookup.</li>
-          <li>Fix dependency on Java >=26 in AUR package.</li>
-          <li>Fix directory selection in file picker.</li>
-          <li>Update to libGDX 1.14.2.</li>
+          <li>Major procedural planet generation overhaul with improved noise, domain warping, 3D biome LUTs, and new presets (lava, tropical, desert).</li>
+          <li>Merge biome + surfacegen passes into a single render pass. This halves GPU bandwidth, eliminates 8-bit quantization.</li>
+          <li>Add tessellation capability detection, plains code, latitude influence, and colored atmospheres.</li>
+          <li>Update all UI icons to higher resolution for HiDPI support.</li>
+          <li>Implement custom control panes for Stereo, Panorama, Planetarium, and Orthosphere view modes.</li>
+          <li>Add pulsar component type and on-focus load for proximity descriptors.</li>
+          <li>Fix cube-sphere and octahedron-sphere UV mapping and tangents.</li>
+          <li>Fix VR UI regression, light glow in cubemap mode, label seams, and star point size adjustment.</li>
+          <li>Update LWJGL3 to 3.3.4, Gradle to 9.6.1, JRE to JDK-26.0.1+8.</li>
         </ul>
       </description>
       </release>
