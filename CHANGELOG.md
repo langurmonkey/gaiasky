@@ -1,3 +1,36 @@
+
+<a name="3.7.4"></a>
+## [3.7.4](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.7.4) (2026-06-17)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.7.3...3.7.4)
+
+Gaia Sky 3.7.4 brings a major overhaul of the atmospheric scattering model with ozone absorption, Bruneton's density scale, a unified ground/sky integrator, and a physically-grounded parametrization. It also includes important bugfixes for the keyframe system, and build system updates.
+
+## Features
+
+- Rendering
+  - Overhaul the atmospheric scattering model. The previous O'Neil-based implementation used separate, divergent code paths for the ground and sky (atmosphere dome) shaders, leading to unstable behavior when parameters changed and visible banding artifacts at low sample counts. The new implementation consolidates both into a single unified `integrateAtmosphere()` function shared by the ground and sky shaders. It adopts Bruneton's 4th-order polynomial approximation of the Chapman function for the density scale, which eliminates artifacts at grazing angles. The scattering color is correctly blended using glow and transmittance, and the tone mapping exposure is unified across both paths.
+  - Consider elevation displacement in scattering calculations. The vertex shader now correctly accounts for the terrain height offset when computing the vertex position for atmospheric scattering.
+  - Add ozone (O₃) absorption to atmospheric scattering. Ozone is modeled as a Gaussian density profile centered in the stratosphere (default peak at 25 km altitude, \~20 km width). The absorption coefficients match the Chappuis band shape (peaking at \~600 nm in the red, with significant absorption in green and minimal in blue). Parametrization adopts O₃ optical depth, the vertical optical depth of ozone at red (\~600 nm, Chappuis peak). The Earth reference value us \~0.025.
+  - Expose ozone optical depth in the procedural planet dialog. Adds new slider to the procedural planet generation window.
+
+## Bug Fixes
+
+- Fix regression in which the keyframe visual representation was not visible ([#916](https://codeberg.org/gaiasky/gaiasky/issues/916)).
+- Fix locale initialization sequence by passing the settings object. At startup, the `GaiaSky` instance has not been initialized, so i18n always defaulted to the system locale regardless of the settings ([#915](https://codeberg.org/gaiasky/gaiasky/issues/915)).
+- Check for SSBO extension additionally to the compute shader one in `isComputeShaderSupported()`. Avoids a crash when the driver supports compute shaders but not OpenGL 4.3 nor SSBO ([#914](https://codeberg.org/gaiasky/gaiasky/issues/914)).
+- Fix dependency on Java >=26 in AUR package. Required for compact object headers support without `UnlockExperimentalVMOptions`.
+- Fix directory selection in file picker. The file picker dialog now correctly selects directories instead of files when a directory path is provided.
+
+## Localization
+
+- Update translation files with missing keys, bringing all locale files to 100% completion.
+- Update screenshot URLs in metainfo file to point to the current hosting locations.
+
+## Build System
+
+- Update to libGDX 1.14.2. This major version bump brings improvements to the underlying graphics framework.
+- Update Gradle wrapper to 9.5.1.
+
 <a name="3.7.3"></a>
 ## [3.7.3](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.7.3) (2026-06-02)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.7.2...3.7.3)
