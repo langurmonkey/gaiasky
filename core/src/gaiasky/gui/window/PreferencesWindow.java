@@ -1707,6 +1707,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                             85.9f,
                                             skin);
         lodTransitions.setTooltip(I18n.msg("gui.lod.thresholds"));
+        lodTransitions.setValueSuffix("°");
         lodTransitions.setDisplayValueMapped(true);
         lodTransitions.setWidth(sliderWidth);
         lodTransitions.setMappedValue(settings.scene.octree.threshold[0] * MathUtilsDouble.radDeg);
