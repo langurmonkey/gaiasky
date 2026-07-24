@@ -27,12 +27,6 @@ import org.lwjgl.opengl.GL20;
  * nodes, and finally {@link #end()} to produce the {@link IntMesh}.
  */
 public class LODCubeSphere {
-    private static final int I_TOP = 0;
-    private static final int I_BOTTOM = 1;
-    private static final int I_LEFT = 2;
-    private static final int I_RIGHT = 3;
-    private static final int I_FRONT = 4;
-    private static final int I_BACK = 5;
 
     // Auxiliary vectors (reused to avoid allocation).
     private final Vector3 aux1 = new Vector3();
@@ -52,7 +46,7 @@ public class LODCubeSphere {
     final Quadtree[] faces;
 
     /** Minimum tree depth, defaults to 0 for top-level. **/
-    final int minDepth =0 ;
+    final int minDepth = 0;
     /** Maximum tree depth. **/
     final int maxDepth;
 
@@ -112,11 +106,14 @@ public class LODCubeSphere {
 
     /**
      * Traverses the structure computing the visible nodes, adding them to the {@link #visibleLeaves} list.
-     * @param cam The camera.
-     * @param radius The radius.
+     *
+     * @param cam         The camera.
+     * @param radius      The radius.
      * @param planetScale The planet scale.
      */
-    public void traverse(ICamera cam, float radius, float planetScale) {
+    public void traverse(ICamera cam,
+                         float radius,
+                         float planetScale) {
         visibleLeaves.clear();
 
         for (int f = 0; f < 6; f++) {
@@ -124,7 +121,10 @@ public class LODCubeSphere {
         }
     }
 
-    void traverseNode(Quadtree node, ICamera cam, float radius, float planetScale) {
+    void traverseNode(Quadtree node,
+                      ICamera cam,
+                      float radius,
+                      float planetScale) {
         // Frustum cull using bounding sphere.
         if (!frustumTest(node.center, node.radius, cam)) return;
 
@@ -144,15 +144,19 @@ public class LODCubeSphere {
         }
     }
 
-    int computeTargetDepth(double dist, double screenSize, double errorThreshold) {
+    int computeTargetDepth(double dist,
+                           double screenSize,
+                           double errorThreshold) {
         // The node's geometric error is roughly proportional to its angular size.
         // Convert to target depth using a logarithmic scale.
         double ratio = errorThreshold / screenSize;
-        int depth = (int)(Math.log(ratio) / Math.log(2)) + minDepth;
+        int depth = (int) (Math.log(ratio) / Math.log(2)) + minDepth;
         return MathUtilsDouble.clamp(depth, minDepth, maxDepth);
     }
 
-    boolean frustumTest(Vector3D center, double radius, ICamera cam) {
+    boolean frustumTest(Vector3D center,
+                        double radius,
+                        ICamera cam) {
         return cam.getCamera().frustum.boundsInFrustum(center.put(aux1), aux2.set((float) radius, (float) radius, (float) radius));
     }
 
@@ -163,68 +167,38 @@ public class LODCubeSphere {
      * @param N      The number of subdivisions per edge (N &gt; 0).
      * @param radius The radius of the sphere.
      */
-    public void buildVisibleMeshes(int N, float radius) {
+    public void buildVisibleMeshes(int N,
+                                   float radius) {
         for (Quadtree leaf : visibleLeaves) {
             leaf.buildMesh(N, radius);
         }
     }
 
     /**
-     * Begin building a mesh. Creates a new {@link IntIntMeshBuilder} and calls
+     * Begin building a mesh. Initializes the internal {@link IntIntMeshBuilder}, if needed, and calls
      * {@code begin(attributes, primitiveType)} on it.
      *
      * @param attributes    Vertex attributes for the mesh.
      * @param primitiveType Primitive type (e.g. {@link GL20#GL_TRIANGLES}).
      */
-    public void begin(VertexAttributes attributes, int primitiveType) {
-        builder = new IntIntMeshBuilder();
+    public void begin(VertexAttributes attributes,
+                      int primitiveType) {
+        if (builder == null) {
+            builder = new IntIntMeshBuilder();
+        }
         builder.begin(attributes, primitiveType);
     }
 
     /**
-     * Finish building and return the mesh. The internal builder is set to {@code null}
-     * so that stale references are not accidentally reused.
+     * Finish building and return the mesh.
      *
      * @return The completed mesh.
      */
     public IntMesh end() {
         if (builder == null)
             throw new IllegalStateException("begin() must be called before end()");
-        IntMesh mesh = builder.end();
-        builder = null;
-        return mesh;
+        return builder.end();
     }
-
-    /** Gets the top quadtree. **/
-    public Quadtree top() {
-        return faces[I_TOP];
-    }
-
-    /** Gets the bottom quadtree. **/
-    public Quadtree bottom() {
-        return faces[I_BOTTOM];
-    }
-
-    /** Gets the left quadtree. **/
-    public Quadtree left() {
-        return faces[I_LEFT];
-    }
-
-    /** Gets the right quadtree. **/
-    public Quadtree right() {
-        return faces[I_RIGHT];
-    }
-
-    /** Gets the front quadtree. **/
-    public Quadtree front() {
-        return faces[I_FRONT];
-    }
-
-    /** Gets the back quadtree. **/
-    public Quadtree back() {
-        return faces[I_BACK];
-    }
-
 
     /**
      * <p>A quadtree, which parts 2D space into 4 parts on subdivision.</p>
@@ -350,8 +324,8 @@ public class LODCubeSphere {
          * Remove the children of this node, making it into a leaf node.
          */
         public void undivide() {
-            if(!isLeaf()) {
-                children[0] = children[1] =  children[2] = children[3] = null;
+            if (!isLeaf()) {
+                children[0] = children[1] = children[2] = children[3] = null;
             }
         }
 
@@ -391,7 +365,8 @@ public class LODCubeSphere {
          * @param N      The number of subdivisions per edge (N &gt; 0). Produces an NxN grid of quads.
          * @param radius The radius of the sphere.
          */
-        public void buildMesh(int N, float radius) {
+        public void buildMesh(int N,
+                              float radius) {
             if (N < 1)
                 throw new IllegalArgumentException("N must be > 0");
 
