@@ -45,28 +45,30 @@ public class ModelCache {
                     var quality = params.containsKey("quality")? ((Long) params.get("quality")).intValue() : ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                     var oblateness = params.containsKey("oblateness") ? ((Double) params.get("oblateness")).floatValue() : 0f;
-                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    var flip = params.containsKey("flip") && (Boolean) params.get("flip");
                     model = mb.createSphere(diameter, diameter, diameter * (1.0f - oblateness), quality, quality, flip, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
                 case "icosphere" -> {
                     var recursion = ((Long) params.get("recursion")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
-                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    var flip = params.containsKey("flip") && (Boolean) params.get("flip");
                     model = mb.createIcoSphere(diameter / 2.0f, recursion, flip, false, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
                 case "cubesphere" -> {
                     var divisions = ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
-                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
-                    model = mb.createCubeSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
+                    // If "mapping" is "basic", we use radius scaling. Otherwise, we use Phil Nowell's mapping.
+                    var useBadMapping = params.containsKey("mapping") && params.get("mapping").equals("basic");
+                    var flip = params.containsKey("flip") && (Boolean) params.get("flip");
+                    model = mb.createCubeSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes, !useBadMapping);
                     modelCache.put(key, model);
                 }
                 case "octahedronsphere" -> {
                     var divisions = ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
-                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    var flip = params.containsKey("flip") && (Boolean) params.get("flip");
                     model = mb.createOctahedronSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
@@ -80,7 +82,7 @@ public class ModelCache {
                         width = ((Double) params.get("width")).floatValue();
                         height = ((Double) params.get("height")).floatValue();
                     }
-                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    var flip = params.containsKey("flip") && (Boolean) params.get("flip");
                     model = mb.createPlane(width, height, divisionsU, divisionsV, flip, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
@@ -188,7 +190,7 @@ public class ModelCache {
                     var height = ((Double) params.get("height")).floatValue();
                     var depth = ((Double) params.get("depth")).floatValue();
                     var divisions = ((Long) params.get("divisions")).intValue();
-                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    var flip = params.containsKey("flip") && (Boolean) params.get("flip");
 
                     model = mb.createCylinder(width, height, depth, divisions, flip, primitiveType, mat, attributes);
                 }
@@ -201,7 +203,7 @@ public class ModelCache {
                     var divisions = ((Long) params.get("divisions")).intValue();
                     var innerRad = ((Double) params.get("innerradius")).floatValue();
                     var outerRad = ((Double) params.get("outerradius")).floatValue();
-                    var sph = params.containsKey("sphere-in-ring") ? (Boolean) params.get("sphere-in-ring") : true;
+                    var sph = !params.containsKey("sphere-in-ring") || (Boolean) params.get("sphere-in-ring");
 
                     if (sph) {
                         model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, attributes);
@@ -236,7 +238,7 @@ public class ModelCache {
                         height = ((Double) params.get("size")).floatValue();
                         depth = ((Double) params.get("size")).floatValue();
                     }
-                    var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                    var flip = params.containsKey("flip") && (Boolean) params.get("flip");
                     model = mb.createBox(width, height, depth, flip, mat, attributes);
                 }
             }

@@ -26,7 +26,7 @@ public sealed abstract class NamedComponent implements IComponent, Disposable pe
             this.name = name.toLowerCase(Locale.ROOT).replaceAll("\\s+", "_");
     }
 
-    protected Map<String, Object> createUVSphereParameters(long quality, double diameter, boolean flip) {
+    protected static Map<String, Object> createUVSphereParameters(long quality, double diameter, boolean flip) {
         Map<String, Object> params = new HashMap<>();
         params.put("quality", quality);
         params.put("diameter", diameter);
@@ -34,7 +34,7 @@ public sealed abstract class NamedComponent implements IComponent, Disposable pe
         return params;
     }
 
-    protected Map<String, Object> createIcoSphereParameters(long recursion, double diameter, boolean flip) {
+    protected static Map<String, Object> createIcoSphereParameters(long recursion, double diameter, boolean flip) {
         Map<String, Object> params = new HashMap<>();
         params.put("recursion", recursion);
         params.put("diameter", diameter);
@@ -42,7 +42,7 @@ public sealed abstract class NamedComponent implements IComponent, Disposable pe
         return params;
     }
 
-    protected Map<String, Object> createOctahedronSphereParameters(long divisions, double diameter, boolean flip) {
+    protected static Map<String, Object> createCubeSphereParameters(long divisions, double diameter, boolean flip) {
         Map<String, Object> params = new HashMap<>();
         params.put("divisions", divisions);
         params.put("diameter", diameter);
@@ -50,12 +50,8 @@ public sealed abstract class NamedComponent implements IComponent, Disposable pe
         return params;
     }
 
-    protected Map<String, Object> createCubeSphereParameters(long divisions, double diameter, boolean flip) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("divisions", divisions);
-        params.put("diameter", diameter);
-        params.put("flip", flip);
-        return params;
+    protected static Map<String, Object> createOctahedronSphereParameters(long divisions, double diameter, boolean flip) {
+        return createCubeSphereParameters(divisions, diameter, flip);
     }
 
     protected double gaussian(Random rand, double mean, double sigma) {

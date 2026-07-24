@@ -13,6 +13,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -20,15 +22,19 @@ import gaiasky.GaiaSky;
 import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.render.MainPostProcessor;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.shader.Material;
 import gaiasky.scene.record.MaterialComponent;
+import gaiasky.scene.record.ModelComponent;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
-import gaiasky.util.CatalogManager;
-import gaiasky.util.LocationLogManager;
+import gaiasky.util.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.svt.SVTManager;
+
+import java.util.Map;
 
 public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSkyLoaderParameters> {
 
@@ -99,6 +105,13 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
         // Preload the biome LUTs if NASA exoplanet archive is enabled.
         if (GaiaSky.settings().data.isEnabled("nasa-exoplanet-archive")) {
             MaterialComponent.getLUTManager();
+            String modelType = ModelComponent.getDefaultModelType();
+            var modelParams = ModelComponent.getDefaultModelParameters(modelType);
+            Bits attributes = Bits.indices(VertexAttributes.Usage.Position, VertexAttributes.Usage.Normal, VertexAttributes.Usage.Tangent, VertexAttributes.Usage.BiNormal, VertexAttributes.Usage.TextureCoordinates);
+            if (modelParams.containsKey("attributes")) {
+                attributes = Bits.indices(((Long) modelParams.get("attributes")).intValue());
+            }
+            var ignored = ModelCache.cache.getModel(modelType, modelParams, attributes, GL20.GL_TRIANGLES);
         }
         return assets;
     }

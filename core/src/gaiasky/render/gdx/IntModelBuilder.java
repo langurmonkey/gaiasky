@@ -786,8 +786,18 @@ public class IntModelBuilder {
      * @return The model
      */
     public IntModel createCubeSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int primitiveType, Material material, Bits attributes) {
+        return createCubeSphere(radius, divisions, flipNormals, hardEdges, primitiveType, material, attributes, true);
+    }
+
+    /**
+     * Creates a cube-sphere with choice of cube-to-sphere mapping.
+     *
+     * @param useBetterMapping If true, use the Catlike Coding mapping (more uniform triangles); otherwise normalize-and-scale.
+     * @return The model
+     */
+    public IntModel createCubeSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int primitiveType, Material material, Bits attributes, boolean useBetterMapping) {
         begin();
-        part("cubesphere", primitiveType, attributes, material).cubesphere(radius, divisions, flipNormals, hardEdges);
+        part("cubesphere", primitiveType, attributes, material).cubesphere(radius, divisions, flipNormals, hardEdges, useBetterMapping);
         return end();
     }
 

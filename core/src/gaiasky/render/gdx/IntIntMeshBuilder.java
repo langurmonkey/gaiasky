@@ -1235,9 +1235,14 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void cubesphere(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
+        cubesphere(radius, divisions, flipNormals, hardEdges, true);
+    }
+
+    @Override
+    public void cubesphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, boolean useBetterMapping) {
         ensureTriangles(12 * divisions * divisions);
         CubeSphereCreator csc = new CubeSphereCreator();
-        csc.create(radius, divisions, flipNormals);
+        csc.create(radius, divisions, flipNormals, useBetterMapping);
 
         for (IFace face : csc.faces) {
             int[] tri = new int[3];

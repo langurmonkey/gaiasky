@@ -33,7 +33,11 @@ public class CubeSphereCreator extends ModelCreator {
     /**
      * Creates a cube-sphere model. Start with a cube where each face contains
      * {@code divisions x divisions} quads, then project each vertex onto the
-     * sphere by normalizing its position and scaling by the radius.
+     * sphere. By default uses
+     * <a href="https://mathproofs.blogspot.com/2005/07/mapping-cube-to-sphere.html">Phil Nowell's mapping</a>,
+     * which produces
+     * much more uniform triangle sizes than simple normalization. The old
+     * normalize-and-scale method is available via {@code useBetterMapping = false}.
      * <p>
      * UVs are computed from the final spherical direction (longitude/colatitude),
      * using the same convention as {@link SphereCreator} (u=1 at longitude 0,
@@ -53,6 +57,31 @@ public class CubeSphereCreator extends ModelCreator {
      * @return This creator.
      */
     public CubeSphereCreator create(float radius, int divisions, boolean flipNormals) {
+        return create(radius, divisions, flipNormals, true);
+    }
+
+    /**
+     * Creates a cube-sphere model with a choice of cube-to-sphere mapping.
+     * <p>
+     * When {@code useBetterMapping} is true, Phil Nowell's formula is used:
+     * <pre>
+     * s.x = x * sqrt(1 - y²/2 - z²/2 + y²z²/3)
+     * s.y = y * sqrt(1 - x²/2 - z²/2 + x²z²/3)
+     * s.z = z * sqrt(1 - x²/2 - y²/2 + x²y²/3)
+     * </pre>
+     * where (x,y,z) is the cube vertex in [-1,1]³. The result s is on the unit
+     * sphere, producing much more uniform triangle sizes.
+     * <p>
+     * When false, the simple normalize-and-scale method is used.
+     *
+     * @param radius           The radius of the sphere.
+     * @param divisions        The number of subdivisions per face edge (must be &gt; 0).
+     * @param flipNormals      Whether to reverse triangle winding (flip normals).
+     * @param useBetterMapping If true, use <a href="https://mathproofs.blogspot.com/2005/07/mapping-cube-to-sphere.html">Phil Nowell's mapping</a>;
+     *                         otherwise normalize-and-scale.
+     * @return This creator.
+     */
+    public CubeSphereCreator create(float radius, int divisions, boolean flipNormals, boolean useBetterMapping) {
         if (divisions < 1)
             throw new AssertionError("Divisions must be > 0");
 
@@ -72,12 +101,12 @@ public class CubeSphereCreator extends ModelCreator {
         //   uComp  = the axis used for the local U direction
         //   vComp  = the axis used for the local V direction
         int[][] faceDefs = {
-                { 0, 1, 1, 2 },  // +X : x = +1, u=y, v=z   — cross(y,z)=+x, outward=+x ✓
-                { 0, -1, 2, 1 }, // -X : x = -1, u=z, v=y   — cross(z,y)=-x, outward=-x ✓
-                { 1, 1, 2, 0 },  // +Y : y = +1, u=z, v=x   — cross(z,x)=+y, outward=+y ✓
-                { 1, -1, 0, 2 }, // -Y : y = -1, u=x, v=z   — cross(x,z)=-y, outward=-y ✓
-                { 2, 1, 0, 1 },  // +Z : z = +1, u=x, v=y   — cross(x,y)=+z, outward=+z ✓
-                { 2, -1, 1, 0 }  // -Z : z = -1, u=y, v=x   — cross(y,x)=-z, outward=-z ✓
+                { 0, 1, 1, 2 },  // +X : x = +1, u=y, v=z   — cross(y,z)=+x, outward=+x
+                { 0, -1, 2, 1 }, // -X : x = -1, u=z, v=y   — cross(z,y)=-x, outward=-x
+                { 1, 1, 2, 0 },  // +Y : y = +1, u=z, v=x   — cross(z,x)=+y, outward=+y
+                { 1, -1, 0, 2 }, // -Y : y = -1, u=x, v=z   — cross(x,z)=-y, outward=-y
+                { 2, 1, 0, 1 },  // +Z : z = +1, u=x, v=y   — cross(x,y)=+z, outward=+z
+                { 2, -1, 1, 0 }  // -Z : z = -1, u=y, v=x   — cross(y,x)=-z, outward=-z
         };
 
         for (int f = 0; f < 6; f++) {
@@ -105,9 +134,25 @@ public class CubeSphereCreator extends ModelCreator {
 
                     Vector3 cubePos = new Vector3(pos[0], pos[1], pos[2]);
 
-                    // Project onto sphere (normalize and scale by radius).
-                    Vector3 spherePos = cubePos.cpy().nor().scl(radius);
-                    Vector3 normal = spherePos.cpy().nor();
+                    Vector3 spherePos;
+                    Vector3 normal;
+                    if (useBetterMapping) {
+                        // Phil Nowell's formula:
+                        //   s = (x*sqrt(1 - y²/2 - z²/2 + y²z²/3), ...)
+                        // s is already on the unit sphere.
+                        float x = cubePos.x, y = cubePos.y, z = cubePos.z;
+                        float x2 = x * x, y2 = y * y, z2 = z * z;
+                        float sx = x * (float) Math.sqrt(1.0 - y2 / 2.0 - z2 / 2.0 + y2 * z2 / 3.0);
+                        float sy = y * (float) Math.sqrt(1.0 - x2 / 2.0 - z2 / 2.0 + x2 * z2 / 3.0);
+                        float sz = z * (float) Math.sqrt(1.0 - x2 / 2.0 - y2 / 2.0 + x2 * y2 / 3.0);
+                        Vector3 s = new Vector3(sx, sy, sz);
+                        normal = s.cpy().nor();
+                        spherePos = s.scl(radius);
+                    } else {
+                        // Simple normalize-and-scale (original method).
+                        spherePos = cubePos.cpy().nor().scl(radius);
+                        normal = spherePos.cpy().nor();
+                    }
 
                     // UV from the final spherical direction, matching SphereCreator:
                     // longitude in the x-z plane, colatitude measured from +Y.

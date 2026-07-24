@@ -246,6 +246,9 @@ public interface IntMeshPartBuilder {
     /** Add a cube sphere **/
     void cubesphere(float radius, int divisions, boolean flipNormals, boolean hardEdges);
 
+    /** Add a cube sphere, with choice of cube-to-sphere mapping **/
+    void cubesphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, boolean useBetterMapping);
+
     /** Add a capsule */
     void capsule(float radius, float height, int divisions);
 
