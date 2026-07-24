@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.gdx.IntIntMeshBuilder;
 import gaiasky.render.gdx.mesh.IntMesh;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.util.Bits;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import org.lwjgl.opengl.GL20;
@@ -22,7 +23,7 @@ import org.lwjgl.opengl.GL20;
 /**
  * A unit LOD cube-sphere, where each cube face is a quadtree.
  * <p>
- * The {@link #builder} lives in this object. Use {@link #begin(VertexAttributes, int)}
+ * The {@link #builder} lives in this object. Use {@link #begin(int)}
  * to start building, then call {@link Quadtree#buildMesh(int, float)} on visible leaf
  * nodes, and finally {@link #end()} to produce the {@link IntMesh}.
  */
@@ -39,8 +40,10 @@ public class LODCubeSphere {
     public final Vector3 scratchBinormal = new Vector3();
     public final Vector2 scratchUV = new Vector2();
 
+    /** The vertex attributes. **/
+    private final Bits attributes;
     /** The single mesh builder owned by this LODCubeSphere. **/
-    public IntIntMeshBuilder builder;
+    private final IntIntMeshBuilder builder;
 
     /** Faces of the cube-sphere, [top, bottom, left, right, front, back]. **/
     final Quadtree[] faces;
@@ -102,6 +105,13 @@ public class LODCubeSphere {
 
             faces[f] = new Quadtree(this, 0, pos0, pos1, pos2, pos3);
         }
+
+        attributes = Bits.indices(VertexAttributes.Usage.Position,
+                                  VertexAttributes.Usage.Normal,
+                                  VertexAttributes.Usage.Tangent,
+                                  VertexAttributes.Usage.BiNormal,
+                                  VertexAttributes.Usage.TextureCoordinates);
+        builder = new IntIntMeshBuilder();
     }
 
     /**
@@ -178,14 +188,9 @@ public class LODCubeSphere {
      * Begin building a mesh. Initializes the internal {@link IntIntMeshBuilder}, if needed, and calls
      * {@code begin(attributes, primitiveType)} on it.
      *
-     * @param attributes    Vertex attributes for the mesh.
      * @param primitiveType Primitive type (e.g. {@link GL20#GL_TRIANGLES}).
      */
-    public void begin(VertexAttributes attributes,
-                      int primitiveType) {
-        if (builder == null) {
-            builder = new IntIntMeshBuilder();
-        }
+    public void begin(int primitiveType) {
         builder.begin(attributes, primitiveType);
     }
 
@@ -359,7 +364,7 @@ public class LODCubeSphere {
          * matching the conventions of {@link gaiasky.render.gdx.creators.CubeSphereCreator}.
          * <p>
          * This method uses the parent {@link LODCubeSphere#builder} to add geometry.
-         * Call {@link LODCubeSphere#begin(VertexAttributes, int)} before, and
+         * Call {@link LODCubeSphere#begin(int)} before, and
          * {@link LODCubeSphere#end()} after building all visible leaf nodes.
          *
          * @param N      The number of subdivisions per edge (N &gt; 0). Produces an NxN grid of quads.
