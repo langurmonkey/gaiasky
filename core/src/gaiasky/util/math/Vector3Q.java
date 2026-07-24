@@ -514,6 +514,10 @@ public class Vector3Q {
         return dst(x, y, z).doubleValue();
     }
 
+    public double dstD(Vector3D vec) {
+        return dst(vec).doubleValue();
+    }
+
     /** @return the distance between this point and the given point */
     public Quadruple dst(double x, double y, double z) {
         return dst2(x, y, z).sqrt();
