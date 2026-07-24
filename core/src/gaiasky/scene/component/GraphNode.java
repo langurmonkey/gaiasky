@@ -58,6 +58,9 @@ public class GraphNode implements Component, ICopy {
      * Local transform matrix. Contains the transform matrix and the
      * transformations that will be applied to this object and not to its
      * children.
+     * <p>
+     *     It is what we ultimately send to the <code>u_worldTrans</code>.
+     * </p>
      */
     public Matrix4 localTransform;
 
