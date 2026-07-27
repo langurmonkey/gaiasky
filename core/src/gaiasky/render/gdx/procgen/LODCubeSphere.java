@@ -118,27 +118,21 @@ public class LODCubeSphere {
      * Traverses the structure computing the visible nodes, adding them to the {@link #visibleLeaves} list.
      *
      * @param cam         The camera.
-     * @param radius      The radius.
-     * @param planetScale The planet scale.
      */
-    public void traverse(ICamera cam,
-                         float radius,
-                         float planetScale) {
+    public void traverse(ICamera cam) {
         visibleLeaves.clear();
 
         for (int f = 0; f < 6; f++) {
-            traverseNode(faces[f], cam, radius, planetScale);
+            traverseNode(faces[f], cam);
         }
     }
 
     void traverseNode(Quadtree node,
-                      ICamera cam,
-                      float radius,
-                      float planetScale) {
+                      ICamera cam) {
         // Frustum cull using bounding sphere.
         if (!frustumTest(node.center, node.radius, cam)) return;
 
-        // 2. Determine if this node should subdivide based on screen-space error
+        // Determine if this node should subdivide based on screen-space error
         double dist = cam.getPos().dstD(node.center);
         double screenSize = node.radius / dist;
         int targetDepth = computeTargetDepth(dist, screenSize, 10f);
@@ -146,7 +140,7 @@ public class LODCubeSphere {
         if (node.depth < targetDepth && !node.isLeaf()) {
             // Subdivide: recurse into children
             for (int i = 0; i < 4; i++) {
-                traverseNode(node.children[i], cam, radius, planetScale);
+                traverseNode(node.children[i], cam);
             }
         } else {
             // Leaf: add to visible list
@@ -171,7 +165,7 @@ public class LODCubeSphere {
     }
 
     /**
-     * Build meshes for all visible leaves (populated by {@link #traverse(ICamera, float, float)}).
+     * Build meshes for all visible leaves (populated by {@link #traverse(ICamera)}).
      * Calls {@link Quadtree#buildMesh(int, float)} on each visible leaf.
      *
      * @param N      The number of subdivisions per edge (N &gt; 0).
