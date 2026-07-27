@@ -32,6 +32,7 @@ import gaiasky.render.gdx.model.IntModel;
 import gaiasky.render.gdx.model.IntModelInstance;
 import gaiasky.render.gdx.model.data.OwnModelMaterial;
 import gaiasky.render.gdx.model.gltf.scene3d.model.ModelInstanceHack;
+import gaiasky.render.gdx.procgen.LODCubeSphere;
 import gaiasky.render.gdx.shader.Environment;
 import gaiasky.render.gdx.shader.Material;
 import gaiasky.render.gdx.shader.attribute.*;
@@ -99,12 +100,22 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
 
 
     public boolean forceInit = false;
+    /** Some planets use a LOD cube-sphere system. **/
+    public LODCubeSphere lodSphere;
+    /** The model instance. **/
     public IntModelInstance instance;
+    /** The environment (lights, etc.). **/
     public Environment env;
+    /** Model parameters. **/
     public Map<String, Object> modelParams;
-    public String modelType, modelFile;
+    /** Model type. **/
+    public String modelType;
+    /** Model file, if any. **/
+    public String modelFile;
+    /** Scale factor. **/
     public double scale = 1d;
     public boolean culling = true;
+    /** Is this model rendered with tessellation? **/
     public boolean tessellated = false;
     /** True if this is a ringed planet, and has a child particle dataset. In this case, the ring must fade on approach. **/
     public boolean ringDataset = false;

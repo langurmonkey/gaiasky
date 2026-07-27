@@ -9,6 +9,7 @@ package gaiasky.render.gdx.procgen;
 
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -18,6 +19,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Bits;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import org.lwjgl.opengl.GL20;
 
 /**
@@ -32,6 +34,7 @@ public class LODCubeSphere {
     // Auxiliary vectors (reused to avoid allocation).
     private final Vector3 aux1 = new Vector3();
     private final Vector3 aux2 = new Vector3();
+    private final Vector3Q auxQ = new Vector3Q();
 
     // Scratch vectors for sphere-space computation in buildMesh().
     public final Vector3 scratchPos = new Vector3();
@@ -117,30 +120,42 @@ public class LODCubeSphere {
     /**
      * Traverses the structure computing the visible nodes, adding them to the {@link #visibleLeaves} list.
      *
-     * @param cam         The camera.
+     * @param cam The camera.
      */
-    public void traverse(ICamera cam) {
+    public void update(ICamera cam,
+                       double objectRadius,
+                       Matrix4 localTransform) {
         visibleLeaves.clear();
 
         for (int f = 0; f < 6; f++) {
-            traverseNode(faces[f], cam);
+            traverseNode(faces[f], cam, objectRadius, localTransform);
         }
     }
 
     void traverseNode(Quadtree node,
-                      ICamera cam) {
+                      ICamera cam,
+                      double objectRadius,
+                      Matrix4 localTransform) {
+        // Put in world coordinates.
+        var worldPosition = node.center.put(aux1).mul(localTransform);
+
         // Frustum cull using bounding sphere.
-        if (!frustumTest(node.center, node.radius, cam)) return;
+        if (!frustumTest(worldPosition, node.radius * objectRadius, cam)) return;
 
         // Determine if this node should subdivide based on screen-space error
-        double dist = cam.getPos().dstD(node.center);
-        double screenSize = node.radius / dist;
-        int targetDepth = computeTargetDepth(dist, screenSize, 10f);
+        // We compute the distance from the camera to the node.
+        double dist = worldPosition.len();
+        // Screen size is the node radius over the distance.
+        double screenSize = node.radius * objectRadius / dist;
+        int targetDepth = computeTargetDepth(screenSize, 10f);
 
         if (node.depth < targetDepth && !node.isLeaf()) {
             // Subdivide: recurse into children
             for (int i = 0; i < 4; i++) {
-                traverseNode(node.children[i], cam);
+                if (node.isLeaf()) {
+                    node.subdivide();
+                }
+                traverseNode(node.children[i], cam, objectRadius, localTransform);
             }
         } else {
             // Leaf: add to visible list
@@ -148,8 +163,7 @@ public class LODCubeSphere {
         }
     }
 
-    int computeTargetDepth(double dist,
-                           double screenSize,
+    int computeTargetDepth(double screenSize,
                            double errorThreshold) {
         // The node's geometric error is roughly proportional to its angular size.
         // Convert to target depth using a logarithmic scale.
@@ -158,14 +172,14 @@ public class LODCubeSphere {
         return MathUtilsDouble.clamp(depth, minDepth, maxDepth);
     }
 
-    boolean frustumTest(Vector3D center,
+    boolean frustumTest(Vector3 position,
                         double radius,
                         ICamera cam) {
-        return cam.getCamera().frustum.boundsInFrustum(center.put(aux1), aux2.set((float) radius, (float) radius, (float) radius));
+        return cam.getCamera().frustum.boundsInFrustum(position, aux2.set((float) radius, (float) radius, (float) radius));
     }
 
     /**
-     * Build meshes for all visible leaves (populated by {@link #traverse(ICamera)}).
+     * Build meshes for all visible leaves (populated by {@link #update(ICamera, double, Matrix4)}).
      * Calls {@link Quadtree#buildMesh(int, float)} on each visible leaf.
      *
      * @param N      The number of subdivisions per edge (N &gt; 0).
@@ -226,7 +240,7 @@ public class LODCubeSphere {
         final Vector3D center;
         /** Depth of this node in the tree structure. **/
         final int depth;
-        /** Radius of this node, given by the distance of its points to the center. **/
+        /** Radius of this node, given by the distance of its points to the center of the patch. **/
         final double radius;
 
         /** Array of children, as in [tl, tr, bl, br]. **/

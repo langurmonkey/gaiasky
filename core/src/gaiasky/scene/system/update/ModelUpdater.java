@@ -95,7 +95,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
         }
     }
 
-    protected void updateRing(Body body, Model model) {
+    protected void updateRing(Body body,
+                              Model model) {
         if (model.model != null && model.model.ringDataset) {
             // Compute alpha.
             var d = body.distToCamera;

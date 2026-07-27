@@ -104,13 +104,13 @@ public class ModelExtractor extends AbstractExtractSystem {
                             addToRender(render, RenderGroup.BILLBOARD_SSO);
                         }
                     } else if (body.solidAngleApparent > thQuad2) {
-                        addToRenderModel(render, model);
+                        addToRenderModel(render, model, body);
                     } else {
                         // Both
                         if (renderFlags == null || renderFlags.renderQuad) {
                             addToRender(render, RenderGroup.BILLBOARD_SSO);
                         }
-                        addToRenderModel(render, model);
+                        addToRenderModel(render, model, body);
                     }
                     if (renderText(base, body, sa, label)) {
                         addToRender(render, RenderGroup.FONT_LABEL);
@@ -140,7 +140,8 @@ public class ModelExtractor extends AbstractExtractSystem {
     }
 
     private void addToRenderModel(Render render,
-                                  Model model) {
+                                  Model model,
+                                  Body body) {
         RenderGroup rg;
         var rt = Mapper.render.get(render.entity);
         if (rt != null && rt.renderGroup != null) {
@@ -154,6 +155,12 @@ public class ModelExtractor extends AbstractExtractSystem {
             }
         }
         addToRender(render, rg);
+
+        if (model.model != null && model.model.lodSphere != null) {
+            var graph = Mapper.graph.get(render.entity);
+            // Gather visible nodes from current position.
+            model.model.lodSphere.update(GaiaSky.instance.getICamera(), body.size, graph.localTransform);
+        }
     }
 
     private boolean isProcedural(Model model){
