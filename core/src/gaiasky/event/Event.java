@@ -1636,8 +1636,14 @@ public enum Event {
      */
     SVT_MATERIAL_INFO,
 
-    /** Set cache size **/
+    /** Set cache size. **/
     SVT_CACHE_SIZE_CMD,
+
+    /**
+     * (Re)initialize REST server with the given port. Contains the port (Integer) in [0].
+     * Use a negative port number to disable the REST server.
+     **/
+    REST_SERVER_CMD,
 
     /** Set the new upscale filter. Contains the new {@link UpscaleFilter} object. **/
     UPSCALE_FILTER_CMD,

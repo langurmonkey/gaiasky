@@ -3364,7 +3364,7 @@ play-icon
   index: -1
 quit-icon
   rotate: false
-  xy: 688, 100
+  xy: 688, 2
   size: 90, 96
   orig: 90, 96
   offset: 0, 0
@@ -3404,9 +3404,16 @@ reload
   orig: 96, 96
   offset: 0, 0
   index: -1
-wrench
+rest-api
   rotate: false
   xy: 590, 2
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+wrench
+  rotate: false
+  xy: 688, 100
   size: 96, 96
   orig: 96, 96
   offset: 0, 0

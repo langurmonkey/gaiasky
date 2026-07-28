@@ -114,6 +114,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox motionTrails;
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
+    private OwnCheckBox restEnabled;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect,
@@ -145,9 +146,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSliderReset pgResolution;
     private OwnSliderReset cmResolution;
     private OwnSliderReset plResolution;
-    private OwnSliderReset plAperture;
-    private OwnSliderReset plAngle;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
+    private OwnTextField restPort;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber, tessQualityLabel;
     private ColorPicker pointerGuidesColor, anaglyphCustomLeft, anaglyphCustomRight, accentColor;
@@ -199,7 +199,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                         Image img,
                                         Skin skin) {
         OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), Align.left, img, skin, "toggle-big");
-        tab.addListener(new OwnTextTooltip(title, skin));
+        tab.setTooltip(title);
         tab.pad(pad10);
         tab.setWidth(480f);
         return tab;
@@ -267,6 +267,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnTextIconButton tab360 = createTab(I18n.msg("gui.360.title"), new Image(skin.getDrawable("cubemap-icon")), skin);
         OwnTextIconButton tabPlanetarium = createTab(I18n.msg("gui.planetarium.title"), new Image(skin.getDrawable("dome-icon")), skin);
         OwnTextIconButton tabData = createTab(I18n.msg("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin);
+        OwnTextIconButton tabRest = createTab(I18n.msg("gui.rest"), new Image(skin.getDrawable("rest-api")), skin);
         OwnTextIconButton tabSystem = createTab(I18n.msg("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin);
 
         tabsTable.add(tabGraphics).row();
@@ -281,6 +282,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabsTable.add(tab360).row();
         tabsTable.add(tabPlanetarium).row();
         tabsTable.add(tabData).row();
+        tabsTable.add(tabRest).row();
         tabsTable.add(tabSystem).row();
         content.add(tabsTable).align(Align.left | Align.top).padLeft(pad10);
 
@@ -297,6 +299,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabButtons.add(tab360);
         tabButtons.add(tabPlanetarium);
         tabButtons.add(tabData);
+        tabButtons.add(tabRest);
         tabButtons.add(tabSystem);
 
         // Create the tab content. Just using images here for simplicity.
@@ -783,7 +786,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // ELEVATION TYPE
             OwnLabel elevationTypeLabel = new OwnLabel(I18n.msg("gui.elevation.type"), skin);
-            int tn = settings.runtime.tessellation ? ElevationType.values().length : ElevationType.values().length -1;
+            int tn = settings.runtime.tessellation ? ElevationType.values().length : ElevationType.values().length - 1;
             ElevationComboBoxBean[] elevationValues = new ElevationComboBoxBean[tn];
             int i = 0;
             for (ElevationType et : ElevationType.values()) {
@@ -2425,7 +2428,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Aperture
         var apertureLabel = new OwnLabel(I18n.msg("gui.planetarium.aperture"), skin);
-        plAperture = new OwnSliderReset("", Constants.MIN_PL_APERTURE, Constants.MAX_PL_APERTURE, Constants.SLIDER_STEP, 180f, skin);
+        OwnSliderReset plAperture = new OwnSliderReset("", Constants.MIN_PL_APERTURE, Constants.MAX_PL_APERTURE, Constants.SLIDER_STEP, 180f, skin);
         plAperture.setTooltip(I18n.msg("gui.planetarium.aperture"));
         plAperture.setValueLabelTransform((value) -> String.format("%.1f°", value));
         plAperture.setValue(settings.program.modeCubemap.planetarium.aperture);
@@ -2434,7 +2437,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Skew angle
         var plAngleLabel = new OwnLabel(I18n.msg("gui.planetarium.angle"), skin);
-        plAngle = new OwnSliderReset("", Constants.MIN_PL_ZENITH_ANGLE, Constants.MAX_PL_ZENITH_ANGLE, Constants.SLIDER_STEP, 50f, skin);
+        OwnSliderReset plAngle = new OwnSliderReset("",
+                                                    Constants.MIN_PL_ZENITH_ANGLE,
+                                                    Constants.MAX_PL_ZENITH_ANGLE,
+                                                    Constants.SLIDER_STEP,
+                                                    50f,
+                                                    skin);
         plAngle.setTooltip(I18n.msg("gui.planetarium.angle"));
         plAngle.setValueLabelTransform((value) -> String.format("%.1f°", value));
         plAngle.setValue(settings.program.modeCubemap.planetarium.angle);
@@ -2681,6 +2689,60 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         addContentGroup(contentDataTable, titleAttitude, attitude);
 
+        /*
+         * ==== REST ====
+         */
+        OwnLabel titleRest = new OwnLabel(I18n.msg("gui.rest"), skin, "header");
+        var contentRest = new Table(skin);
+        contentRest.align(Align.top | Align.left);
+
+        var restTable = new Table(skin);
+
+        // Port.
+        var currentPort = settings.program.net.restPort;
+        var portLabel = new OwnLabel(I18n.msg("gui.rest.port"), skin);
+        restPort = new OwnTextField(Integer.toString(currentPort), skin, new PortValidator());
+        var portTooltip = new OwnImageButton(skin, "tooltip");
+        portTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.rest.port.info"), skin));
+
+        // REST enabled checkbox.
+        var restEnabledLabel = new OwnLabel(I18n.msg("gui.rest.enable"), skin);
+        restEnabled = new OwnCheckBox("", skin);
+        restEnabled.setChecked(currentPort >= 0);
+        restEnabled.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                restPort.setDisabled(!restEnabled.isChecked());
+            }
+            return true;
+        });
+        restPort.setDisabled(!restEnabled.isChecked());
+
+        // Apply.
+        OwnTextButton applyRESTSettings = new OwnTextButton(I18n.msg("gui.apply"), skin);
+        applyRESTSettings.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                applyRestSettings(true);
+                return true;
+            } else {
+                return false;
+            }
+        });
+        applyRESTSettings.pad(0, pad34, 0, pad34);
+        applyRESTSettings.setHeight(buttonHeight);
+
+
+        labels.add(portLabel, restEnabledLabel);
+
+        restTable.add(restEnabledLabel).left().padBottom(pad10);
+        restTable.add(restEnabled).left().padBottom(pad10).row();
+        restTable.add(portLabel).left().padBottom(pad10);
+        restTable.add(restPort).left().padBottom(pad10).padRight(pad34);
+        restTable.add(portTooltip).left().padBottom(pad10).row();
+        // Only add 'apply' when not in welcome screen mode.
+        if (!welcomeScreen)
+            restTable.add(applyRESTSettings).left().padBottom(pad10);
+
+        addContentGroup(contentRest, titleRest, restTable, 0f);
 
         /*
          * ==== SYSTEM ====
@@ -2795,6 +2857,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         addTabContent(content360);
         addTabContent(contentPlanetarium);
         addTabContent(contentData);
+        addTabContent(contentRest);
         addTabContent(contentSystem);
 
         /* ADD TO MAIN TABLE */
@@ -2883,6 +2946,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel restart = new OwnLabel("*", skin, "header-red");
         restart.addListener(new OwnTextTooltip(I18n.msg("gui.restart"), skin));
         return restart;
+    }
+
+    private void applyRestSettings(boolean showPopupOnError) {
+        int port;
+        if (restEnabled.isChecked()) {
+            if (restPort.isValid()) {
+                port = Parser.parseInt(restPort.getText());
+            } else {
+                if (showPopupOnError) {
+                    var err = I18n.msg("gui.rest.port.error", restPort.getText());
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, err);
+                }
+                return;
+            }
+        } else {
+            port = -1;
+        }
+        EventManager.publish(Event.REST_SERVER_CMD, this, port);
     }
 
     @Override
@@ -3405,6 +3486,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Gaia attitude
         settings.data.realGaiaAttitude = real.isChecked();
+
+        // REST server
+        applyRestSettings(true);
 
         // System
         if (settings.program.debugInfo != debugInfoBak) {

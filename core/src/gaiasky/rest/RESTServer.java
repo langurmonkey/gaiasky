@@ -48,10 +48,10 @@ public class RESTServer implements Disposable {
     private boolean activated;
 
     public RESTServer(int port) {
-       super();
-       if (port > 0) {
-           initialize(port);
-       }
+        super();
+        if (port >= 0) {
+            initialize(port);
+        }
     }
 
     /**
@@ -59,29 +59,58 @@ public class RESTServer implements Disposable {
      * <p>
      * Sets the routes and then passes the call to the handler.
      *
-     * @param rest_port The port to use for the REST server
+     * @param restPort The port to use for the REST server
      */
-    public void initialize(Integer rest_port) {
-
-        if (rest_port < 1024) {
-            logger.error("You are trying to bind a reserved port (" + rest_port + " < 1024). Please, choose a port greater than 1024 and try again.");
-            logger.error("You need superuser permissions to bind reserved ports, but running Gaia Sky with root privileges is STRONGLY DISCOURAGED!");
-            logger.error("Proceed at your own risk.");
-        }
-        if (rest_port > 49151) {
-            logger.error("Your port (" + rest_port + ") is not in the user ports range [1024, 49151]. Please, choose a port in this range and try again.");
-            logger.error("Proceed at your own risk.");
-        }
-
-        /* Check for valid TCP port (otherwise considered as "disabled") */
-        int port = rest_port;
-        printStartupInfo();
+    public void initialize(Integer restPort) {
+        // Stop server if port is negative.
+        int port = restPort;
         if (port < 0) {
-            logger.error("Error: invalid port. REST API inactive.");
+            if (isRunning()) {
+                logger.info("Stopping server.");
+            } else {
+                logger.error("Error: invalid port. REST API inactive.");
+            }
+            Spark.stop();
             return;
         }
 
+        // Check port range.
+        if (restPort < 1024 && restPort != 0) {
+            logger.error("You are trying to bind a reserved port (" + restPort + " < 1024). Please, choose a port greater than 1024 and try again.");
+            logger.error("You need superuser permissions to bind reserved ports, but running Gaia Sky with root privileges is STRONGLY DISCOURAGED!");
+            logger.error("Proceed at your own risk.");
+        }
+        if (restPort > 49151) {
+            logger.error("Your port (" + restPort + ") is not in the user ports range [1024, 49151]. Please, choose a port in this range and try again.");
+            logger.error("Proceed at your own risk.");
+        }
+
+
+        printStartupInfo();
+
+        // Figure out if the server is running, and stop it if so.
+        if (isRunning()) {
+            if (Spark.port() == port) {
+                // In this case, we do nothing.
+                // The server is already running at the given port.
+                return;
+            }
+            Spark.stop();
+        }
+
         try {
+            Spark.port(port);
+
+            /* Scripting APIv1 mapping */
+            var api1Methods = addAPI1Methods();
+            api1Mappings(api1Methods);
+
+            /* Scripting APIv2 mapping */
+            var api2Module = api2Module();
+            apiv2Mappings(api2Module);
+
+            port = Spark.port();
+
             logger.info("Starting REST APIv1 server on http://localhost:{}/api/", port);
             logger.info("   See available calls at http://localhost:{}/api/help", port);
             logger.info("Starting REST APIv2 server on http://localhost:{}/apiv2/", port);
@@ -90,30 +119,15 @@ public class RESTServer implements Disposable {
                                 " base, camcorder, camera, data, geom, graphics, input, instances, output, refys, scene, time, ui");
             logger.info("   Examples: http://localhost:{}/apiv2/base/help", port);
             logger.info("             http://localhost:{}/apiv2/camera/help", port);
-            Spark.port(port);
 
-            /* Scripting APIv1 mapping */
-            var apiV1Methods = addAPIv1Methods();
-            Spark.get("/api", (request, response) -> {
-                response.redirect("/api/help");
-                return response;
-            });
-            Spark.get("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
-            Spark.post("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
-
-
-            /* Scripting APIv2 mapping */
-            ModuleDesc apiV2Modules = constructAPIv2Modules();
-            apiv2Mappings(apiV2Modules);
-
-            logger.info("Startup finished.");
+            logger.info("REST server is running.");
 
         } catch (Exception e) {
             logger.error(e, "Caught an exception during initialization:");
         }
     }
 
-    private Map<String, Array<Method>> addAPIv1Methods() {
+    private Map<String, Array<Method>> addAPI1Methods() {
         Map<String, Array<Method>> apiv1Methods = new HashMap<>();
         Class<IScriptingInterface> iScriptingInterfaceClass = IScriptingInterface.class;
         Method[] allMethods = iScriptingInterfaceClass.getDeclaredMethods();
@@ -132,7 +146,17 @@ public class RESTServer implements Disposable {
         return apiv1Methods;
     }
 
-    private ModuleDesc constructAPIv2Modules() {
+    private void api1Mappings(Map<String, Array<Method>> api1Methods) {
+        Spark.get("/api", (request, response) -> {
+            response.redirect("/api/help");
+            return response;
+        });
+        Spark.get("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, api1Methods));
+        Spark.post("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, api1Methods));
+
+    }
+
+    private ModuleDesc api2Module() {
         return ModuleDesc.of(Path.of("apiv2"), APIv2.class);
     }
 
@@ -798,12 +822,28 @@ public class RESTServer implements Disposable {
         return apiv2.getModuleInstance(clazz);
     }
 
-
     /**
-     * Activate. Set the "activated" flag for the server.
+     * Activates the server to start serving requests.
      */
     public void activate() {
-        activated = true;
+        this.activated = true;
+    }
+
+    /**
+     * Checks if the REST server is running.
+     *
+     * @return True if the server is running.
+     */
+    public boolean isRunning() {
+        boolean isRunning;
+        try {
+            Spark.port();
+            isRunning = true;
+        } catch (IllegalStateException ignored) {
+            isRunning = false;
+        }
+
+        return isRunning;
     }
 
     /**

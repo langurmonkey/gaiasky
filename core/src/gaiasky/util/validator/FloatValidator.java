@@ -25,7 +25,7 @@ public class FloatValidator extends NumberValidator<Float> {
     protected boolean validateLocal(String value) {
         float val;
         try {
-            val = Parser.parseFloat(value);
+            val = Parser.parseFloatException(value);
         } catch (NumberFormatException e) {
             return false;
         }

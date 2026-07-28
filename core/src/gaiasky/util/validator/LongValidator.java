@@ -8,6 +8,7 @@
 package gaiasky.util.validator;
 
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.parse.Parser;
 
 public class LongValidator extends NumberValidator<Long> {
 
@@ -35,7 +36,7 @@ public class LongValidator extends NumberValidator<Long> {
     protected boolean validateLocal(String value) {
         long val;
         try {
-            val = Long.parseLong(value);
+            val = Parser.parseLongException(value);
         } catch (NumberFormatException e) {
             return false;
         }

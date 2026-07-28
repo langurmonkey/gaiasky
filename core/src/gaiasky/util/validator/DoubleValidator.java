@@ -27,7 +27,7 @@ public class DoubleValidator extends NumberValidator<Double> {
     protected boolean validateLocal(String value) {
         double val;
         try {
-            val = Parser.parseDouble(value);
+            val = Parser.parseDoubleException(value);
         } catch (NumberFormatException e) {
             return false;
         }

@@ -8,6 +8,7 @@
 package gaiasky.util.validator;
 
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.parse.Parser;
 
 public class IntValidator extends NumberValidator<Integer> {
 
@@ -27,7 +28,7 @@ public class IntValidator extends NumberValidator<Integer> {
     protected boolean validateLocal(String value) {
         int val;
         try {
-            val = Integer.parseInt(value);
+            val = Parser.parseIntException(value);
         } catch (NumberFormatException e) {
             return false;
         }

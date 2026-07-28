@@ -2621,6 +2621,7 @@ public class Settings extends SettingsObject {
                         saveProceduralTextures = (Boolean) data[0];
                     }
                     case NAME_CONFLICTS_STARTUP_CMD -> showNameConflicts = (Boolean) data[0];
+                    case REST_SERVER_CMD -> net.restPort = (Integer) data[0];
                     default -> {
                     }
                 }
@@ -2678,6 +2679,7 @@ public class Settings extends SettingsObject {
                                             Event.UV_GRID_FRAME_COORDINATES_CMD,
                                             Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD,
                                             Event.NAME_CONFLICTS_STARTUP_CMD,
+                                            Event.REST_SERVER_CMD,
                                             Event.SHOW_NOTIFICATIONS_CMD);
 
             minimap.setupListeners();
@@ -2715,6 +2717,7 @@ public class Settings extends SettingsObject {
             EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointer.guides.active, pointer.guides.color,
                                  pointer.guides.width);
             EventManager.publish(Event.NAME_CONFLICTS_STARTUP_CMD, this, showNameConflicts);
+            EventManager.publish(Event.REST_SERVER_CMD, this, net.restPort);
 
             // Those need to run in the main thread, as they may need the OpenGL context.
             GaiaSky.postRunnable(() -> {

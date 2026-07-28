@@ -785,7 +785,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                                         Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD,
                                         Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD,
                                         Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.SCENE_FORCE_UPDATE,
-                                        Event.GO_HOME_INSTANT_CMD);
+                                        Event.GO_HOME_INSTANT_CMD, Event.REST_SERVER_CMD);
 
         // Re-enable input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -1695,6 +1695,18 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                 removeRunnable(key);
             }
             case SCENE_FORCE_UPDATE -> touchSceneGraph();
+            case REST_SERVER_CMD -> {
+                if (scene != null && gaiaSkyAssets != null && gaiaSkyAssets.restServer != null) {
+                    int port = (Integer) data[0];
+                    gaiaSkyAssets.restServer.initialize(port);
+                    if (port < 0) {
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.rest.info.stop"));
+                    } else if (gaiaSkyAssets.restServer.isRunning()) {
+                        var msg = I18n.msg("gui.rest.info", Integer.toString(settings.program.net.restPort));
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, msg);
+                    }
+                }
+            }
         }
     }
 
