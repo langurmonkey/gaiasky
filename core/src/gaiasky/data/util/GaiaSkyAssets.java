@@ -9,6 +9,7 @@ package gaiasky.data.util;
 
 import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.render.api.IPostProcessor;
+import gaiasky.rest.RESTServer;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.util.CatalogManager;
@@ -23,4 +24,5 @@ public class GaiaSkyAssets {
     public SVTManager svtManager;
     public ConsoleManager consoleManager;
     public CatalogManager catalogManager;
+    public RESTServer restServer;
 }

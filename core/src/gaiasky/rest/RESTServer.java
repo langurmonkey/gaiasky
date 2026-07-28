@@ -8,6 +8,7 @@
 package gaiasky.rest;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import gaiasky.GaiaSky;
@@ -29,29 +30,135 @@ import java.util.*;
 /**
  * Implements the REST server, which serves the APIS ({@link gaiasky.script.v2.impl.APIv2} and {@link IScriptingInterface}) over HTTP(s).
  */
-public class RESTServer {
-
-    /**
-     * Logger
-     */
+public class RESTServer implements Disposable {
     private static final Log logger = Logger.getLogger(RESTServer.class);
+
     /**
      * "Shutdown already triggered" flag. {@link Spark#stop()} can be called multiple times
      * (multiple events), but only processed once.
      */
-    private static boolean shutdownTriggered;
+    private boolean shutdownTriggered;
+
     /**
      * Activated flag. Calling API methods generally requires the GUI to be fully
      * started and all objects initialized, indicated by the "activated" flag. This
      * flag is set true through the {@link RESTServer#activate()} method that needs to be called
      * externally once the GUI is ready.
      */
-    private static boolean activated;
+    private boolean activated;
+
+    public RESTServer(int port) {
+       super();
+       if (port > 0) {
+           initialize(port);
+       }
+    }
+
+    /**
+     * Initialize the REST server.
+     * <p>
+     * Sets the routes and then passes the call to the handler.
+     *
+     * @param rest_port The port to use for the REST server
+     */
+    public void initialize(Integer rest_port) {
+
+        if (rest_port < 1024) {
+            logger.error("You are trying to bind a reserved port (" + rest_port + " < 1024). Please, choose a port greater than 1024 and try again.");
+            logger.error("You need superuser permissions to bind reserved ports, but running Gaia Sky with root privileges is STRONGLY DISCOURAGED!");
+            logger.error("Proceed at your own risk.");
+        }
+        if (rest_port > 49151) {
+            logger.error("Your port (" + rest_port + ") is not in the user ports range [1024, 49151]. Please, choose a port in this range and try again.");
+            logger.error("Proceed at your own risk.");
+        }
+
+        /* Check for valid TCP port (otherwise considered as "disabled") */
+        int port = rest_port;
+        printStartupInfo();
+        if (port < 0) {
+            logger.error("Error: invalid port. REST API inactive.");
+            return;
+        }
+
+        try {
+            logger.info("Starting REST APIv1 server on http://localhost:{}/api/", port);
+            logger.info("   See available calls at http://localhost:{}/api/help", port);
+            logger.info("Starting REST APIv2 server on http://localhost:{}/apiv2/", port);
+            logger.info("   See available calls per module at http://localhost:{}/apiv2/{}/help", port, "[module]");
+            logger.info("   Where [module] is one of:" +
+                                " base, camcorder, camera, data, geom, graphics, input, instances, output, refys, scene, time, ui");
+            logger.info("   Examples: http://localhost:{}/apiv2/base/help", port);
+            logger.info("             http://localhost:{}/apiv2/camera/help", port);
+            Spark.port(port);
+
+            /* Scripting APIv1 mapping */
+            var apiV1Methods = addAPIv1Methods();
+            Spark.get("/api", (request, response) -> {
+                response.redirect("/api/help");
+                return response;
+            });
+            Spark.get("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
+            Spark.post("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
+
+
+            /* Scripting APIv2 mapping */
+            ModuleDesc apiV2Modules = constructAPIv2Modules();
+            apiv2Mappings(apiV2Modules);
+
+            logger.info("Startup finished.");
+
+        } catch (Exception e) {
+            logger.error(e, "Caught an exception during initialization:");
+        }
+    }
+
+    private Map<String, Array<Method>> addAPIv1Methods() {
+        Map<String, Array<Method>> apiv1Methods = new HashMap<>();
+        Class<IScriptingInterface> iScriptingInterfaceClass = IScriptingInterface.class;
+        Method[] allMethods = iScriptingInterfaceClass.getDeclaredMethods();
+
+        for (Method method : allMethods) {
+            Array<Method> matches;
+            if (apiv1Methods.containsKey(method.getName())) {
+                matches = apiv1Methods.get(method.getName());
+            } else {
+                matches = new Array<>(false, 1);
+            }
+            if (!matches.contains(method, true))
+                matches.add(method);
+            apiv1Methods.put(method.getName(), matches);
+        }
+        return apiv1Methods;
+    }
+
+    private ModuleDesc constructAPIv2Modules() {
+        return ModuleDesc.of(Path.of("apiv2"), APIv2.class);
+    }
+
+    private void apiv2Mappings(ModuleDesc module) {
+        var path = module.path();
+        Spark.get("/" + path, (request, response) -> {
+            response.redirect("/" + path + "/help");
+            return response;
+        });
+
+        // Handle methods in current module.
+        Spark.get("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
+        Spark.post("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
+
+        // Recursively add modules.
+        if (module.modules() != null && !module.modules().isEmpty()) {
+            for (var child : module.modules()) {
+                apiv2Mappings(child);
+            }
+        }
+    }
 
     /**
      * Prints startup warning and current log level of SimpleLogger.
      */
-    private static void printStartupInfo() {
+    private void printStartupInfo() {
         String s = System.getProperty("org.slf4j.simpleLogger.defaultLogLevel");
         logger.debug("Simple Logger defaultLogLevel = " + s);
         logger.warn("*** Warning: REST API server may permit remote code execution! " + "Only use this functionality in a trusted environment! ***");
@@ -62,7 +169,10 @@ public class RESTServer {
      * "value" key. - Additional keys may provide further data or information. - The
      * "text" key is encouraged for human-readable information.
      */
-    private static String responseData(spark.Request request, spark.Response response, Map<String, Object> ret, boolean success) {
+    private String responseData(spark.Request request,
+                                spark.Response response,
+                                Map<String, Object> ret,
+                                boolean success) {
 
         String responseString;
 
@@ -95,7 +205,7 @@ public class RESTServer {
     /**
      * Log information on the request.
      */
-    private static void loggerRequestInfo(spark.Request request) {
+    private void loggerRequestInfo(spark.Request request) {
         logger.debug("======== Handling API call via HTTP {}: ========", request.requestMethod());
         logger.debug("* Parameter extracted:");
         logger.debug("  command = ", request.params(":cmd"));
@@ -128,7 +238,7 @@ public class RESTServer {
     /**
      * Returns a declaration string for the given method.
      */
-    private static String methodDeclarationString(Method method) {
+    private String methodDeclarationString(Method method) {
         Parameter[] methodParams = method.getParameters();
 
         StringBuilder ret = new StringBuilder(method.getName());
@@ -144,7 +254,7 @@ public class RESTServer {
      * Returns a list of all matching method declaration strings. To get a list of
      * all method declarations, use empty string for <code>methodName</code>.
      */
-    private static String[] getMethodDeclarationStrings(String methodName) {
+    private String[] getMethodDeclarationStrings(String methodName) {
         Method[] allMethods = IScriptingInterface.class.getDeclaredMethods();
 
         List<String> matchMethodsDeclarations = new ArrayList<>();
@@ -167,7 +277,8 @@ public class RESTServer {
      *
      * @return A list of all matching methods.
      */
-    private static String[] getMethodDeclarationStrings(String methodName, ModuleDesc module) {
+    private String[] getMethodDeclarationStrings(String methodName,
+                                                 ModuleDesc module) {
         Method[] allMethods = module.clazz().getDeclaredMethods();
 
         List<String> matchMethodsDeclarations = new ArrayList<>();
@@ -191,7 +302,7 @@ public class RESTServer {
      *
      * @return The list of all modules.
      */
-    private static String[] getModuleDeclarations(ModuleDesc module) {
+    private String[] getModuleDeclarations(ModuleDesc module) {
         List<String> result = new ArrayList<>();
         for (var m : module.modules()) {
             result.add(m.name());
@@ -205,7 +316,7 @@ public class RESTServer {
      * This defines how array need to be passed as HTTP request parameters:
      * comma-separated and enclosed in square brackets, e.g. "[var1,var2,var3]"
      */
-    private static String[] splitArrayString(String arrayString) {
+    private String[] splitArrayString(String arrayString) {
         int len = arrayString.length();
         if (len >= 2 && "[".equals(arrayString.substring(0, 1)) && "]".equals(arrayString.substring(len - 1, len))) {
             return arrayString.substring(1, len - 1).split(",");
@@ -218,9 +329,9 @@ public class RESTServer {
         }
     }
 
-    private static Pair<Method, Boolean> matchParameters(Array<Method> matchMethods,
-                                                         String cmd,
-                                                         Set<String> queryParams) {
+    private Pair<Method, Boolean> matchParameters(Array<Method> matchMethods,
+                                                  String cmd,
+                                                  Set<String> queryParams) {
         Method matchMethod = null;
         boolean methodNameMatches = false;
         for (int i = 0; i < matchMethods.size; i++) {
@@ -279,7 +390,9 @@ public class RESTServer {
      * optionally add a type to the parameters, e.g. "distance_float=0.3f" and split
      * by the underscore.
      */
-    private static String handleAPIv1Call(spark.Request request, spark.Response response, Map<String, Array<Method>> apiv1Methods) {
+    private String handleAPIv1Call(spark.Request request,
+                                   spark.Response response,
+                                   Map<String, Array<Method>> apiv1Methods) {
 
         // Logging basic request information
         loggerRequestInfo(request);
@@ -328,7 +441,7 @@ public class RESTServer {
         }
 
         Array<Method> matchMethods = apiv1Methods.get(cmd);
-        var matched = matchParameters(matchMethods, cmd,  queryParams);
+        var matched = matchParameters(matchMethods, cmd, queryParams);
         var matchMethod = matched.getFirst();
         var methodNameMatches = matched.getSecond();
 
@@ -471,7 +584,9 @@ public class RESTServer {
         }
     }
 
-    private static String handleAPIv2Call(spark.Request request, spark.Response response, ModuleDesc module) {
+    private String handleAPIv2Call(spark.Request request,
+                                   spark.Response response,
+                                   ModuleDesc module) {
         // Logging basic request information
         loggerRequestInfo(request);
 
@@ -534,7 +649,7 @@ public class RESTServer {
         }
 
         Array<Method> matchMethods = module.methodMap().get(cmd);
-        var matched = matchParameters(matchMethods, cmd,  queryParams);
+        var matched = matchParameters(matchMethods, cmd, queryParams);
         var matchMethod = matched.getFirst();
         var methodNameMatches = matched.getSecond();
 
@@ -678,119 +793,23 @@ public class RESTServer {
         }
     }
 
-    private static Object getModuleInstance(Class<?> clazz) {
+    private Object getModuleInstance(Class<?> clazz) {
         var apiv2 = ((EventScriptingInterface) GaiaSky.instance.scripting()).apiv2;
         return apiv2.getModuleInstance(clazz);
     }
 
-    /**
-     * Initialize the REST server.
-     * <p>
-     * Sets the routes and then passes the call to the handler.
-     *
-     * @param rest_port The port to use for the REST server
-     */
-    public static void initialize(Integer rest_port) {
-
-        if (rest_port < 1024) {
-            logger.error("You are trying to bind a reserved port (" + rest_port + " < 1024). Please, choose a port greater than 1024 and try again.");
-            logger.error("You need superuser permissions to bind reserved ports, but running Gaia Sky with root privileges is STRONGLY DISCOURAGED!");
-            logger.error("Proceed at your own risk.");
-        }
-        if (rest_port > 49151) {
-            logger.error("Your port (" + rest_port + ") is not in the user ports range [1024, 49151]. Please, choose a port in this range and try again.");
-            logger.error("Proceed at your own risk.");
-        }
-
-        /* Check for valid TCP port (otherwise considered as "disabled") */
-        int port = rest_port;
-        printStartupInfo();
-        if (port < 0) {
-            logger.error("Error: invalid port. REST API inactive.");
-            return;
-        }
-
-        try {
-            logger.info("Starting REST APIv1 server on http://localhost:{}/api/", port);
-            logger.info("   See available calls at http://localhost:{}/api/help", port);
-            logger.info("Starting REST APIv2 server on http://localhost:{}/apiv2/", port);
-            logger.info("   See available calls at http://localhost:{}/apiv2/help", port);
-            Spark.port(port);
-
-            /* Scripting APIv1 mapping */
-            var apiV1Methods = addAPIv1Methods();
-            Spark.get("/api", (request, response) -> {
-                response.redirect("/api/help");
-                return response;
-            });
-            Spark.get("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
-            Spark.post("/api/:cmd", (request, response) -> handleAPIv1Call(request, response, apiV1Methods));
-
-
-            /* Scripting APIv2 mapping */
-            ModuleDesc apiV2Modules = constructAPIv2Modules();
-            apiv2Mappings(apiV2Modules);
-
-            logger.info("Startup finished.");
-
-        } catch (Exception e) {
-            logger.error(e, "Caught an exception during initialization:");
-        }
-    }
-
-    private static Map<String, Array<Method>> addAPIv1Methods() {
-        Map<String, Array<Method>> apiv1Methods = new HashMap<>();
-        Class<IScriptingInterface> iScriptingInterfaceClass = IScriptingInterface.class;
-        Method[] allMethods = iScriptingInterfaceClass.getDeclaredMethods();
-
-        for (Method method : allMethods) {
-            Array<Method> matches;
-            if (apiv1Methods.containsKey(method.getName())) {
-                matches = apiv1Methods.get(method.getName());
-            } else {
-                matches = new Array<>(false, 1);
-            }
-            if (!matches.contains(method, true))
-                matches.add(method);
-            apiv1Methods.put(method.getName(), matches);
-        }
-        return apiv1Methods;
-    }
-
-    private static ModuleDesc constructAPIv2Modules() {
-        return ModuleDesc.of(Path.of("apiv2"), APIv2.class);
-    }
-
-    private static void apiv2Mappings(ModuleDesc module) {
-        var path = module.path();
-        Spark.get("/" + path, (request, response) -> {
-            response.redirect("/" + path + "/help");
-            return response;
-        });
-
-        // Handle methods in current module.
-        Spark.get("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
-        Spark.post("/" + path + "/:cmd", (request, response) -> handleAPIv2Call(request, response, module));
-
-        // Recursively add modules.
-        if (module.modules() != null && !module.modules().isEmpty()) {
-            for (var child : module.modules()) {
-                apiv2Mappings(child);
-            }
-        }
-    }
 
     /**
      * Activate. Set the "activated" flag for the server.
      */
-    public static void activate() {
+    public void activate() {
         activated = true;
     }
 
     /**
      * Stops the REST server gracefully.
      */
-    public static void dispose() {
+    public void dispose() {
         try {
             if (!shutdownTriggered) {
                 shutdownTriggered = true;

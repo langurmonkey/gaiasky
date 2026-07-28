@@ -45,7 +45,16 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IPostProcessor;
 import gaiasky.render.api.IPostProcessor.RenderType;
+import gaiasky.render.gdx.TextureArrayLoader;
+import gaiasky.render.gdx.g2d.BitmapFont;
+import gaiasky.render.gdx.graphics.VolumeTexture;
 import gaiasky.render.gdx.loader.*;
+import gaiasky.render.gdx.loader.is.GzipInputStreamProvider;
+import gaiasky.render.gdx.loader.is.RegularInputStreamProvider;
+import gaiasky.render.gdx.model.IntModel;
+import gaiasky.render.gdx.shader.ComputeShaderProgram;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
+import gaiasky.render.gdx.shader.attribute.Attribute;
 import gaiasky.render.gdx.shader.loader.*;
 import gaiasky.render.gdx.shader.provider.*;
 import gaiasky.scene.Mapper;
@@ -67,15 +76,6 @@ import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.coord.vsop87.VSOP87Binary;
 import gaiasky.util.coord.vsop87.VSOP87Loader;
 import gaiasky.util.ds.GaiaSkyExecutorService;
-import gaiasky.render.gdx.TextureArrayLoader;
-import gaiasky.render.gdx.g2d.BitmapFont;
-import gaiasky.render.gdx.graphics.VolumeTexture;
-import gaiasky.render.gdx.loader.is.GzipInputStreamProvider;
-import gaiasky.render.gdx.loader.is.RegularInputStreamProvider;
-import gaiasky.render.gdx.model.IntModel;
-import gaiasky.render.gdx.shader.ComputeShaderProgram;
-import gaiasky.render.gdx.shader.ExtShaderProgram;
-import gaiasky.render.gdx.shader.attribute.Attribute;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -541,7 +541,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             ab.load(assetManager);
         }
 
-        EventManager.instance.subscribe(this, Event.LOAD_DATA_CMD, Event.UI_SCALE_RECOMPUTE_CMD);
+        EventManager.instance.subscribe(this, Event.LOAD_DATA_CMD, Event.UI_SCALE_RECOMPUTE_CMD, Event.SCENE_LOADED);
 
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -1114,6 +1114,11 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             gaiaSkyAssets.postProcessor.dispose();
         }
 
+        // REST server.
+        if (gaiaSkyAssets != null && gaiaSkyAssets.restServer != null) {
+            gaiaSkyAssets.restServer.dispose();
+        }
+
         // Clear temp.
         try {
             Path tmp = SysUtils.getDataTempDir(settings.data.location);
@@ -1413,14 +1418,23 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     }
 
     /**
-     * Returns a reference to the current settings object.
+     * Returns the reference to the current settings object.
      *
-     * @return Reference to the settings object.
+     * @return The reference to the settings object.
      */
     public static Settings settings() {
         assert instance != null : "Gaia Sky instance is null";
         assert instance.settings != null : "Settings instance is null";
         return instance.settings;
+    }
+
+    /**
+     * Returns the reference to the current settings object for this Gaia Sky instance.
+     *
+     * @return The reference to the settings object.
+     */
+    public Settings getSettings() {
+        return settings;
     }
 
     /**
@@ -1511,6 +1525,13 @@ public final class GaiaSky implements ApplicationListener, IObserver {
                        Object source,
                        final Object... data) {
         switch (event) {
+            case SCENE_LOADED -> {
+                try {
+                    gaiaSkyAssets.restServer.activate();
+                } catch (SecurityException | IllegalArgumentException e) {
+                    logger.error(e);
+                }
+            }
             case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
                 reinitialiseGUI1();
 

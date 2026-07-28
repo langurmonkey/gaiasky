@@ -21,13 +21,10 @@ import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.GlobalResources;
-import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.gui.main.ConsoleLogger;
 import gaiasky.gui.main.KeyBindings;
 import gaiasky.render.ScreenModeCmd;
-import gaiasky.rest.RESTServer;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Logger.LoggerLevel;
@@ -35,7 +32,6 @@ import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
-import org.lwjgl.system.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -49,7 +45,7 @@ import java.util.Map;
  * Main entry point for Gaia Sky. This class takes care of initializing the settings and logging system, parsing
  * the CLI arguments, setting up the GDX configuration and starting the application.
  */
-public class GaiaSkyDesktop implements IObserver {
+public class GaiaSkyDesktop {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
     /**
      * Minimum Java version required to run Gaia Sky.
@@ -115,7 +111,6 @@ public class GaiaSkyDesktop implements IObserver {
 
     public GaiaSkyDesktop() {
         super();
-        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.DISPOSE);
     }
 
     /**
@@ -251,12 +246,6 @@ public class GaiaSkyDesktop implements IObserver {
 
             // Key mappings.
             KeyBindings.initialize();
-
-            // REST API server.
-            REST_ENABLED = gsd.settings.program.net.restPort >= 0;
-            if (REST_ENABLED) {
-                RESTServer.initialize(gsd.settings.program.net.restPort);
-            }
 
             consoleLogger.dispose();
 
@@ -612,38 +601,6 @@ public class GaiaSkyDesktop implements IObserver {
         new Lwjgl3Application(new ErrorDialog(ex), cfg);
     }
 
-    @Override
-    public void notify(Event event,
-                       Object source,
-                       Object... data) {
-        switch (event) {
-            case SCENE_LOADED -> {
-                if (REST_ENABLED) {
-                    /*
-                     * Notify REST server that GUI is loaded and everything should be in a
-                     * well-defined state
-                     */
-                    try {
-                        RESTServer.activate();
-                    } catch (SecurityException | IllegalArgumentException e) {
-                        logger.error(e);
-                    }
-                }
-            }
-            case DISPOSE -> {
-                if (REST_ENABLED) {
-                    /* Shutdown REST server thread on termination */
-                    try {
-                        RESTServer.dispose();
-                    } catch (SecurityException | IllegalArgumentException e) {
-                        logger.error(e);
-                    }
-                }
-            }
-            default -> {
-            }
-        }
-    }
 
     /**
      * Program CLI arguments.

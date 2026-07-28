@@ -24,6 +24,7 @@ import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.render.MainPostProcessor;
 import gaiasky.render.gdx.model.IntModel;
 import gaiasky.render.gdx.shader.Material;
+import gaiasky.rest.RESTServer;
 import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.script.ConsoleManager;
@@ -91,6 +92,9 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
 
         // Console manager.
         assets.consoleManager = new ConsoleManager(assets.scriptingInterface);
+
+        // REST server.
+        assets.restServer = new RESTServer(parameter.gaiaSky.getSettings().program.net.restPort);
     }
 
     @Override
