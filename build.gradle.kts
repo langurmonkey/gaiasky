@@ -23,7 +23,7 @@ allprojects {
     extra.set("jafamaVersion", "2.3.+")
     extra.set("commonsioVersion", "2.+")
     extra.set("py4jVersion", "0.10.9.+")
-    extra.set("oshiVersion", "6.9.+")
+    extra.set("oshiVersion", "7.4.+")
     extra.set("stilVersion", "4.3")
     extra.set("jsampVersion", "1.3.+")
     extra.set("jacksonVersion", "2.20.+")
@@ -170,7 +170,7 @@ project(":core") {
         implementation("org.kamranzafar:jtar:${property("jtarVersion")}")
 
         implementation("net.sf.py4j:py4j:${property("py4jVersion")}")
-        implementation("com.github.oshi:oshi-core-java11:${property("oshiVersion")}")
+        implementation("com.github.oshi:oshi-core:${property("oshiVersion")}")
         implementation("com.fasterxml.jackson.core:jackson-databind:${property("jacksonVersion")}")
         implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${property("jacksonVersion")}")
         implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${property("jacksonVersion")}")

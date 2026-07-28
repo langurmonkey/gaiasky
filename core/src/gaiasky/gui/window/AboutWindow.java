@@ -31,7 +31,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
-import oshi.SystemInfo;
+import oshi.spi.SystemInfoFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -403,7 +403,7 @@ public class AboutWindow extends GenericDialog {
         OwnLabel sysOS;
 
         try {
-            var si = new SystemInfo();
+            var si = SystemInfoFactory.create();
             var os = si.getOperatingSystem();
             var st = System.getenv("XDG_SESSION_TYPE");
             sysOS = new OwnLabel(
@@ -531,7 +531,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(new Separator(skin, "small")).colspan(2).bottom().left().expandX().fillX().padBottom(pad20);
         contentSystem.row();
         try {
-            var si = new SystemInfo();
+            var si = SystemInfoFactory.create();
             var hal = si.getHardware();
             var cp = hal.getProcessor();
 
@@ -561,8 +561,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         try {
-            var si = new SystemInfo();
-
+            var si = SystemInfoFactory.create();
             var gcs = si.getHardware().getGraphicsCards();
             if (gcs.isEmpty()) {
                 var none = new OwnLabel(I18n.msg("gui.focusinfo.na"), skin);
