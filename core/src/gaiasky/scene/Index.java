@@ -140,7 +140,7 @@ public class Index {
                             conflicts.add(nc);
 
                             // Log.
-                            logger.warn(I18n.msg("error.name.conflict",
+                            logger.debug(I18n.msg("error.name.conflict",
                                                  conflictBase.getName() + " [" + conflictArchetype.getName()
                                                          .toLowerCase(Locale.ROOT) + ", " + conflictParent + "]",
                                                  name + " [" + base.archetype.getName().toLowerCase(Locale.ROOT) + ", " + baseParent + "]"));
@@ -213,7 +213,7 @@ public class Index {
                         conflicts.add(nc);
 
                         // Log.
-                        logger.warn(I18n.msg("error.name.conflict",
+                        logger.debug(I18n.msg("error.name.conflict",
                                              conflictBase.getName() + " [" + conflictArchetype.getName()
                                                      .toLowerCase(Locale.ROOT) + ", " + conflictParent + "]",
                                              key + " [" + pgArchetype.getName().toLowerCase(Locale.ROOT) + ", " + pgName + "]"));
