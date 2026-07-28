@@ -22,20 +22,20 @@ import gaiasky.GaiaSky;
 import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.gui.bookmarks.BookmarksManager;
 import gaiasky.render.MainPostProcessor;
-import gaiasky.render.gdx.model.IntModel;
-import gaiasky.render.gdx.shader.Material;
 import gaiasky.rest.RESTServer;
 import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.record.ModelComponent;
+import gaiasky.scene.record.ModelType;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
-import gaiasky.util.*;
+import gaiasky.util.Bits;
+import gaiasky.util.CatalogManager;
+import gaiasky.util.LocationLogManager;
+import gaiasky.util.ModelCache;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.svt.SVTManager;
-
-import java.util.Map;
 
 public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSkyLoaderParameters> {
 
@@ -109,7 +109,7 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
         // Preload the biome LUTs if NASA exoplanet archive is enabled.
         if (GaiaSky.settings().data.isEnabled("nasa-exoplanet-archive")) {
             MaterialComponent.getLUTManager();
-            String modelType = ModelComponent.getDefaultModelType();
+            ModelType modelType = ModelComponent.getDefaultModelType();
             var modelParams = ModelComponent.getDefaultModelParameters(modelType);
             Bits attributes = Bits.indices(VertexAttributes.Usage.Position, VertexAttributes.Usage.Normal, VertexAttributes.Usage.Tangent, VertexAttributes.Usage.BiNormal, VertexAttributes.Usage.TextureCoordinates);
             if (modelParams.containsKey("attributes")) {

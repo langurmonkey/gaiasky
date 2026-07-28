@@ -37,6 +37,7 @@ import gaiasky.scene.entity.KeyframeUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.ModelComponent;
+import gaiasky.scene.record.ModelType;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.script.v2.api.SceneAPI;
@@ -1084,7 +1085,7 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
                 var model = Mapper.model.get(newShape);
                 model.model = new ModelComponent();
-                model.model.modelType = shapeLc;
+                model.model.modelType = ModelType.from(shapeLc);
                 model.model.setPrimitiveType(primitiveInt);
                 model.model.setParams(params);
                 model.model.setStaticLight(true);

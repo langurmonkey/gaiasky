@@ -22,6 +22,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Label.LabelDisplay;
+import gaiasky.scene.record.ModelType;
 import gaiasky.scene.record.ParticleKepler;
 import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.FilterView;
@@ -137,7 +138,7 @@ public class ParticleSet implements Component, IDisposable {
      * Default model type to use for the particles of this set.
      * Typically, this should be set to quad, but allows for other model types.
      **/
-    public String modelType = "quad";
+    public ModelType modelType = ModelType.QUAD;
 
     /**
      * Parameters for the model, in case 'modelType' is used.
@@ -748,7 +749,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setModelType(String modelType) {
-        this.modelType = modelType;
+        this.modelType = ModelType.from(modelType, ModelType.QUAD);
     }
 
     public void setModelParams(Map<String, Object> params) {
@@ -1323,11 +1324,11 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public boolean isBillboard() {
-        return model == null && modelType.equalsIgnoreCase("quad");
+        return model == null && modelType.isQuad();
     }
 
     public boolean isModel() {
-        return model != null || !modelType.equalsIgnoreCase("quad");
+        return model != null || !modelType.isQuad();
     }
 
     public void setLabelDisplay(LabelDisplay state,

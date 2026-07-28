@@ -26,6 +26,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Highlight;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.record.ModelType;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.scene.record.ParticleKepler;
 import gaiasky.scene.system.render.SceneRenderer;
@@ -128,7 +129,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                              model.numVertices,
                                              n,
                                              model.numIndices,
-                                             "quad",
+                                             ModelType.QUAD,
                                              primitive);
                     setModel(offset, model);
                     setOffset(render, offset);
@@ -196,7 +197,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                                              model.numVertices,
                                              n,
                                              model.numIndices,
-                                             "quad",
+                                             ModelType.QUAD,
                                              primitive);
                     setModel(offset, model);
                     setOffset(render, offset);

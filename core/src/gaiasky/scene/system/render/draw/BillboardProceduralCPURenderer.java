@@ -20,6 +20,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.gdx.mesh.IntMesh;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
@@ -27,12 +29,11 @@ import gaiasky.scene.component.RefSysTransform;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.CPUGalGenFallback;
+import gaiasky.scene.record.ModelType;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.render.gdx.mesh.IntMesh;
-import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Matrix4Utils;
 import gaiasky.util.math.Vector3Q;
 import gaiasky.util.tree.GenStatus;
@@ -125,14 +126,13 @@ public class BillboardProceduralCPURenderer extends InstancedRenderSystem implem
      * Prepares the data of a billboard dataset for the GPU.
      *
      * @param bd The billboard dataset.
-     *
      */
     private void prepareGPUData(IRenderable render, BillboardDataset bd) {
         // Particle count after applying completion factor.
         int count = bd.data.size();
 
-        var model = getModel(null, "quad", null, GL41.GL_TRIANGLES, -1);
-        int offset = addMeshData(model, model.numVertices, count, model.numIndices, null, "quad",
+        var model = getModel(null, ModelType.QUAD, null, GL41.GL_TRIANGLES, -1);
+        int offset = addMeshData(model, model.numVertices, count, model.numIndices, null, ModelType.QUAD,
                                  GL41.GL_TRIANGLES);
         setOffset(bd, offset);
         curr = meshes.get(offset);

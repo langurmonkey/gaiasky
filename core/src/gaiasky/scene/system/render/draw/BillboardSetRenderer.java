@@ -25,6 +25,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.BillboardDataset.ChannelType;
+import gaiasky.scene.record.ModelType;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Logger;
@@ -121,8 +122,8 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             count += in[i];
         }
 
-        var model = getModel(null, "quad", null, GL41.GL_TRIANGLES, -1);
-        int offset = addMeshData(model, model.numVertices, count, model.numIndices, null, "quad",
+        var model = getModel(null, ModelType.QUAD, null, GL41.GL_TRIANGLES, -1);
+        int offset = addMeshData(model, model.numVertices, count, model.numIndices, null, ModelType.QUAD,
                                  GL41.GL_TRIANGLES);
         setOffset(render, offset);
         curr = meshes.get(offset);

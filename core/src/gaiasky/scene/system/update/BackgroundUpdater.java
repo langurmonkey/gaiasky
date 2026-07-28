@@ -66,7 +66,7 @@ public class BackgroundUpdater extends AbstractUpdateSystem {
         }
 
         // Must rotate due to orientation of the sphere model
-        if (model.model != null && model.model.modelType.equalsIgnoreCase("sphere")) {
+        if (model.model != null && model.model.modelType.isAnySphere()) {
             localTransform.rotate(0, 1, 0, 90);
         }
     }

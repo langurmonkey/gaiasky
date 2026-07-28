@@ -11,6 +11,7 @@ import gaiasky.render.gdx.IntMeshPartBuilder.VertexInfo;
 import gaiasky.render.gdx.IntModelBuilder;
 import gaiasky.render.gdx.model.IntModel;
 import gaiasky.render.gdx.shader.Material;
+import gaiasky.scene.record.ModelType;
 
 import java.util.*;
 
@@ -30,8 +31,8 @@ public class ModelCache {
         mb = new IntModelBuilder();
     }
 
-    public Pair<IntModel, Map<String, Material>> getModel(String shape, Map<String, Object> params, Bits attributes, int primitiveType) {
-        String key = getKey(shape, params, attributes, primitiveType);
+    public Pair<IntModel, Map<String, Material>> getModel(ModelType modelType, Map<String, Object> params, Bits attributes, int primitiveType) {
+        String key = getKey(modelType.name(), params, attributes, primitiveType);
         IntModel model = null;
         Map<String, Material> materials = new HashMap<>();
         Material mat;
@@ -40,8 +41,8 @@ public class ModelCache {
             mat = model.materials.first();
         } else {
             mat = new Material();
-            switch (shape.toLowerCase(Locale.ROOT)) {
-                case "sphere", "uvsphere" -> {
+            switch (modelType) {
+                case SPHERE, UVSPHERE -> {
                     var quality = params.containsKey("quality")? ((Long) params.get("quality")).intValue() : ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                     var oblateness = params.containsKey("oblateness") ? ((Double) params.get("oblateness")).floatValue() : 0f;
@@ -49,14 +50,14 @@ public class ModelCache {
                     model = mb.createSphere(diameter, diameter, diameter * (1.0f - oblateness), quality, quality, flip, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
-                case "icosphere" -> {
+                case ICOSPHERE -> {
                     var recursion = ((Long) params.get("recursion")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                     var flip = params.containsKey("flip") && (Boolean) params.get("flip");
                     model = mb.createIcoSphere(diameter / 2.0f, recursion, flip, false, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
-                case "cubesphere" -> {
+                case CUBESPHERE -> {
                     var divisions = ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                     // If "mapping" is "basic", we use radius scaling. Otherwise, we use Phil Nowell's mapping.
@@ -65,14 +66,14 @@ public class ModelCache {
                     model = mb.createCubeSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes, !useBadMapping);
                     modelCache.put(key, model);
                 }
-                case "octahedronsphere" -> {
+                case OCTAHEDRONSPHERE -> {
                     var divisions = ((Long) params.get("divisions")).intValue();
                     var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
                     var flip = params.containsKey("flip") && (Boolean) params.get("flip");
                     model = mb.createOctahedronSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
-                case "plane", "patch", "surface", "billboard" -> {
+                case PLANE, PATCH, SURFACE, BILLBOARD, QUAD -> {
                     var divisionsU = ((Long) params.get("divisionsu")).intValue();
                     var divisionsV = ((Long) params.get("divisionsv")).intValue();
                     var side = params.containsKey("size") ? ((Double) params.get("size")).floatValue() : (params.containsKey("side") ? ((Double) params.get("side")).floatValue() : -1);
@@ -86,7 +87,7 @@ public class ModelCache {
                     model = mb.createPlane(width, height, divisionsU, divisionsV, flip, primitiveType, mat, attributes);
                     modelCache.put(key, model);
                 }
-                case "disc" -> {
+                case DISC -> {
                     // Prepare model
                     var diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
                     // Initialize disc model
@@ -132,7 +133,7 @@ public class ModelCache {
                     mb.part("down", primitiveType, attributes, mat).rect(vb00, vb10, vb11, vb01);
                     model = mb.end();
                 }
-                case "twofacedbillboard" -> {
+                case TWOFACEDBILLBOARD -> {
                     // Prepare model
                     var diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
                     // Initialize disc model
@@ -184,7 +185,7 @@ public class ModelCache {
                     mb.part("down", primitiveType, attributes, mat).rect(vb00, vb10, vb11, vb01);
                     model = mb.end();
                 }
-                case "cylinder" -> {
+                case CYLINDER -> {
                     // Use builder
                     var width = ((Double) params.get("width")).floatValue();
                     var height = ((Double) params.get("height")).floatValue();
@@ -194,7 +195,7 @@ public class ModelCache {
 
                     model = mb.createCylinder(width, height, depth, divisions, flip, primitiveType, mat, attributes);
                 }
-                case "ring" -> {
+                case RING -> {
                     // Sphere with cylinder
                     Material ringMat = new Material();
                     materials.put("ring", ringMat);
@@ -211,7 +212,7 @@ public class ModelCache {
                         model = ModelCache.cache.mb.createRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, attributes);
                     }
                 }
-                case "cone" -> {
+                case CONE -> {
                     var width = ((Double) params.get("width")).floatValue();
                     var height = ((Double) params.get("height")).floatValue();
                     var depth = ((Double) params.get("depth")).floatValue();
@@ -227,7 +228,7 @@ public class ModelCache {
                         model = mb.createCone(width, height, depth, divisions, hDivisions, primitiveType, mat, attributes);
 
                 }
-                case "cube", "box" -> {
+                case CUBE, BOX -> {
                     float width, height, depth;
                     if (params.containsKey("width")) {
                         width = ((Double) params.get("width")).floatValue();

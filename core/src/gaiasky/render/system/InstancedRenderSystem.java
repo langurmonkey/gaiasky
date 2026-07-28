@@ -27,6 +27,7 @@ import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Highlight;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.record.ModelType;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Bits;
 import gaiasky.util.ModelCache;
@@ -151,11 +152,11 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
 
     protected InstancedModel getModelQuad(int primitive,
                                           int offset) {
-        return getModel(null, "quad", null, primitive, offset);
+        return getModel(null, ModelType.QUAD, null, primitive, offset);
     }
 
     protected InstancedModel getModel(IntModel modelFile,
-                                      String modelType,
+                                      ModelType modelType,
                                       Map<String, Object> modelParams,
                                       int primitive,
                                       int offset) {
@@ -172,7 +173,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             var mesh = modelFile.meshes.get(0);
             model = new InstancedModel(mesh);
 
-        } else if (modelType.equalsIgnoreCase("sphere")) {
+        } else if (modelType.isUVSphere()) {
             // UV-sphere.
             final float width = 1f;
             final float height = 1f;
@@ -255,7 +256,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                 model = new InstancedModel(mesh);
             }
 
-        } else if (modelType.equalsIgnoreCase("icosphere")) {
+        } else if (modelType == ModelType.ICOSPHERE) {
             final long recursion = 3;
             final double diameter = 1.0;
             if (wireframe) {
@@ -304,12 +305,12 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                     modelParams.put("recursion", recursion);
                     modelParams.put("diameter", diameter);
                 }
-                var modelPair = ModelCache.cache.getModel(modelType, modelParams, Bits.indices(Usage.Position, Usage.TextureCoordinates), primitive);
+                var modelPair = ModelCache.cache.getModel(ModelType.ICOSPHERE, modelParams, Bits.indices(Usage.Position, Usage.TextureCoordinates), primitive);
                 var intModel = modelPair.getFirst();
                 var mesh = intModel.meshes.get(0);
                 model = new InstancedModel(mesh);
             }
-        } else if (modelType.equalsIgnoreCase("quad")) {
+        } else if (modelType.isQuad()) {
             // Regular quad.
             // Construct custom billboard with two triangles.
 
@@ -470,7 +471,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param model        The instanced model instance.
      * @param maxVerts     The max number of vertices the divisor 0 mesh data can hold.
      * @param maxInstances The max number of vertices the divisor 1 mesh data can hold.
-     * @param modelType    The model type string.
+     * @param modelType    The model type.
      * @param primitive    The rendering primitive.
      *
      * @return The index of the new mesh data.
@@ -479,7 +480,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                               int maxVerts,
                               int maxInstances,
                               int maxIndices,
-                              String modelType,
+                              ModelType modelType,
                               int primitive) {
         return addMeshData(model, maxVerts, maxInstances, maxIndices, null, modelType, primitive);
     }
@@ -491,7 +492,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
      * @param maxVerts     The max number of vertices the divisor 0 mesh data can hold.
      * @param maxInstances The max number of vertices the divisor 1 mesh data can hold.
      * @param modelFile    The model file, if any.
-     * @param modelType    The model type string.
+     * @param modelType    The model type.
      * @param primitive    The rendering primitive.
      *
      * @return The index of the new mesh data.
@@ -501,12 +502,12 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
                               int maxInstances,
                               int maxIndices,
                               String modelFile,
-                              String modelType,
+                              ModelType modelType,
                               int primitive) {
         int mdi = createMeshData();
         curr = meshes.get(mdi);
 
-        VertexAttribute[] attributes0 = buildAttributesDivisor0(modelFile == null && modelType.equalsIgnoreCase("quad") ? 2 : 3, modelFile != null,
+        VertexAttribute[] attributes0 = buildAttributesDivisor0(modelFile == null && modelType.isQuad() ? 2 : 3, modelFile != null,
                                                                 !isWireframe(primitive));
         VertexAttribute[] attributes1 = buildAttributesDivisor1(primitive);
         curr.mesh = new IntMesh(true, maxVerts, maxInstances, maxIndices, attributes0, attributes1);

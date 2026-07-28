@@ -84,7 +84,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
         Material atmMat;
         if (mc.instance == null) {
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere",
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(ModelType.SPHERE,
                                                                                    params,
                                                                                    Bits.indices(Usage.Position, Usage.Normal),
                                                                                    GL20.GL_TRIANGLES);

@@ -16,6 +16,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.record.ModelType;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Bits;
@@ -80,7 +81,7 @@ public class VRDeviceInitializer extends AbstractInitSystem {
             params.put("diameter", 1.0);
             params.put("quality", 20L);
             params.put("flip", false);
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indices(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(ModelType.UVSPHERE, params, Bits.indices(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
             IntModel sphere = pair.getFirst();
 
             // Create models

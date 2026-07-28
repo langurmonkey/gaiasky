@@ -25,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.api.IGui;
 import gaiasky.render.ComponentTypes;
+import gaiasky.scene.record.ModelType;
 import gaiasky.util.Bits;
 import gaiasky.util.Logger;
 import gaiasky.util.ModelCache;
@@ -128,7 +129,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
 
         ModelCache cache = new ModelCache();
         Bits attributes = Bits.indices(VertexAttributes.Usage.Position, VertexAttributes.Usage.Normal, VertexAttributes.Usage.Tangent, VertexAttributes.Usage.BiNormal, VertexAttributes.Usage.TextureCoordinates);
-        var pair = cache.getModel("surface", params, attributes, GL20.GL_TRIANGLES);
+        var pair = cache.getModel(ModelType.SURFACE, params, attributes, GL20.GL_TRIANGLES);
         IntModel model = pair.getFirst();
         Map<String, Material> materials = pair.getSecond();
         Material material;

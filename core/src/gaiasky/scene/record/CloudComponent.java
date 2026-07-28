@@ -44,10 +44,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.scene.record.MaterialComponent.convertToComponent;
@@ -89,8 +86,6 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     public boolean downloadTriggered = false;
     /** The download has been finished. **/
     public boolean downloadFinished = false;
-    /** Location of the file pointed at by the URL on disk. **/
-    public String urlLocation;
 
     /**
      * The material component associated to the same model.
@@ -102,7 +97,7 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
     public VirtualTextureComponent diffuseSvt;
     public Map<Object, Object> svtParams;
     /** Mode type. **/
-    public String modelType = "sphere";
+    public ModelType modelType = ModelType.UVSPHERE;
     /** Model parameters. **/
     public Map<String, Object> modelParams;
     Vector3 aux;
@@ -473,8 +468,18 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
         setModelType(type);
     }
 
-    public void setModelType(String type) {
-        this.modelType = type;
+
+    public void setModelType(ModelType modelType) {
+        this.modelType = modelType;
+    }
+
+    /**
+     * Sets the type of the model to construct.
+     *
+     * @param modelType The type. See {@link ModelType} for the currently supported types.
+     */
+    public void setModelType(String modelType) {
+        this.modelType = ModelType.from(modelType, ModelType.SPHERE);
     }
 
     public void setParams(Map<String, Object> modelParams) {
@@ -553,12 +558,12 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
             color[3] = 1f;
         }
         // Type
-        setType("cubesphere");
+        setModelType(ModelType.CUBESPHERE);
         // Params
         switch (modelType) {
-            case "icosphere" -> setParams(createIcoSphereParameters(7, 1.0, false));
-            case "cubesphere" -> setParams(createCubeSphereParameters(100, 1.0, false));
-            case "octahedronsphere" -> setParams(createOctahedronSphereParameters(7, 1.0, false));
+            case ICOSPHERE -> setParams(createIcoSphereParameters(7, 1.0, false));
+            case CUBESPHERE -> setParams(createCubeSphereParameters(100, 1.0, false));
+            case OCTAHEDRONSPHERE -> setParams(createOctahedronSphereParameters(7, 1.0, false));
             default -> setParams(createUVSphereParameters(400, 1.0, false));
         }
         // Noise

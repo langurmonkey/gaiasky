@@ -78,8 +78,8 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
      *
      * @return The model type.
      */
-    public static String getDefaultModelType() {
-        return "cubesphere";
+    public static ModelType getDefaultModelType() {
+        return ModelType.CUBESPHERE;
     }
 
     /**
@@ -89,11 +89,11 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
      *
      * @return The model parameters.
      */
-    public static Map<String, Object> getDefaultModelParameters(String modelType) {
+    public static Map<String, Object> getDefaultModelParameters(ModelType modelType) {
         return switch (modelType) {
-            case "icosphere" -> createIcoSphereParameters(8, 1.0, false);
-            case "cubesphere" -> createCubeSphereParameters(200, 1.0, false);
-            case "octahedronsphere" -> createOctahedronSphereParameters(8, 1.0, false);
+            case SPHERE, ICOSPHERE -> createIcoSphereParameters(8, 1.0, false);
+            case CUBESPHERE -> createCubeSphereParameters(200, 1.0, false);
+            case OCTAHEDRONSPHERE -> createOctahedronSphereParameters(8, 1.0, false);
             default -> createUVSphereParameters(600, 1.0, false);
         };
     }
@@ -109,7 +109,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     /** Model parameters. **/
     public Map<String, Object> modelParams;
     /** Model type. **/
-    public String modelType;
+    public ModelType modelType;
     /** Model file, if any. **/
     public String modelFile;
     /** Scale factor. **/
@@ -888,14 +888,17 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
+    public void setModelType(ModelType modelType) {
+        this.modelType = modelType;
+    }
+
     /**
      * Sets the type of the model to construct.
      *
-     * @param modelType The type. Currently supported types are
-     *                  sphere|cubesphere|cylinder|ring|disc.
+     * @param modelType The type. See {@link ModelType} for the currently supported types.
      */
     public void setModelType(String modelType) {
-        this.modelType = modelType;
+        this.modelType = ModelType.from(modelType, ModelType.SPHERE);
     }
 
     public void setType(String modelType) {
@@ -1218,7 +1221,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     public void randomizeAll(long seed,
                              double size) {
         // Type
-        setType(getDefaultModelType());
+        setModelType(getDefaultModelType());
         // Parameters
         setParams(getDefaultModelParameters(modelType));
         // Material

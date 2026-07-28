@@ -254,12 +254,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         }
 
         // Set ring dataset to parent, if necessary.
-        // We assume that if the parent of a particle set is a ringed planet (model type "ring"), we are the ring dataset.
+        // We assume that if the parent of a particle set is a ringed planet (model type RING), we are the ring dataset.
         var graph = Mapper.graph.get(entity);
         var parent = graph.parent;
         if (parent != null && Mapper.model.has(parent)) {
             var model = Mapper.model.get(parent);
-            if (model.model != null && model.model.modelType != null && model.model.modelType.equalsIgnoreCase("ring")) {
+            if (model.model != null && model.model.modelType != null && model.model.modelType.isRing()) {
                 model.model.ringDataset = true;
             }
         }

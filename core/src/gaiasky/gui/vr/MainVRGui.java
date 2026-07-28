@@ -46,6 +46,7 @@ import gaiasky.scene.component.Base;
 import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.component.tag.TagNoClosest;
 import gaiasky.scene.record.ModelComponent;
+import gaiasky.scene.record.ModelType;
 import gaiasky.util.Constants;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.StaticCoordinates;
@@ -497,7 +498,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
                     var model = Mapper.model.get(entity);
                     model.model = new ModelComponent();
-                    model.model.modelType = "surface";
+                    model.model.modelType = ModelType.SURFACE;
                     model.modelSize = 1;
                     model.model.setPrimitiveType(GL20.GL_TRIANGLES);
                     model.model.setParams(params);
