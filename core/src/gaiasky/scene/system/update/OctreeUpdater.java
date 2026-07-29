@@ -51,6 +51,11 @@ public class OctreeUpdater extends AbstractUpdateSystem {
         var root = Mapper.octant.get(entity);
         var octree = Mapper.octree.get(entity);
 
+        // Always clear the roulette at the start of the update cycle
+        // octree.roulette is already cleared at the end of the frame by OctreeExtractor,
+        // but this step is completely skipped if the entity's opacity fades to 0 (since mustRender() returns false).
+        octree.roulette.clear();
+
         // Fade node visibility applies here
         if (base.isVisible()) {
             // Update octants
@@ -100,8 +105,12 @@ public class OctreeUpdater extends AbstractUpdateSystem {
         graphUpdater.setCamera(GaiaSky.instance.cameraManager);
         for (int i = 0; i < size; i++) {
             Entity entity = ((OctreeObjectView) octree.roulette.get(i)).getEntity();
-            // Use octant opacity
+            // Use octant opacity--guard against entities whose OctreeNode link
+            // is not yet established (can happen during concurrent LOD loading).
             var octant = Mapper.octant.get(entity);
+            if (octant == null || octant.octant == null) {
+                continue;
+            }
             graphUpdater.update(entity, time, graph.translation, base.opacity * octant.octant.opacity);
         }
     }

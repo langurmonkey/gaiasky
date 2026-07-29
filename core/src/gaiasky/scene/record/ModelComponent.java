@@ -397,7 +397,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             if (modelFile != null) {
                 logger.error(new RuntimeException("Error loading model: " + modelFile));
             } else {
-                logger.error(new RuntimeException("Error loading model type: " + modelType + " (" + modelParams.toString() + ")"));
+                logger.error(new RuntimeException("Error loading model."));
             }
         }
         // Clear base material
@@ -702,7 +702,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
             // Read-write depth test.
             case ALPHA, COLOR, NONE -> {
                 depthTestReadWrite();
-                if (modelType != null && modelType.equals("ring")) {
+                if (modelType != null && modelType.isRing()) {
                     // Second material (ring) depth test read only.
                     setDepthTestRing();
                 }

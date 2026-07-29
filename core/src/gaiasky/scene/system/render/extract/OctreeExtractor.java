@@ -50,7 +50,9 @@ public class OctreeExtractor extends AbstractExtractSystem {
             octree.roulette.clear();
 
             // Extract octree nodes themselves (render octree wireframes).
-            addToRenderLists(base, root.octant, camera);
+            if (root != null && root.octant != null) {
+                addToRenderLists(base, root.octant, camera);
+            }
         }
     }
 
