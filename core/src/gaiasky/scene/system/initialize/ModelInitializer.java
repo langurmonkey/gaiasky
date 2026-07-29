@@ -20,6 +20,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.gdx.procgen.LODCubeSphere;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.FocusActive;
@@ -118,30 +119,36 @@ public class ModelInitializer extends AbstractInitSystem {
             body.size = (float) ((body.size * (body.sizeIsRadiusFlag ? 2.0 : 1.0)) * (body.sizeInUnitsFlag ? 1.0 : Constants.KM_TO_U));
         }
 
-        // First init spacecraft if needed
+        // First init spacecraft if needed.
         if (isSpacecraft) {
             initializeSpacecraft(entity, base, body, graph, model, scaffolding, engine, label);
         }
 
-        // Initialize model body
+        // Initialize model body.
         initializeModel(entity, base, body, model, celestial, bb, sa, label, scaffolding, graph, focus, isBillboardGal);
 
-        // Init billboard
         if (isBillboard) {
+            // Init billboard.
             initializeBillboard(scaffolding, sa, label, isBillboardGal);
         }
 
         if (isSatellite) {
+            // Initialize satellite.
             initializeSatellite(scaffolding, sa, label);
         }
 
         if (isPlanet) {
-            // Initialize planet
+            // Initialize planet.
             initializePlanet(base, body, model, scaffolding, sa, label, atmosphere, cloud);
         }
 
         if (orientation != null) {
+            // Orientation.
             initializeOrientation(orientation);
+        }
+
+        if (model.model.lodFlag) {
+           model.model.lodSphere = new LODCubeSphere(10);
         }
     }
 

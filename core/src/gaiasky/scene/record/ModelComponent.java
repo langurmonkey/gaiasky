@@ -99,7 +99,10 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
 
+    /** Force-initialize the component, skipping the lazy configuration. **/
     public boolean forceInit = false;
+    /** LOD flag signaling that the model must be rendered with a LOD cube-sphere. **/
+    public boolean lodFlag = false;
     /** Some planets use a LOD cube-sphere system. **/
     public LODCubeSphere lodSphere;
     /** The model instance. **/
@@ -886,6 +889,10 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
                 }
             }
         }
+    }
+
+    public void setLod(Boolean lod) {
+        this.lodFlag = lod;
     }
 
     public void setModelType(ModelType modelType) {
