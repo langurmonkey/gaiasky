@@ -1645,6 +1645,12 @@ public enum Event {
      **/
     REST_SERVER_CMD,
 
+    /**
+     * Sent to inform of a change of state in the REST server (online/offline). Contains
+     * a boolean with the status.
+     */
+    REST_SERVER_STATUS_INFO,
+
     /** Set the new upscale filter. Contains the new {@link UpscaleFilter} object. **/
     UPSCALE_FILTER_CMD,
 

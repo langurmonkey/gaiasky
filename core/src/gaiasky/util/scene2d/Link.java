@@ -51,6 +51,12 @@ public class Link extends Label {
         initialize();
     }
 
+    public Link(CharSequence text, Skin skin) {
+        super(text, skin, "link");
+        this.linkURL = text.toString();
+        initialize();
+    }
+
     private void initialize() {
         // Fix touchUp issue
         this.addListener(new ClickListener() {

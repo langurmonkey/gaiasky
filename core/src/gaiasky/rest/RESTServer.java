@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.v2.impl.APIv2;
@@ -71,6 +73,8 @@ public class RESTServer implements Disposable {
                 logger.error("Error: invalid port. REST API inactive.");
             }
             Spark.stop();
+            // Broadcast REST offline.
+            EventManager.publish(Event.REST_SERVER_STATUS_INFO, this, false);
             return;
         }
 
@@ -122,8 +126,12 @@ public class RESTServer implements Disposable {
 
             logger.info("REST server is running.");
 
+            // Broadcast REST online.
+            EventManager.publish(Event.REST_SERVER_STATUS_INFO, this, true);
         } catch (Exception e) {
-            logger.error(e, "Caught an exception during initialization:");
+            logger.error(e, "Error during initialization.");
+            // Broadcast REST offline.
+            EventManager.publish(Event.REST_SERVER_STATUS_INFO, this, false);
         }
     }
 
@@ -844,6 +852,18 @@ public class RESTServer implements Disposable {
         }
 
         return isRunning;
+    }
+
+    /**
+     * Returns the port the REST server listens to, if it is online. If it is offline, returns -1.
+     *
+     * @return The port.
+     */
+    public int getPort() {
+        if (isRunning()) {
+            return Spark.port();
+        }
+        return -1;
     }
 
     /**

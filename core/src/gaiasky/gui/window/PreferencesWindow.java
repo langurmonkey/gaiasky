@@ -42,6 +42,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DatasetGroup;
 import gaiasky.util.datadesc.DatasetUtils;
 import gaiasky.util.i18n.I18n;
@@ -151,7 +152,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber, tessQualityLabel;
     private ColorPicker pointerGuidesColor, anaglyphCustomLeft, anaglyphCustomRight, accentColor;
-    private Cell<?> noticeHiResCell;
+    private Cell<?> noticeHiResCell, restServerStatusCell;
     private Table controllersTable;
     // Backup values.
     private ToneMapping toneMappingBak;
@@ -193,6 +194,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         EventManager.instance.subscribe(this, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO);
         EventManager.instance.subscribe(this, Event.INVERT_Y_CMD, Event.INVERT_X_CMD, Event.WINDOW_RESOLUTION_INFO);
+        EventManager.instance.subscribe(this, Event.REST_SERVER_STATUS_INFO);
     }
 
     private OwnTextIconButton createTab(String title,
@@ -2721,7 +2723,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnTextButton applyRESTSettings = new OwnTextButton(I18n.msg("gui.apply"), skin);
         applyRESTSettings.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                applyRestSettings(true);
+                applyRESTSettings(true);
                 return true;
             } else {
                 return false;
@@ -2729,7 +2731,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
         applyRESTSettings.pad(0, pad34, 0, pad34);
         applyRESTSettings.setHeight(buttonHeight);
-
 
         labels.add(portLabel, restEnabledLabel);
 
@@ -2740,9 +2741,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         restTable.add(portTooltip).left().padBottom(pad10).row();
         // Only add 'apply' when not in welcome screen mode.
         if (!welcomeScreen)
-            restTable.add(applyRESTSettings).left().padBottom(pad10);
+            restTable.add(applyRESTSettings).left().padBottom(pad34).row();
+
+        restServerStatusCell = restTable.add().left();
+        updateRESTServerStatus(true);
 
         addContentGroup(contentRest, titleRest, restTable, 0f);
+
+
 
         /*
          * ==== SYSTEM ====
@@ -2948,7 +2954,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         return restart;
     }
 
-    private void applyRestSettings(boolean showPopupOnError) {
+    private void applyRESTSettings(boolean showPopupOnError) {
         int port;
         if (restEnabled.isChecked()) {
             if (restPort.isValid()) {
@@ -2964,6 +2970,61 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             port = -1;
         }
         EventManager.publish(Event.REST_SERVER_CMD, this, port);
+    }
+
+    private void updateRESTServerStatus(boolean status) {
+        if (welcomeScreen
+                || restServerStatusCell == null
+                || GaiaSky.instance.gaiaSkyAssets == null) {
+            return;
+        }
+        var server = GaiaSky.instance.gaiaSkyAssets.restServer;
+        if (server == null) {
+            return;
+        }
+
+        boolean online = server.isRunning() && status;
+        int port = server.getPort();
+
+        restServerStatusCell.clearActor();
+        var statusTable = new Table(skin);
+
+        // Actual status
+        var statusLabel = new OwnLabel(I18n.msg("gui.rest.status"), skin);
+        var statusInfo = new OwnLabel(I18n.msg("gui.rest.status." + (online ? "online" : "offline")), skin);
+        if (online) {
+            statusInfo.setColor(ColorUtils.gGreenC);
+        } else {
+            statusInfo.setColor(ColorUtils.gRedC);
+        }
+
+        statusTable.add(statusLabel).left().padRight(pad18).padBottom(pad34);
+        statusTable.add(statusInfo).left().padBottom(pad34).row();
+
+        // Endpoints
+        if (online) {
+            var endpoints = new OwnLabel(I18n.msg("gui.rest.endpoints"), skin, "header-s");
+            var endpointsHelp = new OwnLabel(I18n.msg("gui.rest.endpoints.help"), skin, "header-s");
+
+            var base = String.format("http://localhost:%s", port);
+
+            var epV1 = new Link(String.format("%s/api", base), skin);
+            var epV2 = new Link(String.format("%s/apiv2", base), skin);
+
+            var helpV1 = new Link(String.format("%s/api/help", base), skin);
+            var helpV2 = new Link(String.format("%s/apiv2/$MODULE_NAME/help", base), skin);
+
+            statusTable.add(endpoints).colspan(2).left().padBottom(pad20).row();
+            statusTable.add(epV1).colspan(2).left().padBottom(pad10).row();
+            statusTable.add(epV2).colspan(2).left().padBottom(pad34).row();
+
+            statusTable.add(endpointsHelp).colspan(2).left().padBottom(pad20).row();
+            statusTable.add(helpV1).colspan(2).left().padBottom(pad10).row();
+            statusTable.add(helpV2).colspan(2).left().padBottom(pad34).row();
+        }
+
+        restServerStatusCell.setActor(statusTable);
+        pack();
     }
 
     @Override
@@ -3488,7 +3549,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.data.realGaiaAttitude = real.isChecked();
 
         // REST server
-        applyRestSettings(true);
+        applyRESTSettings(true);
 
         // System
         if (settings.program.debugInfo != debugInfoBak) {
@@ -3669,6 +3730,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                        Object source,
                        Object... data) {
         switch (event) {
+            case REST_SERVER_STATUS_INFO -> updateRESTServerStatus((Boolean) data[0]);
             case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateGamepadsList(controllersTable);
             case INVERT_X_CMD -> {
                 if (source != this && invertX != null) {
