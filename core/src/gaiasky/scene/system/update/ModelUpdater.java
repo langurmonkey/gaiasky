@@ -69,6 +69,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
         LightingUtils.updateLights(model, body, camera);
         updateLocalTransform(entity, body, graph, scaffolding);
         updateRing(body, model);
+        // Update LOD cube-sphere if needed.
+        updateLOD(camera, model, body, graph);
 
         // Atmosphere.
         if (atmosphere != null && atmosphere.atmosphere != null) {
@@ -92,6 +94,13 @@ public class ModelUpdater extends AbstractUpdateSystem {
                                  engine.yawp,
                                  engine.pitchp,
                                  engine.rollp);
+        }
+
+    }
+
+    protected void updateLOD(ICamera camera, Model model, Body body, GraphNode graph) {
+        if (model.model != null && model.model.lodSphere != null) {
+            model.model.lodSphere.update(camera, body.size, graph.localTransform);
         }
     }
 

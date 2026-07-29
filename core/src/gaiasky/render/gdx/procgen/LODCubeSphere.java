@@ -59,7 +59,8 @@ public class LODCubeSphere {
     /** Visible leaves list, cleared at the start of each traverse() call. **/
     public final Array<Quadtree> visibleLeaves = new Array<>(256);
 
-    public LODCubeSphere(int maxDepth) {
+    public LODCubeSphere(int maxDepth,
+                         boolean fullInit) {
         this.maxDepth = maxDepth;
 
         // Face definitions: { axis, sign, uComp, vComp }
@@ -107,6 +108,9 @@ public class LODCubeSphere {
             pos3[vComp] = 1;
 
             faces[f] = new Quadtree(this, 0, pos0, pos1, pos2, pos3);
+            if (fullInit) {
+                faces[f].initialize(maxDepth);
+            }
         }
 
         attributes = Bits.indices(VertexAttributes.Usage.Position,
@@ -125,6 +129,7 @@ public class LODCubeSphere {
     public void update(ICamera cam,
                        double objectRadius,
                        Matrix4 localTransform) {
+        System.out.println(visibleLeaves.size);
         visibleLeaves.clear();
 
         for (int f = 0; f < 6; f++) {
@@ -147,9 +152,9 @@ public class LODCubeSphere {
         double dist = worldPosition.len();
         // Screen size is the node radius over the distance.
         double screenSize = node.radius * objectRadius / dist;
-        int targetDepth = computeTargetDepth(screenSize, 10f);
+        int targetDepth = computeTargetDepth(screenSize, 3f);
 
-        if (node.depth < targetDepth && !node.isLeaf()) {
+        if (node.depth < targetDepth) {
             // Subdivide: recurse into children
             for (int i = 0; i < 4; i++) {
                 if (node.isLeaf()) {
@@ -164,10 +169,10 @@ public class LODCubeSphere {
     }
 
     int computeTargetDepth(double screenSize,
-                           double errorThreshold) {
+                           double factor) {
         // The node's geometric error is roughly proportional to its angular size.
         // Convert to target depth using a logarithmic scale.
-        double ratio = errorThreshold / screenSize;
+        double ratio = screenSize * factor;
         int depth = (int) (Math.log(ratio) / Math.log(2)) + minDepth;
         return MathUtilsDouble.clamp(depth, minDepth, maxDepth);
     }
@@ -280,6 +285,20 @@ public class LODCubeSphere {
         }
 
         /**
+         * Spawns cells in this node down to the given level, fully.
+         *
+         * @param depth The depth to initialize.
+         */
+        public void initialize(int depth) {
+            if (isLeaf() && this.depth < depth) {
+                subdivide();
+                for (var ch : children) {
+                    ch.initialize(depth);
+                }
+            }
+        }
+
+        /**
          * Check if this node has any children or if it is a leaf node.
          *
          * @return True if the node has no children.
@@ -293,7 +312,7 @@ public class LODCubeSphere {
          * This operation only succeeds if this is a leaf node. Otherwise, the node is already subdivided and nothing happens.
          */
         public void subdivide() {
-            if (isLeaf()) {
+            if (isLeaf() && depth < parent.maxDepth) {
                 var p01 = middlePoint(p0, p1);
                 var p02 = middlePoint(p0, p2);
                 var p13 = middlePoint(p1, p3);
