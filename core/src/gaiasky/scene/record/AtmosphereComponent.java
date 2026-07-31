@@ -93,6 +93,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
             setUpAtmosphericScatteringMaterial(atmMat);
             atmMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
+            //atmMat.set(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE));
             // CREATE ATMOSPHERE MODEL
             mc.instance = new IntModelInstance(atmosphereModel, this.localTransform);
         } else {
