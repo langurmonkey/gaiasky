@@ -21,6 +21,7 @@ in vec3 v_position;
 
 void main(void) {
     vec4 atmosphereColor = computeAtmosphericScattering(v_position);
+    //fragColor = vec4(atmosphereColor.rgb * atmosphereColor.a, atmosphereColor.a);
     fragColor = atmosphereColor;
     #ifdef eclipsingBodyFlag
     fragColor *= v_eclipseFactor;
