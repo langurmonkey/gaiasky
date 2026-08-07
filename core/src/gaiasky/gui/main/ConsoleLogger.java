@@ -195,17 +195,11 @@ public class ConsoleLogger implements IObserver {
                 PrintWriter pw = new PrintWriter(sw);
                 t.printStackTrace(pw);
                 String stackTrace = sw.toString();
-                if (data.length == 1) {
-                    if (I18n.messages != null)
-                        addMessage(I18n.msg("notif.error", stackTrace));
-                    else
-                        addMessage("Error: " + stackTrace);
-                } else {
-                    if (I18n.messages != null)
-                        addMessage(I18n.msg("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
-                    else
-                        addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
-                }
+                // Build the message with plain string concatenation. The stack trace
+                // is arbitrary text full of '{', '}' and '\'' characters, which
+                // MessageFormat would interpret as pattern. Never route the contents through I18n.msg()/MessageFormat.
+                String msg = I18n.msg("notif.error", "") + (data.length > 1 ? data[1] + TAG_SEPARATOR : "") + stackTrace;
+                addMessage(msg);
             }
             case ORBIT_DATA_LOADED ->
                     addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), LoggerLevel.DEBUG);

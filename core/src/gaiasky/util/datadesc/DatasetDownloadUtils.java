@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -198,8 +199,13 @@ public class DatasetDownloadUtils {
                 if (Path.of(path).toRealPath().equals(candidatePath.toRealPath())) {
                     return true;
                 }
+            } catch (NoSuchFileException e) {
+                // Check file temporarily missing (dataset mid-update).
+                // Do not log, this is not an error.
+                return false;
             } catch (IOException e) {
                 logger.error(e);
+                return false;
             }
         }
         return false;
