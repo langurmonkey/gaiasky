@@ -47,7 +47,7 @@ class TextFormatter {
 	 * @param args the arguments
 	 * @return the formatted pattern
 	 * @exception IllegalArgumentException if the pattern is invalid */
-	public String format (String pattern, Object... args) {
+	public synchronized String format (String pattern, Object... args) {
 		if (messageFormat != null) {
 			messageFormat.applyPattern(replaceEscapeChars(pattern));
 			return messageFormat.format(args);
@@ -55,11 +55,13 @@ class TextFormatter {
 		return simpleFormat(pattern, args);
 	}
 
-	// This code is needed because a simple replacement like
-	// pattern.replace("'", "''").replace("{{", "'{'");
-	// can't properly manage some special cases.
-	// For example, the expected output for {{{{ is {{ but you get {'{ instead.
-	// Also this code is optimized since a new string is returned only if something has been replaced.
+	/**
+	* This code is needed because a simple replacement like
+	* pattern.replace("'", "''").replace("{{", "'{'");
+	* can't properly manage some special cases.
+	* For example, the expected output for {{{{ is {{ but you get {'{ instead.
+	* Also, this code is optimized since a new string is returned only if something has been replaced.
+	 **/
 	private String replaceEscapeChars (String pattern) {
 		buffer.setLength(0);
 		boolean changed = false;
