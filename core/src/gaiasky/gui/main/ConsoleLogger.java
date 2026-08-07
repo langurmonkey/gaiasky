@@ -13,6 +13,7 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Logger;
@@ -191,15 +192,7 @@ public class ConsoleLogger implements IObserver {
             case TIME_WARP_CHANGED_INFO -> addMessage(I18n.msg("notif.timepace.change", data[0]));
             case JAVA_EXCEPTION -> {
                 Throwable t = (Throwable) data[0];
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                t.printStackTrace(pw);
-                String stackTrace = sw.toString();
-                // Build the message with plain string concatenation. The stack trace
-                // is arbitrary text full of '{', '}' and '\'' characters, which
-                // MessageFormat would interpret as pattern. Never route the contents through I18n.msg()/MessageFormat.
-                String msg = I18n.msg("notif.error", "") + (data.length > 1 ? data[1] + TAG_SEPARATOR : "") + stackTrace;
-                addMessage(msg);
+                addMessage(NotificationsInterface.exceptionToString(t, data));
             }
             case ORBIT_DATA_LOADED ->
                     addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), LoggerLevel.DEBUG);

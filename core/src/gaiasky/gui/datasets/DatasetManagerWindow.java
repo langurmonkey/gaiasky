@@ -56,7 +56,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -89,17 +88,17 @@ public class DatasetManagerWindow extends GenericDialog {
     /** Icon height. **/
     private final float h = 40f;
 
-    /**
-     * Reentrant lock to synchronize the latter part of the dataset download process: checksum,
-     * extraction, and dataset enable+UI update.
-     */
-    private final ReentrantLock finishLock = new ReentrantLock();
-
-    public DatasetManagerWindow(Stage stage, Skin skin, DatasetGroup serverDd) {
+    public DatasetManagerWindow(Stage stage,
+                                Skin skin,
+                                DatasetGroup serverDd) {
         this(stage, skin, serverDd, true, I18n.msg("gui.close"));
     }
 
-    public DatasetManagerWindow(Stage stage, Skin skin, DatasetGroup serverDd, boolean dataLocation, String acceptText) {
+    public DatasetManagerWindow(Stage stage,
+                                Skin skin,
+                                DatasetGroup serverDd,
+                                boolean dataLocation,
+                                String acceptText) {
         super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates",
                                                                                                                  serverDd.numUpdates) : ""),
               skin,
@@ -193,7 +192,8 @@ public class DatasetManagerWindow extends GenericDialog {
         // Set visibility of the tab content to match the checked state.
         ChangeListener tabListener = new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 if (tabAvail.isChecked()) {
                     if (initialized.get())
                         selectedTab = 0;
@@ -312,16 +312,21 @@ public class DatasetManagerWindow extends GenericDialog {
         });
     }
 
-    private void reloadAvailable(Table content, float width) {
+    private void reloadAvailable(Table content,
+                                 float width) {
         reloadBothPanes(content, width, serverDd, currentMode = DatasetMode.AVAILABLE);
     }
 
-    private void reloadInstalled(Table content, float width) {
+    private void reloadInstalled(Table content,
+                                 float width) {
         localDd = DatasetUtils.instance().buildLocalDatasets(this.serverDd);
         reloadBothPanes(content, width, localDd, currentMode = DatasetMode.INSTALLED);
     }
 
-    private void reloadBothPanes(Table content, float width, DatasetGroup dataDescriptor, DatasetMode mode) {
+    private void reloadBothPanes(Table content,
+                                 float width,
+                                 DatasetGroup dataDescriptor,
+                                 DatasetMode mode) {
         content.clear();
         if (dataDescriptor == null || dataDescriptor.datasets.isEmpty()) {
             if (mode == DatasetMode.AVAILABLE) {
@@ -350,7 +355,10 @@ public class DatasetManagerWindow extends GenericDialog {
         me.pack();
     }
 
-    private int reloadLeftPane(Cell<?> left, DatasetGroup dataDescriptor, DatasetMode mode, float width) {
+    private int reloadLeftPane(Cell<?> left,
+                               DatasetGroup dataDescriptor,
+                               DatasetMode mode,
+                               float width) {
         var leftContent = new Table(skin);
         var leftTable = new Table(skin);
 
@@ -359,7 +367,8 @@ public class DatasetManagerWindow extends GenericDialog {
         filter.setWidth(width * 0.5f);
         filter.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event,
+                                Actor actor) {
                 populateLeftTable(leftTable, mode, dataDescriptor, GaiaSky.settings().data.dataFiles, width, filter.getText());
             }
         });
@@ -577,7 +586,8 @@ public class DatasetManagerWindow extends GenericDialog {
                     select.setHeight(40f);
                     select.addListener(new ChangeListener() {
                         @Override
-                        public void changed(ChangeEvent event, Actor actor) {
+                        public void changed(ChangeEvent event,
+                                            Actor actor) {
                             if (select.isChecked()) {
                                 actionEnableDataset(dataset, select);
                             } else {
@@ -662,7 +672,8 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                           skin.getDrawable("iconic-arrow-circle-bottom"));
                                                 update.addListener(new ChangeListener() {
                                                     @Override
-                                                    public void changed(ChangeEvent event, Actor actor) {
+                                                    public void changed(ChangeEvent event,
+                                                                        Actor actor) {
                                                         actionUpdateDataset(dataset);
                                                     }
                                                 });
@@ -677,7 +688,8 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                                skin.getDrawable("check-off-disabled"));
                                                     disable.addListener(new ChangeListener() {
                                                         @Override
-                                                        public void changed(ChangeEvent event, Actor actor) {
+                                                        public void changed(ChangeEvent event,
+                                                                            Actor actor) {
                                                             actionDisableDataset(dataset);
                                                             if (installOrSelect instanceof OwnCheckBox cb) {
                                                                 cb.setProgrammaticChangeEvents(false);
@@ -693,7 +705,8 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     var enable = new MenuItem(I18n.msg("gui.download.enable"), skin, skin.getDrawable("check-on"));
                                                     enable.addListener(new ChangeListener() {
                                                         @Override
-                                                        public void changed(ChangeEvent event, Actor actor) {
+                                                        public void changed(ChangeEvent event,
+                                                                            Actor actor) {
                                                             actionEnableDataset(dataset, null);
                                                             if (installOrSelect instanceof OwnCheckBox cb) {
                                                                 cb.setProgrammaticChangeEvents(false);
@@ -711,7 +724,9 @@ public class DatasetManagerWindow extends GenericDialog {
                                             var delete = new MenuItem(I18n.msg("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
                                             delete.addListener(new ClickListener() {
                                                 @Override
-                                                public void clicked(InputEvent event, float x, float y) {
+                                                public void clicked(InputEvent event,
+                                                                    float x,
+                                                                    float y) {
                                                     actionDeleteDataset(dataset);
                                                     super.clicked(event, x, y);
                                                 }
@@ -724,7 +739,8 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                        skin.getDrawable("iconic-cloud-download"));
                                             install.addListener(new ChangeListener() {
                                                 @Override
-                                                public void changed(ChangeEvent event, Actor actor) {
+                                                public void changed(ChangeEvent event,
+                                                                    Actor actor) {
                                                     actionDownloadDataset(dataset);
                                                 }
                                             });
@@ -769,7 +785,9 @@ public class DatasetManagerWindow extends GenericDialog {
         return added;
     }
 
-    private void reloadRightPane(Cell<?> cell, Dataset dataset, DatasetMode mode) {
+    private void reloadRightPane(Cell<?> cell,
+                                 Dataset dataset,
+                                 DatasetMode mode) {
         if (rightPaneWatcher != null) {
             rightPaneWatcher.dispose();
             watchers.remove(rightPaneWatcher);
@@ -1132,7 +1150,8 @@ public class DatasetManagerWindow extends GenericDialog {
                 cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
                 cancelDownloadButton.addListener(new ChangeListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
                         if (request != null) {
                             GaiaSky.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
                         }
@@ -1192,7 +1211,8 @@ public class DatasetManagerWindow extends GenericDialog {
         downloadDataset(dataset, null);
     }
 
-    private void downloadDataset(Dataset dataset, Runnable successRunnable) {
+    private void downloadDataset(Dataset dataset,
+                                 Runnable successRunnable) {
         var tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
 
         try {
@@ -1250,11 +1270,11 @@ public class DatasetManagerWindow extends GenericDialog {
                                                             speedString));
         };
 
-        // The whole finish process runs in serial mode thanks to the finishLock.
+        // The whole finish process runs in serial mode thanks to the extraction lock.
         // Prevents sync issues with file extraction and UI update.
         Consumer<String> finish = (digest) -> {
-            finishLock.lock();
-            try{
+            DatasetDownloadUtils.EXTRACTION_LOCK.lock();
+            try {
                 String errorMsg = null;
                 // Unpack.
                 int errors = 0;
@@ -1336,7 +1356,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     }
                 });
             } finally {
-                finishLock.unlock();
+                DatasetDownloadUtils.EXTRACTION_LOCK.unlock();
             }
 
         };
@@ -1389,7 +1409,8 @@ public class DatasetManagerWindow extends GenericDialog {
         setStatusError(ds, null);
     }
 
-    private void setStatusError(Dataset ds, String message) {
+    private void setStatusError(Dataset ds,
+                                String message) {
         if (message != null && !message.isEmpty()) {
             EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1, message);
         } else {
@@ -1544,7 +1565,8 @@ public class DatasetManagerWindow extends GenericDialog {
      * @param dataset The dataset to enable.
      * @param cb      The checkbox to enable the dataset.
      */
-    private void actionEnableDataset(Dataset dataset, OwnCheckBox cb) {
+    private void actionEnableDataset(Dataset dataset,
+                                     OwnCheckBox cb) {
         // Texture packs can't be enabled here.
         if (dataset.type.equals("texture-pack"))
             return;
@@ -1681,7 +1703,12 @@ public class DatasetManagerWindow extends GenericDialog {
             @Override
             protected boolean accept() {
                 // Delete dataset.
-                actionDeleteDatasetDirect(dataset);
+                boolean deleted = actionDeleteDatasetDirect(dataset);
+                if (deleted) {
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                         this,
+                                         I18n.msg("gui.dataset.remove.info", dataset.name));
+                }
                 // RELOAD DATASETS VIEW
                 GaiaSky.postRunnable(() -> reloadAll());
                 return true;
@@ -1708,61 +1735,68 @@ public class DatasetManagerWindow extends GenericDialog {
      *
      * @param dataset The dataset to delete.
      */
-    private void actionDeleteDatasetDirect(Dataset dataset) {
-        Dataset serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
-        boolean deleted = false;
-        // Delete
-        if (dataset.files != null) {
-            for (String fileToDelete : dataset.files) {
-                String toDelete = fileToDelete;
-                try {
-                    if (toDelete.endsWith("/")) {
-                        toDelete = toDelete.substring(0, toDelete.length() - 1);
-                    }
-                    // Separate parent from file.
-                    String baseParent = "";
-                    String baseName = toDelete;
-                    if (toDelete.contains("/")) {
-                        baseParent = toDelete.substring(0, toDelete.lastIndexOf('/'));
-                        baseName = toDelete.substring(toDelete.lastIndexOf('/') + 1);
-                    }
-                    // Add data location if necessary.
-                    Path dataPath;
-                    Path basePath = Path.of(baseParent);
-                    if (!basePath.isAbsolute()) {
-                        dataPath = Paths.get(GaiaSky.settings().data.location).resolve(baseParent);
-                    } else {
-                        dataPath = basePath;
-                    }
-                    File directory = dataPath.toRealPath().toFile();
-                    // Expand possible wildcards.
-                    Collection<File> files = FileUtils.listFilesAndDirs(directory,
-                                                                        WildcardFileFilter.builder().setWildcards(baseName).get(),
-                                                                        WildcardFileFilter.builder().setWildcards(baseName).get());
-                    for (File file : files) {
-                        if (!file.equals(directory) && file.exists()) {
-                            FileUtils.forceDelete(file);
+    private boolean actionDeleteDatasetDirect(Dataset dataset) {
+
+        DatasetDownloadUtils.EXTRACTION_LOCK.lock();
+        try {
+            Dataset serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
+            boolean deleted = false;
+            // Delete
+            if (dataset.files != null) {
+                for (String fileToDelete : dataset.files) {
+                    String toDelete = fileToDelete;
+                    try {
+                        if (toDelete.endsWith("/")) {
+                            toDelete = toDelete.substring(0, toDelete.length() - 1);
                         }
+                        // Separate parent from file.
+                        String baseParent = "";
+                        String baseName = toDelete;
+                        if (toDelete.contains("/")) {
+                            baseParent = toDelete.substring(0, toDelete.lastIndexOf('/'));
+                            baseName = toDelete.substring(toDelete.lastIndexOf('/') + 1);
+                        }
+                        // Add data location if necessary.
+                        Path dataPath;
+                        Path basePath = Path.of(baseParent);
+                        if (!basePath.isAbsolute()) {
+                            dataPath = Paths.get(GaiaSky.settings().data.location).resolve(baseParent);
+                        } else {
+                            dataPath = basePath;
+                        }
+                        File directory = dataPath.toRealPath().toFile();
+                        // Expand possible wildcards.
+                        Collection<File> files = FileUtils.listFilesAndDirs(directory,
+                                                                            WildcardFileFilter.builder().setWildcards(baseName).get(),
+                                                                            WildcardFileFilter.builder().setWildcards(baseName).get());
+                        for (File file : files) {
+                            if (!file.equals(directory) && file.exists()) {
+                                FileUtils.forceDelete(file);
+                            }
+                        }
+                        deleted = true;
+                    } catch (Exception e) {
+                        logger.error(e);
                     }
+                }
+            } else if (dataset.checkPath != null) {
+                // Only remove "check"
+                try {
+                    FileUtils.forceDelete(dataset.checkPath.toFile());
                     deleted = true;
-                } catch (Exception e) {
+                } catch (IOException e) {
                     logger.error(e);
                 }
             }
-        } else if (dataset.checkPath != null) {
-            // Only remove "check"
-            try {
-                FileUtils.forceDelete(dataset.checkPath.toFile());
-                deleted = true;
-            } catch (IOException e) {
-                logger.error(e);
+            // Update server dataset status and selected
+            if (deleted && serverDataset != null) {
+                serverDataset.exists = false;
+                actionDisableDataset(dataset);
+                resetSelectedDataset();
             }
-        }
-        // Update server dataset status and selected
-        if (deleted && serverDataset != null) {
-            serverDataset.exists = false;
-            actionDisableDataset(dataset);
-            resetSelectedDataset();
+            return deleted;
+        } finally {
+            DatasetDownloadUtils.EXTRACTION_LOCK.unlock();
         }
     }
 

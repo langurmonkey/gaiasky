@@ -278,21 +278,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 case TIME_WARP_CHANGED_INFO -> addMessage(I18n.msg("notif.timepace.change", data[0]));
                 case JAVA_EXCEPTION -> {
                     Throwable t = (Throwable) data[0];
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    t.printStackTrace(pw);
-                    String stackTrace = sw.toString();
-                    if (data.length == 1) {
-                        if (I18n.messages != null)
-                            addMessage(I18n.msg("notif.error", stackTrace));
-                        else
-                            addMessage("Error: " + stackTrace);
-                    } else {
-                        if (I18n.messages != null)
-                            addMessage(I18n.msg("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
-                        else
-                            addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
-                    }
+                    addMessage(exceptionToString(t, data));
                 }
                 case ORBIT_DATA_LOADED -> addMessage(I18n.msg("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false,
                                                      LoggerLevel.DEBUG);
@@ -369,4 +355,22 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         return FastMath.max(getMessage1Width(), getMessage2Width());
     }
 
+
+    public static String exceptionToString(Throwable t, Object[] data) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        String stackTrace = sw.toString();
+
+        String prefix = I18n.messages != null
+                ? I18n.msg("notif.error", "")
+                : "Error: ";
+
+        // Build the message with plain string concatenation. The stack trace
+        // is arbitrary text full of '{', '}' and '\'' characters, which
+        // MessageFormat would interpret as pattern. Never route the contents through I18n.msg()/MessageFormat.
+        return prefix
+                + (data.length > 1 ? data[1] + TAG_SEPARATOR : "")
+                + stackTrace;
+    }
 }

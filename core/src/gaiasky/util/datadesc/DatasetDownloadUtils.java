@@ -26,6 +26,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
@@ -36,6 +37,12 @@ public class DatasetDownloadUtils {
     private static final Logger.Log logger = Logger.getLogger(DatasetDownloadUtils.class);
 
     public static final String mirrorKeyword = "@mirror-url@";
+
+    /**
+     * Reentrant lock to synchronize the latter part of the dataset download process: checksum,
+     * extraction, and dataset enable+UI update.
+     */
+    public static final ReentrantLock EXTRACTION_LOCK = new ReentrantLock();
 
     /**
      * Returns the file size.
@@ -122,7 +129,9 @@ public class DatasetDownloadUtils {
 
     private final static DecimalFormat nf = new DecimalFormat("##0.0");
 
-    public static void decompress(String in, File out, Dataset dataset) throws Exception {
+    public static void decompress(String in,
+                                  File out,
+                                  Dataset dataset) throws Exception {
         FileInfoInputStream fIs = new FileInfoInputStream(in);
         GZIPInputStream gzIs = new GZIPInputStream(fIs);
         TarInputStream tarIs = new TarInputStream(gzIs);
@@ -188,11 +197,12 @@ public class DatasetDownloadUtils {
         }
     }
 
-    public static  boolean isEnabled(Dataset dataset) {
+    public static boolean isEnabled(Dataset dataset) {
         return isPathIn(GaiaSky.settings().data.dataFile(dataset.checkStr), GaiaSky.settings().data.dataFiles);
     }
 
-    public static boolean isPathIn(String path, List<String> setting) {
+    public static boolean isPathIn(String path,
+                                   List<String> setting) {
         for (String candidate : setting) {
             var candidatePath = GaiaSky.settings().data.dataPath(candidate);
             try {
@@ -200,9 +210,8 @@ public class DatasetDownloadUtils {
                     return true;
                 }
             } catch (NoSuchFileException e) {
-                // Check file temporarily missing (dataset mid-update).
-                // Do not log, this is not an error.
-                return false;
+                // This candidate is temporarily unavailable; check the others.
+                // Just continue.
             } catch (IOException e) {
                 logger.error(e);
                 return false;
