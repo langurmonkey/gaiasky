@@ -15,7 +15,6 @@ import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
@@ -86,8 +85,46 @@ public class TrajectoryUtils {
     }
 
     public void initializeTransformMatrix(Trajectory trajectory, GraphNode graph, RefSysTransform transform) {
-        if (trajectory.model == Trajectory.OrbitOrientationModel.EXTRASOLAR_SYSTEM && transform.matrix == null && graph.parent != null) {
+        if (graph.parent == null) {
+            return;
+        }
+
+        if (trajectory.model == Trajectory.OrbitOrientationModel.EXTRASOLAR_SYSTEM && transform.matrix == null) {
             computeExtrasolarSystemTransformMatrix(graph, transform);
+        } else if (trajectory.model == Trajectory.OrbitOrientationModel.INHERIT && transform.matrix == null) {
+            computeInheritedTransformMatrix(graph, transform);
+        }
+    }
+
+    /**
+     * Copies the extrasolar reference frame from the nearest ancestor that has
+     * an extrasolar or inherited orientation model.
+     */
+    public void computeInheritedTransformMatrix(GraphNode graph, RefSysTransform transform) {
+        Entity ancestor = graph.parent;
+        while (ancestor != null) {
+            Trajectory ancestorTrajectory = Mapper.trajectory.get(ancestor);
+            RefSysTransform ancestorTransform = Mapper.transform.get(ancestor);
+            GraphNode ancestorGraph = Mapper.graph.get(ancestor);
+
+            if (ancestorTrajectory != null
+                    && ancestorTransform != null
+                    && ancestorGraph != null
+                    && ancestorTrajectory.model == Trajectory.OrbitOrientationModel.EXTRASOLAR_SYSTEM
+                    && ancestorTransform.matrix == null) {
+                computeExtrasolarSystemTransformMatrix(ancestorGraph, ancestorTransform);
+            }
+
+            if (ancestorTrajectory != null
+                    && (ancestorTrajectory.model == Trajectory.OrbitOrientationModel.EXTRASOLAR_SYSTEM
+                    || ancestorTrajectory.model == Trajectory.OrbitOrientationModel.INHERIT)
+                    && ancestorTransform != null
+                    && ancestorTransform.matrix != null) {
+                transform.setTransformMatrix(ancestorTransform.matrix);
+                return;
+            }
+
+            ancestor = ancestorGraph != null ? ancestorGraph.parent : null;
         }
     }
 
@@ -104,17 +141,26 @@ public class TrajectoryUtils {
             EntityUtils.getAbsolutePosition(parent, barycenter);
         }
 
-        // Up
-        Vector3Q y = B32.set(barycenter).nor();
-        Vector3D yd = y.put(D31);
-        // Towards north - intersect y with plane
-        Vector3D zd = D32;
-        IntersectorDouble.lineIntersection(barycenter.put(new Vector3D()), (new Vector3D(yd)), new Vector3D(0, 0, 0), new Vector3D(0, 1, 0), zd);
-        zd.sub(barycenter).nor();
-        //zd.set(yd).crs(0, 1, 0).nor();
+        // The reference-plane normal is the line of sight from the Sun to the
+        // object. Use the parent's position as that direction.
+        Vector3D yd = B32.set(barycenter).nor().put(D31);
 
-        // Orthogonal to ZY, right-hand system
-        Vector3D xd = D33.set(yd).crs(zd);
+        // Project the direction from the object to the north celestial pole
+        // onto the reference plane. The pole is the origin's +Y direction in
+        // the equatorial frame, so this is the pole direction minus its
+        // component along the reference-plane normal.
+        Vector3D zd;
+        if (Math.abs(yd.y) < 0.9) {
+            zd = D32.set(0, 1, 0);
+        } else {
+            // Near the celestial poles, use the equatorial X direction to
+            // avoid amplifying numerical noise in the projection.
+            zd = D32.set(1, 0, 0);
+        }
+        zd.mulAdd(yd, -zd.dot(yd)).nor();
+
+        // Complete the right-handed orthonormal basis.
+        Vector3D xd = D33.set(yd).crs(zd).nor();
 
         transform.matrix = Matrix4D.changeOfBasis(zd, yd, xd);
     }

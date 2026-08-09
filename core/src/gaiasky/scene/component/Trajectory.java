@@ -336,7 +336,13 @@ public class Trajectory implements Component {
          * star for whom the orbit is defined. The reference direction is the direction from the object to the north
          * celestial pole projected on the reference plane.
          */
-        EXTRASOLAR_SYSTEM;
+        EXTRASOLAR_SYSTEM,
+
+        /**
+         * Inherited system frame: a child orbit uses the already-computed frame of its parent/system ancestor.
+         * This explicitly propagates the parent’s extrasolar transform, if any.
+         */
+        INHERIT;
 
         public boolean isDefault() {
             return this.equals(DEFAULT);

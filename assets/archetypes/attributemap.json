@@ -238,7 +238,7 @@
         "unit": "Map"
       },
       "orientationModel": {
-        "description": "The orientation model of this orbit. |brsp| **Values:** |ul| |li| ``default`` -- the default orientation, where the reference plane is the equator. Use this for orbits in the Solar System. |eli| |li| ``extrasolar_system`` -- orientation for extrasolar systems. |eli| |eul| |brsp| See :ref:`orbits` for more information.",
+        "description": "The orientation model of this orbit. |brsp| **Values:** |ul| |li| ``default`` -- the default orientation, where the reference plane is the equator. Use this for orbits in the Solar System. |eli| |li| ``extrasolar_system`` -- orientation for extrasolar systems, using the reference plane defined by the line of sight from the Sun to the parent object. |eli| |li| ``inherit`` -- inherit the extrasolar-system reference frame from the nearest parent or system ancestor. Use this for child orbits, such as moons, whose orbital elements use the same reference system as the parent system. |eli| |eul| |brsp| See :ref:`orbits` for more information.",
         "unit": "String",
         "aliases": [
           "model:Orbit"

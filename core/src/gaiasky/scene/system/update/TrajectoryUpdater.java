@@ -55,6 +55,8 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
 
         if (trajectory.model == OrbitOrientationModel.EXTRASOLAR_SYSTEM) {
             utils.computeExtrasolarSystemTransformMatrix(graph, transform);
+        } else if (trajectory.model == OrbitOrientationModel.INHERIT) {
+            utils.computeInheritedTransformMatrix(graph, transform);
         }
 
         // Compute position percentage in the trajectory.
