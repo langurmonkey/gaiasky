@@ -160,6 +160,8 @@ public class ModelExtractor extends AbstractExtractSystem {
             var graph = Mapper.graph.get(render.entity);
             // Gather visible nodes from current position.
             model.model.lodSphere.update(GaiaSky.instance.getICamera(), body.size, graph.localTransform);
+            // Update meshes.
+            model.model.lodSphere.buildVisibleMeshes(4, body.size);
         }
     }
 

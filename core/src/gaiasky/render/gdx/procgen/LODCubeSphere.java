@@ -20,6 +20,7 @@ import gaiasky.util.Bits;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
+import net.jafama.FastMath;
 import org.lwjgl.opengl.GL20;
 
 /**
@@ -33,7 +34,6 @@ public class LODCubeSphere {
 
     // Auxiliary vectors (reused to avoid allocation).
     private final Vector3 aux1 = new Vector3();
-    private final Vector3 aux2 = new Vector3();
     private final Vector3Q auxQ = new Vector3Q();
 
     // Scratch vectors for sphere-space computation in buildMesh().
@@ -55,6 +55,8 @@ public class LODCubeSphere {
     final int minDepth = 0;
     /** Maximum tree depth. **/
     final int maxDepth;
+    /** Screen-space ratio thresholds for each tree depth. **/
+    private final double[] depthThresholds;
 
     /** Visible leaves list, cleared at the start of each traverse() call. **/
     public final Array<Quadtree> visibleLeaves = new Array<>(256);
@@ -62,6 +64,10 @@ public class LODCubeSphere {
     public LODCubeSphere(int maxDepth,
                          boolean fullInit) {
         this.maxDepth = maxDepth;
+        this.depthThresholds = new double[maxDepth + 1];
+        for (int depth = minDepth; depth <= maxDepth; depth++) {
+            depthThresholds[depth] = FastMath.scalb(1.0, depth - minDepth);
+        }
 
         // Face definitions: { axis, sign, uComp, vComp }
         // Each row describes one face of the unit cube [-1, 1]^3:
@@ -129,7 +135,6 @@ public class LODCubeSphere {
     public void update(ICamera cam,
                        double objectRadius,
                        Matrix4 localTransform) {
-        System.out.println(visibleLeaves.size);
         visibleLeaves.clear();
 
         for (int f = 0; f < 6; f++) {
@@ -155,11 +160,11 @@ public class LODCubeSphere {
         int targetDepth = computeTargetDepth(screenSize, 3f);
 
         if (node.depth < targetDepth) {
+            if (node.isLeaf()) {
+                node.subdivide();
+            }
             // Subdivide: recurse into children
             for (int i = 0; i < 4; i++) {
-                if (node.isLeaf()) {
-                    node.subdivide();
-                }
                 traverseNode(node.children[i], cam, objectRadius, localTransform);
             }
         } else {
@@ -171,16 +176,22 @@ public class LODCubeSphere {
     int computeTargetDepth(double screenSize,
                            double factor) {
         // The node's geometric error is roughly proportional to its angular size.
-        // Convert to target depth using a logarithmic scale.
+        // Find the deepest threshold reached without evaluating logarithms per node.
         double ratio = screenSize * factor;
-        int depth = (int) (Math.log(ratio) / Math.log(2)) + minDepth;
+        int depth = minDepth;
+        for (int candidate = maxDepth; candidate > minDepth; candidate--) {
+            if (ratio >= depthThresholds[candidate]) {
+                depth = candidate;
+                break;
+            }
+        }
         return MathUtilsDouble.clamp(depth, minDepth, maxDepth);
     }
 
     boolean frustumTest(Vector3 position,
                         double radius,
                         ICamera cam) {
-        return cam.getCamera().frustum.boundsInFrustum(position, aux2.set((float) radius, (float) radius, (float) radius));
+        return cam.getCamera().frustum.sphereInFrustum(position, (float) radius);
     }
 
     /**

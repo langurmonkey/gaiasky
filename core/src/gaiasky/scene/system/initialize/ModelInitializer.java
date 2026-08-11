@@ -148,7 +148,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
 
         if (model.model.lodFlag) {
-           model.model.lodSphere = new LODCubeSphere(5, true);
+           model.model.lodSphere = new LODCubeSphere(5, false);
         }
     }
 
