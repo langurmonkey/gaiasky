@@ -147,16 +147,16 @@ public class LODCubeSphere {
                       double objectRadius,
                       Matrix4 localTransform) {
         // Put in world coordinates.
-        var worldPosition = node.center.put(aux1).mul(localTransform);
+        var worldPosition = node.sphereCenter.put(aux1).mul(localTransform);
 
-        // Frustum cull using bounding sphere.
-        if (!frustumTest(worldPosition, node.radius * objectRadius, cam)) return;
+        // Frustum cull using the spherical-space bounding sphere.
+        double worldRadius = node.sphereRadius * objectRadius;
+        if (!frustumTest(worldPosition, worldRadius, cam)) return;
 
-        // Determine if this node should subdivide based on screen-space error
-        // We compute the distance from the camera to the node.
+        // The floating-camera system keeps the camera at the origin.
         double dist = worldPosition.len();
-        // Screen size is the node radius over the distance.
-        double screenSize = node.radius * objectRadius / dist;
+        // Avoid invalid values when the camera is inside or extremely close to a node.
+        double screenSize = dist > 0.0 ? worldRadius / dist : Double.POSITIVE_INFINITY;
         int targetDepth = computeTargetDepth(screenSize, 3f);
 
         if (node.depth < targetDepth) {
@@ -252,12 +252,14 @@ public class LODCubeSphere {
         final LODCubeSphere parent;
         /** Bounds of the quadtree, in the flat cube. **/
         final Vector3D p0, p1, p2, p3;
-        /** Central point. **/
+        /** Central point in cube space, used for subdivision. **/
         final Vector3D center;
+        /** Central point after cube-to-sphere projection, used for traversal. **/
+        final Vector3D sphereCenter;
         /** Depth of this node in the tree structure. **/
         final int depth;
-        /** Radius of this node, given by the distance of its points to the center of the patch. **/
-        final double radius;
+        /** Bounding radius in sphere space, used for culling and LOD decisions. **/
+        final double sphereRadius;
 
         /** Array of children, as in [tl, tr, bl, br]. **/
         final Quadtree[] children = new Quadtree[4];
@@ -291,8 +293,28 @@ public class LODCubeSphere {
             this.p2 = p2;
             this.p3 = p3;
             this.center = middlePoint(p0, p3);
-            this.radius = p0.dst(center);
 
+            // Keep traversal bounds in the same space as the rendered mesh.
+            this.sphereCenter = new Vector3D(center);
+            map(this.sphereCenter);
+            this.sphereRadius = computeSphereRadius(sphereCenter,
+                                                    p0, p1, p2, p3,
+                                                    middlePoint(p0, p1),
+                                                    middlePoint(p0, p2),
+                                                    middlePoint(p1, p3),
+                                                    middlePoint(p2, p3));
+
+        }
+
+        private double computeSphereRadius(Vector3D sphereCenter,
+                                           Vector3D... samplePoints) {
+            double radius = 0.0;
+            for (Vector3D samplePoint : samplePoints) {
+                Vector3D mapped = new Vector3D(samplePoint);
+                map(mapped);
+                radius = Math.max(radius, mapped.dst(sphereCenter));
+            }
+            return radius;
         }
 
         /**
