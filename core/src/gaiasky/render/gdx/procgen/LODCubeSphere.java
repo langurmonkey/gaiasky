@@ -224,8 +224,6 @@ public class LODCubeSphere {
      * @return The completed mesh.
      */
     public IntMesh end() {
-        if (builder == null)
-            throw new IllegalStateException("begin() must be called before end()");
         return builder.end();
     }
 
