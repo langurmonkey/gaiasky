@@ -882,11 +882,14 @@ public class DatasetManagerWindow extends GenericDialog {
                         if (Files.exists(filePath)) {
                             // Use cached file.
                             logger.info("File found: " + filePath);
-                            var tex = new Texture(filePath.toAbsolutePath().toString());
-                            if (Dataset.verifyDatasetImage(tex)) {
-                                var image = new OwnImage(tex, false);
-                                image.setSize(imageSide, imageSide);
-                                imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+                            try {
+                                var tex = new Texture(filePath.toAbsolutePath().toString());
+                                if (Dataset.verifyDatasetImage(tex)) {
+                                    var image = new OwnImage(tex, false);
+                                    image.setSize(imageSide, imageSide);
+                                    imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
+                                }
+                            } catch (Exception ignored) {
                             }
                         } else {
                             // Download
@@ -900,11 +903,14 @@ public class DatasetManagerWindow extends GenericDialog {
                                                             // OK.
                                                             logger.info("Image downloaded successfully: " + filePath);
                                                             GaiaSky.postRunnable(() -> {
-                                                                var tex = new Texture(filePath.toAbsolutePath().toString());
-                                                                if (Dataset.verifyDatasetImage(tex)) {
-                                                                    var image = new OwnImage(tex, false);
-                                                                    image.setSize(300, 300);
-                                                                    table.add(image).center().padRight(pad10).padLeft(pad10);
+                                                                try {
+                                                                    var tex = new Texture(filePath.toAbsolutePath().toString());
+                                                                    if (Dataset.verifyDatasetImage(tex)) {
+                                                                        var image = new OwnImage(tex, false);
+                                                                        image.setSize(300, 300);
+                                                                        table.add(image).center().padRight(pad10).padLeft(pad10);
+                                                                    }
+                                                                } catch (Exception ignored) {
                                                                 }
                                                             });
                                                         }),
