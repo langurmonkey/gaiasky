@@ -28,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -111,8 +112,8 @@ public class DatasetManagerWindow extends GenericDialog {
         this.selectedDataset = new Dataset[2];
         this.initialized = new AtomicBoolean(false);
         this.buttonMap = new ArrayList<>(2);
-        this.buttonMap.add(new HashMap<String, Button>());
-        this.buttonMap.add(new HashMap<String, Button>());
+        this.buttonMap.add(new HashMap<>());
+        this.buttonMap.add(new HashMap<>());
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
         this.selectionOrder = new ArrayList<>();
         this.dataLocation = dataLocation;
@@ -889,6 +890,15 @@ public class DatasetManagerWindow extends GenericDialog {
                                     image.setSize(imageSide, imageSide);
                                     imagesTable.add(image).center().padRight(pad10).padLeft(pad10);
                                 }
+                            } catch (GdxRuntimeException corruptedImage) {
+                                // Remove cached image, as it is corrupted.
+                                logger.warn("Corrupted cached image detected, deleting: " + filePath);
+                                try {
+                                    Files.deleteIfExists(filePath);
+                                } catch (IOException ex) {
+                                    logger.error(ex);
+                                }
+
                             } catch (Exception ignored) {
                             }
                         } else {
