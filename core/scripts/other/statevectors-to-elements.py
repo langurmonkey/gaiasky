@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import argparse
 import numpy as np
 from astropy.io import votable
@@ -176,10 +175,44 @@ def process_sso_data(input_file, output_file):
     # Storage for computed values
     results = {k: [] for k in ['a', 'e', 'i', 'om', 'w', 'ma', 'period', 'epoch']}
 
+    # Determine state vector source: prefer array column 'h_state_vector',
+    # fall back to individual columns x, y, z, vx, vy, vz.
+    use_array = 'h_state_vector' in data.colnames
+    if use_array:
+        print("[*] Using 'h_state_vector' array column.")
+    else:
+        print("[*] 'h_state_vector' not found; using individual columns 'x','y','z','vx','vy','vz'.")
+
+    # Determine epoch source: prefer 'epoch_state_vector_jd' (Julian Days),
+    # fall back to 'epoch_state_vector' (TCB).
+    if 'epoch_state_vector_jd' in data.colnames:
+        epoch_col = 'epoch_state_vector_jd'
+        print("[*] Using 'epoch_state_vector_jd' (JD) for epoch.")
+    elif 'epoch_state_vector' in data.colnames:
+        epoch_col = 'epoch_state_vector'
+        print("[*] 'epoch_state_vector_jd' not found; using 'epoch_state_vector' (TCB) for epoch.")
+    else:
+        epoch_col = None
+        print("[!] No epoch column found ('epoch_state_vector_jd' or 'epoch_state_vector'); epoch will be NaN.")
+
     print(f"[*] Processing {len(data)} rows...")
     for row in tqdm(data, desc="Calculating Elements"):
-        sv = row['h_state_vector']
-        orbit = orbitalElements(Vector3D(*sv[:3]), Vector3D(*sv[3:]), G_msol_AU_day, 1.0)
+        if epoch_col:
+            if epoch_col.endswith('_jd'):
+                epoch_jd = float(row[epoch_col])
+            else:
+                epoch_jd = float(row[epoch_col]) + 2455197.5
+        else:
+            epoch_jd = np.nan
+        
+        if use_array:
+            sv = row['h_state_vector']
+            pos = Vector3D(*(float(c) for c in sv[:3]))
+            vel = Vector3D(*(float(c) for c in sv[3:]))
+        else:
+            pos = Vector3D(float(row['x']), float(row['y']), float(row['z']))
+            vel = Vector3D(float(row['vx']), float(row['vy']), float(row['vz']))
+        orbit = orbitalElements(pos, vel, G_msol_AU_day, 1.0)
         orbit.calcOrbitFromVector()
         
         results['a'].append(orbit.a)
@@ -189,7 +222,7 @@ def process_sso_data(input_file, output_file):
         results['w'].append(np.degrees(orbit.argper))
         results['ma'].append(np.degrees(orbit.meananom))
         results['period'].append(orbit.period)
-        results['epoch'].append(row['epoch_state_vector_jd'])
+        results['epoch'].append(epoch_jd)
 
     # Insert calculated columns into the Astropy Table
     data['epoch'] = results['epoch']
@@ -202,7 +235,8 @@ def process_sso_data(input_file, output_file):
     data['period'] = results['period']
 
     # Delete memory-heavy columns
-    cols_to_remove = ['h_state_vector', 'orbital_elements_var_covar_matrix', 'epoch_state_vector_jd']
+    cols_to_remove = ['h_state_vector', 'orbital_elements_var_covar_matrix',
+                      'epoch_state_vector_jd', 'epoch_state_vector']
     for col in cols_to_remove:
         if col in data.colnames:
             data.remove_column(col)
