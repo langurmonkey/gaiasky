@@ -51,10 +51,14 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
 
     @Override
     public IntModelData loadModelData(FileHandle file, ObjLoaderParameters parameters) {
-        return loadModelData(file, parameters != null && parameters.flipV);
+        return loadModelData(file, parameters != null && parameters.flipV, true);
     }
 
     protected IntModelData loadModelData(FileHandle file, boolean flipV) {
+        return loadModelData(file, flipV, false);
+    }
+
+    protected IntModelData loadModelData(FileHandle file, boolean flipV, boolean computeNormals) {
         if (logWarning)
             Gdx.app.error(OwnObjLoader.class.getSimpleName(), "Wavefront (OBJ) is not fully supported, consult the documentation for more information");
         String line;
@@ -159,6 +163,17 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
         if (groups.size < 1)
             return null;
 
+        // Compute smooth vertex normals for groups that have faces but no
+        // normals in the file, if requested.
+        if (computeNormals)
+            for (Group group : groups)
+                if (!group.hasNorms && group.numFaces > 0) {
+                    computeSmoothNormals(group);
+                    // The mesh will contain normals, so the group must be
+                    // marked accordingly for the vertex expansion below.
+                    group.hasNorms = true;
+                }
+
         // Get number of objects/groups remaining after removing empty ones
         int numGroups = groups.size;
 
@@ -171,19 +186,31 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             int numFaces = group.numFaces;
             boolean hasNorms = group.hasNorms;
             boolean hasUVs = group.hasUVs;
+            // Normals computed in-loader (no vn entries in the file) are
+            // indexed by vertex index, not by a normal index in the face.
+            float[] computedNormals = group.computedNormals;
 
             float[] finalVerts = new float[(numFaces * 3) * (3 + (hasNorms ? 3 : 0) + (hasUVs ? 2 : 0))];
 
             for (int i = 0, vi = 0; i < numElements; ) {
-                int vertIndex = faces.get(i++) * 3;
+                int vertIdx = faces.get(i++);
+                int vertIndex = vertIdx * 3;
                 finalVerts[vi++] = verts.get(vertIndex++);
                 finalVerts[vi++] = verts.get(vertIndex++);
                 finalVerts[vi++] = verts.get(vertIndex);
                 if (hasNorms) {
-                    int normIndex = faces.get(i++) * 3;
-                    finalVerts[vi++] = norms.get(normIndex++);
-                    finalVerts[vi++] = norms.get(normIndex++);
-                    finalVerts[vi++] = norms.get(normIndex);
+                    if (computedNormals != null) {
+                        // Smooth normals: use the vertex index directly.
+                        int normIndex = vertIdx * 3;
+                        finalVerts[vi++] = computedNormals[normIndex++];
+                        finalVerts[vi++] = computedNormals[normIndex++];
+                        finalVerts[vi++] = computedNormals[normIndex];
+                    } else {
+                        int normIndex = faces.get(i++) * 3;
+                        finalVerts[vi++] = norms.get(normIndex++);
+                        finalVerts[vi++] = norms.get(normIndex++);
+                        finalVerts[vi++] = norms.get(normIndex);
+                    }
                 }
                 if (hasUVs) {
                     int uvIndex = faces.get(i++) * 2;
@@ -253,6 +280,96 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
         return data;
     }
 
+    /**
+     * Computes smooth (per-vertex, angle-accumulated) normals for a group
+     * that contains faces but no normals in the OBJ file. The result is
+     * stored in {@link Group#computedNormals}, indexed by vertex index
+     * (3 floats per vertex), so it can be read during vertex expansion.
+     * <p>
+     * The face stride depends on the face layout produced during parsing:
+     * each face corner consumes 1 index for the position, plus 1 more for
+     * the normal (never present here) and/or the UV, if the group has UVs.
+     */
+    private void computeSmoothNormals(Group group) {
+        final int numVerts = verts.size / 3;
+        final float[] accumulated = new float[numVerts * 3];
+
+        final IntArray faces = group.faces;
+        final int stride = group.hasUVs ? 2 : 1;
+        final int numFaces = group.numFaces;
+
+        final Vector3 a = new Vector3();
+        final Vector3 b = new Vector3();
+        final Vector3 c = new Vector3();
+        final Vector3 ab = new Vector3();
+        final Vector3 ac = new Vector3();
+        final Vector3 fn = new Vector3();
+
+        for (int f = 0; f < numFaces; f++) {
+            final int base = f * 3 * stride;
+
+            final int ia = faces.get(base) * 3;
+            final int ib = faces.get(base + stride) * 3;
+            final int ic = faces.get(base + 2 * stride) * 3;
+
+            a.set(verts.get(ia), verts.get(ia + 1), verts.get(ia + 2));
+            b.set(verts.get(ib), verts.get(ib + 1), verts.get(ib + 2));
+            c.set(verts.get(ic), verts.get(ic + 1), verts.get(ic + 2));
+
+            // Face normal (not normalized — its length equals twice the
+            // triangle area, which weights the contribution by area).
+            ab.set(b).sub(a);
+            ac.set(c).sub(a);
+            fn.set(ab).crs(ac);
+
+            // Skip degenerate faces.
+            if (fn.isZero())
+                continue;
+
+            accumulated[ia] += fn.x;
+            accumulated[ia + 1] += fn.y;
+            accumulated[ia + 2] += fn.z;
+            accumulated[ib] += fn.x;
+            accumulated[ib + 1] += fn.y;
+            accumulated[ib + 2] += fn.z;
+            accumulated[ic] += fn.x;
+            accumulated[ic + 1] += fn.y;
+            accumulated[ic + 2] += fn.z;
+        }
+
+        // Normalize accumulated normals; fall back to the normalized
+        // position for vertices that belong to degenerate faces only.
+        for (int i = 0; i < numVerts; i++) {
+            final int idx = i * 3;
+            float x = accumulated[idx];
+            float y = accumulated[idx + 1];
+            float z = accumulated[idx + 2];
+            final float len2 = x * x + y * y + z * z;
+            if (len2 > 0f) {
+                final float invLen = 1f / (float) Math.sqrt(len2);
+                accumulated[idx] = x * invLen;
+                accumulated[idx + 1] = y * invLen;
+                accumulated[idx + 2] = z * invLen;
+            } else {
+                // Fallback: use the normalized vertex position.
+                final float px = verts.get(idx);
+                final float py = verts.get(idx + 1);
+                final float pz = verts.get(idx + 2);
+                final float plen2 = px * px + py * py + pz * pz;
+                if (plen2 > 0f) {
+                    final float invLen = 1f / (float) Math.sqrt(plen2);
+                    accumulated[idx] = px * invLen;
+                    accumulated[idx + 1] = py * invLen;
+                    accumulated[idx + 2] = pz * invLen;
+                } else {
+                    accumulated[idx + 1] = 1f;
+                }
+            }
+        }
+
+        group.computedNormals = accumulated;
+    }
+
     private Group setActiveGroup(String name) {
         for (Group group : groups) {
             if (group.name.equals(name))
@@ -288,6 +405,8 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
         int numFaces;
         boolean hasNorms;
         boolean hasUVs;
+        /** Smooth vertex normals computed in the loader (indexed by vertex, 3 floats per vertex). Null if not computed. */
+        float[] computedNormals;
 
         Group(String name) {
             this.name = name;
