@@ -18,6 +18,7 @@ import gaiasky.data.group.MetadataBinaryIO;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -230,6 +231,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
             var base = Mapper.base.get(entity);
             base.setName(name);
+            base.setComponentType(ComponentTypes.ComponentType.Stars);
             base.opacity = 1;
 
             var graph = Mapper.graph.get(entity);
