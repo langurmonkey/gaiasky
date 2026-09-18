@@ -156,7 +156,7 @@ public class ModelExtractor extends AbstractExtractSystem {
         }
         addToRender(render, rg);
 
-        if (model.model != null && model.model.lodSphere != null) {
+        if (model.model != null && model.model.lodSphere != null && false) {
             var graph = Mapper.graph.get(render.entity);
             // Gather visible nodes from current position.
             model.model.lodSphere.update(GaiaSky.instance.getICamera(), body.size, graph.localTransform);
