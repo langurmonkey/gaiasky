@@ -140,6 +140,19 @@ vec2 ds_div(vec2 dsa, vec2 dsb) {
     return dsc;
 }
 
+// Modulo: res = ds_mod(a, f) => res = a mod f
+// Uses the identity a mod f = a - f * trunc(a / f), computed in
+// double-single precision so the result is accurate even when
+// a is much larger than f.
+vec2 ds_mod(vec2 dsa, float f) {
+    vec2 fs = ds_set(f);
+    vec2 q = ds_div(dsa, fs);
+    // Truncate toward zero, in double-single precision.
+    float t = trunc(q.x);
+    vec2 qt = ds_set(t);
+    return ds_sub(dsa, ds_mul(fs, qt));
+}
+
 // result = pow(dsa, 2)
 vec2 ds_pow2(vec2 dsa) {
     return ds_mul(dsa, dsa);

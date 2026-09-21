@@ -20,6 +20,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
@@ -30,14 +31,12 @@ import gaiasky.scene.record.ModelType;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.scene.record.ParticleKepler;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.util.DatasetCard;
 import gaiasky.util.Constants;
+import gaiasky.util.DatasetCard;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Nature;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL41;
@@ -63,7 +62,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     }
 
     @Override
-    protected void addAttributesDivisor1(Array<VertexAttribute> attributes, int primitive) {
+    protected void addAttributesDivisor1(Array<VertexAttribute> attributes,
+                                         int primitive) {
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems1, 4, "a_orbitelems01"));
         attributes.add(new VertexAttribute(OwnUsage.OrbitElems2, 4, "a_orbitelems02"));
@@ -72,12 +72,14 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
     }
 
     @Override
-    protected void offsets0(MeshData curr, InstancedModel model) {
+    protected void offsets0(MeshData curr,
+                            InstancedModel model) {
         // Unused
     }
 
     @Override
-    protected void offsets1(MeshData curr, InstancedModel model) {
+    protected void offsets1(MeshData curr,
+                            InstancedModel model) {
         curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ?
                 curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
         model.elems01Offset = curr.mesh.getInstancedAttribute(OwnUsage.OrbitElems1) != null ?
@@ -292,25 +294,10 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     // VR scale.
                     shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
 
-                    // Time computation. We emulate double with vec2.
-                    if (set != null && set.epochJd == 0) {
-                        // Hack for precision in rings.
-                        // Since the seconds are paramount in rings (time scales are much smaller than asteroids for instance), we just wrap it
-                        // after a year.
-                        var startTimeSecs = GaiaSky.instance.getStartTimeScene() / 1000.0;
-                        double currSeconds = (GaiaSky.instance.time.getTimeSeconds() - startTimeSecs) % Nature.Y_TO_S;
-
-                        float curRt1 = (float) currSeconds;
-                        float curRt2 = (float) (currSeconds - (double) curRt1);
-                        shaderProgram.setUniformf("u_t", curRt1, curRt2);
-                        shaderProgram.setUniformi("u_tInSecs", 1);
-                    } else {
-                        double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
-                        float curRt1 = (float) curRt;
-                        float curRt2 = (float) (curRt - (double) curRt1);
-                        shaderProgram.setUniformf("u_t", curRt1, curRt2);
-                        shaderProgram.setUniformi("u_tInSecs", 0);
-                    }
+                    double curRt = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
+                    float curRt1 = (float) curRt;
+                    float curRt2 = (float) (curRt - (double) curRt1);
+                    shaderProgram.setUniformf("u_t", curRt1, curRt2);
 
                     // Ref-sys transform and dataset position.
                     setRefSysTransformAndDatasetPosUniforms(shaderProgram, graph, set);

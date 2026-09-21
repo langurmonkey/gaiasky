@@ -14,8 +14,6 @@ uniform mat4 u_refSysTransform;
 uniform vec2 u_sizeLimits;
 // Current julian date, in days, emulates a double in vec2
 uniform vec2 u_t;
-// Is the time already in seconds? (optimization)
-uniform int u_tInSecs;
 // VR scale factor
 uniform float u_vrScale;
 // Arbitrary affine transformation(s)
@@ -71,24 +69,30 @@ vec4 keplerToCartesian() {
     // Mean anomaly at epoch (rad)
     float M0 = a_orbitelems02.w;
 
-    // Time since epoch in seconds
-    float deltat = 0.0;
-    if (u_tInSecs == 1) {
-        // Here we use the optimization for ring particles.
-        // Time is in seconds, epoch is 0.
-        deltat = u_t.x;
+    // Mean motion (rad/day)
+    float n = PI2 / period;
+
+    // Time since epoch, in days (double, emulated)
+    vec2 deltat_d;
+    if (epoch == 0.0) {
+        // A: epoch is start-of-time; u_t is already "time since epoch".
+        deltat_d = u_t;
     } else {
-        // Here time is physical in days.
-        vec2 epoch_d = ds_set(epoch);
-        vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(D_TO_S));
-        deltat = deltat_d.x;
+        deltat_d = ds_add(u_t, ds_set(-epoch));
     }
 
-    // Mean motion (rad/s)
-    float n = PI2 / (period * D_TO_S);
-
-    // Mean anomaly at target time
-    float M = mod(M0 + n * deltat, PI2);
+    // Mean anomaly: accumulate in double, reduce mod 2π in double,
+    // then convert to float. This is the key precision step.
+    // First reduce deltat modulo the orbital period (in double): M is
+    // exactly periodic in `period`, so this is equivalent, but it keeps
+    // n * deltat small so that the single-precision rounding error of n
+    // (~2e-7 relative) is not amplified over large time spans (JD ~ 2.5e6 d
+    // would otherwise produce errors of several radians).
+    vec2 deltat_p = ds_mod(deltat_d, period);
+    vec2 nd = ds_mul(deltat_p, ds_set(n));      // n * deltat, double
+    vec2 M_d = ds_add(ds_set(M0), nd);
+    M_d = ds_mod(M_d, PI2);
+    float M = M_d.x;                            // now in [0, 2π), float-exact
 
     // Solve Kepler’s equation: M = E - e * sin(E)
     float E = (e < 0.8) ? M : PI;
