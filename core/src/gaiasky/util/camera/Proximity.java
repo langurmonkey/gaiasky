@@ -467,6 +467,16 @@ public class Proximity {
         }
 
         @Override
+        public double getLogG() {
+            return 0;
+        }
+
+        @Override
+        public double getMh() {
+            return 0;
+        }
+
+        @Override
         public double getElevationAt(Vector3Q camPos) {
             return 0;
         }

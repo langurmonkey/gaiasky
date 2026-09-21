@@ -62,10 +62,12 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final Vector3D pos;
     private final Vector3Q posQ;
     protected Skin skin;
-    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, focusTEff, radiusSptLabel, tEffLabel;
+    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol,
+            focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadiusSpt, radiusSptLabel, focusTEff, tEffLabel, focusLogG, logGLabel, focusMh, mhLabel;
     protected OwnTextIconButton goTo, landOn, landAt, refreshOrbit, proceduralPlanet, proceduralGalaxy;
     protected OwnImageButton objectVisibility, forceLabel, bookmark;
-    protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC, camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel, rulerName, rulerName0, rulerName1, rulerDist;
+    protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC, camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel,
+            RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel, rulerName, rulerName0, rulerName1, rulerDist;
     protected Link toggleSize;
     protected ITextTooltip toggleSizeTooltip;
     protected HorizontalGroup focusActionsGroup;
@@ -127,6 +129,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusDistCam = new OwnLabel("", skin, "hud");
         focusRadiusSpt = new OwnLabel("", skin, "hud");
         focusTEff = new OwnLabel("", skin, "hud");
+        focusLogG = new OwnLabel("", skin, "hud");
+        focusMh = new OwnLabel("", skin, "hud");
 
         // Labels
         appMagEarthLabel = new OwnLabel(I18n.msg("gui.focusinfo.appmag.earth"), skin, "hud");
@@ -353,6 +357,10 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusInfo.add(focusRadiusSpt).left().padLeft(pad15).row();
         focusInfo.add(tEffLabel = new OwnLabel(I18n.msg("gui.focusinfo.teff"), skin, "hud")).left();
         focusInfo.add(focusTEff).left().padLeft(pad15).row();
+        focusInfo.add(logGLabel = new OwnLabel(I18n.msg("gui.focusinfo.logg"), skin, "hud")).left();
+        focusInfo.add(focusLogG).left().padLeft(pad15).row();
+        focusInfo.add(mhLabel = new OwnLabel(I18n.msg("gui.focusinfo.mh"), skin, "hud")).left();
+        focusInfo.add(focusMh).left().padLeft(pad15).row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad10);
 
         // POINTER INFO
@@ -702,6 +710,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
                     radiusSptLabel.setText(I18n.msg("gui.focusinfo.sptype"));
 
+                    // T_eff, spectral type
                     var tEff = view.getTEff();
                     if (Double.isFinite(tEff) && tEff > 0) {
                         focusTEff.setText(GlobalResources.formatNumber(tEff) + " " + I18n.msg("gui.unit.kelvin"));
@@ -710,6 +719,26 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                         focusRadiusSpt.setText("?");
                         focusTEff.setText("?");
                     }
+                    // Log(g)
+                    var logG = view.getLogG();
+                    if (Double.isFinite(logG)) {
+                        logGLabel.setVisible(true);
+                        focusLogG.setVisible(true);
+                        focusLogG.setText(GlobalResources.formatNumber(logG) + " " + I18n.msg("gui.unit.logg"));
+                    } else {
+                        logGLabel.setVisible(false);
+                        focusLogG.setVisible(false);
+                    }
+                    // MH
+                    var mh = view.getMh();
+                    if (Double.isFinite(mh)) {
+                        mhLabel.setVisible(true);
+                        focusMh.setVisible(true);
+                        focusMh.setText(GlobalResources.formatNumber(mh) + " " + I18n.msg("gui.unit.dex"));
+                    } else {
+                        mhLabel.setVisible(false);
+                        focusMh.setVisible(false);
+                    }
                 } else {
                     radiusSptLabel.setText(I18n.msg("gui.focusinfo.radius"));
                     var rad = GlobalResources.doubleToDistanceString(view.getRadius(), settings.program.ui.distanceUnits);
@@ -717,6 +746,10 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
                     tEffLabel.setVisible(false);
                     focusTEff.setVisible(false);
+                    logGLabel.setVisible(false);
+                    focusLogG.setVisible(false);
+                    mhLabel.setVisible(false);
+                    focusMh.setVisible(false);
                 }
 
                 // Go-to button status.

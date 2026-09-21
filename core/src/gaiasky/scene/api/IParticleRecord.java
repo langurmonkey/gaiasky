@@ -163,6 +163,19 @@ public interface IParticleRecord {
     default float tEff() {
         return -1;
     }
+    /**
+     * @return The surface gravity in log(cm.s**-2).
+     */
+    default float logG() {
+        return -1;
+    }
+
+    /**
+     * @return The stellar metallicity in dex.
+     */
+    default float mh() {
+        return -1;
+    }
 
     default double epoch() {
         return 0;

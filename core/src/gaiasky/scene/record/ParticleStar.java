@@ -38,7 +38,10 @@ import gaiasky.util.ucd.UCD;
  * @param color     Packed color.
  * @param size      Size.
  * @param hip       HIP number.
- * @param tEff16    Effective temperature.
+ * @param tEff16    Effective temperature [K].
+ * @param logG16    Log_G (stellar surface gravity [log(cm.s**-2)]).
+ * @param mh16      Stellar metallicity [dex].
+ *
  * @param extra     Map with extra attributes.
  */
 public record ParticleStar(long id,
@@ -58,6 +61,8 @@ public record ParticleStar(long id,
                            float size,
                            int hip,
                            short tEff16,
+                           short logG16,
+                           short mh16,
                            ObjectMap<UCD, Object> extra) implements IParticleRecord {
 
     public ParticleStar(long id,
@@ -77,10 +82,12 @@ public record ParticleStar(long id,
                         float size,
                         int hip,
                         float tEff,
+                        float logG,
+                        float mh,
                         ObjectMap<UCD, Object> extra) {
         this(id, names, x, y, z, Float.floatToFloat16(muAlpha), Float.floatToFloat16(muDelta), Float.floatToFloat16(radVel),
              vx, vy, vz, Float.floatToFloat16(appMag), Float.floatToFloat16(absMag), color, size, hip,
-             Float.floatToFloat16(tEff), extra);
+             Float.floatToFloat16(tEff), Float.floatToFloat16(logG), Float.floatToFloat16(mh), extra);
     }
 
     @Override
@@ -258,6 +265,16 @@ public record ParticleStar(long id,
     @Override
     public float tEff() {
        return Float.float16ToFloat(tEff16);
+    }
+
+    @Override
+    public float logG() {
+        return Float.float16ToFloat(logG16);
+    }
+
+    @Override
+    public float mh() {
+        return Float.float16ToFloat(mh16);
     }
 
     @Override

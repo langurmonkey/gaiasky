@@ -850,6 +850,14 @@ public class ParticleSet implements Component, IDisposable {
         return isStars ? focus.tEff() : -1;
     }
 
+    public double getLogG() {
+        return isStars ? focus.logG() : -1;
+    }
+
+    public double getMh() {
+        return isStars ? focus.mh() : -1;
+    }
+
     /**
      * Updates the parameters of the focus, if the focus is active in this group
      *

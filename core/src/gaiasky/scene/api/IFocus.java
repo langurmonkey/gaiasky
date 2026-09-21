@@ -280,11 +280,19 @@ public interface IFocus {
     double getRadius();
 
     /**
-     * Return the effective temperature.
-     *
      * @return The effective temperature of the object, in Kelvins.
      */
     double getTEff();
+
+    /**
+     * @return The surface gravity, in log(cm.s**-2). Only for stars.
+     */
+    double getLogG();
+
+    /**
+     * @return The metallicity, in dex. Only for stars.
+     */
+    double getMh();
 
     /**
      * Return the surface elevation of the projected position of the current camera

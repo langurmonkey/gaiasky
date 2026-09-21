@@ -101,7 +101,7 @@ public class BinaryVersion3 implements BinaryIO {
         }
 
         return new ParticleStar(id, names, dataD[0], dataD[1], dataD[2], dataF[3], dataF[4], dataF[5], dataF[0], dataF[1], dataF[2], dataF[6],
-                                dataF[7], dataF[8], dataF[9], (int) dataF[10], dataF[11], null);
+                                dataF[7], dataF[8], dataF[9], (int) dataF[10], dataF[11], Float.NaN, Float.NaN, null);
     }
 
     @Override

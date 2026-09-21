@@ -727,6 +727,32 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
+    public double getLogG() {
+        if (!isValid()) {
+            return 0;
+        }
+        var set = getStarSet();
+        if (set != null) {
+            return set.getLogG();
+        } else {
+            return extra != null ? extra.logG : Double.NaN;
+        }
+    }
+
+    @Override
+    public double getMh() {
+        if (!isValid()) {
+            return 0;
+        }
+        var set = getStarSet();
+        if (set != null) {
+            return set.getMh();
+        }else {
+            return extra != null ? extra.mh : Double.NaN;
+        }
+    }
+
+    @Override
     public double getElevationAt(Vector3Q camPos) {
         if (!isValid()) {
             return 0;

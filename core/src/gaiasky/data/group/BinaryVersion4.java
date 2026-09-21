@@ -14,29 +14,21 @@ import gaiasky.data.group.reader.MappedBufferDataReader;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleStar;
 import gaiasky.util.Constants;
+import gaiasky.util.parse.Parser;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
+import java.util.Arrays;
 
 /**
- * Implements the base data loading for binary versions 0, 1, and 2.
+ * The binary version 4 includes the log_G and the metallicity.
  */
-public abstract class BinaryIOBase implements BinaryIO {
-    protected final int nDoubles;
-    protected final int nFloats;
+public class BinaryVersion4 implements BinaryIO {
 
-    protected boolean hipId;
-    protected boolean tychoIds;
-
-    protected BinaryIOBase(int nDoubles,
-                           int nFloats,
-                           boolean hipId,
-                           boolean tychoIds) {
-        this.hipId = hipId;
-        this.tychoIds = tychoIds;
-        this.nDoubles = nDoubles;
-        this.nFloats = nFloats;
+    protected BinaryVersion4() {
+        super();
     }
 
     @Override
@@ -57,39 +49,25 @@ public abstract class BinaryIOBase implements BinaryIO {
         float[] dataF = new float[14];
         int floatOffset = 0;
         // Double
-        for (int i = 0; i < nDoubles; i++) {
-            if (i < dataD.length) {
-                // Goes to double array
-                dataD[i] = in.readDouble();
-                dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
-            } else {
-                // Goes to float array
-                int idx = i - dataD.length;
-                dataF[idx] = (float) in.readDouble();
-                floatOffset = idx + 1;
-            }
+        for (int i = 0; i < 3; i++) {
+            // Goes to double array
+            dataD[i] = in.readDouble();
+            dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
         }
         // Float
-        for (int i = 0; i < nFloats; i++) {
+        for (int i = 0; i < 11; i++) {
             int idx = i + floatOffset;
             dataF[idx] = in.readFloat();
             // Scale proper motions and size
             if (idx <= 2 || idx == 9)
                 dataF[idx] *= (float) Constants.DISTANCE_SCALE_FACTOR;
         }
-        // Version 2: we have the HIP number in the data file.
-        if (hipId) {
-            // HIP
-            dataF[10] = in.readInt();
-        }
-
-        // TYCHO
-        if (tychoIds) {
-            // Skip unused tycho numbers, 3 Integers
-            in.readInt();
-            in.readInt();
-            in.readInt();
-        }
+        // The last one is actually the TEFF.
+        dataF[11] = dataF[10];
+        dataF[10] = -1;
+        // Log_G and metallicity
+        dataF[12] = dataF[11];
+        dataF[13] = dataF[12];
 
         // ID
         long id = in.readLong();
@@ -107,7 +85,60 @@ public abstract class BinaryIOBase implements BinaryIO {
                     .split(Constants.nameSeparatorRegex);
         }
 
+        // Version 3: we take the HIP number from the names array.
+        // HIP from names.
+        var hipName = Arrays.stream(names)
+                .filter(name -> name.startsWith("HIP "))
+                .toList();
+        if (!hipName.isEmpty()) {
+            var name = hipName.get(0)
+                    .trim();
+            // We parse the hip id from the string (e.g. we take "2334" from "HIP 2334").
+            if (name.length() > 4) {
+                try {
+                    dataF[10] = Parser.parseIntException(name.substring(4));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
         return new ParticleStar(id, names, dataD[0], dataD[1], dataD[2], dataF[3], dataF[4], dataF[5], dataF[0], dataF[1], dataF[2], dataF[6],
                                 dataF[7], dataF[8], dataF[9], (int) dataF[10], dataF[11], dataF[12], dataF[13], null);
+    }
+
+    @Override
+    public void writeParticleRecord(IParticleRecord sb,
+                                    DataOutputStream out) throws IOException {
+        // 3 doubles
+        out.writeDouble(sb.x());
+        out.writeDouble(sb.y());
+        out.writeDouble(sb.z());
+
+        // 13 floats
+        out.writeFloat(sb.vx());
+        out.writeFloat(sb.vy());
+        out.writeFloat(sb.vz());
+        out.writeFloat(sb.muAlpha());
+        out.writeFloat(sb.muDelta());
+        out.writeFloat(sb.radVel());
+        out.writeFloat(sb.appMag());
+        out.writeFloat(sb.absMag());
+        out.writeFloat(sb.color());
+        out.writeFloat(sb.size());
+        out.writeFloat(sb.tEff());
+        out.writeFloat(sb.logG());
+        out.writeFloat(sb.mh());
+
+        // ID
+        out.writeLong(sb.id());
+
+        // NAME
+        String namesConcat = sb.namesConcat();
+        if (namesConcat == null || namesConcat.isEmpty()) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(namesConcat.length());
+            out.writeChars(namesConcat);
+        }
     }
 }

@@ -1039,6 +1039,21 @@
         "aliases": [
           "teff"
         ]
+      },
+      "logG": {
+        "description": "Surface gravity of the star in log(cm.s**2).",
+        "unit": "Double",
+        "aliases": [
+          "logg",
+          "surfaceGravity"
+        ]
+      },
+      "mh": {
+        "description": "Metallicity of the star in dex.",
+        "unit": "Double",
+        "aliases": [
+          "metallicity"
+        ]
       }
     },
     "Mesh": {

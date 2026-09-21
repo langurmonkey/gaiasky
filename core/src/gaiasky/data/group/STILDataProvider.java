@@ -585,6 +585,28 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 tEff = (float) bvToTEff.bvToTeff(colorIndex);
                             }
 
+                            // LOG_G
+                            float logG = Float.NaN;
+                            if (!ucdParser.LOGG.isEmpty()) {
+                                Pair<UCD, Double> logGPair = getDoubleUcd(ucdParser.LOGG, row);
+                                if (logGPair != null) {
+                                    // Use value from table.
+                                    logG = logGPair.getSecond()
+                                            .floatValue();
+                                }
+                            }
+
+                            // Metallicity
+                            float mh = Float.NaN;
+                            if (!ucdParser.MH.isEmpty()) {
+                                Pair<UCD, Double> mhPair = getDoubleUcd(ucdParser.MH, row);
+                                if (mhPair != null) {
+                                    // Use value from table.
+                                    mh = mhPair.getSecond()
+                                            .floatValue();
+                                }
+                            }
+
                             // RGB COLOR (PACKED) from COLOR INDEX or effective temperature.
                             float colorPacked;
                             float[] rgb = null;
@@ -695,7 +717,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 } else {
                                     pr = new ParticleStar(id, names, p.realPosition.x, p.realPosition.y, p.realPosition.z, (float) muAlphaStar,
                                                           (float) muDelta, (float) radVel, (float) pm.x, (float) pm.y, (float) pm.z, (float) appMag,
-                                                          (float) absMag, colorPacked, (float) sizePc, hip, tEff, extraAttributes);
+                                                          (float) absMag, colorPacked, (float) sizePc, hip, tEff, logG, mh, extraAttributes);
                                 }
 
                                 list.add(pr);

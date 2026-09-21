@@ -25,14 +25,44 @@ public class ParticleExtra implements Component, ICopy {
     public double radius;
     /** Effective temperature of the star, in Kelvin. **/
     public double tEff = -1;
+    /** The surface gravity in log(cm.s**-2). **/
+    public double logG = Double.NaN;
+    /** The metallicity in dex. **/
+    public double mh = Double.NaN;
+    /** Primitive render scale. **/
     public double primitiveRenderScale;
 
     public void setTEff(Double tEff) {
         this.tEff = tEff;
     }
+
     public void setteff(Double tEff) {
-        setTEff(tEff);
+        this.setTEff(tEff);
     }
+    public void setEffectiveTemperature(Double tEff) {
+        this.setTEff(tEff);
+    }
+
+    public void setLogG(Double logG) {
+        this.logG = logG;
+    }
+
+    public void setLogg(Double logG) {
+        this.setSurfaceGravity(logG);
+    }
+
+    public void setSurfaceGravity(Double logG) {
+        this.setSurfaceGravity(logG);
+    }
+
+    public void setMh(Double mh) {
+        this.mh = mh;
+    }
+
+    public void setMetallicity(Double mh) {
+        this.setMh(mh);
+    }
+
     public void setPrimitiveRenderScale(Double primitiveRenderScale) {
         this.primitiveRenderScale = primitiveRenderScale;
     }

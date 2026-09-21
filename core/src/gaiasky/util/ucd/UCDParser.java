@@ -34,7 +34,9 @@ public class UCDParser {
     public static String[] PLLX_NAMES = new String[] { "plx", "parallax", "pllx", "par" };
     public static String[] MAG_NAMES = new String[] { "phot_g_mean_mag", "mag", "g_mag", "bmag", "gmag" };
     public static String[] COLOR_NAMES = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
-    public static String[] TEFF_NAMES = new String[] { "teff", "t_eff", "temperature", "effective_temperature" };
+    public static String[] TEFF_NAMES = new String[] { "teff", "t_eff", "temperature", "effective_temperature", "teff_gspphot" };
+    public static String[] LOGG_NAMES = new String[] { "logg", "log_g", "surface_gravity" };
+    public static String[] MH_NAMES = new String[] { "mh", "m_h", "metallicity", "stellar_metallicity" };
     public static String[] PMRA_NAMES = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
     public static String[] PMDEC_NAMES = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
     public static String[] RADVEL_NAMES = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
@@ -76,6 +78,10 @@ public class UCDParser {
     public Array<UCD> SIZE;
     public boolean hasTEff;
     public Array<UCD> TEFF;
+    public boolean hasLogG;
+    public Array<UCD> LOGG;
+    public boolean hasMh;
+    public Array<UCD> MH;
     // VARIABILITY
     public boolean hasVariability;
     public boolean hasPeriod;
@@ -415,6 +421,34 @@ public class UCDParser {
             this.TEFF = getByColNames(TEFF_NAMES);
         }
         this.hasTEff = !this.TEFF.isEmpty();
+
+        // LOG_G
+        if (phys != null) {
+            for (UCD candidate : phys) {
+                if (candidate.UCD[0].length >= 2 && candidate.UCD[0][1].equals("gravity")) {
+                    this.LOGG.add(candidate);
+                    break;
+                }
+            }
+        }
+        if (this.LOGG == null || this.LOGG.isEmpty()) {
+            this.LOGG = getByColNames(LOGG_NAMES);
+        }
+        this.hasLogG = !this.LOGG.isEmpty();
+
+        // METALLICITY
+        if (phys != null) {
+            for (UCD candidate : phys) {
+                if (candidate.UCD[0].length >= 3 && candidate.UCD[0][1].equals("abund") && candidate.UCD[0][2].equalsIgnoreCase("Z") ) {
+                    this.MH.add(candidate);
+                    break;
+                }
+            }
+        }
+        if (this.MH == null || this.MH.isEmpty()) {
+            this.MH = getByColNames(MH_NAMES);
+        }
+        this.hasMh = !this.MH.isEmpty();
 
         // VARIABILITY
         Array<UCD> vari = ucdmap.get(UCDType.VARI);
