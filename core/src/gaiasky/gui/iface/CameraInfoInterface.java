@@ -721,7 +721,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     }
                     // Log(g)
                     var logG = view.getLogG();
-                    if (Double.isFinite(logG)) {
+                    if (Double.isFinite(logG) && logG > 0) {
                         logGLabel.setVisible(true);
                         focusLogG.setVisible(true);
                         focusLogG.setText(GlobalResources.formatNumber(logG) + " " + I18n.msg("gui.unit.logg"));
@@ -731,7 +731,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     }
                     // MH
                     var mh = view.getMh();
-                    if (Double.isFinite(mh)) {
+                    if (Double.isFinite(mh) && mh > 0) {
                         mhLabel.setVisible(true);
                         focusMh.setVisible(true);
                         focusMh.setText(GlobalResources.formatNumber(mh) + " " + I18n.msg("gui.unit.dex"));
@@ -751,6 +751,8 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     mhLabel.setVisible(false);
                     focusMh.setVisible(false);
                 }
+                focusInfo.pack();
+
 
                 // Go-to button status.
                 goTo.setDisabled(!isGoToEnabled());

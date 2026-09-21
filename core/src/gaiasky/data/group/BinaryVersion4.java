@@ -55,7 +55,7 @@ public class BinaryVersion4 implements BinaryIO {
             dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
         }
         // Float
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < 13; i++) {
             int idx = i + floatOffset;
             dataF[idx] = in.readFloat();
             // Scale proper motions and size
@@ -65,9 +65,6 @@ public class BinaryVersion4 implements BinaryIO {
         // The last one is actually the TEFF.
         dataF[11] = dataF[10];
         dataF[10] = -1;
-        // Log_G and metallicity
-        dataF[12] = dataF[11];
-        dataF[13] = dataF[12];
 
         // ID
         long id = in.readLong();

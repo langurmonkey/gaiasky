@@ -48,11 +48,12 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     public BinaryDataProvider() {
         super();
 
-        binaryVersions = new BinaryIO[4];
+        binaryVersions = new BinaryIO[5];
         binaryVersions[0] = new BinaryVersion0();
         binaryVersions[1] = new BinaryVersion1();
         binaryVersions[2] = new BinaryVersion2();
         binaryVersions[3] = new BinaryVersion3();
+        binaryVersions[4] = new BinaryVersion4();
     }
 
     @Override
