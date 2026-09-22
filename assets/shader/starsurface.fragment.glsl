@@ -24,7 +24,7 @@ in vec3 v_viewVec;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 layerBuffer;
 
-#define time v_time * 0.001
+#define time v_time * 0.6
 
 #include <shader/lib/luma.glsl>
 #include <shader/lib/noise/common.glsl>
@@ -46,12 +46,10 @@ void main() {
 
     // Star surface
     gln_tFBMOpts opts = gln_tFBMOpts(0.3245, // seed
-            0.1, // amplitude
             1.4, // persistence
-            80.0, // frequency
+            40.0, // frequency
             2.0, // lacunarity
-            vec3(4.0, 4.0, 4.0), // scale
-            1.0, // power
+            vec3(2.0, 2.0, 2.0), // scale
             1, // octaves
             false,
             false);
@@ -61,18 +59,26 @@ void main() {
     // Sample on the surface of a sphere.
     float phiStep = gln_PI / (viewport.y - 1);
     float phi = (-gln_PI / 2.0) + xy.y * phiStep;
-    float r = triangle_wave(time) * 0.2 + 1.0;
     float thetaStep = gln_PI * 2.0 / viewport.x;
     float theta = xy.x * thetaStep;
     float cosPhi = cos(phi);
-    // P is a point in the sphere.
+    // Cross-faded time evolution: the pattern morphs in place, without
+    // translating across the surface (no apparent rotation or drift).
+    // Sample the noise at two consecutive integer time steps and blend
+    // between them with the fractional part of the time.
+    float tf = time;
+    float t0 = floor(tf);
+    float blend = smoothstep(0.0, 1.0, tf - t0);
     vec3 p = vec3(
-            cosPhi * cos(theta) + r,
+            cosPhi * cos(theta),
             cosPhi * sin(theta),
             sin(phi)
         );
-
-    float n = (gln_cfbm(p, opts) + 1.6) * 0.12;
+    float value0 = gln_cfbm(p + t0, opts);
+    float value1 = gln_cfbm(p + t0 + 1.0, opts);
+    float value = mix(value0, value1, blend);
+    value = gln_map(value, -0.4, 0.4, 0.0, 1.0);
+    float n = (value + 1.0) * 0.1;
 
     // Sunspots
     float s = 0.47;

@@ -126,3 +126,41 @@ float gln_curl(vec3 p) {
     const float divisor = 1.0 / (2.0 * e);
     return luma(normalize(vec3(x, y, z) * divisor));
 }
+/**
+ * Generates 3D Fractional Brownian motion (fBm) from Curl Noise.
+ *
+ * @name gln_pfbm
+ * @function
+ * @param {vec3} p               Point to sample fBm at.
+ * @param {gln_tFBMOpts} opts    Options for generating Perlin Noise.
+ * @return {float}               Value of fBm at point "p".
+ */
+float gln_cfbm(vec3 p, gln_tFBMOpts opts) {
+    p += (opts.seed * 100.0);
+    float result = 0.0;
+    float amplitude = 1.0;
+    float frequency = opts.frequency;
+    float maximum = amplitude;
+
+    for (int i = 0; i < MAX_FBM_ITERATIONS; i++) {
+        if (i >= opts.octaves)
+        break;
+
+        vec3 p = p * frequency * opts.scale;
+
+        float noiseVal = gln_curl(p);
+        result += noiseVal * amplitude;
+
+        frequency *= opts.lacunarity;
+        amplitude *= opts.persistence;
+        maximum += amplitude;
+    }
+
+    float value = result / maximum;
+    // Map to [0,1] before pow to avoid NaN from pow(negative, non-integer).
+    // If turbulence/ridge are on, then the result is already in [0,1].
+    if (!opts.turbulence && !opts.ridge) {
+        value = gln_map(value, -1.0, 1.0, 0.0, 1.0);
+    }
+    return value;
+}
