@@ -58,7 +58,7 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
     private final FocusView view;
     private final Table focusInfo, moreInfo, rulerInfo, focusNames, content;
     private final Cell<Table> contentCell;
-    private final Cell<?> focusInfoCell, rulerCell;
+    private final Cell<?> focusInfoCell, rulerCell, logGLabelCell, logGCell, mhLabelCell, mhCell;
     private final Vector3D pos;
     private final Vector3Q posQ;
     protected Skin skin;
@@ -357,10 +357,12 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
         focusInfo.add(focusRadiusSpt).left().padLeft(pad15).row();
         focusInfo.add(tEffLabel = new OwnLabel(I18n.msg("gui.focusinfo.teff"), skin, "hud")).left();
         focusInfo.add(focusTEff).left().padLeft(pad15).row();
-        focusInfo.add(logGLabel = new OwnLabel(I18n.msg("gui.focusinfo.logg"), skin, "hud")).left();
-        focusInfo.add(focusLogG).left().padLeft(pad15).row();
-        focusInfo.add(mhLabel = new OwnLabel(I18n.msg("gui.focusinfo.mh"), skin, "hud")).left();
-        focusInfo.add(focusMh).left().padLeft(pad15).row();
+        logGLabelCell = focusInfo.add(logGLabel = new OwnLabel(I18n.msg("gui.focusinfo.logg"), skin, "hud")).left();
+        logGCell = focusInfo.add(focusLogG).left().padLeft(pad15);
+        logGCell.row();
+        mhLabelCell = focusInfo.add(mhLabel = new OwnLabel(I18n.msg("gui.focusinfo.mh"), skin, "hud")).left();
+        mhCell = focusInfo.add(focusMh).left().padLeft(pad15);
+        mhCell.row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad10);
 
         // POINTER INFO
@@ -722,22 +724,22 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
                     // Log(g)
                     var logG = view.getLogG();
                     if (Double.isFinite(logG) && logG > 0) {
-                        logGLabel.setVisible(true);
-                        focusLogG.setVisible(true);
+                        logGLabelCell.setActor(logGLabel);
+                        logGCell.setActor(focusLogG);
                         focusLogG.setText(GlobalResources.formatNumber(logG) + " " + I18n.msg("gui.unit.logg"));
                     } else {
-                        logGLabel.setVisible(false);
-                        focusLogG.setVisible(false);
+                        logGLabelCell.clearActor();
+                        logGCell.clearActor();
                     }
                     // MH
                     var mh = view.getMh();
                     if (Double.isFinite(mh) && mh > 0) {
-                        mhLabel.setVisible(true);
-                        focusMh.setVisible(true);
+                        mhLabelCell.setActor(mhLabel);
+                        mhCell.setActor(focusMh);
                         focusMh.setText(GlobalResources.formatNumber(mh) + " " + I18n.msg("gui.unit.dex"));
                     } else {
-                        mhLabel.setVisible(false);
-                        focusMh.setVisible(false);
+                        mhLabelCell.clearActor();
+                        mhCell.clearActor();
                     }
                 } else {
                     radiusSptLabel.setText(I18n.msg("gui.focusinfo.radius"));
@@ -746,10 +748,10 @@ public class CameraInfoInterface extends TableGuiInterface implements IObserver 
 
                     tEffLabel.setVisible(false);
                     focusTEff.setVisible(false);
-                    logGLabel.setVisible(false);
-                    focusLogG.setVisible(false);
-                    mhLabel.setVisible(false);
-                    focusMh.setVisible(false);
+                    logGLabelCell.clearActor();
+                    logGCell.clearActor();
+                    mhLabelCell.clearActor();
+                    mhCell.clearActor();
                 }
                 focusInfo.pack();
 
