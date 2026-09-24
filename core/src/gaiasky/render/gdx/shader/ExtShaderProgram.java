@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.render.ShaderCompilationException;
+import gaiasky.render.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.SysUtils;
@@ -1127,13 +1128,41 @@ public class ExtShaderProgram implements Disposable {
 
     private void checkManaged() {
         if (invalidated) {
+            // Re-read the shader sources from disk when the source files are
+            // known, so that shader hot-reloading (Ctrl+Shift+Y) picks up
+            // changes on disk. Falls back to the stored sources otherwise.
+            String vs = reloadSource(vertexShaderFile, vertexShaderSource, prependVertexCode);
+            String gs = reloadSource(geometryShaderFile, geometryShaderSource, prependGeometryCode);
+            String fs = reloadSource(fragmentShaderFile, fragmentShaderSource, prependFragmentCode);
+
             if (geometryShaderSource != null) {
-                compileShaders(getName(), vertexShaderSource, geometryShaderSource, fragmentShaderSource);
+                compileShaders(getName(), vs, gs, fs);
             } else {
-                compileShaders(getName(), vertexShaderSource, fragmentShaderSource);
+                compileShaders(getName(), vs, fs);
             }
             invalidated = false;
         }
+    }
+
+    /**
+     * Loads the shader source from the given file (applying the templating
+     * loader to resolve includes) and prepends the given code. If the file
+     * is null or the load fails, the fallback source is returned as-is.
+     */
+    private String reloadSource(String file, String fallbackSource, String prependCode) {
+        if (file == null) {
+            return fallbackSource;
+        }
+        try {
+            String source = ShaderTemplatingLoader.load(file);
+            if (source != null) {
+                if (prependCode != null && !prependCode.isEmpty())
+                    source = prependCode + source;
+                return source;
+            }
+        } catch (Exception ignored) {
+        }
+        return fallbackSource;
     }
 
     private void addManagedShader(Application app,
