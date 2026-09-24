@@ -51,7 +51,7 @@ void computeShadingTypeColor(vec3 pos, vec3 datasetPos, inout vec4 col) {
     if (u_shadingType != 0 && u_occlusion != 0) {
         // Light Direction (Directional light for parallel rays)
         // If u_lightPos is a position, normalize the vector from planet to light
-        vec3 L = normalize(u_lightPos - u_datasetPos);
+        vec3 L = normalize(u_lightPos - datasetPos);
 
         // Vector to the current particle
         vec3 P = pos - datasetPos;

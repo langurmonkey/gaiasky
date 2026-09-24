@@ -643,13 +643,16 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         shaderProgram.setUniformf("u_lightPos", light.pos);
 
         shaderProgram.setUniformf("u_ambientLight", (float) GaiaSky.settings().scene.renderer.ambient);
-        shaderProgram.setUniformf("u_diffuseScattering", MathUtils.clamp(ambient, 0, 1));
+        shaderProgram.setUniformf("u_diffuseScattering", MathUtils.clamp(ambient, 0, 1) * 0.0f);
         shaderProgram.setUniformi("u_shadingType", shadingType);
         shaderProgram.setUniformf("u_lightIntensity", 1f);
         shaderProgram.setUniformf("u_sphericalPower", sphericalPower);
 
         // Occlusion in ringed planets.
-        if (graph != null && graph.parent != null && Mapper.model.has(graph.parent)) {
+        // Planets have the atmosphere component.
+        if (graph != null
+                && graph.parent != null
+                && Mapper.atmosphere.has(graph.parent)) {
             shaderProgram.setUniformi("u_occlusion", 1);
             var parentBody = Mapper.body.get(graph.parent);
             shaderProgram.setUniformf("u_planetRadius", parentBody.size / 2f);
