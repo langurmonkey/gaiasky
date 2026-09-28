@@ -30,6 +30,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.Camcorder;
+import gaiasky.util.datadesc.DatasetUrlHandler;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
 import org.yaml.snakeyaml.Yaml;
@@ -153,6 +154,15 @@ public class GaiaSkyDesktop {
         try {
             // Check java version.
             javaVersionCheck();
+
+            // Single-instance handling. If a Gaia Sky instance is already
+            // running and a dataset URL was passed, forward it and exit.
+            if (DatasetUrlHandler.isDatasetUrl(cliArgs.parameter)) {
+                if (SingleInstanceManager.forwardToRunningInstance(cliArgs.parameter)) {
+                    out.println("gaiasky: dataset URL forwarded to running instance, exiting");
+                    return;
+                }
+            }
 
             // Experimental features.
             experimentalCheck();

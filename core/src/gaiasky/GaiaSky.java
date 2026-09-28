@@ -549,6 +549,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         welcomeGui = new WelcomeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, cliArgs.skipWelcome, vrStatus);
         welcomeGui.initialize(assetManager, globalResources.getSpriteBatch());
 
+
         if (settings.runtime.openXr) {
             welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new XrInputListener() {
 
@@ -1060,6 +1061,11 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         // Stop
         running.set(false);
 
+        // Single instance manager.
+        if (gaiaSkyAssets != null && gaiaSkyAssets.singleInstanceManager != null) {
+            gaiaSkyAssets.singleInstanceManager.stopServer();
+        }
+
         // Revert back-buffer resolution.
         if (dynamicResolutionLevel > 0 && settings.graphics.backBufferScale == settings.graphics.dynamicResolutionScale[0]) {
             settings.graphics.backBufferScale = 1f;
@@ -1527,7 +1533,10 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         switch (event) {
             case SCENE_LOADED -> {
                 try {
+                    // Activate the REST server.
                     gaiaSkyAssets.restServer.activate();
+                    // Star the single instance manager server.
+                    gaiaSkyAssets.singleInstanceManager.startServer();
                 } catch (SecurityException | IllegalArgumentException e) {
                     logger.error(e);
                 }

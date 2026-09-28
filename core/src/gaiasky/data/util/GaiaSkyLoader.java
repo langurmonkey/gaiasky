@@ -7,6 +7,7 @@
 
 package gaiasky.data.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.gui.bookmarks.BookmarksManager;
+import gaiasky.gui.main.WelcomeGui;
 import gaiasky.render.MainPostProcessor;
 import gaiasky.rest.RESTServer;
 import gaiasky.scene.record.MaterialComponent;
@@ -29,10 +31,7 @@ import gaiasky.scene.record.ModelType;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
-import gaiasky.util.Bits;
-import gaiasky.util.CatalogManager;
-import gaiasky.util.LocationLogManager;
-import gaiasky.util.ModelCache;
+import gaiasky.util.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.svt.SVTManager;
@@ -95,6 +94,15 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
 
         // REST server.
         assets.restServer = new RESTServer(parameter.gaiaSky.getSettings().program.net.restPort);
+
+        // Single instance manager
+        assets.singleInstanceManager = new SingleInstanceManager();
+        assets.singleInstanceManager.addListener(url -> Gdx.app.postRunnable(() -> {
+            var wg = parameter.gaiaSky.welcomeGui;
+            if (wg instanceof WelcomeGui welcome) {
+                welcome.handleDatasetUrl(url, true);
+            }
+        }));
     }
 
     @Override

@@ -13,6 +13,7 @@ import gaiasky.rest.RESTServer;
 import gaiasky.script.ConsoleManager;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.util.CatalogManager;
+import gaiasky.util.SingleInstanceManager;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.svt.SVTManager;
 
@@ -25,4 +26,5 @@ public class GaiaSkyAssets {
     public ConsoleManager consoleManager;
     public CatalogManager catalogManager;
     public RESTServer restServer;
+    public SingleInstanceManager singleInstanceManager;
 }

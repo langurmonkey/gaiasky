@@ -1087,8 +1087,22 @@ public class WelcomeGui extends AbstractGui {
     private void handleDatasetUrl() {
         var cliArgs = GaiaSky.instance.getCliArgs();
         if (cliArgs != null && DatasetUrlHandler.isDatasetUrl(cliArgs.parameter)) {
-            Gdx.app.postRunnable(() -> DatasetUrlHandler.handle(cliArgs.parameter, skin, stage));
+            handleDatasetUrl(cliArgs.parameter, false);
         }
+    }
+
+    /**
+     * Handles the given dataset URL. This must be called once the welcome UI
+     * has been built, so that the stage, skin and dataset metadata are
+     * available.
+     *
+     * @param url     The URL.
+     * @param hotLoad True to hot-load the dataset (running instance), false to
+     *                only enable it (startup path).
+     */
+    public void handleDatasetUrl(String url,
+                                 boolean hotLoad) {
+        Gdx.app.postRunnable(() -> DatasetUrlHandler.handle(url, skin, stage, hotLoad));
     }
 
     private static void reloadLocalDatasets() {
