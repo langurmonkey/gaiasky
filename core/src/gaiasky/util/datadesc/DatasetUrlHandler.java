@@ -21,6 +21,7 @@ import gaiasky.util.i18n.I18n;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -52,10 +53,21 @@ public class DatasetUrlHandler {
     /** Name of the parameter that contains the dataset key or URL. **/
     public static final String PARAM_DATASET = "dataset";
 
-    /** Whether the CLI URL has already been handled. It must be handled only once. **/
-    private static boolean handled = false;
+    /** The last URL handled. Used to avoid handling the same URL twice. **/
+    private static String lastHandledUrl = null;
 
     private DatasetUrlHandler() {
+    }
+
+    /**
+     * Returns true if the given URL has already been handled.
+     *
+     * @param url The URL.
+     *
+     * @return True if the URL has already been handled.
+     */
+    private static boolean isHandled(String url) {
+        return url == null || url.equals(lastHandledUrl);
     }
 
     /**
@@ -70,9 +82,8 @@ public class DatasetUrlHandler {
     }
 
     /**
-     * Handles the given URL, if it has not been handled yet. This must be called
-     * from the GL thread, once a UI stage is available and the dataset metadata
-     * has been fetched.
+     * Handles the given URL with the default behavior (no hot-load). See
+     * {@link #handle(String, Skin, Stage, boolean)}.
      *
      * @param url   The URL, as received in the CLI.
      * @param skin  The UI skin.
@@ -81,10 +92,32 @@ public class DatasetUrlHandler {
     public static void handle(String url,
                               Skin skin,
                               Stage stage) {
-        if (handled || !isDatasetUrl(url)) {
+        handle(url, skin, stage, false);
+    }
+
+    /**
+     * Handles the given URL, if it has not been handled yet. This must be called
+     * from the GL thread, once a UI stage is available and the dataset metadata
+     * has been fetched.
+     * <p>
+     * If {@code hotLoad} is false (startup path), an already-installed dataset is
+     * only enabled — it will be loaded by the regular startup sequence. If
+     * {@code hotLoad} is true (Gaia Sky already running), the dataset is loaded
+     * immediately after installation/enabling through the hot-load API.
+     *
+     * @param url     The URL, as received in the CLI.
+     * @param skin    The UI skin.
+     * @param stage   The UI stage.
+     * @param hotLoad True to hot-load the dataset once installed/enabled.
+     */
+    public static void handle(String url,
+                              Skin skin,
+                              Stage stage,
+                              boolean hotLoad) {
+        if (isHandled(url) || !isDatasetUrl(url)) {
             return;
         }
-        handled = true;
+        lastHandledUrl = url;
 
         URI uri;
         try {
@@ -115,12 +148,13 @@ public class DatasetUrlHandler {
         }
 
         if (dataset.exists) {
-            // Already installed. Enable it if it is not enabled yet.
-            enableDataset(dataset);
+            // Already installed. Enable it if it is not enabled yet, and
+            // hot-load it if requested.
+            enableDataset(dataset, hotLoad);
         } else {
             // Not installed. Download and install through the dataset manager window,
             // which provides the progress UI and the install/enable pipeline.
-            downloadDataset(dataset, skin, stage);
+            downloadDataset(dataset, skin, stage, hotLoad);
         }
     }
 
@@ -180,11 +214,14 @@ public class DatasetUrlHandler {
 
     /**
      * Enables an already-installed dataset, if it is not enabled yet, and persists
-     * the settings.
+     * the settings. If {@code hotLoad} is true, the dataset is also loaded
+     * immediately through the hot-load API.
      *
      * @param dataset The dataset to enable.
+     * @param hotLoad True to hot-load the dataset after enabling it.
      */
-    private static void enableDataset(Dataset dataset) {
+    private static void enableDataset(Dataset dataset,
+                                      boolean hotLoad) {
         if (dataset.checkStr != null
                 && !dataset.type.equals("texture-pack")
                 && !DatasetDownloadUtils.isEnabled(dataset)) {
@@ -199,23 +236,61 @@ public class DatasetUrlHandler {
             logger.info("Dataset already installed and enabled: " + dataset.key);
             postNotification(I18n.msg("gui.url.dataset.installed", dataset.name));
         }
+        if (hotLoad) {
+            hotLoadDataset(dataset);
+        }
+    }
+
+    /**
+     * Hot-loads an installed dataset through the scripting API, so that it is
+     * available immediately, without a restart. This is the same mechanism used
+     * by the dataset load dialog.
+     *
+     * @param dataset The dataset to load. It must be installed
+     *                ({@code checkPath} must point to the dataset JSON file).
+     */
+    private static void hotLoadDataset(Dataset dataset) {
+        if (dataset.checkPath == null || !Files.exists(dataset.checkPath)) {
+            logger.error("Cannot hot-load dataset, check path does not exist: " + dataset.key);
+            return;
+        }
+        logger.info("Hot-loading dataset via URL: " + dataset.key);
+        GaiaSky.instance.getExecutorService().execute(() -> {
+            var loaded = GaiaSky.instance.scripting()
+                    .loadJsonCatalog(dataset.name, dataset.checkPath.toAbsolutePath().toString());
+            if (loaded) {
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                     DatasetUrlHandler.class,
+                                     I18n.msg("gui.url.dataset.loaded", dataset.name),
+                                     10f);
+            } else {
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION,
+                                     DatasetUrlHandler.class,
+                                     I18n.msg("gui.url.dataset.loadfail", dataset.name),
+                                     -1f);
+            }
+        });
     }
 
     /**
      * Downloads and installs the given dataset using the dataset manager window,
-     * which provides the progress UI and the full install pipeline.
+     * which provides the progress UI and the full install pipeline. If
+     * {@code hotLoad} is true, the dataset is hot-loaded once the download and
+     * installation finish successfully.
      *
      * @param dataset The dataset to download and install.
      * @param skin    The UI skin.
      * @param stage   The UI stage.
+     * @param hotLoad True to hot-load the dataset after installing it.
      */
     private static void downloadDataset(Dataset dataset,
                                         Skin skin,
-                                        Stage stage) {
+                                        Stage stage,
+                                        boolean hotLoad) {
         logger.info("Downloading dataset from URL: " + dataset.file);
         var dsw = new DatasetManagerWindow(stage, skin, DatasetGroup.serverDataDescriptor);
         dsw.show(stage);
-        dsw.downloadDataset(dataset);
+        dsw.downloadDataset(dataset, hotLoad ? () -> hotLoadDataset(dataset) : null);
     }
 
     /**
