@@ -2,7 +2,8 @@
 Type=Application
 Name=Gaia Sky
 Comment=Explore the universe in 3D
-Exec=gaiasky
+Exec=gaiasky %u
+MimeType=x-scheme-handler/gaiasky;
 Icon=/opt/gaiasky/gs_icon.svg
 Terminal=false
 Categories=Science;Education;
