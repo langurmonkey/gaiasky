@@ -104,6 +104,12 @@ public class DatasetUrlHandler {
      * only enabled — it will be loaded by the regular startup sequence. If
      * {@code hotLoad} is true (Gaia Sky already running), the dataset is loaded
      * immediately after installation/enabling through the hot-load API.
+     * <p>
+     * The deduplication guard only applies to the startup path ({@code hotLoad}
+     * is false), where the same CLI URL may be processed more than once (e.g.
+     * when the welcome GUI is rebuilt). URLs forwarded from a second instance
+     * ({@code hotLoad} is true) are always processed, so that re-sending the
+     * same URL works as expected.
      *
      * @param url     The URL, as received in the CLI.
      * @param skin    The UI skin.
@@ -114,10 +120,17 @@ public class DatasetUrlHandler {
                               Skin skin,
                               Stage stage,
                               boolean hotLoad) {
-        if (isHandled(url) || !isDatasetUrl(url)) {
+        // Deduplication only applies to the startup path. Forwarded URLs
+        // (hot-load) are always processed.
+        if (!hotLoad && (isHandled(url) || !isDatasetUrl(url))) {
             return;
         }
-        lastHandledUrl = url;
+        if (!isDatasetUrl(url)) {
+            return;
+        }
+        if (!hotLoad) {
+            lastHandledUrl = url;
+        }
 
         URI uri;
         try {
