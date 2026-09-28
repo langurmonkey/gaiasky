@@ -46,6 +46,7 @@ import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.datadesc.DatasetGroup;
 import gaiasky.util.datadesc.DatasetUtils;
 import gaiasky.util.datadesc.DatasetType;
+import gaiasky.util.datadesc.DatasetUrlHandler;
 import gaiasky.render.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -359,6 +360,7 @@ public class WelcomeGui extends AbstractGui {
         serverDatasets = !downloadError ? DatasetUtils.instance()
                 .buildServerDatasets(dataDescriptor) : null;
         reloadLocalDatasets();
+        handleDatasetUrl();
 
         // Central table
         if (bgTex == null) {
@@ -1075,6 +1077,18 @@ public class WelcomeGui extends AbstractGui {
         clearGui();
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         buildWelcomeUI();
+    }
+
+    /**
+     * Handles the dataset URL from the CLI arguments, if any. This is called
+     * once the welcome UI has been built, so that the stage, skin and dataset
+     * metadata are available.
+     */
+    private void handleDatasetUrl() {
+        var cliArgs = GaiaSky.instance.getCliArgs();
+        if (cliArgs != null && DatasetUrlHandler.isDatasetUrl(cliArgs.parameter)) {
+            Gdx.app.postRunnable(() -> DatasetUrlHandler.handle(cliArgs.parameter, skin, stage));
+        }
     }
 
     private static void reloadLocalDatasets() {

@@ -40,7 +40,10 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 /**
- *
+ * The window used to load a dataset during the program's execution.
+ * <p>
+ *     It contains two tabs: one for installed datasets, and another for loading datasets from the file system.
+ * </p>
  */
 public class DatasetLoadWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetLoadWindow.class);

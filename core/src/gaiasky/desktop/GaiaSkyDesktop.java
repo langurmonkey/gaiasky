@@ -606,6 +606,9 @@ public class GaiaSkyDesktop {
      * Program CLI arguments.
      */
     public static class CLIArgs {
+        @Parameter(description="dataset", help = true)
+        public String parameter;
+
         @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
         public boolean help;
 

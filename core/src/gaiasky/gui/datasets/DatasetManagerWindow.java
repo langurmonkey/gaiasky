@@ -1223,11 +1223,11 @@ public class DatasetManagerWindow extends GenericDialog {
         build();
     }
 
-    private void downloadDataset(Dataset dataset) {
+    public void downloadDataset(Dataset dataset) {
         downloadDataset(dataset, null);
     }
 
-    private void downloadDataset(Dataset dataset,
+    public void downloadDataset(Dataset dataset,
                                  Runnable successRunnable) {
         var tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
 
