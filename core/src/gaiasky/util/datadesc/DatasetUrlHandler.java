@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.gui.datasets.DatasetManagerWindow;
+import gaiasky.gui.datasets.DatasetDownloadService;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.SettingsManager;
@@ -274,14 +274,16 @@ public class DatasetUrlHandler {
     }
 
     /**
-     * Downloads and installs the given dataset using the dataset manager window,
-     * which provides the progress UI and the full install pipeline. If
+     * Downloads and installs the given dataset using the headless dataset
+     * download service. Progress is reported through the
+     * {@link Event#UPDATE_LOAD_PROGRESS} events, which are picked up by the
+     * load progress interface, so no window needs to be opened. If
      * {@code hotLoad} is true, the dataset is hot-loaded once the download and
      * installation finish successfully.
      *
      * @param dataset The dataset to download and install.
-     * @param skin    The UI skin.
-     * @param stage   The UI stage.
+     * @param skin    The UI skin. May be null.
+     * @param stage   The UI stage. May be null.
      * @param hotLoad True to hot-load the dataset after installing it.
      */
     private static void downloadDataset(Dataset dataset,
@@ -289,9 +291,8 @@ public class DatasetUrlHandler {
                                         Stage stage,
                                         boolean hotLoad) {
         logger.info("Downloading dataset from URL: " + dataset.file);
-        var dsw = new DatasetManagerWindow(stage, skin, DatasetGroup.serverDataDescriptor);
-        dsw.show(stage);
-        dsw.downloadDataset(dataset, hotLoad ? () -> hotLoadDataset(dataset) : null);
+        var service = new DatasetDownloadService(new HashMap<>());
+        service.downloadDataset(dataset, skin, stage, hotLoad ? () -> hotLoadDataset(dataset) : null, null);
     }
 
     /**
