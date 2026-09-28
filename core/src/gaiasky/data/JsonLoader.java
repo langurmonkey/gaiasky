@@ -94,7 +94,7 @@ public class JsonLoader extends AbstractSceneLoader {
         // Actually load the files.
         JsonReader json = new JsonReader();
         for (String filePath : filePaths) {
-            FileHandle file = GaiaSky.settings().data.dataFileHandle(filePath, datasetDirectory);
+            FileHandle file = GaiaSky.settings().data.dataFileHandle(filePath);
             JsonValue root = json.parse(file.read());
             if (root.has("objects")) {
                 // If the top element is 'objects', we have a list of new objects.

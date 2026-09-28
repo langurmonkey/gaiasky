@@ -1512,6 +1512,10 @@ public enum Event {
      */
     UI_ACCENT_COLOR_CMD,
     /**
+     * Reload enabled datasets pane in welcome UI.
+     */
+    ENABLED_DATASETS_RELOAD_CMD,
+    /**
      * Displays a dialog to restart. Contains the text, or nothing.
      */
     SHOW_RESTART_ACTION,

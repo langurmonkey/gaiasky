@@ -523,7 +523,7 @@ public class SysUtils {
     }
 
     public static Path getProceduralPixmapDir() {
-        return GaiaSky.settings().data.dataPath("$data/", null).resolve(PROCEDURAL_TEX_DIR_NAME);
+        return GaiaSky.settings().data.dataPath("$data/").resolve(PROCEDURAL_TEX_DIR_NAME);
     }
 
     /**

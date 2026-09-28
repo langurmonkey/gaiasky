@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.gui.bookmarks.BookmarksManager;
+import gaiasky.gui.main.MainGui;
 import gaiasky.gui.main.WelcomeGui;
 import gaiasky.render.MainPostProcessor;
 import gaiasky.rest.RESTServer;
@@ -98,9 +99,13 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
         // Single instance manager
         assets.singleInstanceManager = new SingleInstanceManager();
         assets.singleInstanceManager.addListener(url -> Gdx.app.postRunnable(() -> {
-            var wg = parameter.gaiaSky.welcomeGui;
-            if (wg instanceof WelcomeGui welcome) {
+            var gs = parameter.gaiaSky;
+            // Route to the welcome GUI if it is still alive (loading phase),
+            // otherwise to the main GUI (scene already loaded).
+            if (gs.welcomeGui instanceof WelcomeGui welcome) {
                 welcome.handleDatasetUrl(url, true);
+            } else if (gs.mainGui instanceof MainGui main) {
+                main.handleDatasetUrl(url, true);
             }
         }));
     }

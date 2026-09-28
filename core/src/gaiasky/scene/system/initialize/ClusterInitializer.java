@@ -95,7 +95,7 @@ public class ClusterInitializer extends AbstractInitSystem {
         var bb = Mapper.billboard.get(entity);
 
         if (cluster.clusterTex == null) {
-            cluster.clusterTex = new Texture(GaiaSky.settings().data.dataFileHandle(Constants.DATA_LOCATION_TOKEN + "tex/base/cluster-tex.png"), true);
+            cluster.clusterTex = new Texture(GaiaSky.settings().data.dataFileHandle(Constants.DEFAULT_DATA_LOCATION + "tex/base/cluster-tex.png"), true);
             cluster.clusterTex.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear);
         }
         if (cluster.model == null) {

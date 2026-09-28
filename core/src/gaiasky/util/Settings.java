@@ -876,32 +876,15 @@ public class Settings extends SettingsObject {
             this.reflectionSkyboxLocation = location;
         }
 
-        public Path dataPath(String pathStr,
-                             String dsLocation) {
+        public Path dataPath(String pathStr) {
             // Windows does not allow asterisks in paths
             String resolvedPathStr = pathStr.replaceAll("\\*", Constants.STAR_SUBSTITUTE);
 
             if (resolvedPathStr.startsWith(Constants.DATA_LOCATION_TOKEN)) {
                 // Path is in data directory, just remove leading 'data/' and prepend data location
                 String pathFromDataStr = resolvedPathStr.replace(Constants.DATA_LOCATION_TOKEN, "");
-                Path pathFromData = Path.of(pathFromDataStr);
-                Path resolvedPath = Path.of(location)
+                return Path.of(location)
                         .resolve(pathFromDataStr);
-                // We inject the location if:
-                // - the current resolved path does not exist, and
-                // - the dataset location is not null or empty, and
-                // - the injected dataset location is not already in the path.
-                if (!Files.exists(resolvedPath) && dsLocation != null && !dsLocation.isEmpty() && !pathFromData.getName(0)
-                        .toString()
-                        .equals(dsLocation)) {
-                    // Use dsLocation
-                    return Path.of(location)
-                            .resolve(dsLocation)
-                            .resolve(pathFromDataStr);
-                } else {
-                    // It exists, use as it is
-                    return resolvedPath;
-                }
             } else {
                 var p = Path.of(resolvedPathStr);
                 if (p.toFile()
@@ -916,32 +899,21 @@ public class Settings extends SettingsObject {
             }
         }
 
-        public Path dataPath(String path) {
-            return dataPath(path, Constants.DEFAULT_DATASET_KEY);
-        }
-
-        public String dataFile(String path,
-                               String dsLocation) {
-            return dataPath(path, dsLocation).toString()
-                    .replaceAll("\\\\", "/");
-        }
 
         public String dataFile(String path) {
             if (path == null)
                 return null;
-            return dataFile(path, Constants.DEFAULT_DATASET_KEY);
+            return dataPath(path).toString()
+                    .replaceAll("\\\\", "/");
         }
 
-        public FileHandle dataFileHandle(String path,
-                                         String dsLocation) {
-            if (path == null)
-                return null;
-            return new FileHandle(dataFile(path, dsLocation));
-        }
 
         public FileHandle dataFileHandle(String path) {
-            return dataFileHandle(path, Constants.DEFAULT_DATASET_KEY);
+            if (path == null)
+                return null;
+            return new FileHandle(dataFile(path));
         }
+
 
         /**
          * Checks whether the dataset with the given key is enabled. This method works by checking
@@ -1690,7 +1662,7 @@ public class Settings extends SettingsObject {
                 var settings = getRoot();
                 String texture = settings.data.dataFile(
                         GlobalResources.unpackAssetPathExtensions(
-                                Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                                Constants.DEFAULT_DATA_LOCATION + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
                                 ".jpg",
                                 ".png"));
                 if (texture == null) {
@@ -1699,7 +1671,7 @@ public class Settings extends SettingsObject {
                         starTexIdx = String.format("%02d", i);
                         texture = settings.data.dataFile(
                                 GlobalResources.unpackAssetPathExtensions(
-                                        Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                                        Constants.DEFAULT_DATA_LOCATION + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
                                         ".jpg",
                                         ".png"));
                         if (texture != null)
@@ -1723,7 +1695,7 @@ public class Settings extends SettingsObject {
                 for (int i = 1; i < 9; i++) {
                     var starTexIdx = String.format("%02d", i);
                     var t = GlobalResources.unpackAssetPathExtensions(
-                            Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
+                            Constants.DEFAULT_DATA_LOCATION + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE,
                             ".jpg",
                             ".png");
                     if (t != null) {
@@ -4394,9 +4366,9 @@ public class Settings extends SettingsObject {
             public int blurPasses = 35;
             public float flareSaturation = 0.8f;
             public float bias = -0.98f;
-            public String texLensColor = Constants.DATA_LOCATION_TOKEN + "tex/base/lenscolor.png";
-            public String texLensDirt = Constants.DATA_LOCATION_TOKEN + "tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg";
-            public String texLensStarburst = Constants.DATA_LOCATION_TOKEN + "tex/base/lensstarburst.jpg";
+            public String texLensColor = Constants.DEFAULT_DATA_LOCATION + "tex/base/lenscolor.png";
+            public String texLensDirt = Constants.DEFAULT_DATA_LOCATION + "tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg";
+            public String texLensStarburst = Constants.DEFAULT_DATA_LOCATION + "tex/base/lensstarburst.jpg";
             public float fboScale = 0.4f;
 
             public void setType(String type) {

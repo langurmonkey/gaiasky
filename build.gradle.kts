@@ -23,7 +23,7 @@ allprojects {
     extra.set("jafamaVersion", "2.3.+")
     extra.set("commonsioVersion", "2.+")
     extra.set("py4jVersion", "0.10.9.+")
-    extra.set("oshiVersion", "7.4.+")
+    extra.set("oshiVersion", "7.6.+")
     extra.set("stilVersion", "4.3")
     extra.set("jsampVersion", "1.3.+")
     extra.set("jacksonVersion", "2.20.+")

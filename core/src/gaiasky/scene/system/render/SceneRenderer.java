@@ -378,7 +378,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                BILLBOARD_SSO,
                                                alphas,
                                                renderAssets.billboardShaders,
-                                               Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png",
+                                               Constants.DEFAULT_DATA_LOCATION + "tex/base/sso.png",
                                                false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
@@ -397,7 +397,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                                                BILLBOARD_GAL,
                                                alphas,
                                                renderAssets.galShaders,
-                                               Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg",
+                                               Constants.DEFAULT_DATA_LOCATION + "tex/base/static.jpg",
                                                false);
                 system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }

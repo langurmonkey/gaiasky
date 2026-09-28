@@ -232,6 +232,7 @@ public class DatasetUrlHandler {
             settingsManager.persist(GaiaSky.settings());
             logger.info("Dataset enabled via URL: " + dataset.key);
             postNotification(I18n.msg("gui.url.dataset.enabled", dataset.name));
+            EventManager.publish(Event.ENABLED_DATASETS_RELOAD_CMD, dataset);
         } else {
             logger.info("Dataset already installed and enabled: " + dataset.key);
             postNotification(I18n.msg("gui.url.dataset.installed", dataset.name));

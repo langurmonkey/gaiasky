@@ -127,7 +127,7 @@ public class GlobalResources implements Disposable {
         manager.load("img/markers/loc-marker-city.png", Texture.class, params);
         manager.load("img/markers/loc-marker-town.png", Texture.class, params);
         manager.load("img/markers/loc-marker-landmark.png", Texture.class, params);
-        manager.load(GaiaSky.settings().data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class, params);
+        manager.load(GaiaSky.settings().data.dataFile(Constants.DEFAULT_DATA_LOCATION + "tex/base/attitudeindicator.png"), Texture.class, params);
     }
 
     public void doneLoading(AssetManager manager) {
@@ -147,7 +147,7 @@ public class GlobalResources implements Disposable {
         textures.put("loc-marker-town", manager.get("img/markers/loc-marker-town.png"));
         textures.put("loc-marker-landmark", manager.get("img/markers/loc-marker-landmark.png"));
         textures.put("attitude-indicator",
-                     manager.get(GaiaSky.settings().data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class));
+                     manager.get(GaiaSky.settings().data.dataFile(Constants.DEFAULT_DATA_LOCATION + "tex/base/attitudeindicator.png"), Texture.class));
 
     }
 

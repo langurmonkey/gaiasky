@@ -8,6 +8,7 @@
 package gaiasky.gui.main;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -46,6 +47,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
+import gaiasky.util.datadesc.DatasetUrlHandler;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.FilePicker;
 import gaiasky.util.scene2d.FilePickerComponent;
@@ -68,6 +70,7 @@ public class MainGui extends AbstractGui {
     private final GlobalResources globalResources;
     private final FocusView view;
     private CatalogManager catalogManager;
+
     protected ControlsWindow controlsWindow;
     protected ControlsInterface controlsInterface;
     protected Container<CameraInfoInterface> fi;
@@ -784,6 +787,18 @@ public class MainGui extends AbstractGui {
             }
         }
         return cool;
+    }
+
+    /**
+     * Handles a dataset URL forwarded from another instance. This must be
+     * called once the main UI stage has been built.
+     *
+     * @param url     The URL.
+     * @param hotLoad True to hot-load the dataset.
+     */
+    public void handleDatasetUrl(String url,
+                                 boolean hotLoad) {
+        Gdx.app.postRunnable(() -> DatasetUrlHandler.handle(url, skin, stage, hotLoad));
     }
 
 }

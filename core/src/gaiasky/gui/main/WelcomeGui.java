@@ -394,7 +394,7 @@ public class WelcomeGui extends AbstractGui {
         float buttonWidth = 460f;
         float buttonHeight = 110f;
 
-        EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_RECOMPUTE_CMD);
+        EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_RECOMPUTE_CMD, Event.ENABLED_DATASETS_RELOAD_CMD);
         EventManager.publish(Event.UI_SCALE_RECOMPUTE_CMD, this);
 
         // CENTRAL TABLE
@@ -1311,6 +1311,9 @@ public class WelcomeGui extends AbstractGui {
                     height = Gdx.graphics.getHeight();
                 }
                 GaiaSky.instance.applyUIScale(height, this);
+            }
+            case ENABLED_DATASETS_RELOAD_CMD -> {
+                reloadView();
             }
         }
     }
