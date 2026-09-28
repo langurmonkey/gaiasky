@@ -7,40 +7,41 @@
 
 package gaiasky.gui.window;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.datasets.DatasetDownloadService;
 import gaiasky.gui.datasets.DatasetWatcher;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Pair;
+import gaiasky.util.TextUtils;
 import gaiasky.util.datadesc.Dataset;
-import gaiasky.util.datadesc.DatasetDownloadUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnProgressBar;
-import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A window that downloads a list of datasets ({@link Dataset}) sequentially.
+ * The actual download pipeline is delegated to {@link DatasetDownloadService};
+ * this window only provides the per-dataset progress UI.
  */
 public class BatchDownloadWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(BatchDownloadWindow.class);
 
     private final String infoString;
     private final List<Dataset> datasets;
-    private final DecimalFormat nf;
     private final Set<DatasetWatcher> watchers;
     /** Runs when all downloads are successful. **/
     private Runnable success;
@@ -48,6 +49,8 @@ public class BatchDownloadWindow extends GenericDialog {
     private Runnable error;
 
     private final Map<String, Pair<Dataset, Net.HttpRequest>> currentDownloads;
+    /** The download service, which contains the actual download pipeline. **/
+    private DatasetDownloadService downloadService;
 
     public BatchDownloadWindow(String title,
                                String info,
@@ -57,7 +60,6 @@ public class BatchDownloadWindow extends GenericDialog {
                                Runnable success,
                                Runnable error) {
         super(title, skin, stage);
-        this.nf = new DecimalFormat("##0.0");
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
         this.watchers = new HashSet<>();
 
@@ -139,168 +141,25 @@ public class BatchDownloadWindow extends GenericDialog {
 
     private void downloadDataset(Dataset dataset,
                                  Runnable successRunnable) {
-        var tempDir = SysUtils.getDataTempDir(GaiaSky.settings().data.location);
-
-        try {
-            var fileStore = Files.getFileStore(tempDir);
-
-            // Check for space. We need enough space for the compressed tar.gz package, plus the
-            // extracted data, so we do s + s * 1.5, with a base compression ratio of 0.666.
-            if (dataset.sizeBytes > 0 && dataset.sizeBytes + dataset.sizeBytes * 1.5 >= fileStore.getUsableSpace()) {
-                var title = I18n.msg("gui.download.space.error.title");
-                var msg = I18n.msg("gui.download.space.error", fileStore.toString());
-                logger.error(msg);
-                GuiUtils.addNotificationWindow(title, msg, skin, stage, null);
-                return;
-            }
-        } catch (IOException e) {
-            logger.warn(I18n.msg("gui.batch.error.filestore", tempDir));
+        if (downloadService == null) {
+            downloadService = new DatasetDownloadService(currentDownloads);
         }
-
-        String name = dataset.name;
-        String url = dataset.file.replace(DatasetDownloadUtils.mirrorKeyword, GaiaSky.settings().program.url.getCurrentDataMirror());
-
-        String filename = FilenameUtils.getName(url);
-        FileHandle tempDownload = Gdx.files.absolute(tempDir + "/" + filename + ".part");
-
-        ProgressRunnable progressDownload = (read, total, progress, speed) -> {
-            try {
-                double readMb = (double) read / 1e6d;
-                double totalMb = (double) total / 1e6d;
-                String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.downloading", nf.format(progress));
-                double mbPerSecond = speed / 1000d;
-                String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
-                // Since we are downloading on a background thread, post a runnable to touch UI.
-                GaiaSky.postRunnable(() -> {
-                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
-                });
-            } catch (Exception e) {
-                logger.warn(I18n.msg("gui.download.error.progress"));
+        downloadService.downloadDataset(dataset, skin, stage, successRunnable, new DatasetDownloadService.DownloadCallback() {
+            @Override
+            public void onSuccess(Dataset dataset) {
+                actionEnableDataset(dataset);
             }
-        };
-        ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
-            double readMb = (double) read / 1e6d;
-            double totalMb = (double) total / 1e6d;
-            String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksum.check", nf.format(progress));
-            double mbPerSecond = speed / 1000d;
-            String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
-            // Since we are downloading on a background thread, post a runnable to touch UI.
-            GaiaSky.postRunnable(() -> {
-                EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
-            });
-        };
 
-        // The whole finish process runs in serial mode thanks to the extraction lock.
-        // Prevents sync issues with file extraction and UI update.
-        Consumer<String> finish = (digest) -> {
-            DatasetDownloadUtils.EXTRACTION_LOCK.lock();
-            try {
-                String errorMsg = null;
-                // Unpack.
-                int errors = 0;
-                logger.info(I18n.msg("gui.download.extracting", tempDownload.path()));
-                String dataLocation = GaiaSky.settings().data.location + File.separatorChar;
-                // Checksum.
-                if (digest != null && dataset.sha256 != null) {
-                    String serverDigest = dataset.sha256;
-                    try {
-                        var ok = serverDigest.equals(digest);
-                        if (ok) {
-                            logger.info(I18n.msg("gui.download.checksum.ok", name));
-                        } else {
-                            logger.error(I18n.msg("gui.download.checksum.fail", name));
-                            errorMsg = I18n.msg("gui.download.checksum.fail.msg");
-                            errors++;
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.error", name), -1f);
-                        }
-                    } catch (Exception e) {
-                        logger.info(I18n.msg("gui.download.checksum.error", name));
-                        errorMsg = I18n.msg("gui.download.checksum.fail.msg");
-                        errors++;
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.error", name), -1f);
-                    }
-                } else {
-                    logger.info(I18n.msg("gui.download.checksum.notfound", name));
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.checksum.notfound", name), -1f);
+            @Override
+            public void onError(Dataset dataset,
+                                String message) {
+                setStatusError(dataset, message);
+                // Main error runnable.
+                if (error != null) {
+                    error.run();
                 }
-
-                if (errors == 0) {
-                    try {
-                        // Extract.
-                        DatasetDownloadUtils.decompress(tempDownload.path(), new File(dataLocation), dataset);
-                    } catch (Exception e) {
-                        logger.error(e, I18n.msg("gui.download.decompress.error", name));
-                        errorMsg = I18n.msg("gui.download.decompress.error.msg");
-                        errors++;
-                    } finally {
-                        // Set to 100% completion.
-                        EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) 100, "complete", "-");
-                        // Remove archive.
-                        DatasetDownloadUtils.cleanupTempFile(tempDownload.path());
-                    }
-                }
-
-                String errorMessage = errorMsg;
-                int numErrors = errors;
-                // Done.
-                GaiaSky.postRunnable(() -> {
-                    currentDownloads.remove(dataset.key);
-
-                    if (numErrors == 0) {
-                        // Ok message.
-                        EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, dataset.key, 0);
-                        dataset.exists = true;
-                        actionEnableDataset(dataset);
-                        if (successRunnable != null) {
-                            successRunnable.run();
-                        }
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.finished", name), -1f);
-                    } else {
-                        logger.error(I18n.msg("gui.download.failed", name + " - " + url));
-                        tempDownload.delete();
-                        setStatusError(dataset, errorMessage);
-                        currentDownloads.remove(dataset.key);
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), -1f);
-                        // Main error runnable.
-                        if (error != null) {
-                            error.run();
-                        }
-                    }
-                });
-            } finally {
-                DatasetDownloadUtils.EXTRACTION_LOCK.unlock();
             }
-
-        };
-
-        Runnable fail = () -> {
-            logger.error(I18n.msg("gui.download.failed", name + " - " + url));
-            tempDownload.delete();
-            setStatusError(dataset);
-            currentDownloads.remove(dataset.key);
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), -1f);
-            // Run main error runnable.
-            if (error != null) {
-                error.run();
-            }
-        };
-
-        // Download.
-        Net.HttpRequest request = DownloadHelper.downloadFile(url,
-                                                              tempDownload,
-                                                              GaiaSky.settings().program.offlineMode,
-                                                              progressDownload,
-                                                              progressHashResume,
-                                                              finish,
-                                                              fail,
-                                                              null);
-        GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_START_INFO, this, dataset.key, request));
-        currentDownloads.put(dataset.key, new Pair<>(dataset, request));
-
-    }
-
-    private void setStatusError(Dataset ds) {
-        setStatusError(ds, null);
+        });
     }
 
     private void setStatusError(Dataset ds,
