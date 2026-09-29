@@ -1344,6 +1344,8 @@ return true;</property>
         <entry filesetId="970" />
       </exclude>
       <jreBundle jreBundleSource="none" />
+      <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
+      <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </unixInstaller>
     <linuxDeb name="Linux DEB" id="30" description="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" maintainerEmail="tsagrista@ari.uni-heidelberg.de">
       <excludedLaunchers>
