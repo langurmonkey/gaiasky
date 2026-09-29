@@ -60,6 +60,8 @@ public class SingleInstanceManager {
     private final List<String> pendingUrls = new ArrayList<>();
     /** The server accept loop thread. **/
     private Thread serverThread;
+    /** The active manager instance, if a server has been started. **/
+    private static SingleInstanceManager activeInstance;
 
     /**
      * Attempts to forward the given URL to an already-running Gaia Sky instance.
@@ -109,6 +111,7 @@ public class SingleInstanceManager {
             Logger.getLogger(SingleInstanceManager.class).info("Single-instance server port in use, not starting: " + e.getMessage());
             return;
         }
+        activeInstance = this;
         serverThread = new Thread(this::acceptLoop, "gaiasky-single-instance");
         serverThread.setDaemon(true);
         serverThread.start();
@@ -129,6 +132,22 @@ public class SingleInstanceManager {
             serverThread.interrupt();
             serverThread = null;
         }
+        if (activeInstance == this) {
+            activeInstance = null;
+        }
+    }
+
+    /**
+     * Returns the active manager instance, if a single-instance server is
+     * running in this process. Used by the macOS open-URL handler to decide
+     * whether to forward the URL to the running instance (another process)
+     * or to store it as pending in this one.
+     *
+     * @return The active {@link SingleInstanceManager}, or null if the
+     * server has not been started in this process.
+     */
+    public static SingleInstanceManager getActiveInstance() {
+        return activeInstance;
     }
 
     /**
@@ -198,6 +217,17 @@ public class SingleInstanceManager {
         synchronized (pendingUrls) {
             pendingUrls.add(url);
         }
+    }
+
+    /**
+     * Public entry point to dispatch a URL received locally in this process
+     * (e.g. through the macOS open-URL handler when this instance is the
+     * running one). Same behavior as {@link #dispatch(String)}.
+     *
+     * @param url The URL.
+     */
+    public void dispatchUrl(String url) {
+        dispatch(url);
     }
 
     /**

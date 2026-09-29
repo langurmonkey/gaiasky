@@ -59,7 +59,7 @@
       </iconImageFiles>
     </launcher>
     <launcher name="gaiasky macos" id="573" excludeFromMenu="true" menuName="${compiler:sys.fullName}">
-      <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" dpiAware="false">
+      <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
         <versionInfo include="true" fileDescription="Open source 3D universe platform for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseZGC -XX:+UseCompactObjectHeaders --enable-native-access=ALL-UNNAMED -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">

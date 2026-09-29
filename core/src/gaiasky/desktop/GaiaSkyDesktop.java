@@ -175,7 +175,15 @@ public class GaiaSkyDesktop {
                 desktop.setOpenURIHandler(e -> {
                     var url = e.getURI().toString();
                     if (DatasetUrlHandler.isDatasetUrl(url)) {
-                        if (!SingleInstanceManager.forwardToRunningInstance(url)) {
+                        // If the single-instance server is running in this
+                        // process, we ARE the running instance: dispatch the
+                        // URL locally. Otherwise, forward it to the running
+                        // instance, or store it for the startup path if there
+                        // is none (cold start).
+                        var sim = SingleInstanceManager.getActiveInstance();
+                        if (sim != null) {
+                            sim.dispatchUrl(url);
+                        } else if (!SingleInstanceManager.forwardToRunningInstance(url)) {
                             DatasetUrlHandler.setPendingUrl(url);
                         }
                     }
