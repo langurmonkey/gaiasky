@@ -157,19 +157,35 @@ public class GaiaSkyDesktop {
             javaVersionCheck();
 
             // macOS: URLs opened through the gaiasky:// scheme arrive as
-            // open-URL Apple events, not as CLI arguments. install4j's
-            // StartupNotification delivers them (to this process at startup,
-            // or to the already-running instance, which is always
-            // single-instance in an app bundle). URLs that arrive before the
-            // UI is ready are stored and processed by the startup path later.
-            // Wrapped in try/catch so that dev runs without an install4j
-            // launcher are unaffected.
+            // open-URL Apple events, not as CLI arguments. We register two
+            // handlers, in this order:
+            //  1. The JDK's OpenURIHandler. This is the one that actually
+            //     receives events in regular (non-install4j) bundles, like
+            //     the Homebrew .app.
+            //  2. install4j's StartupNotification. If the launcher has the
+            //     "single instance" option enabled, install4j installs its
+            //     own OpenURIHandler, replacing (1), and delivers events to
+            //     this listener. If the option is disabled, the call is a
+            //     silent no-op and (1) remains active.
+            // Either way, events end up in the same two destinations:
+            // forward to the running instance, or store for the startup
+            // path if the UI is not ready yet.
+            try {
+                var desktop = java.awt.Desktop.getDesktop();
+                desktop.setOpenURIHandler(e -> {
+                    var url = e.getURI().toString();
+                    if (DatasetUrlHandler.isDatasetUrl(url)) {
+                        if (!SingleInstanceManager.forwardToRunningInstance(url)) {
+                            DatasetUrlHandler.setPendingUrl(url);
+                        }
+                    }
+                });
+            } catch (Throwable ignored) {
+                // Not on macOS, or headless — no-op.
+            }
             try {
                 StartupNotification.registerStartupListener(argument -> {
                     if (DatasetUrlHandler.isDatasetUrl(argument)) {
-                        // If the single-instance manager is up, route
-                        // through it (hot-load in the running instance).
-                        // Otherwise, store for the startup path.
                         if (!SingleInstanceManager.forwardToRunningInstance(argument)) {
                             DatasetUrlHandler.setPendingUrl(argument);
                         }
