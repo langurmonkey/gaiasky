@@ -70,6 +70,9 @@
       <iconImageFiles>
         <file path="@gs-git-folder@/assets/icon/gs_macos_512.png" />
       </iconImageFiles>
+      <macStaticAssociations>
+        <urlHandler scheme="gaiasky" />
+      </macStaticAssociations>
     </launcher>
     <launcher name="gaiasky vr" id="683" menuName="${compiler:sys.fullName}/${compiler:sys.fullName} VR">
       <executable name="${compiler:sys.shortName}vr" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gsvr_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
@@ -359,6 +362,12 @@ return console.askOkCancel(message, true);
               <action id="11" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" actionElevationType="elevated">
                 <serializedBean>
                   <property name="itemName" type="string">${compiler:sys.fullName} ${compiler:sys.version}</property>
+                </serializedBean>
+              </action>
+              <action id="980" beanClass="com.install4j.runtime.beans.actions.desktop.UrlHandlerAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
+                <serializedBean>
+                  <property name="launcherId" type="string">22</property>
+                  <property name="scheme" type="string">gaiasky</property>
                 </serializedBean>
               </action>
             </actions>
