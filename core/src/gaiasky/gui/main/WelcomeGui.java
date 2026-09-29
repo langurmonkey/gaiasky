@@ -1085,9 +1085,17 @@ public class WelcomeGui extends AbstractGui {
      * metadata are available.
      */
     private void handleDatasetUrl() {
+        // CLI argument (Linux/Windows path).
         var cliArgs = GaiaSky.instance.getCliArgs();
         if (cliArgs != null && DatasetUrlHandler.isDatasetUrl(cliArgs.parameter)) {
             handleDatasetUrl(cliArgs.parameter, false);
+        } else {
+            // macOS: URL arrived via the open-URL Apple event before the UI
+            // was ready, and was stored by the startup listener.
+            var pending = DatasetUrlHandler.consumePendingUrl();
+            if (pending != null) {
+                handleDatasetUrl(pending, false);
+            }
         }
     }
 

@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.utils.Array;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.install4j.api.launcher.StartupNotification;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.GlobalResources;
@@ -154,6 +155,29 @@ public class GaiaSkyDesktop {
         try {
             // Check java version.
             javaVersionCheck();
+
+            // macOS: URLs opened through the gaiasky:// scheme arrive as
+            // open-URL Apple events, not as CLI arguments. install4j's
+            // StartupNotification delivers them (to this process at startup,
+            // or to the already-running instance, which is always
+            // single-instance in an app bundle). URLs that arrive before the
+            // UI is ready are stored and processed by the startup path later.
+            // Wrapped in try/catch so that dev runs without an install4j
+            // launcher are unaffected.
+            try {
+                StartupNotification.registerStartupListener(argument -> {
+                    if (DatasetUrlHandler.isDatasetUrl(argument)) {
+                        // If the single-instance manager is up, route
+                        // through it (hot-load in the running instance).
+                        // Otherwise, store for the startup path.
+                        if (!SingleInstanceManager.forwardToRunningInstance(argument)) {
+                            DatasetUrlHandler.setPendingUrl(argument);
+                        }
+                    }
+                });
+            } catch (Throwable ignored) {
+                // Not running under an install4j launcher (dev runs, etc.).
+            }
 
             // Single-instance handling. If a Gaia Sky instance is already
             // running and a dataset URL was passed, forward it and exit.

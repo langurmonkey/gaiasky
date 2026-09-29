@@ -17,6 +17,7 @@ allprojects {
     extra.set("gdxVersion", "1.14.2")
     extra.set("gdxcontrollersVersion", "2.2.4")
     extra.set("lwjglVersion", "3.3.4")
+    extra.set("install4jVersion", "13.1.1")
     extra.set("jcommanderVersion", "3.+")
     extra.set("slf4jVersion", "2.0.+")
     extra.set("sparkjavaVersion", "2.9.+")
@@ -144,6 +145,9 @@ project(":core") {
         fun property(name: String): String = project.extra.get(name) as String
 
         compileOnly("com.badlogicgames.gdx:gdx-tools:${property("gdxVersion")}")
+        // install4j runtime API. Compile-only: the runtime classes are provided
+        // by the install4j launcher in the deployed packages.
+        compileOnly("com.install4j:install4j-runtime:${property("install4jVersion")}")
 
         implementation("org.lwjgl:lwjgl-openxr:${property("lwjglVersion")}")
         implementation("org.lwjgl:lwjgl-glfw:${property("lwjglVersion")}")

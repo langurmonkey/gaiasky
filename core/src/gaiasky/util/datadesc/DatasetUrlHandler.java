@@ -56,6 +56,13 @@ public class DatasetUrlHandler {
     /** The last URL handled. Used to avoid handling the same URL twice. **/
     private static String lastHandledUrl = null;
 
+    /**
+     * URL received through a platform-specific channel (e.g. the macOS
+     * open-URL Apple event) before the UI is ready. Consumed by the startup
+     * path once the welcome GUI is built.
+     **/
+    private static String pendingUrl = null;
+
     private DatasetUrlHandler() {
     }
 
@@ -79,6 +86,30 @@ public class DatasetUrlHandler {
      */
     public static boolean isDatasetUrl(String arg) {
         return arg != null && arg.toLowerCase(Locale.ROOT).startsWith(URL_SCHEME + "://");
+    }
+
+    /**
+     * Stores a URL received before the UI is ready (e.g. through the macOS
+     * open-URL event). It will be processed by the startup path once the
+     * welcome GUI is built.
+     *
+     * @param url The dataset URL.
+     */
+    public static void setPendingUrl(String url) {
+        if (isDatasetUrl(url)) {
+            pendingUrl = url;
+        }
+    }
+
+    /**
+     * Returns and clears the pending URL, if any.
+     *
+     * @return The pending dataset URL, or null if none is set.
+     */
+    public static String consumePendingUrl() {
+        var url = pendingUrl;
+        pendingUrl = null;
+        return url;
     }
 
     /**
