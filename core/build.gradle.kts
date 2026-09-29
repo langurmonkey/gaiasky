@@ -105,7 +105,7 @@ sourceSets {
 
 
 install4j {
-    installDir = file("${System.getProperty("user.home")}/Programs/install4j11")
+    installDir = file("${System.getProperty("user.home")}/Programs/install4j13")
 }
 
 tasks.withType<Javadoc>().configureEach {

@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 plugins {
     id("java")
-    id("com.install4j.gradle") version "10.0.4"
+    id("com.install4j.gradle") version "13.1.1"
     id("com.dorongold.task-tree") version "1.5"
     id("de.undercouch.download") version "4.1.1"
 }

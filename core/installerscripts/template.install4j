@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="11.0.5" transformSequenceNumber="11">
+<install4j version="13.1.1" transformSequenceNumber="13">
   <directoryPresets config="@gs-git-folder@/assets/cert/cert.pfx" />
   <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://gaiasky.space" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="21" allowBetaVM="true">
     <languages skipLanguageSelection="true">
@@ -16,7 +16,7 @@
     <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="26/jdk-26.0.1+8" />
   </application>
-  <files defaultOverwriteMode="1" defaultUninstallMode="2">
+  <files defaultOverwriteMode="always" defaultUninstallMode="always">
     <filesets>
       <fileset name="Windows libraries" id="967" />
       <fileset name="macOS libraries" id="970" />
@@ -198,6 +198,7 @@
           <screen id="1" beanClass="com.install4j.runtime.beans.screens.StartupScreen" rollbackBarrierExitCode="0">
             <actions>
               <action id="13" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" actionElevationType="none" />
+              <action id="981" beanClass="com.install4j.runtime.beans.actions.control.SetInstallationDirectoryAction" actionElevationType="none" />
             </actions>
           </screen>
         </startup>
@@ -231,7 +232,7 @@
                     <element index="0">sys.installationDir</element>
                   </property>
                 </serializedBean>
-                <condition>context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
+                <condition>context.getBooleanVariable("sys.streamlinedInstallation")</condition>
               </action>
             </actions>
             <formComponents>
@@ -252,9 +253,12 @@ return console.askOkCancel(message, true);
                   </property>
                 </serializedBean>
               </formComponent>
-              <formComponent id="239" beanClass="com.install4j.runtime.beans.formcomponents.UpdateAlertComponent" useExternalParametrization="true" externalParametrizationName="Update Alert" externalParametrizationMode="include">
+              <formComponent id="239" beanClass="com.install4j.runtime.beans.formcomponents.StreamlinedInstallationChooserComponent" useExternalParametrization="true" externalParametrizationName="Update Alert" externalParametrizationMode="include">
+                <serializedBean>
+                  <property name="streamlinedInstallationStrategy" type="enum" class="com.install4j.runtime.beans.formcomponents.StreamlinedInstallationStrategy" value="UPDATE_ONLY" />
+                </serializedBean>
                 <externalParametrizationPropertyNames>
-                  <propertyName>updateCheck</propertyName>
+                  <propertyName>streamlinedInstallationStrategy</propertyName>
                 </externalParametrizationPropertyNames>
               </formComponent>
               <formComponent id="240" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" insetTop="20">
@@ -265,7 +269,7 @@ return console.askOkCancel(message, true);
             </formComponents>
           </screen>
           <screen id="4" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen">
-            <condition>!context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
+            <condition>!context.getBooleanVariable("sys.streamlinedInstallation")</condition>
             <actions>
               <action id="5" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" multiExec="true">
                 <serializedBean>
@@ -324,15 +328,16 @@ return console.askOkCancel(message, true);
             <serializedBean>
               <property name="programGroupName" type="string">${compiler:sys.fullName}</property>
             </serializedBean>
-            <condition>!context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
+            <condition>!context.getBooleanVariable("sys.streamlinedInstallation")</condition>
           </screen>
           <screen id="8" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" rollbackBarrier="true">
             <actions>
               <action id="394" beanClass="com.install4j.runtime.beans.actions.UninstallPreviousAction" actionElevationType="none" />
               <action id="9" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" actionElevationType="elevated" failureStrategy="quit" errorMessage="${i18n:FileCorrupted}" />
-              <action id="10" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" actionElevationType="elevated">
+              <action id="10" beanClass="com.install4j.runtime.beans.actions.desktop.CreateDefaultStartMenuEntriesAction" actionElevationType="elevated">
                 <serializedBean>
-                  <property name="addUninstaller" type="boolean" value="true" />
+                  <property name="folderName" type="string">${installer:sys.programGroupName}</property>
+                  <property name="linkDirectory" type="string">${installer:sys.symlinkDir}</property>
                   <property name="programGroupEntryConfigs">
                     <add>
                       <object class="com.install4j.runtime.beans.screens.components.ProgramGroupFileConfig">
@@ -355,7 +360,6 @@ return console.askOkCancel(message, true);
                       </object>
                     </add>
                   </property>
-                  <property name="uninstallerMenuName" type="string">${i18n:UninstallerMenuEntry(${compiler:sys.fullName})}</property>
                 </serializedBean>
                 <condition>!context.getBooleanVariable("sys.programGroupDisabled")</condition>
               </action>
@@ -694,17 +698,22 @@ return console.askYesNo(message, true);
                   <formComponent id="796" beanClass="com.install4j.runtime.beans.formcomponents.KeyValuePairComponent">
                     <serializedBean>
                       <property name="labelText" type="string">${i18n:updater.CurrentVersionLabel}</property>
-                      <property name="valueLabelColor">
-                        <object class="java.awt.Color">
-                          <int>128</int>
-                          <int>0</int>
-                          <int>0</int>
-                          <int>255</int>
-                        </object>
-                      </property>
-                      <property name="valueLabelFontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
-                      <property name="valueLabelFontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
                       <property name="valueLabelText" type="string">${installer:sys.version}</property>
+                      <property name="valueLabelWidgetStyle" id="LabelWidgetStyle0">
+                        <property name="fontDescriptor">
+                          <property name="fontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
+                          <property name="fontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
+                        </property>
+                        <property name="foregroundColor">
+                          <object class="java.awt.Color">
+                            <int>128</int>
+                            <int>0</int>
+                            <int>0</int>
+                            <int>255</int>
+                          </object>
+                        </property>
+                      </property>
+                      <property name="valueLabelWidgetStyleId" type="null" />
                     </serializedBean>
                   </formComponent>
                   <group id="797" beanClass="com.install4j.runtime.beans.groups.HorizontalFormComponentGroup">
@@ -712,17 +721,22 @@ return console.askYesNo(message, true);
                       <formComponent id="798" beanClass="com.install4j.runtime.beans.formcomponents.KeyValuePairComponent">
                         <serializedBean>
                           <property name="labelText" type="string">${i18n:updater.NewVersionLabel}</property>
-                          <property name="valueLabelColor">
-                            <object class="java.awt.Color">
-                              <int>0</int>
-                              <int>128</int>
-                              <int>0</int>
-                              <int>255</int>
-                            </object>
-                          </property>
-                          <property name="valueLabelFontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
-                          <property name="valueLabelFontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
                           <property name="valueLabelText" type="string">${installer:updaterNewVersion}</property>
+                          <property name="valueLabelWidgetStyle" id="LabelWidgetStyle0">
+                            <property name="fontDescriptor">
+                              <property name="fontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
+                              <property name="fontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
+                            </property>
+                            <property name="foregroundColor">
+                              <object class="java.awt.Color">
+                                <int>0</int>
+                                <int>128</int>
+                                <int>0</int>
+                                <int>255</int>
+                              </object>
+                            </property>
+                          </property>
+                          <property name="valueLabelWidgetStyleId" type="null" />
                         </serializedBean>
                       </formComponent>
                       <formComponent id="799" beanClass="com.install4j.runtime.beans.formcomponents.HyperlinkActionLabelComponent" insetLeft="5">
@@ -1125,23 +1139,6 @@ return true;</property>
                   <property name="bottom" type="boolean" value="true" />
                 </object>
               </property>
-              <property name="imageEdgeBackgroundColor">
-                <object class="com.install4j.runtime.beans.LightOrDarkColor">
-                  <object class="java.awt.Color">
-                    <int>25</int>
-                    <int>143</int>
-                    <int>220</int>
-                    <int>255</int>
-                  </object>
-                  <object class="java.awt.Color">
-                    <int>0</int>
-                    <int>74</int>
-                    <int>151</int>
-                    <int>255</int>
-                  </object>
-                </object>
-              </property>
-              <property name="imageEdgeBorder" type="boolean" value="true" />
               <property name="imageFile">
                 <object class="com.install4j.api.beans.ExternalFile">
                   <string>${compiler:sys.install4jHome}/resource/styles/wizard.png</string>
@@ -1155,13 +1152,34 @@ return true;</property>
                   <int>10</int>
                 </object>
               </property>
+              <property name="imageEdgeBackgroundColor">
+                <object class="com.install4j.runtime.beans.LightOrDarkColor">
+                  <object class="java.awt.Color">
+                    <int>27</int>
+                    <int>143</int>
+                    <int>220</int>
+                    <int>255</int>
+                  </object>
+                  <object class="java.awt.Color">
+                    <int>0</int>
+                    <int>73</int>
+                    <int>150</int>
+                    <int>255</int>
+                  </object>
+                </object>
+              </property>
             </serializedBean>
             <beans>
               <formComponent id="462" beanClass="com.install4j.runtime.beans.styles.ScreenTitleComponent" insetTop="0">
                 <serializedBean>
-                  <property name="labelFontSizePercent" type="int" value="130" />
-                  <property name="labelFontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
-                  <property name="labelFontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
+                  <property name="labelWidgetStyleId" type="null" />
+                  <property name="labelWidgetStyle">
+                    <property name="fontDescriptor">
+                      <property name="fontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
+                      <property name="fontSizePercent" type="int" value="130" />
+                      <property name="fontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
+                    </property>
+                  </property>
                 </serializedBean>
               </formComponent>
               <formComponent id="463" beanClass="com.install4j.runtime.beans.formcomponents.SeparatorComponent" />
@@ -1239,8 +1257,13 @@ return true;</property>
                 <beans>
                   <formComponent name="Title" id="469" beanClass="com.install4j.runtime.beans.styles.ScreenTitleComponent">
                     <serializedBean>
-                      <property name="labelFontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
-                      <property name="labelFontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
+                      <property name="labelWidgetStyleId" type="null" />
+                      <property name="labelWidgetStyle">
+                        <property name="fontDescriptor">
+                          <property name="fontType" type="enum" class="com.install4j.runtime.beans.formcomponents.FontType" value="DERIVED" />
+                          <property name="fontStyle" type="enum" class="com.install4j.runtime.beans.formcomponents.FontStyle" value="BOLD" />
+                        </property>
+                      </property>
                     </serializedBean>
                   </formComponent>
                   <formComponent name="Subtitle" id="470" beanClass="com.install4j.runtime.beans.styles.ScreenTitleComponent" insetLeft="8">
@@ -1305,6 +1328,9 @@ return true;</property>
         </beans>
       </group>
     </styles>
+    <widgetStyles defaultWidgetStyleId="175">
+      <widgetStyle name="Standard" id="175" beanClass="com.install4j.runtime.beans.widgets.WidgetStyleCollection" />
+    </widgetStyles>
   </installerGui>
   <mediaSets>
     <windows name="Windows x64" id="25" installDir="${compiler:sys.fullName}" architecture="64">
@@ -1353,8 +1379,6 @@ return true;</property>
         <entry filesetId="970" />
       </exclude>
       <jreBundle jreBundleSource="none" />
-      <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
-      <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </unixInstaller>
     <linuxDeb name="Linux DEB" id="30" description="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" maintainerEmail="tsagrista@ari.uni-heidelberg.de">
       <excludedLaunchers>
