@@ -66,6 +66,10 @@ tasks.register("genVersionFile") {
     val system = coreExtra("system")
 
     outputs.file(layout.buildDirectory.file("classes/java/main/version"))
+    // Always rewrite: the values (rev, buildtime) are not trackable task
+    // inputs, so without this the task is UP-TO-DATE forever and stale
+    // build/rev info gets packaged into the jar.
+    outputs.upToDateWhen { false }
 
     doLast {
         val versionFile = file("build/classes/java/main/version")
