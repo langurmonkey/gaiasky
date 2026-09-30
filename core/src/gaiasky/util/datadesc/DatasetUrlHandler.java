@@ -7,12 +7,14 @@
 
 package gaiasky.util.datadesc;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.datasets.DatasetDownloadService;
+import gaiasky.gui.window.DatasetUrlConfirmWindow;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.SettingsManager;
@@ -22,6 +24,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -191,15 +194,67 @@ public class DatasetUrlHandler {
             return;
         }
 
+        // For URL datasets, the stub always reports exists=false. Check whether
+        // a dataset with the same key or name is already installed in the data
+        // location, and use that instead of re-downloading.
+        if (isUrlDataset(datasetParam)) {
+            var local = DatasetDownloadUtils.findLocalDataset(Path.of(GaiaSky.settings().data.location), dataset.key, dataset.name);
+            if (local != null) {
+                logger.info("Dataset from URL already installed locally: " + local.key);
+                DatasetDownloadUtils.copyInstallFields(dataset, local);
+            }
+        }
+
         if (dataset.exists) {
             // Already installed. Enable it if it is not enabled yet, and
             // hot-load it if requested.
             enableDataset(dataset, hotLoad);
+            return;
+        }
+
+        // Not installed. If it is a URL dataset (not a key resolved against the
+        // server descriptor), ask the user for confirmation before downloading
+        // and installing, unless it comes from one of the configured data
+        // mirrors.
+        if (isUrlDataset(datasetParam) && !DatasetUrlConfirmWindow.isFromDataMirror(dataset.file)) {
+            var confirmDialog = new DatasetUrlConfirmWindow(dataset.file, skin, stage,
+                                                            () -> Gdx.app.postRunnable(() -> downloadDataset(dataset, skin, stage, hotLoad)),
+                                                            () -> logger.info("Dataset download from URL cancelled by user: " + dataset.file));
+            confirmDialog.show(stage);
         } else {
-            // Not installed. Download and install through the dataset manager window,
-            // which provides the progress UI and the install/enable pipeline.
+            // Download and install through the dataset manager window, which
+            // provides the progress UI and the install/enable pipeline. After
+            // installation, the dataset is updated in place with the fields
+            // from its descriptor (check path, type, etc.), so that it can be
+            // enabled and hot-loaded.
             downloadDataset(dataset, skin, stage, hotLoad);
         }
+    }
+
+    /**
+     * Enables the given dataset (adds its check string to the settings and
+     * persists them) and hot-loads it if requested. Called after a successful
+     * install of a URL-sourced dataset, once the descriptor has been resolved.
+     *
+     * @param dataset The installed dataset.
+     * @param hotLoad True to hot-load the dataset after enabling it.
+     */
+    public static void enableAndHotLoad(Dataset dataset,
+                                        boolean hotLoad) {
+        enableDataset(dataset, hotLoad);
+    }
+
+    /**
+     * Returns true if the given dataset parameter is a full URL (as opposed to
+     * a dataset key resolved against the local metadata).
+     *
+     * @param datasetParam The dataset parameter.
+     *
+     * @return True if the parameter is a URL.
+     */
+    private static boolean isUrlDataset(String datasetParam) {
+        String lower = datasetParam.toLowerCase(Locale.ROOT);
+        return lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("file://");
     }
 
     /**
@@ -211,8 +266,7 @@ public class DatasetUrlHandler {
      * @return The dataset, or null if it could not be resolved.
      */
     private static Dataset resolveDataset(String datasetParam) {
-        String lower = datasetParam.toLowerCase(Locale.ROOT);
-        if (lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("file://")) {
+        if (isUrlDataset(datasetParam)) {
             return datasetFromUrl(datasetParam);
         } else {
             // Dataset key. Look it up in the server descriptor first (it contains
@@ -336,7 +390,7 @@ public class DatasetUrlHandler {
                                         boolean hotLoad) {
         logger.info("Downloading dataset from URL: " + dataset.file);
         var service = new DatasetDownloadService(new HashMap<>());
-        service.downloadDataset(dataset, skin, stage, hotLoad ? () -> hotLoadDataset(dataset) : null, null);
+        service.downloadDataset(dataset, skin, stage, hotLoad ? () -> enableAndHotLoad(dataset, true) : null, null);
     }
 
     /**
