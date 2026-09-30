@@ -34,6 +34,7 @@ import gaiasky.util.camera.rec.Camcorder;
 import gaiasky.util.datadesc.DatasetUrlHandler;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
+import org.lwjgl.system.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -156,51 +157,25 @@ public class GaiaSkyDesktop {
             // Check java version.
             javaVersionCheck();
 
-            // macOS: URLs opened through the gaiasky:// scheme arrive as
-            // open-URL Apple events, not as CLI arguments. We register two
-            // handlers, in this order:
-            //  1. The JDK's OpenURIHandler. This is the one that actually
-            //     receives events in regular (non-install4j) bundles, like
-            //     the Homebrew .app.
-            //  2. install4j's StartupNotification. If the launcher has the
-            //     "single instance" option enabled, install4j installs its
-            //     own OpenURIHandler, replacing (1), and delivers events to
-            //     this listener. If the option is disabled, the call is a
-            //     silent no-op and (1) remains active.
-            // Either way, events end up in the same two destinations:
-            // forward to the running instance, or store for the startup
-            // path if the UI is not ready yet.
-            try {
-                var desktop = java.awt.Desktop.getDesktop();
-                desktop.setOpenURIHandler(e -> {
-                    var url = e.getURI().toString();
-                    if (DatasetUrlHandler.isDatasetUrl(url)) {
-                        // If the single-instance server is running in this
-                        // process, we ARE the running instance: dispatch the
-                        // URL locally. Otherwise, forward it to the running
-                        // instance, or store it for the startup path if there
-                        // is none (cold start).
-                        var sim = SingleInstanceManager.getActiveInstance();
-                        if (sim != null) {
-                            sim.dispatchUrl(url);
-                        } else if (!SingleInstanceManager.forwardToRunningInstance(url)) {
-                            DatasetUrlHandler.setPendingUrl(url);
+            // Respond to custom URL protocol `gaiasky://` on macOS
+            if (SysUtils.isMac()) {
+                // GLFW async is required on macOS so that AWT can
+                // continue to process macOS application events.
+                Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
+
+                // macOS URL events arrive through StartupNotification
+                // rather than as command-line arguments.
+                try {
+                    StartupNotification.registerStartupListener(argument -> {
+                        if (DatasetUrlHandler.isDatasetUrl(argument)) {
+                            if (!SingleInstanceManager.forwardToRunningInstance(argument)) {
+                                DatasetUrlHandler.setPendingUrl(argument);
+                            }
                         }
-                    }
-                });
-            } catch (Throwable ignored) {
-                // Not on macOS, or headless — no-op.
-            }
-            try {
-                StartupNotification.registerStartupListener(argument -> {
-                    if (DatasetUrlHandler.isDatasetUrl(argument)) {
-                        if (!SingleInstanceManager.forwardToRunningInstance(argument)) {
-                            DatasetUrlHandler.setPendingUrl(argument);
-                        }
-                    }
-                });
-            } catch (Throwable ignored) {
-                // Not running under an install4j launcher (dev runs, etc.).
+                    });
+                } catch (Throwable ignored) {
+                    // Not running under an install4j launcher (dev runs, etc.).
+                }
             }
 
             // Single-instance handling. If a Gaia Sky instance is already

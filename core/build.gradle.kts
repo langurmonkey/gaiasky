@@ -140,9 +140,6 @@ abstract class GaiaSkyRun @Inject constructor() : JavaExec() {
         maxHeapSize = "6g"
 
         val baseJvmArgs = mutableListOf("-XX:+UseZGC", "-XX:+UseCompactObjectHeaders")
-        if (DefaultNativePlatform.getCurrentOperatingSystem().isMacOsX) {
-            baseJvmArgs.add("-XstartOnFirstThread")
-        }
         jvmArgs = baseJvmArgs
 
         classpath = project.sourceSets.main.get().runtimeClasspath + project.files(assets)
