@@ -262,6 +262,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 && ComponentUtils.isLoaded(roughnessUnapcked, manager)
                 && ComponentUtils.isLoaded(metallicUnpacked, manager)
                 && ComponentUtils.isLoaded(aoUnpacked, manager)
+                && ComponentUtils.isLoaded(occlusionMetallicRoughnessUnpacked, manager)
                 && ComponentUtils.isLoaded(diffuseCubemap, manager)
                 && ComponentUtils.isLoaded(normalCubemap, manager)
                 && ComponentUtils.isLoaded(emissiveCubemap, manager)
@@ -270,12 +271,12 @@ public final class MaterialComponent extends NamedComponent implements IObserver
                 && ComponentUtils.isLoaded(metallicCubemap, manager)
                 && ComponentUtils.isLoaded(heightCubemap, manager)
                 && ComponentUtils.isLoaded(aoCubemap, manager)
-                && ComponentUtils.isLoaded(volume0, manager)
-                && ComponentUtils.isLoaded(volume1, manager)
-                && ComponentUtils.isLoaded(volume2, manager)
-                && ComponentUtils.isLoaded(volume3, manager)
-                && ComponentUtils.isLoaded(texture0, manager)
-                && ComponentUtils.isLoaded(texture1, manager);
+                && ComponentUtils.isLoaded(volume0Unpacked, manager)
+                && ComponentUtils.isLoaded(volume1Unpacked, manager)
+                && ComponentUtils.isLoaded(volume2Unpacked, manager)
+                && ComponentUtils.isLoaded(volume3Unpacked, manager)
+                && ComponentUtils.isLoaded(texture0Unpacked, manager)
+                && ComponentUtils.isLoaded(texture1Unpacked, manager);
     }
 
     public boolean hasSVT() {

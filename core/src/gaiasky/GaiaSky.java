@@ -272,7 +272,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
     private final Runnable mainUpdaterRenderer = () -> {
 
         // Asynchronous load of textures and resources.
-        assetManager.update();
+        assetManager.update(2);
 
         if (!settings.runtime.updatePause) {
             synchronized (frameMonitor) {
