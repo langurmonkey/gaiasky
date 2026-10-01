@@ -9,6 +9,7 @@ package gaiasky.render.gdx.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.TextureData;
@@ -90,11 +91,15 @@ public class BufferedImageTextureData implements TextureData {
                 pixmap.drawPixel(x, y);
             }
         }
-        Gdx.gl.glTexImage2D(target, 0, pixmap.getGLInternalFormat(), width, height, 0,
-                pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
-
+        // Do not upload level 0 here when mip maps are requested: MipMapGenerator already
+        // uploads level 0 itself before calling glGenerateMipmap, so an extra glTexImage2D
+        // here would be a duplicate (and costly) upload.
+        Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
         if (useMipMaps()) {
             MipMapGenerator.generateMipMap(target, pixmap, width, height);
+        } else {
+            Gdx.gl.glTexImage2D(target, 0, pixmap.getGLInternalFormat(), width, height, 0,
+                    pixmap.getGLFormat(), pixmap.getGLType(), pixmap.getPixels());
         }
 
         // Dispose prepared data.
