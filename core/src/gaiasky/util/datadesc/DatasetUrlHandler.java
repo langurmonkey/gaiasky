@@ -9,10 +9,9 @@ package gaiasky.util.datadesc;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.urlprotocol.ActionApiCall;
 import gaiasky.util.urlprotocol.ActionFocus;
 import gaiasky.util.urlprotocol.ActionGoto;
 import gaiasky.util.urlprotocol.ActionHandler;
@@ -29,12 +28,15 @@ import java.util.Map;
  * Handles <code>gaiasky://</code> URLs, such as those produced by the protocol handler
  * registered with the operating system.
  * <p>
- * Only a few actions are currently supported, see {@link DatasetUrlHandler#ACTIONS}.
+ * Only a few actions are explicitly supported, see {@link DatasetUrlHandler#ACTIONS}.
+ * Any other action is dispatched reflectively to the APIv2 scripting subsystem by
+ * {@link ActionApiCall}, using the form <code>gaiasky://&lt;module&gt;/&lt;method&gt;?params</code>.
  * <p>
  * Example URLs:
  * <ul>
  * <li><code>gaiasky://load?dataset=gaia-dr3-nss</code></li>
  * <li><code>gaiasky://load?dataset=https%3A%2F%2Fgaia.ari.uni-heidelberg.de%2Fgaiasky%2Fdata%2Fcatalog.tar.gz</code></li>
+ * <li><code>gaiasky://camera/focus_mode?name=Earth</code></li>
  * </ul>
  */
 public class DatasetUrlHandler {
@@ -173,16 +175,17 @@ public class DatasetUrlHandler {
 
         // Run appropriate action.
         var handler = ACTIONS.get(action);
-        if (handler != null) {
-            handler.process(url,
-                            skin,
-                            stage,
-                            hotLoad,
-                            params);
-        } else {
-            String msg = String.format("Unknown URL action: gaiasky://%s", action);
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, DatasetUrlHandler.class, msg, 10f);
+        if (handler == null) {
+            // Not a built-in action. Fall back to the generic APIv2 dispatch,
+            // which treats the host as an API module and the first path segment
+            // as the method name, e.g. gaiasky://camera/focus_mode?name=Earth.
+            handler = new ActionApiCall();
         }
+        handler.process(url,
+                        skin,
+                        stage,
+                        hotLoad,
+                        params);
 
     }
 
