@@ -2594,6 +2594,7 @@ public class Settings extends SettingsObject {
                     }
                     case NAME_CONFLICTS_STARTUP_CMD -> showNameConflicts = (Boolean) data[0];
                     case REST_SERVER_CMD -> net.restPort = (Integer) data[0];
+                    case REST_SERVER_LOOPBACK_CMD -> net.restLoopbackOnly = (Boolean) data[0];
                     default -> {
                     }
                 }
@@ -2652,6 +2653,7 @@ public class Settings extends SettingsObject {
                                             Event.PROCEDURAL_GENERATION_SAVE_TEXTURES_CMD,
                                             Event.NAME_CONFLICTS_STARTUP_CMD,
                                             Event.REST_SERVER_CMD,
+                                            Event.REST_SERVER_LOOPBACK_CMD,
                                             Event.SHOW_NOTIFICATIONS_CMD);
 
             minimap.setupListeners();
@@ -3138,6 +3140,14 @@ public class Settings extends SettingsObject {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class NetSettings extends SettingsObject {
             public int restPort;
+            /**
+             * Whether to bind the REST server to the loopback interface only.
+             * If true (the default), the REST API is not reachable from other
+             * machines. Set to false to expose it to the network (for example,
+             * in master-slave planetarium setups). WARNING: this exposes the
+             * whole scripting API to your network.
+             */
+            public boolean restLoopbackOnly = true;
             public MasterSettings master;
             public SlaveSettings slave;
 

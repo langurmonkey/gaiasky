@@ -1650,6 +1650,12 @@ public enum Event {
     REST_SERVER_CMD,
 
     /**
+     * Change whether the REST server is restricted to the loopback interface.
+     * Contains a boolean (true = localhost only, false = reachable from the network).
+     **/
+    REST_SERVER_LOOPBACK_CMD,
+
+    /**
      * Sent to inform of a change of state in the REST server (online/offline). Contains
      * a boolean with the status.
      */

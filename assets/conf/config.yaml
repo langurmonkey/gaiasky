@@ -417,6 +417,11 @@ program:
   net:
     # Enable the REST API on this TCP port (negative to disable).
     restPort: -1
+    # Restrict the REST API to the loopback interface (localhost only).
+    # Set to false to make it reachable from other machines (for example, in
+    # master-slave planetarium setups). This exposes the whole scripting API to
+    # your network, so only do it in a trusted environment.
+    restLoopbackOnly: true
     # Master configuration.
     master:
       # Is master instance.

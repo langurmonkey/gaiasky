@@ -116,6 +116,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox shaderCache;
     private OwnCheckBox saveTextures;
     private OwnCheckBox restEnabled;
+    private OwnCheckBox restLoopbackOnly;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean<Integer>> graphicsQuality, antiAlias, lineRenderer, numThreads, screenshotMode,
             screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect, toneMappingSelect,
@@ -2719,6 +2720,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
         restPort.setDisabled(!restEnabled.isChecked());
 
+        // Loopback only.
+        var restLoopbackLabel = new OwnLabel(I18n.msg("gui.rest.loopback"), skin);
+        restLoopbackOnly = new OwnCheckBox("", skin);
+        restLoopbackOnly.setChecked(settings.program.net.restLoopbackOnly);
+        var restLoopbackTooltip = new OwnImageButton(skin, "tooltip");
+        restLoopbackTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.rest.loopback.info"), skin));
+
         // Apply.
         OwnTextButton applyRESTSettings = new OwnTextButton(I18n.msg("gui.apply"), skin);
         applyRESTSettings.addListener(event -> {
@@ -2732,13 +2740,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         applyRESTSettings.pad(0, pad34, 0, pad34);
         applyRESTSettings.setHeight(buttonHeight);
 
-        labels.add(portLabel, restEnabledLabel);
+        labels.add(portLabel, restEnabledLabel, restLoopbackLabel);
 
         restTable.add(restEnabledLabel).left().padBottom(pad10);
         restTable.add(restEnabled).left().padBottom(pad10).row();
         restTable.add(portLabel).left().padBottom(pad10);
         restTable.add(restPort).left().padBottom(pad10).padRight(pad34);
         restTable.add(portTooltip).left().padBottom(pad10).row();
+        restTable.add(restLoopbackLabel).left().padBottom(pad10);
+        restTable.add(restLoopbackOnly).left().padBottom(pad10).padRight(pad34);
+        restTable.add(restLoopbackTooltip).left().padBottom(pad10).row();
         // Only add 'apply' when not in welcome screen mode.
         if (!welcomeScreen)
             restTable.add(applyRESTSettings).left().padBottom(pad34).row();
@@ -2969,6 +2980,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         } else {
             port = -1;
         }
+        EventManager.publish(Event.REST_SERVER_LOOPBACK_CMD, this, restLoopbackOnly.isChecked());
         EventManager.publish(Event.REST_SERVER_CMD, this, port);
     }
 

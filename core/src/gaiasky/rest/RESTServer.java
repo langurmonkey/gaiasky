@@ -106,7 +106,16 @@ public class RESTServer implements Disposable {
             // Bind to the loopback interface only. Without this, the REST API
             // (which includes dataset downloads, file writes and the full
             // scripting API) would be reachable from the whole network.
-            Spark.ipAddress("127.0.0.1");
+            boolean loopbackOnly = GaiaSky.instance == null
+                    || GaiaSky.settings().program.net.restLoopbackOnly;
+            if (loopbackOnly) {
+                Spark.ipAddress("127.0.0.1");
+            } else {
+                // Reset, in case a previous run of this method had bound to loopback.
+                Spark.ipAddress("0.0.0.0");
+                logger.warn("The REST server is NOT restricted to the loopback interface: it is reachable from the whole network!");
+                logger.warn("Anyone who can reach this machine on port {} can run arbitrary scripting API calls.", port);
+            }
             Spark.port(port);
 
             /* Scripting APIv1 mapping */
@@ -121,8 +130,9 @@ public class RESTServer implements Disposable {
              * loopback interface. This prevents DNS rebinding attacks, where
              * a web page resolves its own domain to 127.0.0.1 and then talks
              * to the local REST API from the browser. */
-            Spark.before((request, response) -> {
-                String host = request.headers("Host");
+            if (loopbackOnly) {
+                Spark.before((request, response) -> {
+                    String host = request.headers("Host");
                 if (host != null) {
                     String hostname = host;
                     int colon = hostname.indexOf(':');
@@ -138,7 +148,8 @@ public class RESTServer implements Disposable {
                         Spark.halt(403);
                     }
                 }
-            });
+                });
+            }
 
             port = Spark.port();
 
