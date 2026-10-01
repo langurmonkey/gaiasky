@@ -57,14 +57,17 @@ public class ActionApiCall implements ActionHandler {
             "input",
             "output",
             "instances",
-            "scene",
-            "graphics"
+            "scene"
     };
     /**
      * Individual APIv2 methods that can NOT be reached through
      * {@code gaiasky://} URLs, in {@code module.method} format (e.g.
      * {@code camera.go_to_object}). Applied on top of the module
      * disallow list.
+     * <p>
+     *     Note that all methods that return a non-void type are
+     *     disallowed in code.
+     * </p>
      **/
     private static final String[] urlApiDisallowedMethods = new String[0];
 
@@ -135,6 +138,16 @@ public class ActionApiCall implements ActionHandler {
             return;
         }
 
+        // Reject calls that return a value: the result would be discarded by
+        // the URL invocation, so they make no sense as an action (getters,
+        // queries, listings).
+        if (!Void.TYPE.equals(matchMethod.getReturnType())) {
+            String msg = "API method returns a value, so it cannot be used as an action: " + module + "/" + method;
+            logger.warn(msg);
+            postNotification(msg);
+            return;
+        }
+
         // Coerce arguments.
         Object[] arguments;
         try {
@@ -161,9 +174,10 @@ public class ActionApiCall implements ActionHandler {
     }
 
     /**
-     * Checks whether the given module or method is disallowed through the
-     * <code>program::url::urlApiDisallowedModules</code> and
-     * <code>program::url::urlApiDisallowedMethods</code> settings.
+     * Checks whether the given module or method is disallowed by the
+     * hardcoded lists of this class. Additionally, methods that return a
+     * value are rejected after method resolution, see
+     * {@code process()}.
      *
      * @param module The module name.
      * @param method The method name. May be null (only the module is checked).
