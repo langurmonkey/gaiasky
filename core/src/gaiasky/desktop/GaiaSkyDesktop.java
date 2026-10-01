@@ -31,7 +31,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.Camcorder;
-import gaiasky.util.datadesc.DatasetUrlHandler;
+import gaiasky.util.urlprotocol.URLProtocolHandler;
 import gaiasky.util.i18n.I18n;
 import net.jafama.FastMath;
 import org.lwjgl.system.Configuration;
@@ -167,9 +167,9 @@ public class GaiaSkyDesktop {
                 // rather than as command-line arguments.
                 try {
                     StartupNotification.registerStartupListener(argument -> {
-                        if (DatasetUrlHandler.isDatasetUrl(argument)) {
+                        if (URLProtocolHandler.isDatasetUrl(argument)) {
                             if (!SingleInstanceManager.forwardToRunningInstance(argument)) {
-                                DatasetUrlHandler.setPendingUrl(argument);
+                                URLProtocolHandler.setPendingUrl(argument);
                             }
                         }
                     });
@@ -180,7 +180,7 @@ public class GaiaSkyDesktop {
 
             // Single-instance handling. If a Gaia Sky instance is already
             // running and a dataset URL was passed, forward it and exit.
-            if (DatasetUrlHandler.isDatasetUrl(cliArgs.parameter)) {
+            if (URLProtocolHandler.isDatasetUrl(cliArgs.parameter)) {
                 if (SingleInstanceManager.forwardToRunningInstance(cliArgs.parameter)) {
                     out.println("gaiasky: dataset URL forwarded to running instance, exiting");
                     return;

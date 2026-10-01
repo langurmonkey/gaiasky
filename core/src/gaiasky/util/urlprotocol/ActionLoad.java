@@ -20,7 +20,6 @@ import gaiasky.util.SettingsManager;
 import gaiasky.util.datadesc.Dataset;
 import gaiasky.util.datadesc.DatasetDownloadUtils;
 import gaiasky.util.datadesc.DatasetGroup;
-import gaiasky.util.datadesc.DatasetUrlHandler;
 import gaiasky.util.i18n.I18n;
 
 import java.nio.file.Files;
@@ -220,12 +219,12 @@ public class ActionLoad implements ActionHandler {
                     .loadJsonCatalog(dataset.name, dataset.checkPath.toAbsolutePath().toString());
             if (loaded) {
                 EventManager.publish(Event.POST_POPUP_NOTIFICATION,
-                                     DatasetUrlHandler.class,
+                                     URLProtocolHandler.class,
                                      I18n.msg("gui.url.dataset.loaded", dataset.name),
                                      10f);
             } else {
                 EventManager.publish(Event.POST_POPUP_NOTIFICATION,
-                                     DatasetUrlHandler.class,
+                                     URLProtocolHandler.class,
                                      I18n.msg("gui.url.dataset.loadfail", dataset.name),
                                      -1f);
             }

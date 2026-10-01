@@ -5,17 +5,12 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util.datadesc;
+package gaiasky.util.urlprotocol;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.urlprotocol.ActionApiCall;
-import gaiasky.util.urlprotocol.ActionFocus;
-import gaiasky.util.urlprotocol.ActionGoto;
-import gaiasky.util.urlprotocol.ActionHandler;
-import gaiasky.util.urlprotocol.ActionLoad;
 
 import java.net.URI;
 import java.net.URLDecoder;
@@ -24,23 +19,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Handles <code>gaiasky://</code> URLs, such as those produced by the protocol handler
- * registered with the operating system.
- * <p>
- * Only a few actions are explicitly supported, see {@link DatasetUrlHandler#ACTIONS}.
- * Any other action is dispatched reflectively to the APIv2 scripting subsystem by
- * {@link ActionApiCall}, using the form <code>gaiasky://&lt;module&gt;/&lt;method&gt;?params</code>.
- * <p>
- * Example URLs:
- * <ul>
- * <li><code>gaiasky://load?dataset=gaia-dr3-nss</code></li>
- * <li><code>gaiasky://load?dataset=https%3A%2F%2Fgaia.ari.uni-heidelberg.de%2Fgaiasky%2Fdata%2Fcatalog.tar.gz</code></li>
- * <li><code>gaiasky://camera/focus_mode?name=Earth</code></li>
- * </ul>
- */
-public class DatasetUrlHandler {
-    private static final Log logger = Logger.getLogger(DatasetUrlHandler.class);
+public class URLProtocolHandler {
+    private static final Log logger = Logger.getLogger(URLProtocolHandler.class);
 
     /** The URL scheme handled by this class. **/
     public static final String URL_SCHEME = "gaiasky";
@@ -61,7 +41,7 @@ public class DatasetUrlHandler {
      **/
     private static String pendingUrl = null;
 
-    private DatasetUrlHandler() {
+    private URLProtocolHandler() {
     }
 
     /**
@@ -76,7 +56,7 @@ public class DatasetUrlHandler {
     }
 
     /**
-     * Returns true if the given CLI argument is a {@link DatasetUrlHandler} URL.
+     * Returns true if the given CLI argument is a {@link URLProtocolHandler} URL.
      *
      * @param arg The CLI argument.
      *

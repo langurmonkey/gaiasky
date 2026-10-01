@@ -47,7 +47,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
-import gaiasky.util.datadesc.DatasetUrlHandler;
+import gaiasky.util.urlprotocol.URLProtocolHandler;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.FilePicker;
 import gaiasky.util.scene2d.FilePickerComponent;
@@ -798,7 +798,7 @@ public class MainGui extends AbstractGui {
      */
     public void handleDatasetUrl(String url,
                                  boolean hotLoad) {
-        Gdx.app.postRunnable(() -> DatasetUrlHandler.handle(url, skin, stage, hotLoad));
+        Gdx.app.postRunnable(() -> URLProtocolHandler.handle(url, skin, stage, hotLoad));
     }
 
 }

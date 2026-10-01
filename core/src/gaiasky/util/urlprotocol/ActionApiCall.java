@@ -7,10 +7,12 @@
 
 package gaiasky.util.urlprotocol;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.gui.window.ApiCallConfirmWindow;
 import gaiasky.script.v2.impl.APIv2;
 import gaiasky.script.v2.meta.ModuleDesc;
 import gaiasky.util.Logger;
@@ -47,6 +49,13 @@ import java.util.Map;
 public class ActionApiCall implements ActionHandler {
     private static final Logger.Log logger = Logger.getLogger(ActionApiCall.class);
 
+    /** Maximum accepted URL length, in characters. **/
+    private static final int MAX_URL_LENGTH = 4096;
+    /** Maximum accepted number of URL parameters. **/
+    private static final int MAX_PARAMS = 64;
+    /** Maximum accepted length of a single parameter value. **/
+    private static final int MAX_PARAM_VALUE_LENGTH = 1024;
+
     /**
      * APIv2 modules that can NOT be reached through {@code gaiasky://}
      * URLs of the form {@code gaiasky://<module>/<method>?params}.
@@ -77,6 +86,25 @@ public class ActionApiCall implements ActionHandler {
                         Stage stage,
                         boolean hotLoad,
                         Map<String, String> params) {
+        // Reject absurdly long URLs before doing any parsing work: a
+        // malicious page can trigger the protocol handler in a loop.
+        if (url == null || url.length() > MAX_URL_LENGTH) {
+            logger.warn("Rejected over-long API URL (" + (url == null ? 0 : url.length()) + " chars)");
+            return;
+        }
+        if (params != null && params.size() > MAX_PARAMS) {
+            logger.warn("Rejected API URL with too many parameters: " + params.size());
+            return;
+        }
+        if (params != null) {
+            for (var v : params.values()) {
+                if (v != null && v.length() > MAX_PARAM_VALUE_LENGTH) {
+                    logger.warn("Rejected API URL with an over-long parameter value");
+                    return;
+                }
+            }
+        }
+
         URI uri;
         try {
             uri = new URI(url);
@@ -159,14 +187,42 @@ public class ActionApiCall implements ActionHandler {
             return;
         }
 
-        // Invoke on the executor thread.
-        var args = arguments;
-        var methodName = method;
+        // Ask the user for confirmation. Any web page can trigger a
+        // gaiasky:// URL without user interaction (iframe, redirect, link
+        // with automatic navigation), so an API call must never be executed
+        // silently.
+        final String moduleName = module;
+        final String methodNameFinal = method;
+        var invoke = (Runnable) () -> invoke(moduleDesc, matchMethod, arguments, moduleName, methodNameFinal);
+        if (skin != null && stage != null) {
+            var confirm = new ApiCallConfirmWindow(url, moduleName + "/" + methodNameFinal, skin, stage, () -> Gdx.app.postRunnable(invoke),
+                                                 () -> logger.info("API call cancelled by user: " + moduleName + "/" + methodNameFinal));
+            confirm.show(stage);
+        } else {
+            // No UI available (e.g. headless or startup): do not execute.
+            logger.warn("No UI available to confirm API call, ignoring: " + module + "/" + method);
+        }
+    }
+
+    /**
+     * Invokes the given API method on the Gaia Sky executor thread.
+     *
+     * @param moduleDesc The module descriptor.
+     * @param method     The resolved method.
+     * @param arguments  The coerced arguments.
+     * @param module     The module name (for logging).
+     * @param methodName The method name (for logging).
+     */
+    private static void invoke(ModuleDesc moduleDesc,
+                               Method method,
+                               Object[] arguments,
+                               String module,
+                               String methodName) {
         GaiaSky.instance.getExecutorService().execute(() -> {
             try {
                 var apiv2 = ((gaiasky.script.EventScriptingInterface) GaiaSky.instance.scripting()).apiv2;
                 var moduleInstance = apiv2.getModuleInstance(moduleDesc.clazz());
-                matchMethod.invoke(moduleInstance, args);
+                method.invoke(moduleInstance, arguments);
             } catch (Exception e) {
                 logger.error(e, "Error invoking API method: " + module + "/" + methodName);
             }
@@ -366,6 +422,14 @@ public class ActionApiCall implements ActionHandler {
         if (s.isBlank()) {
             return new String[0];
         }
-        return s.split(",");
+        if (s.length() > MAX_PARAM_VALUE_LENGTH) {
+            throw new IllegalArgumentException("Array parameter is too long: " + s.length() + " characters");
+        }
+        // Trim each element, so that "[1, 2, 3]" works like "1,2,3".
+        var parts = s.split(",");
+        for (int i = 0; i < parts.length; i++) {
+            parts[i] = parts[i].trim();
+        }
+        return parts;
     }
 }

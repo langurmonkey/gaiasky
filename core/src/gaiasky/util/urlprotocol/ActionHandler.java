@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.util.datadesc.DatasetUrlHandler;
 
 import java.util.Map;
 
@@ -51,6 +50,6 @@ public interface ActionHandler {
      * @param message The message.
      */
     default void postNotification(String message) {
-        EventManager.publish(Event.POST_POPUP_NOTIFICATION, DatasetUrlHandler.class, message, 10f);
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, URLProtocolHandler.class, message, 10f);
     }
 }

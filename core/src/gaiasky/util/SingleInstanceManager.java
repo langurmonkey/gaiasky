@@ -7,7 +7,7 @@
 
 package gaiasky.util;
 
-import gaiasky.util.datadesc.DatasetUrlHandler;
+import gaiasky.util.urlprotocol.URLProtocolHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -184,7 +184,7 @@ public class SingleInstanceManager {
                 }
                 String url = in.readLine();
                 var out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
-                if (url != null && DatasetUrlHandler.isDatasetUrl(url)) {
+                if (url != null && URLProtocolHandler.isDatasetUrl(url)) {
                     out.println("OK");
                     dispatch(url);
                 } else {

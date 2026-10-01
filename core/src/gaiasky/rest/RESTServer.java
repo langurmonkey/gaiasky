@@ -103,6 +103,10 @@ public class RESTServer implements Disposable {
         }
 
         try {
+            // Bind to the loopback interface only. Without this, the REST API
+            // (which includes dataset downloads, file writes and the full
+            // scripting API) would be reachable from the whole network.
+            Spark.ipAddress("127.0.0.1");
             Spark.port(port);
 
             /* Scripting APIv1 mapping */
@@ -112,6 +116,29 @@ public class RESTServer implements Disposable {
             /* Scripting APIv2 mapping */
             var api2Module = api2Module();
             apiv2Mappings(api2Module);
+
+            /* Reject requests whose Host header does not point at the
+             * loopback interface. This prevents DNS rebinding attacks, where
+             * a web page resolves its own domain to 127.0.0.1 and then talks
+             * to the local REST API from the browser. */
+            Spark.before((request, response) -> {
+                String host = request.headers("Host");
+                if (host != null) {
+                    String hostname = host;
+                    int colon = hostname.indexOf(':');
+                    if (colon >= 0) {
+                        hostname = hostname.substring(0, colon);
+                    }
+                    if (!hostname.equalsIgnoreCase("localhost")
+                        && !hostname.equals("127.0.0.1")
+                        && !hostname.equals("[::1]")) {
+                        logger.warn("Rejected request with foreign Host header: " + host);
+                        response.status(403);
+                        response.body("Forbidden: the Gaia Sky REST API only accepts requests addressed to localhost.");
+                        Spark.halt(403);
+                    }
+                }
+            });
 
             port = Spark.port();
 

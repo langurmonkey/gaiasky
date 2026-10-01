@@ -42,14 +42,11 @@ import gaiasky.util.*;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.datadesc.Dataset;
-import gaiasky.util.datadesc.DatasetGroup;
-import gaiasky.util.datadesc.DatasetUtils;
-import gaiasky.util.datadesc.DatasetType;
-import gaiasky.util.datadesc.DatasetUrlHandler;
+import gaiasky.util.datadesc.*;
 import gaiasky.render.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+import gaiasky.util.urlprotocol.URLProtocolHandler;
 import gaiasky.vr.openxr.XrLoadStatus;
 import net.jafama.FastMath;
 
@@ -1087,12 +1084,12 @@ public class WelcomeGui extends AbstractGui {
     private void handleDatasetUrl() {
         // CLI argument (Linux/Windows path).
         var cliArgs = GaiaSky.instance.getCliArgs();
-        if (cliArgs != null && DatasetUrlHandler.isDatasetUrl(cliArgs.parameter)) {
+        if (cliArgs != null && URLProtocolHandler.isDatasetUrl(cliArgs.parameter)) {
             handleDatasetUrl(cliArgs.parameter, false);
         } else {
             // macOS: URL arrived via the open-URL Apple event before the UI
             // was ready, and was stored by the startup listener.
-            var pending = DatasetUrlHandler.consumePendingUrl();
+            var pending = URLProtocolHandler.consumePendingUrl();
             if (pending != null) {
                 handleDatasetUrl(pending, false);
             }
@@ -1110,7 +1107,7 @@ public class WelcomeGui extends AbstractGui {
      */
     public void handleDatasetUrl(String url,
                                  boolean hotLoad) {
-        Gdx.app.postRunnable(() -> DatasetUrlHandler.handle(url, skin, stage, hotLoad));
+        Gdx.app.postRunnable(() -> URLProtocolHandler.handle(url, skin, stage, hotLoad));
     }
 
     private static void reloadLocalDatasets() {

@@ -132,71 +132,113 @@ public class DatasetDownloadUtils {
 
     private final static DecimalFormat nf = new DecimalFormat("##0.0");
 
+    /**
+     * Hard cap on the total uncompressed size of an extracted archive
+     * (tar bomb protection). 200 GiB is far above any legitimate Gaia Sky
+     * dataset.
+     */
+    private final static long MAX_UNCOMPRESSED_BYTES = 200L * 1024L * 1024L * 1024L;
+
     public static void decompress(String in,
                                   File out,
                                   Dataset dataset) throws Exception {
-        FileInfoInputStream fIs = new FileInfoInputStream(in);
-        GZIPInputStream gzIs = new GZIPInputStream(fIs);
-        TarInputStream tarIs = new TarInputStream(gzIs);
-        double sizeKb = DatasetDownloadUtils.fileSize(in) / 1000d;
-        String sizeKbStr = nf.format(sizeKb);
-        TarEntry entry;
-        long last = 0;
-        boolean error = false;
-        Exception errorException = null;
-        Array<File> processedFiles = new Array<>();
-        while (null != (entry = tarIs.getNextEntry())) {
-            if (entry.isDirectory()) {
-                continue;
-            }
-            File curFile = new File(out, entry.getName());
-            File parent = curFile.getParentFile();
-            if (!parent.exists()) {
-                if (!parent.mkdirs()) {
-                    logger.info("Parent directory not created, already exists: " + parent.toPath());
+        // Canonical base directory for the extraction. Every entry is resolved
+        // against it and must stay inside it, otherwise a crafted archive could
+        // write outside the output directory ("zip slip").
+        Path outPath = out.getCanonicalFile().toPath().normalize();
+        final long maxUncompressedBytes = MAX_UNCOMPRESSED_BYTES;
+
+        try (FileInfoInputStream fIs = new FileInfoInputStream(in);
+             GZIPInputStream gzIs = new GZIPInputStream(fIs);
+             TarInputStream tarIs = new TarInputStream(gzIs)) {
+            double sizeKb = DatasetDownloadUtils.fileSize(in) / 1000d;
+            String sizeKbStr = nf.format(sizeKb);
+            TarEntry entry;
+            long last = 0;
+            boolean error = false;
+            Exception errorException = null;
+            Array<File> processedFiles = new Array<>();
+            long totalBytesWritten = 0L;
+            while (null != (entry = tarIs.getNextEntry())) {
+                if (entry.isDirectory()) {
+                    continue;
                 }
-            }
-
-            try (FileOutputStream fos = new FileOutputStream(curFile); BufferedOutputStream dest = new BufferedOutputStream(fos)) {
-                processedFiles.add(curFile);
-
-                int count;
-                byte[] data = new byte[2048];
-
-                while ((count = tarIs.read(data)) != -1) {
-                    dest.write(data, 0, count);
+                // Resolve the entry and make sure it does not escape the output
+                // directory via "..", absolute paths or symlinked parents.
+                Path resolved = outPath.resolve(entry.getName()).normalize();
+                if (!resolved.startsWith(outPath) || resolved.equals(outPath)) {
+                    String msg = I18n.msg("gui.download.extracting.error", "entry outside target directory: " + entry.getName());
+                    logger.error(msg);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, entry, msg, -1f);
+                    for (File f : processedFiles) {
+                        DatasetDownloadUtils.deleteFile(f.toPath());
+                    }
+                    throw new IOException(msg);
+                }
+                Path resolvedParent = resolved.getParent();
+                if (resolvedParent != null && Files.isSymbolicLink(resolvedParent)) {
+                    String msg = I18n.msg("gui.download.extracting.error", "symbolic link in extraction path: " + entry.getName());
+                    logger.error(msg);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, entry, msg, -1f);
+                    for (File f : processedFiles) {
+                        DatasetDownloadUtils.deleteFile(f.toPath());
+                    }
+                    throw new IOException(msg);
+                }
+                File curFile = resolved.toFile();
+                File parent = curFile.getParentFile();
+                if (!parent.exists()) {
+                    if (!parent.mkdirs()) {
+                        logger.info("Parent directory not created, already exists: " + parent.toPath());
+                    }
                 }
 
-            } catch (IOException e) {
-                errorException = e;
-                error = true;
-                break;
+                try (FileOutputStream fos = new FileOutputStream(curFile); BufferedOutputStream dest = new BufferedOutputStream(fos)) {
+                    processedFiles.add(curFile);
+
+                    int count;
+                    byte[] data = new byte[2048];
+
+                    while ((count = tarIs.read(data)) != -1) {
+                        totalBytesWritten += count;
+                        if (totalBytesWritten > maxUncompressedBytes) {
+                            throw new IOException("Archive expands beyond the maximum allowed size of "
+                                                          + maxUncompressedBytes + " bytes, aborting extraction");
+                        }
+                        dest.write(data, 0, count);
+                    }
+
+                } catch (IOException e) {
+                    errorException = e;
+                    error = true;
+                    break;
+                }
+
+                // Every 250 ms we update the view.
+                long current = System.currentTimeMillis();
+                long elapsed = current - last;
+                if (elapsed > 250) {
+                    var source = entry;
+                    GaiaSky.postRunnable(() -> {
+                        float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
+                        String progressString = I18n.msg("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
+                        EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, source, dataset.key, val, progressString, null);
+                    });
+                    last = current;
+                }
+
             }
 
-            // Every 250 ms we update the view.
-            long current = System.currentTimeMillis();
-            long elapsed = current - last;
-            if (elapsed > 250) {
-                var source = entry;
-                GaiaSky.postRunnable(() -> {
-                    float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
-                    String progressString = I18n.msg("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
-                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, source, dataset.key, val, progressString, null);
-                });
-                last = current;
+            if (error) {
+                String msg = I18n.msg("gui.download.extracting.error", errorException);
+                logger.error(errorException, msg);
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, entry, msg, -1f);
+                // Delete uncompressed files.
+                for (File f : processedFiles) {
+                    DatasetDownloadUtils.deleteFile(f.toPath());
+                }
+
             }
-
-        }
-
-        if (error) {
-            String msg = I18n.msg("gui.download.extracting.error", errorException);
-            logger.error(errorException, msg);
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, entry, msg, -1f);
-            // Delete uncompressed files.
-            for (File f : processedFiles) {
-                DatasetDownloadUtils.deleteFile(f.toPath());
-            }
-
         }
     }
 
@@ -214,7 +256,11 @@ public class DatasetDownloadUtils {
     public static Set<Path> snapshotDescriptors(Path dataLocation) {
         Set<Path> descriptors = new HashSet<>();
         if (dataLocation != null && Files.isDirectory(dataLocation)) {
-            try (Stream<Path> stream = Files.find(dataLocation, 2, (path, attrs) -> path.getFileName() != null && path.getFileName().toString().equals("dataset.json"))) {
+            try (Stream<Path> stream = Files.find(dataLocation,
+                                                  2,
+                                                  (path, attrs) -> path.getFileName() != null && path.getFileName()
+                                                          .toString()
+                                                          .equals("dataset.json"))) {
                 stream.forEach(descriptors::add);
             } catch (IOException e) {
                 logger.error(e, "Error snapshotting dataset descriptors in: " + dataLocation);
@@ -296,7 +342,11 @@ public class DatasetDownloadUtils {
     public static List<Dataset> localDatasets(Path dataLocation) {
         List<Dataset> datasets = new ArrayList<>();
         if (dataLocation != null && Files.isDirectory(dataLocation)) {
-            try (Stream<Path> stream = Files.find(dataLocation, 2, (path, attrs) -> path.getFileName() != null && path.getFileName().toString().equals("dataset.json"))) {
+            try (Stream<Path> stream = Files.find(dataLocation,
+                                                  2,
+                                                  (path, attrs) -> path.getFileName() != null && path.getFileName()
+                                                          .toString()
+                                                          .equals("dataset.json"))) {
                 stream.forEach(path -> {
                     var ds = datasetFromDescriptor(path);
                     if (ds != null) {
