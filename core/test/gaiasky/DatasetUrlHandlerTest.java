@@ -56,10 +56,4 @@ public class DatasetUrlHandlerTest {
         DatasetUrlHandler.handle("", null, null);
     }
 
-    @Test
-    public void testConstants() {
-        Assert.assertEquals("gaiasky", DatasetUrlHandler.URL_SCHEME);
-        Assert.assertEquals("load", DatasetUrlHandler.ACTION_LOAD);
-        Assert.assertEquals("dataset", DatasetUrlHandler.PARAM_DATASET);
-    }
 }

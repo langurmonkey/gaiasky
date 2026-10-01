@@ -662,9 +662,9 @@ public class CameraModule extends APIModule implements IObserver, CameraAPI {
 
     @Override
     public void go_to_object(String name,
-                             double positionDurationSeconds,
+                             double pos_duration,
                              double ori_duration) {
-        go_to_object(name, positionDurationSeconds, ori_duration, true);
+        go_to_object(name, pos_duration, ori_duration, true);
     }
 
     @Override
