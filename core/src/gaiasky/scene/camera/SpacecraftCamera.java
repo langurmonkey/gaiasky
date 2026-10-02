@@ -105,7 +105,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         camera.far = (float) CAM_FAR;
 
         // Init cameras vector.
-        cameras = new PerspectiveCamera[] { camera, camLeft, camRight };
+        cameras = new PerspectiveCamera[]{camera, camLeft, camRight};
 
         /*
          * Camera to render the attitude indicator system.
@@ -153,7 +153,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public PerspectiveCamera[] getFrontCameras() {
-        return new PerspectiveCamera[] { camera };
+        return new PerspectiveCamera[]{camera};
     }
 
     @Override
@@ -173,7 +173,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public Vector3D[] getDirections() {
-        return new Vector3D[] { direction };
+        return new Vector3D[]{direction};
     }
 
     @Override
@@ -181,7 +181,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         return 1;
     }
 
-    public void update(double dt, ITimeFrameProvider time) {
+    public void update(double dt,
+                       ITimeFrameProvider time) {
         spacecraftMouseKbdListener.update();
         gamepadListener.update();
 
@@ -195,7 +196,15 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scAccel.set(view.accel());
         scVel.set(view.vel());
         scpos.set(view.pos());
-        scpos = ((SpacecraftCoordinates) view.getCoordinates()).computePosition(dt, secondClosest, view.currentEnginePower(), scThrust, view.direction(), scForce, scAccel, scVel, scpos);
+        scpos = ((SpacecraftCoordinates) view.getCoordinates()).computePosition(dt,
+                                                                                secondClosest,
+                                                                                view.currentEnginePower(),
+                                                                                scThrust,
+                                                                                view.direction(),
+                                                                                scForce,
+                                                                                scAccel,
+                                                                                scVel,
+                                                                                scpos);
         scDir.set(view.direction());
         scUp.set(view.up());
         view.computeDirectionUp(dt, dirUp);
@@ -275,7 +284,10 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode mode, boolean centerFocus) {
+    public void updateMode(ICamera previousCam,
+                           CameraMode previousMode,
+                           CameraMode mode,
+                           boolean centerFocus) {
         InputProcessor ip = Gdx.input.getInputProcessor();
         if (ip instanceof InputMultiplexer im) {
             if (mode == CameraMode.SPACECRAFT_MODE && sc != null && previousMode != CameraMode.SPACECRAFT_MODE) {
@@ -353,21 +365,24 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         switch (event) {
-        case SPACECRAFT_LOADED -> {
-            sc = (Entity) data[0];
-            view.setEntity(sc);
-            updateTargetDistance();
-        }
-        case SPACECRAFT_MACHINE_SELECTION_INFO -> updateTargetDistance();
-        default -> {
-        }
+            case SPACECRAFT_LOADED -> {
+                sc = (Entity) data[0];
+                view.setEntity(sc);
+                updateTargetDistance();
+            }
+            case SPACECRAFT_MACHINE_SELECTION_INFO -> updateTargetDistance();
+            default -> {
+            }
         }
     }
 
     private void updateTargetDistance() {
-        this.targetDistance = view.size() * 3.5;
+        if (view.isValid())
+            this.targetDistance = view.size() * 3.5;
     }
 
     @Override
@@ -397,7 +412,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize(int width,
+                       int height) {
     }
 
     @Override

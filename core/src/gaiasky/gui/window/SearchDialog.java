@@ -35,6 +35,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.util.DatasetCard;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.SesameResolver;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -63,6 +64,10 @@ public class SearchDialog extends GenericDialog {
     private OwnLabel infoMessage;
     private Table candidates;
     private int cIdx = -1;
+    /** Label of the "search on Sesame" pseudo-candidate, always the last row of the list. **/
+    private OwnLabel sesameLabel;
+    /** Whether the Sesame pseudo-candidate is currently available. **/
+    private boolean sesameAvailable;
 
     public SearchDialog(Skin skin, Stage ui, Scene scene, boolean suggestions) {
         super(I18n.msg("gui.objects.search"), skin, ui);
@@ -112,22 +117,28 @@ public class SearchDialog extends GenericDialog {
         searchInput.setMessageText(I18n.msg("gui.objects.search"));
         searchInput.addListener(event -> {
             if (event instanceof InputEvent ie) {
-                int matchingSize = matching.size();
                 int code = ie.getKeyCode();
                 if (ie.getType() == Type.keyUp) {
                     if (code == Keys.ESCAPE || code == Keys.ENTER) {
-                        if (cIdx >= 0) {
+                        if (cIdx >= 0 && isSesameIndex(cIdx)) {
+                            // External name resolution: close the dialog like with any other candidate
+                            String term = searchInput.getText();
+                            removeCandidates();
+                            me.remove();
+                            resolveOnSesame(term);
+                            return true;
+                        } else if (cIdx >= 0) {
                             checkString(searchInput.getText(), scene);
                         }
                         removeCandidates();
                         me.remove();
                         return true;
-                    } else if (code == Keys.TAB && Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && matchingSize > 0) {
-                        cIdx = cIdx - 1 < 0 ? matchingSize - 1 : cIdx - 1;
+                    } else if (code == Keys.TAB && Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && candidateCount() > 0) {
+                        cIdx = cIdx - 1 < 0 ? candidateCount() - 1 : cIdx - 1;
                         selectMatch();
                         return true;
-                    } else if (code == Keys.TAB && !Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && matchingSize > 0) {
-                        cIdx = (cIdx + 1) % matchingSize;
+                    } else if (code == Keys.TAB && !Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && candidateCount() > 0) {
+                        cIdx = (cIdx + 1) % candidateCount();
                         selectMatch();
                         return true;
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
@@ -142,9 +153,11 @@ public class SearchDialog extends GenericDialog {
                                     synchronized (matching) {
                                         matchingNodes(name, scene);
 
-                                        if (!matching.isEmpty()) {
+                                        boolean any = !matching.isEmpty() || sesameEnabled();
+                                        if (any) {
                                             cIdx = -1;
                                             candidates.clear();
+                                            matchingLabels.clear();
                                             matching.forEach(match -> {
                                                 OwnLabel m = new OwnLabel(match, skin);
                                                 m.addListener((evt) -> {
@@ -163,6 +176,27 @@ public class SearchDialog extends GenericDialog {
                                                 Cell<?> c = candidates.add(m).left().padBottom(pad10);
                                                 c.row();
                                             });
+
+                                            // The Sesame entry always goes last, in blue, so that it can be told
+                                            // apart from the local catalog matches.
+                                            sesameAvailable = false;
+                                            if (sesameEnabled()) {
+                                                sesameAvailable = true;
+                                                sesameLabel = new OwnLabel(I18n.msg("gui.search.sesame.candidate", name), skin);
+                                                sesameLabel.addListener((evt) -> {
+                                                    if (evt instanceof InputEvent iEvt
+                                                            && iEvt.getType() == Type.touchDown) {
+                                                        resolveOnSesame(name);
+                                                        accept();
+                                                        return true;
+                                                    }
+                                                    return false;
+                                                });
+                                                sesameLabel.setWidth(searchInput.getWidth());
+                                                sesameLabel.setColor(ColorUtils.gBlueC);
+                                                candidates.add(sesameLabel).left().padBottom(pad10).row();
+                                            }
+
                                             candidates.pack();
                                             searchInput.localToStageCoordinates(aux.set(0, 0));
                                             candidates.setPosition(aux.x, aux.y, Align.topLeft);
@@ -246,6 +280,59 @@ public class SearchDialog extends GenericDialog {
             candidates.remove();
         }
         cIdx = -1;
+        sesameAvailable = false;
+        sesameLabel = null;
+    }
+
+    /**
+     * Whether the Sesame name discovery is enabled and usable.
+     */
+    private boolean sesameEnabled() {
+        return GaiaSky.settings().program.search.sesameNameDiscovery && !GaiaSky.settings().program.offlineMode;
+    }
+
+    /**
+     * Number of selectable candidates, i.e. the local matches plus the Sesame entry.
+     */
+    private int candidateCount() {
+        return matching.size() + (sesameAvailable ? 1 : 0);
+    }
+
+    private boolean isSesameIndex(int idx) {
+        return sesameAvailable && idx == matching.size();
+    }
+
+    /**
+     * Runs a Sesame name resolution for the given term and notifies the user with the result.
+     *
+     * @param term The search term.
+     */
+    private void resolveOnSesame(String term) {
+        logger.info(I18n.msg("gui.search.sesame.running", term));
+
+        // The window is created right away, and shows a "running" message until the result arrives.
+        final SesameResultWindow window = new SesameResultWindow(stage, skin, term, null);
+        window.setRunning();
+        window.show(stage);
+
+        SesameResolver.resolve(term, (result, error) -> {
+            if (error != null) {
+                logger.info(I18n.msg("gui.search.sesame.error", term, error));
+                window.setResult(null, error);
+            } else if (result == null) {
+                logger.info(I18n.msg("gui.search.sesame.miss", term));
+                window.setResult(null, null);
+            } else {
+                // The alias list can be very long, so only log the first few.
+                String aliases = result.aliases().isEmpty() ? "-" : String.join(", ",
+                                                                                 result.aliases()
+                                                                                         .stream()
+                                                                                         .limit(5)
+                                                                                         .toList());
+                logger.info(I18n.msg("gui.search.sesame.hit", result.oname(), result.otype(), aliases));
+                window.setResult(result, null);
+            }
+        });
     }
 
     private void selectMatch() {
@@ -257,6 +344,11 @@ public class SearchDialog extends GenericDialog {
             } else {
                 l.setColor(ColorUtils.gWhiteC);
             }
+        }
+        // The Sesame entry is highlighted in yellow like any other candidate, but it goes back to
+        // blue when the selection moves away from it, so that it remains distinguishable.
+        if (sesameLabel != null) {
+            sesameLabel.setColor(isSesameIndex(cIdx) ? ColorUtils.gYellowC : ColorUtils.gBlueC);
         }
     }
 

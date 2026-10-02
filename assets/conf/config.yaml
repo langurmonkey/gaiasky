@@ -387,6 +387,12 @@ program:
   uvGrid:
     # Display coordinates in the frame of the window
     frameCoordinates: true
+  # Search settings.
+  search:
+    # Offer name discovery via the Sesame name resolver of the CDS in the search dialog.
+    sesameNameDiscovery: true
+    # URL of the Sesame name resolver service.
+    sesameUrl: https://cds.unistra.fr/cgi-bin/nph-sesame/-oxpI
   # Stereoscopic mode (3D).
   modeStereo:
     # Start in 3D mode.

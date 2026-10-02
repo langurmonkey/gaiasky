@@ -181,15 +181,16 @@ public class SpacecraftGui extends AbstractGui {
         stabilise = new OwnImageButton(skin, "sc-stabilise");
         stabilise.setProgrammaticChangeEvents(false);
         stabilise.setName("stabilise");
-        if (sc != null)
+        if (view.isValid()) {
             stabilise.setChecked(view.isStabilising());
-        stabilise.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(gaiasky.event.Event.SPACECRAFT_STABILISE_CMD, stabilise, stabilise.isChecked());
-                return true;
-            }
-            return false;
-        });
+            stabilise.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(gaiasky.event.Event.SPACECRAFT_STABILISE_CMD, stabilise, stabilise.isChecked());
+                    return true;
+                }
+                return false;
+            });
+        }
         stabilise.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.sc.stabilise"), skin));
 
         stop = new OwnImageButton(skin, "sc-stop");
@@ -294,16 +295,18 @@ public class SpacecraftGui extends AbstractGui {
 
         // Spaceship selector
         machineSelector = new OwnSelectBox<>(skin);
-        machineSelector.setItems(view.getMachines());
-        machineSelector.setSelected(view.getMachines()[view.getCurrentMachine()]);
-        machineSelector.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                int machineIndex = machineSelector.getSelectedIndex();
-                EventManager.publish(gaiasky.event.Event.SPACECRAFT_MACHINE_SELECTION_CMD, machineSelector, machineIndex);
-                return true;
-            }
-            return false;
-        });
+        if (view.isValid()) {
+            machineSelector.setItems(view.getMachines());
+            machineSelector.setSelected(view.getMachines()[view.getCurrentMachine()]);
+            machineSelector.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    int machineIndex = machineSelector.getSelectedIndex();
+                    EventManager.publish(gaiasky.event.Event.SPACECRAFT_MACHINE_SELECTION_CMD, machineSelector, machineIndex);
+                    return true;
+                }
+                return false;
+            });
+        }
 
         // Whether to keep the velocity pointing in the direction vector
         velToDir = new OwnCheckBox(I18n.msg("gui.sc.veltodir"), skin, 16f);
@@ -593,8 +596,10 @@ public class SpacecraftGui extends AbstractGui {
             case SPACECRAFT_LOADED -> {
                 this.sc = (Entity) data[0];
                 this.view.setEntity(this.sc);
-                this.qf = view.getRotationQuaternion();
-                this.vel = view.vel();
+                if (this.view.isValid()) {
+                    this.qf = view.getRotationQuaternion();
+                    this.vel = view.vel();
+                }
                 buildGui();
             }
             case SPACECRAFT_STABILISE_CMD -> {

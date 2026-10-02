@@ -2434,6 +2434,7 @@ public class Settings extends SettingsObject {
         public ModeCubemapSettings modeCubemap;
         public NetSettings net;
         public UiSettings ui;
+        public SearchSettings search;
         /** Ask confirmation on exit. **/
         public boolean exitConfirmation = true;
         /** Show name conflicts at startup, if any. **/
@@ -2609,6 +2610,7 @@ public class Settings extends SettingsObject {
             c.pointer = this.pointer.clone();
             c.ui = this.ui.clone();
             c.net = this.net.clone();
+            c.search = this.search.clone();
             c.modeCubemap = this.modeCubemap.clone();
             c.modeStereo = this.modeStereo.clone();
             c.recursiveGrid = this.recursiveGrid.clone();
@@ -2623,6 +2625,7 @@ public class Settings extends SettingsObject {
             fileChooser.setParent(s);
             ui.setParent(s);
             net.setParent(s);
+            search.setParent(s);
             modeCubemap.setParent(s);
             modeStereo.setParent(s);
             recursiveGrid.setParent(s);
@@ -2660,6 +2663,7 @@ public class Settings extends SettingsObject {
             fileChooser.setupListeners();
             ui.setupListeners();
             net.setupListeners();
+            search.setupListeners();
             modeCubemap.setupListeners();
             modeStereo.setupListeners();
             recursiveGrid.setupListeners();
@@ -2674,6 +2678,7 @@ public class Settings extends SettingsObject {
             fileChooser.dispose();
             ui.dispose();
             net.dispose();
+            search.dispose();
             modeCubemap.dispose();
             modeStereo.dispose();
             recursiveGrid.dispose();
@@ -2707,6 +2712,7 @@ public class Settings extends SettingsObject {
             fileChooser.apply();
             ui.apply();
             net.apply();
+            search.apply();
             modeCubemap.apply();
             modeStereo.apply();
             recursiveGrid.apply();
@@ -3134,6 +3140,35 @@ public class Settings extends SettingsObject {
                 @Override
                 public void apply() {
                 }
+            }
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class SearchSettings extends SettingsObject {
+            /** Offer name discovery via the Sesame name resolver of the CDS. **/
+            public boolean sesameNameDiscovery = true;
+            /** URL of the Sesame name resolver service. **/
+            public String sesameUrl = "https://cds.unistra.fr/cgi-bin/nph-sesame/-oxpI";
+
+            @Override
+            public SearchSettings clone() {
+                return (SearchSettings) super.clone();
+            }
+
+            @Override
+            protected void setParentRecursive(SettingsObject s) {
+            }
+
+            @Override
+            protected void setupListeners() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+
+            @Override
+            public void apply() {
             }
         }
 

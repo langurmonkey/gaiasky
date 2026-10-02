@@ -282,6 +282,7 @@ public class SettingsMorph {
         program.minimap.active = bool("program.display.minimap", p);
         program.minimap.size = f32("program.minimap.size", p);
         program.minimap.inWindow = false;
+        program.search = new SearchSettings();
         program.modeStereo = new ModeStereoSettings();
         program.modeStereo.active = bool("program.stereoscopic", p);
         program.modeStereo.profile = StereoProfile.values()[i32("program.stereoscopic.profile", p)];

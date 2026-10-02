@@ -98,7 +98,9 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
     }
 
     public float size() {
-        return body.size;
+        if (body != null)
+            return body.size;
+        else return 0;
     }
 
     public double getResponsiveness() {
@@ -242,7 +244,8 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
             EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
     }
 
-    public void setThrustFactorIndex(int i, boolean broadcast) {
+    public void setThrustFactorIndex(int i,
+                                     boolean broadcast) {
         assert i >= 0 && i < MotorEngine.thrustFactor.length : "Index " + i + " out of range of thrustFactor vector: [0.." + (MotorEngine.thrustFactor.length - 1);
         engine.thrustFactorIndex = i;
         logger.info("Thrust factor: " + MotorEngine.thrustFactor[engine.thrustFactorIndex]);
@@ -250,7 +253,8 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
             EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
     }
 
-    public double computeDirectionUp(double dt, Pair<Vector3D, Vector3D> pair) {
+    public double computeDirectionUp(double dt,
+                                     Pair<Vector3D, Vector3D> pair) {
         // Yaw, pitch and roll
         engine.yawf = engine.yawp * engine.responsiveness;
         engine.pitchf = engine.pitchp * engine.responsiveness;

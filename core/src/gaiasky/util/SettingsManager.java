@@ -18,6 +18,7 @@ import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasSettings;
 import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
+import gaiasky.util.Settings.ProgramSettings.SearchSettings;
 import gaiasky.util.Settings.ProgramSettings.UVGridSettings;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.SceneSettings.ParticleSettings;
@@ -283,6 +284,11 @@ public class SettingsManager {
         // UV grid.
         if (settings.program.uvGrid == null) {
             settings.program.uvGrid = new UVGridSettings();
+        }
+
+        // Search settings.
+        if (settings.program.search == null) {
+            settings.program.search = new SearchSettings();
         }
 
         // Line settings.
