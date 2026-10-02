@@ -214,9 +214,17 @@ public class WelcomeGui extends AbstractGui {
                                     null,
                                     null,
                                     (digest) -> GaiaSky.postRunnable(() -> {
-                                        // Data descriptor ok. Skip welcome screen only if flag and base data present
-                                        if (skipWelcome && baseDataPresent()) {
-                                            startLoading();
+                                        // Data descriptor ok.
+                                        if (skipWelcome) {
+                                            // No base data means no datasets to load, so the recommended
+                                            // datasets screen would be shown. There is nothing to skip
+                                            // to, so tell the user and exit.
+                                            if (!baseDataPresent()) {
+                                                logger.info(I18n.msg("gui.welcome.skipwelcome.nodatasets"));
+                                                GaiaSky.postRunnable(Gdx.app::exit);
+                                            } else {
+                                                startLoading();
+                                            }
                                         } else {
                                             buildWelcomeUI();
                                         }
@@ -252,6 +260,11 @@ public class WelcomeGui extends AbstractGui {
             logger.error(I18n.msg("gui.welcome.error.nointernet"));
         }
         if (baseDataPresent()) {
+            // Nothing to download, so we can go on directly.
+            if (skipWelcome) {
+                GaiaSky.postRunnable(this::startLoading);
+                return;
+            }
             // Just post a tooltip and go on.
             GaiaSky.postRunnable(() -> {
                 var title = I18n.msg("gui.download.noconnection.continue");
