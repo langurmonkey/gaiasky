@@ -72,6 +72,47 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Minimum distance from camera to object.
      */
     private static final double MIN_DIST = 1 * Constants.M_TO_U;
+
+    /**
+     * Baseline camera speed used right at a body surface, i.e. the lower bound of the speed
+     * scaling curve. Roughly the speed of a walking pace.
+     */
+    private static final double SURFACE_SPEED = 10d * Constants.M_TO_U;
+
+    /**
+     * Multiplier applied to {@link #SURFACE_SPEED} to obtain the lower bound of the velocity
+     * clamp (the "top speed" cap). Deliberately larger than the scaling floor so that the cap
+     * does not become the limiting factor right above a surface.
+     */
+    private static final double SURFACE_SPEED_CAP_FACTOR = 10d;
+
+    /**
+     * Minimum altitude (in body radii) considered for the near-surface damping factor. Prevents
+     * the damping from diverging when the camera is very close to the surface.
+     */
+    private static final double MIN_ALTITUDE_RATIO = 1.0e-2;
+
+    /**
+     * Maximum boost applied to the near-surface damping factor.
+     */
+    private static final double MAX_DAMPING_BOOST = 1.0 / MIN_ALTITUDE_RATIO;
+
+    /**
+     * Reference altitude used by the logarithmic (power) speed scaling curve. Speed is
+     * {@link #SURFACE_SPEED} at this altitude.
+     */
+    private static final double SPEED_SCALE_REF_ALTITUDE = 1d * Constants.M_TO_U;
+
+    /**
+     * Exponent of the power scaling curve. Chosen so that the curve still reaches the previous
+     * maximum speed (~2e16 u/s) at {@link #DIST_SMOOTH_UP}.
+     */
+    private static final double SPEED_SCALE_EXPONENT = 0.67d;
+
+    /**
+     * Hard ceiling of the speed scaling curve.
+     */
+    private static final double MAX_SPEED_SCALING = 2.0e16;
     /**
      * The force acting on the entity and the friction.
      **/
@@ -449,7 +490,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
         speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
-        speedScalingCapped = FastMath.max(10d * Constants.M_TO_U, speedScaling);
+        // Lower bound of the velocity clamp. This must stay well above {@link #SURFACE_SPEED}, otherwise
+        // the cap (and not the available speed) limits the camera right above a surface.
+        speedScalingCapped = FastMath.max(SURFACE_SPEED_CAP_FACTOR * SURFACE_SPEED, speedScaling);
         switch (m) {
             case FOCUS_MODE:
                 if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow() && focus.isFocusable()) {
@@ -712,10 +755,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public void addForwardForce(double amount) {
         double tu = speedScaling();
-        if (amount <= 0) {
-            // Avoid getting stuck in surface
-            tu = FastMath.max(10d * Constants.M_TO_U, tu);
-        }
+        // Avoid getting stuck in surface mode: the forward speed must never fall below the
+        // surface speed floor, in either direction.
+        tu = FastMath.max(SURFACE_SPEED, tu);
         if (parent.mode == CameraMode.FOCUS_MODE) {
             desired.set(focusDirection);
         } else {
@@ -999,7 +1041,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             double elevation = focus.getElevationAt(pos);
             double counterAmount = lastFwdAmount < 0 && cinematic ? FastMath.min(speedScaling, 200) : 2;
             if (getMode().isFocus() && lastFwdAmount > 0) {
-                counterAmount *= 1.0 / ((focus.getDistToCamera() - elevation) / elevation);
+                // Extra braking when moving towards the body. This must stay bounded, otherwise the
+                // factor diverges as the altitude goes to zero and the camera gets stuck on the surface.
+                double altitude = FastMath.max(focus.getDistToCamera() - elevation, elevation * MIN_ALTITUDE_RATIO);
+                double ratio = elevation / altitude;
+                counterAmount *= FastMath.min(ratio, MAX_DAMPING_BOOST);
             }
             // The last term applies a greater scale when the direction and velocity vector face in the same general direction.
             double scl = -velocity * counterAmount * dt;
@@ -1007,6 +1053,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 friction.set(vel)
                         .nor()
                         .scl(scl);
+            } else {
+                // Never keep a stale friction vector around.
+                friction.setZero();
             }
         } else {
             friction.set(force)
@@ -1420,6 +1469,26 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double smoothedDistance = -1;
 
     /**
+     * Maps an altitude (distance above a body surface) to a speed scaling value, using a power
+     * curve instead of a linear mapping. Linear scaling collapses to zero at the surface, which
+     * makes the camera unusably slow in surface mode.
+     *
+     * @param altitude Distance above the surface, in internal units.
+     *
+     * @return The speed scaling.
+     */
+    private static double altitudeToSpeedScale(double altitude) {
+        if (altitude <= 0 || !Double.isFinite(altitude)) {
+            return SURFACE_SPEED;
+        }
+
+        double normalized = altitude / SPEED_SCALE_REF_ALTITUDE;
+        double scale = SURFACE_SPEED * Math.pow(normalized, SPEED_SCALE_EXPONENT);
+
+        return FastMath.min(scale, MAX_SPEED_SCALING);
+    }
+
+    /**
      * The speed scaling function.
      *
      * @param min The minimum speed.
@@ -1436,7 +1505,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             smoothedDistance = 0;
         }
         smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, 5.0);
-        var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, 2e16);
+
+        if (dist < SPEED_SCALE_REF_ALTITUDE) {
+            // Very close to a surface: use the logarithmic curve.
+            return FastMath.max(altitudeToSpeedScale(dist), min) * GaiaSky.settings().scene.camera.speed * Constants.DISTANCE_SCALE_FACTOR;
+        }
+
+        // Far from any surface: keep the original linear mapping.
+        var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, MAX_SPEED_SCALING);
 
         return smoothedDistance >= 0 ? (Math.max(distanceMap,
                                                  min) * GaiaSky.settings().scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
