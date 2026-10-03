@@ -64,7 +64,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The basic camera of Gaia Sky. Implements focus, free and game modes. It also incorporates the
- * cinematic and the non-cinematic behaviours.
+ * cinematic and the non-cinematic behaviours: in the regular (non cinematic) mode the camera is
+ * damped to a full stop when the input is released, while in cinematic mode it keeps rotating and
+ * moving inwards and outwards until it is explicitly stopped.
  */
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
@@ -113,6 +115,69 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Hard ceiling of the speed scaling curve.
      */
     private static final double MAX_SPEED_SCALING = 2.0e16;
+
+    /**
+     * Lower bound of the factor that slows the rotation as the focus fills the screen. Without a
+     * floor, the camera cannot be turned at all when it is very close to a surface.
+     */
+    private static final double ROTATION_MIN_FACTOR = 0.15;
+
+    /**
+     * Number of focus radii below which the rotation slowdown starts to kick in.
+     */
+    private static final double ROTATION_SLOWDOWN_RADII = 2.0;
+
+    /**
+     * Time constant (in seconds) used to ramp the angular rate up to the requested rate.
+     */
+    private static final double ROTATION_ACCEL_TAU = 0.2;
+
+    /**
+     * Time constant (in seconds) used to decay the angular rate to rest when there is no rotation
+     * input. Only used when the camera stops on its own, i.e. outside cinematic mode.
+     */
+    private static final double ROTATION_DECAY_TAU = 0.2;
+
+    /**
+     * Effectively infinite time constant, used in cinematic mode to hold the current angular rate
+     * once the input stops: the camera keeps rotating at the last requested rate.
+     */
+    private static final double ROTATION_HOLD_TAU = 1.0e9;
+
+    /**
+     * Angular rates with a magnitude below this are snapped to zero, so that the exponential decay
+     * actually reaches a full stop instead of crawling asymptotically.
+     */
+    private static final double ROTATION_MIN_RATE = 1e-9;
+
+    /**
+     * Time (in seconds) without forward input after which the camera starts being damped to a stop.
+     * Note that {@code lastFwdTime} is in seconds. Only used when {@link #stopsOnRelease()}.
+     */
+    private static final double FORWARD_RESPONSE_TIME = 0.25;
+
+    /**
+     * Time (in seconds) of exponential damping applied to the velocity once the forward input has
+     * been released, so that the camera decelerates smoothly to a full stop. Only used when {@link
+     * #stopsOnRelease()}.
+     */
+    private static final double STOP_DAMPING_TAU = 0.3;
+
+    /**
+     * Time (in seconds) without forward input after which the camera is stopped outright, in case
+     * the exponential damping has not brought it to a complete rest yet. Only used when {@link
+     * #stopsOnRelease()}.
+     */
+    private static final double FORWARD_STOP_TIME = 1.0;
+
+    /**
+     * Time (in seconds) after the last rotation input during which the requested angular rate is
+     * still considered active. The input listeners keep their last value around instead of clearing
+     * it, so this is what tells the camera that the input has actually stopped. It must be at least
+     * one frame long, so that a single dropped input event does not cut the rotation.
+     */
+    private static final double ROTATION_INPUT_GRACE = 0.06;
+
     /**
      * The force acting on the entity and the friction.
      **/
@@ -232,6 +297,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private Vector3Q freeTargetPos;
     private boolean freeTargetOn;
     private Vector3Q desired;
+
+    /**
+     * Distance from the camera to the focus, as computed at the beginning of the current frame in
+     * {@link #camUpdate(double, ITimeFrameProvider)}. Negative when it has not been computed yet,
+     * in which case the distance is taken from the focus object instead. Used by {@link
+     * #addRotateMovement(double, double, boolean, boolean)} so that the rotation slowdown and the
+     * surface mode use the same, current distance.
+     */
+    private double distFromFocus = -1;
+
+    /**
+     * Time (in seconds) since the last rotation input arrived. Reset by {@link
+     * #addAmount(Vector3D, double, boolean)} and the {@code setXxx} methods.
+     */
+    private double rotationIdleTime = Double.MAX_VALUE;
 
     /**
      * Surface mode Cartesian coordinates of the mouse pointer on the focus object at every frame.
@@ -514,6 +594,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         distance = pos.lenDouble();
 
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
+        // Reset the focus distance: it is recomputed in focus mode below.
+        distFromFocus = -1;
+        // Advance the rotation input idle timer (reset whenever an input arrives).
+        rotationIdleTime += dt;
         // Advance the distance smoothing filters exactly once per frame.
         rawDistancesValid = false;
         updateSmoothedDistances(dt);
@@ -595,7 +679,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         // Surface mode.
                         Vector3Q camObj = aux1b.set(aux4b)
                                 .sub(pos);
-                        double distFromFocus = camObj.lenDouble();
+                        // Store it in the field, so the rotation slowdown uses the same value.
+                        this.distFromFocus = camObj.lenDouble();
 
                         // Surface mode activates when we're at 1.8 radii from the focus object, and it is a planet. Camera can't be tracking an object.
                         surfaceModeFlag.set(
@@ -903,9 +988,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 addPitch(deltaY * fovFactor, acceleration);
             } else {
                 double radius = focus.isSolidObject() ? focus.getRadius() : 0;
-                double distanceInRadii = getFovFactor() * (focus.getDistToCamera() - radius) / radius;
-                double maxRadii = 2.0;
-                double factor = ((distanceInRadii < maxRadii) ? distanceInRadii / maxRadii : 1.0);
+                // Use the same distance source as the surface mode flag, so that both use the
+                // freshly computed distance in the current frame.
+                double distToFocus = this.distFromFocus >= 0 ? this.distFromFocus : focus.getDistToCamera();
+                double distanceInRadii = radius > 0 ? getFovFactor() * (distToFocus - radius) / radius : Double.MAX_VALUE;
+                // Slow down as the focus fills the screen, but never stop being able to turn.
+                double factor = (distanceInRadii < ROTATION_SLOWDOWN_RADII)
+                        ? FastMath.max(distanceInRadii / ROTATION_SLOWDOWN_RADII, ROTATION_MIN_FACTOR)
+                        : 1.0;
                 // This factor slows the rotation as the focus gets closer and closer
                 addHorizontal(deltaX * factor, acceleration);
                 addVertical(deltaY * factor, acceleration);
@@ -913,13 +1003,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
+    /**
+     * Adds the given amount of angular rate to the given angle vector. The {@code acceleration}
+     * flag is ignored: the amount is always a requested rate, which {@link
+     * #updatePosition(Vector3D, double)} ramps towards and decays back to rest when the input
+     * stops.
+     *
+     * @param vec          The angle vector ({@code x} = requested rate, {@code y} = current rate,
+     *                      {@code z} = rotation this frame).
+     * @param amount       The requested angular rate.
+     * @param acceleration Unused, kept for backwards compatibility.
+     */
     public void addAmount(Vector3D vec,
                           double amount,
-                          boolean x) {
-        if (x)
-            vec.x += amount;
-        else
-            vec.y = amount;
+                          boolean acceleration) {
+        vec.x = amount;
+        rotationIdleTime = 0;
     }
 
     /**
@@ -931,8 +1030,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setYaw(double amount) {
-        yaw.x = 0;
-        yaw.y = amount;
+        // A zero amount means the input has been released, so the current rate is left alone and
+        // updatePosition() damps it to a halt. Anything else is applied directly.
+        yaw.x = amount;
+        if (amount != 0) {
+            yaw.y = amount;
+        }
+        rotationIdleTime = 0;
     }
 
     /**
@@ -944,8 +1048,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setPitch(double amount) {
-        pitch.x = 0;
-        pitch.y = amount;
+        // A zero amount means the input has been released, so the current rate is left alone and
+        // updatePosition() damps it to a halt. Anything else is applied directly.
+        pitch.x = amount;
+        if (amount != 0) {
+            pitch.y = amount;
+        }
+        rotationIdleTime = 0;
     }
 
     /**
@@ -957,8 +1066,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setRoll(double amount) {
-        roll.x = 0;
-        roll.y = amount;
+        // A zero amount means the input has been released, so the current rate is left alone and
+        // updatePosition() damps it to a halt. Anything else is applied directly.
+        roll.x = amount;
+        if (amount != 0) {
+            roll.y = amount;
+        }
+        rotationIdleTime = 0;
     }
 
     /**
@@ -971,8 +1085,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setHorizontal(double amount) {
-        horizontal.x = 0;
-        horizontal.y = amount * fovFactor;
+        // A zero amount means the input has been released, so the current rate is left alone and
+        // updatePosition() damps it to a halt. Anything else is applied directly.
+        horizontal.x = amount * fovFactor;
+        if (amount != 0) {
+            horizontal.y = amount * fovFactor;
+        }
+        rotationIdleTime = 0;
     }
 
     /**
@@ -985,8 +1104,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setVertical(double amount) {
-        vertical.x = 0;
-        vertical.y = amount * fovFactor;
+        // A zero amount means the input has been released, so the current rate is left alone and
+        // updatePosition() damps it to a halt. Anything else is applied directly.
+        vertical.x = amount * fovFactor;
+        if (amount != 0) {
+            vertical.y = amount * fovFactor;
+        }
+        rotationIdleTime = 0;
     }
 
     /**
@@ -996,14 +1120,51 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * False if camera was already still.
      */
     public boolean stopMovement() {
-        boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0 || horizontal.y != 0);
+        boolean stopped = (vel.len2() != 0 || yaw.x != 0 || yaw.y != 0 || pitch.x != 0 || pitch.y != 0 || roll.x != 0 || roll.y != 0
+                || vertical.x != 0 || vertical.y != 0 || horizontal.x != 0 || horizontal.y != 0);
         force.setZero();
         vel.setZero();
-        yaw.y = 0;
-        pitch.y = 0;
-        roll.y = 0;
-        horizontal.y = 0;
-        vertical.y = 0;
+        yaw.setZero();
+        pitch.setZero();
+        roll.setZero();
+        horizontal.setZero();
+        vertical.setZero();
+        rotationIdleTime = Double.MAX_VALUE;
+        return stopped;
+    }
+
+    /**
+     * Releases the current user input: the translation is stopped right away, but the rotation is
+     * only left to decay smoothly to a stop by {@link #updatePosition(Vector3D, double)}.
+     * <p>
+     * This is what the mouse listener calls when the button is released, so that the camera keeps
+     * turning for a moment and slows down, instead of stopping abruptly. In cinematic mode nothing
+     * is damped and the camera simply keeps going.
+     *
+     * @return True if the camera had any movement at all and it has been released.
+     * False if the camera was already still.
+     */
+    public boolean releaseInput() {
+        boolean stopped = (vel.len2() != 0 || yaw.x != 0 || yaw.y != 0 || pitch.x != 0 || pitch.y != 0 || roll.x != 0 || roll.y != 0
+                || vertical.x != 0 || vertical.y != 0 || horizontal.x != 0 || horizontal.y != 0);
+
+        force.setZero();
+        vel.setZero();
+
+        if (!stopsOnRelease()) {
+            // Cinematic mode: the camera keeps rotating, so nothing is reset at all.
+            return stopped;
+        }
+
+        // Forget the requested rates only. The current rates (y) are left in place so that the
+        // rotation is damped to a halt over ROTATION_DECAY_TAU instead of stopping abruptly.
+        yaw.x = 0;
+        pitch.x = 0;
+        roll.x = 0;
+        horizontal.x = 0;
+        vertical.x = 0;
+        rotationIdleTime = Double.MAX_VALUE;
+
         return stopped;
     }
 
@@ -1018,6 +1179,26 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         roll.setZero();
         horizontal.setZero();
         vertical.setZero();
+        rotationIdleTime = Double.MAX_VALUE;
+    }
+
+    /**
+     * Releases the current rotation input. The requested rates are forgotten, but the camera is
+     * left to decay smoothly to a halt by {@link #updatePosition(Vector3D, double)} rather than
+     * stopping abruptly. Does nothing in cinematic mode.
+     */
+    public void releaseRotateInput() {
+        if (!stopsOnRelease()) {
+            // Cinematic mode: the camera keeps rotating, so nothing is reset at all.
+            return;
+        }
+
+        yaw.x = 0;
+        pitch.x = 0;
+        roll.x = 0;
+        horizontal.x = 0;
+        vertical.x = 0;
+        rotationIdleTime = Double.MAX_VALUE;
     }
 
     public void stopRotateMovement() {
@@ -1025,6 +1206,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         pitch.setZero();
         horizontal.setZero();
         vertical.setZero();
+        rotationIdleTime = Double.MAX_VALUE;
     }
 
     /**
@@ -1064,6 +1246,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double forceLen = force.lenDouble();
         double velocity = vel.len();
 
+        boolean noGamepadVrInput = velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0;
+        // No forward input has been received for a while, so the camera must come to a stop.
+        boolean inputReleased = stopsOnRelease() && noGamepadVrInput && lastFwdTime > FORWARD_RESPONSE_TIME && fullStop;
+
+        if (inputReleased && velocity > 0) {
+            // Damp the velocity exponentially towards rest. Without this the camera keeps coasting
+            // forever once the input is released.
+            vel.scl(1d - smoothingAlpha(STOP_DAMPING_TAU, dt));
+        }
+
         // Half a second after we have stopped zooming, real friction kicks in
         if (fullStop && focus.isValid()) {
             double elevation = focus.getElevationAt(pos);
@@ -1093,8 +1285,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         force.add(friction);
 
-        if (lastFwdTime > (cinematic ? 250f : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop
-                || lastFwdAmount > 0 && speedScaling == 0) {
+        // Stop outright once the damping has had time to bring the camera to a complete rest.
+        if (stopsOnRelease() && noGamepadVrInput && lastFwdTime > FORWARD_STOP_TIME && fullStop || lastFwdAmount > 0 && speedScaling == 0) {
             stopForwardMovement();
         }
 
@@ -1206,8 +1398,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             rotate(up, -yaw.z * rotateSpeed * movementMultiplier);
         }
 
-        defaultState(pitch, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
-        defaultState(yaw, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
     }
 
     private void updateRoll(double dt,
@@ -1216,7 +1406,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // Roll
             rotate(direction, -roll.z * rotateSpeed * movementMultiplier);
         }
-        defaultState(roll, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
     }
 
     /**
@@ -1238,19 +1427,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             rotateAround(rotationCenter, up, -horizontal.z * GaiaSky.settings().scene.camera.rotate * movementMultiplier);
         }
 
-        defaultState(vertical, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
-        defaultState(horizontal, !GaiaSky.settings().scene.camera.cinematic && !gamepadInput);
 
-    }
-
-    private void defaultState(Vector3D vec,
-                              boolean resetVelocity) {
-        // Always reset acceleration
-        vec.x = 0;
-
-        // Reset velocity if needed
-        if (resetVelocity)
-            vec.y = 0;
     }
 
     private void updateLateral(double dt,
@@ -1275,17 +1452,66 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Updates the given accel/vel/pos of the angle using dt.
+     * Whether the camera comes to a full stop on its own once the input is released. This is the
+     * case in the regular (non cinematic) mode. In cinematic mode the camera keeps rotating and
+     * keeps moving inwards and outwards indefinitely, and only stops when explicitly requested.
+     *
+     * @return True if the camera is damped to a stop when the input is released.
+     */
+    private boolean stopsOnRelease() {
+        return !GaiaSky.settings().scene.camera.cinematic;
+    }
+
+    /**
+     * Updates the given angular rate vector of an angle using dt.
+     * <p>
+     * The vector holds three components: {@code x} is the angular rate requested by the input
+     * listeners, {@code y} is the rate the camera is actually turning at, and {@code z} is the
+     * rotation to apply this frame, i.e. {@code y} times {@code dt}.
+     * <p>
+     * The rate ramps up towards the requested value using a time constant, so the resulting
+     * angular speed is framerate independent. This used to be an acceleration integrated as
+     * {@code y += x * dt}, which made the rotation grow without bound and depend on the framerate.
+     * <p>
+     * When the input stops, the rate decays back to rest exponentially if {@link
+     * #stopsOnRelease()}, or is held at its last value in cinematic mode, where the camera keeps
+     * rotating indefinitely.
      */
     private boolean updatePosition(Vector3D angle,
                                    double dt) {
         if (angle.x != 0 || angle.y != 0) {
-            // Calculate velocity from acceleration
-            angle.y += angle.x * dt;
-            // Cap velocity
-            angle.y = FastMath.signum(angle.y) * FastMath.abs(angle.y);
-            // Update position
-            angle.z = (angle.y * dt) % 360f;
+            boolean stopOnRelease = stopsOnRelease();
+
+            // Forget the requested rate once the input has stopped. The input listeners keep their
+            // last value around, so without this the camera would rotate indefinitely after the
+            // mouse is released. Gamepad axes only report a change, so a held stick would be seen
+            // as "idle" here; the gamepad input flag disables this until the stick reports again.
+            // Not done in cinematic mode, where the rotation is deliberately kept.
+            if (stopOnRelease && !gamepadInput && rotationIdleTime > ROTATION_INPUT_GRACE) {
+                angle.x = 0;
+            }
+
+            // Requested angular rate. Once the input stops, the rate either decays to rest or is
+            // held at its last value, depending on the mode.
+            double target = angle.x;
+            double tau;
+            if (target != 0) {
+                tau = ROTATION_ACCEL_TAU;
+            } else if (stopOnRelease) {
+                tau = ROTATION_DECAY_TAU;
+            } else {
+                // Cinematic mode: the camera keeps rotating at the last requested rate.
+                tau = ROTATION_HOLD_TAU;
+            }
+            angle.y += (target - angle.y) * smoothingAlpha(tau, dt);
+
+            // Snap to a full stop, otherwise the exponential decay leaves an endless crawl.
+            if (stopOnRelease && target == 0 && Math.abs(angle.y) < ROTATION_MIN_RATE) {
+                angle.y = 0;
+            }
+
+            // Rotation to apply this frame.
+            angle.z = angle.y * dt;
             return true;
         } else {
             return false;

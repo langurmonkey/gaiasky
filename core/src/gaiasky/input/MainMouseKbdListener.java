@@ -305,7 +305,12 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     GaiaSky.postRunnable(() -> {
                         // 5% of width pixels distance.
                         if (!GaiaSky.settings().scene.camera.cinematic || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
-                            boolean stopped = camera.stopMovement();
+                            // A click (no drag) always stops the camera for good, in any mode. A drag
+                            // release in the regular mode only releases the input, so that the
+                            // rotation is damped to a halt instead of stopping abruptly.
+                            boolean stopped = gesture.dst(screenX, screenY) < MOVE_PX_DIST
+                                    ? camera.stopMovement()
+                                    : camera.releaseInput();
                             boolean focusRemoved = GaiaSky.instance.mainGui != null && GaiaSky.instance.mainGui.cancelTouchFocus();
                             boolean doubleClick = currentTime - lastLeftTime < doubleClickTime;
                             gesture.set(0, 0);
@@ -337,17 +342,21 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                         GaiaSky.postRunnable(() -> {
                             // 5% of width pixels distance
                             if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && !GaiaSky.settings().program.modeStereo.active) {
-                                // Stop
-                                camera.setYaw(0);
-                                camera.setPitch(0);
+                                // Release: the rotation is damped to a stop, not cut abruptly
+                                camera.releaseRotateInput();
 
                                 // Right click, context menu
                                 Entity hit = getBestHit(screenX, screenY);
                                 EventManager.publish(Event.CONTEXT_MENU_CMD, this, hit, screenX, screenY);
                             }
                         });
-                        camera.setHorizontal(0);
-                        camera.setVertical(0);
+                        // A click (no drag) stops the camera for good, in any mode. A drag release in
+                        // the regular mode only releases the input, so that the rotation is damped.
+                        if (gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
+                            camera.stopRotateMovement();
+                        } else {
+                            camera.releaseRotateInput();
+                        }
                     }
                 }
 
