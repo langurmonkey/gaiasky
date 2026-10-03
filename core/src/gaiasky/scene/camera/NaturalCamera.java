@@ -90,7 +90,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Minimum altitude (in body radii) considered for the near-surface damping factor. Prevents
      * the damping from diverging when the camera is very close to the surface.
      */
-    private static final double MIN_ALTITUDE_RATIO = 1.0e-2;
+    private static final double MIN_ALTITUDE_RATIO = 1.0e-1;
 
     /**
      * Maximum boost applied to the near-surface damping factor.
@@ -306,6 +306,31 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double DIST_SMOOTH_UP;
     private double MAX_ALLOWED_DISTANCE;
 
+    /**
+     * Time constant (in seconds) of the exponential low-pass filters applied to the raw distances
+     * used for speed scaling. Using a time constant instead of a per-call factor makes the
+     * filtering independent of the framerate.
+     */
+    private static final double DISTANCE_SMOOTHING_TAU = 0.1d;
+
+    /**
+     * Raw (unsmoothed) distance to the closest body, in internal units.
+     */
+    private double rawBodyDistance = Double.MAX_VALUE;
+    /**
+     * Raw (unsmoothed) smoothed-radius distance to the closest star.
+     */
+    private double rawStarDistance = Double.MAX_VALUE;
+    /**
+     * Minimum of {@link #rawBodyDistance} and {@link #rawStarDistance} (plus the focus distance).
+     */
+    private double rawDistance = Double.MAX_VALUE;
+
+    /**
+     * Whether the raw distances have already been computed for the current frame.
+     */
+    private boolean rawDistancesValid = false;
+
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
 
@@ -489,6 +514,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         distance = pos.lenDouble();
 
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
+        // Advance the distance smoothing filters exactly once per frame.
+        rawDistancesValid = false;
+        updateSmoothedDistances(dt);
         speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
         // Lower bound of the velocity clamp. This must stay well above {@link #SURFACE_SPEED}, otherwise
         // the cap (and not the available speed) limits the camera right above a surface.
@@ -1427,7 +1455,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * For bodies, we just get the distance minus the elevation plus the minimum distance.
      *
-     * @return The distance to the closest body.
+     * @return The raw (unsmoothed) distance to the closest body.
      */
     private double getClosestBodyDistance() {
         return closestBody != null ?
@@ -1436,12 +1464,87 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 : 1.0e40;
     }
 
+    /**
+     * Computes the raw (unsmoothed) distances used for the speed scaling. The result is cached,
+     * so this method may be safely called multiple times per frame.
+     *
+     * @return The raw (unsmoothed) minimum distance.
+     */
+    private double computeRawDistances() {
+        if (rawDistancesValid) {
+            return rawDistance;
+        }
+
+        rawBodyDistance = getClosestBodyDistance();
+
+        var focusDistance = getMode().isFocus() && focus != null ? focus.getDistToCamera() : Double.MAX_VALUE;
+
+        rawStarDistance = getClosestStarDistance();
+
+        rawDistance = FastMath.min(rawStarDistance, FastMath.min(rawBodyDistance, focusDistance));
+        rawDistancesValid = true;
+
+        return rawDistance;
+    }
+
+    /**
+     * Computes the frame-rate independent exponential smoothing factor for a given time constant.
+     *
+     * @param tau The time constant, in seconds.
+     * @param dt  The frame delta time, in seconds.
+     *
+     * @return The smoothing factor in [0, 1].
+     */
+    private static double smoothingAlpha(double tau,
+                                         double dt) {
+        if (tau <= 0 || dt <= 0) {
+            return 1d;
+        }
+        double alpha = 1d - FastMath.exp(-dt / tau);
+        // Guard against numerical drift.
+        return Math.min(1d, Math.max(0d, alpha));
+    }
+
+    /**
+     * Advances the exponential low-pass filters of the raw distances. This must be called exactly
+     * once per frame, so that the filtering does not depend on the number of times
+     * {@link #speedScaling(double)} is invoked.
+     *
+     * @param dt The frame delta time, in seconds.
+     */
+    private void updateSmoothedDistances(double dt) {
+        double raw = computeRawDistances();
+
+        if (!Double.isFinite(raw)) {
+            raw = 0;
+        }
+
+        double alpha = smoothingAlpha(DISTANCE_SMOOTHING_TAU, dt);
+
+        if (smoothedDistance < 0 || !Double.isFinite(smoothedDistance)) {
+            // First frame: initialize.
+            smoothedDistance = raw;
+        } else {
+            smoothedDistance += (raw - smoothedDistance) * alpha;
+        }
+
+        // Same treatment for the star distance, so that both filters share the same time constant.
+        if (!Double.isFinite(rawStarDistance)) {
+            rawStarDistance = smoothedDistance;
+        }
+        if (smoothedStarDistance < 0 || !Double.isFinite(smoothedStarDistance)) {
+            smoothedStarDistance = rawStarDistance;
+        } else {
+            smoothedStarDistance += (rawStarDistance - smoothedStarDistance) * alpha;
+        }
+    }
+
     private double smoothedStarDistance = -1;
 
     /**
      * For stars, we implement a smoothing radius.
      *
-     * @return The minimum distance to a star, with a smoothing radius.
+     * @return The raw (unsmoothed) minimum distance to a star, with a smoothing radius.
      */
     private double getClosestStarDistance() {
         if (GaiaSky.instance.cameraManager.getMode()
@@ -1459,10 +1562,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             double dist0Scale = 1.0E3;
             double dist1Scale = 1.0E7;
-            double rawDistance = computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
-
-            smoothedStarDistance = MathUtilsDouble.lowPass(rawDistance, smoothedStarDistance, 5.0);
-            return smoothedStarDistance;
+            return computeDistanceScale(distance, radius * dist0Scale, radius * dist1Scale);
         }
     }
 
@@ -1496,15 +1596,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The speed scaling.
      */
     public double speedScaling(double min) {
-        var focusDistance = getMode().isFocus() ? focus.getDistToCamera() : Double.MAX_VALUE;
-        var closestBodyDistance = getClosestBodyDistance();
-        var closestStarDistance = getClosestStarDistance();
-
-        double dist = FastMath.min(closestStarDistance, FastMath.min(closestBodyDistance, focusDistance));
-        if (!Double.isFinite(smoothedDistance)) {
-            smoothedDistance = 0;
-        }
-        smoothedDistance = MathUtilsDouble.lowPass(dist, smoothedDistance, 5.0);
+        double dist = computeRawDistances();
 
         if (dist < SPEED_SCALE_REF_ALTITUDE) {
             // Very close to a surface: use the logarithmic curve.
