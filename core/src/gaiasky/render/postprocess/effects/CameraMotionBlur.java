@@ -57,6 +57,10 @@ public final class CameraMotionBlur extends PostProcessorEffect {
         cameraMotionBlurFilter.setDCam(aux);
         // Z-far and K.
         cameraMotionBlurFilter.setZFarK((float) cam.getFar(), Constants.getCameraK());
+        // Projection matrix coefficients for the clip-space Z: A = -(f+n)/(f-n), B = -2fn/(f-n).
+        float near = (float) cam.getNear();
+        float far = (float) cam.getFar();
+        cameraMotionBlurFilter.setProjAB(-(far + near) / (far - near), -2f * far * near / (far - near));
         // Previous projectionView inverse matrix.
         cameraMotionBlurFilter.setProjView(cam.getProjView());
         cameraMotionBlurFilter.setPrevProjView(cam.getPreviousProjView());

@@ -9,8 +9,13 @@ uniform sampler2D u_texture1;// depth map
 uniform vec3 u_dCam;
 // Z-far and K values for depth buffer.
 uniform vec2 u_zFarK;
+// Projection matrix coefficients A and B, with zClip = A * zView + B,
+// A = -(f+n)/(f-n), B = -2fn/(f-n).
+uniform vec2 u_projAB;
 // Previous projection-view matrix.
 uniform mat4 u_prevProjView;
+// Inverse of projection-view matrix.
+uniform mat4 u_projViewInverse;
 
 uniform float u_blurScale;
 uniform int u_blurSamplesMax;
@@ -26,26 +31,29 @@ layout (location = 0) out vec4 fragColor;
 
 void main() {
 
-    // depth buffer
-    float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zFarK.x, u_zFarK.y);
-    // H is the viewport position at this pixel in the range -1 to 1 (NDC).
-    vec4 currentPosClip = vec4(v_texCoords.x * 2.0 - 1.0, (v_texCoords.y) * 2.0 - 1.0, depth, 1.0);
-    // Transform by the view-projection inverse. Clip coordinates.
-    vec4 D = u_projViewInverse * currentPosClip;
-    // Transform by the view-projection inverse.
-    vec4 currentPosWorld = D;
-    // Compute previous world position.
-    vec4 previousPosWorld = currentPosWorld;
-    previousPosWorld.xyz += u_dCam;
+    // Recover view-space distance from logarithmic depth buffer.
+    float viewZ = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zFarK.x, u_zFarK.y);
+    // NDC coordinates of this pixel.
+    vec2 ndc = vec2(v_texCoords.x * 2.0 - 1.0, v_texCoords.y * 2.0 - 1.0);
+    // Clip-space position of the point at view distance viewZ:
+    // w = viewZ, xy = ndc * w, z = A * (-viewZ) + B.
+    float w = viewZ;
+    float zClip = -u_projAB.x * viewZ + u_projAB.y;
+    vec4 currentPosWorld = u_projViewInverse * vec4(ndc * w, zClip, w);
+    // Compute previous world position. The world position is camera-relative
+    // (floating origin), in global axes. The previous-frame position of the
+    // same point is obtained by subtracting the camera position delta
+    // (dPos = prevPos - pos).
+    vec3 previousPosWorld = currentPosWorld.xyz - u_dCam;
 
     // Use the world position, and transform by the previous view-
     // projection matrix.
-    vec4 previousPosClip = u_prevProjView * previousPosWorld;
+    vec4 previousPosClip = u_prevProjView * vec4(previousPosWorld, 1.0);
     // Convert to nonhomogeneous points [-1,1] by dividing by w.
     previousPosClip /= previousPosClip.w;
     // Use this frame's position and last frame's to compute the pixel
     // velocity.
-    vec2 velocity = (previousPosClip.xy - currentPosClip.xy) / 2.0;
+    vec2 velocity = (previousPosClip.xy - ndc) / 2.0;
     // Scale with blur scale parameter.
     vec2 vel = velocity * u_blurScale;
     // Compute viewport speed and number of smaples.

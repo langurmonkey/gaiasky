@@ -18,6 +18,7 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
     private final Vector2 viewport = new Vector2();
     private final Vector3 dCam = new Vector3();
     private final Vector2 zFarK = new Vector2();
+    private final Vector2 projAB = new Vector2();
     private final Matrix4 projViewInverse = new Matrix4();
     private final Matrix4 prevProjView = new Matrix4();
     private Texture depthTexture;
@@ -31,11 +32,6 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
 
     public void setDepthTexture(Texture texture) {
         this.depthTexture = texture;
-    }
-
-    public void setProjViewInverse(Matrix4 m) {
-        this.projViewInverse.set(m);
-        setParam(Param.ProjViewInverse, m);
     }
 
     public void setProjView(Matrix4 m) {
@@ -68,6 +64,11 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
         setParam(Param.ZFarK, this.zFarK);
     }
 
+    public void setProjAB(float a, float b) {
+        this.projAB.set(a, b);
+        setParam(Param.ProjAB, this.projAB);
+    }
+
     public void setViewport(float width, float height) {
         viewport.set(width, height);
         setParam(Param.Viewport, viewport);
@@ -82,6 +83,7 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
         setParams(Param.Viewport, viewport);
         setParams(Param.DCam, dCam);
         setParams(Param.ZFarK, zFarK);
+        setParams(Param.ProjAB, projAB);
         setParams(Param.BlurScale, blurScale);
         setParams(Param.BlurMaxSamples, samples);
         endParams();
@@ -102,6 +104,7 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
         ProjViewInverse("u_projViewInverse", 16),
         DCam("u_dCam", 3),
         ZFarK("u_zFarK", 2),
+        ProjAB("u_projAB", 2),
         BlurMaxSamples("u_blurSamplesMax", 0),
         BlurScale("u_blurScale", 0),
         Viewport("u_viewport", 2);
