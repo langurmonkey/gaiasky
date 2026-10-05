@@ -54,7 +54,7 @@ public final class CameraMotionBlur extends PostProcessorEffect {
         // Delta camera pos.
         var cam = GaiaSky.instance.getICamera();
         cam.getDPos().put(aux);
-        cameraMotionBlurFilter.setDCam(aux.scl(1f / (float) cam.getSpeedScalingCapped()));
+        cameraMotionBlurFilter.setDCam(aux);
         // Z-far and K.
         cameraMotionBlurFilter.setZFarK((float) cam.getFar(), Constants.getCameraK());
         // Previous projectionView inverse matrix.

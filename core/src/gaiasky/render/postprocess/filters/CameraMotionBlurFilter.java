@@ -91,7 +91,7 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
     protected void onBeforeRender() {
         rebind();
         inputTexture.bind(u_texture0);
-        depthTexture.bind(u_texture2);
+        depthTexture.bind(u_texture1);
     }
 
     public enum Param implements Parameter {
