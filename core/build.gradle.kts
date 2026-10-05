@@ -208,7 +208,24 @@ tasks.register("copyToLib") {
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
             from(configurations.runtimeClasspath)
             into(distLib)
-            exclude("**/data", "**/assets-bak", "**/metainfo", "**/core-$version.jar", "dummyversion")
+            exclude(
+                "**/data",
+                "**/assets-bak",
+                "**/metainfo",
+                "**/core-$version.jar",
+                "**/*-natives-windows-x86.jar",
+                "dummyversion")
+        }
+        val unwantedX86Natives = distLib
+            .walkTopDown()
+            .filter { it.isFile && it.name.endsWith("-natives-windows-x86.jar") }
+            .toList()
+
+        if (unwantedX86Natives.isNotEmpty()) {
+            throw GradleException(
+                "Unexpected Windows x86 LWJGL native libraries found: " +
+                    unwantedX86Natives.joinToString { it.name }
+            )
         }
 
         listOf("archetypes", "conf", "data", "font", "fonts", "i18n", "icon", "img",
