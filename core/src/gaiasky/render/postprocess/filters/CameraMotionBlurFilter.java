@@ -76,7 +76,7 @@ public final class CameraMotionBlurFilter extends Filter<CameraMotionBlurFilter>
     @Override
     public void rebind() {
         setParams(Param.InputScene, u_texture0);
-        setParams(Param.DepthMap, u_texture2);
+        setParams(Param.DepthMap, u_texture1);
         setParams(Param.PrevProjView, prevProjView);
         setParams(Param.ProjViewInverse, projViewInverse);
         setParams(Param.Viewport, viewport);
