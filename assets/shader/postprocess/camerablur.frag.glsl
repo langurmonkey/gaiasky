@@ -9,8 +9,6 @@ uniform sampler2D u_texture1;// depth map
 uniform vec3 u_dCam;
 // Z-far and K values for depth buffer.
 uniform vec2 u_zFarK;
-// Current projection-view matrix, inverted.
-uniform mat4 u_projViewInverse;
 // Previous projection-view matrix.
 uniform mat4 u_prevProjView;
 
@@ -35,10 +33,10 @@ void main() {
     // Transform by the view-projection inverse. Clip coordinates.
     vec4 D = u_projViewInverse * currentPosClip;
     // Transform by the view-projection inverse.
-    vec4 currentPosWorld = D / D.w;
+    vec4 currentPosWorld = D;
     // Compute previous world position.
     vec4 previousPosWorld = currentPosWorld;
-    previousPosWorld.xyz += u_dCam / D.w;
+    previousPosWorld.xyz += u_dCam;
 
     // Use the world position, and transform by the previous view-
     // projection matrix.
@@ -47,7 +45,7 @@ void main() {
     previousPosClip /= previousPosClip.w;
     // Use this frame's position and last frame's to compute the pixel
     // velocity.
-    vec2 velocity = (currentPosClip.xy - previousPosClip.xy) / 2.0;
+    vec2 velocity = (previousPosClip.xy - currentPosClip.xy) / 2.0;
     // Scale with blur scale parameter.
     vec2 vel = velocity * u_blurScale;
     // Compute viewport speed and number of smaples.
