@@ -60,14 +60,20 @@ void main() {
     float speed = length(vel * u_viewport);
     int nSamples = clamp(int(speed), 1, u_blurSamplesMax);
 
-    // Get color at this fragment.
+    // Luminance-weighted average: over dark regions (sky) weights are
+    // near-uniform and the result matches the plain average; bright samples
+    // (stars) dominate the sum, so point-like sources keep their peak
+    // brightness along the trail instead of being divided by nSamples.
     vec3 color = texture(u_texture0, v_texCoords).rgb;
+    float wsum = 1.0;
     for (int i = 1; i < nSamples; ++i) {
         vec2 offset = vel * (float(i) / float(nSamples) - 0.5);
-        color += texture(u_texture0, v_texCoords + offset).rgb;
+        vec3 s = texture(u_texture0, v_texCoords + offset).rgb;
+        float w = 0.25 + dot(s, vec3(0.33333333));
+        color += s * w;
+        wsum += w;
     }
-    // Average all samples to get final color.
-    color /= float(nSamples);
+    color /= wsum;
     fragColor = vec4(color, 1.0);
 
     //float l = abs(length(velocity) * 5.0);
