@@ -1504,6 +1504,11 @@ public enum Event {
      **/
     TURNING_SPEED_CMD,
     /**
+     * Contains the new camera damping factor, i.e. the factor applied to the time constants
+     * that govern how long the camera keeps moving after the input has been released.
+     **/
+    CAMERA_DAMPING_FACTOR_CMD,
+    /**
      * Issues the command to reload the UI, contains the {@link GlobalResources} instance.
      */
     UI_RELOAD_CMD,

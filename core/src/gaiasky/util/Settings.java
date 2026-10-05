@@ -1397,6 +1397,14 @@ public class Settings extends SettingsObject {
             public double turn;
             public double rotate;
             public float fov;
+            /**
+             * Multiplicative factor applied to the camera damping time constants, i.e. the time it
+             * takes for the camera rotation, turning and movement to come to a full stop after the
+             * input has been released. Values above 1 make the camera glide longer, values below 1
+             * make it stop sooner. It only has an effect in non-cinematic mode, as nothing is
+             * damped in cinematic mode.
+             */
+            public double dampingFactor = 1d;
             public boolean cinematic;
             public boolean targetMode;
             /** Also use distance to closest star to compute camera velocity scale factor. **/
@@ -1427,6 +1435,7 @@ public class Settings extends SettingsObject {
                         case CAMERA_SPEED_CMD -> speed = (float) data[0];
                         case ROTATION_SPEED_CMD -> rotate = (float) data[0];
                         case TURNING_SPEED_CMD -> turn = (float) data[0];
+                        case CAMERA_DAMPING_FACTOR_CMD -> dampingFactor = (float) data[0];
                         case SPEED_LIMIT_CMD -> {
                             speedLimitIndex = (Integer) data[0];
                             updateSpeedLimit();
@@ -1517,6 +1526,7 @@ public class Settings extends SettingsObject {
                                                 Event.CAMERA_SPEED_CMD,
                                                 Event.ROTATION_SPEED_CMD,
                                                 Event.TURNING_SPEED_CMD,
+                                                Event.CAMERA_DAMPING_FACTOR_CMD,
                                                 Event.SPEED_LIMIT_CMD);
 
                 focusLock.setupListeners();
@@ -1538,6 +1548,7 @@ public class Settings extends SettingsObject {
                 EventManager.publish(Event.TURNING_SPEED_CMD, this, (float) turn);
                 EventManager.publish(Event.SPEED_LIMIT_CMD, this, speedLimitIndex);
                 EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, cinematic);
+                EventManager.publish(Event.CAMERA_DAMPING_FACTOR_CMD, this, dampingFactor);
 
                 focusLock.apply();
             }

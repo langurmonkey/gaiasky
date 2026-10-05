@@ -90,6 +90,13 @@ public class Constants {
     public static final float MAX_TURN_SPEED = 3e3f;
     /** Minimum turning speed. **/
     public static final float MIN_TURN_SPEED = 2e2f;
+    /** Minimum value of the camera damping factor slider. **/
+    public static final float MIN_DAMPING_FACTOR = 0.0f;
+    /** Maximum value of the camera damping factor slider. **/
+    public static final float MAX_DAMPING_FACTOR = 3f;
+    /** Default (reset) value of the camera damping factor. **/
+    public static final float RESET_DAMPING_FACTOR = 1f;
+
     /** Minimum star brightness. **/
     public static final float MIN_STAR_BRIGHTNESS = 0.4f;
 

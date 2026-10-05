@@ -37,10 +37,11 @@ import java.util.Objects;
  */
 public class CameraComponent extends GuiComponent implements IObserver {
 
+
     protected OwnLabel date;
     protected SelectBox<String> cameraSpeedLimit;
     protected SelectBox<CameraComboBoxBean> cameraMode;
-    protected OwnSliderReset fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
+    protected OwnSliderReset fieldOfView, cameraSpeed, turnSpeed, rotateSpeed, dampingFactor;
     protected CheckBox focusLock, orientationLock, cinematic;
     protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonMaster;
     protected OwnImageButton recCamera, keyframesEditor, playCamera;
@@ -130,6 +131,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cinematic.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.CAMERA_CINEMATIC_CMD, cinematic, cinematic.isChecked());
+                // The damping factor only has an effect outside cinematic mode.
+                dampingFactor.setVisible(!cinematic.isChecked());
                 return true;
             }
             return false;
@@ -342,7 +345,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         // CAMERA SPEED
         cameraSpeed = new OwnSliderReset(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED,
-                                        Constants.MAX_CAM_SPEED, 10f, skin);
+                                        Constants.MAX_CAM_SPEED, 7.55f, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(componentWidth);
         cameraSpeed.setDisplayValueMapped(false);
@@ -357,7 +360,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         // ROTATION SPEED
         rotateSpeed = new OwnSliderReset(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED,
-                                        Constants.MAX_ROT_SPEED, 5000f, skin);
+                                        Constants.MAX_ROT_SPEED, 5100f, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(componentWidth);
         rotateSpeed.setDisplayValueMapped(false);
@@ -372,7 +375,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         // TURNING SPEED
         turnSpeed = new OwnSliderReset(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED,
-                                      Constants.MAX_TURN_SPEED, 1060f, skin);
+                                      Constants.MAX_TURN_SPEED, 1600f, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(componentWidth);
         turnSpeed.setDisplayValueMapped(false);
@@ -380,6 +383,25 @@ public class CameraComponent extends GuiComponent implements IObserver {
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.publish(Event.TURNING_SPEED_CMD, turnSpeed, turnSpeed.getMappedValue(), true);
+                return true;
+            }
+            return false;
+        });
+
+        // CAMERA DAMPING FACTOR
+        // Multiplies the time constants that bring the camera to a halt once the input is
+        // released. Only visible (and effective) outside cinematic mode.
+        dampingFactor = new OwnSliderReset(I18n.msg("gui.camera.dampingfactor"), Constants.MIN_DAMPING_FACTOR, Constants.MAX_DAMPING_FACTOR,
+                                         Constants.SLIDER_STEP_SMALL, Constants.RESET_DAMPING_FACTOR, skin);
+        dampingFactor.setName("camera damping factor");
+        dampingFactor.setWidth(componentWidth);
+        dampingFactor.setDisplayValueMapped(false);
+        dampingFactor.setMappedValue((float) GaiaSky.settings().scene.camera.dampingFactor);
+        dampingFactor.setTooltip(I18n.msg("gui.tooltip.camera.dampingfactor"));
+        dampingFactor.setVisible(!GaiaSky.settings().scene.camera.cinematic);
+        dampingFactor.addListener(event -> {
+            if (!fieldLock && event instanceof ChangeEvent) {
+                EventManager.publish(Event.CAMERA_DAMPING_FACTOR_CMD, dampingFactor, dampingFactor.getMappedValue());
                 return true;
             }
             return false;
@@ -432,7 +454,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.add(fieldOfView).top().left().padBottom(pad9).row();
         cameraGroup.add(cameraSpeed).top().left().padBottom(pad9).row();
         cameraGroup.add(rotateSpeed).top().left().padBottom(pad9).row();
-        cameraGroup.add(turnSpeed).top().left().padBottom(pad20).row();
+        cameraGroup.add(turnSpeed).top().left().padBottom(pad9).row();
+        cameraGroup.add(dampingFactor).top().left().padBottom(pad9).row();
         cameraGroup.add(cinematic).top().left().padBottom(pad9).row();
         cameraGroup.add(focusLock).top().left().padBottom(pad9).row();
         cameraGroup.add(orientationLock).top().left().row();
@@ -443,7 +466,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cameraGroup.pack();
         EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.ROTATION_SPEED_CMD,
-                                        Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CMD,
+                                        Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.CAMERA_DAMPING_FACTOR_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CMD,
                                         Event.CUBEMAP_CMD, Event.CAMERA_CINEMATIC_CMD, Event.ORIENTATION_LOCK_CMD,
                                         Event.RECORD_CAMERA_CMD);
     }
@@ -459,6 +482,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 cinematic.setProgrammaticChangeEvents(false);
                 cinematic.setChecked((Boolean) data[0]);
                 cinematic.setProgrammaticChangeEvents(true);
+                dampingFactor.setVisible(!cinematic.isChecked());
             }
         }
         case CAMERA_MODE_CMD -> {
@@ -501,6 +525,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 float value = (Float) data[0];
                 fieldLock = true;
                 turnSpeed.setMappedValue(value);
+                fieldLock = false;
+            }
+        }
+        case CAMERA_DAMPING_FACTOR_CMD -> {
+            if (source != dampingFactor) {
+                float value = (Float) data[0];
+                fieldLock = true;
+                dampingFactor.setMappedValue(value);
                 fieldLock = false;
             }
         }

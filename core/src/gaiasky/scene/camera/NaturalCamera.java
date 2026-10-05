@@ -36,6 +36,7 @@ import gaiasky.input.GameMouseKbdListener;
 import gaiasky.input.MainGamepadListener;
 import gaiasky.input.MainMouseKbdListener;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.gdx.g2d.Sprite;
 import gaiasky.render.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -48,7 +49,6 @@ import gaiasky.util.DecalUtils;
 import gaiasky.util.MasterManager;
 import gaiasky.util.SlaveManager;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.render.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.QuaternionDouble;
@@ -103,7 +103,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Reference altitude used by the logarithmic (power) speed scaling curve. Speed is
      * {@link #SURFACE_SPEED} at this altitude.
      */
-    private static final double SPEED_SCALE_REF_ALTITUDE = 1d * Constants.M_TO_U;
+    private static final double SPEED_SCALE_REF_ALTITUDE = Constants.M_TO_U;
 
     /**
      * Exponent of the power scaling curve. Chosen so that the curve still reaches the previous
@@ -130,13 +130,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Time constant (in seconds) used to ramp the angular rate up to the requested rate.
      */
-    private static final double ROTATION_ACCEL_TAU = 0.2;
+    private static final double ROTATION_ACCEL_TAU = 0.3;
 
     /**
      * Time constant (in seconds) used to decay the angular rate to rest when there is no rotation
      * input. Only used when the camera stops on its own, i.e. outside cinematic mode.
      */
-    private static final double ROTATION_DECAY_TAU = 0.2;
+    private static final double ROTATION_DECAY_TAU = 0.15;
 
     /**
      * Effectively infinite time constant, used in cinematic mode to hold the current angular rate
@@ -1010,7 +1010,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * stops.
      *
      * @param vec          The angle vector ({@code x} = requested rate, {@code y} = current rate,
-     *                      {@code z} = rotation this frame).
+     *                     {@code z} = rotation this frame).
      * @param amount       The requested angular rate.
      * @param acceleration Unused, kept for backwards compatibility.
      */
@@ -1253,7 +1253,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (inputReleased && velocity > 0) {
             // Damp the velocity exponentially towards rest. Without this the camera keeps coasting
             // forever once the input is released.
-            vel.scl(1d - smoothingAlpha(STOP_DAMPING_TAU, dt));
+            vel.scl(1d - smoothingAlpha(dampingTau(STOP_DAMPING_TAU), dt));
         }
 
         // Half a second after we have stopped zooming, real friction kicks in
@@ -1498,7 +1498,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (target != 0) {
                 tau = ROTATION_ACCEL_TAU;
             } else if (stopOnRelease) {
-                tau = ROTATION_DECAY_TAU;
+                tau = dampingTau(ROTATION_DECAY_TAU);
             } else {
                 // Cinematic mode: the camera keeps rotating at the last requested rate.
                 tau = ROTATION_HOLD_TAU;
@@ -1670,8 +1670,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             var a = distance < smoothingDistance0 ?
                     0.0
                     : (distance > smoothingDistance1 ?
-                       1.0 :
-                       (distance - smoothingDistance0) / (smoothingDistance1 - smoothingDistance0));
+                    1.0 :
+                    (distance - smoothingDistance0) / (smoothingDistance1 - smoothingDistance0));
             return MathUtilsDouble.mix(distance, focusDistance, a);
         } else {
             return distance;
@@ -1686,7 +1686,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double getClosestBodyDistance() {
         return closestBody != null ?
                 (closestBody.getDistToCamera() - (closestBody.getElevationAt(pos, false) + MIN_DIST))
-                * (closestBody.isBillboard() ? 15.0 : 1.0)
+                        * (closestBody.isBillboard() ? 15.0 : 1.0)
                 : 1.0e40;
     }
 
@@ -1728,7 +1728,24 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
         double alpha = 1d - FastMath.exp(-dt / tau);
         // Guard against numerical drift.
-        return Math.min(1d, Math.max(0d, alpha));
+        return Math.clamp(alpha, 0d, 1d);
+    }
+
+    /**
+     * Scales a damping time constant with the camera damping factor setting, so that the user can
+     * control how long the camera keeps moving after the input has been released. It has no effect
+     * in cinematic mode, where nothing is damped anyway.
+     *
+     * @param tau The base time constant, in seconds.
+     *
+     * @return The scaled time constant, in seconds.
+     */
+    private double dampingTau(double tau) {
+        double factor = GaiaSky.settings().scene.camera.dampingFactor;
+        if (!Double.isFinite(factor) || factor < 0d) {
+            return tau;
+        }
+        return tau * factor;
     }
 
     /**

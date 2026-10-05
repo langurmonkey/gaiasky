@@ -116,11 +116,11 @@ scene:
     # negative - No limit
     speedLimitIndex: 27
     # Camera speed multiplier.
-    speed: 10.0
+    speed: 7.55
     # Camera turn velocity.
-    turn: 1060.0
+    turn: 1600.0
     # Camera rotation.
-    rotate: 5000.0
+    rotate: 5100.0
     # Field of view in degrees.
     fov: 45.0
     # Cinematic camera
