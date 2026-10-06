@@ -61,6 +61,13 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     private final int MIN_PIX_DIST;
     private final Vector2 gesture = new Vector2();
     /**
+    /**
+     * Base speed scale for the cinematic rotation. The drag distance (click to current, normalized
+     * by the screen width) is multiplied by this factor to obtain the requested orbit rate, both
+     * while dragging and after release. Lower values produce slower orbits.
+     **/
+    private static final double CINEMATIC_DRAG_SCALE = 0.1;
+    /**
      * Smoothing factor applied in the non-cinematic mode.
      **/
     private final double noAccelSmoothing;
@@ -323,6 +330,11 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
                                 }
                             }
+                        } else {
+                            // Cinematic mode: the drag handler already feeds the total click-to-current
+                            // distance every frame, so the last requested rate is the correct sustained
+                            // orbit speed. In cinematic mode the rate is held indefinitely on release,
+                            // so nothing needs to be done here.
                         }
                     });
                     dragDx = 0;
@@ -443,10 +455,20 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                     return result;
 
                 var fpsScale = getFpsScale();
-                double deltaX = fpsScale * (screenX - startX) / Gdx.graphics.getWidth();
-                double deltaY = fpsScale * (startY - screenY) / Gdx.graphics.getHeight();
-                startX = screenX;
-                startY = screenY;
+                double deltaX;
+                double deltaY;
+                if (GaiaSky.settings().scene.camera.cinematic && (button == leftMouseButton || button == rightMouseButton)) {
+                    // Cinematic mode: feed the total distance from the click position to the current
+                    // position, so that the requested rotation rate scales with the drag distance
+                    // while dragging. On release the rate is simply maintained, with no extra ramp.
+                    deltaX = fpsScale * CINEMATIC_DRAG_SCALE * (screenX - gesture.x) / Gdx.graphics.getWidth();
+                    deltaY = fpsScale * CINEMATIC_DRAG_SCALE * (gesture.y - screenY) / Gdx.graphics.getHeight();
+                } else {
+                    deltaX = fpsScale * (screenX - startX) / Gdx.graphics.getWidth();
+                    deltaY = fpsScale * (startY - screenY) / Gdx.graphics.getHeight();
+                    startX = screenX;
+                    startY = screenY;
+                }
                 return processDrag(screenX, screenY, deltaX, deltaY, button);
             }
             return false;
