@@ -1085,12 +1085,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setHorizontal(double amount) {
-        // A zero amount means the input has been released, so the current rate is left alone and
-        // updatePosition() damps it to a halt. Anything else is applied directly.
         horizontal.x = amount * fovFactor;
-        if (amount != 0) {
-            horizontal.y = amount * fovFactor;
-        }
+        horizontal.y = amount * fovFactor;
         rotationIdleTime = 0;
     }
 
@@ -1104,12 +1100,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void setVertical(double amount) {
-        // A zero amount means the input has been released, so the current rate is left alone and
-        // updatePosition() damps it to a halt. Anything else is applied directly.
         vertical.x = amount * fovFactor;
-        if (amount != 0) {
-            vertical.y = amount * fovFactor;
-        }
+        vertical.y = amount * fovFactor;
         rotationIdleTime = 0;
     }
 
