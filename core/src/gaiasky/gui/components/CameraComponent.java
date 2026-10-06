@@ -146,6 +146,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
         }
         cameraMode = new OwnSelectBox<>(skin);
+        cameraMode.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.camera.mode"), skin));
         cameraMode.setName("camera mode");
         cameraMode.setWidth(componentWidth);
         cameraMode.setItems(cameraOptions);
@@ -286,6 +287,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView = new OwnSliderReset(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_TINY, 45f, skin);
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
+        fieldOfView.setTooltip(I18n.msg("gui.tooltip.camera.fov"));
         fieldOfView.setWidth(componentWidth);
         fieldOfView.setValue(GaiaSky.settings().scene.camera.fov);
         fieldOfView.setDisabled(GaiaSky.settings().program.modeCubemap.isFixedFov());
@@ -330,6 +332,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         speedLimits[27] = I18n.msg("gui.camera.speedlimit.nolimit");
 
         cameraSpeedLimit = new OwnSelectBox<>(skin);
+        cameraSpeedLimit.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.camera.speedlimit"), skin));
         cameraSpeedLimit.setName("camera speed limit");
         cameraSpeedLimit.setWidth(componentWidth);
         cameraSpeedLimit.setItems(speedLimits);
@@ -347,6 +350,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeed = new OwnSliderReset(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED,
                                         Constants.MAX_CAM_SPEED, 7.55f, skin);
         cameraSpeed.setName("camera speed");
+        cameraSpeed.setTooltip(I18n.msg("gui.tooltip.camera.speed"));
         cameraSpeed.setWidth(componentWidth);
         cameraSpeed.setDisplayValueMapped(false);
         cameraSpeed.setMappedValue(GaiaSky.settings().scene.camera.speed);
@@ -362,6 +366,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         rotateSpeed = new OwnSliderReset(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED,
                                         Constants.MAX_ROT_SPEED, 5100f, skin);
         rotateSpeed.setName("rotate speed");
+        rotateSpeed.setTooltip(I18n.msg("gui.tooltip.camera.rotate"));
         rotateSpeed.setWidth(componentWidth);
         rotateSpeed.setDisplayValueMapped(false);
         rotateSpeed.setMappedValue(GaiaSky.settings().scene.camera.rotate);
@@ -377,6 +382,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         turnSpeed = new OwnSliderReset(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED,
                                       Constants.MAX_TURN_SPEED, 1600f, skin);
         turnSpeed.setName("turn speed");
+        turnSpeed.setTooltip(I18n.msg("gui.tooltip.camera.turn"));
         turnSpeed.setWidth(componentWidth);
         turnSpeed.setDisplayValueMapped(false);
         turnSpeed.setMappedValue(GaiaSky.settings().scene.camera.turn);
@@ -409,6 +415,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         // FOCUS_MODE lock
         focusLock = new CheckBox(" " + I18n.msg("gui.camera.lock"), skin);
+        focusLock.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.camera.lock"), skin));
         focusLock.setName("focus lock");
         focusLock.setChecked(GaiaSky.settings().scene.camera.focusLock.position);
         focusLock.addListener(event -> {
@@ -422,6 +429,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         // FOCUS_MODE orientation lock
         orientationLock = new CheckBox(" " + I18n.msg("gui.camera.lock.orientation"), skin);
+        orientationLock.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.camera.lock.orientation"), skin));
         orientationLock.setName("orientation lock");
         orientationLock.setChecked(GaiaSky.settings().scene.camera.focusLock.orientation);
         orientationLock.setVisible(GaiaSky.settings().scene.camera.focusLock.position);
