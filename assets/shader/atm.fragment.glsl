@@ -27,9 +27,13 @@ void main(void) {
     fragColor *= v_eclipseFactor;
     #endif // eclipsingBodyFlag
 
-    layerBuffer = vec4(0.0, 0.0, 0.0, 0.0);
+    layerBuffer = vec4(0.0, 0.0, 0.0, 1.0);
 
-    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    // Write constant depth (atmosphere shell radius) instead of per-fragment
+    // depth. This ensures the motion blur shader reconstructs a consistent
+    // world position for all atmosphere pixels, producing coherent velocities
+    // despite the volumetric nature of the shell.
+    gl_FragDepth = getDepthValue(fOuterRadius, u_cameraNearFar.y, u_cameraK);
 
     #ifdef ssrFlag
     ssrBuffers();
