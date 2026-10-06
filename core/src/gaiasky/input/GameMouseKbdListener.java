@@ -42,7 +42,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public boolean pollKeys() {
-        float keySensitivity = 3e-1f;
+        float keySensitivity = 8e-1f;
         // Run mode
         float multiplier = isKeyPressed(Keys.SHIFT_LEFT) ? 3f : 1f;
         double minTranslateUnits = 1e-5;
@@ -72,10 +72,10 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
         }
 
         if (isKeyPressed(Keys.Q)) {
-            camera.addRoll(keySensitivity, true);
+            camera.addRoll(keySensitivity * 0.1f, true);
             result = true;
         } else if (isKeyPressed(Keys.E)) {
-            camera.addRoll(-keySensitivity, true);
+            camera.addRoll(-keySensitivity * 0.1f, true);
             result = true;
         }
 
@@ -151,16 +151,16 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         if (isActive()) {
-            float dt = Gdx.graphics.getDeltaTime() * 2e2f;
+            float dt = Gdx.graphics.getDeltaTime() * 2e4f;
             float mouseXSensitivity = 1f / dt;
             float mouseYSensitivity = -1f / dt;
             if (!prevValid) {
                 updatePreviousMousePosition((float) screenX, (float) screenY);
                 prevValid = true;
             }
-            float limit = 17f;
-            dx = MathUtils.clamp(MathUtilsDouble.lowPass(mouseXSensitivity * ((float) screenX - prevX), dx, 14f), -limit, limit);
-            dy = MathUtils.clamp(MathUtilsDouble.lowPass(mouseYSensitivity * ((float) screenY - prevY), dy, 14f), -limit, limit);
+            float limit = 20f;
+            dx = MathUtils.clamp(MathUtilsDouble.lowPass(mouseXSensitivity * ((float) screenX - prevX), dx, 0f), -limit, limit);
+            dy = MathUtils.clamp(MathUtilsDouble.lowPass(mouseYSensitivity * ((float) screenY - prevY), dy, 0f), -limit, limit);
             camera.addYaw(dx, true);
             camera.addPitch(dy, true);
 
