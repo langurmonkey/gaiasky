@@ -32,32 +32,64 @@ layout (location = 0) out vec4 fragColor;
 void main() {
 
     // Recover view-space distance from logarithmic depth buffer.
-    float viewZ = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zFarK.x, u_zFarK.y);
+    // Pixels with depth == 1.0 have no geometry (background, or render groups
+    // with depth writes disabled).
+    float depth = texture(u_texture1, v_texCoords).r;
     // NDC coordinates of this pixel.
     vec2 ndc = vec2(v_texCoords.x * 2.0 - 1.0, v_texCoords.y * 2.0 - 1.0);
-    // Clip-space position of the point at view distance viewZ:
-    // w = viewZ, xy = ndc * w, z = A * (-viewZ) + B.
-    float w = viewZ;
-    float zClip = -u_projAB.x * viewZ + u_projAB.y;
-    vec4 currentPosWorld = u_projViewInverse * vec4(ndc * w, zClip, w);
-    // Compute previous world position. The world position is camera-relative
-    // (floating origin), in global axes. The previous-frame position of the
-    // same point is obtained by subtracting the camera position delta
-    // (dPos = prevPos - pos).
-    vec3 previousPosWorld = currentPosWorld.xyz - u_dCam;
 
-    // Use the world position, and transform by the previous view-
-    // projection matrix.
-    vec4 previousPosClip = u_prevProjView * vec4(previousPosWorld, 1.0);
-    // Convert to nonhomogeneous points [-1,1] by dividing by w.
-    previousPosClip /= previousPosClip.w;
-    // Use this frame's position and last frame's to compute the pixel
-    // velocity.
-    vec2 velocity = (previousPosClip.xy - ndc) / 2.0;
+    vec2 velocity;
+    if (depth >= 1.0) {
+        // Background pixels: treat them as points at infinity and work with
+        // the ray *direction* instead of a position. Reconstructing a world
+        // position at the far plane (w = zfar ~ 1e13) and running it through
+        // the inverse projection (entries ~ 1/near ~ 1e9) produces
+        // intermediate values ~1e22 that cancel back to ~1e13; float32
+        // cannot survive that cancellation and the resulting velocity is
+        // garbage, saturating the blur for the slightest motion.
+        //
+        // The far-plane homogeneous point is (ndc, -A, 1) -- the limit of
+        // (ndc*w, zClip, w) as w -> infinity. Transforming it with the
+        // inverse proj-view gives the world-space ray direction. Using an
+        // input w of 0 with the previous proj-view keeps only the camera
+        // rotation, which is all that matters for points at infinity.
+        vec3 dirWorld = (u_projViewInverse * vec4(ndc, -u_projAB.x, 1.0)).xyz;
+        vec4 previousPosClip = u_prevProjView * vec4(normalize(dirWorld), 0.0);
+        velocity = (previousPosClip.xy / previousPosClip.w - ndc) / 2.0;
+    } else {
+        float viewZ = 1.0 / recoverWValue(depth, u_zFarK.x, u_zFarK.y);
+        // Clip-space position of the point at view distance viewZ:
+        // w = viewZ, xy = ndc * w, z = A * (-viewZ) + B.
+        float w = viewZ;
+        float zClip = -u_projAB.x * viewZ + u_projAB.y;
+        vec4 currentPosWorld = u_projViewInverse * vec4(ndc * w, zClip, w);
+        // Compute previous world position. The world position is camera-relative
+        // (floating origin), in global axes. The previous-frame position of the
+        // same point is obtained by subtracting the camera position delta
+        // (dPos = prevPos - pos).
+        vec3 previousPosWorld = currentPosWorld.xyz - u_dCam;
+
+        // Use the world position, and transform by the previous view-
+        // projection matrix.
+        vec4 previousPosClip = u_prevProjView * vec4(previousPosWorld, 1.0);
+        // Convert to nonhomogeneous points [-1,1] by dividing by w.
+        previousPosClip /= previousPosClip.w;
+        // Use this frame's position and last frame's to compute the pixel
+        // velocity.
+        velocity = (previousPosClip.xy - ndc) / 2.0;
+    }
     // Scale with blur scale parameter.
     vec2 vel = velocity * u_blurScale;
-    // Compute viewport speed and number of smaples.
+    // Viewport speed, in pixels displaced per frame.
     float speed = length(vel * u_viewport);
+    // Clamp the maximum trail length, in pixels. The per-pixel velocity is a
+    // true screen-space displacement, so at large camera speeds it grows
+    // without bound and smears across the whole frame. Capping the velocity
+    // makes the blur saturate at a fixed radius (high speeds stop increasing
+    // it), while slow scenes stay below the cap and are unaffected.
+    float maxTrailPx = float(u_blurSamplesMax);
+    if(speed > maxTrailPx)
+        vel *= maxTrailPx / speed;
     int nSamples = clamp(int(speed), 1, u_blurSamplesMax);
 
     // Luminance-weighted average: over dark regions (sky) weights are
