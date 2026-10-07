@@ -1084,7 +1084,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 backBufferScale = new OwnSliderReset("",
                                                      Constants.BACKBUFFER_SCALE_MIN,
                                                      Constants.BACKBUFFER_SCALE_MAX,
-                                                     Constants.BACKBUFFER_SCALE_STEP,
+                                                     Constants.SLIDER_STEP_TINY,
                                                      1f,
                                                      skin);
                 backBufferScale.setTooltip(I18n.msg("gui.backbuffer.scale.info"));

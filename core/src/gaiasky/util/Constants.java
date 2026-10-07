@@ -208,7 +208,6 @@ public class Constants {
     public static final int PG_RESOLUTION_MAX = 6000;
     public static final float BACKBUFFER_SCALE_MIN = 0.1f;
     public static final float BACKBUFFER_SCALE_MAX = 8.0f;
-    public static final float BACKBUFFER_SCALE_STEP = 0.1f;
     public static final float MOTIONBLUR_MIN = 0.0f;
     public static final float MOTIONBLUR_MAX = 2.0f;
     // Max time for VSOP87 algorithms
