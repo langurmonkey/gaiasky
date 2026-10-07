@@ -231,6 +231,11 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
+    public Vector3Q getFocusDx() {
+        return current.getFocusDx();
+    }
+
+    @Override
     public void setDPos(Vector3D dPos) {
         current.setDPos(dPos);
     }

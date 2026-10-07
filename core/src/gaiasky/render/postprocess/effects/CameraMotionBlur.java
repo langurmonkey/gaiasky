@@ -54,6 +54,21 @@ public final class CameraMotionBlur extends PostProcessorEffect {
         // Delta camera pos.
         var cam = GaiaSky.instance.getICamera();
         cam.getDPos().put(aux);
+        // When the camera is position-locked to the focus, the camera delta
+        // contains the focus's own motion (e.g. its orbital motion). Focus-
+        // locked geometry moves with the camera, so it must not be attributed
+        // the full camera delta. Subtract the focus delta, so that the blur
+        // for focus-locked pixels only reflects the user's motion relative
+        // to the focus. Static background objects will be under-blurred, but
+        // that is preferable to the focus being over-blurred.
+        // Sign: for a focus-locked point, W_prev = W_cur - dPos - dx, while
+        // the shader computes W_cur - u_dCam. So u_dCam = dPos + dx.
+        var focusDx = cam.getFocusDx();
+        if (focusDx != null && cam.getFocus() != null && GaiaSky.settings().scene.camera.focusLock.position) {
+            aux.x += focusDx.x.floatValue();
+            aux.y += focusDx.y.floatValue();
+            aux.z += focusDx.z.floatValue();
+        }
         cameraMotionBlurFilter.setDCam(aux);
         // Z-far and K.
         cameraMotionBlurFilter.setZFarK((float) cam.getFar(), Constants.getCameraK());

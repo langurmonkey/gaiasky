@@ -156,6 +156,15 @@ public interface ICamera {
     IFocus getFocus();
 
     /**
+     * Returns the focus position delta computed in the last camera update
+     * (next focus position minus current focus position). Only meaningful in
+     * focus mode with the position lock enabled. May be null.
+     *
+     * @return The focus position delta, or null if not applicable.
+     */
+    Vector3Q getFocusDx();
+
+    /**
      * Checks whether the current camera has a focus set.
      *
      * @return True if the camera has a focus.

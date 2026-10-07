@@ -2213,6 +2213,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return getMode().equals(CameraMode.FOCUS_MODE) ? this.focus : null;
     }
 
+    /**
+     * Returns the focus position delta computed in the last update (next focus
+     * position minus current focus position). It is zero if the position lock
+     * is disabled. Only meaningful in focus mode.
+     *
+     * @return The focus position delta.
+     */
+    public Vector3Q getFocusDx() {
+        return dx;
+    }
+
     @Override
     public boolean hasFocus() {
         return getMode().equals(CameraMode.FOCUS_MODE) && focus != null && !focus.isEmpty();

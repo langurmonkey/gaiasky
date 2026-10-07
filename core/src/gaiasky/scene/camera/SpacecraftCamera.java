@@ -345,6 +345,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
+    public Vector3Q getFocusDx() {
+        return null;
+    }
+
+    @Override
     public boolean hasFocus() {
         return false;
     }

@@ -15,6 +15,7 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public class RelativisticCamera extends AbstractCamera {
@@ -109,6 +110,11 @@ public class RelativisticCamera extends AbstractCamera {
 
     @Override
     public IFocus getFocus() {
+        return null;
+    }
+
+    @Override
+    public Vector3Q getFocusDx() {
         return null;
     }
 
