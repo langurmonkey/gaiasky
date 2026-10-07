@@ -1710,7 +1710,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                                             0.1f,
                                             Constants.MIN_LOD_TRANS_ANGLE_DEG,
                                             Constants.MAX_LOD_TRANS_ANGLE_DEG,
-                                            85.9f,
+                                            65.0f,
                                             skin);
         lodTransitions.setTooltip(I18n.msg("gui.lod.thresholds"));
         lodTransitions.setValueSuffix("°");
