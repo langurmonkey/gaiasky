@@ -2711,7 +2711,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // REST enabled checkbox.
         var restEnabledLabel = new OwnLabel(I18n.msg("gui.rest.enable"), skin);
         restEnabled = new OwnCheckBox("", skin);
-        restEnabled.setChecked(currentPort >= 0);
+        restEnabled.setChecked(settings.program.net.restEnabled);
         restEnabled.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 restPort.setDisabled(!restEnabled.isChecked());
@@ -2966,7 +2966,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private void applyRESTSettings(boolean showPopupOnError) {
-        int port;
+        int port = GaiaSky.settings().program.net.restPort;
         if (restEnabled.isChecked()) {
             if (restPort.isValid()) {
                 port = Parser.parseInt(restPort.getText());
@@ -2977,11 +2977,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 }
                 return;
             }
-        } else {
-            port = -1;
         }
         EventManager.publish(Event.REST_SERVER_LOOPBACK_CMD, this, restLoopbackOnly.isChecked());
-        EventManager.publish(Event.REST_SERVER_CMD, this, port);
+        EventManager.publish(Event.REST_SERVER_CMD, this, restEnabled.isChecked(), port);
     }
 
     private void updateRESTServerStatus(boolean status) {

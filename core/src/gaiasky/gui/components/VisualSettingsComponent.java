@@ -17,7 +17,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.Constants;
-import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnSliderReset;
@@ -41,10 +40,10 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         super(skin, stage);
     }
 
-    private final float STAR_BRIGHTNESS_DEFAULT = 2.22f;
-    private final float STAR_BR_POWER_DEFAULT = 1f;
+    private final float STAR_BRIGHTNESS_DEFAULT = 3.15f;
+    private final float STAR_MAG_MULTIPLIER_DEFAULT = 0.97f;
     private final float STAR_GLOW_FACTOR_DEFAULT = 0.035f;
-    private final float POINT_SIZE_DEFAULT = 3f;
+    private final float POINT_SIZE_DEFAULT = 1.69f;
     private final float STAR_BASE_LEVEL_DEFAULT = 0.0f;
     private final float AMBIENT_LIGHT_DEFAULT = 0.0f;
     private final float LABEL_SIZE_DEFAULT = 1.3f;
@@ -74,11 +73,11 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                                                    Constants.MIN_STAR_BRIGHTNESS_POW,
                                                    Constants.MAX_STAR_BRIGHTNESS_POW,
                                                    Constants.SLIDER_STEP_WEENY,
-                                                   STAR_BR_POWER_DEFAULT,
+                                                   STAR_MAG_MULTIPLIER_DEFAULT,
                                                    skin);
         starBrightnessPow.setTooltip(I18n.msg("gui.star.brightness.pow.info"));
         starBrightnessPow.setWidth(componentWidth);
-        starBrightnessPow.setValue(GaiaSky.settings().scene.star.power);
+        starBrightnessPow.setValue(GaiaSky.settings().scene.star.magMultiplier);
         starBrightnessPow.connect(Event.STAR_BRIGHTNESS_POW_CMD);
 
         /* Star glow factor */
@@ -201,7 +200,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         // Post events to reset all.
         EventManager m = EventManager.instance;
         m.post(Event.STAR_BRIGHTNESS_CMD, source, STAR_BRIGHTNESS_DEFAULT);
-        m.post(Event.STAR_BRIGHTNESS_POW_CMD, source, STAR_BR_POWER_DEFAULT);
+        m.post(Event.STAR_BRIGHTNESS_POW_CMD, source, STAR_MAG_MULTIPLIER_DEFAULT);
         m.post(Event.STAR_GLOW_FACTOR_CMD, source, STAR_GLOW_FACTOR_DEFAULT);
         m.post(Event.STAR_POINT_SIZE_CMD, source, POINT_SIZE_DEFAULT);
         m.post(Event.STAR_BASE_LEVEL_CMD, source, STAR_BASE_LEVEL_DEFAULT);

@@ -49,10 +49,10 @@ public class RESTServer implements Disposable {
      */
     private boolean activated;
 
-    public RESTServer(int port) {
+    public RESTServer(boolean enabled, int port) {
         super();
         if (port >= 0) {
-            initialize(port);
+            initialize(enabled, port);
         }
     }
 
@@ -63,14 +63,14 @@ public class RESTServer implements Disposable {
      *
      * @param restPort The port to use for the REST server
      */
-    public void initialize(Integer restPort) {
+    public void initialize(boolean enabled, Integer restPort) {
         // Stop server if port is negative.
         int port = restPort;
-        if (port < 0) {
+        if (!enabled || port < 0) {
             if (isRunning()) {
                 logger.info("Stopping server.");
             } else {
-                logger.error("Error: invalid port. REST API inactive.");
+                logger.error(String.format("Error: invalid port (%d). REST API inactive.", port));
             }
             Spark.stop();
             // Broadcast REST offline.

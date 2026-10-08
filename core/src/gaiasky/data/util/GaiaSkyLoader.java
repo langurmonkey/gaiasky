@@ -94,7 +94,7 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
         assets.consoleManager = new ConsoleManager(assets.scriptingInterface);
 
         // REST server.
-        assets.restServer = new RESTServer(parameter.gaiaSky.getSettings().program.net.restPort);
+        assets.restServer = new RESTServer(parameter.gaiaSky.getSettings().program.net.restEnabled, parameter.gaiaSky.getSettings().program.net.restPort);
 
         // Single instance manager
         assets.singleInstanceManager = new SingleInstanceManager();
@@ -124,7 +124,11 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
             MaterialComponent.getLUTManager();
             ModelType modelType = ModelComponent.getDefaultModelType();
             var modelParams = ModelComponent.getDefaultModelParameters(modelType);
-            Bits attributes = Bits.indices(VertexAttributes.Usage.Position, VertexAttributes.Usage.Normal, VertexAttributes.Usage.Tangent, VertexAttributes.Usage.BiNormal, VertexAttributes.Usage.TextureCoordinates);
+            Bits attributes = Bits.indices(VertexAttributes.Usage.Position,
+                                           VertexAttributes.Usage.Normal,
+                                           VertexAttributes.Usage.Tangent,
+                                           VertexAttributes.Usage.BiNormal,
+                                           VertexAttributes.Usage.TextureCoordinates);
             if (modelParams.containsKey("attributes")) {
                 attributes = Bits.indices(((Long) modelParams.get("attributes")).intValue());
             }

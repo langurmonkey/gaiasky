@@ -180,7 +180,7 @@ public class SettingsMorph {
         scene.fadeMs = i32("scene.object.fadems", p);
         var star = new StarSettings();
         star.brightness = f32("scene.star.brightness", p);
-        star.power = f32("scene.star.brightness.pow", p);
+        star.magMultiplier = f32("scene.star.brightness.pow", p);
         star.pointSize = f32("scene.star.point.size", p);
         star.textureIndex = i32("scene.star.tex.index", p);
         var group = new GroupSettings();

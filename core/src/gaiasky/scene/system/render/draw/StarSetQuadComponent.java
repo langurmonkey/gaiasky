@@ -35,7 +35,7 @@ public class StarSetQuadComponent {
 
         updateMinQuadSolidAngle(GaiaSky.settings().graphics.backBufferResolution);
         updateStarBrightness(GaiaSky.settings().scene.star.brightness);
-        updateBrightnessPower(GaiaSky.settings().scene.star.power);
+        updateBrightnessPower(GaiaSky.settings().scene.star.magMultiplier);
         updateStarPointSize(GaiaSky.settings().scene.star.pointSize);
         updateStarOpacityLimits(GaiaSky.settings().scene.star.opacity[0], GaiaSky.settings().scene.star.opacity[1]);
 

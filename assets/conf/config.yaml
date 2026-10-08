@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 3060801
+configVersion: 3080101
 
 #
 # Data configuration
@@ -149,14 +149,14 @@ scene:
     # Render star spheres.
     renderStarSpheres: false
     # Star brightness factor.
-    brightness: 2.22
-    # Modulate the brightness of stars.
-    power: 1.0
+    brightness: 3.15
+    # Accentuates differences between faint and bright stars.
+    magMultiplier: 0.97
     # Base screen size of stars.
-    pointSize: 3.0
+    pointSize: 1.69
     # Value to add to each star's saturation value in HSV.
     # A value of 0 does not modify the saturation of stars.
-    saturate: 0.16
+    saturate: 0.0
     # Control the glow amount when close to stars.
     # Should be set rather low, i.e., in [0.01, 0.7].
     glowFactor: 0.035
@@ -421,8 +421,10 @@ program:
     celestialSphereIndexOfRefraction: 1.0
   # Gaia Sky instance connection (master-slave).
   net:
-    # Enable the REST API on this TCP port (negative to disable).
-    restPort: -1
+    # Enable the REST server.
+    restEnabled: false
+    # TCP port for the REST API (negative does not start the server).
+    restPort: 44356
     # Restrict the REST API to the loopback interface (localhost only).
     # Set to false to make it reachable from other machines (for example, in
     # master-slave planetarium setups). This exposes the whole scripting API to

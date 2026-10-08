@@ -939,7 +939,7 @@ public class GamepadGui extends AbstractGui {
         magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         magnitudeMultiplier.setWidth(ww);
         magnitudeMultiplier.setHeight(sh);
-        magnitudeMultiplier.setValue(GaiaSky.settings().scene.star.power);
+        magnitudeMultiplier.setValue(GaiaSky.settings().scene.star.magMultiplier);
         magnitudeMultiplier.connect(Event.STAR_BRIGHTNESS_POW_CMD);
 
         // Star glow factor

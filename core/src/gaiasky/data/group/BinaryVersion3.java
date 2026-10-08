@@ -89,8 +89,7 @@ public class BinaryVersion3 implements BinaryIO {
                 .filter(name -> name.startsWith("HIP "))
                 .toList();
         if (!hipName.isEmpty()) {
-            var name = hipName.get(0)
-                    .trim();
+            var name = hipName.getFirst().trim();
             // We parse the hip id from the string (e.g. we take "2334" from "HIP 2334").
             if (name.length() > 4) {
                 try {

@@ -1706,12 +1706,15 @@ public final class GaiaSky implements ApplicationListener, IObserver {
             case SCENE_FORCE_UPDATE -> touchSceneGraph();
             case REST_SERVER_CMD -> {
                 if (scene != null && gaiaSkyAssets != null && gaiaSkyAssets.restServer != null) {
-                    int port = (Integer) data[0];
-                    gaiaSkyAssets.restServer.initialize(port);
-                    if (port < 0) {
+                    boolean wasRunning = gaiaSkyAssets.restServer.isRunning();
+                    boolean enabled = (Boolean) data[0];
+                    int port = (Integer) data[1];
+                    gaiaSkyAssets.restServer.initialize(enabled, port);
+                    boolean isRunning = gaiaSkyAssets.restServer.isRunning();
+                    if (wasRunning && !isRunning) {
                         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.rest.info.stop"));
-                    } else if (gaiaSkyAssets.restServer.isRunning()) {
-                        var msg = I18n.msg("gui.rest.info", Integer.toString(settings.program.net.restPort));
+                    } else if (!wasRunning && isRunning) {
+                        var msg = I18n.msg("gui.rest.info", port);
                         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, msg);
                     }
                 }

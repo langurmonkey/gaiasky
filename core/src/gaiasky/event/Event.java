@@ -1649,8 +1649,7 @@ public enum Event {
     SVT_CACHE_SIZE_CMD,
 
     /**
-     * (Re)initialize REST server with the given port. Contains the port (Integer) in [0].
-     * Use a negative port number to disable the REST server.
+     * (Re)initialize REST server with the given port. Contains the enabled flag (Boolean) in [0], and port (Integer) in [1].
      **/
     REST_SERVER_CMD,
 

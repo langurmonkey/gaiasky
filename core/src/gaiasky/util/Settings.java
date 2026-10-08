@@ -71,7 +71,7 @@ public class Settings extends SettingsObject {
      * 3.5.3-1 -> 3050301
      * Leading zeroes are omitted to avoid octal literal interpretation.
      **/
-    public static final int SOURCE_VERSION = 3080001;
+    public static final int SOURCE_VERSION = 3080101;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the
@@ -1620,9 +1620,9 @@ public class Settings extends SettingsObject {
             /** Render stars as textured sphere models. **/
             public boolean renderStarSpheres;
             public float brightness;
-            public float power;
+            public float magMultiplier;
             public float pointSize;
-            public float saturate = 0.16f;
+            public float saturate;
             /**
              * When close to the stars, this factor controls the amount of glow.
              * It should be set rather low, i.e., in [0.01,0.2].
@@ -1759,7 +1759,7 @@ public class Settings extends SettingsObject {
 
                         case STAR_BRIGHTNESS_CMD -> brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS,
                                                                                        Constants.MAX_STAR_BRIGHTNESS);
-                        case STAR_BRIGHTNESS_POW_CMD -> power = (float) data[0];
+                        case STAR_BRIGHTNESS_POW_CMD -> magMultiplier = (float) data[0];
                         case STAR_GLOW_FACTOR_CMD -> glowFactor = (float) data[0];
                     }
                 }
@@ -1815,7 +1815,7 @@ public class Settings extends SettingsObject {
                 EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, textureIndex);
                 EventManager.publish(Event.GLOW_TEXTURE_IDX_CMD, this, textureIndexLens);
                 EventManager.publish(Event.STAR_BRIGHTNESS_CMD, this, brightness);
-                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, this, power);
+                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, this, magMultiplier);
                 EventManager.publish(Event.STAR_GLOW_FACTOR_CMD, this, (float) glowFactor);
 
                 group.apply();
@@ -2605,7 +2605,10 @@ public class Settings extends SettingsObject {
                         saveProceduralTextures = (Boolean) data[0];
                     }
                     case NAME_CONFLICTS_STARTUP_CMD -> showNameConflicts = (Boolean) data[0];
-                    case REST_SERVER_CMD -> net.restPort = (Integer) data[0];
+                    case REST_SERVER_CMD -> {
+                        net.restEnabled = (Boolean) data[0];
+                        net.restPort = (Integer) data[1];
+                    }
                     case REST_SERVER_LOOPBACK_CMD -> net.restLoopbackOnly = (Boolean) data[0];
                     default -> {
                     }
@@ -2707,7 +2710,7 @@ public class Settings extends SettingsObject {
             EventManager.publish(Event.POINTER_GUIDES_CMD, this, pointer.guides.active, pointer.guides.color,
                                  pointer.guides.width);
             EventManager.publish(Event.NAME_CONFLICTS_STARTUP_CMD, this, showNameConflicts);
-            EventManager.publish(Event.REST_SERVER_CMD, this, net.restPort);
+            EventManager.publish(Event.REST_SERVER_CMD, this, net.restEnabled, net.restPort);
 
             // Those need to run in the main thread, as they may need the OpenGL context.
             GaiaSky.postRunnable(() -> {
@@ -3185,6 +3188,14 @@ public class Settings extends SettingsObject {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class NetSettings extends SettingsObject {
+            /**
+             * Whether the server must be enabled.
+             */
+            public boolean restEnabled;
+            /**
+             * The rest port. Needs to be >0. If <=0, the server won't be
+             * started.
+             */
             public int restPort;
             /**
              * Whether to bind the REST server to the loopback interface only.
