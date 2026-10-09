@@ -538,13 +538,14 @@ public class Scene {
         if (!ok) {
             logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity)
                     .getName() + ")"));
-        } else {
-            if (parent != null) {
-                var parentGraph = Mapper.graph.get(parent);
+        }
+        if (parent != null) {
+            var parentGraph = Mapper.graph.get(parent);
+            if (parentGraph.children != null && !parentGraph.children.contains(entity, true)) {
                 parentGraph.addChild(parent, entity, true, 1);
-            } else {
-                throw new RuntimeException(I18n.msg("error.parent.notfound", base.getName(), graph.parentName));
             }
+        } else {
+            throw new RuntimeException(I18n.msg("error.parent.notfound", base.getName(), graph.parentName));
         }
         try {
             engine.addEntity(entity);
