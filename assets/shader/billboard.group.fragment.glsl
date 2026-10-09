@@ -84,7 +84,15 @@ vec3 emissionEmissive(float alpha, float texBrightness) {
  * fragments dominates and the approximation of order-independent compositing becomes accurate.
  */
 float oitWeight(float coverage, float depth) {
+    // depth is expected to be NORMALISED LINEAR eye depth in [0, 1]. gl_FragCoord.z is the log-depth
+    // value written by getDepthValue(), which is extremely compressed: over a galaxy's depth range
+    // it barely moves, so the depth term stops discriminating and everything gets the same weight.
     return clamp(pow(min(1.0, coverage * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - depth * 0.9, 3.0), 1e-2, 3e3);
+}
+
+/** Recovers the linear eye-space distance from the log depth in gl_FragCoord.z, normalised to [0,1]. */
+float oitLinearDepth() {
+    return clamp(recoverWValue(gl_FragCoord.z, u_zfar, u_k) / u_zfar, 0.0, 1.0);
 }
 #endif// wboitFlag
 
@@ -99,38 +107,50 @@ void main() {
     // E: emission, a: coverage. Both are consumed by the OIT accumulation pass; until that
     // exists, they are combined here exactly as the old per-channel blending did.
     vec3 E;
-    float a;
+    float aW;   // coverage used for the WEIGHT and for the average: every fragment contributes.
+    float aOIT; // coverage used for TRANSMITTANCE: only fragments that actually hide things.
     if (v_type == T_DUST) {
         // Occlusive channel: no emission at all. The coverage is the sprite's radial falloff,
         // scaled by the dataset intensity and the global opacity, i.e. the same quantity that
         // used to be subtracted. Clamped so a sprite can never fully hide what is behind it,
         // which would also make the weight term vanish.
         E = vec3(0.0);
-        a = clamp(texBrightness * v_col.a * u_alpha, 0.0, 1.0);
+        aW = clamp(texBrightness * v_col.a * u_alpha, 0.0, 1.0);
+        aOIT = aW;
     } else {
         // Emissive channel: the colour contributes light, the falloff is the coverage.
         E = emissionEmissive(u_alpha, texBrightness);
-        a = texBrightness;
+        aW = texBrightness;
+        // An emitter must NOT hide what is behind it. If it contributed its falloff to the
+        // transmittance product prod(1 - a), then a stack of N overlapping sprites would drive it
+        // to zero (N * a ~ O(100) is routine for a galaxy), i.e. every star would occlude itself
+        // and the frame would go black. Emission is additive: the only thing that reduces
+        // transmittance is dust.
+        aOIT = 0.0;
     }
 
 #ifdef wboitFlag
-    // OIT path: E and a go to the accumulation targets, not to the scene colour buffer, so that
-    // they can be resolved across resolutions before anything is composited.
-    //   accum.rgb: additive under (ONE, ONE)           -> sum(E * w), the numerator
-    //   accum.a:   multiplied by (ONE_MINUS_SRC_ALPHA) -> prod(1 - a), the transmittance
-    //   weight.rgb: additive under (ONE, ONE)          -> sum(a * w), the denominator
+    // OIT path: E, aW and aOIT go to the accumulation targets, not to the scene colour buffer, so
+    // that they can be resolved across resolutions before anything is composited.
+    //   accum.rgb:   additive under (ONE, ONE)           -> sum(E * aW * w), the numerator
+    //   accum.a:     multiplied by (ONE_MINUS_SRC_ALPHA) -> prod(1 - aOIT), the transmittance
+    //   weight.rgb:  additive under (ONE, ONE)           -> sum(aW * w), the denominator
     //
-    // The transmittance uses the RAW coverage a, not a * w. w is a weighting factor for the
-    // weighted average and reaches 3e3; multiplying alpha by it makes (1 - a*w) strongly negative
-    // for any non-trivial coverage, the product collapses towards zero, and the whole galaxy is
-    // composited at zero brightness, i.e. black. Only the weighted average is weighted.
-    float w = oitWeight(aW, gl_FragCoord.z);
+    // Three details that each caused a fully black frame when they were wrong:
+    //   1. The transmittance uses aOIT, not aW and not aW*w. w reaches 3e3, so aW*w makes
+    //      (1 - aW*w) strongly negative and the product collapses to zero.
+    //   2. aOIT is zero for emissive channels. Feeding every sprite's falloff into prod(1 - a)
+    //      makes each star occlude itself; a galaxy stacks hundreds of overlapping sprites.
+    //   3. The numerator is E * aW * w, not E * w. Since the denominator is sum(aW * w), the aW
+    //      must appear in both or the resolved average is E/aW, which blows up at sprite edges
+    //      (aW -> 0) and was the pink halos on big particles in the accum buffer.
+    float w = oitWeight(aW, oitLinearDepth());
     oitAccum = vec4(E * aW * w, aOIT);
     oitWeightAccum = vec4(aW * w);
     fragColor = vec4(0.0);
 #else
-    // Non-OIT path: composited with ALPHA blending, i.e. dst = E + dst * (1 - a).
-    fragColor = vec4(E, a);
+    // Non-OIT path: composited with ALPHA blending, i.e. dst = E + dst * (1 - aW).
+    fragColor = vec4(E, aW);
     #endif// wboitFlag
 
     // Logarithmic depth buffer (not used actually).
