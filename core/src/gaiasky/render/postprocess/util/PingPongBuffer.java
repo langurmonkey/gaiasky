@@ -30,8 +30,10 @@ public final class PingPongBuffer implements Disposable {
     private boolean writeState, pending1, pending2;
     private GaiaSkyFrameBuffer ownedResult, ownedSource;
     private int ownedW, ownedH;
+    /** Whether the OIT accum/revealage attachments were allocated. */
+    private final boolean oitEnabled;
 
-    /** Creates a new ping-pong buffer and owns the resources. */
+    /** Creates a new ping-pong buffer and owns the resources, with no OIT attachments. */
     public PingPongBuffer(int width,
                           int height,
                           Format pixmapFormat,
@@ -39,22 +41,43 @@ public final class PingPongBuffer implements Disposable {
                           boolean hasNormal,
                           boolean hasReflectionMask,
                           boolean preventFloatBuffer) {
+        this(width, height, pixmapFormat, hasDepth, hasNormal, hasReflectionMask, preventFloatBuffer, false);
+    }
+
+    /**
+     * Creates a new ping-pong buffer and owns the resources.
+     *
+     * @param oitEnabled whether to allocate the weighted-blended-OIT accumulation and revealage
+     *                   attachments at fixed indices 4 and 5.
+     */
+    public PingPongBuffer(int width,
+                          int height,
+                          Format pixmapFormat,
+                          boolean hasDepth,
+                          boolean hasNormal,
+                          boolean hasReflectionMask,
+                          boolean preventFloatBuffer,
+                          boolean oitEnabled) {
         ownResources = true;
+        this.oitEnabled = oitEnabled;
 
         // BUFFERS (FULL- and HALF-RES) USED FOR THE ACTUAL RENDERING:
-        // n RENDER TARGETS:
+        // n RENDER TARGETS (see createMainFrameBuffer for the layout):
         //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (SCENE)
         //      1: COLOR 1 - FLOAT TEXTURE ATTACHMENT (NON_SCENE: labels, lines, grids)
         //      2: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
         //      3: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
-        //      4: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
+        //      4: COLOR 4 - FLOAT TEXTURE ATTACHMENT (OIT ACCUM)       [if oitEnabled]
+        //      5: COLOR 5 - FLOAT TEXTURE ATTACHMENT (OIT REVEALAGE)   [if oitEnabled]
+        //      n: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
         ownedFull = createMainFrameBuffer(width,
                                           height,
                                           hasDepth,
                                           hasNormal,
                                           hasReflectionMask,
                                           pixmapFormat,
-                                          preventFloatBuffer);
+                                          preventFloatBuffer,
+                                          oitEnabled);
         // Default half-resolution factor is 0.4.
         var halfWidth = Math.max(760, (int) (width * 0.4));
         var halfHeight = (int) ((float) height / (float) width * (float) halfWidth);
@@ -64,7 +87,8 @@ public final class PingPongBuffer implements Disposable {
                                           hasNormal,
                                           hasReflectionMask,
                                           pixmapFormat,
-                                          preventFloatBuffer);
+                                          preventFloatBuffer,
+                                          oitEnabled);
 
         // PING-PONG BUFFERS:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
@@ -77,6 +101,24 @@ public final class PingPongBuffer implements Disposable {
         set(owned1, owned2);
     }
 
+    /**
+     * Creates the full/half-resolution main frame buffers.
+     * <p>
+     * The attachment layout is FIXED so that shaders and renderers can rely on constant
+     * draw-buffer indices regardless of feature toggles:
+     * <ul>
+     *     <li>0: scene color</li>
+     *     <li>1: non-scene color (labels, lines, grids)</li>
+     *     <li>2: normal buffer (always allocated)</li>
+     *     <li>3: reflection mask (always allocated)</li>
+     *     <li>4: OIT accum (only if oitEnabled)</li>
+     *     <li>5: OIT revealage (only if oitEnabled)</li>
+     *     <li>last: depth (if hasDepth)</li>
+     * </ul>
+     * Slots 2 and 3 are always allocated even when unused: keeping them present means the
+     * indices of the OIT targets never shift, which is what lets the billboard renderer bind
+     * {@code GL_COLOR_ATTACHMENT4/5} under a fixed {@code #define wboitFlag}.
+     */
     public static GaiaSkyFrameBuffer createMainFrameBuffer(int width,
                                                            int height,
                                                            boolean hasDepth,
@@ -84,9 +126,21 @@ public final class PingPongBuffer implements Disposable {
                                                            boolean hasReflectionMask,
                                                            Format frameBufferFormat,
                                                            boolean preventFloatBuffer) {
+        return createMainFrameBuffer(width, height, hasDepth, hasNormal, hasReflectionMask, frameBufferFormat, preventFloatBuffer, false);
+    }
+
+    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width,
+                                                           int height,
+                                                           boolean hasDepth,
+                                                           boolean hasNormal,
+                                                           boolean hasReflectionMask,
+                                                           Format frameBufferFormat,
+                                                           boolean preventFloatBuffer,
+                                                           boolean oitEnabled) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
         int colorIndex, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+        int accumIndex = -1, revealageIndex = -1;
         int idx = 0;
 
         // 0
@@ -100,20 +154,25 @@ public final class PingPongBuffer implements Disposable {
         layerIndex = idx++;
 
         // 2
-        // Normal buffer.
-        if (hasNormal) {
-            addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-            normalIndex = idx++;
-        }
+        // Normal buffer. Always allocated to keep the layout fixed; unused if !hasNormal.
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        normalIndex = idx++;
 
         // 3
-        // Reflection mask buffer.
-        if (hasReflectionMask) {
-            addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-            reflectionMaskIndex = idx++;
+        // Reflection mask buffer. Always allocated to keep the layout fixed; unused if !hasReflectionMask.
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        reflectionMaskIndex = idx++;
+
+        // 4, 5
+        // Weighted blended OIT targets.
+        if (oitEnabled) {
+            addOitRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+            accumIndex = idx++;
+            addOitRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+            revealageIndex = idx++;
         }
 
-        // 4
+        // Last
         // Depth buffer.
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
@@ -122,7 +181,7 @@ public final class PingPongBuffer implements Disposable {
             }
         }
 
-        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, layerIndex, normalIndex, reflectionMaskIndex);
+        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, layerIndex, normalIndex, reflectionMaskIndex, accumIndex, revealageIndex);
 
     }
 
@@ -142,6 +201,22 @@ public final class PingPongBuffer implements Disposable {
 
     private static void addFloatRenderTarget(FrameBufferBuilder builder, int internalFormat) {
         builder.addFloatAttachment(internalFormat, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+    }
+
+    /**
+     * Adds a weighted-blended-OIT color target. OIT accum needs to hold emission * weight summed
+     * over many fragments, and the revealage target holds a product that converges towards zero,
+     * so both must be floating point with enough range: RGBA16F for accum (matching the rest of
+     * the pipeline) and R32F-equivalent RGBA16F for revealage.
+     */
+    private static void addOitRenderTarget(FrameBufferBuilder builder, Format pixmapFormat, boolean preventFloatBuffer) {
+        if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
+            addFloatRenderTarget(builder, GL30.GL_RGBA16F);
+        } else {
+            // No float buffers: OIT cannot run correctly, but we still allocate the slots so the
+            // attachment layout stays fixed.
+            addColorRenderTarget(builder, pixmapFormat);
+        }
     }
 
     private static void addColorRenderTarget(FrameBufferBuilder builder, Format pixmapFormat) {
@@ -300,6 +375,31 @@ public final class PingPongBuffer implements Disposable {
 
     public GaiaSkyFrameBuffer getHalfBuffer() {
         return ownedHalf;
+    }
+
+    /** @return true if the OIT accum/revealage attachments were allocated in the full/half buffers. */
+    public boolean isOitEnabled() {
+        return oitEnabled;
+    }
+
+    /** @return the full-resolution OIT accumulation texture, or null if OIT is disabled. */
+    public Texture getFullAccumTexture() {
+        return ownedFull.getAccumBufferTexture();
+    }
+
+    /** @return the full-resolution OIT revealage texture, or null if OIT is disabled. */
+    public Texture getFullRevealageTexture() {
+        return ownedFull.getRevealageBufferTexture();
+    }
+
+    /** @return the half-resolution OIT accumulation texture, or null if OIT is disabled. */
+    public Texture getHalfAccumTexture() {
+        return ownedHalf.getAccumBufferTexture();
+    }
+
+    /** @return the half-resolution OIT revealage texture, or null if OIT is disabled. */
+    public Texture getHalfRevealageTexture() {
+        return ownedHalf.getRevealageBufferTexture();
     }
 
     // internal use

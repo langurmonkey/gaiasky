@@ -40,6 +40,8 @@ public final class PostProcessor implements Disposable {
     private final Color clearColor = Color.CLEAR;
     private final Rectangle viewport = new Rectangle();
     private final boolean useDepth;
+    /** Whether the OIT attachments are present on the full/half-resolution main frame buffers. */
+    private final boolean oitEnabled;
     // maintains a per-frame updated list of enabled effects
     private final Array<PostProcessorEffect> enabledEffects = new Array<>(5);
     private TextureWrap compositeWrapU;
@@ -67,6 +69,17 @@ public final class PostProcessor implements Disposable {
 
     /** Construct a new PostProcessor with the given parameters and the specified texture wrap mode */
     public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer, TextureWrap u, TextureWrap v) {
+        this(rt, fboWidth, fboHeight, useDepth, useAlphaChannel, use32Bits, hasNormal, hasReflectionMask, preventFloatBuffer, u, v, false);
+    }
+
+    /**
+     * Construct a new PostProcessor with the given parameters, the specified texture wrap mode,
+     * and optionally the weighted-blended-OIT attachments on the full and half-resolution main
+     * frame buffers.
+     *
+     * @param oitEnabled whether to allocate the OIT accum/revealage attachments at indices 4 and 5.
+     */
+    public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer, TextureWrap u, TextureWrap v, boolean oitEnabled) {
         if (use32Bits) {
             if (useAlphaChannel) {
                 pixmapFormat = Format.RGBA8888;
@@ -81,7 +94,8 @@ public final class PostProcessor implements Disposable {
             }
         }
 
-        composite = newPingPongBuffer(fboWidth, fboHeight, pixmapFormat, useDepth, hasNormal, hasReflectionMask, preventFloatBuffer);
+        composite = newPingPongBuffer(fboWidth, fboHeight, pixmapFormat, useDepth, hasNormal, hasReflectionMask, preventFloatBuffer, oitEnabled);
+        this.oitEnabled = oitEnabled;
         setBufferTextureWrap(u, v);
         if (rt == RenderType.screen) {
             UpscaleFilter upscaleFilter = GaiaSky.settings().postprocess.upscaleFilter;
@@ -123,7 +137,25 @@ public final class PostProcessor implements Disposable {
                                                    boolean hasNormal,
                                                    boolean hasReflectionMask,
                                                    boolean preventFloatBuffer) {
-        PingPongBuffer buffer = new PingPongBuffer(width, height, pixmapFormat, hasDepth, hasNormal, hasReflectionMask, preventFloatBuffer);
+        return newPingPongBuffer(width, height, pixmapFormat, hasDepth, hasNormal, hasReflectionMask, preventFloatBuffer, false);
+    }
+
+    /**
+     * Creates a ping-pong buffer whose full/half-resolution main frame buffers also carry the
+     * weighted-blended-OIT accum and revealage attachments at fixed indices 4 and 5.
+     * <p>
+     * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
+     *
+     * @param oitEnabled whether to allocate the OIT attachments.
+     */
+    public static PingPongBuffer newPingPongBuffer(int width, int height,
+                                                   Format pixmapFormat,
+                                                   boolean hasDepth,
+                                                   boolean hasNormal,
+                                                   boolean hasReflectionMask,
+                                                   boolean preventFloatBuffer,
+                                                   boolean oitEnabled) {
+        PingPongBuffer buffer = new PingPongBuffer(width, height, pixmapFormat, hasDepth, hasNormal, hasReflectionMask, preventFloatBuffer, oitEnabled);
         buffers.add(buffer);
         return buffer;
     }
@@ -384,6 +416,11 @@ public final class PostProcessor implements Disposable {
 
     public PingPongBuffer getCombinedBuffer() {
         return composite;
+    }
+
+    /** @return true if the OIT accum/revealage attachments are present. */
+    public boolean isOitEnabled() {
+        return oitEnabled;
     }
 
     /** Regenerates and/or rebinds owned resources when needed, eg. when the OpenGL context is lost. */

@@ -13,6 +13,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -59,6 +60,13 @@ import java.util.Map;
  */
 public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
+
+    /**
+     * Whether the weighted-blended-OIT attachments are allocated on the main scene frame buffers.
+     * Off by default; the OIT phases of the galaxy work turn it on. Requires OpenGL 3.0+ and
+     * float render targets, so it is also forced off in safe mode.
+     */
+    public static boolean oitEnabled = false;
 
     /**
      * Contains a map by name with
@@ -201,7 +209,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         if (settings.program.modeStereo.isStereoHalfWidth())
             ar /= 2f;
 
-        ppb.pp = new PostProcessor(rt, FastMath.round(width), FastMath.round(height), true, true, false, !safeMode, !safeMode, safeMode);
+        // Weighted blended OIT: only with GL 3.0+ float buffers (i.e. not safe mode).
+        boolean oit = oitEnabled && !safeMode && Gdx.graphics.isGL30Available();
+        ppb.pp = new PostProcessor(rt, FastMath.round(width), FastMath.round(height), true, true, false, !safeMode, !safeMode, safeMode,
+                                   TextureWrap.ClampToEdge, TextureWrap.ClampToEdge, oit);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // BLEND FULL- and HALF-RES TARGETS in the main pipeline
