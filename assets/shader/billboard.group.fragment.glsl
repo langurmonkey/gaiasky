@@ -47,10 +47,24 @@ void main() {
         discard;
     }
     float texBrightness = texture(u_textures, vec3(uv, v_layer)).r;
-    fragColor = colorTex(u_alpha, texBrightness);
-    // Apply non-linear intensity compression to prevent whiteout
-    fragColor.rgb = fragColor.rgb / (fragColor.rgb + vec3(1.2));
-    //fragColor.rgb = pow(fragColor.rgb, vec3(1.1));
+
+    if (v_type == T_DUST) {
+        // Dust is an absorber, not an emitter: black with a coverage in the alpha channel.
+        // With ALPHA blending (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) this evaluates
+        //     dst *= (1 - coverage),
+        // which is multiplicative, monotone (more dust always means less light), bounded in
+        // [0, 1] and independent of draw order - unlike the previous SUBTRACTIVE mode, which
+        // computed 'src - dst' (GL_FUNC_REVERSE_SUBTRACT) and could brighten a pixel.
+        // The coverage is the sprite's radial falloff, scaled by the dataset intensity and the
+        // global opacity, i.e. the same quantity that used to be subtracted.
+        float coverage = clamp(texBrightness * v_col.a * u_alpha, 0.0, 1.0);
+        fragColor = vec4(0.0, 0.0, 0.0, coverage);
+    } else {
+        fragColor = colorTex(u_alpha, texBrightness);
+        // Apply non-linear intensity compression to prevent whiteout
+        fragColor.rgb = fragColor.rgb / (fragColor.rgb + vec3(1.2));
+        //fragColor.rgb = pow(fragColor.rgb, vec3(1.1));
+    }
 
     // Logarithmic depth buffer (not used actually).
     gl_FragDepth = getDepthValue(v_dist, u_zfar, u_k);

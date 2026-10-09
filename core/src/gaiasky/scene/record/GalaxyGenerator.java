@@ -450,8 +450,12 @@ public class GalaxyGenerator {
         bd.setMaxSize(getMaxSize(type));
 
         if (type == DUST) {
-            // Subtractive blending.
-            bd.setBlending(BlendMode.SUBTRACTIVE);
+            // Dust is an absorber, not a subtractor. Absorption is multiplicative (Beer-Lambert), so dust
+            // attenuates what is behind it with alpha blending over a black base color. It must NOT use
+            // SUBTRACTIVE blending, which computes 'src - dst' with GL_FUNC_REVERSE_SUBTRACT: that is
+            // order-dependent and unbounded (a dust layer can brighten the pixel by cancelling a previous
+            // draw's contribution).
+            bd.setBlending(BlendMode.ALPHA);
             bd.setDepthMask(false);
             // Use FBM perlin noise.
             bd.setSizeNoiseScale(-rand.nextDouble(10.0, 25.0));

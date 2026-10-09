@@ -497,8 +497,9 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                     ds.type = type.getSelected().value;
                     if (ds.type == ChannelType.DUST) {
                         GaiaSky.postRunnable(() -> {
-                            // Subtractive blending.
-                            ds.setBlending(BlendMode.SUBTRACTIVE);
+                            // Dust absorbs. Absorption is multiplicative, so it uses alpha blending
+                            // over a black base color, not SUBTRACTIVE blending (see GalaxyGenerator).
+                            ds.setBlending(BlendMode.ALPHA);
                             ds.setDepthMask(false);
                         });
                     }

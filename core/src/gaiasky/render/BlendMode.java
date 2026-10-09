@@ -10,7 +10,10 @@ package gaiasky.render;
 public enum BlendMode {
     /** Uses GL_ONE and GL_ONE for source and destination in blend equation (GL_FUNC_ADD). **/
     ADDITIVE,
-    /** Uses GL_ONE and GL_ONE with blend equation GL_FUNC_SUBTRACT. **/
+    /**
+     * Uses GL_ONE and GL_ONE with blend equation GL_FUNC_REVERSE_SUBTRACT, i.e. 'dst = src - dst'.
+     * Not suitable for absorption: the result is order-dependent and unbounded.
+     **/
     SUBTRACTIVE,
     /** Uses GL_SRC_ALPHA and GL_ONE_MINUS_SRC_ALPHA for source and destination in blend equation. **/
     ALPHA,
