@@ -18,6 +18,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.MainPostProcessor;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.gdx.mesh.IntMesh;
@@ -50,7 +51,11 @@ import java.util.Map;
 public class BillboardProceduralCPURenderer extends InstancedRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(BillboardProceduralCPURenderer.class);
 
-
+    /**
+     * Whether the weighted-blended-OIT path is active. Snapshotted from
+     * {@link MainPostProcessor#oitEnabled}, which is fixed before the render assets are compiled.
+     */
+    private static final boolean OIT_ENABLED = MainPostProcessor.oitEnabled;
     private final Map<BillboardDataset, Integer> offsets;
 
     /** Quad mesh, same for everyone. **/
@@ -259,7 +264,13 @@ public class BillboardProceduralCPURenderer extends InstancedRenderSystem implem
 
                     if (curr != null) {
                         // Blend mode
-                        switch (dataset.blending) {
+                        if (OIT_ENABLED) {
+                            // Weighted blended OIT: see BillboardSetRenderer. Per-dataset blend
+                            // modes are ignored, since ordering is resolved in the composite.
+                            Gdx.gl20.glEnable(GL20.GL_BLEND);
+                            Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                            Gdx.gl20.glBlendFuncSeparate(GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                        } else switch (dataset.blending) {
                             case ALPHA -> {
                                 Gdx.gl20.glEnable(GL20.GL_BLEND);
                                 Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);

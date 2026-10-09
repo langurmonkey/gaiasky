@@ -8,8 +8,6 @@ uniform float u_alpha;
 uniform float u_zfar;
 uniform float u_k;
 uniform sampler2DArray u_textures;
-
-// INPUT
 in vec4 v_col;
 in vec2 v_uv;
 in float v_dist;
@@ -29,6 +27,12 @@ flat in int v_layer;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 layerBuffer;
+// Weighted blended OIT accumulation target (index 4, see PingPongBuffer.createMainFrameBuffer):
+//   rgb = sum over fragments of E * w   (additive)
+//   a   = product over fragments of (1 - a * w)   (multiplicative, via blendFuncSeparate)
+#ifdef wboitFlag
+layout (location = 4) out vec4 oitAccum;
+#endif// wboitFlag
 
 #ifdef ssrFlag
 #include <shader/lib/ssr.frag.glsl>
@@ -69,6 +73,17 @@ vec3 emissionEmissive(float alpha, float texBrightness) {
     return E;
 }
 
+#ifdef wboitFlag
+/**
+ * Weighted blended OIT weight (McGuire et al. 2013). The weight is exponential in both the
+ * fragment coverage and its (window-space) depth, so that a small set of near or opaque
+ * fragments dominates and the approximation of order-independent compositing becomes accurate.
+ */
+float oitWeight(float coverage, float depth) {
+    return clamp(pow(min(1.0, coverage * 10.0) + 0.01, 3.0) * 1e8 * pow(1.0 - depth * 0.9, 3.0), 1e-2, 3e3);
+}
+#endif// wboitFlag
+
 void main() {
     vec2 uv = v_uv;
     float dist = min(1.0, distance(vec2(0.5), uv) * 2.0);
@@ -94,8 +109,17 @@ void main() {
         a = texBrightness;
     }
 
+#ifdef wboitFlag
+    // OIT path: E and a go to the accumulation target, not to the scene color buffer.
+    //   rgb: additive under (ONE, ONE)          -> sum(E * w), divided by sum(a * w) in the composite.
+    //   a:   multiplied by (ONE_MINUS_SRC_ALPHA) -> prod(1 - a * w), the transmittance.
+    float w = oitWeight(a, gl_FragCoord.z);
+    oitAccum = vec4(E * w, a * w);
+    fragColor = vec4(0.0);
+    #else
     // Non-OIT path: composited with ALPHA blending, i.e. dst = E + dst * (1 - a).
     fragColor = vec4(E, a);
+    #endif// wboitFlag
 
     // Logarithmic depth buffer (not used actually).
     gl_FragDepth = getDepthValue(v_dist, u_zfar, u_k);

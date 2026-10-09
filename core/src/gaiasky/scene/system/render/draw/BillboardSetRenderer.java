@@ -17,6 +17,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.MainPostProcessor;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.InstancedRenderSystem;
@@ -43,6 +44,13 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
 
     private final ColorGenerator starColorGenerator;
     private final ColorGenerator dustColorGenerator;
+
+    /**
+     * Whether the weighted-blended-OIT path is active for this renderer. Snapshotted at construction
+     * time from {@link MainPostProcessor#oitEnabled}, which is itself fixed before the render assets
+     * are compiled (the shader outputs exist only in the wboitFlag variants).
+     */
+    private static final boolean OIT_ENABLED = MainPostProcessor.oitEnabled;
 
 
     /**
@@ -237,7 +245,16 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
                 if (curr != null) {
                     BillboardDataset dataset = billboard.datasets[i];
                     // Blend mode
-                    switch (dataset.blending) {
+                    if (OIT_ENABLED) {
+                        // Weighted blended OIT: emission accumulates additively in RGB, while the
+                        // alpha channel is multiplied by (ONE_MINUS_SRC_ALPHA) so each fragment
+                        // contributes a factor (1 - a*w) to the total transmittance. Per-dataset
+                        // blend modes are ignored: the accumulation buffers are shared, so ordering
+                        // is resolved in the composite instead of per dataset.
+                        Gdx.gl20.glEnable(GL20.GL_BLEND);
+                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                        Gdx.gl20.glBlendFuncSeparate(GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                    } else switch (dataset.blending) {
                         case ALPHA -> {
                             Gdx.gl20.glEnable(GL20.GL_BLEND);
                             Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);

@@ -46,7 +46,9 @@ public class RenderAssets {
     public static final String SUFFIX_SSR = "SSR";
     public static final String SUFFIX_REL = "Rel";
     public static final String SUFFIX_GRAV = "Grav";
-    public static final String SUFFIX_COLMAP = "Colmap";
+public static final String SUFFIX_COLMAP = "Colmap";
+    /** Define enabling the weighted-blended-OIT outputs of the billboard group shaders. */
+    public static final String DEFINE_WBOIT = "#define wboitFlag\n";
     private static final Log logger = Logger.getLogger(RenderAssets.class);
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
@@ -127,15 +129,20 @@ public class RenderAssets {
                                    "shader/sprite.fragment.glsl",
                                    TextUtils.concatAll("sprite", names),
                                    defines);
+        // Weighted blended OIT. This is deliberately NOT a shader variant dimension: it is a fixed
+        // prepend for the galaxy billboard shaders only, and only when OIT is enabled. Making it a
+        // variant would double the number of compiled billboard programs for a flag that is
+        // constant for the whole session.
+        var oitPrepend = MainPostProcessor.oitEnabled ? DEFINE_WBOIT : null;
         billboardGroupDesc = loadShaderExt(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl",
-                                           TextUtils.concatAll("billboard.group", names), defines);
+                                           TextUtils.concatAll("billboard.group", names), defines, oitPrepend);
         if (compute) {
             billboardProceduralDesc = loadShaderExt(manager, "shader/billboard.proc.vertex.glsl", "shader/billboard.group.fragment.glsl",
-                                                    TextUtils.concatAll("billboard.proc", names), defines);
+                                                    TextUtils.concatAll("billboard.proc", names), defines, oitPrepend);
         }
 
         billboardProceduralCpuDesc = loadShaderExt(manager, "shader/billboard.proc.cpu.vertex.glsl", "shader/billboard.group.fragment.glsl",
-                                                   TextUtils.concatAll("billboard.proc.cpu", names), defines);
+                                                   TextUtils.concatAll("billboard.proc.cpu", names), defines, oitPrepend);
         pointDesc = loadShaderExt(manager,
                                   "shader/point.cpu.vertex.glsl",
                                   "shader/point.cpu.fragment.glsl",
