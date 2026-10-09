@@ -32,6 +32,7 @@ public class BlendFullHalfRes extends PostProcessorEffect {
         // Z-far and K.
         var cam = GaiaSky.instance.getICamera();
         filter.setZFarK((float) cam.getFar(), Constants.getCameraK());
+        filter.setDebugMode();
 
         restoreViewport(dest);
         filter.setInput(full, half).setOutput(dest).render();

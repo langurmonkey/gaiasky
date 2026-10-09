@@ -19,6 +19,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.MainPostProcessor;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
@@ -45,6 +46,12 @@ import java.util.List;
  */
 public class BillboardProceduralRenderer extends AbstractRenderSystem implements IObserver {
     protected static final Logger.Log logger = Logger.getLogger(BillboardProceduralRenderer.class);
+
+    /**
+     * Whether the weighted-blended-OIT path is active. Snapshotted from
+     * {@link MainPostProcessor#oitEnabled}, which is fixed before the render assets are compiled.
+     */
+    private static final boolean OIT_ENABLED = MainPostProcessor.oitEnabled;
 
     /** The compute shader that generates particles. **/
     private final ComputeShaderProgram computeShader;
@@ -287,7 +294,14 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             for (var dataset : billboard.datasets) {
                 if (isPrepared(dataset)) {
                     // Blend mode
-                    switch (dataset.blending) {
+                    if (OIT_ENABLED) {
+                        // Weighted blended OIT: see BillboardSetRenderer. RGB accumulates additively,
+                        // alpha multiplies by (1 - srcA). Per-dataset blend modes are ignored, since
+                        // ordering is resolved in the composite.
+                        Gdx.gl20.glEnable(GL20.GL_BLEND);
+                        Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);
+                        Gdx.gl20.glBlendFuncSeparate(GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                    } else switch (dataset.blending) {
                         case ALPHA -> {
                             Gdx.gl20.glEnable(GL20.GL_BLEND);
                             Gdx.gl20.glBlendEquation(GL20.GL_FUNC_ADD);

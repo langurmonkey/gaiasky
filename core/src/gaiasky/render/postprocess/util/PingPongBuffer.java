@@ -30,7 +30,7 @@ public final class PingPongBuffer implements Disposable {
     private boolean writeState, pending1, pending2;
     private GaiaSkyFrameBuffer ownedResult, ownedSource;
     private int ownedW, ownedH;
-    /** Whether the OIT accum/revealage attachments were allocated. */
+    /** Whether the OIT accum/weight attachments were allocated. */
     private final boolean oitEnabled;
 
     /** Creates a new ping-pong buffer and owns the resources, with no OIT attachments. */
@@ -47,7 +47,7 @@ public final class PingPongBuffer implements Disposable {
     /**
      * Creates a new ping-pong buffer and owns the resources.
      *
-     * @param oitEnabled whether to allocate the weighted-blended-OIT accumulation and revealage
+     * @param oitEnabled whether to allocate the weighted-blended-OIT accumulation and weight
      *                   attachments at fixed indices 4 and 5.
      */
     public PingPongBuffer(int width,
@@ -68,7 +68,7 @@ public final class PingPongBuffer implements Disposable {
         //      2: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
         //      3: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
         //      4: COLOR 4 - FLOAT TEXTURE ATTACHMENT (OIT ACCUM)       [if oitEnabled]
-        //      5: COLOR 5 - FLOAT TEXTURE ATTACHMENT (OIT REVEALAGE)   [if oitEnabled]
+        //      5: COLOR 5 - FLOAT TEXTURE ATTACHMENT (OIT WEIGHT)      [if oitEnabled]
         //      n: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
         ownedFull = createMainFrameBuffer(width,
                                           height,
@@ -112,7 +112,7 @@ public final class PingPongBuffer implements Disposable {
      *     <li>2: normal buffer (always allocated)</li>
      *     <li>3: reflection mask (always allocated)</li>
      *     <li>4: OIT accum (only if oitEnabled)</li>
-     *     <li>5: OIT revealage (only if oitEnabled)</li>
+     *     <li>5: OIT weight (only if oitEnabled)</li>
      *     <li>last: depth (if hasDepth)</li>
      * </ul>
      * Slots 2 and 3 are always allocated even when unused: keeping them present means the
@@ -140,7 +140,7 @@ public final class PingPongBuffer implements Disposable {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
         int colorIndex, depthIndex = -1, layerIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
-        int accumIndex = -1, revealageIndex = -1;
+        int accumIndex = -1, weightIndex = -1;
         int idx = 0;
 
         // 0
@@ -169,7 +169,7 @@ public final class PingPongBuffer implements Disposable {
             addOitRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             accumIndex = idx++;
             addOitRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-            revealageIndex = idx++;
+            weightIndex = idx++;
         }
 
         // Last
@@ -181,7 +181,7 @@ public final class PingPongBuffer implements Disposable {
             }
         }
 
-        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, layerIndex, normalIndex, reflectionMaskIndex, accumIndex, revealageIndex);
+        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, layerIndex, normalIndex, reflectionMaskIndex, accumIndex, weightIndex);
 
     }
 
@@ -204,10 +204,9 @@ public final class PingPongBuffer implements Disposable {
     }
 
     /**
-     * Adds a weighted-blended-OIT color target. OIT accum needs to hold emission * weight summed
-     * over many fragments, and the revealage target holds a product that converges towards zero,
-     * so both must be floating point with enough range: RGBA16F for accum (matching the rest of
-     * the pipeline) and R32F-equivalent RGBA16F for revealage.
+     * Adds a weighted-blended-OIT color target. Both targets must hold unbounded float sums (sum of
+     * E*w, and sum of a*w, where w reaches 3e3), so they are always RGBA16F when float render
+     * targets are available, independently of the scene colour format.
      */
     private static void addOitRenderTarget(FrameBufferBuilder builder, Format pixmapFormat, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
@@ -377,7 +376,7 @@ public final class PingPongBuffer implements Disposable {
         return ownedHalf;
     }
 
-    /** @return true if the OIT accum/revealage attachments were allocated in the full/half buffers. */
+    /** @return true if the OIT accum/weight attachments were allocated in the full/half buffers. */
     public boolean isOitEnabled() {
         return oitEnabled;
     }
@@ -387,9 +386,9 @@ public final class PingPongBuffer implements Disposable {
         return ownedFull.getAccumBufferTexture();
     }
 
-    /** @return the full-resolution OIT revealage texture, or null if OIT is disabled. */
-    public Texture getFullRevealageTexture() {
-        return ownedFull.getRevealageBufferTexture();
+    /** @return the full-resolution OIT weight texture, or null if OIT is disabled. */
+    public Texture getFullWeightTexture() {
+        return ownedFull.getWeightBufferTexture();
     }
 
     /** @return the half-resolution OIT accumulation texture, or null if OIT is disabled. */
@@ -397,9 +396,9 @@ public final class PingPongBuffer implements Disposable {
         return ownedHalf.getAccumBufferTexture();
     }
 
-    /** @return the half-resolution OIT revealage texture, or null if OIT is disabled. */
-    public Texture getHalfRevealageTexture() {
-        return ownedHalf.getRevealageBufferTexture();
+    /** @return the half-resolution OIT weight texture, or null if OIT is disabled. */
+    public Texture getHalfWeightTexture() {
+        return ownedHalf.getWeightBufferTexture();
     }
 
     // internal use

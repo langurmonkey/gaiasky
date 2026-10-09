@@ -362,6 +362,13 @@ public final class PostProcessor implements Disposable {
 
             Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
             Gdx.gl.glClear(clearBits);
+
+            // The OIT accumulations are not cleared by the above: the accum target must start fully
+            // revealed (alpha 1), not at the scene clear colour.
+            if (oitEnabled) {
+                composite.getFullBuffer()
+                        .clearOit();
+            }
             return true;
         }
 

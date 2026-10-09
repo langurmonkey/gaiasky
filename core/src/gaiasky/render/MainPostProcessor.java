@@ -66,7 +66,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
      * Off by default; the OIT phases of the galaxy work turn it on. Requires OpenGL 3.0+ and
      * float render targets, so it is also forced off in safe mode.
      */
-    public static boolean oitEnabled = false;
+    public static boolean oitEnabled = true;
 
     /**
      * Contains a map by name with

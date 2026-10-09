@@ -27,11 +27,15 @@ flat in int v_layer;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 layerBuffer;
-// Weighted blended OIT accumulation target (index 4, see PingPongBuffer.createMainFrameBuffer):
-//   rgb = sum over fragments of E * w   (additive)
-//   a   = product over fragments of (1 - a * w)   (multiplicative, via blendFuncSeparate)
+// Weighted blended OIT targets (indices 4 and 5, see PingPongBuffer.createMainFrameBuffer).
+// Both are written with the same blend state, blendFuncSeparate(ONE, ONE, ZERO, ONE_MINUS_SRC_ALPHA):
+// RGB is additive on both, and alpha is multiplicative, which is only meaningful on the accum target.
+//   accum.rgb = sum over fragments of E * w        -> numerator of the weighted average
+//   accum.a   = prod over fragments of (1 - a * w)  -> transmittance
+//   weight.rgb = sum over fragments of a * w        -> denominator of the weighted average
 #ifdef wboitFlag
 layout (location = 4) out vec4 oitAccum;
+layout (location = 5) out vec4 oitWeightAccum;
 #endif// wboitFlag
 
 #ifdef ssrFlag
@@ -110,13 +114,21 @@ void main() {
     }
 
 #ifdef wboitFlag
-    // OIT path: E and a go to the accumulation target, not to the scene color buffer.
-    //   rgb: additive under (ONE, ONE)          -> sum(E * w), divided by sum(a * w) in the composite.
-    //   a:   multiplied by (ONE_MINUS_SRC_ALPHA) -> prod(1 - a * w), the transmittance.
-    float w = oitWeight(a, gl_FragCoord.z);
-    oitAccum = vec4(E * w, a * w);
+    // OIT path: E and a go to the accumulation targets, not to the scene colour buffer, so that
+    // they can be resolved across resolutions before anything is composited.
+    //   accum.rgb: additive under (ONE, ONE)           -> sum(E * w), the numerator
+    //   accum.a:   multiplied by (ONE_MINUS_SRC_ALPHA) -> prod(1 - a), the transmittance
+    //   weight.rgb: additive under (ONE, ONE)          -> sum(a * w), the denominator
+    //
+    // The transmittance uses the RAW coverage a, not a * w. w is a weighting factor for the
+    // weighted average and reaches 3e3; multiplying alpha by it makes (1 - a*w) strongly negative
+    // for any non-trivial coverage, the product collapses towards zero, and the whole galaxy is
+    // composited at zero brightness, i.e. black. Only the weighted average is weighted.
+    float w = oitWeight(aW, gl_FragCoord.z);
+    oitAccum = vec4(E * aW * w, aOIT);
+    oitWeightAccum = vec4(aW * w);
     fragColor = vec4(0.0);
-    #else
+#else
     // Non-OIT path: composited with ALPHA blending, i.e. dst = E + dst * (1 - a).
     fragColor = vec4(E, a);
     #endif// wboitFlag

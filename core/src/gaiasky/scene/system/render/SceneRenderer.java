@@ -592,6 +592,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     .begin();
             clearScreen();
 
+            // The OIT accumulations need their own clear: the accum target must start fully revealed.
+            var combined = pp.getCombinedBuffer();
+            if (combined.isOitEnabled()) {
+                combined.getHalfBuffer()
+                        .clearOit();
+            }
+
             // Iterate over render groups and get systems.
             for (var renderGroup : renderGroups) {
                 List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
