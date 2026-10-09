@@ -36,8 +36,37 @@ layout (location = 1) out vec4 layerBuffer;
 
 #define decay 0.2
 
+/**
+ * Per-channel transmission model.
+ *
+ * Every fragment is described by exactly two quantities:
+ *
+ *   E - emission: the light this fragment contributes to the scene (linear RGB).
+ *   a - coverage: how much of the background this fragment hides, in [0, 1].
+ *
+ * There are exactly two kinds of channel:
+ *
+ *   emissive (stars, HII, bulge, gas): E is the particle colour, a is the sprite falloff.
+ *       These add light and also occlude a little, because their coverage enters the
+ *       transmittance term (1 - R). This is mild and is deliberate: the falloff cancels in
+ *       the composite, so an emitter-only frame reproduces the additive result exactly.
+ *
+ *   occlusive (dust): E = 0, a is the dust coverage. Dust must never add light.
+ *
+ * Splitting the pair is what makes dust able to occlude a full-resolution star that lives in
+ * a different buffer: both channels write the same (E, a) pair into shared accumulation
+ * targets, so ordering is resolved once, before resolution is split.
+ */
 vec4 colorTex(float alpha, float texBrightness) {
     return v_col * v_col.a * texBrightness * alpha;
+}
+
+/** Returns the emission E of an emissive fragment, after whiteout compression. */
+vec3 emissionEmissive(float alpha, float texBrightness) {
+    vec3 E = colorTex(alpha, texBrightness).rgb;
+    // Apply non-linear intensity compression to prevent whiteout
+    E = E / (E + vec3(1.2));
+    return E;
 }
 
 void main() {
@@ -48,23 +77,25 @@ void main() {
     }
     float texBrightness = texture(u_textures, vec3(uv, v_layer)).r;
 
+    // E: emission, a: coverage. Both are consumed by the OIT accumulation pass; until that
+    // exists, they are combined here exactly as the old per-channel blending did.
+    vec3 E;
+    float a;
     if (v_type == T_DUST) {
-        // Dust is an absorber, not an emitter: black with a coverage in the alpha channel.
-        // With ALPHA blending (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) this evaluates
-        //     dst *= (1 - coverage),
-        // which is multiplicative, monotone (more dust always means less light), bounded in
-        // [0, 1] and independent of draw order - unlike the previous SUBTRACTIVE mode, which
-        // computed 'src - dst' (GL_FUNC_REVERSE_SUBTRACT) and could brighten a pixel.
-        // The coverage is the sprite's radial falloff, scaled by the dataset intensity and the
-        // global opacity, i.e. the same quantity that used to be subtracted.
-        float coverage = clamp(texBrightness * v_col.a * u_alpha, 0.0, 1.0);
-        fragColor = vec4(0.0, 0.0, 0.0, coverage);
+        // Occlusive channel: no emission at all. The coverage is the sprite's radial falloff,
+        // scaled by the dataset intensity and the global opacity, i.e. the same quantity that
+        // used to be subtracted. Clamped so a sprite can never fully hide what is behind it,
+        // which would also make the weight term vanish.
+        E = vec3(0.0);
+        a = clamp(texBrightness * v_col.a * u_alpha, 0.0, 1.0);
     } else {
-        fragColor = colorTex(u_alpha, texBrightness);
-        // Apply non-linear intensity compression to prevent whiteout
-        fragColor.rgb = fragColor.rgb / (fragColor.rgb + vec3(1.2));
-        //fragColor.rgb = pow(fragColor.rgb, vec3(1.1));
+        // Emissive channel: the colour contributes light, the falloff is the coverage.
+        E = emissionEmissive(u_alpha, texBrightness);
+        a = texBrightness;
     }
+
+    // Non-OIT path: composited with ALPHA blending, i.e. dst = E + dst * (1 - a).
+    fragColor = vec4(E, a);
 
     // Logarithmic depth buffer (not used actually).
     gl_FragDepth = getDepthValue(v_dist, u_zfar, u_k);
