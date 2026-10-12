@@ -68,6 +68,13 @@ layout(location = 1) out vec4 layerBuffer;
 
 #define PI 3.14159265359
 #define ITERATIONS 150
+#define EXPOSURE 10.0
+
+float hash12(vec2 p) {
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
 
 // Convert world position to volume texture coordinates
 vec3 worldToVolumeUVW(vec3 worldPos, vec3 boundsMin, vec3 boundsMax) {
@@ -110,18 +117,11 @@ vec2 boxIntersection(vec3 rayOrigin, vec3 rayDir, vec3 boundsMin, vec3 boundsMax
 }
 
 // Transfer function for additive blending - allows saturation to white
-vec4 transferFunction(float density, vec3 baseColor, float stepSize, float transmittance) {
-    // Start with base color but DON'T clamp it - let it accumulate
-    vec3 color = baseColor;
-    
-    float intensity = density * (1.0 + density * 0.05);
-    
-    // Apply intensity (no clamping - let additive blending handle it)
-    color *= intensity;
-    
-    // Opacity scales with density but doesn't clamp
-    float alpha = density * stepSize * (1.0 + density * 0.2);
-    
+vec4 transferFunction(float density, vec3 baseColor, float stepUVW, float transmittance) {
+    // Emission: integrate density*baseColor over the normalized step.
+    vec3 color = baseColor * density * stepUVW;
+    // Opacity: dimensionless per-step coverage. Beer-Lambert or the linear form both work.
+    float alpha = clamp(density * stepUVW, 0.0, 1.0);
     return vec4(color, alpha);
 }
 
@@ -144,26 +144,31 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
 
     vec3 entryPoint = rayOrigin + rayDir * entryDist;
     float stepSize = rayLength / float(ITERATIONS);
+    vec3  extent    = boundsMax - boundsMin;
+    vec3  uvwDir    = rayDir / extent;              // world dir -> UVW dir
+    float stepUVW   = stepSize * length(uvwDir);    // per-sample step in UVW space
+    int nSteps = min(ITERATIONS, int(ceil(stepUVW * 2000.0)));
 
     float transmittance = 1.0;
 
     vec3 baseColor = color;
 
-    for (int i = 0; i < ITERATIONS; i++) {
-        float currentDist = entryDist + float(i) * stepSize;
+    float jitter = hash12(gl_FragCoord.xy);
+    for (int i = 0; i < nSteps; i++) {
+        float currentDist = entryDist + (float(i) + jitter) * stepSize;
         vec3 samplePos = rayOrigin + rayDir * currentDist;
         vec3 uvw = worldToVolumeUVW(samplePos, boundsMin, boundsMax);
 
         float density = sampleVolume(uvw, volume);
 
-        if (firstDepth < 0.0 && density > 0.01) {
+        if (firstDepth < 0.0 && density > 0.0) {
             firstDepth = currentDist;
         }
 
         // Emission with enhanced transfer function
-        if (density > 0.01 && transmittance > 0.001) {
+        if (density > 0.0 && transmittance > 0.001) {
             // Use accumulated density for saturation effects
-            vec4 sampl = transferFunction(density, baseColor, stepSize, transmittance);
+            vec4 sampl = transferFunction(density, baseColor, stepUVW, transmittance);
 
             vec3 emittedLight = sampl.rgb * transmittance;
 
@@ -199,6 +204,7 @@ void main() {
 
         if (result.a > 0.001) {
             // Simple reinhard tone mapping to control brightness
+            result.rgb *= EXPOSURE;
             result.rgb = result.rgb / (1.0 + result.rgb);
             fragColor = vec4(result.rgb, result.a);
         } else {
