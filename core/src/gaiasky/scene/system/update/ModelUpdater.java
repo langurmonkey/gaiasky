@@ -35,6 +35,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
     private final ICamera camera;
     private final Vector3D D32;
     private final Matrix4D MD4;
+    private final Matrix4 MF4;
     private final Quaternion QF;
     private final QuaternionDouble QD;
 
@@ -46,6 +47,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         this.QD = new QuaternionDouble();
         this.QF = new Quaternion();
         this.MD4 = new Matrix4D();
+        this.MF4 = new Matrix4();
     }
 
     @Override
@@ -132,6 +134,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
                                     float sizeFactor,
                                     Matrix4 localTransform,
                                     boolean forceUpdate) {
+
         // Update translation, orientation and local transform.
         ITimeFrameProvider time = GaiaSky.instance.time;
 
@@ -237,5 +240,16 @@ public class ModelUpdater extends AbstractUpdateSystem {
         // Apply transformations
         var affine = Mapper.affine.get(entity);
         affine.apply(localTransform);
+
+        // Apply reference system transformation.
+        var refSys = Mapper.transform.get(entity);
+        if (refSys != null) {
+            if (refSys.matrixf != null) {
+                localTransform.mul(refSys.matrixf);
+            } else if (refSys.matrix != null) {
+                refSys.matrix.putIn(MF4);
+                localTransform.mul(MF4);
+            }
+        }
     }
 }

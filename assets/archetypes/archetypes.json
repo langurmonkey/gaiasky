@@ -62,7 +62,9 @@
     "Volume": {
       "parent": "ModelBody",
       "components": [
-        "Volume"
+        "Volume",
+        "RefSysTransform",
+        "Fade"
       ]
     },
     "Particle": {
