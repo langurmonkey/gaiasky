@@ -2,14 +2,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
+import gzip
 import sys
 
 def interactive_volume_viewer(filename, grid_size=128):
-    """Interactive 3D volume viewer with slice scrolling"""
+    """Interactive 3D volume viewer with slice scrolling.
+    Accepts plain .raw files as well as gzipped .raw.gz files."""
     
-    # Read the raw file
-    with open(filename, 'rb') as f:
-        data = np.fromfile(f, dtype=np.uint8)
+    # Read the raw file (plain or gzipped)
+    if filename.endswith('.gz'):
+        open_func = gzip.open
+    else:
+        open_func = open
+    with open_func(filename, 'rb') as f:
+        data = np.frombuffer(f.read(), dtype=np.uint8)
     
     # Reshape to 3D
     volume = data.reshape((grid_size, grid_size, grid_size))
@@ -72,7 +78,9 @@ def interactive_volume_viewer(filename, grid_size=128):
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python view_volume.py <raw_file>")
+        print("       <raw_file> may be a plain .raw file or a gzipped .raw.gz file")
         print("Example: python view_volume.py galaxy_ArmDust-low_density.raw")
+        print("Example: python view_volume.py galaxy_ArmDust-low_density.raw.gz")
         sys.exit(1)
     
     filename = sys.argv[1]

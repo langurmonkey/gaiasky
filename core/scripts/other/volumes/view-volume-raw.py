@@ -1,19 +1,29 @@
 #!/usr/bin/env python3
 """
 Volume Renderer for Gaia Sky .raw files using Vedo
-Supports both density and color volumes
+Supports both density and color volumes.
+Accepts plain .raw files as well as gzipped .raw.gz files.
 """
 
 import numpy as np
 import argparse
+import gzip
 import sys
 import os
 
-def load_volume_file(filename, grid_size=128):
-    """Load a .raw volume file and return as 3D array"""
-    try:
+def read_raw_bytes(filename):
+    """Read the raw bytes of a .raw or .raw.gz file"""
+    if filename.endswith('.gz'):
+        with gzip.open(filename, 'rb') as f:
+            return f.read()
+    else:
         with open(filename, 'rb') as f:
-            data = np.fromfile(f, dtype=np.uint8)
+            return f.read()
+
+def load_volume_file(filename, grid_size=128):
+    """Load a .raw (or .raw.gz) volume file and return as 3D array"""
+    try:
+        data = np.frombuffer(read_raw_bytes(filename), dtype=np.uint8)
         
         # Check if it's a color file (3 channels) or density file (1 channel)
         expected_size_density = grid_size ** 3
@@ -141,26 +151,27 @@ def volume_render_vedo(raw_file, grid_size=128, color_file=None):
     return True
 
 def find_matching_color_file(density_file):
-    """Find the corresponding color file for a density file"""
-    base_name = density_file.replace('_density.raw', '')
-    color_file = base_name + '_color.raw'
-    
-    if os.path.exists(color_file):
-        return color_file
-    else:
-        # Try other naming patterns
-        alternatives = [
-            density_file.replace('density', 'color'),
-            density_file.replace('_density', '_color'),
-        ]
-        for alt in alternatives:
-            if os.path.exists(alt):
-                return alt
+    """Find the corresponding color file for a density file (.raw or .raw.gz)"""
+    # Preserve the trailing compression suffix (if any)
+    suffix = ''
+    stem = density_file
+    if stem.endswith('.gz'):
+        suffix = '.gz'
+        stem = stem[:-len('.gz')]
+
+    # Try other naming patterns, preserving the compression suffix
+    alternatives = [
+        stem.replace('_density', '_color') + suffix,
+        stem.replace('density', 'color') + suffix,
+    ]
+    for alt in alternatives:
+        if os.path.exists(alt):
+            return alt
     return None
 
 def main():
-    parser = argparse.ArgumentParser(description='Volume renderer for Gaia Sky .raw files')
-    parser.add_argument('raw_file', help='Path to the .raw volume file (density or color)')
+    parser = argparse.ArgumentParser(description='Volume renderer for Gaia Sky .raw and .raw.gz files')
+    parser.add_argument('raw_file', help='Path to the .raw or .raw.gz volume file (density or color)')
     parser.add_argument('--grid-size', type=int, default=128, 
                        help='Grid size (default: 128)')
     parser.add_argument('--color-file', help='Path to color volume file (optional)')
