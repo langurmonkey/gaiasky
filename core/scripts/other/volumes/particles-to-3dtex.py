@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Convert Gaia Sky particle channel files (.dat.gz) to 3D volume textures
 """
@@ -6,12 +5,13 @@ Convert Gaia Sky particle channel files (.dat.gz) to 3D volume textures
 import argparse
 import gzip
 import os
-import numpy as np
-from dataclasses import dataclass
-from typing import List, Tuple
-from scipy.ndimage import gaussian_filter
 import time
+from dataclasses import dataclass
+
+import numpy as np
+from scipy.ndimage import gaussian_filter
 from tqdm import tqdm
+
 
 @dataclass
 class Particle:
@@ -53,7 +53,7 @@ class VolumeConfig:
         
         self.voxel_size = self.world_size / grid_size
 
-def compute_world_bounds(input_dir: str) -> Tuple[np.ndarray, np.ndarray]:
+def compute_world_bounds(input_dir: str) -> tuple[np.ndarray, np.ndarray]:
     """Compute bounding box from all particle files"""
     print("Computing world bounds from all particle files...")
     
@@ -125,7 +125,7 @@ def compute_world_bounds(input_dir: str) -> Tuple[np.ndarray, np.ndarray]:
     
     return all_min, all_max
 
-def parse_particle_file(filename: str, world_bounds: Tuple[np.ndarray, np.ndarray] = None) -> ParticleChannel:
+def parse_particle_file(filename: str, world_bounds: (None|tuple[np.ndarray, np.ndarray]) = None) -> ParticleChannel:
     """Parse gzipped particle files - handles both with and without headers"""
     channel_name = os.path.basename(filename)
     channel = ParticleChannel(channel_name)
@@ -192,7 +192,7 @@ def parse_particle_file(filename: str, world_bounds: Tuple[np.ndarray, np.ndarra
     print(f"Parsed {channel.particle_count} particles from {channel_name}")
     return channel
 
-def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig) -> Tuple[np.ndarray, np.ndarray]:
+def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig) -> tuple[np.ndarray, np.ndarray]:
     """Conversion using direct voxel assignment"""
     
     print(f"Converting {channel.particle_count} particles to volume grid...")
@@ -266,7 +266,7 @@ def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig
     
     return density_grid, color_grid
 
-def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) -> Tuple[np.ndarray, np.ndarray]:
+def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) -> tuple[np.ndarray, np.ndarray]:
     """SMART conversion with adaptive sampling - good balance of speed and quality"""
     
     print(f"Converting {channel.particle_count} particles to volume grid (smart sampling)...")
@@ -353,7 +353,7 @@ def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) ->
     
     return density_grid, color_grid
 
-def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray, color_grid: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray, color_grid: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Apply channel-specific processing"""
     channel_name = channel.name.lower()
     
@@ -382,26 +382,41 @@ def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray,
     print(f"Applied {channel_name} channel processing")
     return density_grid, color_grid
 
+def _swap_xyz(grid: np.ndarray) -> np.ndarray:
+    """Permute axes: X'=Y, Y'=Z, Z'=X, i.e. out[a, b, c] = in[c, a, b].
+
+    The input grid is indexed (x, y, z) in galactic coordinates (disk in XY,
+    z towards the galactic north). The output texture must have the disk in
+    XZ with y towards the galactic north.
+    """
+    if grid.ndim == 4:
+        # (x, y, z, channels) -> keep the channel axis last.
+        return np.ascontiguousarray(grid.transpose(1, 2, 0, 3))
+    return np.ascontiguousarray(grid.transpose(1, 2, 0))
+
+def _write_bytes(data: bytes, output_path: str, compresslevel: int = 6):
+    """Write raw voxel bytes to output_path, gzip-compressed (.raw.gz)."""
+    with gzip.open(output_path, 'wb', compresslevel=compresslevel) as f:
+        f.write(data)
+
 def create_volume_texture(density_grid: np.ndarray, output_path: str):
-    """Save 3D texture as raw binary for OpenGL"""
+    """Save 3D texture as gzipped raw binary for OpenGL"""
     if density_grid.max() > 0:
         density_grid = density_grid / density_grid.max()
     
-    density_8bit = (density_grid * 255).astype(np.uint8)
+    density_8bit = _swap_xyz((density_grid * 255).astype(np.uint8))
     
-    with open(output_path, 'wb') as f:
-        f.write(density_8bit.tobytes())
+    _write_bytes(density_8bit.tobytes(), output_path)
     
-    print(f"Saved density texture: {output_path} ({density_8bit.nbytes / 1024 / 1024:.2f} MB)")
+    print(f"Saved density texture: {output_path} ({density_8bit.nbytes / 1024 / 1024:.2f} MB raw)")
 
 def create_color_texture(color_grid: np.ndarray, output_path: str):
-    """Save 3D color texture as raw RGB"""
-    color_8bit = (np.clip(color_grid, 0, 1) * 255).astype(np.uint8)
+    """Save 3D color texture as gzipped raw RGB"""
+    color_8bit = _swap_xyz((np.clip(color_grid, 0, 1) * 255).astype(np.uint8))
     
-    with open(output_path, 'wb') as f:
-        f.write(color_8bit.tobytes())
+    _write_bytes(color_8bit.tobytes(), output_path)
     
-    print(f"Saved color texture: {output_path} ({color_8bit.nbytes / 1024 / 1024:.2f} MB)")
+    print(f"Saved color texture: {output_path} ({color_8bit.nbytes / 1024 / 1024:.2f} MB raw)")
 
 def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: str, basename: str):
     """Save metadata file for the volume texture"""
@@ -422,7 +437,7 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
     
     print(f"Saved metadata: {metadata_path}")
 
-def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int, world_bounds: Tuple[np.ndarray, np.ndarray], method: str = "ultrafast"):
+def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast"):
     """Main conversion function"""
     
     os.makedirs(output_dir, exist_ok=True)
@@ -462,8 +477,8 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int
         basename = os.path.splitext(os.path.splitext(particle_file)[0])[0]
         
         # Save volume textures
-        density_path = os.path.join(output_dir, f"{basename}_density.raw")
-        color_path = os.path.join(output_dir, f"{basename}_color.raw")
+        density_path = os.path.join(output_dir, f"{basename}_density.raw.gz")
+        color_path = os.path.join(output_dir, f"{basename}_color.raw.gz")
         
         create_volume_texture(density_grid, density_path)
         create_color_texture(color_grid, color_path)
