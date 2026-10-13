@@ -11,7 +11,8 @@ import com.badlogic.gdx.graphics.GL30;
 
 public enum VolumeType {
     DENSITY(GL30.GL_RED, GL30.GL_R8, GL30.GL_UNSIGNED_BYTE),
-    COLOR(GL30.GL_RGB, GL30.GL_RGB8, GL30.GL_UNSIGNED_BYTE);
+    COLOR(GL30.GL_RGB, GL30.GL_RGB8, GL30.GL_UNSIGNED_BYTE),
+    RGBA(GL30.GL_RGBA, GL30.GL_RGBA8, GL30.GL_UNSIGNED_BYTE);
 
     public final int glFormat;
     public final int glInternalFormat;

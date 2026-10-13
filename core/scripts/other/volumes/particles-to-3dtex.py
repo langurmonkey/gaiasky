@@ -676,7 +676,7 @@ def main():
     parser.add_argument(
         "--format",
         type=parse_format,
-        default=set(ALL_FORMATS),
+        default=set("rgba"),
         metavar="FMT[|FMT...]",
         help="Artifacts to write, as a '|'- or ','-separated set of "
              "{density, color, rgba}, or 'all'. 'density' writes the R8 density "

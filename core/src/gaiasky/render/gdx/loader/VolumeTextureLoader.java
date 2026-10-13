@@ -93,24 +93,59 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             return new VolumeDetectionResult(VolumeType.COLOR,
                                              new Trio<>(colorDimension, colorDimension, colorDimension));
         }
+        // Try as color+density (four channels)
+        int rgbaVoxels = data.length / 4;
+        int rgbaDimension = (int) Math.round(Math.cbrt(rgbaVoxels));
 
+        if (rgbaDimension * rgbaDimension * rgbaDimension == rgbaVoxels) {
+            return new VolumeDetectionResult(VolumeType.RGBA,
+                                             new Trio<>(rgbaDimension, rgbaDimension, rgbaDimension));
+        }
+
+        // No file length can satisfy two of the three cases at once (n³ = 4k³ and
+        // 3m³ = 4k³ both require a rational cube root of 4 or 4/3), so the order of
+        // the tests above does not matter.
         throw new GdxRuntimeException("Cannot detect volume format. File size: " + data.length +
-                                              " bytes. Must be a perfect cube for density (n³) or color (3*n³)");
+                                              " bytes. Must be a perfect cube for density (n³), color (3*n³) or color+density (4*n³)");
+    }
+
+    /**
+     * Suffixes appended to the channel basename by particles-to-3dtex.py.
+     * Longest first: the first match wins, so ".raw.gz" cannot shadow "_rgba.raw.gz".
+     */
+    private static final String[] VOLUME_SUFFIXES = {
+            "_density.raw.gz", "_color.raw.gz", "_rgba.raw.gz",
+            "_density.raw", "_color.raw", "_rgba.raw",
+            ".raw.gz", ".raw"
+    };
+
+    /**
+     * Strip the volume file suffix from a path, recovering the channel basename.
+     *
+     * Only a suffix that terminates the *file name* is removed, and only one of
+     * them. The previous chained String.replace() ran over the whole path, so a
+     * directory whose name happened to contain ".raw" or "_color.raw" was mangled
+     * even when the file name itself was fine.
+     */
+    private static String volumeBasename(String path) {
+        int lastSeparator = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+        String dir = path.substring(0, lastSeparator + 1);
+        String name = path.substring(lastSeparator + 1);
+
+        for (String suffix : VOLUME_SUFFIXES) {
+            if (name.length() > suffix.length() && name.endsWith(suffix)) {
+                return dir + name.substring(0, name.length() - suffix.length());
+            }
+        }
+        return dir + name;
     }
 
     /**
      * Load bounds from metadata file
      */
     private static Vector3[] loadBoundsFromMetadata(FileHandle volumeFile) {
-        // Remove _density.raw or _color.raw suffix
-        var volumePath = volumeFile.path();
-        String basePath = volumePath
-                .replace("_density.raw.gz", "")
-                .replace("_color.raw.gz", "")
-                .replace(".raw.gz", "")
-                .replace("_density.raw", "")
-                .replace("_color.raw", "")
-                .replace(".raw", "");
+        // Remove the _density/_color/_rgba .raw[.gz] suffix to get the channel basename
+        String basePath = volumeBasename(volumeFile.path());
 
         FileHandle metadataFile = new FileHandle(basePath + "_metadata.txt");
 
@@ -216,7 +251,11 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         logger.info("Auto-detected volume: " + type + " " + width + "x" + height + "x" + depth);
 
         // Validate size
-        int channels = (type == VolumeType.COLOR) ? 3 : 1;
+        int channels = switch (type) {
+            case DENSITY -> 1;
+            case COLOR -> 3;
+            case RGBA -> 4;
+        };
         int expectedSize = width * height * depth * channels;
         if (fileData.length != expectedSize) {
             throw new IOException(String.format(
