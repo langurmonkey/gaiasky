@@ -14,6 +14,37 @@ from tqdm import tqdm
 
 skip_files = ["galaxy_HII", "galaxy_Stars"]
 
+# Artifacts that --format can request. Each token names exactly one output file;
+# 'all' is shorthand for the whole set.
+_FORMAT_TOKENS = ("density", "color", "rgba")
+ALL_FORMATS = frozenset(_FORMAT_TOKENS)
+
+def parse_format(value: str) -> set[str]:
+    """Parse --format into the set of artifacts to write.
+
+    Accepts a '|'- or ','-separated union of {density, color, rgba}, or 'all'.
+    A token does not imply any other, so '--format color' writes the colour
+    texture and nothing else:
+
+        density -> <base>_density.raw.gz  (R8,   density)
+        color   -> <base>_color.raw.gz    (RGB8, colour only)
+        rgba    -> <base>_rgba.raw.gz     (RGBA8, colour in RGB, density in A)
+    """
+    tokens = [t.strip().lower() for t in value.replace("|", ",").split(",") if t.strip()]
+    if not tokens:
+        raise argparse.ArgumentTypeError("--format must not be empty")
+    if "all" in tokens:
+        if len(tokens) > 1:
+            raise argparse.ArgumentTypeError("'all' cannot be combined with other tokens")
+        return set(ALL_FORMATS)
+    unknown = [t for t in tokens if t not in _FORMAT_TOKENS]
+    if unknown:
+        raise argparse.ArgumentTypeError(
+            f"unknown format token(s): {', '.join(unknown)}; expected any of "
+            f"{', '.join(_FORMAT_TOKENS)} (or 'all')"
+        )
+    return set(tokens)
+
 def must_skip(string):
     return any(i in string for i in skip_files)
 
@@ -262,10 +293,8 @@ def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig
         nonzero_mask = density_grid > 0
         for c in range(3):
             color_grid[nonzero_mask, c] /= density_grid[nonzero_mask]
-        # Fill in color for zero-density regions with default
-        zero_mask = density_grid == 0
-        for c in range(3):
-            color_grid[zero_mask, c] = 0.5  # Default gray
+        # Zero-density voxels are left black (0,0,0). color_grid starts as
+        # zeros and is only written where density > 0, so no fill is needed.
     
     elapsed = time.time() - start_time
     print(f"Volume conversion completed in {elapsed:.2f} seconds")
@@ -361,31 +390,62 @@ def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) ->
     
     return density_grid, color_grid
 
+def _blur_color(color_grid: np.ndarray, density_grid: np.ndarray, sigma: float) -> np.ndarray:
+    """Spread the colour over the same neighbourhood as the density blur.
+
+    process_channel_specific() blurs the density, which pushes density into
+    voxels that were never assigned a colour - under 'ultrafast' a particle only
+    writes its own voxel. Those voxels then carry density with a black colour:
+    measured at 50.6% of the Gas and 31.9% of the Bulge density mass. Taking the
+    emission colour from the texture would therefore turn every blurred tail
+    into a dark rim, defeating the blur.
+
+    Blurring the density-weighted colour and dividing by the blurred density
+    propagates the colour with exactly the same kernel, so the colour field is
+    defined wherever the density is and remains a weighted mean (never a sum,
+    so the spread does not brighten anything).
+    """
+    if sigma <= 0:
+        return color_grid
+
+    numerator = gaussian_filter(color_grid * density_grid[..., None], sigma=(sigma, sigma, sigma, 0))
+    denominator = gaussian_filter(density_grid, sigma=sigma)
+
+    out = np.zeros_like(color_grid)
+    nonzero = denominator > 1e-9
+    out[nonzero] = numerator[nonzero] / denominator[nonzero, None]
+    return out
+
 def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray, color_grid: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Apply channel-specific processing"""
     channel_name = channel.name.lower()
     
-    # Apply Gaussian filtering based on channel type
+    # Gaussian sigma for the density blur, and the fallback colour used for
+    # channels that carry no colour column of their own.
     if 'dust' in channel_name:
-        density_grid = gaussian_filter(density_grid, sigma=0.5)
-        if not channel.has_color:
-            color_grid[:,:,:,0] = 0.8; color_grid[:,:,:,1] = 0.6; color_grid[:,:,:,2] = 0.4
+        sigma, default_color = 0.5, (0.8, 0.6, 0.4)
     elif 'gas' in channel_name:
-        density_grid = gaussian_filter(density_grid, sigma=1.5)
-        if not channel.has_color:
-            color_grid[:,:,:,0] = 0.3; color_grid[:,:,:,1] = 0.5; color_grid[:,:,:,2] = 0.8
+        sigma, default_color = 1.5, (0.3, 0.5, 0.8)
     elif 'hii' in channel_name:
-        density_grid = gaussian_filter(density_grid, sigma=1.2)
-        if not channel.has_color:
-            color_grid[:,:,:,0] = 1.0; color_grid[:,:,:,1] = 0.4; color_grid[:,:,:,2] = 0.6
+        sigma, default_color = 1.2, (1.0, 0.4, 0.6)
     elif 'bulge' in channel_name:
-        density_grid = gaussian_filter(density_grid, sigma=1.0)
-        if not channel.has_color:
-            color_grid[:,:,:,0] = 1.0; color_grid[:,:,:,1] = 0.9; color_grid[:,:,:,2] = 0.6
+        sigma, default_color = 1.0, (1.0, 0.9, 0.6)
     elif 'star' in channel_name:
-        density_grid = gaussian_filter(density_grid, sigma=0.8)
-        if not channel.has_color:
-            color_grid[:,:,:,0] = 1.0; color_grid[:,:,:,1] = 0.95; color_grid[:,:,:,2] = 0.9
+        sigma, default_color = 0.8, (1.0, 0.95, 0.9)
+    else:
+        sigma, default_color = 0.0, None
+    
+    # Colour first, from the *unblurred* density, so that it spreads as far as
+    # the density is about to.
+    if channel.has_color:
+        color_grid = _blur_color(color_grid, density_grid, sigma)
+    
+    if sigma > 0:
+        density_grid = gaussian_filter(density_grid, sigma=sigma)
+    
+    if not channel.has_color and default_color is not None:
+        for c in range(3):
+            color_grid[:,:,:,c] = default_color[c]
     
     print(f"Applied {channel_name} channel processing")
     return density_grid, color_grid
@@ -407,10 +467,52 @@ def _write_bytes(data: bytes, output_path: str, compresslevel: int = 6):
     with gzip.open(output_path, 'wb', compresslevel=compresslevel) as f:
         f.write(data)
 
+def _normalize_density(density_grid: np.ndarray) -> np.ndarray:
+    """Scale density to [0, 1] by its own maximum."""
+    peak = density_grid.max()
+    return density_grid / peak if peak > 0 else density_grid
+
+# Percentile of the occupied-voxel colour used to derive the gain, per mode.
+COLOR_NORMALIZE_PERCENTILES = {"max": 100.0, "p99": 99.0, "p999": 99.9}
+
+def normalize_color(color_grid: np.ndarray, density_grid: np.ndarray,
+                    mode: str = "p999") -> tuple[np.ndarray, float]:
+    """Scale the colour grid so the stored 8-bit values use their range.
+
+    The source particle colours are emission coefficients, not display colours:
+    Gas averages ~0.02, Bulge ~0.02, so `clip(c, 0, 1) * 255` rounds ~82% of
+    occupied Gas voxels to 0 and the whole channel is carried by 32 distinct
+    levels. This restores the information before quantisation.
+
+    A *single scalar* gain is applied to all three channels, which preserves the
+    chromaticity (hue) of every voxel. Per-channel normalisation would give each
+    channel the full range and thereby wash the hues towards grey - exactly the
+    information a per-voxel colour texture exists to carry.
+
+    The gain is derived from the occupied voxels only (density > 0); zero-density
+    voxels are never visible, and for channels without colour data the constant
+    fill would otherwise not represent anything.
+
+    Returns the scaled grid and the gain that was applied (1.0 = no change).
+    """
+    if mode == "none":
+        return color_grid, 1.0
+
+    occupied = density_grid > 0
+    if not np.any(occupied):
+        return color_grid, 1.0
+
+    percentile = COLOR_NORMALIZE_PERCENTILES[mode]
+    peak = float(np.percentile(color_grid[occupied], percentile))
+    if peak <= 0:
+        return color_grid, 1.0
+
+    gain = 1.0 / peak
+    return color_grid * gain, gain
+
 def create_volume_texture(density_grid: np.ndarray, output_path: str):
     """Save 3D texture as gzipped raw binary for OpenGL"""
-    if density_grid.max() > 0:
-        density_grid = density_grid / density_grid.max()
+    density_grid = _normalize_density(density_grid)
     
     density_8bit = _swap_xyz((density_grid * 255).astype(np.uint8))
     
@@ -426,7 +528,28 @@ def create_color_texture(color_grid: np.ndarray, output_path: str):
     
     print(f"Saved color texture: {output_path} ({color_8bit.nbytes / 1024 / 1024:.2f} MB raw)")
 
-def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: str, basename: str):
+def create_rgba_texture(density_grid: np.ndarray, color_grid: np.ndarray, output_path: str):
+    """Save density and colour packed into one RGBA texture.
+
+    RGB carries the (already normalised) voxel colour, A carries the density. The
+    loader distinguishes the format from the file size - 4*n^3 bytes - so the
+    alpha channel here must be byte-identical to what create_volume_texture()
+    writes for the same channel, otherwise the two files would disagree about
+    the density. Both go through _normalize_density() with the same maximum.
+    """
+    density_grid = _normalize_density(density_grid)
+
+    rgba = np.empty((*color_grid.shape[:3], 4), dtype=np.uint8)
+    rgba[..., :3] = (np.clip(color_grid, 0, 1) * 255).astype(np.uint8)
+    rgba[..., 3] = (density_grid * 255).astype(np.uint8)
+
+    rgba_8bit = _swap_xyz(rgba)
+    _write_bytes(rgba_8bit.tobytes(), output_path)
+
+    print(f"Saved RGBA texture: {output_path} ({rgba_8bit.nbytes / 1024 / 1024:.2f} MB raw)")
+
+def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: str, basename: str,
+                  color_gain: float = 1.0, color_normalize: str = "none", formats=frozenset()):
     """Save metadata file for the volume texture"""
     metadata_path = os.path.join(output_dir, f"{basename}_metadata.txt")
     min_bound, max_bound = config.world_bounds
@@ -442,10 +565,15 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
         f.write(f"Voxel size: {config.voxel_size:.6f}\n")
         f.write(f"Has color: {channel.has_color}\n")
         f.write(f"Original particle count: {channel.particle_count}\n")
+        # Colour quantisation info. The gain is already applied to the stored
+        # bytes, so nothing needs to be undone at load time; it is recorded so
+        # the colour files stay reproducible and comparable across runs.
+        f.write(f"Formats: {', '.join(sorted(formats)) if formats else 'none'}\n")
+        f.write(f"Color gain: {color_gain:.6f} (mode: {color_normalize})\n")
     
     print(f"Saved metadata: {metadata_path}")
 
-def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast"):
+def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999"):
     """Main conversion function"""
     
     os.makedirs(output_dir, exist_ok=True)
@@ -460,6 +588,7 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int
     print(f"Found {len(particle_files)} particle files to process")
     print(f"Volume configuration: {grid_size}³ grid, world size {config.world_size:.3f}")
     print(f"Using method: {method}")
+    print(f"Writing formats: {'|'.join(sorted(formats))} (colour normalization: {color_normalize})")
     
     for particle_file in particle_files:
         print(f"\n{'='*50}")
@@ -481,18 +610,30 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int
         # Apply channel-specific processing
         density_grid, color_grid = process_channel_specific(channel, density_grid, color_grid)
         
+        # Stretch the (very dark) source colours over the 8-bit range. Done once,
+        # before writing, so the colour and RGBA files agree byte for byte.
+        color_grid, color_gain = normalize_color(color_grid, density_grid, color_normalize)
+        
         # Generate output filenames
         basename = os.path.splitext(os.path.splitext(particle_file)[0])[0]
         
-        # Save volume textures
-        density_path = os.path.join(output_dir, f"{basename}_density.raw.gz")
-        color_path = os.path.join(output_dir, f"{basename}_color.raw.gz")
+        # Save exactly the artifacts requested by --format. Nothing is written
+        # implicitly: '--format color' produces the colour texture only, with no
+        # density file alongside it.
+        if "density" in formats:
+            density_path = os.path.join(output_dir, f"{basename}_density.raw.gz")
+            create_volume_texture(density_grid, density_path)
         
-        create_volume_texture(density_grid, density_path)
-        create_color_texture(color_grid, color_path)
+        if "color" in formats:
+            color_path = os.path.join(output_dir, f"{basename}_color.raw.gz")
+            create_color_texture(color_grid, color_path)
+        
+        if "rgba" in formats:
+            rgba_path = os.path.join(output_dir, f"{basename}_rgba.raw.gz")
+            create_rgba_texture(density_grid, color_grid, rgba_path)
         
         # Save metadata
-        save_metadata(channel, config, output_dir, basename)
+        save_metadata(channel, config, output_dir, basename, color_gain, color_normalize, formats)
         
         print(f"Completed processing {particle_file}")
 
@@ -533,6 +674,26 @@ def main():
     )
     
     parser.add_argument(
+        "--format",
+        type=parse_format,
+        default=set(ALL_FORMATS),
+        metavar="FMT[|FMT...]",
+        help="Artifacts to write, as a '|'- or ','-separated set of "
+             "{density, color, rgba}, or 'all'. 'density' writes the R8 density "
+             "texture only; 'color' writes the RGB colour texture only; 'rgba' "
+             "packs colour (RGB) and density (A) into one texture. Nothing is "
+             "written implicitly, so '--format color' produces no density file."
+    )
+    
+    parser.add_argument(
+        "--color-normalize",
+        choices=["none", "max", "p99", "p999"],
+        default="p999",
+        help="Scale the colour grid before 8-bit quantisation, using a single "
+             "scalar gain (hue preserving) taken from the occupied voxels"
+    )
+    
+    parser.add_argument(
         "--skip-existing",
         action="store_true",
         help="Skip processing if output files already exist"
@@ -568,7 +729,9 @@ def main():
             output_dir=args.output_dir,
             grid_size=args.grid_size,
             world_bounds=world_bounds,
-            method=args.method
+            method=args.method,
+            formats=args.format,
+            color_normalize=args.color_normalize
         )
         print("\nConversion completed successfully!")
         return 0
