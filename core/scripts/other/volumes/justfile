@@ -1,7 +1,11 @@
 
-# Create a 3D texture from particle data. Needs input and output directories.
+# Create a 3D texture from particle data using smart method.
 tex gridsize input output:
 	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size {{gridsize}} {{input}} {{output}} 
+
+# Create a 3D texture from particle data using fast method.
+texfast gridsize input output:
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --grid-size {{gridsize}} {{input}} {{output}} 
 
 # Visualize a 3D texture file. Needs the path to the file.
 vis file:

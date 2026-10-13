@@ -12,6 +12,10 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 from tqdm import tqdm
 
+skip_files = ["galaxy_HII", "galaxy_Stars"]
+
+def must_skip(string):
+    return any(i in string for i in skip_files)
 
 @dataclass
 class Particle:
@@ -43,7 +47,7 @@ class VolumeConfig:
             self.world_bounds = (min_bound, max_bound)
             # Use the maximum dimension for a cubic volume
             dimensions = max_bound - min_bound
-            self.world_size = np.max(dimensions) * 1.1  # 10% padding
+            self.world_size = np.max(dimensions) * 1.05  # 5% padding
             self.world_center = (min_bound + max_bound) / 2
         else:
             self.world_size = world_size
@@ -57,7 +61,7 @@ def compute_world_bounds(input_dir: str) -> tuple[np.ndarray, np.ndarray]:
     """Compute bounding box from all particle files"""
     print("Computing world bounds from all particle files...")
     
-    particle_files = [f for f in os.listdir(input_dir) if f.endswith('.dat.gz')]
+    particle_files = [f for f in os.listdir(input_dir) if f.endswith('.dat.gz') and not must_skip(f)]
     
     if not particle_files:
         raise ValueError(f"No .dat.gz files found in {input_dir}")
@@ -113,7 +117,7 @@ def compute_world_bounds(input_dir: str) -> tuple[np.ndarray, np.ndarray]:
     print(f"  Y: [{all_min[1]:.3f}, {all_max[1]:.3f}] -> span: {all_max[1] - all_min[1]:.3f}")
     print(f"  Z: [{all_min[2]:.3f}, {all_max[2]:.3f}] -> span: {all_max[2] - all_min[2]:.3f}")
     
-    # Add 10% padding to ensure all particles are inside
+    # Add 5% padding to ensure all particles are inside
     padding = (all_max - all_min) * 0.05
     all_min -= padding
     all_max += padding
@@ -246,8 +250,12 @@ def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig
     for i, (x, y, z) in enumerate(grid_coords):
         density_grid[x, y, z] += weights[i]
         if channel.has_color:
+            # Colour must accumulate with the SAME weight as density, so that
+            # the later division by density_grid yields a size-weighted mean
+            # colour. An extra factor of sizes[i] here would bias the mean
+            # towards large particles and scale it by the particle size.
             for c in range(3):
-                color_grid[x, y, z, c] += colors[i, c] * weights[i] * sizes[i]
+                color_grid[x, y, z, c] += colors[i, c] * weights[i]
     
     # Normalize color grid
     if channel.has_color:
@@ -359,7 +367,7 @@ def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray,
     
     # Apply Gaussian filtering based on channel type
     if 'dust' in channel_name:
-        density_grid = gaussian_filter(density_grid, sigma=2.0)
+        density_grid = gaussian_filter(density_grid, sigma=0.5)
         if not channel.has_color:
             color_grid[:,:,:,0] = 0.8; color_grid[:,:,:,1] = 0.6; color_grid[:,:,:,2] = 0.4
     elif 'gas' in channel_name:
@@ -443,7 +451,7 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int
     os.makedirs(output_dir, exist_ok=True)
     config = VolumeConfig(grid_size=grid_size, world_bounds=world_bounds)
     
-    particle_files = [f for f in os.listdir(input_dir) if f.endswith('.dat.gz')]
+    particle_files = [f for f in os.listdir(input_dir) if f.endswith('.dat.gz') and not must_skip(f)]
     
     if not particle_files:
         print(f"No .dat.gz files found in {input_dir}")
