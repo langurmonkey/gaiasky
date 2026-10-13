@@ -49,7 +49,6 @@ public class MeshInitializer extends AbstractInitSystem {
         var label = Mapper.label.get(entity);
         ModelComponent mc = model.model;
 
-        label.label = true;
         label.textScale = 0.2f;
         label.labelFactor = 0.8e-3f;
         label.labelMax = 1f;

@@ -33,7 +33,7 @@ public class BillboardSetExtractor extends AbstractExtractSystem {
             var billboard = Mapper.billboardSet.get(entity);
 
             // Label.
-            if (label.label && label.renderLabel()) {
+            if (label.globalEnableFlag && label.renderLabel()) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
 

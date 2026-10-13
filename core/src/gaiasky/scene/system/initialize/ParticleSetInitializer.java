@@ -138,7 +138,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.labelColors = new IntMap<>();
 
         // Labels.
-        label.label = true;
         label.textScale = 0.3f;
         label.renderFunction = LabelView::renderTextBase;
 

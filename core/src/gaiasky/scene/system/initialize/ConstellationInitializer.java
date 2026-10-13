@@ -9,7 +9,6 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.utils.IntMap;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -20,7 +19,6 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
-import gaiasky.util.tree.IPosition;
 
 /**
  * Initializes constellation entities, including their names and lines.
@@ -50,7 +48,6 @@ public class ConstellationInitializer extends AbstractInitSystem {
         }
 
         // Labels.
-        label.label = true;
         label.renderConsumer = LabelEntityRenderSystem::renderConstellation;
         label.renderFunction = LabelView::renderTextBase;
         label.labelPosition = new Vector3Q();

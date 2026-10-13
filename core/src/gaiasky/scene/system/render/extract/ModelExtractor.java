@@ -178,6 +178,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                                SolidAngle sa,
                                Label label) {
         return base.names != null
+                && label.globalEnableFlag
                 && label.renderLabel()
                 && renderer.isOn(ComponentTypes.ComponentType.Labels)
                 && (label.forceLabel() || body.solidAngleApparent >= sa.thresholdLabel / label.labelBias);

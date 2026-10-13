@@ -64,7 +64,6 @@ public class ShapeInitializer extends AbstractInitSystem {
         }
 
         // Label.
-        label.label = true;
         label.textScale = 0.2f;
         label.labelMax = 1f;
         if (label.labelFactor == 0)

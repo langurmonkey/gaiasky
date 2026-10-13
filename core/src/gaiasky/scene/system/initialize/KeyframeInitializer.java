@@ -38,7 +38,6 @@ public class KeyframeInitializer extends AbstractInitSystem {
         var kf = Mapper.keyframes.get(entity);
         var label = Mapper.label.get(entity);
 
-        label.label = false;
         label.labelFactor = 1;
         label.labelMax = 0.5e-3f;
         label.textScale = 0.3f;

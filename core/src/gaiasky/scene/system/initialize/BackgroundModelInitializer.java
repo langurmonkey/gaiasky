@@ -134,7 +134,6 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
         }
 
         // Label for VR
-        label.label = true;
         label.textScale = 0.2f;
         label.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
         label.labelFactor = 1;

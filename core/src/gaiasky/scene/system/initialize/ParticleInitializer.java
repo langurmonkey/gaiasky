@@ -179,7 +179,6 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
         sa.thresholdLabel = sa.thresholdPoint / GaiaSky.settings().scene.label.number;
 
-        label.label = true;
         label.textScale = 0.2f;
         label.labelFactor = 1.3e-1f;
         label.labelMax = 0.01f;

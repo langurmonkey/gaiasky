@@ -54,7 +54,6 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         var bb = Mapper.billboardSet.get(entity);
 
         // Label.
-        label.label = true;
         label.textScale = 3;
         label.labelMax = (float) (2e-3 / Constants.DISTANCE_SCALE_FACTOR);
         label.labelFactor = 0.6f;

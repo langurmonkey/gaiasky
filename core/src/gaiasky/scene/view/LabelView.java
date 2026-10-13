@@ -128,7 +128,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextBackgroundModel() {
-        return renderTextBase() && label.label;
+        return renderTextBase() && label.globalEnableFlag;
     }
 
     public boolean renderTextTitle() {
@@ -140,7 +140,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextGridRec() {
-        return label.label;
+        return label.globalEnableFlag;
     }
 
     public boolean renderTextEssential() {
@@ -259,7 +259,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public boolean isLabel() {
-        return label == null || label.label;
+        return label == null || label.globalEnableFlag;
     }
 
     public boolean isLocation() {

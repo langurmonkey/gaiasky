@@ -107,7 +107,6 @@ public class ModelInitializer extends AbstractInitSystem {
         focus.hitRayConsumer = FocusHit::addHitRayModel;
 
         // All celestial labels use the same consumer.
-        label.label = true;
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextCelestial;
 
@@ -279,7 +278,6 @@ public class ModelInitializer extends AbstractInitSystem {
         coord.coordinates = scc;
 
         // No label.
-        label.label = false;
         label.labelMax = 0;
         label.renderConsumer = null;
         label.labelFactor = 0;

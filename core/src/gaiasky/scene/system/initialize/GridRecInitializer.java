@@ -56,7 +56,6 @@ public class GridRecInitializer extends AbstractInitSystem {
         label.textScale = 1;
         label.labelFactor = 2e-3f;
         label.labelMax = 1f;
-        label.label = true;
         label.labelPosition = new Vector3Q();
         label.renderConsumer = LabelEntityRenderSystem::renderRecursiveGrid;
         label.renderFunction = LabelView::renderTextGridRec;

@@ -9,6 +9,8 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.render.RenderingContext;
+import gaiasky.render.gdx.g2d.ExtSpriteBatch;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
@@ -16,8 +18,6 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Consumers.Consumer7;
 import gaiasky.util.LocalizedEnum;
-import gaiasky.render.gdx.g2d.ExtSpriteBatch;
-import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3Q;
 
@@ -67,7 +67,7 @@ public class Label implements Component {
     /**
      * Is it a label or another kind of text?
      */
-    public boolean label;
+    public boolean globalEnableFlag = true;
 
     /** Function that checks whether the label must be rendered or not. **/
     public Function<LabelView, Boolean> renderFunction;
@@ -96,6 +96,10 @@ public class Label implements Component {
 
     public boolean forceLabel() {
         return isDisplayAlways();
+    }
+
+    public void setLabel(Boolean label) {
+        this.globalEnableFlag = label;
     }
 
     public void setLabelDisplay(String value) {

@@ -29,7 +29,7 @@ public class GridRecExtractor extends AbstractExtractSystem {
             var label = Mapper.label.get(entity);
 
             addToRender(render, RenderGroup.MODEL_VERT_RECGRID);
-            if (label.label && label.renderLabel()) {
+            if (label.globalEnableFlag && label.renderLabel()) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
             if (GaiaSky.settings().program.recursiveGrid.origin.isRefSys() && GaiaSky.settings().program.recursiveGrid.projectionLines && camera.hasFocus()) {
