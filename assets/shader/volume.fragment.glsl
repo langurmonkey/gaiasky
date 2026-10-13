@@ -12,6 +12,7 @@ uniform float u_cameraK;
 uniform sampler3D u_volume0;
 uniform vec3 u_volume0BoundsMin;
 uniform vec3 u_volume0BoundsMax;
+uniform int u_volume0ColorMode;
 #endif //volume0Flag
 
 #ifdef volume1Flag
@@ -19,6 +20,7 @@ uniform vec3 u_volume0BoundsMax;
 uniform sampler3D u_volume1;
 uniform vec3 u_volume1BoundsMin;
 uniform vec3 u_volume1BoundsMax;
+uniform int u_volume1ColorMode;
 #endif //volume1Flag
 
 #ifdef volume2Flag
@@ -26,6 +28,7 @@ uniform vec3 u_volume1BoundsMax;
 uniform sampler3D u_volume2;
 uniform vec3 u_volume2BoundsMin;
 uniform vec3 u_volume2BoundsMax;
+uniform int u_volume2ColorMode;
 #endif //volume2Flag
 
 #ifdef volume3Flag
@@ -33,6 +36,7 @@ uniform vec3 u_volume2BoundsMax;
 uniform sampler3D u_volume3;
 uniform vec3 u_volume3BoundsMin;
 uniform vec3 u_volume3BoundsMax;
+uniform int u_volume3ColorMode;
 #endif //volume3Flag
 
 #if defined(volume0Flag) || defined(volume1Flag) || defined(volume2Flag) || defined(volume3Flag)
@@ -70,6 +74,15 @@ layout(location = 1) out vec4 layerBuffer;
 #define ITERATIONS 150
 #define EXPOSURE 10.0
 
+// Volume colour modes, passed in per slot as u_volumeNColorMode. They describe both where
+// the colour comes from and where the density lives, because the two travel together: a
+// colour+density (RGBA) volume has its colour in .rgb and its density in .a, whereas a
+// density-only (R8) volume keeps its density in .r and stores no colour. These values must
+// match VolumeType.COLOR_MODE_* in gaiasky.render.gdx.graphics.VolumeType.
+#define COLOR_MODE_RAMP 0         // density in .r, colour from the slot's fixed colour
+#define COLOR_MODE_TEXTURE 1      // density in .a, colour from the texture (.rgb)
+#define COLOR_MODE_TEXTURE_RAMP 2 // density in .a, colour = texture colour * fixed colour
+
 float hash12(vec2 p) {
     vec3 p3 = fract(vec3(p.xyx) * 0.1031);
     p3 += dot(p3, p3.yzx + 33.33);
@@ -85,12 +98,33 @@ vec3 worldToVolumeUVW(vec3 worldPos, vec3 boundsMin, vec3 boundsMax) {
     return volumeSpace;
 }
 
-// Sample volume density
-float sampleVolume(vec3 uvw, sampler3D volume) {
+// Fetch one texel per sample, normalised to (rgb = colour, a = density).
+//
+// Unpacking both here, from a single fetch, keeps this to one texture read per step. The
+// channel the density lives in is a property of the storage layout, and the colour mode
+// already tells us which layout is bound: .r for density-only (R8), .a for colour+density
+// (RGBA). Note that an RGB volume has no density at all - sampled as a 3D texture its alpha
+// reads 1.0 - so it cannot be raymarched and must not be bound to a volume slot.
+vec4 sampleVolumeRGBA(vec3 uvw, sampler3D volume, int colorMode) {
     if (any(lessThan(uvw, vec3(0.0))) || any(greaterThan(uvw, vec3(1.0)))) {
-        return 0.0;
+        return vec4(0.0);
     }
-    return texture(volume, uvw).r;
+    vec4 texel = texture(volume, uvw);
+    // Density-only: density in R, no colour stored.
+    return colorMode == COLOR_MODE_RAMP
+    ? vec4(0.0, 0.0, 0.0, texel.r)
+    : texel; // colour+density: colour in RGB, density in A
+}
+
+// Colour of an emitting sample. `fallback` is this shader's fixed per-slot colour, used when
+// the volume carries no colour of its own (mode 0). In texture-ramp mode the fixed colour
+// modulates the baked one, which is worth having when the texture's colour is flat across a
+// channel - as it is for volumes converted from particles with no colour column of their own.
+vec3 volumeColor(vec3 fallback, vec3 texColor, int colorMode) {
+    if (colorMode == COLOR_MODE_TEXTURE) {
+        return texColor;
+    }
+    return colorMode == COLOR_MODE_TEXTURE_RAMP ? texColor * fallback : fallback;
 }
 
 // Ray-box intersection - returns (entryDistance, exitDistance)
@@ -125,7 +159,7 @@ vec4 transferFunction(float density, vec3 baseColor, float stepUVW, float transm
     return vec4(color, alpha);
 }
 
-vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, in vec3 color, inout float firstDepth) {
+vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, in int colorMode, in vec3 color, inout float firstDepth) {
     vec3 rayOrigin = u_cameraPos;
     vec3 rayDir = normalize(v_data.fragPosWorld - u_cameraPos);
     // Scale to size.
@@ -151,15 +185,14 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
 
     float transmittance = 1.0;
 
-    vec3 baseColor = color;
-
     float jitter = hash12(gl_FragCoord.xy);
     for (int i = 0; i < nSteps; i++) {
         float currentDist = entryDist + (float(i) + jitter) * stepSize;
         vec3 samplePos = rayOrigin + rayDir * currentDist;
         vec3 uvw = worldToVolumeUVW(samplePos, boundsMin, boundsMax);
 
-        float density = sampleVolume(uvw, volume);
+        vec4 texel = sampleVolumeRGBA(uvw, volume, colorMode);
+        float density = texel.a;
 
         if (firstDepth < 0.0 && density > 0.0) {
             firstDepth = currentDist;
@@ -167,7 +200,7 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
 
         // Emission with enhanced transfer function
         if (density > 0.0 && transmittance > 0.001) {
-            // Use accumulated density for saturation effects
+            vec3 baseColor = volumeColor(color, texel.rgb, colorMode);
             vec4 sampl = transferFunction(density, baseColor, stepUVW, transmittance);
 
             vec3 emittedLight = sampl.rgb * transmittance;
@@ -190,16 +223,16 @@ void main() {
         float firstDepth = -1.0;
 
         #ifdef volume0Flag
-            result += raymarchVolume(u_volume0, u_volume0BoundsMin, u_volume0BoundsMax, fetchColorDiffuse(vec4(0.3, 0.6, 1.0, 1.0)).rgb, firstDepth);
+            result += raymarchVolume(u_volume0, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, fetchColorDiffuse(vec4(0.3, 0.6, 1.0, 1.0)).rgb, firstDepth);
         #endif //volume0Flag
         #ifdef volume1Flag
-            result += raymarchVolume(u_volume1, u_volume1BoundsMin, u_volume1BoundsMax, vec3(0.1, 0.8, 0.2), firstDepth);
+            result += raymarchVolume(u_volume1, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, vec3(0.1, 0.8, 0.2), firstDepth);
         #endif //volume1Flag
         #ifdef volume2Flag
-            result += raymarchVolume(u_volume2, u_volume2BoundsMin, u_volume2BoundsMax, vec3(0.0, 0.2, 0.8), firstDepth);
+            result += raymarchVolume(u_volume2, u_volume2BoundsMin, u_volume2BoundsMax, u_volume2ColorMode, vec3(0.0, 0.2, 0.8), firstDepth);
         #endif //volume2Flag
         #ifdef volume3Flag
-            result += raymarchVolume(u_volume3, u_volume3BoundsMin, u_volume3BoundsMax, vec3(0.8, 0.2, 0.1), firstDepth);
+            result += raymarchVolume(u_volume3, u_volume3BoundsMin, u_volume3BoundsMax, u_volume3ColorMode, vec3(0.8, 0.2, 0.1), firstDepth);
         #endif //volume3Flag
 
         if (result.a > 0.001) {

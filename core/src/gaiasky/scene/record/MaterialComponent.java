@@ -521,7 +521,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         if (volume0 != null && material.get(Texture3DAttribute.Volume0) == null) {
             VolumeTexture tex = manager.get(volume0Unpacked, VolumeTexture.class);
             if (tex != null && material != null) {
-                material.set(new Texture3DAttribute(Texture3DAttribute.Volume0, tex.texture()));
+                material.set(new Texture3DAttribute(Texture3DAttribute.Volume0, tex.texture(), tex.type()));
                 material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMin, tex.boundsMin()));
                 material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMax, tex.boundsMax()));
             }
@@ -531,7 +531,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             if (material.get(Texture3DAttribute.Volume1) == null) {
                 VolumeTexture tex = manager.get(volume1Unpacked, VolumeTexture.class);
                 if (tex != null && material != null) {
-                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume1, tex.texture()));
+                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume1, tex.texture(), tex.type()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMin, tex.boundsMin()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMax, tex.boundsMax()));
                 }
@@ -542,7 +542,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             if (material.get(Texture3DAttribute.Volume2) == null) {
                 VolumeTexture tex = manager.get(volume2Unpacked, VolumeTexture.class);
                 if (tex != null && material != null) {
-                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume2, tex.texture()));
+                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume2, tex.texture(), tex.type()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMin, tex.boundsMin()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMax, tex.boundsMax()));
                 }
@@ -553,7 +553,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             if (material.get(Texture3DAttribute.Volume3) == null) {
                 VolumeTexture tex = manager.get(volume3Unpacked, VolumeTexture.class);
                 if (tex != null && material != null) {
-                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume3, tex.texture()));
+                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume3, tex.texture(), tex.type()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMin, tex.boundsMin()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMax, tex.boundsMax()));
                 }

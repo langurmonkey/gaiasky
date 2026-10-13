@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture3D;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
+import gaiasky.render.gdx.graphics.VolumeType;
 
 public class Texture3DAttribute extends Attribute {
     public final static String Volume0Alias = "volume0";
@@ -29,6 +30,15 @@ public class Texture3DAttribute extends Attribute {
     public float scaleU = 1;
     public float scaleV = 1;
     public float scaleW = 1;
+    /**
+     * Storage format of the texture at this slot, propagated from
+     * {@link gaiasky.render.gdx.graphics.VolumeTexture#type()}. It tells the shader what the
+     * sampled texel means: a density-only (R8) volume reads its density from {@code .r}, while a
+     * color+density (RGBA) volume reads colour from {@code .rgb} and density from {@code .a}.
+     * Defaults to {@link VolumeType#DENSITY}, so a slot populated without an explicit type keeps
+     * the legacy density-only behaviour.
+     */
+    public VolumeType volumeType = VolumeType.DENSITY;
 
     public Texture3DAttribute(int index) {
         super(index);
@@ -42,6 +52,12 @@ public class Texture3DAttribute extends Attribute {
 
     public <T extends Texture3D> Texture3DAttribute(int index, TextureDescriptor<T> textureDescription, float offsetU,
                                                     float offsetV, float offsetW, float scaleU, float scaleV, float scaleW) {
+        this(index, textureDescription, offsetU, offsetV, offsetW, scaleU, scaleV, scaleW, VolumeType.DENSITY);
+    }
+
+    public <T extends Texture3D> Texture3DAttribute(int index, TextureDescriptor<T> textureDescription, float offsetU,
+                                                    float offsetV, float offsetW, float scaleU, float scaleV, float scaleW,
+                                                    VolumeType volumeType) {
         this(index, textureDescription);
         this.offsetU = offsetU;
         this.offsetV = offsetV;
@@ -49,12 +65,18 @@ public class Texture3DAttribute extends Attribute {
         this.scaleU = scaleU;
         this.scaleV = scaleV;
         this.scaleW = scaleW;
+        this.volumeType = volumeType == null ? VolumeType.DENSITY : volumeType;
     }
 
 
     public Texture3DAttribute(int index, Texture3D texture) {
+        this(index, texture, VolumeType.DENSITY);
+    }
+
+    public Texture3DAttribute(int index, Texture3D texture, VolumeType volumeType) {
         this(index);
         textureDescription.texture = texture;
+        this.volumeType = volumeType == null ? VolumeType.DENSITY : volumeType;
     }
 
     public Texture3DAttribute(Texture3DAttribute copyFrom) {
@@ -65,7 +87,8 @@ public class Texture3DAttribute extends Attribute {
              copyFrom.offsetW,
              copyFrom.scaleU,
              copyFrom.scaleV,
-             copyFrom.scaleW);
+             copyFrom.scaleW,
+             copyFrom.volumeType);
     }
 
     @Override
@@ -83,6 +106,7 @@ public class Texture3DAttribute extends Attribute {
         result = 991 * result + NumberUtils.floatToRawIntBits(scaleU);
         result = 991 * result + NumberUtils.floatToRawIntBits(scaleV);
         result = 991 * result + NumberUtils.floatToRawIntBits(scaleW);
+        result = 991 * result + volumeType.ordinal();
         return result;
     }
 
@@ -106,6 +130,8 @@ public class Texture3DAttribute extends Attribute {
             return offsetV > other.offsetV ? 1 : -1;
         if (!MathUtils.isEqual(offsetW, other.offsetW))
             return offsetW > other.offsetW ? 1 : -1;
+        if (volumeType != other.volumeType)
+            return volumeType.ordinal() < other.volumeType.ordinal() ? -1 : 1;
         return 0;
     }
 }

@@ -113,7 +113,7 @@ public abstract class Attribute implements Comparable<Attribute> {
             return true;
         if (!(obj instanceof Attribute other))
             return false;
-        if (this.type.equals(other.type))
+        if (!this.type.equals(other.type))
             return false;
         return equals(other);
     }

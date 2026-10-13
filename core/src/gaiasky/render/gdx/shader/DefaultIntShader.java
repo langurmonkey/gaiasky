@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.render.gdx.graphics.VolumeType;
 import gaiasky.render.ShadowMapImpl;
 import gaiasky.render.gdx.model.gltf.scene3d.attributes.*;
 import gaiasky.render.gdx.shader.attribute.*;
@@ -119,6 +120,15 @@ public class DefaultIntShader extends BaseIntShader {
     public int u_volume2BoundsMax;
     public int u_volume3BoundsMin;
     public int u_volume3BoundsMax;
+
+    /**
+     * Per-slot volume colour mode (see {@link VolumeType#colorMode()}): 0 = look-up ramp,
+     * 1 = texture colour, 2 = texture colour modulated by the ramp.
+     */
+    public int u_volume0ColorMode;
+    public int u_volume1ColorMode;
+    public int u_volume2ColorMode;
+    public int u_volume3ColorMode;
 
     // Cubemaps
     protected final int u_reflectionCubemap;
@@ -357,6 +367,11 @@ public class DefaultIntShader extends BaseIntShader {
         u_volume1 = register(Inputs.volume1, Setters.volume1);
         u_volume2 = register(Inputs.volume2, Setters.volume2);
         u_volume3 = register(Inputs.volume3, Setters.volume3);
+
+        u_volume0ColorMode = register(Inputs.volume0ColorModeUniform, Setters.volume0ColorModeSetter);
+        u_volume1ColorMode = register(Inputs.volume1ColorModeUniform, Setters.volume1ColorModeSetter);
+        u_volume2ColorMode = register(Inputs.volume2ColorModeUniform, Setters.volume2ColorModeSetter);
+        u_volume3ColorMode = register(Inputs.volume3ColorModeUniform, Setters.volume3ColorModeSetter);
 
         // SVT.
         u_svtId = register(Inputs.svtId, Setters.svtId);
@@ -1075,6 +1090,12 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform volume2BoundsMaxUniform = new Uniform("u_volume2BoundsMax");
         public final static Uniform volume3BoundsMinUniform = new Uniform("u_volume3BoundsMin");
         public final static Uniform volume3BoundsMaxUniform = new Uniform("u_volume3BoundsMax");
+        // Volume colour mode (0 = ramp, 1 = texture colour, 2 = texture colour * ramp). Declared in
+        // volume.fragment.glsl inside the volumeNFlag blocks; unset uniforms read as 0.
+        public final static Uniform volume0ColorModeUniform = new Uniform("u_volume0ColorMode");
+        public final static Uniform volume1ColorModeUniform = new Uniform("u_volume1ColorMode");
+        public final static Uniform volume2ColorModeUniform = new Uniform("u_volume2ColorMode");
+        public final static Uniform volume3ColorModeUniform = new Uniform("u_volume3ColorMode");
 
         public final static Uniform svtTileSize = new Uniform("u_svtTileSize", FloatAttribute.SvtTileSize);
         public final static Uniform svtResolution = new Uniform("u_svtResolution", Vector2Attribute.SvtResolution);
@@ -1961,6 +1982,58 @@ public class DefaultIntShader extends BaseIntShader {
                     shader.set(inputID,
                                ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.Volume3BoundsMax)))).value);
                 }
+            }
+        };
+
+        /**
+         * Colour mode for the volume slot bound to {@code volumeAttribute}, derived from the storage
+         * format of the texture (see {@link VolumeType#colorMode()}).
+         * <p>
+         * Unlike {@link #iorSetter}, which assumes a PBR material always carries the IOR attribute,
+         * the texture attribute may legitimately be absent: these uniforms are declared with an empty
+         * mask, so their validator always succeeds and the setter runs for every renderable. A missing
+         * or density-only attribute therefore reports {@link VolumeType#COLOR_MODE_RAMP}, which is the
+         * pre-RGBA behaviour.
+         */
+        private static int volumeColorMode(Attributes combinedAttributes, int volumeAttribute) {
+            Texture3DAttribute a = (Texture3DAttribute) combinedAttributes.get(volumeAttribute);
+            return a == null ? VolumeType.COLOR_MODE_RAMP : a.volumeType.colorMode();
+        }
+
+        public final static Setter volume0ColorModeSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeColorMode(combinedAttributes, Texture3DAttribute.Volume0));
+            }
+        };
+        public final static Setter volume1ColorModeSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeColorMode(combinedAttributes, Texture3DAttribute.Volume1));
+            }
+        };
+        public final static Setter volume2ColorModeSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeColorMode(combinedAttributes, Texture3DAttribute.Volume2));
+            }
+        };
+        public final static Setter volume3ColorModeSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeColorMode(combinedAttributes, Texture3DAttribute.Volume3));
             }
         };
         public final static Setter kmToU = new LocalSetter() {
