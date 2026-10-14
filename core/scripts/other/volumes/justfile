@@ -1,11 +1,30 @@
 
 # Create a 3D texture from particle data using smart method.
-tex gridsize formats input output:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size {{gridsize}} --format '{{formats}}' {{input}} {{output}} 
+tex gridsize formats input output *args:
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size {{gridsize}} --format '{{formats}}' {{args}} {{input}} {{output}}
 
 # Create a 3D texture from particle data using fast method.
 texfast gridsize input output:
 	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --grid-size {{gridsize}} {{input}} {{output}} 
+
+# Convert particles and merge the channels into one emissive and one occlusive
+# texture in one go. 'group' is '<emissive>|<occlusive>', each side a
+# '+'-separated list of channel names with an optional ':weight', e.g.
+# 'Gas+Bulge:0.6|ArmDust'.
+texgroup gridsize group input output:
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size {{gridsize}} --format rgba --group '{{group}}' {{input}} {{output}}
+
+# Merge volume textures into an emissive and an occlusive one. The options are passed
+# straight through, e.g. (all on one line):
+#   just combine out --emissive galaxy_Gas_rgba.raw.gz --occlusive galaxy_ArmDust_rgba.raw.gz
+# Do not insert a '--' before them: just only treats it as a separator *before* the
+# recipe name, so it would be forwarded to the script and rejected by argparse.
+combine output *args:
+	uv run --with numpy python combine-volumes.py -o {{output}} {{args}}
+
+# Verify a merge: merge each input on its own and compare with the original file.
+combine-check output *args:
+	uv run --with numpy python combine-volumes.py --check -o {{output}} {{args}}
 
 # Visualize a 3D texture file. Needs the path to the file.
 vis file:

@@ -5,6 +5,8 @@ Convert Gaia Sky particle channel files (.dat.gz) to 3D volume textures
 import argparse
 import gzip
 import os
+import subprocess
+import sys
 import time
 from dataclasses import dataclass
 
@@ -47,6 +49,79 @@ def parse_format(value: str) -> set[str]:
 
 def must_skip(string):
     return any(i in string for i in skip_files)
+
+
+def parse_group(value: str) -> dict:
+    """Parse --group into {'emissive': [(pattern, weight), ...], 'occlusive': [...]}.
+
+    The spec is '<emissive>|<occlusive>', and each side is a '+'-separated list of
+    channel names, each optionally followed by ':weight':
+
+        --group 'Gas+Bulge:0.6|ArmDust'
+
+    A pattern is matched as a case-insensitive substring of the channel name, and it has
+    to match exactly one of the channels this run converts; an unknown or ambiguous
+    pattern stops the run rather than silently dropping a channel. Either side may be
+    empty, and a spec with no '|' is taken to be all-emissive.
+    """
+    emissive, separator, occlusive = value.partition("|")
+    groups = {}
+    for name, side in (("emissive", emissive), ("occlusive", occlusive)):
+        entries = []
+        for item in side.split("+"):
+            item = item.strip()
+            if not item:
+                continue
+            pattern, _, weight = item.partition(":")
+            try:
+                entries.append((pattern.strip(), float(weight) if weight else 1.0))
+            except ValueError:
+                raise argparse.ArgumentTypeError(
+                    f"'{weight}' in '{item}' is not a number") from None
+        groups[name] = entries
+    if not groups["emissive"] and not groups["occlusive"]:
+        raise argparse.ArgumentTypeError("no channel named")
+    return groups
+
+
+def run_group_combiner(groups: dict, channels: list, out_dir: str, color_normalize: str,
+                       norm: str) -> int:
+    """Merge the channels just written into one emissive and one occlusive texture.
+
+    Delegates to combine-volumes.py as a separate process, so the merge itself lives in
+    one place, stays usable on its own on textures from an earlier run, and can be
+    re-run with different weights without converting the particles again.
+    """
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "combine-volumes.py")
+    if not os.path.exists(script):
+        print(f"Error: --group needs {script}, which is missing")
+        return 1
+
+    command = [sys.executable, script, "-o", out_dir,
+               "--color-normalize", color_normalize, "--norm", norm]
+
+    for name, entries in groups.items():
+        option = "--emissive" if name == "emissive" else "--occlusive"
+        for pattern, weight in entries:
+            matches = [c for c in channels if pattern.lower() in c.lower()]
+            if not matches:
+                print(f"Error: --group: nothing matches '{pattern}'; this run wrote "
+                      f"{', '.join(channels) if channels else 'nothing'}")
+                return 1
+            if len(matches) > 1:
+                print(f"Error: --group: '{pattern}' is ambiguous, it matches "
+                      f"{', '.join(matches)}")
+                return 1
+            command += [option, os.path.join(out_dir, f"{matches[0]}_rgba.raw.gz")]
+            if weight != 1.0:
+                command += ["--weight", f"{matches[0]}={weight}"]
+
+    # Flush before handing the terminal over: the parent's prints are block buffered when
+    # stdout is a pipe, so without this the child's output would overtake them.
+    print(f"\n{'=' * 50}\nCombining groups")
+    print("  " + " ".join(command), flush=True)
+    return subprocess.run(command).returncode
+
 
 @dataclass
 class Particle:
@@ -429,7 +504,7 @@ def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray,
     elif 'hii' in channel_name:
         sigma, default_color = 1.2, (1.0, 0.4, 0.6)
     elif 'bulge' in channel_name:
-        sigma, default_color = 1.0, (1.0, 0.9, 0.6)
+        sigma, default_color = 3.0, (1.0, 0.9, 0.6)
     elif 'star' in channel_name:
         sigma, default_color = 0.3, (1.0, 0.95, 0.9)
     else:
@@ -573,9 +648,9 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
     
     print(f"Saved metadata: {metadata_path}")
 
-def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999"):
+def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999", group: dict = None, group_norm: str = "max"):
     """Main conversion function"""
-    
+
     os.makedirs(output_dir, exist_ok=True)
     config = VolumeConfig(grid_size=grid_size, world_bounds=world_bounds)
     
@@ -589,6 +664,10 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int
     print(f"Volume configuration: {grid_size}³ grid, world size {config.world_size:.3f}")
     print(f"Using method: {method}")
     print(f"Writing formats: {'|'.join(sorted(formats))} (colour normalization: {color_normalize})")
+    
+    # Basenames of the channels actually written as RGBA, for --group to merge. A
+    # channel that yields no particles is skipped, so it must not be offered.
+    rgba_channels = []
     
     for particle_file in particle_files:
         print(f"\n{'='*50}")
@@ -631,11 +710,16 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int
         if "rgba" in formats:
             rgba_path = os.path.join(output_dir, f"{basename}_rgba.raw.gz")
             create_rgba_texture(density_grid, color_grid, rgba_path)
+            rgba_channels.append(basename)
         
         # Save metadata
         save_metadata(channel, config, output_dir, basename, color_gain, color_normalize, formats)
         
         print(f"Completed processing {particle_file}")
+    
+    if group is not None:
+        return run_group_combiner(group, rgba_channels, output_dir, color_normalize, group_norm)
+    return 0
 
 def main():
     parser = argparse.ArgumentParser(
@@ -699,7 +783,34 @@ def main():
         help="Skip processing if output files already exist"
     )
     
+    parser.add_argument(
+        "--group",
+        type=parse_group,
+        metavar="EMISSIVE|OCCLUSIVE",
+        help="After converting, merge the channels into one emissive and one occlusive "
+             "texture by calling combine-volumes.py. The spec is "
+             "'<emissive>|<occlusive>', each side a '+'-separated list of channel names "
+             "with an optional ':weight', e.g. 'Gas+Bulge:0.6|ArmDust'. The merged files "
+             "are written next to the per-channel ones, named after their common prefix. "
+             "Requires 'rgba' in --format."
+    )
+    
+    parser.add_argument(
+        "--group-norm",
+        choices=["max", "none"],
+        default="max",
+        help="Density normalisation for the textures written by --group"
+    )
+    
     args = parser.parse_args()
+
+    if args.group is not None and "rgba" not in args.format:
+        print("Error: --group merges the RGBA textures, so 'rgba' must be in --format")
+        return 1
+
+    if args.group is not None and not args.group["emissive"] and not args.group["occlusive"]:
+        print("Error: --group names no channels")
+        return 1
     
     if not os.path.exists(args.input_dir):
         print(f"Error: Input directory '{args.input_dir}' does not exist")
@@ -724,15 +835,20 @@ def main():
         else:
             world_bounds = compute_world_bounds(args.input_dir)
         
-        convert_particles_to_volumes(
+        status = convert_particles_to_volumes(
             input_dir=args.input_dir,
             output_dir=args.output_dir,
             grid_size=args.grid_size,
             world_bounds=world_bounds,
             method=args.method,
             formats=args.format,
-            color_normalize=args.color_normalize
+            color_normalize=args.color_normalize,
+            group=args.group,
+            group_norm=args.group_norm
         )
+        if status:
+            print("\nThe conversion succeeded but the group merge failed; see above.")
+            return status
         print("\nConversion completed successfully!")
         return 0
     except Exception as e:
