@@ -47,6 +47,26 @@ def parse_format(value: str) -> set[str]:
         )
     return set(tokens)
 
+def parse_grid_size(value: str):
+    """Parse --grid-size: '400' (cubic), or '400x40x400' in storage order (W, H, D).
+
+    Storage order is the order of the file and of the metadata's 'Grid size:', which is
+    galactic (Y, Z, X). So a flat galaxy disk, whose thickness is the galactic Z, wants
+    '400x40x400': a texture 400 wide, 40 tall, 400 deep, holding a 400x400x40 galactic
+    grid. 'x', '*' and ',' all separate the axes.
+    """
+    parts = [p for p in value.strip().lower().replace("*", "x").replace(",", "x").split("x") if p.strip()]
+    try:
+        numbers = [int(p) for p in parts]
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"'{value}' is not a resolution or a WxHxD grid") from None
+    if len(numbers) == 1 and numbers[0] > 0:
+        return numbers[0]
+    if len(numbers) == 3 and all(n > 0 for n in numbers):
+        return tuple(numbers)
+    raise argparse.ArgumentTypeError(
+        f"grid must be one positive resolution or three (WxHxD), got '{value}'")
+
 def must_skip(string):
     return any(i in string for i in skip_files)
 
@@ -144,24 +164,114 @@ class ParticleChannel:
         self.particles.append(particle)
         self.particle_count = len(self.particles)
 
+def storage_to_galactic(values):
+    """(W, H, D) in storage order -> (nx, ny, nz) in galactic order.
+
+    _swap_xyz() writes `out = in.transpose(1, 2, 0)`, so storage axis 0 is galactic Y,
+    axis 1 is galactic Z and axis 2 is galactic X.
+    """
+    return values[2], values[0], values[1]
+
+def galactic_to_storage(values):
+    """(nx, ny, nz) in galactic order -> (W, H, D) in storage order."""
+    return values[1], values[2], values[0]
+
+# The permutation between the two orders, as an index array: storage[k] = galactic[...].
+# Used to permute vectors (bounds) the same way the grid is permuted.
+_GALACTIC_TO_STORAGE = np.array([1, 2, 0])
+
+def _grid_axes(grid) -> tuple[np.ndarray, np.ndarray]:
+    """Validate a resolution and return it as (storage order, galactic order)."""
+    scalar = np.isscalar(grid)
+    storage = (int(grid),) * 3 if scalar else tuple(int(g) for g in grid)
+    if len(storage) != 3 or any(g <= 0 for g in storage):
+        raise ValueError(f"grid must be a positive resolution or three of them, got {grid!r}")
+    return np.array(storage, dtype=int), np.array(storage_to_galactic(storage), dtype=int)
+
 class VolumeConfig:
-    def __init__(self, grid_size=256, world_size=30.0, world_bounds=None):
-        self.grid_size = grid_size
+    """The geometry of one volume: its grid resolution and the world-space box it covers.
+
+    Both are per-axis, and both are *galactic* (x, y, z) internally - the order the
+    particle files use and the order the rasteriser indexes. The file, and therefore the
+    metadata, is in *storage* order (W, H, D) = galactic (Y, Z, X), because _swap_xyz()
+    permutes the array on the way out; see stored_grid() and stored_bounds(). Both orders
+    are written to the metadata, so neither has to be inferred from the other.
+
+    The box used to be forced to a cube (`max(span) * 1.05` on every axis). On a flat
+    galaxy disk that put most of the texture over empty space: 400 cubed of RGBA is
+    244 MiB, where a 400x400x40 grid of the *same voxel size* is 24 MiB. The grid and the
+    box have to be flattened together, or the voxels become anisotropic - the same memory,
+    but banded along the stretched axis.
+
+    Args:
+        grid: A single resolution (cubic), or three in *storage* order (W, H, D), so that
+            `--grid-size 400x40x400` means what the metadata's 'Grid size:' says.
+        world_bounds: The (min, max) data bounds, in galactic order.
+        cube: Force a cubic box of the largest span. Defaults to True for a scalar grid
+            (the historical behaviour, so `--grid-size 400` is unchanged) and False for a
+            per-axis grid, which reads as a request for a box shaped like the data.
+        world_size: Fallback box size when there are no data bounds; scalar or three
+            galactic values.
+    """
+
+    # Margin the box adds to the data bounds. compute_world_bounds() has already padded
+    # those by 5% per side, so the box ends up 10% larger than the raw particle extent,
+    # as the cubic box always has.
+    PADDING = 1.05
+
+    def __init__(self, grid=256, world_bounds=None, cube=None, world_size=30.0):
+        scalar_grid = np.isscalar(grid)
+        self.storage_grid, self.grid = _grid_axes(grid)
+
         if world_bounds is not None:
-            # Calculate world size from bounds with some padding
-            min_bound, max_bound = world_bounds
-            self.world_bounds = (min_bound, max_bound)
-            # Use the maximum dimension for a cubic volume
-            dimensions = max_bound - min_bound
-            self.world_size = np.max(dimensions) * 1.05  # 5% padding
+            self.world_bounds = (np.asarray(world_bounds[0], dtype=float),
+                                 np.asarray(world_bounds[1], dtype=float))
+            min_bound, max_bound = self.world_bounds
+            span = max_bound - min_bound
+            if scalar_grid if cube is None else cube:
+                span = np.repeat(np.max(span) * self.PADDING, 3)
+            else:
+                span = span * self.PADDING
             self.world_center = (min_bound + max_bound) / 2
         else:
-            self.world_size = world_size
             self.world_center = np.zeros(3)
-            self.world_bounds = (np.array([-world_size/2, -world_size/2, -world_size/2]), 
-                               np.array([world_size/2, world_size/2, world_size/2]))
-        
-        self.voxel_size = self.world_size / grid_size
+            side = np.asarray(world_size, dtype=float)
+            span = np.repeat(side, 3) if side.ndim == 0 else side
+            self.world_bounds = (self.world_center - span / 2, self.world_center + span / 2)
+
+        # The box, in galactic order.
+        self.world_size = span
+        self.box_min = self.world_center - span / 2
+        self.box_max = self.world_center + span / 2
+
+        # Per-axis, in galactic order. voxel_scale is the single number the isotropic
+        # kernels (the smart splat and the Gaussian blurs) want.
+        self.voxel_size = span / self.grid
+        self.voxel_scale = float(np.mean(self.voxel_size))
+
+    def set_grid(self, grid):
+        """Replace the resolution, keeping the box.
+
+        Used by --voxel-size, which derives the grid from the box rather than the box from
+        the grid, and can only be resolved once the box is known.
+        """
+        self.storage_grid, self.grid = _grid_axes(grid)
+        self.voxel_size = self.world_size / self.grid
+        self.voxel_scale = float(np.mean(self.voxel_size))
+
+    def stored_grid(self) -> np.ndarray:
+        """The grid resolution in storage order, i.e. as the metadata and the file have it."""
+        return self.storage_grid
+
+    def stored_bounds(self) -> tuple[np.ndarray, np.ndarray]:
+        """The box in storage order: the (Y, Z, X) extremes of the galactic box.
+
+        The metadata has to be in the order the *file* is indexed in, because the shader
+        turns a position into texture coordinates per axis: the first coordinate samples
+        storage axis 0. For a cubic box the two orders coincide, which is why this went
+        unnoticed until the box became flat.
+        """
+        return self.box_min[_GALACTIC_TO_STORAGE], self.box_max[_GALACTIC_TO_STORAGE]
 
 def compute_world_bounds(input_dir: str) -> tuple[np.ndarray, np.ndarray]:
     """Compute bounding box from all particle files"""
@@ -302,14 +412,23 @@ def parse_particle_file(filename: str, world_bounds: (None|tuple[np.ndarray, np.
     print(f"Parsed {channel.particle_count} particles from {channel_name}")
     return channel
 
+def to_grid_coords(positions: np.ndarray, config: VolumeConfig) -> np.ndarray:
+    """World positions -> integer grid indices, per axis, in galactic order.
+
+    The box is config.box_min..box_max, not the data bounds: the same box the metadata
+    declares, so a particle lands in the voxel index the renderer will sample it from.
+    """
+    fraction = (positions - config.box_min) / (config.box_max - config.box_min)
+    return (fraction * config.grid).astype(int)
+
 def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig) -> tuple[np.ndarray, np.ndarray]:
     """Conversion using direct voxel assignment"""
     
     print(f"Converting {channel.particle_count} particles to volume grid...")
     start_time = time.time()
     
-    density_grid = np.zeros((config.grid_size, config.grid_size, config.grid_size), dtype=np.float32)
-    color_grid = np.zeros((config.grid_size, config.grid_size, config.grid_size, 3), dtype=np.float32)
+    density_grid = np.zeros(tuple(config.grid), dtype=np.float32)
+    color_grid = np.zeros((*config.grid, 3), dtype=np.float32)
     
     if channel.particle_count == 0:
         return density_grid, color_grid
@@ -323,21 +442,10 @@ def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig
     else:
         colors = np.ones((len(channel.particles), 3))
     
-    # Convert to grid coordinates using computed bounds
-    min_bound, max_bound = config.world_bounds
-    # Center the volume around the data
-    volume_min = config.world_center - config.world_size / 2
-    volume_max = config.world_center + config.world_size / 2
+    grid_coords = to_grid_coords(positions, config)
     
-    grid_coords_float = (positions - volume_min) / (volume_max - volume_min) * config.grid_size
-    grid_coords = grid_coords_float.astype(int)
-    
-    # Filter valid particles
-    valid_mask = (
-        (grid_coords[:, 0] >= 0) & (grid_coords[:, 0] < config.grid_size) &
-        (grid_coords[:, 1] >= 0) & (grid_coords[:, 1] < config.grid_size) &
-        (grid_coords[:, 2] >= 0) & (grid_coords[:, 2] < config.grid_size)
-    )
+    # Filter valid particles. The grid is per-axis, so the test is too.
+    valid_mask = np.all((grid_coords >= 0) & (grid_coords < config.grid), axis=1)
     
     grid_coords = grid_coords[valid_mask]
     sizes = sizes[valid_mask]
@@ -374,7 +482,7 @@ def particles_to_volume_ultrafast(channel: ParticleChannel, config: VolumeConfig
     elapsed = time.time() - start_time
     print(f"Volume conversion completed in {elapsed:.2f} seconds")
     print(f"Volume density range: {density_grid.min():.6f} to {density_grid.max():.6f}")
-    print(f"Non-zero voxels: {np.sum(density_grid > 0)} / {config.grid_size ** 3}")
+    print(f"Non-zero voxels: {np.sum(density_grid > 0)} / {int(np.prod(config.grid))}")
     
     return density_grid, color_grid
 
@@ -384,8 +492,8 @@ def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) ->
     print(f"Converting {channel.particle_count} particles to volume grid (smart sampling)...")
     start_time = time.time()
     
-    density_grid = np.zeros((config.grid_size, config.grid_size, config.grid_size), dtype=np.float32)
-    color_grid = np.zeros((config.grid_size, config.grid_size, config.grid_size, 3), dtype=np.float32)
+    density_grid = np.zeros(tuple(config.grid), dtype=np.float32)
+    color_grid = np.zeros((*config.grid, 3), dtype=np.float32)
     
     if channel.particle_count == 0:
         return density_grid, color_grid
@@ -399,21 +507,10 @@ def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) ->
     else:
         colors = np.ones((len(channel.particles), 3))
     
-    # Convert to grid coordinates using computed bounds
-    min_bound, max_bound = config.world_bounds
-    # Center the volume around the data
-    volume_min = config.world_center - config.world_size / 2
-    volume_max = config.world_center + config.world_size / 2
+    grid_coords = to_grid_coords(positions, config)
     
-    grid_coords_float = (positions - volume_min) / (volume_max - volume_min) * config.grid_size
-    grid_coords = grid_coords_float.astype(int)
-    
-    # Filter valid particles
-    valid_mask = (
-        (grid_coords[:, 0] >= 0) & (grid_coords[:, 0] < config.grid_size) &
-        (grid_coords[:, 1] >= 0) & (grid_coords[:, 1] < config.grid_size) &
-        (grid_coords[:, 2] >= 0) & (grid_coords[:, 2] < config.grid_size)
-    )
+    # Filter valid particles. The grid is per-axis, so the test is too.
+    valid_mask = np.all((grid_coords >= 0) & (grid_coords < config.grid), axis=1)
     
     grid_coords = grid_coords[valid_mask]
     sizes = sizes[valid_mask]
@@ -430,7 +527,7 @@ def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) ->
     
     for i in tqdm(range(len(grid_coords)), desc="Processing particles"):
         cx, cy, cz = grid_coords[i]
-        size_factor = min(2.0, sizes[i] / config.voxel_size)  # Limit influence
+        size_factor = min(2.0, sizes[i] / config.voxel_scale)  # Limit influence
         
         # Small kernel around particle
         for dx in range(-kernel_radius, kernel_radius + 1):
@@ -440,9 +537,9 @@ def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) ->
                     y = cy + dy
                     z = cz + dz
                     
-                    if (0 <= x < config.grid_size and 
-                        0 <= y < config.grid_size and 
-                        0 <= z < config.grid_size):
+                    if (0 <= x < config.grid[0] and 
+                        0 <= y < config.grid[1] and 
+                        0 <= z < config.grid[2]):
                         
                         # Simple distance-based weight
                         dist = np.sqrt(dx**2 + dy**2 + dz**2)
@@ -623,21 +720,40 @@ def create_rgba_texture(density_grid: np.ndarray, color_grid: np.ndarray, output
 
     print(f"Saved RGBA texture: {output_path} ({rgba_8bit.nbytes / 1024 / 1024:.2f} MB raw)")
 
+def _format_axes(values) -> str:
+    """Render a per-axis quantity as '400x40x400'."""
+    return "x".join(str(int(v)) for v in values)
+
+def _format_vector(values) -> str:
+    """Render a vector the way the samples and the combiner write theirs."""
+    return "[" + ", ".join(f"{float(v):.3f}" for v in values) + "]"
+
 def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: str, basename: str,
                   color_gain: float = 1.0, color_normalize: str = "none", formats=frozenset()):
-    """Save metadata file for the volume texture"""
+    """Save metadata file for the volume texture.
+
+    The grid and the box are written in *storage* order (W, H, D), because that is the
+    order the file is indexed in and the shader turns a position into texture coordinates
+    per axis - the first coordinate indexes storage axis 0. Both were cubic while the box
+    was forced to a cube, so the two orders coincided and nothing had to say which was
+    meant. The galactic order is written on its own line as well, so a reader never has to
+    permute anything by hand.
+    """
     metadata_path = os.path.join(output_dir, f"{basename}_metadata.txt")
-    min_bound, max_bound = config.world_bounds
-    volume_min = config.world_center - config.world_size / 2
-    volume_max = config.world_center + config.world_size / 2
+    data_min, data_max = config.world_bounds
+    box_min, box_max = config.stored_bounds()
+    grid = config.stored_grid()
     
     with open(metadata_path, 'w') as f:
+        f.write("# Grid, world size, bounds and voxel size are in storage order (W, H, D)\n")
+        f.write("# = galactic (Y, Z, X), the order the file is indexed in.\n")
         f.write(f"Channel: {channel.name}\n")
-        f.write(f"Grid size: {config.grid_size}\n")
-        f.write(f"World size: {config.world_size:.3f}\n")
-        f.write(f"Data bounds: [{min_bound[0]:.3f}, {min_bound[1]:.3f}, {min_bound[2]:.3f}] to [{max_bound[0]:.3f}, {max_bound[1]:.3f}, {max_bound[2]:.3f}]\n")
-        f.write(f"Volume bounds: [{volume_min[0]:.3f}, {volume_min[1]:.3f}, {volume_min[2]:.3f}] to [{volume_max[0]:.3f}, {volume_max[1]:.3f}, {volume_max[2]:.3f}]\n")
-        f.write(f"Voxel size: {config.voxel_size:.6f}\n")
+        f.write(f"Grid size: {_format_axes(grid)}\n")
+        f.write(f"Galactic grid (x, y, z): {_format_axes(config.grid)}\n")
+        f.write(f"World size: {_format_vector(config.world_size[_GALACTIC_TO_STORAGE])}\n")
+        f.write(f"Data bounds: {_format_vector(data_min)} to {_format_vector(data_max)}\n")
+        f.write(f"Volume bounds: {_format_vector(box_min)} to {_format_vector(box_max)}\n")
+        f.write(f"Voxel size: {_format_vector(config.voxel_size[_GALACTIC_TO_STORAGE])}\n")
         f.write(f"Has color: {channel.has_color}\n")
         f.write(f"Original particle count: {channel.particle_count}\n")
         # Colour quantisation info. The gain is already applied to the stored
@@ -648,11 +764,25 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
     
     print(f"Saved metadata: {metadata_path}")
 
-def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999", group: dict = None, group_norm: str = "max"):
-    """Main conversion function"""
+def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999", group: dict = None, group_norm: str = "max", voxel_size: float = None, world_size: float = None):
+    """Main conversion function.
+
+    `grid` is one resolution or three, in storage order (W, H, D); see parse_grid_size().
+    `voxel_size` wins over it when given: the grid is then derived per axis from the box,
+    which is what keeps the voxel size of an N^3 grid while flattening only the axes where
+    the data has no extent.
+    """
 
     os.makedirs(output_dir, exist_ok=True)
-    config = VolumeConfig(grid_size=grid_size, world_bounds=world_bounds)
+    # --voxel-size derives the grid from the box, so the box has to be shaped like the data
+    # for the answer to mean anything: a cubic box would ask for just as many voxels on an
+    # axis that is mostly empty, which is the waste being avoided.
+    config = VolumeConfig(grid=grid, world_bounds=world_bounds,
+                          cube=False if voxel_size else None,
+                          world_size=world_size if world_size is not None else 30.0)
+    if voxel_size:
+        galactic_grid = [max(1, int(round(span / voxel_size))) for span in config.world_size]
+        config.set_grid(galactic_to_storage(galactic_grid))
     
     particle_files = [f for f in os.listdir(input_dir) if f.endswith('.dat.gz') and not must_skip(f)]
     
@@ -661,7 +791,14 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid_size: int
         return
     
     print(f"Found {len(particle_files)} particle files to process")
-    print(f"Volume configuration: {grid_size}³ grid, world size {config.world_size:.3f}")
+    print(f"Grid: {_format_axes(config.stored_grid())} (storage, WxHxD) = "
+          f"{_format_axes(config.grid)} (galactic, x, y, z)")
+    print(f"Box and voxel below are galactic: {_format_vector(config.box_min)} to "
+          f"{_format_vector(config.box_max)}, voxel {_format_vector(config.voxel_size)}")
+    if not np.allclose(config.voxel_size, config.voxel_size[0], rtol=0.1):
+        print("Warning: the grid is not proportional to the box, so the voxels are "
+              "anisotropic - the same memory, but banded along the stretched axis. A "
+              "grid with roughly span_proportional axes gives cubic voxels.")
     print(f"Using method: {method}")
     print(f"Writing formats: {'|'.join(sorted(formats))} (colour normalization: {color_normalize})")
     
@@ -739,9 +876,24 @@ def main():
     
     parser.add_argument(
         "--grid-size",
-        type=int,
-        default=128,  # Reduced default for speed
-        help="Resolution of the 3D volume grid (cubed)"
+        type=parse_grid_size,
+        default=None,
+        metavar="N|WxHxD",
+        help="Grid resolution: one number for a cubic grid, or three as WxHxD. The three "
+             "are in storage order (the order of the file, and of the metadata's 'Grid "
+             "size:'), i.e. galactic (Y, Z, X) - a flat disk wants '400x40x400', a 400 "
+             "wide, 40 tall and 400 deep texture. A per-axis grid also makes the box "
+             "follow the data instead of being forced to a cube. Default: 128."
+    )
+    
+    parser.add_argument(
+        "--voxel-size",
+        type=float,
+        default=None,
+        metavar="SIZE",
+        help="World size of one voxel, as an alternative to --grid-size: the grid is "
+             "derived per axis from the box. Use it to keep the voxel size of an N^3 grid "
+             "while flattening the axes where the data has no extent."
     )
     
     parser.add_argument(
@@ -804,6 +956,10 @@ def main():
     
     args = parser.parse_args()
 
+    if args.voxel_size is not None and args.grid_size is not None:
+        parser.error("--grid-size and --voxel-size are alternatives; pass one")
+    grid = args.grid_size if args.grid_size is not None else 128
+
     if args.group is not None and "rgba" not in args.format:
         print("Error: --group merges the RGBA textures, so 'rgba' must be in --format")
         return 1
@@ -825,7 +981,11 @@ def main():
     print("Gaia Sky Particle to Volume Converter")
     print(f"Input: {args.input_dir}")
     print(f"Output: {args.output_dir}")
-    print(f"Grid size: {args.grid_size}")
+    if args.voxel_size is not None:
+        print(f"Voxel size: {args.voxel_size} (the grid follows the box)")
+    else:
+        print(f"Grid size: {grid if isinstance(grid, int) else _format_axes(grid)}"
+              + ("" if isinstance(grid, int) else " (storage, WxHxD)"))
     
     try:
         # Compute world bounds from all files
@@ -838,13 +998,15 @@ def main():
         status = convert_particles_to_volumes(
             input_dir=args.input_dir,
             output_dir=args.output_dir,
-            grid_size=args.grid_size,
+            grid=grid,
             world_bounds=world_bounds,
             method=args.method,
             formats=args.format,
             color_normalize=args.color_normalize,
             group=args.group,
-            group_norm=args.group_norm
+            group_norm=args.group_norm,
+            voxel_size=args.voxel_size,
+            world_size=args.fixed_world_size
         )
         if status:
             print("\nThe conversion succeeded but the group merge failed; see above.")

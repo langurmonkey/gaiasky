@@ -112,16 +112,50 @@ def _volume_basename(path: str) -> tuple[str, str]:
     return directory, name
 
 
-def _detect_format(total_bytes: int) -> tuple[int | None, int | None]:
-    """Grid edge and channel count from the file size, as VolumeTextureLoader does."""
+def _detect_format(total_bytes: int, declared_grid=None) -> tuple[tuple | None, int | None]:
+    """Resolve the grid and the channel count, from the metadata where possible.
+
+    With a declared grid the resolution comes from it and only the channel count is read
+    off the file size. That is the only way to handle a grid that is not a cube: a byte
+    count says nothing about how the voxels are split between the axes, so 400x400x40 is
+    simply unclassifiable from its size alone. VolumeTextureLoader does the same, for the
+    same reason. Without a declared grid, the cube a byte count implies.
+    """
+    if declared_grid is not None:
+        voxels = int(np.prod(declared_grid))
+        if voxels > 0 and total_bytes % voxels == 0:
+            channels = total_bytes // voxels
+            if channels in (1, 3, 4):
+                return tuple(int(g) for g in declared_grid), int(channels)
+        return None, None
+
     for channels in (1, 4, 3):
         voxels = total_bytes / channels
         if voxels != int(voxels):
             continue
         edge = int(round(voxels ** (1.0 / 3.0)))
         if edge > 0 and edge ** 3 * channels == total_bytes:
-            return edge, channels
+            return (edge, edge, edge), channels
     return None, None
+
+
+def _storage_to_galactic(grid) -> tuple[int, int, int]:
+    """Storage order (W, H, D) -> galactic (x, y, z).
+
+    The inverse of what _swap_xyz() does when writing: an array read back with
+    _unswap_xyz() is laid out in galactic order, so its shape is the galactic grid, while
+    the metadata and the file describe it in storage order.
+    """
+    return int(grid[2]), int(grid[0]), int(grid[1])
+
+
+def _format_grid(grid) -> str:
+    """Render a grid resolution as '400x40x400'."""
+    return "x".join(str(int(g)) for g in grid)
+
+
+def _format_vector(values) -> str:
+    return "[" + ", ".join(f"{float(v):.3f}" for v in values) + "]"
 
 
 # ---------------------------------------------------------------------------
@@ -170,9 +204,22 @@ def _parse_color_gain(meta: dict) -> float:
     return gain if gain > 0 else 1.0
 
 
-def _parse_int(meta: dict, key: str) -> int | None:
-    match = _GAIN_RE.search(meta.get(key, ""))
-    return int(float(match.group(1))) if match else None
+_GRID_RE = re.compile(r"^\s*(\d+)\s*(?:[xX*,\s]\s*(\d+)\s*[xX*,\s]\s*(\d+))?\s*$")
+
+
+def _parse_grid(meta: dict) -> tuple[int, int, int] | None:
+    """Read 'Grid size:', either one resolution (a cube) or 'WxHxD'.
+
+    The three, when there are three, are in storage order (W, H, D) - the order the file
+    is indexed in - which is what VolumeTextureLoader reads them as.
+    """
+    match = _GRID_RE.match(meta.get("grid size", ""))
+    if not match:
+        return None
+    if match.group(2) is None:
+        edge = int(match.group(1))
+        return (edge, edge, edge)
+    return (int(match.group(1)), int(match.group(2)), int(match.group(3)))
 
 
 # ---------------------------------------------------------------------------
@@ -183,9 +230,10 @@ def _parse_int(meta: dict, key: str) -> int | None:
 class VolumeInput:
     path: str
     key: str                       # channel basename, e.g. 'galaxy_Gas'
-    grid: int
-    density: np.ndarray            # float32 (n, n, n), [0, 1]
-    rgb: np.ndarray | None         # float32 (n, n, n, 3), [0, 1], gains undone
+    grid: tuple[int, int, int]     # galactic (x, y, z): the shape of the arrays below
+    storage_grid: tuple[int, int, int]  # (W, H, D): what the metadata and the file say
+    density: np.ndarray            # float32 (galactic grid), [0, 1]
+    rgb: np.ndarray | None         # float32 (galactic grid, 3), [0, 1], gains undone
     color_gain: float
     metadata: dict
     weight: float = 1.0
@@ -196,32 +244,42 @@ def load_input(path: str) -> VolumeInput:
         raise SystemExit(f"error: no such file: {path}")
 
     data = np.frombuffer(_read_bytes(path), dtype=np.uint8)
-    grid, channels = _detect_format(data.size)
-    if grid is None:
+
+    directory, key = _volume_basename(path)
+    meta = _read_metadata(path)
+    declared_grid = _parse_grid(meta)
+
+    storage_grid, channels = _detect_format(data.size, declared_grid)
+    if storage_grid is None:
+        if declared_grid is not None:
+            raise SystemExit(
+                f"error: {path}: {data.size} bytes is not a "
+                f"{_format_grid(declared_grid)} grid of 1, 3 or 4 channels, which is what "
+                "its metadata declares. The texture and its metadata are out of step (a "
+                "stale or truncated file?); refusing to merge with guessed geometry."
+            )
         raise SystemExit(
             f"error: {path}: cannot detect the volume format from {data.size} bytes. "
-            "Expected n^3 (density), 3*n^3 (color) or 4*n^3 (color+density)."
+            "Expected n^3 (density), 3*n^3 (color) or 4*n^3 (color+density), or a "
+            "'Grid size:' in the metadata."
         )
+    if declared_grid is None:
+        # Legitimate for the cubic volumes written before the metadata carried a grid, but
+        # it cannot be told apart from a non-cubic volume whose byte count happens to admit
+        # a cubic reading, so say which one was assumed.
+        print(f"  note: {key} has no 'Grid size:' in its metadata, so its grid was "
+              f"inferred from the file length as {_format_grid(storage_grid)} "
+              f"({channels} channel{'s' if channels > 1 else ''}). A non-cubic grid "
+              "cannot be recovered that way.", file=sys.stderr)
     if channels == 3:
         raise SystemExit(
             f"error: {path}: an RGB volume carries no density, so it cannot be merged. "
             "Combine the _rgba or _density artifact instead."
         )
 
-    directory, key = _volume_basename(path)
-    meta = _read_metadata(path)
-
-    declared_grid = _parse_int(meta, "grid size")
-    if declared_grid is not None and declared_grid != grid:
-        raise SystemExit(
-            f"error: {path}: {data.size} bytes is a {grid}^3 texture with {channels} "
-            f"channel(s), but its metadata says 'Grid size: {declared_grid}'. The "
-            "texture and its metadata are out of step (a stale or truncated file?); "
-            "refusing to merge with guessed bounds."
-        )
-
-    volume = _unswap_xyz(data.reshape((grid, grid, grid, channels) if channels == 4
-                                      else (grid, grid, grid)))
+    # The file is in storage order; unswap it into galactic order, which is the order the
+    # generator worked in and the order everything below merges in.
+    volume = _unswap_xyz(data.reshape((*storage_grid, channels) if channels == 4 else storage_grid))
 
     density = np.ascontiguousarray(volume[..., 3] if channels == 4 else volume)
     density = density.astype(np.float32)
@@ -239,7 +297,8 @@ def load_input(path: str) -> VolumeInput:
             rgb *= np.float32(1.0 / gain)
     del volume
 
-    return VolumeInput(path=path, key=key, grid=grid, density=density, rgb=rgb,
+    return VolumeInput(path=path, key=key, grid=_storage_to_galactic(storage_grid),
+                       storage_grid=storage_grid, density=density, rgb=rgb,
                        color_gain=gain, metadata=meta)
 
 
@@ -287,10 +346,10 @@ def merge(inputs: list[VolumeInput], norm: str, fallback_color: tuple[float, flo
 
     Returns (rgb, density, peak, has_color).
     """
-    edge = inputs[0].grid
-    density = np.zeros((edge, edge, edge), dtype=np.float32)
-    rgb_sum = np.zeros((edge, edge, edge, 3), dtype=np.float32)
-    weight_sum = np.zeros((edge, edge, edge), dtype=np.float32)
+    shape = tuple(int(g) for g in inputs[0].grid)
+    density = np.zeros(shape, dtype=np.float32)
+    rgb_sum = np.zeros((*shape, 3), dtype=np.float32)
+    weight_sum = np.zeros(shape, dtype=np.float32)
     scratch = None
 
     for volume in inputs:
@@ -344,21 +403,29 @@ def write_rgba(rgb: np.ndarray, density: np.ndarray, output_path: str):
 
 
 def save_metadata(inputs: list[VolumeInput], group: str, output_dir: str, basename: str,
-                  grid: int, world_size: float, bounds_min: np.ndarray, bounds_max: np.ndarray,
+                  grid: tuple[int, int, int], bounds_min: np.ndarray, bounds_max: np.ndarray,
                   norm: str, peak: float, color_mode: str, color_gain: float, has_color: bool,
                   clipped: int):
     """Write <basename>_metadata.txt, in the shape the generator writes and
-    VolumeTextureLoader reads."""
+    VolumeTextureLoader reads.
+
+    The grid and the box are the inputs' own, in *storage* order (W, H, D) - the order the
+    file is indexed in, which is the order the shader samples it in too. The generator
+    writes a matching note at the top of its metadata; this keeps the two files
+    interchangeable for the loader.
+    """
     metadata_path = os.path.join(output_dir, f"{basename}_metadata.txt")
+    grid = tuple(int(g) for g in grid)
+    world_size = np.asarray(bounds_max, dtype=float) - np.asarray(bounds_min, dtype=float)
 
     with open(metadata_path, "w") as f:
+        f.write("# Grid, world size, bounds and voxel size are in storage order (W, H, D).\n")
         f.write(f"Channel: {'+'.join(v.key for v in inputs)}\n")
         f.write(f"Group: {group}\n")
-        f.write(f"Grid size: {grid}\n")
-        f.write(f"World size: {world_size:.3f}\n")
-        f.write(f"Volume bounds: [{bounds_min[0]:.3f}, {bounds_min[1]:.3f}, {bounds_min[2]:.3f}]"
-                f" to [{bounds_max[0]:.3f}, {bounds_max[1]:.3f}, {bounds_max[2]:.3f}]\n")
-        f.write(f"Voxel size: {world_size / grid:.6f}\n")
+        f.write(f"Grid size: {_format_grid(grid)}\n")
+        f.write(f"World size: {_format_vector(world_size)}\n")
+        f.write(f"Volume bounds: {_format_vector(bounds_min)} to {_format_vector(bounds_max)}\n")
+        f.write(f"Voxel size: {_format_vector(world_size / np.asarray(grid, dtype=float))}\n")
         f.write(f"Has color: {has_color}\n")
         f.write(f"Formats: rgba\n")
         f.write(f"Color gain: {color_gain:.6f} (mode: {color_mode})\n")
@@ -422,10 +489,6 @@ def common_prefix(keys: list[str]) -> str:
     return prefix
 
 
-def _format_vector(vector) -> str:
-    return "[" + ", ".join(f"{float(x):.3f}" for x in vector) + "]"
-
-
 def check_alignment(inputs: list[VolumeInput]):
     """Refuse to merge textures that do not share a grid and a volume box."""
     reference = inputs[0]
@@ -439,11 +502,11 @@ def check_alignment(inputs: list[VolumeInput]):
         )
 
     for volume in inputs[1:]:
-        if volume.grid != reference.grid:
+        if tuple(volume.storage_grid) != tuple(reference.storage_grid):
             raise SystemExit(
-                f"error: {volume.path} is {volume.grid}^3 but {reference.path} is "
-                f"{reference.grid}^3. Merging different grids needs a resample, which "
-                "this script does not do."
+                f"error: {volume.path} is {_format_grid(volume.storage_grid)} but "
+                f"{reference.path} is {_format_grid(reference.storage_grid)}. Merging "
+                "different grids needs a resample, which this script does not do."
             )
         other_min, other_max = _parse_bounds(volume.metadata)
         if other_min is None:
@@ -537,13 +600,12 @@ def main():
         resolve_weight(name, volumes).weight = weight
 
     bounds_min, bounds_max, reference = check_alignment(volumes)
-    world_size = float(np.max(bounds_max - bounds_min))
-    grid = reference.grid
+    grid = tuple(int(g) for g in reference.storage_grid)
     prefix = args.prefix if args.prefix is not None else common_prefix([v.key for v in volumes])
 
     for name, paths in groups:
         inputs = [all_inputs[path] for path in paths]
-        print(f"\n{name.capitalize()} group (grid {grid}^3, "
+        print(f"\n{name.capitalize()} group (grid {_format_grid(grid)}, "
               f"bounds {_format_vector(bounds_min)} to {_format_vector(bounds_max)}):")
         for volume in inputs:
             print(f"  {volume.key:<24} weight {volume.weight:<6g} "
@@ -562,7 +624,7 @@ def main():
 
         basename = f"{prefix}{name}"
         write_rgba(rgb, density, os.path.join(args.out_dir, f"{basename}_rgba.raw.gz"))
-        save_metadata(inputs, name, args.out_dir, basename, grid, world_size,
+        save_metadata(inputs, name, args.out_dir, basename, grid,
                       bounds_min, bounds_max, args.norm, peak, args.color_normalize,
                       color_gain, has_color, clipped)
         del rgb, density

@@ -1,18 +1,43 @@
 
+# Grids are 'N' (cubic) or 'WxHxD'. The three are in storage order, the order of the file
+# and of the metadata's 'Grid size:', which is galactic (Y, Z, X) - a flat disk, whose
+# thickness is the galactic Z, wants the middle number small (e.g. 400x40x400).
+#
+# VARIADIC ARGS ARE INTERPOLATED UNQUOTED. '{{args}}' splices the extra arguments into
+# the command line as raw text, so anything the shell reads as syntax breaks: a group
+# spec contains a '|', and `--group 'Gas+Bulge:0.6|ArmDust'` arrives at the recipe as
+# `--group Gas+Bulge:0.6|ArmDust`, where the shell takes the '|' for a pipe ("ArmDust:
+# command not found"). Recipes that take a group spec therefore take it as a *named*
+# parameter and quote it themselves; for the others, escape the metacharacter
+# (`--group Gas+Bulge:0.6\|ArmDust`), which the shell then hands over intact.
+
 # Create a 3D texture from particle data using smart method.
 tex gridsize formats input output *args:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size {{gridsize}} --format '{{formats}}' {{args}} {{input}} {{output}}
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size '{{gridsize}}' --format '{{formats}}' {{args}} {{input}} {{output}}
 
 # Create a 3D texture from particle data using fast method.
 texfast gridsize input output:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --grid-size {{gridsize}} {{input}} {{output}} 
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --grid-size '{{gridsize}}' {{input}} {{output}}
+
+# Create a 3D texture with a voxel size instead of a grid: the grid follows the box on
+# each axis, so the detail of an N^3 grid is kept without spending voxels on the axes the
+# data has no extent in. This is the usual way to make a flat volume.
+texvoxel voxelsize input output *args:
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --voxel-size {{voxelsize}} --format rgba {{args}} {{input}} {{output}}
+
+# Same, and merge the channels into one emissive and one occlusive texture in one go.
+# 'group' is a positional argument ('<emissive>|<occlusive>', each side a '+'-separated
+# list of channel names with an optional ':weight'), because a group spec cannot travel
+# through *args - see the note at the top of this file.
+texvoxelgroup voxelsize group input output *args:
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --voxel-size {{voxelsize}} --format rgba --group '{{group}}' {{args}} {{input}} {{output}}
 
 # Convert particles and merge the channels into one emissive and one occlusive
 # texture in one go. 'group' is '<emissive>|<occlusive>', each side a
 # '+'-separated list of channel names with an optional ':weight', e.g.
 # 'Gas+Bulge:0.6|ArmDust'.
 texgroup gridsize group input output:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size {{gridsize}} --format rgba --group '{{group}}' {{input}} {{output}}
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size '{{gridsize}}' --format rgba --group '{{group}}' {{input}} {{output}}
 
 # Merge volume textures into an emissive and an occlusive one. The options are passed
 # straight through, e.g. (all on one line):

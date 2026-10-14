@@ -40,6 +40,12 @@ import java.util.zip.GZIPInputStream;
  * gzip-compressed, with a {@code _metadata.txt} sidecar that gives the world-space box and, since
  * non-cubic grids are supported, the {@code Grid size:}. The metadata's grid is authoritative when
  * present, because a byte count alone can only ever yield a cube.
+ * <p>
+ * Everything the metadata describes - grid, box - is in the file's own (W, H, D) order. The texture
+ * GL ends up with indexes those axes in reverse, because {@code glTexImage3D} varies its first axis
+ * fastest while a C-order array varies its last one fastest. {@link #glGrid} and {@link #glBounds}
+ * apply that permutation, and they have to be applied together. See {@link #glGrid} for why this
+ * only ever bites on a non-cubic grid.
  */
 public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, VolumeTextureLoader.VolumeTextureParameter> {
     private static final Logger.Log logger = Logger.getLogger(VolumeTextureLoader.class);
@@ -178,6 +184,60 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             case 4 -> VolumeType.RGBA;
             default -> null;
         };
+    }
+
+    /**
+     * The grid to declare to {@link CustomTexture3DData}, given the grid the metadata describes.
+     * <p>
+     * This reverses the three numbers, and the reason is the memory layout. A volume file is a
+     * C-order dump of an (W, H, D, C) array, so its fastest varying spatial axis is the <em>last</em>
+     * one, D. {@code glTexImage3D} reads its client buffer with the <em>first</em> axis, width,
+     * varying fastest. Declaring the extents in the file's own order therefore reads the buffer with
+     * the wrong stride: GL's x advances one element at a time down a file that only advances a whole
+     * D line every W elements, so every row is sheared by one element relative to the last and the
+     * volume comes out as a fan of slabs - and it does so silently, because the buffer is exactly the
+     * right length.
+     * <p>
+     * While every grid was a cube this was invisible: with W = D the two orders are the same three
+     * numbers, and the shear degenerates into a clean transposition of the data. A transposition of a
+     * cube is a cube, so the volume merely rendered with its axes permuted, and an axisymmetric gas
+     * disk hides a permutation of its own plane. The first non-cubic grid ever loaded was the first
+     * one to be visibly wrong.
+     * <p>
+     * Declaring the extents reversed makes GL's x the file's last axis, GL's y the middle one and
+     * GL's z the first: a clean transposition, which is the read every cubic volume has always had.
+     * It is a no-op for a cube (three equal numbers reverse to themselves), so no existing volume
+     * changes.
+     * <p>
+     * Package-private and free of I/O so the rule can be tested directly.
+     *
+     * @param grid The grid as the metadata describes it, i.e. in the file's (W, H, D) order.
+     *
+     * @return The grid in texture order, (D, H, W), to hand to {@link CustomTexture3DData}.
+     */
+    static Trio<Integer, Integer, Integer> glGrid(Trio<Integer, Integer, Integer> grid) {
+        return new Trio<>(grid.getThird(), grid.getSecond(), grid.getFirst());
+    }
+
+    /**
+     * The box the shader compares against, given the box the metadata describes.
+     * <p>
+     * The shader turns a position into texture coordinates component-wise, so its x normalises over
+     * the texture's x extent, which by {@link #glGrid} is the file's <em>last</em> axis. The metadata
+     * says that extent first. The box is therefore reversed for the same reason the grid is, and by
+     * the same permutation, so that the two stay consistent: reversing one without the other would
+     * map the box onto the wrong axes, which on a flat volume stretches the thin axis over the wide
+     * one.
+     * <p>
+     * A no-op for a cubic box, which is what every volume written before non-cubic grids existed
+     * has (to within the sub-voxel wobble of one that is not exactly centred on the origin).
+     *
+     * @param bounds The box as the metadata describes it, in the file's (W, H, D) order.
+     *
+     * @return The box in texture order, (D, H, W).
+     */
+    static Vector3 glBounds(Vector3 bounds) {
+        return new Vector3(bounds.z, bounds.y, bounds.x);
     }
 
     /**
@@ -410,22 +470,27 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             ));
         }
 
-        Vector3 boundsMin = metadata.boundsMin();
-        Vector3 boundsMax = metadata.boundsMax();
+        // The file's own order (W, H, D) is not the order GL reads it in, and the box has to be
+        // turned into the same frame as the texture, so the two go together: see glGrid and
+        // glBounds. Everything above this line is about the file; everything below is about the
+        // texture.
+        Trio<Integer, Integer, Integer> glGrid = glGrid(dimensions);
+        Vector3 boundsMin = glBounds(metadata.boundsMin());
+        Vector3 boundsMax = glBounds(metadata.boundsMax());
 
         // The box and the grid are independent, so the voxels need not be cubes. Worth saying out
         // loud: an anisotropic grid renders correctly (the shader normalises over the box) but its
         // voxels are stretched, which shows as banding along the stretched axis.
         if (width != height || height != depth) {
-            logger.info(String.format("Volume grid is not cubic: voxel size %.6f x %.6f x %.6f world units",
-                                      (boundsMax.x - boundsMin.x) / width,
-                                      (boundsMax.y - boundsMin.y) / height,
-                                      (boundsMax.z - boundsMin.z) / depth));
+            logger.info(String.format("Volume grid is not cubic: voxel size %.6f x %.6f x %.6f world units (texture x, y, z)",
+                                      (boundsMax.x - boundsMin.x) / glGrid.getFirst(),
+                                      (boundsMax.y - boundsMin.y) / glGrid.getSecond(),
+                                      (boundsMax.z - boundsMin.z) / glGrid.getThird()));
         }
 
         // Create Texture3DData
         CustomTexture3DData textureData = new CustomTexture3DData(
-                width, height, depth,
+                glGrid.getFirst(), glGrid.getSecond(), glGrid.getThird(),
                 0, // mipMapLevel
                 type.glFormat,
                 type.glInternalFormat,

@@ -7,6 +7,7 @@
 
 package gaiasky.render.gdx.loader;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.render.gdx.graphics.VolumeType;
 import gaiasky.util.Trio;
@@ -193,6 +194,96 @@ public class VolumeTextureLoaderTest {
     public void lengthsThatAreNoVolumeAtAllAreRejected() {
         assertCannotDetect(1001);
         assertCannotDetect(0);
+    }
+
+    @Test
+    public void parsesWhatTheGeneratorActuallyWrites() {
+        // Verbatim from `particles-to-3dtex.py --grid-size 60x15x60`, so that the generator
+        // and the loader stay pinned to each other. The '#' lines have no key and must be
+        // skipped, as must the extra keys (Galactic grid, Data bounds, ...); the grid is a
+        // vector in storage order, which is the order the file is indexed in.
+        String generated = """
+                # Grid, world size, bounds and voxel size are in storage order (W, H, D)
+                # = galactic (Y, Z, X), the order the file is indexed in.
+                Channel: galaxy_Gas.dat.gz
+                Grid size: 60x15x60
+                Galactic grid (x, y, z): 60x60x15
+                World size: [7.058, 7.071, 0.704]
+                Data bounds: [-3.348, -3.372, -0.343] to [3.373, 3.363, 0.328]
+                Volume bounds: [-3.540, -0.359, -3.516] to [3.532, 0.345, 3.541]
+                Voxel size: [0.118, 0.118, 0.047]
+                Has color: True
+                Original particle count: 14864
+                Formats: rgba
+                Color gain: 21.203079 (mode: p999)
+                """;
+
+        var metadata = VolumeTextureLoader.parseMetadata(generated);
+
+        assertGrid(metadata.grid(), 60, 15, 60);
+        Assert.assertEquals(-3.540f, metadata.boundsMin().x, 1e-6f);
+        Assert.assertEquals(-0.359f, metadata.boundsMin().y, 1e-6f);
+        Assert.assertEquals(-3.516f, metadata.boundsMin().z, 1e-6f);
+        Assert.assertEquals(3.532f, metadata.boundsMax().x, 1e-6f);
+        Assert.assertEquals(0.345f, metadata.boundsMax().y, 1e-6f);
+        Assert.assertEquals(3.541f, metadata.boundsMax().z, 1e-6f);
+
+        // And the grid the metadata declares is the one the file length implies.
+        var detection = VolumeTextureLoader.detectVolumeTypeAndDimensions(
+                60L * 15 * 60 * 4, metadata.grid());
+        Assert.assertEquals(VolumeType.RGBA, detection.type());
+        assertGrid(detection.dimensions(), 60, 15, 60);
+
+        // A scalar grid, as the cubic runs wrote it before per-axis grids existed, still
+        // reads as a cube.
+        assertGrid(VolumeTextureLoader.parseMetadata("Grid size: 40\n").grid(), 40, 40, 40);
+    }
+
+    @Test
+    public void theTexturePutsTheFilesLastAxisFirst() {
+        // glTexImage3D varies its first axis fastest, and a .raw file varies its last one
+        // fastest, so the extents GL is told about are the file's in reverse. The most common
+        // shape of all - a cube - reverses to itself, which is why this went unnoticed.
+        assertGrid(VolumeTextureLoader.glGrid(new Trio<>(400, 400, 400)), 400, 400, 400);
+        assertGrid(VolumeTextureLoader.glGrid(new Trio<>(60, 15, 60)), 60, 15, 60);
+        assertGrid(VolumeTextureLoader.glGrid(new Trio<>(400, 40, 399)), 399, 40, 400);
+        assertGrid(VolumeTextureLoader.glGrid(new Trio<>(200, 100, 50)), 50, 100, 200);
+    }
+
+    @Test
+    public void theBoxIsReversedWithTheGrid() {
+        // The box has to be turned into the texture's frame by the same permutation as the grid,
+        // or the thin axis of a flat volume is normalised over the wide extent of the texture.
+        Vector3 box = VolumeTextureLoader.glBounds(new Vector3(-3.540f, -0.359f, -3.516f));
+
+        Assert.assertEquals(-3.516f, box.x, 1e-6f);
+        Assert.assertEquals(-0.359f, box.y, 1e-6f);
+        Assert.assertEquals(-3.540f, box.z, 1e-6f);
+
+        // A cubic box is its own reverse, so nothing written before non-cubic grids existed
+        // changes: the two calls must be indistinguishable for every cube.
+        Vector3 cube = VolumeTextureLoader.glBounds(new Vector3(-3.0718f, -3.0718f, -3.0718f));
+        Assert.assertEquals(cube.x, -3.0718f, 1e-6f);
+        Assert.assertEquals(cube.y, -3.0718f, 1e-6f);
+        Assert.assertEquals(cube.z, -3.0718f, 1e-6f);
+    }
+
+    @Test
+    public void gridAndBoxStayPairedThroughTheReversal() {
+        // The shader normalises each axis over the box's own component, so whichever extent is
+        // first in the box must be the extent associated with the grid's first number. Reversing
+        // both keeps them paired; reversing one is what stretches the volume.
+        var grid = VolumeTextureLoader.glGrid(new Trio<>(400, 40, 399));
+        Vector3 min = VolumeTextureLoader.glBounds(new Vector3(-3.540f, -0.359f, -3.516f));
+        Vector3 max = VolumeTextureLoader.glBounds(new Vector3(3.532f, 0.345f, 3.541f));
+
+        // Every voxel of a grid generated with a single --voxel-size is a cube, and the pairing
+        // is what says so: 7.072/400, 0.704/40 and 7.057/399 all come out at 0.0177.
+        float voxelX = (max.x - min.x) / grid.getFirst();
+        float voxelY = (max.y - min.y) / grid.getSecond();
+        float voxelZ = (max.z - min.z) / grid.getThird();
+        Assert.assertEquals(voxelX, voxelY, 1e-4f);
+        Assert.assertEquals(voxelY, voxelZ, 1e-4f);
     }
 
     private static void assertGrid(Trio<Integer, Integer, Integer> grid, int width, int height, int depth) {
