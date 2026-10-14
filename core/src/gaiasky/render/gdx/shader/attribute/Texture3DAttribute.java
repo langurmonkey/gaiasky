@@ -39,6 +39,20 @@ public class Texture3DAttribute extends Attribute {
      * the legacy density-only behaviour.
      */
     public VolumeType volumeType = VolumeType.DENSITY;
+    /**
+     * Minimum density for this slot to be treated as an occluder in the depth-only pre-pass
+     * ({@link gaiasky.render.RenderGroup#VOLUME_DEPTH}). A sample of this volume contributes to
+     * the written depth only where its density exceeds this value.
+     * <p>
+     * Zero (the default) or negative means the slot never occludes: it still renders, but
+     * nothing can be hidden behind it. That is the right default for a volume that only emits
+     * (gas): opacity is the job of the absorbing volume, and a faint emissive shell must not
+     * punch an opaque hole in the star field.
+     * <p>
+     * The whole depth pass is skipped for a volume whose scene sets
+     * {@code "writeDepth": false}.
+     */
+    public float depthThreshold = 0f;
 
     public Texture3DAttribute(int index) {
         super(index);
@@ -89,6 +103,7 @@ public class Texture3DAttribute extends Attribute {
              copyFrom.scaleV,
              copyFrom.scaleW,
              copyFrom.volumeType);
+        this.depthThreshold = copyFrom.depthThreshold;
     }
 
     @Override
@@ -107,6 +122,7 @@ public class Texture3DAttribute extends Attribute {
         result = 991 * result + NumberUtils.floatToRawIntBits(scaleV);
         result = 991 * result + NumberUtils.floatToRawIntBits(scaleW);
         result = 991 * result + volumeType.ordinal();
+        result = 991 * result + NumberUtils.floatToRawIntBits(depthThreshold);
         return result;
     }
 
@@ -132,6 +148,8 @@ public class Texture3DAttribute extends Attribute {
             return offsetW > other.offsetW ? 1 : -1;
         if (volumeType != other.volumeType)
             return volumeType.ordinal() < other.volumeType.ordinal() ? -1 : 1;
+        if (!MathUtils.isEqual(depthThreshold, other.depthThreshold))
+            return depthThreshold > other.depthThreshold ? 1 : -1;
         return 0;
     }
 }

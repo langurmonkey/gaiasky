@@ -15,10 +15,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * The storage format of a volume texture lives in {@link Texture3DAttribute#volumeType} and is
- * consumed by the renderer to decide whether a texel carries density alone (R8, `.r`) or colour
- * plus density (RGBA, `.rgb` + `.a`). These tests pin the parts that fail silently if the field is
- * dropped anywhere along the copy path.
+ * The storage format of a volume texture lives in {@link Texture3DAttribute#volumeType} and its
+ * role as a depth-buffer occluder in {@link Texture3DAttribute#depthThreshold}. Both are consumed
+ * by the renderer and both fail silently if dropped anywhere along the copy path, so they are
+ * pinned here.
  */
 public class Texture3DAttributeTest {
 
@@ -91,5 +91,38 @@ public class Texture3DAttributeTest {
         Assert.assertEquals(original.getMask(), other.getMask());
         Assert.assertNotEquals(original.attributesHash(), other.attributesHash());
         Assert.assertNotEquals(original.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void depthThresholdDefaultsToNoOcclusion() {
+        // A slot with no threshold must not write depth: a purely emissive volume (gas) is not an
+        // occluder, and only the scene saying otherwise should make it one.
+        Assert.assertEquals(0f, new Texture3DAttribute(Texture3DAttribute.Volume1).depthThreshold, 0f);
+        Assert.assertEquals(0f, new Texture3DAttribute(Texture3DAttribute.Volume1, NO_TEXTURE).depthThreshold, 0f);
+        Assert.assertEquals(0f, vol0(VolumeType.RGBA).depthThreshold, 0f);
+    }
+
+    @Test
+    public void copyPreservesDepthThreshold() {
+        Texture3DAttribute dust = vol0(VolumeType.RGBA);
+        dust.depthThreshold = 0.02f;
+
+        Texture3DAttribute copy = (Texture3DAttribute) dust.copy();
+        Assert.assertEquals(0.02f, copy.depthThreshold, 0f);
+        Assert.assertEquals(dust.hashCode(), copy.hashCode());
+        Assert.assertEquals(0, dust.compareTo(copy));
+    }
+
+    @Test
+    public void depthThresholdParticipatesInHashAndOrder() {
+        // Two materials that differ only in whether the volume occludes must not hash the same,
+        // or a renderer keyed on the material would treat them as interchangeable.
+        Texture3DAttribute emitting = vol0(VolumeType.RGBA);
+        Texture3DAttribute occluding = vol0(VolumeType.RGBA);
+        occluding.depthThreshold = 0.05f;
+
+        Assert.assertNotEquals(emitting.hashCode(), occluding.hashCode());
+        Assert.assertTrue(emitting.compareTo(occluding) < 0);
+        Assert.assertTrue(occluding.compareTo(emitting) > 0);
     }
 }

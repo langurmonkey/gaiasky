@@ -412,6 +412,10 @@
       "fragmentShader": {
         "description": "The fragment shader to use. Prefix with ``\"$data/\"`` to use a shader in a dataset.",
         "unit": "String"
+      },
+      "writeDepth": {
+        "description": "Whether this volume writes to the depth buffer. Enabled by default, so the volume occludes whatever is drawn after it (labels, grids, stars, planets), using the depth of the first sample that found material. Set to false to always see through the volume.",
+        "unit": "Boolean"
       }
     },
     "Atmosphere": {

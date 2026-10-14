@@ -699,6 +699,9 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
      *     <li>blendMode = alpha -> depth reads and writes</li>
      *     <li>blendMode = additive -> depth reads but no writes</li>
      * </ul>
+     * Volumes do not use this: they write depth regardless of the blend mode, so that an
+     * additive-blended volume still occludes what is drawn after it. See
+     * {@link gaiasky.scene.component.Volume#writeDepth}.
      */
     public void updateDepthTest() {
         switch (blendMode) {

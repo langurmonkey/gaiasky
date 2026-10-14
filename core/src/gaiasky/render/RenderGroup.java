@@ -27,6 +27,17 @@ public enum RenderGroup {
      **/
     MODEL_VERT_GRID(200),
     /**
+     * Depth-only pre-pass of the volume models, so that the volume occludes everything drawn
+     * after it (stars, labels, points, lines) instead of only everything drawn after
+     * {@link #VOLUME}.
+     * <p>
+     * It sits <em>after</em> {@link #MODEL_VERT_GRID} on purpose: that group clears the depth
+     * buffer after drawing (so the grids do not leave depth behind), which would wipe the depth
+     * this pass has just written. It sits <em>before</em> {@link #POINT_STAR} so that the single
+     * stars are the first thing it occludes.
+     **/
+    VOLUME_DEPTH(250),
+    /**
      * Single pixel.
      **/
     POINT_STAR(300),

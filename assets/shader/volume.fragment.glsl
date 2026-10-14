@@ -13,6 +13,8 @@ uniform sampler3D u_volume0;
 uniform vec3 u_volume0BoundsMin;
 uniform vec3 u_volume0BoundsMax;
 uniform int u_volume0ColorMode;
+// Minimum density for volume 0 to write depth. 0 or less = this volume never occludes.
+uniform float u_volume0DepthThreshold;
 #endif //volume0Flag
 
 #ifdef volume1Flag
@@ -21,6 +23,8 @@ uniform sampler3D u_volume1;
 uniform vec3 u_volume1BoundsMin;
 uniform vec3 u_volume1BoundsMax;
 uniform int u_volume1ColorMode;
+// Minimum density for volume 1 to write depth. 0 or less = this volume never occludes.
+uniform float u_volume1DepthThreshold;
 #endif //volume1Flag
 
 #ifdef volume2Flag
@@ -29,6 +33,8 @@ uniform sampler3D u_volume2;
 uniform vec3 u_volume2BoundsMin;
 uniform vec3 u_volume2BoundsMax;
 uniform int u_volume2ColorMode;
+// Minimum density for volume 2 to write depth. 0 or less = this volume never occludes.
+uniform float u_volume2DepthThreshold;
 #endif //volume2Flag
 
 #ifdef volume3Flag
@@ -37,6 +43,8 @@ uniform sampler3D u_volume3;
 uniform vec3 u_volume3BoundsMin;
 uniform vec3 u_volume3BoundsMax;
 uniform int u_volume3ColorMode;
+// Minimum density for volume 3 to write depth. 0 or less = this volume never occludes.
+uniform float u_volume3DepthThreshold;
 #endif //volume3Flag
 
 #if defined(volume0Flag) || defined(volume1Flag) || defined(volume2Flag) || defined(volume3Flag)
@@ -82,6 +90,13 @@ layout(location = 1) out vec4 layerBuffer;
 #define COLOR_MODE_RAMP 0         // density in .r, colour from the slot's fixed colour
 #define COLOR_MODE_TEXTURE 1      // density in .a, colour from the texture (.rgb)
 #define COLOR_MODE_TEXTURE_RAMP 2 // density in .a, colour = texture colour * fixed colour
+
+// Occlusion, per slot, via u_volumeNDepthThreshold. A volume writes depth only where its own
+// density exceeds its threshold, and a threshold of 0 (the default) disables the slot for the
+// depth pass entirely: it still renders, but nothing can be hidden behind it. An emissive
+// volume (gas) should be left at 0 so that its faint outer haze does not cut a hard hole in the
+// star field, while an absorbing one (dust) carries a threshold so that only its dense lanes
+// occlude and its blurred tail does not.
 
 float hash12(vec2 p) {
     vec3 p3 = fract(vec3(p.xyx) * 0.1031);
@@ -159,7 +174,7 @@ vec4 transferFunction(float density, vec3 baseColor, float stepUVW, float transm
     return vec4(color, alpha);
 }
 
-vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, in int colorMode, in vec3 color, inout float firstDepth) {
+vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, in int colorMode, in float depthThreshold, in vec3 color, inout float firstDepth) {
     vec3 rayOrigin = u_cameraPos;
     vec3 rayDir = normalize(v_data.fragPosWorld - u_cameraPos);
     // Scale to size.
@@ -194,10 +209,23 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
         vec4 texel = sampleVolumeRGBA(uvw, volume, colorMode);
         float density = texel.a;
 
-        if (firstDepth < 0.0 && density > 0.0) {
+        // Does this sample occlude? Only if the slot is configured as an occluder and its density
+        // clears that threshold. Both passes run this same test, so they agree on the depth they
+        // write and there is no z-fighting between them.
+        bool occludes = depthThreshold > 0.0 && density > depthThreshold;
+        if (firstDepth < 0.0 && occludes) {
             firstDepth = currentDist;
         }
 
+    #ifdef DEPTH_PASS
+        // Depth-only pre-pass (RenderGroup.VOLUME_DEPTH): the distance to the first occluding
+        // sample is all we need, so stop right there - one step instead of the whole
+        // integration. The colour pass marches the same ray again, with the same jitter and so
+        // the same first sample, and writes the same depth.
+        if (occludes) {
+            break;
+        }
+    #else
         // Emission with enhanced transfer function
         if (density > 0.0 && transmittance > 0.001) {
             vec3 baseColor = volumeColor(color, texel.rgb, colorMode);
@@ -213,6 +241,7 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
         if (transmittance < 0.01 || result.a > 0.99) {
             break;
         }
+    #endif
     }
     return result;
 }
@@ -223,30 +252,35 @@ void main() {
         float firstDepth = -1.0;
 
         #ifdef volume0Flag
-            result += raymarchVolume(u_volume0, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, fetchColorDiffuse(vec4(0.3, 0.6, 1.0, 1.0)).rgb, firstDepth);
+            result += raymarchVolume(u_volume0, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold, fetchColorDiffuse(vec4(0.3, 0.6, 1.0, 1.0)).rgb, firstDepth);
         #endif //volume0Flag
         #ifdef volume1Flag
-            result += raymarchVolume(u_volume1, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, vec3(0.1, 0.8, 0.2), firstDepth);
+            result += raymarchVolume(u_volume1, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold, vec3(0.1, 0.8, 0.2), firstDepth);
         #endif //volume1Flag
         #ifdef volume2Flag
-            result += raymarchVolume(u_volume2, u_volume2BoundsMin, u_volume2BoundsMax, u_volume2ColorMode, vec3(0.0, 0.2, 0.8), firstDepth);
+            result += raymarchVolume(u_volume2, u_volume2BoundsMin, u_volume2BoundsMax, u_volume2ColorMode, u_volume2DepthThreshold, vec3(0.0, 0.2, 0.8), firstDepth);
         #endif //volume2Flag
         #ifdef volume3Flag
-            result += raymarchVolume(u_volume3, u_volume3BoundsMin, u_volume3BoundsMax, u_volume3ColorMode, vec3(0.8, 0.2, 0.1), firstDepth);
+            result += raymarchVolume(u_volume3, u_volume3BoundsMin, u_volume3BoundsMax, u_volume3ColorMode, u_volume3DepthThreshold, vec3(0.8, 0.2, 0.1), firstDepth);
         #endif //volume3Flag
 
+        // Never discard this fragment: a discarded fragment writes no depth, so a ray that
+        // crosses the volume without accumulating enough opacity to be visible would lose its
+        // depth write too, and whatever is behind it would show through. An invisible fragment
+        // writes an all-zero colour instead, which contributes nothing under additive blending.
         if (result.a > 0.001) {
             // Simple reinhard tone mapping to control brightness
             result.rgb *= EXPOSURE;
             result.rgb = result.rgb / (1.0 + result.rgb);
             fragColor = vec4(result.rgb, result.a);
         } else {
-            // See box
-            //fragColor = vec4(0.2, 0.1, 0.0, 1.0);
-            discard;
+            fragColor = vec4(0.0);
         }
 
-        float depth = (firstDepth > 0.0) ? firstDepth : 1.0e10;
-        gl_FragDepth = getDepthValue(depth, u_cameraNearFar.y, u_cameraK);
+        // Depth of the first sample dense enough to occlude, i.e. of the first sample of a slot
+        // whose u_volumeNDepthThreshold it clears. A ray that crossed the boxes without ever
+        // meeting such a sample - a purely emissive volume, or material thinner than the
+        // threshold - writes the far plane, which cannot occlude anything behind it.
+        gl_FragDepth = firstDepth > 0.0 ? getDepthValue(firstDepth, u_cameraNearFar.y, u_cameraK) : 1.0;
     #endif // volumeFlag
 }

@@ -130,6 +130,16 @@ public class DefaultIntShader extends BaseIntShader {
     public int u_volume2ColorMode;
     public int u_volume3ColorMode;
 
+    /**
+     * Minimum density for each volume slot to act as an occluder in the depth-only pre-pass. Zero
+     * or negative disables the slot, so a purely emissive volume (gas) does not hide the star
+     * field behind it. See {@link Texture3DAttribute#depthThreshold}.
+     */
+    public int u_volume0DepthThreshold;
+    public int u_volume1DepthThreshold;
+    public int u_volume2DepthThreshold;
+    public int u_volume3DepthThreshold;
+
     // Cubemaps
     protected final int u_reflectionCubemap;
     protected final int u_diffuseCubemap;
@@ -372,6 +382,11 @@ public class DefaultIntShader extends BaseIntShader {
         u_volume1ColorMode = register(Inputs.volume1ColorModeUniform, Setters.volume1ColorModeSetter);
         u_volume2ColorMode = register(Inputs.volume2ColorModeUniform, Setters.volume2ColorModeSetter);
         u_volume3ColorMode = register(Inputs.volume3ColorModeUniform, Setters.volume3ColorModeSetter);
+
+        u_volume0DepthThreshold = register(Inputs.volume0DepthThresholdUniform, Setters.volume0DepthThresholdSetter);
+        u_volume1DepthThreshold = register(Inputs.volume1DepthThresholdUniform, Setters.volume1DepthThresholdSetter);
+        u_volume2DepthThreshold = register(Inputs.volume2DepthThresholdUniform, Setters.volume2DepthThresholdSetter);
+        u_volume3DepthThreshold = register(Inputs.volume3DepthThresholdUniform, Setters.volume3DepthThresholdSetter);
 
         // SVT.
         u_svtId = register(Inputs.svtId, Setters.svtId);
@@ -1096,6 +1111,13 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform volume1ColorModeUniform = new Uniform("u_volume1ColorMode");
         public final static Uniform volume2ColorModeUniform = new Uniform("u_volume2ColorMode");
         public final static Uniform volume3ColorModeUniform = new Uniform("u_volume3ColorMode");
+        // Minimum density for a volume slot to write depth in the depth-only pre-pass. Declared in
+        // volume.fragment.glsl inside the volumeNFlag blocks; unset uniforms read as 0, which
+        // means "this slot never occludes".
+        public final static Uniform volume0DepthThresholdUniform = new Uniform("u_volume0DepthThreshold");
+        public final static Uniform volume1DepthThresholdUniform = new Uniform("u_volume1DepthThreshold");
+        public final static Uniform volume2DepthThresholdUniform = new Uniform("u_volume2DepthThreshold");
+        public final static Uniform volume3DepthThresholdUniform = new Uniform("u_volume3DepthThreshold");
 
         public final static Uniform svtTileSize = new Uniform("u_svtTileSize", FloatAttribute.SvtTileSize);
         public final static Uniform svtResolution = new Uniform("u_svtResolution", Vector2Attribute.SvtResolution);
@@ -2036,6 +2058,58 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, volumeColorMode(combinedAttributes, Texture3DAttribute.Volume3));
             }
         };
+
+        /**
+         * Minimum density for the volume slot bound to {@code volumeAttribute} to write depth in
+         * the depth-only pre-pass, or 0 when the slot must not occlude at all.
+         * <p>
+         * Like {@link #volumeColorMode}, this reads the texture attribute rather than a dedicated
+         * {@code FloatAttribute}, and must tolerate its absence: the uniform has an empty mask, so
+         * its validator always passes and the setter runs for every renderable, including ones
+         * with no volume bound.
+         */
+        private static float volumeDepthThreshold(Attributes combinedAttributes, int volumeAttribute) {
+            Texture3DAttribute a = (Texture3DAttribute) combinedAttributes.get(volumeAttribute);
+            return a == null ? 0f : a.depthThreshold;
+        }
+
+        public final static Setter volume0DepthThresholdSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeDepthThreshold(combinedAttributes, Texture3DAttribute.Volume0));
+            }
+        };
+        public final static Setter volume1DepthThresholdSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeDepthThreshold(combinedAttributes, Texture3DAttribute.Volume1));
+            }
+        };
+        public final static Setter volume2DepthThresholdSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeDepthThreshold(combinedAttributes, Texture3DAttribute.Volume2));
+            }
+        };
+        public final static Setter volume3DepthThresholdSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, volumeDepthThreshold(combinedAttributes, Texture3DAttribute.Volume3));
+            }
+        };
+
         public final static Setter kmToU = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,

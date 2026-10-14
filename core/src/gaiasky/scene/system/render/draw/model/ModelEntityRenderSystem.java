@@ -232,7 +232,16 @@ public class ModelEntityRenderSystem {
             mc.updateCamPos(camPos);
             mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
             mc.update(alpha * alphaFactor, relativistic);
-            mc.updateDepthTest();
+            // Volumes write depth by default (see Volume.writeDepth): the box is a real occluder
+            // and the shader stores the depth of the first sample that found material. The blend
+            // mode still decides the colour blend - additive for emission - but not the mask,
+            // because an additive volume that does not write depth cannot hide anything.
+            var volume = Mapper.volume.get(entity);
+            if (volume == null || volume.writeDepth) {
+                mc.depthTestReadWrite();
+            } else {
+                mc.updateDepthTest();
+            }
             batch.render(mc.instance, mc.env);
         }
     }

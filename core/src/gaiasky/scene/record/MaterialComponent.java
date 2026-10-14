@@ -95,6 +95,36 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked,
             heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked, texture0Unpacked,
             texture1Unpacked, volume0Unpacked, volume1Unpacked, volume2Unpacked, volume3Unpacked;
+    /**
+     * Per-slot minimum density for a volume to act as an occluder, indexed like the volume
+     * slots ({@code volume0}..{@code volume3}). Entry {@code i} is the smallest density of
+     * volume {@code i} that is allowed to write to the depth buffer, so anything drawn later
+     * (stars, labels, points, lines) is hidden behind it.
+     * <p>
+     * A missing entry, or one that is zero or negative, means that slot never occludes: it is
+     * drawn, but nothing is hidden behind it. That is the right setting for an emissive volume
+     * such as gas, whose faint outer haze must not cut an opaque hole in the star field. Only
+     * an absorbing volume (dust) should carry a threshold.
+     * <p>
+     * The value is a fraction of the volume's own normalisation (the same one the shader samples
+     * as density, i.e. the alpha channel of an RGBA volume), so it is independent of the texture
+     * resolution. Compare it against the file's density histogram: for the shipped ArmDust
+     * volume the median occupied voxel is 0.024 and a third of them sit above 0.05, so
+     * {@code [0.0, 0.02]} keeps roughly half the dust mass as an occluder and discards the blur
+     * tail.
+     * <p>
+     * Example, in the {@code material} node of a scene:
+     * <pre>
+     * "material": {
+     *   "volume0": "$data/.../galaxy_Gas_rgba.raw.gz",      // gas: emits only
+     *   "volume1": "$data/.../galaxy_ArmDust_rgba.raw.gz",  // dust: absorbs
+     *   "volumeDepthThreshold": [0.0, 0.02]                 // slot 0 never occludes, slot 1 does
+     * }
+     * </pre>
+     * Note that the array elements must be written with a decimal point: the scene loader types
+     * a JSON array from its first element, so {@code [0, 0.02]} would be read as an int array.
+     */
+    public double[] volumeDepthThreshold;
     // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
@@ -521,7 +551,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         if (volume0 != null && material.get(Texture3DAttribute.Volume0) == null) {
             VolumeTexture tex = manager.get(volume0Unpacked, VolumeTexture.class);
             if (tex != null && material != null) {
-                material.set(new Texture3DAttribute(Texture3DAttribute.Volume0, tex.texture(), tex.type()));
+                material.set(volumeAttribute(Texture3DAttribute.Volume0, 0, tex));
                 material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMin, tex.boundsMin()));
                 material.set(new Vector3Attribute(Vector3Attribute.Volume0BoundsMax, tex.boundsMax()));
             }
@@ -531,7 +561,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             if (material.get(Texture3DAttribute.Volume1) == null) {
                 VolumeTexture tex = manager.get(volume1Unpacked, VolumeTexture.class);
                 if (tex != null && material != null) {
-                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume1, tex.texture(), tex.type()));
+                    material.set(volumeAttribute(Texture3DAttribute.Volume1, 1, tex));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMin, tex.boundsMin()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume1BoundsMax, tex.boundsMax()));
                 }
@@ -542,7 +572,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             if (material.get(Texture3DAttribute.Volume2) == null) {
                 VolumeTexture tex = manager.get(volume2Unpacked, VolumeTexture.class);
                 if (tex != null && material != null) {
-                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume2, tex.texture(), tex.type()));
+                    material.set(volumeAttribute(Texture3DAttribute.Volume2, 2, tex));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMin, tex.boundsMin()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume2BoundsMax, tex.boundsMax()));
                 }
@@ -553,7 +583,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             if (material.get(Texture3DAttribute.Volume3) == null) {
                 VolumeTexture tex = manager.get(volume3Unpacked, VolumeTexture.class);
                 if (tex != null && material != null) {
-                    material.set(new Texture3DAttribute(Texture3DAttribute.Volume3, tex.texture(), tex.type()));
+                    material.set(volumeAttribute(Texture3DAttribute.Volume3, 3, tex));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMin, tex.boundsMin()));
                     material.set(new Vector3Attribute(Vector3Attribute.Volume3BoundsMax, tex.boundsMax()));
                 }
@@ -1174,6 +1204,61 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
     public void setVolume3(String tex) {
         this.volume3 = GaiaSky.settings().data.dataFile(tex);
+    }
+
+    public void setVolumeDepthThreshold(double[] thresholds) {
+        this.volumeDepthThreshold = thresholds;
+    }
+
+    /**
+     * Overload for a scene that writes its thresholds without a decimal point, e.g.
+     * {@code [0, 1]}. The scene loader types a JSON array from the type of its <em>first</em>
+     * element, so {@code [0, 0.02]} arrives as a {@code double[]} and {@code [0, 1]} as an
+     * {@code int[]}; without this the load would fail with a reflection error rather than
+     * silently using the wrong values.
+     */
+    public void setVolumeDepthThreshold(int[] thresholds) {
+        if (thresholds == null) {
+            this.volumeDepthThreshold = null;
+            return;
+        }
+        var converted = new double[thresholds.length];
+        for (int i = 0; i < thresholds.length; i++) {
+            converted[i] = thresholds[i];
+        }
+        this.volumeDepthThreshold = converted;
+    }
+
+    /**
+     * Builds the texture attribute for a volume slot, carrying the slot's configured depth
+     * threshold so that the shader can tell an occluding volume (dust) from a purely emitting
+     * one (gas). See {@link #setVolumeDepthThreshold(double[])}.
+     *
+     * @param attributeIndex The {@link Texture3DAttribute} slot constant.
+     * @param slot           The volume slot number, 0 to 3, used to index the thresholds.
+     * @param tex            The loaded volume texture.
+     *
+     * @return The attribute, ready to be put into the material.
+     */
+    private Texture3DAttribute volumeAttribute(int attributeIndex, int slot, VolumeTexture tex) {
+        var attr = new Texture3DAttribute(attributeIndex, tex.texture(), tex.type());
+        attr.depthThreshold = volumeDepthThreshold(slot);
+        return attr;
+    }
+
+    /**
+     * The depth threshold configured for the given volume slot, or 0 when the scene says nothing
+     * about it, which means the slot never acts as an occluder.
+     *
+     * @param slot The volume slot, 0 to 3.
+     *
+     * @return The minimum density at which the slot may write depth, 0 to disable.
+     */
+    private float volumeDepthThreshold(int slot) {
+        if (volumeDepthThreshold == null || slot < 0 || slot >= volumeDepthThreshold.length) {
+            return 0f;
+        }
+        return (float) volumeDepthThreshold[slot];
     }
 
     public void setDiffuseCubemap(String cubemap) {

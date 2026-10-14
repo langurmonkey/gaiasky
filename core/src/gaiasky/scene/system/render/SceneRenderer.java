@@ -27,6 +27,8 @@ import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.api.StubRenderable;
+import gaiasky.render.gdx.IntModelBatch;
+import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.render.postprocess.util.PingPongBuffer;
 import gaiasky.render.process.RenderModeCubemapProjections;
 import gaiasky.render.process.RenderModeMain;
@@ -48,8 +50,6 @@ import gaiasky.scene.system.render.pass.ShadowMapRenderPass;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.render.gdx.IntModelBatch;
-import gaiasky.render.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.XrControllerDevice;
@@ -97,7 +97,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private List<List<IRenderable>> renderListsFull, renderListsHalf;
     private Map<RenderGroup, IRenderSystem> renderSystems;
     private List<RenderGroup> renderGroups;
-    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, depthWritesR, clearDepthR;
+    private RenderSystemRunnable depthTestR,
+            additiveBlendR,
+            noDepthTestR,
+            regularBlendR,
+            depthTestNoWritesR,
+            depthWritesR,
+            clearDepthR,
+            colorMaskOnR,
+            colorMaskOffR;
     /**
      * The particular current scene graph renderer.
      **/
@@ -183,6 +191,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             GL40.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         };
         clearDepthR = (renderSystem, renderList, camera) -> Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+        colorMaskOnR = (renderSystem, renderList, camera) -> {
+            Gdx.gl.glColorMask(true, true, true, true);
+        };
+        colorMaskOffR = (renderSystem, renderList, camera) -> {
+            Gdx.gl.glColorMask(false, false, false, false);
+        };
 
         for (var renderPass : renderPasses) {
             renderPass.initialize();
@@ -265,7 +279,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case POINT_STAR -> {
                 // SINGLE STAR POINTS
                 system = new SingleStarQuadRenderer(this, POINT_STAR, alphas, renderAssets.starGroupShaders, ComponentType.Stars);
-                system.addPreRunnables(additiveBlendR, noDepthTestR);
+                // Depth reads but no writes: the single stars must be occluded by whatever has
+                // already written depth (the volume pre-pass - see VOLUME_DEPTH), but they must
+                // not write depth themselves, or they would occlude each other and everything
+                // drawn after them (blending, additive, per-star).
+                system.addPreRunnables(additiveBlendR, depthTestNoWritesR);
             }
             case MODEL_VERT_GRID -> {
                 // MODEL GRID - (Ecl, Eq, Gal grids)
@@ -307,19 +325,28 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     system.addPreRunnables(regularBlendR, depthTestR);
                 }
             }
-            case BILLBOARD_GROUP -> system = new BillboardSetRenderer(this,
-                                                                      BILLBOARD_GROUP,
-                                                                      alphas,
-                                                                      renderAssets.billboardGroupShaders);
-            case BILLBOARD_GROUP_PROCEDURAL -> system = new BillboardProceduralRenderer(this,
-                                                                                        BILLBOARD_GROUP_PROCEDURAL,
-                                                                                        alphas,
-                                                                                        renderAssets.billboardProceduralShaders,
-                                                                                        renderAssets.galGenShader);
-            case BILLBOARD_GROUP_PROCEDURAL_CPU -> system = new BillboardProceduralCPURenderer(this,
-                                                                                               BILLBOARD_GROUP_PROCEDURAL_CPU,
-                                                                                               alphas,
-                                                                                               renderAssets.billboardProceduralCpuShaders);
+            case BILLBOARD_GROUP -> {
+                system = new BillboardSetRenderer(this,
+                                                  BILLBOARD_GROUP,
+                                                  alphas,
+                                                  renderAssets.billboardGroupShaders);
+                system.addPreRunnables(depthTestNoWritesR);
+            }
+            case BILLBOARD_GROUP_PROCEDURAL -> {
+                system = new BillboardProceduralRenderer(this,
+                                                         BILLBOARD_GROUP_PROCEDURAL,
+                                                         alphas,
+                                                         renderAssets.billboardProceduralShaders,
+                                                         renderAssets.galGenShader);
+                system.addPreRunnables(depthTestNoWritesR);
+            }
+            case BILLBOARD_GROUP_PROCEDURAL_CPU -> {
+                system = new BillboardProceduralCPURenderer(this,
+                                                            BILLBOARD_GROUP_PROCEDURAL_CPU,
+                                                            alphas,
+                                                            renderAssets.billboardProceduralCpuShaders);
+                system.addPreRunnables(depthTestNoWritesR);
+            }
             case PARTICLE_GROUP -> {
                 system = new ParticleSetInstancedRenderer(this,
                                                           PARTICLE_GROUP,
@@ -430,6 +457,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             case VOLUME -> // VOLUME MODEL
                     system = new VolumeRenderer(this, VOLUME, alphas);
+            case VOLUME_DEPTH -> {
+                // VOLUME MODEL - depth-only pre-pass. Renders the same geometry as VOLUME, but
+                // with the colour mask off and DEPTH_PASS defined in the shader, which stops the
+                // raymarch at the first sample dense enough to occlude (the dust lanes - see
+                // MaterialComponent#volumeDepthThreshold). All it leaves behind is depth, which is
+                // what makes the volume occlude the star, label and point passes that follow it.
+                system = new VolumeRenderer(this, VOLUME_DEPTH, alphas, true);
+                system.addPreRunnables(depthTestR, colorMaskOffR);
+                system.addPostRunnables(colorMaskOnR);
+            }
             case PARTICLE_EFFECTS -> {
                 system = new ParticleEffectsRenderer(this, PARTICLE_EFFECTS, alphas, renderAssets.particleEffectShaders);
                 system.addPreRunnables(additiveBlendR, noDepthTestR);
