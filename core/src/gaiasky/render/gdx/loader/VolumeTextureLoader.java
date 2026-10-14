@@ -28,8 +28,19 @@ import gaiasky.render.gdx.graphics.VolumeType;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Loads 3D volume textures.
+ * <p>
+ * A volume is a density (R8), colour (RGB8) or colour+density (RGBA8) grid, stored raw and
+ * gzip-compressed, with a {@code _metadata.txt} sidecar that gives the world-space box and, since
+ * non-cubic grids are supported, the {@code Grid size:}. The metadata's grid is authoritative when
+ * present, because a byte count alone can only ever yield a cube.
+ */
 public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, VolumeTextureLoader.VolumeTextureParameter> {
     private static final Logger.Log logger = Logger.getLogger(VolumeTextureLoader.class);
 
@@ -73,40 +84,133 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
     }
 
     /**
-     * Auto-detect volume type and dimensions from file
+     * Auto-detect the volume format and the grid resolution.
+     * <p>
+     * When the sidecar metadata declares a {@code Grid size:} the resolution comes from there and
+     * only the number of channels is derived from the file length. That is the only way to load a
+     * grid that is not a cube: the number of voxels says nothing about how they are split between
+     * the axes, so cube-rooting the length can only ever recover cubic grids, and a flattened
+     * 400x400x40 volume is simply unclassifiable (its 6.4 M voxels have no integral cube root).
+     * Non-cubic volumes are worth having because a galaxy disk is flat - a 400x400x40 grid occupies
+     * a tenth of the memory of 400³ (24 MiB against 244 MiB for RGBA) and fits in cache, while
+     * keeping the same voxel size.
+     * <p>
+     * Without a declared grid the resolution is inferred from the length as a cube, which is what
+     * every volume written before the grid line existed is.
+     * <p>
+     * Package-private and free of I/O so that the resolution and channel logic can be tested
+     * directly, without a volume file or a GL context.
+     *
+     * @param fileLength   The length of the decompressed volume data, in bytes.
+     * @param declaredGrid The grid resolution declared by the metadata, or null.
+     *
+     * @return The detected volume type and resolution.
      */
-    private static VolumeDetectionResult detectVolumeTypeAndDimensions(byte[] data) {
-        // Try as density first (single channel)
-        int densityVoxels = data.length;
-        int densityDimension = (int) Math.round(Math.cbrt(densityVoxels));
+    static VolumeDetectionResult detectVolumeTypeAndDimensions(long fileLength, Trio<Integer, Integer, Integer> declaredGrid) {
+        if (fileLength <= 0) {
+            throw new GdxRuntimeException("Volume has no data (file length " + fileLength + " bytes).");
+        }
+        if (declaredGrid != null) {
+            long width = declaredGrid.getFirst();
+            long height = declaredGrid.getSecond();
+            long depth = declaredGrid.getThird();
+            if (width <= 0 || height <= 0 || depth <= 0) {
+                throw new GdxRuntimeException("Volume metadata declares an empty grid: " +
+                                                      width + "x" + height + "x" + depth);
+            }
+            long voxels = width * height * depth;
+            if (fileLength % voxels != 0) {
+                throw new GdxRuntimeException("Volume file size does not match the grid declared by its metadata: " +
+                                                      "grid " + width + "x" + height + "x" + depth + " is " + voxels +
+                                                      " voxels, so the file must be a multiple of " + voxels +
+                                                      " bytes, but it is " + fileLength + " bytes.");
+            }
+            long channels = fileLength / voxels;
+            VolumeType type = typeForChannels(channels);
+            if (type == null) {
+                throw new GdxRuntimeException("Volume metadata declares grid " + width + "x" + height + "x" + depth +
+                                                      ", which makes the file " + fileLength + " bytes = " + channels +
+                                                      " bytes per voxel. Expected 1 (density), 3 (color) or 4 (color+density).");
+            }
+            return new VolumeDetectionResult(type, new Trio<>((int) width, (int) height, (int) depth));
+        }
 
-        if (densityDimension * densityDimension * densityDimension == densityVoxels) {
+        // No declared grid: infer a cube from the file length. Try as density first (single
+        // channel), then color (three), then color+density (four). No file length can satisfy two
+        // of the three cases at once (n³ = 4k³ and 3m³ = 4k³ both require a rational cube root of
+        // 4 or 4/3), so the order of the tests does not matter.
+        int densityDimension = (int) Math.round(Math.cbrt(fileLength));
+        if ((long) densityDimension * densityDimension * densityDimension == fileLength) {
             return new VolumeDetectionResult(VolumeType.DENSITY,
                                              new Trio<>(densityDimension, densityDimension, densityDimension));
         }
 
-        // Try as color (three channels)
-        int colorVoxels = data.length / 3;
+        long colorVoxels = fileLength / 3;
         int colorDimension = (int) Math.round(Math.cbrt(colorVoxels));
-
-        if (colorDimension * colorDimension * colorDimension == colorVoxels) {
+        if ((long) colorDimension * colorDimension * colorDimension == colorVoxels) {
             return new VolumeDetectionResult(VolumeType.COLOR,
                                              new Trio<>(colorDimension, colorDimension, colorDimension));
         }
-        // Try as color+density (four channels)
-        int rgbaVoxels = data.length / 4;
-        int rgbaDimension = (int) Math.round(Math.cbrt(rgbaVoxels));
 
-        if (rgbaDimension * rgbaDimension * rgbaDimension == rgbaVoxels) {
+        long rgbaVoxels = fileLength / 4;
+        int rgbaDimension = (int) Math.round(Math.cbrt(rgbaVoxels));
+        if ((long) rgbaDimension * rgbaDimension * rgbaDimension == rgbaVoxels) {
             return new VolumeDetectionResult(VolumeType.RGBA,
                                              new Trio<>(rgbaDimension, rgbaDimension, rgbaDimension));
         }
 
-        // No file length can satisfy two of the three cases at once (n³ = 4k³ and
-        // 3m³ = 4k³ both require a rational cube root of 4 or 4/3), so the order of
-        // the tests above does not matter.
-        throw new GdxRuntimeException("Cannot detect volume format. File size: " + data.length +
-                                              " bytes. Must be a perfect cube for density (n³), color (3*n³) or color+density (4*n³)");
+        throw new GdxRuntimeException("Cannot detect volume format. File size: " + fileLength +
+                                              " bytes. Must be a perfect cube for density (n³), color (3*n³) or " +
+                                              "color+density (4*n³), or the metadata must declare a 'Grid size:'.");
+    }
+
+    /**
+     * Map a byte-per-voxel count to a storage format.
+     *
+     * @param channels Bytes per voxel.
+     *
+     * @return The format, or null if the count is not one the loader can bind.
+     */
+    private static VolumeType typeForChannels(long channels) {
+        return switch ((int) channels) {
+            case 1 -> VolumeType.DENSITY;
+            case 3 -> VolumeType.COLOR;
+            case 4 -> VolumeType.RGBA;
+            default -> null;
+        };
+    }
+
+    /**
+     * Grid sizes accepted in the metadata's {@code Grid size:} line: either a single edge, which
+     * means a cube, or three axes separated by {@code x}, {@code *} or {@code ,}
+     * ({@code 400x400x40}, {@code 400 * 400 * 40}, {@code 400, 400, 40}).
+     */
+    private static final Pattern GRID_VECTOR = Pattern.compile("^\\s*(\\d+)\\s*[xX*,\\s]\\s*(\\d+)\\s*[xX*,\\s]\\s*(\\d+)\\s*$");
+    private static final Pattern GRID_SCALAR = Pattern.compile("^\\s*(\\d+)\\s*$");
+
+    /**
+     * Parse a {@code Grid size:} value.
+     *
+     * @param value The value as written in the metadata, without the key.
+     *
+     * @return The grid resolution, or null if the value is not understood.
+     */
+    static Trio<Integer, Integer, Integer> parseGridSize(String value) {
+        if (value == null) {
+            return null;
+        }
+        Matcher vector = GRID_VECTOR.matcher(value);
+        if (vector.matches()) {
+            return new Trio<>(Integer.parseInt(vector.group(1)),
+                              Integer.parseInt(vector.group(2)),
+                              Integer.parseInt(vector.group(3)));
+        }
+        Matcher scalar = GRID_SCALAR.matcher(value);
+        if (scalar.matches()) {
+            int edge = Integer.parseInt(scalar.group(1));
+            return new Trio<>(edge, edge, edge);
+        }
+        return null;
     }
 
     /**
@@ -141,9 +245,30 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
     }
 
     /**
-     * Load bounds from metadata file
+     * A volume's sidecar metadata: the grid resolution, when the file declares one, and the
+     * world-space box. The box always has a value, defaulting to the unit cube.
      */
-    private static Vector3[] loadBoundsFromMetadata(FileHandle volumeFile) {
+    record VolumeMetadata(Trio<Integer, Integer, Integer> grid, Vector3 boundsMin, Vector3 boundsMax) {
+    }
+
+    /**
+     * Matches the value of a {@code Volume bounds:} / {@code World bounds:} line, i.e.
+     * <code>[-3.523, -3.540, -3.543] to [3.548, 3.532, 3.528]</code>. Both the generator and the
+     * combiner write this shape.
+     */
+    private static final Pattern BOUNDS_PATTERN = Pattern.compile(
+            "\\[\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*]\\s*to\\s*" +
+                    "\\[\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*]");
+
+    /**
+     * Read a volume's sidecar metadata, falling back to defaults when it is missing or unreadable.
+     *
+     * @param volumeFile The volume file.
+     *
+     * @return The metadata, never null. The grid is null when the metadata is missing or does not
+     * declare one, which means the caller has to infer the resolution from the file length.
+     */
+    private static VolumeMetadata loadMetadata(FileHandle volumeFile) {
         // Remove the _density/_color/_rgba .raw[.gz] suffix to get the channel basename
         String basePath = volumeBasename(volumeFile.path());
 
@@ -155,56 +280,71 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         }
 
         if (!metadataFile.exists()) {
-            logger.warn("No metadata file found for: " + volumeFile.name() + ". Using default bounds.");
-            return getDefaultBounds();
+            logger.warn("No metadata file found for: " + volumeFile.name() +
+                                ". Using default bounds and inferring the grid from the file size.");
+            return new VolumeMetadata(null, getDefaultBounds()[0], getDefaultBounds()[1]);
         }
 
         try {
-            String metadata = metadataFile.readString();
-            Vector3 boundsMin = new Vector3();
-            Vector3 boundsMax = new Vector3();
-
-            // Parse metadata - look for lines like:
-            // World bounds: [-3.359, -3.375, -0.345] to [3.365, 3.359, 0.329]
-            String[] lines = metadata.split("\n");
-            for (String line : lines) {
-                if (line.contains("World bounds:") || line.contains("Volume bounds:")) {
-                    // Extract the bounds string
-                    String boundsStr = line.substring(line.indexOf('['));
-                    String[] parts = boundsStr.split(" to ");
-
-                    if (parts.length == 2) {
-                        // Parse min bounds
-                        String minStr = parts[0].replace("[", "").replace("]", "").trim();
-                        String[] minCoords = minStr.split(",");
-                        boundsMin.set(
-                                Float.parseFloat(minCoords[0].trim()),
-                                Float.parseFloat(minCoords[1].trim()),
-                                Float.parseFloat(minCoords[2].trim())
-                        );
-
-                        // Parse max bounds
-                        String maxStr = parts[1].replace("[", "").replace("]", "").trim();
-                        String[] maxCoords = maxStr.split(",");
-                        boundsMax.set(
-                                Float.parseFloat(maxCoords[0].trim()),
-                                Float.parseFloat(maxCoords[1].trim()),
-                                Float.parseFloat(maxCoords[2].trim())
-                        );
-
-                        logger.info("Loaded bounds from metadata: " + boundsMin + " to " + boundsMax);
-                        return new Vector3[]{boundsMin, boundsMax};
-                    }
-                }
-            }
-
-            logger.warn("Could not parse bounds from metadata file: " + metadataFile.name());
-            return getDefaultBounds();
-
+            return parseMetadata(metadataFile.readString());
         } catch (Exception e) {
             logger.error("Error reading metadata file: " + metadataFile.name(), e);
-            return getDefaultBounds();
+            return new VolumeMetadata(null, getDefaultBounds()[0], getDefaultBounds()[1]);
         }
+    }
+
+    /**
+     * Parse a volume metadata file.
+     * <p>
+     * Package-private and free of I/O so that the parsing can be tested directly, without a volume
+     * file or a GL context.
+     *
+     * @param metadata The metadata file contents.
+     *
+     * @return The parsed metadata. The grid is null when no <code>Grid size:</code> line is present
+     * or parseable; the bounds fall back to the unit cube.
+     */
+    static VolumeMetadata parseMetadata(String metadata) {
+        Trio<Integer, Integer, Integer> grid = null;
+        Vector3[] bounds = getDefaultBounds();
+
+        for (String line : metadata.split("\\R")) {
+            int colon = line.indexOf(':');
+            if (colon < 0) {
+                continue;
+            }
+            String key = line.substring(0, colon).trim().toLowerCase(Locale.ROOT);
+            String value = line.substring(colon + 1).trim();
+
+            switch (key) {
+                case "grid size" -> {
+                    Trio<Integer, Integer, Integer> parsed = parseGridSize(value);
+                    if (parsed != null) {
+                        grid = parsed;
+                    } else {
+                        logger.warn("Could not parse the grid size from metadata: '" + value + "'");
+                    }
+                }
+                // "Data bounds" is the extent of the particles, not of the box, and is ignored.
+                case "volume bounds", "world bounds" -> {
+                    Matcher matcher = BOUNDS_PATTERN.matcher(value);
+                    if (matcher.find()) {
+                        bounds[0].set(Float.parseFloat(matcher.group(1)),
+                                      Float.parseFloat(matcher.group(2)),
+                                      Float.parseFloat(matcher.group(3)));
+                        bounds[1].set(Float.parseFloat(matcher.group(4)),
+                                      Float.parseFloat(matcher.group(5)),
+                                      Float.parseFloat(matcher.group(6)));
+                    } else {
+                        logger.warn("Could not parse the bounds from metadata: '" + value + "'");
+                    }
+                }
+                default -> {
+                }
+            }
+        }
+
+        return new VolumeMetadata(grid, bounds[0], bounds[1]);
     }
 
     /**
@@ -240,23 +380,29 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             fileData = file.readBytes();
         }
 
+        // Read the metadata first: it is what declares the grid resolution, and without it the
+        // resolution can only be inferred as a cube from the file length.
+        VolumeMetadata metadata = loadMetadata(file);
+
         // Auto-detect type and dimensions
-        var detection = detectVolumeTypeAndDimensions(fileData);
+        var detection = detectVolumeTypeAndDimensions(fileData.length, metadata.grid());
         VolumeType type = detection.type;
         Trio<Integer, Integer, Integer> dimensions = detection.dimensions;
         int width = dimensions.getFirst();
         int height = dimensions.getSecond();
         int depth = dimensions.getThird();
 
-        logger.info("Auto-detected volume: " + type + " " + width + "x" + height + "x" + depth);
+        logger.info("Auto-detected volume: " + type + " " + width + "x" + height + "x" + depth
+                            + (metadata.grid() != null ? " (grid from metadata)" : " (grid from file size)"));
 
-        // Validate size
+        // Validate size. Redundant after detection, which derives the channel count from the same
+        // numbers, but it is the last guard before the data is handed to GL.
         int channels = switch (type) {
             case DENSITY -> 1;
             case COLOR -> 3;
             case RGBA -> 4;
         };
-        int expectedSize = width * height * depth * channels;
+        long expectedSize = (long) width * height * depth * channels;
         if (fileData.length != expectedSize) {
             throw new IOException(String.format(
                     "Volume file size mismatch. Expected %d bytes (%dx%dx%dx%d) but got %d bytes",
@@ -264,10 +410,18 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             ));
         }
 
-        // Load bounds from metadata
-        Vector3[] bounds = loadBoundsFromMetadata(file);
-        Vector3 boundsMin = bounds[0];
-        Vector3 boundsMax = bounds[1];
+        Vector3 boundsMin = metadata.boundsMin();
+        Vector3 boundsMax = metadata.boundsMax();
+
+        // The box and the grid are independent, so the voxels need not be cubes. Worth saying out
+        // loud: an anisotropic grid renders correctly (the shader normalises over the box) but its
+        // voxels are stretched, which shows as banding along the stretched axis.
+        if (width != height || height != depth) {
+            logger.info(String.format("Volume grid is not cubic: voxel size %.6f x %.6f x %.6f world units",
+                                      (boundsMax.x - boundsMin.x) / width,
+                                      (boundsMax.y - boundsMin.y) / height,
+                                      (boundsMax.z - boundsMin.z) / depth));
+        }
 
         // Create Texture3DData
         CustomTexture3DData textureData = new CustomTexture3DData(
@@ -287,7 +441,7 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
     }
 
     // Helper classes
-    private record VolumeDetectionResult(VolumeType type, Trio<Integer, Integer, Integer> dimensions) {
+    record VolumeDetectionResult(VolumeType type, Trio<Integer, Integer, Integer> dimensions) {
     }
 
     private record VolumeLoadResult(CustomTexture3DData data, VolumeType type, Vector3 boundsMin, Vector3 boundsMax) {
