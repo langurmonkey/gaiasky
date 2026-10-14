@@ -216,13 +216,6 @@ public class ModelEntityRenderSystem {
         if (mc != null && mc.instance != null && mc.isModelInitialised()) {
             var base = Mapper.base.get(entity);
 
-            float alphaFactor;
-            if (scaffolding != null) {
-                alphaFactor = !Mapper.fade.has(entity) ? base.opacity : scaffolding.fadeOpacity * base.opacity;
-            } else {
-                alphaFactor = base.opacity;
-            }
-
             // In our approach, the object is always at the origin (0 0 0), so we compute the location of the camera with respect to it.
             // cam = cam_float - obj
             focusView.setEntity(entity);
@@ -231,7 +224,7 @@ public class ModelEntityRenderSystem {
 
             mc.updateCamPos(camPos);
             mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
-            mc.update(alpha * alphaFactor, relativistic);
+            mc.update(alpha * base.opacity, relativistic);
             // Volumes write depth by default (see Volume.writeDepth): the box is a real occluder
             // and the shader stores the depth of the first sample that found material. The blend
             // mode still decides the colour blend - additive for emission - but not the mask,

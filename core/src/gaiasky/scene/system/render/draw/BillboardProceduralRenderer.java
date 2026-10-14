@@ -283,7 +283,6 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
 
             int qualityIndex = GaiaSky.settings().graphics.quality.ordinal();
 
-            Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
             for (var dataset : billboard.datasets) {
                 if (isPrepared(dataset)) {
                     // Blend mode

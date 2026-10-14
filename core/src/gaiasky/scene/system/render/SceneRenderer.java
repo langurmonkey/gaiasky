@@ -288,7 +288,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case MODEL_VERT_GRID -> {
                 // MODEL GRID - (Ecl, Eq, Gal grids)
                 system = new ModelRenderer(this, MODEL_VERT_GRID, alphas, renderAssets.mbSimpleGrid);
-                system.addPostRunnables(clearDepthR);
+                system.addPostRunnables(clearDepthR, depthTestNoWritesR);
             }
             case MODEL_VERT_RECGRID -> {
                 // RECURSIVE GRID

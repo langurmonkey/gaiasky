@@ -272,7 +272,7 @@ void main() {
             // Simple reinhard tone mapping to control brightness
             result.rgb *= EXPOSURE;
             result.rgb = result.rgb / (1.0 + result.rgb);
-            fragColor = vec4(result.rgb, result.a);
+            fragColor = vec4(result.rgb, result.a) * v_data.opacity;
         } else {
             fragColor = vec4(0.0);
         }

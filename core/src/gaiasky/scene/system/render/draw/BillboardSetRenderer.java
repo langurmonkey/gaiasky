@@ -226,9 +226,6 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
 
             int qualityIndex = GaiaSky.settings().graphics.quality.ordinal();
 
-            // Disable depth test because we are rendering to empty half-res buffer.
-            Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
-
             var offsets = getOffsets(render);
             for (int i = 0; i < offsets.size; i++) {
                 var offset = offsets.get(i);
