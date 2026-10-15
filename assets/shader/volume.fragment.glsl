@@ -280,7 +280,19 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
     float stepSize = rayLength / float(nSteps);
     float stepUVW = stepSize * uvwScale; // consistent with the loop, by construction
 
+    // The jitter decorrelates neighbouring pixels so that a step size in UVW does not show as
+    // banding across a smooth volume. In the pre-pass there is no banding to hide - it writes a
+    // depth, not a colour - and a phase that re-rolls every frame is a mask that boils at its
+    // edges and, at a coarse step, flickers over whole dust lanes. So the pre-pass hashes position
+    // only: still per pixel, no longer per frame, and the same camera gives the same mask twice.
+    // This matters more here than in a single-volume shader, because the slots share one
+    // firstDepth: the earliest depth-writing sample of any slot is the one that survives, so an
+    // unstable phase in one slot moves the depth written for all of them.
+    #ifdef DEPTH_PASS
+    float jitter = hash12(gl_FragCoord.xy);
+    #else
     float jitter = hash12(gl_FragCoord.xy * u_time * 0.1);
+    #endif
     for (int i = 0; i < nSteps; i++) {
         float currentDist = entryDist + (float(i) + jitter) * stepSize;
         vec3 samplePos = rayOrigin + rayDir * currentDist;
@@ -299,9 +311,11 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
 
         #ifdef DEPTH_PASS
         // Depth-only pre-pass (RenderGroup.VOLUME_DEPTH): the distance to the first depth-writing
-        // sample is all we need, so stop right there - one step instead of the whole
-        // integration. The colour pass marches the same ray again, with the same jitter and so
-        // the same first sample, and writes the same depth.
+        // sample is all we need, so stop right there - one step instead of the whole integration.
+        // The colour pass runs the same threshold test to decide what the dust hides, so the two
+        // passes agree on *which sample* is the front; they no longer agree on the sample points
+        // (see the note on the jitter above), which they do not have to. Where a pre-pass runs, it
+        // is the depth buffer's only writer for this object.
         if (occludes) {
             break;
         }
