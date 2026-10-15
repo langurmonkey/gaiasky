@@ -1,6 +1,6 @@
 
 # Grids are 'N' (cubic) or 'WxHxD'. The three are in storage order, the order of the file
-# and of the metadata's 'Grid size:', which is galactic (Y, Z, X) - a flat disk, whose
+# and of the metadata's 'Grid size:', which is galactic (X, Z, -Y) - a flat disk, whose
 # thickness is the galactic Z, wants the middle number small (e.g. 400x40x400).
 #
 # VARIADIC ARGS ARE INTERPOLATED UNQUOTED. '{{args}}' splices the extra arguments into
@@ -23,7 +23,7 @@ texfast gridsize input output:
 # each axis, so the detail of an N^3 grid is kept without spending voxels on the axes the
 # data has no extent in. This is the usual way to make a flat volume.
 texvoxel voxelsize input output *args:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --voxel-size {{voxelsize}} --format rgba {{args}} {{input}} {{output}}
+	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --voxel-size {{voxelsize}} --format rgba {{args}} {{input}} {{output}}
 
 # Same, and merge the channels into one emissive and one occlusive texture in one go.
 # 'group' is a positional argument ('<emissive>|<occlusive>', each side a '+'-separated

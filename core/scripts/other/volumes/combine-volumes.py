@@ -53,12 +53,15 @@ import numpy as np
 # ---------------------------------------------------------------------------
 # Texture I/O, shared with particles-to-3dtex.py. Keep the two in sync.
 #
-# _unswap_xyz() is the only piece the generator does not have, and it exists so that a
+# _from_file_order() is the only piece the generator does not have, and it exists so that a
 # texture reads back the way its author wrote it. The pair defines the axis convention
-# shared by the generator, these merged files and VolumeTextureLoader: (x, y, z) ->
-# (y, z, x). If the pair ever diverges from the generator's, the merged volume is
-# silently rotated relative to the textures it was built from - nothing reports it,
-# the galaxy just ends up on its side. Merging a texture with itself and comparing the
+# shared by the generator, these merged files and VolumeTextureLoader: galactic (x, y, z)
+# is written out as (x, z, -y) - a reordering of the file's axes that the C-order/GL
+# mismatch forces, times the 90 deg in-plane rotation that puts the volume in the object
+# frame the renderer samples it in (see particles-to-3dtex._to_file_order()). If the pair
+# ever diverges from the generator's, the merged volume is silently rotated relative to the
+# textures it was built from - nothing reports it, the galaxy just ends up on its side, or
+# its dust lanes 90 deg off the star field. Merging a texture with itself and comparing the
 # bytes is what pins it (see --check).
 # ---------------------------------------------------------------------------
 
@@ -75,18 +78,30 @@ def _write_bytes(data: bytes, output_path: str, compresslevel: int = 6):
         f.write(data)
 
 
-def _swap_xyz(grid: np.ndarray) -> np.ndarray:
-    """Permute axes: out[a, b, c] = in[c, a, b]. Matches particles-to-3dtex._swap_xyz()."""
+def _to_file_order(grid: np.ndarray) -> np.ndarray:
+    """Galactic order -> file order (x, z, -y): out[i, k, ny-1-j] = in[i, j, k].
+
+    The exact inverse of _from_file_order(), and a byte-compatible copy of
+    particles-to-3dtex._to_file_order() - the two must stay identical, or a merge rotates
+    what it merges.
+    """
     if grid.ndim == 4:
-        return np.ascontiguousarray(grid.transpose(1, 2, 0, 3))
-    return np.ascontiguousarray(grid.transpose(1, 2, 0))
+        return np.ascontiguousarray(grid.transpose(0, 2, 1, 3)[:, :, ::-1, :])
+    return np.ascontiguousarray(grid.transpose(0, 2, 1)[:, :, ::-1])
 
 
-def _unswap_xyz(grid: np.ndarray) -> np.ndarray:
-    """Inverse of _swap_xyz(), so a stored texture reads back as it was written."""
+def _from_file_order(grid: np.ndarray) -> np.ndarray:
+    """Inverse of _to_file_order(): (x, z, -y) -> (x, y, z), so a stored texture reads back
+    as it was written.
+
+    Not the same expression as the writer: the flip has to be applied to the galactic Y axis,
+    which is the *last* axis of the array in galactic order and the *last* one in file order
+    too - but the reader starts from the file, so the flip comes first here and the
+    transposition second.
+    """
     if grid.ndim == 4:
-        return np.ascontiguousarray(grid.transpose(2, 0, 1, 3))
-    return np.ascontiguousarray(grid.transpose(2, 0, 1))
+        return np.ascontiguousarray(grid[:, :, ::-1, :].transpose(0, 2, 1, 3))
+    return np.ascontiguousarray(grid[:, :, ::-1].transpose(0, 2, 1))
 
 
 # Artifacts particles-to-3dtex.py appends to the channel basename, longest first so
@@ -142,11 +157,13 @@ def _detect_format(total_bytes: int, declared_grid=None) -> tuple[tuple | None, 
 def _storage_to_galactic(grid) -> tuple[int, int, int]:
     """Storage order (W, H, D) -> galactic (x, y, z).
 
-    The inverse of what _swap_xyz() does when writing: an array read back with
-    _unswap_xyz() is laid out in galactic order, so its shape is the galactic grid, while
-    the metadata and the file describe it in storage order.
+    The inverse of what _to_file_order() does when writing: an array read back with
+    _from_file_order() is laid out in galactic order, so its shape is the galactic grid,
+    while the metadata and the file describe it in storage order. Storage is galactic
+    (x, z, -y), so this is the permutation (0, 2, 1) - the sign the frame rotation puts on
+    the galactic Y axis belongs to the bounds, not to a count of voxels.
     """
-    return int(grid[2]), int(grid[0]), int(grid[1])
+    return int(grid[0]), int(grid[2]), int(grid[1])
 
 
 def _format_grid(grid) -> str:
@@ -277,9 +294,9 @@ def load_input(path: str) -> VolumeInput:
             "Combine the _rgba or _density artifact instead."
         )
 
-    # The file is in storage order; unswap it into galactic order, which is the order the
+    # The file is in storage order; read it back into galactic order, which is the order the
     # generator worked in and the order everything below merges in.
-    volume = _unswap_xyz(data.reshape((*storage_grid, channels) if channels == 4 else storage_grid))
+    volume = _from_file_order(data.reshape((*storage_grid, channels) if channels == 4 else storage_grid))
 
     density = np.ascontiguousarray(volume[..., 3] if channels == 4 else volume)
     density = density.astype(np.float32)
@@ -398,7 +415,7 @@ def write_rgba(rgb: np.ndarray, density: np.ndarray, output_path: str):
     density *= np.float32(255.0)
     rgba[..., 3] = density.astype(np.uint8)
 
-    _write_bytes(_swap_xyz(rgba).tobytes(), output_path)
+    _write_bytes(_to_file_order(rgba).tobytes(), output_path)
     print(f"Saved RGBA texture: {output_path} ({rgba.nbytes / 1024 / 1024:.2f} MB raw)")
 
 
@@ -632,11 +649,11 @@ def main():
     if args.check:
         # Merge each input on its own and compare the bytes we would write with the bytes
         # of the original file. This is what pins the axis convention against the
-        # generator: _swap_xyz() and _unswap_xyz() must be exactly inverse *and* match
-        # particles-to-3dtex._swap_xyz(), or the merged volume comes out silently rotated
-        # relative to the textures it was built from. Bytes are compared rather than
-        # arrays, because a self consistent permutation error would cancel out if both
-        # sides went through the same helpers.
+        # generator: _to_file_order() and _from_file_order() must be exactly inverse *and*
+        # match particles-to-3dtex._to_file_order(), or the merged volume comes out
+        # silently rotated relative to the textures it was built from. Bytes are compared
+        # rather than arrays, because a self consistent permutation error would cancel out
+        # if both sides went through the same helpers.
         print("\nSelf-check: each input merged on its own, compared with the original file.")
         for volume in volumes:
             weight, volume.weight = volume.weight, 1.0
@@ -649,7 +666,7 @@ def main():
             rgba[..., :3] = (rgb * np.float32(255.0)).astype(np.uint8)
             np.clip(density, 0.0, 1.0, out=density)
             rgba[..., 3] = (density * np.float32(255.0)).astype(np.uint8)
-            written = np.frombuffer(_swap_xyz(rgba).tobytes(), dtype=np.uint8)
+            written = np.frombuffer(_to_file_order(rgba).tobytes(), dtype=np.uint8)
             del rgb, density, rgba
 
             original = np.frombuffer(_read_bytes(volume.path), dtype=np.uint8)

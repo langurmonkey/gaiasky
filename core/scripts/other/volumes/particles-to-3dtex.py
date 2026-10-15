@@ -51,7 +51,7 @@ def parse_grid_size(value: str):
     """Parse --grid-size: '400' (cubic), or '400x40x400' in storage order (W, H, D).
 
     Storage order is the order of the file and of the metadata's 'Grid size:', which is
-    galactic (Y, Z, X). So a flat galaxy disk, whose thickness is the galactic Z, wants
+    galactic (X, Z, -Y). So a flat galaxy disk, whose thickness is the galactic Z, wants
     '400x40x400': a texture 400 wide, 40 tall, 400 deep, holding a 400x400x40 galactic
     grid. 'x', '*' and ',' all separate the axes.
     """
@@ -167,18 +167,22 @@ class ParticleChannel:
 def storage_to_galactic(values):
     """(W, H, D) in storage order -> (nx, ny, nz) in galactic order.
 
-    _swap_xyz() writes `out = in.transpose(1, 2, 0)`, so storage axis 0 is galactic Y,
-    axis 1 is galactic Z and axis 2 is galactic X.
+    _to_file_order() writes storage = galactic (x, z, -y), so storage axis 0 is galactic X
+    and axis 2 is galactic Y: the first and last axes are transposed. A transposition is its
+    own inverse, so this is the same function as galactic_to_storage() - the two exist
+    because the two directions read differently at the call sites.
     """
-    return values[2], values[0], values[1]
+    return values[0], values[2], values[1]
 
 def galactic_to_storage(values):
     """(nx, ny, nz) in galactic order -> (W, H, D) in storage order."""
-    return values[1], values[2], values[0]
+    return values[0], values[2], values[1]
 
 # The permutation between the two orders, as an index array: storage[k] = galactic[...].
-# Used to permute vectors (bounds) the same way the grid is permuted.
-_GALACTIC_TO_STORAGE = np.array([1, 2, 0])
+# Used to permute the *sizes* (world size, voxel size) the same way the grid is permuted.
+# A size has no sign, so the negation the frame rotation puts on the galactic Y axis is not
+# part of this: it is applied by stored_bounds(), and only there.
+_GALACTIC_TO_STORAGE = np.array([0, 2, 1])
 
 def _grid_axes(grid) -> tuple[np.ndarray, np.ndarray]:
     """Validate a resolution and return it as (storage order, galactic order)."""
@@ -193,9 +197,10 @@ class VolumeConfig:
 
     Both are per-axis, and both are *galactic* (x, y, z) internally - the order the
     particle files use and the order the rasteriser indexes. The file, and therefore the
-    metadata, is in *storage* order (W, H, D) = galactic (Y, Z, X), because _swap_xyz()
-    permutes the array on the way out; see stored_grid() and stored_bounds(). Both orders
-    are written to the metadata, so neither has to be inferred from the other.
+    metadata, is in *storage* order (W, H, D) = galactic (X, Z, -Y), because
+    _to_file_order() permutes the array on the way out; see stored_grid() and
+    stored_bounds(). Both orders are written to the metadata, so neither has to be
+    inferred from the other.
 
     The box used to be forced to a cube (`max(span) * 1.05` on every axis). On a flat
     galaxy disk that put most of the texture over empty space: 400 cubed of RGBA is
@@ -264,14 +269,19 @@ class VolumeConfig:
         return self.storage_grid
 
     def stored_bounds(self) -> tuple[np.ndarray, np.ndarray]:
-        """The box in storage order: the (Y, Z, X) extremes of the galactic box.
+        """The box in storage order: the (x, z, -y) extremes of the galactic box.
 
         The metadata has to be in the order the *file* is indexed in, because the shader
         turns a position into texture coordinates per axis: the first coordinate samples
-        storage axis 0. For a cubic box the two orders coincide, which is why this went
-        unnoticed until the box became flat.
+        storage axis 0. For a cubic box centred on the origin the two orders coincide, which
+        is why this went unnoticed until the box became flat.
+
+        Axis 2 is the galactic Y backwards (see _to_file_order()), so it is the one axis
+        whose stored extremes are not simply a reordering: the interval flips, and the
+        minimum comes from the galactic maximum.
         """
-        return self.box_min[_GALACTIC_TO_STORAGE], self.box_max[_GALACTIC_TO_STORAGE]
+        return (np.array([self.box_min[0], self.box_min[2], -self.box_max[1]]),
+                np.array([self.box_max[0], self.box_max[2], -self.box_min[1]]))
 
 def compute_world_bounds(input_dir: str) -> tuple[np.ndarray, np.ndarray]:
     """Compute bounding box from all particle files"""
@@ -595,7 +605,7 @@ def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray,
     # Gaussian sigma for the density blur, and the fallback colour used for
     # channels that carry no colour column of their own.
     if 'dust' in channel_name:
-        sigma, default_color = 0.22, (0.8, 0.6, 0.4)
+        sigma, default_color = 0.5, (0.8, 0.6, 0.4)
     elif 'gas' in channel_name:
         sigma, default_color = 1.5, (0.3, 0.5, 0.8)
     elif 'hii' in channel_name:
@@ -622,17 +632,41 @@ def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray,
     print(f"Applied {channel_name} channel processing")
     return density_grid, color_grid
 
-def _swap_xyz(grid: np.ndarray) -> np.ndarray:
-    """Permute axes: X'=Y, Y'=Z, Z'=X, i.e. out[a, b, c] = in[c, a, b].
+def _to_file_order(grid: np.ndarray) -> np.ndarray:
+    """Galactic-order array -> the order the file is indexed in: galactic (x, z, -y).
 
-    The input grid is indexed (x, y, z) in galactic coordinates (disk in XY,
-    z towards the galactic north). The output texture must have the disk in
-    XZ with y towards the galactic north.
+    Two things stack up here, and both have to be undone at the other end.
+
+    The first is the permutation glTexImage3D needs. A volume file is a C-order dump, so its
+    last axis varies fastest, while GL reads its client buffer with the *first* axis varying
+    fastest; VolumeTextureLoader.glGrid() declares the extents reversed to compensate. The
+    texture GL ends up with is therefore the file's three axes in reverse, and this writes
+    them out in reverse.
+
+    The second is a rotation. The renderer places the particles of the same data set through
+    BillboardSetInitializer.transformData():
+
+        aux.set(x, z, y).scl(size / 2).rotate(-90, 0, 1, 0).mul(transform).add(position)
+
+    so a galactic point (x, y, z) ends up at the object-local (-y, z, x) - a 90 deg turn in
+    the disk plane, about the axis the disk is thin along. The volume shader identifies the
+    texture's three axes with those same local axes and samples the box with them, so the
+    texture has to be authored in that rotated frame: without it the volume is 90 deg off
+    every other representation of the same data, which shows on the dust lanes against the
+    star field and nowhere else, the gas being close to axisymmetric.
+
+    Galactic (x, y, z) -> texture (x_t, y_t, z_t) is then
+
+        x_t = -y,   y_t = z,   z_t = x
+
+    and the file, which holds the texture reversed, is (z_t, y_t, x_t) = (x, z, -y). Reading
+    it back is that read left to right: flip the axis the galactic Y runs along, then undo
+    the transposition - see combine-volumes._from_file_order().
     """
     if grid.ndim == 4:
         # (x, y, z, channels) -> keep the channel axis last.
-        return np.ascontiguousarray(grid.transpose(1, 2, 0, 3))
-    return np.ascontiguousarray(grid.transpose(1, 2, 0))
+        return np.ascontiguousarray(grid.transpose(0, 2, 1, 3)[:, :, ::-1, :])
+    return np.ascontiguousarray(grid.transpose(0, 2, 1)[:, :, ::-1])
 
 def _write_bytes(data: bytes, output_path: str, compresslevel: int = 6):
     """Write raw voxel bytes to output_path, gzip-compressed (.raw.gz)."""
@@ -686,7 +720,7 @@ def create_volume_texture(density_grid: np.ndarray, output_path: str):
     """Save 3D texture as gzipped raw binary for OpenGL"""
     density_grid = _normalize_density(density_grid)
     
-    density_8bit = _swap_xyz((density_grid * 255).astype(np.uint8))
+    density_8bit = _to_file_order((density_grid * 255).astype(np.uint8))
     
     _write_bytes(density_8bit.tobytes(), output_path)
     
@@ -694,7 +728,7 @@ def create_volume_texture(density_grid: np.ndarray, output_path: str):
 
 def create_color_texture(color_grid: np.ndarray, output_path: str):
     """Save 3D color texture as gzipped raw RGB"""
-    color_8bit = _swap_xyz((np.clip(color_grid, 0, 1) * 255).astype(np.uint8))
+    color_8bit = _to_file_order((np.clip(color_grid, 0, 1) * 255).astype(np.uint8))
     
     _write_bytes(color_8bit.tobytes(), output_path)
     
@@ -715,7 +749,7 @@ def create_rgba_texture(density_grid: np.ndarray, color_grid: np.ndarray, output
     rgba[..., :3] = (np.clip(color_grid, 0, 1) * 255).astype(np.uint8)
     rgba[..., 3] = (density_grid * 255).astype(np.uint8)
 
-    rgba_8bit = _swap_xyz(rgba)
+    rgba_8bit = _to_file_order(rgba)
     _write_bytes(rgba_8bit.tobytes(), output_path)
 
     print(f"Saved RGBA texture: {output_path} ({rgba_8bit.nbytes / 1024 / 1024:.2f} MB raw)")
@@ -746,7 +780,8 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
     
     with open(metadata_path, 'w') as f:
         f.write("# Grid, world size, bounds and voxel size are in storage order (W, H, D)\n")
-        f.write("# = galactic (Y, Z, X), the order the file is indexed in.\n")
+        f.write("# = galactic (X, Z, -Y), the order the file is indexed in; see\n")
+        f.write("# particles-to-3dtex._to_file_order() for why the frame is rotated.\n")
         f.write(f"Channel: {channel.name}\n")
         f.write(f"Grid size: {_format_axes(grid)}\n")
         f.write(f"Galactic grid (x, y, z): {_format_axes(config.grid)}\n")
@@ -881,7 +916,7 @@ def main():
         metavar="N|WxHxD",
         help="Grid resolution: one number for a cubic grid, or three as WxHxD. The three "
              "are in storage order (the order of the file, and of the metadata's 'Grid "
-             "size:'), i.e. galactic (Y, Z, X) - a flat disk wants '400x40x400', a 400 "
+             "size:'), i.e. galactic (X, Z, -Y) - a flat disk wants '400x40x400', a 400 "
              "wide, 40 tall and 400 deep texture. A per-axis grid also makes the box "
              "follow the data instead of being forced to a cube. Default: 128."
     )
