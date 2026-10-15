@@ -55,8 +55,8 @@ public final class PingPongBuffer implements Disposable {
                                           hasReflectionMask,
                                           pixmapFormat,
                                           preventFloatBuffer);
-        // Default half-resolution factor is 0.4.
-        var halfWidth = Math.max(760, (int) (width * 0.4));
+        // Default half-resolution factor is 0.6.
+        var halfWidth = Math.max(1000, (int) (width * 0.6));
         var halfHeight = (int) ((float) height / (float) width * (float) halfWidth);
         ownedHalf = createMainFrameBuffer(halfWidth,
                                           halfHeight,
