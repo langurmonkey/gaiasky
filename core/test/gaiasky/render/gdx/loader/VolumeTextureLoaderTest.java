@@ -286,6 +286,94 @@ public class VolumeTextureLoaderTest {
         Assert.assertEquals(voxelY, voxelZ, 1e-4f);
     }
 
+    @Test
+    public void theDensityChannelIsWhereTheShaderReadsIt() {
+        // volume.fragment.glsl takes the density from .r in a density-only volume and from .a in a
+        // colour+density one, and gates every use of a voxel's colour behind a density test. A
+        // colour-only volume therefore has no density to measure, and nothing to crop.
+        Assert.assertEquals(0, VolumeTextureLoader.densityChannelOffset(VolumeType.DENSITY));
+        Assert.assertEquals(3, VolumeTextureLoader.densityChannelOffset(VolumeType.RGBA));
+        Assert.assertEquals(-1, VolumeTextureLoader.densityChannelOffset(VolumeType.COLOR));
+    }
+
+    @Test
+    public void contentBoundsAreTheFilledBoxPaddedByOneVoxel() {
+        // A 4x3x5 RGBA grid with material at (1, 1, 2) and (2, 1, 3) only, i.e. inside the grid on
+        // both ends of every axis, so every side gets its padding.
+        int w = 4, h = 3, d = 5, channels = 4, density = 3;
+        byte[] data = new byte[w * h * d * channels];
+        data[voxel(w, h, d, channels, density, 1, 1, 2)] = 10;
+        data[voxel(w, h, d, channels, density, 2, 1, 3)] = 10;
+
+        Assert.assertArrayEquals(new int[]{0, 3, 0, 2, 1, 4},
+                                 VolumeTextureLoader.contentVoxelBounds(data, w, h, d, channels, density));
+    }
+
+    @Test
+    public void contentBoundsStopAtTheGridEdge() {
+        // Material in the first voxel of the grid leaves nothing to pad toward, and the bounds have
+        // to stay inside the grid rather than point at voxels that do not exist.
+        int w = 4, h = 3, d = 5, channels = 4, density = 3;
+        byte[] data = new byte[w * h * d * channels];
+        data[voxel(w, h, d, channels, density, 0, 0, 0)] = 1;
+
+        Assert.assertArrayEquals(new int[]{0, 1, 0, 1, 0, 1},
+                                 VolumeTextureLoader.contentVoxelBounds(data, w, h, d, channels, density));
+    }
+
+    @Test
+    public void anEmptyGridHasNoContentBounds() {
+        // Which the caller reads as "nothing to crop", not as an empty box: a volume with no
+        // material at all is left on the box its metadata declares.
+        Assert.assertNull(VolumeTextureLoader.contentVoxelBounds(new byte[4 * 3 * 5 * 4], 4, 3, 5, 4, 3));
+        Assert.assertNull(VolumeTextureLoader.contentVoxelBounds(new byte[4 * 3 * 5], 4, 3, 5, 1, 0));
+    }
+
+    @Test
+    public void onlyTheDensityChannelDecidesWhatIsContent() {
+        // A voxel with no density is never sampled for its colour, so a filled colour channel is
+        // not material and must not keep the empty shell alive.
+        int w = 2, h = 2, d = 2, channels = 4, density = 3;
+        byte[] data = new byte[w * h * d * channels];
+        for (int i = 0; i < data.length; i += channels) {
+            data[i] = (byte) 255;
+            data[i + 1] = (byte) 255;
+            data[i + 2] = (byte) 255;
+        }
+
+        Assert.assertNull(VolumeTextureLoader.contentVoxelBounds(data, w, h, d, channels, density));
+    }
+
+    @Test
+    public void cropMovesWholeRowsInFileOrder() {
+        // The file's fastest axis is contiguous, so a cropped row is a copy of a run of the source;
+        // every byte has to land at the offset it had relative to the voxel, or the texture is
+        // uploaded with its channels shifted.
+        int w = 4, h = 3, d = 5, channels = 4;
+        byte[] data = new byte[w * h * d * channels];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = (byte) (i & 0x7f);
+        }
+
+        // The box the content-bounds test above produces for this grid.
+        int[] bounds = {0, 3, 0, 2, 1, 4};
+        byte[] cropped = VolumeTextureLoader.crop(data, w, h, d, channels, bounds);
+
+        Assert.assertEquals(4 * 3 * 4 * channels, cropped.length);
+        for (int c = 0; c < channels; c++) {
+            int from = voxel(w, h, d, channels, c, 2, 1, 3);
+            int to = voxel(4, 3, 4, channels, c, 2, 1, 2);
+            Assert.assertEquals(data[from], cropped[to]);
+        }
+    }
+
+    /**
+     * The byte offset of a channel within a voxel, in the file's C-order (W, H, D, channels).
+     */
+    private static int voxel(int w, int h, int d, int channels, int channel, int x, int y, int z) {
+        return ((x * h + y) * d + z) * channels + channel;
+    }
+
     private static void assertGrid(Trio<Integer, Integer, Integer> grid, int width, int height, int depth) {
         Assert.assertNotNull(grid);
         Assert.assertEquals(width, grid.getFirst().intValue());

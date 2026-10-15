@@ -470,6 +470,56 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             ));
         }
 
+        // Crop the grid to the box that holds any material at all. A voxel with no density
+        // contributes nothing to the image - no emission, and no extinction, so no occlusion either
+        // - which means removing the empty shell around a volume cannot change what it draws, while
+        // it buys three things at once: the box the shader intersects (and so the span every ray
+        // marches) shrinks, the same TARGET_STEP_UVW advances fewer voxels, and the texture costs
+        // less memory. A galaxy volume spends most of its grid on that shell, including the margin
+        // the generator leaves around the data, none of which has to be traversed. It is also what
+        // lets volume.fragment.glsl take a coarser step in its depth pre-pass: what matters there
+        // is the step in voxels, and the pre-pass now searches the dust's own box rather than the
+        // whole volume's.
+        //
+        // The one voxel of padding is not cosmetic. A sample between the last non-empty voxel and
+        // an empty one interpolates toward zero, and that empty voxel has to still be there for the
+        // interpolated value to come out the same; one voxel of reach is all trilinear filtering
+        // has. The box moves with the data (see the bounds below), so nothing on screen shifts.
+        int densityOffset = densityChannelOffset(type);
+        if (densityOffset >= 0) {
+            int[] content = contentVoxelBounds(fileData, width, height, depth, channels, densityOffset);
+            if (content != null && (content[0] > 0 || content[1] < width - 1
+                                            || content[2] > 0 || content[3] < height - 1
+                                            || content[4] > 0 || content[5] < depth - 1)) {
+                // The box is measured in voxel edges, so voxel i covers [i, i + 1) and the cropped
+                // box is the first and last index of the content plus one at the far end.
+                float voxelX = (metadata.boundsMax().x - metadata.boundsMin().x) / width;
+                float voxelY = (metadata.boundsMax().y - metadata.boundsMin().y) / height;
+                float voxelZ = (metadata.boundsMax().z - metadata.boundsMin().z) / depth;
+
+                Vector3 croppedMin = new Vector3(metadata.boundsMin().x + content[0] * voxelX,
+                                                 metadata.boundsMin().y + content[2] * voxelY,
+                                                 metadata.boundsMin().z + content[4] * voxelZ);
+                Vector3 croppedMax = new Vector3(metadata.boundsMin().x + (content[1] + 1) * voxelX,
+                                                 metadata.boundsMin().y + (content[3] + 1) * voxelY,
+                                                 metadata.boundsMin().z + (content[5] + 1) * voxelZ);
+                int croppedWidth = content[1] - content[0] + 1;
+                int croppedHeight = content[3] - content[2] + 1;
+                int croppedDepth = content[5] - content[4] + 1;
+
+                logger.info("Cropping " + file.name() + " from " + width + "x" + height + "x" + depth
+                                    + " to " + croppedWidth + "x" + croppedHeight + "x" + croppedDepth
+                                    + ": the rest of the grid has no density.");
+
+                fileData = crop(fileData, width, height, depth, channels, content);
+                width = croppedWidth;
+                height = croppedHeight;
+                depth = croppedDepth;
+                dimensions = new Trio<>(croppedWidth, croppedHeight, croppedDepth);
+                metadata = new VolumeMetadata(dimensions, croppedMin, croppedMax);
+            }
+        }
+
         // The file's own order (W, H, D) is not the order GL reads it in, and the box has to be
         // turned into the same frame as the texture, so the two go together: see glGrid and
         // glBounds. Everything above this line is about the file; everything below is about the
@@ -503,6 +553,125 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         pixels.flip();
 
         return new VolumeLoadResult(textureData, type, boundsMin, boundsMax);
+    }
+
+    /**
+     * The byte within a voxel that holds the density, for the formats {@code particles-to-3dtex.py}
+     * writes; -1 when the format stores no density.
+     * <p>
+     * This has to agree with the sampling in {@code volume.fragment.glsl}, which reads the density
+     * from {@code .r} in a density-only (R8) volume and from {@code .a} in a colour+density (RGBA)
+     * one. A colour-only volume carries no density at all - the shader gates every use of a voxel's
+     * colour behind a density test, so its colour alone cannot be raymarched and there is nothing to
+     * measure, let alone to crop.
+     *
+     * @param type The volume format.
+     *
+     * @return The density channel's byte offset in a voxel, or -1 if there is none.
+     */
+    static int densityChannelOffset(VolumeType type) {
+        return switch (type) {
+            case DENSITY -> 0;
+            case RGBA -> 3;
+            case COLOR -> -1;
+        };
+    }
+
+    /**
+     * The range of voxels that hold any density, per axis, inclusive on both ends, in the file's
+     * (W, H, D) order, expanded by one voxel on every side that has room for it.
+     * <p>
+     * Empty is not the same as invisible: a zero voxel still costs a step and a fetch on every ray
+     * that crosses it, and a flat volume is mostly zero voxels. Nothing outside this range can
+     * contribute emission, extinction or depth, so the range is the only part of the grid worth
+     * marching, sampling or storing.
+     * <p>
+     * Package-private and free of I/O so the rule can be tested directly.
+     *
+     * @param data          The volume's voxels, C-order (W, H, D, channels).
+     * @param width         The grid's extent on the file's first axis.
+     * @param height        The grid's extent on the file's second axis.
+     * @param depth         The grid's extent on the file's third (fastest varying) axis.
+     * @param channels      Bytes per voxel.
+     * @param densityOffset The density byte within a voxel, from {@link #densityChannelOffset}.
+     *
+     * @return {@code {wMin, wMax, hMin, hMax, dMin, dMax}}, or null if every voxel is empty.
+     */
+    static int[] contentVoxelBounds(byte[] data, int width, int height, int depth, int channels, int densityOffset) {
+        int wMin = width, wMax = -1, hMin = height, hMax = -1, dMin = depth, dMax = -1;
+
+        int index = densityOffset;
+        for (int w = 0; w < width; w++) {
+            for (int h = 0; h < height; h++) {
+                for (int d = 0; d < depth; d++) {
+                    if (data[index] != 0) {
+                        if (w < wMin) {
+                            wMin = w;
+                        }
+                        if (w > wMax) {
+                            wMax = w;
+                        }
+                        if (h < hMin) {
+                            hMin = h;
+                        }
+                        if (h > hMax) {
+                            hMax = h;
+                        }
+                        if (d < dMin) {
+                            dMin = d;
+                        }
+                        if (d > dMax) {
+                            dMax = d;
+                        }
+                    }
+                    index += channels;
+                }
+            }
+        }
+
+        if (wMax < 0) {
+            return null;
+        }
+
+        // One voxel of padding, clamped to the grid: see the note where this is used.
+        return new int[]{
+                Math.max(0, wMin - 1), Math.min(width - 1, wMax + 1),
+                Math.max(0, hMin - 1), Math.min(height - 1, hMax + 1),
+                Math.max(0, dMin - 1), Math.min(depth - 1, dMax + 1)};
+    }
+
+    /**
+     * Copy the sub-grid {@code bounds} out of a C-order voxel block, in the same order.
+     * <p>
+     * The file's fastest axis is contiguous, so a run of it is a single array copy; only the two
+     * outer loops are walked. The result is the block a texture is uploaded from, one row at a time.
+     * <p>
+     * Package-private and free of I/O so the rule can be tested directly.
+     *
+     * @param data     The volume's voxels, C-order (W, H, D, channels).
+     * @param width    The grid's extent on the file's first axis.
+     * @param height   The grid's extent on the file's second axis.
+     * @param depth    The grid's extent on the file's third (fastest varying) axis.
+     * @param channels Bytes per voxel.
+     * @param bounds   {@code {wMin, wMax, hMin, hMax, dMin, dMax}}, as {@link #contentVoxelBounds}
+     *                 returns it.
+     *
+     * @return The cropped voxels, C-order, with the same channels per voxel.
+     */
+    static byte[] crop(byte[] data, int width, int height, int depth, int channels, int[] bounds) {
+        int wMin = bounds[0], wMax = bounds[1], hMin = bounds[2], hMax = bounds[3], dMin = bounds[4], dMax = bounds[5];
+        int rowLength = (dMax - dMin + 1) * channels;
+        byte[] cropped = new byte[(wMax - wMin + 1) * (hMax - hMin + 1) * rowLength];
+
+        int out = 0;
+        for (int w = wMin; w <= wMax; w++) {
+            for (int h = hMin; h <= hMax; h++) {
+                int from = (int) ((((long) w * height + h) * depth + dMin) * channels);
+                System.arraycopy(data, from, cropped, out, rowLength);
+                out += rowLength;
+            }
+        }
+        return cropped;
     }
 
     // Helper classes

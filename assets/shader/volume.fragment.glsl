@@ -89,7 +89,7 @@ layout(location = 1) out vec4 layerBuffer;
 #include <shader/lib/logdepthbuff.glsl>
 
 #define PI 3.14159265359
-#define ITERATIONS 100
+#define ITERATIONS 90
 #define EXPOSURE 40.0
 
 // Volume colour modes, passed in per slot as u_volumeNColorMode. They describe both
