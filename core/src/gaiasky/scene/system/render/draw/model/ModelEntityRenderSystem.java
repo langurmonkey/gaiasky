@@ -231,7 +231,14 @@ public class ModelEntityRenderSystem {
             // because an additive volume that does not write depth cannot hide anything.
             var volume = Mapper.volume.get(entity);
             if (volume == null || volume.writeDepth) {
-                mc.depthTestReadWrite();
+                if (renderGroup == RenderGroup.VOLUME_DEPTH) {
+                    // The pre-pass stores the dust front; that is the mask the passes after it are tested against.
+                    mc.depthTestReadWrite();
+                } else {
+                    // The colour pass rasterises the FAR side of this flipped sphere, i.e. behind the mask.
+                    // A LEQUAL test against it deletes the whole fragment (colour included) -> black.
+                    mc.depthTestDisable();   // GL_NONE, no write: the pre-pass owns depth
+                }
             } else {
                 mc.updateDepthTest();
             }
