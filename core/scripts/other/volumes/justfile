@@ -3,6 +3,13 @@
 # and of the metadata's 'Grid size:', which is galactic (X, Z, -Y) - a flat disk, whose
 # thickness is the galactic Z, wants the middle number small (e.g. 400x40x400).
 #
+# The box is normalized: its largest side is 1, in units of the object's size in the scene,
+# so the object's sizePc decides how large the volume is drawn and the data only decides its
+# shape. A voxel size of 1/400 therefore asks for 400 voxels along the largest axis.
+# --no-normalize keeps the box in the source units, where the metadata bounds also acted as
+# a size multiplier on the object (a box of side 7 drew the volume 7 times the declared
+# size); volumes written either way must not be mixed.
+#
 # VARIADIC ARGS ARE INTERPOLATED UNQUOTED. '{{args}}' splices the extra arguments into
 # the command line as raw text, so anything the shell reads as syntax breaks: a group
 # spec contains a '|', and `--group 'Gas+Bulge:0.6|ArmDust'` arrives at the recipe as

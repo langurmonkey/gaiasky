@@ -216,7 +216,13 @@ class VolumeConfig:
             (the historical behaviour, so `--grid-size 400` is unchanged) and False for a
             per-axis grid, which reads as a request for a box shaped like the data.
         world_size: Fallback box size when there are no data bounds; scalar or three
-            galactic values.
+            galactic values. Only its shape survives - see `normalize`.
+        normalize: Rescale the box about the origin so its largest side is
+            NORMALIZED_SIDE, i.e. so the box is the object's size and the *data* only
+            decides its shape. This is what leaves the object's size in the JSON as the
+            only thing that decides how large the volume is drawn. Pass False to keep the
+            box in the source units, as the generator did before, where the metadata bounds
+            also carried a size multiplier of their own.
     """
 
     # Margin the box adds to the data bounds. compute_world_bounds() has already padded
@@ -224,7 +230,13 @@ class VolumeConfig:
     # as the cubic box always has.
     PADDING = 1.05
 
-    def __init__(self, grid=256, world_bounds=None, cube=None, world_size=30.0):
+    # Side of the largest axis of the box, in the units the metadata declares. The box is
+    # normalized to it, so the numbers the renderer reads are the object's size times a
+    # number of order 1, and the source units - arbitrary, and different from one data set
+    # to the next - never reach it. See _normalize().
+    NORMALIZED_SIDE = 1.0
+
+    def __init__(self, grid=256, world_bounds=None, cube=None, world_size=1.0, normalize=True):
         scalar_grid = np.isscalar(grid)
         self.storage_grid, self.grid = _grid_axes(grid)
 
@@ -249,10 +261,43 @@ class VolumeConfig:
         self.box_min = self.world_center - span / 2
         self.box_max = self.world_center + span / 2
 
-        # Per-axis, in galactic order. voxel_scale is the single number the isotropic
-        # kernels (the smart splat and the Gaussian blurs) want.
-        self.voxel_size = span / self.grid
+        # The data bounds as they came in, before _normalize() rescaled them. The metadata
+        # records both, so a run can always be related back to the source data.
+        self.raw_data_bounds = self.world_bounds
+
+        self.normalization = 1.0
+        if normalize:
+            self._normalize()
+
+        # Per-axis, in galactic order, in the normalized units. voxel_scale is the single
+        # number the isotropic kernels (the smart splat and the Gaussian blurs) want; the
+        # particle sizes are scaled by the same factor (see parse_particle_file), so a
+        # splat's radius in voxels - the ratio of the two - is unaffected.
+        self.voxel_size = self.world_size / self.grid
         self.voxel_scale = float(np.mean(self.voxel_size))
+
+    def _normalize(self):
+        """Rescale the box about the origin so its largest side is NORMALIZED_SIDE.
+
+        The renderer takes the volume's size from the box alone: the shader multiplies the
+        metadata bounds by the object's size. A box of side 7.06 therefore draws the galaxy
+        7.06 times the size the JSON asks for, which is what made the Milky Way three and a
+        half times too large. Normalizing here leaves the object's size as the only thing
+        that decides how large the volume is drawn, and the data as the only thing that
+        decides its shape.
+
+        Scaling about the origin, not about the box centre, is deliberate: the particle
+        pipeline places a point at its coordinate times size/2 with no recentring, so a data
+        set whose centre is off the origin has to stay off-centre, in the box and in the
+        particles alike.
+        """
+        self.normalization = float(self.NORMALIZED_SIDE / np.max(self.world_size))
+        self.world_size = self.world_size * self.normalization
+        self.world_center = self.world_center * self.normalization
+        self.box_min = self.world_center - self.world_size / 2
+        self.box_max = self.world_center + self.world_size / 2
+        self.world_bounds = (self.world_bounds[0] * self.normalization,
+                             self.world_bounds[1] * self.normalization)
 
     def set_grid(self, grid):
         """Replace the resolution, keeping the box.
@@ -355,8 +400,17 @@ def compute_world_bounds(input_dir: str) -> tuple[np.ndarray, np.ndarray]:
     
     return all_min, all_max
 
-def parse_particle_file(filename: str, world_bounds: (None|tuple[np.ndarray, np.ndarray]) = None) -> ParticleChannel:
-    """Parse gzipped particle files - handles both with and without headers"""
+def parse_particle_file(filename: str, world_bounds: (None|tuple[np.ndarray, np.ndarray]) = None,
+                        scale: float = 1.0) -> ParticleChannel:
+    """Parse gzipped particle files - handles both with and without headers.
+
+    `world_bounds` is in the *source* units and only decides which particles are inside the
+    box. `scale` then converts the coordinates and the particle sizes to the normalized
+    units the box is in (see VolumeConfig._normalize()); the sampling is unaffected, because
+    the box is scaled by the same factor, so a particle lands in the voxel it always landed
+    in. The sizes have to follow the coordinates: a splat's radius in voxels is the
+    particle's size over the voxel size, and both are scaled.
+    """
     channel_name = os.path.basename(filename)
     channel = ParticleChannel(channel_name)
     
@@ -393,6 +447,10 @@ def parse_particle_file(filename: str, world_bounds: (None|tuple[np.ndarray, np.
                                 z < min_bound[2] or z > max_bound[2]):
                                 particles_skipped += 1
                                 continue
+                        
+                        # Normalized units from here on; the culling above needed the
+                        # source ones. See the docstring.
+                        x, y, z, size = x * scale, y * scale, z * scale, size * scale
                         
                         # Check if this line has color data (7 columns)
                         if len(values) >= 7:
@@ -777,6 +835,7 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
     data_min, data_max = config.world_bounds
     box_min, box_max = config.stored_bounds()
     grid = config.stored_grid()
+    raw_min, raw_max = config.raw_data_bounds
     
     with open(metadata_path, 'w') as f:
         f.write("# Grid, world size, bounds and voxel size are in storage order (W, H, D)\n")
@@ -789,6 +848,12 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
         f.write(f"Data bounds: {_format_vector(data_min)} to {_format_vector(data_max)}\n")
         f.write(f"Volume bounds: {_format_vector(box_min)} to {_format_vector(box_max)}\n")
         f.write(f"Voxel size: {_format_vector(config.voxel_size[_GALACTIC_TO_STORAGE])}\n")
+        # Everything above is in normalized units, so a reader can no longer size the volume
+        # from the metadata alone - the object's size in the scene does that. The factor and
+        # the source bounds are recorded so the link to the data is not lost.
+        f.write(f"Normalization: {config.normalization:.6f} (stored units = source units "
+                f"times this, so the largest box side is {VolumeConfig.NORMALIZED_SIDE:g}; "
+                f"source data bounds {_format_vector(raw_min)} to {_format_vector(raw_max)})\n")
         f.write(f"Has color: {channel.has_color}\n")
         f.write(f"Original particle count: {channel.particle_count}\n")
         # Colour quantisation info. The gain is already applied to the stored
@@ -799,13 +864,17 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
     
     print(f"Saved metadata: {metadata_path}")
 
-def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999", group: dict = None, group_norm: str = "max", voxel_size: float = None, world_size: float = None):
+def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999", group: dict = None, group_norm: str = "max", voxel_size: float = None, world_size: float = None, normalize: bool = True):
     """Main conversion function.
 
     `grid` is one resolution or three, in storage order (W, H, D); see parse_grid_size().
     `voxel_size` wins over it when given: the grid is then derived per axis from the box,
     which is what keeps the voxel size of an N^3 grid while flattening only the axes where
-    the data has no extent.
+    the data has no extent. It is in the normalized units the box is in, so the box being
+    a side of 1, `--voxel-size 1/400` asks for 400 voxels on the largest axis.
+
+    `world_bounds` is in the source units; the box built from it is normalized unless
+    `normalize` is False, and the particles are converted to match. See VolumeConfig.
     """
 
     os.makedirs(output_dir, exist_ok=True)
@@ -814,7 +883,8 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bo
     # axis that is mostly empty, which is the waste being avoided.
     config = VolumeConfig(grid=grid, world_bounds=world_bounds,
                           cube=False if voxel_size else None,
-                          world_size=world_size if world_size is not None else 30.0)
+                          world_size=world_size if world_size is not None else 1.0,
+                          normalize=normalize)
     if voxel_size:
         galactic_grid = [max(1, int(round(span / voxel_size))) for span in config.world_size]
         config.set_grid(galactic_to_storage(galactic_grid))
@@ -830,6 +900,10 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bo
           f"{_format_axes(config.grid)} (galactic, x, y, z)")
     print(f"Box and voxel below are galactic: {_format_vector(config.box_min)} to "
           f"{_format_vector(config.box_max)}, voxel {_format_vector(config.voxel_size)}")
+    print(f"Box normalized by {config.normalization:.6f}, so its largest side is "
+          f"{VolumeConfig.NORMALIZED_SIDE:g} in units of the object's size (particles "
+          f"scaled to match); source data bounds "
+          f"{_format_vector(config.raw_data_bounds[0])} to {_format_vector(config.raw_data_bounds[1])}")
     if not np.allclose(config.voxel_size, config.voxel_size[0], rtol=0.1):
         print("Warning: the grid is not proportional to the box, so the voxels are "
               "anisotropic - the same memory, but banded along the stretched axis. A "
@@ -846,7 +920,7 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bo
         print(f"Processing {particle_file}...")
         
         filepath = os.path.join(input_dir, particle_file)
-        channel = parse_particle_file(filepath, world_bounds)
+        channel = parse_particle_file(filepath, world_bounds, config.normalization)
         
         if channel.particle_count == 0:
             print(f"Warning: No particles found in {particle_file}, skipping")
@@ -926,15 +1000,27 @@ def main():
         type=float,
         default=None,
         metavar="SIZE",
-        help="World size of one voxel, as an alternative to --grid-size: the grid is "
-             "derived per axis from the box. Use it to keep the voxel size of an N^3 grid "
-             "while flattening the axes where the data has no extent."
+        help="Size of one voxel, as an alternative to --grid-size: the grid is derived per "
+             "axis from the box. The box is normalized, its largest side being 1, so "
+             "--voxel-size 1/400 asks for 400 voxels along the largest axis. Use it to keep "
+             "the voxel size of an N^3 grid while flattening the axes where the data has no "
+             "extent."
     )
     
     parser.add_argument(
         "--fixed-world-size",
         type=float,
-        help="Use fixed world size instead of computing from data (for testing)"
+        help="Use a fixed box instead of computing one from the data (for testing). Only its "
+             "shape survives: the box is normalized to a side of 1."
+    )
+
+    parser.add_argument(
+        "--no-normalize",
+        action="store_true",
+        help="Keep the box in the source units instead of normalizing its largest side to 1. "
+             "The metadata bounds then act as a size multiplier on the object - a box of side "
+             "7 draws the volume 7 times the size in the JSON - which is what the generator "
+             "did before, and what makes the volumes it wrote incomparable with new ones."
     )
     
     parser.add_argument(
@@ -1041,7 +1127,8 @@ def main():
             group=args.group,
             group_norm=args.group_norm,
             voxel_size=args.voxel_size,
-            world_size=args.fixed_world_size
+            world_size=args.fixed_world_size,
+            normalize=not args.no_normalize
         )
         if status:
             print("\nThe conversion succeeded but the group merge failed; see above.")
