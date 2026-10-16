@@ -10,6 +10,25 @@
 # a size multiplier on the object (a box of side 7 drew the volume 7 times the declared
 # size); volumes written either way must not be mixed.
 #
+# The density blur is a length in the world, not a count of voxels: by default 0.85 of the
+# channel's *local* inter-particle spacing (the median distance from a particle to its
+# neighbours, in CHANNEL_SIGMA_LOCAL in particles-to-3dtex.py). Local, not the mean spacing of
+# the box: the box figure assumes the channel fills the box, and the dust does not - it is a
+# thin disk in a few percent of it - so sizing by the box gave the dust a blur 3.5x thicker
+# than the disk itself, which is what "puffy" is. Both figures are lengths on the particles, so
+# the same particles drawn at 200 and at 800 get the same galaxy.
+#
+# One fraction cannot be right for every channel at once - a dense thin disk and a diffuse halo
+# want different amounts - so --sigma overrides it per channel, as a fraction of that channel's
+# own spacing:
+#
+#     just texvoxelgroup 0.00125 'Gas+Bulge:0.6|ArmDust' <in> <out> --sigma dust=0.4
+#
+# The resulting width, in world units and in this grid's voxels, is in each channel's metadata,
+# alongside the two lengths it was sized and capped by - which is the cheap way to tell whether
+# two runs were generated to look the same.
+#
+#
 # VARIADIC ARGS ARE INTERPOLATED UNQUOTED. '{{args}}' splices the extra arguments into
 # the command line as raw text, so anything the shell reads as syntax breaks: a group
 # spec contains a '|', and `--group 'Gas+Bulge:0.6|ArmDust'` arrives at the recipe as
@@ -17,6 +36,19 @@
 # command not found"). Recipes that take a group spec therefore take it as a *named*
 # parameter and quote it themselves; for the others, escape the metacharacter
 # (`--group Gas+Bulge:0.6\|ArmDust`), which the shell then hands over intact.
+
+# Generate the emissive and occlusive galaxy volumes in one go, from the particle channels.
+#
+#     just volume 400 <in> <out>
+#     just volume 400 <in> <out> --intensity Bulge=0.3
+#
+# 'resolution' is the number of voxels along the longest side of the box; the other axes follow
+# the shape of the data, so the voxels stay cubic. Extra arguments go straight to the script:
+# --intensity NAME=FLOAT (0..1, repeatable) dims one channel, and nothing else is exposed here
+# because nothing else is needed for the usual run. This writes <prefix>_emissive_rgba.raw.gz and
+# <prefix>_occlusive_rgba.raw.gz, which are the two textures the scene's volume0/volume1 want.
+volume resolution input output *args:
+	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} {{args}}
 
 # Create a 3D texture from particle data using smart method.
 tex gridsize formats input output *args:
@@ -36,6 +68,7 @@ texvoxel voxelsize input output *args:
 # 'group' is a positional argument ('<emissive>|<occlusive>', each side a '+'-separated
 # list of channel names with an optional ':weight'), because a group spec cannot travel
 # through *args - see the note at the top of this file.
+alias gen := texvoxelgroup
 texvoxelgroup voxelsize group input output *args:
 	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --voxel-size {{voxelsize}} --format rgba --group '{{group}}' {{args}} {{input}} {{output}}
 

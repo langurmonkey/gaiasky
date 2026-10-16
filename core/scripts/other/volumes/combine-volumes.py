@@ -449,6 +449,18 @@ def save_metadata(inputs: list[VolumeInput], group: str, output_dir: str, basena
         f.write(f"Sources: " + ", ".join(f"{v.key} (weight {v.weight:g})" for v in inputs) + "\n")
         f.write(f"Color gains undone: " + ", ".join(f"{v.key} {v.color_gain:.6f}" for v in inputs) + "\n")
         f.write(f"Density normalization: {norm} (peak {peak:.6f})\n")
+        # The blur each source was written with, quoted from its own metadata: this file is the
+        # one that travels with the volume, and "how much was this smoothed" is not recoverable
+        # from the merged voxels. Both of the generator's figures are properties of the particles
+        # rather than of the grid, so two runs of the same particles at different resolutions
+        # report the same pair - which is what makes this a usable check.
+        for v in inputs:
+            smoothing = v.metadata.get("density smoothing")
+            lengths = v.metadata.get("density smoothing lengths")
+            if smoothing:
+                f.write(f"Source blur: {v.key} {smoothing}\n")
+            if lengths:
+                f.write(f"Source blur lengths: {v.key} {lengths}\n")
         if clipped:
             f.write(f"Clipped voxels: {clipped} (density above 1 with --norm none)\n")
 

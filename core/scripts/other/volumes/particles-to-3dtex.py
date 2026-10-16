@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from scipy.ndimage import gaussian_filter
+from scipy.spatial import cKDTree
 from tqdm import tqdm
 
 skip_files = ["galaxy_HII", "galaxy_Stars"]
@@ -46,6 +47,26 @@ def parse_format(value: str) -> set[str]:
             f"{', '.join(_FORMAT_TOKENS)} (or 'all')"
         )
     return set(tokens)
+
+def parse_sigma_override(value: str):
+    """Parse one --sigma CHANNEL=FACTOR into (channel, factor).
+
+    CHANNEL is a key of CHANNEL_SIGMA_LOCAL, and the key is what selects a channel's kind, so an
+    override can only name one that already has a table entry: a typo would otherwise silently do
+    nothing, which is the least useful way to fail.
+    """
+    if '=' not in value:
+        raise argparse.ArgumentTypeError(f"expected CHANNEL=FACTOR, got '{value}'")
+    channel, _, factor = value.partition('=')
+    channel = channel.strip().lower()
+    known = list(CHANNEL_SIGMA_LOCAL)
+    if channel not in known:
+        raise argparse.ArgumentTypeError(
+            f"unknown channel '{channel}'; known channels are {', '.join(sorted(known))}")
+    try:
+        return channel, float(factor)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"'{factor}' is not a number in '{value}'")
 
 def parse_grid_size(value: str):
     """Parse --grid-size: '400' (cubic), or '400x40x400' in storage order (W, H, D).
@@ -159,6 +180,9 @@ class ParticleChannel:
         self.particles = []
         self.has_color = False
         self.particle_count = 0
+        # (local spacing, thin-axis thickness) in world units, filled in on first use by
+        # _channel_geometry(). Both are properties of the particles alone.
+        self._geometry = None
     
     def add_particle(self, particle: Particle):
         self.particles.append(particle)
@@ -589,8 +613,16 @@ def particles_to_volume_smart(channel: ParticleChannel, config: VolumeConfig) ->
     if len(grid_coords) == 0:
         return density_grid, color_grid
     
-    # Use a simple Gaussian splatting approach
-    # For each particle, add density to a small 3x3x3 region
+    # A fixed +-1 voxel scatter. That is a *voxel*-sized footprint, so it is the one thing in this
+    # path that does not follow the world-unit rule in process_channel_specific(): the blur there
+    # still sets the width, and this scatter adds roughly one voxel to it, which is 13% of the
+    # width at a 200-wide grid and 1% at 800. Left as it is because it is small and because
+    # changing it would move every existing 'smart' volume; --method ultrafast, which is what the
+    # group path uses, scatters to the nearest voxel alone and has no such term.
+    #
+    # size_factor is a no-op as written: sizes are particle weights of order 1..50 in the box's
+    # units while voxel_scale is of order 1e-3, so the min() always returns its 2.0 clamp. Kept
+    # because removing it would change what 'smart' writes.
     kernel_radius = 1  # 3x3x3 kernel
     
     for i in tqdm(range(len(grid_coords)), desc="Processing particles"):
@@ -656,24 +688,196 @@ def _blur_color(color_grid: np.ndarray, density_grid: np.ndarray, sigma: float) 
     out[nonzero] = numerator[nonzero] / denominator[nonzero, None]
     return out
 
-def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray, color_grid: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Apply channel-specific processing"""
+# ---------------------------------------------------------------- density smoothing
+#
+# The deposit scatters each particle into a single voxel, so what it leaves behind is the raw
+# point cloud, and how connected that cloud looks is decided by the grid: at 200 several
+# particles share a voxel and the field is continuous, at 800 nearly every occupied voxel holds
+# one particle and it is a sprinkle of dots. Taken through the real pipeline, that is a 5.7x
+# drop in the dust's projected column density between 200 and 800 (2.9x for the emissive group)
+# and a fall in lane contrast from 5.4 to 3.4: the same particles in the same box drawing a
+# different picture because the grid changed.
+#
+# The blur below is what turns that point cloud into a field, and its width has to be a length
+# in the world rather than a count of voxels, or it reintroduces the same dependence. A width
+# held constant in *voxels* drifts just as badly - measured, 5.7x over 200..800 - so the rule is
+# a distance.
+#
+# The width is a fraction of the channel's *local* inter-particle spacing: the median distance
+# from a particle to its neighbours, measured on the particles themselves. This is not the same
+# as the mean spacing of the box, and the difference is the whole tuning problem:
+#
+#   channel  N       (V_box/N)^(1/3)   local    box/local   thin-axis thickness
+#   dust     92982      0.01024       0.00136      7.5x          0.00073
+#   gas      14864      0.01887       0.00782      2.4x          0.00601
+#   bulge      933      0.04747       0.00819      5.8x          0.00606
+#
+# The box figure assumes the channel fills the box. The dust does not - it is a thin disk inside
+# a few percent of it - so the box figure overstates the distance between dust particles by 7.5x,
+# and a fraction that suits the gas comes out far too wide for the dust. At the old 0.25 of the
+# box spacing the dust blur was 0.00256, i.e. 3.5x the thickness of the dust disk itself: a blur
+# wider than the thing being blurred, which is what "puffy" is. The gas at the same fraction was
+# 0.00472, just under its own thickness, and read correctly.
+#
+# So the width is LOCAL_SIGMA of the local spacing, and it is capped at MAX_SIGMA_THICKNESS times
+# the channel's own thin-axis thickness. The cap is what makes one fraction serve every channel:
+# a blur is only allowed to widen a channel's thin-axis profile by about 10%, and where the local
+# spacing would ask for more than that - the dust's does - the channel is left as sharp as its
+# resolution allows instead of being smoothed into a slab. Both quantities are lengths on the
+# particles, so neither depends on the grid.
+DEFAULT_SIGMA_LOCAL = 0.85
+
+CHANNEL_SIGMA_LOCAL = {
+    'dust': DEFAULT_SIGMA_LOCAL,
+    'gas': DEFAULT_SIGMA_LOCAL,
+    'hii': DEFAULT_SIGMA_LOCAL,
+    'bulge': DEFAULT_SIGMA_LOCAL,
+    'star': DEFAULT_SIGMA_LOCAL,
+}
+
+# The neighbour whose distance to a particle is taken as the local spacing. The first is the
+# noisiest - two particles can share a voxel - so a few neighbours in, which is stable and still
+# local. The median over particles is taken, not the mean, so a channel with a dense core and a
+# sparse halo is sized by its typical particle.
+LOCAL_SPACING_NEIGHBOURS = 4
+
+# A guard on the width, as a multiple of the channel's thin-axis half-mass thickness: it stops
+# the rule above turning a sparse channel into a slab. Deliberately loose. The channels in this
+# data set have local spacings of 1.1x to 1.8x their own thickness, so at the default fraction
+# nothing is clamped and both knobs stay live; a cap tight enough to bind here would also take
+# the gas below the width it wants. What it is for is the case the fraction cannot see - a
+# channel of a few hundred particles, whose "local spacing" is an artefact of its sparsity.
+MAX_SIGMA_THICKNESS = 2.0
+
+CHANNEL_DEFAULT_COLOR = {
+    'dust': (0.8, 0.6, 0.4),
+    'gas': (0.3, 0.5, 0.8),
+    'hii': (1.0, 0.4, 0.6),
+    'bulge': (1.0, 0.9, 0.6),
+    'star': (1.0, 0.95, 0.9),
+}
+
+def channel_kind(channel_name: str) -> str | None:
+    """The entry of the tables above a channel name selects, or None for a channel that gets no
+    processing of its own. The dicts are ordered, so the first match is the specific one."""
+    name = channel_name.lower()
+    for kind in CHANNEL_SIGMA_LOCAL:
+        if kind in name:
+            return kind
+    return None
+
+def _channel_geometry(channel: "ParticleChannel") -> tuple[float, float]:
+    """The two lengths on a channel that the blur is sized and capped by: the local
+    inter-particle spacing and the thin-axis thickness, both in the world units of the box.
+
+    Spacing is the median distance from a particle to its LOCAL_SPACING_NEIGHBOURS-th nearest
+    neighbour, so it measures the gaps that actually have to be filled rather than the volume
+    divided by the count. Thickness is the half-mass thickness along the galactic Z axis, the
+    standard deviation of the mass profile in the direction a disk is thin in - scaled by 0.6745
+    so a Gaussian profile reports its half-width at half maximum, which is the length "how thick
+    is this channel" usually means.
+
+    Both come from the particles and the box alone, so both are identical at every resolution.
+    Computed once per channel and cached: the tree on ~100k particles is a second, and the
+    metadata and the blur both want the answer.
+    """
+    cached = getattr(channel, '_geometry', None)
+    if cached is not None:
+        return cached
+
+    pos = channel.particles
+    n = len(pos)
+    if n == 0:
+        channel._geometry = (0.0, 0.0)
+        return channel._geometry
+
+    xyz = np.empty((n, 3), np.float64)
+    w = np.empty(n, np.float64)
+    for i, p in enumerate(pos):
+        xyz[i, 0] = p.x
+        xyz[i, 1] = p.y
+        xyz[i, 2] = p.z
+        w[i] = p.size
+
+    k = min(LOCAL_SPACING_NEIGHBOURS + 1, n)
+    tree = cKDTree(xyz)
+    dist, _ = tree.query(xyz, k=k)
+    spacing = float(np.median(dist[:, -1])) if n > 1 else 0.0
+
+    # Thin axis is galactic Z (the third component; the file is in galactic order).
+    z = np.abs(xyz[:, 2] - np.average(xyz[:, 2], weights=w))
+    order = np.argsort(z)
+    zs, ws = z[order], w[order]
+    cum = np.cumsum(ws) / ws.sum()
+    thickness = float(np.interp(0.5, cum, zs))
+
+    channel._geometry = (spacing, thickness)
+    return channel._geometry
+
+def _local_spacing(channel: "ParticleChannel") -> float:
+    """The channel's local inter-particle spacing, in world units. See _channel_geometry."""
+    return _channel_geometry(channel)[0]
+
+def _thin_thickness(channel: "ParticleChannel") -> float:
+    """The channel's half-mass thickness along galactic Z, in world units. See _channel_geometry."""
+    return _channel_geometry(channel)[1]
+
+def _density_sigma_world(kind: str | None, config: "VolumeConfig", channel: "ParticleChannel",
+                         smoothing_scale: float = 1.0) -> float:
+    """The density blur of a channel, as a width in world units of the box.
+
+    CHANNEL_SIGMA_LOCAL of the channel's local inter-particle spacing, times the caller's
+    --smoothing-scale, capped at MAX_SIGMA_THICKNESS times the channel's own thin-axis thickness.
+    Every term is a length on the particles, so the result neither depends on the resolution nor
+    cares whether the box was normalized - and, unlike a fraction of the *box* spacing, it sizes
+    a channel by where its particles are rather than by how much empty box surrounds them.
+    """
+    if kind is None:
+        return 0.0
+    spacing = _local_spacing(channel)
+    sigma = CHANNEL_SIGMA_LOCAL[kind] * spacing * smoothing_scale
+    return min(sigma, MAX_SIGMA_THICKNESS * _thin_thickness(channel))
+
+def _density_sigma_voxels(kind: str | None, config: "VolumeConfig", channel: "ParticleChannel",
+                          smoothing_scale: float = 1.0) -> float:
+    """The same width as a sigma this grid can actually apply: sigma_world / voxel_size.
+
+    Independent of the resolution by construction, which is the whole point: the same particles
+    written at 200 and at 800 get four times and a quarter of these voxels of blur, and the same
+    galaxy in the end.
+    """
+    return _density_sigma_world(kind, config, channel, smoothing_scale) / config.voxel_scale
+
+def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray, color_grid: np.ndarray,
+                             config: "VolumeConfig", smoothing_scale: float = 1.0) -> tuple[np.ndarray, np.ndarray]:
+    """Apply channel-specific processing.
+
+    The blur is a width in world units, not in voxels, so that the same particle data written at
+    any resolution describes the same galaxy - which it did not while the width was counted in
+    voxels. See CHANNEL_SIGMA_LOCAL.
+    """
     channel_name = channel.name.lower()
-    
-    # Gaussian sigma for the density blur, and the fallback colour used for
-    # channels that carry no colour column of their own.
-    if 'dust' in channel_name:
-        sigma, default_color = 0.2, (0.8, 0.6, 0.4)
-    elif 'gas' in channel_name:
-        sigma, default_color = 1.5, (0.3, 0.5, 0.8)
-    elif 'hii' in channel_name:
-        sigma, default_color = 1.2, (1.0, 0.4, 0.6)
-    elif 'bulge' in channel_name:
-        sigma, default_color = 3.0, (1.0, 0.9, 0.6)
-    elif 'star' in channel_name:
-        sigma, default_color = 0.3, (1.0, 0.95, 0.9)
-    else:
-        sigma, default_color = 0.0, None
+    kind = channel_kind(channel_name)
+    sigma = _density_sigma_voxels(kind, config, channel, smoothing_scale)
+    default_color = CHANNEL_DEFAULT_COLOR.get(kind) if kind else None
+
+    if kind is not None:
+        requested = CHANNEL_SIGMA_LOCAL[kind] * _local_spacing(channel) * smoothing_scale
+        cap = MAX_SIGMA_THICKNESS * _thin_thickness(channel)
+        if requested > cap:
+            print(f"Note: the {channel_name} blur of {requested:.5f} world units was clamped to "
+                  f"{cap:.5f}, its own thin-axis thickness. Its particles are {requested / max(cap, 1e-12):.1f}x "
+                  f"further apart than the channel is thick, so bridging the gap would mean "
+                  f"blurring the channel into a slab. It is left as sharp as this grid allows.")
+
+    # Below a voxel the kernel has no voxel to act on and scipy leaves the grid alone, so the
+    # raw point cloud shows through - which at a low resolution is exactly the granular look
+    # this blur exists to hide. It is not an error and it is not clamped: forcing the sigma up
+    # to a voxel would put the resolution dependence straight back where it came from.
+    if 0 < sigma < 0.5:
+        print(f"Note: the {channel_name} blur is {sigma:.3f} voxels, below one voxel, so this "
+              f"grid cannot carry it and the point cloud shows through. Use a smaller "
+              f"--voxel-size (a finer grid) if the smoothing matters here.")
     
     # Colour first, from the *unblurred* density, so that it spreads as far as
     # the density is about to.
@@ -687,7 +891,7 @@ def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray,
         for c in range(3):
             color_grid[:,:,:,c] = default_color[c]
     
-    print(f"Applied {channel_name} channel processing")
+    print(f"Applied {channel_name} channel processing (sigma {sigma:.4f} voxels)")
     return density_grid, color_grid
 
 def _to_file_order(grid: np.ndarray) -> np.ndarray:
@@ -821,7 +1025,8 @@ def _format_vector(values) -> str:
     return "[" + ", ".join(f"{float(v):.3f}" for v in values) + "]"
 
 def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: str, basename: str,
-                  color_gain: float = 1.0, color_normalize: str = "none", formats=frozenset()):
+                  color_gain: float = 1.0, color_normalize: str = "none", formats=frozenset(),
+                  smoothing_scale: float = 1.0):
     """Save metadata file for the volume texture.
 
     The grid and the box are written in *storage* order (W, H, D), because that is the
@@ -861,10 +1066,30 @@ def save_metadata(channel: ParticleChannel, config: VolumeConfig, output_dir: st
         # the colour files stay reproducible and comparable across runs.
         f.write(f"Formats: {', '.join(sorted(formats)) if formats else 'none'}\n")
         f.write(f"Color gain: {color_gain:.6f} (mode: {color_normalize})\n")
+        # The density blur, recorded as a width in world units as well as in voxels: the world
+        # figure is resolution-independent by construction, so two runs of the same particles at
+        # different resolutions write the same number here - which makes the metadata answer
+        # "were these two generated to look the same?" without regenerating anything.
+        kind = channel_kind(channel.name)
+        spacing = _local_spacing(channel)
+        thickness = _thin_thickness(channel)
+        sigma_world = _density_sigma_world(kind, config, channel, smoothing_scale)
+        clamped = kind is not None and CHANNEL_SIGMA_LOCAL[kind] * spacing * smoothing_scale > sigma_world + 1e-12
+        f.write(f"Density smoothing: sigma "
+                f"{_density_sigma_voxels(kind, config, channel, smoothing_scale):.4f} voxels = "
+                f"{sigma_world:.8f} world units "
+                f"({CHANNEL_SIGMA_LOCAL.get(kind, 0.0):g} x the {spacing:.8f} local inter-particle "
+                f"spacing, scale {smoothing_scale:g})\n")
+        # The two lengths the width was sized and capped by, so a later run can be compared to
+        # this one without the particles: both are properties of the channel, not of the grid, so
+        # the same particles at another resolution must write the same pair.
+        f.write(f"Density smoothing lengths: local spacing {spacing:.8f}, thin-axis half-mass "
+                f"thickness {thickness:.8f}, cap {MAX_SIGMA_THICKNESS:g} x thickness"
+                f"{' (CLAMPED)' if clamped else ''}\n")
     
     print(f"Saved metadata: {metadata_path}")
 
-def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999", group: dict = None, group_norm: str = "max", voxel_size: float = None, world_size: float = None, normalize: bool = True):
+def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bounds: tuple[np.ndarray, np.ndarray], method: str = "ultrafast", formats: frozenset = ALL_FORMATS, color_normalize: str = "p999", group: dict = None, group_norm: str = "max", voxel_size: float = None, world_size: float = None, normalize: bool = True, smoothing_scale: float = 1.0):
     """Main conversion function.
 
     `grid` is one resolution or three, in storage order (W, H, D); see parse_grid_size().
@@ -875,6 +1100,11 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bo
 
     `world_bounds` is in the source units; the box built from it is normalized unless
     `normalize` is False, and the particles are converted to match. See VolumeConfig.
+
+    `smoothing_scale` multiplies the per-channel density blur, which is a width in world units -
+    CHANNEL_SIGMA_LOCAL of the channel's local inter-particle spacing - so
+    that runs at different resolutions describe the same galaxy. It is the knob for the overall
+    amount of smoothing: 0 for none, 2 for twice as much.
     """
 
     os.makedirs(output_dir, exist_ok=True)
@@ -933,7 +1163,7 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bo
             density_grid, color_grid = particles_to_volume_ultrafast(channel, config)
         
         # Apply channel-specific processing
-        density_grid, color_grid = process_channel_specific(channel, density_grid, color_grid)
+        density_grid, color_grid = process_channel_specific(channel, density_grid, color_grid, config, smoothing_scale)
         
         # Stretch the (very dark) source colours over the 8-bit range. Done once,
         # before writing, so the colour and RGBA files agree byte for byte.
@@ -959,7 +1189,8 @@ def convert_particles_to_volumes(input_dir: str, output_dir: str, grid, world_bo
             rgba_channels.append(basename)
         
         # Save metadata
-        save_metadata(channel, config, output_dir, basename, color_gain, color_normalize, formats)
+        save_metadata(channel, config, output_dir, basename, color_gain, color_normalize, formats,
+                      smoothing_scale)
         
         print(f"Completed processing {particle_file}")
     
@@ -1075,6 +1306,34 @@ def main():
         help="Density normalisation for the textures written by --group"
     )
     
+    parser.add_argument(
+        "--smoothing-scale",
+        type=float,
+        default=1.0,
+        metavar="FACTOR",
+        help="Multiplier on the per-channel density blur, which is a width in world units - "
+             "%.2f of the channel's *local* inter-particle spacing (the median distance from a "
+             "particle to its neighbours), capped at %g x the channel's own thin-axis thickness - "
+             "so that the same particles written at 200 and at 800 describe the same galaxy, and "
+             "so that a channel that fills little of the box (a thin dust disk) is not sized by "
+             "the box it sits in. 0 disables the blur, which leaves the raw point cloud and its "
+             "resolution dependence in place; 2 doubles the width everywhere."
+             % (DEFAULT_SIGMA_LOCAL, MAX_SIGMA_THICKNESS)
+    )
+
+    parser.add_argument(
+        "--sigma",
+        type=parse_sigma_override,
+        action="append",
+        default=[],
+        metavar="CHANNEL=FACTOR",
+        help="Override the blur of one channel, as a fraction of its local inter-particle "
+             "spacing. Repeatable, e.g. --sigma dust=0.4 --sigma gas=1.2. CHANNEL is a key of "
+             "the internal table: %s. Useful because one fraction cannot suit both a dense thin "
+             "disk and a diffuse halo at once. The per-channel cap still applies."
+             % ', '.join(sorted(CHANNEL_SIGMA_LOCAL))
+    )
+    
     args = parser.parse_args()
 
     if args.voxel_size is not None and args.grid_size is not None:
@@ -1092,6 +1351,14 @@ def main():
     if not os.path.exists(args.input_dir):
         print(f"Error: Input directory '{args.input_dir}' does not exist")
         return 1
+
+    # Per-channel overrides land on the table the blur is sized from, before any channel is
+    # processed. A channel named twice keeps the last value, as a command line would.
+    for channel, factor in args.sigma:
+        CHANNEL_SIGMA_LOCAL[channel] = factor
+    if args.sigma:
+        print("Blur overrides: " + ", ".join(f"{c} = {CHANNEL_SIGMA_LOCAL[c]:g} x local spacing"
+                                             for c, _ in args.sigma))
     
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and not args.skip_existing:
         print(f"Warning: Output directory '{args.output_dir}' is not empty")
@@ -1128,7 +1395,8 @@ def main():
             group_norm=args.group_norm,
             voxel_size=args.voxel_size,
             world_size=args.fixed_world_size,
-            normalize=not args.no_normalize
+            normalize=not args.no_normalize,
+            smoothing_scale=args.smoothing_scale
         )
         if status:
             print("\nThe conversion succeeded but the group merge failed; see above.")
