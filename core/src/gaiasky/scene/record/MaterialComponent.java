@@ -1243,6 +1243,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     private Texture3DAttribute volumeAttribute(int attributeIndex, int slot, VolumeTexture tex) {
         var attr = new Texture3DAttribute(attributeIndex, tex.texture(), tex.type());
         attr.depthThreshold = volumeDepthThreshold(slot);
+        attr.occupancyDescription = tex.occupancyDescriptor();
         return attr;
     }
 

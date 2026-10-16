@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.render.gdx.graphics.VolumeTexture;
 import gaiasky.render.gdx.graphics.VolumeType;
 import gaiasky.render.ShadowMapImpl;
 import gaiasky.render.gdx.model.gltf.scene3d.attributes.*;
@@ -111,6 +112,15 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_volume1;
     protected final int u_volume2;
     protected final int u_volume3;
+
+    /**
+     * Per-slot brick occupancy grid, which the volume shaders march over to skip the empty parts of
+     * a volume's box. See {@link Texture3DAttribute#occupancyDescription}.
+     */
+    public int u_volume0Occupancy;
+    public int u_volume1Occupancy;
+    public int u_volume2Occupancy;
+    public int u_volume3Occupancy;
 
     public int u_volume0BoundsMin;
     public int u_volume0BoundsMax;
@@ -377,6 +387,11 @@ public class DefaultIntShader extends BaseIntShader {
         u_volume1 = register(Inputs.volume1, Setters.volume1);
         u_volume2 = register(Inputs.volume2, Setters.volume2);
         u_volume3 = register(Inputs.volume3, Setters.volume3);
+
+        u_volume0Occupancy = register(Inputs.volume0Occupancy, Setters.volumeOccupancy(Texture3DAttribute.Volume0));
+        u_volume1Occupancy = register(Inputs.volume1Occupancy, Setters.volumeOccupancy(Texture3DAttribute.Volume1));
+        u_volume2Occupancy = register(Inputs.volume2Occupancy, Setters.volumeOccupancy(Texture3DAttribute.Volume2));
+        u_volume3Occupancy = register(Inputs.volume3Occupancy, Setters.volumeOccupancy(Texture3DAttribute.Volume3));
 
         u_volume0ColorMode = register(Inputs.volume0ColorModeUniform, Setters.volume0ColorModeSetter);
         u_volume1ColorMode = register(Inputs.volume1ColorModeUniform, Setters.volume1ColorModeSetter);
@@ -1059,6 +1074,11 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform volume1 = new Uniform("u_volume1", Texture3DAttribute.Volume1);
         public final static Uniform volume2 = new Uniform("u_volume2", Texture3DAttribute.Volume2);
         public final static Uniform volume3 = new Uniform("u_volume3", Texture3DAttribute.Volume3);
+        // Brick occupancy grids. Declared in the volume shaders alongside the slot's own sampler.
+        public final static Uniform volume0Occupancy = new Uniform("u_volume0Occupancy");
+        public final static Uniform volume1Occupancy = new Uniform("u_volume1Occupancy");
+        public final static Uniform volume2Occupancy = new Uniform("u_volume2Occupancy");
+        public final static Uniform volume3Occupancy = new Uniform("u_volume3Occupancy");
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
@@ -2203,6 +2223,32 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, unit);
             }
         };
+
+        /**
+         * The brick occupancy grid of the volume slot bound to {@code volumeAttribute}, which the
+         * volume shaders march over to jump the empty parts of the box: see
+         * {@link Texture3DAttribute#occupancyDescription}.
+         * <p>
+         * A slot without a grid gets the 1x1x1 volume of ones from
+         * {@link VolumeTexture#occupancyDescriptor}, so the shader's unconditional uniform always
+         * has something to read and always reads the do-nothing answer. Note that the attribute may
+         * be absent altogether here: this uniform has an empty mask, so its validator always
+         * succeeds and the setter runs for every renderable, including ones with no volume bound.
+         */
+        private static Setter volumeOccupancy(int volumeAttribute) {
+            return new LocalSetter() {
+                @Override
+                public void set(BaseIntShader shader,
+                                int inputID,
+                                IntRenderable renderable,
+                                Attributes combinedAttributes) {
+                    Texture3DAttribute a = (Texture3DAttribute) combinedAttributes.get(volumeAttribute);
+                    int unit = shader.context.textureBinder.bind(
+                            VolumeTexture.occupancyDescriptor(a == null ? null : a.occupancyDescription));
+                    shader.set(inputID, unit);
+                }
+            };
+        }
 
         public static class Bones extends LocalSetter {
             private final static Matrix4 idtMatrix = new Matrix4();

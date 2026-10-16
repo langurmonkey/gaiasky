@@ -54,6 +54,20 @@ public class Texture3DAttribute extends Attribute {
      */
     public float depthThreshold = 0f;
 
+    /**
+     * The brick occupancy grid of the volume at this slot, if it has one: an R8 3D texture covering
+     * the same box, each texel the maximum density of the corresponding brick of voxels, built by
+     * {@link gaiasky.render.gdx.loader.VolumeTextureLoader#brickOccupancy}. A zero texel means
+     * every sample in that brick would read a zero, so the shader's march jumps the whole brick.
+     * <p>
+     * Null means the slot has no occupancy grid, and the shader is bound a 1x1x1 volume of ones
+     * instead - see {@link gaiasky.render.gdx.graphics.VolumeTexture#occupancyDescriptor}. This is
+     * deliberately not part of {@link #hashCode()} or {@link #compareTo}: it is derived from
+     * {@link #textureDescription}, so two attributes with the same texture always have the same
+     * grid, and comparing it would only ever repeat the texture comparison.
+     */
+    public TextureDescriptor<Texture3D> occupancyDescription;
+
     public Texture3DAttribute(int index) {
         super(index);
         textureDescription = new TextureDescriptor<>();
@@ -104,6 +118,7 @@ public class Texture3DAttribute extends Attribute {
              copyFrom.scaleW,
              copyFrom.volumeType);
         this.depthThreshold = copyFrom.depthThreshold;
+        this.occupancyDescription = copyFrom.occupancyDescription;
     }
 
     @Override

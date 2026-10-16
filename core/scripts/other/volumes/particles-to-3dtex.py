@@ -663,7 +663,7 @@ def process_channel_specific(channel: ParticleChannel, density_grid: np.ndarray,
     # Gaussian sigma for the density blur, and the fallback colour used for
     # channels that carry no colour column of their own.
     if 'dust' in channel_name:
-        sigma, default_color = 0.5, (0.8, 0.6, 0.4)
+        sigma, default_color = 0.2, (0.8, 0.6, 0.4)
     elif 'gas' in channel_name:
         sigma, default_color = 1.5, (0.3, 0.5, 0.8)
     elif 'hii' in channel_name:

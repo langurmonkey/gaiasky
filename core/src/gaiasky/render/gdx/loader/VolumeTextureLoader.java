@@ -62,6 +62,10 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             parameter.type = result.type;
             parameter.boundsMin = result.boundsMin;
             parameter.boundsMax = result.boundsMax;
+            parameter.occupancy = result.occupancy;
+            parameter.occupancyWidth = result.occupancyWidth;
+            parameter.occupancyHeight = result.occupancyHeight;
+            parameter.occupancyDepth = result.occupancyDepth;
         } catch (IOException e) {
             logger.error("Error loading volume texture: " + file, e);
             parameter.data = null;
@@ -78,8 +82,31 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
             texture.setWrap(parameter.wrapU, parameter.wrapV, parameter.wrapR);
             texture.setFilter(parameter.minFilter, parameter.magFilter);
 
+            // The occupancy grid, if the volume has one. Nearest and clamped regardless of what the
+            // volume asked for: the shader is asking which brick a position is in, and an
+            // interpolated answer to that question is not an answer - it would blend two brick
+            // maxima across the boundary and skip a brick that has content in it.
+            Texture3D occupancy = null;
+            if (parameter.occupancy != null) {
+                var occupancyData = new CustomTexture3DData(
+                        parameter.occupancyWidth, parameter.occupancyHeight, parameter.occupancyDepth,
+                        0, // mipMapLevel
+                        VolumeType.DENSITY.glFormat,
+                        VolumeType.DENSITY.glInternalFormat,
+                        VolumeType.DENSITY.glType);
+                ByteBuffer occupancyPixels = occupancyData.getPixels();
+                occupancyPixels.put(parameter.occupancy);
+                occupancyPixels.flip();
+
+                occupancy = new Texture3D(occupancyData);
+                occupancy.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge,
+                                 Texture.TextureWrap.ClampToEdge);
+                occupancy.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            }
+
             return new VolumeTexture(texture, parameter.data.getWidth(), parameter.data.getHeight(),
-                                     parameter.data.getDepth(), parameter.type, parameter.boundsMin, parameter.boundsMax);
+                                     parameter.data.getDepth(), parameter.type, parameter.boundsMin, parameter.boundsMax,
+                                     occupancy);
         }
         return null;
     }
@@ -552,7 +579,24 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         pixels.put(fileData);
         pixels.flip();
 
-        return new VolumeLoadResult(textureData, type, boundsMin, boundsMax);
+        // The occupancy grid, which the shader marches over to skip the empty parts of the box that
+        // survived the crop: see brickOccupancy(). It is built from the file's own (W, H, D) order
+        // and declared to GL with the same reversal as the voxels, so the two line up in the
+        // shader's uvw space without either being transposed on its own.
+        byte[] occupancy = brickOccupancy(fileData, width, height, depth, channels, densityOffset);
+        int occupancyWidth = 0, occupancyHeight = 0, occupancyDepth = 0;
+        if (occupancy != null) {
+            Trio<Integer, Integer, Integer> brickGrid = brickGrid(width, height, depth);
+            Trio<Integer, Integer, Integer> glBrickGrid = glGrid(brickGrid);
+            occupancyWidth = glBrickGrid.getFirst();
+            occupancyHeight = glBrickGrid.getSecond();
+            occupancyDepth = glBrickGrid.getThird();
+            logger.info("Volume occupancy grid: " + occupancyWidth + "x" + occupancyHeight + "x" + occupancyDepth +
+                                " bricks of " + OCCUPANCY_BRICK + " voxels, " + occupancy.length + " bytes.");
+        }
+
+        return new VolumeLoadResult(textureData, type, boundsMin, boundsMax,
+                                    occupancy, occupancyWidth, occupancyHeight, occupancyDepth);
     }
 
     /**
@@ -674,11 +718,158 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         return cropped;
     }
 
+    /**
+     * The edge, in voxels, of one brick of the occupancy grid - the granularity at which
+     * {@link #brickOccupancy} can skip empty space.
+     * <p>
+     * This is a trade: a smaller brick is a finer measure of where the material is and so skips
+     * more, but costs more memory and more texels to fetch through. On a galaxy volume, four is
+     * where the two curves cross - 4x4x4 leaves 76% of the dust's bricks empty for 8.8 kB of R8,
+     * against 47% for 1.1 kB at 8x8x8, and the step counts follow the emptiness rather than the
+     * memory.
+     */
+    static final int OCCUPANCY_BRICK = 4;
+
+    /**
+     * The resolution, in bricks, of the occupancy grid summarising a voxel grid of the given
+     * resolution.
+     * <p>
+     * Rounded up per axis, so the last brick on a partial axis hangs over the edge of the grid.
+     * The voxels that are not there read as zero, which is what an empty brick means anyway, so
+     * the overhang only ever makes the grid more conservative than it needs to be.
+     *
+     * @param width  The grid's extent on the file's first axis.
+     * @param height The grid's extent on the file's second axis.
+     * @param depth  The grid's extent on the file's third (fastest varying) axis.
+     *
+     * @return The brick grid, in the same (W, H, D) order.
+     */
+    static Trio<Integer, Integer, Integer> brickGrid(int width, int height, int depth) {
+        int b = OCCUPANCY_BRICK;
+        return new Trio<>((width + b - 1) / b, (height + b - 1) / b, (depth + b - 1) / b);
+    }
+
+    /**
+     * The occupancy grid of a volume: one byte per brick, 255 where that brick can be seen to hold
+     * density and 0 where it certainly does not.
+     * <p>
+     * The march through a volume is bounded by the volume's box, and the box is already cropped to
+     * the data, but that is all: inside the box every step fetches, whether or not there is
+     * anything there to fetch, and a galaxy's dust fills 0.4% of its grid. A brick whose voxels
+     * are all zero contributes nothing to the image - no emission, and no extinction, so no
+     * occlusion either - so a ray that jumps over it cannot draw anything different. What it saves
+     * is every fetch and every step the brick would have cost.
+     * <p>
+     * The load-bearing part is that a brick is marked when any sample that <em>reads</em> a non-zero
+     * voxel can land in it, which is not the same as "a non-zero voxel is inside it". A trilinear
+     * fetch at a point samples the eight voxels around it, so a sample reads the voxels within one
+     * voxel of itself, and the samples that read voxel v span uvw {@code [(v-0.5)/V, (v+1.5)/V)} -
+     * wider than the voxel, and it straddles both neighbouring voxels. Marking every brick that
+     * range touches is what makes "this brick's texel is zero" mean "no fetch anywhere in this
+     * brick can read a non-zero voxel", whatever the filtering does. Without that reach the dust
+     * would acquire a thin halo of missing extinction along every brick boundary.
+     * <p>
+     * The range is mapped through the brick grid, not through a voxel count: the grid has
+     * {@code ceil(V / OCCUPANCY_BRICK)} bricks, and dividing the two is only the same as
+     * {@code v / OCCUPANCY_BRICK} when the brick edge divides V. When it does not, the two disagree
+     * by a brick at either end, and a marked brick that is one short is a hole in the volume.
+     * <p>
+     * Returned in the same C-order (W, H, D) as {@code data}, for the caller to hand to GL with
+     * the same axis reversal the voxels get: see {@link #glGrid}.
+     * <p>
+     * Package-private and free of I/O so the rule can be tested directly.
+     *
+     * @param data          The volume's voxels, C-order (W, H, D, channels).
+     * @param width         The grid's extent on the file's first axis.
+     * @param height        The grid's extent on the file's second axis.
+     * @param depth         The grid's extent on the file's third (fastest varying) axis.
+     * @param channels      Bytes per voxel.
+     * @param densityOffset The density byte within a voxel, from {@link #densityChannelOffset}.
+     *
+     * @return The brick grid, {@code brickGrid(width, height, depth)} bytes of it, or null when the
+     * format stores no density and so has nothing to skip.
+     */
+    static byte[] brickOccupancy(byte[] data, int width, int height, int depth, int channels, int densityOffset) {
+        if (densityOffset < 0) {
+            return null;
+        }
+
+        Trio<Integer, Integer, Integer> grid = brickGrid(width, height, depth);
+        int bw = grid.getFirst();
+        int bh = grid.getSecond();
+        int bd = grid.getThird();
+        byte[] occupancy = new byte[bw * bh * bd];
+
+        // The brick span of the samples that read each voxel, per axis.
+        int[] wFrom = new int[width], wTo = new int[width];
+        for (int w = 0; w < width; w++) {
+            wFrom[w] = brickFloor(2L * w - 1, 2L * width, bw);
+            wTo[w] = brickCeil(2L * w + 3, 2L * width, bw);
+        }
+        int[] hFrom = new int[height], hTo = new int[height];
+        for (int h = 0; h < height; h++) {
+            hFrom[h] = brickFloor(2L * h - 1, 2L * height, bh);
+            hTo[h] = brickCeil(2L * h + 3, 2L * height, bh);
+        }
+        int[] dFrom = new int[depth], dTo = new int[depth];
+        for (int d = 0; d < depth; d++) {
+            dFrom[d] = brickFloor(2L * d - 1, 2L * depth, bd);
+            dTo[d] = brickCeil(2L * d + 3, 2L * depth, bd);
+        }
+
+        int index = densityOffset;
+        for (int w = 0; w < width; w++) {
+            for (int h = 0; h < height; h++) {
+                for (int d = 0; d < depth; d++, index += channels) {
+                    if (data[index] == 0) {
+                        continue;
+                    }
+                    for (int wb = wFrom[w]; wb <= wTo[w]; wb++) {
+                        for (int hb = hFrom[h]; hb <= hTo[h]; hb++) {
+                            for (int db = dFrom[d]; db <= dTo[d]; db++) {
+                                occupancy[(wb * bh + hb) * bd + db] = (byte) 255;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return occupancy;
+    }
+
+    /**
+     * The first brick a sample whose fetch reads the voxel at the given position can land in, i.e.
+     * the floor of the low end of that sample's uvw range times the brick count.
+     * <p>
+     * Both arguments are in half-voxel units, so that the range's ends are exact: a sample reading
+     * voxel {@code v} of {@code V} covers uvw {@code [(v - 0.5)/V, (v + 1.5)/V)}.
+     */
+    private static int brickFloor(long twiceLowEnd, long twiceVoxels, int bricks) {
+        long brick = Math.floorDiv(twiceLowEnd * bricks, twiceVoxels);
+        return (int) Math.max(0L, Math.min(bricks - 1L, brick));
+    }
+
+    /**
+     * The last brick such a sample can land in. The uvw range is half-open at the top, so a
+     * high end that lands exactly on a brick boundary leaves the brick below it: this is the
+     * ceiling of the high end minus one.
+     */
+    private static int brickCeil(long twiceHighEnd, long twiceVoxels, int bricks) {
+        long brick = Math.floorDiv(twiceHighEnd * bricks + twiceVoxels - 1, twiceVoxels) - 1;
+        return (int) Math.max(0L, Math.min(bricks - 1L, brick));
+    }
+
     // Helper classes
     record VolumeDetectionResult(VolumeType type, Trio<Integer, Integer, Integer> dimensions) {
     }
 
-    private record VolumeLoadResult(CustomTexture3DData data, VolumeType type, Vector3 boundsMin, Vector3 boundsMax) {
+    /**
+     * A loaded volume and the occupancy grid that summarises it. {@code occupancy} is null when
+     * there is none to build, which the texture carries through as a null occupancy texture.
+     */
+    private record VolumeLoadResult(CustomTexture3DData data, VolumeType type, Vector3 boundsMin, Vector3 boundsMax,
+                                    byte[] occupancy, int occupancyWidth, int occupancyHeight, int occupancyDepth) {
     }
 
     static public class VolumeTextureParameter extends AssetLoaderParameters<VolumeTexture> {
@@ -691,6 +882,12 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         /** Volume bounds in world space **/
         public Vector3 boundsMin;
         public Vector3 boundsMax;
+        /** The brick occupancy grid of the volume, or null if it has none: see {@link #brickOccupancy}. **/
+        public byte[] occupancy;
+        /** The occupancy grid's resolution, in bricks, in texture order. **/
+        public int occupancyWidth;
+        public int occupancyHeight;
+        public int occupancyDepth;
         public Texture.TextureFilter magFilter = Texture.TextureFilter.Linear;
         public Texture.TextureFilter minFilter = Texture.TextureFilter.Linear;
         public Texture.TextureWrap wrapU = Texture.TextureWrap.ClampToEdge;

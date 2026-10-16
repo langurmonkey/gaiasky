@@ -367,6 +367,106 @@ public class VolumeTextureLoaderTest {
         }
     }
 
+    @Test
+    public void theBrickGridRoundsUpPerAxis() {
+        // Each axis is ceiled on its own, so a partial brick at the far edge still gets a texel.
+        assertGrid(VolumeTextureLoader.brickGrid(400, 40, 399), 100, 10, 100);
+        assertGrid(VolumeTextureLoader.brickGrid(601, 60, 602), 151, 15, 151);
+    }
+
+    @Test
+    public void anEmptyVolumeOccupiesNoBrick() {
+        // 8x8x8 is 2x2x2 bricks of four voxels.
+        int channels = 4, density = 3;
+        byte[] occupancy = VolumeTextureLoader.brickOccupancy(new byte[8 * 8 * 8 * channels], 8, 8, 8, channels, density);
+
+        Assert.assertNotNull(occupancy);
+        Assert.assertEquals(8, occupancy.length);
+        for (byte b : occupancy) {
+            Assert.assertEquals(0, b);
+        }
+    }
+
+    @Test
+    public void aVoxelMarksTheBricksItsTrilinearNeighbourhoodReaches() {
+        // The brick grid is not a coarse copy of the voxel grid: a sample one voxel inside a brick
+        // still interpolates with the first voxel of the neighbouring brick, so a voxel on a brick
+        // boundary has to mark both bricks or the skip will cut a one-voxel hole in the extinction
+        // wherever two bricks meet. This is the test that pins that dilation.
+        int channels = 4, density = 3, size = 8;
+        byte[] data = new byte[size * size * size * channels];
+
+        // Brick (0,0,0), i.e. index (0*2 + 0)*2 + 0, on its own.
+        data[voxel(size, size, size, channels, density, 0, 0, 0)] = 1;
+        Assert.assertArrayEquals(new byte[]{-1, 0, 0, 0, 0, 0, 0, 0},
+                                 VolumeTextureLoader.brickOccupancy(data, size, size, size, channels, density));
+
+        // Voxel 3 is the last of brick 0 and voxel 4 the first of brick 1: every brick is within one
+        // voxel of it.
+        data = new byte[size * size * size * channels];
+        data[voxel(size, size, size, channels, density, 3, 3, 3)] = 1;
+        for (byte b : VolumeTextureLoader.brickOccupancy(data, size, size, size, channels, density)) {
+            Assert.assertEquals(-1, b);
+        }
+
+        // Voxel 7 is the last of brick 1, with nothing beyond it: brick (1,1,1) alone.
+        data = new byte[size * size * size * channels];
+        data[voxel(size, size, size, channels, density, 7, 7, 7)] = 1;
+        Assert.assertArrayEquals(new byte[]{0, 0, 0, 0, 0, 0, 0, -1},
+                                 VolumeTextureLoader.brickOccupancy(data, size, size, size, channels, density));
+    }
+
+    @Test
+    public void aColourWithoutDensityOccupiesNoBrick() {
+        // The shader gates every use of a voxel's colour behind a density test, so a filled colour
+        // channel is not material and must not keep the empty shell alive.
+        int channels = 4, density = 3, size = 8;
+        byte[] data = new byte[size * size * size * channels];
+        for (int i = 0; i < data.length; i += channels) {
+            data[i] = (byte) 255;
+        }
+        for (byte b : VolumeTextureLoader.brickOccupancy(data, size, size, size, channels, density)) {
+            Assert.assertEquals(0, b);
+        }
+
+        // And a format that stores no density has no grid to build at all.
+        Assert.assertNull(VolumeTextureLoader.brickOccupancy(data, size, size, size, channels, -1));
+    }
+
+    @Test
+    public void densityOnlyVolumesAreMeasuredFromTheirOnlyChannel() {
+        int channels = 1, density = 0;
+        byte[] data = new byte[4 * 4 * 4];
+        data[voxel(4, 4, 4, channels, density, 2, 2, 2)] = 7;
+
+        byte[] occupancy = VolumeTextureLoader.brickOccupancy(data, 4, 4, 4, channels, density);
+
+        Assert.assertNotNull(occupancy);
+        Assert.assertEquals(1, occupancy.length);
+        Assert.assertEquals(-1, occupancy[0]);
+    }
+
+    @Test
+    public void aBrickEdgeThatDoesNotDivideTheGridMarksTheRightBricks() {
+        // The brick grid has ceil(V / brick) bricks, so the brick a position falls in is
+        // floor(uvw * bricks), not floor(v / brick) - the two only agree when the brick edge
+        // divides V. Here it does not: 182 voxels is 46 bricks of four, and a sample that reads
+        // voxel 150 covers uvw [149.5/182, 151.5/182), i.e. bricks 37 to 38 - while floor(150/4)
+        // is 37 on its own. Marking from the voxel index rather than through the grid would leave
+        // brick 38 unmarked and punch a hole in the volume wherever two such bricks meet.
+        int width = 182, channels = 1, density = 0;
+        byte[] data = new byte[width];
+        data[150] = 1;
+
+        byte[] occupancy = VolumeTextureLoader.brickOccupancy(data, width, 1, 1, channels, density);
+
+        Assert.assertNotNull(occupancy);
+        Assert.assertEquals(46, occupancy.length);
+        for (int i = 0; i < occupancy.length; i++) {
+            Assert.assertEquals("brick " + i, i == 37 || i == 38 ? -1 : 0, occupancy[i]);
+        }
+    }
+
     /**
      * The byte offset of a channel within a voxel, in the file's C-order (W, H, D, channels).
      */

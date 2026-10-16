@@ -16,6 +16,7 @@ uniform float u_bodySize;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 uniform float u_time;
+uniform int u_iterations = 90;
 
 #ifdef volume0Flag
 // Volume texture 0
@@ -25,6 +26,9 @@ uniform vec3 u_volume0BoundsMax;
 uniform int u_volume0ColorMode;
 // Minimum density for volume 0 to write depth. 0 or less = this volume never writes depth.
 uniform float u_volume0DepthThreshold;
+// Brick occupancy grid of volume 0: one texel per brick of voxels, holding the maximum density
+// of the brick. See emptyBrickSteps().
+uniform sampler3D u_volume0Occupancy;
 #endif //volume0Flag
 
 #ifdef volume1Flag
@@ -35,6 +39,8 @@ uniform vec3 u_volume1BoundsMax;
 uniform int u_volume1ColorMode;
 // Minimum density for volume 1 to write depth. 0 or less = this volume never writes depth.
 uniform float u_volume1DepthThreshold;
+// Brick occupancy grid of volume 1. See emptyBrickSteps().
+uniform sampler3D u_volume1Occupancy;
 #endif //volume1Flag
 
 #ifdef volume2Flag
@@ -45,6 +51,8 @@ uniform vec3 u_volume2BoundsMax;
 uniform int u_volume2ColorMode;
 // Minimum density for volume 2 to write depth. 0 or less = this volume never writes depth.
 uniform float u_volume2DepthThreshold;
+// Brick occupancy grid of volume 2. See emptyBrickSteps().
+uniform sampler3D u_volume2Occupancy;
 #endif //volume2Flag
 
 #ifdef volume3Flag
@@ -55,6 +63,8 @@ uniform vec3 u_volume3BoundsMax;
 uniform int u_volume3ColorMode;
 // Minimum density for volume 3 to write depth. 0 or less = this volume never writes depth.
 uniform float u_volume3DepthThreshold;
+// Brick occupancy grid of volume 3. See emptyBrickSteps().
+uniform sampler3D u_volume3Occupancy;
 #endif //volume3Flag
 
 #if defined(volume0Flag) || defined(volume1Flag) || defined(volume2Flag) || defined(volume3Flag)
@@ -89,7 +99,6 @@ layout(location = 1) out vec4 layerBuffer;
 #include <shader/lib/logdepthbuff.glsl>
 
 #define PI 3.14159265359
-#define ITERATIONS 90
 #define EXPOSURE 20.0
 
 // Volume colour modes, passed in per slot as u_volumeNColorMode. They describe both
@@ -149,6 +158,62 @@ vec3 worldToVolumeUVW(vec3 pos, vec3 boundsMin, vec3 boundsMax) {
     return volumeSpace;
 }
 
+// How many whole sample steps the ray may jump from a sample that lies in an empty brick.
+//
+// `occupancy` covers the same box as the volume, one texel per brick of voxels, each holding the
+// maximum density of its brick (VolumeTextureLoader.brickOccupancy). A zero texel therefore says
+// that every voxel in that brick is zero - and, because the loader dilates the brick occupancy by
+// one voxel, that no trilinear fetch anywhere in the brick can read a non-zero voxel either. Every
+// sample the march would have taken inside that brick would have fetched a zero, and a zero
+// contributes nothing to the sum, so jumping the whole brick cannot change the image.
+//
+// What it buys: one nearest R8 fetch in place of every full fetch the brick would have cost, and -
+// because the caller advances the sample index rather than shrinking the step - the whole set of
+// steps the brick spans is never executed.
+//
+// `span` is the slot's own [entry, exit] along the ray. Outside it the sample reads zero whatever
+// the texture holds, because the box clips it, so nothing is constrained there and the function
+// says how far the ray has to go to get back in. Slots have independent boxes, so a sample can be
+// inside one and outside another.
+//
+// Returns the number of steps to skip, or 0 when the brick has content in it and the sample has to
+// be taken. The result is always >= 1 when it is not 0, so a caller that acts on it always makes
+// progress.
+float emptyBrickSteps(vec3 uvw, vec3 rayDir, vec3 boundsMin, vec3 boundsMax, sampler3D occupancy,
+                      vec2 span, float t, float stepSize) {
+    if (t < span.x) {
+        // One step short of the entry: the samples before the box are all zero, and stopping short
+        // of it means a sample that does land inside can never be jumped.
+        return max(1.0, ceil((span.x - t) / stepSize) - 1.0);
+    }
+    if (t > span.y) {
+        return 1.0e9; // the ray has left the box: this slot contributes nothing from here on
+    }
+
+    vec3 uvwClamped = clamp(uvw, 0.0, 1.0);
+    // Nearest filtering, so this is the brick the sample is in. A slot with no occupancy grid is
+    // bound a 1x1x1 volume of ones, which reads 1 here and never skips.
+    if (texture(occupancy, uvwClamped).r > 0.0) {
+        return 0.0;
+    }
+
+    // Distance to the brick's exit plane, i.e. how far the ray can go before the brick changes.
+    // Standard DDA: step to the next brick boundary on each axis and keep the nearest.
+    vec3 brickGrid = vec3(textureSize(occupancy, 0));
+    vec3 g = rayDir * brickGrid / (boundsMax - boundsMin); // brick units per unit world distance
+    vec3 b = uvwClamped * brickGrid;
+    // floor(b) + 1 on an axis the ray moves along positively, floor(b) where it moves negatively.
+    vec3 nextBoundary = floor(b) + max(sign(g), vec3(0.0));
+    // An axis the ray is parallel to cannot bound the exit, and 0/0 is a NaN that would poison the
+    // min(): give it a denominator it cannot divide by and a distance that cannot win.
+    vec3 safeG = sign(g) * max(abs(g), vec3(1.0e-20));
+    vec3 distanceToBoundary = (nextBoundary - b) / safeG + step(abs(g), vec3(1.0e-12)) * 1.0e30;
+    float exitDistance = min(min(distanceToBoundary.x, distanceToBoundary.y), distanceToBoundary.z);
+
+    // Round up, so the caller never lands a sample inside the brick it is leaving.
+    return max(1.0, ceil(exitDistance / stepSize));
+}
+
 // Fetch one texel per sample, normalised to (rgb = colour, a = density).
 //
 // Unpacking both here, from a single fetch, is what keeps this to one texture read per
@@ -159,7 +224,7 @@ vec3 worldToVolumeUVW(vec3 pos, vec3 boundsMin, vec3 boundsMax) {
 // a volume slot.
 vec4 sampleVolumeRGBA(vec3 uvw, sampler3D volume, int colorMode) {
     // Branchless bounds test. This runs once per fetch, and the loop takes one fetch per step per
-    // slot for up to ITERATIONS steps, so with four slots it is the most executed piece of code in
+    // slot for up to u_iterations steps, so with four slots it is the most executed piece of code in
     // the shader - and the `if` it replaces diverges at every silhouette edge, which is exactly
     // where the ray spends its steps. Clamping the coordinate into the volume and scaling the
     // sample by a 0/1 mask gives the same answer for a fraction of the cost, and keeps neighbouring
@@ -233,7 +298,7 @@ vec4 transferFunction(float density, vec3 baseColor, float stepUVW) {
 // `firstDepth` carries the distance to the nearest depth-writing sample across all slots;
 // `intersects` reports whether the ray met this box at all, which is what tells the caller
 // whether the fragment is worth shading.
-vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, in int colorMode,
+vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsMin, in vec3 boundsMax, in int colorMode,
     in float depthThreshold, in vec3[3] ramp, inout float firstDepth, out bool intersects) {
     intersects = false;
 
@@ -282,7 +347,7 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
     float pathUVW = rayLength * uvwScale; // total arc length in UVW space
     const float TARGET_STEP_UVW = 0.01;
 
-    int nSteps = clamp(int(ceil(pathUVW / TARGET_STEP_UVW)), 16, ITERATIONS);
+    int nSteps = clamp(int(ceil(pathUVW / TARGET_STEP_UVW)), 16, u_iterations);
     float stepSize = rayLength / float(nSteps);
     float stepUVW = stepSize * uvwScale; // consistent with the loop, by construction
 
@@ -303,6 +368,17 @@ vec4 raymarchVolume(in sampler3D volume, in vec3 boundsMin, in vec3 boundsMax, i
         float currentDist = entryDist + (float(i) + jitter) * stepSize;
         vec3 samplePos = rayOrigin + rayDir * currentDist;
         vec3 uvw = worldToVolumeUVW(samplePos, boundsMin, boundsMax);
+
+        // Jump the empty bricks instead of stepping through them. The index advances, not the step,
+        // so the samples that are still taken sit on exactly the lattice this loop would have used
+        // without the skip, and the ones dropped are all inside a brick with no density in it: see
+        // emptyBrickSteps().
+        float skip = emptyBrickSteps(uvw, rayDir, boundsMin, boundsMax, occupancy,
+                                     vec2(entryDist, exitDist), currentDist, stepSize);
+        if (skip >= 1.0) {
+            i += int(min(skip, float(nSteps))) - 1;
+            continue;
+        }
 
         vec4 texel = sampleVolumeRGBA(uvw, volume, colorMode);
         float density = texel.a;
@@ -356,19 +432,19 @@ void main() {
     // of the incoming volumes. No ordering is modelled between them, and no slot attenuates
     // another.
     #ifdef volume0Flag
-    result += raymarchVolume(u_volume0, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume0, u_volume0Occupancy, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
     anyHit = anyHit || hit;
     #endif //volume0Flag
     #ifdef volume1Flag
-    result += raymarchVolume(u_volume1, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume1, u_volume1Occupancy, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
     anyHit = anyHit || hit;
     #endif //volume1Flag
     #ifdef volume2Flag
-    result += raymarchVolume(u_volume2, u_volume2BoundsMin, u_volume2BoundsMax, u_volume2ColorMode, u_volume2DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume2, u_volume2Occupancy, u_volume2BoundsMin, u_volume2BoundsMax, u_volume2ColorMode, u_volume2DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
     anyHit = anyHit || hit;
     #endif //volume2Flag
     #ifdef volume3Flag
-    result += raymarchVolume(u_volume3, u_volume3BoundsMin, u_volume3BoundsMax, u_volume3ColorMode, u_volume3DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume3, u_volume3Occupancy, u_volume3BoundsMin, u_volume3BoundsMax, u_volume3ColorMode, u_volume3DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
     anyHit = anyHit || hit;
     #endif //volume3Flag
 
