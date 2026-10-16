@@ -90,7 +90,7 @@ layout(location = 1) out vec4 layerBuffer;
 
 #define PI 3.14159265359
 #define ITERATIONS 90
-#define EXPOSURE 40.0
+#define EXPOSURE 20.0
 
 // Volume colour modes, passed in per slot as u_volumeNColorMode. They describe both
 // where the colour comes from and where the density lives, because the two travel
@@ -158,13 +158,19 @@ vec3 worldToVolumeUVW(vec3 pos, vec3 boundsMin, vec3 boundsMax) {
 // 3D texture its alpha reads 1.0 - so it cannot be raymarched and must not be bound to
 // a volume slot.
 vec4 sampleVolumeRGBA(vec3 uvw, sampler3D volume, int colorMode) {
-    if (any(lessThan(uvw, vec3(0.0))) || any(greaterThan(uvw, vec3(1.0)))) {
-        return vec4(0.0);
-    }
-    vec4 texel = texture(volume, uvw);
+    // Branchless bounds test. This runs once per fetch, and the loop takes one fetch per step per
+    // slot for up to ITERATIONS steps, so with four slots it is the most executed piece of code in
+    // the shader - and the `if` it replaces diverges at every silhouette edge, which is exactly
+    // where the ray spends its steps. Clamping the coordinate into the volume and scaling the
+    // sample by a 0/1 mask gives the same answer for a fraction of the cost, and keeps neighbouring
+    // pixels in the same warp on the same path.
+    vec3 inVolume = step(vec3(0.0), uvw) * step(uvw, vec3(1.0));
+    float mask = inVolume.x * inVolume.y * inVolume.z;
+    vec4 texel = texture(volume, clamp(uvw, 0.0, 1.0));
     // Density-only: density in R, no colour stored.
-    return colorMode == COLOR_MODE_RAMP
+    vec4 sample_d = colorMode == COLOR_MODE_RAMP
     ? vec4(0.0, 0.0, 0.0, texel.r) : texel; // colour+density: colour in RGB, density in A
+    return sample_d * mask;
 }
 
 // Ray-box intersection - returns (entryDistance, exitDistance)
@@ -379,8 +385,6 @@ void main() {
     // additive blending.
     if (result.a > 0.001) {
         result.rgb *= EXPOSURE;
-        // Simple reinhard tone mapping to control brightness
-        result.rgb = result.rgb / (1.0 + result.rgb);
         fragColor = vec4(result.rgb, result.a) * v_data.opacity;
     } else {
         fragColor = vec4(0.0);
