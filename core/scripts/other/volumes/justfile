@@ -41,60 +41,24 @@
 #
 #     just volume 400 <in> <out>
 #     just volume 400 <in> <out> --intensity Bulge=0.3
+#     just volume 400 <in> <out> --smoothing ArmDust=0.5
 #
 # 'resolution' is the number of voxels along the longest side of the box; the other axes follow
-# the shape of the data, so the voxels stay cubic. Extra arguments go straight to the script:
-# --intensity NAME=FLOAT (0..1, repeatable) dims one channel, and nothing else is exposed here
-# because nothing else is needed for the usual run. This writes <prefix>_emissive_rgba.raw.gz and
-# <prefix>_occlusive_rgba.raw.gz, which are the two textures the scene's volume0/volume1 want.
-volume resolution input output *args:
+# the shape of the data, so the voxels stay cubic. Extra arguments go straight to the script, and
+# there are two of them: --intensity NAME=FLOAT (0..1) dims one channel, --smoothing NAME=FACTOR
+# (greater than 0, 1 = the default) makes it thinner or thicker. Both are per channel and both are
+# resolution independent. Nothing else is exposed here because nothing else is needed for the usual
+# run. This writes <prefix>_emissive_rgba.raw.gz and <prefix>_occlusive_rgba.raw.gz, which are the
+# two textures the scene's volume0/volume1 want.
+
+# Run with user-defined smoothing and intensity
+genvol resolution input output *args:
 	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} {{args}}
 
-# Create a 3D texture from particle data using smart method.
-tex gridsize formats input output *args:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size '{{gridsize}}' --format '{{formats}}' {{args}} {{input}} {{output}}
+# Run with default values smoothing and intensity
+genvold resolution input output:
+	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} --smoothing ArmDust=0.4 --intensity ArmDust=0.08
 
-# Create a 3D texture from particle data using fast method.
-texfast gridsize input output:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --grid-size '{{gridsize}}' {{input}} {{output}}
-
-# Create a 3D texture with a voxel size instead of a grid: the grid follows the box on
-# each axis, so the detail of an N^3 grid is kept without spending voxels on the axes the
-# data has no extent in. This is the usual way to make a flat volume.
-texvoxel voxelsize input output *args:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --voxel-size {{voxelsize}} --format rgba {{args}} {{input}} {{output}}
-
-# Same, and merge the channels into one emissive and one occlusive texture in one go.
-# 'group' is a positional argument ('<emissive>|<occlusive>', each side a '+'-separated
-# list of channel names with an optional ':weight'), because a group spec cannot travel
-# through *args - see the note at the top of this file.
-alias gen := texvoxelgroup
-texvoxelgroup voxelsize group input output *args:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method ultrafast --voxel-size {{voxelsize}} --format rgba --group '{{group}}' {{args}} {{input}} {{output}}
-
-# Convert particles and merge the channels into one emissive and one occlusive
-# texture in one go. 'group' is '<emissive>|<occlusive>', each side a
-# '+'-separated list of channel names with an optional ':weight', e.g.
-# 'Gas+Bulge:0.6|ArmDust'.
-texgroup gridsize group input output:
-	uv run --with numpy --with scipy --with tqdm python particles-to-3dtex.py --method smart --grid-size '{{gridsize}}' --format rgba --group '{{group}}' {{input}} {{output}}
-
-# Merge volume textures into an emissive and an occlusive one. The options are passed
-# straight through, e.g. (all on one line):
-#   just combine out --emissive galaxy_Gas_rgba.raw.gz --occlusive galaxy_ArmDust_rgba.raw.gz
-# Do not insert a '--' before them: just only treats it as a separator *before* the
-# recipe name, so it would be forwarded to the script and rejected by argparse.
-combine output *args:
-	uv run --with numpy python combine-volumes.py -o {{output}} {{args}}
-
-# Verify a merge: merge each input on its own and compare with the original file.
-combine-check output *args:
-	uv run --with numpy python combine-volumes.py --check -o {{output}} {{args}}
-
-# Visualize a 3D texture file. Needs the path to the file.
-vis file:
-	uv run --with numpy --with vedo view-volume-raw.py {{file}}
-
-# Visualize slices of a 3D texture file. Needs the path to the file.
-slices file:
-	uv run --with numpy --with vedo view-volume-slices.py {{file}}
+# Create top-down and edge-on images
+img dir:
+	uv run --with numpy --with matplotlib volume-preview.py {{dir}} --saturation 2.5
