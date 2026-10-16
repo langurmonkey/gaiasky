@@ -60,5 +60,5 @@ genvold resolution input output:
 	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} --smoothing ArmDust=0.4 --intensity ArmDust=0.08
 
 # Create top-down and edge-on images
-img dir:
-	uv run --with numpy --with matplotlib volume-preview.py {{dir}} --saturation 2.5
+img dir *args:
+	uv run --with numpy --with matplotlib volume-preview.py {{dir}} --saturation 2.5 --exposure 15.0 {{args}}
