@@ -325,7 +325,7 @@
         "unit": "Double"
       }
     },
-    "TLESource" : {
+    "TLESource": {
       "description": "Defines attributes used to update a trajectory by fetching data in TLE format from a URL.",
       "urlTLE": {
         "description": "URL of the TLE file to fetch. This URL must return a file with the data for a number of objects. Each object has exactly three lines of text in the file. The first line contains the object name. The other two lines contain the data in TLE (Two-Line Element set) format. A good TLE provider is `celestrak <https://celestrak.org/NORAD/elements/>`__.",
@@ -416,6 +416,14 @@
       "writeDepth": {
         "description": "Whether this volume writes to the depth buffer. Enabled by default, so the volume occludes whatever is drawn after it (labels, grids, stars, planets), using the depth of the first sample that found material. Set to false to always see through the volume.",
         "unit": "Boolean"
+      },
+      "iterations": {
+        "description": "The number of iterations for the ray-marcher volume shader. This can be a single positive integer, or an array of 4 integers, one for each of the graphics quality settings: low, normal, high, ultra.",
+        "unit": "Integer[4]",
+        "aliases": [
+          "raymarchIterations",
+          "iterationCount"
+        ]
       }
     },
     "Atmosphere": {
@@ -513,7 +521,8 @@
         "description": "The starting and ending fade-out distances, in parsecs, from the reference system origin (unless 'fadeObjectName' or 'fadePosition' are defined, in which case the distances are relative to the given object or position), where the object starts and ends its fade-out transition. ",
         "unit": "Double[2]",
         "aliases": [
-          "fadeout", "fadeOutPc"
+          "fadeout",
+          "fadeOutPc"
         ]
       },
       "fadeOutAU": {
@@ -974,7 +983,7 @@
         "unit": "Integer"
       }
     },
-    "OrbitElementsSet" : {
+    "OrbitElementsSet": {
       "description": "Defines attributes related to orbita elements sets.",
       "provider:OrbitalElementsGroup": {
         "description": "The class to be used to load the data. This class must implement ``IParticleGroupDataProvider``. This should have the fully-qualified class name. For instance, ``gaiasky.data.group.ElementsGroupVOTableProvider``.",
@@ -1099,7 +1108,7 @@
       },
       "additional": {
         "description": "Array of up to 4 components to pass to the ray-marching shader (u_additional uniform) as additional data.",
-        "unit":  "Double[4]",
+        "unit": "Double[4]",
         "aliases": [
           "additionalData"
         ]
@@ -1115,7 +1124,7 @@
     "ProceduralTrigger": {
       "description": "Defines attributes related to the procedural generation of galaxies.",
       "proceduralGeneration": {
-        "description":  "Whether procedural generation is enabled for the given object.",
+        "description": "Whether procedural generation is enabled for the given object.",
         "unit": "Boolean"
       }
     }

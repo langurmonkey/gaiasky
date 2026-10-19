@@ -10,7 +10,9 @@ package gaiasky;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.gdx.shader.attribute.IntAttribute;
 import gaiasky.scene.component.Volume;
+import gaiasky.util.Settings;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -69,6 +71,59 @@ public class VolumeComponentTest {
         // The colour pass is later still, and must stay that way: it is additive and needs the
         // depth the pre-pass wrote to be rejected where it is not the front of the volume.
         Assert.assertTrue(RenderGroup.VOLUME_DEPTH.priority < RenderGroup.VOLUME.priority);
+    }
+
+    @Test
+    public void iterationsDefaultsToNinetyForEveryQuality() {
+        // 90 is the shader's own default, so a scene that does not set the property renders exactly
+        // the same as before this attribute existed.
+        int[] iterations = new Volume().iterations;
+        Assert.assertEquals(Settings.GraphicsQuality.values().length, iterations.length);
+        for (int i : iterations) {
+            Assert.assertEquals(90, i);
+        }
+    }
+
+    @Test
+    public void setIterationsAcceptsAScalarAndAWholeArray() {
+        var v = new Volume();
+
+        // JsonLoader resolves the setter by the exact class of the JSON value, and a scalar integer
+        // arrives as Long (JsonLoader.getValueClass -> longValue -> Long.class), so the parameter
+        // has to be Long or the whole attribute is silently dropped.
+        v.setIterations(120L);
+        Assert.assertArrayEquals(new int[]{120, 120, 120, 120}, v.iterations);
+
+        // An array of integers arrives as int[], one value per graphics quality, in the order of
+        // Settings.GraphicsQuality: low, normal, high, ultra.
+        v.setIterations(new int[]{40, 60, 90, 110});
+        Assert.assertArrayEquals(new int[]{40, 60, 90, 110}, v.iterations);
+
+        // A short or long array is not a per-quality value; it must leave the field alone rather
+        // than throw or truncate silently.
+        v.setIterations(new int[]{40, 60});
+        Assert.assertArrayEquals(new int[]{40, 60, 90, 110}, v.iterations);
+
+        // Same for null, which the loader hands over for a JSON null.
+        v.setIterations((Long) null);
+        Assert.assertArrayEquals(new int[]{40, 60, 90, 110}, v.iterations);
+    }
+
+    @Test
+    public void iterationsJsonLoaderContract() throws Exception {
+        // The two overloads the JSON loader needs for "iterations" as declared in
+        // archetypes/attributemap.json under Volume: a scalar integer and an array of integers.
+        Assert.assertNotNull("missing Volume.setIterations(Long) for the scalar form",
+                             ClassReflection.getMethod(Volume.class, "setIterations", Long.class));
+        Assert.assertNotNull("missing Volume.setIterations(int[]) for the array form",
+                             ClassReflection.getMethod(Volume.class, "setIterations", int[].class));
+        Assert.assertNotNull("missing public Volume.iterations field",
+                             ClassReflection.getField(Volume.class, "iterations"));
+
+        // And the attribute that bridges it to the shader: VolumeInitializer writes it, the shader
+        // setter reads it by this constant, so a renamed alias would break the link silently.
+        Assert.assertEquals("volumeIterations", IntAttribute.VolumeIterationsAlias);
+        Assert.assertTrue(IntAttribute.VolumeIterations >= 0);
     }
 
     @Test

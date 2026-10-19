@@ -131,6 +131,8 @@ public class DefaultIntShader extends BaseIntShader {
     public int u_volume3BoundsMin;
     public int u_volume3BoundsMax;
 
+    /** Ray-march step budget of the volume shaders (u_iterations), from Volume#iterations. */
+    public int u_iterations;
     /**
      * Per-slot volume colour mode (see {@link VolumeType#colorMode()}): 0 = look-up ramp,
      * 1 = texture colour, 2 = texture colour modulated by the ramp.
@@ -392,6 +394,8 @@ public class DefaultIntShader extends BaseIntShader {
         u_volume1Occupancy = register(Inputs.volume1Occupancy, Setters.volumeOccupancy(Texture3DAttribute.Volume1));
         u_volume2Occupancy = register(Inputs.volume2Occupancy, Setters.volumeOccupancy(Texture3DAttribute.Volume2));
         u_volume3Occupancy = register(Inputs.volume3Occupancy, Setters.volumeOccupancy(Texture3DAttribute.Volume3));
+
+        u_iterations = register(Inputs.iterationsUniform, Setters.iterationsSetter);
 
         u_volume0ColorMode = register(Inputs.volume0ColorModeUniform, Setters.volume0ColorModeSetter);
         u_volume1ColorMode = register(Inputs.volume1ColorModeUniform, Setters.volume1ColorModeSetter);
@@ -1127,6 +1131,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform volume3BoundsMaxUniform = new Uniform("u_volume3BoundsMax");
         // Volume colour mode (0 = ramp, 1 = texture colour, 2 = texture colour * ramp). Declared in
         // volume.fragment.glsl inside the volumeNFlag blocks; unset uniforms read as 0.
+        public final static Uniform iterationsUniform = new Uniform("u_iterations");
         public final static Uniform volume0ColorModeUniform = new Uniform("u_volume0ColorMode");
         public final static Uniform volume1ColorModeUniform = new Uniform("u_volume1ColorMode");
         public final static Uniform volume2ColorModeUniform = new Uniform("u_volume2ColorMode");
@@ -1264,6 +1269,21 @@ public class DefaultIntShader extends BaseIntShader {
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.CameraPos))
                     shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.CameraPos)))).value);
+            }
+        };
+        /**
+         * Ray-march iterations from the {@link IntAttribute#VolumeIterations} attribute, which
+         * VolumeInitializer sets per graphics quality. Falls back to the shader's own default (90)
+         * for objects that never get the attribute, e.g. custom shaders.
+         */
+        public final static Setter iterationsSetter = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                var a = combinedAttributes.get(IntAttribute.VolumeIterations);
+                shader.set(inputID, a == null ? 90 : ((IntAttribute) a).value);
             }
         };
         public final static Setter eclipseOutlines = new LocalSetter() {

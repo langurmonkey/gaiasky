@@ -1,11 +1,16 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import gaiasky.util.Logger;
+import gaiasky.util.Settings;
+
+import java.util.Arrays;
 
 /**
  * Stores information for volumetric rendering of bodies.
  */
 public class Volume implements Component {
+    public static final Logger.Log logger = Logger.getLogger(Volume.class);
 
     public String vertexShader = "assets/shader/pbr.vertex.glsl";
     public String fragmentShader = "assets/shader/volume.fragment.glsl";
@@ -37,5 +42,79 @@ public class Volume implements Component {
         if (writeDepth != null) {
             this.writeDepth = writeDepth;
         }
+    }
+
+    /**
+     * Number of iterations for the ray-marching volume shader, per quality preset.
+     */
+    public int[] iterations = {90, 90, 90, 90};
+
+    /**
+     * Sets the iteration count for the ray-marcher on this volume.
+     *
+     * @param iterations Single value: same iteration count for all graphics qualities. The JSON loader hands over a
+     *                   scalar integer as {@link Long}, so this must take a Long for the reflective lookup to find it.
+     */
+    public void setIterations(Long iterations) {
+        if (iterations == null) {
+            return;
+        }
+        if (iterations <= 0) {
+            logger.warn("Iterations must be greater than zero: " + iterations);
+        }
+        int n = Settings.GraphicsQuality.values().length;
+        this.iterations = new int[n];
+        for (int i = 0; i < n; i++)
+            this.iterations[i] = iterations.intValue();
+    }
+
+    /**
+     * Alias to {@link #setIterations(Long)}.
+     */
+    public void setRaymarchIterations(Long iterations) {
+        setIterations(iterations);
+    }
+
+    /**
+     * Alias to {@link #setIterations(Long)}.
+     */
+    public void setIterationCount(Long iterations) {
+        setIterations(iterations);
+    }
+
+    /**
+     * Sets the iteration count for the ray-marcher on this volume.
+     *
+     * @param iterations Array of integers, one per graphics quality [LOW, NORMAL, HIGH, ULTRA].
+     */
+    public void setIterations(int[] iterations) {
+        int n = Settings.GraphicsQuality.values().length;
+        if (iterations.length == n) {
+            this.iterations = new int[n];
+            for (int i = 0; i < n; i++) {
+                if (iterations[i] <= 0) {
+                    logger.warn("Iterations must be greater than zero: " + iterations[i]);
+                }
+                this.iterations[i] = iterations[i];
+            }
+        } else {
+            logger.warn("'iterations' must either be an integer, or an array with "
+                                + Settings.GraphicsQuality.values().length + " values: "
+                                + Arrays.toString(iterations));
+        }
+    }
+
+    /**
+     * Alias to {@link #setIterations(int[])}.
+     */
+    public void setRaymarchIterations(int[] iterations) {
+        setIterations(iterations);
+    }
+
+    /**
+     * Alias to {@link #setIterations(int[])}.
+     */
+    public void setIterationCount(int[] iterations) {
+        setIterations(iterations);
     }
 }
