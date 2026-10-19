@@ -58,6 +58,10 @@ public class Constants {
     public static final float MIN_SLIDER_1 = 1;
     /** Maximum generic slider value. **/
     public static final float MAX_SLIDER = 100;
+    /** Minimum gamepad smoothing value (off, the input is applied as it arrives). **/
+    public static final float MIN_GAMEPAD_SMOOTHING = 0f;
+    /** Maximum gamepad smoothing value (smoothest response). **/
+    public static final float MAX_GAMEPAD_SMOOTHING = 1f;
     /** Default step value for sliders. **/
     public static final float SLIDER_STEP = 1f;
     /** Default step value for sliders (small). **/

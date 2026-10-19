@@ -512,6 +512,9 @@ controls:
     invertX: false
     # Invert look Y axis
     invertY: true
+    # Smoothing of the gamepad axis input, in [0,1]. 0 applies the input as it arrives,
+    # 1 gives the smoothest (slowest) response. Use it to get rid of jittery navigation.
+    smoothing: 0.35
     # Blacklist of controller names. All controllers here will not be
     # processed by Gaia Sky. Find the connected controller names in the Preferences
     # window, Controls tab.

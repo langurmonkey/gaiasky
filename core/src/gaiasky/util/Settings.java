@@ -3564,6 +3564,13 @@ public class Settings extends SettingsObject {
             public String mappingsFile;
             public boolean invertX;
             public boolean invertY;
+            /**
+             * Smoothing factor for the gamepad axis readings, in [0,1]. 0 applies the raw input as
+             * it arrives, 1 gives the smoothest (slowest) response. The initialiser matches the
+             * value shipped in config.yaml, so that configuration files written before this setting
+             * existed still get a smooth response out of the box.
+             */
+            public double smoothing = 0.35;
             public String[] blacklist;
 
             public GamepadSettings clone() {
@@ -3581,7 +3588,7 @@ public class Settings extends SettingsObject {
 
             @Override
             protected void setupListeners() {
-                EventManager.instance.subscribe(this, Event.INVERT_X_CMD, Event.INVERT_Y_CMD);
+                EventManager.instance.subscribe(this, Event.INVERT_X_CMD, Event.INVERT_Y_CMD, Event.GAMEPAD_SMOOTHING_CMD);
             }
 
             @Override
@@ -3761,6 +3768,7 @@ public class Settings extends SettingsObject {
                     switch (event) {
                         case INVERT_X_CMD -> this.invertX = (Boolean) data[0];
                         case INVERT_Y_CMD -> this.invertY = (Boolean) data[0];
+                        case GAMEPAD_SMOOTHING_CMD -> this.smoothing = (Double) data[0];
                     }
                 }
             }
@@ -3769,6 +3777,7 @@ public class Settings extends SettingsObject {
             public void apply() {
                 EventManager.publish(Event.INVERT_X_CMD, this, invertX);
                 EventManager.publish(Event.INVERT_Y_CMD, this, invertY);
+                EventManager.publish(Event.GAMEPAD_SMOOTHING_CMD, this, smoothing);
             }
         }
     }

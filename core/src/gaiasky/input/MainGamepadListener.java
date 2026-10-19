@@ -17,6 +17,9 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import net.jafama.FastMath;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Implements the gamepad/game controller listener in default mode.
  * <p>The default mappings go like this:
@@ -36,11 +39,45 @@ import net.jafama.FastMath;
  *     <li>ZR - roll right</li>
  *     <li>ZL - roll left</li>
  * </ul>
+ * <p>The axes and the RB/LB vertical movement all go through the same smoothing filter, driven by
+ * the {@code controls.gamepad.smoothing} setting, so the navigation ramps in and out instead of
+ * responding to every controller sample as it arrives.
  */
 public class MainGamepadListener extends AbstractGamepadListener {
     private static final Log logger = Logger.getLogger(MainGamepadListener.class);
 
+    /**
+     * Time constant of the input smoothing filter at the maximum smoothing setting, in seconds.
+     */
+    private static final double MAX_SMOOTHING_TAU = 0.5;
+    /**
+     * Difference between the smoothed value and its target below which the value snaps to the
+     * target.
+     */
+    private static final double SMOOTHING_EPSILON = 1.0e-4;
+    /**
+     * Reserved channel key for the button-driven vertical movement (RB and LB). Negative, so it can
+     * never collide with a controller axis code. This is what lets those two buttons go through the
+     * very same smoothing filter as the axes.
+     */
+    private static final int BUTTON_VERTICAL = -1;
+
     private final NaturalCamera cam;
+
+    /** Is the vertical movement button up (RB) currently held? **/
+    private boolean verticalButtonUp;
+    /** Is the vertical movement button down (LB) currently held? **/
+    private boolean verticalButtonDown;
+
+    /**
+     * Target value of each axis, as it comes from the controller, after the dead zone and the power
+     * curve have been applied. Filled in by the axis events.
+     */
+    private final Map<Integer, Double> axisTargets = new HashMap<>();
+    /**
+     * Smoothed value of each axis, that is, the value currently handed over to the camera.
+     */
+    private final Map<Integer, Double> axisValues = new HashMap<>();
 
     public MainGamepadListener(NaturalCamera cam, String mappingsFile) {
         super(mappingsFile);
@@ -79,13 +116,11 @@ public class MainGamepadListener extends AbstractGamepadListener {
                     em.post(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
                 }
             } else if (buttonCode == mappings.getButtonRB()) {
-                if (cam.getMode().isFree()) {
-                    cam.setVertical(1.0);
-                }
+                // Held state only. The vertical movement itself is produced by the smoothing filter
+                // in update(), which is the single place that writes to the camera.
+                verticalButtonUp = true;
             } else if (buttonCode == mappings.getButtonLB()) {
-                if (cam.getMode().isFree()) {
-                    cam.setVertical(-1.0);
-                }
+                verticalButtonDown = true;
             }
 
             cam.setGamepadInput(true);
@@ -101,13 +136,9 @@ public class MainGamepadListener extends AbstractGamepadListener {
             logger.debug("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
             if (buttonCode == mappings.getButtonRB()) {
-                if (cam.getMode().isFree()) {
-                    cam.setVertical(0.0);
-                }
+                verticalButtonUp = false;
             } else if (buttonCode == mappings.getButtonLB()) {
-                if (cam.getMode().isFree()) {
-                    cam.setVertical(0.0);
-                }
+                verticalButtonDown = false;
             } else if (buttonCode == mappings.getButtonA()) {
                 cam.setCameraMultipliers(1, 1);
             }
@@ -124,60 +155,162 @@ public class MainGamepadListener extends AbstractGamepadListener {
             super.axisMoved(controller, axisCode, value);
             logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
 
-            boolean treated = false;
+            if (isMappedAxis(axisCode)) {
+                // Apply zero-point correction.
+                value = (float) applyZeroPoint(value);
 
-            // Apply zero-point correction.
-            value = (float) applyZeroPoint(value);
+                // Apply power function to axis reading.
+                double val = FastMath.signum(value) * FastMath.pow(Math.abs(value), mappings.getAxisValuePower());
 
-            // Apply power function to axis reading.
-            double val = FastMath.signum(value) * FastMath.pow(Math.abs(value), mappings.getAxisValuePower());
+                // Do not touch the camera here, only record the new target. The smoothing filter in
+                // update() is the single place that writes to the camera, so that the response is
+                // frame-locked and framerate-independent.
+                axisTargets.put(axisCode, val);
 
-            if (axisCode == mappings.getAxisLstickH()) {
-
-                double valMapped = val * mappings.getAxisLstickHSensitivity();
-                if (cam.getMode().isFocus()) {
-                    cam.setRoll(valMapped * 1.0e-1);
-                } else {
-                    // Use this for lateral movement
-                    cam.setHorizontal(valMapped);
-                }
-                treated = true;
-            } else if (axisCode == mappings.getAxisLstickV()) {
-                cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
-                treated = true;
-            } else if (axisCode == mappings.getAxisRstickH()) {
-                double valMapped = (GaiaSky.settings().controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
-                if (cam.getMode().isFocus()) {
-                    cam.setHorizontal(valMapped * 2.0e-2);
-                } else {
-                    cam.setYaw(valMapped * 1.0e-1);
-                }
-                treated = true;
-            } else if (axisCode == mappings.getAxisRstickV()) {
-                double valMapped = (GaiaSky.settings().controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
-                if (cam.getMode().isFocus()) {
-                    cam.setVertical(valMapped * 2.0e-2);
-                } else {
-                    cam.setPitch(valMapped * 1.0e-1);
-                }
-                treated = true;
-            } else if (axisCode == mappings.getAxisRT()) {
-                double valMapped = val * 1.0e-1 * mappings.getAxisRTSensitivity();
-                cam.setRoll(valMapped);
-                treated = true;
-            } else if (axisCode == mappings.getAxisLT()) {
-                double valMapped = val * 1.0e-1 * mappings.getAxisLTSensitivity();
-                cam.setRoll(-valMapped);
-                treated = true;
-            }
-
-            if (treated) {
                 cam.setGamepadInput(true);
+                return true;
             }
-
-            return treated;
         }
         return false;
+    }
+
+    /**
+     * Is the given axis one of the axes this listener maps to a camera action?
+     *
+     * @param axisCode The axis code.
+     * @return True if the axis is mapped, false otherwise.
+     */
+    private boolean isMappedAxis(int axisCode) {
+        return axisCode == mappings.getAxisLstickH()
+                || axisCode == mappings.getAxisLstickV()
+                || axisCode == mappings.getAxisRstickH()
+                || axisCode == mappings.getAxisRstickV()
+                || axisCode == mappings.getAxisRT()
+                || axisCode == mappings.getAxisLT();
+    }
+
+    @Override
+    public void update() {
+        // Polling first, as in the base class.
+        super.update();
+
+        if (!active.get()) {
+            return;
+        }
+
+        double dt = GaiaSky.instance.time.getDt();
+        if (dt <= 0) {
+            return;
+        }
+
+        double smoothing = GaiaSky.settings().controls.gamepad.smoothing;
+        // Map the [0,1] user setting onto a time constant. At 0 the filter is a pass-through and the
+        // input is applied exactly as it arrives, which is the pre-smoothing behaviour.
+        double tau = Math.max(0, Math.min(1, smoothing)) * MAX_SMOOTHING_TAU;
+
+        // The vertical movement buttons (RB/LB) are not axes, but they go through the same filter
+        // under a reserved key, so that they ramp in and out instead of starting and stopping the
+        // vertical movement abruptly. Only meaningful in free mode, where they translate the camera
+        // along its own up vector; in any other mode the target stays at zero and the movement is
+        // damped out.
+        double verticalTarget = cam.getMode().isFree()
+                ? (verticalButtonUp ? 1.0 : 0.0) - (verticalButtonDown ? 1.0 : 0.0)
+                : 0.0;
+        if (verticalTarget != 0.0 || axisTargets.containsKey(BUTTON_VERTICAL)) {
+            axisTargets.put(BUTTON_VERTICAL, verticalTarget);
+        }
+
+        for (var entry : axisTargets.entrySet()) {
+            int axisCode = entry.getKey();
+            double target = entry.getValue();
+
+            Double previous = axisValues.get(axisCode);
+            double current = previous == null ? 0.0 : previous;
+
+            if (tau <= 0) {
+                current = target;
+            } else {
+                // Framerate-independent exponential approach to the target.
+                current += (target - current) * (1.0 - FastMath.exp(-dt / tau));
+                if (FastMath.abs(target - current) < SMOOTHING_EPSILON) {
+                    current = target;
+                }
+            }
+
+            // Only write to the camera when the value actually changes. A resting axis would
+            // otherwise reset the camera's rotation idle timer on every single frame.
+            if (previous == null || current != previous) {
+                axisValues.put(axisCode, current);
+                applyAxis(axisCode, current);
+            }
+        }
+    }
+
+    /**
+     * Hands the given axis value over to the camera, applying the per-axis sensitivity and the mode
+     * dependent scaling.
+     *
+     * @param axisCode The axis code.
+     * @param val      The axis value, after the dead zone and the power curve.
+     */
+    private void applyAxis(int axisCode, double val) {
+        if (axisCode == BUTTON_VERTICAL) {
+            // Vertical movement buttons (RB/LB): translate along the camera up vector in free mode.
+            cam.setVertical(val);
+        } else if (axisCode == mappings.getAxisLstickH()) {
+            double valMapped = val * mappings.getAxisLstickHSensitivity();
+            if (cam.getMode().isFocus()) {
+                cam.setRoll(valMapped * 1.0e-1);
+            } else {
+                // Use this for lateral movement
+                cam.setHorizontal(valMapped);
+            }
+        } else if (axisCode == mappings.getAxisLstickV()) {
+            cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
+        } else if (axisCode == mappings.getAxisRstickH()) {
+            double valMapped = (GaiaSky.settings().controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
+            if (cam.getMode().isFocus()) {
+                cam.setHorizontal(valMapped * 2.0e-2);
+            } else {
+                cam.setYaw(valMapped * 1.0e-1);
+            }
+        } else if (axisCode == mappings.getAxisRstickV()) {
+            double valMapped = (GaiaSky.settings().controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
+            if (cam.getMode().isFocus()) {
+                cam.setVertical(valMapped * 2.0e-2);
+            } else {
+                cam.setPitch(valMapped * 1.0e-1);
+            }
+        } else if (axisCode == mappings.getAxisRT()) {
+            cam.setRoll(val * 1.0e-1 * mappings.getAxisRTSensitivity());
+        } else if (axisCode == mappings.getAxisLT()) {
+            cam.setRoll(-val * 1.0e-1 * mappings.getAxisLTSensitivity());
+        }
+    }
+
+    @Override
+    public void activate() {
+        // Do not apply stale values from a previous activation.
+        resetState();
+        super.activate();
+    }
+
+    @Override
+    public void deactivate() {
+        resetState();
+        super.deactivate();
+    }
+
+    private void resetState() {
+        // If the vertical button channel was in use, the camera may be left climbing on its own
+        // (a release event lost, or the listener going away with the button still held). Stop it.
+        if (axisTargets.containsKey(BUTTON_VERTICAL) || axisValues.containsKey(BUTTON_VERTICAL)) {
+            cam.setVertical(0.0);
+        }
+        verticalButtonUp = false;
+        verticalButtonDown = false;
+        axisTargets.clear();
+        axisValues.clear();
     }
 
     @Override

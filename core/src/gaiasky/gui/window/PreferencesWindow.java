@@ -89,6 +89,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox real;
     private OwnCheckBox invertX;
     private OwnCheckBox invertY;
+    private OwnSliderReset gamepadSmoothing;
     private OwnCheckBox highAccuracyPositions;
     private OwnCheckBox showNameConflicts;
     private OwnCheckBox pullCloudData;
@@ -194,7 +195,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         buildSuper();
 
         EventManager.instance.subscribe(this, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO);
-        EventManager.instance.subscribe(this, Event.INVERT_Y_CMD, Event.INVERT_X_CMD, Event.WINDOW_RESOLUTION_INFO);
+        EventManager.instance.subscribe(this, Event.INVERT_Y_CMD, Event.INVERT_X_CMD, Event.GAMEPAD_SMOOTHING_CMD, Event.WINDOW_RESOLUTION_INFO);
         EventManager.instance.subscribe(this, Event.REST_SERVER_STATUS_INFO);
     }
 
@@ -1810,8 +1811,20 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel invertYLabel = new OwnLabel(I18n.msg("gui.controller.axis.invert", "Y"), skin);
         invertY = new OwnCheckBox("", skin);
         invertY.setChecked(settings.controls.gamepad.invertY);
+        // Input smoothing
+        OwnLabel smoothingLabel = new OwnLabel(I18n.msg("gui.controller.axis.smoothing"), skin);
+        gamepadSmoothing = new OwnSliderReset("",
+                                              Constants.MIN_GAMEPAD_SMOOTHING,
+                                              Constants.MAX_GAMEPAD_SMOOTHING,
+                                              Constants.SLIDER_STEP_TINY,
+                                              0.35f,
+                                              skin);
+        gamepadSmoothing.setTooltip(I18n.msg("gui.controller.axis.smoothing.info"));
+        gamepadSmoothing.setName("gamepad input smoothing");
+        gamepadSmoothing.setWidth(sliderWidth);
+        gamepadSmoothing.setValue((float) settings.controls.gamepad.smoothing);
 
-        labels.add(detectedLabel, mappingsLabel, invertXLabel, invertYLabel);
+        labels.addAll(detectedLabel, mappingsLabel, invertXLabel, invertYLabel, smoothingLabel);
 
         Table controller = new Table(skin);
         controller.add(detectedLabel).left().padBottom(pad18).padRight(pad18);
@@ -1822,6 +1835,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controller.add(invertX).left().padBottom(pad18).row();
         controller.add(invertYLabel).left().padBottom(pad34).padRight(pad18);
         controller.add(invertY).left().padBottom(pad34).row();
+        controller.add(smoothingLabel).left().padBottom(pad18).padRight(pad18);
+        controller.add(gamepadSmoothing).left().padBottom(pad18).row();
 
         // KEY BINDINGS
         OwnLabel titleKeybindings = new OwnLabel(I18n.msg("gui.keymappings"), skin, "header");
@@ -3554,6 +3569,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         EventManager.publish(Event.INVERT_X_CMD, this, invertX.isChecked());
         EventManager.publish(Event.INVERT_Y_CMD, this, invertY.isChecked());
+        EventManager.publish(Event.GAMEPAD_SMOOTHING_CMD, this, (double) gamepadSmoothing.getMappedValue());
 
         // Gaia attitude
         settings.data.realGaiaAttitude = real.isChecked();
@@ -3754,6 +3770,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     invertY.setProgrammaticChangeEvents(false);
                     invertY.setChecked((Boolean) data[0]);
                     invertY.setProgrammaticChangeEvents(true);
+                }
+            }
+            case GAMEPAD_SMOOTHING_CMD -> {
+                if (source != this && gamepadSmoothing != null) {
+                    gamepadSmoothing.setValue(((Number) data[0]).floatValue());
                 }
             }
             case WINDOW_RESOLUTION_INFO -> {

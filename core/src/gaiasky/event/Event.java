@@ -1585,6 +1585,9 @@ public enum Event {
     INVERT_X_CMD,
     INVERT_Y_CMD,
 
+    /** Sets the gamepad input smoothing factor, in [0,1]. **/
+    GAMEPAD_SMOOTHING_CMD,
+
     /**
      * This event informs a new DISTANCE_SCALE_FACTOR is in place
      */
