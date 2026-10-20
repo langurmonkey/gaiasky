@@ -520,6 +520,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         } else if (aavalue.equals(AntialiasType.NFAA)) {
             antialiasing = new Nfaa(width, height);
             Logger.getLogger(this.getClass()).debug(I18n.msg("notif.selected", "NFAA"));
+        } else if (aavalue.equals(AntialiasType.SMAA)) {
+            antialiasing = new Smaa((int) width, (int) height, GaiaSky.settings().postprocess.antialiasing.quality);
+            Logger.getLogger(this.getClass()).debug(I18n.msg("notif.selected", "SMAA"));
         }
         if (antialiasing != null) {
             antialiasing.setEnabled(GaiaSky.settings().postprocess.antialiasing.type.isPostProcessAntialias());
@@ -1163,8 +1166,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         PostProcessorEffect ppe = ppb.get(Fxaa.class);
         if (ppe == null) {
             ppe = ppb.get(Nfaa.class);
-            if (ppe == null)
-                return null;
+            if (ppe == null) {
+                ppe = ppb.get(Smaa.class);
+                if (ppe == null)
+                    return null;
+            }
         }
         return (Antialiasing) ppe;
     }

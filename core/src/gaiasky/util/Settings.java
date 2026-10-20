@@ -4324,6 +4324,7 @@ public class Settings extends SettingsObject {
             NONE(0),
             FXAA(-1),
             NFAA(-2),
+            SMAA(-3),
             SSAA(1);
 
             final int aaCode;
@@ -4337,6 +4338,7 @@ public class Settings extends SettingsObject {
                     case 0 -> NONE;
                     case -1 -> FXAA;
                     case -2 -> NFAA;
+                    case -3 -> SMAA;
                     case 1 -> SSAA;
                     default -> throw new IllegalStateException("Unexpected value: " + code);
                 };

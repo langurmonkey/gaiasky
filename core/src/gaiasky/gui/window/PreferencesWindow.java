@@ -652,7 +652,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean<>(I18n.msg("gui.aa.no"), 0),
                     new ComboBoxBean<>(I18n.msg("gui.aa.fxaa"), -1),
-                    new ComboBoxBean<>(I18n.msg("gui.aa.nfaa"), -2)};
+                    new ComboBoxBean<>(I18n.msg("gui.aa.nfaa"), -2),
+                    new ComboBoxBean<>(I18n.msg("gui.aa.smaa"), -3)};
             antiAlias = new OwnSelectBox<>(skin);
             antiAlias.setItems(aas);
             antiAlias.setWidth(selectWidth);
@@ -3703,6 +3704,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return 1;
         if (x.getAACode() == -2)
             return 2;
+        if (x.getAACode() == -3)
+            return 3;
         if (x.getAACode() == 0)
             return 0;
         return (int) (Math.log(x.getAACode()) / FastMath.log(2) + 1e-10) + 2;
