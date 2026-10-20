@@ -26,7 +26,7 @@ public final class SmaaBlendFilter extends Filter<SmaaBlendFilter> {
      * @param viewportHeight The viewport height in pixels.
      */
     public SmaaBlendFilter(float viewportWidth, float viewportHeight) {
-        super(ShaderLoader.fromFile("smaa-blend", "smaa-blend"));
+        super("smaa-blend", "smaa-blend");
         this.texelSize = new Vector2(1f / viewportWidth, 1f / viewportHeight);
         rebind();
     }

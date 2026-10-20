@@ -25,7 +25,7 @@ public final class SmaaEdgesFilter extends Filter<SmaaEdgesFilter> {
      * @param defines        Shader defines, used to select the preset and the input color space.
      */
     public SmaaEdgesFilter(float viewportWidth, float viewportHeight, String defines) {
-        super(ShaderLoader.fromFile("smaa-edges", "smaa-edges", defines));
+        super("smaa-edges", "smaa-edges", defines);
         this.texelSize = new Vector2(1f / viewportWidth, 1f / viewportHeight);
         rebind();
     }

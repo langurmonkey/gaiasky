@@ -52,5 +52,4 @@ public class AntialiasTypeTest {
             assertEquals(type, postprocess.getAntialias(type.getAACode()));
         }
     }
-}   
 }

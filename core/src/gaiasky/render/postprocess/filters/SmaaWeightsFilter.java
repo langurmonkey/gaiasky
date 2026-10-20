@@ -30,7 +30,7 @@ public final class SmaaWeightsFilter extends Filter<SmaaWeightsFilter> {
      * @param defines        Shader defines, used to select the preset.
      */
     public SmaaWeightsFilter(float viewportWidth, float viewportHeight, Texture areaTexture, Texture searchTexture, String defines) {
-        super(ShaderLoader.fromFile("smaa-weights", "smaa-weights", defines));
+        super("smaa-weights", "smaa-weights", defines);
         this.texelSize = new Vector2(1f / viewportWidth, 1f / viewportHeight);
         this.areaTexture = areaTexture;
         this.searchTexture = searchTexture;
