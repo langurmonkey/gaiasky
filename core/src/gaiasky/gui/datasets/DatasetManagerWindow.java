@@ -11,7 +11,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.HttpRequest;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -44,7 +43,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
@@ -57,7 +55,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -90,6 +87,9 @@ public class DatasetManagerWindow extends GenericDialog {
     private final float w = 40f;
     /** Icon height. **/
     private final float h = 40f;
+
+    /** Maximum number of dataset images to fetch/load. **/
+    private static final int MAX_DS_IMAGES = 4;
 
     public DatasetManagerWindow(Stage stage,
                                 Skin skin,
@@ -848,7 +848,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 // Max 3 images, 1:1 aspect, no larger than DatasetDesc#MAX_IMAGE_SIDE^2 px.
                 if (mode == DatasetMode.INSTALLED) {
                     // LOCAL IMAGES
-                    int n = Math.min(3, dataset.images.length);
+                    int n = Math.min(MAX_DS_IMAGES, dataset.images.length);
                     for (int i = 0; i < n; i++) {
                         var img = dataset.images[i];
                         try {
@@ -868,7 +868,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     }
                 } else if (mode == DatasetMode.AVAILABLE) {
                     // REMOTE IMAGES
-                    int n = Math.min(3, dataset.images.length);
+                    int n = Math.min(MAX_DS_IMAGES, dataset.images.length);
                     imagesTable = new Table(skin);
                     for (int i = 0; i < n; i++) {
                         String url = dataset.images[i].replace(DatasetDownloadUtils.mirrorKeyword,
@@ -1150,14 +1150,6 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
 
-            // Scroll.
-            var infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
-            infoScroll.setScrollingDisabled(true, false);
-            infoScroll.setExpand(true);
-            infoScroll.setSmoothScrolling(false);
-            infoScroll.setFadeScrollBars(false);
-            infoScroll.setWidth(1050f);
-
             OwnTextIconButton cancelDownloadButton = null;
             if (currentDownloads.containsKey(dataset.key)) {
                 Pair<Dataset, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
@@ -1183,7 +1175,13 @@ public class DatasetManagerWindow extends GenericDialog {
                 rightTable.add(replacedBy).top().left().fillX().padBottom(pad10 * 3f).row();
             }
             if (imagesTable != null) {
-                rightTable.add(imagesTable).top().center().padBottom(pad34).row();
+                var imagesScroll = new OwnScrollPane(imagesTable, skin, "minimalist-nobg");
+                imagesScroll.setScrollingDisabled(false, true);
+                imagesScroll.setSmoothScrolling(false);
+                imagesScroll.setFadeScrollBars(false);
+                imagesScroll.setWidth(1050f);
+
+                rightTable.add(imagesScroll).top().center().padBottom(pad34).row();
             }
             rightTable.add(type).top().left().padBottom(pad10).row();
             rightTable.add(version).top().left().padBottom(pad10).row();
@@ -1194,7 +1192,7 @@ public class DatasetManagerWindow extends GenericDialog {
             rightTable.add(nObjects).top().left().padBottom(pad18).row();
             if (linksGroup != null)
                 rightTable.add(linksGroup).top().left().padBottom(pad34 * 2f).row();
-            rightTable.add(infoScroll).top().left().padBottom(pad34).row();
+            rightTable.add(infoTable).top().left().padBottom(pad34).row();
             if (replaces != null) {
                 rightTable.add(replaces).top().left().padBottom(pad10).row();
             }
