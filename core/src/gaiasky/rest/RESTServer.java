@@ -69,7 +69,7 @@ public class RESTServer implements Disposable {
         if (!enabled || port < 0) {
             if (isRunning()) {
                 logger.info("Stopping server.");
-            } else {
+            } else if (enabled) {
                 logger.error(String.format("Error: invalid port (%d). REST API inactive.", port));
             }
             Spark.stop();
