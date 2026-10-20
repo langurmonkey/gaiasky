@@ -572,7 +572,6 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             result[0] = 0;
             result[1] = 0;
             result[2] = 0;
-
         }
     }
 
