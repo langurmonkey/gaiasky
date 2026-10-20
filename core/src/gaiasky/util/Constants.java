@@ -257,9 +257,9 @@ public class Constants {
     public static final String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
 
     /** Number of directional lights. **/
-    public static final int N_DIR_LIGHTS = 3;
+    public static final int N_DIR_LIGHTS = 5;
     /** Number of point lights. **/
-    public static final int N_POINT_LIGHTS = 3;
+    public static final int N_POINT_LIGHTS = 5;
     /** Number of spotlights. **/
     public static final int N_SPOT_LIGHTS = 0;
     /**

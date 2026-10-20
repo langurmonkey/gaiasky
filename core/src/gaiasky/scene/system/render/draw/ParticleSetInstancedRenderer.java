@@ -300,8 +300,9 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 // Shading type.
                 setShadingTypeUniforms(shaderProgram, camera, shadingType, set.sphericalPower, set.ambientLight, Mapper.graph.get(render.entity));
 
-                // Shading style.
-                shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getRunTimeSeconds());
+                // Shading style. The frame-time accumulator, not the wall clock, so the twinkling
+                // keeps its speed in frame output and camcorder mode.
+                shaderProgram.setUniformf("u_appTime", (float) GaiaSky.instance.getT());
                 shaderProgram.setUniformi("u_shadingStyle", set.shadingStyle.ordinal());
 
                 // Render target.

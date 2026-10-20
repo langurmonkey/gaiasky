@@ -630,7 +630,6 @@ postprocess:
   # Light glow effect
   lightGlow:
     active: false
-    samples: 10
   # Re-projection as post-processing.
   # Modes are:
   # DISABLED

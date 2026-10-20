@@ -42,7 +42,7 @@ public final class FilmGrainFilter extends Filter<FilmGrainFilter> {
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
-        setParam(Param.Time, (float) GaiaSky.instance.getRunTimeSeconds());
+        setParam(Param.Time, (float) GaiaSky.instance.getT());
     }
 
     public enum Param implements Parameter {

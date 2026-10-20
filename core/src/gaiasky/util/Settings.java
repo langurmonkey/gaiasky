@@ -4476,7 +4476,6 @@ public class Settings extends SettingsObject {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class LightGlowSettings extends SettingsObject {
             public boolean active;
-            public int samples = 1;
 
             @Override
             public LightGlowSettings clone() {

@@ -685,8 +685,11 @@ public enum Event {
     LENS_FLARE_CMD,
 
     /**
-     * Contains an int with the number of lights and a float[] with [x, y] of
-     * the 10 closest stars in screen coordinates in [0,1].
+     * Contains an int with the number of lights, followed by the per-light arrays:
+     * the float[] with [x, y] of the closest stars in screen coordinates in [0,1], the float[] with
+     * their apparent view angles, the float[] with their colors (rgb), the float[] with their
+     * distance from the camera along the view direction (for occlusion), and the float[] with their
+     * glow intensity in [0,1], derived from their apparent magnitude.
      **/
     LIGHT_POS_2D_UPDATE,
     /**

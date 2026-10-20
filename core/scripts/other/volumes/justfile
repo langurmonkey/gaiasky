@@ -57,7 +57,7 @@ genvol resolution input output *args:
 
 # Run with default values smoothing and intensity
 genvold resolution input output:
-	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} --smoothing ArmDust=0.4 --intensity ArmDust=0.08
+	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} --smoothing ArmDust=0.4 --intensity ArmDust=0.08 --intensity Bulge=0.3 --intensity Gas=0.7
 
 # Create top-down and edge-on images
 img dir *args:

@@ -15,64 +15,14 @@
  ******************************************************************************/
 #version 330 core
 
-#define N 8
-
-// Current frame.
-uniform sampler2D u_texture0;
-// Star texture.
-uniform sampler2D u_texture1;
-
-uniform vec2 u_viewport;
-uniform int u_nLights;
-uniform int u_nSamples;
-uniform float u_spiralScale;
-uniform vec2 u_lightPositions[N];
+// Full-screen quad pass-through.
 
 in vec4 a_position;
 in vec2 a_texCoord0;
 
 out vec2 v_texCoords;
 
-out float v_lums[N];
-
-#include <shader/lib/luma.glsl>
-#define saturate(x) clamp(x, 0.0, 1.0)
-
-float fx(float t, float a){
-    return a * t * cos(t);
-}
-
-float fy(float t, float a){
-    return a * t * sin(t);
-}
-
 void main() {
-    float ar = u_viewport.x / u_viewport.y;
-    for (int li = 0; li < u_nLights; li++){
-        // Size of sampling spiral
-        float a = u_spiralScale;
-
-        // Archimedes' spiral (fx = a*t*cos(t), fy = a*t*sin(t)) sampling from 0 to 3*Pi (extends to a radius of roughly 10)
-        float t = 0;
-        float dt = 3.0 * 3.14159 / u_nSamples;
-
-        // This is the luma threshold for stars. If the luma is over this threshold, we find a star. Otherwise, no star.
-        float th = 0.95;
-
-        float lum = 0.0;
-        for (int idx = 0; idx < u_nSamples; idx++){
-            vec2 curr_coord = clamp(u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
-            float value = luma((texture(u_texture0, curr_coord)).rgb);
-            lum += step(th, value) * value;
-            t += dt;
-        }
-        // Threshold the incoming texture at 0.9 so that only the brightest pixels pass.
-        float value = luma((texture(u_texture0, u_lightPositions[li] + vec2(fx(t, a) / ar, fy(t, a) * ar))).rgb);
-        lum += step(th, value) * value;
-        lum /= u_nSamples;
-
-        v_lums[li] = saturate(lum);
-    }
     v_texCoords = a_texCoord0;
     gl_Position = a_position;
 }

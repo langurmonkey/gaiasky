@@ -61,6 +61,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
 
     /**
+     * Maximum halo radius, in pixels at the reference height of the glow shader. Only the lights with
+     * a large angular size reach it: the Sun and the Moon.
+     */
+    private static final float GLOW_HALO_RADIUS_PX = 160f;
+
+    /**
      * Contains a map by name with
      * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string},
      * 5:texture3{string}] for ray-marching post-processors.
@@ -220,12 +226,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         glowTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         var lightGlow = new LightGlow((int) width, (int) height);
         lightGlow.setLightGlowTexture(glowTexture);
-        lightGlow.setTextureScale(getGlowTextureScale(ss.brightness,
-                                                      ss.glowFactor,
-                                                      ss.pointSize,
-                                                      GaiaSky.instance.cameraManager.getFovFactor(),
-                                                      settings.program.modeCubemap.active));
-        lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
+        lightGlow.setTextureScale(getGlowTextureScale(ss.brightness, ss.glowFactor));
         lightGlow.setBackBufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
         lightGlow.setEnabledOptions(false, true);
@@ -476,10 +477,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lgh = FastMath.round(lgw / ar);
         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
         if (lightglow != null) {
-            lightglow.setNSamples(1);
             lightglow.setViewportSize(lgw, lgh);
         }
-        GaiaSky.settings().postprocess.lightGlow.samples = 1;
     }
 
     private void updateCameraBlur(PostProcessBean ppb) {
@@ -554,18 +553,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
     }
 
-    private float getGlowTextureScale(double starBrightness, double glowFactor, float pointSize, float fovFactor, boolean cubemap) {
+    /**
+     * Maximum halo radius, in pixels at the reference height, scaled by the brightness and glow settings.
+     */
+    private float getGlowTextureScale(double starBrightness, double glowFactor) {
         glowFactor = glowFactor / 0.06f;
-        if (cubemap) {
-            float ts = (float) starBrightness * (float) glowFactor * pointSize * 7e-2f / fovFactor;
-            return FastMath.min(ts * 0.2f, 5e-1f);
-        } else {
-            return (float) starBrightness * (float) glowFactor * 0.2f;
-        }
-    }
-
-    private float getGlowSpiralScale(double starBrightness, float starSize, float fovFactor) {
-        return (float) starBrightness * starSize * 0.5e-4f / fovFactor;
+        return (float) (GLOW_HALO_RADIUS_PX * starBrightness * glowFactor);
     }
 
     @Override
@@ -583,14 +576,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             PostProcessBean ppb = pps[i];
                             LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                             if (lightglow != null) {
-                                lightglow.setTextureScale(getGlowTextureScale(brightness,
-                                                                              GaiaSky.settings().scene.star.glowFactor,
-                                                                              GaiaSky.settings().scene.star.pointSize,
-                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
-                                                                              GaiaSky.settings().program.modeCubemap.active));
-                                lightglow.setSpiralScale(getGlowSpiralScale(brightness,
-                                                                            GaiaSky.settings().scene.star.pointSize,
-                                                                            GaiaSky.instance.cameraManager.getFovFactor()));
+                                lightglow.setTextureScale(getGlowTextureScale(brightness, GaiaSky.settings().scene.star.glowFactor));
                             }
                         }
                     }
@@ -604,42 +590,23 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             PostProcessBean ppb = pps[i];
                             LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                             if (lightglow != null) {
-                                lightglow.setTextureScale(getGlowTextureScale(GaiaSky.settings().scene.star.brightness,
-                                                                              glowFactor,
-                                                                              GaiaSky.settings().scene.star.pointSize,
-                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
-                                                                              GaiaSky.settings().program.modeCubemap.active));
+                                lightglow.setTextureScale(getGlowTextureScale(GaiaSky.settings().scene.star.brightness, glowFactor));
                             }
                         }
                     }
                 });
             }
             case STAR_POINT_SIZE_CMD -> {
-                var size = (Float) data[0];
-                GaiaSky.postRunnable(() -> {
-                    for (int i = 0; i < RenderType.values().length; i++) {
-                        if (pps[i] != null) {
-                            PostProcessBean ppb = pps[i];
-                            LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                            if (lightglow != null) {
-                                lightglow.setTextureScale(getGlowTextureScale(GaiaSky.settings().scene.star.brightness,
-                                                                              GaiaSky.settings().scene.star.glowFactor,
-                                                                              size,
-                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
-                                                                              GaiaSky.settings().program.modeCubemap.active));
-                                lightglow.setSpiralScale(getGlowSpiralScale(GaiaSky.settings().scene.star.brightness,
-                                                                            size,
-                                                                            GaiaSky.instance.cameraManager.getFovFactor()));
-                            }
-                        }
-                    }
-                });
+                // The point size of the stars no longer affects the glow, which follows the light
+                // intensity and its angular size.
             }
             case LIGHT_POS_2D_UPDATE -> {
                 var nLights = (Integer) data[0];
                 var lightPos = (float[]) data[1];
                 var angles = (float[]) data[2];
                 var colors = (float[]) data[3];
+                var depths = (float[]) data[4];
+                var intensities = (float[]) data[5];
                 var alphas = new float[nLights];
                 var lensFlareSettings = GaiaSky.settings().postprocess.lensFlare;
                 var nLightsFlare = 0;
@@ -666,7 +633,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         if (lightGlow != null && lightGlow.isEnabled()) {
                             lightGlow.setLightPositions(nLights, lightPos);
                             lightGlow.setLightSolidAngles(angles);
+                            lightGlow.setLightDepths(depths);
+                            lightGlow.setLightIntensities(intensities);
                             lightGlow.setLightColors(colors);
+                            // The halo sizes follow the field of view, so they are refreshed with the
+                            // light data.
+                            lightGlow.setFovFactor(GaiaSky.instance.cameraManager.getFovFactor());
                         }
                         if (!lensFlareSettings.type.isPseudoLensFlare()) {
                             LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
@@ -700,18 +672,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
-                            // Light glow.
-                            LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
-                            if (lightGlow != null) {
-                                lightGlow.setTextureScale(getGlowTextureScale(GaiaSky.settings().scene.star.brightness,
-                                                                              GaiaSky.settings().scene.star.glowFactor,
-                                                                              GaiaSky.settings().scene.star.pointSize,
-                                                                              GaiaSky.instance.cameraManager.getFovFactor(),
-                                                                              GaiaSky.settings().program.modeCubemap.active));
-                                lightGlow.setSpiralScale(getGlowSpiralScale(GaiaSky.settings().scene.star.brightness,
-                                                                            GaiaSky.settings().scene.star.pointSize,
-                                                                            GaiaSky.instance.cameraManager.getFovFactor()));
-                            }
                             // Re-projection.
                             Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
                             if (reprojection != null)
@@ -921,9 +881,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         PseudoLensFlare flare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
                         if (flare != null)
                             flare.setStarburstOffset(cameraOffset);
-                        LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
-                        if (glow != null)
-                            glow.setOrientation(cameraOffset * 50f);
 
                         // Update ray marching shaders
                         Map<String, PostProcessorEffect> rms = ppb.getAll(RaymarchObject.class);
@@ -993,10 +950,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             reprojection.setEnabled(active);
                             reprojection.setMode(mode.mode);
                         }
-                        LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
-                        if (glow != null) {
-                            glow.setNSamples(active ? 1 : GaiaSky.settings().postprocess.lightGlow.samples);
-                        }
                     }
                 }
             }
@@ -1034,15 +987,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         CameraMotionBlur cameraMotion = (CameraMotionBlur) ppb.get(CameraMotionBlur.class);
                         if (cameraMotion != null) {
                             cameraMotion.setEnabled(enabled);
-                        }
-                        LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightGlow != null && lightGlow.isEnabledInCubemap()) {
-                            lightGlow.setNSamples(enabled ? 1 : GaiaSky.settings().postprocess.lightGlow.samples);
-                            lightGlow.setTextureScale(getGlowTextureScale(GaiaSky.settings().scene.star.brightness,
-                                                                          GaiaSky.settings().scene.star.glowFactor,
-                                                                          GaiaSky.settings().scene.star.pointSize,
-                                                                          GaiaSky.instance.cameraManager.getFovFactor(),
-                                                                          GaiaSky.settings().program.modeCubemap.active));
                         }
                     }
                 }

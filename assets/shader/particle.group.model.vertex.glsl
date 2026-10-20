@@ -20,7 +20,7 @@ uniform mat4 u_refSysTransform;
 uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
 uniform float u_proximityThreshold;
-// App run time in seconds.
+// Animation clock in seconds: the frame-time accumulator, so captures keep the real time speed.
 uniform float u_appTime;
 // Shading style: 0: default, 1: twinkle.
 uniform int u_shadingStyle;
