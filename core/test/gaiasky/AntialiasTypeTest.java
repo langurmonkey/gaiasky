@@ -7,6 +7,7 @@
 
 package gaiasky;
 
+import gaiasky.util.Settings;
 import gaiasky.util.Settings.PostprocessSettings.AntialiasType;
 import org.junit.Test;
 
@@ -38,4 +39,18 @@ public class AntialiasTypeTest {
         assertFalse(AntialiasType.SSAA.isPostProcessAntialias());
         assertFalse(AntialiasType.NONE.isPostProcessAntialias());
     }
+
+    /**
+     * The preferences dialog turns the combo box code back into an antialias type with this method.
+     * If a code is missing here the selection silently falls back to NONE and the dialog shows
+     * "No antialiasing" the next time it is opened.
+     */
+    @Test
+    public void comboBoxCodesMapBackToTheirType() {
+        var postprocess = new Settings.PostprocessSettings();
+        for (AntialiasType type : AntialiasType.values()) {
+            assertEquals(type, postprocess.getAntialias(type.getAACode()));
+        }
+    }
+}   
 }

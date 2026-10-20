@@ -525,7 +525,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             Logger.getLogger(this.getClass()).debug(I18n.msg("notif.selected", "SMAA"));
         }
         if (antialiasing != null) {
-            antialiasing.setEnabled(GaiaSky.settings().postprocess.antialiasing.type.isPostProcessAntialias());
+            // Use the requested value, not the current setting: the settings listener may not have
+            // processed the ANTIALIASING_CMD event yet, in which case the setting still holds the old value.
+            antialiasing.setEnabled(aavalue.isPostProcessAntialias());
             ppb.add(antialiasing);
         }
     }
@@ -1014,8 +1016,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                                 if (antialiasing != null) {
                                     ppb.remove(antialiasing.getClass());
                                 }
-                                // update
-                                initAntiAliasing(antiAliasingValue, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
+                                // update. Use the size of this render type, which is not the window size
+                                // when the back buffer is scaled, in VR or in the offscreen processors.
+                                int[] size = getSize(RenderType.values()[i]);
+                                initAntiAliasing(antiAliasingValue, size[0], size[1], ppb);
                                 // ensure motion blur and levels go after
                                 ppb.remove(Levels.class);
                                 initLevels(ppb);

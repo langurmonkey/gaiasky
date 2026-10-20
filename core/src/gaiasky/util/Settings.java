@@ -4061,6 +4061,7 @@ public class Settings extends SettingsObject {
             return switch (code) {
                 case -1 -> AntialiasType.FXAA;
                 case -2 -> AntialiasType.NFAA;
+                case -3 -> AntialiasType.SMAA;
                 case 1 -> AntialiasType.SSAA;
                 default -> AntialiasType.NONE;
             };

@@ -178,8 +178,23 @@ public final class Smaa extends Antialiasing {
         }
     }
 
+    /**
+     * Rebuilds the intermediate buffers and updates the texel size when the source size changes.
+     * This keeps the effect correct when it was created with a size that does not match the render
+     * target (scaled back buffer, VR, offscreen processors).
+     */
+    private void syncViewportSize(int width, int height) {
+        if (this.width != width || this.height != height) {
+            setViewportSize(width, height);
+        }
+    }
+
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer full, GaiaSkyFrameBuffer half) {
+        // The intermediate buffers and the texel size must match the source, which is not
+        // necessarily the window size (scaled back buffer, VR, offscreen processors).
+        syncViewportSize(src.getWidth(), src.getHeight());
+
         // 1. Edge detection
         edgesFilter.setInput(src).setOutput(edgesBuffer).render();
         // 2. Blending weights
