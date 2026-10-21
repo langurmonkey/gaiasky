@@ -4058,13 +4058,7 @@ public class Settings extends SettingsObject {
         }
 
         public AntialiasType getAntialias(int code) {
-            return switch (code) {
-                case -1 -> AntialiasType.FXAA;
-                case -2 -> AntialiasType.NFAA;
-                case -3 -> AntialiasType.SMAA;
-                case 1 -> AntialiasType.SSAA;
-                default -> AntialiasType.NONE;
-            };
+            return AntialiasType.getFromCode(code, AntialiasType.NONE);
         }
 
         @Override
@@ -4074,7 +4068,7 @@ public class Settings extends SettingsObject {
             if (isEnabled() && source != this) {
                 switch (event) {
                     case ANTIALIASING_CMD -> antialiasing.type = (AntialiasType) data[0];
-                    case FXAA_QUALITY_CMD -> antialiasing.quality = MathUtils.clamp((Integer) data[0], 0, 2);
+                    case AA_QUALITY_CMD -> antialiasing.quality = MathUtils.clamp((Integer) data[0], 0, 2);
                     case BLOOM_CMD -> bloom.intensity = (float) data[0];
                     case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
                     case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
@@ -4166,7 +4160,7 @@ public class Settings extends SettingsObject {
                                             Event.TONEMAPPING_TYPE_CMD,
                                             Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD,
                                             Event.FILM_GRAIN_CMD,
-                                            Event.ANTIALIASING_CMD, Event.FXAA_QUALITY_CMD);
+                                            Event.ANTIALIASING_CMD, Event.AA_QUALITY_CMD);
 
             antialiasing.setupListeners();
             bloom.setupListeners();
@@ -4206,7 +4200,7 @@ public class Settings extends SettingsObject {
             // This needs to run in the main thread because it accesses the OpenGL context.
             GaiaSky.postRunnable(() -> {
                 EventManager.publish(Event.ANTIALIASING_CMD, this, antialiasing.type);
-                EventManager.publish(Event.FXAA_QUALITY_CMD, this, antialiasing.quality);
+                EventManager.publish(Event.AA_QUALITY_CMD, this, antialiasing.quality);
                 EventManager.publish(Event.BLOOM_CMD, this, bloom.intensity);
                 EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMask.factor);
                 EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, this, chromaticAberration.amount);
@@ -4296,7 +4290,7 @@ public class Settings extends SettingsObject {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class AntialiasSettings extends SettingsObject {
-            public AntialiasType type = AntialiasType.FXAA;
+            public AntialiasType type = AntialiasType.SMAA;
             public int quality = 1;
 
             @Override
@@ -4323,9 +4317,9 @@ public class Settings extends SettingsObject {
 
         public enum AntialiasType {
             NONE(0),
-            FXAA(-1),
-            NFAA(-2),
-            SMAA(-3),
+            SMAA(-1),
+            FXAA(-2),
+            NFAA(-3),
             SSAA(1);
 
             final int aaCode;
@@ -4335,14 +4329,22 @@ public class Settings extends SettingsObject {
             }
 
             public static AntialiasType getFromCode(int code) {
-                return switch (code) {
-                    case 0 -> NONE;
-                    case -1 -> FXAA;
-                    case -2 -> NFAA;
-                    case -3 -> SMAA;
-                    case 1 -> SSAA;
-                    default -> throw new IllegalStateException("Unexpected value: " + code);
-                };
+                var types = AntialiasType.values();
+                for (var aa : types) {
+                    if (aa.aaCode == code) {
+                        return aa;
+                    }
+                }
+                throw new IllegalStateException("Unexpected value: " + code);
+            }
+
+
+            public static AntialiasType getFromCode(int code, AntialiasType defaultValue) {
+                try {
+                    return getFromCode(code);
+                } catch (IllegalStateException ignored) {
+                    return defaultValue;
+                }
             }
 
             public int getAACode() {

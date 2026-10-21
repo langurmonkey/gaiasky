@@ -51,7 +51,6 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.validator.*;
-import net.jafama.FastMath;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -162,7 +161,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             lensFlareBak, filmGrainBak, stereoKBak, stereoIpdBak, stereoSdBak, plApertureBak, plAngleBak;
     private boolean lightGlowBak, debugInfoBak, frameCoordinatesBak;
     private float[] accentColorBak;
-    private int FXAAQuality, FXAAQualityBak;
+    private int aaQuality, AAQualityBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
     private AtomicBoolean vsyncValue;
@@ -341,7 +340,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     graphicsQuality.setSelectedIndex(GraphicsQuality.LOW.ordinal());
                     // No anti-aliasing.
                     antiAlias.setSelectedIndex(idxAa(AntialiasType.NONE));
-                    FXAAQuality = 0;
+                    aaQuality = 0;
                     // Legacy line style.
                     lineRenderer.setSelectedIndex(LineMode.GL_LINES.ordinal());
                     // Lens flare.
@@ -378,9 +377,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
                     // Normal graphics quality.
                     graphicsQuality.setSelectedIndex(GraphicsQuality.NORMAL.ordinal());
-                    // FXAA anti-aliasing.
-                    antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
-                    FXAAQuality = 1;
+                    // SMAA anti-aliasing.
+                    antiAlias.setSelectedIndex(idxAa(AntialiasType.SMAA));
+                    aaQuality = 1;
                     // Polyline quadstrip line style.
                     lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
                     // Simple lens flare.
@@ -409,9 +408,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
                     // Normal graphics quality.
                     graphicsQuality.setSelectedIndex(GraphicsQuality.HIGH.ordinal());
-                    // FXAA anti-aliasing.
-                    antiAlias.setSelectedIndex(idxAa(AntialiasType.FXAA));
-                    FXAAQuality = 2;
+                    // SMAA anti-aliasing.
+                    antiAlias.setSelectedIndex(idxAa(AntialiasType.SMAA));
+                    aaQuality = 2;
                     // Polyline quadstrip line style.
                     lineRenderer.setSelectedIndex(LineMode.POLYLINE_QUADSTRIP.ordinal());
                     // Complex lens flare.
@@ -650,15 +649,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             OwnLabel aaLabel = new OwnLabel(I18n.msg("gui.aa"), skin);
             aaLabel.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
-            ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean<>(I18n.msg("gui.aa.no"), 0),
-                    new ComboBoxBean<>(I18n.msg("gui.aa.fxaa"), -1),
-                    new ComboBoxBean<>(I18n.msg("gui.aa.nfaa"), -2),
-                    new ComboBoxBean<>(I18n.msg("gui.aa.smaa"), -3)};
+            ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean<>(I18n.msg("gui.aa.no"), AntialiasType.NONE.getAACode()),
+                    new ComboBoxBean<>(I18n.msg("gui.aa.smaa"), AntialiasType.SMAA.getAACode()),
+                    new ComboBoxBean<>(I18n.msg("gui.aa.fxaa"), AntialiasType.FXAA.getAACode()),
+                    new ComboBoxBean<>(I18n.msg("gui.aa.nfaa"), AntialiasType.NFAA.getAACode())};
             antiAlias = new OwnSelectBox<>(skin);
             antiAlias.setItems(aas);
             antiAlias.setWidth(selectWidth);
             antiAlias.setSelected(aas[idxAa(settings.postprocess.antialiasing.type)]);
-            FXAAQuality = settings.postprocess.antialiasing.quality;
+            aaQuality = settings.postprocess.antialiasing.quality;
 
             OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
             aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
@@ -3112,7 +3111,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         reprojectionBak = settings.postprocess.reprojection.mode;
         upscaleFilterBak = settings.postprocess.upscaleFilter;
         frameCoordinatesBak = settings.program.uvGrid.frameCoordinates;
-        FXAAQualityBak = settings.postprocess.antialiasing.quality;
+        AAQualityBak = settings.postprocess.antialiasing.quality;
         stereoKBak = (float) settings.program.modeStereo.k;
         stereoIpdBak = (float) settings.program.modeStereo.ipd;
         stereoSdBak = (float) settings.program.modeStereo.screenDistance;
@@ -3291,7 +3290,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (settings.postprocess.antialiasing.type != newAntiAlias) {
             EventManager.publish(Event.ANTIALIASING_CMD, this, newAntiAlias);
         }
-        EventManager.publish(Event.FXAA_QUALITY_CMD, this, FXAAQuality);
+        EventManager.publish(Event.AA_QUALITY_CMD, this, aaQuality);
 
         settings.graphics.vsync = vsyncValue.get();
         try {
@@ -3649,7 +3648,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
         EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
         EventManager.publish(Event.UV_GRID_FRAME_COORDINATES_CMD, this, frameCoordinatesBak);
-        EventManager.publish(Event.FXAA_QUALITY_CMD, this, FXAAQualityBak);
+        EventManager.publish(Event.AA_QUALITY_CMD, this, AAQualityBak);
         EventManager.publish(Event.STEREO_K_CMD, this, stereoKBak);
         EventManager.publish(Event.STEREO_IPD_CMD, this, stereoIpdBak);
         EventManager.publish(Event.STEREO_SCREEN_DIST_CMD, this, stereoSdBak);
@@ -3700,15 +3699,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private int idxAa(AntialiasType x) {
-        if (x.getAACode() == -1)
-            return 1;
-        if (x.getAACode() == -2)
-            return 2;
-        if (x.getAACode() == -3)
-            return 3;
-        if (x.getAACode() == 0)
+        if (x == AntialiasType.NONE)
             return 0;
-        return (int) (Math.log(x.getAACode()) / FastMath.log(2) + 1e-10) + 2;
+        else if (x == AntialiasType.SMAA)
+            return 1;
+        else if (x == AntialiasType.FXAA)
+            return 2;
+        else if (x == AntialiasType.NFAA)
+            return 3;
+        return 1;
     }
 
     private int idxLang(String code,

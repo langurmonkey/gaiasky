@@ -582,8 +582,8 @@ camrecorder:
 postprocess:
   # Antialiasing settings
   antialiasing:
-    # Antialias type: [NONE|FXAA|NFAA|SMAA]
-    type: FXAA
+    # Antialias type: [NONE|SMAA|FXAA|NFAA]
+    type: SMAA
     # Antialias quality, in [0, 1, 2] from worse to best. Used by FXAA and SMAA.
     quality: 2
   # Bloom settings

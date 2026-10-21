@@ -90,11 +90,11 @@ public enum Event {
     AMBIENT_LIGHT_CMD,
 
     /**
-     * Antialiasing changed, contains the new antialiasing value.
+     * Antialiasing changed, contains the new antialiasing value as a {@link gaiasky.util.Settings.PostprocessSettings.AntialiasType}.
      **/
     ANTIALIASING_CMD,
-    /** Changes the quality setting of FXAA. Includes an integer in [0|1|2]. **/
-    FXAA_QUALITY_CMD,
+    /** Changes the quality setting of FXAA and SMAA. Includes an integer in [0|1|2]. **/
+    AA_QUALITY_CMD,
 
     /** Notifies of screen resolution changes in windowed mode. Contains the new width and height as integers. **/
     WINDOW_RESOLUTION_INFO,
