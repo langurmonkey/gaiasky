@@ -10,7 +10,7 @@
 // Pixels per unit of normalised view angle, at the reference height.
 #define PX_PER_ANGLE (REF_HEIGHT * 0.5 / TAN_REF_FOV)
 // Smallest halo radius, in pixels at the reference height.
-#define MIN_HALO_PX 0.8
+#define MIN_HALO_PX 0.1
 // Angular radius, in pixels at the reference height, of a full-size halo.
 #define GLOW_ANGULAR_REF_PX 2.0e-3
 // Exponent of the halo radius against the fov: 0 keeps it constant, -1 is physical.

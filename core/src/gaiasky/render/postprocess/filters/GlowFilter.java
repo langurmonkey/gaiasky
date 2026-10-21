@@ -40,7 +40,7 @@ public final class GlowFilter extends Filter<GlowFilter> {
     private Texture lightGlowTexture;
 
     public GlowFilter(int width, int height) {
-        super(ShaderLoader.fromFile("lightglow", "lightglow"));
+        super(ShaderLoader.fromFile("screenspace", "lightglow"));
         viewport = new Vector2(width, height);
         rebind();
     }
