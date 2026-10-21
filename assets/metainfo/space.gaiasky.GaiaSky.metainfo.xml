@@ -39,20 +39,27 @@
 
   <releases>
 
-    <release version="3.8.0" date="2026-07-23" urgency="high">
-      <url>https://gaiasky.space/news/2026/gaiasky_3.8.0</url>
+    <release version="3.9.0" date="2026-10-21" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.9.0</url>
       <description>
-        <p>This release brings a major update of the procedural planet generation system, new high-resolution icons, and many bug fixes:</p>
+        <p>This release brings volumetric rendering of the Milky Way, a new SMAA anti-aliasing implementation, a reworked camera, and support for <code>gaiasky://</code> URLs, among many more new features and bug fixes.</p>
         <ul>
-          <li>Major procedural planet generation overhaul with improved noise, domain warping, 3D biome LUTs, and new presets (lava, tropical, desert).</li>
-          <li>Merge biome + surfacegen passes into a single render pass. This halves GPU bandwidth, eliminates 8-bit quantization.</li>
-          <li>Add tessellation capability detection, plains code, latitude influence, and colored atmospheres.</li>
-          <li>Update all UI icons to higher resolution for HiDPI support.</li>
-          <li>Implement custom control panes for Stereo, Panorama, Planetarium, and Orthosphere view modes.</li>
-          <li>Add pulsar component type and on-focus load for proximity descriptors.</li>
-          <li>Fix cube-sphere and octahedron-sphere UV mapping and tangents.</li>
-          <li>Fix VR UI regression, light glow in cubemap mode, label seams, and star point size adjustment.</li>
-          <li>Update LWJGL3 to 3.3.4, Gradle to 9.6.1, JRE to JDK-26.0.1+8.</li>
+          <li>Add volumetric rendering of the Milky Way, with per-slot depth so that dense dust lanes hide the stars behind them while the faint outer haze does not.
+            </li><li>Support non-cubic and RGBA (color+density) volumes, crop unused data at load time, and skip empty bricks in the raymarcher.
+            </li><li>Expose the ray-marching iteration count to the JSON format and add reference system transformations to volumes.
+            </li><li>Improve the scripts that convert particle fields to 3D textures.
+            </li><li>Add SMAA, now the default anti-aliasing method, selectable in the preferences window with three quality levels.
+            </li><li>Rework the camera stop behaviour in cinematic and regular modes, and improve the camera close to planets and other bodies.
+            </li><li>Smooth gamepad axis and RB/LB vertical input with a configurable smoothing setting, and recalibrate controls in game mode.
+            </li><li>Register and handle the <code>gaiasky://</code> protocol on Windows, Linux, and macOS, with the <code>gaiasky://load?dataset=</code> handler and single-instance support.
+            </li><li>Move the REST server to the main Gaia Sky core, with a preferences section to start and stop it, show the API endpoints, and restrict it to the loopback interface.
+            </li><li>Add version 4 to the binary format, with astrophysical parameters such as log(g) and metallicity.
+            </li><li>Add initial implementation of Sesame name discovery in the search dialog.
+            </li><li>Size the light glow halos from the angular size of the light and grade their intensity by apparent magnitude, and occlude them with the depth buffer instead of a pre-pass.
+            </li><li>Automatically compute smooth vertex normals for wavefront models without normals, and add Phil Nowell's mapping to the cube sphere creator as the default.
+            </li><li>Accept 4 images per dataset, with horizontal scrolling, and update the default star visual settings.
+            </li><li>Lots of bug fixes.
+            </li>
         </ul>
       </description>
       </release>
@@ -73,6 +80,10 @@
     <screenshot>
       <caption>Atmospheric scattering of Earth</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20260616_flathub/scattering.jpg</image>
+      </screenshot>
+    <screenshot>
+      <caption>The Milky Way rendered volumetrically</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20261021_flathub/mw-view.jpg</image>
       </screenshot>
     <screenshot>
       <caption>Rendering of Andromeda Galaxy (M31)</caption>
@@ -105,6 +116,10 @@
     <screenshot>
       <caption>The city of Rome on the surface of Earth, using a virtual texture with Sentinel-II data</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20260408_flathub/rome.jpg</image>
+      </screenshot>
+    <screenshot>
+      <caption>Inside the Milky Way</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20261021_flathub/mw-inside.jpg</image>
       </screenshot>
     </screenshots>
   </component>

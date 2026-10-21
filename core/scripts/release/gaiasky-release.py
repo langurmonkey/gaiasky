@@ -9,37 +9,72 @@ This script prepares Gaia Sky for a new release
     0.1
 """
 
-import argparse, os, sys, json, glob
-from datetime import datetime
-from tempfile import mkstemp
-from shutil import move
-from os import fdopen, remove
+import argparse
+import glob
+import json
+import os
 import subprocess
+import sys
+from datetime import datetime
+from os import fdopen, remove
+from shutil import move
+from tempfile import mkstemp
+
 
 def check_args(args=None):
-    parser = argparse.ArgumentParser(prog='gaiasky-release', description='This script prepares Gaia Sky for a new release. It will edit the build/script files, generate a tag, update the changelog file and creates the application release packages.')
-    parser.add_argument('-g', '--gs_folder', type=str, default=os.environ.get('GS'), help='Location of the Gaia Sky folder. If not present, it uses the $GS environment variable.')
-    parser.add_argument('-u', '--undo', action='store_true', help='Undoes the changes to the build and script files. If this flag is not present, the default is to *do* a release.')
-    parser.add_argument('-t', '--tag', type=str, help='Tag name for the new release. If this is not present, the tag is not created, the change log is not generated and the release is not packed.')
-    parser.add_argument('-a', '--tag_annotation', type=str, help='Tag annotation for the new release.')
-    parser.add_argument('-d', '--def_file', type=str, help='JSON file with the action definitions.')
-    parser.add_argument('-p', '--keystore_pwd', type=str, help='Keystore password for the windows binary.', required=True)
+    parser = argparse.ArgumentParser(
+        prog="gaiasky-release",
+        description="This script prepares Gaia Sky for a new release. It will edit the build/script files, generate a tag, update the changelog file and creates the application release packages.",
+    )
+    parser.add_argument(
+        "-g",
+        "--gs_folder",
+        type=str,
+        default=os.environ.get("GS"),
+        help="Location of the Gaia Sky folder. If not present, it uses the $GS environment variable.",
+    )
+    parser.add_argument(
+        "-u",
+        "--undo",
+        action="store_true",
+        help="Undoes the changes to the build and script files. If this flag is not present, the default is to *do* a release.",
+    )
+    parser.add_argument(
+        "-t",
+        "--tag",
+        type=str,
+        help="Tag name for the new release. If this is not present, the tag is not created, the change log is not generated and the release is not packed.",
+    )
+    parser.add_argument(
+        "-a", "--tag_annotation", type=str, help="Tag annotation for the new release."
+    )
+    parser.add_argument(
+        "-d", "--def_file", type=str, help="JSON file with the action definitions."
+    )
+    parser.add_argument(
+        "-p",
+        "--keystore_pwd",
+        type=str,
+        help="Keystore password for the windows binary.",
+        required=True,
+    )
 
     return parser.parse_args(args)
 
+
 def comment_line(file_path, pattern, comment_char, uncomment=False):
-    #Create temp file
+    # Create temp file
     fh, abs_path = mkstemp()
-    with fdopen(fh,'w') as new_file:
+    with fdopen(fh, "w") as new_file:
         with open(file_path) as old_file:
             for line in old_file:
                 if pattern in line:
-                    line_lstrip = line.lstrip(' ')
+                    line_lstrip = line.lstrip(" ")
                     nspaces = len(line) - len(line_lstrip)
                     spaces = line[:nspaces]
                     if uncomment:
                         if line_lstrip.startswith(comment_char):
-                            new_file.write(spaces + line_lstrip[len(comment_char):])
+                            new_file.write(spaces + line_lstrip[len(comment_char) :])
                             print(" > OK")
                         else:
                             print(" > NO NEED")
@@ -54,13 +89,15 @@ def comment_line(file_path, pattern, comment_char, uncomment=False):
                 else:
                     new_file.write(line)
 
-    #Remove original file
+    # Remove original file
     remove(file_path)
-    #Move new file
+    # Move new file
     move(abs_path, file_path)
+
 
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
+
 
 def process_files(defs, gsfolder, do=True):
     for file in defs:
@@ -95,37 +132,43 @@ def get_git_tag_date(tag):
         # Run the git command to get the commit date of the tag
         result = subprocess.run(
             ["git", "log", "-1", "--format=%ci", tag],
-            capture_output=True, text=True, check=True
+            capture_output=True,
+            text=True,
+            check=True,
         )
         git_date = result.stdout.strip()
 
-         # Convert to desired format
-        date_obj = datetime.strptime(git_date, '%Y-%m-%d %H:%M:%S %z')
-        return date_obj.strftime('%Y-%m-%dT%H:%M:%S')
+        # Convert to desired format
+        date_obj = datetime.strptime(git_date, "%Y-%m-%d %H:%M:%S %z")
+        return date_obj.strftime("%Y-%m-%dT%H:%M:%S")
     except subprocess.CalledProcessError:
         print(f"Error: Tag '{tag}' not found or git command failed.")
         return None
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     arguments = check_args(sys.argv[1:])
 
     print("Gaia Sky folder: %s" % arguments.gs_folder)
-
 
     # PARSE FILE DATA
     if arguments.def_file is None:
         arguments.def_file = "%s/%s" % (get_script_path(), "gaiasky-release-none.json")
 
         print("Loading definitions file: %s" % arguments.def_file)
-        with open(arguments.def_file, 'r') as f:
+        with open(arguments.def_file, "r") as f:
             defs = json.load(f)
 
         # Make sure the version is set wherever it needs to be set
         print("Before running this script:")
         print()
-        print("- Make sure that $GS/releasenotes.txt exists and is ready, otherwise we will auto-generate it!")
+        print(
+            "- Make sure that $GS/releasenotes.txt exists and is ready, otherwise we will auto-generate it!"
+        )
         print("    - Use the generate-releasenotes script.")
-        print("- Make sure that the space.gaiasky.GaiaSky.metainfo.xml file in assets/metainfo is up to date. Update the version number and date, and the release notes.")
+        print(
+            "- Make sure that the space.gaiasky.GaiaSky.metainfo.xml file in assets/metainfo is up to date. Update the version number and date, and the release notes."
+        )
         print()
         input("Press any key to continue, or C-c to quit...")
 
@@ -134,7 +177,7 @@ if __name__ == '__main__':
         # PROCESS FILES
         process_files(releaserules, arguments.gs_folder, do=not arguments.undo)
 
-        # If undo, end 
+        # If undo, end
         if arguments.undo:
             print("Undid possible changes, finishing here")
             print("Note that -t is not supported with -u")
@@ -156,10 +199,13 @@ if __name__ == '__main__':
             print()
 
             # Check revision >= 2
-            if '-' in arguments.tag:
-                revision = arguments.tag[arguments.tag.rfind('-')+1:]
+            if "-" in arguments.tag:
+                revision = arguments.tag[arguments.tag.rfind("-") + 1 :]
                 if int(revision) < 2:
-                    print("ERROR: revision number can't be less than 2 -> %d" % int(revision))
+                    print(
+                        "ERROR: revision number can't be less than 2 -> %d"
+                        % int(revision)
+                    )
                     exit()
 
             commands = defs["releasecommands"]
@@ -169,7 +215,9 @@ if __name__ == '__main__':
                 for cmd in command.split():
                     for key in arguments.__dict__:
                         if "&%s&" % key in cmd:
-                            cmd = cmd.replace("&%s&" % key, "%s" % arguments.__dict__[key])
+                            cmd = cmd.replace(
+                                "&%s&" % key, "%s" % arguments.__dict__[key]
+                            )
                     cmdstr.append(cmd)
 
                 print("==> RUNNING: %s" % cmdstr)
@@ -180,11 +228,14 @@ if __name__ == '__main__':
             process_files(releaserules, arguments.gs_folder, do=False)
 
             # RECALL PARAMETERS
-            packages_dir = max(glob.glob(os.path.join(arguments.gs_folder, 'releases', 'packages-*')), key=os.path.getmtime)
+            packages_dir = max(
+                glob.glob(os.path.join(arguments.gs_folder, "releases", "packages-*")),
+                key=os.path.getmtime,
+            )
             packages_name = os.path.basename(packages_dir)
             version_rev = packages_name[9:]
             build = packages_name[-9:]
-            version_flat = arguments.tag.replace('.', '_')
+            version_flat = arguments.tag.replace(".", "_")
             release_date = get_git_tag_date(arguments.tag)
 
             # PRINT TODOS
@@ -192,26 +243,50 @@ if __name__ == '__main__':
             print()
             print("================ TODOs ================")
             print()
-            print(" > Your release %s is in %s/releases" % (arguments.tag, arguments.gs_folder))
-            print(" > Generate the changelog for the new tag and prepend it to CHANGELOG.md: generate-changelog %s" % arguments.tag)
-            print(" > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget updates.xml)")
+            print(
+                " > Your release %s is in %s/releases"
+                % (arguments.tag, arguments.gs_folder)
+            )
+            print(
+                " > Generate the changelog for the new tag and prepend it to CHANGELOG.md: generate-changelog %s"
+                % arguments.tag
+            )
+            print(
+                " > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget updates.xml)"
+            )
             print(" > Update symlink to latest: rm latest && ln -s new_release latest")
             print(" > Generate the html listings for the new files: dir2html")
             print(" > Create new post on website $GSW with change log")
             print(" > Run $GSW/script/gen-releases.py to generate the new release")
-            print(" > Update config.yaml [params.release] of webiste $GSW with:")
+            print(" > Update config.yaml [params.release] of website $GSW with:")
             print("     > version: %s" % arguments.tag)
             print("     > versionFlat: %s" % version_flat)
             print("     > versionBuild: %s" % version_rev)
             print("     > build: %s" % build)
             print("     > date: %s" % release_date)
             print("     > post: /news/year/pointer-to-release-post.md")
-            print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
-            print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
-            print(" > Add new release to codeberg: https://codeberg.org/gaiasky/gaiasky/releases")
-            print(" > Create new docs tag (%s) and generate the docs: make server VERSION=%s" % (arguments.tag, arguments.tag))
-            print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
-            print(" > Update flatpak repo and do pull request. See here: https://codeberg.org/gaiasky/gaiasky/issues/337#issuecomment-521949")
+            print(
+                " > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)"
+                % arguments.tag
+            )
+            print(
+                " > Update docs if necessary (in particular, scripting API links): %s/docs"
+                % arguments.gs_folder
+            )
+            print(
+                " > Add new release to codeberg: https://codeberg.org/gaiasky/gaiasky/releases"
+            )
+            print(
+                " > Create new docs tag (%s) and generate the docs: make server VERSION=%s"
+                % (arguments.tag, arguments.tag)
+            )
+            print(
+                " > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository"
+            )
+            print(
+                " > Update flatpak repo and do pull request. See here: https://codeberg.org/gaiasky/gaiasky/issues/337#issuecomment-521949"
+            )
+            print(" > Add package to Microsoft store")
             print(" > Post to social media")
             print()
             print(">DONE<")

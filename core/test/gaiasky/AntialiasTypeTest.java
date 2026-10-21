@@ -29,9 +29,9 @@ public class AntialiasTypeTest {
 
     @Test
     public void smaaIsAPostProcessAntialias() {
-        assertEquals(AntialiasType.SMAA, AntialiasType.getFromCode(-3));
+        assertEquals(AntialiasType.SMAA, AntialiasType.getFromCode(-1));
         assertTrue(AntialiasType.SMAA.isPostProcessAntialias());
-        assertEquals(-3, AntialiasType.SMAA.getAACode());
+        assertEquals(-1, AntialiasType.SMAA.getAACode());
     }
 
     @Test

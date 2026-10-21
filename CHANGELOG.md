@@ -1,3 +1,79 @@
+<a name="3.9.0"></a>
+## [3.9.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.9.0) (2026-10-21)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.8.0...3.9.0)
+
+### Features
+- Accept 4 images per dataset. Add horizontal scroll to images and remove the info scroll, which is useless. 
+- Add RGBA (density+color) format support to the rest of the pipeline, from the loader all the way to the shader. 
+- Add RGBA (density+color) format to particles -> 3D texture script. 
+- Make the `view-volume-*.py` files accept gzipped inputs. 
+- Improve default (sample) volume rendering shader with a normalized sampling volume and jitter. 
+- Update default star visual settings. New settings version forces config file update. Fix REST server port disappearing on stop event. 
+- Add camera damp factor scaler to camera component. Controls the damping decay for the non-cinematic camera. Also, modify default values for camera speed, rotation, and turn. 
+- Rework camera stop behaviour in cinematic and regular modes to improve responsiveness and damping. 
+- Camera work when close to planets and other bodies. Bound near-surface damping (clamped). Decouple cap from the floor. Use logarithmic speed scaling. 
+- Add initial implementation of Sesame name discovery to Gaia Sky. Currently, Sesame is displayed at the bottom of the autocomplete list in the search dialog. When selected, the query is sent, and the result is shown in a new `SesameResultWindow`. If it succeeds, all names for the object are displayed in a list. Part of [#936](https://codeberg.org/gaiasky/gaiasky/issues/936). 
+- Add configuration setting to enable or disable the loopback-only binding in the REST server. Defaults to true for safety concerns. Expose to UI with a checkbox in the preferences window. 
+- Add reflective APIv2 dispatch for gaiasky:// URLs. Part of [#935](https://codeberg.org/gaiasky/gaiasky/issues/935). 
+- Add translations for URL protocol handler dialog. Fixes [#935](https://codeberg.org/gaiasky/gaiasky/issues/935). 
+- Update installer image to contain only the Gaia Sky logo. 
+- Handle gaiasky:// URLs forwarded from second instances and macOS open events. Part of [#935](https://codeberg.org/gaiasky/gaiasky/issues/935). 
+- add single-instance manager for `gaiasky://` URL forwarding 
+- Add version 4 to binary format, possibly to be used for DR4. It includes astrophysical parameters like log(g) and metallicity. 
+- Automatic smooth vertex normal computation for wavefront models in `OwnObjLoader` for files without normals. Prevents black models with files with only vertices and faces. 
+- Flexibilize the state vectors to elements script. 
+- Add REST server status and API endpoints to preferences window. 
+- Add 'REST server' section to preferences dialog, where we can start and stop the server with a given port. 
+- Move REST server to main Gaia Sky core from the desktop launcher. 
+- Add Phil Nowell's mapping to cube sphere creator as default. Precompute procgen model on startup. 
+
+### Bug Fixes
+- Fixes all around for recently introduced SMAA. 
+- Issues with NFAA and FXAA shaders. Global code clean-up, bugfix hunt. 
+- Global label enable flag now used correctly (defaults to true, objects can turn it off). 
+- Galaxies added via UI do not get the parent populated correctly. 
+- Adjust back-buffer scale slider step from 0.1 to 0.01. 
+- Fix focus locking by incorporating the focus delta position into the camera delta position `dCam`. 
+- Fix catastrophic cancellation issue with camera blur shader. 
+- Write constant depth to depth buffer in atmosphere shader to ensure that the motion blur shader reconstructs a consistent world position for all fragments. 
+- Camera motion blur star dimming: luminance-weighted sample average preserves peak brightness of point-like sources along the trail. 
+- Camera motion blur world-position reconstruction: unproject using view depth from log depth buffer and projection coefficients, fix `u_dCam` sign, bind depth texture to correct unit, remove dead setter. 
+- Camera motion blur wrong target buffer index, and incorrect delta cam scaling. 
+- Exclude x86 LWJGL windows natives from the build. They are unused (only x86_64 is supported by Gaia Sky) and they are flagged by Windows Defender as a potential threat. 
+- `--skip-welcome` when no datasets are present now exits and prints a message instead of showing the recommended datasets welcome screen. 
+- Double upload of mip level 0 when mip maps are enabled in buffered image texture data. 
+- Limit asset manager update to 2 milliseconds, fix issues with `isFinishedLoading` in material components. 
+- Security fixes for URL protocol, REST server and dataset downloads 
+- URL protocol handling on macOS does not rely on the `-XstartOnFirstThread` VM flag anymore, but uses the `glfw_async` mode instead. Hence, we drop the flag everywhere and use the asynchronous mode for GLFW on macOS. Part of [#935](https://codeberg.org/gaiasky/gaiasky/issues/935). 
+- Mark `genVersionFile` task as never up to date to re-run it every time. 
+- Actually reload shader source code on CTRL+SHIFT+Y, whenever possible. 
+- Ringed planet detection to compute occlusion attribute in elements group renderer. This prevents stars with accretion disks to have the incorrect illumination model determined. 
+- Crash in star surface shader. Fixes [#934](https://codeberg.org/gaiasky/gaiasky/issues/934). 
+- Use emulated double-precision time also for fast-moving particles (epoch=0), such as the rings of Saturn. Fixes [#930](https://codeberg.org/gaiasky/gaiasky/issues/930). Part of [#933](https://codeberg.org/gaiasky/gaiasky/issues/933). 
+- Octree loader now correctly sets the octree wrapper object component type as 'stars'. 
+- Add guard for empty object names to prevent NPEs during focus change. Fixes [#931](https://codeberg.org/gaiasky/gaiasky/issues/931). 
+- Corrupted image download crashes app. Fixes [#929](https://codeberg.org/gaiasky/gaiasky/issues/929). 
+- Add missing Japanese characters to character set, and re-generate fonts. 
+- Extrasolar orbit orientation inheritance 
+- Concurrent dataset update handling issues. Add popup notification on dataset deletion. 
+- Serialize dataset extraction with a finish lock. Guard checksum + extraction behind a ReentrantLock so concurrent downloads can't clash on the shared data dir, while downloads themselves stay parallel. Part of [#928](https://codeberg.org/gaiasky/gaiasky/issues/928). 
+- Make `TextFormatter` thread-safe by synchronizing the `format()` method. Prevents crashes due to concurrent usage of `MessageFormat`. Part of [#928](https://codeberg.org/gaiasky/gaiasky/issues/928). 
+- Harden dataset update error handling. Part of [#928](https://codeberg.org/gaiasky/gaiasky/issues/928). 
+- NPE and memory leak when octants fade out. Thread-safety issues in camera module. Guard against NPEs in octree node. 
+- Log index name conflicts only to debug channel. 
+
+### Build System
+- Upgrade to install4j 13.1.1. 
+- Add pre-uninstall and post-install script to UNIX installer. 
+- Update to Gradle 9.8.0. 
+- Upgrade jCommander to version 3.+. 
+- Upgrade to oshi 7.4.+, use base `oshi-core` instead of `oshi-core-java11`. 
+
+### Code Refactoring
+- make batch download window to also use the new dataset download service. 
+- Decouple dataset download code from dataset manager window into own dataset download service. Use it in URL handler. Part of [#935](https://codeberg.org/gaiasky/gaiasky/issues/935). 
+- Replace the old string model types with a proper enum. 
+
 
 <a name="3.8.0"></a>
 ## [3.8.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.8.0) (2026-07-23)
