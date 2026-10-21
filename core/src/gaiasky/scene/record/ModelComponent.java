@@ -796,7 +796,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     /**
-     * Checks if the model has at least one material with intrinsic transparency 0 < t < 1.
+     * Checks if the model has at least one material with intrinsic transparency 0 &lt; t &lt; 1.
      *
      * @return True if the model has a material with intrinsic transparency.
      */

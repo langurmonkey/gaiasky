@@ -259,12 +259,12 @@ if __name__ == "__main__":
             print(" > Create new post on website $GSW with change log")
             print(" > Run $GSW/script/gen-releases.py to generate the new release")
             print(" > Update config.yaml [params.release] of website $GSW with:")
-            print("     > version: %s" % arguments.tag)
-            print("     > versionFlat: %s" % version_flat)
-            print("     > versionBuild: %s" % version_rev)
-            print("     > build: %s" % build)
-            print("     > date: %s" % release_date)
-            print("     > post: /news/year/pointer-to-release-post.md")
+            print('     version = "%s"' % arguments.tag)
+            print('     versionFlat = "%s"' % version_flat)
+            print('     versionBuild = "%s"' % version_rev)
+            print('     build = "%s"' % build)
+            print('     date = "%s"' % release_date)
+            print('     post = "/news/year/pointer-to-release-post.md"')
             print(
                 " > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)"
                 % arguments.tag

@@ -3193,7 +3193,7 @@ public class Settings extends SettingsObject {
              */
             public boolean restEnabled;
             /**
-             * The rest port. Needs to be >0. If <=0, the server won't be
+             * The rest port. Needs to be &lt; 0. If &leq; 0, the server won't be
              * started.
              */
             public int restPort;
