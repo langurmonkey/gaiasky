@@ -477,6 +477,9 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
      * @param tabContentWidth The tab content width.
      */
     private void addDatasets(Entity entity, Table datasetsTable, float thirdWidthBox, float halfWidthBox, float fullWidthBox, float tabContentWidth) {
+        if (entity == null) {
+            return;
+        }
         final var cpSize = 32f;
         var render = Mapper.render.get(entity);
         var billboard = Mapper.billboardSet.get(entity);

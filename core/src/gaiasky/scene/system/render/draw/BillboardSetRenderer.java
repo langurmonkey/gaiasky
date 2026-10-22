@@ -210,9 +210,11 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             shaderProgram.begin();
 
             // Global uniforms.
+            // Texture array on unit 0, and the sampler must be told explicitly.
             if (billboard.textureArray != null) {
-                billboard.textureArray.bind(GL20.GL_TEXTURE10);
+                billboard.textureArray.bind(0);
             }
+            shaderProgram.setUniformi("u_textures", 0);
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos());
             addCameraUpCubemapMode(shaderProgram, camera);
