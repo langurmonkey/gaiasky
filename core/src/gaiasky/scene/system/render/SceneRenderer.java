@@ -540,6 +540,22 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
+     * Copies the depth buffer of the source framebuffer into the depth buffer of the destination one. Both must have
+     * the same depth attachment format, which is the case for the full- and half-resolution buffers.
+     *
+     * @param src The source framebuffer.
+     * @param dst The destination framebuffer.
+     */
+    private void blitDepth(FrameBuffer src, FrameBuffer dst) {
+        Gdx.gl.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, src.getFramebufferHandle());
+        Gdx.gl.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, dst.getFramebufferHandle());
+        GL30.glBlitFramebuffer(0, 0, src.getWidth(), src.getHeight(),
+                               0, 0, dst.getWidth(), dst.getHeight(),
+                               GL20.GL_DEPTH_BUFFER_BIT, GL20.GL_NEAREST);
+        Gdx.gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, dst.getFramebufferHandle());
+    }
+
+    /**
      * Main render function.
      *
      * @param camera The camera.
@@ -621,13 +637,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
 
             // Bind half-resolution buffer.
-            pp.getCombinedBuffer()
-                    .getFullBuffer()
-                    .end();
-            pp.getCombinedBuffer()
-                    .getHalfBuffer()
-                    .begin();
+            var fullBuffer = pp.getCombinedBuffer().getFullBuffer();
+            var halfBuffer = pp.getCombinedBuffer().getHalfBuffer();
+            fullBuffer.end();
+            halfBuffer.begin();
             clearScreen();
+            // Give the half-resolution pass the depth of the full-resolution one, so that its content
+            // is occluded by full-resolution occluders (e.g. volumes writing depth in their pre-pass).
+            blitDepth(fullBuffer, halfBuffer);
 
             // Iterate over render groups and get systems.
             for (var renderGroup : renderGroups) {
@@ -641,12 +658,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
 
             // Back to full-resolution buffer.
-            pp.getCombinedBuffer()
-                    .getHalfBuffer()
-                    .end();
-            pp.getCombinedBuffer()
-                    .getFullBuffer()
-                    .begin();
+            halfBuffer.end();
+            fullBuffer.begin();
 
         } catch (GdxRuntimeException | ShaderCompilationException gre) {
             // Escalate.
