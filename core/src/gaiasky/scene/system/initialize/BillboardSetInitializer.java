@@ -94,8 +94,12 @@ public class BillboardSetInitializer extends AbstractInitSystem {
 
         // Textures.
         AssetManager manager = AssetBean.manager();
-        if (manager.contains(billboard.textureArrayName)) {
-            billboard.textureArray = manager.get(billboard.textureArrayName, false);
+        if (billboard.textureArrayName != null && manager.contains(billboard.textureArrayName)) {
+            // Entities created at runtime are set up right after their array is queued, so wait for it here.
+            billboard.textureArray = manager.finishLoadingAsset(billboard.textureArrayName);
+            if (billboard.textureArray == null) {
+                logger.error("Could not load texture array: " + billboard.textureArrayName);
+            }
         }
 
         // Generate.
