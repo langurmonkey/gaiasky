@@ -541,10 +541,8 @@ public class Scene {
         }
         if (parent != null) {
             var parentGraph = Mapper.graph.get(parent);
-            if (parentGraph.children != null && !parentGraph.children.contains(entity, true)) {
-                parentGraph.addChild(parent, entity, true, 1);
-            }
-        } else {
+            parentGraph.addChild(parent, entity, true, 1);
+        } else if (ok) {
             throw new RuntimeException(I18n.msg("error.parent.notfound", base.getName(), graph.parentName));
         }
         try {

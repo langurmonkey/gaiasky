@@ -111,6 +111,11 @@ public class GraphNode implements Component, ICopy {
         if (this.children == null) {
             initChildren(numChildren);
         }
+        // Adding an existing child again would double-count it.
+        if (this.children.contains(child, true)) {
+            return;
+        }
+
         // Add to children list.
         this.children.add(child);
         // Remove from previous parent, if any.
