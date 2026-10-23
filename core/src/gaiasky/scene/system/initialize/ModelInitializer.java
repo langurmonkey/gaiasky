@@ -92,14 +92,14 @@ public class ModelInitializer extends AbstractInitSystem {
         var cloud = Mapper.cloud.get(entity);
         var orientation = Mapper.orientation.get(entity);
         var engine = Mapper.engine.get(entity);
-        var fade = Mapper.fade.get(entity);
         var focus = Mapper.focus.get(entity);
         var bb = Mapper.billboard.get(entity);
 
         boolean isPlanet = atmosphere != null || cloud != null;
         boolean isSatellite = base.ct.isEnabled(ComponentType.Satellites);
         boolean isSpacecraft = engine != null;
-        boolean isBillboard = fade != null;
+        // The Fade component is not a billboard marker: volumes have it too, so check the billboard tag.
+        boolean isBillboard = Mapper.tagBillboard.has(entity);
         boolean isBillboardGal = Mapper.tagBillboardGalaxy.has(entity);
 
         // Focus hits.
