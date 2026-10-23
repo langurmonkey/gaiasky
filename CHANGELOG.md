@@ -1,3 +1,16 @@
+<a name="3.9.1"></a>
+## [3.9.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.9.1) (2026-10-23)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.9.0...3.9.1)
+
+### Bug Fixes
+- Half-resolution channels are not occluded by full-resolution occluders 
+- Runtime-created billboards never bind their texture array 
+- Unparented entities and billboard texture leaks 
+- Adding children to nodes has incorrect guard that makes it function improperly. 
+
+### Performance Improvements
+- Half-res volume depth handling 
+
 <a name="3.9.0"></a>
 ## [3.9.0](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.9.0) (2026-10-21)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.8.0...3.9.0)

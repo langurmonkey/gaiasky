@@ -39,27 +39,16 @@
 
   <releases>
 
-    <release version="3.9.0" date="2026-10-21" urgency="high">
-      <url>https://gaiasky.space/news/2026/gaiasky_3.9.0</url>
+    <release version="3.9.1" date="2026-10-23" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.9.1</url>
       <description>
-        <p>This release brings volumetric rendering of the Milky Way, a new SMAA anti-aliasing implementation, a reworked camera, and support for <code>gaiasky://</code> URLs, among many more new features and bug fixes.</p>
+        <p>This is a bug-fix release. It restores the occlusion of the procedurally generated galaxy channels by the volume dust, and fixes several issues that surfaced when creating galaxies from the UI and when inserting entities into the scene graph.</p>
         <ul>
-          <li>Add volumetric rendering of the Milky Way, with per-slot depth so that dense dust lanes hide the stars behind them while the faint outer haze does not.
-            </li><li>Support non-cubic and RGBA (color+density) volumes, crop unused data at load time, and skip empty bricks in the raymarcher.
-            </li><li>Expose the ray-marching iteration count to the JSON format and add reference system transformations to volumes.
-            </li><li>Improve the scripts that convert particle fields to 3D textures.
-            </li><li>Add SMAA, now the default anti-aliasing method, selectable in the preferences window with three quality levels.
-            </li><li>Rework the camera stop behaviour in cinematic and regular modes, and improve the camera close to planets and other bodies.
-            </li><li>Smooth gamepad axis and RB/LB vertical input with a configurable smoothing setting, and recalibrate controls in game mode.
-            </li><li>Register and handle the <code>gaiasky://</code> protocol on Windows, Linux, and macOS, with the <code>gaiasky://load?dataset=</code> handler and single-instance support.
-            </li><li>Move the REST server to the main Gaia Sky core, with a preferences section to start and stop it, show the API endpoints, and restrict it to the loopback interface.
-            </li><li>Add version 4 to the binary format, with astrophysical parameters such as log(g) and metallicity.
-            </li><li>Add initial implementation of Sesame name discovery in the search dialog.
-            </li><li>Size the light glow halos from the angular size of the light and grade their intensity by apparent magnitude, and occlude them with the depth buffer instead of a pre-pass.
-            </li><li>Automatically compute smooth vertex normals for wavefront models without normals, and add Phil Nowell's mapping to the cube sphere creator as the default.
-            </li><li>Accept 4 images per dataset, with horizontal scrolling, and update the default star visual settings.
-            </li><li>Lots of bug fixes.
-            </li>
+          <li>Half-resolution channels are occluded by full-resolution occluders again.          </li><li>Runtime-created billboards bind their texture array correctly.
+          </li><li>Galaxies added via the UI get their parent populated correctly again.
+          </li><li>Fix the guard in the code that adds children to nodes, which made it function improperly. This prevents a crash with the NASA Exoplanet Archive dataset.
+          </li><li>Always run the volume depth pre-pass at full resolution, so that its depth occludes half-resolution content, and skip the full-to-half depth blit when the half-resolution pass is empty.
+          </li>
         </ul>
       </description>
       </release>
