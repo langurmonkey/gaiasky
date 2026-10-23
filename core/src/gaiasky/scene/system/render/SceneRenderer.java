@@ -540,6 +540,20 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     /**
+     * Checks whether the half-resolution render lists hold anything to draw.
+     *
+     * @return True if any half-resolution render list is non-empty.
+     */
+    private boolean hasHalfResolutionContent() {
+        for (var l : renderListsHalf) {
+            if (l != null && !l.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Copies the depth buffer of the source framebuffer into the depth buffer of the destination one. Both must have
      * the same depth attachment format, which is the case for the full- and half-resolution buffers.
      *
@@ -644,7 +658,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             clearScreen();
             // Give the half-resolution pass the depth of the full-resolution one, so that its content
             // is occluded by full-resolution occluders (e.g. volumes writing depth in their pre-pass).
-            blitDepth(fullBuffer, halfBuffer);
+            // Only needed when there is something to draw in the half-resolution pass.
+            if (hasHalfResolutionContent()) {
+                blitDepth(fullBuffer, halfBuffer);
+            }
 
             // Iterate over render groups and get systems.
             for (var renderGroup : renderGroups) {

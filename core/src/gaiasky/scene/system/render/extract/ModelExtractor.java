@@ -67,7 +67,8 @@ public class ModelExtractor extends AbstractExtractSystem {
                 if (volume.writeDepth) {
                     // Depth-only pre-pass, run early enough to occlude the star, label and point
                     // passes. See RenderGroup.VOLUME_DEPTH and Volume#writeDepth.
-                    addToRender(render, RenderGroup.VOLUME_DEPTH);
+                    // Depth always renders to full-res buffer.
+                    addToRender(render, RenderGroup.VOLUME_DEPTH, true);
                 }
                 if (renderText(base, body, sa, label)) {
                     addToRender(render, RenderGroup.FONT_LABEL);
