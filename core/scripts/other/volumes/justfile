@@ -6,23 +6,31 @@
 # The box is normalized: its largest side is 1, in units of the object's size in the scene,
 # so the object's sizePc decides how large the volume is drawn and the data only decides its
 # shape. A voxel size of 1/400 therefore asks for 400 voxels along the largest axis.
-# --no-normalize keeps the box in the source units, where the metadata bounds also acted as
-# a size multiplier on the object (a box of side 7 drew the volume 7 times the declared
-# size); volumes written either way must not be mixed.
+# There is no switch for this: older volumes were written in raw source units, where the
+# metadata bounds also acted as a size multiplier on the object (a box of side 7 drew the
+# volume 7 times the declared size), so those must not be mixed with these.
 #
 # The density blur is a length in the world, not a count of voxels: by default 0.85 of the
 # channel's *local* inter-particle spacing (the median distance from a particle to its
-# neighbours, in CHANNEL_SIGMA_LOCAL in particles-to-3dtex.py). Local, not the mean spacing of
+# 4th neighbour, DEFAULT_WIDTH in particles-to-volume.py). Local, not the mean spacing of
 # the box: the box figure assumes the channel fills the box, and the dust does not - it is a
 # thin disk in a few percent of it - so sizing by the box gave the dust a blur 3.5x thicker
 # than the disk itself, which is what "puffy" is. Both figures are lengths on the particles, so
 # the same particles drawn at 200 and at 800 get the same galaxy.
 #
 # One fraction cannot be right for every channel at once - a dense thin disk and a diffuse halo
-# want different amounts - so --sigma overrides it per channel, as a fraction of that channel's
-# own spacing:
+# want different amounts - so --smoothing overrides it per channel, as a fraction of that
+# channel's own spacing:
 #
-#     just texvoxelgroup 0.00125 'Gas+Bulge:0.6|ArmDust' <in> <out> --sigma dust=0.4
+#     just genvol 400 <in> <out> --smoothing ArmDust=0.4
+#
+# To set the blur outright instead of as a multiple of the spacing, --width takes a length in
+# box units - a fraction of the longest side of the box, so 1/400 is one voxel at 400 and the
+# same number is the same length at every resolution:
+#
+#     just genvol 400 <in> <out> --width ArmDust=0.004
+#
+# The two compose: --smoothing multiplies whatever --width set.
 #
 # The resulting width, in world units and in this grid's voxels, is in each channel's metadata,
 # alongside the two lengths it was sized and capped by - which is the cheap way to tell whether
@@ -39,17 +47,18 @@
 
 # Generate the emissive and occlusive galaxy volumes in one go, from the particle channels.
 #
-#     just volume 400 <in> <out>
-#     just volume 400 <in> <out> --intensity Bulge=0.3
-#     just volume 400 <in> <out> --smoothing ArmDust=0.5
+#     just genvol 400 <in> <out>
+#     just genvol 400 <in> <out> --intensity Bulge=0.3
+#     just genvol 400 <in> <out> --smoothing ArmDust=0.5
 #
 # 'resolution' is the number of voxels along the longest side of the box; the other axes follow
 # the shape of the data, so the voxels stay cubic. Extra arguments go straight to the script, and
-# there are two of them: --intensity NAME=FLOAT (0..1) dims one channel, --smoothing NAME=FACTOR
-# (greater than 0, 1 = the default) makes it thinner or thicker. Both are per channel and both are
-# resolution independent. Nothing else is exposed here because nothing else is needed for the usual
-# run. This writes <prefix>_emissive_rgba.raw.gz and <prefix>_occlusive_rgba.raw.gz, which are the
-# two textures the scene's volume0/volume1 want.
+# there are three of them: --intensity NAME=FLOAT (0..1) dims one channel, --smoothing
+# NAME=FACTOR (greater than 0, 1 = the default) makes it thinner or thicker, and --width
+# NAME=LENGTH sets the blur as a length in box units instead of a multiple of the spacing. All
+# three are per channel and all three are resolution independent. Nothing else is exposed here
+# because nothing else is needed for the usual run. This writes <prefix>_emissive_rgba.raw.gz and
+# <prefix>_occlusive_rgba.raw.gz, which are the two textures the scene's volume0/volume1 want.
 
 # Run with user-defined smoothing and intensity
 genvol resolution input output *args:
@@ -57,7 +66,7 @@ genvol resolution input output *args:
 
 # Run with default values smoothing and intensity
 genvold resolution input output:
-	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} --smoothing ArmDust=0.4 --intensity ArmDust=0.08 --intensity Bulge=0.3 --intensity Gas=0.7
+	uv run --with numpy --with scipy python particles-to-volume.py {{resolution}} {{input}} {{output}} --smoothing ArmDust=0.4 --intensity ArmDust=0.06 --intensity Bulge=0.2 --intensity Gas=0.7
 
 # Create top-down and edge-on images
 img dir *args:

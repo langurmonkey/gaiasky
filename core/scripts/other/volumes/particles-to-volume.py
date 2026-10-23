@@ -3,11 +3,13 @@
 
     particles-to-volume.py RESOLUTION INPUT_DIR OUTPUT_DIR
         [--intensity NAME=FLOAT ...] [--smoothing [NAME=]FACTOR ...]
+        [--width [NAME=]LENGTH ...]
 
 RESOLUTION is the number of voxels along the longest side of the box; the other axes follow the
 shape of the data, so the voxels stay cubic. Per-channel floats in [0, 1] dim individual channels,
-and per-channel smoothing factors of 1 or less make them thinner. Both are lengths or pure ratios,
-so both mean the same thing at every resolution.
+per-channel smoothing factors of 1 or less make them thinner, and per-channel widths set the blur
+outright. Smoothing is a pure ratio and a width is a length in the box, so each means the same
+thing at every resolution.
 
 
 WHY THIS REPLACES particles-to-3dtex.py
@@ -62,20 +64,36 @@ out as the plain normalised density, which is what the shader's extinction wants
 
 TUNING A CHANNEL
 ----------------
-Two knobs, one per channel, both pure numbers, both applied before the merge:
+Three knobs, one per channel, all applied before the merge:
 
   --intensity X=0..1   how much light the channel puts out.
   --smoothing X=f      how far its particles are smeared; f multiplies the channel's own width
                        (a fraction of its local inter-particle spacing, with a floor for the
                        channels packed tighter than a voxel). 1 is the default, 0.5 half as
                        thick.
+  --width [X=]LEN      replace the channel's own width with LEN, in box units - a fraction of the
+                       longest side of the box, so 1/RESOLUTION is exactly one voxel. It is the
+                       same length at every resolution, and --smoothing multiplies it, so the two
+                       compose.
 
-A smoothing factor is a ratio of two lengths and the floor is itself a length in the box, so the
-knob behaves identically at 200, 400 and 800 - it changes the picture, never its resolution
+The width taken from the particles is one number per channel - the median distance from a
+particle to its LOCAL_SPACING_NEIGHBOURS-th neighbour - and not one per particle. A per-particle
+width would make the field's peak, which is the number the stored bytes are scaled by, depend on
+how densely each neighbourhood happens to be sampled rather than on the particles themselves.
+
+The 4th column of a particle file (size) is not usable as a width: it is the sprite's diameter in
+world units, and the renderer clamps it to an angular range, so it encodes how large a particle is
+*drawn* rather than how large it is. In this galaxy it is 700-1200 times the local inter-particle
+spacing for gas and bulge and about 20 times for the dust, and for gas it does not track the
+spacing at all (the logs correlate at 0.01), so as a kernel width it would smear a channel over
+several box widths. It is used as the mass, which is what it is good for.
+
+A smoothing factor is a ratio of two lengths and the floor is itself a length in the box, so every
+knob behaves identically at 200, 400 and 800 - they change the picture, never its resolution
 behaviour. Note that thinning a channel also lowers its *column* through the box: the bytes are
 normalised by the peak density, which grows as the width shrinks, while the mass along a ray does
 not, so a thinner dust is a more transparent dust. Raise its intensity to put the extinction back
-if that is not what you want; the two knobs do not fight, they compose.
+if that is not what you want; the knobs do not fight, they compose.
 """
 
 import argparse
@@ -215,6 +233,28 @@ def parse_smoothing(value: str):
     return (name.strip().lower() if name else None), factor
 
 
+def parse_width(value: str):
+    """Parse one --width: a bare LENGTH for every channel, or NAME=LENGTH for one.
+
+    LENGTH is in box units, a fraction of the longest side of the box, so 1/RESOLUTION is exactly
+    one voxel and the same number is the same length at every resolution.
+    """
+    name, separator, number = value.partition("=")
+    if not separator:
+        name, number = None, value
+    elif not name.strip():
+        raise argparse.ArgumentTypeError(f"expected LENGTH or NAME=LENGTH, got '{value}'")
+    try:
+        length = float(number)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"'{number}' is not a number in '{value}'") from None
+    if length <= 0.0:
+        raise argparse.ArgumentTypeError(
+            f"width {length} must be greater than 0: at 0 the field is a point cloud, whose peak "
+            f"density - the number the bytes are normalised by - is infinite")
+    return (name.strip().lower() if name else None), length
+
+
 def parse_patterns(value: str):
     """Parse a comma-separated channel pattern list."""
     patterns = [p.strip().lower() for p in value.split(",") if p.strip()]
@@ -351,38 +391,47 @@ def stored_bounds(box_min: np.ndarray, box_max: np.ndarray):
 # --------------------------------------------------------------------------- conversion
 
 
-def channel_width(spacing: float, factor: float) -> float:
+def channel_width(spacing: float, factor: float, override: float = None) -> float:
     """A channel's kernel width in box units: its own width, times the --smoothing factor.
 
-    The channel's own width is a fraction of the spacing between its particles, which is a property
-    of the particles rather than of the grid, so it is the same length at every resolution. The
-    floor catches the channels whose particles are packed closer together than a voxel; it is a
-    length in the box and not a count of voxels, for the same reason. `factor` scales both, so
+    The channel's own width is --width when that was given - an absolute length in the box - and
+    otherwise a fraction of the spacing between its particles, which is a property of the particles
+    rather than of the grid, so it is the same length at every resolution. The floor catches the
+    channels whose particles are packed closer together than a voxel; it is a length in the box and
+    not a count of voxels, for the same reason. `factor` scales whichever was chosen, so
     --smoothing 0.5 halves a channel at any resolution.
     """
+    if override is not None:
+        return override * factor
     return max(DEFAULT_WIDTH * spacing, MIN_WIDTH_BOX) * factor
 
 
 def convert_channel(positions, mass, colour, kind, box_min, voxel, grid, factor,
-                    mass_mode, label):
+                    mass_mode, label, width_override=None):
     """One channel -> (a8, rgb8): the brightness bytes and the chromaticity bytes.
 
     Steps: deposit the mass into voxels, blur by the residual width, turn the mass into a density
     (mass per unit box volume), normalise by the field's physical peak, and split the emission into
     a per-voxel chromaticity (RGB) and a per-voxel brightness (A).
 
-    `factor` is the --smoothing factor of this channel, applied to its width by channel_width.
+    `factor` is the --smoothing factor of this channel, applied to its width by channel_width, and
+    `width_override` is its --width in box units, if one was given.
     """
     count = len(positions)
     spacing = local_spacing(positions)
-    width = channel_width(spacing, factor)
+    width = channel_width(spacing, factor, width_override)
     width_voxels = width / voxel
     residual = np.sqrt(max(width_voxels ** 2 - BINNING_VARIANCE, 0.0))
 
-    floored = ", from the floor" if DEFAULT_WIDTH * spacing < MIN_WIDTH_BOX else ""
+    if width_override is not None:
+        source = ", from --width"
+    elif DEFAULT_WIDTH * spacing < MIN_WIDTH_BOX:
+        source = ", from the floor"
+    else:
+        source = ""
     print(f"  {label}: {count} particles, local spacing {spacing:.3e} "
           f"({spacing / voxel:.2f} voxels), width {width:.3e} box units "
-          f"= {width_voxels:.2f} voxels (smoothing {factor:g}{floored}), "
+          f"= {width_voxels:.2f} voxels (smoothing {factor:g}{source}), "
           f"blur {residual:.2f} voxels")
     if width_voxels < MIN_WIDTH_SAMPLED_VOXELS:
         print(f"    note: the width is {width_voxels:.2f} voxels, below the "
@@ -533,7 +582,7 @@ def write_metadata(path, name, lines):
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Generate the emissive and occlusive galaxy volume textures from particle "
-                    "channels, at a resolution, with a per-channel intensity and smoothing.",
+                    "channels, at a resolution, with per-channel intensity, smoothing and width.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("resolution", type=int,
                         help="Voxels along the longest side of the box. The other axes follow the "
@@ -561,6 +610,14 @@ def main() -> int:
                              "thick. A bare number applies to every channel, NAME=FACTOR to one, "
                              "e.g. --smoothing ArmDust=0.5. It is a length, the same at every "
                              "resolution, so the picture does not change with it. Must be > 0.")
+    parser.add_argument("--width", type=parse_width, action="append", default=[],
+                        metavar="[NAME=]LENGTH",
+                        help="Kernel width of a channel, in box units: a fraction of the longest "
+                             "side of the box, so 1/RESOLUTION is one voxel at that resolution. "
+                             "Replaces the channel's own width (a fraction of its local "
+                             "inter-particle spacing); --smoothing then multiplies it. A bare "
+                             "number applies to every channel, NAME=LENGTH to one, e.g. "
+                             "--width ArmDust=0.004. Must be > 0.")
     parser.add_argument("--mass", choices=["size", "unit"], default="size",
                         help="What the 4th column of a particle file is: a mass, or nothing "
                              "('unit' gives every particle the same mass).")
@@ -607,6 +664,16 @@ def main() -> int:
         else:
             try:
                 factors[match(name, names)] = value
+            except ValueError as error:
+                parser.error(str(error))
+    widths = {}
+    default_width = None
+    for name, value in args.width:
+        if name is None:
+            default_width = value
+        else:
+            try:
+                widths[match(name, names)] = value
             except ValueError as error:
                 parser.error(str(error))
 
@@ -662,10 +729,12 @@ def main() -> int:
             mass = mass * scale ** 3
             kind = channel_kind(name)
             factor = factors.get(name, default_factor)
+            override = widths.get(name, default_width)
             a8, rgb8, _, spacing, width, width_voxels = convert_channel(
-                positions, mass, colour, kind, box_min, voxel, grid, factor, args.mass, name)
+                positions, mass, colour, kind, box_min, voxel, grid, factor, args.mass, name,
+                override)
             converted[name] = (group, a8, rgb8)
-            details[name] = (spacing, width, width_voxels, factor)
+            details[name] = (spacing, width, width_voxels, factor, override)
 
     # --- the reference the merged bytes are scaled by: the brightest voxel of the sum of the
     # channels at unit intensity. Taken before any intensity is applied, so that the reference is a
@@ -729,14 +798,20 @@ def main() -> int:
         ]
         for name in group_names:
             _, a8c, rgb8c = converted[name]
-            spacing, width, width_voxels, factor = details[name]
+            spacing, width, width_voxels, factor, override = details[name]
+            if override is not None:
+                sized_by = f"from --width {override:.8f} box units"
+            elif spacing > 0.0:
+                sized_by = (f"{width / (DEFAULT_WIDTH * spacing):.2f} x the default width, "
+                            f"{spacing:.8f} local inter-particle spacing")
+            else:
+                sized_by = "from the floor, no local spacing available"
             metadata.append(
                 f"Source: {name} intensity {intensities.get(name, 1.0):.4f}, "
                 f"smoothing {factor:g}x, "
                 f"kind '{channel_kind(name)}', {len(channels[name][0])} particles, "
                 f"stored peak {a8c.max() / 255.0:.3f}, kernel width {width:.8f} box units "
-                f"({width_voxels:.2f} voxels, {width / (DEFAULT_WIDTH * spacing):.2f} x the "
-                f"default width, {spacing:.8f} local inter-particle spacing)")
+                f"({width_voxels:.2f} voxels, {sized_by})")
         write_metadata(base + "_metadata.txt", group, metadata)
 
     print(f"\nDone in {time.time() - started:.1f} s")
