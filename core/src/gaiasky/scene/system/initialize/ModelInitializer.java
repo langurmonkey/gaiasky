@@ -208,9 +208,9 @@ public class ModelInitializer extends AbstractInitSystem {
                                             Event.SPACECRAFT_MACHINE_SELECTION_CMD);
         }
         if (fade != null) {
-            // Billboards -- add depth test attribute, set to false.
+            // Not billboards only: this also covers background models. The value only sticks for
+            // entities drawn by renderGenericModel; the rest re-set depth in their render consumer.
             if (model != null && model.model != null && model.model.instance != null) {
-                // Disable depth test.
                 Array<Material> mats = model.model.instance.materials;
                 for (Material mat : mats) {
                     mat.set(new DepthTestAttribute(false));
