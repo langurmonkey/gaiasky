@@ -15,11 +15,11 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.TextUtils;
 import gaiasky.util.math.Vector3D;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public abstract class AbstractOrbitCoordinates implements IOrbitCoordinates {
@@ -131,7 +131,7 @@ public abstract class AbstractOrbitCoordinates implements IOrbitCoordinates {
        if(owner != null) {
            var base = Mapper.base.get(owner);
            if (base != null) {
-               var newOwner = index.get(base.getName().toLowerCase(Locale.ROOT));
+               var newOwner = index.get(TextUtils.normalizeName(base.getName()));
                if(newOwner != null) {
                    owner = newOwner;
                }

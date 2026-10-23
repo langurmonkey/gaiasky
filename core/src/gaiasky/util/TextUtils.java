@@ -31,6 +31,18 @@ public class TextUtils {
     private static final String ANSI_REGEX = "\\u001B\\[[;\\d]*m";
 
     /**
+     * Normalizes an object name for storage and lookup in the indexes: lower case and trimmed. Both insertion and
+     * resolution must use this method, otherwise names with leading or trailing whitespace never resolve.
+     *
+     * @param name The name to normalize.
+     *
+     * @return The normalized name, or null if the name is null.
+     */
+    public static String normalizeName(String name) {
+        return name == null ? null : name.toLowerCase(Locale.ROOT).trim();
+    }
+
+    /**
      * Removes ANSI color codes from the input string.
      *
      * @param input The string possibly containing ANSI color codes.

@@ -480,12 +480,18 @@ public class ParticleSet implements Component, IDisposable {
                 IParticleRecord pb = pointData.get(idx);
                 if (pb.names() != null) {
                     for (var name : pb.names()) {
-                        var nameLC = name.toLowerCase(Locale.ROOT);
+                        var nameLC = TextUtils.normalizeName(name);
+                        if (nameLC == null || nameLC.isEmpty()) {
+                            continue;
+                        }
                         index.put(nameLC, idx);
 
                         var loc = I18n.localizeIfExists(nameLC);
-                        if (loc != null && !loc.equals(nameLC)) {
-                            index.put(loc.toLowerCase(Locale.ROOT), idx);
+                        if (loc != null) {
+                            var locNorm = TextUtils.normalizeName(loc);
+                            if (locNorm != null && !locNorm.equals(nameLC)) {
+                                index.put(locNorm, idx);
+                            }
                         }
                     }
                 }
@@ -823,8 +829,7 @@ public class ParticleSet implements Component, IDisposable {
     public void setFocusIndex(String name) {
         synchronized (indexSync) {
             if (index != null) {
-                candidateFocusIndex = index.get(name.toLowerCase(Locale.ROOT)
-                                                        .trim());
+                candidateFocusIndex = index.get(TextUtils.normalizeName(name));
             }
         }
     }
@@ -960,8 +965,7 @@ public class ParticleSet implements Component, IDisposable {
     public Vector3Q getAbsolutePosition(String name,
                                         Instant date,
                                         Vector3Q out) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
@@ -1028,8 +1032,7 @@ public class ParticleSet implements Component, IDisposable {
      */
     public Vector3Q getAbsolutePosition(String name,
                                         Vector3Q out) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
@@ -1341,8 +1344,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setLabelDisplay(LabelDisplay state,
                                 String name) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
@@ -1370,8 +1372,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public boolean isForceLabel(String name) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
@@ -1387,8 +1388,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public boolean isRenderLabel(String name) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);
@@ -1404,8 +1404,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setLabelColor(float[] color,
                               String name) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);

@@ -20,6 +20,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.record.ParticleKepler;
 import gaiasky.util.FastObjectIntMap;
 import gaiasky.util.Logger;
+import gaiasky.util.TextUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.KeplerianElements;
@@ -271,13 +272,17 @@ public class OrbitElementsSet implements Component {
                 ParticleKepler pb = (ParticleKepler) pointData.get(i);
                 if (pb.name() != null) {
                     var name = pb.name();
-                    var nlc = name.toLowerCase(Locale.ROOT);
+                    var nlc = TextUtils.normalizeName(name);
+                    if (nlc == null || nlc.isEmpty()) {
+                        continue;
+                    }
                     index.put(nlc, i);
                     if (I18n.hasLocalizedVersion(nlc)) {
                         var loc = I18n.localize(nlc, name);
-                        if (!loc.equals(nlc)) {
+                        var locNorm = TextUtils.normalizeName(loc);
+                        if (locNorm != null && !locNorm.equals(nlc)) {
                             // We still use root locale here, by design.
-                            index.put(I18n.localize(nlc, name).toLowerCase(Locale.ROOT), i);
+                            index.put(locNorm, i);
                         }
                     }
                 }
@@ -289,8 +294,7 @@ public class OrbitElementsSet implements Component {
     public void setFocusIndex(String name) {
         synchronized (indexSync) {
             if (index != null) {
-                candidateFocusIndex = index.get(name.toLowerCase(Locale.ROOT)
-                                                        .trim());
+                candidateFocusIndex = index.get(TextUtils.normalizeName(name));
             }
         }
     }
@@ -433,8 +437,7 @@ public class OrbitElementsSet implements Component {
     public Vector3Q getAbsolutePosition(String name,
                                         Instant date,
                                         Vector3Q out) {
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
         synchronized (indexSync) {
             if (index != null && index.containsKey(name)) {
                 int idx = index.get(name);

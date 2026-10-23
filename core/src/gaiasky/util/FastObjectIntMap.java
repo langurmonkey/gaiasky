@@ -46,14 +46,28 @@ public class FastObjectIntMap<K> {
     }
 
     /**
-     * Returns the value associated with the specified key, or 0 if not found.
+     * Returns the value associated with the specified key, or -1 if not found. All the usages of this map store
+     * positional indices, so -1 is used as the "not found" sentinel; use {@link #getOrDefault(Object, int)} for any
+     * other default.
      *
      * @param key the key
-     * @return the associated value, or 0 if the key is not present
+     * @return the associated value, or -1 if the key is not present
      */
     public int get(K key) {
         int index = indexOf(key);
-        return index != -1 ? values[index] : 0;
+        return index != -1 ? values[index] : -1;
+    }
+
+    /**
+     * Returns the value associated with the specified key, or the given default value if the key is not present.
+     *
+     * @param key the key
+     * @param defaultValue the value to return if the key is not present
+     * @return the associated value, or the default value if the key is not present
+     */
+    public int getOrDefault(K key, int defaultValue) {
+        int index = indexOf(key);
+        return index != -1 ? values[index] : defaultValue;
     }
 
     /**

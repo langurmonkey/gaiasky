@@ -4,10 +4,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Pool;
 import gaiasky.scene.Scene;
 import gaiasky.util.Logger;
+import gaiasky.util.TextUtils;
 import gaiasky.util.math.Vector3Q;
 
 import java.time.Instant;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -92,7 +92,7 @@ public class TimedOrbitCoordinates implements IOrbitCoordinates {
 
         // Update parent.
         if (parentName != null) {
-            var key = parentName.toLowerCase(Locale.ROOT);
+            var key = TextUtils.normalizeName(parentName);
             if (index.containsKey(key)) {
                 parent = index.get(key);
             }

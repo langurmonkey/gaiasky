@@ -15,6 +15,7 @@ import gaiasky.scene.record.Position;
 import gaiasky.scene.view.PositionView;
 import gaiasky.util.FastStringObjectMap;
 import gaiasky.util.Logger;
+import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
@@ -75,8 +76,7 @@ public class Index {
      * @return The entity, or null if it does not exist.
      */
     public Entity getEntity(String name) {
-        name = name.toLowerCase(Locale.ROOT)
-                .strip();
+        name = TextUtils.normalizeName(name);
         try {
             return index.get(name);
         } catch (ArrayIndexOutOfBoundsException ignored) {
@@ -92,8 +92,7 @@ public class Index {
      * @return True if the index contains an entity with the given name. False otherwise.
      */
     public boolean containsEntity(String name) {
-        return index.containsKey(name.toLowerCase(Locale.ROOT)
-                                         .trim());
+        return index.containsKey(TextUtils.normalizeName(name));
     }
 
     /**
@@ -115,8 +114,10 @@ public class Index {
                     var baseParent = bci.parentName != null ? bci.parentName : "-";
 
                     for (String name : base.names) {
-                        String nameLowerCase = name.toLowerCase(Locale.ROOT)
-                                .trim();
+                        String nameLowerCase = TextUtils.normalizeName(name);
+                        if (nameLowerCase == null || nameLowerCase.isEmpty()) {
+                            continue;
+                        }
                         if (!index.containsKey(nameLowerCase)) {
                             // Add to index.
                             index.put(nameLowerCase, entity);
@@ -299,8 +300,7 @@ public class Index {
         var base = Mapper.base.get(entity);
         if (base.names != null) {
             for (String name : base.names) {
-                index.remove(name.toLowerCase(Locale.ROOT)
-                                     .trim());
+                index.remove(TextUtils.normalizeName(name));
             }
 
             // Id
@@ -350,8 +350,7 @@ public class Index {
      */
     public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
         String[] keys = index.keys();
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
 
         int i = 0;
         for (String key : keys) {
@@ -384,8 +383,7 @@ public class Index {
      */
     public void matchingNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
         String[] keys = index.keys();
-        name = name.toLowerCase(Locale.ROOT)
-                .trim();
+        name = TextUtils.normalizeName(name);
 
         int i = 0;
         for (String key : keys) {
