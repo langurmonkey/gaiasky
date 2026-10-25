@@ -74,6 +74,10 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
         });
         shaderProgram.end();
 
+        // The per-renderable line width set above is global GL state. Restore the default so it
+        // does not leak into the rest of the frame. See LineRenderSystem.
+        Gdx.gl.glLineWidth(1f);
+
         // Reset indices
         meshIdx = 1;
         curr = meshes.get(0);

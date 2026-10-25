@@ -645,6 +645,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 if (l != null && !l.isEmpty()) {
                     var renderSystem = getOrInitializeRenderSystem(renderGroup);
                     if (renderSystem != null) {
+                        resetGlBaseline();
                         renderSystem.render(l, camera, t, renderContext);
                     }
                 }
@@ -654,29 +655,39 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             var fullBuffer = pp.getCombinedBuffer().getFullBuffer();
             var halfBuffer = pp.getCombinedBuffer().getHalfBuffer();
             fullBuffer.end();
-            halfBuffer.begin();
-            clearScreen();
-            // Give the half-resolution pass the depth of the full-resolution one, so that its content
-            // is occluded by full-resolution occluders (e.g. volumes writing depth in their pre-pass).
-            // Only needed when there is something to draw in the half-resolution pass.
-            if (hasHalfResolutionContent()) {
-                blitDepth(fullBuffer, halfBuffer);
-            }
+            try {
+                halfBuffer.begin();
+                clearScreen();
+                // Give the half-resolution pass the depth of the full-resolution one, so that its content
+                // is occluded by full-resolution occluders (e.g. volumes writing depth in their pre-pass).
+                // Only needed when there is something to draw in the half-resolution pass.
+                if (hasHalfResolutionContent()) {
+                    blitDepth(fullBuffer, halfBuffer);
+                }
 
-            // Iterate over render groups and get systems.
-            for (var renderGroup : renderGroups) {
-                List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
-                if (l != null && !l.isEmpty()) {
-                    var renderSystem = getOrInitializeRenderSystem(renderGroup);
-                    if (renderSystem != null) {
-                        renderSystem.render(l, camera, t, renderContext);
+                // Iterate over render groups and get systems.
+                for (var renderGroup : renderGroups) {
+                    List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
+                    if (l != null && !l.isEmpty()) {
+                        var renderSystem = getOrInitializeRenderSystem(renderGroup);
+                        if (renderSystem != null) {
+                            resetGlBaseline();
+                            renderSystem.render(l, camera, t, renderContext);
+                        }
                     }
                 }
+            } finally {
+                // Always go back to the full-resolution buffer, even if a render system threw.
+                // Otherwise the next frame starts with the half-resolution buffer bound and every
+                // full-resolution group is drawn at half resolution.
+                try {
+                    halfBuffer.end();
+                } catch (Exception e) {
+                    // The half buffer was not begun; nothing to end.
+                    logger.error(e);
+                }
+                fullBuffer.begin();
             }
-
-            // Back to full-resolution buffer.
-            halfBuffer.end();
-            fullBuffer.begin();
 
         } catch (GdxRuntimeException | ShaderCompilationException gre) {
             // Escalate.
@@ -686,6 +697,24 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             logger.error(e);
         }
 
+    }
+
+    /**
+     * Re-establishes a canonical baseline for the fixed-function GL state that neither the model
+     * batch (through its {@link com.badlogic.gdx.graphics.g3d.utils.RenderContext}) nor any other
+     * component manages: the color mask and the line width.
+     * <p>
+     * Non-ModelBatch render systems set these directly with {@code Gdx.gl.*} and there is no stack to
+     * restore them, so a system that fails, or that simply forgets, leaks its state into the rest of
+     * the frame. Resetting before each render group bounds the damage to the offending system.
+     * <p>
+     * Deliberately not touched here: depth test, depth mask, blending and culling. Those are cached by
+     * {@code RenderContext}, and writing them behind its back would desynchronize it and make it skip
+     * the GL calls it believes are redundant.
+     */
+    private void resetGlBaseline() {
+        Gdx.gl.glColorMask(true, true, true, true);
+        Gdx.gl.glLineWidth(1f);
     }
 
     /**

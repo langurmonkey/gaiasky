@@ -43,10 +43,17 @@ public class TessellationRenderer extends AbstractRenderSystem {
             // Triangles for tessellation
             GL41.glPatchParameteri(GL41.GL_PATCH_VERTICES, 3);
             batch.begin(camera.getCamera());
-            renderables.forEach(r -> {
-                Render render = (Render) r;
-                renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagBillboard.has(render.entity));
-            });
+            try {
+                renderables.forEach(r -> {
+                    Render render = (Render) r;
+                    renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagBillboard.has(render.entity));
+                });
+            } catch (Exception e) {
+                // Do not leave the batch begun: IntModelBatch.begin() throws if the previous
+                // begin() was not matched by an end(), which would break every later frame.
+                batch.cancel();
+                throw e;
+            }
             batch.end();
         }
     }

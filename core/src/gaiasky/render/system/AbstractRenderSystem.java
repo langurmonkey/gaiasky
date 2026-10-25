@@ -68,8 +68,14 @@ public abstract class AbstractRenderSystem implements IRenderSystem, Comparable<
         if (renderables != null && !renderables.isEmpty()) {
             this.rc = rc;
             run(preRunners, renderables, camera);
-            renderStud(renderables, camera, t);
-            run(postRunners, renderables, camera);
+            try {
+                renderStud(renderables, camera, t);
+            } finally {
+                // Post-runners must run even if the system throws. Some of them restore global GL
+                // state (e.g. the color mask of the volume depth pass) that would otherwise stay
+                // clobbered for the rest of the frame and for every subsequent one.
+                run(postRunners, renderables, camera);
+            }
         }
     }
 

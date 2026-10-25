@@ -114,6 +114,12 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
         });
         shaderProgram.end();
 
+        // The line width set per renderable above is global GL state and would otherwise leak into
+        // every later group in the frame. Restore the default. Note that GL_LINE_SMOOTH is enabled
+        // once in initShaderProgram() and deliberately left enabled: it is a global policy shared
+        // with the minimap and the other line-based systems.
+        Gdx.gl.glLineWidth(1f);
+
         // Reset indices
         meshIdx = 1;
         curr = meshes.get(0);
