@@ -291,9 +291,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(clearDepthR, depthTestNoWritesR);
             }
             case MODEL_VERT_RECGRID -> {
-                // RECURSIVE GRID
+                // RECURSIVE GRID. No pre-runnables: the batch owns its context and resets the
+                // fixed-function state in begin(), so anything set here is wiped before the first
+                // draw. Blend and depth come from the material attributes instead.
                 system = new ModelRenderer(this, MODEL_VERT_RECGRID, alphas, renderAssets.mbSimpleRecGrid);
-                system.addPreRunnables(regularBlendR, depthTestR);
             }
             case LINE -> system = getLineCPURenderSystem();
             case LINE_GPU -> system = getLineGPURenderSystem();
@@ -314,15 +315,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case MODEL_PBR -> // MODEL PER-PIXEL-LIGHTING
                     system = new ModelRenderer(this, MODEL_PBR, alphas, renderAssets.mbPBR);
             case MODEL_PBR_TESS -> {
-                // MODEL PER-PIXEL-LIGHTING-TESSELLATION
+                // MODEL PER-PIXEL-LIGHTING-TESSELLATION. No pre-runnables: wiped by the batch's
+                // RenderContext.begin(). See MODEL_VERT_RECGRID.
                 system = new TessellationRenderer(this, MODEL_PBR_TESS, alphas, renderAssets.mbPBRTessellation);
-                system.addPreRunnables(regularBlendR, depthTestR);
             }
             case MODEL_PROCEDURAL_TESS -> {
-                // MODEL PROCEDURAL TESSELLATION
+                // MODEL PROCEDURAL TESSELLATION. No pre-runnables, same reason.
                 if (GaiaSky.settings().scene.renderer.elevation.shaderMethod) {
                     system = new TessellationRenderer(this, MODEL_PROCEDURAL_TESS, alphas, renderAssets.mbPBRTessellationProcedural);
-                    system.addPreRunnables(regularBlendR, depthTestR);
                 }
             }
             case BILLBOARD_GROUP -> {
