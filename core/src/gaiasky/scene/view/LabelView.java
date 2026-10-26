@@ -143,6 +143,10 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         return label.globalEnableFlag;
     }
 
+    public boolean renderTextUVGrid() {
+        return true;
+    }
+
     public boolean renderTextEssential() {
         return base.names != null && renderTextBase() && base.opacity > 0;
     }

@@ -133,11 +133,11 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
             }
         }
 
-        // Label for VR
+        // UV grid annotations.
         label.textScale = 0.2f;
         label.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
         label.labelFactor = 1;
         label.renderConsumer = LabelEntityRenderSystem::renderGridAnnotations;
-        label.renderFunction = LabelView::renderTextGridRec;
+        label.renderFunction = LabelView::renderTextUVGrid;
     }
 }
