@@ -332,10 +332,15 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
     }
 
     /**
-     * A volume's sidecar metadata: the grid resolution, when the file declares one, and the
-     * world-space box. The box always has a value, defaulting to the unit cube.
+     * A volume's sidecar metadata: the grid resolution, when the file declares one, the world-space
+     * box, and the box's declared side ({@code World size:}), which is null when the file does not
+     * state it. The box always has a value, defaulting to the unit cube.
      */
-    record VolumeMetadata(Trio<Integer, Integer, Integer> grid, Vector3 boundsMin, Vector3 boundsMax) {
+    record VolumeMetadata(Trio<Integer, Integer, Integer> grid, Vector3 boundsMin, Vector3 boundsMax,
+                          Vector3 boxSize) {
+        VolumeMetadata(Trio<Integer, Integer, Integer> grid, Vector3 boundsMin, Vector3 boundsMax) {
+            this(grid, boundsMin, boundsMax, null);
+        }
     }
 
     /**
@@ -346,6 +351,10 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
     private static final Pattern BOUNDS_PATTERN = Pattern.compile(
             "\\[\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*]\\s*to\\s*" +
                     "\\[\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*]");
+
+    /** Matches a bare three-component vector, as in {@code World size: [0.998, 0.100, 1.000]}. */
+    private static final Pattern VECTOR_PATTERN = Pattern.compile(
+            "\\[\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*,\\s*(-?[0-9.eE+]+)\\s*]");
 
     /**
      * Read a volume's sidecar metadata, falling back to defaults when it is missing or unreadable.
@@ -394,6 +403,7 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
     static VolumeMetadata parseMetadata(String metadata) {
         Trio<Integer, Integer, Integer> grid = null;
         Vector3[] bounds = getDefaultBounds();
+        Vector3 boxSize = null;
 
         for (String line : metadata.split("\\R")) {
             int colon = line.indexOf(':');
@@ -426,12 +436,57 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
                         logger.warn("Could not parse the bounds from metadata: '" + value + "'");
                     }
                 }
+                case "world size" -> {
+                    Matcher matcher = VECTOR_PATTERN.matcher(value);
+                    if (matcher.find()) {
+                        boxSize = new Vector3(Float.parseFloat(matcher.group(1)),
+                                              Float.parseFloat(matcher.group(2)),
+                                              Float.parseFloat(matcher.group(3)));
+                    }
+                }
                 default -> {
                 }
             }
         }
 
-        return new VolumeMetadata(grid, bounds[0], bounds[1]);
+        return new VolumeMetadata(grid, bounds[0], bounds[1], boxSize);
+    }
+
+    /**
+     * Whether a metadata file's box is not the box its texture covers.
+     * <p>
+     * A volume is sampled over the box its voxel grid spans, and the shader gets that box from the
+     * metadata: it clips each ray against it and normalises a position over it to get a texture
+     * coordinate. A declared box that is smaller than the grid it describes is therefore not a
+     * cosmetic problem - the volume is drawn too large, and because the box then sits inside the
+     * object instead of around it, it is drawn off-centre as well, by the same fraction of the
+     * object's size.
+     * <p>
+     * That is exactly what {@code particles-to-volume.py} used to write: the <em>data</em> extent in
+     * the {@code Volume bounds:} line, where the box is the data extent grown by 5%, and the box
+     * anchored at the data's own corner. Nothing here can repair that - the box cannot be recovered
+     * from the data extent alone without knowing which corner the padding went to - so the file has
+     * to be regenerated, and this says so instead of rendering it 5% too large in silence.
+     *
+     * @param metadata The metadata.
+     *
+     * @return True when the declared box is not the extent of the grid, i.e. when the volume will be
+     * drawn too large and off its object. A file that declares no box side, or no bounds, cannot be
+     * checked and returns false.
+     */
+    static boolean boxIsNotTheGridExtent(VolumeMetadata metadata) {
+        Vector3 size = metadata.boxSize();
+        Vector3 min = metadata.boundsMin();
+        Vector3 max = metadata.boundsMax();
+        if (size == null || min == null || max == null || size.x <= 0f || size.y <= 0f || size.z <= 0f) {
+            return false;
+        }
+        // The generator writes the box from the same extent it writes as 'World size', so the two
+        // agree to the last printed digit; a voxel of slack covers the printing.
+        float slop = 0.01f;
+        return Math.abs((max.x - min.x) - size.x) > slop * size.x
+                       || Math.abs((max.y - min.y) - size.y) > slop * size.y
+                       || Math.abs((max.z - min.z) - size.z) > slop * size.z;
     }
 
     /**
@@ -470,6 +525,12 @@ public class VolumeTextureLoader extends AsynchronousAssetLoader<VolumeTexture, 
         // Read the metadata first: it is what declares the grid resolution, and without it the
         // resolution can only be inferred as a cube from the file length.
         VolumeMetadata metadata = loadMetadata(file);
+        if (boxIsNotTheGridExtent(metadata)) {
+            logger.warn("The box declared in the metadata of " + file.name() + " does not match the "
+                                + "'World size' the same file declares, so the volume will be drawn too large "
+                                + "and off-centre. Older versions of particles-to-volume.py wrote the data "
+                                + "extent where the box belongs: regenerate the volume.");
+        }
 
         // Auto-detect type and dimensions
         var detection = detectVolumeTypeAndDimensions(fileData.length, metadata.grid());

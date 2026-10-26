@@ -467,6 +467,62 @@ public class VolumeTextureLoaderTest {
         }
     }
 
+    @Test
+    public void aVolumeWhoseBoxIsTheDataExtentIsFlagged() {
+        // Verbatim from the shipped gal-400 volume: the box is the data extent grown by 5%, so the
+        // bounds span 0.9524 of the World size on every axis. The shader takes those bounds as the
+        // box, which draws the volume 5% too large and 2.3% of the object's size off-centre, so the
+        // loader says so rather than rendering it in silence.
+        String metadata = """
+                Grid size: 399x40x400
+                World size: [0.998040, 0.099562, 1.000000]
+                Volume bounds: [-0.473301, -0.048570, -0.475536] to [0.477213, 0.046252, 0.476845]
+                Data bounds: [-0.473301, -0.476845, -0.048570] to [0.477213, 0.475536, 0.046252]
+                """;
+
+        Assert.assertTrue(VolumeTextureLoader.boxIsNotTheGridExtent(
+                VolumeTextureLoader.parseMetadata(metadata)));
+    }
+
+    @Test
+    public void aVolumeWhoseBoxIsTheGridExtentIsAccepted() {
+        // What particles-to-volume.py writes now: 'Volume bounds' is the box itself, so it spans
+        // exactly the World size and there is nothing to warn about.
+        String metadata = """
+                Grid size: 400x40x400
+                World size: [0.999524, 0.099483, 1.000000]
+                Volume bounds: [-0.498776, -0.050900, -0.498997] to [0.500748, 0.048583, 0.501003]
+                Data bounds (galactic, inside the box): [-0.475693, -0.474751, -0.047386] to \
+                [0.477517, 0.475373, 0.047376]
+                """;
+
+        Assert.assertFalse(VolumeTextureLoader.boxIsNotTheGridExtent(
+                VolumeTextureLoader.parseMetadata(metadata)));
+    }
+
+    @Test
+    public void aRawUnitsVolumeIsFlagged() {
+        // The convention before normalization, whose bounds double as a size multiplier of ~7 on
+        // the object. It cannot be rendered as it stands either, so it is flagged too.
+        String metadata = """
+                Grid size: 60x15x60
+                World size: [7.058, 7.071, 0.704]
+                Volume bounds: [-3.540, -0.359, -3.516] to [3.532, 0.345, 3.541]
+                """;
+
+        Assert.assertTrue(VolumeTextureLoader.boxIsNotTheGridExtent(
+                VolumeTextureLoader.parseMetadata(metadata)));
+    }
+
+    @Test
+    public void aMetadataWithoutAWorldSizeCannotBeChecked() {
+        var metadata = VolumeTextureLoader.parseMetadata(
+                "Grid size: 400x40x400\nVolume bounds: [-0.4, -0.04, -0.4] to [0.4, 0.04, 0.4]\n");
+
+        Assert.assertNull(metadata.boxSize());
+        Assert.assertFalse(VolumeTextureLoader.boxIsNotTheGridExtent(metadata));
+    }
+
     /**
      * The byte offset of a channel within a voxel, in the file's C-order (W, H, D, channels).
      */

@@ -3,9 +3,11 @@
 # and of the metadata's 'Grid size:', which is galactic (X, Z, -Y) - a flat disk, whose
 # thickness is the galactic Z, wants the middle number small (e.g. 400x40x400).
 #
-# The box is normalized: its largest side is 1, in units of the object's size in the scene,
-# so the object's sizePc decides how large the volume is drawn and the data only decides its
-# shape. A voxel size of 1/400 therefore asks for 400 voxels along the largest axis.
+# The box is normalized: its largest side is NORMALIZED_SIDE (1.37) in units of the object's
+# size in the scene, so the object's sizePc decides how large the volume is drawn and the data
+# only decides its shape. More than 1 draws the gas larger than sizePc - the galaxy uses it to
+# agree with the reference render - while the label, the hit sphere and the go-to distance stay
+# at sizePc. A voxel size of 1/400 therefore asks for 400 voxels along the largest axis.
 # There is no switch for this: older volumes were written in raw source units, where the
 # metadata bounds also acted as a size multiplier on the object (a box of side 7 drew the
 # volume 7 times the declared size), so those must not be mixed with these.
@@ -70,4 +72,4 @@ genvold resolution input output:
 
 # Create top-down and edge-on images
 img dir *args:
-	uv run --with numpy --with matplotlib volume-preview.py {{dir}} --saturation 2.5 --exposure 15.0 {{args}}
+	uv run --with numpy --with matplotlib volume-preview.py {{dir}} --gamma 1.5 --saturation 2.5 --exposure 15.0 {{args}}

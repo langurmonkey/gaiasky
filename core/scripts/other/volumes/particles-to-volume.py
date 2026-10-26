@@ -161,7 +161,14 @@ BOX_PADDING = 1.05
 # The largest side of the box, in units of the object's size. The shader multiplies the metadata
 # bounds by the object's diameter, so a box of side 1 draws the volume exactly the size the scene
 # asks for; a box in raw data units (side ~7 here) would draw it seven times too large.
-NORMALIZED_SIDE = 1.0
+#
+# More than 1 draws the volume LARGER than the object's sizePc, which the scene does not know about:
+# the mesh sphere stays at sizePc across, the label, the hit sphere and the go-to distance all stay
+# at sizePc, and only the gas is bigger. The galaxy uses 1.37, measured against the reference render
+# (the 50% isophote sits at 0.70 of the Sun's distance there against 0.49 here, 1.68/1.49 and 1.90/
+# 1.38 on the 20% and 10% ones). That gives a gas radius of 17 kpc with the Sun at 0.47 of it, and
+# keeps the sprite layer from towering three times over the disk it belongs to.
+NORMALIZED_SIDE = 1.37
 
 DEFAULT_EMISSIVE = "gas,bulge"
 DEFAULT_OCCLUSIVE = "dust"
@@ -331,6 +338,11 @@ def field_on_particles(positions: np.ndarray, mass: np.ndarray, width: float) ->
 def make_box(positions: np.ndarray, resolution: int):
     """The box every channel shares, its side normalised, plus the grid it is sampled on.
 
+    The returned `low` and `high` are the BOX, the extent the voxel grid covers and the one that
+    has to reach the shader (see the Volume bounds line). The particles fill a sub-box of it,
+    centred, and the margin is what keeps a sample just outside the data interpolating toward
+    zero instead of wrapping or ending the box on the last particle.
+
     One box for every channel is what makes the emissive and the occlusive volumes align: the
     shader intersects each box independently, and two boxes that differ would put the dust and the
     gas at different places in the same object.
@@ -341,7 +353,16 @@ def make_box(positions: np.ndarray, resolution: int):
     """
     low = positions.min(axis=0)
     high = positions.max(axis=0)
-    span = (high - low) * BOX_PADDING
+    extent = high - low
+    span = extent * BOX_PADDING
+
+    # The padding goes to both ends, so the data is centred in its box. It used to go to the high
+    # end only, which put the data half a margin off the box centre - and the box is the object
+    # (the shader clips and samples against it in units of the object's size, and the mesh is a
+    # sphere of exactly that diameter), so the whole volume was drawn off-centre and the far end of
+    # the box poked out of the sphere.
+    low = low - (span - extent) / 2.0
+    high = high + (span - extent) / 2.0
 
     # Scaling about the origin, not about the centre: the particle pipeline places a point at its
     # coordinate times the object's size with no recentring, so a data set that is not centred on
@@ -713,6 +734,9 @@ def main() -> int:
     # flat in for a galaxy disk.
     thin_axis = int(np.argmin(span))
     bounds_min, bounds_max = stored_bounds(box_min, box_max)
+    # Where the particles are, in box units. Not what the shader clips against - that is the box -
+    # but worth writing down next to it, because the two differ by the padding.
+    data_min, data_max = everything.min(axis=0) * scale, everything.max(axis=0) * scale
     print(f"  box {np.round(span, 4)} (galactic x, y, z), {scale:.4f} source units per stored unit")
     print(f"  grid {grid[0]}x{grid[1]}x{grid[2]} galactic = "
           f"{stored_grid[0]}x{stored_grid[1]}x{stored_grid[2]} storage, voxel {voxel:.5f}")
@@ -785,8 +809,9 @@ def main() -> int:
             f"World size: [{span[0]:.6f}, {span[2]:.6f}, {span[1]:.6f}]",
             f"Volume bounds: [{bounds_min[0]:.6f}, {bounds_min[1]:.6f}, {bounds_min[2]:.6f}] "
             f"to [{bounds_max[0]:.6f}, {bounds_max[1]:.6f}, {bounds_max[2]:.6f}]",
-            f"Data bounds: [{box_min[0]:.6f}, {box_min[1]:.6f}, {box_min[2]:.6f}] "
-            f"to [{box_max[0]:.6f}, {box_max[1]:.6f}, {box_max[2]:.6f}]",
+            f"Data bounds (galactic, inside the box): "
+            f"[{data_min[0]:.6f}, {data_min[1]:.6f}, {data_min[2]:.6f}] "
+            f"to [{data_max[0]:.6f}, {data_max[1]:.6f}, {data_max[2]:.6f}]",
             f"Voxel size: {voxel:.8f} (cubic; the largest box side is {NORMALIZED_SIDE:g}, in "
             f"units of the object's size)",
             f"Resolution: {args.resolution} voxels on the longest side of the box",
