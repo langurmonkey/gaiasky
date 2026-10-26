@@ -68,8 +68,13 @@ fun fetchGitInfo(cmd: List<String>): String? {
     }
 }
 
-val gitTag = fetchGitInfo(listOf("git", "describe", "--abbrev=0", "--tags", "HEAD")) ?: "unknown"
-val gitRev = fetchGitInfo(listOf("git", "rev-parse", "--short", "HEAD")) ?: "???"
+val gitTag = fetchGitInfo(
+    listOf("git", "describe", "--abbrev=0", "--tags", "HEAD")
+) ?: "unknown"
+
+val gitRev = fetchGitInfo(
+    listOf("git", "rev-parse", "--short", "HEAD")
+) ?: "???"
 
 project(":core") {
     apply(plugin = "java-library")
@@ -80,15 +85,12 @@ project(":core") {
     extra.set("tag", gitTag)
     extra.set("rev", gitRev)
 
-    val systemString: String = if (currentOS.isWindows) {
-        "${currentOS.displayName} ${currentArch.displayName}"
-    } else {
-        try {
-            val proc = Runtime.getRuntime().exec(arrayOf("uname", "-snmr"))
-            proc.inputStream.bufferedReader().use { it.readText().trim() }
-        } catch (_: Exception) {
-            "unknown"
-        }
+    val systemString = buildString {
+        append(currentOS.displayName)
+        append(" ")
+        append(currentArch.displayName)
+        append(" ")
+        append(System.getProperty("os.version"))
     }
     extra.set("system", systemString)
 

@@ -42,6 +42,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.component.Body;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
@@ -2230,10 +2231,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Checks the position of the camera does not collide with the focus object.
+     * Checks the position of the camera does not collide with the focus object. Only objects whose
+     * bounding sphere collides with the camera are checked, see {@link Body#cameraCollision}. Large
+     * objects that always contain the camera, like the Milky Way, must opt out of this, or focusing
+     * them teleports the camera outside of them.
      */
     private void checkFocus() {
-        if (focus.isValid() && !Mapper.hip.has(focus.getEntity()) && focus.getSet() == null && focus.getElementsSet() == null) {
+        if (focus.isValid() && focus.isCameraCollision() && !Mapper.hip.has(focus.getEntity()) && focus.getSet() == null && focus.getElementsSet() == null) {
             // Move camera if too close to focus.
             this.focus.getAbsolutePosition(aux1b);
             if (pos.dstD(aux1b, aux2b) < this.focus.getRadius()) {
