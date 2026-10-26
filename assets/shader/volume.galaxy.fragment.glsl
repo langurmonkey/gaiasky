@@ -89,7 +89,7 @@ layout(location = 1) out vec4 layerBuffer;
 // that fixes their relative scale. Start at 100, sweep 30-300.
 #define DUST_SIGMA 1000.0
 // Optional: light *emitted* by the dust (scattering). 0.0 = pure extinction.
-#define DUST_EMISSION 0.0
+#define DUST_EMISSION 0.2
 
 // ---- Transfer function colour ramps --------------------------------------
 // Two colour sources, selected per slot by u_volumeNColorMode: these ramps, which map
