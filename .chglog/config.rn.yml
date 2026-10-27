@@ -48,7 +48,10 @@ options:
             - Fixes
 
     header:
-        pattern: "^(\\w*)\\:\\s(.*)$"
+        # Accepts conventional-commit scopes, e.g. "fix(labels): ..." and "feat(volumes): ...".
+        # Without the optional scope group, scoped commits match no type and are dropped by the
+        # Type filter below, so the 3.9.2 notes silently lost 5 of 10 commits.
+        pattern: "^(\\w*)(?:\\([^)]*\\))?\\:\\s(.*)$"
         pattern_maps:
             - Type
             - Subject

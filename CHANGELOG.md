@@ -1,3 +1,17 @@
+<a name="3.9.2"></a>
+## [3.9.2](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.9.2) (2026-10-27)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.9.1...3.9.2)
+
+### Bug Fixes
+
+- Procedural galaxy volumes are drawn at the correct size and position (they were 5% too large and off-centre). Volumes generated with an older `particles-to-volume.py` must be regenerated.
+- Volume labels are no longer 10 times too large. Fixes [#943](https://codeberg.org/gaiasky/gaiasky/issues/943).
+- The latitude/longitude annotations of the equatorial, ecliptic and galactic grids are visible again.
+- Fixed-function GL state no longer leaks between render groups, and render-group teardown no longer skips state restoration on failure.
+- Focusing an object that opts out of camera collision (e.g. the Milky Way) no longer teleports the camera out of it.
+- Focus resolution no longer jumps to the first particle of a set when a name is not in its index.
+- The galaxy volume is 1.37 times larger, giving a 17 kpc gas disk with the Sun at 0.47 of it, and dust scattering is enabled.
+
 <a name="3.9.1"></a>
 ## [3.9.1](https://codeberg.org/gaiasky/gaiasky/releases/tag/3.9.1) (2026-10-23)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.9.0...3.9.1)

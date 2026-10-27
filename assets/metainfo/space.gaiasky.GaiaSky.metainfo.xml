@@ -39,16 +39,18 @@
 
   <releases>
 
-    <release version="3.9.1" date="2026-10-23" urgency="high">
-      <url>https://gaiasky.space/news/2026/gaiasky_3.9.1</url>
+    <release version="3.9.2" date="2026-10-27" urgency="high">
+      <url>https://gaiasky.space/news/2026/gaiasky_3.9.2</url>
       <description>
-        <p>This is a bug-fix release. It restores the occlusion of the procedurally generated galaxy channels by the volume dust, and fixes several issues that surfaced when creating galaxies from the UI and when inserting entities into the scene graph.</p>
+        <p>This is a bug-fix release. The procedural galaxy is drawn at the right size and position, the background grid annotations are back, and a camera teleport when focusing large objects is fixed.</p>
         <ul>
-          <li>Half-resolution channels are occluded by full-resolution occluders again.          </li><li>Runtime-created billboards bind their texture array correctly.
-          </li><li>Galaxies added via the UI get their parent populated correctly again.
-          </li><li>Fix the guard in the code that adds children to nodes, which made it function improperly. This prevents a crash with the NASA Exoplanet Archive dataset.
-          </li><li>Always run the volume depth pre-pass at full resolution, so that its depth occludes half-resolution content, and skip the full-to-half depth blit when the half-resolution pass is empty.
-          </li>
+          <li>Procedural galaxy volumes are drawn at the correct size and position (they were 5% too large and off-centre). Volumes generated with an older <code>particles-to-volume.py</code> must be regenerated.</li>
+          <li>Volume labels are no longer 10 times too large.</li>
+          <li>The latitude/longitude annotations of the equatorial, ecliptic and galactic grids are visible again.</li>
+          <li>Fixed-function GL state no longer leaks between render groups, and render-group teardown no longer skips state restoration on failure.</li>
+          <li>Focusing an object that opts out of camera collision (e.g. the Milky Way) no longer teleports the camera out of it.</li>
+          <li>Focus resolution no longer jumps to the first particle of a set when a name is not in its index.</li>
+          <li>The galaxy volume is 1.37 times larger, giving a 17 kpc gas disk with the Sun at 0.47 of it, and dust scattering is enabled.</li>
         </ul>
       </description>
       </release>
