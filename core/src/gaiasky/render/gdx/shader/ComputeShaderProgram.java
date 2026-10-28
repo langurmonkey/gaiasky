@@ -506,6 +506,40 @@ public class ComputeShaderProgram implements Disposable {
         }
     }
 
+    /**
+     * Dispatch the compute shader over a 3D grid, inserting a full memory barrier.
+     * <p>
+     * The workgroup is 256x1x1, so x is the only axis that is tiled: the group count on x is
+     * rounded up (a shader whose work is a voxel grid must mask the overshooting invocations
+     * itself), while y and z dispatch exactly their voxel count.
+     * <p>
+     * The barrier is {@link GL43#GL_ALL_BARRIER_BITS} rather than the storage buffer bit used by
+     * {@link #end(int)}: these dispatches write 3D images and the next pass may both read what they
+     * wrote and sample the texture it produced.
+     *
+     * @param nx Number of invocations on x.
+     * @param ny Number of invocations on y.
+     * @param nz Number of invocations on z.
+     */
+    public void end3D(int nx, int ny, int nz) {
+        if (using) {
+            int groupsX = (nx + localSizeX - 1) / localSizeX;
+
+            while (GL43.glGetError() != GL43.GL_NO_ERROR) ;
+
+            glDispatchCompute(groupsX, Math.max(ny, 1), Math.max(nz, 1));
+            int error = GL43.glGetError();
+            if (error != GL43.GL_NO_ERROR) {
+                logger.error("OpenGL error after dispatch: " + error);
+            }
+
+            GL43.glMemoryBarrier(GL43.GL_ALL_BARRIER_BITS);
+            unbind();
+        } else {
+            logger.error("You need to call begin() first, otherwise the shader is not active.");
+        }
+    }
+
     /** Stop this or any other program. */
     private void unbind() {
         glUseProgram(0);
