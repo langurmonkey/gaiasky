@@ -245,19 +245,26 @@ public class BillboardDataset {
     }
 
 
+    /** Vertical tail of the density field, in scale heights. Mirrors {@code GX_VERTICAL_TAIL}. **/
+    private static final double GX_VERTICAL_TAIL = 3.0;
+    /** Arm width, in units of {@link #baseRadius}. Mirrors {@code GX_ARM_WIDTH}. **/
+    private static final double GX_ARM_WIDTH = 0.2;
+
     /**
      * Vertical-to-lateral aspect ratio of the box that encloses this distribution, used to size the
      * volume grid of procedurally generated galaxies. Flat distributions (and bars) are thin, the
      * rest are isotropic.
+     * <p>
+     * Must match {@code gxBoxAspect()} in {@code assets/shader/lib/galaxy.glsl}, which is where the
+     * density field defines the box it lives in.
      */
     public double volumeAspectY() {
         if (!(distribution.isFlat() || distribution.isBar())) {
             return 1.0;
         }
-        // Vertical extent is set by the height profile plus the warp, with a margin for the
-        // density tail.
-        double half = heightScale + 0.5 * warpStrength + 0.02;
-        return MathUtilsDouble.clamp(2.0 * half, 0.06, 1.0);
+        double lateral = baseRadius * (1.0 + MathUtilsDouble.clamp(GX_VERTICAL_TAIL * armSigma * GX_ARM_WIDTH, 0.0, 0.2));
+        double vertical = GX_VERTICAL_TAIL * heightScale + Math.abs(warpStrength);
+        return MathUtilsDouble.clamp(vertical / lateral, 0.02, 1.0);
     }
 
     /**
