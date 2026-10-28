@@ -14,6 +14,7 @@ import gaiasky.data.util.GlobalResources;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.BlendMode;
+import gaiasky.render.gdx.graphics.VoxelGrid;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.LocalizedEnum;
 import gaiasky.util.Logger;
@@ -203,7 +204,8 @@ public class BillboardDataset {
         this.genStatus.set(genStatus);
     }
 
-    public boolean initialize(PointDataProvider provider, boolean reload) {
+    public boolean initialize(PointDataProvider provider,
+                              boolean reload) {
         if (file != null && !file.isBlank()) {
             Pair<List<IParticleRecord>, String> p;
             p = reloadFile(provider, file, fileUnpack, data);
@@ -215,7 +217,20 @@ public class BillboardDataset {
         return false;
     }
 
-    private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<IParticleRecord> curr) {
+    /**
+     * Load the given file and return the dataset.
+     *
+     * @param prov   The point data provider.
+     * @param src    Source file path.
+     * @param srcUpk Source file path, unpacked.
+     * @param curr   The dataset.
+     *
+     * @return The new dataset and unpacked location.
+     */
+    private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov,
+                                                           String src,
+                                                           String srcUpk,
+                                                           List<IParticleRecord> curr) {
         String upk = GlobalResources.unpackAssetPath(GaiaSky.settings().data.dataFile(src));
         if (srcUpk == null || !srcUpk.equals(upk)) {
             var d = prov.loadData(upk, () -> EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, src, 0f),
@@ -228,6 +243,36 @@ public class BillboardDataset {
             return new Pair<>(curr, srcUpk);
         }
     }
+
+
+    /**
+     * Vertical-to-lateral aspect ratio of the box that encloses this distribution, used to size the
+     * volume grid of procedurally generated galaxies. Flat distributions (and bars) are thin, the
+     * rest are isotropic.
+     */
+    public double volumeAspectY() {
+        if (!(distribution.isFlat() || distribution.isBar())) {
+            return 1.0;
+        }
+        // Vertical extent is set by the height profile plus the warp, with a margin for the
+        // density tail.
+        double half = heightScale + 0.5 * warpStrength + 0.02;
+        return MathUtilsDouble.clamp(2.0 * half, 0.06, 1.0);
+    }
+
+    /**
+     * Derives the volume grid this dataset should be voxelised into.
+     *
+     * @param sizePc  Lateral span of the galaxy, in parsecs.
+     * @param quality Graphics quality, which sets the target voxel size and the voxel budget.
+     *
+     * @return The grid.
+     */
+    public VoxelGrid volumeGrid(double sizePc,
+                                GraphicsQuality quality) {
+        return VoxelGrid.forSpan(sizePc, volumeAspectY(), quality);
+    }
+
 
     public void setParticleCount(Long n) {
         this.particleCount = n.intValue();
@@ -382,7 +427,9 @@ public class BillboardDataset {
         this.heightProfile = p;
     }
 
-    public void setHeightParameters(Double warpStrength, Double heightScale, HeightProfile profile) {
+    public void setHeightParameters(Double warpStrength,
+                                    Double heightScale,
+                                    HeightProfile profile) {
         setWarpStrength(warpStrength);
         setHeightScale(heightScale);
         setHeightProfile(profile);
@@ -475,7 +522,10 @@ public class BillboardDataset {
      * @param b   The blue.
      * @param idx The index of the color, in [0,MAX_COLORS-1]
      */
-    private void setColor(double r, double g, double b, int idx) {
+    private void setColor(double r,
+                          double g,
+                          double b,
+                          int idx) {
         assert idx >= 0 && idx < MAX_COLORS;
         this.baseColors[idx * 3] = (float) r;
         this.baseColors[idx * 3 + 1] = (float) g;
@@ -537,7 +587,8 @@ public class BillboardDataset {
         return c;
     }
 
-    public void setColorRGBA(float[] rgba, int i) {
+    public void setColorRGBA(float[] rgba,
+                             int i) {
         baseColors[i * 3] = rgba[0];
         baseColors[i * 3 + 1] = rgba[1];
         baseColors[i * 3 + 2] = rgba[2];
@@ -668,7 +719,11 @@ public class BillboardDataset {
      * @param numArms   The number of arms.
      * @param armSigma  The arm spread.
      */
-    public void setSpiralData(double baseAngle, double ec, double[] deltaPos, long numArms, double armSigma) {
+    public void setSpiralData(double baseAngle,
+                              double ec,
+                              double[] deltaPos,
+                              long numArms,
+                              double armSigma) {
         setBaseAngle(baseAngle);
         setEccentricity(ec);
         setSpiralDeltaPos(deltaPos);

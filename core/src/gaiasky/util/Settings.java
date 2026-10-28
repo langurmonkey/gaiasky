@@ -605,24 +605,32 @@ public class Settings extends SettingsObject {
     }
 
     public enum GraphicsQuality {
-        LOW("gui.gquality.low", "-low", 1024, 512),
-        NORMAL("gui.gquality.normal", "-med", 2048, 1024),
-        HIGH("gui.gquality.high", "-high", 4096, 2048),
-        ULTRA("gui.gquality.ultra", "-ultra", 8192, 4096);
+        LOW("gui.gquality.low", "-low", 1024, 512, 256, 2_000_000L),
+        NORMAL("gui.gquality.normal", "-med", 2048, 1024, 160, 4_000_000L),
+        HIGH("gui.gquality.high", "-high", 4096, 2048, 96, 8_000_000L),
+        ULTRA("gui.gquality.ultra", "-ultra", 8192, 4096, 64, 16_000_000L);
 
         public final String key;
         public final String suffix;
         public final int texWidthTarget;
         public final int texHeightTarget;
+        /** Target voxel size, in parsecs, for procedurally generated galaxy volumes. **/
+        public final double voxelSizePc;
+        /** Cap on the number of voxels of a single procedurally generated galaxy volume. **/
+        public final long voxelBudget;
 
         GraphicsQuality(String key,
                         String suffix,
                         int texWidthTarget,
-                        int texHeightTarget) {
+                        int texHeightTarget,
+                        double voxelSizePc,
+                        long voxelBudget) {
             this.key = key;
             this.suffix = suffix;
             this.texWidthTarget = texWidthTarget;
             this.texHeightTarget = texHeightTarget;
+            this.voxelSizePc = voxelSizePc;
+            this.voxelBudget = voxelBudget;
         }
 
         public boolean isAtLeast(GraphicsQuality gq) {
