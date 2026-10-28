@@ -249,9 +249,11 @@ public class BillboardDataset {
     private static final double GX_VERTICAL_TAIL = 3.0;
     /** Arm width, in units of {@link #baseRadius}. Mirrors {@code GX_ARM_WIDTH}. **/
     private static final double GX_ARM_WIDTH = 0.2;
+    /** Dust slab thickness, as a fraction of {@link #heightScale}. Mirrors {@code GX_DUST_HEIGHT}. **/
+    private static final double GX_DUST_HEIGHT = 0.5;
 
     /** Length in floats of one field in the packed uniform of {@code galtype.comp.glsl}. **/
-    public static final int FIELD_STRIDE = 28;
+    public static final int FIELD_STRIDE = 32;
     /** Maximum number of fields summed into one volume slot. **/
     public static final int MAX_FIELDS = 3;
 
@@ -283,6 +285,7 @@ public class BillboardDataset {
         out[offset + 14] = colorNoise;
         out[offset + 15] = intensity;
         System.arraycopy(baseColors, 0, out, offset + 16, MAX_COLORS * 3);
+        out[offset + 28] = type.ordinal();
     }
 
     /**
@@ -304,7 +307,12 @@ public class BillboardDataset {
         if (!(distribution.isFlat() || distribution.isBar())) {
             return volumeLateralHalfExtent();
         }
-        return GX_VERTICAL_TAIL * heightScale + Math.abs(warpStrength);
+        return GX_VERTICAL_TAIL * effectiveHeightScale() + Math.abs(warpStrength);
+    }
+
+    /** Scale height of the field: dust sits in a thinner slab than the gas. Mirrors {@code gxHeightScale()}. **/
+    public double effectiveHeightScale() {
+        return type == ChannelType.DUST ? GX_DUST_HEIGHT * heightScale : heightScale;
     }
 
     /**

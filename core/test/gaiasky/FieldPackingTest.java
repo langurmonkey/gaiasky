@@ -36,6 +36,7 @@ public class FieldPackingTest {
         ds.heightProfile = BillboardDataset.HeightProfile.SMOOTH_INC;
         ds.colorNoise = 0.08f;
         ds.intensity = 0.7f;
+        ds.type = BillboardDataset.ChannelType.DUST;
         ds.baseColors = new float[]{1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f};
 
         float[] packed = new float[BillboardDataset.MAX_FIELDS * BillboardDataset.FIELD_STRIDE];
@@ -61,6 +62,8 @@ public class FieldPackingTest {
         for (int i = 0; i < 12; i++) {
             Assert.assertEquals(i + 1f, packed[o + 16 + i], 0f);
         }
+        Assert.assertEquals(0f, packed[o + 28], 0f); // channel DUST
+        Assert.assertEquals(28 + 4, BillboardDataset.FIELD_STRIDE); // padded for the next field
         // Nothing outside this field's window was touched.
         Assert.assertEquals(0f, packed[o + BillboardDataset.FIELD_STRIDE - 1 + 1], 0f);
         Assert.assertEquals(0f, packed[0], 0f);
@@ -75,5 +78,9 @@ public class FieldPackingTest {
         Assert.assertEquals(5, BillboardDataset.Distribution.ELLIPSOID.ordinal());
         Assert.assertEquals(0, BillboardDataset.HeightProfile.CONSTANT.ordinal());
         Assert.assertEquals(4, BillboardDataset.HeightProfile.SMOOTH_DEC.ordinal());
+        // And the GX_CHANNEL_* constants depend on these.
+        Assert.assertEquals(0, BillboardDataset.ChannelType.DUST.ordinal());
+        Assert.assertEquals(1, BillboardDataset.ChannelType.BULGE.ordinal());
+        Assert.assertEquals(3, BillboardDataset.ChannelType.GAS.ordinal());
     }
 }

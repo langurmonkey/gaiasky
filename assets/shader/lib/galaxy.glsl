@@ -84,7 +84,18 @@ struct GalaxyShape {
     // Weight of this field in the sum. Not used by galaxyDensity(): the caller applies it when it
     // combines fields (the dataset's intensity, and the per-slot gain).
     float weight;
+    // Channel of the field, one of the GX_CHANNEL_* constants. Only dust is treated differently:
+    // it gets its own concentration (see gxDustDensity).
+    int channel;
 };
+
+// Channel ids. These must match the BillboardDataset.ChannelType ordinals.
+#define GX_CHANNEL_DUST 0
+#define GX_CHANNEL_BULGE 1
+#define GX_CHANNEL_STAR 2
+#define GX_CHANNEL_GAS 3
+#define GX_CHANNEL_HII 4
+#define GX_CHANNEL_POINT 5
 
 // ---- Packed layout of a GalaxyShape in a float[] uniform ----
 //
@@ -93,7 +104,7 @@ struct GalaxyShape {
 // above; GX_FIELD_STRIDE is its length in floats. Mirror any change here in the Java packer
 // (BillboardDataset.packFields) or every field after the change shifts by one.
 #define GX_MAX_FIELDS 3
-#define GX_FIELD_STRIDE 28
+#define GX_FIELD_STRIDE 32
 #define GX_FIELD_ARRAY (GX_MAX_FIELDS * GX_FIELD_STRIDE)
 #define GX_F_DISTRIBUTION 0
 #define GX_F_BASE_RADIUS 1
@@ -112,6 +123,7 @@ struct GalaxyShape {
 #define GX_F_COLOR_NOISE 14
 #define GX_F_WEIGHT 15
 #define GX_F_BASE_COLORS 16 // 4 x vec3
+#define GX_F_CHANNEL 28
 
 // Rebuilds one shape from `d` starting at float `o`.
 GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
@@ -130,6 +142,7 @@ GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
     s.heightProfile = int(d[o + GX_F_HEIGHT_PROFILE] + 0.5);
     s.colorNoise = d[o + GX_F_COLOR_NOISE];
     s.weight = d[o + GX_F_WEIGHT];
+    s.channel = int(d[o + GX_F_CHANNEL] + 0.5);
     for (int i = 0; i < 4; i++) {
         int b = o + GX_F_BASE_COLORS + 3 * i;
         s.baseColors[i] = vec3(d[b], d[b + 1], d[b + 2]);
@@ -216,6 +229,50 @@ float gxTaper(float rn, float start) {
     return 1.0 - smoothstep(start, 1.0, rn);
 }
 
+// ---- Dust ----
+//
+// Dust is not just "gas with smaller numbers": it is a thin ring of narrow lanes inside the arms,
+// and it is the only channel whose look is set by its contrast rather than by its brightness. Three
+// departures from the gas profile, all of them resolution-independent (they are smooth functions of
+// position, so the field never depends on the grid it is sampled on):
+//
+//   - no inter-arm floor: the 0.22 the gas keeps between arms is exactly the uniform veil dust must
+//     not have;
+//   - a radial ring, because a galaxy has little dust in the core or at the very rim;
+//   - a contrast power on the product, which thins the lanes without making them sub-voxel: the peak
+//     is untouched (it is 1^q) while the tails fall away.
+//
+// The Milky Way's dust texture measures a mean-to-peak ratio of 3.3e-4 (1.933e-5 of luma against a
+// peak of 0.059), and this profile is tuned to land there: 3.5e-4 at NORMAL, 3.3e-4 at ULTRA, so the
+// lane contrast is the Milky Way's and not just its integrated absorption. That the ratio holds
+// across resolutions is the point of using a smooth function rather than noise: a thresholded noise
+// field concentrates harder but its peak is set by which voxel happens to sample the noise, which
+// makes both the ratio and the look depend on the grid.
+#define GX_DUST_RING_IN 0.25
+#define GX_DUST_RING_OUT 0.95
+// Width of the radial fade at both edges of the ring.
+#define GX_DUST_RING_FADE 0.15
+// Contrast power applied to the whole dust field. 1 is the gas profile. 4 measured out of the
+// field itself: it lands the mean-to-peak ratio at 3.5e-4, next to the Milky Way's 3.3e-4, and
+// leaves the stored peak just under 1.0, so nothing clips - a higher power concentrates further but
+// pushes the peak over 1 and the calibrated extinction loses its brightest voxels to the clamp.
+#define GX_DUST_CONTRAST 4.0
+// Dust is thinner than the gas slab it lives in.
+#define GX_DUST_HEIGHT 0.5
+
+// Scale height of the slab: dust sits in a thinner layer than the gas.
+float gxHeightScale(in GalaxyShape s) {
+    return s.channel == GX_CHANNEL_DUST ? GX_DUST_HEIGHT * s.heightScale : s.heightScale;
+}
+
+// Dust density inside the flat branch. `disk` and `arm` are the gas terms, already evaluated.
+float gxDustDensity(float rnCyl, float disk, float arm, vec3 p, float base) {
+    float ring = smoothstep(GX_DUST_RING_IN, GX_DUST_RING_IN + GX_DUST_RING_FADE, rnCyl)
+            * (1.0 - smoothstep(GX_DUST_RING_OUT - GX_DUST_RING_FADE, GX_DUST_RING_OUT, rnCyl));
+    float d = disk * ring * arm * arm * gxClumps(p, base);
+    return pow(max(d, 0.0), GX_DUST_CONTRAST);
+}
+
 // Radial density profile, normalised radius in, relative density out.
 float gxRadial(in GalaxyShape s, float rn) {
     if (s.distribution == GX_SPHERE || s.distribution == GX_ELLIPSOID) {
@@ -280,14 +337,18 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s) {
             // frequency grows without bound as r -> 0, which would alias into radial spokes.
             float armWeight = smoothstep(0.0, 2.0 * max(s.minRadius, 0.02), rnCyl);
             float arm = mix(1.0, gxArmFactor(s, r, phi), armWeight);
-            density = disk * (0.22 + 0.78 * arm) * gxClumps(p, base);
+            if (s.channel == GX_CHANNEL_DUST) {
+                density = gxDustDensity(rnCyl, disk, arm, p, base);
+            } else {
+                density = disk * (0.22 + 0.78 * arm) * gxClumps(p, base);
+            }
         } else {
             density = gxRadial(s, rnCyl);
         }
 
         // Vertical structure: sech^2, which has the exponential tail of a real disk and is
         // cut at GX_VERTICAL_TAIL scale heights where it drops below 1/255.
-        float h = max(gxHeightFactor(s, r) * s.heightScale, 1e-5);
+        float h = max(gxHeightFactor(s, r) * gxHeightScale(s), 1e-5);
         float t = (p.y - gxWarp(s, r, p.z)) / h;
         if (abs(t) > GX_VERTICAL_TAIL) {
             return vec4(0.0);
@@ -334,7 +395,7 @@ float gxVerticalHalfExtent(in GalaxyShape s) {
     if (!gxIsFlat(s)) {
         return gxLateralHalfExtent(s);
     }
-    return GX_VERTICAL_TAIL * s.heightScale + abs(s.warpStrength);
+    return GX_VERTICAL_TAIL * gxHeightScale(s) + abs(s.warpStrength);
 }
 
 // Vertical to lateral aspect ratio of the containing box. The volume grid is sized from this,
@@ -343,42 +404,47 @@ float gxBoxAspect(in GalaxyShape s) {
     return gxVerticalHalfExtent(s) / max(gxLateralHalfExtent(s), 1e-6);
 }
 
+// Luma weights of the offline pipeline (particles-to-volume.py, LUMA), which is what its
+// "mean ray integral" is averaged with. Kept the same so the two numbers can be compared.
+const vec3 GX_LUMA = vec3(0.2126, 0.7152, 0.0722);
+
 // Several fields summed at one point, which is what one volume slot holds: gas+bulge in the
 // emissive slot, dust in the occlusive one.
-struct GalaxyFieldSample {
-    // Brightness-weighted colour mix, normalised so its brightest component is 1. The volume
-    // raymarcher wants chromaticity in .rgb and magnitude in .a, so the hue lives here and the
-    // brightness in `weighted`; scaling one never disturbs the other.
-    vec3 chroma;
-    // Sum of weight * density: the brightness at the fields' actual intensities.
-    float weighted;
-    // Sum of density: the brightness at unit intensity, which is the "merged reference" the
-    // volume metadata divides by.
-    float unweighted;
+struct GalaxyFields {
+    // Sum of intensity * density * colour. This is the emitted light as a vector, exactly as the
+    // offline pipeline merges channels: colour and brightness are its direction and its length.
+    vec3 light;
+    // The same at unit intensity, which is what the "merged reference" in the volume metadata is
+    // the peak of: a property of the shape, unaffected by the intensities.
+    vec3 unitLight;
 };
 
-GalaxyFieldSample gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count) {
-    GalaxyFieldSample r;
-    vec3 colSum = vec3(0.0);
-    r.weighted = 0.0;
-    r.unweighted = 0.0;
-    r.chroma = vec3(0.0);
+GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count) {
+    GalaxyFields r;
+    r.light = vec3(0.0);
+    r.unitLight = vec3(0.0);
     for (int i = 0; i < GX_MAX_FIELDS; i++) {
         if (i >= count) {
             break;
         }
         GalaxyShape s = gxUnpack(d, i * GX_FIELD_STRIDE);
         vec4 v = galaxyDensity(p, s);
-        float w = s.weight * v.a;
-        r.weighted += w;
-        r.unweighted += v.a;
-        colSum += w * v.rgb;
-    }
-    if (r.weighted > 0.0) {
-        r.chroma = colSum / r.weighted;
-        r.chroma /= max(max(r.chroma.r, max(r.chroma.g, r.chroma.b)), 1e-6);
+        vec3 emission = v.rgb * v.a;
+        r.light += s.weight * emission;
+        r.unitLight += emission;
     }
     return r;
+}
+
+// Brightness of a light vector: its largest channel. Storing that in .a and the vector divided by
+// it in .rgb reconstructs the light exactly, whatever the hue, in 8 + 8 + 8 bits.
+float gxBrightness(vec3 light) {
+    return max(max(light.r, light.g), light.b);
+}
+
+// Perceived brightness, i.e. the quantity the mean ray integral of the pipeline averages.
+float gxLuma(vec3 light) {
+    return dot(light, GX_LUMA);
 }
 
 #endif
