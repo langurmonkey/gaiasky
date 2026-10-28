@@ -250,6 +250,63 @@ public class BillboardDataset {
     /** Arm width, in units of {@link #baseRadius}. Mirrors {@code GX_ARM_WIDTH}. **/
     private static final double GX_ARM_WIDTH = 0.2;
 
+    /** Length in floats of one field in the packed uniform of {@code galtype.comp.glsl}. **/
+    public static final int FIELD_STRIDE = 28;
+    /** Maximum number of fields summed into one volume slot. **/
+    public static final int MAX_FIELDS = 3;
+
+    /**
+     * Packs this dataset as one field of the density model, at {@code out[offset..offset+FIELD_STRIDE]}.
+     * <p>
+     * The order is the member order of {@code GalaxyShape} in {@code assets/shader/lib/galaxy.glsl},
+     * where {@code gxUnpack()} reads it back. Anything added to the struct has to be added here and to
+     * {@code GX_FIELD_STRIDE} at the same time, or every field after it shifts by one.
+     *
+     * @param out    The destination array, at least {@code offset + FIELD_STRIDE} long.
+     * @param offset Where this field starts.
+     */
+    public void packFields(float[] out, int offset) {
+        out[offset] = distribution.ordinal();
+        out[offset + 1] = baseRadius;
+        out[offset + 2] = minRadius;
+        out[offset + 3] = numArms;
+        out[offset + 4] = armSigma;
+        out[offset + 5] = baseAngle;
+        out[offset + 6] = eccentricity[0];
+        out[offset + 7] = eccentricity[1];
+        out[offset + 8] = spiralDeltaPos[0];
+        out[offset + 9] = spiralDeltaPos[1];
+        out[offset + 10] = aspect;
+        out[offset + 11] = warpStrength;
+        out[offset + 12] = heightScale;
+        out[offset + 13] = heightProfile.ordinal();
+        out[offset + 14] = colorNoise;
+        out[offset + 15] = intensity;
+        System.arraycopy(baseColors, 0, out, offset + 16, MAX_COLORS * 3);
+    }
+
+    /**
+     * Half-extent of this dataset's field laterally, in galaxy space.
+     * <p>
+     * Mirrors {@code gxLateralHalfExtent()} in {@code assets/shader/lib/galaxy.glsl}. Absolute units,
+     * not normalised: the fields sharing a slot have their own {@link #baseRadius}, so their boxes
+     * have to be unioned in a common space.
+     */
+    public double volumeLateralHalfExtent() {
+        if (!(distribution.isFlat() || distribution.isBar())) {
+            return baseRadius;
+        }
+        return baseRadius * (1.0 + MathUtilsDouble.clamp(GX_VERTICAL_TAIL * armSigma * GX_ARM_WIDTH, 0.0, 0.2));
+    }
+
+    /** Half-extent of this dataset's field vertically, in galaxy space. Mirrors {@code gxVerticalHalfExtent()}. **/
+    public double volumeVerticalHalfExtent() {
+        if (!(distribution.isFlat() || distribution.isBar())) {
+            return volumeLateralHalfExtent();
+        }
+        return GX_VERTICAL_TAIL * heightScale + Math.abs(warpStrength);
+    }
+
     /**
      * Vertical-to-lateral aspect ratio of the box that encloses this distribution, used to size the
      * volume grid of procedurally generated galaxies. Flat distributions (and bars) are thin, the
@@ -259,16 +316,32 @@ public class BillboardDataset {
      * density field defines the box it lives in.
      */
     public double volumeAspectY() {
-        if (!(distribution.isFlat() || distribution.isBar())) {
-            return 1.0;
-        }
-        double lateral = baseRadius * (1.0 + MathUtilsDouble.clamp(GX_VERTICAL_TAIL * armSigma * GX_ARM_WIDTH, 0.0, 0.2));
-        double vertical = GX_VERTICAL_TAIL * heightScale + Math.abs(warpStrength);
-        return MathUtilsDouble.clamp(vertical / lateral, 0.02, 1.0);
+        return MathUtilsDouble.clamp(volumeVerticalHalfExtent() / Math.max(volumeLateralHalfExtent(), 1e-6), 0.02, 1.0);
     }
 
     /**
-     * Derives the volume grid this dataset should be voxelised into.
+     * Derives the volume grid of a whole slot, which holds several datasets at once - gas and bulge
+     * share the emissive slot - so the box has to contain all of them, not just the first.
+     *
+     * @param datasets The datasets going into the slot.
+     * @param sizePc   Lateral span of the galaxy, in parsecs.
+     * @param quality  Graphics quality, which sets the target voxel size and the voxel budget.
+     *
+     * @return The grid.
+     */
+    public static VoxelGrid volumeGrid(List<BillboardDataset> datasets,
+                                       double sizePc,
+                                       GraphicsQuality quality) {
+        double lateral = 0.0, vertical = 0.0;
+        for (var dataset : datasets) {
+            lateral = Math.max(lateral, dataset.volumeLateralHalfExtent());
+            vertical = Math.max(vertical, dataset.volumeVerticalHalfExtent());
+        }
+        return VoxelGrid.forSpan(sizePc, vertical / Math.max(lateral, 1e-6), quality);
+    }
+
+    /**
+     * Derives the volume grid this dataset should be voxelised into on its own.
      *
      * @param sizePc  Lateral span of the galaxy, in parsecs.
      * @param quality Graphics quality, which sets the target voxel size and the voxel budget.
@@ -279,7 +352,6 @@ public class BillboardDataset {
                                 GraphicsQuality quality) {
         return VoxelGrid.forSpan(sizePc, volumeAspectY(), quality);
     }
-
 
     public void setParticleCount(Long n) {
         this.particleCount = n.intValue();

@@ -81,7 +81,61 @@ struct GalaxyShape {
     vec3 baseColors[4];
     // Amplitude of the spatial colour modulation, in [0,1].
     float colorNoise;
+    // Weight of this field in the sum. Not used by galaxyDensity(): the caller applies it when it
+    // combines fields (the dataset's intensity, and the per-slot gain).
+    float weight;
 };
+
+// ---- Packed layout of a GalaxyShape in a float[] uniform ----
+//
+// A shape travels from Java as a flat float array, because a compute program here has no uniform
+// buffer and struct members cannot be set by index. The order below is the order of the struct
+// above; GX_FIELD_STRIDE is its length in floats. Mirror any change here in the Java packer
+// (BillboardDataset.packFields) or every field after the change shifts by one.
+#define GX_MAX_FIELDS 3
+#define GX_FIELD_STRIDE 28
+#define GX_FIELD_ARRAY (GX_MAX_FIELDS * GX_FIELD_STRIDE)
+#define GX_F_DISTRIBUTION 0
+#define GX_F_BASE_RADIUS 1
+#define GX_F_MIN_RADIUS 2
+#define GX_F_NUM_ARMS 3
+#define GX_F_ARM_SIGMA 4
+#define GX_F_BASE_ANGLE 5
+#define GX_F_ECCENTRICITY_X 6
+#define GX_F_ECCENTRICITY_Y 7
+#define GX_F_SPIRAL_DELTA_X 8
+#define GX_F_SPIRAL_DELTA_Y 9
+#define GX_F_ASPECT 10
+#define GX_F_WARP_STRENGTH 11
+#define GX_F_HEIGHT_SCALE 12
+#define GX_F_HEIGHT_PROFILE 13
+#define GX_F_COLOR_NOISE 14
+#define GX_F_WEIGHT 15
+#define GX_F_BASE_COLORS 16 // 4 x vec3
+
+// Rebuilds one shape from `d` starting at float `o`.
+GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
+    GalaxyShape s;
+    s.distribution = int(d[o + GX_F_DISTRIBUTION] + 0.5);
+    s.baseRadius = d[o + GX_F_BASE_RADIUS];
+    s.minRadius = d[o + GX_F_MIN_RADIUS];
+    s.numArms = int(d[o + GX_F_NUM_ARMS] + 0.5);
+    s.armSigma = d[o + GX_F_ARM_SIGMA];
+    s.baseAngle = d[o + GX_F_BASE_ANGLE];
+    s.eccentricity = vec2(d[o + GX_F_ECCENTRICITY_X], d[o + GX_F_ECCENTRICITY_Y]);
+    s.spiralDeltaPos = vec2(d[o + GX_F_SPIRAL_DELTA_X], d[o + GX_F_SPIRAL_DELTA_Y]);
+    s.aspect = d[o + GX_F_ASPECT];
+    s.warpStrength = d[o + GX_F_WARP_STRENGTH];
+    s.heightScale = d[o + GX_F_HEIGHT_SCALE];
+    s.heightProfile = int(d[o + GX_F_HEIGHT_PROFILE] + 0.5);
+    s.colorNoise = d[o + GX_F_COLOR_NOISE];
+    s.weight = d[o + GX_F_WEIGHT];
+    for (int i = 0; i < 4; i++) {
+        int b = o + GX_F_BASE_COLORS + 3 * i;
+        s.baseColors[i] = vec3(d[b], d[b + 1], d[b + 2]);
+    }
+    return s;
+}
 
 bool gxIsFlat(in GalaxyShape s) {
     return s.distribution == GX_DISK || s.distribution == GX_DISK_GAUSS
@@ -268,9 +322,9 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s) {
 }
 
 // Half-extent of the box that contains the whole field, in galaxy space, laterally. Covers the
-// arm spread beyond baseRadius.
+// arm spread beyond baseRadius - only flat distributions have arms, so only they pay for it.
 float gxLateralHalfExtent(in GalaxyShape s) {
-    float spread = clamp(GX_VERTICAL_TAIL * s.armSigma * GX_ARM_WIDTH, 0.0, 0.2);
+    float spread = gxIsFlat(s) ? clamp(GX_VERTICAL_TAIL * s.armSigma * GX_ARM_WIDTH, 0.0, 0.2) : 0.0;
     return s.baseRadius * (1.0 + spread);
 }
 
@@ -287,6 +341,44 @@ float gxVerticalHalfExtent(in GalaxyShape s) {
 // so that a flat galaxy gets a thin texture and a spheroid a cubic one.
 float gxBoxAspect(in GalaxyShape s) {
     return gxVerticalHalfExtent(s) / max(gxLateralHalfExtent(s), 1e-6);
+}
+
+// Several fields summed at one point, which is what one volume slot holds: gas+bulge in the
+// emissive slot, dust in the occlusive one.
+struct GalaxyFieldSample {
+    // Brightness-weighted colour mix, normalised so its brightest component is 1. The volume
+    // raymarcher wants chromaticity in .rgb and magnitude in .a, so the hue lives here and the
+    // brightness in `weighted`; scaling one never disturbs the other.
+    vec3 chroma;
+    // Sum of weight * density: the brightness at the fields' actual intensities.
+    float weighted;
+    // Sum of density: the brightness at unit intensity, which is the "merged reference" the
+    // volume metadata divides by.
+    float unweighted;
+};
+
+GalaxyFieldSample gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count) {
+    GalaxyFieldSample r;
+    vec3 colSum = vec3(0.0);
+    r.weighted = 0.0;
+    r.unweighted = 0.0;
+    r.chroma = vec3(0.0);
+    for (int i = 0; i < GX_MAX_FIELDS; i++) {
+        if (i >= count) {
+            break;
+        }
+        GalaxyShape s = gxUnpack(d, i * GX_FIELD_STRIDE);
+        vec4 v = galaxyDensity(p, s);
+        float w = s.weight * v.a;
+        r.weighted += w;
+        r.unweighted += v.a;
+        colSum += w * v.rgb;
+    }
+    if (r.weighted > 0.0) {
+        r.chroma = colSum / r.weighted;
+        r.chroma /= max(max(r.chroma.r, max(r.chroma.g, r.chroma.b)), 1e-6);
+    }
+    return r;
 }
 
 #endif

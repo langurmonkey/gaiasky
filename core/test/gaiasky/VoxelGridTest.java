@@ -8,9 +8,12 @@
 package gaiasky;
 
 import gaiasky.render.gdx.graphics.VoxelGrid;
+import gaiasky.scene.record.BillboardDataset;
 import gaiasky.util.Settings.GraphicsQuality;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * {@link VoxelGrid#forSpan(double, double, GraphicsQuality)} sizes the volume texture of a
@@ -73,5 +76,29 @@ public class VoxelGridTest {
         var giant = VoxelGrid.forSpan(200_000, FLAT_ASPECT, GraphicsQuality.ULTRA);
         Assert.assertTrue(dwarf.voxelCount() < giant.voxelCount());
         Assert.assertTrue(dwarf.nx >= 32);
+    }
+
+    @Test
+    public void slotGridUnionsItsFields() {
+        // The emissive slot holds gas and bulge. Their boxes differ by an order of magnitude in the
+        // vertical, and the union has to contain both or the bulge is cut in half.
+        var gas = new BillboardDataset();
+        gas.distribution = BillboardDataset.Distribution.SPIRAL;
+        gas.baseRadius = 1.0f;
+        gas.armSigma = 0.1872f;
+        gas.heightScale = 0.02f;
+
+        var bulge = new BillboardDataset();
+        bulge.distribution = BillboardDataset.Distribution.SPHERE;
+        bulge.baseRadius = 0.12f;
+
+        Assert.assertEquals(0.06, gas.volumeVerticalHalfExtent(), 1e-6);
+        Assert.assertEquals(0.12, bulge.volumeVerticalHalfExtent(), 1e-6);
+        Assert.assertEquals(0.12, bulge.volumeLateralHalfExtent(), 1e-6);
+
+        var union = BillboardDataset.volumeGrid(List.of(gas, bulge), 20_400, GraphicsQuality.NORMAL);
+        var gasOnly = BillboardDataset.volumeGrid(List.of(gas), 20_400, GraphicsQuality.NORMAL);
+        Assert.assertTrue(union.spanYPc > gasOnly.spanYPc);
+        Assert.assertEquals(gasOnly.spanPc, union.spanPc, 1e-9);
     }
 }
