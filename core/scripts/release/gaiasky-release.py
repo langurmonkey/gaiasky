@@ -286,6 +286,7 @@ if __name__ == "__main__":
             print(
                 " > Update flatpak repo and do pull request. See here: https://codeberg.org/gaiasky/gaiasky/issues/337#issuecomment-521949"
             )
+            print(" > Update homebrew formula with codeberg tar.gz")
             print(" > Add package to Microsoft store")
             print(" > Post to social media")
             print()
