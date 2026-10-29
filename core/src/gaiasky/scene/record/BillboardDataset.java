@@ -62,15 +62,6 @@ public class BillboardDataset {
      */
     public ChannelType type = ChannelType.POINT;
     /**
-     * How this dataset is turned into something the renderer can draw: voxelised into a density
-     * field and raymarched as a volume, or sampled into billboard particles.
-     * <p>
-     * Billboard is the default, which keeps every existing descriptor looking exactly as it does today
-     * - descriptors were written for the billboard path and know nothing about the field. A volume is
-     * opt-in, per dataset, with {@code "generation": "volume"}.
-     */
-    public Generation generation = Generation.BILLBOARD;
-    /**
      * Probability distribution, for procedural datasets.
      */
     public Distribution distribution = Distribution.DISK;
@@ -575,50 +566,6 @@ public class BillboardDataset {
         }
     }
 
-    public void setGeneration(Generation generation) {
-        this.generation = generation;
-    }
-
-    public void setGeneration(String generation) {
-        if (generation != null && !generation.isBlank()) {
-            this.generation = Generation.valueOf(generation.toUpperCase(Locale.ROOT));
-        }
-    }
-
-    /**
-     * Whether this dataset should be voxelised into a density field rather than sampled into billboards.
-     * <p>
-     * Only the channels the field model can express are eligible: stars and HII regions are point
-     * sources, and a density field would smear them into a cloud. They keep the billboard path whatever
-     * their descriptor says.
-     *
-     * @return True if this dataset goes through the volume generator.
-     */
-    public boolean isVolume() {
-        return generation == Generation.VOLUME && supportsVolume(type);
-    }
-
-    /**
-     * Volume slot this dataset's channel belongs to, or -1 if it does not go into a volume.
-     * <p>
-     * Emission and extinction are two different quantities and the raymarcher keeps them in separate
-     * slots: gas and the bulge emit (slot 0), dust only absorbs (slot 1). See
-     * {@code volume.galaxy.fragment.glsl}.
-     *
-     * @return 0 for the emissive slot, 1 for the occlusive one, -1 for none.
-     */
-    public int volumeSlot() {
-        if (!isVolume()) {
-            return -1;
-        }
-        return type == ChannelType.DUST ? 1 : 0;
-    }
-
-    /** Whether the given channel has an analytic density field behind it. **/
-    public static boolean supportsVolume(ChannelType type) {
-        return type == ChannelType.GAS || type == ChannelType.BULGE || type == ChannelType.DUST;
-    }
-
     public void setDistribution(Distribution distribution) {
         this.distribution = distribution;
     }
@@ -1110,22 +1057,5 @@ public class BillboardDataset {
         SMOOTH_INC,
         /** Decreasing smoothly with radius (smoothstep). **/
         SMOOTH_DEC,
-    }
-
-    /**
-     * How a dataset's particles reach the screen.
-     */
-    public enum Generation {
-        /**
-         * The analytic density field of {@code assets/shader/lib/galaxy.glsl}, voxelised into a 3D
-         * texture by {@code galtype.comp.glsl} and raymarched as a volume. Resolution-independent and
-         * seedless: changing a parameter changes the field, not a roll of the dice. Opt-in.
-         */
-        VOLUME,
-        /**
-         * Sampled into billboard particles by {@code galgen.comp.glsl}, as before. The default, so a
-         * descriptor written for the billboard path keeps its look until it asks otherwise.
-         */
-        BILLBOARD
     }
 }

@@ -96,12 +96,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnpacked, occlusionMetallicRoughnessUnpacked, texture0Unpacked,
             texture1Unpacked, volume0Unpacked, volume1Unpacked, volume2Unpacked, volume3Unpacked;
     /**
-     * Volumes built in memory instead of loaded from a file, indexed like the volume slots. A non-null
-     * entry is applied to the material by {@link #initMaterial}, which is where a material exists to
-     * apply it to.
-     */
-    public VolumeTexture[] generatedVolumes = new VolumeTexture[4];
-    /**
      * Per-slot minimum density for a volume to act as an occluder, indexed like the volume
      * slots ({@code volume0}..{@code volume3}). Entry {@code i} is the smallest density of
      * volume {@code i} that is allowed to write to the depth buffer, so anything drawn later
@@ -673,14 +667,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             EventManager.publish(Event.SVT_MATERIAL_INFO, this, svtId, this);
         }
 
-        // Volumes that were generated in memory rather than loaded from a file. The caller usually has
-        // them before this method runs, so this is where they reach the material.
-        for (int slot = 0; slot < generatedVolumes.length; slot++) {
-            if (generatedVolumes[slot] != null) {
-                attachVolume(slot, generatedVolumes[slot]);
-            }
-        }
-
     }
 
     private void addSVTAttributes(Material material,
@@ -1241,63 +1227,6 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             converted[i] = thresholds[i];
         }
         this.volumeDepthThreshold = converted;
-    }
-
-    /**
-     * Sets a volume slot to a texture that was generated in memory rather than loaded from a file,
-     * such as a procedural galaxy's gas or dust field. Same wiring as the loader path: the attribute,
-     * the slot's depth threshold and the box.
-     * <p>
-     * The texture is kept on the component as well, because the caller usually has it before
-     * {@code initMaterial()} has created the libgdx material; {@link #doneLoading} applies whatever is
-     * still pending once there is a material to apply it to.
-     *
-     * @param slot The volume slot, 0 to 3.
-     * @param tex  The generated volume.
-     */
-    public void setGeneratedVolume(int slot, VolumeTexture tex) {
-        if (tex == null || slot < 0 || slot >= generatedVolumes.length) {
-            return;
-        }
-        generatedVolumes[slot] = tex;
-        attachVolume(slot, tex);
-    }
-
-    /** Puts a generated volume into the material, if the material exists yet. **/
-    private void attachVolume(int slot, VolumeTexture tex) {
-        if (material == null) {
-            return;
-        }
-        int attribute;
-        int boundsMin, boundsMax;
-        switch (slot) {
-            case 0 -> {
-                attribute = Texture3DAttribute.Volume0;
-                boundsMin = Vector3Attribute.Volume0BoundsMin;
-                boundsMax = Vector3Attribute.Volume0BoundsMax;
-            }
-            case 1 -> {
-                attribute = Texture3DAttribute.Volume1;
-                boundsMin = Vector3Attribute.Volume1BoundsMin;
-                boundsMax = Vector3Attribute.Volume1BoundsMax;
-            }
-            case 2 -> {
-                attribute = Texture3DAttribute.Volume2;
-                boundsMin = Vector3Attribute.Volume2BoundsMin;
-                boundsMax = Vector3Attribute.Volume2BoundsMax;
-            }
-            case 3 -> {
-                attribute = Texture3DAttribute.Volume3;
-                boundsMin = Vector3Attribute.Volume3BoundsMin;
-                boundsMax = Vector3Attribute.Volume3BoundsMax;
-            }
-            default -> {
-                return;
-            }
-        }
-        material.set(volumeAttribute(attribute, slot, tex));
-        material.set(new Vector3Attribute(boundsMin, tex.boundsMin()));
-        material.set(new Vector3Attribute(boundsMax, tex.boundsMax()));
     }
 
     /**
