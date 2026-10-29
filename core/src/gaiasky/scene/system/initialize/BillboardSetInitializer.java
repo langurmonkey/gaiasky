@@ -45,6 +45,8 @@ public class BillboardSetInitializer extends AbstractInitSystem {
 
     private final Vector3D D31;
     private final ObjectMap<Entity, BillboardDataset[]> generatedDatasets = new ObjectMap<>();
+    /** Galaxies whose volume has already been built or scheduled, so the second channel skips it. **/
+    private final com.badlogic.gdx.utils.ObjectSet<Entity> volumeOwners = new com.badlogic.gdx.utils.ObjectSet<>();
 
     public BillboardSetInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -167,57 +169,122 @@ public class BillboardSetInitializer extends AbstractInitSystem {
      * @param billboard Its billboard set.
      */
     private void buildVolumeChild(Entity entity, gaiasky.scene.component.BillboardSet billboard) {
-        boolean anyVolume = false;
-        for (var dataset : billboard.datasets) {
-            if (dataset != null && dataset.isVolume()) {
-                anyVolume = true;
-                break;
-            }
+        var graph = Mapper.graph.get(entity);
+        var render = Mapper.render.get(entity);
+        // The full-resolution entity owns the object, so the volume hangs off it whichever of the two
+        // resolution entities the field's datasets come in.
+        Entity owner = render.halfResolutionBuffer && graph.parent != null ? graph.parent : entity;
+        var ownerName = Mapper.base.get(owner).getName();
+
+        // Gas, bulge and dust can be split across the two resolution entities, and either may be set
+        // up first, so the field is taken as the union of both.
+        var fields = collectVolumeDatasets(owner);
+        if (fields.isEmpty()) {
+            return;
         }
-        if (!anyVolume) {
+        if (hasVolumeChild(owner, ownerName) || volumeOwners.contains(owner)) {
+            // Already built (or being built this frame): a reload must not stack volumes on top of
+            // each other, and the billboards of this channel must still go, or they draw over the
+            // volume that replaced them.
+            removeVolumeDatasets(owner);
             return;
         }
         if (!GalaxyVolumeGenerator.isSupported()) {
             // No compute shaders: leave the billboards alone rather than draw nothing at all.
-            logger.warn("Volume generation needs compute shaders, falling back to billboards for " + Mapper.base.get(entity).getName());
+            logger.warn("Volume generation needs compute shaders, falling back to billboards for " + ownerName);
             return;
         }
 
-        var graph = Mapper.graph.get(entity);
-        var render = Mapper.render.get(entity);
-        Entity owner = render.halfResolutionBuffer && graph.parent != null ? graph.parent : entity;
-        var ownerName = Mapper.base.get(owner).getName();
-        if (hasVolumeChild(owner, ownerName)) {
-            // Already built: reloading a scene must not stack volumes on top of each other.
+        try {
+            double sizePc = Mapper.body.get(entity).size * Constants.U_TO_PC;
+            var textures = GalaxyVolumeBuilder.generate(fields.toArray(new BillboardDataset[0]), sizePc,
+                                                        GaiaSky.settings().graphics.quality);
+            if (textures[GalaxyVolumeBuilder.SLOT_EMISSIVE] == null && textures[GalaxyVolumeBuilder.SLOT_OCCLUSIVE] == null) {
+                logger.warn("Volume generation produced no textures for " + ownerName + ", keeping billboards");
+                return;
+            }
+            volumeOwners.add(owner);
+
+            var volume = GalaxyVolumeEntity.create(GaiaSky.instance.scene, owner,
+                                                   textures[GalaxyVolumeBuilder.SLOT_EMISSIVE],
+                                                   textures[GalaxyVolumeBuilder.SLOT_OCCLUSIVE]);
+            if (volume == null) {
+                return;
+            }
+
+            GaiaSky.instance.scene.initializeEntity(volume);
+            GaiaSky.instance.scene.setUpEntity(volume);
+            // Queued, like every other runtime insertion: the scene is still setting entities up, and
+            // adding to the engine in the middle of that is asking for trouble.
+            EventManager.instance.post(Event.SCENE_ADD_OBJECT_CMD, this, volume, true);
+
+            logger.info("Galaxy volume for " + ownerName + ": " + Mapper.base.get(volume).getName()
+                                + ", emissive=" + (textures[GalaxyVolumeBuilder.SLOT_EMISSIVE] != null)
+                                + ", occlusive=" + (textures[GalaxyVolumeBuilder.SLOT_OCCLUSIVE] != null)
+                                + ", sizePc=" + sizePc);
+        } catch (Exception e) {
+            // A volume is an extra: if it cannot be built, the billboards stay and the scene loads.
+            logger.error(e, "Error building the volume of " + ownerName + ", keeping billboards");
             return;
         }
 
-        double sizePc = Mapper.body.get(entity).size * Constants.U_TO_PC;
-        var textures = GalaxyVolumeBuilder.generate(billboard.datasets, sizePc, GaiaSky.settings().graphics.quality);
-        if (textures[GalaxyVolumeBuilder.SLOT_EMISSIVE] == null && textures[GalaxyVolumeBuilder.SLOT_OCCLUSIVE] == null) {
-            logger.warn("Volume generation produced no textures for " + ownerName + ", keeping billboards");
+        // Only once the volume exists: dropping the datasets first would leave a galaxy with neither.
+        removeVolumeDatasets(owner);
+    }
+
+    /** The field's datasets of the owner and of its billboard children, deduplicated by identity. **/
+    private List<BillboardDataset> collectVolumeDatasets(Entity owner) {
+        var fields = new java.util.ArrayList<BillboardDataset>();
+        collectVolumeDatasets(owner, fields);
+        var children = Mapper.graph.get(owner).children;
+        if (children != null) {
+            for (var child : children) {
+                if (child != null) {
+                    collectVolumeDatasets(child, fields);
+                }
+            }
+        }
+        return fields;
+    }
+
+    private void collectVolumeDatasets(Entity entity, List<BillboardDataset> out) {
+        if (!Mapper.billboardSet.has(entity) || Mapper.billboardSet.get(entity).datasets == null) {
             return;
         }
+        for (var dataset : Mapper.billboardSet.get(entity).datasets) {
+            if (dataset != null && dataset.isVolume() && !out.contains(dataset)) {
+                out.add(dataset);
+            }
+        }
+    }
 
-        var volume = GalaxyVolumeEntity.create(GaiaSky.instance.scene, owner,
-                                               textures[GalaxyVolumeBuilder.SLOT_EMISSIVE],
-                                               textures[GalaxyVolumeBuilder.SLOT_OCCLUSIVE]);
-        if (volume == null) {
+    /** Drops the datasets that became a volume from the owner and its children, in place. **/
+    private void removeVolumeDatasets(Entity owner) {
+        removeVolumeDatasets(Mapper.billboardSet.get(owner));
+        var children = Mapper.graph.get(owner).children;
+        if (children != null) {
+            for (var child : children) {
+                if (child != null && Mapper.billboardSet.has(child)) {
+                    removeVolumeDatasets(Mapper.billboardSet.get(child));
+                }
+            }
+        }
+    }
+
+    /** Drops the datasets that became a volume from one billboard set, in place. **/
+    private void removeVolumeDatasets(gaiasky.scene.component.BillboardSet billboard) {
+        if (billboard.datasets == null) {
             return;
         }
-
-        GaiaSky.instance.scene.initializeEntity(volume);
-        GaiaSky.instance.scene.setUpEntity(volume);
-        EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, volume, false);
-
-        // The billboards of this set would otherwise be drawn on top of the volume they became.
         var remaining = new java.util.ArrayList<BillboardDataset>(billboard.datasets.length);
         for (var dataset : billboard.datasets) {
             if (dataset == null || !dataset.isVolume()) {
                 remaining.add(dataset);
             }
         }
-        billboard.datasets = remaining.toArray(new BillboardDataset[0]);
+        if (remaining.size() != billboard.datasets.length) {
+            billboard.datasets = remaining.toArray(new BillboardDataset[0]);
+        }
     }
 
     /** Whether the galaxy already has a volume child, by name. **/

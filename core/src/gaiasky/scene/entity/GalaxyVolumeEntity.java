@@ -8,6 +8,7 @@
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
+import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.gdx.graphics.VolumeTexture;
 import gaiasky.scene.Mapper;
@@ -92,6 +93,15 @@ public final class GalaxyVolumeEntity {
         var focus = Mapper.focus.get(entity);
         focus.focusable = false;
 
+        // Reference-system transform: the child must be expressed in the same frame as its parent,
+        // otherwise the field is rotated away from the object it belongs to. The Milky Way's volume
+        // declares the same transformName as its billboard group for exactly this reason.
+        var parentTransform = Mapper.transform.get(parent);
+        var transform = Mapper.transform.get(entity);
+        if (parentTransform != null && parentTransform.transformName != null) {
+            transform.setTransformName(parentTransform.transformName);
+        }
+
         // Volume: the galaxy raymarcher, and the box the field lives in.
         var volume = Mapper.volume.get(entity);
         volume.vertexShader = VERTEX_SHADER;
@@ -104,10 +114,16 @@ public final class GalaxyVolumeEntity {
         model.model = modelComponent;
         modelComponent.setModelType("sphere");
         Map<String, Object> params = new HashMap<>();
+        // Types matter: ModelCache casts these entries, and the JSON loader hands over Long and
+        // Double. An Integer quality is a ClassCastException at model creation time.
         params.put("diameter", 1.0);
         params.put("flip", true);
-        params.put("quality", 30);
+        params.put("quality", 30L);
         modelComponent.setParams(params);
+        // Emission adds: a volume is light, not a surface.
+        modelComponent.setBlendMode(BlendMode.ADDITIVE);
+        modelComponent.setUseColor(true);
+        modelComponent.setCulling(false);
 
         // Material: dust is the only slot that occludes, and only where it is dense enough to read as a
         // lane; the emissive slot never hides anything behind it.

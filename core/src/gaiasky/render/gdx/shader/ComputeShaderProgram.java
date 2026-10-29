@@ -248,45 +248,82 @@ public class ComputeShaderProgram implements Disposable {
         checkGLError("setUniform(" + name + ", float[" + values.length + "])");
     }
 
+    /**
+     * Sets a float array or a single vector uniform from an array.
+     * <p>
+     * A scalar array and a single vec3 are both "a few floats from Java", but GL is strict about
+     * which call accepts which: {@code glUniform1fv} on a vec3 is {@code GL_INVALID_OPERATION} and
+     * leaves the uniform untouched. So the type decides the call, and a vector is one element.
+     */
     public void setUniform(String name, float[] values) {
         if (!checkUniformExists(name)) return;
 
         Integer type = uniformTypes.get(name);
         Integer loc = uniforms.get(name);
+        int vecSize = switch (type) {
+            case GL_FLOAT_VEC4 -> 4;
+            case GL_FLOAT_VEC3 -> 3;
+            case GL_FLOAT_VEC2 -> 2;
+            default -> 1;
+        };
+        if (vecSize > 1 && values.length < vecSize) {
+            logger.warn("Uniform '" + name + "' needs " + vecSize + " floats, got " + values.length);
+            return;
+        }
+        if (vecSize == 1 && type != GL_FLOAT) {
+            logger.warn("Uniform '" + name + "' type mismatch. Expected float, got type: " + type);
+        }
 
-        if (type == GL_FLOAT || type == GL_FLOAT_VEC4 || type == GL_FLOAT_VEC3 || type == GL_FLOAT_VEC2) {
-            // For uniform float arrays, just call glUniform1fv
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
-            buffer.put(values).flip();
-            glUniform1fv(loc, buffer);
-        } else {
-            logger.warn("Uniform '" + name + "' type mismatch. Expected float array, got type: " + type);
-            // Try anyway
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
-            buffer.put(values).flip();
-            glUniform1fv(loc, buffer);
+        switch (vecSize) {
+            case 4 -> glUniform4fv(loc, values);
+            case 3 -> glUniform3fv(loc, values);
+            case 2 -> glUniform2fv(loc, values);
+            default -> glUniform1fv(loc, values);
         }
 
         checkGLError("setUniform(" + name + ", float[" + values.length + "])");
     }
 
-    public void setUniform(String name, int[] values) {
+    /** Sets an ivec3 uniform. **/
+    public void setUniform(String name, int x, int y, int z) {
         if (!checkUniformExists(name)) return;
 
         Integer type = uniformTypes.get(name);
         Integer loc = uniforms.get(name);
 
-        if (type == GL_INT || type == GL_INT_VEC2 || type == GL_INT_VEC3 || type == GL_INT_VEC4) {
-            // For uniform int arrays, just call glUniform1iv
-            IntBuffer buffer = BufferUtils.createIntBuffer(values.length);
-            buffer.put(values).flip();
-            GL43.glUniform1iv(loc, buffer);
-        } else {
-            logger.warn("Uniform '" + name + "' type mismatch. Expected int array, got type: " + type);
-            // Try anyway
-            IntBuffer buffer = BufferUtils.createIntBuffer(values.length);
-            buffer.put(values).flip();
-            GL43.glUniform1iv(loc, buffer);
+        if (type != GL_INT_VEC3) {
+            logger.warn("Uniform '" + name + "' type mismatch. Expected ivec3, got type: " + type);
+        }
+        GL43.glUniform3i(loc, x, y, z);
+
+        checkGLError("setUniform(" + name + ", ivec3)");
+    }
+
+    /** Sets an int array or a single integer vector uniform from an array. **/
+    public void setUniform(String name, int[] values) {
+        if (!checkUniformExists(name)) return;
+
+        Integer type = uniformTypes.get(name);
+        Integer loc = uniforms.get(name);
+        int vecSize = switch (type) {
+            case GL_INT_VEC4 -> 4;
+            case GL_INT_VEC3 -> 3;
+            case GL_INT_VEC2 -> 2;
+            default -> 1;
+        };
+        if (vecSize > 1 && values.length < vecSize) {
+            logger.warn("Uniform '" + name + "' needs " + vecSize + " ints, got " + values.length);
+            return;
+        }
+        if (vecSize == 1 && type != GL_INT) {
+            logger.warn("Uniform '" + name + "' type mismatch. Expected int, got type: " + type);
+        }
+
+        switch (vecSize) {
+            case 4 -> GL43.glUniform4iv(loc, values);
+            case 3 -> GL43.glUniform3iv(loc, values);
+            case 2 -> GL43.glUniform2iv(loc, values);
+            default -> GL43.glUniform1iv(loc, values);
         }
 
         checkGLError("setUniform(" + name + ", int[" + values.length + "])");

@@ -137,15 +137,18 @@ public class GalaxyVolumeGenerator implements Disposable {
                                     GL43.GL_WRITE_ONLY, VolumeType.RGBA.glInternalFormat);
             GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, STATS_BINDING, statsBuffer);
 
+            float[] origin = gridOrigin(lateralHalf, verticalHalf, grid);
+            float[] cell = gridCell(lateralHalf, verticalHalf, grid);
+
             for (int pass = PASS_REDUCE; pass <= PASS_WRITE; pass++) {
                 program.begin();
                 program.setUniform("u_pass", pass);
                 program.setUniform("u_fieldCount", count);
                 program.setUniform("u_fields[0]", fields);
-                program.setUniform("u_gridOrigin", gridOrigin(lateralHalf, verticalHalf, grid));
-                program.setUniform("u_gridCell", gridCell(lateralHalf, verticalHalf, grid));
-                program.setUniform("u_gridDims[0]", new int[]{grid.nx, grid.ny, grid.nz});
-                program.setUniform("u_gridOffset[0]", new int[]{0, 0, 0});
+                program.setUniform("u_gridOrigin", origin[0], origin[1], origin[2]);
+                program.setUniform("u_gridCell", cell[0], cell[1], cell[2]);
+                program.setUniform("u_gridDims", grid.nx, grid.ny, grid.nz);
+                program.setUniform("u_gridOffset", 0, 0, 0);
                 program.setUniform("u_targetMeanRayIntegral", targetMeanRayIntegral);
                 program.setUniform("u_gain", 1f);
                 program.end3D(grid.nx, grid.ny, grid.nz);
