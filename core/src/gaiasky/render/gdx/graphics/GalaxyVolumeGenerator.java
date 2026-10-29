@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.render.gdx.shader.ComputeShaderProgram;
 import gaiasky.render.gdx.shader.loader.ShaderTemplatingLoader;
-import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import org.lwjgl.BufferUtils;
@@ -85,34 +85,40 @@ public class GalaxyVolumeGenerator implements Disposable {
     /**
      * Generates the volume texture of one slot.
      *
-     * @param datasets              The datasets that go into the slot, in slot order. At most
-     *                              {@link BillboardDataset#MAX_FIELDS} are used.
+     * @param fields                The fields that go into the slot, in slot order. At most
+     *                              {@link GalaxyAttributes#MAX_FIELDS} are used.
      * @param grid                  Grid dimensions, normally from
-     *                              {@link BillboardDataset#volumeGrid(List, double, gaiasky.util.Settings.GraphicsQuality)}.
+     *                              {@link GalaxyAttributes#volumeGrid(List, double, gaiasky.util.Settings.GraphicsQuality)}.
      * @param targetMeanRayIntegral Mean luma the slot should have at unit intensity. See
      *                              {@link VolumeCalibration}; zero skips the calibration.
      *
      * @return The volume, or null if generation is not possible (no compute support, shader
      * compilation failure, degenerate grid).
      */
-    public VolumeTexture generate(List<BillboardDataset> datasets, VoxelGrid grid, float targetMeanRayIntegral) {
-        if (!isSupported() || unavailable || datasets == null || datasets.isEmpty() || grid == null) {
+    public VolumeTexture generate(List<? extends GalaxyAttributes> fields, VoxelGrid grid, float targetMeanRayIntegral) {
+        if (!isSupported() || unavailable || fields == null || fields.isEmpty() || grid == null) {
             return null;
         }
         if (!ensureProgram()) {
             return null;
         }
 
-        int count = Math.min(datasets.size(), BillboardDataset.MAX_FIELDS);
-        float[] fields = packFields(datasets, count);
+        int count = fields.size();
+        if (count > GalaxyAttributes.MAX_FIELDS) {
+            logger.warn("Slot declares " + count + " fields, which is more than the " + GalaxyAttributes.MAX_FIELDS
+                                + " a volume slot can hold. Dropping the last " + (count - GalaxyAttributes.MAX_FIELDS)
+                                + ".");
+            count = GalaxyAttributes.MAX_FIELDS;
+        }
+        float[] packed = packFields(fields, count);
 
         // The box has to hold every field in the slot, not just the first: a bulge can be taller than
         // the gas disk it sits in.
         double lateralHalf = 0.0;
         double verticalHalf = 0.0;
         for (int i = 0; i < count; i++) {
-            lateralHalf = Math.max(lateralHalf, datasets.get(i).volumeLateralHalfExtent());
-            verticalHalf = Math.max(verticalHalf, datasets.get(i).volumeVerticalHalfExtent());
+            lateralHalf = Math.max(lateralHalf, fields.get(i).volumeLateralHalfExtent());
+            verticalHalf = Math.max(verticalHalf, fields.get(i).volumeVerticalHalfExtent());
         }
         if (lateralHalf <= 0.0 || verticalHalf <= 0.0) {
             logger.error("Cannot generate volume: empty extent");
@@ -144,7 +150,7 @@ public class GalaxyVolumeGenerator implements Disposable {
                 program.begin();
                 program.setUniform("u_pass", pass);
                 program.setUniform("u_fieldCount", count);
-                program.setUniform("u_fields[0]", fields);
+                program.setUniform("u_fields[0]", packed);
                 program.setUniform("u_gridOrigin", origin[0], origin[1], origin[2]);
                 program.setUniform("u_gridCell", cell[0], cell[1], cell[2]);
                 program.setUniform("u_gridDims", grid.nx, grid.ny, grid.nz);
@@ -206,13 +212,13 @@ public class GalaxyVolumeGenerator implements Disposable {
         };
     }
 
-    /** Packs the slot's datasets into the flat uniform the shader unpacks. **/
-    public static float[] packFields(List<BillboardDataset> datasets, int count) {
-        float[] fields = new float[BillboardDataset.MAX_FIELDS * BillboardDataset.FIELD_STRIDE];
+    /** Packs the slot's fields into the flat uniform the shader unpacks. **/
+    public static float[] packFields(List<? extends GalaxyAttributes> fields, int count) {
+        float[] packed = new float[GalaxyAttributes.MAX_FIELDS * GalaxyAttributes.FIELD_STRIDE];
         for (int i = 0; i < count; i++) {
-            datasets.get(i).packFields(fields, i * BillboardDataset.FIELD_STRIDE);
+            fields.get(i).packFields(packed, i * GalaxyAttributes.FIELD_STRIDE);
         }
-        return fields;
+        return packed;
     }
 
     /**

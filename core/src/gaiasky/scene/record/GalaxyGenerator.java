@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.JsonValue.ValueType;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.record.BillboardDataset.HeightProfile;
+import gaiasky.scene.record.GalaxyAttributes.HeightProfile;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
@@ -18,10 +18,10 @@ import net.jafama.FastMath;
 import java.util.Objects;
 import java.util.Random;
 
-import static gaiasky.scene.record.BillboardDataset.ChannelType;
-import static gaiasky.scene.record.BillboardDataset.ChannelType.*;
-import static gaiasky.scene.record.BillboardDataset.Distribution;
-import static gaiasky.scene.record.BillboardDataset.Distribution.*;
+import static gaiasky.scene.record.GalaxyAttributes.ChannelType;
+import static gaiasky.scene.record.GalaxyAttributes.ChannelType.*;
+import static gaiasky.scene.record.GalaxyAttributes.Distribution;
+import static gaiasky.scene.record.GalaxyAttributes.Distribution.*;
 
 /**
  * Generates galaxies as lists of {@link BillboardDataset} objects.

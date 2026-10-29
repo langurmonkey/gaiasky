@@ -8,11 +8,12 @@
 package gaiasky;
 
 import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.GalaxyAttributes;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * {@link BillboardDataset#packFields(float[], int)} fills the flat uniform that
+ * {@link GalaxyAttributes#packFields(float[], int)} fills the flat uniform that
  * {@code gxUnpack()} in {@code assets/shader/lib/galaxy.glsl} reads back. The two have no compile-time
  * link, so the layout is pinned here: an offset that moves on one side and not the other would
  * silently shuffle every field after it.
@@ -22,7 +23,7 @@ public class FieldPackingTest {
     @Test
     public void packMatchesTheShaderLayout() {
         var ds = new BillboardDataset();
-        ds.distribution = BillboardDataset.Distribution.SPIRAL;
+        ds.distribution = GalaxyAttributes.Distribution.SPIRAL;
         ds.baseRadius = 1.0f;
         ds.minRadius = 0.19f;
         ds.numArms = 2;
@@ -33,16 +34,16 @@ public class FieldPackingTest {
         ds.aspect = 0.3f;
         ds.warpStrength = 0.05f;
         ds.heightScale = 0.02f;
-        ds.heightProfile = BillboardDataset.HeightProfile.SMOOTH_INC;
+        ds.heightProfile = GalaxyAttributes.HeightProfile.SMOOTH_INC;
         ds.colorNoise = 0.08f;
         ds.intensity = 0.7f;
-        ds.type = BillboardDataset.ChannelType.DUST;
+        ds.type = GalaxyAttributes.ChannelType.DUST;
         ds.baseColors = new float[]{1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f};
 
-        float[] packed = new float[BillboardDataset.MAX_FIELDS * BillboardDataset.FIELD_STRIDE];
-        ds.packFields(packed, BillboardDataset.FIELD_STRIDE);
+        float[] packed = new float[GalaxyAttributes.MAX_FIELDS * GalaxyAttributes.FIELD_STRIDE];
+        ds.packFields(packed, GalaxyAttributes.FIELD_STRIDE);
 
-        int o = BillboardDataset.FIELD_STRIDE;
+        int o = GalaxyAttributes.FIELD_STRIDE;
         Assert.assertEquals(2f, packed[o], 0f);      // distribution SPIRAL
         Assert.assertEquals(1.0f, packed[o + 1], 0f);
         Assert.assertEquals(0.19f, packed[o + 2], 0f);
@@ -63,24 +64,51 @@ public class FieldPackingTest {
             Assert.assertEquals(i + 1f, packed[o + 16 + i], 0f);
         }
         Assert.assertEquals(0f, packed[o + 28], 0f); // channel DUST
-        Assert.assertEquals(28 + 4, BillboardDataset.FIELD_STRIDE); // padded for the next field
+        Assert.assertEquals(28 + 4, GalaxyAttributes.FIELD_STRIDE); // padded for the next field
         // Nothing outside this field's window was touched.
-        Assert.assertEquals(0f, packed[o + BillboardDataset.FIELD_STRIDE - 1 + 1], 0f);
+        Assert.assertEquals(0f, packed[o + GalaxyAttributes.FIELD_STRIDE - 1 + 1], 0f);
         Assert.assertEquals(0f, packed[0], 0f);
+    }
+
+    @Test
+    public void packsEveryFieldOfAFullSlotIntoItsOwnWindow() {
+        // GX_MAX_FIELDS fields go into one packed array at stride FIELD_STRIDE, and nothing spills
+        // into the neighbouring window. Field i is given the intensity i + 1, so a shifted offset
+        // shows up as a wrong weight.
+        int max = GalaxyAttributes.MAX_FIELDS;
+        float[] packed = new float[max * GalaxyAttributes.FIELD_STRIDE];
+        var fields = new BillboardDataset[max];
+        for (int i = 0; i < max; i++) {
+            fields[i] = new BillboardDataset();
+            fields[i].intensity = i + 1;
+        }
+        for (int i = 0; i < max; i++) {
+            fields[i].packFields(packed, i * GalaxyAttributes.FIELD_STRIDE);
+        }
+        for (int i = 0; i < max; i++) {
+            int o = i * GalaxyAttributes.FIELD_STRIDE;
+            Assert.assertEquals(i + 1f, packed[o + 15], 0f);        // GX_F_WEIGHT
+            Assert.assertEquals(5f, packed[o + 28], 0f);            // GX_F_CHANNEL, the default POINT
+            Assert.assertEquals(0f, packed[o + 29], 0f);            // padding, untouched
+        }
+        // A full slot must fit in the guaranteed uniform space of a GL 4.3 compute shader (1024
+        // components), with room for the grid and calibration uniforms on top.
+        Assert.assertTrue(max * GalaxyAttributes.FIELD_STRIDE <= 256);
+        Assert.assertEquals(8, max); // mirrors GX_MAX_FIELDS in galaxy.glsl
     }
 
     @Test
     public void distributioOrdinalsMatchTheShader() {
         // The GX_* constants in galaxy.glsl depend on these ordinals.
-        Assert.assertEquals(0, BillboardDataset.Distribution.SPHERE.ordinal());
-        Assert.assertEquals(2, BillboardDataset.Distribution.SPIRAL.ordinal());
-        Assert.assertEquals(3, BillboardDataset.Distribution.SPIRAL_LOG.ordinal());
-        Assert.assertEquals(5, BillboardDataset.Distribution.ELLIPSOID.ordinal());
-        Assert.assertEquals(0, BillboardDataset.HeightProfile.CONSTANT.ordinal());
-        Assert.assertEquals(4, BillboardDataset.HeightProfile.SMOOTH_DEC.ordinal());
+        Assert.assertEquals(0, GalaxyAttributes.Distribution.SPHERE.ordinal());
+        Assert.assertEquals(2, GalaxyAttributes.Distribution.SPIRAL.ordinal());
+        Assert.assertEquals(3, GalaxyAttributes.Distribution.SPIRAL_LOG.ordinal());
+        Assert.assertEquals(5, GalaxyAttributes.Distribution.ELLIPSOID.ordinal());
+        Assert.assertEquals(0, GalaxyAttributes.HeightProfile.CONSTANT.ordinal());
+        Assert.assertEquals(4, GalaxyAttributes.HeightProfile.SMOOTH_DEC.ordinal());
         // And the GX_CHANNEL_* constants depend on these.
-        Assert.assertEquals(0, BillboardDataset.ChannelType.DUST.ordinal());
-        Assert.assertEquals(1, BillboardDataset.ChannelType.BULGE.ordinal());
-        Assert.assertEquals(3, BillboardDataset.ChannelType.GAS.ordinal());
+        Assert.assertEquals(0, GalaxyAttributes.ChannelType.DUST.ordinal());
+        Assert.assertEquals(1, GalaxyAttributes.ChannelType.BULGE.ordinal());
+        Assert.assertEquals(3, GalaxyAttributes.ChannelType.GAS.ordinal());
     }
 }

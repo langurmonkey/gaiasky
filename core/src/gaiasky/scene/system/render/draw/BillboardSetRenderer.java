@@ -24,7 +24,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.record.BillboardDataset;
-import gaiasky.scene.record.BillboardDataset.ChannelType;
+import gaiasky.scene.record.GalaxyAttributes.ChannelType;
 import gaiasky.scene.record.ModelType;
 import gaiasky.scene.record.ParticleVector;
 import gaiasky.scene.system.render.SceneRenderer;

@@ -424,6 +424,10 @@
           "raymarchIterations",
           "iterationCount"
         ]
+      },
+      "fields": {
+        "description": "Procedural generation fields of this volume. If present and non-empty, the volume is not loaded from a texture file but voxelised at load time from the analytic galaxy density model: each field is one component of the galaxy (a gas disk, a bulge, a dust lane) with its own shape, colour, brightness and channel. Omitting this attribute leaves the volume as a plain texture volume. |brsp| Fields are grouped by slot: occluding channels (``DUST``) are reduced into the occlusive texture, every other channel (``GAS``, ``BULGE``, ``STAR``, ``HII``, ``POINT``) into the emissive one. There is no slot attribute; a galaxy may carry up to 8 fields per slot. |brsp| Each entry needs an ``impl`` of ``gaiasky.scene.record.GalaxyAttributes`` and accepts the shape and colour attributes of a :ref:`BillboardDataset <billboardset>` -- ``type``, ``distribution``, ``baseRadius``, ``minRadius``, ``numArms``, ``armSigma``, ``baseAngle``, ``eccentricity``, ``spiralDeltaPos``, ``aspect``, ``warpStrength``, ``heightScale``, ``heightProfile``, ``colors``, ``colorNoise``, ``intensity``, ``translation`` and ``scale`` -- with one difference: ``intensity`` is a per-unit-length emission weight, not a sprite multiplier. |brsp| Example: |brsp| ``\\\"fields\\\": [`` |brsp| ``  { \\\"impl\\\": \\\"gaiasky.scene.record.GalaxyAttributes\\\", \\\"type\\\": \\\"gas\\\", \\\"distribution\\\": \\\"spiral\\\", \\\"colors\\\": [0.42, 0.58, 0.9], \\\"intensity\\\": 1.0 },`` |brsp| ``  { \\\"type\\\": \\\"bulge\\\", \\\"distribution\\\": \\\"sphere\\\", \\\"baseRadius\\\": 0.12, \\\"colors\\\": [1.0, 0.86, 0.6], \\\"intensity\\\": 2.5 },`` |brsp| ``  { \\\"type\\\": \\\"dust\\\", \\\"distribution\\\": \\\"spiral\\\", \\\"heightScale\\\": 0.01, \\\"colors\\\": [0.35, 0.25, 0.2], \\\"intensity\\\": 0.6 }`` |brsp| ``]``",
+        "unit": "GalaxyAttributes[]"
       }
     },
     "Atmosphere": {

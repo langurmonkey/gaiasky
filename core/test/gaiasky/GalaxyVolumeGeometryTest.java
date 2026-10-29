@@ -10,6 +10,7 @@ package gaiasky;
 import gaiasky.render.gdx.graphics.GalaxyVolumeGenerator;
 import gaiasky.render.gdx.graphics.VoxelGrid;
 import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.util.Settings.GraphicsQuality;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,8 +26,8 @@ public class GalaxyVolumeGeometryTest {
 
     private static BillboardDataset gas() {
         var gas = new BillboardDataset();
-        gas.type = BillboardDataset.ChannelType.GAS;
-        gas.distribution = BillboardDataset.Distribution.SPIRAL;
+        gas.type = GalaxyAttributes.ChannelType.GAS;
+        gas.distribution = GalaxyAttributes.Distribution.SPIRAL;
         gas.baseRadius = 1.0f;
         gas.armSigma = 0.1872369f;
         gas.heightScale = 0.02f;
@@ -35,8 +36,8 @@ public class GalaxyVolumeGeometryTest {
 
     private static BillboardDataset bulge() {
         var bulge = new BillboardDataset();
-        bulge.type = BillboardDataset.ChannelType.BULGE;
-        bulge.distribution = BillboardDataset.Distribution.SPHERE;
+        bulge.type = GalaxyAttributes.ChannelType.BULGE;
+        bulge.distribution = GalaxyAttributes.Distribution.SPHERE;
         bulge.baseRadius = 0.12f;
         return bulge;
     }
@@ -59,7 +60,7 @@ public class GalaxyVolumeGeometryTest {
 
     @Test
     public void voxelCentresFillTheBox() {
-        var grid = BillboardDataset.volumeGrid(List.of(gas(), bulge()), 20_400, GraphicsQuality.NORMAL);
+        var grid = GalaxyAttributes.volumeGrid(List.of(gas(), bulge()), 20_400, GraphicsQuality.NORMAL);
         double lateral = 1.1123, vertical = 0.12;
         float[] origin = GalaxyVolumeGenerator.gridOrigin(lateral, vertical, grid);
         float[] cell = GalaxyVolumeGenerator.gridCell(lateral, vertical, grid);
@@ -85,11 +86,11 @@ public class GalaxyVolumeGeometryTest {
     @Test
     public void packedFieldsAreTheShadersUniformSize() {
         var fields = GalaxyVolumeGenerator.packFields(List.of(gas(), bulge()), 2);
-        Assert.assertEquals(BillboardDataset.MAX_FIELDS * BillboardDataset.FIELD_STRIDE, fields.length);
+        Assert.assertEquals(GalaxyAttributes.MAX_FIELDS * GalaxyAttributes.FIELD_STRIDE, fields.length);
         // Slot 0 is the gas, slot 1 the bulge, and the third slot is left at zero.
-        Assert.assertEquals(BillboardDataset.ChannelType.GAS.ordinal(), fields[28], 0f);
-        Assert.assertEquals(BillboardDataset.ChannelType.BULGE.ordinal(),
-                            fields[BillboardDataset.FIELD_STRIDE + 28], 0f);
-        Assert.assertEquals(0f, fields[2 * BillboardDataset.FIELD_STRIDE + 28], 0f);
+        Assert.assertEquals(GalaxyAttributes.ChannelType.GAS.ordinal(), fields[28], 0f);
+        Assert.assertEquals(GalaxyAttributes.ChannelType.BULGE.ordinal(),
+                            fields[GalaxyAttributes.FIELD_STRIDE + 28], 0f);
+        Assert.assertEquals(0f, fields[2 * GalaxyAttributes.FIELD_STRIDE + 28], 0f);
     }
 }

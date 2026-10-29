@@ -1,10 +1,13 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Stores information for volumetric rendering of bodies.
@@ -15,6 +18,68 @@ public class Volume implements Component {
     public String vertexShader = "assets/shader/pbr.vertex.glsl";
     public String fragmentShader = "assets/shader/volume.fragment.glsl";
     public int key;
+
+    /**
+     * Procedural generation fields of this volume, or null/empty for a volume loaded from a file.
+     * <p>
+     * These are the same shape parameters a {@link gaiasky.scene.record.BillboardDataset} carries,
+     * describing the analytic density model of {@code assets/shader/lib/galaxy.glsl}. A volume is
+     * generated from its own fields and from nothing else - no billboard set is read, written or
+     * emptied to produce a volume. A volume without fields is a plain texture volume, which is
+     * what the Milky Way is.
+     * <p>
+     * The routing is by {@link GalaxyAttributes#type}: occluding channels (dust) go to the
+     * occlusive slot, everything else to the emissive one. There is no slot index in the
+     * descriptor - the raymarcher has exactly two slots and always will.
+     */
+    public GalaxyAttributes[] fields;
+
+    /**
+     * Setter used by the scene JSON loader, mirroring {@link gaiasky.scene.component.BillboardSet#setData(Object[])}.
+     *
+     * @param fields The field objects, each of them a {@link GalaxyAttributes}.
+     */
+    public void setFields(Object[] fields) {
+        if (fields == null) {
+            this.fields = null;
+            return;
+        }
+        this.fields = new GalaxyAttributes[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            this.fields[i] = (GalaxyAttributes) fields[i];
+        }
+    }
+
+    /** @return Whether this volume is generated from {@link #fields} rather than from a file. **/
+    public boolean isProcedural() {
+        return fields != null && fields.length > 0;
+    }
+
+    /**
+     * @return The fields that go into the emissive slot, in descriptor order. Empty if none.
+     */
+    public List<GalaxyAttributes> emissiveFields() {
+        return fieldsOfSlot(false);
+    }
+
+    /**
+     * @return The fields that go into the occlusive slot, in descriptor order. Empty if none.
+     */
+    public List<GalaxyAttributes> occlusiveFields() {
+        return fieldsOfSlot(true);
+    }
+
+    private List<GalaxyAttributes> fieldsOfSlot(boolean occlusive) {
+        var list = new ArrayList<GalaxyAttributes>();
+        if (fields != null) {
+            for (var field : fields) {
+                if (field.isOcclusive() == occlusive) {
+                    list.add(field);
+                }
+            }
+        }
+        return list;
+    }
 
     /**
      * Whether this volume takes part in the depth-only pre-pass. Enabled by default.

@@ -102,8 +102,14 @@ struct GalaxyShape {
 // A shape travels from Java as a flat float array, because a compute program here has no uniform
 // buffer and struct members cannot be set by index. The order below is the order of the struct
 // above; GX_FIELD_STRIDE is its length in floats. Mirror any change here in the Java packer
-// (BillboardDataset.packFields) or every field after the change shifts by one.
-#define GX_MAX_FIELDS 3
+// (GalaxyAttributes.packFields) or every field after the change shifts by one.
+//
+// GX_MAX_FIELDS is the number of fields summed into ONE slot, and each slot gets its own packed
+// array, so a galaxy can carry up to 2 * GX_MAX_FIELDS fields. Fields are baked into the slot's
+// texture, so this costs nothing per frame: it only multiplies the voxeliser's work at generation
+// time. 8 * 32 = 256 floats is a quarter of the 1024 components a GL 4.3 compute shader is
+// guaranteed to get, so the limit is the authoring model, not the hardware.
+#define GX_MAX_FIELDS 8
 #define GX_FIELD_STRIDE 32
 #define GX_FIELD_ARRAY (GX_MAX_FIELDS * GX_FIELD_STRIDE)
 #define GX_F_DISTRIBUTION 0
