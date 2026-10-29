@@ -59,6 +59,15 @@ public class VolumeComponentTest {
     }
 
     @Test
+    public void fieldsJsonLoaderContract() throws Exception {
+        // "fields" is an array of objects. JsonLoader hands an array of objects to the setter as a
+        // plain Object[], so the parameter type is what decides whether the attribute is found - a
+        // GalaxyAttributes[] here would only log a loader error and leave the volume empty.
+        Method m = ClassReflection.getMethod(Volume.class, "setFields", Object[].class);
+        Assert.assertNotNull("missing Volume.setFields(Object[])", m);
+    }
+
+    @Test
     public void depthPrePassSitsBetweenTheGridClearAndTheStars() {
         // The depth-only pre-pass has to run after MODEL_VERT_GRID, whose post-runnable clears the
         // depth buffer (so that grids leave no depth behind) - anything written before that is

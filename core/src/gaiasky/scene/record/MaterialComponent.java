@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
@@ -169,6 +170,12 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      * The actual material
      **/
     private Material material, ringMaterial;
+    /**
+     * Callbacks waiting for {@link #material} to exist. Lazy texture initialisation defers
+     * {@link #initMaterial} to the first frame the entity is drawn, so anything that has to add
+     * attributes to the material cannot do it at set-up time and has to wait for this.
+     */
+    private final MaterialInitQueue materialInitQueue = new MaterialInitQueue();
     private final AtomicBoolean heightGenerated = new AtomicBoolean(false);
     private final AtomicBoolean heightInitialized = new AtomicBoolean(false);
     private Texture heightTex, specularTex, diffuseTex, normalTex, emissiveTex;
@@ -667,6 +674,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             EventManager.publish(Event.SVT_MATERIAL_INFO, this, svtId, this);
         }
 
+        // Everything that contributes attributes after the fact (generated volumes) waits here.
+        materialInitQueue.markReady();
+
     }
 
     private void addSVTAttributes(Material material,
@@ -946,6 +956,24 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
     public Material getRingMaterial() {
         return ringMaterial;
+    }
+
+    /**
+     * Runs the given callback as soon as the material exists, or immediately if it already does.
+     * <p>
+     * With lazy texture initialisation the material is built in
+     * {@link gaiasky.scene.record.ModelComponent#touch(com.badlogic.gdx.math.Matrix4)}, i.e. the
+     * first frame the entity is drawn, which is well after set-up. Anything that contributes
+     * attributes to the material has to go through here rather than assume it can do it at
+     * {@code setUpEntity} time.
+     * <p>
+     * The callback runs on the GL thread, either in the caller's thread (already initialised) or
+     * inside {@link #initMaterial}. It is dropped if the material never arrives.
+     *
+     * @param listener The callback.
+     */
+    public void whenMaterialInitialized(Runnable listener) {
+        materialInitQueue.whenReady(listener);
     }
 
     private void removeElevationData() {
@@ -1260,6 +1288,65 @@ public final class MaterialComponent extends NamedComponent implements IObserver
             return 0f;
         }
         return (float) volumeDepthThreshold[slot];
+    }
+
+    /**
+     * Binds a volume texture to one of the material's 3D slots, with its box, replacing whatever was
+     * there. The depth threshold of the slot still comes from {@link #volumeDepthThreshold}.
+     * <p>
+     * This is the entry point for volumes that are generated rather than loaded: a procedural
+     * volume has no file, so it never passes through {@link #initialize} or {@link #initMaterial},
+     * and its textures come from {@link gaiasky.render.gdx.graphics.GalaxyVolumeGenerator} at set-up
+     * time.
+     * <p>
+     * The attribute has to be in the material <em>before</em> the volume shader is compiled, because
+     * the shader's per-slot code is behind {@code #ifdef volumeNFlag}, which
+     * {@link gaiasky.render.gdx.shader.DefaultIntShader} emits from the attributes present. Set-up
+     * runs before the first render of the entity, so that holds.
+     *
+     * @param slot The slot number, 0 to 3. Generated galaxies use 0 for the emissive volume and 1
+     *             for the occlusive one.
+     * @param tex  The volume, with its box in body-size units.
+     *
+     * @return True if the attribute was bound. False if the material is not initialised yet, the
+     * volume is null, or the slot does not exist.
+     */
+    public boolean setVolumeTexture(int slot,
+                                    VolumeTexture tex) {
+        if (material == null || tex == null) {
+            return false;
+        }
+        int attribute;
+        int boundsMin, boundsMax;
+        switch (slot) {
+            case 0 -> {
+                attribute = Texture3DAttribute.Volume0;
+                boundsMin = Vector3Attribute.Volume0BoundsMin;
+                boundsMax = Vector3Attribute.Volume0BoundsMax;
+            }
+            case 1 -> {
+                attribute = Texture3DAttribute.Volume1;
+                boundsMin = Vector3Attribute.Volume1BoundsMin;
+                boundsMax = Vector3Attribute.Volume1BoundsMax;
+            }
+            case 2 -> {
+                attribute = Texture3DAttribute.Volume2;
+                boundsMin = Vector3Attribute.Volume2BoundsMin;
+                boundsMax = Vector3Attribute.Volume2BoundsMax;
+            }
+            case 3 -> {
+                attribute = Texture3DAttribute.Volume3;
+                boundsMin = Vector3Attribute.Volume3BoundsMin;
+                boundsMax = Vector3Attribute.Volume3BoundsMax;
+            }
+            default -> {
+                return false;
+            }
+        }
+        material.set(volumeAttribute(attribute, slot, tex));
+        material.set(new Vector3Attribute(boundsMin, new Vector3(tex.boundsMin())));
+        material.set(new Vector3Attribute(boundsMax, new Vector3(tex.boundsMax())));
+        return true;
     }
 
     public void setDiffuseCubemap(String cubemap) {

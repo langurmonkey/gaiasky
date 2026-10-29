@@ -80,4 +80,38 @@ public class VolumeFieldsTest {
         Assert.assertEquals(max, volume.emissiveFields().size());
         Assert.assertEquals(max, volume.occlusiveFields().size());
     }
+
+    @Test
+    public void theTwoSlotsAreEmissiveAndOcclusive() {
+        // The slot numbers the initializer binds to are the ones the raymarcher expects: 0 emits,
+        // 1 absorbs. Anything else is a bug that would show as a dust texture emitting light.
+        Assert.assertEquals(0, Volume.SLOT_EMISSIVE);
+        Assert.assertEquals(1, Volume.SLOT_OCCLUSIVE);
+    }
+
+    @Test
+    public void generatedSlotsStartEmptyAndClearSafely() {
+        var volume = new Volume();
+        // Nothing generated yet.
+        Assert.assertNull(volume.getGeneratedVolume(Volume.SLOT_EMISSIVE));
+        Assert.assertNull(volume.getGeneratedVolume(Volume.SLOT_OCCLUSIVE));
+        // Clearing an empty slot, disposing nothing, or asking for a slot that does not exist must
+        // all be harmless: they run on the removal path of every volume, including the loaded ones.
+        volume.setGeneratedVolume(Volume.SLOT_EMISSIVE, null);
+        volume.setGeneratedVolume(Volume.SLOT_OCCLUSIVE, null);
+        volume.setGeneratedVolume(42, null);
+        volume.dispose(null);
+        Assert.assertNull(volume.getGeneratedVolume(Volume.SLOT_EMISSIVE));
+        Assert.assertNull(volume.getGeneratedVolume(42));
+    }
+
+    @Test
+    public void disposalIsVisibleToDeferredGeneration() {
+        var volume = new Volume();
+        Assert.assertFalse(volume.isDisposed());
+        volume.dispose(null);
+        // With lazy texture initialisation the generation callback arrives after the entity may be
+        // gone; it checks this before binding anything.
+        Assert.assertTrue(volume.isDisposed());
+    }
 }

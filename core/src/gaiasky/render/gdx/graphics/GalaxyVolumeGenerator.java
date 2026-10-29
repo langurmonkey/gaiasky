@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL43;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Builds the volume texture of a procedurally generated galaxy: gas and bulge in the emissive slot,
@@ -51,8 +52,8 @@ public class GalaxyVolumeGenerator implements Disposable {
     private static final int IMAGE_UNIT = 0;
     /** SSBO binding of the statistics ({@code layout(std430, binding = 1) buffer Stats}). **/
     private static final int STATS_BINDING = 1;
-    /** Number of uints in the statistics buffer: two peaks and two sums. **/
-    private static final int STATS_UINTS = 4;
+    /** Number of uints in the statistics buffer: four peaks and two sums. **/
+    private static final int STATS_UINTS = 6;
     /** Must match {@code GX_SUM_SCALE} in the compute shader. **/
     private static final float SUM_SCALE = 32.0f;
 
@@ -84,18 +85,20 @@ public class GalaxyVolumeGenerator implements Disposable {
 
     /**
      * Generates the volume texture of one slot.
+     * <p>
+     * The slot's kind follows from its fields: occluding channels (dust) are stored as density and
+     * calibrated on the peak, the rest are stored as emitted light and calibrated on the mean ray
+     * integral. The targets come from {@link VolumeCalibration}.
      *
-     * @param fields                The fields that go into the slot, in slot order. At most
-     *                              {@link GalaxyAttributes#MAX_FIELDS} are used.
-     * @param grid                  Grid dimensions, normally from
-     *                              {@link GalaxyAttributes#volumeGrid(List, double, gaiasky.util.Settings.GraphicsQuality)}.
-     * @param targetMeanRayIntegral Mean luma the slot should have at unit intensity. See
-     *                              {@link VolumeCalibration}; zero skips the calibration.
+     * @param fields The fields that go into the slot, in slot order. At most
+     *               {@link GalaxyAttributes#MAX_FIELDS} are used.
+     * @param grid   Grid dimensions, normally from
+     *               {@link GalaxyAttributes#volumeGrid(List, double, gaiasky.util.Settings.GraphicsQuality)}.
      *
      * @return The volume, or null if generation is not possible (no compute support, shader
      * compilation failure, degenerate grid).
      */
-    public VolumeTexture generate(List<? extends GalaxyAttributes> fields, VoxelGrid grid, float targetMeanRayIntegral) {
+    public VolumeTexture generate(List<? extends GalaxyAttributes> fields, VoxelGrid grid) {
         if (!isSupported() || unavailable || fields == null || fields.isEmpty() || grid == null) {
             return null;
         }
@@ -111,6 +114,38 @@ public class GalaxyVolumeGenerator implements Disposable {
             count = GalaxyAttributes.MAX_FIELDS;
         }
         float[] packed = packFields(fields, count);
+
+        // A spiral whose pitch is too small for its radial span is a set of radial spokes, not a
+        // spiral, and it looks like a cross. Worth saying out loud: baseAngle is in tenths of a
+        // degree and measured from the radial direction, so a plausible-looking "12" is 1.2 deg and
+        // almost straight.
+        for (int i = 0; i < count; i++) {
+            var field = fields.get(i);
+            double sweep = field.spiralArmSweepDegrees();
+            if (field.distribution.isAnySpiral() && sweep < 25.0) {
+                logger.warn(String.format(Locale.ROOT,
+                                          "Field %d (%s, %s) has baseAngle=%.1f, which sweeps only %.1f deg of arm "
+                                                  + "between minRadius %.3f and baseRadius %.1f: the arms come out as radial spokes, not a spiral. "
+                                                  + "baseAngle is in tenths of a degree, measured from the radial direction, so a 4-arm spiral "
+                                                  + "with arms that curve needs something in the 400-700 range.",
+                                          i, field.type, field.distribution, field.baseAngle, sweep,
+                                          field.minRadius, field.baseRadius));
+            }
+        }
+
+        // One slot stores either density or light, never both: the alpha channel is the only one with
+        // a free interpretation. A mixed slot is a descriptor mistake, so it is reported and the
+        // first field decides.
+        boolean occlusive = fields.get(0).isOcclusive();
+        for (int i = 1; i < count; i++) {
+            if (fields.get(i).isOcclusive() != occlusive) {
+                logger.warn("Slot mixes occluding and emitting fields (field 0 is "
+                                    + (occlusive ? "occluding" : "emitting") + ", field " + i + " is not). The first field decides.");
+                break;
+            }
+        }
+        float targetMeanRayIntegral = occlusive ? 0f : (float) VolumeCalibration.EMISSIVE_TARGET_MEAN_LUMA;
+        float targetPeak = occlusive ? (float) VolumeCalibration.OCCLUSIVE_TARGET_PEAK : 0f;
 
         // The box has to hold every field in the slot, not just the first: a bulge can be taller than
         // the gas disk it sits in.
@@ -156,6 +191,8 @@ public class GalaxyVolumeGenerator implements Disposable {
                 program.setUniform("u_gridDims", grid.nx, grid.ny, grid.nz);
                 program.setUniform("u_gridOffset", 0, 0, 0);
                 program.setUniform("u_targetMeanRayIntegral", targetMeanRayIntegral);
+                program.setUniform("u_targetPeak", targetPeak);
+                program.setUniform("u_occlusive", occlusive ? 1 : 0);
                 program.setUniform("u_gain", 1f);
                 program.end3D(grid.nx, grid.ny, grid.nz);
             }
@@ -190,9 +227,11 @@ public class GalaxyVolumeGenerator implements Disposable {
      *
      * @param grid The grid that was generated.
      *
-     * @return {@code {peakLight, peakUnit, meanLight, meanUnit}}, or null if there is nothing to read.
-     * The peaks are the largest channel of the summed light, the means are luma averages over all
-     * voxels - the quantity {@link VolumeCalibration} is stated in.
+     * @return {@code {peakLight, peakUnit, meanLight, meanUnit, peakDensity, peakUnitDensity}}, or
+     * null if there is nothing to read. The light peaks are the largest channel of the summed light,
+     * the means are luma averages over all voxels - the quantity {@link VolumeCalibration} is stated
+     * in - and the density peaks are the maxima of the summed density, which is what an occlusive
+     * slot is normalised by.
      */
     public float[] readStats(VoxelGrid grid) {
         if (statsBuffer < 0 || grid == null) {
@@ -208,7 +247,9 @@ public class GalaxyVolumeGenerator implements Disposable {
                 Float.intBitsToFloat(stats.get(0)),
                 Float.intBitsToFloat(stats.get(1)),
                 stats.get(2) / voxelCount,
-                stats.get(3) / voxelCount
+                stats.get(3) / voxelCount,
+                Float.intBitsToFloat(stats.get(4)),
+                Float.intBitsToFloat(stats.get(5))
         };
     }
 

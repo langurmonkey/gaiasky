@@ -221,6 +221,27 @@ public class GalaxyAttributes {
     }
 
     /**
+     * Total angle the arm centreline sweeps between {@link #minRadius} and {@link #baseRadius}, in
+     * degrees.
+     * <p>
+     * Mirrors the arm centreline of {@code gxArmFactor()}: {@code theta = b * ln(r / (0.1 *
+     * baseRadius))} with {@code b = tan(baseAngle * 0.1)}. Note what that makes {@link #baseAngle}:
+     * the angle at which the arm leaves the <em>radial</em> direction, in tenths of a degree, so
+     * larger means more wound and 0 means radial spokes. A sweep under ~25 deg is a cross of four
+     * spokes rather than a spiral, which is why {@code GalaxyVolumeGenerator} warns about it.
+     */
+    public double spiralArmSweepDegrees() {
+        if (!distribution.isAnySpiral()) {
+            return 0.0;
+        }
+        double deg = MathUtilsDouble.clamp(baseAngle * 0.1, 0.0, 85.0);
+        double b = Math.tan(Math.toRadians(deg));
+        // r runs from minRadius * baseRadius to baseRadius, so ln(r / (0.1 * baseRadius)) goes from
+        // ln(10 * minRadius) to ln(10) and the difference is ln(1 / minRadius).
+        return Math.toDegrees(b * Math.log(1.0 / MathUtilsDouble.clamp(minRadius, 1e-4, 1.0)));
+    }
+
+    /**
      * Derives the volume grid of a whole slot, which holds several fields at once - gas and bulge
      * share the emissive slot - so the box has to contain all of them, not just the first.
      *
@@ -772,7 +793,7 @@ public class GalaxyAttributes {
         }
 
         public boolean isLogarithmicSpiral() {
-            return this == SPIRAL;
+            return this == SPIRAL_LOG;
         }
 
         public boolean isEllipsoid() {

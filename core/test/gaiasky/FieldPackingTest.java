@@ -98,6 +98,52 @@ public class FieldPackingTest {
     }
 
     @Test
+    public void armSweepGrowsWithBaseAngle() {
+        // baseAngle is in tenths of a degree and measured from the radial direction, so a small
+        // value is a set of radial spokes. This is the trap the descriptor falls into: 12 reads like
+        // "12 degrees" and is 1.2, i.e. a 3.6 deg sweep over a disk starting at minRadius = 0.05.
+        var ds = new BillboardDataset();
+        ds.distribution = GalaxyAttributes.Distribution.SPIRAL;
+        ds.minRadius = 0.05f;
+
+        ds.baseAngle = 12f;
+        Assert.assertEquals(3.6, ds.spiralArmSweepDegrees(), 0.2);
+
+        ds.baseAngle = 600f;
+        Assert.assertEquals(297.0, ds.spiralArmSweepDegrees(), 1.0);
+
+        // Larger is always more wound, and never decreases.
+        double previous = -1;
+        for (float a = 0; a <= 850; a += 50) {
+            ds.baseAngle = a;
+            double sweep = ds.spiralArmSweepDegrees();
+            Assert.assertTrue(sweep >= previous);
+            previous = sweep;
+        }
+
+        // A 4-arm spiral that visibly curves is the 400-700 band the generator recommends.
+        ds.baseAngle = 500f;
+        Assert.assertTrue(ds.spiralArmSweepDegrees() > 150.0);
+
+        // Non-spirals have no sweep to report.
+        ds.distribution = GalaxyAttributes.Distribution.SPHERE;
+        Assert.assertEquals(0.0, ds.spiralArmSweepDegrees(), 0.0);
+    }
+
+    @Test
+    public void logarithmicSpiralIsItsOwnDistribution() {
+        // This predicate decides which knobs the procedural galaxy window shows, so SPIRAL and
+        // SPIRAL_LOG must not answer for each other.
+        Assert.assertTrue(GalaxyAttributes.Distribution.SPIRAL.isDensityWaveSpiral());
+        Assert.assertFalse(GalaxyAttributes.Distribution.SPIRAL.isLogarithmicSpiral());
+        Assert.assertTrue(GalaxyAttributes.Distribution.SPIRAL_LOG.isLogarithmicSpiral());
+        Assert.assertFalse(GalaxyAttributes.Distribution.SPIRAL_LOG.isDensityWaveSpiral());
+        Assert.assertTrue(GalaxyAttributes.Distribution.SPIRAL.isAnySpiral());
+        Assert.assertTrue(GalaxyAttributes.Distribution.SPIRAL_LOG.isAnySpiral());
+        Assert.assertFalse(GalaxyAttributes.Distribution.DISK.isAnySpiral());
+    }
+
+    @Test
     public void distributioOrdinalsMatchTheShader() {
         // The GX_* constants in galaxy.glsl depend on these ordinals.
         Assert.assertEquals(0, GalaxyAttributes.Distribution.SPHERE.ordinal());

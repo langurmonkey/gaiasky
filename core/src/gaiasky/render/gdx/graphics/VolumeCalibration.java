@@ -64,6 +64,21 @@ public final class VolumeCalibration {
     /** Peak stored brightness of the Milky Way's dust texture. **/
     public static final double MW_OCCLUSIVE_PEAK = 0.059;
     /**
+     * Target stored peak of the occlusive slot at unit field intensity: 0.98.
+     * <p>
+     * The occlusive slot is calibrated on its <em>peak</em> and not on its mean, unlike the emissive
+     * one. What the raymarcher compares against {@code u_volumeNDepthThreshold} is the lanes, which
+     * sit at the peak; the mean is dominated by the faint tail that never occludes anything, so
+     * matching it would let a galaxy with the right mean and no lanes look correct. The mean-to-peak
+     * ratio below is then a shape diagnostic rather than a target - the analytic dust field measures
+     * 3.5e-4 against the Milky Way's 3.3e-4, which is what says the lanes are where they should be.
+     * <p>
+     * Note the consequence of the per-unit convention: the Milky Way's own dust intensity is 0.06, so
+     * a procedural dust field at intensity 1 saturates the 8-bit alpha. That is intentional - an
+     * intensity of 1 means "about 17 times the Milky Way's dust".
+     */
+    public static final double OCCLUSIVE_TARGET_PEAK = MW_OCCLUSIVE_PEAK / MW_DUST_INTENSITY;
+    /**
      * Mean-to-peak ratio of the Milky Way's dust, 4.2e-4: its dust is a few saturated lanes in an
      * almost empty box (0.3% of the voxels are lit). A shape diagnostic for a procedural dust
      * field - matching the mean alone is not enough, because a smooth field with the same mean has a

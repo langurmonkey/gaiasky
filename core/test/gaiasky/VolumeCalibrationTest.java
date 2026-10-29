@@ -52,6 +52,19 @@ public class VolumeCalibrationTest {
     }
 
     @Test
+    public void occlusiveSlotIsAnchoredOnItsPeak() {
+        Assert.assertEquals(VolumeCalibration.MW_OCCLUSIVE_PEAK / VolumeCalibration.MW_DUST_INTENSITY,
+                            VolumeCalibration.OCCLUSIVE_TARGET_PEAK, 1e-12);
+        // At the Milky Way's own dust intensity the stored peak is the Milky Way's own peak.
+        Assert.assertEquals(VolumeCalibration.MW_OCCLUSIVE_PEAK,
+                            VolumeCalibration.OCCLUSIVE_TARGET_PEAK * VolumeCalibration.MW_DUST_INTENSITY, 1e-12);
+        // The Milky Way's dust intensity is 0.06, so a field at unit intensity is about 17 times its
+        // dust and the target peak lands just below a full byte.
+        Assert.assertTrue(VolumeCalibration.OCCLUSIVE_TARGET_PEAK > 0.9);
+        Assert.assertTrue(VolumeCalibration.OCCLUSIVE_TARGET_PEAK <= 1.0);
+    }
+
+    @Test
     public void dustDiagnosticIsAPeakToMeanContrast() {
         Assert.assertEquals(VolumeCalibration.MW_OCCLUSIVE_MEAN_LUMA / VolumeCalibration.MW_OCCLUSIVE_PEAK,
                             VolumeCalibration.MW_OCCLUSIVE_MEAN_PEAK_RATIO, 1e-12);
