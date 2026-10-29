@@ -186,7 +186,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
             // Already built (or being built this frame): a reload must not stack volumes on top of
             // each other, and the billboards of this channel must still go, or they draw over the
             // volume that replaced them.
-            removeVolumeDatasets(owner);
+            removeVolumeDatasets(owner, fields);
             return;
         }
         if (!GalaxyVolumeGenerator.isSupported()) {
@@ -196,7 +196,9 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         }
 
         try {
-            double sizePc = Mapper.body.get(entity).size * Constants.U_TO_PC;
+            // Size of the object, not of this entity: the volume is parented to the full-resolution
+            // entity, which is the one that owns the object's dimensions.
+            double sizePc = Mapper.body.get(owner).size * Constants.U_TO_PC;
             var textures = GalaxyVolumeBuilder.generate(fields.toArray(new BillboardDataset[0]), sizePc,
                                                         GaiaSky.settings().graphics.quality);
             if (textures[GalaxyVolumeBuilder.SLOT_EMISSIVE] == null && textures[GalaxyVolumeBuilder.SLOT_OCCLUSIVE] == null) {
@@ -229,7 +231,9 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         }
 
         // Only once the volume exists: dropping the datasets first would leave a galaxy with neither.
-        removeVolumeDatasets(owner);
+        // Only the datasets that actually went into a slot are dropped, so a channel that stayed on
+        // billboards keeps its billboards.
+        removeVolumeDatasets(owner, fields);
     }
 
     /** The field's datasets of the owner and of its billboard children, deduplicated by identity. **/
@@ -258,27 +262,32 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         }
     }
 
-    /** Drops the datasets that became a volume from the owner and its children, in place. **/
-    private void removeVolumeDatasets(Entity owner) {
-        removeVolumeDatasets(Mapper.billboardSet.get(owner));
+    /** Drops the given datasets from the owner's billboard sets and those of its children, in place. **/
+    private void removeVolumeDatasets(Entity owner, List<BillboardDataset> consumed) {
+        if (consumed.isEmpty()) {
+            return;
+        }
+        if (Mapper.billboardSet.has(owner)) {
+            removeVolumeDatasets(Mapper.billboardSet.get(owner), consumed);
+        }
         var children = Mapper.graph.get(owner).children;
         if (children != null) {
             for (var child : children) {
                 if (child != null && Mapper.billboardSet.has(child)) {
-                    removeVolumeDatasets(Mapper.billboardSet.get(child));
+                    removeVolumeDatasets(Mapper.billboardSet.get(child), consumed);
                 }
             }
         }
     }
 
     /** Drops the datasets that became a volume from one billboard set, in place. **/
-    private void removeVolumeDatasets(gaiasky.scene.component.BillboardSet billboard) {
+    private void removeVolumeDatasets(gaiasky.scene.component.BillboardSet billboard, List<BillboardDataset> consumed) {
         if (billboard.datasets == null) {
             return;
         }
         var remaining = new java.util.ArrayList<BillboardDataset>(billboard.datasets.length);
         for (var dataset : billboard.datasets) {
-            if (dataset == null || !dataset.isVolume()) {
+            if (dataset == null || !consumed.contains(dataset)) {
                 remaining.add(dataset);
             }
         }

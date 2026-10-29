@@ -23,6 +23,7 @@ public class GalaxyVolumePlanTest {
     private static BillboardDataset dataset(BillboardDataset.ChannelType type) {
         var ds = new BillboardDataset();
         ds.type = type;
+        ds.generation = BillboardDataset.Generation.VOLUME;
         ds.distribution = type == BillboardDataset.ChannelType.BULGE
                 ? BillboardDataset.Distribution.SPHERE
                 : BillboardDataset.Distribution.SPIRAL;
@@ -77,10 +78,18 @@ public class GalaxyVolumePlanTest {
     }
 
     @Test
-    public void legacyDescriptorsKeepTheirBillboards() {
-        var gas = dataset(BillboardDataset.ChannelType.GAS);
-        gas.generation = BillboardDataset.Generation.BILLBOARD;
+    public void descriptorsDefaultToBillboards() {
+        // Existing descriptors were written for the billboard path: nothing opts in unless it says so.
+        var gas = new BillboardDataset();
+        gas.type = BillboardDataset.ChannelType.GAS;
+        gas.distribution = BillboardDataset.Distribution.SPIRAL;
+        gas.baseRadius = 1.0f;
+        Assert.assertEquals(BillboardDataset.Generation.BILLBOARD, gas.generation);
+        Assert.assertFalse(gas.isVolume());
         Assert.assertTrue(GalaxyVolumeBuilder.plan(new BillboardDataset[]{gas}, 20_400, GraphicsQuality.NORMAL).isEmpty());
+        // And the same dataset, once it opts in, does plan a volume.
+        gas.generation = BillboardDataset.Generation.VOLUME;
+        Assert.assertEquals(1, GalaxyVolumeBuilder.plan(new BillboardDataset[]{gas}, 20_400, GraphicsQuality.NORMAL).size());
     }
 
     @Test
