@@ -64,8 +64,12 @@ public class BillboardDataset {
     /**
      * How this dataset is turned into something the renderer can draw: voxelised into a density
      * field and raymarched as a volume, or sampled into billboard particles.
+     * <p>
+     * Billboard is the default, which keeps every existing descriptor looking exactly as it does today
+     * - descriptors were written for the billboard path and know nothing about the field. A volume is
+     * opt-in, per dataset, with {@code "generation": "volume"}.
      */
-    public Generation generation = Generation.VOLUME;
+    public Generation generation = Generation.BILLBOARD;
     /**
      * Probability distribution, for procedural datasets.
      */
@@ -1115,12 +1119,12 @@ public class BillboardDataset {
         /**
          * The analytic density field of {@code assets/shader/lib/galaxy.glsl}, voxelised into a 3D
          * texture by {@code galtype.comp.glsl} and raymarched as a volume. Resolution-independent and
-         * seedless: changing a parameter changes the field, not a roll of the dice.
+         * seedless: changing a parameter changes the field, not a roll of the dice. Opt-in.
          */
         VOLUME,
         /**
-         * Sampled into billboard particles by {@code galgen.comp.glsl}, as before. Kept selectable per
-         * descriptor so an existing galaxy can hold on to its current look.
+         * Sampled into billboard particles by {@code galgen.comp.glsl}, as before. The default, so a
+         * descriptor written for the billboard path keeps its look until it asks otherwise.
          */
         BILLBOARD
     }
