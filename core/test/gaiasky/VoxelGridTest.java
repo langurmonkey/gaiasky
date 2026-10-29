@@ -9,6 +9,7 @@ package gaiasky;
 
 import gaiasky.render.gdx.graphics.VoxelGrid;
 import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.util.Settings.GraphicsQuality;
 import org.junit.Assert;
 import org.junit.Test;
@@ -83,21 +84,21 @@ public class VoxelGridTest {
         // The emissive slot holds gas and bulge. Their boxes differ by an order of magnitude in the
         // vertical, and the union has to contain both or the bulge is cut in half.
         var gas = new BillboardDataset();
-        gas.distribution = BillboardDataset.Distribution.SPIRAL;
+        gas.distribution = GalaxyAttributes.Distribution.SPIRAL;
         gas.baseRadius = 1.0f;
         gas.armSigma = 0.1872f;
         gas.heightScale = 0.02f;
 
         var bulge = new BillboardDataset();
-        bulge.distribution = BillboardDataset.Distribution.SPHERE;
+        bulge.distribution = GalaxyAttributes.Distribution.SPHERE;
         bulge.baseRadius = 0.12f;
 
         Assert.assertEquals(0.06, gas.volumeVerticalHalfExtent(), 1e-6);
         Assert.assertEquals(0.12, bulge.volumeVerticalHalfExtent(), 1e-6);
         Assert.assertEquals(0.12, bulge.volumeLateralHalfExtent(), 1e-6);
 
-        var union = BillboardDataset.volumeGrid(List.of(gas, bulge), 20_400, GraphicsQuality.NORMAL);
-        var gasOnly = BillboardDataset.volumeGrid(List.of(gas), 20_400, GraphicsQuality.NORMAL);
+        var union = GalaxyAttributes.volumeGrid(List.of(gas, bulge), 20_400, GraphicsQuality.NORMAL);
+        var gasOnly = GalaxyAttributes.volumeGrid(List.of(gas), 20_400, GraphicsQuality.NORMAL);
         Assert.assertTrue(union.spanYPc > gasOnly.spanYPc);
         Assert.assertEquals(gasOnly.spanPc, union.spanPc, 1e-9);
     }

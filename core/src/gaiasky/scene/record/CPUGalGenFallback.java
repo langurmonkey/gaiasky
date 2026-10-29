@@ -8,7 +8,7 @@
 package gaiasky.scene.record;
 
 import gaiasky.scene.api.IParticleRecord;
-import gaiasky.scene.record.BillboardDataset.Distribution;
+import gaiasky.scene.record.GalaxyAttributes.Distribution;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
@@ -24,9 +24,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.IntStream;
 
-import static gaiasky.scene.record.BillboardDataset.ChannelType.DUST;
-import static gaiasky.scene.record.BillboardDataset.Distribution.IRREGULAR;
-import static gaiasky.scene.record.BillboardDataset.Distribution.SPIRAL_LOG;
+import static gaiasky.scene.record.GalaxyAttributes.ChannelType.DUST;
+import static gaiasky.scene.record.GalaxyAttributes.Distribution.IRREGULAR;
+import static gaiasky.scene.record.GalaxyAttributes.Distribution.SPIRAL_LOG;
 
 /**
  * CPU equivalent of the GLSL compute shader for procedural billboard particle generation.
