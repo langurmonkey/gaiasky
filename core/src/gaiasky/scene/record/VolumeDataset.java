@@ -26,8 +26,6 @@ public class VolumeDataset {
     public String fileUnpack;
     // The data.
     public VolumeTexture texture;
-    // True when the texture was generated in memory and has no file behind it.
-    public boolean generated = false;
     // Type of data.
     public ParticleType type;
     // The intensity factor.
@@ -42,10 +40,6 @@ public class VolumeDataset {
     }
 
     public boolean initialize() {
-        if (generated && texture != null) {
-            // Already built in memory: nothing to load, nothing to wait for.
-            return true;
-        }
         if (file != null && !file.isBlank()) {
             fileUnpack = GlobalResources.unpackAssetPath(GaiaSky.settings().data.dataFile(file));
             var param = new VolumeTextureLoader.VolumeTextureParameter();
@@ -55,22 +49,7 @@ public class VolumeDataset {
         return false;
     }
 
-    /**
-     * Hands over a volume that was built in memory instead of loaded from a file, such as the density
-     * field the galaxy generator voxelises. Skips the asset loading entirely: there is no file, and no
-     * asset manager entry to wait for.
-     *
-     * @param texture The generated texture.
-     */
-    public void setTexture(VolumeTexture texture) {
-        this.texture = texture;
-        this.generated = texture != null;
-    }
-
     public void doneLoading() {
-        if (generated) {
-            return;
-        }
         if (fileUnpack != null && AssetBean.manager().contains(fileUnpack, VolumeTexture.class)) {
             texture = AssetBean.manager().get(fileUnpack, VolumeTexture.class);
         }
