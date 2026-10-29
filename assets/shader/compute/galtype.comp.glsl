@@ -9,9 +9,10 @@
 // Two passes over the same grid, because the texture is normalised by quantities that are only
 // known once the whole field has been evaluated:
 //
-//   pass 0 (u_pass = REDUCE) evaluates the field, writes nothing, and reduces four statistics: the
-//          peak brightness of the sum at the actual intensities and at unit intensity (the latter
-//          is the "merged reference" of the volume metadata), and the luma sum of each.
+//   pass 0 (u_pass = REDUCE) evaluates the field, writes nothing, and reduces six statistics: the
+//          peak of the summed light and the peak of the summed density, each at the actual
+//          intensities and at unit intensity (the latter being the "merged reference" of the volume
+//          metadata), and the luma sum of the light at both intensities.
 //   pass 1 (u_pass = WRITE) evaluates the field again and stores it, divided by the unit peak and
 //          scaled by the gain derived from the unit luma sum - see u_targetMeanRayIntegral.
 //
@@ -30,8 +31,11 @@ layout(rgba8, binding = 0) uniform image3D u_volume;
 
 // Results of the reduce pass. Peaks as ordered float bits, sums as fixed point.
 layout(std430, binding = 1) buffer Stats {
-    // [0] peak brightness of the sum at the actual intensities, [1] at unit intensity.
-    uint peaks[2];
+    // [0] peak brightness of the summed light at the actual intensities, [1] at unit intensity,
+    // [2] peak summed density at the actual intensities, [3] at unit intensity. The density peaks
+    // are only read by an occlusive slot, but they are always reduced: the branch that uses them
+    // must not depend on a value that was never computed.
+    uint peaks[4];
     // [0] sum of luma(light), [1] sum of luma(unitLight), scaled by GX_SUM_SCALE.
     uint sums[2];
 };
@@ -62,9 +66,16 @@ uniform ivec3 u_gridDims;
 uniform ivec3 u_gridOffset;
 // Mean ray integral this slot is calibrated to: the luma a face-on ray accumulates through the
 // texture, in UVW units - i.e. the mean luma of the stored voxels. 0 or less disables the
-// calibration and leaves u_gain acting alone. See VolumeCalibration on the Java side for the
-// numbers and where they come from.
+// calibration and leaves u_gain acting alone. Emissive slots only; an occlusive slot uses
+// u_targetPeak instead. See VolumeCalibration on the Java side for the numbers and where they come
+// from.
 uniform float u_targetMeanRayIntegral;
+// Stored peak this slot is calibrated to, at unit field intensity. Occlusive slots only.
+uniform float u_targetPeak;
+// 1 if this slot occludes: its alpha is the summed density, normalised by the peak of the unit
+// density and scaled to u_targetPeak. 0 if it emits: its alpha is the summed light, normalised by
+// the unit peak and scaled to u_targetMeanRayIntegral.
+uniform int u_occlusive;
 // Manual scale on top of the calibration.
 uniform float u_gain;
 
@@ -72,6 +83,8 @@ uniform float u_gain;
 // scope.
 shared uint sPeakLight[256];
 shared uint sPeakUnit[256];
+shared uint sPeakDensity[256];
+shared uint sPeakUnitDensity[256];
 shared uint sSumLight[256];
 shared uint sSumUnit[256];
 
@@ -92,6 +105,8 @@ void main() {
     GalaxyFields field;
     field.light = vec3(0.0);
     field.unitLight = vec3(0.0);
+    field.density = 0.0;
+    field.unitDensity = 0.0;
     if (inside) {
         vec3 p = u_gridOrigin + vec3(voxel) * u_gridCell;
         field = gxSampleFields(p, u_fields, u_fieldCount);
@@ -106,6 +121,8 @@ void main() {
         uint i = gl_LocalInvocationIndex;
         sPeakLight[i] = orderedBits(brightLight);
         sPeakUnit[i] = orderedBits(brightUnit);
+        sPeakDensity[i] = orderedBits(field.density);
+        sPeakUnitDensity[i] = orderedBits(field.unitDensity);
         // Rounded sums, so that the rounding does not bias the mean in one direction.
         sSumLight[i] = uint(gxLuma(field.light) * GX_SUM_SCALE + 0.5);
         sSumUnit[i] = uint(gxLuma(field.unitLight) * GX_SUM_SCALE + 0.5);
@@ -114,6 +131,8 @@ void main() {
             if (i < stride) {
                 sPeakLight[i] = max(sPeakLight[i], sPeakLight[i + stride]);
                 sPeakUnit[i] = max(sPeakUnit[i], sPeakUnit[i + stride]);
+                sPeakDensity[i] = max(sPeakDensity[i], sPeakDensity[i + stride]);
+                sPeakUnitDensity[i] = max(sPeakUnitDensity[i], sPeakUnitDensity[i + stride]);
                 sSumLight[i] += sSumLight[i + stride];
                 sSumUnit[i] += sSumUnit[i + stride];
             }
@@ -122,9 +141,30 @@ void main() {
         if (i == 0u) {
             atomicMax(peaks[0], sPeakLight[0]);
             atomicMax(peaks[1], sPeakUnit[0]);
+            atomicMax(peaks[2], sPeakDensity[0]);
+            atomicMax(peaks[3], sPeakUnitDensity[0]);
             atomicAdd(sums[0], sSumLight[0]);
             atomicAdd(sums[1], sSumUnit[0]);
         }
+        return;
+    }
+
+    vec3 chroma = field.light / max(brightLight, 1.0e-12);
+
+    if (u_occlusive == 1) {
+        // The stored alpha is the summed density, and the reference is its peak at *unit*
+        // intensity, so that an intensity stays a linear knob. Anchoring on the peak and not on the
+        // mean is what makes the texture comparable to the Milky Way's dust: what the raymarcher
+        // tests against u_volumeNDepthThreshold is the lanes, which sit at the peak, while the mean
+        // is dominated by the faint tail that never occludes anything. The mean-to-peak ratio is
+        // therefore a shape diagnostic (see VolumeCalibration), not a target.
+        float reference = uintBitsToFloat(peaks[3]);
+        float alpha = field.density;
+        if (u_targetPeak > 0.0 && reference > 0.0) {
+            alpha *= u_targetPeak / reference;
+        }
+        alpha *= u_gain;
+        imageStore(u_volume, voxel, vec4(clamp(chroma, 0.0, 1.0), clamp(alpha, 0.0, 1.0)));
         return;
     }
 
@@ -149,6 +189,5 @@ void main() {
     }
     brightness *= u_gain / max(reference, 1.0e-12);
 
-    vec3 chroma = field.light / max(brightLight, 1.0e-12);
     imageStore(u_volume, voxel, vec4(clamp(chroma, 0.0, 1.0), clamp(brightness, 0.0, 1.0)));
 }

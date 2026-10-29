@@ -1,6 +1,8 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
+import gaiasky.render.gdx.graphics.VolumeTexture;
 import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -12,8 +14,13 @@ import java.util.List;
 /**
  * Stores information for volumetric rendering of bodies.
  */
-public class Volume implements Component {
+public class Volume implements Component, IDisposable {
     public static final Logger.Log logger = Logger.getLogger(Volume.class);
+
+    /** Slot of the emissive volume texture: what the galaxy emits. **/
+    public static final int SLOT_EMISSIVE = 0;
+    /** Slot of the occlusive volume texture: what absorbs light through it. **/
+    public static final int SLOT_OCCLUSIVE = 1;
 
     public String vertexShader = "assets/shader/pbr.vertex.glsl";
     public String fragmentShader = "assets/shader/volume.fragment.glsl";
@@ -33,6 +40,13 @@ public class Volume implements Component {
      * descriptor - the raymarcher has exactly two slots and always will.
      */
     public GalaxyAttributes[] fields;
+
+    /** Volume texture generated from {@link #emissiveFields()}, or null. Owned by this component. **/
+    private VolumeTexture generatedEmissive;
+    /** Volume texture generated from {@link #occlusiveFields()}, or null. Owned by this component. **/
+    private VolumeTexture generatedOcclusive;
+    /** Set when the component is disposed, see {@link #isDisposed()}. **/
+    private boolean disposed;
 
     /**
      * Setter used by the scene JSON loader, mirroring {@link gaiasky.scene.component.BillboardSet#setData(Object[])}.
@@ -79,6 +93,69 @@ public class Volume implements Component {
             }
         }
         return list;
+    }
+
+    /**
+     * The texture generated for the given slot, or null if the slot is empty or was not generated.
+     * The texture is owned by this component, not by the asset manager, so it has to be disposed
+     * here - see {@link #dispose(Entity)}.
+     */
+    public VolumeTexture getGeneratedVolume(int slot) {
+        return switch (slot) {
+            case SLOT_EMISSIVE -> generatedEmissive;
+            case SLOT_OCCLUSIVE -> generatedOcclusive;
+            default -> null;
+        };
+    }
+
+    /**
+     * Stores the texture generated for the given slot, disposing whatever the slot held before.
+     * Passing null clears the slot.
+     *
+     * @param slot    {@link #SLOT_EMISSIVE} or {@link #SLOT_OCCLUSIVE}.
+     * @param texture The generated volume, owned by this component from now on.
+     */
+    public void setGeneratedVolume(int slot,
+                                   VolumeTexture texture) {
+        switch (slot) {
+            case SLOT_EMISSIVE -> {
+                disposeVolume(generatedEmissive, texture);
+                generatedEmissive = texture;
+            }
+            case SLOT_OCCLUSIVE -> {
+                disposeVolume(generatedOcclusive, texture);
+                generatedOcclusive = texture;
+            }
+            default -> logger.warn("No such volume slot: " + slot);
+        }
+    }
+
+    private static void disposeVolume(VolumeTexture previous,
+                                      VolumeTexture replacement) {
+        if (previous != null && previous != replacement && previous.texture() != null) {
+            previous.texture().dispose();
+        }
+    }
+
+    /**
+     * Releases the generated textures. Called by the scene when the entity is removed, which is the
+     * only place these textures are freed: they are not registered with the asset manager, so
+     * nothing else will.
+     */
+    @Override
+    public void dispose(Entity e) {
+        disposed = true;
+        setGeneratedVolume(SLOT_EMISSIVE, null);
+        setGeneratedVolume(SLOT_OCCLUSIVE, null);
+    }
+
+    /**
+     * @return Whether this component has been disposed. Generation may complete after the entity is
+     * gone when lazy texture initialisation is on, and a texture bound to a disposed component would
+     * leak, so the deferred generation checks this first.
+     */
+    public boolean isDisposed() {
+        return disposed;
     }
 
     /**

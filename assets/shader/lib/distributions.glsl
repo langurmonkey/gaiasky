@@ -120,14 +120,14 @@ float noise(in vec3 st) {
 
     vec3 u = f * f * (3.0 - 2.0 * f);
 
-    // Interpolate between the corners using the fade function (smoothstep)
-    return mix(a, b, u.x) +
-    (c - a) * u.y * (1.0 - u.x) +
-    (d - b) * u.x * u.y * (1.0 - u.z) +
-    (e - a) * u.z * (1.0 - u.x) +
-    (f1 - b) * u.x * u.z * (1.0 - u.y) +
-    (g - c) * u.y * u.z * (1.0 - u.x) +
-    (h - d) * u.x * u.y * u.z;
+    // Trilinear: three mixes along x, then along y, then along z. Written out as a sum of corner
+    // differences the way the 2D version is, every term but the first is missing one of its
+    // complementary factors, so the result still hits most of the eight corner values but not the
+    // (1,1,1) one - it lands on b + h - d there - and the cell is discontinuous at that corner. As
+    // a modulation that reads as a lattice of blocky cells, which is what gxClumps() would then
+    // bake into every procedural galaxy volume.
+    return mix(mix(mix(a, b, u.x), mix(c, d, u.x), u.y),
+               mix(mix(e, f1, u.x), mix(g, h, u.x), u.y), u.z);
 }
 
 #define OCTAVES 4

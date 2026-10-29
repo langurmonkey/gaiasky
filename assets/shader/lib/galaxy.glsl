@@ -423,12 +423,20 @@ struct GalaxyFields {
     // The same at unit intensity, which is what the "merged reference" in the volume metadata is
     // the peak of: a property of the shape, unaffected by the intensities.
     vec3 unitLight;
+    // Sum of intensity * density, with no colour in it. This is what an occluding field stores:
+    // optical depth is a scalar, and taking it from `light` instead would let two fields of
+    // different colours partially cancel in the alpha channel.
+    float density;
+    // The same at unit intensity, which is the reference the occlusive slot is normalised by.
+    float unitDensity;
 };
 
 GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count) {
     GalaxyFields r;
     r.light = vec3(0.0);
     r.unitLight = vec3(0.0);
+    r.density = 0.0;
+    r.unitDensity = 0.0;
     for (int i = 0; i < GX_MAX_FIELDS; i++) {
         if (i >= count) {
             break;
@@ -438,6 +446,8 @@ GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count) {
         vec3 emission = v.rgb * v.a;
         r.light += s.weight * emission;
         r.unitLight += emission;
+        r.density += s.weight * v.a;
+        r.unitDensity += v.a;
     }
     return r;
 }
