@@ -233,14 +233,12 @@ public class ModelEntityRenderSystem {
             if (volume == null) {
                 mc.updateDepthTest();
             } else if (renderGroup == RenderGroup.VOLUME_DEPTH) {
-                // The pre-pass stores the dust front; that is the mask the passes after it are tested against.
+                // Pre-pass: writes the dust front into a target of its own, later composed into the
+                // scene depth. LEQUAL plus the write keeps the nearest of the volume's fragments.
                 mc.depthTestReadWrite();
             } else if (volume.writeDepth) {
-                // Colour pass: no test and no write here. The pre-pass owns depth for this object.
-                // Testing the colour pass against that same mask is not safe (see the note in
-                // Volume.writeDepth): the shader replaces the rasterised depth with the distance to
-                // its first dense sample, and that distance jumps by whole steps where a dust
-                // filament is grazed, so the fragment compares its own mask against itself.
+                // Colour pass: no depth test or write. Occlusion is done in the shader against the
+                // stored front (see VolumeDepthMask); a test here would compare the volume with itself.
                 mc.depthTestDisable();
             } else {
                 mc.updateDepthTest();

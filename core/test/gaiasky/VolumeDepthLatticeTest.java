@@ -17,18 +17,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 /**
- * The volume depth mask is only usable if the pre-pass and the colour pass march the same lattice.
- * <p>
- * {@link gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem#renderVolume} now draws the
- * colour pass with {@code GL_LEQUAL} and no depth writes, against the mask the pre-pass left in the
- * depth buffer - that is what lets two volumes hide each other. The shader writes the depth of its
- * own first dense sample, so the test compares the volume against its own mask as well, and the
- * distance to that sample is discontinuous near a dust edge: one step either way and a thin filament
- * is missed. Any difference in the sample positions between the two passes therefore punches the
- * volume with its own mask, in speckles along every lane, which is exactly what happened when the
- * pre-pass stepped at 0.02 UVW and the colour pass at 0.01 with a phase that re-rolled every frame.
- * <p>
- * These assertions pin the properties that keep the two lattices identical.
+ * Pins the volume occlusion invariants: the colour pass compares two stored depths (its own front and
+ * the shared buffer) instead of testing a recomputed one, it clips the march at that distance rather
+ * than dropping the fragment, and the pre-pass does not clip at all.
  */
 public class VolumeDepthLatticeTest {
 
@@ -37,7 +28,7 @@ public class VolumeDepthLatticeTest {
 
     private static String read(String relative)
             throws IOException {
-        // Tests run from the module directory, but be forgiving about how they are launched.
+        // Try the usual working directories.
         for (String root : List.of("..", ".", "../..")) {
             Path p = Paths.get(root, relative);
             if (Files.exists(p)) {
@@ -47,7 +38,7 @@ public class VolumeDepthLatticeTest {
         throw new IOException("Cannot find " + relative + " from " + Paths.get(".").toAbsolutePath());
     }
 
-    /** Drops line comments, so a note about a symbol does not read as a use of it. **/
+    /** Drops line comments. **/
     private static String stripComments(String src) {
         StringBuilder sb = new StringBuilder();
         for (String line : src.split("\n")) {
@@ -58,51 +49,94 @@ public class VolumeDepthLatticeTest {
     }
 
     @Test
-    public void theMarchLatticeDoesNotDependOnThePass()
+    public void thePrePassIsPhaseStable()
             throws IOException {
         for (String shader : SHADERS) {
             String src = read(shader);
 
-            // Only the pre-pass' jitter may be phase-stable: its mask has to hold still. The colour
-            // pass animates its phase, or the march noise freezes into a stipple.
+            // The pre-pass jitter must be phase-stable, or the stored front crawls.
             Assert.assertTrue(shader + " must keep the pre-pass jitter free of u_time",
                               src.contains("#ifdef DEPTH_PASS\n    float jitter = hash12(gl_FragCoord.xy);"));
-
-            // The step must be the same in both passes.
-            Assert.assertTrue(shader + " must declare the march step once, outside any DEPTH_PASS branch",
-                              src.contains("const float TARGET_STEP_UVW = 0.01;"));
-            Assert.assertFalse(shader + " must not vary the march step per pass",
-                               src.contains("#ifdef DEPTH_PASS\n    const float TARGET_STEP_UVW"));
-
-            // Nor may a pass drop a box: that changes the union span and therefore the step count.
-            Assert.assertFalse(shader + " must not drop a box in one pass only",
-                               src.contains("iEmissive = vec2(-1.0)"));
-            Assert.assertFalse(shader + " must not drop a box in one pass only",
-                               src.contains("iOpaque = vec2(-1.0)"));
-            Assert.assertFalse(shader + " must not narrow a slot's extent in one pass only",
-                               src.contains("uvwScaleEmissive = 0.0"));
-            Assert.assertFalse(shader + " must not narrow a slot's extent in one pass only",
-                               src.contains("uvwScaleOpaque = 0.0"));
         }
     }
 
     @Test
-    public void theColourPassWritesTheDepthItIsTestedAgainst()
+    public void theOcclusionTestComparesStoredDepths()
             throws IOException {
         for (String shader : SHADERS) {
-            String src = read(shader);
+            String code = stripComments(read(shader));
 
-            // The colour pass is drawn with a depth test, which only makes sense because the fragment
-            // shader replaces the rasterised depth (the far side of the proxy mesh) with the depth of
-            // its own first dense sample. Without this write the GL_LEQUAL test would compare the far
-            // side and delete every fragment.
-            Assert.assertTrue(shader + " must write gl_FragDepth from the first dense sample",
-                              src.contains("gl_FragDepth = firstDepth > 0.0"));
+            // Both depths read as textures.
+            Assert.assertTrue(shader + " must read this volume's own front from its mask texture",
+                              code.contains("texelFetch(u_volumeDepthTexture, texel, 0).r"));
+            Assert.assertTrue(shader + " must read the shared depth buffer",
+                              code.contains("texelFetch(u_volumeSceneDepth, texel, 0).r"));
 
-            // A hair of margin for float noise between two separately compiled programs. It is not a
-            // lattice tolerance: it is four orders of magnitude below a step.
-            Assert.assertTrue(shader + " must keep a float-noise margin on the depth it writes",
-                              src.contains("firstDepth * 0.9999"));
+            // Both lookups must use the same texel, or a half-resolution volume clips its own dust.
+            Assert.assertTrue(shader + " must look the two depths up at one texel",
+                              code.contains("ivec2 texel = ivec2(gl_FragCoord.xy * u_volumeDepthMaskScale);"));
+
+            // Both are stored log depths, so the margin is just the attachment quantum.
+            Assert.assertTrue(shader + " must treat a nearer buffer as a foreign occluder",
+                              code.contains("if (!(scene < mine - 1.0e-5))"));
         }
+    }
+
+    @Test
+    public void theColourPassClipsInsteadOfTesting()
+            throws IOException {
+        for (String shader : SHADERS) {
+            String code = stripComments(read(shader));
+
+            // A distance applied to the span of the march.
+            Assert.assertTrue(shader + " must clip the march at the occluder's distance",
+                              code.contains("exitDist = min(exitDist, clipDist);"));
+            // Threaded into every march of the file.
+            Assert.assertEquals(shader + " must thread the clip into every raymarch",
+                                count(code, "clipDist);"), count(code, "raymarchVolume"));
+
+            // Only the colour pass clips: the pre-pass writes that very depth.
+            Assert.assertTrue(shader + " must not clip in the pre-pass",
+                              code.contains("#if defined(volumeDepthTextureFlag) && !defined(DEPTH_PASS)"));
+        }
+    }
+
+    @Test
+    public void thePrePassIsComposedBackIntoTheScene()
+            throws IOException {
+        String renderer = read("core/src/gaiasky/scene/system/render/draw/VolumeRenderer.java");
+
+        // Without the compose, the dust would stop occluding the stars and labels.
+        Assert.assertTrue("the depth pass must bind a per-volume target", renderer.contains("depthMask.begin(volume)"));
+        Assert.assertTrue("the depth pass must compose the fronts into the scene depth", renderer.contains("depthMask.compose("));
+        // The colour pass needs both textures before its shader compiles.
+        Assert.assertTrue("the colour pass must bind the mask", renderer.contains("setVolumeDepthMask("));
+        Assert.assertTrue("the pre-pass must go back to the scene's framebuffer",
+                          renderer.contains("depthMask.restore();"));
+    }
+
+    /** The colour pass must not depth-test against its own front. */
+    @Test
+    public void theColourPassDoesNotTestAgainstItsOwnDepth()
+            throws IOException {
+        String renderer = read("core/src/gaiasky/scene/system/render/draw/model/ModelEntityRenderSystem.java");
+        String colourPass = renderer.substring(renderer.indexOf("} else if (volume.writeDepth) {"));
+        String branch = colourPass.substring(0, colourPass.indexOf("} else {"));
+        Assert.assertTrue("the volume colour pass must not test or write depth",
+                          branch.contains("mc.depthTestDisable();"));
+        Assert.assertFalse("the volume colour pass must not depth-test against its own front",
+                           branch.contains("depthTestReadOnly"));
+        Assert.assertFalse("the volume colour pass must not depth-test against its own front",
+                           branch.contains("depthTestReadWrite"));
+    }
+
+    private static int count(String haystack,
+                             String needle) {
+        int n = 0, i = 0;
+        while ((i = haystack.indexOf(needle, i)) >= 0) {
+            n++;
+            i += needle.length();
+        }
+        return n;
     }
 }

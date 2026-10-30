@@ -152,6 +152,11 @@ public class DefaultIntShader extends BaseIntShader {
     public int u_volume2DepthThreshold;
     public int u_volume3DepthThreshold;
 
+    /** Volume depth mask: this volume's own front, the shared scene depth, and the mask scale. */
+    public int u_volumeDepthTexture;
+    public int u_volumeSceneDepth;
+    public int u_volumeDepthMaskScale;
+
     // Cubemaps
     protected final int u_reflectionCubemap;
     protected final int u_diffuseCubemap;
@@ -407,6 +412,10 @@ public class DefaultIntShader extends BaseIntShader {
         u_volume2DepthThreshold = register(Inputs.volume2DepthThresholdUniform, Setters.volume2DepthThresholdSetter);
         u_volume3DepthThreshold = register(Inputs.volume3DepthThresholdUniform, Setters.volume3DepthThresholdSetter);
 
+        u_volumeDepthTexture = register(Inputs.volumeDepthTexture, Setters.volumeDepthTexture);
+        u_volumeSceneDepth = register(Inputs.volumeSceneDepth, Setters.volumeSceneDepth);
+        u_volumeDepthMaskScale = register(Inputs.volumeDepthMaskScale, Setters.volumeDepthMaskScale);
+
         // SVT.
         u_svtId = register(Inputs.svtId, Setters.svtId);
         u_svtDetectionFactor = register(Inputs.svtDetectionFactor, Setters.svtDetectionFactor);
@@ -637,6 +646,10 @@ public class DefaultIntShader extends BaseIntShader {
         }
         if (attributes.has(Texture3DAttribute.Volume3)) {
             prefix.append("#define " + Texture3DAttribute.Volume3Alias + "Flag\n");
+        }
+
+        if (attributes.has(TextureAttribute.VolumeDepth)) {
+            prefix.append("#define " + TextureAttribute.VolumeDepthAlias + "Flag\n");
         }
 
         if (GaiaSky.settings().postprocess.ssr.active) {
@@ -1143,6 +1156,9 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform volume1DepthThresholdUniform = new Uniform("u_volume1DepthThreshold");
         public final static Uniform volume2DepthThresholdUniform = new Uniform("u_volume2DepthThreshold");
         public final static Uniform volume3DepthThresholdUniform = new Uniform("u_volume3DepthThreshold");
+        public final static Uniform volumeDepthTexture = new Uniform("u_volumeDepthTexture", TextureAttribute.VolumeDepth);
+        public final static Uniform volumeSceneDepth = new Uniform("u_volumeSceneDepth", TextureAttribute.VolumeSceneDepth);
+        public final static Uniform volumeDepthMaskScale = new Uniform("u_volumeDepthMaskScale", Vector2Attribute.VolumeDepthMaskScale);
 
         public final static Uniform svtTileSize = new Uniform("u_svtTileSize", FloatAttribute.SvtTileSize);
         public final static Uniform svtResolution = new Uniform("u_svtResolution", Vector2Attribute.SvtResolution);
@@ -2113,6 +2129,41 @@ public class DefaultIntShader extends BaseIntShader {
             return a == null ? 0f : a.depthThreshold;
         }
 
+        public final static Setter volumeDepthTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.VolumeDepth)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(
+                            ((TextureAttribute) Objects.requireNonNull(combinedAttributes.get(TextureAttribute.VolumeDepth))).textureDescription));
+                }
+            }
+        };
+        public final static Setter volumeSceneDepth = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.VolumeSceneDepth)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(
+                            ((TextureAttribute) Objects.requireNonNull(combinedAttributes.get(TextureAttribute.VolumeSceneDepth))).textureDescription));
+                }
+            }
+        };
+        public final static Setter volumeDepthMaskScale = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector2Attribute.VolumeDepthMaskScale)) {
+                    shader.set(inputID, ((Vector2Attribute) Objects.requireNonNull(combinedAttributes.get(Vector2Attribute.VolumeDepthMaskScale))).value);
+                }
+            }
+        };
         public final static Setter volume0DepthThresholdSetter = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader,

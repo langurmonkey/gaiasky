@@ -100,6 +100,33 @@ layout(location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
+#ifdef volumeDepthTextureFlag
+// This volume's own front: depth of its first sample dense enough to occlude, written by the
+// depth-only pre-pass.
+uniform sampler2D u_volumeDepthTexture;
+// The scene depth buffer as of this pass: geometry plus every volume's composed front.
+uniform sampler2D u_volumeSceneDepth;
+// Mask texels per fragment of this pass (2 in the half-resolution buffer, 1 otherwise).
+uniform vec2 u_volumeDepthMaskScale;
+
+// Distance along the ray at which something other than this volume occludes it, or 0 if nothing does.
+// Both depths are stored by the pre-pass, so they compare exactly; a fixed-function depth test would
+// compare the volume with its own front instead.
+float volumeOcclusionDistance() {
+    // One texel for both textures, so where this volume is nearest they hold the same number.
+    ivec2 texel = ivec2(gl_FragCoord.xy * u_volumeDepthMaskScale);
+    float mine = texelFetch(u_volumeDepthTexture, texel, 0).r;
+    float scene = texelFetch(u_volumeSceneDepth, texel, 0).r;
+    // Stored log depths: nearer is smaller. 1e-5 is above the 24-bit quantum.
+    if (!(scene < mine - 1.0e-5)) {
+        return 0.0;
+    }
+    // View depth of the occluder, converted to a distance along this fragment's ray.
+    float sceneDist = 1.0 / recoverWValue(scene, u_cameraNearFar.y, u_cameraK);
+    return sceneDist * length(v_data.fragPosWorld) * gl_FragCoord.w;
+}
+#endif // volumeDepthTextureFlag
+
 #define PI 3.14159265359
 #define EXPOSURE 20.0
 
@@ -301,7 +328,7 @@ vec4 transferFunction(float density, vec3 baseColor, float stepUVW) {
 // `intersects` reports whether the ray met this box at all, which is what tells the caller
 // whether the fragment is worth shading.
 vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsMin, in vec3 boundsMax, in int colorMode,
-    in float depthThreshold, in vec3[3] ramp, inout float firstDepth, out bool intersects) {
+    in float depthThreshold, in vec3[3] ramp, inout float firstDepth, out bool intersects, in float clipDist) {
     intersects = false;
 
     // Rotation part of u_worldTrans (= S·R; strip the uniform scale).
@@ -342,6 +369,13 @@ vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsM
     vec4 result = vec4(0.0);
     float entryDist = intersection.x;
     float exitDist = intersection.y;
+    // Stop the march at whatever occludes this volume.
+    if (clipDist > 0.0) {
+        exitDist = min(exitDist, clipDist);
+    }
+    if (exitDist <= entryDist) {
+        return vec4(0.0);
+    }
     float rayLength = exitDist - entryDist;
 
     vec3 extent = boundsMax - boundsMin;
@@ -431,23 +465,30 @@ void main() {
     bool hit = false;
     bool anyHit = false;
 
+    // Only the colour pass clips: the pre-pass is writing the very depth this would be read from.
+    #if defined(volumeDepthTextureFlag) && !defined(DEPTH_PASS)
+    float clipDist = volumeOcclusionDistance();
+    #else
+    float clipDist = 0.0;
+    #endif
+
     // Every slot is raymarched over its own box and the results are summed: additive blending
     // of the incoming volumes. No ordering is modelled between them, and no slot attenuates
     // another.
     #ifdef volume0Flag
-    result += raymarchVolume(u_volume0, u_volume0Occupancy, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume0, u_volume0Occupancy, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold, DEFAULT_RAMP, firstDepth, hit, clipDist);
     anyHit = anyHit || hit;
     #endif //volume0Flag
     #ifdef volume1Flag
-    result += raymarchVolume(u_volume1, u_volume1Occupancy, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume1, u_volume1Occupancy, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold, DEFAULT_RAMP, firstDepth, hit, clipDist);
     anyHit = anyHit || hit;
     #endif //volume1Flag
     #ifdef volume2Flag
-    result += raymarchVolume(u_volume2, u_volume2Occupancy, u_volume2BoundsMin, u_volume2BoundsMax, u_volume2ColorMode, u_volume2DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume2, u_volume2Occupancy, u_volume2BoundsMin, u_volume2BoundsMax, u_volume2ColorMode, u_volume2DepthThreshold, DEFAULT_RAMP, firstDepth, hit, clipDist);
     anyHit = anyHit || hit;
     #endif //volume2Flag
     #ifdef volume3Flag
-    result += raymarchVolume(u_volume3, u_volume3Occupancy, u_volume3BoundsMin, u_volume3BoundsMax, u_volume3ColorMode, u_volume3DepthThreshold, DEFAULT_RAMP, firstDepth, hit);
+    result += raymarchVolume(u_volume3, u_volume3Occupancy, u_volume3BoundsMin, u_volume3BoundsMax, u_volume3ColorMode, u_volume3DepthThreshold, DEFAULT_RAMP, firstDepth, hit, clipDist);
     anyHit = anyHit || hit;
     #endif //volume3Flag
 
@@ -474,12 +515,7 @@ void main() {
     // slot ever sets firstDepth, and the fragment writes the far plane: it still draws, but
     // nothing can be hidden behind it.
     //
-    // In the colour pass this depth is also *tested*, against the mask the pre-pass left behind
-    // (GL_LEQUAL, no writes - see ModelEntityRenderSystem.renderVolume). That is what hides a
-    // volume where another one found dust in front of it. Both passes march the same lattice, so
-    // this is the distance the pre-pass stored for this pixel and the volume's own mask passes the
-    // test exactly; the 1e-4 absorbs float noise between two separately compiled programs and
-    // nothing more. The pre-pass writes it unbiased: what it writes is the mask itself.
+    // Only the pre-pass writes this; the colour pass runs with the depth test off.
     float depthDist = firstDepth * 0.9999;
     gl_FragDepth = firstDepth > 0.0 ? getDepthValue(depthDist, u_cameraNearFar.y, u_cameraK) : 1.0;
     #endif // volumeFlag

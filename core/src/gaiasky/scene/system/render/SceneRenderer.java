@@ -458,11 +458,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             case VOLUME -> // VOLUME MODEL
                     system = new VolumeRenderer(this, VOLUME, alphas);
             case VOLUME_DEPTH -> {
-                // VOLUME MODEL - depth-only pre-pass. Renders the same geometry as VOLUME, but
-                // with the colour mask off and DEPTH_PASS defined in the shader, which stops the
-                // raymarch at the first sample dense enough to occlude (the dust lanes - see
-                // MaterialComponent#volumeDepthThreshold). All it leaves behind is depth, which is
-                // what makes the volume occlude the star, label and point passes that follow it.
+                // VOLUME MODEL - depth-only pre-pass. Same geometry as VOLUME, with DEPTH_PASS
+                // defined, which stops the raymarch at the first sample dense enough to occlude (the
+                // dust lanes - see MaterialComponent#volumeDepthThreshold). That front is composed
+                // into the scene depth and kept per volume for the colour pass
+                // (see VolumeRenderer#renderDepthPass).
                 system = new VolumeRenderer(this, VOLUME_DEPTH, alphas, true);
                 system.addPreRunnables(depthTestR, colorMaskOffR);
                 system.addPostRunnables(colorMaskOnR);

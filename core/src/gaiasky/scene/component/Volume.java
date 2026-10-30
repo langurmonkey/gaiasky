@@ -174,13 +174,8 @@ public class Volume implements Component, IDisposable {
      * the absorbing one (dust) carries one, so only its dense lanes hide anything. With no
      * threshold set on any slot this flag has no visible effect, and the pre-pass is wasted work.
      * <p>
-     * The mask is consumed by everything drawn after the pre-pass, but not by the volume's own
-     * colour pass, which runs much later with the depth test off: the shader replaces the
-     * rasterised depth with the distance to its first dense sample, and that distance jumps by
-     * whole march steps where a dust filament is grazed, so a colour pass tested against the same
-     * mask compares the volume against itself and cuts holes along its own lanes. Two volumes
-     * therefore do not hide each other yet; making them do so needs the front distance to be
-     * handed to the colour pass explicitly rather than re-derived.
+     * The pre-pass front is composed into the scene depth, which occludes the passes that follow, and
+     * kept per volume so the colour pass can tell its own dust from something in front and clip there.
      */
     public boolean writeDepth = true;
 

@@ -16,6 +16,9 @@ public class Vector2Attribute extends Attribute {
     public static final int HeightSize = register(HeightSizeAlias);
     public static final String SvtResolutionAlias = "svtResolution";
     public static final int SvtResolution = register(SvtResolutionAlias);
+    /** Fragment-to-texel scale for the volume depth mask. */
+    public static final String VolumeDepthMaskScaleAlias = "volumeDepthMaskScale";
+    public static final int VolumeDepthMaskScale = register(VolumeDepthMaskScaleAlias);
     public Vector2 value;
 
     public Vector2Attribute(int index) {
