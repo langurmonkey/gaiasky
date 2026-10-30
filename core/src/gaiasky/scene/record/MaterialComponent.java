@@ -1354,7 +1354,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
 
     /**
      * Binds the volume depth mask: this volume's own front, the shared scene depth and the
-     * fragment-to-texel scale. A placeholder is bound at set-up so the shader sees the attributes.
+     * fragment-to-texel scale. The scale doubles as the enable: it is zero until a real mask exists.
      *
      * @param own    This volume's own front.
      * @param scene  Shared scene depth at the start of the colour pass.

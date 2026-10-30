@@ -11,7 +11,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -29,9 +28,9 @@ import java.util.Map;
  * plus the machinery to compose those distances into the scene depth buffer.
  * <p>
  * The pre-pass must write the dust front into the scene depth so the star, label and point passes are
- * hidden behind it, but that front is still there when the colour pass runs, so testing against it
- * compares the volume with itself (the colour pass may run at half resolution and dithers). Storing
- * each front separately lets the colour pass compare the buffer with a value written by that same
+ * hidden behind it, but that front is still there when the color pass runs, so testing against it
+ * compares the volume with itself (the color pass may run at half resolution and dithers). Storing
+ * each front separately lets the color pass compare the buffer with a value written by that same
  * pass: equal or farther means this volume is nearest, nearer means something occludes it.
  */
 public class VolumeDepthMask implements Disposable {
@@ -56,8 +55,6 @@ public class VolumeDepthMask implements Disposable {
                 gl_FragDepth = texelFetch(u_volumeDepth, ivec2(gl_FragCoord.xy), 0).r;
             }
             """;
-
-    private static Texture placeholder;
 
     private final Map<Object, Target> targets = new IdentityHashMap<>();
     private ShaderProgram composeProgram;
@@ -155,25 +152,6 @@ public class VolumeDepthMask implements Disposable {
         Gdx.gl.glColorMask(true, true, true, true);
     }
 
-    /**
-     * A 1x1 black texture bound until the real mask exists, so the shader compiles with the mask
-     * code in it. Black is the nearest possible depth, so it never clips anything.
-     *
-     * @return The placeholder, created on first use.
-     */
-    public static Texture placeholder() {
-        if (placeholder == null) {
-            var pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pixmap.setColor(0f, 0f, 0f, 1f);
-            pixmap.fill();
-            placeholder = new Texture(pixmap);
-            placeholder.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            placeholder.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-            pixmap.dispose();
-        }
-        return placeholder;
-    }
-
     private void ensureComposeResources() {
         if (composeProgram != null) {
             return;
@@ -209,7 +187,7 @@ public class VolumeDepthMask implements Disposable {
         }
     }
 
-    /** A depth-only framebuffer: one depth texture attachment, no colour. **/
+    /** A depth-only framebuffer: one depth texture attachment, no color. **/
     private static final class Target implements Disposable {
         final int fboHandle;
         final Texture texture;
@@ -231,7 +209,7 @@ public class VolumeDepthMask implements Disposable {
             gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboHandle);
             gl.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL20.GL_TEXTURE_2D,
                                       texture.getTextureObjectHandle(), 0);
-            // No colour attachment, so both draw and read buffers must be NONE.
+            // No color attachment, so both draw and read buffers must be NONE.
             var none = BufferUtils.newIntBuffer(1);
             none.put(0, GL30.GL_NONE);
             gl.glDrawBuffers(1, none);

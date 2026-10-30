@@ -648,10 +648,6 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define " + Texture3DAttribute.Volume3Alias + "Flag\n");
         }
 
-        if (attributes.has(TextureAttribute.VolumeDepth)) {
-            prefix.append("#define " + TextureAttribute.VolumeDepthAlias + "Flag\n");
-        }
-
         if (GaiaSky.settings().postprocess.ssr.active) {
             prefix.append("#define ssrFlag\n");
         }

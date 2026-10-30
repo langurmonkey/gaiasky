@@ -67,7 +67,6 @@ layout(location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
-#ifdef volumeDepthTextureFlag
 // This volume's own front: depth of its first sample dense enough to occlude, written by the
 // depth-only pre-pass.
 uniform sampler2D u_volumeDepthTexture;
@@ -80,6 +79,10 @@ uniform vec2 u_volumeDepthMaskScale;
 // Both depths are stored by the pre-pass, so they compare exactly; a fixed-function depth test would
 // compare the volume with its own front instead.
 float volumeOcclusionDistance() {
+    // Nothing bound yet (no mask): no occlusion. The scale is the only always-present uniform here.
+    if (u_volumeDepthMaskScale.x <= 0.0) {
+        return 0.0;
+    }
     // One texel for both textures, so where this volume is nearest they hold the same number.
     ivec2 texel = ivec2(gl_FragCoord.xy * u_volumeDepthMaskScale);
     float mine = texelFetch(u_volumeDepthTexture, texel, 0).r;
@@ -92,7 +95,6 @@ float volumeOcclusionDistance() {
     float sceneDist = 1.0 / recoverWValue(scene, u_cameraNearFar.y, u_cameraK);
     return sceneDist * length(v_data.fragPosWorld) * gl_FragCoord.w;
 }
-#endif // volumeDepthTextureFlag
 
 #define PI 3.14159265359
 #define EXPOSURE 20.0
@@ -623,7 +625,7 @@ void main() {
     float firstDepth = -1.0;
 
     // Only the colour pass clips: the pre-pass is writing the very depth this would be read from.
-    #if defined(volumeDepthTextureFlag) && !defined(DEPTH_PASS)
+    #ifndef DEPTH_PASS
     float clipDist = volumeOcclusionDistance();
     #else
     float clipDist = 0.0;

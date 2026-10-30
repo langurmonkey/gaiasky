@@ -97,7 +97,11 @@ public class VolumeDepthLatticeTest {
 
             // Only the colour pass clips: the pre-pass writes that very depth.
             Assert.assertTrue(shader + " must not clip in the pre-pass",
-                              code.contains("#if defined(volumeDepthTextureFlag) && !defined(DEPTH_PASS)"));
+                              code.contains("#ifndef DEPTH_PASS"));
+            // The mask code is compiled unconditionally, so no attribute has to exist for the shader
+            // to be correct; the scale uniform, zero until a mask is bound, is what gates it.
+            Assert.assertTrue(shader + " must gate the clip on the mask being bound",
+                              code.contains("if (u_volumeDepthMaskScale.x <= 0.0)"));
         }
     }
 
