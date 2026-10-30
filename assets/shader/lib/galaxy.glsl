@@ -92,13 +92,13 @@ struct GalaxyShape {
     // Amplitude of the azimuthal warp of the arms, in fractions of the arm period. 0 leaves the
     // lanes on their analytic spiral; see gxLaneWarp.
     float laneWarp;
-    // Amplitude of the 3D clumping mask, in [0,1]. Applies to every dust field, whatever its
-    // distribution; see gxDustMask.
-    float dustMask;
+    // Amplitude of the 3D noise mask, in [0,1]. Applies to every field, whatever its channel and
+    // its distribution; see gxNoiseMask.
+    float noiseMask;
     // Base frequency of the mask, in cycles per baseRadius.
-    float dustMaskFreq;
+    float noiseMaskFreq;
     // Number of octaves summed into the mask.
-    int dustMaskOctaves;
+    int noiseMaskOctaves;
     // Frequency multiplier of the lane perturbations (warp and rough). 0 or less means 1.
     float laneNoiseScale;
     // Amplitude of the ragged edge of the dust lane, in units of the arm sigma. Only dust uses it;
@@ -148,11 +148,11 @@ struct GalaxyShape {
 #define GX_F_BASE_COLORS 16 // 4 x vec3
 #define GX_F_CHANNEL 28
 #define GX_F_LANE_WARP 29
-#define GX_F_DUST_MASK 30
+#define GX_F_NOISE_MASK 30
 #define GX_F_LANE_NOISE_SCALE 31
 #define GX_F_LANE_ROUGH 32
-#define GX_F_DUST_MASK_FREQ 33
-#define GX_F_DUST_MASK_OCTAVES 34
+#define GX_F_NOISE_MASK_FREQ 33
+#define GX_F_NOISE_MASK_OCTAVES 34
 
 // Rebuilds one shape from `d` starting at float `o`.
 GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
@@ -173,11 +173,11 @@ GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
     s.weight = d[o + GX_F_WEIGHT];
     s.channel = int(d[o + GX_F_CHANNEL] + 0.5);
     s.laneWarp = d[o + GX_F_LANE_WARP];
-    s.dustMask = d[o + GX_F_DUST_MASK];
+    s.noiseMask = d[o + GX_F_NOISE_MASK];
     s.laneNoiseScale = d[o + GX_F_LANE_NOISE_SCALE];
     s.laneRough = d[o + GX_F_LANE_ROUGH];
-    s.dustMaskFreq = d[o + GX_F_DUST_MASK_FREQ];
-    s.dustMaskOctaves = int(d[o + GX_F_DUST_MASK_OCTAVES] + 0.5);
+    s.noiseMaskFreq = d[o + GX_F_NOISE_MASK_FREQ];
+    s.noiseMaskOctaves = int(d[o + GX_F_NOISE_MASK_OCTAVES] + 0.5);
     for (int i = 0; i < 4; i++) {
         int b = o + GX_F_BASE_COLORS + 3 * i;
         s.baseColors[i] = vec3(d[b], d[b + 1], d[b + 2]);
@@ -278,9 +278,9 @@ float gxClumps(vec3 p, float base) {
 //   laneRough  displaces the dust lane edge across itself, over four octaves. A single octave is a
 //              smooth meander - a wave - and that is what makes a lane read as deformed liquid.
 //
-// Only the dust uses laneRough: the gas keeps the analytic arms. The clumping mask is a separate
-// thing - it is not a property of a lane, since a dust field needs it with or without arms - and it
-// lives below, next to the density it modifies.
+// Only the dust uses laneRough: the gas keeps the analytic arms. The 3D noise mask is a separate
+// thing - it is not a property of a lane, since a field needs it with or without arms and in any
+// channel - and it lives below, next to the density it modifies.
 
 // Frequency of the warp, in cycles per baseRadius.
 #define GX_LANE_FREQ 2.4
@@ -371,31 +371,32 @@ float gxDustRoughness(in GalaxyShape s, vec3 p, float r, float warp, float cell)
     return GX_LANE_ROUGH_SIGMA * s.laneRough * (2.0 * n - 1.0);
 }
 
-// ---- Dust clumping mask ----
+// ---- 3D noise mask ----
 //
-// A 3D noise field evaluated at the point itself, in [0,1], multiplied into every dust field. It is
-// isotropic and in cartesian space: a clump is a lump of dust at some place in the box, so the field
-// that carves it has to be a function of that place and of nothing else - no spiral frame, no
+// A 3D noise field evaluated at the point itself, in [0,1], multiplied into the density of any field
+// regardless of its channel: a bulge and a gas disk want clumps as much as a dust lane does. It is
+// isotropic and in cartesian space: a clump is a lump of material at some place in the box, so the
+// field that carves it has to be a function of that place and of nothing else - no spiral frame, no
 // stretching along an arm, and no dependence on the distribution, which is why this is not part of
 // the lane noise above.
 //
-// It reaches zero rather than keeping a floor. The dust is drawn as extinction and through a lane
-// the optical depth is tens of times what saturates, so the visible boundary is one level set of the
-// density with flat opaque inside it. A multiplier with a floor can thicken or thin a lane but never
-// break that level set, which is what makes a smooth field read as deformed liquid; reaching zero
-// opens it into separate clumps.
-float gxDustMask(in GalaxyShape s, vec3 p, float cell) {
-    if (s.dustMask <= 0.0) {
+// It reaches zero rather than keeping a floor. Where the field is drawn as extinction (dust) the
+// optical depth is tens of times what saturates, so the visible boundary is one level set of the
+// density with flat opaque inside it: a multiplier with a floor can thicken or thin a lane but never
+// break that level set, which is what makes a smooth field read as deformed liquid. Reaching zero
+// opens it into separate clumps. On an emissive field the same remap gives the mottling instead.
+float gxNoiseMask(in GalaxyShape s, vec3 p, float cell) {
+    if (s.noiseMask <= 0.0) {
         return 1.0;
     }
     // Default frequency and octaves when unset, so the amplitude alone is enough to get a result.
-    float freq = (s.dustMaskFreq > 0.0 ? s.dustMaskFreq : 10.0) / max(s.baseRadius, 1e-6);
-    int octaves = s.dustMaskOctaves > 0 ? min(s.dustMaskOctaves, 8) : 3;
+    float freq = (s.noiseMaskFreq > 0.0 ? s.noiseMaskFreq : 10.0) / max(s.baseRadius, 1e-6);
+    int octaves = s.noiseMaskOctaves > 0 ? min(s.noiseMaskOctaves, 8) : 3;
     float n = gxNoiseFbm(p * freq, freq * cell, octaves);
     // Remap so the low end is a plateau: the fbm sits mostly near 0.5, and a linear remap would
     // thin the whole field evenly instead of leaving clumps and emptying the space between them.
     float clump = smoothstep(0.32, 0.68, n);
-    return 1.0 - s.dustMask * (1.0 - clump);
+    return clamp(1.0 - s.noiseMask * (1.0 - clump), 0.0, 1.0);
 }
 
 // Soft outer rim, so the distribution ends at baseRadius instead of being clipped by it.
@@ -563,11 +564,9 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
         return vec4(0.0);
     }
 
-    // Clumping is a property of the dust, not of the arms: it applies to a disk as much as to a
-    // spiral, and after the vertical profile so a clump scales the whole column.
-    if (s.channel == GX_CHANNEL_DUST) {
-        density *= gxDustMask(s, p, cell);
-    }
+    // The mask is a property of the volume, not of the channel or of the distribution, and it goes
+    // after the vertical profile so a clump scales the whole column rather than one slice of it.
+    density *= gxNoiseMask(s, p, cell);
 
     // Colour: radius gradient, modulated in luminance so the hue survives the noise.
     vec3 color = gxPalette(s, clamp(rn, 0.0, 1.0));

@@ -40,11 +40,11 @@ public class FieldPackingTest {
         ds.type = GalaxyAttributes.ChannelType.DUST;
         ds.baseColors = new float[]{1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f};
         ds.laneWarp = 0.35f;
-        ds.dustMask = 0.6f;
+        ds.noiseMask = 0.6f;
         ds.laneNoiseScale = 2.5f;
         ds.laneRough = 1.25f;
-        ds.dustMaskFreq = 14f;
-        ds.dustMaskOctaves = 5;
+        ds.noiseMaskFreq = 14f;
+        ds.noiseMaskOctaves = 5;
 
         float[] packed = new float[GalaxyAttributes.MAX_FIELDS * GalaxyAttributes.FIELD_STRIDE];
         ds.packFields(packed, GalaxyAttributes.FIELD_STRIDE);
@@ -71,11 +71,11 @@ public class FieldPackingTest {
         }
         Assert.assertEquals(0f, packed[o + 28], 0f); // channel DUST
         Assert.assertEquals(0.35f, packed[o + 29], 0f); // GX_F_LANE_WARP
-        Assert.assertEquals(0.6f, packed[o + 30], 0f);  // GX_F_DUST_MASK
+        Assert.assertEquals(0.6f, packed[o + 30], 0f);  // GX_F_NOISE_MASK
         Assert.assertEquals(2.5f, packed[o + 31], 0f);  // GX_F_LANE_NOISE_SCALE
         Assert.assertEquals(1.25f, packed[o + 32], 0f); // GX_F_LANE_ROUGH
-        Assert.assertEquals(14f, packed[o + 33], 0f);   // GX_F_DUST_MASK_FREQ
-        Assert.assertEquals(5f, packed[o + 34], 0f);    // GX_F_DUST_MASK_OCTAVES
+        Assert.assertEquals(14f, packed[o + 33], 0f);   // GX_F_NOISE_MASK_FREQ
+        Assert.assertEquals(5f, packed[o + 34], 0f);    // GX_F_NOISE_MASK_OCTAVES
         // Nothing outside this field's window was touched.
         Assert.assertEquals(0f, packed[o + GalaxyAttributes.FIELD_STRIDE - 1 + 1], 0f);
         Assert.assertEquals(0f, packed[0], 0f);
