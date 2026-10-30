@@ -19,8 +19,8 @@
 //
 // Nothing here calls rand(): there is no seed, no particle count and no discretisation left,
 // so the field is resolution-independent and changing a parameter never needs a reseed. The one
-// exception is the lane noise, whose finest octaves are faded out by the voxel size (gxLaneFbm):
-// that is a fade towards a smoother lane, not a different pattern.
+// exception is the lane noise, whose octaves are clamped to what the voxel size can hold
+// (gxNoiseFbm): that is a coarser lane, not a different pattern.
 
 #include <shader/lib/distributions.glsl>
 
@@ -92,11 +92,18 @@ struct GalaxyShape {
     // Amplitude of the azimuthal warp of the arms, in fractions of the arm period. 0 leaves the
     // lanes on their analytic spiral; see gxLaneWarp.
     float laneWarp;
-    // Raggedness of the dust lane, in [0,1]: displaces the lane edge across itself and modulates
-    // its density along it. Only dust uses it; see gxDustRoughness and gxDustFilaments.
-    float laneClump;
-    // Frequency multiplier of both lane perturbations. 0 or less means 1.
+    // Amplitude of the 3D clumping mask, in [0,1]. Applies to every dust field, whatever its
+    // distribution; see gxDustMask.
+    float dustMask;
+    // Base frequency of the mask, in cycles per baseRadius.
+    float dustMaskFreq;
+    // Number of octaves summed into the mask.
+    int dustMaskOctaves;
+    // Frequency multiplier of the lane perturbations (warp and rough). 0 or less means 1.
     float laneNoiseScale;
+    // Amplitude of the ragged edge of the dust lane, in units of the arm sigma. Only dust uses it;
+    // see gxDustRoughness.
+    float laneRough;
 };
 
 // Channel ids. These must match the BillboardDataset.ChannelType ordinals.
@@ -117,10 +124,10 @@ struct GalaxyShape {
 // GX_MAX_FIELDS is the number of fields summed into ONE slot, and each slot gets its own packed
 // array, so a galaxy can carry up to 2 * GX_MAX_FIELDS fields. Fields are baked into the slot's
 // texture, so this costs nothing per frame: it only multiplies the voxeliser's work at generation
-// time. 8 * 32 = 256 floats is a quarter of the 1024 components a GL 4.3 compute shader is
+// time. 8 * 36 = 288 floats is a quarter of the 1024 components a GL 4.3 compute shader is
 // guaranteed to get, so the limit is the authoring model, not the hardware.
 #define GX_MAX_FIELDS 8
-#define GX_FIELD_STRIDE 32
+#define GX_FIELD_STRIDE 36
 #define GX_FIELD_ARRAY (GX_MAX_FIELDS * GX_FIELD_STRIDE)
 #define GX_F_DISTRIBUTION 0
 #define GX_F_BASE_RADIUS 1
@@ -141,8 +148,11 @@ struct GalaxyShape {
 #define GX_F_BASE_COLORS 16 // 4 x vec3
 #define GX_F_CHANNEL 28
 #define GX_F_LANE_WARP 29
-#define GX_F_LANE_CLUMP 30
+#define GX_F_DUST_MASK 30
 #define GX_F_LANE_NOISE_SCALE 31
+#define GX_F_LANE_ROUGH 32
+#define GX_F_DUST_MASK_FREQ 33
+#define GX_F_DUST_MASK_OCTAVES 34
 
 // Rebuilds one shape from `d` starting at float `o`.
 GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
@@ -163,8 +173,11 @@ GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
     s.weight = d[o + GX_F_WEIGHT];
     s.channel = int(d[o + GX_F_CHANNEL] + 0.5);
     s.laneWarp = d[o + GX_F_LANE_WARP];
-    s.laneClump = d[o + GX_F_LANE_CLUMP];
+    s.dustMask = d[o + GX_F_DUST_MASK];
     s.laneNoiseScale = d[o + GX_F_LANE_NOISE_SCALE];
+    s.laneRough = d[o + GX_F_LANE_ROUGH];
+    s.dustMaskFreq = d[o + GX_F_DUST_MASK_FREQ];
+    s.dustMaskOctaves = int(d[o + GX_F_DUST_MASK_OCTAVES] + 0.5);
     for (int i = 0; i < 4; i++) {
         int b = o + GX_F_BASE_COLORS + 3 * i;
         s.baseColors[i] = vec3(d[b], d[b + 1], d[b + 2]);
@@ -256,61 +269,66 @@ float gxClumps(vec3 p, float base) {
 
 // ---- Lane noise ----
 //
-// Three perturbations of the lanes, all driven by laneWarp and laneClump and all off at zero
-// amplitude. None of them calls rand() and all are sampled at a frequency relative to baseRadius,
-// so they are smooth functions of position and independent of the grid:
+// Perturbations of the lanes, all off at zero amplitude, all sampled at a frequency relative to
+// baseRadius, so none of them depends on the grid:
 //
 //   laneWarp   bends the arm centreline with a low-frequency phase displacement. An analytic log
 //              spiral has no variation along itself, which is what makes the lanes read as drawn
 //              arcs.
-//   laneClump  makes the dust lane ragged, twice over: it displaces the lane edge across itself
-//              with a mid-frequency field (width variation, spurs, gaps) and modulates the density
-//              along the lane with a finer one (filaments). Applied to the dust only: the gas
-//              keeps the analytic arms.
+//   laneRough  displaces the dust lane edge across itself, over four octaves. A single octave is a
+//              smooth meander - a wave - and that is what makes a lane read as deformed liquid.
+//
+// Only the dust uses laneRough: the gas keeps the analytic arms. The clumping mask is a separate
+// thing - it is not a property of a lane, since a dust field needs it with or without arms - and it
+// lives below, next to the density it modifies.
 
-// Frequency of the warp, in cycles per baseRadius. Low: it displaces the whole arm, so it has to be
-// smooth over the arm's length.
+// Frequency of the warp, in cycles per baseRadius.
 #define GX_LANE_FREQ 2.4
-// Frequencies of the ragged edge and of the density filaments, in cycles per baseRadius across the
-// lane. Both are faded out octave by octave when the grid cannot resolve them (see gxLaneFbm).
-#define GX_LANE_ROUGH_FREQ 8.0
-#define GX_LANE_FILAMENT_FREQ 24.0
-#define GX_LANE_OCTAVES 2
+// Lowest frequency of the ragged edge, in cycles per baseRadius across the lane, and the number of
+// octaves summed on top of it.
+#define GX_LANE_ROUGH_FREQ 4.0
+#define GX_LANE_ROUGH_OCTAVES 4
+// Highest frequency the grid can carry, in cycles per voxel. Past this the noise aliases, so
+// octaves above it are clamped down to it rather than dropped. Shared by every noise field here.
+#define GX_NOISE_MAX_LOD 0.35
+// Displacement of the lane edge at laneRough = 1, in units of the arm sigma. The fbm is summed with
+// weights 1, 1/2, 1/4..., so its range is well inside [0,1] and this is the peak, not the typical.
+#define GX_LANE_ROUGH_SIGMA 3.0
 // How much longer a feature is along the lane than across it, and how much flatter it is
 // vertically.
 #define GX_LANE_STRETCH 2.5
 #define GX_LANE_FLATTEN 0.35
-// Displacement of the lane edge at laneClump = 1, in units of the arm sigma, and depth of the
-// density modulation over the same range.
-#define GX_LANE_ROUGH_SIGMA 1.5
-#define GX_LANE_FILAMENT_AMP 0.6
 
 // Multiplier of the noise frequency: 0 or less means 1.
 float gxLaneScale(in GalaxyShape s) {
     return s.laneNoiseScale > 0.0 ? s.laneNoiseScale : 1.0;
 }
 
-// Value-noise fbm in [0,1]. `lod` is the first octave's frequency in cycles per voxel: octaves
-// whose wavelength drops under a few voxels are faded out, so a coarse grid gets a smoother lane
-// instead of per-voxel speckle. Renormalised by the weights, so the mean and the range do not
-// depend on how many octaves survived.
-float gxLaneFbm(vec3 q, float lod) {
+// Value-noise fbm in [0,1]: `octaves` octaves, the first at the frequency already folded into `q`.
+// `lod` is that first frequency in cycles per voxel, and it is what the grid is checked against:
+// an octave that would alias is clamped to the highest the grid can hold, and the octaves after it
+// are dropped as duplicates. Clamping rather than fading matters - a fade with a hard cutoff makes
+// a coarse grid drop the term entirely, so the parameter silently stops doing anything instead of
+// getting smoother. Renormalised by the weights, so the range does not depend on the octave count.
+float gxNoiseFbm(vec3 q, float lod, int octaves) {
+    float maxMul = lod > 1.0e-9 ? GX_NOISE_MAX_LOD / lod : 1.0e9;
     float sum = 0.0;
     float weight = 0.0;
     float amp = 1.0;
-    float freq = 1.0;
-    for (int i = 0; i < GX_LANE_OCTAVES; i++) {
-        float w = amp * (1.0 - smoothstep(0.18, 0.36, lod * freq));
-        // lod is uniform across the dispatch, so this branch is not divergent: a faded octave is
-        // skipped outright rather than evaluated and multiplied by zero.
-        if (w > 0.0) {
-            sum += w * noise(q * freq + float(i) * vec3(17.1, 9.4, 31.7));
-            weight += w;
+    float mul = 1.0;
+    for (int i = 0; i < 8; i++) {
+        if (i >= octaves) {
+            break;
+        }
+        sum += amp * noise(q * min(mul, maxMul) + float(i) * vec3(17.1, 9.4, 31.7));
+        weight += amp;
+        if (mul >= maxMul) {
+            break;
         }
         amp *= 0.5;
-        freq *= 2.07;
+        mul *= 2.07;
     }
-    return weight > 1.0e-5 ? sum / weight : 0.5;
+    return sum / weight;
 }
 
 // Lane noise in [0,1], sampled in the spiral's own frame: along the arm (the arc length, which for a
@@ -321,19 +339,19 @@ float gxLaneFbm(vec3 q, float lod) {
 // Warping the cartesian position instead does not work: the along-arm direction rotates with the
 // position, and once the lane curves that rotation dominates the displacement and the field comes
 // back isotropic.
-float gxLaneNoise(in GalaxyShape s, vec3 p, float r, float warp, float freq, float cell) {
+float gxLaneNoise(in GalaxyShape s, vec3 p, float r, float warp, float freq, int octaves, float cell) {
     float base = max(s.baseRadius, 1e-6);
     float b = gxPitchB(s.baseAngle);
     float q1 = sqrt(1.0 + b * b);
     float along = r * q1;
     float across = gxArmDelta(s, r, atan(p.z, p.x), warp) * r / q1;
     float f = freq * gxLaneScale(s) / base;
-    return gxLaneFbm(vec3(along / GX_LANE_STRETCH, across, p.y * GX_LANE_FLATTEN) * f, f * cell);
+    return gxNoiseFbm(vec3(along / GX_LANE_STRETCH, across, p.y * GX_LANE_FLATTEN) * f, f * cell, octaves);
 }
 
 // Displacement of the arm phase at this point, in fractions of the arm period. Two octaves of value
 // noise: the warp is the coarsest structure in the field, far above the voxel size at any quality,
-// so it needs neither the extra octaves nor the resolution fade.
+// so it needs neither the extra octaves nor the grid check.
 float gxLaneWarp(in GalaxyShape s, vec3 p) {
     if (s.laneWarp == 0.0) {
         return 0.0;
@@ -343,22 +361,41 @@ float gxLaneWarp(in GalaxyShape s, vec3 p) {
 }
 
 // Displacement of the dust lane edge across itself, in units of the arm sigma. Positive and
-// negative, so the lane widens, narrows and breaks.
+// negative, over four octaves from 4 cycles per baseRadius up, so the silhouette varies at every
+// scale the grid can carry instead of undulating with one.
 float gxDustRoughness(in GalaxyShape s, vec3 p, float r, float warp, float cell) {
-    if (s.laneClump <= 0.0) {
+    if (s.laneRough <= 0.0) {
         return 0.0;
     }
-    float n = gxLaneNoise(s, p, r, warp, GX_LANE_ROUGH_FREQ, cell);
-    return 2.0 * GX_LANE_ROUGH_SIGMA * s.laneClump * (n - 0.5);
+    float n = gxLaneNoise(s, p, r, warp, GX_LANE_ROUGH_FREQ, GX_LANE_ROUGH_OCTAVES, cell);
+    return GX_LANE_ROUGH_SIGMA * s.laneRough * (2.0 * n - 1.0);
 }
 
-// Multiplicative modulation of the dust density along the lane, mean 1.
-float gxDustFilaments(in GalaxyShape s, vec3 p, float r, float warp, float cell) {
-    if (s.laneClump <= 0.0) {
+// ---- Dust clumping mask ----
+//
+// A 3D noise field evaluated at the point itself, in [0,1], multiplied into every dust field. It is
+// isotropic and in cartesian space: a clump is a lump of dust at some place in the box, so the field
+// that carves it has to be a function of that place and of nothing else - no spiral frame, no
+// stretching along an arm, and no dependence on the distribution, which is why this is not part of
+// the lane noise above.
+//
+// It reaches zero rather than keeping a floor. The dust is drawn as extinction and through a lane
+// the optical depth is tens of times what saturates, so the visible boundary is one level set of the
+// density with flat opaque inside it. A multiplier with a floor can thicken or thin a lane but never
+// break that level set, which is what makes a smooth field read as deformed liquid; reaching zero
+// opens it into separate clumps.
+float gxDustMask(in GalaxyShape s, vec3 p, float cell) {
+    if (s.dustMask <= 0.0) {
         return 1.0;
     }
-    float n = gxLaneNoise(s, p, r, warp, GX_LANE_FILAMENT_FREQ, cell);
-    return max(1.0 + 2.0 * GX_LANE_FILAMENT_AMP * s.laneClump * (n - 0.5), 0.0);
+    // Default frequency and octaves when unset, so the amplitude alone is enough to get a result.
+    float freq = (s.dustMaskFreq > 0.0 ? s.dustMaskFreq : 10.0) / max(s.baseRadius, 1e-6);
+    int octaves = s.dustMaskOctaves > 0 ? min(s.dustMaskOctaves, 8) : 3;
+    float n = gxNoiseFbm(p * freq, freq * cell, octaves);
+    // Remap so the low end is a plateau: the fbm sits mostly near 0.5, and a linear remap would
+    // thin the whole field evenly instead of leaving clumps and emptying the space between them.
+    float clump = smoothstep(0.32, 0.68, n);
+    return 1.0 - s.dustMask * (1.0 - clump);
 }
 
 // Soft outer rim, so the distribution ends at baseRadius instead of being clipped by it.
@@ -412,13 +449,13 @@ float gxHeightScale(in GalaxyShape s) {
 // the lanes start, and 0 means they reach the core. It used to be a constant (0.25) here, which is
 // why setting minRadius on a dust field did nothing beyond moving the arm modulation: the ring cut
 // the dust out of the middle regardless.
-float gxDustDensity(in GalaxyShape s, float r, float rnCyl, float disk, float arm, vec3 p, float warp, float cell) {
+float gxDustDensity(in GalaxyShape s, float rnCyl, float disk, float arm, vec3 p, float cell) {
     float ringIn = clamp(s.minRadius, 0.0, GX_DUST_RING_OUT - GX_DUST_RING_FADE);
     float ring = smoothstep(ringIn, ringIn + GX_DUST_RING_FADE, rnCyl)
             * (1.0 - smoothstep(GX_DUST_RING_OUT - GX_DUST_RING_FADE, GX_DUST_RING_OUT, rnCyl));
     float d = disk * ring * arm * arm * gxClumps(p, s.baseRadius);
-    // Contrast first, then the clumping: the power would sharpen the noise instead of the lane.
-    return pow(max(d, 0.0), GX_DUST_CONTRAST) * gxDustFilaments(s, p, r, warp, cell);
+    // Contrast, so the tails fall away without thinning the peak.
+    return pow(max(d, 0.0), GX_DUST_CONTRAST);
 }
 
 // Radial density profile, normalised radius in, relative density out.
@@ -490,7 +527,7 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
             float rough = s.channel == GX_CHANNEL_DUST ? gxDustRoughness(s, p, r, warp, cell) : 0.0;
             float arm = mix(1.0, gxArmFactor(s, r, phi, warp, rough), armWeight);
             if (s.channel == GX_CHANNEL_DUST) {
-                density = gxDustDensity(s, r, rnCyl, disk, arm, p, warp, cell);
+                density = gxDustDensity(s, rnCyl, disk, arm, p, cell);
             } else {
                 density = disk * (0.22 + 0.78 * arm) * gxClumps(p, base);
             }
@@ -524,6 +561,12 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
 
     if (density <= 0.0) {
         return vec4(0.0);
+    }
+
+    // Clumping is a property of the dust, not of the arms: it applies to a disk as much as to a
+    // spiral, and after the vertical profile so a clump scales the whole column.
+    if (s.channel == GX_CHANNEL_DUST) {
+        density *= gxDustMask(s, p, cell);
     }
 
     // Colour: radius gradient, modulated in luminance so the hue survives the noise.
