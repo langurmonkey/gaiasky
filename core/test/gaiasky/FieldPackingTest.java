@@ -39,6 +39,9 @@ public class FieldPackingTest {
         ds.intensity = 0.7f;
         ds.type = GalaxyAttributes.ChannelType.DUST;
         ds.baseColors = new float[]{1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f};
+        ds.laneWarp = 0.35f;
+        ds.laneClump = 0.6f;
+        ds.laneNoiseScale = 2.5f;
 
         float[] packed = new float[GalaxyAttributes.MAX_FIELDS * GalaxyAttributes.FIELD_STRIDE];
         ds.packFields(packed, GalaxyAttributes.FIELD_STRIDE);
@@ -64,7 +67,10 @@ public class FieldPackingTest {
             Assert.assertEquals(i + 1f, packed[o + 16 + i], 0f);
         }
         Assert.assertEquals(0f, packed[o + 28], 0f); // channel DUST
-        Assert.assertEquals(28 + 4, GalaxyAttributes.FIELD_STRIDE); // padded for the next field
+        Assert.assertEquals(0.35f, packed[o + 29], 0f); // GX_F_LANE_WARP
+        Assert.assertEquals(0.6f, packed[o + 30], 0f);  // GX_F_LANE_CLUMP
+        Assert.assertEquals(2.5f, packed[o + 31], 0f);  // GX_F_LANE_NOISE_SCALE
+        Assert.assertEquals(28 + 4, GalaxyAttributes.FIELD_STRIDE); // filled to the end, no padding
         // Nothing outside this field's window was touched.
         Assert.assertEquals(0f, packed[o + GalaxyAttributes.FIELD_STRIDE - 1 + 1], 0f);
         Assert.assertEquals(0f, packed[0], 0f);
@@ -89,7 +95,7 @@ public class FieldPackingTest {
             int o = i * GalaxyAttributes.FIELD_STRIDE;
             Assert.assertEquals(i + 1f, packed[o + 15], 0f);        // GX_F_WEIGHT
             Assert.assertEquals(5f, packed[o + 28], 0f);            // GX_F_CHANNEL, the default POINT
-            Assert.assertEquals(0f, packed[o + 29], 0f);            // padding, untouched
+            Assert.assertEquals(0f, packed[o + 29], 0f);            // GX_F_LANE_WARP, off by default
         }
         // A full slot must fit in the guaranteed uniform space of a GL 4.3 compute shader (1024
         // components), with room for the grid and calibration uniforms on top.

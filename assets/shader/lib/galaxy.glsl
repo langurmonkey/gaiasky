@@ -18,7 +18,9 @@
 // in COLOR_MODE_TEXTURE: colour in .rgb, density in .a, one fetch per sample.
 //
 // Nothing here calls rand(): there is no seed, no particle count and no discretisation left,
-// so the field is resolution-independent and changing a parameter never needs a reseed.
+// so the field is resolution-independent and changing a parameter never needs a reseed. The one
+// exception is the lane noise, whose finest octaves are faded out by the voxel size (gxLaneFbm):
+// that is a fade towards a smoother lane, not a different pattern.
 
 #include <shader/lib/distributions.glsl>
 
@@ -87,6 +89,14 @@ struct GalaxyShape {
     // Channel of the field, one of the GX_CHANNEL_* constants. Only dust is treated differently:
     // it gets its own concentration (see gxDustDensity).
     int channel;
+    // Amplitude of the azimuthal warp of the arms, in fractions of the arm period. 0 leaves the
+    // lanes on their analytic spiral; see gxLaneWarp.
+    float laneWarp;
+    // Raggedness of the dust lane, in [0,1]: displaces the lane edge across itself and modulates
+    // its density along it. Only dust uses it; see gxDustRoughness and gxDustFilaments.
+    float laneClump;
+    // Frequency multiplier of both lane perturbations. 0 or less means 1.
+    float laneNoiseScale;
 };
 
 // Channel ids. These must match the BillboardDataset.ChannelType ordinals.
@@ -130,6 +140,9 @@ struct GalaxyShape {
 #define GX_F_WEIGHT 15
 #define GX_F_BASE_COLORS 16 // 4 x vec3
 #define GX_F_CHANNEL 28
+#define GX_F_LANE_WARP 29
+#define GX_F_LANE_CLUMP 30
+#define GX_F_LANE_NOISE_SCALE 31
 
 // Rebuilds one shape from `d` starting at float `o`.
 GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
@@ -149,6 +162,9 @@ GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
     s.colorNoise = d[o + GX_F_COLOR_NOISE];
     s.weight = d[o + GX_F_WEIGHT];
     s.channel = int(d[o + GX_F_CHANNEL] + 0.5);
+    s.laneWarp = d[o + GX_F_LANE_WARP];
+    s.laneClump = d[o + GX_F_LANE_CLUMP];
+    s.laneNoiseScale = d[o + GX_F_LANE_NOISE_SCALE];
     for (int i = 0; i < 4; i++) {
         int b = o + GX_F_BASE_COLORS + 3 * i;
         s.baseColors[i] = vec3(d[b], d[b + 1], d[b + 2]);
@@ -200,20 +216,28 @@ float gxPitchB(float baseAngle) {
     return tan(radians(deg));
 }
 
-// Value of the arm modulation at a point, in [0,1]: 1 on the arm centreline, 0 far from it.
-float gxArmFactor(in GalaxyShape s, float r, float phi) {
-    float base = max(s.baseRadius, 1e-6);
+// Angular distance to the nearest arm centreline, wrapped to the arm period. `warp` displaces the
+// centreline by a fraction of the period; see gxLaneWarp.
+float gxArmDelta(in GalaxyShape s, float r, float phi, float warp) {
     float b = gxPitchB(s.baseAngle);
     float arms = float(max(s.numArms, 1));
     // Arm centreline: theta = b * ln(r / r0), the same relation the particle sampler uses.
-    float theta = b * log(max(r / (0.1 * base), 1e-4));
-    // Angular distance to the nearest arm, wrapped to the arm period.
+    float theta = b * log(max(r / (0.1 * max(s.baseRadius, 1e-6)), 1e-4));
     float period = 6.2831853 / arms;
-    float d = mod(phi - theta + 0.5 * period, period) - 0.5 * period;
+    return mod(phi - theta - warp * period + 0.5 * period, period) - 0.5 * period;
+}
+
+// Value of the arm modulation at a point, in [0,1]: 1 on the arm centreline, 0 far from it. `rough`
+// displaces the centreline across itself, in units of the arm sigma, which is what makes a lane
+// ragged; 0 leaves the analytic arm.
+float gxArmFactor(in GalaxyShape s, float r, float phi, float warp, float rough) {
+    float base = max(s.baseRadius, 1e-6);
+    float b = gxPitchB(s.baseAngle);
+    float d = gxArmDelta(s, r, phi, warp);
+    float sigma = max(s.armSigma * GX_ARM_WIDTH * base, 1e-4);
     // Turn the angular distance into a linear one: a log spiral of pitch b has perpendicular
     // spacing r/sqrt(1+b^2) per unit of angle.
-    float perpendicular = abs(d) * r / sqrt(1.0 + b * b);
-    float sigma = max(s.armSigma * GX_ARM_WIDTH * base, 1e-4);
+    float perpendicular = abs(d) * r / sqrt(1.0 + b * b) + rough * sigma;
     return exp(-0.5 * perpendicular * perpendicular / (sigma * sigma));
 }
 
@@ -228,6 +252,113 @@ float gxNoise3(vec3 q) {
 // azimuth.
 float gxClumps(vec3 p, float base) {
     return 0.55 + 0.9 * gxNoise3(p * (5.0 / base));
+}
+
+// ---- Lane noise ----
+//
+// Three perturbations of the lanes, all driven by laneWarp and laneClump and all off at zero
+// amplitude. None of them calls rand() and all are sampled at a frequency relative to baseRadius,
+// so they are smooth functions of position and independent of the grid:
+//
+//   laneWarp   bends the arm centreline with a low-frequency phase displacement. An analytic log
+//              spiral has no variation along itself, which is what makes the lanes read as drawn
+//              arcs.
+//   laneClump  makes the dust lane ragged, twice over: it displaces the lane edge across itself
+//              with a mid-frequency field (width variation, spurs, gaps) and modulates the density
+//              along the lane with a finer one (filaments). Applied to the dust only: the gas
+//              keeps the analytic arms.
+
+// Frequency of the warp, in cycles per baseRadius. Low: it displaces the whole arm, so it has to be
+// smooth over the arm's length.
+#define GX_LANE_FREQ 2.4
+// Frequencies of the ragged edge and of the density filaments, in cycles per baseRadius across the
+// lane. Both are faded out octave by octave when the grid cannot resolve them (see gxLaneFbm).
+#define GX_LANE_ROUGH_FREQ 8.0
+#define GX_LANE_FILAMENT_FREQ 24.0
+#define GX_LANE_OCTAVES 2
+// How much longer a feature is along the lane than across it, and how much flatter it is
+// vertically.
+#define GX_LANE_STRETCH 2.5
+#define GX_LANE_FLATTEN 0.35
+// Displacement of the lane edge at laneClump = 1, in units of the arm sigma, and depth of the
+// density modulation over the same range.
+#define GX_LANE_ROUGH_SIGMA 1.5
+#define GX_LANE_FILAMENT_AMP 0.6
+
+// Multiplier of the noise frequency: 0 or less means 1.
+float gxLaneScale(in GalaxyShape s) {
+    return s.laneNoiseScale > 0.0 ? s.laneNoiseScale : 1.0;
+}
+
+// Value-noise fbm in [0,1]. `lod` is the first octave's frequency in cycles per voxel: octaves
+// whose wavelength drops under a few voxels are faded out, so a coarse grid gets a smoother lane
+// instead of per-voxel speckle. Renormalised by the weights, so the mean and the range do not
+// depend on how many octaves survived.
+float gxLaneFbm(vec3 q, float lod) {
+    float sum = 0.0;
+    float weight = 0.0;
+    float amp = 1.0;
+    float freq = 1.0;
+    for (int i = 0; i < GX_LANE_OCTAVES; i++) {
+        float w = amp * (1.0 - smoothstep(0.18, 0.36, lod * freq));
+        // lod is uniform across the dispatch, so this branch is not divergent: a faded octave is
+        // skipped outright rather than evaluated and multiplied by zero.
+        if (w > 0.0) {
+            sum += w * noise(q * freq + float(i) * vec3(17.1, 9.4, 31.7));
+            weight += w;
+        }
+        amp *= 0.5;
+        freq *= 2.07;
+    }
+    return weight > 1.0e-5 ? sum / weight : 0.5;
+}
+
+// Lane noise in [0,1], sampled in the spiral's own frame: along the arm (the arc length, which for a
+// log spiral is linear in r), across it (the same perpendicular distance gxArmFactor uses, wrapped
+// at the arm period so that every lane gets its own pattern) and vertically. The along-arm
+// coordinate is compressed, and y too, so features come out stretched along the lane.
+//
+// Warping the cartesian position instead does not work: the along-arm direction rotates with the
+// position, and once the lane curves that rotation dominates the displacement and the field comes
+// back isotropic.
+float gxLaneNoise(in GalaxyShape s, vec3 p, float r, float warp, float freq, float cell) {
+    float base = max(s.baseRadius, 1e-6);
+    float b = gxPitchB(s.baseAngle);
+    float q1 = sqrt(1.0 + b * b);
+    float along = r * q1;
+    float across = gxArmDelta(s, r, atan(p.z, p.x), warp) * r / q1;
+    float f = freq * gxLaneScale(s) / base;
+    return gxLaneFbm(vec3(along / GX_LANE_STRETCH, across, p.y * GX_LANE_FLATTEN) * f, f * cell);
+}
+
+// Displacement of the arm phase at this point, in fractions of the arm period. Two octaves of value
+// noise: the warp is the coarsest structure in the field, far above the voxel size at any quality,
+// so it needs neither the extra octaves nor the resolution fade.
+float gxLaneWarp(in GalaxyShape s, vec3 p) {
+    if (s.laneWarp == 0.0) {
+        return 0.0;
+    }
+    float freq = GX_LANE_FREQ * gxLaneScale(s) / max(s.baseRadius, 1e-6);
+    return s.laneWarp * (2.0 * gxNoise3(p * freq) - 1.0);
+}
+
+// Displacement of the dust lane edge across itself, in units of the arm sigma. Positive and
+// negative, so the lane widens, narrows and breaks.
+float gxDustRoughness(in GalaxyShape s, vec3 p, float r, float warp, float cell) {
+    if (s.laneClump <= 0.0) {
+        return 0.0;
+    }
+    float n = gxLaneNoise(s, p, r, warp, GX_LANE_ROUGH_FREQ, cell);
+    return 2.0 * GX_LANE_ROUGH_SIGMA * s.laneClump * (n - 0.5);
+}
+
+// Multiplicative modulation of the dust density along the lane, mean 1.
+float gxDustFilaments(in GalaxyShape s, vec3 p, float r, float warp, float cell) {
+    if (s.laneClump <= 0.0) {
+        return 1.0;
+    }
+    float n = gxLaneNoise(s, p, r, warp, GX_LANE_FILAMENT_FREQ, cell);
+    return max(1.0 + 2.0 * GX_LANE_FILAMENT_AMP * s.laneClump * (n - 0.5), 0.0);
 }
 
 // Soft outer rim, so the distribution ends at baseRadius instead of being clipped by it.
@@ -277,16 +408,17 @@ float gxHeightScale(in GalaxyShape s) {
 }
 
 // Dust density inside the flat branch. `disk` and `arm` are the gas terms, already evaluated.
-// `minRadius` is the field's own inner radius, normalised by baseRadius like rnCyl: it is where the
-// lanes start, and 0 means they reach the core. It used to be a constant (0.25) here, which is why
-// setting minRadius on a dust field did nothing beyond moving the arm modulation: the ring cut the
-// dust out of the middle regardless.
-float gxDustDensity(float rnCyl, float disk, float arm, vec3 p, float base, float minRadius) {
-    float ringIn = clamp(minRadius, 0.0, GX_DUST_RING_OUT - GX_DUST_RING_FADE);
+// `s.minRadius` is the field's own inner radius, normalised by baseRadius like rnCyl: it is where
+// the lanes start, and 0 means they reach the core. It used to be a constant (0.25) here, which is
+// why setting minRadius on a dust field did nothing beyond moving the arm modulation: the ring cut
+// the dust out of the middle regardless.
+float gxDustDensity(in GalaxyShape s, float r, float rnCyl, float disk, float arm, vec3 p, float warp, float cell) {
+    float ringIn = clamp(s.minRadius, 0.0, GX_DUST_RING_OUT - GX_DUST_RING_FADE);
     float ring = smoothstep(ringIn, ringIn + GX_DUST_RING_FADE, rnCyl)
             * (1.0 - smoothstep(GX_DUST_RING_OUT - GX_DUST_RING_FADE, GX_DUST_RING_OUT, rnCyl));
-    float d = disk * ring * arm * arm * gxClumps(p, base);
-    return pow(max(d, 0.0), GX_DUST_CONTRAST);
+    float d = disk * ring * arm * arm * gxClumps(p, s.baseRadius);
+    // Contrast first, then the clumping: the power would sharpen the noise instead of the lane.
+    return pow(max(d, 0.0), GX_DUST_CONTRAST) * gxDustFilaments(s, p, r, warp, cell);
 }
 
 // Radial density profile, normalised radius in, relative density out.
@@ -332,8 +464,9 @@ float gxRadius(in GalaxyShape s, vec3 p) {
     return length(p) / base;
 }
 
-// The density field. Returns vec4(colour, density); see the note at the top of the file.
-vec4 galaxyDensity(vec3 p, in GalaxyShape s) {
+// The density field. Returns vec4(colour, density); see the note at the top of the file. `cell` is
+// the galaxy-space size of one voxel, used only to fade noise the grid cannot resolve.
+vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
     float base = max(s.baseRadius, 1e-6);
     float rn = gxRadius(s, p);
     if (rn > 1.2) {
@@ -352,9 +485,12 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s) {
             // No azimuthal structure inside the arm start radius: a log spiral's angular
             // frequency grows without bound as r -> 0, which would alias into radial spokes.
             float armWeight = smoothstep(0.0, 2.0 * max(s.minRadius, 0.02), rnCyl);
-            float arm = mix(1.0, gxArmFactor(s, r, phi), armWeight);
+            float warp = gxLaneWarp(s, p);
+            // Only the dust gets the ragged edge: the gas keeps the analytic arms.
+            float rough = s.channel == GX_CHANNEL_DUST ? gxDustRoughness(s, p, r, warp, cell) : 0.0;
+            float arm = mix(1.0, gxArmFactor(s, r, phi, warp, rough), armWeight);
             if (s.channel == GX_CHANNEL_DUST) {
-                density = gxDustDensity(rnCyl, disk, arm, p, base, s.minRadius);
+                density = gxDustDensity(s, r, rnCyl, disk, arm, p, warp, cell);
             } else {
                 density = disk * (0.22 + 0.78 * arm) * gxClumps(p, base);
             }
@@ -441,7 +577,7 @@ struct GalaxyFields {
     float unitDensity;
 };
 
-GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count) {
+GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count, float cell) {
     GalaxyFields r;
     r.light = vec3(0.0);
     r.unitLight = vec3(0.0);
@@ -452,7 +588,7 @@ GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count) {
             break;
         }
         GalaxyShape s = gxUnpack(d, i * GX_FIELD_STRIDE);
-        vec4 v = galaxyDensity(p, s);
+        vec4 v = galaxyDensity(p, s, cell);
         vec3 emission = v.rgb * v.a;
         r.light += s.weight * emission;
         r.unitLight += emission;
