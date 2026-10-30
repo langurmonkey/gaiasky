@@ -140,22 +140,54 @@ public class GalaxyAttributes {
     public float laneWarp = 0.0f;
 
     /**
-     * Raggedness of the dust lanes, in [0,1]. Two effects: the lane edge is displaced across itself
-     * with a mid-frequency field, which varies the width of the lane and breaks it into spurs and
-     * gaps, and the density along the lane is modulated with a finer one, which gives it filaments.
-     * Only {@link ChannelType#DUST} uses it, and both effects are applied after the dust contrast,
-     * which would otherwise sharpen the noise instead of the lane.
+     * Depth of the dust clumping mask, in [0,1]. Only {@link ChannelType#DUST} uses it, but there it
+     * applies whatever the {@link #distribution} is: clumping is a property of the dust, not of the
+     * arms.
      * <p>
-     * It changes the shape's mean-to-peak ratio (it breaks the lanes into strands that individually
-     * sit below the old peak, so the mean rises relative to it), which the volume calibration then
-     * turns into a denser-looking dust. Adjust {@link #intensity} to compensate.
+     * The dust is multiplied by a 3D noise field evaluated at each point, isotropic and in cartesian
+     * space: a clump is a lump of dust at a place in the box, so the field that carves it is a
+     * function of that place and nothing else. It reaches zero in the troughs, which is what breaks
+     * the field into separate clumps - the dust is drawn as extinction and a tube of it is far past
+     * saturation, so the visible boundary is a single level set of the density, and only a factor
+     * that reaches zero can open it.
+     * <p>
+     * It lowers the mean extinction, so raise {@link #intensity} to keep the same overall dust.
+     *
+     * @see #dustMaskFreq
+     * @see #dustMaskOctaves
      */
-    public float laneClump = 0.0f;
+    public float dustMask = 0.0f;
 
     /**
-     * Frequency multiplier of {@link #laneWarp} and {@link #laneClump}. Zero or less means 1.
+     * Base frequency of the clumping mask, in cycles per {@code baseRadius}. Zero or less means 10.
+     * Larger values give smaller, denser clumps.
+     */
+    public float dustMaskFreq = 0.0f;
+
+    /**
+     * Number of noise octaves summed into the clumping mask, 1 to 8. Zero or less means 3. Octaves
+     * whose wavelength the voxel grid cannot resolve are clamped down to it rather than dropped, so
+     * a coarse grid gets coarser clumps, not a missing mask.
+     */
+    public int dustMaskOctaves = 0;
+
+    /**
+     * Frequency multiplier of {@link #laneWarp} and {@link #laneRough}. Zero or less means 1. Not
+     * applied to the clumping mask, which has its own frequency.
      */
     public float laneNoiseScale = 1.0f;
+
+    /**
+     * Amplitude of the ragged edge of the dust lanes, in units of {@code armSigma}: 1 displaces the
+     * edge by a few sigma at the peaks. Only {@link ChannelType#DUST} uses it.
+     * <p>
+     * The displacement is summed over four octaves starting at a few cycles per {@code baseRadius},
+     * so the silhouette of a lane varies at every scale the voxel grid can carry. A single octave -
+     * or a smooth function - moves the whole edge up and down together, which is what makes a lane
+     * read as a deformed liquid surface rather than as a ragged one. Pair it with
+     * {@link #dustMask}, which does the breaking.
+     */
+    public float laneRough = 0.0f;
 
     /**
      * The intensity factor.
@@ -180,7 +212,7 @@ public class GalaxyAttributes {
     private static final double GX_DUST_HEIGHT = 0.5;
 
     /** Length in floats of one field in the packed uniform of {@code galtype.comp.glsl}. **/
-    public static final int FIELD_STRIDE = 32;
+    public static final int FIELD_STRIDE = 36;
     /**
      * Maximum number of fields summed into one volume slot. Mirrors {@code GX_MAX_FIELDS} in
      * {@code assets/shader/lib/galaxy.glsl}. Each slot gets its own packed array, so a galaxy can
@@ -218,8 +250,11 @@ public class GalaxyAttributes {
         System.arraycopy(baseColors, 0, out, offset + 16, MAX_COLORS * 3);
         out[offset + 28] = type.ordinal();
         out[offset + 29] = laneWarp;
-        out[offset + 30] = laneClump;
+        out[offset + 30] = dustMask;
         out[offset + 31] = laneNoiseScale;
+        out[offset + 32] = laneRough;
+        out[offset + 33] = dustMaskFreq;
+        out[offset + 34] = (float) dustMaskOctaves;
     }
 
     /**
@@ -463,12 +498,12 @@ public class GalaxyAttributes {
         this.laneWarp = laneWarp.floatValue();
     }
 
-    public void setLaneClump(Double laneClump) {
-        this.laneClump = MathUtilsDouble.clamp(laneClump.floatValue(), 0f, 1f);
+    public void setDustMask(Double dustMask) {
+        this.dustMask = MathUtilsDouble.clamp(dustMask.floatValue(), 0f, 1f);
     }
 
-    public void setLaneClump(Long laneClump) {
-        setLaneClump(laneClump.doubleValue());
+    public void setDustMask(Long dustMask) {
+        setDustMask(dustMask.doubleValue());
     }
 
     public void setLaneNoiseScale(Double laneNoiseScale) {
@@ -479,22 +514,60 @@ public class GalaxyAttributes {
         this.laneNoiseScale = laneNoiseScale.floatValue();
     }
 
+    public void setDustMaskFreq(Double dustMaskFreq) {
+        this.dustMaskFreq = dustMaskFreq.floatValue();
+    }
+
+    public void setDustMaskFreq(Long dustMaskFreq) {
+        this.dustMaskFreq = dustMaskFreq.floatValue();
+    }
+
+    public void setDustMaskOctaves(Long dustMaskOctaves) {
+        this.dustMaskOctaves = MathUtilsDouble.clamp(dustMaskOctaves.intValue(), 1, 8);
+    }
+
+    public void setLaneRough(Double laneRough) {
+        this.laneRough = MathUtilsDouble.clamp(laneRough.floatValue(), 0f, 4f);
+    }
+
+    public void setLaneRough(Long laneRough) {
+        setLaneRough(laneRough.doubleValue());
+    }
+
     /**
-     * Sets the lane perturbations in one go: warp, clump and frequency scale, from one to three
+     * Sets the lane perturbations in one go: warp, roughness and frequency scale, from one to three
      * values. Missing ones are left as they are.
      *
      * @param v The values.
      */
     public void setLaneNoise(double[] v) {
         if (v.length > 0) setLaneWarp(v[0]);
-        if (v.length > 1) setLaneClump(v[1]);
+        if (v.length > 1) setLaneRough(v[1]);
         if (v.length > 2) setLaneNoiseScale(v[2]);
     }
 
     public void setLaneNoise(int[] v) {
         if (v.length > 0) setLaneWarp((double) v[0]);
-        if (v.length > 1) setLaneClump((double) v[1]);
+        if (v.length > 1) setLaneRough((double) v[1]);
         if (v.length > 2) setLaneNoiseScale((double) v[2]);
+    }
+
+    /**
+     * Sets the dust clumping mask in one go: amplitude, frequency and octaves, from one to three
+     * values. Missing ones are left as they are.
+     *
+     * @param v The values.
+     */
+    public void setDustMaskNoise(double[] v) {
+        if (v.length > 0) setDustMask(v[0]);
+        if (v.length > 1) setDustMaskFreq(v[1]);
+        if (v.length > 2) setDustMaskOctaves((long) v[2]);
+    }
+
+    public void setDustMaskNoise(int[] v) {
+        if (v.length > 0) setDustMask((double) v[0]);
+        if (v.length > 1) setDustMaskFreq((double) v[1]);
+        if (v.length > 2) setDustMaskOctaves((long) v[2]);
     }
 
     public void setAspect(Double aspect) {
