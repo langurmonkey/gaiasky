@@ -6,6 +6,8 @@ uniform vec3 u_cameraPos;
 uniform float u_bodySize;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
+// u_time is bound only for the colour pass' march jitter (see the note on the jitter in the
+// raymarch); the depth pre-pass must keep a fixed phase so its mask does not boil.
 uniform float u_time;
 uniform int u_iterations = 90;
 
@@ -326,29 +328,26 @@ vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsM
     vec3 extent = boundsMax - boundsMin;
     float uvwScale = length(rayDir / extent); // UVW length per unit world distance
     float pathUVW = rayLength * uvwScale; // total arc length in UVW space
-    // The pre-pass has to *find* the first occluding sample, it does not integrate the ray, so it
-    // can step further over the same span. What decides whether it finds the dust is the step
-    // measured in voxels, and that depends on the box: VolumeTextureLoader crops a volume to the
-    // box its density actually fills, which shortens this walk by ~2x on the wide axes, so 0.02
-    // here is a finer step per voxel than 0.01 was over the uncropped box. Removing the crop means
-    // putting this back to 0.01, or the mask starts stepping over thin dust lanes.
-    #ifdef DEPTH_PASS
-    const float TARGET_STEP_UVW = 0.02;
-    #else
+    // The pre-pass and the colour pass have to march the *same* samples: the mask the pre-pass
+    // writes is compared against the depth this pass computes (GL_LEQUAL, see
+    // ModelEntityRenderSystem.renderVolume), and the distance to the first dense sample is a
+    // discontinuous function of the sample position near a lane edge - one step either way and a
+    // thin filament is missed entirely. Two lattices would therefore cut the volume with its own
+    // mask, in speckles along every dust edge. So everything that sets the lattice - the step, the
+    // jitter phase, the span - is the same in both passes, and the pre-pass no longer takes the
+    // coarser step it used to: it is buying correctness, and the early break at the first dense
+    // sample still keeps it cheap.
     const float TARGET_STEP_UVW = 0.01;
-    #endif
 
     int nSteps = clamp(int(ceil(pathUVW / TARGET_STEP_UVW)), 16, u_iterations);
     float stepSize = rayLength / float(nSteps);
     float stepUVW = stepSize * uvwScale; // consistent with the loop, by construction
 
     float transmittance = 1.0;
-
     // The jitter decorrelates neighbouring pixels so that a step size in UVW does not show as
-    // banding across a smooth volume. In the pre-pass there is no banding to hide - it writes a
-    // depth, not a colour - and a phase that re-rolls every frame is a mask that boils at its
-    // edges and, at a coarse step, flickers over whole dust lanes. So the pre-pass hashes position
-    // only: still per pixel, no longer per frame, and the same camera gives the same mask twice.
+    // banding across a smooth volume. The pre-pass must keep its phase fixed, so that the mask it
+    // writes does not boil; the colour pass may re-roll it every frame, and does, because a fixed
+    // phase turns the march noise into a stipple pattern that the eye can see.
     #ifdef DEPTH_PASS
     float jitter = hash12(gl_FragCoord.xy);
     #else
@@ -374,10 +373,9 @@ vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsM
         float density = texel.a;
 
         // Does this sample occlude? Only if the slot is configured as an occluder and its density
-        // clears that threshold. The colour pass runs this same test to decide what the dust hides,
-        // so the two passes agree on which sample is the front; they no longer agree on the sample
-        // *points* (see the note on the jitter below), which they do not have to. Where a pre-pass
-        // runs, it is the depth buffer's only writer for this object.
+        // clears that threshold. The colour pass runs this same test over the same samples and
+        // computes the same front, which is what makes the depth the two passes write identical -
+        // the colour pass tests against it.
         bool occludes = depthThreshold > 0.0 && density > depthThreshold;
         if (firstDepth < 0.0 && occludes) {
             firstDepth = currentDist;
@@ -443,19 +441,10 @@ vec4 raymarchVolumeOccluded(in sampler3D emissiveVolume, in sampler3D emissiveOc
     vec2 iEmissive = boxIntersection(rayOrigin, rayDir, emissiveBoundsMin, emissiveBoundsMax);
     vec2 iOpaque = boxIntersection(rayOrigin, rayDir, opaqueBoundsMin, opaqueBoundsMax);
 
-    #ifdef DEPTH_PASS
-    // The pre-pass looks for the first sample that clears a threshold, so a slot without one cannot
-    // contribute to it: not a sample, and not a span either. Dropping its box here is what keeps the
-    // search inside the occluding volume - in the gas+dust coupling, the dust alone, already cropped
-    // by the loader to the box its density fills. A ray that misses the dust then costs nothing at
-    // all, instead of marching the whole gas box looking for a front that cannot be in it.
-    if (emissiveDepthThreshold <= 0.0) {
-        iEmissive = vec2(-1.0);
-    }
-    if (opaqueDepthThreshold <= 0.0) {
-        iOpaque = vec2(-1.0);
-    }
-    #endif
+    // The pre-pass used to drop the box of a slot that cannot write depth, to keep its search
+    // inside the occluding volume. It cannot: dropping a box changes the union span, and with it
+    // nSteps and therefore the samples the colour pass will be compared against (see the note on
+    // TARGET_STEP_UVW). Both passes march the union as it is.
 
     // Discard only if *both* boxes are missed. A ray that clips one volume and not
     // the other must still render the one it hits.
@@ -495,27 +484,10 @@ vec4 raymarchVolumeOccluded(in sampler3D emissiveVolume, in sampler3D emissiveOc
     float uvwScaleEmissive = length(rayDir / emissiveExtent);
     float uvwScaleOpaque = length(rayDir / opaqueExtent);
 
-    #ifdef DEPTH_PASS
-    // Only a box that is actually being marched may set the step. A slot with no threshold was
-    // dropped from the span above by the very same test, and its scale has to go with it: left in,
-    // it would only make the pre-pass walk the occluder in finer steps than the occluder needs.
-    if (emissiveDepthThreshold <= 0.0) {
-        uvwScaleEmissive = 0.0;
-    }
-    if (opaqueDepthThreshold <= 0.0) {
-        uvwScaleOpaque = 0.0;
-    }
-    #endif
-
-    // Size the step from the finer of the two, so neither volume is undersampled. That `max` is also
-    // what keeps the pre-pass honest: it takes the finer of the boxes actually present, and the
-    // occluding volume is the cropped one - see the TARGET_STEP_UVW note in raymarchVolume().
+    // Size the step from the finer of the two, so neither volume is undersampled.
     float pathUVW = rayLength * max(uvwScaleEmissive, uvwScaleOpaque);
-    #ifdef DEPTH_PASS
-    const float TARGET_STEP_UVW = 0.02;
-    #else
+    // Same lattice in both passes - see the note on TARGET_STEP_UVW in raymarchVolume().
     const float TARGET_STEP_UVW = 0.01;
-    #endif
     int nSteps = clamp(int(ceil(pathUVW / TARGET_STEP_UVW)), 16, u_iterations);
     float stepSize = rayLength / float(nSteps);
     float stepUVWEmissive = stepSize * uvwScaleEmissive;
@@ -525,11 +497,11 @@ vec4 raymarchVolumeOccluded(in sampler3D emissiveVolume, in sampler3D emissiveOc
     float transmittance = 1.0;
     float alpha = 0.0;
 
-    // See the note on the jitter in raymarchVolume(): the pre-pass phase must not change with time.
+    // Fixed phase in the pre-pass, animated in the colour pass - see the note on the jitter above.
     #ifdef DEPTH_PASS
     float jitter = hash12(gl_FragCoord.xy);
     #else
-    float jitter = hash12(gl_FragCoord.xy * u_time * 0.01);
+    float jitter = hash12(gl_FragCoord.xy * u_time * 0.1);
     #endif
     for (int i = 0; i < nSteps; i++) {
         float currentDist = entryDist + (float(i) + jitter) * stepSize;
@@ -652,7 +624,15 @@ void main() {
     // firstDepth is along the ray; the buffer wants the view depth of the same point.
     // The fragment and the sample lie on the same ray, so cos of the angle to the view
     // axis is (view depth of the fragment) / (distance to the fragment).
-    float viewDepth = (1.0 / gl_FragCoord.w) * (firstDepth / length(v_data.fragPosWorld));
+    //
+    // In the colour pass this depth is also *tested*, against the mask the pre-pass left behind
+    // (GL_LEQUAL, no writes - see ModelEntityRenderSystem.renderVolume). That is what hides a
+    // volume where another one found dust in front of it. Both passes march the same lattice, so
+    // this is the distance the pre-pass stored for this pixel and the volume's own mask passes the
+    // test exactly; the 1e-4 absorbs float noise between two separately compiled programs and
+    // nothing more. The pre-pass writes it unbiased: what it writes is the mask itself.
+    float depthDist = firstDepth * 0.9999;
+    float viewDepth = (1.0 / gl_FragCoord.w) * (depthDist / length(v_data.fragPosWorld));
     gl_FragDepth = firstDepth > 0.0 ? getDepthValue(viewDepth, u_cameraNearFar.y, u_cameraK) : 1.0;
     #endif // volumeFlag
 }

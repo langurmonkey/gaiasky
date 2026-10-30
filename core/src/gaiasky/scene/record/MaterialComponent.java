@@ -1283,7 +1283,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      *
      * @return The minimum density at which the slot may write depth, 0 to disable.
      */
-    private float volumeDepthThreshold(int slot) {
+    public float volumeDepthThreshold(int slot) {
         if (volumeDepthThreshold == null || slot < 0 || slot >= volumeDepthThreshold.length) {
             return 0f;
         }

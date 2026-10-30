@@ -230,15 +230,18 @@ public class ModelEntityRenderSystem {
             // mode still decides the colour blend - additive for emission - but not the mask,
             // because an additive volume that does not write depth cannot hide anything.
             var volume = Mapper.volume.get(entity);
-            if (volume == null || volume.writeDepth) {
-                if (renderGroup == RenderGroup.VOLUME_DEPTH) {
-                    // The pre-pass stores the dust front; that is the mask the passes after it are tested against.
-                    mc.depthTestReadWrite();
-                } else {
-                    // The colour pass rasterises the FAR side of this flipped sphere, i.e. behind the mask.
-                    // A LEQUAL test against it deletes the whole fragment (colour included) -> black.
-                    mc.depthTestDisable();   // GL_NONE, no write: the pre-pass owns depth
-                }
+            if (volume == null) {
+                mc.updateDepthTest();
+            } else if (renderGroup == RenderGroup.VOLUME_DEPTH) {
+                // The pre-pass stores the dust front; that is the mask the passes after it are tested against.
+                mc.depthTestReadWrite();
+            } else if (volume.writeDepth) {
+                // Colour pass: no test and no write here. The pre-pass owns depth for this object.
+                // Testing the colour pass against that same mask is not safe (see the note in
+                // Volume.writeDepth): the shader replaces the rasterised depth with the distance to
+                // its first dense sample, and that distance jumps by whole steps where a dust
+                // filament is grazed, so the fragment compares its own mask against itself.
+                mc.depthTestDisable();
             } else {
                 mc.updateDepthTest();
             }

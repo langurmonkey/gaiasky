@@ -156,5 +156,12 @@ public class VolumeComponentTest {
         Assert.assertEquals("volumeDepthThreshold must be a double[] for the loader to fill it",
                             double[].class,
                             material.getDeclaredField("volumeDepthThreshold").getType());
+        // The initializer reads it back to log the value that a slot was bound with, and to warn
+        // when it is 0 - the one silent failure of the whole chain, because the volume renders and
+        // the dust absorbs whether or not anything can be hidden behind it.
+        var accessor = material.getDeclaredMethod("volumeDepthThreshold", int.class);
+        Assert.assertTrue("MaterialComponent.volumeDepthThreshold(int) must be public",
+                          java.lang.reflect.Modifier.isPublic(accessor.getModifiers()));
+        Assert.assertEquals(float.class, accessor.getReturnType());
     }
 }
