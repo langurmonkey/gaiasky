@@ -57,8 +57,20 @@ public class GalaxyAttributes {
      */
     public float baseRadius = 1;
     /**
-     * Minimum radius to generate particles. Only available for spiral and density wave distributions.
-     * Must be in [0,1], where 0 is the very center, and 1 is baseRadius.
+     * Minimum radius of this field, in [0,1], where 0 is the very centre and 1 is {@link #baseRadius}.
+     * <p>
+     * What it does depends on the channel, because the density field is analytic rather than sampled
+     * from particles:
+     * <ul>
+     *     <li>A {@code DUST} field is a ring of lanes whose inner edge is this radius: 0 lets the dust
+     *     reach the core, and the default 0.01 nearly so. (The inner edge used to be a constant
+     *     0.25 in {@code gxDustDensity()}, which is why setting this on a dust field only moved the
+     *     arm modulation and the lanes stayed where they were.)</li>
+     *     <li>Any other flat distribution uses it as the radius at which the azimuthal arm structure
+     *     fades in, over {@code 0..2 * minRadius}. The radial profile is unaffected, so the disk of
+     *     a spiral still peaks at the centre whatever this says.</li>
+     *     <li>Spheroids ignore it: their profile is normalised on {@link #baseRadius} alone.</li>
+     * </ul>
      */
     public float minRadius = 0.01f;
 

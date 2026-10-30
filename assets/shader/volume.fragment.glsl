@@ -15,6 +15,8 @@ uniform vec3 u_cameraPos;
 uniform float u_bodySize;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
+// u_time is bound only for the colour pass' march jitter (see the note on the jitter in the
+// raymarch); the depth pre-pass must keep a fixed phase so its mask does not boil.
 uniform float u_time;
 uniform int u_iterations = 90;
 
@@ -359,6 +361,8 @@ vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsM
     // This matters more here than in a single-volume shader, because the slots share one
     // firstDepth: the earliest depth-writing sample of any slot is the one that survives, so an
     // unstable phase in one slot moves the depth written for all of them.
+    // Fixed phase in the pre-pass, animated in the colour pass: a static phase turns the march
+    // noise into a stipple pattern that survives in a still frame.
     #ifdef DEPTH_PASS
     float jitter = hash12(gl_FragCoord.xy);
     #else
@@ -394,10 +398,9 @@ vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsM
         #ifdef DEPTH_PASS
         // Depth-only pre-pass (RenderGroup.VOLUME_DEPTH): the distance to the first depth-writing
         // sample is all we need, so stop right there - one step instead of the whole integration.
-        // The colour pass runs the same threshold test to decide what the dust hides, so the two
-        // passes agree on *which sample* is the front; they no longer agree on the sample points
-        // (see the note on the jitter above), which they do not have to. Where a pre-pass runs, it
-        // is the depth buffer's only writer for this object.
+        // The colour pass runs the same threshold test over the same samples and computes the same
+        // front, which is what makes the depth the two passes write identical - the colour pass
+        // tests against it.
         if (occludes) {
             break;
         }
@@ -470,6 +473,14 @@ void main() {
     // slot whose u_volumeNDepthThreshold it clears. With every threshold at 0 (the default) no
     // slot ever sets firstDepth, and the fragment writes the far plane: it still draws, but
     // nothing can be hidden behind it.
-    gl_FragDepth = firstDepth > 0.0 ? getDepthValue(firstDepth, u_cameraNearFar.y, u_cameraK) : 1.0;
+    //
+    // In the colour pass this depth is also *tested*, against the mask the pre-pass left behind
+    // (GL_LEQUAL, no writes - see ModelEntityRenderSystem.renderVolume). That is what hides a
+    // volume where another one found dust in front of it. Both passes march the same lattice, so
+    // this is the distance the pre-pass stored for this pixel and the volume's own mask passes the
+    // test exactly; the 1e-4 absorbs float noise between two separately compiled programs and
+    // nothing more. The pre-pass writes it unbiased: what it writes is the mask itself.
+    float depthDist = firstDepth * 0.9999;
+    gl_FragDepth = firstDepth > 0.0 ? getDepthValue(depthDist, u_cameraNearFar.y, u_cameraK) : 1.0;
     #endif // volumeFlag
 }

@@ -190,23 +190,35 @@ public class VolumeInitializer extends AbstractInitSystem {
 
         var occlusiveGrid = gridFor(volume.occlusiveFields(), sizePc, quality);
         VolumeTexture occlusive = generateSlot(generator, volume.occlusiveFields(), occlusiveGrid);
+        float occlusiveThreshold = mtc.volumeDepthThreshold(Volume.SLOT_OCCLUSIVE);
         if (occlusive != null && mtc.setVolumeTexture(Volume.SLOT_OCCLUSIVE, occlusive)) {
             volume.setGeneratedVolume(Volume.SLOT_OCCLUSIVE, occlusive);
+            if (occlusiveThreshold <= 0f) {
+                // A generated volume has no descriptor of its own to inherit this from, and the
+                // depth pre-pass drops every slot whose threshold is zero - so the lanes render but
+                // hide nothing. It is a silent failure otherwise: the scene looks right.
+                logger.warn("The occlusive volume of " + name + " is bound with no depth threshold "
+                                    + "(material.volumeDepthThreshold[" + Volume.SLOT_OCCLUSIVE + "] is 0), so its dust will "
+                                    + "not occlude anything. Set it to a density in (0, 1], e.g. 0.005.");
+            }
         } else if (occlusive != null) {
             occlusive.texture().dispose();
         }
 
         // The grid is the thing to look at when the result looks coarse: a lateral voxel of N pc is
         // N / (spanPc / spanOnScreenPx) pixels wide, so this line plus a screenshot answers whether
-        // the blockiness is the grid or something else.
+        // the blockiness is the grid or something else. The thresholds say whether the dust can
+        // occlude at all - the depth pre-pass skips a slot whose threshold is zero.
         logger.info(String.format(Locale.ROOT,
-                                  "Generated the volumes of %s in %.1f ms (%.0f pc span, %s): emissive %s, occlusive %s",
+                                  "Generated the volumes of %s in %.1f ms (%.0f pc span, %s): emissive %s (depth threshold %.4f), occlusive %s (depth threshold %.4f)",
                                   name,
                                   (System.nanoTime() - start) / 1.0e6,
                                   sizePc,
                                   quality,
                                   emissiveGrid == null ? "none" : emissiveGrid.toString(),
-                                  occlusiveGrid == null ? "none" : occlusiveGrid.toString()));
+                                  mtc.volumeDepthThreshold(Volume.SLOT_EMISSIVE),
+                                  occlusiveGrid == null ? "none" : occlusiveGrid.toString(),
+                                  occlusiveThreshold));
     }
 
     private VoxelGrid gridFor(List<GalaxyAttributes> fields,

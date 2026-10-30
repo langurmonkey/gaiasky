@@ -244,7 +244,9 @@ float gxTaper(float rn, float start) {
 //
 //   - no inter-arm floor: the 0.22 the gas keeps between arms is exactly the uniform veil dust must
 //     not have;
-//   - a radial ring, because a galaxy has little dust in the core or at the very rim;
+//   - a radial ring, whose inner edge is the field's own minRadius and whose outer one is fixed at
+//     the rim of the disk: the lanes start where the field says they start, and minRadius = 0 lets
+//     them reach the core;
 //   - a contrast power on the product, which thins the lanes without making them sub-voxel: the peak
 //     is untouched (it is 1^q) while the tails fall away.
 //
@@ -253,8 +255,11 @@ float gxTaper(float rn, float start) {
 // lane contrast is the Milky Way's and not just its integrated absorption. That the ratio holds
 // across resolutions is the point of using a smooth function rather than noise: a thresholded noise
 // field concentrates harder but its peak is set by which voxel happens to sample the noise, which
-// makes both the ratio and the look depend on the grid.
-#define GX_DUST_RING_IN 0.25
+// makes both the ratio and the look depend on the grid. Note that those two numbers were measured
+// with the ring's inner edge pinned at 0.25; a field with a smaller minRadius puts more dust in the
+// texture and raises the ratio, so re-measure before trusting the comparison again.
+
+// Outer edge of the dust ring: the lanes fade out at the rim of the disk.
 #define GX_DUST_RING_OUT 0.95
 // Width of the radial fade at both edges of the ring.
 #define GX_DUST_RING_FADE 0.15
@@ -272,8 +277,13 @@ float gxHeightScale(in GalaxyShape s) {
 }
 
 // Dust density inside the flat branch. `disk` and `arm` are the gas terms, already evaluated.
-float gxDustDensity(float rnCyl, float disk, float arm, vec3 p, float base) {
-    float ring = smoothstep(GX_DUST_RING_IN, GX_DUST_RING_IN + GX_DUST_RING_FADE, rnCyl)
+// `minRadius` is the field's own inner radius, normalised by baseRadius like rnCyl: it is where the
+// lanes start, and 0 means they reach the core. It used to be a constant (0.25) here, which is why
+// setting minRadius on a dust field did nothing beyond moving the arm modulation: the ring cut the
+// dust out of the middle regardless.
+float gxDustDensity(float rnCyl, float disk, float arm, vec3 p, float base, float minRadius) {
+    float ringIn = clamp(minRadius, 0.0, GX_DUST_RING_OUT - GX_DUST_RING_FADE);
+    float ring = smoothstep(ringIn, ringIn + GX_DUST_RING_FADE, rnCyl)
             * (1.0 - smoothstep(GX_DUST_RING_OUT - GX_DUST_RING_FADE, GX_DUST_RING_OUT, rnCyl));
     float d = disk * ring * arm * arm * gxClumps(p, base);
     return pow(max(d, 0.0), GX_DUST_CONTRAST);
@@ -344,7 +354,7 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s) {
             float armWeight = smoothstep(0.0, 2.0 * max(s.minRadius, 0.02), rnCyl);
             float arm = mix(1.0, gxArmFactor(s, r, phi), armWeight);
             if (s.channel == GX_CHANNEL_DUST) {
-                density = gxDustDensity(rnCyl, disk, arm, p, base);
+                density = gxDustDensity(rnCyl, disk, arm, p, base, s.minRadius);
             } else {
                 density = disk * (0.22 + 0.78 * arm) * gxClumps(p, base);
             }

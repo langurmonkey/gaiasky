@@ -114,4 +114,5 @@ public class VolumeFieldsTest {
         // gone; it checks this before binding anything.
         Assert.assertTrue(volume.isDisposed());
     }
+
 }

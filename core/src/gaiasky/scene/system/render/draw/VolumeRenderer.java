@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ * Copyright (c) 2023-2026 Gaia Sky - All rights reserved.
  *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.scene.system.render;
+package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.utils.IntMap;
 import gaiasky.GaiaSky;
@@ -19,6 +19,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.Volume;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.render.gdx.IntModelBatch;
 import gaiasky.render.gdx.shader.loader.ShaderTemplatingLoader;
@@ -27,11 +28,6 @@ import gaiasky.render.gdx.shader.provider.ShaderProgramProvider;
 
 import java.util.List;
 
-/**
- * Renders models with arbitrary shaders, kept in a map. The shaders themselves are defined in the {@link Volume} component.
- * Optionally, the shader may receive one or more 3D texture (density, color, etc.). In this case, the shader must be a
- * full-on volume rendering shader.
- */
 public class VolumeRenderer extends AbstractRenderSystem implements IObserver {
 
     /**
