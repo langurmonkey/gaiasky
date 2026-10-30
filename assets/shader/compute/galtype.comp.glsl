@@ -109,7 +109,7 @@ void main() {
     field.unitDensity = 0.0;
     if (inside) {
         vec3 p = u_gridOrigin + vec3(voxel) * u_gridCell;
-        field = gxSampleFields(p, u_fields, u_fieldCount);
+        field = gxSampleFields(p, u_fields, u_fieldCount, u_gridCell.x);
     }
 
     float brightLight = gxBrightness(field.light);

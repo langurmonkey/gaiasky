@@ -132,6 +132,32 @@ public class GalaxyAttributes {
     public float armSigma = 0.4f;
 
     /**
+     * Amplitude of the azimuthal warp of the arms, in fractions of the arm period. Zero, the
+     * default, leaves the lanes on their analytic log spiral; a few tenths of the arm spacing turn
+     * the arms from drawn arcs into something with a varying sweep. Applies to the whole arm
+     * modulation, so the gas and the dust of a galaxy bend together.
+     */
+    public float laneWarp = 0.0f;
+
+    /**
+     * Raggedness of the dust lanes, in [0,1]. Two effects: the lane edge is displaced across itself
+     * with a mid-frequency field, which varies the width of the lane and breaks it into spurs and
+     * gaps, and the density along the lane is modulated with a finer one, which gives it filaments.
+     * Only {@link ChannelType#DUST} uses it, and both effects are applied after the dust contrast,
+     * which would otherwise sharpen the noise instead of the lane.
+     * <p>
+     * It changes the shape's mean-to-peak ratio (it breaks the lanes into strands that individually
+     * sit below the old peak, so the mean rises relative to it), which the volume calibration then
+     * turns into a denser-looking dust. Adjust {@link #intensity} to compensate.
+     */
+    public float laneClump = 0.0f;
+
+    /**
+     * Frequency multiplier of {@link #laneWarp} and {@link #laneClump}. Zero or less means 1.
+     */
+    public float laneNoiseScale = 1.0f;
+
+    /**
      * The intensity factor.
      */
     public float intensity = 1;
@@ -191,6 +217,9 @@ public class GalaxyAttributes {
         out[offset + 15] = intensity;
         System.arraycopy(baseColors, 0, out, offset + 16, MAX_COLORS * 3);
         out[offset + 28] = type.ordinal();
+        out[offset + 29] = laneWarp;
+        out[offset + 30] = laneClump;
+        out[offset + 31] = laneNoiseScale;
     }
 
     /**
@@ -424,6 +453,48 @@ public class GalaxyAttributes {
 
     public void setArmSigma(Long armSigma) {
         this.armSigma = armSigma.floatValue();
+    }
+
+    public void setLaneWarp(Double laneWarp) {
+        this.laneWarp = laneWarp.floatValue();
+    }
+
+    public void setLaneWarp(Long laneWarp) {
+        this.laneWarp = laneWarp.floatValue();
+    }
+
+    public void setLaneClump(Double laneClump) {
+        this.laneClump = MathUtilsDouble.clamp(laneClump.floatValue(), 0f, 1f);
+    }
+
+    public void setLaneClump(Long laneClump) {
+        setLaneClump(laneClump.doubleValue());
+    }
+
+    public void setLaneNoiseScale(Double laneNoiseScale) {
+        this.laneNoiseScale = laneNoiseScale.floatValue();
+    }
+
+    public void setLaneNoiseScale(Long laneNoiseScale) {
+        this.laneNoiseScale = laneNoiseScale.floatValue();
+    }
+
+    /**
+     * Sets the lane perturbations in one go: warp, clump and frequency scale, from one to three
+     * values. Missing ones are left as they are.
+     *
+     * @param v The values.
+     */
+    public void setLaneNoise(double[] v) {
+        if (v.length > 0) setLaneWarp(v[0]);
+        if (v.length > 1) setLaneClump(v[1]);
+        if (v.length > 2) setLaneNoiseScale(v[2]);
+    }
+
+    public void setLaneNoise(int[] v) {
+        if (v.length > 0) setLaneWarp((double) v[0]);
+        if (v.length > 1) setLaneClump((double) v[1]);
+        if (v.length > 2) setLaneNoiseScale((double) v[2]);
     }
 
     public void setAspect(Double aspect) {
