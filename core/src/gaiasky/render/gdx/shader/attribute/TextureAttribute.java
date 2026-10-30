@@ -61,6 +61,12 @@ public class TextureAttribute extends Attribute {
     public final static int SvtIndirectionMetallic = register(SvtIndirectionMetallicAlias);
     public final static String SvtIndirectionAmbientOcclusionAlias = "svtIndirectionAoTexture";
     public final static int SvtIndirectionAmbientOcclusion = register(SvtIndirectionAmbientOcclusionAlias);
+    /** This volume's own front, written by the depth-only pre-pass into its own target. */
+    public final static String VolumeDepthAlias = "volumeDepthTexture";
+    public final static int VolumeDepth = register(VolumeDepthAlias);
+    /** The shared scene depth at the start of the volume colour pass. */
+    public final static String VolumeSceneDepthAlias = "volumeSceneDepth";
+    public final static int VolumeSceneDepth = register(VolumeSceneDepthAlias);
     public final TextureDescriptor<Texture> textureDescription;
     public float offsetU;
     public float offsetV;

@@ -67,6 +67,33 @@ layout(location = 1) out vec4 layerBuffer;
 
 #include <shader/lib/logdepthbuff.glsl>
 
+#ifdef volumeDepthTextureFlag
+// This volume's own front: depth of its first sample dense enough to occlude, written by the
+// depth-only pre-pass.
+uniform sampler2D u_volumeDepthTexture;
+// The scene depth buffer as of this pass: geometry plus every volume's composed front.
+uniform sampler2D u_volumeSceneDepth;
+// Mask texels per fragment of this pass (2 in the half-resolution buffer, 1 otherwise).
+uniform vec2 u_volumeDepthMaskScale;
+
+// Distance along the ray at which something other than this volume occludes it, or 0 if nothing does.
+// Both depths are stored by the pre-pass, so they compare exactly; a fixed-function depth test would
+// compare the volume with its own front instead.
+float volumeOcclusionDistance() {
+    // One texel for both textures, so where this volume is nearest they hold the same number.
+    ivec2 texel = ivec2(gl_FragCoord.xy * u_volumeDepthMaskScale);
+    float mine = texelFetch(u_volumeDepthTexture, texel, 0).r;
+    float scene = texelFetch(u_volumeSceneDepth, texel, 0).r;
+    // Stored log depths: nearer is smaller. 1e-5 is above the 24-bit quantum.
+    if (!(scene < mine - 1.0e-5)) {
+        return 0.0;
+    }
+    // View depth of the occluder, converted to a distance along this fragment's ray.
+    float sceneDist = 1.0 / recoverWValue(scene, u_cameraNearFar.y, u_cameraK);
+    return sceneDist * length(v_data.fragPosWorld) * gl_FragCoord.w;
+}
+#endif // volumeDepthTextureFlag
+
 #define PI 3.14159265359
 #define EXPOSURE 20.0
 
@@ -277,7 +304,7 @@ float extinction(float dustDensity, float dustStepUVW) {
     return exp(-DUST_SIGMA * dustDensity * dustStepUVW);
 }
 
-vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsMin, in vec3 boundsMax, in int colorMode, in float depthThreshold, in vec3[3] ramp, inout float firstDepth) {
+vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsMin, in vec3 boundsMax, in int colorMode, in float depthThreshold, in vec3[3] ramp, inout float firstDepth, in float clipDist) {
     // Rotation part of u_worldTrans (= S·R; strip the uniform scale).
     mat3 W = mat3(u_worldTrans);
     mat3 R = mat3(W[0] / length(W[0]), W[1] / length(W[1]), W[2] / length(W[2]));
@@ -323,20 +350,19 @@ vec4 raymarchVolume(in sampler3D volume, in sampler3D occupancy, in vec3 boundsM
     vec4 result = vec4(0.0);
     float entryDist = intersection.x;
     float exitDist = intersection.y;
+    // Stop the march at whatever occludes this volume.
+    if (clipDist > 0.0) {
+        exitDist = min(exitDist, clipDist);
+    }
+    if (exitDist <= entryDist) {
+        return vec4(0.0);
+    }
     float rayLength = exitDist - entryDist;
 
     vec3 extent = boundsMax - boundsMin;
     float uvwScale = length(rayDir / extent); // UVW length per unit world distance
     float pathUVW = rayLength * uvwScale; // total arc length in UVW space
-    // The pre-pass and the colour pass have to march the *same* samples: the mask the pre-pass
-    // writes is compared against the depth this pass computes (GL_LEQUAL, see
-    // ModelEntityRenderSystem.renderVolume), and the distance to the first dense sample is a
-    // discontinuous function of the sample position near a lane edge - one step either way and a
-    // thin filament is missed entirely. Two lattices would therefore cut the volume with its own
-    // mask, in speckles along every dust edge. So everything that sets the lattice - the step, the
-    // jitter phase, the span - is the same in both passes, and the pre-pass no longer takes the
-    // coarser step it used to: it is buying correctness, and the early break at the first dense
-    // sample still keeps it cheap.
+    // Same step in both passes, so the colour pass reaches the dust where the pre-pass found it.
     const float TARGET_STEP_UVW = 0.01;
 
     int nSteps = clamp(int(ceil(pathUVW / TARGET_STEP_UVW)), 16, u_iterations);
@@ -421,7 +447,7 @@ vec4 raymarchVolumeOccluded(in sampler3D emissiveVolume, in sampler3D emissiveOc
     in sampler3D opaqueVolume, in sampler3D opaqueOccupancy,
     in vec3 opaqueBoundsMin, in vec3 opaqueBoundsMax,
     in int opaqueColorMode, in float opaqueDepthThreshold,
-    in vec3[3] ramp, inout float firstDepth) {
+    in vec3[3] ramp, inout float firstDepth, in float clipDist) {
 
     // Rotation part of u_worldTrans (= S·R; strip the uniform scale). See the frame note in
     // raymarchVolume(): the camera's position in the box frame is the rotated u_cameraPos, and the
@@ -475,6 +501,14 @@ vec4 raymarchVolumeOccluded(in sampler3D emissiveVolume, in sampler3D emissiveOc
         entryDist = min(entryDist, iOpaque.x);
         exitDist = max(exitDist, iOpaque.y);
     }
+    // Stop the march at whatever occludes this volume.
+    if (clipDist > 0.0) {
+        exitDist = min(exitDist, clipDist);
+    }
+    if (exitDist <= entryDist) {
+        return vec4(0.0);
+    }
+
     float rayLength = exitDist - entryDist;
 
     // Each volume lives in its own UVW space, so the per-sample step has to be
@@ -588,18 +622,25 @@ void main() {
     vec4 result = vec4(0.0);
     float firstDepth = -1.0;
 
+    // Only the colour pass clips: the pre-pass is writing the very depth this would be read from.
+    #if defined(volumeDepthTextureFlag) && !defined(DEPTH_PASS)
+    float clipDist = volumeOcclusionDistance();
+    #else
+    float clipDist = 0.0;
+    #endif
+
     #if defined(volume0Flag) && defined(volume1Flag)
     // Gas (volume0) emissive, ArmDust (volume1) absorbing. The scene gives the dust a depth
     // threshold and leaves the gas at 0, so only the dust lanes occlude the passes that follow.
     result += raymarchVolumeOccluded(u_volume0, u_volume0Occupancy, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold,
             u_volume1, u_volume1Occupancy, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold,
-            GAS_RAMP, firstDepth);
+            GAS_RAMP, firstDepth, clipDist);
     #elif defined(volume0Flag)
-    result += raymarchVolume(u_volume0, u_volume0Occupancy, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold, GAS_RAMP, firstDepth);
+    result += raymarchVolume(u_volume0, u_volume0Occupancy, u_volume0BoundsMin, u_volume0BoundsMax, u_volume0ColorMode, u_volume0DepthThreshold, GAS_RAMP, firstDepth, clipDist);
     #elif defined(volume1Flag)
     // Dust alone: pure extinction with no emissive volume behind it. Nothing to
     // occlude, so it only contributes its own (currently disabled) glow.
-    result += raymarchVolume(u_volume1, u_volume1Occupancy, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold, DUST_RAMP, firstDepth);
+    result += raymarchVolume(u_volume1, u_volume1Occupancy, u_volume1BoundsMin, u_volume1BoundsMax, u_volume1ColorMode, u_volume1DepthThreshold, DUST_RAMP, firstDepth, clipDist);
     #endif //volume0Flag && volume1Flag
 
     // Never discard this fragment: a discarded fragment writes no depth, and the dust has to
@@ -625,12 +666,7 @@ void main() {
     // The fragment and the sample lie on the same ray, so cos of the angle to the view
     // axis is (view depth of the fragment) / (distance to the fragment).
     //
-    // In the colour pass this depth is also *tested*, against the mask the pre-pass left behind
-    // (GL_LEQUAL, no writes - see ModelEntityRenderSystem.renderVolume). That is what hides a
-    // volume where another one found dust in front of it. Both passes march the same lattice, so
-    // this is the distance the pre-pass stored for this pixel and the volume's own mask passes the
-    // test exactly; the 1e-4 absorbs float noise between two separately compiled programs and
-    // nothing more. The pre-pass writes it unbiased: what it writes is the mask itself.
+    // Only the pre-pass writes this; the colour pass runs with the depth test off.
     float depthDist = firstDepth * 0.9999;
     float viewDepth = (1.0 / gl_FragCoord.w) * (depthDist / length(v_data.fragPosWorld));
     gl_FragDepth = firstDepth > 0.0 ? getDepthValue(viewDepth, u_cameraNearFar.y, u_cameraK) : 1.0;

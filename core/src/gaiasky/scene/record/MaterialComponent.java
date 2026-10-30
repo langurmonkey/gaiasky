@@ -170,6 +170,9 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      * The actual material
      **/
     private Material material, ringMaterial;
+    /** Volume depth mask currently bound: this volume's own front, and the shared scene depth. **/
+    private Texture volumeDepthTex, volumeSceneDepthTex;
+    private float volumeDepthScaleX, volumeDepthScaleY;
     /**
      * Callbacks waiting for {@link #material} to exist. Lazy texture initialisation defers
      * {@link #initMaterial} to the first frame the entity is drawn, so anything that has to add
@@ -1347,6 +1350,40 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         material.set(new Vector3Attribute(boundsMin, new Vector3(tex.boundsMin())));
         material.set(new Vector3Attribute(boundsMax, new Vector3(tex.boundsMax())));
         return true;
+    }
+
+    /**
+     * Binds the volume depth mask: this volume's own front, the shared scene depth and the
+     * fragment-to-texel scale. A placeholder is bound at set-up so the shader sees the attributes.
+     *
+     * @param own    This volume's own front.
+     * @param scene  Shared scene depth at the start of the colour pass.
+     * @param scaleX Mask texels per fragment, x.
+     * @param scaleY Mask texels per fragment, y.
+     */
+    public void setVolumeDepthMask(Texture own,
+                                   Texture scene,
+                                   float scaleX,
+                                   float scaleY) {
+        if (own == null || scene == null) {
+            return;
+        }
+        if (own == volumeDepthTex && scene == volumeSceneDepthTex
+                && scaleX == volumeDepthScaleX && scaleY == volumeDepthScaleY) {
+            return;
+        }
+        volumeDepthTex = own;
+        volumeSceneDepthTex = scene;
+        volumeDepthScaleX = scaleX;
+        volumeDepthScaleY = scaleY;
+        whenMaterialInitialized(() -> {
+            if (material == null) {
+                return;
+            }
+            material.set(new TextureAttribute(TextureAttribute.VolumeDepth, own));
+            material.set(new TextureAttribute(TextureAttribute.VolumeSceneDepth, scene));
+            material.set(new Vector2Attribute(Vector2Attribute.VolumeDepthMaskScale, new Vector2(scaleX, scaleY)));
+        });
     }
 
     public void setDiffuseCubemap(String cubemap) {

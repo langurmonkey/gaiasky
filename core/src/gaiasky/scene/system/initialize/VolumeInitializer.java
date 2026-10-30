@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.render.gdx.graphics.GalaxyVolumeGenerator;
+import gaiasky.render.gdx.graphics.VolumeDepthMask;
 import gaiasky.render.gdx.graphics.VolumeTexture;
 import gaiasky.render.gdx.graphics.VoxelGrid;
 import gaiasky.render.gdx.shader.attribute.IntAttribute;
@@ -81,6 +82,12 @@ public class VolumeInitializer extends AbstractInitSystem {
         model.model.setUnits(Constants.KM_TO_U);
         // Set size.
         model.model.updateSize(body.size);
+
+        // Bind a 1x1 placeholder so the mask #define is present when the volume shader compiles.
+        if (model.model.mtc != null) {
+            var placeholder = VolumeDepthMask.placeholder();
+            model.model.mtc.setVolumeDepthMask(placeholder, placeholder, 0f, 0f);
+        }
 
         // Procedural volume: voxelise its own fields into the material's two slots.
         if (volume.isProcedural()) {
