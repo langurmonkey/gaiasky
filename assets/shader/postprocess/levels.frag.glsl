@@ -11,7 +11,7 @@ uniform float u_brightness = 0.0;
 uniform float u_contrast = 1.0;
 uniform float u_saturation = 1.0;
 uniform float u_hue = 1.0;
-uniform float u_gamma = 2.2;
+uniform float u_gamma = 1.0;
 
 
 #ifdef toneMappingExposure
