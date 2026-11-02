@@ -8,7 +8,6 @@
 package gaiasky.render.gdx.graphics;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture3D;
 import com.badlogic.gdx.math.Vector3;
@@ -31,9 +30,9 @@ import java.util.Locale;
  * Builds the volume texture of a procedurally generated galaxy: gas and bulge in the emissive slot,
  * dust in the occlusive one.
  * <p>
- * The heavy lifting is in {@code assets/shader/compute/galtype.comp.glsl}, which evaluates the
+ * The heavy lifting is in {@code assets/shader/compute/galgen.volume.comp.glsl}, which evaluates the
  * analytic density field of {@code assets/shader/lib/galaxy.glsl} once per voxel and stores the
- * result. This class is the orchestration around it: allocate the texture, zero the statistics
+ * result. This class is the surrounding orchestration: allocate the texture, zero the statistics
  * buffer, run the reduce pass, run the write pass against the statistics the first one produced,
  * and hand back a {@link VolumeTexture} shaped like any other volume the renderer knows.
  * <p>
@@ -47,7 +46,7 @@ import java.util.Locale;
 public class GalaxyVolumeGenerator implements Disposable {
     private static final Logger.Log logger = Logger.getLogger(GalaxyVolumeGenerator.class);
 
-    private static final String SHADER_FILE = "shader/compute/galtype.comp.glsl";
+    private static final String SHADER_FILE = "shader/compute/galgen.volume.comp.glsl";
     /** Image unit the shader writes to ({@code layout(binding = 0) uniform image3D u_volume}). **/
     private static final int IMAGE_UNIT = 0;
     /** SSBO binding of the statistics ({@code layout(std430, binding = 1) buffer Stats}). **/
@@ -136,7 +135,7 @@ public class GalaxyVolumeGenerator implements Disposable {
         // One slot stores either density or light, never both: the alpha channel is the only one with
         // a free interpretation. A mixed slot is a descriptor mistake, so it is reported and the
         // first field decides.
-        boolean occlusive = fields.get(0).isOcclusive();
+        boolean occlusive = fields.getFirst().isOcclusive();
         for (int i = 1; i < count; i++) {
             if (fields.get(i).isOcclusive() != occlusive) {
                 logger.warn("Slot mixes occluding and emitting fields (field 0 is "

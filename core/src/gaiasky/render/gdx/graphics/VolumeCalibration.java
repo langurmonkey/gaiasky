@@ -51,7 +51,7 @@ public final class VolumeCalibration {
     public static final double MW_GAS_INTENSITY = 0.7;
     /**
      * Target mean luma of the emissive slot at unit field intensity. Passed to
-     * {@code galtype.comp.glsl} as {@code u_targetMeanRayIntegral}.
+     * {@code galgen.volume.comp.glsl} as {@code u_targetMeanRayIntegral}.
      */
     public static final double EMISSIVE_TARGET_MEAN_LUMA = MW_EMISSIVE_MEAN_LUMA / MW_GAS_INTENSITY;
 

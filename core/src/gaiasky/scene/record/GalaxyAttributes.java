@@ -22,7 +22,7 @@ import java.util.Locale;
  * The shape of one component of a procedurally generated galaxy - a field.
  * <p>
  * These are the parameters of the analytic density model in {@code assets/shader/lib/galaxy.glsl},
- * which is what {@code galgen.comp.glsl} (billboard sampling) and {@code galtype.comp.glsl} (volume
+ * which is what {@code galgen.billboard.comp.glsl} (billboard sampling) and {@code galgen.volume.comp.glsl} (volume
  * voxelisation) both consume. Anything that describes the shape of the galaxy lives here; anything
  * specific to how the particles are drawn lives in {@link BillboardDataset}.
  * <p>
@@ -211,7 +211,7 @@ public class GalaxyAttributes {
     /** Dust slab thickness, as a fraction of {@link #heightScale}. Mirrors {@code GX_DUST_HEIGHT}. **/
     private static final double GX_DUST_HEIGHT = 0.5;
 
-    /** Length in floats of one field in the packed uniform of {@code galtype.comp.glsl}. **/
+    /** Length in floats of one field in the packed uniform of {@code galgen.volume.comp.glsl}. **/
     public static final int FIELD_STRIDE = 36;
     /**
      * Maximum number of fields summed into one volume slot. Mirrors {@code GX_MAX_FIELDS} in

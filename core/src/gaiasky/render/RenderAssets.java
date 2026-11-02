@@ -277,9 +277,9 @@ public class RenderAssets {
 
         // Compute shaders
         if (compute) {
-            manager.load("galgen.comp.glsl",
+            manager.load("galgen.billboard.comp.glsl",
                          ComputeShaderProgram.class,
-                         new ComputeShaderLoader.ComputeShaderParameter("compute.galgen", "shader/compute/galgen.comp.glsl"));
+                         new ComputeShaderLoader.ComputeShaderParameter("compute.galgen.billboard", "shader/compute/galgen.billboard.comp.glsl"));
         }
 
         // Add fonts to load
@@ -442,7 +442,7 @@ public class RenderAssets {
 
         // Compute
         if (compute) {
-            galGenShader = manager.get("galgen.comp.glsl");
+            galGenShader = manager.get("galgen.billboard.comp.glsl");
         }
 
         // Create model batches

@@ -99,9 +99,9 @@ public class VolumeInitializer extends AbstractInitSystem {
 
     /**
      * Prepares the generation of a procedural volume's slots: it binds the results to the material
-     * now if the material already exists, and otherwise hooks onto the material's initialisation.
+     * now if the material already exists, and otherwise hooks onto the material's initialization.
      * <p>
-     * The second case is the common one: with lazy texture initialisation on (the default), the
+     * The second case is the common one: with lazy texture initialization on (the default), the
      * material of a volume is not built at set-up time but on the first frame the entity is drawn,
      * inside {@link ModelComponent#touch(com.badlogic.gdx.math.Matrix4)}. Generating at set-up would
      * then have nowhere to bind the textures, which is what used to make this a no-op.
@@ -157,7 +157,7 @@ public class VolumeInitializer extends AbstractInitSystem {
     }
 
     /**
-     * Voxelises the fields of a procedural volume into its two slots and binds the result to the
+     * Voxelizes the fields of a procedural volume into its two slots and binds the result to the
      * material. The fields are the galaxy's own definition: no billboard set is read, written or
      * emptied to produce a volume.
      * <p>
