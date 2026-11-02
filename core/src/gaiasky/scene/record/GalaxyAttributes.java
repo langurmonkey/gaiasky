@@ -230,6 +230,51 @@ public class GalaxyAttributes {
     }
 
     /**
+     * Default constructor, used by the scene JSON loader and by {@link BillboardDataset}.
+     */
+    public GalaxyAttributes() {
+    }
+
+    /**
+     * Creates a field with the same shape as another one.
+     * <p>
+     * This copies exactly the members that describe the density model, so a
+     * {@link BillboardDataset} can be turned into a volume field without carrying its sampler
+     * parameters (particle count, size, layers, data, blending, ...) along. Those live in the
+     * subclass and are therefore not copied by construction, which is what keeps the two paths from
+     * drifting apart as either side gains members.
+     *
+     * @param other The field to copy.
+     */
+    public GalaxyAttributes(GalaxyAttributes other) {
+        this.type = other.type;
+        this.distribution = other.distribution;
+        this.baseColors = other.baseColors.clone();
+        this.colorNoise = other.colorNoise;
+        this.baseRadius = other.baseRadius;
+        this.minRadius = other.minRadius;
+        this.translation = new Vector3(other.translation);
+        this.scale = new Vector3(other.scale);
+        this.warpStrength = other.warpStrength;
+        this.heightScale = other.heightScale;
+        this.heightProfile = other.heightProfile;
+        this.eccentricity = other.eccentricity.clone();
+        this.aspect = other.aspect;
+        this.baseAngle = other.baseAngle;
+        this.spiralDeltaPos = other.spiralDeltaPos.clone();
+        this.numArms = other.numArms;
+        this.armSigma = other.armSigma;
+        this.laneWarp = other.laneWarp;
+        this.noiseMask = other.noiseMask;
+        this.noiseMaskFreq = other.noiseMaskFreq;
+        this.noiseMaskOctaves = other.noiseMaskOctaves;
+        this.laneNoiseScale = other.laneNoiseScale;
+        this.laneRough = other.laneRough;
+        this.intensity = other.intensity;
+        this.occlusionThreshold = other.occlusionThreshold;
+    }
+
+    /**
      * Whether this field absorbs light rather than emitting it. A procedural volume routes its
      * occluding fields into the occlusive slot and the rest into the emissive one.
      *
@@ -940,6 +985,19 @@ public class GalaxyAttributes {
          */
         public boolean occludes() {
             return this == DUST;
+        }
+
+        /**
+         * Whether this channel is drawn by the volume raymarcher rather than as billboards.
+         * <p>
+         * Gas, bulge and dust are the diffuse components: they are what the analytic density field
+         * in {@code galaxy.glsl} describes best, and what looks wrong when sampled into sprites.
+         * Stars, HII regions and points are compact emitters, so they stay billboards.
+         *
+         * @return True if this channel is a volume field.
+         */
+        public boolean isVolumetric() {
+            return this == GAS || this == BULGE || this == DUST;
         }
 
         @Override

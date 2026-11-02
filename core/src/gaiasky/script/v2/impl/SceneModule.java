@@ -56,6 +56,9 @@ import java.util.*;
  */
 public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
+    /** Seed used by the procedural galaxies created from the GUI when none is given. **/
+    private static final long PROCEDURAL_GALAXY_SEED = 123L;
+
     /** Reference to the main {@link Scene} object in Gaia Sky. **/
     public Scene scene;
 
@@ -1123,85 +1126,187 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                                                           Vector3Q pos,
                                                           GalaxyGenerator.GalaxyMorphology morphology) {
         var generator = new GalaxyGenerator();
-        var channels = generator.generateGalaxy(morphology, 123L);
+        var channels = generator.generateGalaxy(morphology, PROCEDURAL_GALAXY_SEED);
         var full = channels.getFirst();
         var half = channels.getSecond();
 
-        var archetype = scene.archetypes().get("BillboardGroup");
-
         // FULL RESOLUTION
-        var entityFull = archetype.createEntity();
-        var baseFull = Mapper.base.get(entityFull);
-        baseFull.setName(name);
-        baseFull.setComponentType(ComponentTypes.ComponentType.Galaxies);
-
-        var bodyFull = Mapper.body.get(entityFull);
-        bodyFull.cameraCollision = false;
-        bodyFull.setSize(radius);
-
-        var coordFull = Mapper.coordinates.get(entityFull);
-        var coordinatesFull = new StaticCoordinates();
-        coordinatesFull.setPosition(pos);
-        coordFull.coordinates = coordinatesFull;
-
-        var fadeFull = Mapper.fade.get(entityFull);
-        fadeFull.setFadeOut(new double[]{bodyFull.size * 5, bodyFull.size * 10});
-        fadeFull.setFadeObjectName(baseFull.getName());
-
-        var graphFull = Mapper.graph.get(entityFull);
-        graphFull.setParent(Scene.ROOT_NAME);
-
-        var focusFull = Mapper.focus.get(entityFull);
-        focusFull.focusable = true;
-
-        var renderFull = Mapper.render.get(entityFull);
-        renderFull.halfResolutionBuffer = false;
-
-        var bbSetFull = Mapper.billboardSet.get(entityFull);
-        bbSetFull.procedural = true;
-        bbSetFull.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
-        bbSetFull.setData(full);
+        var entityFull = createGalaxyBillboardEntity(name, radius, pos, full, true, Scene.ROOT_NAME);
 
         // HALF RESOLUTION
-        var entityHalf = archetype.createEntity();
-        var baseHalf = Mapper.base.get(entityHalf);
-        baseHalf.setName(name + " (HALF)");
-        baseHalf.setComponentType(ComponentTypes.ComponentType.Galaxies);
-
-        var bodyHalf = Mapper.body.get(entityHalf);
-        bodyHalf.cameraCollision = false;
-        bodyHalf.setSize(radius);
-        bodyHalf.labelColor = new float[]{0, 0, 0, 0};
-
-        var coordHalf = Mapper.coordinates.get(entityHalf);
-        var coordinatesHalf = new StaticCoordinates();
-        coordinatesHalf.setPosition(pos);
-        coordHalf.coordinates = coordinatesHalf;
-
-        var fadeHalf = Mapper.fade.get(entityHalf);
-        fadeHalf.setFadeOut(new double[]{bodyHalf.size * 5, bodyHalf.size * 10});
-        fadeHalf.setFadeObjectName(baseHalf.getName());
-
-        var graphHalf = Mapper.graph.get(entityHalf);
-        graphHalf.setParent(baseFull.getName());
-
-        var focusHalf = Mapper.focus.get(entityHalf);
-        focusHalf.focusable = false;
-
-        var renderHalf = Mapper.render.get(entityHalf);
-        renderHalf.halfResolutionBuffer = true;
-
-        var bbSetHalf = Mapper.billboardSet.get(entityHalf);
-        bbSetHalf.procedural = true;
-        bbSetHalf.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
-        bbSetHalf.setData(half);
+        var entityHalf = createGalaxyBillboardEntity(name + " (HALF)", radius, pos, half, false, name);
 
         // Add children here and now.
+        var graphFull = Mapper.graph.get(entityFull);
         graphFull.addChild(entityFull, entityHalf, false, 1);
 
         return new Pair<>(entityFull, entityHalf);
     }
 
+    /**
+     * Creates a new hybrid procedural galaxy: the compact channels (stars, HII regions) as a billboard
+     * entity, and the diffuse ones (gas, bulge, dust) as a volume entity under it.
+     * <p>
+     * Both halves come from one seeded draw of {@link GalaxyGenerator}, so the volume is the one the
+     * stars describe. There is no half-resolution billboard entity: the channels that used to go
+     * there are now voxelised, so the split has no purpose and the volume's depth pre-pass belongs
+     * in the full-resolution pass.
+     *
+     * @param name       The name of the entity.
+     * @param radius     The radius of the galaxy in internal units.
+     * @param pos        The position of the galaxy.
+     * @param morphology The morphology, or null to pick one at random.
+     * @param seed       The seed of the draw. The same seed yields the same galaxy, and the same
+     *                   billboards as the billboard-only path.
+     *
+     * @return The billboard entity and the volume entity, in a pair. The first one is the billboard,
+     *         the second one the volume, which is a child of the first.
+     */
+    public Pair<Entity, Entity> createNewProceduralVolumeGalaxy(String name,
+                                                                double radius,
+                                                                Vector3Q pos,
+                                                                GalaxyGenerator.GalaxyMorphology morphology,
+                                                                long seed) {
+        var spec = new GalaxyGenerator().generateGalaxySpec(morphology, seed);
+
+        // Billboard half: the compact emitters, unchanged.
+        var entityFull = createGalaxyBillboardEntity(name, radius, pos, spec.full, true, Scene.ROOT_NAME);
+
+        // Volume half: the diffuse channels, as an analytic density.
+        var archetype = scene.archetypes().get("Volume");
+        var entityVolume = archetype.createEntity();
+
+        var baseVolume = Mapper.base.get(entityVolume);
+        baseVolume.setName(name + " (VOLUME)");
+        baseVolume.setComponentType(ComponentTypes.ComponentType.Galaxies);
+
+        var bodyVolume = Mapper.body.get(entityVolume);
+        bodyVolume.cameraCollision = false;
+        bodyVolume.setSize(radius);
+        // The label belongs to the billboard entity, which is what the user sees and focuses.
+        bodyVolume.labelColor = new float[]{0, 0, 0, 0};
+
+        var coordVolume = Mapper.coordinates.get(entityVolume);
+        var coordinatesVolume = new StaticCoordinates();
+        coordinatesVolume.setPosition(pos);
+        coordVolume.coordinates = coordinatesVolume;
+
+        var fadeVolume = Mapper.fade.get(entityVolume);
+        fadeVolume.setFadeOut(new double[]{bodyVolume.size * 5, bodyVolume.size * 10});
+        fadeVolume.setFadeObjectName(baseVolume.getName());
+
+        var graphVolume = Mapper.graph.get(entityVolume);
+        graphVolume.setParent(baseName(entityFull));
+
+        var focusVolume = Mapper.focus.get(entityVolume);
+        focusVolume.focusable = false;
+
+        var renderVolume = Mapper.render.get(entityVolume);
+        renderVolume.halfResolutionBuffer = false;
+
+        // The volume is a unit sphere scaled by the body size, drawn additively. The galaxy shader is
+        // the coupled gas+dust one the Milky Way uses, not the generic multi-slot one: the fields are
+        // galaxy density fields and it is that shader which understands them.
+        var modelVolume = Mapper.model.get(entityVolume);
+        var modelComponent = new ModelComponent();
+        modelComponent.setModelType(ModelType.SPHERE);
+        Map<String, Object> params = new HashMap<>();
+        params.put("flip", true);
+        params.put("diameter", 1.0);
+        params.put("quality", 30L);
+        modelComponent.setParams(params);
+        modelComponent.setUseColor(true);
+        modelComponent.setBlendMode(BlendMode.ADDITIVE);
+        modelVolume.setModel(modelComponent);
+
+        var volume = Mapper.volume.get(entityVolume);
+        volume.vertexShader = "shader/pbr.vertex.glsl";
+        volume.fragmentShader = "shader/volume.galaxy.fragment.glsl";
+        volume.setIterations(new int[]{50, 70, 90, 110});
+        volume.fields = spec.volumeFields;
+
+        var graphFull = Mapper.graph.get(entityFull);
+        graphFull.addChild(entityFull, entityVolume, false, 1);
+
+        return new Pair<>(entityFull, entityVolume);
+    }
+
+    /**
+     * Same as {@link #createNewProceduralVolumeGalaxy(String, double, Vector3Q, GalaxyGenerator.GalaxyMorphology, long)},
+     * with the default seed.
+     */
+    public Pair<Entity, Entity> createNewProceduralVolumeGalaxy(String name,
+                                                                double radius,
+                                                                Vector3Q pos,
+                                                                GalaxyGenerator.GalaxyMorphology morphology) {
+        return createNewProceduralVolumeGalaxy(name, radius, pos, morphology, PROCEDURAL_GALAXY_SEED);
+    }
+
+    /**
+     * Builds the billboard entity of a procedural galaxy, shared by the billboard-only and the hybrid
+     * paths so that the same seed draws the same star field in both.
+     *
+     * @param name           The name of the entity.
+     * @param radius         The radius of the galaxy in internal units.
+     * @param pos            The position of the galaxy.
+     * @param data           The datasets to bind.
+     * @param fullResolution Whether this is the full-resolution half of the galaxy.
+     * @param parentName     Name of the parent, as the loader would have set it.
+     *
+     * @return The entity, not yet added to the scene.
+     */
+    private Entity createGalaxyBillboardEntity(String name,
+                                               double radius,
+                                               Vector3Q pos,
+                                               Object[] data,
+                                               boolean fullResolution,
+                                               String parentName) {
+        var archetype = scene.archetypes().get("BillboardGroup");
+        var entity = archetype.createEntity();
+
+        var base = Mapper.base.get(entity);
+        base.setName(name);
+        base.setComponentType(ComponentTypes.ComponentType.Galaxies);
+
+        var body = Mapper.body.get(entity);
+        body.cameraCollision = false;
+        body.setSize(radius);
+
+        var coord = Mapper.coordinates.get(entity);
+        var coordinates = new StaticCoordinates();
+        coordinates.setPosition(pos);
+        coord.coordinates = coordinates;
+
+        var fade = Mapper.fade.get(entity);
+        fade.setFadeOut(new double[]{body.size * 5, body.size * 10});
+        fade.setFadeObjectName(base.getName());
+
+        var graph = Mapper.graph.get(entity);
+        graph.setParent(parentName);
+
+        var focus = Mapper.focus.get(entity);
+        focus.focusable = fullResolution;
+
+        var render = Mapper.render.get(entity);
+        render.halfResolutionBuffer = !fullResolution;
+
+        if (!fullResolution) {
+            // The label of a galaxy belongs to its full-resolution half.
+            body.labelColor = new float[]{0, 0, 0, 0};
+        }
+
+        var bbSet = Mapper.billboardSet.get(entity);
+        bbSet.procedural = true;
+        bbSet.setTextures(new String[]{"$data/default-data/galaxy/sprites"});
+        bbSet.setData(data);
+
+        return entity;
+    }
+
+    /** @return The name of the given entity, for parenting. **/
+    private static String baseName(Entity entity) {
+        return Mapper.base.get(entity).getName();
+    }
 
     @Override
     public void notify(Event event,

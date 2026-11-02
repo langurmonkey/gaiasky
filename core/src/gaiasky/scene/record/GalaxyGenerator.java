@@ -180,7 +180,7 @@ public class GalaxyGenerator {
     }
 
     /**
-     * Generates galaxies given a morphology.
+     * Generates galaxies given a morphology, as billboard datasets only.
      *
      * @param gm   The galaxy morphology.
      * @param seed The RNG seed.
@@ -189,12 +189,34 @@ public class GalaxyGenerator {
      *         channel.
      */
     public Pair<BillboardDataset[], BillboardDataset[]> generateGalaxy(GalaxyMorphology gm, long seed) {
+        var spec = generateGalaxySpec(gm, seed);
+        var result = new Pair<BillboardDataset[], BillboardDataset[]>();
+        result.set(spec.full, spec.half);
+        return result;
+    }
+
+    /**
+     * Generates the complete description of a galaxy given a morphology: its billboard datasets and
+     * the volume fields that describe the same gas, bulge and dust analytically.
+     * <p>
+     * Both come from a single seeded draw, so the volume of a hybrid galaxy is the one its billboards
+     * describe. No extra random numbers are consumed when building the volume fields - they are
+     * copies of the descriptors this draw already produced - which is why a seed yields the same
+     * billboards as it did before the volume path existed.
+     *
+     * @param gm   The galaxy morphology. If null, one is picked at random and recorded in the spec.
+     * @param seed The RNG seed.
+     *
+     * @return The spec, which is never null.
+     */
+    public GalaxySpec generateGalaxySpec(GalaxyMorphology gm, long seed) {
         rand.setSeed(seed);
         if (gm == null) {
             gm = GalaxyMorphology.values()[rand.nextInt(GalaxyMorphology.values().length)];
         }
 
-        Pair<BillboardDataset[], BillboardDataset[]> result = new Pair<>();
+        BillboardDataset[] specFull = null;
+        BillboardDataset[] specHalf = null;
         switch (gm) {
             // Ellipticals
             // No HII, old and cool stars.
@@ -238,9 +260,8 @@ public class GalaxyGenerator {
                 }
 
 
-                var full = new BillboardDataset[]{stars};
-                var half = rand.nextBoolean() ? new BillboardDataset[]{gas, dust} : new BillboardDataset[]{gas};
-                result.set(full, half);
+                specFull = new BillboardDataset[]{stars};
+                specHalf = rand.nextBoolean() ? new BillboardDataset[]{gas, dust} : new BillboardDataset[]{gas};
             }
             // Lenticulars
             case S0 -> {
@@ -267,9 +288,8 @@ public class GalaxyGenerator {
                 gas.setMinRadius(0.0);
                 gas.setScale(new double[]{1.0, rand.nextDouble(0.1, 2.0), 1.0});
 
-                var full = new BillboardDataset[]{stars};
-                var half = rand.nextFloat() > 0.3 ? new BillboardDataset[]{gas, dust} : new BillboardDataset[]{gas};
-                result.set(full, half);
+                specFull = new BillboardDataset[]{stars};
+                specHalf = rand.nextFloat() > 0.3 ? new BillboardDataset[]{gas, dust} : new BillboardDataset[]{gas};
             }
             // Spirals
             case Sa, Sb, Sc -> {
@@ -326,9 +346,8 @@ public class GalaxyGenerator {
                 bulge.setColorNoise(0.09);
 
 
-                var full = new BillboardDataset[]{stars, hii};
-                var half = dustDistribution != SPIRAL_LOG ? new BillboardDataset[]{gas, dust, bulge} : new BillboardDataset[]{gas, dust, dustF, bulge};
-                result.set(full, half);
+                specFull = new BillboardDataset[]{stars, hii};
+                specHalf = dustDistribution != SPIRAL_LOG ? new BillboardDataset[]{gas, dust, bulge} : new BillboardDataset[]{gas, dust, dustF, bulge};
             }
             // Barred spirals
             case SBa, SBb, SBc -> {
@@ -392,9 +411,8 @@ public class GalaxyGenerator {
                 bar.setRotationY(-36.0);
 
 
-                var full = new BillboardDataset[]{stars, hii};
-                var half = dustDistribution != SPIRAL_LOG ? new BillboardDataset[]{gas, dust, bar} : new BillboardDataset[]{gas, dust, dustF, bar};
-                result.set(full, half);
+                specFull = new BillboardDataset[]{stars, hii};
+                specHalf = dustDistribution != SPIRAL_LOG ? new BillboardDataset[]{gas, dust, bar} : new BillboardDataset[]{gas, dust, dustF, bar};
             }
             // Irregulars
             case Im -> {
@@ -428,13 +446,12 @@ public class GalaxyGenerator {
                 dust.setSizeNoiseScale(sizeScale);
 
                 // Creating the final dataset
-                var full = new BillboardDataset[]{stars};
-                var half = new BillboardDataset[]{gas, dust};
-                result.set(full, half);
+                specFull = new BillboardDataset[]{stars};
+                specHalf = new BillboardDataset[]{gas, dust};
             }
         }
 
-        return result;
+        return new GalaxySpec(gm, seed, specFull, specHalf);
     }
 
     private BillboardDataset generateBase(ChannelType type, Distribution distribution) {
