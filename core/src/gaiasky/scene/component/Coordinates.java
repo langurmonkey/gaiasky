@@ -34,7 +34,11 @@ public class Coordinates implements Component, ICopy {
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());
-        copy.coordinates = coordinates.getCopy();
+        if (coordinates != null) {
+            copy.coordinates = coordinates.getCopy();
+        } else {
+            copy.coordinates = null;
+        }
         copy.timeOverflow = timeOverflow;
         return copy;
     }

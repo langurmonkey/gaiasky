@@ -860,7 +860,9 @@ public class Scene {
             // Update references to owner.
             if (Mapper.coordinates.has(e)) {
                 var coordinates = Mapper.coordinates.get(e);
-                coordinates.coordinates.updateReferences(idx);
+                if (coordinates.coordinates != null) {
+                    coordinates.coordinates.updateReferences(idx);
+                }
             }
 
             var g = Mapper.graph.get(e);
