@@ -620,7 +620,7 @@
     "Render": {
       "description": "Defines attributes that control rendering operations for this object.",
       "halfResolutionBuffer": {
-        "description": "Whether this object is to be rendered in a post-pass to a half-resolution buffer. Defaults to ``false``.",
+        "description": "Whether this object is to be rendered in a pass of its own, to a half-resolution buffer. That pass runs before the atmosphere is drawn, and its content is depth-tested against the scene depth as it is at that point - real geometry (models, the volume dust front) occludes it, and the atmosphere's synthetic shell depth, written afterwards, is not in it. Defaults to ``false``.",
         "unit": "Boolean"
       },
       "renderGroup": {

@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.GLOnlyTextureData;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.Disposable;
@@ -56,7 +55,7 @@ public class VolumeDepthMask implements Disposable {
             }
             """;
 
-    private final Map<Object, Target> targets = new IdentityHashMap<>();
+    private final Map<Object, DepthOnlyFramebuffer> targets = new IdentityHashMap<>();
     private ShaderProgram composeProgram;
     private Mesh quad;
     private int u_volumeDepth;
@@ -95,11 +94,11 @@ public class VolumeDepthMask implements Disposable {
             if (target != null) {
                 target.dispose();
             }
-            target = new Target(width, height);
+            target = new DepthOnlyFramebuffer(width, height);
             targets.put(key, target);
         }
 
-        Gdx.gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, target.fboHandle);
+        Gdx.gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, target.framebufferHandle);
         Gdx.gl.glViewport(0, 0, width, height);
         // Only depth is written, so only depth is cleared.
         Gdx.gl.glDepthMask(true);
@@ -187,45 +186,4 @@ public class VolumeDepthMask implements Disposable {
         }
     }
 
-    /** A depth-only framebuffer: one depth texture attachment, no color. **/
-    private static final class Target implements Disposable {
-        final int fboHandle;
-        final Texture texture;
-        final int width, height;
-
-        Target(int width,
-               int height) {
-            var gl = Gdx.gl30;
-            this.width = width;
-            this.height = height;
-
-            // A depth texture of its own, so the front can be read and composed later.
-            var data = new GLOnlyTextureData(width, height, 0, GL30.GL_DEPTH_COMPONENT24, GL30.GL_DEPTH_COMPONENT, GL30.GL_UNSIGNED_INT);
-            texture = new Texture(data);
-            texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            texture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-
-            fboHandle = gl.glGenFramebuffer();
-            gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboHandle);
-            gl.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL20.GL_TEXTURE_2D,
-                                      texture.getTextureObjectHandle(), 0);
-            // No color attachment, so both draw and read buffers must be NONE.
-            var none = BufferUtils.newIntBuffer(1);
-            none.put(0, GL30.GL_NONE);
-            gl.glDrawBuffers(1, none);
-            gl.glReadBuffer(GL30.GL_NONE);
-            var status = gl.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
-            gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
-            if (status != GL30.GL_FRAMEBUFFER_COMPLETE) {
-                dispose();
-                throw new IllegalStateException("The volume depth mask framebuffer is incomplete: 0x" + Integer.toHexString(status));
-            }
-        }
-
-        @Override
-        public void dispose() {
-            texture.dispose();
-            Gdx.gl30.glDeleteFramebuffer(fboHandle);
-        }
-    }
 }

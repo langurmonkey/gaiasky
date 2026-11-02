@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -561,12 +562,77 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * @param dst The destination framebuffer.
      */
     private void blitDepth(FrameBuffer src, FrameBuffer dst) {
-        Gdx.gl.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, src.getFramebufferHandle());
+        blitDepth(src.getFramebufferHandle(), src.getWidth(), src.getHeight(), dst);
+    }
+
+    /**
+     * Copies the depth of the given framebuffer object into the destination one. Leaves the destination
+     * bound, so the caller can keep rendering into it.
+     *
+     * @param srcHandle The source framebuffer object handle.
+     * @param srcWidth  The source width.
+     * @param srcHeight The source height.
+     * @param dst       The destination framebuffer.
+     */
+    private void blitDepth(int srcHandle, int srcWidth, int srcHeight, FrameBuffer dst) {
+        Gdx.gl.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, srcHandle);
         Gdx.gl.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, dst.getFramebufferHandle());
-        GL30.glBlitFramebuffer(0, 0, src.getWidth(), src.getHeight(),
+        GL30.glBlitFramebuffer(0, 0, srcWidth, srcHeight,
                                0, 0, dst.getWidth(), dst.getHeight(),
                                GL20.GL_DEPTH_BUFFER_BIT, GL20.GL_NEAREST);
         Gdx.gl.glBindFramebuffer(GL30.GL_FRAMEBUFFER, dst.getFramebufferHandle());
+    }
+
+    /**
+     * Draws everything routed to the half-resolution buffer (renderables flagged with
+     * {@code halfResolutionBuffer}) into that buffer, and goes back to the full-resolution one.
+     * <p>
+     * The half-resolution buffer is cleared and given a copy of the full-resolution depth, so that its
+     * content is occluded by full-resolution geometry. This has to run while the full-resolution depth
+     * still holds only geometry, i.e. before the atmosphere stamps its own depth into it - see the
+     * caller in {@code renderScene}.
+     *
+     * @param camera                 The camera.
+     * @param t                      The session time, in seconds.
+     * @param fullBuffer             The full-resolution buffer, currently bound.
+     * @param halfBuffer             The half-resolution buffer.
+     * @param halfResolutionContent  Whether there is anything to draw in the pass.
+     * @param renderContext          The render context.
+     */
+    private void renderHalfResolutionPass(ICamera camera,
+                                          double t,
+                                          FrameBuffer fullBuffer,
+                                          FrameBuffer halfBuffer,
+                                          boolean halfResolutionContent,
+                                          RenderingContext renderContext) {
+        fullBuffer.end();
+        try {
+            halfBuffer.begin();
+            clearScreen();
+            if (halfResolutionContent) {
+                blitDepth(fullBuffer, halfBuffer);
+            }
+            for (var renderGroup : renderGroups) {
+                List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
+                if (l != null && !l.isEmpty()) {
+                    var renderSystem = getOrInitializeRenderSystem(renderGroup);
+                    if (renderSystem != null) {
+                        resetGlBaseline();
+                        renderSystem.render(l, camera, t, renderContext);
+                    }
+                }
+            }
+        } finally {
+            // Always go back to the full-resolution buffer, even if a render system threw. Otherwise
+            // the rest of the frame is drawn at half resolution.
+            try {
+                halfBuffer.end();
+            } catch (Exception e) {
+                // The half buffer was not begun; nothing to end.
+                logger.error(e);
+            }
+            fullBuffer.begin();
+        }
     }
 
     /**
@@ -640,7 +706,26 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
 
             // Iterate over render groups and get systems.
+            var fullBuffer = pp.getCombinedBuffer().getFullBuffer();
+            var halfBuffer = pp.getCombinedBuffer().getHalfBuffer();
+            boolean halfResolutionContent = hasHalfResolutionContent();
+            // Only an atmosphere forces the pass to run early: its synthetic shell depth is the one thing the
+            // pass must not be depth-tested or composited against. Without one, the pass keeps running at the
+            // end of the frame, where it sees everything the frame drew.
+            var atmosphereList = renderListsFull.get(MODEL_ATM.ordinal());
+            boolean atmosphereInFrame = atmosphereList != null && !atmosphereList.isEmpty();
+            boolean halfPassDone = false;
             for (var renderGroup : renderGroups) {
+                if (!halfPassDone && atmosphereInFrame && renderGroup == MODEL_ATM) {
+                    // The half-resolution pass has to run before the atmosphere. The atmosphere writes a
+                    // depth that is not geometry - a constant at the radius of its shell, for the motion
+                    // blur - and everything that reads the scene depth after it would take that depth for
+                    // an occluder a few thousand kilometres away: the ray clip of a volume drawn in the
+                    // half-resolution pass, and the composite of the full- and half-resolution buffers.
+                    // Running the pass here means the depth it copies holds real geometry only.
+                    renderHalfResolutionPass(camera, t, fullBuffer, halfBuffer, halfResolutionContent, renderContext);
+                    halfPassDone = true;
+                }
                 List<IRenderable> l = renderListsFull.get(renderGroup.ordinal());
                 if (l != null && !l.isEmpty()) {
                     var renderSystem = getOrInitializeRenderSystem(renderGroup);
@@ -651,42 +736,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 }
             }
 
-            // Bind half-resolution buffer.
-            var fullBuffer = pp.getCombinedBuffer().getFullBuffer();
-            var halfBuffer = pp.getCombinedBuffer().getHalfBuffer();
-            fullBuffer.end();
-            try {
-                halfBuffer.begin();
-                clearScreen();
-                // Give the half-resolution pass the depth of the full-resolution one, so that its content
-                // is occluded by full-resolution occluders (e.g. volumes writing depth in their pre-pass).
-                // Only needed when there is something to draw in the half-resolution pass.
-                if (hasHalfResolutionContent()) {
-                    blitDepth(fullBuffer, halfBuffer);
-                }
-
-                // Iterate over render groups and get systems.
-                for (var renderGroup : renderGroups) {
-                    List<IRenderable> l = renderListsHalf.get(renderGroup.ordinal());
-                    if (l != null && !l.isEmpty()) {
-                        var renderSystem = getOrInitializeRenderSystem(renderGroup);
-                        if (renderSystem != null) {
-                            resetGlBaseline();
-                            renderSystem.render(l, camera, t, renderContext);
-                        }
-                    }
-                }
-            } finally {
-                // Always go back to the full-resolution buffer, even if a render system threw.
-                // Otherwise the next frame starts with the half-resolution buffer bound and every
-                // full-resolution group is drawn at half resolution.
-                try {
-                    halfBuffer.end();
-                } catch (Exception e) {
-                    // The half buffer was not begun; nothing to end.
-                    logger.error(e);
-                }
-                fullBuffer.begin();
+            // No atmosphere in the frame, so the pass can run at the end: nothing has written a synthetic
+            // depth for it to pick up.
+            if (!halfPassDone) {
+                renderHalfResolutionPass(camera, t, fullBuffer, halfBuffer, halfResolutionContent, renderContext);
             }
 
         } catch (GdxRuntimeException | ShaderCompilationException gre) {
@@ -1004,6 +1057,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         if (renderPasses != null) {
             renderPasses.forEach(Disposable::dispose);
         }
+
     }
 
     public void updateLineRenderSystems() {

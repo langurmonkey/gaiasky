@@ -33,6 +33,9 @@ void main(void) {
     // depth. This ensures the motion blur shader reconstructs a consistent
     // world position for all atmosphere pixels, producing coherent velocities
     // despite the volumetric nature of the shell.
+    // This depth is not geometry, so nothing may be depth-tested against it. The half-resolution
+    // pass is therefore drawn before this shader runs (SceneRenderer#renderHalfResolutionPass), and
+    // the full/half composite judges the full-resolution side by the half-resolution depth.
     gl_FragDepth = getDepthValue(fOuterRadius, u_cameraNearFar.y, u_cameraK);
 
     #ifdef ssrFlag

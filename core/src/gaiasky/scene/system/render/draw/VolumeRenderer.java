@@ -175,6 +175,10 @@ public class VolumeRenderer extends AbstractRenderSystem implements IObserver {
     /**
      * The depth buffer to compare against: always the full-resolution one, which matches the mask
      * texel for texel and holds everything drawn since the pre-pass.
+     * <p>
+     * It holds real geometry only, because the half-resolution pass - the only place where a volume
+     * reading this can run after other systems - is drawn before the atmosphere writes its synthetic
+     * shell depth (see {@code SceneRenderer#renderHalfResolutionPass}).
      */
     private Texture sceneDepth() {
         var pingPong = rc != null && rc.ppb != null ? rc.ppb.pp : null;
