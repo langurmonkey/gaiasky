@@ -51,8 +51,11 @@ public class GalaxyVolumeGenerator implements Disposable {
     private static final int IMAGE_UNIT = 0;
     /** SSBO binding of the statistics ({@code layout(std430, binding = 1) buffer Stats}). **/
     private static final int STATS_BINDING = 1;
-    /** Number of uints in the statistics buffer: four peaks and two sums. **/
-    private static final int STATS_UINTS = 6;
+    /**
+     * Number of uints in the statistics buffer: four peaks, two sums, and one peak of the unit
+     * density per field. Must match the {@code Stats} block of the compute shader.
+     **/
+    private static final int STATS_UINTS = 6 + GalaxyAttributes.MAX_FIELDS;
     /** Must match {@code GX_SUM_SCALE} in the compute shader. **/
     private static final float SUM_SCALE = 32.0f;
 
@@ -226,11 +229,14 @@ public class GalaxyVolumeGenerator implements Disposable {
      *
      * @param grid The grid that was generated.
      *
-     * @return {@code {peakLight, peakUnit, meanLight, meanUnit, peakDensity, peakUnitDensity}}, or
-     * null if there is nothing to read. The light peaks are the largest channel of the summed light,
-     * the means are luma averages over all voxels - the quantity {@link VolumeCalibration} is stated
-     * in - and the density peaks are the maxima of the summed density, which is what an occlusive
-     * slot is normalised by.
+     * @return {@code {peakLight, peakUnit, meanLight, meanUnit, peakDensity, peakUnitDensity}} followed
+     * by the peak of the unit density of each field, in field order, or null if there is nothing to
+     * read. The light peaks are the largest channel of the summed light, the means are luma averages
+     * over all voxels - the quantity {@link VolumeCalibration} is stated in - and the density peaks are
+     * the maxima of the summed density. The per-field peaks are what an occlusive slot normalises each
+     * field by: the densest voxel of that field stores {@link VolumeCalibration#OCCLUSIVE_TARGET_PEAK}
+     * times its intensity, so an intensity below the depth threshold dims a field without ever
+     * occluding.
      */
     public float[] readStats(VoxelGrid grid) {
         if (statsBuffer < 0 || grid == null) {
@@ -242,14 +248,17 @@ public class GalaxyVolumeGenerator implements Disposable {
         GL43.glBindBuffer(GL43.GL_SHADER_STORAGE_BUFFER, 0);
 
         float voxelCount = (float) grid.voxelCount() * SUM_SCALE;
-        return new float[]{
-                Float.intBitsToFloat(stats.get(0)),
-                Float.intBitsToFloat(stats.get(1)),
-                stats.get(2) / voxelCount,
-                stats.get(3) / voxelCount,
-                Float.intBitsToFloat(stats.get(4)),
-                Float.intBitsToFloat(stats.get(5))
-        };
+        float[] out = new float[STATS_UINTS];
+        out[0] = Float.intBitsToFloat(stats.get(0));
+        out[1] = Float.intBitsToFloat(stats.get(1));
+        out[2] = stats.get(2) / voxelCount;
+        out[3] = stats.get(3) / voxelCount;
+        out[4] = Float.intBitsToFloat(stats.get(4));
+        out[5] = Float.intBitsToFloat(stats.get(5));
+        for (int i = 0; i < GalaxyAttributes.MAX_FIELDS; i++) {
+            out[6 + i] = Float.intBitsToFloat(stats.get(6 + i));
+        }
+        return out;
     }
 
     /** Packs the slot's fields into the flat uniform the shader unpacks. **/

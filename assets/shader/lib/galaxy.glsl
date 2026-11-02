@@ -619,12 +619,21 @@ struct GalaxyFields {
     float unitDensity;
 };
 
-GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count, float cell) {
+// Samples every field of the slot. The sums are what the texture stores; the per-field densities
+// are what lets an occlusive slot normalise each field on its own peak, instead of on the peak of
+// the sum (see the note in galgen.volume.comp.glsl).
+GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count, float cell,
+                            out float fieldDensity[GX_MAX_FIELDS],
+                            out float fieldUnitDensity[GX_MAX_FIELDS]) {
     GalaxyFields r;
     r.light = vec3(0.0);
     r.unitLight = vec3(0.0);
     r.density = 0.0;
     r.unitDensity = 0.0;
+    for (int i = 0; i < GX_MAX_FIELDS; i++) {
+        fieldDensity[i] = 0.0;
+        fieldUnitDensity[i] = 0.0;
+    }
     for (int i = 0; i < GX_MAX_FIELDS; i++) {
         if (i >= count) {
             break;
@@ -636,6 +645,8 @@ GalaxyFields gxSampleFields(vec3 p, in float d[GX_FIELD_ARRAY], int count, float
         r.unitLight += emission;
         r.density += s.weight * v.a;
         r.unitDensity += v.a;
+        fieldDensity[i] = s.weight * v.a;
+        fieldUnitDensity[i] = v.a;
     }
     return r;
 }

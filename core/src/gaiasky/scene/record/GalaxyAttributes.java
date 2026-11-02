@@ -195,6 +195,41 @@ public class GalaxyAttributes {
     public float intensity = 1;
 
     /**
+     * Fraction of this field's own peak density above which it hides what is behind it, in [0,1].
+     * This is the occlusion threshold of the field, and it is only meaningful on an occluding channel
+     * ({@link ChannelType#DUST}); other channels go into the emissive slot and never write depth.
+     * <p>
+     * Being a fraction of the field's own peak, it means the same thing in every scene and does not
+     * move when {@link #intensity} does: the intensity is how much dust there is, this is how much of
+     * it is dense enough to be opaque. A small value (0.01 to 0.05) lets the field occlude almost
+     * everywhere it has any density, a value near 1 keeps only the very core of it, and 0 - the
+     * default - means this field does not hide anything at all. That last one matters beyond the
+     * field: the raymarcher reads a slot threshold of 0 as "this slot never occludes", so a slot
+     * whose fields are all at 0 is switched off rather than switched to maximum.
+     * <p>
+     * The slot's stored threshold is the intensity-weighted sum of
+     * {@code OCCLUSIVE_TARGET_PEAK * intensity * occlusionThreshold} over its fields (see
+     * {@link gaiasky.render.gdx.graphics.VolumeCalibration#occlusiveThreshold(List)}), so with one
+     * field in the slot the comparison is exactly "this field's density is above this fraction of its
+     * peak"; with several the test is on their intensity-weighted aggregate, and the densest field
+     * decides what the ray meets first. A positive entry in
+     * {@link gaiasky.scene.record.MaterialComponent#volumeDepthThreshold} still overrides the whole
+     * derivation, in stored density, for a scene that wants to pin the number by hand.
+     */
+    public float occlusionThreshold = 0.0f;
+
+    /**
+     * Setter used by the scene JSON loader.
+     */
+    public void setOcclusionThreshold(Double occlusionThreshold) {
+        this.occlusionThreshold = MathUtilsDouble.clamp(occlusionThreshold.floatValue(), 0f, 1f);
+    }
+
+    public void setOcclusionThreshold(Long occlusionThreshold) {
+        setOcclusionThreshold(occlusionThreshold.doubleValue());
+    }
+
+    /**
      * Whether this field absorbs light rather than emitting it. A procedural volume routes its
      * occluding fields into the occlusive slot and the rest into the emissive one.
      *

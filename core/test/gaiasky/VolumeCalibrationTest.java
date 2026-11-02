@@ -8,8 +8,11 @@
 package gaiasky;
 
 import gaiasky.render.gdx.graphics.VolumeCalibration;
+import gaiasky.scene.record.GalaxyAttributes;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * Pins the arithmetic documented in {@link VolumeCalibration}. The constants in it are measured from
@@ -71,5 +74,50 @@ public class VolumeCalibrationTest {
         // The Milky Way's dust is sparse lanes: 0.3% of the voxels are lit, and the mean is four
         // orders of magnitude below the peak. A smooth field of the same mean would be far denser.
         Assert.assertTrue(VolumeCalibration.MW_OCCLUSIVE_MEAN_PEAK_RATIO < 1e-3);
+    }
+
+    private static GalaxyAttributes field(float intensity, float fraction) {
+        var f = new GalaxyAttributes();
+        f.intensity = intensity;
+        f.occlusionThreshold = fraction;
+        return f;
+    }
+
+    @Test
+    public void occlusionThresholdIsTheIntensityWeightedSumOfTheFractions() {
+        // One field: the slot threshold is that field's own fraction of its own peak, so the
+        // fraction, and not the intensity, is what decides where the dust starts to occlude.
+        var lanes = field(0.65f, 0.02f);
+        float threshold = VolumeCalibration.occlusiveThreshold(List.of(lanes));
+        Assert.assertEquals(VolumeCalibration.OCCLUSIVE_TARGET_PEAK * 0.65 * 0.02, threshold, 1e-7);
+        // Below the stored peak, i.e. the field does occlude somewhere.
+        Assert.assertTrue(threshold < VolumeCalibration.OCCLUSIVE_TARGET_PEAK * lanes.intensity);
+        // The fraction is recovered whatever the intensity: scaling the field scales both sides.
+        var brighter = field(1.3f, 0.02f);
+        Assert.assertEquals(0.02,
+                            VolumeCalibration.occlusiveThreshold(List.of(brighter))
+                                    / (VolumeCalibration.OCCLUSIVE_TARGET_PEAK * brighter.intensity),
+                            1e-6);
+
+        // Nothing asking to occlude leaves the slot switched off; the raymarcher reads 0 that way.
+        Assert.assertEquals(0f, VolumeCalibration.occlusiveThreshold(List.of(new GalaxyAttributes())), 0f);
+        Assert.assertEquals(0f, VolumeCalibration.occlusiveThreshold(List.of()), 0f);
+        Assert.assertEquals(0f, VolumeCalibration.occlusiveThreshold(null), 0f);
+
+        // Fields add up, weighted by intensity, and the result is clamped to the stored range.
+        Assert.assertEquals(VolumeCalibration.OCCLUSIVE_TARGET_PEAK * (0.65 * 0.02 + 0.02 * 0.71),
+                            VolumeCalibration.occlusiveThreshold(List.of(field(0.65f, 0.02f), field(0.02f, 0.71f))),
+                            1e-7);
+        Assert.assertEquals(1f, VolumeCalibration.occlusiveThreshold(List.of(field(1f, 1f), field(1f, 1f))), 0f);
+    }
+
+    @Test
+    public void materialComponentTakesTheDerivedThresholdWhenTheSceneSaysNothing() throws Exception {
+        // Loaded without initialising: MaterialComponent's static initialiser needs a live GaiaSky.
+        Class<?> material = Class.forName("gaiasky.scene.record.MaterialComponent",
+                                          false,
+                                          VolumeCalibrationTest.class.getClassLoader());
+        Assert.assertNotNull("missing MaterialComponent.setVolumeDepthThresholdDerived(int, float)",
+                             material.getDeclaredMethod("setVolumeDepthThresholdDerived", int.class, float.class));
     }
 }

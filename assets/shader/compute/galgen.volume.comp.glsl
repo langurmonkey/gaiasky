@@ -12,7 +12,9 @@
 //   pass 0 (u_pass = REDUCE) evaluates the field, writes nothing, and reduces six statistics: the
 //          peak of the summed light and the peak of the summed density, each at the actual
 //          intensities and at unit intensity (the latter being the "merged reference" of the volume
-//          metadata), and the luma sum of the light at both intensities.
+//          metadata), and the luma sum of the light at both intensities. Plus, per field, the peak
+//          of its own unit density: an occlusive slot normalises each field by that, not by the
+//          peak of the sum.
 //   pass 1 (u_pass = WRITE) evaluates the field again and stores it, divided by the unit peak and
 //          scaled by the gain derived from the unit luma sum - see u_targetMeanRayIntegral.
 //
@@ -38,6 +40,9 @@ layout(std430, binding = 1) buffer Stats {
     uint peaks[4];
     // [0] sum of luma(light), [1] sum of luma(unitLight), scaled by GX_SUM_SCALE.
     uint sums[2];
+    // Per-field peak of the unit density. An occlusive slot normalises each field by its own entry,
+    // not by the peak of the sum; see the write pass.
+    uint fieldPeaks[GX_MAX_FIELDS];
 };
 
 #define PASS_REDUCE 0
@@ -70,7 +75,8 @@ uniform ivec3 u_gridOffset;
 // u_targetPeak instead. See VolumeCalibration on the Java side for the numbers and where they come
 // from.
 uniform float u_targetMeanRayIntegral;
-// Stored peak this slot is calibrated to, at unit field intensity. Occlusive slots only.
+// Stored peak this slot is calibrated to, at unit field intensity. Occlusive slots only:
+// the densest voxel of each field stores this, times that field's intensity.
 uniform float u_targetPeak;
 // 1 if this slot occludes: its alpha is the summed density, normalised by the peak of the unit
 // density and scaled to u_targetPeak. 0 if it emits: its alpha is the summed light, normalised by
@@ -87,6 +93,7 @@ shared uint sPeakDensity[256];
 shared uint sPeakUnitDensity[256];
 shared uint sSumLight[256];
 shared uint sSumUnit[256];
+shared uint sFieldPeak[GX_MAX_FIELDS][256];
 
 // Peak of a non-negative float as an ordered uint, so that atomicMax on a uint max-reduces floats.
 // floatBitsToUint is monotonically increasing for non-negative values, which is why this is
@@ -107,9 +114,15 @@ void main() {
     field.unitLight = vec3(0.0);
     field.density = 0.0;
     field.unitDensity = 0.0;
+    float fieldDensity[GX_MAX_FIELDS];
+    float fieldUnitDensity[GX_MAX_FIELDS];
+    for (int i = 0; i < GX_MAX_FIELDS; i++) {
+        fieldDensity[i] = 0.0;
+        fieldUnitDensity[i] = 0.0;
+    }
     if (inside) {
         vec3 p = u_gridOrigin + vec3(voxel) * u_gridCell;
-        field = gxSampleFields(p, u_fields, u_fieldCount, u_gridCell.x);
+        field = gxSampleFields(p, u_fields, u_fieldCount, u_gridCell.x, fieldDensity, fieldUnitDensity);
     }
 
     float brightLight = gxBrightness(field.light);
@@ -126,6 +139,9 @@ void main() {
         // Rounded sums, so that the rounding does not bias the mean in one direction.
         sSumLight[i] = uint(gxLuma(field.light) * GX_SUM_SCALE + 0.5);
         sSumUnit[i] = uint(gxLuma(field.unitLight) * GX_SUM_SCALE + 0.5);
+        for (int f = 0; f < GX_MAX_FIELDS; f++) {
+            sFieldPeak[f][i] = orderedBits(fieldUnitDensity[f]);
+        }
         barrier();
         for (uint stride = 128u; stride > 0u; stride >>= 1u) {
             if (i < stride) {
@@ -135,6 +151,9 @@ void main() {
                 sPeakUnitDensity[i] = max(sPeakUnitDensity[i], sPeakUnitDensity[i + stride]);
                 sSumLight[i] += sSumLight[i + stride];
                 sSumUnit[i] += sSumUnit[i + stride];
+                for (int f = 0; f < GX_MAX_FIELDS; f++) {
+                    sFieldPeak[f][i] = max(sFieldPeak[f][i], sFieldPeak[f][i + stride]);
+                }
             }
             barrier();
         }
@@ -145,6 +164,9 @@ void main() {
             atomicMax(peaks[3], sPeakUnitDensity[0]);
             atomicAdd(sums[0], sSumLight[0]);
             atomicAdd(sums[1], sSumUnit[0]);
+            for (int f = 0; f < GX_MAX_FIELDS; f++) {
+                atomicMax(fieldPeaks[f], sFieldPeak[f][0]);
+            }
         }
         return;
     }
@@ -152,16 +174,29 @@ void main() {
     vec3 chroma = field.light / max(brightLight, 1.0e-12);
 
     if (u_occlusive == 1) {
-        // The stored alpha is the summed density, and the reference is its peak at *unit*
-        // intensity, so that an intensity stays a linear knob. Anchoring on the peak and not on the
-        // mean is what makes the texture comparable to the Milky Way's dust: what the raymarcher
-        // tests against u_volumeNDepthThreshold is the lanes, which sit at the peak, while the mean
-        // is dominated by the faint tail that never occludes anything. The mean-to-peak ratio is
-        // therefore a shape diagnostic (see VolumeCalibration), not a target.
-        float reference = uintBitsToFloat(peaks[3]);
-        float alpha = field.density;
-        if (u_targetPeak > 0.0 && reference > 0.0) {
-            alpha *= u_targetPeak / reference;
+        // The stored alpha is the summed density, and each field is normalised by the peak of its
+        // *own* unit density, so that an intensity stays a linear knob and the rule is the same for
+        // every field: the densest voxel of a component stores u_targetPeak * its intensity.
+        //
+        // Normalising by the peak of the *sum* instead - which is what this did - makes a field's
+        // stored brightness depend on the shape of the others. A broad flat field peaks an order of
+        // magnitude above a lane field, whose peak is after a fourth power, so adding one to the slot
+        // divided every lane by that ratio: the lanes fell from ~0.98 to 0.2 while the new field's
+        // flat interior landed at ~0.04, and the level set that u_volumeNDepthThreshold selects
+        // stopped being the lanes and became the whole disk, at any threshold in reach. Per field,
+        // the window between "the lanes" and "the fog" is the ratio of the two intensities, which is
+        // what a threshold can be put in.
+        float alpha = 0.0;
+        for (int i = 0; i < GX_MAX_FIELDS; i++) {
+            if (i >= u_fieldCount) {
+                break;
+            }
+            float fieldReference = uintBitsToFloat(fieldPeaks[i]);
+            if (u_targetPeak > 0.0 && fieldReference > 0.0) {
+                alpha += fieldDensity[i] * u_targetPeak / fieldReference;
+            } else {
+                alpha += fieldDensity[i];
+            }
         }
         alpha *= u_gain;
         imageStore(u_volume, voxel, vec4(clamp(chroma, 0.0, 1.0), clamp(alpha, 0.0, 1.0)));

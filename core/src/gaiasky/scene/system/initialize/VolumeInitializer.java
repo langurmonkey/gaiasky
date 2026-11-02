@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.render.gdx.graphics.GalaxyVolumeGenerator;
+import gaiasky.render.gdx.graphics.VolumeCalibration;
 import gaiasky.render.gdx.graphics.VolumeTexture;
 import gaiasky.render.gdx.graphics.VoxelGrid;
 import gaiasky.render.gdx.shader.attribute.IntAttribute;
@@ -115,10 +116,20 @@ public class VolumeInitializer extends AbstractInitSystem {
                                     Volume volume,
                                     ModelComponent model,
                                     double sizePc) {
-        var mtc = model.mtc;
-        if (mtc == null) {
-            logger.warn("Cannot generate the volumes of " + name(entity) + ": it has no material component.");
-            return;
+        final MaterialComponent mtc;
+        if (model.mtc == null) {
+            // A procedural volume cannot render without a material: the generated textures have
+            // nowhere to be bound, the shader never gets volumeFlag, and the entity draws nothing at
+            // all - which looks like the galaxy vanished, with no error, since the scene loaded
+            // fine. A scene whose material block only ever held volumeDepthThreshold has no reason
+            // to keep it now that the threshold is derived from the fields, so create the material
+            // here rather than drop the volume.
+            mtc = new MaterialComponent();
+            model.setMaterial(mtc);
+            logger.info("The volume entity " + name(entity) + " declares no material; using a default one so that "
+                                + "its procedural volume can be generated and bound.");
+        } else {
+            mtc = model.mtc;
         }
         if (!GalaxyVolumeGenerator.isSupported()) {
             if (!generationUnavailableLogged) {
@@ -189,16 +200,24 @@ public class VolumeInitializer extends AbstractInitSystem {
 
         var occlusiveGrid = gridFor(volume.occlusiveFields(), sizePc, quality);
         VolumeTexture occlusive = generateSlot(generator, volume.occlusiveFields(), occlusiveGrid);
+        // The slot's threshold comes from the fields' own occlusion fractions unless the scene pins
+        // one. It has to be set before the texture is bound: the attribute that carries it is built
+        // from volumeDepthThreshold(slot) inside setVolumeTexture.
+        mtc.setVolumeDepthThresholdDerived(Volume.SLOT_OCCLUSIVE,
+                                          VolumeCalibration.occlusiveThreshold(volume.occlusiveFields()));
         float occlusiveThreshold = mtc.volumeDepthThreshold(Volume.SLOT_OCCLUSIVE);
         if (occlusive != null && mtc.setVolumeTexture(Volume.SLOT_OCCLUSIVE, occlusive)) {
             volume.setGeneratedVolume(Volume.SLOT_OCCLUSIVE, occlusive);
+            logOcclusivePeaks(name, volume.occlusiveFields(), generator.readStats(occlusiveGrid), occlusiveThreshold);
             if (occlusiveThreshold <= 0f) {
                 // A generated volume has no descriptor of its own to inherit this from, and the
                 // depth pre-pass drops every slot whose threshold is zero - so the lanes render but
                 // hide nothing. It is a silent failure otherwise: the scene looks right.
-                logger.warn("The occlusive volume of " + name + " is bound with no depth threshold "
-                                    + "(material.volumeDepthThreshold[" + Volume.SLOT_OCCLUSIVE + "] is 0), so its dust will "
-                                    + "not occlude anything. Set it to a density in (0, 1], e.g. 0.005.");
+                logger.warn("The occlusive volume of " + name + " is bound with no depth threshold: no dust field "
+                                    + "asks to occlude (occlusionThreshold is 0 on all of them) and "
+                                    + "material.volumeDepthThreshold[" + Volume.SLOT_OCCLUSIVE + "] says nothing, so its "
+                                    + "dust will not occlude anything. Give the field that should hide the background "
+                                    + "an occlusionThreshold in (0, 1), e.g. 0.1.");
             }
         } else if (occlusive != null) {
             occlusive.texture().dispose();
@@ -224,6 +243,36 @@ public class VolumeInitializer extends AbstractInitSystem {
                               double sizePc,
                               gaiasky.util.Settings.GraphicsQuality quality) {
         return fields.isEmpty() ? null : GalaxyAttributes.volumeGrid(fields, sizePc, quality);
+    }
+
+    /**
+     * Logs, per occlusive field, the peak of its unit density as the generator measured it, the
+     * brightness that peak ends up stored at once scaled by the field's intensity, and the fraction
+     * of it the field is allowed to occlude from. The slot's threshold is compared against the
+     * stored density, so "stored" against "threshold" says whether a field can hide anything behind
+     * it at all: above the threshold it occludes, below it only dims.
+     */
+    private void logOcclusivePeaks(String name, List<GalaxyAttributes> fields, float[] stats, float threshold) {
+        if (stats == null || fields == null || fields.isEmpty()) {
+            return;
+        }
+        var sb = new StringBuilder();
+        for (int i = 0; i < fields.size(); i++) {
+            var field = fields.get(i);
+            float stored = (float) Math.min(VolumeCalibration.OCCLUSIVE_TARGET_PEAK * field.intensity, 1.0);
+            sb.append(String.format(Locale.ROOT,
+                                    "%sfield %d (%s, %s): peak %.4f, stored %.4f, occludes above %.0f%% of it -> %s",
+                                    i == 0 ? "" : "; ",
+                                    i,
+                                    field.type,
+                                    field.distribution,
+                                    stats[6 + i],
+                                    stored,
+                                    field.occlusionThreshold * 100f,
+                                    stored > threshold ? "occludes" : "dims only"));
+        }
+        sb.append(String.format(Locale.ROOT, "; slot threshold %.4f", threshold));
+        logger.info("Occlusive fields of " + name + ": " + sb);
     }
 
     /**

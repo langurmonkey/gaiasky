@@ -107,7 +107,7 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      * such as gas, whose faint outer haze must not cut an opaque hole in the star field. Only
      * an absorbing volume (dust) should carry a threshold.
      * <p>
-     * The value is a fraction of the volume's own normalisation (the same one the shader samples
+     * The value is a fraction of the volume's own normalization (the same one the shader samples
      * as density, i.e. the alpha channel of an RGBA volume), so it is independent of the texture
      * resolution. Compare it against the file's density histogram: for the shipped ArmDust
      * volume the median occupied voxel is 0.024 and a third of them sit above 0.05, so
@@ -124,8 +124,24 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      * </pre>
      * Note that the array elements must be written with a decimal point: the scene loader types
      * a JSON array from its first element, so {@code [0, 0.02]} would be read as an int array.
+     * <p>
+     * <b>Generated volumes</b> usually do not need this attribute at all. Each field carries its own
+     * {@link gaiasky.scene.record.GalaxyAttributes#occlusionThreshold}, a fraction of that field's
+     * own peak, and the slot's threshold is derived from them as an intensity-weighted sum (see
+     * {@link gaiasky.render.gdx.graphics.VolumeCalibration#occlusiveThreshold(java.util.List)}).
+     * That is what a scene should use: the fraction means the same in every scene and does not move
+     * when an intensity changes, while a raw entry here is a stored-density value that is only
+     * meaningful for one particular set of intensities. A positive entry still wins, for a scene
+     * that wants to pin the number by hand.
      */
     public double[] volumeDepthThreshold;
+
+    /**
+     * Per-slot threshold derived from the occlusion fractions of the fields a generated volume was
+     * built from, used when {@link #volumeDepthThreshold} says nothing for that slot. See
+     * {@link #volumeDepthThreshold(int)} and {@link #setVolumeDepthThresholdDerived(int, float)}.
+     */
+    private float[] derivedVolumeDepthThreshold;
     // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
@@ -1281,16 +1297,46 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     /**
      * The depth threshold configured for the given volume slot, or 0 when the scene says nothing
      * about it, which means the slot never acts as an occluder.
+     * <p>
+     * A positive entry here wins over the value derived from the fields' own
+     * {@link gaiasky.scene.record.GalaxyAttributes#occlusionThreshold} (see
+     * {@link #setVolumeDepthThresholdDerived(int, float)}), in stored density. Zero or absent
+     * defers to that derivation, which is what makes a procedural volume's dust occlude without the
+     * scene having to name a number that only makes sense for its particular intensities.
      *
      * @param slot The volume slot, 0 to 3.
      *
      * @return The minimum density at which the slot may write depth, 0 to disable.
      */
     public float volumeDepthThreshold(int slot) {
-        if (volumeDepthThreshold == null || slot < 0 || slot >= volumeDepthThreshold.length) {
-            return 0f;
+        if (volumeDepthThreshold != null && slot >= 0 && slot < volumeDepthThreshold.length && volumeDepthThreshold[slot] > 0.0) {
+            return (float) volumeDepthThreshold[slot];
         }
-        return (float) volumeDepthThreshold[slot];
+        if (derivedVolumeDepthThreshold != null && slot >= 0 && slot < derivedVolumeDepthThreshold.length) {
+            return derivedVolumeDepthThreshold[slot];
+        }
+        return 0f;
+    }
+
+    /**
+     * Sets the threshold of a slot that was not named by the scene, derived from the occlusion
+     * fractions of the fields it was generated from. See
+     * {@link gaiasky.render.gdx.graphics.VolumeCalibration#occlusiveThreshold(java.util.List)}.
+     * <p>
+     * Only generated volumes have this: a textured volume carries its own densities and cannot say
+     * which of them came from which field, so its threshold can only come from the scene.
+     *
+     * @param slot      The volume slot, 0 to 3.
+     * @param threshold The stored density above which the slot may write depth, in [0,1].
+     */
+    public void setVolumeDepthThresholdDerived(int slot, float threshold) {
+        if (slot < 0 || slot >= 4) {
+            return;
+        }
+        if (derivedVolumeDepthThreshold == null) {
+            derivedVolumeDepthThreshold = new float[4];
+        }
+        derivedVolumeDepthThreshold[slot] = Math.max(0f, Math.min(1f, threshold));
     }
 
     /**
