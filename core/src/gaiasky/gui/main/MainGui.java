@@ -448,7 +448,7 @@ public class MainGui extends AbstractGui {
                         protected boolean accept() {
                             var w = findActor("procedural-gal-window");
                             // Only one instance
-                            if (w != null && w.hasParent() && w instanceof ProceduralGalaxyWindow ggw) {
+                            if (w != null && w.hasParent() && w instanceof ProceduralBillboardGalaxyWindow ggw) {
                                 if (!w.isVisible()) {
                                     ggw.reinitialize(null);
                                     w.setVisible(true);
@@ -457,7 +457,7 @@ public class MainGui extends AbstractGui {
                                 if (nameField.getText() != null && !nameField.getText().isEmpty()) {
                                     name = nameField.getText();
                                 }
-                                ProceduralGalaxyWindow window = new ProceduralGalaxyWindow(name, morphology, scene, stage, skin);
+                                ProceduralBillboardGalaxyWindow window = new ProceduralBillboardGalaxyWindow(name, morphology, scene, stage, skin);
                                 window.setName("procedural-gal-window");
                                 window.show(stage);
                             }
@@ -481,11 +481,11 @@ public class MainGui extends AbstractGui {
                 } else {
                     var w = findActor("procedural-gal-window");
                     // Only one instance
-                    if (w != null && w.hasParent() && w instanceof ProceduralGalaxyWindow ggw) {
+                    if (w != null && w.hasParent() && w instanceof ProceduralBillboardGalaxyWindow ggw) {
                         ggw.reinitialize(focus);
                         w.setVisible(true);
                     } else {
-                        ProceduralGalaxyWindow window = new ProceduralGalaxyWindow(focus, scene, stage, skin);
+                        ProceduralBillboardGalaxyWindow window = new ProceduralBillboardGalaxyWindow(focus, scene, stage, skin);
                         window.setName("procedural-gal-window");
                         window.show(stage);
                     }

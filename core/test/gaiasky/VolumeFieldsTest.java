@@ -7,10 +7,15 @@
 
 package gaiasky;
 
+import gaiasky.render.gdx.graphics.GalaxyVolumeGenerator;
+import gaiasky.render.gdx.graphics.VolumeType;
 import gaiasky.scene.component.Volume;
 import gaiasky.scene.record.GalaxyAttributes;
 import org.junit.Assert;
+import gaiasky.util.Settings;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * Routing of a procedural volume's {@link Volume#fields} into the raymarcher's two slots. The
@@ -115,4 +120,23 @@ public class VolumeFieldsTest {
         Assert.assertTrue(volume.isDisposed());
     }
 
+
+    @Test
+    public void textureIsReusedOnlyWhenTheGridFitsItsDimensions() {
+        var field = field(GalaxyAttributes.ChannelType.GAS);
+        field.distribution = GalaxyAttributes.Distribution.SPIRAL;
+        var grid = GalaxyAttributes.volumeGrid(List.of(field), 30000.0, Settings.GraphicsQuality.HIGH);
+        Assert.assertNotNull(grid);
+
+        // Exact dimensions in the slot's own format: refill in place.
+        Assert.assertTrue(GalaxyVolumeGenerator.canReuse(grid.nx, grid.ny, grid.nz, VolumeType.RGBA, grid));
+        // One voxel short on any axis: the compute dispatch would write past the texture.
+        Assert.assertFalse(GalaxyVolumeGenerator.canReuse(grid.nx - 1, grid.ny, grid.nz, VolumeType.RGBA, grid));
+        Assert.assertFalse(GalaxyVolumeGenerator.canReuse(grid.nx, grid.ny - 1, grid.nz, VolumeType.RGBA, grid));
+        Assert.assertFalse(GalaxyVolumeGenerator.canReuse(grid.nx, grid.ny, grid.nz - 1, VolumeType.RGBA, grid));
+        // A density-only texture holds no colour, so the light+density pass cannot write into it.
+        Assert.assertFalse(GalaxyVolumeGenerator.canReuse(grid.nx, grid.ny, grid.nz, VolumeType.DENSITY, grid));
+        // No grid, no reuse.
+        Assert.assertFalse(GalaxyVolumeGenerator.canReuse(grid.nx, grid.ny, grid.nz, VolumeType.RGBA, null));
+    }
 }

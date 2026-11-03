@@ -9,22 +9,17 @@ package gaiasky.gui.window;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.JsonWriter;
-import com.badlogic.gdx.utils.ObjectFloatMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.Mapper;
@@ -37,74 +32,53 @@ import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.*;
+import gaiasky.util.math.Vector3D;
+import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.*;
-import gaiasky.util.validator.LongValidator;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Interface to the procedural generation of galaxies using billboard datasets and compute shaders.
+ * <p>
+ * A procedural galaxy is drawn as two billboard entities: a full-resolution one with the compact
+ * channels (stars, HII regions) and a half-resolution sibling with the diffuse ones (gas, bulge,
+ * dust) that get composited over it. The window edits both, which is why it is the one that has to
+ * name two sized entities and two transformed ones.
+ * <p>
+ * The layout and the window lifecycle come from {@link AbstractGalaxyGenWindow}; this class only
+ * says which entities to act on and what the channel list and the three actions do.
  */
-public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
-    private final static int SLIDER_STEPS = 1_000;
-    private static final float pad5 = 5f;
-    /** Saves the scroll position for each (full-res) entity. **/
-    private static final ObjectFloatMap<Entity> scrollY = new ObjectFloatMap<>();
-    /** Saves the datasets whose collapsible panes are expanded. **/
-    private static final ObjectSet<BillboardDataset> expandedDatasets = new ObjectSet<>();
-
-    private final GalaxyGenerator gen;
-    private final Scene scene;
+public class ProceduralBillboardGalaxyWindow extends AbstractGalaxyGenWindow {
     private Entity entityFull, entityHalf;
     private final FocusView viewFull, viewHalf;
-    private GalaxyMorphology morphology;
-    private boolean morphologyChanged;
-    private OwnSelectBox<GalaxyMorphology> morphologyBox;
 
-    private Matrix4 m = new Matrix4();
-
-    public ProceduralGalaxyWindow(FocusView target, Scene scene, Stage stage, Skin skin) {
-        super("", skin, stage);
-        this.scene = scene;
+    public ProceduralBillboardGalaxyWindow(FocusView target, Scene scene, Stage stage, Skin skin) {
+        super(scene, stage, skin);
         this.viewFull = new FocusView();
         this.viewHalf = new FocusView();
-        this.gen = new GalaxyGenerator();
 
-        update(target, null);
-
-        setModal(false);
-        setCancelText(I18n.msg("gui.close"));
-
-        // Build UI
+        // Entities before UI: the scaffold reads them while building.
+        init(target, null);
         buildSuper();
-
-        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
     }
 
-    public ProceduralGalaxyWindow(String newName, GalaxyMorphology morphology, Scene scene, Stage stage, Skin skin) {
-        super("", skin, stage);
-        this.scene = scene;
+    public ProceduralBillboardGalaxyWindow(String newName, GalaxyMorphology morphology, Scene scene, Stage stage, Skin skin) {
+        super(scene, stage, skin);
+        this.viewFull = new FocusView();
+        this.viewHalf = new FocusView();
         this.morphology = morphology;
-        this.viewFull = new FocusView();
-        this.viewHalf = new FocusView();
-        this.gen = new GalaxyGenerator();
 
-        update(null, newName);
-
-        setModal(false);
-        setCancelText(I18n.msg("gui.close"));
-
-        // Build UI
+        // Entities before UI: the scaffold reads them while building.
+        init(null, newName);
         buildSuper();
-
-        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
     }
 
-    private void update(FocusView target, String name) {
-
+    @Override
+    protected void init(FocusView target, String name) {
         if (target == null) {
             // Create new object with the given name, a given radius r, and 2r in front of the camera.
             var radius = 10 * Constants.KPC_TO_U;
@@ -143,22 +117,99 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
         this.morphology = fullBB.morphology != null ? fullBB.morphology : GalaxyMorphology.Sc;
         this.viewFull.setEntity(this.entityFull);
         this.viewHalf.setEntity(this.entityHalf);
-        this.getTitleLabel().setText(I18n.msg("gui.galaxy.title", viewFull.getLocalizedName()));
     }
 
-    public void reinitialize(FocusView target) {
-        update(target, null);
+    // ---------------------------------------------------------------------------------------------
+    // Hooks.
+    // ---------------------------------------------------------------------------------------------
 
-        // Build UI
-        rebuild();
+    @Override
+    protected boolean isEditableFocus(FocusView view) {
+        return view.isBillboardDataset();
     }
 
-    /**
-     * Rebuilds the UI.
-     */
-    protected void rebuild() {
-        this.content.clear();
-        build();
+    @Override
+    protected String getHeaderText() {
+        return I18n.msg("gui.galaxy.galaxy", viewFull.getLocalizedName());
+    }
+
+    @Override
+    protected String getWindowTitleText() {
+        return I18n.msg("gui.galaxy.title", viewFull.getLocalizedName());
+    }
+
+    @Override
+    protected List<Entity> getSizedEntities() {
+        // Arrays.asList, not List.of: a billboard entity that is not a procedural galaxy has no
+        // half-resolution child, and List.of would throw on the null.
+        return Arrays.asList(entityFull, entityHalf);
+    }
+
+    @Override
+    protected Entity getTransformSource() {
+        return entityFull;
+    }
+
+    @Override
+    protected long getSeed() {
+        return Mapper.billboardSet.get(entityFull).seed;
+    }
+
+    @Override
+    protected void setSeed(long seed) {
+        Mapper.billboardSet.get(entityFull).seed = seed;
+    }
+
+    @Override
+    protected void onMorphologyChanged(GalaxyMorphology morphology) {
+        Mapper.billboardSet.get(entityFull).morphology = morphology;
+    }
+
+    @Override
+    protected void buildChannelSections(Table table) {
+        addDatasets(entityFull, table, THIRD_WIDTH_BOX, HALF_WIDTH_BOX, FULL_WIDTH_BOX, TAB_CONTENT_WIDTH);
+        table.add(new Separator(skin, "gray")).fillX().expandX().padBottom(pad20).row();
+        addDatasets(entityHalf, table, THIRD_WIDTH_BOX, HALF_WIDTH_BOX, FULL_WIDTH_BOX, TAB_CONTENT_WIDTH);
+    }
+
+    @Override
+    protected void buildChannelButtons(Table table) {
+        // One per half: the two entities have independent channel lists.
+        var addChannelFull = newAddChannelButton(entityFull, "gui.galaxy.add.full", BUTTON_WIDTH);
+        table.add(addChannelFull).center().padRight(pad34).padBottom(pad10);
+        var addChannelHalf = newAddChannelButton(entityHalf, "gui.galaxy.add.half", BUTTON_WIDTH);
+        table.add(addChannelHalf).center().padBottom(pad10).row();
+    }
+
+    @Override
+    protected void onGenerate() {
+        if (morphologyChanged) {
+            // The morphology changed, so the datasets have to be drawn again from scratch.
+            generateRandom(morphology, getSeed());
+            morphologyChanged = false;
+        } else {
+            regenerate();
+        }
+    }
+
+    @Override
+    protected void onExport() {
+        var json = gen.convertToJson(entityFull, entityHalf);
+        var string = json.toJson(JsonWriter.OutputType.json);
+        Gdx.app.getClipboard().setContents(string);
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.done"));
+    }
+
+    @Override
+    protected void onRandomize() {
+        // The base has already replaced the seed.
+        generateRandom(morphology, getSeed());
+    }
+
+    @Override
+    protected Object getPersistenceKey() {
+        // The full-resolution entity identifies the galaxy; the half one is its child.
+        return entityFull;
     }
 
     /**
@@ -170,250 +221,6 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
             EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, this, Mapper.render.get(entityFull));
         if (entityHalf != null && Mapper.render.has(entityHalf))
             EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, this, Mapper.render.get(entityHalf));
-    }
-
-
-    @Override
-    protected void build() {
-        float fieldWidthTotal = 950f;
-        float tabContentWidth = 900f;
-        float scrollHeight = 700f;
-        float fullWidthBox = 850f;
-        float halfWidthBox = fullWidthBox / 2f - 12f;
-        float thirdWidthBox = fullWidthBox / 3f - 12f;
-        float buttonWidth = 380f;
-
-        // Title
-        var mainTitle = new OwnLabel(I18n.msg("gui.galaxy.galaxy", viewFull.getLocalizedName()), skin, "header");
-        content.add(mainTitle).left().padBottom(pad20).row();
-
-        // FIRST: global parameters:
-        // Size, fades, transforms, etc.
-
-        var bb = Mapper.billboardSet.get(entityFull);
-        var seedLabel = new OwnLabel(I18n.msg("gui.galaxy.randomize.seed"), skin);
-        var seedValidator = new LongValidator(-999999L, 999999L);
-        var seed = new OwnTextField(Long.toString(bb.seed), skin, seedValidator);
-        seed.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                if (seed.isValid()) {
-                    bb.seed = seed.getLongValue(123L);
-                }
-            }
-        });
-        var morphologyLabel = new OwnLabel(I18n.msg("gui.galaxy.morphology"), skin);
-        morphologyBox = new OwnSelectBox<>(skin);
-        morphologyBox.setItems(GalaxyMorphology.values());
-        morphologyBox.setSelected(morphology);
-        morphologyBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                morphology = morphologyBox.getSelected();
-                bb.morphology = morphology;
-                morphologyChanged = true;
-            }
-        });
-        var seedMorphTable = new Table(skin);
-        seedMorphTable.add(seedLabel).padRight(pad10);
-        seedMorphTable.add(seed).padRight(pad34);
-        seedMorphTable.add(morphologyLabel).padRight(pad10);
-        seedMorphTable.add(morphologyBox);
-        content.add(seedMorphTable).left().padBottom(pad20).row();
-
-        // Size in KPC
-        OwnSliderPlus sizeKpc = new OwnSliderPlus(I18n.msg("gui.galaxy.size"), 0.2f, 40.0f, 0.1f, skin);
-        sizeKpc.setWidth(fieldWidthTotal);
-        sizeKpc.setValue((float) (viewFull.getSize() * Constants.U_TO_KPC));
-        sizeKpc.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                var sizeInternal = sizeKpc.getValue() * Constants.KPC_TO_U;
-                viewFull.getBody().setSize(sizeInternal);
-                viewHalf.getBody().setSize(sizeInternal);
-            }
-        });
-        content.add(sizeKpc).left().padBottom(pad20).row();
-
-        // Object position
-        var position = new OwnTextButton(I18n.msg("gui.galaxy.pos"), skin);
-        position.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                GaiaSky.postRunnable(() -> {
-                    var bodyFull = Mapper.body.get(entityFull);
-                    var bodyHalf = Mapper.body.get(entityHalf);
-
-                    var camera = GaiaSky.instance.getICamera();
-                    var cpos = camera.getPos();
-                    var cdir = new Vector3D(camera.getDirection());
-                    var pos = new Vector3Q(cpos);
-                    pos.add(cdir.nor().scl(bodyFull.size));
-
-                    bodyFull.pos.set(pos);
-                    bodyHalf.pos.set(pos);
-                });
-            }
-        });
-        content.add(position).left().padBottom(pad20).row();
-
-        // Object rotation
-        var trf = Mapper.transform.get(entityFull);
-        m = trf.matrix == null ? m.idt() : trf.matrix.putIn(m);
-        var euler = Matrix4Utils.recoverEulerAngles(m);
-        var yaw = euler[0];
-        var pitch = euler[1];
-        var roll = euler[2];
-
-        float rotMin = -180.0f;
-        float rotMax = 180.0f;
-        float rotStep = (rotMax - rotMin) / SLIDER_STEPS;
-        var rx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rx"), rotMin, rotMax, rotStep, 0f, skin);
-        var ry = new OwnSliderReset(I18n.msg("gui.galaxy.ds.ry"), rotMin, rotMax, rotStep, 0f, skin);
-        var rz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rz"), rotMin, rotMax, rotStep, 0f, skin);
-
-        // Set up Rx
-        rx.setWidth(thirdWidthBox);
-        rx.setValue(yaw);
-        rx.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                commitRotation(rx.getMappedValue(), ry.getMappedValue(), rz.getMappedValue());
-            }
-        });
-        // Set up Ry
-        ry.setWidth(thirdWidthBox);
-        ry.setValue(pitch);
-        ry.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                commitRotation(rx.getMappedValue(), ry.getMappedValue(), rz.getMappedValue());
-            }
-        });
-        // Set up Rz
-        rz.setWidth(thirdWidthBox);
-        rz.setValue(roll);
-        rz.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                commitRotation(rx.getMappedValue(), ry.getMappedValue(), rz.getMappedValue());
-            }
-        });
-        Table trfTable = new Table(skin);
-        trfTable.add(rx).left().padRight(pad5);
-        trfTable.add(ry).left().padRight(pad5);
-        trfTable.add(rz).left();
-        content.add(trfTable).left().padBottom(pad20).row();
-
-
-        // SECOND: channels -> billboard datasets.
-        var datasetsTable = new Table(skin);
-        datasetsTable.top();
-
-        addDatasets(entityFull, datasetsTable, thirdWidthBox, halfWidthBox, fullWidthBox, tabContentWidth);
-        datasetsTable.add(new Separator(skin, "gray")).fillX().expandX().padBottom(pad20).row();
-        addDatasets(entityHalf, datasetsTable, thirdWidthBox, halfWidthBox, fullWidthBox, tabContentWidth);
-
-        var scroll = new OwnScrollPane(datasetsTable, skin, "minimalist");
-        scroll.setScrollingDisabled(true, false);
-        scroll.setForceScroll(false, true);
-        scroll.setSmoothScrolling(false);
-        scroll.setWidth(fullWidthBox + 100f);
-        scroll.setHeight(scrollHeight);
-        scroll.addListener(new InputListener() {
-            @Override
-            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                // Save last scroll Y position.
-                scrollY.put(entityFull, scroll.getScrollY());
-                return super.scrolled(event, x, y, amountX, amountY);
-            }
-        });
-
-        var channelLabel = new OwnLabel(I18n.msg("gui.galaxy.channels"), skin, "header");
-
-        content.add(channelLabel).left().padBottom(pad20).row();
-        content.add(scroll).left().row();
-        content.pack();
-        scroll.setScrollY(scrollY.get(entityFull, 0f));
-
-        // THIRD: buttons.
-        var buttonsTop = new Table(skin);
-        var buttonsBottom = new Table(skin);
-
-        // Add channel (full)
-        var addChannelFull = newAddChannelButton(entityFull, "gui.galaxy.add.full", buttonWidth);
-        buttonsTop.add(addChannelFull).center().padRight(pad34).padBottom(pad10);
-
-        // Add channel (half)
-        var addChannelHalf = newAddChannelButton(entityHalf, "gui.galaxy.add.half", buttonWidth);
-        buttonsTop.add(addChannelHalf).center().padBottom(pad10).row();
-
-        // Generate
-        var generate = new OwnTextIconButton(I18n.msg("gui.galaxy.generate"), skin, "generate");
-        generate.setColor(ColorUtils.gGreenC);
-        generate.setWidth(buttonWidth);
-        generate.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                var bbFull = Mapper.billboardSet.get(entityFull);
-                if (morphologyBox != null &&
-                        morphologyChanged) {
-                    // Regenerate full dataset!
-                    generateRandom(morphology, bb.seed);
-                    morphologyChanged = false;
-                } else {
-                    regenerate();
-                }
-            }
-        });
-        generate.pad(pad10, pad20, pad10, pad20);
-        generate.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.generate.info"), skin));
-        var export = new OwnTextIconButton("", skin, "export");
-        export.pad(pad10, pad20, pad10, pad20);
-        export.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.export.info"), skin));
-        export.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                var json = gen.convertToJson(entityFull, entityHalf);
-                var string = json.toJson(JsonWriter.OutputType.json);
-                Gdx.app.getClipboard().setContents(string);
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.done"));
-            }
-        });
-        var genTable = new Table(skin);
-        genTable.add(generate).left().padRight(pad20);
-        genTable.add(export);
-
-        buttonsTop.add(genTable).colspan(2).center();
-
-        // Random galaxy
-        var randomize = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize", morphologyBox.getSelected().name()), skin, "random");
-        randomize.setColor(ColorUtils.gYellowC);
-        randomize.setWidth(buttonWidth - 80f);
-        randomize.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.randomize.info"), skin));
-        randomize.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                // New seed, same morphology.
-                var seedValue = StdRandom.uniform(999999);
-                bb.seed = seedValue;
-                generateRandom(bb.morphology, seedValue);
-            }
-        });
-        randomize.pad(pad10, pad20, pad10, pad20);
-        buttonsBottom.add(randomize).center().padBottom(pad10).row();
-
-
-        content.add(buttonsTop).center().padTop(pad34).padBottom(pad20).row();
-        content.add(new Separator(skin, "gray")).fillX().expandX().padBottom(pad20).row();
-        content.add(buttonsBottom).center();
-
     }
 
     private void generateRandom(GalaxyMorphology gm, long seed) {
@@ -586,8 +393,8 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                 }
             });
             Table translationTable = new Table(skin);
-            translationTable.add(x).left().padRight(pad5);
-            translationTable.add(y).left().padRight(pad5);
+            translationTable.add(x).left().padRight(PAD5);
+            translationTable.add(y).left().padRight(PAD5);
             translationTable.add(z).left();
             dsTable.add(translationTable).colspan(2).left().padBottom(pad18).row();
 
@@ -626,8 +433,8 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                 }
             });
             Table rotTable = new Table(skin);
-            rotTable.add(rx).left().padRight(pad5);
-            rotTable.add(ry).left().padRight(pad5);
+            rotTable.add(rx).left().padRight(PAD5);
+            rotTable.add(ry).left().padRight(PAD5);
             rotTable.add(rz).left();
             dsTable.add(rotTable).colspan(2).left().padBottom(pad18).row();
 
@@ -666,8 +473,8 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                 }
             });
             var sclTable = new Table(skin);
-            sclTable.add(sx).left().padRight(pad5);
-            sclTable.add(sy).left().padRight(pad5);
+            sclTable.add(sx).left().padRight(PAD5);
+            sclTable.add(sy).left().padRight(PAD5);
             sclTable.add(sz).left();
             dsTable.add(sclTable).colspan(2).left().padBottom(pad18).row();
 
@@ -705,7 +512,7 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                     ds.setColorNoise((double) colorNoise.getValue());
                 }
             });
-            dsTable.add(colorsTable).left().padRight(pad5).padBottom(pad18);
+            dsTable.add(colorsTable).left().padRight(PAD5).padBottom(pad18);
             dsTable.add(colorNoise).left().padBottom(pad18).row();
 
             if (ds.distribution.isFlat()) {
@@ -749,7 +556,7 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                 OwnLabel heightProfileLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.height.profile"), skin);
                 heightProfileLabel.setWidth(halfWidthBox);
 
-                dsTable.add(heightProfile).left().padBottom(pad18).padRight(pad5);
+                dsTable.add(heightProfile).left().padBottom(pad18).padRight(PAD5);
                 dsTable.add(heightScale).left().padBottom(pad18).row();
 
             }
@@ -793,7 +600,7 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                 }
             });
             if (!ds.distribution.isBar()) {
-                dsTable.add(minRadius).left().padRight(pad5).padBottom(pad18);
+                dsTable.add(minRadius).left().padRight(PAD5).padBottom(pad18);
                 dsTable.add(baseRadius).left().padBottom(pad18).row();
             } else {
                 dsTable.add(baseRadius).colspan(2).left().padBottom(pad18).row();
@@ -848,8 +655,8 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
             });
             var sizeTable = new Table(skin);
             sizeTable.add(size).left().padRight(pad34);
-            sizeTable.add(sizeMask).right().padRight(pad5);
-            sizeTable.add(sizeNoise).left().padRight(pad5);
+            sizeTable.add(sizeMask).right().padRight(PAD5);
+            sizeTable.add(sizeNoise).left().padRight(PAD5);
 
             dsTable.add(sizeTable).colspan(2).left().padBottom(pad18).row();
 
@@ -900,7 +707,7 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                     }
                 });
 
-                dsTable.add(numArms).left().padRight(pad5).padBottom(pad18);
+                dsTable.add(numArms).left().padRight(PAD5).padBottom(pad18);
                 dsTable.add(armSigma).left().padBottom(pad18).row();
             }
             if (ds.distribution.isDensityWaveSpiral()) {
@@ -987,7 +794,7 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                         ds.setEccentricityY((double) ecy.getValue());
                     }
                 });
-                dsTable.add(ecy).left().padRight(pad5).padBottom(pad18);
+                dsTable.add(ecy).left().padRight(PAD5).padBottom(pad18);
                 dsTable.add(ecx).left().padBottom(pad18).row();
             }
 
@@ -1016,7 +823,7 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
                         ds.spiralDeltaPos[1] = deltaY.getValue();
                     }
                 });
-                dsTable.add(deltaX).left().padRight(pad5).padBottom(pad18);
+                dsTable.add(deltaX).left().padRight(PAD5).padBottom(pad18);
                 dsTable.add(deltaY).left().padBottom(pad18).row();
             }
 
@@ -1060,64 +867,15 @@ public class ProceduralGalaxyWindow extends GenericDialog implements IObserver {
             String title = I18n.msg(key, channel, name);
             CollapsiblePane groupPane = new CollapsiblePane(stage, title,
                                                             dsTable, tabContentWidth, skin, "header-s", "expand-collapse",
-                                                            null, expandedDatasets.contains(ds), null, delete);
+                                                            null, isExpanded(ds), null, delete);
             // Update set of expanded datasets whenever this group pane is expanded or collapsed.
             groupPane.setExpandCollapseRunnable(() -> {
                 var expanded = groupPane.isExpanded();
-                if (expanded) {
-                    expandedDatasets.add(ds);
-                } else {
-                    expandedDatasets.remove(ds);
-                }
+                setExpanded(ds, expanded);
             });
 
             datasetsTable.add(groupPane).padBottom(pad18).row();
             channel++;
-        }
-    }
-
-    private void commitRotation(float yaw, float pitch, float roll) {
-        m.setFromEulerAngles(pitch, yaw, roll);
-        var full = Mapper.transform.get(entityFull);
-        var half = Mapper.transform.get(entityHalf);
-        if (full.matrix == null) {
-            full.matrix = new Matrix4D();
-        }
-        full.matrix.set(m);
-        if (half.matrix == null) {
-            half.matrix = new Matrix4D();
-        }
-        half.matrix.set(m);
-    }
-
-    @Override
-    protected boolean accept() {
-        return false;
-    }
-
-    @Override
-    protected void cancel() {
-
-    }
-
-    @Override
-    public void dispose() {
-
-    }
-
-    private final FocusView eventView = new FocusView();
-
-    @Override
-    public void notify(Event event, Object source, Object... data) {
-        if (event == Event.FOCUS_CHANGED) {
-            if (data[0] instanceof String) {
-                eventView.setEntity(scene.getEntity((String) data[0]));
-            } else if (data[0] instanceof FocusView fv) {
-                eventView.setEntity(fv.getEntity());
-            }
-            if (eventView.isBillboardDataset()) {
-                reinitialize(eventView);
-            }
         }
     }
 

@@ -101,6 +101,65 @@ public class GalaxyVolumeGenerator implements Disposable {
      * compilation failure, degenerate grid).
      */
     public VolumeTexture generate(List<? extends GalaxyAttributes> fields, VoxelGrid grid) {
+        return generate(fields, grid, null);
+    }
+
+    /**
+     * Whether a texture can be refilled for the given grid instead of a new one being allocated.
+     * <p>
+     * The dimensions and the storage format have to match exactly: the compute shader writes one
+     * texel per voxel of the grid it is dispatched with, so a texture of another size would be
+     * written past its end.
+     *
+     * @param existing The texture currently bound to the slot, or null.
+     * @param grid     The grid about to be generated.
+     *
+     * @return True if {@code existing} can receive the new content.
+     */
+    public static boolean canReuse(VolumeTexture existing,
+                                   VoxelGrid grid) {
+        return existing != null && existing.texture() != null
+                && canReuse(existing.width(), existing.height(), existing.depth(), existing.type(), grid);
+    }
+
+    /**
+     * Whether a texture of the given shape can receive a generation of the given grid. Split out from
+     * {@link #canReuse(VolumeTexture, VoxelGrid)} so that the decision can be tested without a
+     * texture, which needs a GL context.
+     *
+     * @param width  The texture's extent on the first axis.
+     * @param height The texture's extent on the second axis.
+     * @param depth  The texture's extent on the third axis.
+     * @param type   The texture's storage format.
+     * @param grid   The grid about to be generated.
+     *
+     * @return True if the content fits.
+     */
+    public static boolean canReuse(int width,
+                                   int height,
+                                   int depth,
+                                   VolumeType type,
+                                   VoxelGrid grid) {
+        return grid != null && type == VolumeType.RGBA
+                && width == grid.nx && height == grid.ny && depth == grid.nz;
+    }
+
+    /**
+     * Generates the volume texture of one slot, refilling {@code existing} when it fits the grid.
+     * <p>
+     * Reusing the texture keeps the {@link gaiasky.render.gdx.shader.attribute.Texture3DAttribute}
+     * that holds it valid, so the material keeps the same attributes and the shader keeps the same
+     * variant: regenerating after a slider edit costs one dispatch per pass and no re-initialization
+     * of the model. When the grid no longer fits, a new texture is allocated and returned, and the
+     * caller is responsible for releasing the old one.
+     *
+     * @param fields   The fields that go into the slot, in slot order.
+     * @param grid     Grid dimensions.
+     * @param existing The slot's current texture, or null to always allocate a new one.
+     *
+     * @return The volume, which may wrap {@code existing}, or null if generation is not possible.
+     */
+    public VolumeTexture generate(List<? extends GalaxyAttributes> fields, VoxelGrid grid, VolumeTexture existing) {
         if (!isSupported() || unavailable || fields == null || fields.isEmpty() || grid == null) {
             return null;
         }
@@ -162,16 +221,23 @@ public class GalaxyVolumeGenerator implements Disposable {
             return null;
         }
 
+        // Refill the slot's own texture when it fits, so that regenerating does not churn the
+        // material's attributes or the compiled shader variant.
+        boolean reused = canReuse(existing, grid);
         Texture3D texture = null;
         try {
-            texture = new Texture3D(new EmptyTexture3DData(grid.nx, grid.ny, grid.nz,
-                                                           VolumeType.RGBA.glFormat,
-                                                           VolumeType.RGBA.glInternalFormat,
-                                                           VolumeType.RGBA.glType));
-            texture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge,
-                            Texture.TextureWrap.ClampToEdge);
-            // Linear: a raymarcher samples between voxels and a nearest filter would show the slabs.
-            texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            if (reused) {
+                texture = existing.texture();
+            } else {
+                texture = new Texture3D(new EmptyTexture3DData(grid.nx, grid.ny, grid.nz,
+                                                               VolumeType.RGBA.glFormat,
+                                                               VolumeType.RGBA.glInternalFormat,
+                                                               VolumeType.RGBA.glType));
+                texture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge,
+                                Texture.TextureWrap.ClampToEdge);
+                // Linear: a raymarcher samples between voxels and a nearest filter would show the slabs.
+                texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            }
 
             ensureStatsBuffer();
             resetStats();
@@ -202,7 +268,8 @@ public class GalaxyVolumeGenerator implements Disposable {
             GL43.glBindImageTexture(IMAGE_UNIT, 0, 0, true, 0, GL43.GL_WRITE_ONLY, VolumeType.RGBA.glInternalFormat);
             GL43.glBindBufferBase(GL43.GL_SHADER_STORAGE_BUFFER, STATS_BINDING, 0);
 
-            SysUtils.checkForOpenGLErrors("GalaxyVolumeGenerator.generate(" + grid + ")");
+            SysUtils.checkForOpenGLErrors("GalaxyVolumeGenerator.generate(" + grid + ")"
+                                                  + (reused ? ", reusing the slot's texture" : ""));
 
             // The box is in units of the object's size, with the largest axis spanning 1 - the
             // convention every volume the loader produces follows, and the one the raymarcher scales
@@ -214,7 +281,9 @@ public class GalaxyVolumeGenerator implements Disposable {
                                      null);
         } catch (Exception e) {
             logger.error(e, "Error generating galaxy volume");
-            if (texture != null) {
+            // A reused texture is owned by the slot and may still be bound somewhere, so it is left
+            // alone; one allocated here has never been handed out and would leak.
+            if (texture != null && !reused) {
                 texture.dispose();
             }
             return null;
@@ -233,7 +302,7 @@ public class GalaxyVolumeGenerator implements Disposable {
      * by the peak of the unit density of each field, in field order, or null if there is nothing to
      * read. The light peaks are the largest channel of the summed light, the means are luma averages
      * over all voxels - the quantity {@link VolumeCalibration} is stated in - and the density peaks are
-     * the maxima of the summed density. The per-field peaks are what an occlusive slot normalises each
+     * the maxima of the summed density. The per-field peaks are what an occlusive slot normalizes each
      * field by: the densest voxel of that field stores {@link VolumeCalibration#OCCLUSIVE_TARGET_PEAK}
      * times its intensity, so an intensity below the depth threshold dims a field without ever
      * occluding.

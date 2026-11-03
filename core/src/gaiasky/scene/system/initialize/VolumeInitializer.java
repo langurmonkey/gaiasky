@@ -24,6 +24,7 @@ import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +33,13 @@ import java.util.Locale;
  * Initializes volume entities, such as those used for volumetric rendering.
  */
 public class VolumeInitializer extends AbstractInitSystem {
+    /**
+     * Shadows the instance logger of {@link AbstractInitSystem}: generation has to be reachable
+     * without an instance - see {@link #generateNow(Entity)}, which the GUI calls - and everything
+     * else in this class is static for the same reason.
+     */
+    private static final Logger.Log logger = Logger.getLogger(VolumeInitializer.class);
+
     /** The shaders clamp the step count to at least 40, so anything lower does nothing useful. */
     private static final int MIN_ITERATIONS = 40;
 
@@ -99,6 +107,47 @@ public class VolumeInitializer extends AbstractInitSystem {
     }
 
     /**
+     * Regenerates the volume textures of the given entity from its current fields, now.
+     * <p>
+     * This is the entry point for editing a procedural volume at runtime: the GUI mutates
+     * {@link Volume#fields} and calls this, and the volumes are re-voxelised with the fields as they
+     * are at that moment. Both slots refill their existing texture whenever the grid still fits, so
+     * an edit costs two dispatches and no material re-initialisation - see
+     * {@link GalaxyVolumeGenerator#canReuse}.
+     * <p>
+     * The work is posted to the render thread: it touches GL state (image bindings, SSBO, texture
+     * uploads) and the material's attributes, none of which may be done from anywhere else.
+     *
+     * @param entity The volume entity, which must already be set up.
+     */
+    public static void generateNow(Entity entity) {
+        if (entity == null) {
+            return;
+        }
+        var volume = Mapper.volume.get(entity);
+        if (volume == null || !volume.isProcedural()) {
+            logger.warn("Cannot regenerate the volume of " + name(entity) + ": the entity has no volume fields.");
+            return;
+        }
+        var model = Mapper.model.get(entity);
+        var body = Mapper.body.get(entity);
+        if (model == null || model.model == null || body == null) {
+            logger.warn("Cannot regenerate the volume of " + name(entity) + ": the entity is not set up.");
+            return;
+        }
+        var modelComponent = model.model;
+        String entityName = name(entity);
+        double sizePc = body.size * Constants.U_TO_PC;
+        GaiaSky.postRunnable(() -> {
+            // The entity may be removed between the request and the next frame.
+            if (volume.isDisposed()) {
+                return;
+            }
+            scheduleGeneration(entityName, volume, modelComponent, sizePc);
+        });
+    }
+
+    /**
      * Prepares the generation of a procedural volume's slots: it binds the results to the material
      * now if the material already exists, and otherwise hooks onto the material's initialization.
      * <p>
@@ -112,10 +161,21 @@ public class VolumeInitializer extends AbstractInitSystem {
      * @param model   The model component, whose material receives the textures.
      * @param sizePc  Lateral span of the galaxy, in parsecs.
      */
-    private void scheduleGeneration(Entity entity,
-                                    Volume volume,
-                                    ModelComponent model,
-                                    double sizePc) {
+    private static void scheduleGeneration(Entity entity,
+                                           Volume volume,
+                                           ModelComponent model,
+                                           double sizePc) {
+        scheduleGeneration(name(entity), volume, model, sizePc);
+    }
+
+    /**
+     * Same as {@link #scheduleGeneration(Entity, Volume, ModelComponent, double)}, with the entity's
+     * name resolved by the caller: the deferred paths outlive the entity and must not hold it.
+     */
+    private static void scheduleGeneration(String name,
+                                           Volume volume,
+                                           ModelComponent model,
+                                           double sizePc) {
         final MaterialComponent mtc;
         if (model.mtc == null) {
             // A procedural volume cannot render without a material: the generated textures have
@@ -126,7 +186,7 @@ public class VolumeInitializer extends AbstractInitSystem {
             // here rather than drop the volume.
             mtc = new MaterialComponent();
             model.setMaterial(mtc);
-            logger.info("The volume entity " + name(entity) + " declares no material; using a default one so that "
+            logger.info("The volume entity " + name + " declares no material; using a default one so that "
                                 + "its procedural volume can be generated and bound.");
         } else {
             mtc = model.mtc;
@@ -140,12 +200,10 @@ public class VolumeInitializer extends AbstractInitSystem {
             return;
         }
         if (sizePc <= 0.0) {
-            logger.warn("Cannot generate the volumes of " + name(entity) + ": its size is " + sizePc + " pc");
+            logger.warn("Cannot generate the volumes of " + name + ": its size is " + sizePc + " pc");
             return;
         }
 
-        // Captured as a string so the callback does not keep the entity alive.
-        String name = name(entity);
         Runnable generation = () -> {
             // The entity may be removed before the material arrives; binding a texture then would
             // leak it, since disposal already ran.
@@ -172,42 +230,37 @@ public class VolumeInitializer extends AbstractInitSystem {
      * material. The fields are the galaxy's own definition: no billboard set is read, written or
      * emptied to produce a volume.
      * <p>
-     * Runs on the GL thread. Quality changes reload the scene in Gaia Sky, so this is the only place
-     * generation is triggered, and the textures are released with the component when the entity is
-     * removed.
+     * Runs on the GL thread. It is triggered at set-up and from
+     * {@link #generateNow(Entity)}; the textures are released with the component when the entity is
+     * removed. Each slot refills the texture it already holds when the grid has not changed, so a
+     * regeneration keeps the material's attributes and the shader variant, and only a new grid - or
+     * a slot that went from empty to populated - costs a new texture.
      *
      * @param name   Name of the entity, for logging.
      * @param volume The volume component holding the fields.
      * @param mtc    The material component, which receives the textures.
      * @param sizePc Lateral span of the galaxy, in parsecs.
      */
-    private void generateVolumes(String name,
-                                 Volume volume,
-                                 MaterialComponent mtc,
-                                 double sizePc) {
+    private static void generateVolumes(String name,
+                                        Volume volume,
+                                        MaterialComponent mtc,
+                                        double sizePc) {
         var quality = GaiaSky.settings().graphics.quality;
         var generator = GalaxyVolumeGenerator.instance();
         long start = System.nanoTime();
 
         var emissiveGrid = gridFor(volume.emissiveFields(), sizePc, quality);
-        VolumeTexture emissive = generateSlot(generator, volume.emissiveFields(), emissiveGrid);
-        if (emissive != null && mtc.setVolumeTexture(Volume.SLOT_EMISSIVE, emissive)) {
-            volume.setGeneratedVolume(Volume.SLOT_EMISSIVE, emissive);
-        } else if (emissive != null) {
-            // Bound nowhere: release it now rather than leak it.
-            emissive.texture().dispose();
-        }
+        updateSlot(generator, volume, mtc, Volume.SLOT_EMISSIVE, volume.emissiveFields(), emissiveGrid);
 
-        var occlusiveGrid = gridFor(volume.occlusiveFields(), sizePc, quality);
-        VolumeTexture occlusive = generateSlot(generator, volume.occlusiveFields(), occlusiveGrid);
         // The slot's threshold comes from the fields' own occlusion fractions unless the scene pins
         // one. It has to be set before the texture is bound: the attribute that carries it is built
         // from volumeDepthThreshold(slot) inside setVolumeTexture.
         mtc.setVolumeDepthThresholdDerived(Volume.SLOT_OCCLUSIVE,
                                           VolumeCalibration.occlusiveThreshold(volume.occlusiveFields()));
         float occlusiveThreshold = mtc.volumeDepthThreshold(Volume.SLOT_OCCLUSIVE);
-        if (occlusive != null && mtc.setVolumeTexture(Volume.SLOT_OCCLUSIVE, occlusive)) {
-            volume.setGeneratedVolume(Volume.SLOT_OCCLUSIVE, occlusive);
+        var occlusiveGrid = gridFor(volume.occlusiveFields(), sizePc, quality);
+        updateSlot(generator, volume, mtc, Volume.SLOT_OCCLUSIVE, volume.occlusiveFields(), occlusiveGrid);
+        if (volume.getGeneratedVolume(Volume.SLOT_OCCLUSIVE) != null) {
             logOcclusivePeaks(name, volume.occlusiveFields(), generator.readStats(occlusiveGrid), occlusiveThreshold);
             if (occlusiveThreshold <= 0f) {
                 // A generated volume has no descriptor of its own to inherit this from, and the
@@ -219,8 +272,6 @@ public class VolumeInitializer extends AbstractInitSystem {
                                     + "dust will not occlude anything. Give the field that should hide the background "
                                     + "an occlusionThreshold in (0, 1), e.g. 0.1.");
             }
-        } else if (occlusive != null) {
-            occlusive.texture().dispose();
         }
 
         // The grid is the thing to look at when the result looks coarse: a lateral voxel of N pc is
@@ -239,9 +290,53 @@ public class VolumeInitializer extends AbstractInitSystem {
                                   occlusiveThreshold));
     }
 
-    private VoxelGrid gridFor(List<GalaxyAttributes> fields,
-                              double sizePc,
-                              gaiasky.util.Settings.GraphicsQuality quality) {
+    /**
+     * Brings one slot up to date with the fields routed to it: refills the texture it already holds
+     * when the grid still fits, allocates one when it does not, and unbinds and releases it when the
+     * slot has no fields any more.
+     *
+     * @param generator The volume generator.
+     * @param volume    The volume component, which owns the generated textures.
+     * @param mtc       The material that samples them.
+     * @param slot      {@link Volume#SLOT_EMISSIVE} or {@link Volume#SLOT_OCCLUSIVE}.
+     * @param fields    The fields routed to the slot.
+     * @param grid      The grid for those fields, or null when the slot is empty.
+     */
+    private static void updateSlot(GalaxyVolumeGenerator generator,
+                                   Volume volume,
+                                   MaterialComponent mtc,
+                                   int slot,
+                                   List<GalaxyAttributes> fields,
+                                   VoxelGrid grid) {
+        VolumeTexture previous = volume.getGeneratedVolume(slot);
+        if (fields.isEmpty() || grid == null) {
+            if (previous != null) {
+                // Unbind first: the texture may not be released while the material still samples it.
+                mtc.clearVolumeTexture(slot);
+                volume.setGeneratedVolume(slot, null);
+            }
+            return;
+        }
+        VolumeTexture texture = generator.generate(fields, grid, previous);
+        if (texture == null) {
+            // Already reported by the generator. Whatever the slot held stays bound: showing the
+            // previous volume beats showing nothing.
+            return;
+        }
+        if (!mtc.setVolumeTexture(slot, texture)) {
+            // Nothing samples it, so it would leak. A reused texture is the component's own and is
+            // left for the component to release.
+            if (previous == null || texture.texture() != previous.texture()) {
+                texture.texture().dispose();
+            }
+            return;
+        }
+        volume.setGeneratedVolume(slot, texture);
+    }
+
+    private static VoxelGrid gridFor(List<GalaxyAttributes> fields,
+                                     double sizePc,
+                                     gaiasky.util.Settings.GraphicsQuality quality) {
         return fields.isEmpty() ? null : GalaxyAttributes.volumeGrid(fields, sizePc, quality);
     }
 
@@ -252,7 +347,7 @@ public class VolumeInitializer extends AbstractInitSystem {
      * stored density, so "stored" against "threshold" says whether a field can hide anything behind
      * it at all: above the threshold it occludes, below it only dims.
      */
-    private void logOcclusivePeaks(String name, List<GalaxyAttributes> fields, float[] stats, float threshold) {
+    private static void logOcclusivePeaks(String name, List<GalaxyAttributes> fields, float[] stats, float threshold) {
         if (stats == null || fields == null || fields.isEmpty()) {
             return;
         }
@@ -275,21 +370,4 @@ public class VolumeInitializer extends AbstractInitSystem {
         logger.info("Occlusive fields of " + name + ": " + sb);
     }
 
-    /**
-     * Generates the texture of one slot, or returns null if the slot has no fields.
-     *
-     * @param generator The volume generator.
-     * @param fields    The fields routed to this slot.
-     * @param grid      The grid to fill, or null if the slot is empty.
-     *
-     * @return The generated texture, or null.
-     */
-    private VolumeTexture generateSlot(GalaxyVolumeGenerator generator,
-                                       List<GalaxyAttributes> fields,
-                                       VoxelGrid grid) {
-        if (fields.isEmpty() || grid == null) {
-            return null;
-        }
-        return generator.generate(fields, grid);
-    }
 }

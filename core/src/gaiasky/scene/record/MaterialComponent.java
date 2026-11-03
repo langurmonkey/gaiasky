@@ -1365,37 +1365,57 @@ public final class MaterialComponent extends NamedComponent implements IObserver
         if (material == null || tex == null) {
             return false;
         }
-        int attribute;
-        int boundsMin, boundsMax;
-        switch (slot) {
-            case 0 -> {
-                attribute = Texture3DAttribute.Volume0;
-                boundsMin = Vector3Attribute.Volume0BoundsMin;
-                boundsMax = Vector3Attribute.Volume0BoundsMax;
-            }
-            case 1 -> {
-                attribute = Texture3DAttribute.Volume1;
-                boundsMin = Vector3Attribute.Volume1BoundsMin;
-                boundsMax = Vector3Attribute.Volume1BoundsMax;
-            }
-            case 2 -> {
-                attribute = Texture3DAttribute.Volume2;
-                boundsMin = Vector3Attribute.Volume2BoundsMin;
-                boundsMax = Vector3Attribute.Volume2BoundsMax;
-            }
-            case 3 -> {
-                attribute = Texture3DAttribute.Volume3;
-                boundsMin = Vector3Attribute.Volume3BoundsMin;
-                boundsMax = Vector3Attribute.Volume3BoundsMax;
-            }
-            default -> {
-                return false;
-            }
+        var indices = volumeSlotAttributes(slot);
+        if (indices == null) {
+            return false;
         }
-        material.set(volumeAttribute(attribute, slot, tex));
-        material.set(new Vector3Attribute(boundsMin, new Vector3(tex.boundsMin())));
-        material.set(new Vector3Attribute(boundsMax, new Vector3(tex.boundsMax())));
+        material.set(volumeAttribute(indices[0], slot, tex));
+        material.set(new Vector3Attribute(indices[1], new Vector3(tex.boundsMin())));
+        material.set(new Vector3Attribute(indices[2], new Vector3(tex.boundsMax())));
         return true;
+    }
+
+    /**
+     * Unbinds whatever volume texture the given slot holds.
+     * <p>
+     * Removing the attribute drops the slot's {@code #define volumeNFlag}, so the volume shader is
+     * recompiled without that slot's sampling code - which is the point: a slot whose fields were
+     * deleted should stop sampling a texture that no longer describes anything. The texture itself
+     * is not disposed here; its owner is {@link gaiasky.scene.component.Volume}.
+     *
+     * @param slot The slot number, 0 to 3.
+     *
+     * @return True if the slot was cleared, false if the material is not initialised or the slot
+     *         does not exist.
+     */
+    public boolean clearVolumeTexture(int slot) {
+        if (material == null) {
+            return false;
+        }
+        var indices = volumeSlotAttributes(slot);
+        if (indices == null) {
+            return false;
+        }
+        material.remove(indices[0]);
+        material.remove(indices[1]);
+        material.remove(indices[2]);
+        return true;
+    }
+
+    /**
+     * @param slot The slot number, 0 to 3.
+     *
+     * @return The texture, bounds-min and bounds-max attribute indices of the slot, or null if there
+     *         is no such slot.
+     */
+    private static int[] volumeSlotAttributes(int slot) {
+        return switch (slot) {
+            case 0 -> new int[]{Texture3DAttribute.Volume0, Vector3Attribute.Volume0BoundsMin, Vector3Attribute.Volume0BoundsMax};
+            case 1 -> new int[]{Texture3DAttribute.Volume1, Vector3Attribute.Volume1BoundsMin, Vector3Attribute.Volume1BoundsMax};
+            case 2 -> new int[]{Texture3DAttribute.Volume2, Vector3Attribute.Volume2BoundsMin, Vector3Attribute.Volume2BoundsMax};
+            case 3 -> new int[]{Texture3DAttribute.Volume3, Vector3Attribute.Volume3BoundsMin, Vector3Attribute.Volume3BoundsMax};
+            default -> null;
+        };
     }
 
     /**
