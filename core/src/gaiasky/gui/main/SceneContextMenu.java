@@ -469,6 +469,7 @@ public class SceneContextMenu extends ContextMenu {
 
                 Drawable icon = ci.isVisible(true) ? skin.getDrawable("eye-icon") : skin.getDrawable("eye-closed-icon");
                 OwnImage img = new OwnImage(icon);
+                img.setSize(20f, 20f);
                 cim.add(img).right().padRight(pad).expand();
                 cim.addListener(event -> {
                     if (event instanceof ChangeEvent) {
