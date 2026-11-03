@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import gaiasky.GaiaSky;
@@ -25,6 +27,12 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.record.GalaxyGenerator;
+import gaiasky.gui.beans.ComboBoxBean;
+import gaiasky.render.BlendMode;
+import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.GalaxyAttributes.ChannelType;
+import gaiasky.scene.record.GalaxyAttributes.Distribution;
+import gaiasky.scene.record.GalaxyAttributes.HeightProfile;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.view.FocusView;
@@ -39,6 +47,7 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.LongValidator;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -189,6 +198,14 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
     /** Called when Generate is pressed. **/
     protected abstract void onGenerate();
 
+    /**
+     * Discards the generation of the current object so that the renderer draws it again. Every edit
+     * that changes what the compute pass produces goes through this, so the subclass decides what
+     * "discard" means for the entities it holds - the billboard window releases its datasets, the
+     * volume window its textures.
+     */
+    protected abstract void regenerate();
+
     /** Called when Export is pressed. **/
     protected abstract void onExport();
 
@@ -197,6 +214,27 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
 
     /** @return The key that identifies what is being edited, used to remember the scroll position. **/
     protected abstract Object getPersistenceKey();
+
+    /**
+     * Attaches the mouse-over hint of a label key to a control.
+     * <p>
+     * The hint is read from {@code <key>.info}, so a control labelled with an i18n key gets its
+     * tooltip from the same place as its text, and a key without a hint simply gets none instead of
+     * showing a missing-key marker.
+     *
+     * @param actor The control to annotate.
+     * @param key   The i18n key the control is labelled with.
+     *
+     * @param <T> The actor type.
+     *
+     * @return The same actor, so this can wrap a constructor call.
+     */
+    protected <T extends Actor> T tip(T actor, String key) {
+        if (actor != null && I18n.hasMessage(key + ".info")) {
+            actor.addListener(new OwnTextTooltip(I18n.msg(key + ".info"), skin));
+        }
+        return actor;
+    }
 
     /**
      * @param entity An entity of this window, possibly null.
@@ -364,6 +402,8 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
         var seedLabel = new OwnLabel(I18n.msg("gui.galaxy.randomize.seed"), skin);
         var seedValidator = new LongValidator(-999999L, 999999L);
         var seedField = new OwnTextField(Long.toString(getSeed()), skin, seedValidator);
+        tip(seedField, "gui.galaxy.randomize.seed");
+        tip(seedLabel, "gui.galaxy.randomize.seed");
         seedField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -376,6 +416,8 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
 
         var morphologyLabel = new OwnLabel(I18n.msg("gui.galaxy.morphology"), skin);
         morphologyBox = new OwnSelectBox<>(skin);
+        tip(morphologyBox, "gui.galaxy.morphology");
+        tip(morphologyLabel, "gui.galaxy.morphology");
         morphologyBox.setItems(GalaxyMorphology.values());
         if (morphology != null) {
             morphologyBox.setSelected(morphology);
@@ -404,6 +446,7 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
 
     private void buildSize() {
         sizeSlider = new OwnSliderPlus(I18n.msg("gui.galaxy.size"), 0.2f, 40.0f, 0.1f, skin);
+        tip(sizeSlider, "gui.galaxy.size");
         sizeSlider.setWidth(FIELD_WIDTH_TOTAL);
         sizeSlider.setValue((float) (getSize() * Constants.U_TO_KPC));
         sizeSlider.addListener(new ChangeListener() {
@@ -418,6 +461,7 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
 
     private void buildPosition() {
         var position = new OwnTextButton(I18n.msg("gui.galaxy.pos"), skin);
+        tip(position, "gui.galaxy.pos");
         position.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -442,8 +486,11 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
         float rotMax = 180.0f;
         float rotStep = (rotMax - rotMin) / SLIDER_STEPS;
         var rx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rx"), rotMin, rotMax, rotStep, 0f, skin);
+        tip(rx, "gui.galaxy.ds.rx");
         var ry = new OwnSliderReset(I18n.msg("gui.galaxy.ds.ry"), rotMin, rotMax, rotStep, 0f, skin);
+        tip(ry, "gui.galaxy.ds.ry");
         var rz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rz"), rotMin, rotMax, rotStep, 0f, skin);
+        tip(rz, "gui.galaxy.ds.rz");
 
         rx.setWidth(THIRD_WIDTH_BOX);
         rx.setValue(euler[0]);
@@ -478,6 +525,7 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
 
         // Generate
         var generate = new OwnTextIconButton(I18n.msg("gui.galaxy.generate"), skin, "generate");
+        tip(generate, "gui.galaxy.generate");
         generate.setColor(ColorUtils.gGreenC);
         generate.setWidth(BUTTON_WIDTH);
         generate.pad(pad10, pad20, pad10, pad20);
@@ -512,6 +560,7 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
                 ? morphologyBox.getSelected().name()
                 : GalaxyMorphology.Sc.name();
         randomizeButton = new OwnTextIconButton(I18n.msg("gui.galaxy.randomize", morphologyName), skin, "random");
+        tip(randomizeButton, "gui.galaxy.randomize");
         randomizeButton.setColor(ColorUtils.gYellowC);
         randomizeButton.setWidth(BUTTON_WIDTH - 80f);
         randomizeButton.pad(pad10, pad20, pad10, pad20);
@@ -531,6 +580,712 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
         content.add(buttonsTop).center().padTop(pad34).padBottom(pad20).row();
         content.add(new Separator(skin, "gray")).fillX().expandX().padBottom(pad20).row();
         content.add(buttonsBottom).center();
+    }
+
+    protected OwnTextIconButton newAddChannelButton(Entity entity, String key, float buttonWidth) {
+        var button = new OwnTextIconButton(I18n.msg(key), skin, "new");
+        button.setWidth(buttonWidth);
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                GaiaSky.postRunnable(() -> {
+                    var bb = Mapper.billboardSet.get(entity);
+                    var ds = bb.datasets;
+                    var newDs = new BillboardDataset[ds.length + 1];
+                    System.arraycopy(ds, 0, newDs, 0, ds.length);
+
+                    var dataset = new BillboardDataset();
+                    dataset.setType(ChannelType.POINT);
+                    dataset.setLayers(new int[]{0, 1, 2});
+                    dataset.setBaseColor(new double[]{0.8, 0.8, 0.8});
+                    dataset.setMaxSize(20.0);
+                    newDs[ds.length] = dataset;
+
+                    bb.datasets = newDs;
+
+                    rebuild();
+                });
+            }
+        });
+        button.pad(pad10, pad20, pad10, pad20);
+        button.addListener(new OwnTextTooltip(I18n.msg(key + ".info"), skin));
+        return button;
+    }
+
+    /**
+     * @return The channel types that a billboard dataset may take in this window. All of them by
+     *         default; a window that draws the diffuse channels some other way narrows this to the
+     *         ones it actually samples as particles.
+     */
+    protected ChannelType[] getBillboardChannelTypes() {
+        return ChannelType.values();
+    }
+
+    /**
+     * @param current The type the dataset being edited has, or null.
+     *
+     * @return The channel types of {@link #getBillboardChannelTypes()} as select box items. A type the
+     *         window does not offer - one loaded from a file, say - is appended so that the box can
+     *         still show the dataset as it is instead of failing to select anything.
+     */
+    private Array<ComboBoxBean<ChannelType>> billboardChannelBeans(ChannelType current) {
+        var allowed = new Array<>(getBillboardChannelTypes());
+        if (current != null && !allowed.contains(current, true)) {
+            allowed.add(current);
+        }
+        return new Array<>(ComboBoxBean.getValues(allowed));
+    }
+
+    /**
+     * Adds the billboard datasets of the given entity to the given table.
+     *
+     * @param entity          The entity.
+     * @param datasetsTable   The table.
+     * @param thirdWidthBox   The 1/3 width.
+     * @param halfWidthBox    The half width.
+     * @param fullWidthBox    The bull width.
+     * @param tabContentWidth The tab content width.
+     */
+    protected void addBillboardDatasets(Entity entity, Table datasetsTable, float thirdWidthBox, float halfWidthBox, float fullWidthBox, float tabContentWidth) {
+        if (entity == null) {
+            return;
+        }
+        final var cpSize = 32f;
+        var render = Mapper.render.get(entity);
+        var billboard = Mapper.billboardSet.get(entity);
+        var datasets = billboard.datasets;
+        var half = render.halfResolutionBuffer;
+        int channel = 0;
+        for (var ds : datasets) {
+            var dsTable = new Table(skin);
+            // Type
+            OwnSelectBox<ComboBoxBean<ChannelType>> type = new OwnSelectBox<>(skin);
+            var typeBeans = billboardChannelBeans(ds.type);
+            type.setItems(typeBeans);
+            type.setWidth(halfWidthBox);
+            // Selected by value, not by ordinal: the offered list is a subset of the enum.
+            for (int i = 0; i < typeBeans.size; i++) {
+                if (typeBeans.get(i).value == ds.type) {
+                    type.setSelectedIndex(i);
+                    break;
+                }
+            }
+            type.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.type = type.getSelected().value;
+                    if (ds.type == ChannelType.DUST) {
+                        GaiaSky.postRunnable(() -> {
+                            // Subtractive blending.
+                            ds.setBlending(BlendMode.SUBTRACTIVE);
+                            ds.setDepthMask(false);
+                        });
+                    }
+                    rebuild();
+                }
+            });
+            tip(type, "gui.galaxy.ds.type");
+            OwnLabel typeLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.type"), skin);
+            typeLabel.setWidth(halfWidthBox);
+
+            dsTable.add(typeLabel).left().padRight(pad20).padBottom(pad18);
+            dsTable.add(type).left().padBottom(pad18).row();
+
+            // Distribution
+            OwnSelectBox<ComboBoxBean<Distribution>> distribution = new OwnSelectBox<>(skin);
+            distribution.setItems(ComboBoxBean.getValues(Distribution.class));
+            distribution.setWidth(halfWidthBox);
+            distribution.setSelectedIndex(ds.distribution.ordinal());
+            distribution.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.distribution = distribution.getSelected().value;
+                    rebuild();
+                    regenerate();
+                }
+            });
+            tip(distribution, "gui.galaxy.ds.distribution");
+            OwnLabel distributionLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.distribution"), skin);
+            distributionLabel.setWidth(halfWidthBox);
+
+            dsTable.add(distributionLabel).left().padRight(pad20).padBottom(pad18);
+            dsTable.add(distribution).left().padBottom(pad18).row();
+
+            // Num particles
+            float nMin = ds.type.nParticles[0];
+            float nMax = ds.type.nParticles[1];
+            float nStep = (nMax - nMin) / SLIDER_STEPS;
+            var nParticles = new OwnSliderReset(I18n.msg("gui.galaxy.ds.particles"), nMin, nMax, nStep, nMin + (nMax - nMin) / 2, skin);
+            tip(nParticles, "gui.galaxy.ds.particles");
+            nParticles.setNumberFormatter(new DecimalFormat("#####0"));
+            nParticles.setWidth(fullWidthBox);
+            nParticles.setValue(ds.particleCount);
+            nParticles.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setParticleCount((long) nParticles.getValue());
+                }
+            });
+            dsTable.add(nParticles).colspan(2).left().padBottom(pad18).row();
+
+            // Dataset translation, XYZ
+            float transMin = -1.0f;
+            float transMax = 1.0f;
+            float transStep = (transMax - transMin) / SLIDER_STEPS;
+            var x = new OwnSliderReset(I18n.msg("gui.galaxy.ds.x"), transMin, transMax, transStep, 0f, skin);
+            tip(x, "gui.galaxy.ds.x");
+            x.setWidth(thirdWidthBox);
+            x.setValue(ds.translation.x);
+            x.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.translation.x = x.getValue();
+                }
+            });
+            var y = new OwnSliderReset(I18n.msg("gui.galaxy.ds.y"), transMin, transMax, transStep, 0f, skin);
+            tip(y, "gui.galaxy.ds.y");
+            y.setWidth(thirdWidthBox);
+            y.setValue(ds.translation.y);
+            y.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.translation.y = y.getValue();
+                }
+            });
+            var z = new OwnSliderReset(I18n.msg("gui.galaxy.ds.z"), transMin, transMax, transStep, 0f, skin);
+            tip(z, "gui.galaxy.ds.z");
+            z.setWidth(thirdWidthBox);
+            z.setValue(ds.translation.z);
+            z.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.translation.z = z.getValue();
+                }
+            });
+            Table translationTable = new Table(skin);
+            translationTable.add(x).left().padRight(PAD5);
+            translationTable.add(y).left().padRight(PAD5);
+            translationTable.add(z).left();
+            dsTable.add(translationTable).colspan(2).left().padBottom(pad18).row();
+
+            // Dataset rotation
+            float rotMin = -180.0f;
+            float rotMax = 180.0f;
+            float rotStep = (rotMax - rotMin) / SLIDER_STEPS;
+            var rx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rx"), rotMin, rotMax, rotStep, 0f, skin);
+            tip(rx, "gui.galaxy.ds.rx");
+            rx.setWidth(thirdWidthBox);
+            rx.setValue(ds.rotation.x);
+            rx.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.rotation.x = rx.getValue();
+                }
+            });
+            var ry = new OwnSliderReset(I18n.msg("gui.galaxy.ds.ry"), rotMin, rotMax, rotStep, 0f, skin);
+            tip(ry, "gui.galaxy.ds.ry");
+            ry.setWidth(thirdWidthBox);
+            ry.setValue(ds.rotation.y);
+            ry.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.rotation.y = ry.getValue();
+                }
+            });
+            var rz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.rz"), rotMin, rotMax, rotStep, 0f, skin);
+            tip(rz, "gui.galaxy.ds.rz");
+            rz.setWidth(thirdWidthBox);
+            rz.setValue(ds.rotation.z);
+            rz.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.rotation.z = rz.getValue();
+                }
+            });
+            Table rotTable = new Table(skin);
+            rotTable.add(rx).left().padRight(PAD5);
+            rotTable.add(ry).left().padRight(PAD5);
+            rotTable.add(rz).left();
+            dsTable.add(rotTable).colspan(2).left().padBottom(pad18).row();
+
+            // Dataset scale
+            float sMin = -3.0f;
+            float sMax = 3.0f;
+            float sStep = (sMax - sMin) / SLIDER_STEPS;
+            var sx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sx"), sMin, sMax, sStep, 1f, skin);
+            tip(sx, "gui.galaxy.ds.sx");
+            sx.setWidth(thirdWidthBox);
+            sx.setValue(ds.scale.x);
+            sx.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.scale.x = sx.getValue();
+                }
+            });
+            var sy = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sy"), sMin, sMax, sStep, 1f, skin);
+            tip(sy, "gui.galaxy.ds.sy");
+            sy.setWidth(thirdWidthBox);
+            sy.setValue(ds.scale.y);
+            sy.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.scale.y = sy.getValue();
+                }
+            });
+            var sz = new OwnSliderReset(I18n.msg("gui.galaxy.ds.sz"), sMin, sMax, sStep, 1f, skin);
+            tip(sz, "gui.galaxy.ds.sz");
+            sz.setWidth(thirdWidthBox);
+            sz.setValue(ds.scale.z);
+            sz.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.scale.z = sz.getValue();
+                }
+            });
+            var sclTable = new Table(skin);
+            sclTable.add(sx).left().padRight(PAD5);
+            sclTable.add(sy).left().padRight(PAD5);
+            sclTable.add(sz).left();
+            dsTable.add(sclTable).colspan(2).left().padBottom(pad18).row();
+
+            // Colors and color noise
+            var cLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.color"), skin);
+            var c1 = new ColorPicker("c1", ds.getColorRGBA(0), stage, skin);
+            tip(c1, "gui.galaxy.ds.color");
+            tip(cLabel, "gui.galaxy.ds.color");
+            c1.setNewColorRunnable(() -> {
+                ds.setColorRGBA(c1.color(), 0);
+            });
+            var c2 = new ColorPicker("c2", ds.getColorRGBA(1), stage, skin);
+            tip(c2, "gui.galaxy.ds.color");
+            c2.setNewColorRunnable(() -> {
+                ds.setColorRGBA(c2.color(), 1);
+            });
+            var c3 = new ColorPicker("c3", ds.getColorRGBA(2), stage, skin);
+            tip(c3, "gui.galaxy.ds.color");
+            c3.setNewColorRunnable(() -> {
+                ds.setColorRGBA(c3.color(), 2);
+            });
+            var c4 = new ColorPicker("c4", ds.getColorRGBA(3), stage, skin);
+            tip(c4, "gui.galaxy.ds.color");
+            c4.setNewColorRunnable(() -> {
+                ds.setColorRGBA(c4.color(), 3);
+            });
+            var colorsTable = new Table(skin);
+            colorsTable.add(cLabel).left().padRight(pad34);
+            colorsTable.add(c1).size(cpSize).left().padRight(pad10);
+            colorsTable.add(c2).size(cpSize).left().padRight(pad10);
+            colorsTable.add(c3).size(cpSize).left().padRight(pad10);
+            colorsTable.add(c4).size(cpSize).left().padRight(pad10);
+            var colorNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.color.noise"), 0.0f, 1f, 0.01f, 0f, skin);
+            tip(colorNoise, "gui.galaxy.ds.color.noise");
+            colorNoise.setWidth(halfWidthBox);
+            colorNoise.setValue(ds.colorNoise);
+            colorNoise.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setColorNoise((double) colorNoise.getValue());
+                }
+            });
+            dsTable.add(colorsTable).left().padRight(PAD5).padBottom(pad18);
+            dsTable.add(colorNoise).left().padBottom(pad18).row();
+
+            if (ds.distribution.isFlat()) {
+                // Warp
+                var warp = new OwnSliderReset(I18n.msg("gui.galaxy.ds.warp"), ds.type.warpStrength[0], ds.type.warpStrength[1], 0.001f, 0f, skin);
+                tip(warp, "gui.galaxy.ds.warp");
+                warp.setWidth(fullWidthBox);
+                warp.setValue(ds.warpStrength);
+                warp.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setWarpStrength((double) warp.getValue());
+                    }
+                });
+                dsTable.add(warp).colspan(2).left().padBottom(pad18).row();
+
+                // Height scale
+                var heightScale = new OwnSliderReset(I18n.msg("gui.galaxy.ds.height.scale"), 0.0f, 0.2f, 0.001f, 0.01f, skin);
+                tip(heightScale, "gui.galaxy.ds.height.scale");
+                heightScale.setWidth(halfWidthBox);
+                heightScale.setValue(ds.heightScale);
+                heightScale.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setHeightScale((double) heightScale.getValue());
+                    }
+                });
+
+                // Height profile
+                OwnSelectBox<HeightProfile> heightProfile = new OwnSelectBox<>(skin);
+                heightProfile.setItems(HeightProfile.values());
+                heightProfile.setWidth(halfWidthBox);
+                heightProfile.setSelected(ds.heightProfile);
+                heightProfile.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.heightProfile = heightProfile.getSelected();
+                    }
+                });
+                tip(heightProfile, "gui.galaxy.ds.height.profile");
+                OwnLabel heightProfileLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.height.profile"), skin);
+                heightProfileLabel.setWidth(halfWidthBox);
+
+                dsTable.add(heightProfile).left().padBottom(pad18).padRight(PAD5);
+                dsTable.add(heightScale).left().padBottom(pad18).row();
+
+            }
+
+            // Bar only has base_radius. All the others have also min_radius.
+            // Min and base radii
+            float minRadMin = ds.type.minRadius[0];
+            float minRadMax = ds.type.minRadius[1];
+            float minRadStep = (minRadMax - minRadMin) / SLIDER_STEPS;
+            var minRadius = new OwnSliderReset(I18n.msg("gui.galaxy.ds.radius.min"),
+                                               minRadMin,
+                                               minRadMax,
+                                               minRadStep,
+                                               minRadMin + (minRadMax - minRadMin) / 2f,
+                                               skin);
+            tip(minRadius, "gui.galaxy.ds.radius.min");
+            minRadius.setWidth(halfWidthBox);
+            minRadius.setValue(ds.minRadius);
+            minRadius.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setMinRadius((double) minRadius.getValue());
+                }
+            });
+            float baseRadMin = ds.type.baseRadius[0];
+            float baseRadMax = ds.type.baseRadius[1];
+            float baseRadStep = (baseRadMax - baseRadMin) / SLIDER_STEPS;
+            var baseRadius = new OwnSliderReset(I18n.msg("gui.galaxy.ds.radius.base"),
+                                                baseRadMin,
+                                                baseRadMax,
+                                                baseRadStep,
+                                                baseRadMin + (baseRadMax - baseRadMin) / 2f,
+                                                skin);
+            tip(baseRadius, "gui.galaxy.ds.radius.base");
+            baseRadius.setWidth(ds.distribution.isBar() ? fullWidthBox : halfWidthBox);
+            baseRadius.setValue(ds.baseRadius);
+            baseRadius.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setBaseRadius((double) baseRadius.getValue());
+                }
+            });
+            if (!ds.distribution.isBar()) {
+                dsTable.add(minRadius).left().padRight(PAD5).padBottom(pad18);
+                dsTable.add(baseRadius).left().padBottom(pad18).row();
+            } else {
+                dsTable.add(baseRadius).colspan(2).left().padBottom(pad18).row();
+            }
+
+            // Particle size and size noise
+            float sizeMin = ds.type.size[0];
+            float sizeMax = ds.type.size[1];
+            var size = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size"), sizeMin, sizeMax, true, sizeMin + (sizeMax - sizeMin) / 2f, skin);
+            tip(size, "gui.galaxy.ds.size");
+            size.setNumberFormatter(new DecimalFormat("######0.########"));
+            size.setDisplayValueMapped(true);
+            size.setLogarithmicExponent(4.0);
+            size.setWidth(thirdWidthBox + 115f);
+            size.setMappedValue(ds.size);
+            size.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setSize((double) size.getMappedValue());
+                }
+            });
+            var sizeMask = new OwnCheckBox(I18n.msg("gui.galaxy.ds.size.perlin"), skin, 4f);
+            tip(sizeMask, "gui.galaxy.ds.size.perlin");
+            sizeMask.setChecked(ds.sizeMask);
+            sizeMask.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    ds.setSizeMask(sizeMask.isChecked());
+                    if (ds.sizeMask) {
+                        ds.sizeNoise = 20f;
+                    } else {
+                        ds.sizeNoise = 0.2f;
+                    }
+                    GaiaSky.postRunnable(() -> {
+                        rebuild();
+                    });
+                }
+            });
+            OwnSliderReset sizeNoise;
+            if (ds.sizeMask) {
+                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.scale"), 1.0f, 50f, 0.01f, 0f, skin);
+                tip(sizeNoise, "gui.galaxy.ds.size.scale");
+            } else {
+                sizeNoise = new OwnSliderReset(I18n.msg("gui.galaxy.ds.size.noise"), 0.0f, 1f, 0.01f, 10f, skin);
+                tip(sizeNoise, "gui.galaxy.ds.size.noise");
+            }
+            sizeNoise.setWidth(thirdWidthBox);
+            sizeNoise.setValue(ds.sizeNoise);
+            sizeNoise.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.sizeNoise = sizeNoise.getValue();
+                }
+            });
+            var sizeTable = new Table(skin);
+            sizeTable.add(size).left().padRight(pad34);
+            sizeTable.add(sizeMask).right().padRight(PAD5);
+            sizeTable.add(sizeNoise).left().padRight(PAD5);
+
+            dsTable.add(sizeTable).colspan(2).left().padBottom(pad18).row();
+
+            // Intensity
+            float iMin = ds.type.intensity[0];
+            float iMax = ds.type.intensity[1];
+            float iStep = (iMax - iMin) / SLIDER_STEPS;
+            var intensity = new OwnSliderReset(I18n.msg("gui.galaxy.ds.intensity"), iMin, iMax, iStep, iMin + (iMax - iMin) / 2f, skin);
+            tip(intensity, "gui.galaxy.ds.intensity");
+            intensity.setDisplayValueMapped(true);
+            intensity.setNumberFormatter(new DecimalFormat("#0.######"));
+            intensity.setWidth(fullWidthBox);
+            intensity.setMappedValue(ds.intensity);
+            intensity.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    ds.setIntensity((double) intensity.getMappedValue());
+                }
+            });
+            dsTable.add(intensity).colspan(2).left().padBottom(pad18).row();
+
+            if (ds.distribution.isLogarithmicSpiral()) {
+                // Number of arms
+                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 1f, 8f, 1f, 4f, skin);
+                tip(numArms, "gui.galaxy.ds.arm.number");
+                numArms.setNumberFormatter(new DecimalFormat("#0"));
+                numArms.setWidth(halfWidthBox);
+                numArms.setValue(ds.numArms);
+                numArms.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setSpiralArms((long) numArms.getValue());
+                    }
+                });
+                // Arm sigma
+                float minSigma = ds.type.armSigma[0];
+                float maxSigma = ds.type.armSigma[1];
+                float stepSigma = (maxSigma - minSigma) / SLIDER_STEPS;
+                var armSigma = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.sigma"), minSigma, maxSigma, stepSigma, 0.2f, skin);
+                tip(armSigma, "gui.galaxy.ds.arm.sigma");
+                armSigma.setNumberFormatter(new DecimalFormat("#0.####"));
+                armSigma.setWidth(halfWidthBox);
+                armSigma.setValue(ds.armSigma);
+                armSigma.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setArmSigma((double) armSigma.getValue());
+                    }
+                });
+
+                dsTable.add(numArms).left().padRight(PAD5).padBottom(pad18);
+                dsTable.add(armSigma).left().padBottom(pad18).row();
+            }
+            if (ds.distribution.isDensityWaveSpiral()) {
+                // Number of arms
+                var numArms = new OwnSliderReset(I18n.msg("gui.galaxy.ds.arm.number"), 2f, 4f, 2f, 4f, skin);
+                tip(numArms, "gui.galaxy.ds.arm.number");
+                numArms.setNumberFormatter(new DecimalFormat("#0"));
+                numArms.setWidth(fullWidthBox);
+                numArms.setValue(ds.numArms);
+                numArms.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setSpiralArms((long) numArms.getValue());
+                    }
+                });
+                dsTable.add(numArms).colspan(2).left().padBottom(pad18).row();
+            }
+
+            if (ds.distribution.isAnySpiral()) {
+                // Spiral angle
+                float angleMin = ds.type.baseAngle[0];
+                float angleMax = ds.type.baseAngle[1];
+                var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"),
+                                                   angleMin,
+                                                   angleMax,
+                                                   true,
+                                                   angleMin + (angleMax - angleMin) / 2f,
+                                                   skin);
+                tip(baseAngle, "gui.galaxy.ds.angle");
+                baseAngle.setLogarithmicExponent(1.2);
+                baseAngle.setNumberFormatter(new DecimalFormat("##0.###"));
+                baseAngle.setWidth(fullWidthBox);
+                baseAngle.setValue(ds.baseAngle);
+                baseAngle.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setBaseAngle((double) baseAngle.getValue());
+                    }
+                });
+                dsTable.add(baseAngle).colspan(2).left().padBottom(pad18).row();
+            }
+
+            if (ds.distribution.isDensityWaveSpiral()) {
+                // Single eccentricity.
+                float eMin = ds.type.eccentricity[0];
+                float eMax = ds.type.eccentricity[1];
+                float eStep = (eMax - eMin) / SLIDER_STEPS;
+                var ec = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity"), eMin, eMax, eStep, 0.3f, skin);
+                tip(ec, "gui.galaxy.ds.eccentricity");
+                ec.setNumberFormatter(new DecimalFormat("0.####"));
+                ec.setWidth(fullWidthBox);
+                ec.setValue(ds.eccentricity[0]);
+                ec.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setEccentricity((double) ec.getValue());
+                    }
+                });
+                dsTable.add(ec).colspan(2).left().padBottom(pad18).row();
+            } else if (ds.distribution.isEllipsoid()) {
+                // Eccentricity in X and Y.
+                float eMin = ds.type.eccentricity[0];
+                float eMax = ds.type.eccentricity[1];
+                float eStep = (eMax - eMin) / SLIDER_STEPS;
+                var ecx = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.x"), eMin, eMax, eStep, 0.0f, skin);
+                tip(ecx, "gui.galaxy.ds.eccentricity.x");
+                ecx.setNumberFormatter(new DecimalFormat("0.####"));
+                ecx.setWidth(halfWidthBox);
+                ecx.setValue(ds.eccentricity[0]);
+                ecx.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setEccentricityX((double) ecx.getValue());
+                    }
+                });
+                var ecy = new OwnSliderReset(I18n.msg("gui.galaxy.ds.eccentricity.y"), eMin, eMax, eStep, 0.0f, skin);
+                tip(ecy, "gui.galaxy.ds.eccentricity.y");
+                ecy.setNumberFormatter(new DecimalFormat("0.####"));
+                ecy.setWidth(halfWidthBox);
+                ecy.setValue(ds.eccentricity[1]);
+                ecy.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setEccentricityY((double) ecy.getValue());
+                    }
+                });
+                dsTable.add(ecy).left().padRight(PAD5).padBottom(pad18);
+                dsTable.add(ecx).left().padBottom(pad18).row();
+            }
+
+            if (ds.distribution.isDensityWaveSpiral()) {
+                // Displacement in x and y
+                float dMin = ds.type.spiralDeltaPos[0];
+                float dMax = ds.type.spiralDeltaPos[1];
+                float dStep = (dMax - dMin) / SLIDER_STEPS;
+                var deltaX = new OwnSliderReset(I18n.msg("gui.galaxy.ds.delta.x"), dMin, dMax, dStep, 0f, skin);
+                tip(deltaX, "gui.galaxy.ds.delta.x");
+                deltaX.setWidth(halfWidthBox);
+                deltaX.setValue(ds.spiralDeltaPos[0]);
+                deltaX.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.spiralDeltaPos[0] = deltaX.getValue();
+                    }
+                });
+                var deltaY = new OwnSliderReset(I18n.msg("gui.galaxy.ds.delta.y"), dMin, dMax, dStep, 0f, skin);
+                tip(deltaY, "gui.galaxy.ds.delta.y");
+                deltaY.setWidth(halfWidthBox);
+                deltaY.setValue(ds.spiralDeltaPos[1]);
+                deltaY.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.spiralDeltaPos[1] = deltaY.getValue();
+                    }
+                });
+                dsTable.add(deltaX).left().padRight(PAD5).padBottom(pad18);
+                dsTable.add(deltaY).left().padBottom(pad18).row();
+            }
+
+            if (ds.distribution.isBar()) {
+                // Aspect
+                float aspectMin = ds.type.aspect[0];
+                float aspectMax = ds.type.aspect[1];
+                float aspectStep = (aspectMax - aspectMin) / SLIDER_STEPS;
+                var aspect = new OwnSliderReset(I18n.msg("gui.galaxy.ds.aspect"), aspectMin, aspectMax, aspectStep, 1f, skin);
+                tip(aspect, "gui.galaxy.ds.aspect");
+                aspect.setNumberFormatter(new DecimalFormat("#0.###"));
+                aspect.setWidth(fullWidthBox);
+                aspect.setValue(ds.aspect);
+                aspect.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event,
+                                        Actor actor) {
+                        ds.setAspect((double) aspect.getMappedValue());
+                    }
+                });
+                dsTable.add(aspect).colspan(2).left().padBottom(pad18).row();
+            }
+
+            // Delete dataset (top icon)
+            var delete = new OwnTextIconButton("", skin, "rubbish");
+            tip(delete, "gui.galaxy.delete");
+            delete.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    var e = entity;
+                    var bb = Mapper.billboardSet.get(e);
+                    bb.removeDataset(ds);
+                    EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, this, Mapper.render.get(e));
+                    rebuild();
+                }
+            });
+
+            // Header
+            String key = "gui.galaxy.channel." + (half ? "half" : "full");
+            String name = ds.type.name();
+            String title = I18n.msg(key, channel, name);
+            CollapsiblePane groupPane = new CollapsiblePane(stage, title,
+                                                            dsTable, tabContentWidth, skin, "header-s", "expand-collapse",
+                                                            null, isExpanded(ds), null, delete);
+            // Update set of expanded datasets whenever this group pane is expanded or collapsed.
+            groupPane.setExpandCollapseRunnable(() -> {
+                var expanded = groupPane.isExpanded();
+                setExpanded(ds, expanded);
+            });
+
+            datasetsTable.add(groupPane).padBottom(pad18).row();
+            channel++;
+        }
     }
 
     @Override

@@ -1125,8 +1125,29 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
                                                           double radius,
                                                           Vector3Q pos,
                                                           GalaxyGenerator.GalaxyMorphology morphology) {
+        return createNewProceduralGalaxy(name, radius, pos, morphology, PROCEDURAL_GALAXY_SEED);
+    }
+
+    /**
+     * Same as {@link #createNewProceduralGalaxy(String, double, Vector3Q, GalaxyGenerator.GalaxyMorphology)},
+     * with an explicit seed. A window that generates galaxies from a seed field needs this so that
+     * the galaxy it creates matches the seed it shows.
+     *
+     * @param name       The name of the entity.
+     * @param radius     The radius of the galaxy in internal units.
+     * @param pos        The position of the galaxy.
+     * @param morphology The morphology, or null to pick one at random.
+     * @param seed       The seed of the draw.
+     *
+     * @return The full-resolution and half-resolution billboard entities, in a pair.
+     */
+    public Pair<Entity, Entity> createNewProceduralGalaxy(String name,
+                                                          double radius,
+                                                          Vector3Q pos,
+                                                          GalaxyGenerator.GalaxyMorphology morphology,
+                                                          long seed) {
         var generator = new GalaxyGenerator();
-        var channels = generator.generateGalaxy(morphology, PROCEDURAL_GALAXY_SEED);
+        var channels = generator.generateGalaxy(morphology, seed);
         var full = channels.getFirst();
         var half = channels.getSecond();
 
