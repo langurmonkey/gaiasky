@@ -237,6 +237,21 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
     }
 
     /**
+     * @param entity A galaxy entity, possibly null.
+     *
+     * @return Whether it carries a volume half. This is what tells a hybrid galaxy - a billboard
+     *         entity plus a {@code Volume} child - from a billboard-only one, which has a
+     *         half-resolution billboard entity as its child instead.
+     */
+    protected boolean hasVolumeChild(Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+        var graph = Mapper.graph.get(entity);
+        return graph != null && graph.getFirstChildOfType(scene.archetypes().get("Volume")) != null;
+    }
+
+    /**
      * @param entity An entity of this window, possibly null.
      *
      * @return Its body component, or null if the entity or the component is not there. Subclasses

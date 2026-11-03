@@ -181,7 +181,11 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     @Override
     protected boolean isEditableFocus(FocusView view) {
-        return view.getEntity() != null && (view.isBillboardDataset() || Mapper.volume.has(view.getEntity()));
+        // Either a volume entity handed over by a script or the billboard entity of a hybrid
+        // galaxy. A billboard-only galaxy belongs to the billboard window, and accepting it here
+        // would make both windows follow the same focus.
+        var entity = view.getEntity();
+        return entity != null && (Mapper.volume.has(entity) || (view.isBillboardDataset() && hasVolumeChild(entity)));
     }
 
     @Override

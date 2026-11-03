@@ -390,6 +390,80 @@ public class MainGui extends AbstractGui {
         return false;
     }
 
+    /** Name of the volume galaxy window: a single instance, retargeted rather than duplicated. **/
+    private static final String GALAXY_VOL_WINDOW_NAME = "procedural-vol-gal-window";
+    /** Name of the billboard galaxy window, likewise a single instance. **/
+    private static final String GALAXY_BB_WINDOW_NAME = "procedural-gal-window";
+
+    /**
+     * Opens the procedural galaxy window for an object, or for a new one, or retargets the window
+     * that is already open.
+     * <p>
+     * Which window is opened follows the structure of the object being edited, so that opening an
+     * existing galaxy shows the editors that object can actually be edited with: a hybrid one
+     * (billboard entity plus a {@code Volume} child) gets the volume window, a billboard-only one
+     * gets the billboard window. New galaxies are hybrid, so they get the volume window; its own
+     * "generate billboards only" toggle is what switches one to the other pipeline.
+     *
+     * @param focus      The galaxy to edit, or null to create a new one.
+     * @param morphology The morphology of the new galaxy; unused when {@code focus} is not null.
+     * @param name       The name of the new galaxy; unused when {@code focus} is not null.
+     */
+    private void showGalaxyGenWindow(FocusView focus,
+                                     GalaxyMorphology morphology,
+                                     String name) {
+        if (focus != null && !isHybridGalaxy(focus.getEntity())) {
+            showBillboardGenWindow(focus);
+        } else {
+            showVolumeGenWindow(focus, morphology, name);
+        }
+    }
+
+    /**
+     * @param entity A galaxy entity, possibly the billboard top-level one.
+     *
+     * @return Whether it carries a volume half. A billboard galaxy has a half-resolution billboard
+     *         entity as its child instead.
+     */
+    private boolean isHybridGalaxy(Entity entity) {
+        var graph = Mapper.graph.get(entity);
+        return graph != null && graph.getFirstChildOfType(scene.archetypes().get("Volume")) != null;
+    }
+
+    private void showVolumeGenWindow(FocusView focus,
+                                     GalaxyMorphology morphology,
+                                     String name) {
+        var existing = findActor(GALAXY_VOL_WINDOW_NAME);
+        if (existing != null && existing.hasParent() && existing instanceof ProceduralVolumeGalaxyWindow window) {
+            if (focus != null) {
+                window.reinitialize(focus);
+                existing.setVisible(true);
+            } else if (!existing.isVisible()) {
+                // A hidden window is reused for a new object, so the name field keeps its meaning.
+                window.reinitialize(null);
+                existing.setVisible(true);
+            }
+            return;
+        }
+        var window = focus != null
+                ? new ProceduralVolumeGalaxyWindow(focus, scene, stage, skin)
+                : new ProceduralVolumeGalaxyWindow(name, morphology, scene, stage, skin);
+        window.setName(GALAXY_VOL_WINDOW_NAME);
+        window.show(stage);
+    }
+
+    private void showBillboardGenWindow(FocusView focus) {
+        var existing = findActor(GALAXY_BB_WINDOW_NAME);
+        if (existing != null && existing.hasParent() && existing instanceof ProceduralBillboardGalaxyWindow window) {
+            window.reinitialize(focus);
+            existing.setVisible(true);
+            return;
+        }
+        var window = new ProceduralBillboardGalaxyWindow(focus, scene, stage, skin);
+        window.setName(GALAXY_BB_WINDOW_NAME);
+        window.show(stage);
+    }
+
     @Override
     public void update(double dt) {
         stage.act((float) dt);
@@ -425,11 +499,16 @@ public class MainGui extends AbstractGui {
                 var focus = (FocusView) data[0];
                 GalaxyMorphology morphology = data.length == 1 ? GalaxyMorphology.Sb : (GalaxyMorphology) data[1];
 
-                if (focus == null || !focus.isValid() || !focus.isBillboardDataset()) {
+                // A hybrid galaxy is focused through its billboard entity; its volume child is not
+                // focusable, but a script may still hand it over.
+                if (focus == null || !focus.isValid()
+                        || !(focus.isBillboardDataset() || Mapper.volume.has(focus.getEntity()))) {
                     focus = null;
                 }
-                // Ask for name
-                if (focus == null) {
+                if (focus != null) {
+                    showGalaxyGenWindow(focus, morphology, null);
+                } else {
+                    // Ask for name
                     GenericDialog nameDialog = new GenericDialog(I18n.msg("gui.galaxy.new"), skin, stage) {
                         private String name;
                         private OwnTextField nameField;
@@ -446,21 +525,9 @@ public class MainGui extends AbstractGui {
 
                         @Override
                         protected boolean accept() {
-                            var w = findActor("procedural-gal-window");
-                            // Only one instance
-                            if (w != null && w.hasParent() && w instanceof ProceduralBillboardGalaxyWindow ggw) {
-                                if (!w.isVisible()) {
-                                    ggw.reinitialize(null);
-                                    w.setVisible(true);
-                                }
-                            } else {
-                                if (nameField.getText() != null && !nameField.getText().isEmpty()) {
-                                    name = nameField.getText();
-                                }
-                                ProceduralBillboardGalaxyWindow window = new ProceduralBillboardGalaxyWindow(name, morphology, scene, stage, skin);
-                                window.setName("procedural-gal-window");
-                                window.show(stage);
-                            }
+                            var newName = nameField.getText() != null && !nameField.getText().isEmpty()
+                                    ? nameField.getText() : name;
+                            showGalaxyGenWindow(null, morphology, newName);
                             return true;
                         }
 
@@ -478,17 +545,6 @@ public class MainGui extends AbstractGui {
                     nameDialog.setCancelText(I18n.msg("gui.cancel"));
                     nameDialog.buildSuper();
                     nameDialog.show(stage);
-                } else {
-                    var w = findActor("procedural-gal-window");
-                    // Only one instance
-                    if (w != null && w.hasParent() && w instanceof ProceduralBillboardGalaxyWindow ggw) {
-                        ggw.reinitialize(focus);
-                        w.setVisible(true);
-                    } else {
-                        ProceduralBillboardGalaxyWindow window = new ProceduralBillboardGalaxyWindow(focus, scene, stage, skin);
-                        window.setName("procedural-gal-window");
-                        window.show(stage);
-                    }
                 }
             }
             case SHOW_LAND_AT_LOCATION_CMD -> {

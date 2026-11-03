@@ -125,7 +125,10 @@ public class ProceduralBillboardGalaxyWindow extends AbstractGalaxyGenWindow {
 
     @Override
     protected boolean isEditableFocus(FocusView view) {
-        return view.isBillboardDataset();
+        // A hybrid galaxy is also a billboard dataset, but it is the volume window's: retargeting
+        // this one at it would show a half-resolution pane for an entity that has no billboard
+        // child.
+        return view.isBillboardDataset() && !hasVolumeChild(view.getEntity());
     }
 
     @Override
