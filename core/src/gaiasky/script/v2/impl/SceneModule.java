@@ -1215,14 +1215,19 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         // The label belongs to the billboard entity, which is what the user sees and focuses.
         bodyVolume.labelColor = new float[]{0, 0, 0, 0};
 
+        // The volume is a child of the billboard entity, and a child's position is an offset from
+        // its parent's (GraphUpdater composes translation = parent + body.pos). Putting the galaxy's
+        // absolute position here would place the volume one whole galaxy away from its own stars.
         var coordVolume = Mapper.coordinates.get(entityVolume);
         var coordinatesVolume = new StaticCoordinates();
-        coordinatesVolume.setPosition(pos);
+        coordinatesVolume.setPosition(new Vector3Q());
         coordVolume.coordinates = coordinatesVolume;
 
+        // Fade with the object the user sees, not with itself: a child's own distance to the camera
+        // is measured from its local offset, which is zero here.
         var fadeVolume = Mapper.fade.get(entityVolume);
         fadeVolume.setFadeOut(new double[]{bodyVolume.size * 5, bodyVolume.size * 10});
-        fadeVolume.setFadeObjectName(baseVolume.getName());
+        fadeVolume.setFadeObjectName(name);
 
         var graphVolume = Mapper.graph.get(entityVolume);
         graphVolume.setParent(baseName(entityFull));
@@ -1246,9 +1251,16 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         modelComponent.setParams(params);
         modelComponent.setUseColor(true);
         modelComponent.setBlendMode(BlendMode.ADDITIVE);
-        // The box is a flipped sphere: with back-face culling on, its triangles are all facing
-        // away from a camera outside it and the volume draws nothing at all.
-        modelComponent.setCulling(false);
+        // Culling ON with the flipped winding above is what makes the volume render exactly once per
+        // pixel. The fragment shader does a full camera-to-box intersection and integrates the whole
+        // ray, so it cares about the fragment's view direction and not at all about where on the
+        // sphere the fragment is: two rasterised layers would mean two identical integrals added
+        // together. Flipping the winding turns the far side of the sphere into the front faces, so
+        // back-face culling keeps the far side alone - the one layer there is, whether the camera is
+        // outside the volume or inside it. With culling off the near side draws too: outside the
+        // volume every pixel integrates twice (double brightness, double cost) and just inside the
+        // data appears to halve, because the near hemisphere is then behind the camera and clipped.
+        modelComponent.setCulling(true);
         // The material has to exist before the set-up stage: the generated textures are bound to
         // it, and with lazy initialization nothing would ever initialize a material created after
         // the model was done loading - the entity would render without its volumes, silently.

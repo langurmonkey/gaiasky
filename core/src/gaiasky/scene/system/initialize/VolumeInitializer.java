@@ -47,6 +47,12 @@ public class VolumeInitializer extends AbstractInitSystem {
     /** Set once compute-based volume generation has been reported as unavailable, to log it once. */
     private static boolean generationUnavailableLogged;
 
+    /**
+     * Identity hash codes of the entities with a regeneration queued on the render thread. Used to
+     * coalesce repeated requests for the same entity, which otherwise stack full grid evaluations.
+     */
+    private static final java.util.Set<Integer> pending = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
     public VolumeInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }
@@ -142,12 +148,31 @@ public class VolumeInitializer extends AbstractInitSystem {
         var modelComponent = model.model;
         String entityName = name(entity);
         double sizePc = body.size * Constants.U_TO_PC;
-        GaiaSky.postRunnable(() -> {
-            // The entity may be removed between the request and the next frame.
-            if (volume.isDisposed()) {
+        // Coalesce: every press of Generate posts one of these, and each one evaluates the whole
+        // grid twice per slot. Queueing a second copy of the same work turns a slow click into a
+        // long stall of the render thread.
+        int key = System.identityHashCode(entity);
+        synchronized (pending) {
+            if (!pending.add(key)) {
+                logger.info("Volume regeneration of " + entityName + " is already queued, dropping this request.");
                 return;
             }
-            scheduleGeneration(entityName, volume, modelComponent, sizePc);
+        }
+        long start = System.nanoTime();
+        GaiaSky.postRunnable(() -> {
+            try {
+                // The entity may be removed between the request and the next frame.
+                if (volume.isDisposed()) {
+                    return;
+                }
+                scheduleGeneration(entityName, volume, modelComponent, sizePc);
+            } finally {
+                synchronized (pending) {
+                    pending.remove(key);
+                }
+                logger.info(String.format(Locale.ROOT, "Volume regeneration of %s took %.1f ms",
+                                          entityName, (System.nanoTime() - start) / 1.0e6));
+            }
         });
     }
 
@@ -323,6 +348,11 @@ public class VolumeInitializer extends AbstractInitSystem {
             }
             return;
         }
+        // One line per slot, before the work: when a generation wedges the driver this is the last
+        // line in the log, and it says which slot, at which resolution, on which backend.
+        logger.info(String.format(Locale.ROOT, "Voxelising slot %d: %d fields, %s, %s, %s",
+                                  slot, fields.size(), grid, generator.name(),
+                                  VolumeLayout.canReuse(previous, grid) ? "refilling the slot's texture" : "new texture"));
         VolumeTexture texture = generator.generate(fields, grid, previous);
         if (texture == null) {
             // Already reported by the generator. Whatever the slot held stays bound: showing the

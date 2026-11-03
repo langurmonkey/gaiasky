@@ -49,6 +49,7 @@ import gaiasky.util.validator.LongValidator;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * The functionality shared by the procedural galaxy windows: the seed and morphology row, the size slider,
@@ -96,6 +97,14 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
     protected OwnSelectBox<GalaxyMorphology> morphologyBox;
     protected OwnSliderPlus sizeSlider;
     protected OwnTextIconButton randomizeButton;
+
+    /**
+     * Labels a base angle, which is carried in tenths of a degree everywhere - descriptor, shader
+     * and volume field alike - as the degrees it stands for. The raw number is a convention nobody
+     * reading the slider should have to know.
+     **/
+    protected static final Function<Float, String> TENTHS_TO_DEGREES =
+            v -> new DecimalFormat("##0.#").format(v * 0.1) + "\u00B0";
 
     protected final Matrix4 m = new Matrix4();
     /** Reused to resolve the entity of {@link Event#FOCUS_CHANGED}, so no view is allocated per event. **/
@@ -1153,14 +1162,18 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
                                                    skin);
                 tip(baseAngle, "gui.galaxy.ds.angle");
                 baseAngle.setLogarithmicExponent(1.2);
-                baseAngle.setNumberFormatter(new DecimalFormat("##0.###"));
+                // Mapped, not raw: this slider is logarithmic, so its own value is a position in
+                // [0,1] and the angle is the mapped one. Setting and reading the raw value pinned
+                // the knob at the far right and wrote 0..1 back into the dataset, which is a pitch
+                // of nothing - the arms came out as radial spokes.
+                baseAngle.setValueLabelTransform(TENTHS_TO_DEGREES);
                 baseAngle.setWidth(fullWidthBox);
-                baseAngle.setValue(ds.baseAngle);
+                baseAngle.setMappedValue(ds.baseAngle);
                 baseAngle.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event,
                                         Actor actor) {
-                        ds.setBaseAngle((double) baseAngle.getValue());
+                        ds.setBaseAngle((double) baseAngle.getMappedValue());
                     }
                 });
                 dsTable.add(baseAngle).colspan(2).left().padBottom(pad18).row();

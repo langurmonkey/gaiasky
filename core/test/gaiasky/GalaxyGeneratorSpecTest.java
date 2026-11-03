@@ -7,6 +7,8 @@
 
 package gaiasky;
 
+import gaiasky.render.gdx.graphics.CPUGalaxyVolumeGenerator;
+import gaiasky.render.gdx.graphics.VolumeCalibration;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.scene.record.GalaxyGenerator;
@@ -68,7 +70,9 @@ public class GalaxyGeneratorSpecTest {
                 var to = spec.volumeFields[i];
                 Assert.assertEquals(gm + " type", from.type, to.type);
                 Assert.assertEquals(gm + " distribution", from.distribution, to.distribution);
-                Assert.assertEquals(gm + " intensity", from.intensity, to.intensity, 1e-6f);
+                // The intensity is the one exception: a sprite alpha is not a density weight (see
+                // volumeIntensityIsADensityWeightNotASpriteAlpha).
+                Assert.assertNotEquals(gm + " kept the sprite intensity", from.intensity, to.intensity, 1e-9f);
                 Assert.assertEquals(gm + " base radius", from.baseRadius, to.baseRadius, 1e-6f);
             }
         }
@@ -127,6 +131,54 @@ public class GalaxyGeneratorSpecTest {
                 Assert.assertEquals(gm + " half type " + i, spec.half[i].type, legacy.getSecond()[i].type);
                 Assert.assertEquals(gm + " half count " + i, spec.half[i].particleCount, legacy.getSecond()[i].particleCount);
                 Assert.assertArrayEquals(gm + " half colors " + i, spec.half[i].baseColors, legacy.getSecond()[i].baseColors, 0f);
+            }
+        }
+    }
+
+    @Test
+    public void volumeIntensityIsADensityWeightNotASpriteAlpha() {
+        // The generator's per-channel intensities are sprite alphas: the gas cloud ships 0.011
+        // because it is drawn with thousands of large sprites. Carried into a density field, that
+        // quantises the whole gas channel to zero next to a bulge at ~1, and the galaxy renders
+        // with everything except its gas. Every volumetric channel has to start from a unit weight.
+        for (var gm : GalaxyGenerator.GalaxyMorphology.values()) {
+            for (var field : spec(gm, SEED).volumeFields) {
+                Assert.assertEquals(gm + " " + field.type + " kept its sprite intensity",
+                                    GalaxyAttributes.initialVolumeIntensity(field.type), field.intensity, 0f);
+            }
+        }
+    }
+
+    @Test
+    public void everyVolumeFieldStoresAVisibleAlpha() {
+        // One slot of the previous test's kind: the numbers below are the ones the shader computes,
+        // so a field below the threshold is a field that the 8-bit store rounds to black.
+        for (var gm : new GalaxyGenerator.GalaxyMorphology[]{GalaxyGenerator.GalaxyMorphology.Sc,
+                                                             GalaxyGenerator.GalaxyMorphology.Sb,
+                                                             GalaxyGenerator.GalaxyMorphology.E5,
+                                                             GalaxyGenerator.GalaxyMorphology.Im}) {
+            var spec = spec(gm, SEED);
+
+            var emissive = spec.emissiveFields();
+            var grid = GalaxyAttributes.volumeGrid(emissive, 20_400, gaiasky.util.Settings.GraphicsQuality.LOW);
+            var stats = new float[6 + GalaxyAttributes.MAX_FIELDS];
+            CPUGalaxyVolumeGenerator.voxelise(emissive, grid, stats);
+            // The emissive write pass divides by the mean luma at unit intensity and multiplies by
+            // the target (galgen.volume.comp.glsl); the reference cancels out of the expression.
+            float gain = (float) (VolumeCalibration.EMISSIVE_TARGET_MEAN_LUMA / Math.max(stats[3], 1e-9));
+            for (int i = 0; i < emissive.size(); i++) {
+                float stored = stats[6 + i] * emissive.get(i).intensity * gain;
+                Assert.assertTrue(gm + " " + emissive.get(i).type + " stores alpha " + stored
+                                          + ", which rounds to black", stored > 0.02f);
+            }
+
+            var occlusive = spec.occlusiveFields();
+            if (!occlusive.isEmpty()) {
+                for (var field : occlusive) {
+                    float stored = (float) Math.min(1.0, VolumeCalibration.OCCLUSIVE_TARGET_PEAK * field.intensity);
+                    Assert.assertTrue(gm + " " + field.type + " stores alpha " + stored,
+                                      stored > 0.5f);
+                }
             }
         }
     }

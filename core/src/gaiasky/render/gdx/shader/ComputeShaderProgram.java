@@ -500,11 +500,35 @@ public class ComputeShaderProgram implements Disposable {
         }
     }
 
+    /**
+     * Drains the pending GL error queue, with a bound.
+     * <p>
+     * A lost context makes {@code glGetError} return {@code GL_CONTEXT_LOST} forever, so an
+     * unbounded drain spins at 100% CPU inside the render thread and never returns to the event
+     * loop - which on Wayland means the client never commits another frame. The queue is at most a
+     * few entries deep anyway.
+     */
+    /** {@code GL_CONTEXT_LOST}. libGDX does not expose it (it is a KHR_robustness value). **/
+    private static final int GL_CONTEXT_LOST = 0x0507;
+
+    private static void drainGLErrors() {
+        for (int i = 0; i < 32; i++) {
+            int error = GL43.glGetError();
+            if (error == GL43.GL_NO_ERROR) {
+                return;
+            }
+            if (error == GL_CONTEXT_LOST) {
+                logger.error("OpenGL context lost while draining errors");
+                return;
+            }
+        }
+    }
+
     /** Bind the shader program for dispatch */
     public void begin() {
         if (!using) {
             // Clear any existing errors before beginning
-            while (GL43.glGetError() != GL43.GL_NO_ERROR) ;
+            drainGLErrors();
 
             glUseProgram(program);
             using = true;
@@ -528,7 +552,7 @@ public class ComputeShaderProgram implements Disposable {
             int groups = (numElements + localSizeX - 1) / localSizeX;
 
             // Clear errors before dispatch
-            while (GL43.glGetError() != GL43.GL_NO_ERROR) ;
+            drainGLErrors();
 
             glDispatchCompute(groups, 1, 1);
             int error = GL43.glGetError();
@@ -562,7 +586,7 @@ public class ComputeShaderProgram implements Disposable {
         if (using) {
             int groupsX = (nx + localSizeX - 1) / localSizeX;
 
-            while (GL43.glGetError() != GL43.GL_NO_ERROR) ;
+            drainGLErrors();
 
             glDispatchCompute(groupsX, Math.max(ny, 1), Math.max(nz, 1));
             int error = GL43.glGetError();

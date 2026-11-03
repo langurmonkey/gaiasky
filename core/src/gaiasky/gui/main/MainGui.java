@@ -402,8 +402,8 @@ public class MainGui extends AbstractGui {
      * Which window is opened follows the structure of the object being edited, so that opening an
      * existing galaxy shows the editors that object can actually be edited with: a hybrid one
      * (billboard entity plus a {@code Volume} child) gets the volume window, a billboard-only one
-     * gets the billboard window. New galaxies are hybrid, so they get the volume window; its own
-     * "generate billboards only" toggle is what switches one to the other pipeline.
+     * gets the billboard window. New galaxies are hybrid, so they get the volume window, and a
+     * galaxy keeps the structure it was created with: neither window converts one into the other.
      *
      * @param focus      The galaxy to edit, or null to create a new one.
      * @param morphology The morphology of the new galaxy; unused when {@code focus} is not null.

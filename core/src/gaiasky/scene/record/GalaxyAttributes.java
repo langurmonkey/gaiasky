@@ -284,6 +284,35 @@ public class GalaxyAttributes {
         return type.occludes();
     }
 
+    /**
+     * Intensity a volumetric channel starts from when its field is built out of the billboard
+     * dataset of the same channel.
+     * <p>
+     * A sprite's intensity is an alpha, and it is tuned against how many sprites carry it and how
+     * large they are. The gas cloud is drawn with thousands of 50-80 px sprites, so its alpha is
+     * 0.011; the bulge is a dozen sprites, so its is near 1. A volume field has neither a count nor
+     * a size - its stored alpha is a density that the raymarcher integrates along the ray - so those
+     * numbers mean nothing there. Carried over as they are, the gas lands two orders of magnitude
+     * below the bulge it shares the emissive slot with, quantises to a byte of zero almost
+     * everywhere, and the galaxy renders with a bulge and no gas at all.
+     * <p>
+     * Every volumetric channel therefore starts at a unit density weight, and the volume editors are
+     * what vary it. The values in {@code GalaxyGenerator} stay what they always were: sprite alphas.
+     *
+     * @param type The channel of the field.
+     *
+     * @return The density weight the field starts with.
+     */
+    public static float initialVolumeIntensity(ChannelType type) {
+        return switch (type) {
+            case GAS, BULGE -> 1.0f;
+            // Dust is the occluding slot, and its stored peak is this intensity, so 1 puts a fully
+            // opaque lane centre at the disposal of the occlusion threshold.
+            case DUST -> 1.0f;
+            default -> 1.0f;
+        };
+    }
+
     /** Vertical tail of the density field, in scale heights. Mirrors {@code GX_VERTICAL_TAIL}. **/
     private static final double GX_VERTICAL_TAIL = 3.0;
     /** Arm width, in units of {@link #baseRadius}. Mirrors {@code GX_ARM_WIDTH}. **/

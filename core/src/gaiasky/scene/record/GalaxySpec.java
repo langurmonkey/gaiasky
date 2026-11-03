@@ -61,6 +61,9 @@ public class GalaxySpec {
                 continue;
             }
             var field = new GalaxyAttributes(dataset);
+            // The dataset's intensity is a sprite alpha; a field's is a density weight. See
+            // GalaxyAttributes.initialVolumeIntensity.
+            field.intensity = GalaxyAttributes.initialVolumeIntensity(field.type);
             if (field.isOcclusive() && field.occlusionThreshold <= 0f) {
                 field.occlusionThreshold = DEFAULT_DUST_OCCLUSION_THRESHOLD;
             }

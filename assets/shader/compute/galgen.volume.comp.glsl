@@ -171,6 +171,15 @@ void main() {
         return;
     }
 
+    // Write pass only. The workgroup is 256-wide on x, so up to 255 invocations per row are past
+    // the last voxel, and an imageStore outside an image is undefined: some drivers drop it, others
+    // corrupt neighbouring state, and it happens on every generation whose nx is not a multiple of
+    // 256 - which is nearly all of them. The reduce pass above already returned, and this pass has
+    // no barrier after it, so leaving here is safe.
+    if (!inside) {
+        return;
+    }
+
     vec3 chroma = field.light / max(brightLight, 1.0e-12);
 
     if (u_occlusive == 1) {

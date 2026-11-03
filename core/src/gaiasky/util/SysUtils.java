@@ -886,14 +886,19 @@ public class SysUtils {
         checkForOpenGLErrors(location, false);
     }
 
+    /** {@code GL_CONTEXT_LOST}. libGDX does not expose it (it is a KHR_robustness value). **/
+    private static final int GL_CONTEXT_LOST = 0x0507;
+
     public static void checkForOpenGLErrors(String location, boolean silent) {
         int error = GL43.glGetError();
         if (error != GL43.GL_NO_ERROR) {
             if (!silent)
                 logger.error("OpenGL error at " + location + ": " + error);
-            // Optionally clear the error so it doesn't affect future operations
-            while (GL43.glGetError() != GL43.GL_NO_ERROR)
-                ;
+            // Clear the queue, with a bound: a lost context answers GL_CONTEXT_LOST forever and an
+            // unbounded loop would never return to the render loop.
+            for (int i = 0; i < 32 && error != GL43.GL_NO_ERROR && error != GL_CONTEXT_LOST; i++) {
+                error = GL43.glGetError();
+            }
         }
     }
 
@@ -906,6 +911,11 @@ public class SysUtils {
      * @return True if compute shaders are supported, false otherwise.
      */
     public static boolean isComputeShaderSupported() {
+        // Escape hatch: "gaiasky.compute=false" forces the CPU path on hardware that has compute
+        // shaders, which is the only way to exercise the CPU volume voxeliser deliberately.
+        if ("false".equalsIgnoreCase(System.getProperty("gaiasky.compute"))) {
+            return false;
+        }
         IntBuffer params = BufferUtils.createIntBuffer(1);
         GL30.glGetIntegerv(GL43.GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, params);
         int maxBlocks = params.get(0);

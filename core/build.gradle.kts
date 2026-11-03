@@ -135,6 +135,8 @@ abstract class GaiaSkyRun @Inject constructor() : JavaExec() {
         systemProperty("assets.location", "./assets/")
         systemProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn")
         systemProperty("org.slf4j.simpleLogger.showThreadName", "false")
+        // Forwarded so that "./gradlew run -Pgaiasky.compute=false" forces the CPU volume backend.
+        (project.findProperty("gaiasky.compute") as String?)?.let { systemProperty("gaiasky.compute", it) }
 
         minHeapSize = "3g"
         maxHeapSize = "6g"

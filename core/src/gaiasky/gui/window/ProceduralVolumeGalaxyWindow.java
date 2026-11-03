@@ -8,7 +8,6 @@
 package gaiasky.gui.window;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.JsonWriter;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -55,10 +53,11 @@ import java.util.List;
  * volume fields of that single draw: the billboard section below is the same pane the billboard
  * window builds, and the volume section lists the fields each slot will sum.
  * <p>
- * The <em>generate billboards only</em> toggle switches the window back to the legacy pipeline, for
- * the times when the billboard-only result is what is wanted. It changes the structure of the
- * object - a billboard galaxy has a full-resolution and a half-resolution billboard entity, a hybrid
- * one has a billboard entity and a child volume - so the change only takes effect on Generate.
+ * A galaxy keeps the structure it was created with: this window only ever produces and edits the
+ * hybrid one (a billboard entity plus a child volume). A billboard-only galaxy - a full-resolution
+ * and a half-resolution billboard entity - belongs to {@link ProceduralBillboardGalaxyWindow}, and
+ * {@code MainGui} routes by that structure. Converting one into the other would mean replacing the
+ * object under the user's cursor, so it is not offered.
  */
 public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     /** Seed of the galaxies this window creates on its own, same as the billboard window's. **/
@@ -66,16 +65,9 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     /** The full-resolution billboard entity: stars, HII regions and points. **/
     private Entity entityFull;
-    /**
-     * The diffuse half: a child {@link Volume} entity in hybrid mode, the half-resolution billboard
-     * entity when generating billboards only.
-     */
+    /** The diffuse half: the child {@link Volume} entity that holds the density fields. **/
     private Entity entityDiffuse;
     private final FocusView viewFull = new FocusView();
-    /** Whether the window generates a billboard-only galaxy, as the legacy window does. **/
-    private boolean billboardsOnly;
-    /** Set when the toggle no longer matches the structure the current entities have. **/
-    private boolean structureDirty;
     /** Set when a volume field was edited and has not been voxelised again yet. **/
     private boolean fieldsDirty;
     /**
@@ -117,7 +109,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
             var dir = new Vector3D(camera.getDirection());
             pos.add(dir.nor().scl(radius * 2.0));
 
-            var pair = createPair(name, radius, pos, morphology, DEFAULT_SEED, billboardsOnly);
+            var pair = createPair(name, radius, pos, morphology, DEFAULT_SEED);
             entityFull = pair.getFirst();
             entityDiffuse = pair.getSecond();
             GaiaSky.postRunnable(() -> register(pair));
@@ -128,15 +120,13 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                 entity = Mapper.graph.get(entity).parent;
             }
             entityFull = entity;
-            entityDiffuse = findDiffuseChild(entityFull);
-            billboardsOnly = !isHybrid();
+            entityDiffuse = findVolumeChild(entityFull);
             var bb = Mapper.billboardSet.get(entityFull);
             if (bb != null && bb.morphology != null) {
                 morphology = bb.morphology;
             }
         }
         viewFull.setEntity(entityFull);
-        structureDirty = false;
         fieldsDirty = false;
         seedChanged = false;
     }
@@ -144,15 +134,13 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     /**
      * @param full The full-resolution billboard entity.
      *
-     * @return Its diffuse child, whichever of the two it is, or null if it has none.
+     * @return Its volume child, or null if it has none.
      */
-    private Entity findDiffuseChild(Entity full) {
+    private Entity findVolumeChild(Entity full) {
         if (full == null || !Mapper.graph.has(full)) {
             return null;
         }
-        var graph = Mapper.graph.get(full);
-        var volume = graph.getFirstChildOfType(scene.archetypes().get("Volume"));
-        return volume != null ? volume : graph.getFirstChildOfType(scene.archetypes().get("BillboardGroup"));
+        return Mapper.graph.get(full).getFirstChildOfType(scene.archetypes().get("Volume"));
     }
 
     /** @return Whether the diffuse half is a volume, as opposed to a billboard entity. **/
@@ -164,12 +152,9 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                             double radius,
                                             Vector3Q pos,
                                             GalaxyMorphology morphology,
-                                            long seed,
-                                            boolean billboardsOnly) {
+                                            long seed) {
         var api = GaiaSky.instance.scripting().apiv2().scene;
-        return billboardsOnly
-                ? api.createNewProceduralGalaxy(name, radius, pos, morphology, seed)
-                : api.createNewProceduralVolumeGalaxy(name, radius, pos, morphology, seed);
+        return api.createNewProceduralVolumeGalaxy(name, radius, pos, morphology, seed);
     }
 
     /** Adds a freshly created pair to the scene. Must run on the render thread. **/
@@ -209,7 +194,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     @Override
     protected List<Entity> getSizedEntities() {
-        // Arrays.asList, not List.of: either half may be missing while the structure is being changed.
+        // Arrays.asList, not List.of: a galaxy whose volume child is missing has a null second half.
         return Arrays.asList(entityFull, entityDiffuse);
     }
 
@@ -236,7 +221,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         for (var entity : getSizedEntities()) {
             var body = bodyOf(entity);
             if (body != null) {
-                body.setSize(entity == entityDiffuse && isHybrid() ? internalSize * 2.0 : internalSize);
+                body.setSize(entity == entityDiffuse ? internalSize * 2.0 : internalSize);
             }
         }
     }
@@ -286,47 +271,15 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     @Override
     protected void buildChannelSections(Table table) {
-        buildGenerationMode(table);
-
         var billboardsHeader = new OwnLabel(I18n.msg("gui.galaxy.section.billboards"), skin, "header");
         tip(billboardsHeader, "gui.galaxy.section.billboards");
-        table.add(billboardsHeader).left().padBottom(pad10).row();
+        table.add(billboardsHeader).left().padLeft(pad10).padBottom(pad10).row();
         addBillboardDatasets(entityFull, table, THIRD_WIDTH_BOX, HALF_WIDTH_BOX, FULL_WIDTH_BOX, TAB_CONTENT_WIDTH);
 
-        table.add(new Separator(skin, "gray")).fillX().expandX().padTop(pad20).padBottom(pad20).row();
-
         if (isHybrid()) {
+            table.add(new Separator(skin, "gray")).fillX().expandX().padTop(pad20).padBottom(pad20).row();
             buildVolumeSections(table);
-        } else if (entityDiffuse != null) {
-            var halfHeader = new OwnLabel(I18n.msg("gui.galaxy.section.half"), skin, "header");
-            tip(halfHeader, "gui.galaxy.section.half");
-            table.add(halfHeader).left().padBottom(pad10).row();
-            addBillboardDatasets(entityDiffuse, table, THIRD_WIDTH_BOX, HALF_WIDTH_BOX, FULL_WIDTH_BOX, TAB_CONTENT_WIDTH);
         }
-    }
-
-    private void buildGenerationMode(Table table) {
-        var toggle = new OwnCheckBox(I18n.msg("gui.galaxy.billboards.only"), skin, 4f);
-        toggle.setChecked(billboardsOnly);
-        tip(toggle, "gui.galaxy.billboards.only");
-        toggle.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                if (billboardsOnly != toggle.isChecked()) {
-                    billboardsOnly = toggle.isChecked();
-                    // A different structure cannot be applied in place: Generate rebuilds the object.
-                    structureDirty = true;
-                    rebuild();
-                }
-            }
-        });
-        table.add(toggle).left().padBottom(pad10).row();
-        if (structureDirty) {
-            table.add(new OwnLabel(I18n.msg("gui.galaxy.billboards.only.pending"), skin, "grey-normal"))
-                    .left().padBottom(pad10).row();
-        }
-        table.add().padBottom(pad20).row();
     }
 
     /**
@@ -346,7 +299,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         editedHint = null;
         var volumeHeader = new OwnLabel(I18n.msg("gui.galaxy.section.volume"), skin, "header");
         tip(volumeHeader, "gui.galaxy.section.volume");
-        table.add(volumeHeader).left().padBottom(pad10).row();
+        table.add(volumeHeader).left().padLeft(pad10).padBottom(pad10).row();
         if (volume == null) {
             return;
         }
@@ -356,7 +309,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                                 volume.occlusiveFields().size(),
                                                 GalaxyAttributes.MAX_FIELDS), skin);
         tip(slotCounter, "gui.galaxy.volume.slots");
-        table.add(slotCounter).left().padBottom(pad10).row();
+        table.add(slotCounter).left().padLeft(pad10).padBottom(pad10).row();
 
         // The threshold the next generation will write into the material: it is derived from the
         // fields, so it follows the occlusion sliders below live, without a dispatch.
@@ -364,19 +317,24 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                                    DECIMAL.format(VolumeCalibration.occlusiveThreshold(volume.occlusiveFields()))),
                                           skin, "grey-normal");
         tip(thresholdLabel, "gui.galaxy.volume.threshold");
-        table.add(thresholdLabel).left().padBottom(pad18).row();
+        // Only the threshold line separates the counters from the fields, so it gets a small gap of
+        // its own: the panes below already carry theirs.
+        table.add(thresholdLabel).left().padLeft(pad10).padBottom(pad10).row();
 
         var fields = volume.fields;
         if (fields == null || fields.length == 0) {
             table.add(new OwnLabel(I18n.msg("gui.galaxy.volume.empty"), skin, "grey-normal"))
-                    .left().padBottom(pad18).row();
+                    .left().padLeft(pad10).padBottom(pad18).row();
             return;
         }
 
-        // Empty when clean rather than hidden: a hidden label still takes its cell.
+        // The hint sits above the fields and only takes room while there is something to say: an
+        // empty label has no height, but its padding would still push the first field down, which is
+        // the dead space between the threshold line and the panes. markFieldsDirty() flips the text
+        // in place, so the line appears without rebuilding the pane being dragged.
         editedHint = new OwnLabel(fieldsDirty ? I18n.msg("gui.galaxy.volume.edited") : "", skin, "grey-normal");
         tip(editedHint, "gui.galaxy.volume.edited");
-        table.add(editedHint).left().padBottom(pad18).row();
+        table.add(editedHint).left().padLeft(pad10).padBottom(fieldsDirty ? pad10 : 0f).row();
 
         for (var field : fields) {
             // On the header rather than at the end of the editors, as in the billboard pane: the
@@ -492,8 +450,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         addSlider(detail, arms);
         addSlider(detail, fieldSlider("gui.galaxy.ds.arm.sigma", 0.05f, 1.5f, 0.01f, field.armSigma,
                                       v -> field.armSigma = v));
-        addSlider(detail, fieldSlider("gui.galaxy.ds.angle", -180f, 180f, 0.5f, field.baseAngle,
-                                      v -> field.baseAngle = v));
+        detail.add(angleSlider(field)).colspan(2).left().padBottom(pad18).row();
 
         // Ellipsoid: eccentricity per axis, then the bar aspect.
         var eccTable = new Table(skin);
@@ -604,6 +561,39 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         return slider;
     }
 
+    /**
+     * Base angle of a field. It is carried in tenths of a degree, the same unit the descriptor and
+     * the shaders use, and the slider covers the range the generator draws from
+     * ({@link ChannelType#baseAngle}, 0..1000, i.e. 0..100 deg) with the same curve as the billboard
+     * pane's slider of the same name. A narrower range here would clamp a dataset's 1000 to its
+     * maximum and move the volume's arms dozens of degrees away from the stars'.
+     *
+     * @param field The field being edited.
+     *
+     * @return The slider, ready to be added.
+     */
+    private OwnSliderPlus angleSlider(GalaxyAttributes field) {
+        var baseAngle = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.angle"),
+                                          field.type.baseAngle[0],
+                                          field.type.baseAngle[1],
+                                          true,
+                                          skin);
+        tip(baseAngle, "gui.galaxy.ds.angle");
+        baseAngle.setLogarithmicExponent(1.2);
+        baseAngle.setValueLabelTransform(TENTHS_TO_DEGREES);
+        baseAngle.setWidth(FULL_WIDTH_BOX);
+        baseAngle.setMappedValue(field.baseAngle);
+        baseAngle.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                field.baseAngle = baseAngle.getMappedValue();
+                markFieldsDirty();
+            }
+        });
+        return baseAngle;
+    }
+
     /** Adds a slider on its own row, spanning both columns of the pane. **/
     private void addSlider(Table table,
                            OwnSliderPlus slider) {
@@ -646,10 +636,6 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     protected void buildChannelButtons(Table table) {
         table.add(newAddChannelButton(entityFull, "gui.galaxy.add.full", BUTTON_WIDTH))
                 .center().padRight(pad34).padBottom(pad10);
-        if (!isHybrid()) {
-            table.add(newAddChannelButton(entityDiffuse, "gui.galaxy.add.half", BUTTON_WIDTH))
-                    .center().padBottom(pad10);
-        }
         table.row();
     }
 
@@ -659,10 +645,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     @Override
     protected void onGenerate() {
-        if (structureDirty) {
-            // The toggle asks for a different structure: the entities have to be replaced.
-            recreate();
-        } else if (morphologyChanged || seedChanged) {
+        if (morphologyChanged || seedChanged) {
             // A new morphology or a new seed is a new galaxy: it replaces every dataset and every
             // field, edits included. That is what Randomize does, and what the seed field means.
             redraw();
@@ -700,7 +683,6 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         long seed = getSeed();
         var gm = morphology;
         var spec = gen.generateGalaxySpec(gm, seed);
-        boolean hybrid = isHybrid();
         // A fresh draw replaces the fields wholesale, edits included.
         fieldsDirty = false;
         morphologyChanged = false;
@@ -714,54 +696,13 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                 bb.seed = seed;
                 bb.datasets = spec.full;
             }
-            if (hybrid) {
-                var volume = Mapper.volume.get(entityDiffuse);
+            var volume = entityDiffuse != null ? Mapper.volume.get(entityDiffuse) : null;
+            if (volume != null) {
                 volume.fields = spec.volumeFields;
                 VolumeInitializer.generateNow(entityDiffuse);
-            } else {
-                var half = Mapper.billboardSet.get(entityDiffuse);
-                if (half != null) {
-                    half.datasets = spec.half;
-                }
             }
             rebuild();
         });
-    }
-
-    /**
-     * Rebuilds the galaxy with the structure the toggle asks for: a hybrid one (billboard entity +
-     * child volume) or a billboard-only one (full-resolution + half-resolution billboard entities).
-     * The name, the size and the position carry over; the draw is taken from the current seed.
-     */
-    private void recreate() {
-        if (entityFull == null) {
-            return;
-        }
-        var old = entityFull;
-        var body = bodyOf(old);
-        var base = Mapper.base.get(old);
-        var name = base != null ? base.getName() : "galaxy";
-        double radius = body != null ? body.size : 10 * Constants.KPC_TO_U;
-        var pos = new Vector3Q(body != null ? body.pos : new Vector3Q());
-        long seed = getSeed();
-        var gm = morphology;
-        boolean billboardsOnly = this.billboardsOnly;
-
-        var pair = createPair(name, radius, pos, gm, seed, billboardsOnly);
-        GaiaSky.postRunnable(() -> {
-            // Directly, not through the event: the old object has to be gone before the new one is
-            // inserted under the same name.
-            scene.remove(old, true);
-            register(pair);
-        });
-
-        entityFull = pair.getFirst();
-        entityDiffuse = pair.getSecond();
-        viewFull.setEntity(entityFull);
-        structureDirty = false;
-        fieldsDirty = false;
-        seedChanged = false;
-        rebuild();
     }
 
     @Override
@@ -769,23 +710,13 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         if (entityFull != null && Mapper.render.has(entityFull)) {
             EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, this, Mapper.render.get(entityFull));
         }
-        if (entityDiffuse != null && !isHybrid() && Mapper.render.has(entityDiffuse)) {
-            EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, this, Mapper.render.get(entityDiffuse));
-        }
     }
 
     @Override
     protected void onExport() {
-        if (isHybrid()) {
-            // The JSON writer still has no fields block to emit, so an export here would write a
-            // galaxy that loads back as billboards only.
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.volume.unsupported"));
-            return;
-        }
-        var json = gen.convertToJson(entityFull, entityDiffuse);
-        var string = json.toJson(JsonWriter.OutputType.json);
-        Gdx.app.getClipboard().setContents(string);
-        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.done"));
+        // Every galaxy this window edits is hybrid, and the JSON writer still has no fields block to
+        // emit: an export here would write a galaxy that loads back as billboards only.
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.volume.unsupported"));
     }
 
     @Override

@@ -130,10 +130,26 @@ public class Volume implements Component, IDisposable {
         }
     }
 
+    /**
+     * Releases the old slot texture, unless the replacement is still using it.
+     * <p>
+     * A regeneration that fits the grid refills the texture the slot already holds and wraps it in a
+     * <em>new</em> {@link VolumeTexture}; the wrapper is new, the GL texture inside is the same one.
+     * Comparing the wrappers alone therefore disposes the texture that was just refilled and bound,
+     * and every sampler of it reads the default (0, 0, 0, 1) - which is a black volume that still
+     * occludes, not a missing one. Compare the textures, not the wrappers.
+     *
+     * @param previous    What the slot held, or null.
+     * @param replacement What the slot is receiving, or null to clear it.
+     */
     private static void disposeVolume(VolumeTexture previous,
                                       VolumeTexture replacement) {
-        if (previous != null && previous != replacement && previous.texture() != null) {
-            previous.texture().dispose();
+        if (previous == null || previous == replacement) {
+            return;
+        }
+        var texture = previous.texture();
+        if (texture != null && (replacement == null || texture != replacement.texture())) {
+            texture.dispose();
         }
     }
 
