@@ -10,10 +10,12 @@ package gaiasky.gui.window;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.JsonWriter;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -76,6 +78,12 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     private boolean structureDirty;
     /** Set when a volume field was edited and has not been voxelised again yet. **/
     private boolean fieldsDirty;
+    /**
+     * Set when the seed field changed since the last draw. A new seed is a new galaxy, so Generate
+     * draws from it; without this, every Generate would be a new draw and would discard the edits
+     * made to the datasets and the fields.
+     */
+    private boolean seedChanged;
     /** The "press Generate" line of the volume section, kept to flip it without a rebuild. **/
     private OwnLabel editedHint;
 
@@ -130,6 +138,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         viewFull.setEntity(entityFull);
         structureDirty = false;
         fieldsDirty = false;
+        seedChanged = false;
     }
 
     /**
@@ -209,6 +218,29 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         return entityFull;
     }
 
+    /**
+     * The size the window shows and edits is the galaxy's radius, which is the billboard half's body
+     * size. The volume's is the diameter of its box, twice that, so taking the largest of the two -
+     * what the base does - would report the volume's diameter as the radius and compound on every
+     * edit of the slider.
+     */
+    @Override
+    protected double getSize() {
+        var body = bodyOf(entityFull);
+        return body != null ? body.size : super.getSize();
+    }
+
+    /** Scales the volume's diameter with the radius the billboard half follows. **/
+    @Override
+    protected void applySize(double internalSize) {
+        for (var entity : getSizedEntities()) {
+            var body = bodyOf(entity);
+            if (body != null) {
+                body.setSize(entity == entityDiffuse && isHybrid() ? internalSize * 2.0 : internalSize);
+            }
+        }
+    }
+
     @Override
     protected long getSeed() {
         var bb = Mapper.billboardSet.get(entityFull);
@@ -220,6 +252,9 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         var bb = Mapper.billboardSet.get(entityFull);
         if (bb != null) {
             bb.seed = seed;
+            // Only a Generate consumes it: the seed is a description of the galaxy to draw, not
+            // something to apply to the one on screen.
+            seedChanged = true;
         }
     }
 
@@ -344,9 +379,22 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         table.add(editedHint).left().padBottom(pad18).row();
 
         for (var field : fields) {
+            // On the header rather than at the end of the editors, as in the billboard pane: the
+            // control that removes the field sits next to the one that expands it.
+            var delete = new OwnTextIconButton("", skin, "rubbish");
+            tip(delete, "gui.galaxy.delete");
+            delete.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event,
+                                    float x,
+                                    float y) {
+                    super.clicked(event, x, y);
+                    removeField(volume, field);
+                }
+            });
             var pane = new CollapsiblePane(stage,
                                            field.type.localizedName() + " - " + field.distribution.localizedName(),
-                                           buildFieldDetail(field, volume),
+                                           buildFieldDetail(field),
                                            TAB_CONTENT_WIDTH,
                                            skin,
                                            "header-s",
@@ -354,7 +402,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                            null,
                                            isExpanded(field),
                                            null,
-                                           null);
+                                           delete);
             pane.setExpandCollapseRunnable(() -> setExpanded(field, pane.isExpanded()));
             table.add(pane).padBottom(pad18).row();
         }
@@ -363,13 +411,11 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     /**
      * Builds the editors of one field.
      *
-     * @param field  The field to edit.
-     * @param volume The volume the field belongs to, used by the delete button.
+     * @param field The field to edit.
      *
      * @return A table the collapsible pane can wrap.
      */
-    private Table buildFieldDetail(GalaxyAttributes field,
-                                   Volume volume) {
+    private Table buildFieldDetail(GalaxyAttributes field) {
         var detail = new Table(skin);
 
         // Readout. The stored peak and the occluding fraction are the two numbers the raymarcher
@@ -516,17 +562,6 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                           v -> field.occlusionThreshold = v));
         }
 
-        // Delete
-        var delete = new OwnTextIconButton("", skin, "delete");
-        tip(delete, "gui.galaxy.delete");
-        delete.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                removeField(volume, field);
-            }
-        });
-        detail.add(delete).colspan(2).left().padBottom(pad10).row();
         return detail;
     }
 
@@ -627,36 +662,38 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         if (structureDirty) {
             // The toggle asks for a different structure: the entities have to be replaced.
             recreate();
-        } else if (fieldsDirty && !morphologyChanged) {
-            // The fields are the object of this window, so an edited field wins over a new draw:
-            // re-voxelise what the panes hold instead of overwriting it with the seed's version.
-            reapplyFields();
+        } else if (morphologyChanged || seedChanged) {
+            // A new morphology or a new seed is a new galaxy: it replaces every dataset and every
+            // field, edits included. That is what Randomize does, and what the seed field means.
+            redraw();
         } else {
-            generateInPlace();
+            // Nothing about the draw changed, so generate what the panes hold: the edits are the
+            // object of this window, and pressing Generate must not throw them away.
+            regenerateCurrent();
         }
     }
 
     /**
-     * Voxelises the fields as the panes left them, without touching the billboard datasets or the
-     * seed. This is the cheap path an edited field takes: two compute dispatches, and the slot
-     * textures are refilled rather than reallocated.
+     * Relaunches the generation with the datasets and the fields as the panes left them. Nothing is
+     * re-drawn from the seed: the billboard shader runs again over the current datasets, and the
+     * volume is voxelised again into its existing textures.
      */
-    private void reapplyFields() {
-        if (!isHybrid()) {
-            // No volume fields in a billboards-only galaxy, so there is nothing to re-apply.
-            generateInPlace();
-            return;
-        }
+    private void regenerateCurrent() {
         fieldsDirty = false;
-        VolumeInitializer.generateNow(entityDiffuse);
+        morphologyChanged = false;
+        regenerate();
+        if (isHybrid()) {
+            VolumeInitializer.generateNow(entityDiffuse);
+        }
         rebuild();
     }
 
     /**
-     * Replaces the datasets and the fields of the current entities with a fresh draw. Nothing about
-     * the entities themselves changes, so this is the cheap path: no entity is created or removed.
+     * Draws a new galaxy from the current seed and morphology, replacing the datasets and the fields
+     * of the current entities. Nothing about the entities themselves changes, so this is the cheap
+     * path: no entity is created or removed.
      */
-    private void generateInPlace() {
+    private void redraw() {
         if (entityFull == null) {
             return;
         }
@@ -667,6 +704,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         // A fresh draw replaces the fields wholesale, edits included.
         fieldsDirty = false;
         morphologyChanged = false;
+        seedChanged = false;
 
         regenerate();
         GaiaSky.postRunnable(() -> {
@@ -722,6 +760,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         viewFull.setEntity(entityFull);
         structureDirty = false;
         fieldsDirty = false;
+        seedChanged = false;
         rebuild();
     }
 

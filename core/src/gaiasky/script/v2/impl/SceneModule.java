@@ -36,6 +36,7 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.KeyframeUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.GalaxyGenerator;
+import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.record.ModelType;
 import gaiasky.scene.view.FocusView;
@@ -1203,7 +1204,14 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
 
         var bodyVolume = Mapper.body.get(entityVolume);
         bodyVolume.cameraCollision = false;
-        bodyVolume.setSize(radius);
+        // This entity has a Model component, so ModelInitializer will scale its size unless told
+        // the units are already the internal ones: it would otherwise double it as a radius and
+        // convert it from kilometres, which shrinks the volume by six orders of magnitude and
+        // makes it invisible. The size is the *diameter*, as the volume shader expects ("the
+        // largest axis spans u_bodySize"), so twice the radius the billboard half uses.
+        bodyVolume.sizeIsRadiusFlag = false;
+        bodyVolume.sizeInUnitsFlag = true;
+        bodyVolume.setSize(radius * 2.0);
         // The label belongs to the billboard entity, which is what the user sees and focuses.
         bodyVolume.labelColor = new float[]{0, 0, 0, 0};
 
@@ -1238,6 +1246,14 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         modelComponent.setParams(params);
         modelComponent.setUseColor(true);
         modelComponent.setBlendMode(BlendMode.ADDITIVE);
+        // The box is a flipped sphere: with back-face culling on, its triangles are all facing
+        // away from a camera outside it and the volume draws nothing at all.
+        modelComponent.setCulling(false);
+        // The material has to exist before the set-up stage: the generated textures are bound to
+        // it, and with lazy initialization nothing would ever initialize a material created after
+        // the model was done loading - the entity would render without its volumes, silently.
+        modelComponent.setMaterial(new MaterialComponent());
+        modelComponent.forceInit = true;
         modelVolume.setModel(modelComponent);
 
         var volume = Mapper.volume.get(entityVolume);

@@ -326,7 +326,11 @@ public class VolumeInitializer extends AbstractInitSystem {
         VolumeTexture texture = generator.generate(fields, grid, previous);
         if (texture == null) {
             // Already reported by the generator. Whatever the slot held stays bound: showing the
-            // previous volume beats showing nothing.
+            // previous volume beats showing nothing. Silence here would look like a working galaxy
+            // that simply has no diffuse channels in it.
+            logger.warn("The volume program did not generate slot " + slot + " (" + fields.size()
+                                + " fields, " + grid + "): the slot stays " + (previous == null ? "empty" : "as it was")
+                                + ", so the shader is compiled without it and nothing of it is drawn.");
             return;
         }
         if (!mtc.setVolumeTexture(slot, texture)) {
@@ -335,6 +339,9 @@ public class VolumeInitializer extends AbstractInitSystem {
             if (previous == null || texture.texture() != previous.texture()) {
                 texture.texture().dispose();
             }
+            logger.warn("The volume texture of slot " + slot + " could not be bound: the material has "
+                                + "not been initialised, so the volume shader compiles without this slot and "
+                                + "nothing of it is drawn.");
             return;
         }
         volume.setGeneratedVolume(slot, texture);
