@@ -18,11 +18,15 @@ import com.badlogic.gdx.utils.JsonWriter;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.beans.ComboBoxBean;
+import gaiasky.render.gdx.graphics.VolumeCalibration;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Volume;
 import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.scene.record.GalaxyAttributes.ChannelType;
+import gaiasky.scene.record.GalaxyAttributes.Distribution;
+import gaiasky.scene.record.GalaxyAttributes.HeightProfile;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.system.initialize.VolumeInitializer;
 import gaiasky.scene.view.FocusView;
@@ -33,6 +37,8 @@ import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 import gaiasky.util.scene2d.*;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,6 +74,13 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     private boolean billboardsOnly;
     /** Set when the toggle no longer matches the structure the current entities have. **/
     private boolean structureDirty;
+    /** Set when a volume field was edited and has not been voxelised again yet. **/
+    private boolean fieldsDirty;
+    /** The "press Generate" line of the volume section, kept to flip it without a rebuild. **/
+    private OwnLabel editedHint;
+
+    /** Formats the readouts and the slider labels: enough digits to be useful, few enough to read. **/
+    private static final DecimalFormat DECIMAL = new DecimalFormat("#0.###");
 
     public ProceduralVolumeGalaxyWindow(FocusView target, Scene scene, Stage stage, Skin skin) {
         super(scene, stage, skin);
@@ -116,6 +129,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         }
         viewFull.setEntity(entityFull);
         structureDirty = false;
+        fieldsDirty = false;
     }
 
     /**
@@ -279,14 +293,18 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     /**
      * The volume half of the window.
      * <p>
-     * A field is listed with the two things that identify it - its channel type and its density
-     * model - plus the slot it lands in. The editable parameters come next; they live here because
-     * this is the pane the volume fields belong to, and the scene loads them from the same object.
+     * One collapsible pane per field, holding the parameters {@code galaxyDensity()} reads from it.
+     * The panes are the same editors the scene JSON drives, so what is on screen is exactly what a
+     * saved descriptor would carry: there is no hidden state between the window and the volume.
+     * <p>
+     * An edit only touches the field object; it does not voxelise. Re-voxelisation is a compute
+     * dispatch per slot, so it is deferred to Generate, and the section says so until it runs.
      *
      * @param table The table to fill.
      */
     private void buildVolumeSections(Table table) {
         var volume = Mapper.volume.get(entityDiffuse);
+        editedHint = null;
         var volumeHeader = new OwnLabel(I18n.msg("gui.galaxy.section.volume"), skin, "header");
         tip(volumeHeader, "gui.galaxy.section.volume");
         table.add(volumeHeader).left().padBottom(pad10).row();
@@ -299,7 +317,15 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                                 volume.occlusiveFields().size(),
                                                 GalaxyAttributes.MAX_FIELDS), skin);
         tip(slotCounter, "gui.galaxy.volume.slots");
-        table.add(slotCounter).left().padBottom(pad18).row();
+        table.add(slotCounter).left().padBottom(pad10).row();
+
+        // The threshold the next generation will write into the material: it is derived from the
+        // fields, so it follows the occlusion sliders below live, without a dispatch.
+        var thresholdLabel = new OwnLabel(I18n.msg("gui.galaxy.volume.threshold",
+                                                   DECIMAL.format(VolumeCalibration.occlusiveThreshold(volume.occlusiveFields()))),
+                                          skin, "grey-normal");
+        tip(thresholdLabel, "gui.galaxy.volume.threshold");
+        table.add(thresholdLabel).left().padBottom(pad18).row();
 
         var fields = volume.fields;
         if (fields == null || fields.length == 0) {
@@ -307,21 +333,16 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                     .left().padBottom(pad18).row();
             return;
         }
+
+        // Empty when clean rather than hidden: a hidden label still takes its cell.
+        editedHint = new OwnLabel(fieldsDirty ? I18n.msg("gui.galaxy.volume.edited") : "", skin, "grey-normal");
+        tip(editedHint, "gui.galaxy.volume.edited");
+        table.add(editedHint).left().padBottom(pad18).row();
+
         for (var field : fields) {
-            var slot = field.isOcclusive() ? I18n.msg("gui.galaxy.volume.slot.occlusive")
-                                           : I18n.msg("gui.galaxy.volume.slot.emissive");
-            // Summary only for now; the editors replace this table when the pane is filled in.
-            var detail = new Table(skin);
-            var summary = new OwnLabel(I18n.msg("gui.galaxy.volume.field.summary",
-                                                slot,
-                                                field.baseRadius,
-                                                field.intensity),
-                                       skin, "grey-normal");
-            tip(summary, "gui.galaxy.volume.field.summary");
-            detail.add(summary).left().row();
             var pane = new CollapsiblePane(stage,
                                            field.type.localizedName() + " - " + field.distribution.localizedName(),
-                                           detail,
+                                           buildFieldDetail(field, volume),
                                            TAB_CONTENT_WIDTH,
                                            skin,
                                            "header-s",
@@ -332,6 +353,253 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                            null);
             pane.setExpandCollapseRunnable(() -> setExpanded(field, pane.isExpanded()));
             table.add(pane).padBottom(pad18).row();
+        }
+    }
+
+    /**
+     * Builds the editors of one field.
+     *
+     * @param field  The field to edit.
+     * @param volume The volume the field belongs to, used by the delete button.
+     *
+     * @return A table the collapsible pane can wrap.
+     */
+    private Table buildFieldDetail(GalaxyAttributes field,
+                                   Volume volume) {
+        var detail = new Table(skin);
+
+        // Readout. The stored peak and the occluding fraction are the two numbers the raymarcher
+        // compares, so they are shown next to the editors that move them.
+        var slot = field.isOcclusive() ? I18n.msg("gui.galaxy.volume.slot.occlusive")
+                                       : I18n.msg("gui.galaxy.volume.slot.emissive");
+        var summary = new OwnLabel(I18n.msg("gui.galaxy.volume.field.summary",
+                                            slot,
+                                            DECIMAL.format(field.baseRadius),
+                                            DECIMAL.format(field.intensity)), skin, "grey-normal");
+        tip(summary, "gui.galaxy.volume.field.summary");
+        detail.add(summary).colspan(2).left().padBottom(pad10).row();
+
+        if (field.isOcclusive()) {
+            float storedPeak = (float) Math.min(VolumeCalibration.OCCLUSIVE_TARGET_PEAK * Math.max(0.0, field.intensity), 1.0);
+            var occlusion = new OwnLabel(I18n.msg("gui.galaxy.volume.field.occlusion",
+                                                  DECIMAL.format(storedPeak),
+                                                  Math.round(Math.max(0f, field.occlusionThreshold) * 100f)),
+                                         skin, "grey-normal");
+            tip(occlusion, "gui.galaxy.volume.field.occlusion");
+            detail.add(occlusion).colspan(2).left().padBottom(pad18).row();
+        }
+
+        // Distribution
+        var distribution = new OwnSelectBox<ComboBoxBean<Distribution>>(skin);
+        distribution.setItems(ComboBoxBean.getValues(Distribution.class));
+        distribution.setWidth(HALF_WIDTH_BOX);
+        distribution.setSelectedIndex(field.distribution.ordinal());
+        distribution.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                field.distribution = distribution.getSelected().value;
+                markFieldsDirty();
+                // The pane title names the distribution.
+                rebuild();
+            }
+        });
+        tip(distribution, "gui.galaxy.ds.distribution");
+        var distributionLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.distribution"), skin);
+        distributionLabel.setWidth(HALF_WIDTH_BOX);
+        detail.add(distributionLabel).left().padRight(pad20).padBottom(pad18);
+        detail.add(distribution).left().padBottom(pad18).row();
+
+        // Height profile
+        var heightProfile = new OwnSelectBox<HeightProfile>(skin);
+        heightProfile.setItems(HeightProfile.values());
+        heightProfile.setWidth(HALF_WIDTH_BOX);
+        heightProfile.setSelected(field.heightProfile);
+        heightProfile.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                field.heightProfile = heightProfile.getSelected();
+                markFieldsDirty();
+            }
+        });
+        tip(heightProfile, "gui.galaxy.ds.height.profile");
+        var heightProfileLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.height.profile"), skin);
+        heightProfileLabel.setWidth(HALF_WIDTH_BOX);
+        detail.add(heightProfileLabel).left().padRight(pad20).padBottom(pad18);
+        detail.add(heightProfile).left().padBottom(pad18).row();
+
+        // Radial profile
+        addSlider(detail, fieldSlider("gui.galaxy.ds.radius.base", 0.1f, 2.0f, 0.01f, field.baseRadius,
+                                      v -> field.baseRadius = v));
+        addSlider(detail, fieldSlider("gui.galaxy.ds.radius.min", 0f, 0.95f, 0.01f, field.minRadius,
+                                      v -> field.minRadius = v));
+
+        // Arms
+        var arms = fieldSlider("gui.galaxy.ds.arm.number", 0f, 8f, 1f, field.numArms,
+                               v -> field.numArms = Math.round(v));
+        arms.setNumberFormatter(new DecimalFormat("##0"));
+        addSlider(detail, arms);
+        addSlider(detail, fieldSlider("gui.galaxy.ds.arm.sigma", 0.05f, 1.5f, 0.01f, field.armSigma,
+                                      v -> field.armSigma = v));
+        addSlider(detail, fieldSlider("gui.galaxy.ds.angle", -180f, 180f, 0.5f, field.baseAngle,
+                                      v -> field.baseAngle = v));
+
+        // Ellipsoid: eccentricity per axis, then the bar aspect.
+        var eccTable = new Table(skin);
+        var eccX = fieldSlider("gui.galaxy.ds.eccentricity.x", -0.95f, 0.95f, 0.01f, field.eccentricity[0],
+                               v -> field.eccentricity[0] = v);
+        eccX.setWidth(THIRD_WIDTH_BOX);
+        var eccY = fieldSlider("gui.galaxy.ds.eccentricity.y", -0.95f, 0.95f, 0.01f, field.eccentricity[1],
+                               v -> field.eccentricity[1] = v);
+        eccY.setWidth(THIRD_WIDTH_BOX);
+        var aspect = fieldSlider("gui.galaxy.ds.aspect", 0.1f, 3.0f, 0.01f, field.aspect,
+                                 v -> field.aspect = v);
+        aspect.setWidth(THIRD_WIDTH_BOX);
+        eccTable.add(eccX).left().padRight(PAD5);
+        eccTable.add(eccY).left().padRight(PAD5);
+        eccTable.add(aspect).left();
+        detail.add(eccTable).colspan(2).left().padBottom(pad18).row();
+
+        // Vertical structure
+        addSlider(detail, fieldSlider("gui.galaxy.ds.warp", 0f, 1.0f, 0.01f, field.warpStrength,
+                                      v -> field.warpStrength = v));
+        addSlider(detail, fieldSlider("gui.galaxy.ds.height.scale", 0f, 0.5f, 0.005f, field.heightScale,
+                                      v -> field.heightScale = v));
+
+        // Colors and color noise
+        var colorsTable = new Table(skin);
+        var colorLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.color"), skin);
+        tip(colorLabel, "gui.galaxy.ds.color");
+        colorsTable.add(colorLabel).left().padRight(pad34);
+        for (int i = 0; i < 4; i++) {
+            final int idx = i;
+            var picker = new ColorPicker("c" + idx, field.getColorRGBA(idx), stage, skin);
+            tip(picker, "gui.galaxy.ds.color");
+            picker.setNewColorRunnable(() -> {
+                field.setColorRGBA(picker.color(), idx);
+                markFieldsDirty();
+            });
+            colorsTable.add(picker).size(32f).left().padRight(pad10);
+        }
+        detail.add(colorsTable).colspan(2).left().padBottom(pad18).row();
+        addSlider(detail, fieldSlider("gui.galaxy.ds.color.noise", 0f, 1f, 0.01f, field.colorNoise,
+                                      v -> field.colorNoise = v));
+
+        // Intensity
+        addSlider(detail, fieldSlider("gui.galaxy.ds.intensity", 0f, 5f, 0.01f, field.intensity,
+                                      v -> field.intensity = v));
+
+        // Volume-only knobs: the sprite path has no equivalent for any of these.
+        addSlider(detail, fieldSlider("gui.galaxy.field.lane.warp", -0.5f, 0.5f, 0.01f, field.laneWarp,
+                                      v -> field.laneWarp = v));
+        addSlider(detail, fieldSlider("gui.galaxy.field.lane.rough", 0f, 3f, 0.01f, field.laneRough,
+                                      v -> field.laneRough = v));
+        addSlider(detail, fieldSlider("gui.galaxy.field.lane.noise.scale", 0.1f, 10f, 0.1f, field.laneNoiseScale,
+                                      v -> field.laneNoiseScale = v));
+        addSlider(detail, fieldSlider("gui.galaxy.field.noise.mask", 0f, 1f, 0.01f, field.noiseMask,
+                                      v -> field.noiseMask = v));
+        addSlider(detail, fieldSlider("gui.galaxy.field.noise.mask.freq", 0f, 40f, 0.5f, field.noiseMaskFreq,
+                                      v -> field.noiseMaskFreq = v));
+        var octaves = fieldSlider("gui.galaxy.field.noise.mask.octaves", 0f, 8f, 1f, field.noiseMaskOctaves,
+                                  v -> field.noiseMaskOctaves = Math.round(v));
+        octaves.setNumberFormatter(new DecimalFormat("##0"));
+        addSlider(detail, octaves);
+
+        // Occlusion: only dust writes depth, so only dust gets the knob.
+        if (field.isOcclusive()) {
+            addSlider(detail, fieldSlider("gui.galaxy.field.occlusion", 0f, 1f, 0.01f, field.occlusionThreshold,
+                                          v -> field.occlusionThreshold = v));
+        }
+
+        // Delete
+        var delete = new OwnTextIconButton("", skin, "delete");
+        tip(delete, "gui.galaxy.delete");
+        delete.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                removeField(volume, field);
+            }
+        });
+        detail.add(delete).colspan(2).left().padBottom(pad10).row();
+        return detail;
+    }
+
+    /** Writes a float into a field member, so that the slider builder stays generic. **/
+    @FunctionalInterface
+    private interface FieldConsumer {
+        void accept(float value);
+    }
+
+    /**
+     * @param key    The i18n key of the slider label and of its tooltip.
+     * @param min    Minimum.
+     * @param max    Maximum.
+     * @param step   Step.
+     * @param value  Current value.
+     * @param setter The field member to write to.
+     *
+     * @return The slider, configured and listening. It is not added to any table: some of them share
+     *         a row.
+     */
+    private OwnSliderPlus fieldSlider(String key,
+                                      float min,
+                                      float max,
+                                      float step,
+                                      float value,
+                                      FieldConsumer setter) {
+        var slider = new OwnSliderPlus(I18n.msg(key), min, max, step, skin);
+        tip(slider, key);
+        slider.setWidth(FULL_WIDTH_BOX);
+        // Before the listener: setting the value fires it, and the field is already at that value.
+        slider.setValue(value);
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                setter.accept(slider.getValue());
+                markFieldsDirty();
+            }
+        });
+        return slider;
+    }
+
+    /** Adds a slider on its own row, spanning both columns of the pane. **/
+    private void addSlider(Table table,
+                           OwnSliderPlus slider) {
+        table.add(slider).colspan(2).left().padBottom(pad18).row();
+    }
+
+    /**
+     * Drops a field out of the volume. The next generation re-voxelises without it, and a slot left
+     * with no fields is unbound and released by {@link VolumeInitializer}.
+     *
+     * @param volume The volume the field belongs to.
+     * @param field  The field to remove.
+     */
+    private void removeField(Volume volume,
+                             GalaxyAttributes field) {
+        var remaining = new ArrayList<>(Arrays.asList(volume.fields));
+        if (!remaining.remove(field)) {
+            return;
+        }
+        // An empty array, not null: null means "loaded from a file", and a procedural volume that
+        // lost all its fields still has to be able to unbind its slots.
+        volume.fields = remaining.toArray(new GalaxyAttributes[0]);
+        setExpanded(field, false);
+        markFieldsDirty();
+        // The panes are built from the array, so the list has to be rebuilt.
+        rebuild();
+    }
+
+    /** Flags the volume fields as edited and says so, without rebuilding the pane being dragged. **/
+    private void markFieldsDirty() {
+        if (!fieldsDirty) {
+            fieldsDirty = true;
+            if (editedHint != null) {
+                editedHint.setText(I18n.msg("gui.galaxy.volume.edited"));
+            }
         }
     }
 
@@ -353,10 +621,31 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
     @Override
     protected void onGenerate() {
         if (structureDirty) {
+            // The toggle asks for a different structure: the entities have to be replaced.
             recreate();
+        } else if (fieldsDirty && !morphologyChanged) {
+            // The fields are the object of this window, so an edited field wins over a new draw:
+            // re-voxelise what the panes hold instead of overwriting it with the seed's version.
+            reapplyFields();
         } else {
             generateInPlace();
         }
+    }
+
+    /**
+     * Voxelises the fields as the panes left them, without touching the billboard datasets or the
+     * seed. This is the cheap path an edited field takes: two compute dispatches, and the slot
+     * textures are refilled rather than reallocated.
+     */
+    private void reapplyFields() {
+        if (!isHybrid()) {
+            // No volume fields in a billboards-only galaxy, so there is nothing to re-apply.
+            generateInPlace();
+            return;
+        }
+        fieldsDirty = false;
+        VolumeInitializer.generateNow(entityDiffuse);
+        rebuild();
     }
 
     /**
@@ -371,6 +660,9 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         var gm = morphology;
         var spec = gen.generateGalaxySpec(gm, seed);
         boolean hybrid = isHybrid();
+        // A fresh draw replaces the fields wholesale, edits included.
+        fieldsDirty = false;
+        morphologyChanged = false;
 
         regenerate();
         GaiaSky.postRunnable(() -> {
@@ -425,6 +717,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         entityDiffuse = pair.getSecond();
         viewFull.setEntity(entityFull);
         structureDirty = false;
+        fieldsDirty = false;
         rebuild();
     }
 
@@ -454,7 +747,10 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     @Override
     protected void onRandomize() {
-        // The base has already written the new seed through setSeed().
+        // The base has already written the new seed through setSeed(). A new draw replaces every
+        // field, so whatever was edited in the panes is superseded - the button says "another
+        // galaxy", not "the same one with these edits".
+        fieldsDirty = false;
         onGenerate();
     }
 }

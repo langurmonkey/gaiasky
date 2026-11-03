@@ -104,6 +104,40 @@ public final class VoxelGrid {
         return Math.max(min, Math.min(v, max));
     }
 
+    /**
+     * Shrinks the grid until it holds at most {@code maxVoxels}, keeping voxels as cubic as the
+     * alignment allows.
+     * <p>
+     * The box is untouched - the grid still covers the same volume, at a coarser resolution - so the
+     * volume renders in the same place and at the same size, only blockier. This is how the CPU
+     * voxeliser keeps its cost bounded: it evaluates the field on the processor, where the cost is
+     * linear in the voxel count.
+     *
+     * @param maxVoxels The number of voxels to stay under.
+     *
+     * @return This grid if it already fits, a smaller one otherwise.
+     */
+    public VoxelGrid shrinkTo(long maxVoxels) {
+        if (voxelCount() <= maxVoxels) {
+            return this;
+        }
+        int lateral = nx;
+        int vertical = Math.min(ny, nx);
+        long total = voxelCount();
+        while (total > maxVoxels && (lateral > MIN_LATERAL || vertical > MIN_VERTICAL)) {
+            if (lateral > MIN_LATERAL && lateral >= vertical) {
+                lateral = Math.max(MIN_LATERAL, lateral - ALIGN);
+            } else if (vertical > MIN_VERTICAL) {
+                vertical = Math.max(MIN_VERTICAL, vertical - ALIGN);
+            } else {
+                lateral = Math.max(MIN_LATERAL, lateral - ALIGN);
+            }
+            vertical = Math.min(vertical, lateral);
+            total = (long) lateral * lateral * vertical;
+        }
+        return new VoxelGrid(lateral, vertical, lateral, spanPc, spanYPc);
+    }
+
     /** @return Total number of voxels. **/
     public long voxelCount() {
         return (long) nx * ny * nz;

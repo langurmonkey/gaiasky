@@ -529,7 +529,6 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
         generate.setColor(ColorUtils.gGreenC);
         generate.setWidth(BUTTON_WIDTH);
         generate.pad(pad10, pad20, pad10, pad20);
-        generate.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.generate.info"), skin));
         generate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -541,7 +540,7 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
         // Export
         var export = new OwnTextIconButton("", skin, "export");
         export.pad(pad10, pad20, pad10, pad20);
-        export.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.export.info"), skin));
+        tip(export, "gui.galaxy.export");
         export.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -564,7 +563,6 @@ public abstract class AbstractGalaxyGenWindow extends GenericDialog implements I
         randomizeButton.setColor(ColorUtils.gYellowC);
         randomizeButton.setWidth(BUTTON_WIDTH - 80f);
         randomizeButton.pad(pad10, pad20, pad10, pad20);
-        randomizeButton.addListener(new OwnTextTooltip(I18n.msg("gui.galaxy.randomize.info"), skin));
         randomizeButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,

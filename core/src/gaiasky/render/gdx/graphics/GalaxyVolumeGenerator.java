@@ -24,7 +24,6 @@ import org.lwjgl.opengl.GL43;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Builds the volume texture of a procedurally generated galaxy: gas and bulge in the emissive slot,
@@ -43,7 +42,7 @@ import java.util.Locale;
  * Not available without compute shaders (GL 4.3+). {@link #isSupported()} says so, and
  * {@link #generate} returns null rather than throwing, so the caller can fall back.
  */
-public class GalaxyVolumeGenerator implements Disposable {
+public class GalaxyVolumeGenerator implements Disposable, VolumeGenerator {
     private static final Logger.Log logger = Logger.getLogger(GalaxyVolumeGenerator.class);
 
     private static final String SHADER_FILE = "shader/compute/galgen.volume.comp.glsl";
@@ -85,6 +84,16 @@ public class GalaxyVolumeGenerator implements Disposable {
         return GaiaSky.settings().runtime.compute && Gdx.gl30 != null;
     }
 
+    @Override
+    public String name() {
+        return "GPU compute";
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return isSupported();
+    }
+
     /**
      * Generates the volume texture of one slot.
      * <p>
@@ -118,8 +127,7 @@ public class GalaxyVolumeGenerator implements Disposable {
      */
     public static boolean canReuse(VolumeTexture existing,
                                    VoxelGrid grid) {
-        return existing != null && existing.texture() != null
-                && canReuse(existing.width(), existing.height(), existing.depth(), existing.type(), grid);
+        return VolumeLayout.canReuse(existing, grid);
     }
 
     /**
@@ -140,8 +148,7 @@ public class GalaxyVolumeGenerator implements Disposable {
                                    int depth,
                                    VolumeType type,
                                    VoxelGrid grid) {
-        return grid != null && type == VolumeType.RGBA
-                && width == grid.nx && height == grid.ny && depth == grid.nz;
+        return VolumeLayout.canReuse(width, height, depth, type, grid);
     }
 
     /**
@@ -167,44 +174,12 @@ public class GalaxyVolumeGenerator implements Disposable {
             return null;
         }
 
-        int count = fields.size();
-        if (count > GalaxyAttributes.MAX_FIELDS) {
-            logger.warn("Slot declares " + count + " fields, which is more than the " + GalaxyAttributes.MAX_FIELDS
-                                + " a volume slot can hold. Dropping the last " + (count - GalaxyAttributes.MAX_FIELDS)
-                                + ".");
-            count = GalaxyAttributes.MAX_FIELDS;
-        }
-        float[] packed = packFields(fields, count);
-
-        // A spiral whose pitch is too small for its radial span is a set of radial spokes, not a
-        // spiral, and it looks like a cross. Worth saying out loud: baseAngle is in tenths of a
-        // degree and measured from the radial direction, so a plausible-looking "12" is 1.2 deg and
-        // almost straight.
-        for (int i = 0; i < count; i++) {
-            var field = fields.get(i);
-            double sweep = field.spiralArmSweepDegrees();
-            if (field.distribution.isAnySpiral() && sweep < 25.0) {
-                logger.warn(String.format(Locale.ROOT,
-                                          "Field %d (%s, %s) has baseAngle=%.1f, which sweeps only %.1f deg of arm "
-                                                  + "between minRadius %.3f and baseRadius %.1f: the arms come out as radial spokes, not a spiral. "
-                                                  + "baseAngle is in tenths of a degree, measured from the radial direction, so a 4-arm spiral "
-                                                  + "with arms that curve needs something in the 400-700 range.",
-                                          i, field.type, field.distribution, field.baseAngle, sweep,
-                                          field.minRadius, field.baseRadius));
-            }
-        }
-
-        // One slot stores either density or light, never both: the alpha channel is the only one with
-        // a free interpretation. A mixed slot is a descriptor mistake, so it is reported and the
-        // first field decides.
-        boolean occlusive = fields.getFirst().isOcclusive();
-        for (int i = 1; i < count; i++) {
-            if (fields.get(i).isOcclusive() != occlusive) {
-                logger.warn("Slot mixes occluding and emitting fields (field 0 is "
-                                    + (occlusive ? "occluding" : "emitting") + ", field " + i + " is not). The first field decides.");
-                break;
-            }
-        }
+        int count = VolumeLayout.usableCount(fields);
+        float[] packed = VolumeLayout.packFields(fields, count);
+        VolumeLayout.warnOnPitch(fields, count);
+        // One slot stores either density or light, never both: the alpha channel has a single
+        // interpretation, so a mixed slot is a descriptor mistake and the first field decides.
+        boolean occlusive = VolumeLayout.slotIsOcclusive(fields, count);
         float targetMeanRayIntegral = occlusive ? 0f : (float) VolumeCalibration.EMISSIVE_TARGET_MEAN_LUMA;
         float targetPeak = occlusive ? (float) VolumeCalibration.OCCLUSIVE_TARGET_PEAK : 0f;
 
@@ -330,48 +305,40 @@ public class GalaxyVolumeGenerator implements Disposable {
         return out;
     }
 
-    /** Packs the slot's fields into the flat uniform the shader unpacks. **/
+    /**
+     * Packs the slot's fields into the flat uniform the shader unpacks.
+     *
+     * @see VolumeLayout#packFields(List, int)
+     */
     public static float[] packFields(List<? extends GalaxyAttributes> fields, int count) {
-        float[] packed = new float[GalaxyAttributes.MAX_FIELDS * GalaxyAttributes.FIELD_STRIDE];
-        for (int i = 0; i < count; i++) {
-            fields.get(i).packFields(packed, i * GalaxyAttributes.FIELD_STRIDE);
-        }
-        return packed;
+        return VolumeLayout.packFields(fields, count);
     }
 
     /**
      * Centre of voxel (0, 0, 0) in galaxy space.
-     * <p>
-     * The box is centred on the origin, so this is the near corner plus half a cell - the shader
-     * computes voxel centres as {@code origin + voxel * cell}, which is what keeps the field's
-     * symmetry (and the spiral's winding) aligned with the texture's.
+     *
+     * @see VolumeLayout#gridOrigin(double, double, VoxelGrid)
      */
     public static float[] gridOrigin(double lateralHalf, double verticalHalf, VoxelGrid grid) {
-        float[] cell = gridCell(lateralHalf, verticalHalf, grid);
-        return new float[]{
-                (float) -lateralHalf + 0.5f * cell[0],
-                (float) -verticalHalf + 0.5f * cell[1],
-                (float) -lateralHalf + 0.5f * cell[2]
-        };
-    }
-
-    /** Galaxy-space size of one voxel on each axis. **/
-    public static float[] gridCell(double lateralHalf, double verticalHalf, VoxelGrid grid) {
-        return new float[]{
-                (float) (2.0 * lateralHalf / grid.nx),
-                (float) (2.0 * verticalHalf / grid.ny),
-                (float) (2.0 * lateralHalf / grid.nz)
-        };
+        return VolumeLayout.gridOrigin(lateralHalf, verticalHalf, grid);
     }
 
     /**
-     * The volume's box in object-size units: {@code {-x,-y,-z, +x,+y,+z}}, centred, with the lateral
-     * half-extent at exactly 0.5 so that the largest axis spans the object's size. The vertical one
-     * follows the fields' aspect, so a flat galaxy gets a flat box.
+     * Galaxy-space size of one voxel on each axis.
+     *
+     * @see VolumeLayout#gridCell(double, double, VoxelGrid)
+     */
+    public static float[] gridCell(double lateralHalf, double verticalHalf, VoxelGrid grid) {
+        return VolumeLayout.gridCell(lateralHalf, verticalHalf, grid);
+    }
+
+    /**
+     * The volume's box in object-size units.
+     *
+     * @see VolumeLayout#boxFor(double, double)
      */
     public static float[] boxFor(double lateralHalf, double verticalHalf) {
-        float hy = (float) (0.5 * verticalHalf / Math.max(lateralHalf, 1e-9));
-        return new float[]{-0.5f, -hy, -0.5f, 0.5f, hy, 0.5f};
+        return VolumeLayout.boxFor(lateralHalf, verticalHalf);
     }
 
     private boolean ensureProgram() {

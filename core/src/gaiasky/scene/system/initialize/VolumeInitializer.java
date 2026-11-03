@@ -10,8 +10,9 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
-import gaiasky.render.gdx.graphics.GalaxyVolumeGenerator;
+import gaiasky.render.gdx.graphics.VolumeGenerator;
 import gaiasky.render.gdx.graphics.VolumeCalibration;
+import gaiasky.render.gdx.graphics.VolumeLayout;
 import gaiasky.render.gdx.graphics.VolumeTexture;
 import gaiasky.render.gdx.graphics.VoxelGrid;
 import gaiasky.render.gdx.shader.attribute.IntAttribute;
@@ -113,7 +114,7 @@ public class VolumeInitializer extends AbstractInitSystem {
      * {@link Volume#fields} and calls this, and the volumes are re-voxelised with the fields as they
      * are at that moment. Both slots refill their existing texture whenever the grid still fits, so
      * an edit costs two dispatches and no material re-initialisation - see
-     * {@link GalaxyVolumeGenerator#canReuse}.
+     * {@link VolumeLayout#canReuse}.
      * <p>
      * The work is posted to the render thread: it touches GL state (image bindings, SSBO, texture
      * uploads) and the material's attributes, none of which may be done from anywhere else.
@@ -125,7 +126,10 @@ public class VolumeInitializer extends AbstractInitSystem {
             return;
         }
         var volume = Mapper.volume.get(entity);
-        if (volume == null || !volume.isProcedural()) {
+        if (volume == null || volume.fields == null) {
+            // Null fields is a volume loaded from a file: there is nothing to generate. An empty
+            // array is a procedural volume that lost all its fields, and it is valid - generating it
+            // unbinds the slots instead of leaving stale textures behind.
             logger.warn("Cannot regenerate the volume of " + name(entity) + ": the entity has no volume fields.");
             return;
         }
@@ -191,11 +195,12 @@ public class VolumeInitializer extends AbstractInitSystem {
         } else {
             mtc = model.mtc;
         }
-        if (!GalaxyVolumeGenerator.isSupported()) {
+        var generator = VolumeGenerator.forRuntime();
+        if (!generator.isAvailable()) {
             if (!generationUnavailableLogged) {
                 generationUnavailableLogged = true;
-                logger.warn("Cannot generate procedural volumes: compute shaders are not available. "
-                                    + "The volumes fall back to their shaders' own defaults.");
+                logger.warn("Cannot generate procedural volumes: neither compute shaders nor a 3D-capable "
+                                    + "context are available. The volumes fall back to their shaders' own defaults.");
             }
             return;
         }
@@ -246,10 +251,10 @@ public class VolumeInitializer extends AbstractInitSystem {
                                         MaterialComponent mtc,
                                         double sizePc) {
         var quality = GaiaSky.settings().graphics.quality;
-        var generator = GalaxyVolumeGenerator.instance();
+        var generator = VolumeGenerator.forRuntime();
         long start = System.nanoTime();
 
-        var emissiveGrid = gridFor(volume.emissiveFields(), sizePc, quality);
+        var emissiveGrid = gridFor(generator, volume.emissiveFields(), sizePc, quality);
         updateSlot(generator, volume, mtc, Volume.SLOT_EMISSIVE, volume.emissiveFields(), emissiveGrid);
 
         // The slot's threshold comes from the fields' own occlusion fractions unless the scene pins
@@ -258,7 +263,7 @@ public class VolumeInitializer extends AbstractInitSystem {
         mtc.setVolumeDepthThresholdDerived(Volume.SLOT_OCCLUSIVE,
                                           VolumeCalibration.occlusiveThreshold(volume.occlusiveFields()));
         float occlusiveThreshold = mtc.volumeDepthThreshold(Volume.SLOT_OCCLUSIVE);
-        var occlusiveGrid = gridFor(volume.occlusiveFields(), sizePc, quality);
+        var occlusiveGrid = gridFor(generator, volume.occlusiveFields(), sizePc, quality);
         updateSlot(generator, volume, mtc, Volume.SLOT_OCCLUSIVE, volume.occlusiveFields(), occlusiveGrid);
         if (volume.getGeneratedVolume(Volume.SLOT_OCCLUSIVE) != null) {
             logOcclusivePeaks(name, volume.occlusiveFields(), generator.readStats(occlusiveGrid), occlusiveThreshold);
@@ -279,9 +284,10 @@ public class VolumeInitializer extends AbstractInitSystem {
         // the blockiness is the grid or something else. The thresholds say whether the dust can
         // occlude at all - the depth pre-pass skips a slot whose threshold is zero.
         logger.info(String.format(Locale.ROOT,
-                                  "Generated the volumes of %s in %.1f ms (%.0f pc span, %s): emissive %s (depth threshold %.4f), occlusive %s (depth threshold %.4f)",
+                                  "Generated the volumes of %s in %.1f ms on the %s (%.0f pc span, %s): emissive %s (depth threshold %.4f), occlusive %s (depth threshold %.4f)",
                                   name,
                                   (System.nanoTime() - start) / 1.0e6,
+                                  generator.name(),
                                   sizePc,
                                   quality,
                                   emissiveGrid == null ? "none" : emissiveGrid.toString(),
@@ -302,7 +308,7 @@ public class VolumeInitializer extends AbstractInitSystem {
      * @param fields    The fields routed to the slot.
      * @param grid      The grid for those fields, or null when the slot is empty.
      */
-    private static void updateSlot(GalaxyVolumeGenerator generator,
+    private static void updateSlot(VolumeGenerator generator,
                                    Volume volume,
                                    MaterialComponent mtc,
                                    int slot,
@@ -334,10 +340,21 @@ public class VolumeInitializer extends AbstractInitSystem {
         volume.setGeneratedVolume(slot, texture);
     }
 
-    private static VoxelGrid gridFor(List<GalaxyAttributes> fields,
+    /**
+     * @param generator The backend that will fill the grid: it may not be able to afford the one the
+     *                  quality settings derive, and {@link VolumeGenerator#constrainGrid} is what
+     *                  settles that.
+     * @param fields    The fields that go into the slot.
+     * @param sizePc    Lateral span of the galaxy, in parsecs.
+     * @param quality   Graphics quality, which sets the target voxel size and the voxel budget.
+     *
+     * @return The grid to generate, or null if the slot has no fields.
+     */
+    private static VoxelGrid gridFor(VolumeGenerator generator,
+                                     List<GalaxyAttributes> fields,
                                      double sizePc,
                                      gaiasky.util.Settings.GraphicsQuality quality) {
-        return fields.isEmpty() ? null : GalaxyAttributes.volumeGrid(fields, sizePc, quality);
+        return fields.isEmpty() ? null : generator.constrainGrid(GalaxyAttributes.volumeGrid(fields, sizePc, quality));
     }
 
     /**
