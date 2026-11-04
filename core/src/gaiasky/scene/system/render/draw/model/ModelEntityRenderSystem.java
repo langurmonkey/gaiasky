@@ -225,12 +225,18 @@ public class ModelEntityRenderSystem {
             mc.updateCamPos(camPos);
             mc.updateTimes(GaiaSky.instance.getT(),  FastMath.abs(GaiaSky.instance.time.getTimeSeconds() % 50000.0 - 25000.0));
             mc.update(alpha * base.opacity, relativistic);
-            // Volumes write depth by default (see Volume.writeDepth): the box is a real occluder
-            // and the shader stores the depth of the first sample that found material. The blend
-            // mode still decides the colour blend - additive for emission - but not the mask,
+            // Volumes may write depth (see Volume.writeDepth): the box is then a real occluder and
+            // the depth pre-pass stores the depth of the first sample that found material. The
+            // blend mode still decides the colour blend - additive for emission - but not the mask,
             // because an additive volume that does not write depth cannot hide anything.
+            //
+            // Only a volume with an occluding slot takes part: the pre-pass is the only thing that
+            // can consume the depth, and a shader that predates it (no DEPTH_PASS) writes its own
+            // depth for the whole visible volume, which hides everything drawn after it. That is
+            // how the aurora used to erase the Earth under it. The condition must match the one in
+            // ModelExtractor, which decides whether the pre-pass runs at all.
             var volume = Mapper.volume.get(entity);
-            if (volume == null || volume.writeDepth) {
+            if (volume != null && volume.writeDepth && mc.hasVolumeDepthThreshold()) {
                 if (renderGroup == RenderGroup.VOLUME_DEPTH) {
                     // The pre-pass stores the dust front; that is the mask the passes after it are tested against.
                     mc.depthTestReadWrite();

@@ -64,7 +64,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                 // Volume models.
                 addToRender(render, RenderGroup.VOLUME);
                 var volume = Mapper.volume.get(entity);
-                if (volume.writeDepth) {
+                if (volume.writeDepth && model.model != null && model.model.hasVolumeDepthThreshold()) {
                     // Depth-only pre-pass, run early enough to occlude the star, label and point
                     // passes. See RenderGroup.VOLUME_DEPTH and Volume#writeDepth.
                     // Depth always renders to full-res buffer.

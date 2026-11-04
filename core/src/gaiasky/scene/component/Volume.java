@@ -17,7 +17,10 @@ public class Volume implements Component {
     public int key;
 
     /**
-     * Whether this volume takes part in the depth-only pre-pass. Enabled by default.
+     * Whether this volume takes part in the depth-only pre-pass. Enabled by default, but the
+     * pre-pass only runs if the volume's material declares an occluding slot, i.e. a positive
+     * {@link gaiasky.scene.record.MaterialComponent#volumeDepthThreshold}; a volume with no such
+     * slot never reaches the pre-pass and this flag has no visible effect.
      * <p>
      * A volume can be a real occluder: its box spans a region of space, and the fragment shader
      * writes the depth of the first sample dense enough to hide what is behind it, so anything
@@ -29,8 +32,12 @@ public class Volume implements Component {
      * Which volumes actually occlude is decided per slot, by
      * {@link gaiasky.scene.record.MaterialComponent#volumeDepthThreshold}: an emissive volume
      * such as gas normally carries no threshold and stays transparent to the depth buffer, while
-     * the absorbing one (dust) carries one, so only its dense lanes hide anything. With no
-     * threshold set on any slot this flag has no visible effect, and the pre-pass is wasted work.
+     * the absorbing one (dust) carries one, so only its dense lanes hide anything.
+     * <p>
+     * The pre-pass compiles the volume shader with {@code DEPTH_PASS} defined. A shader that does
+     * not know that define writes its own depth for the whole visible volume, so one such shader
+     * with a threshold set would hide everything drawn after it: the define has to be honoured for
+     * a volume to be a candidate in the first place.
      */
     public boolean writeDepth = true;
 
