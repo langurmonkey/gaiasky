@@ -47,7 +47,7 @@ public class DatasetFiltersWindow extends GenericDialog {
     /** Operators a categorical column accepts: a category has equality and nothing else. **/
     private static final String[] CATEGORICAL_COMPARATORS = {"==", "!="};
     /** Side of the square icon that shows the type of a column. **/
-    private static final float TYPE_ICON_SIZE = 25f;
+    private static final float TYPE_ICON_SIZE = 30f;
 
     private final DatasetCard ci;
     private Table filterTable;
