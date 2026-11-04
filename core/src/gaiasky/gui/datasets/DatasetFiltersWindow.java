@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.Scaling;
 import gaiasky.GaiaSky;
 import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.gui.window.GenericDialog;
+import gaiasky.data.util.GlobalResources;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.record.ParticleType;
@@ -214,7 +215,7 @@ public class DatasetFiltersWindow extends GenericDialog {
                 OwnTextField value = new OwnTextField(valueText,
                                                       skin,
                                                       validatorFor(rule.getAttribute(), categorical, numberValidator, colorValidator));
-                value.setHintTooltip(valuesHint(set, rule.getAttribute()));
+                value.setHintTooltip(hint(set, rule.getAttribute()));
 
                 OwnSelectBox<AttributeComboBoxBean> attribute = new OwnSelectBox<>(skin);
                 attribute.setItems(attrs);
@@ -280,7 +281,7 @@ public class DatasetFiltersWindow extends GenericDialog {
                         comparator.setSelected(rule.getComparator().toString());
                         value.setValidator(validatorFor(newAttr, newCategorical, numberValidator, colorValidator));
                         // The hint follows the column, like the operator list does.
-                        value.setHintTooltip(valuesHint(set, newAttr));
+                        value.setHintTooltip(hint(set, newAttr));
                         // The type icon and its tooltip follow the column too.
                         typeBox.setActor(typeIcon(skin, newCategorical));
                         typeTooltip.setText(typeTooltipText(newCategorical));
@@ -408,6 +409,54 @@ public class DatasetFiltersWindow extends GenericDialog {
     }
 
     /**
+     * Builds the hint tooltip of the value field: the values a categorical column can take, or the
+     * range of a numeric one.
+     *
+     * @param set  The particle set of the dataset, or null.
+     * @param attr The attribute.
+     *
+     * @return The tooltip text, or null if there is nothing to say about this attribute.
+     */
+    private static String hint(ParticleSet set,
+                               IAttribute attr) {
+        if (set == null || attr == null) {
+            return null;
+        }
+        return attr.isStringAttribute() ? categoricalHint(set, attr) : numericHint(set, attr);
+    }
+
+    /**
+     * The range of a numeric column or attribute, for the hint tooltip of the value field.
+     *
+     * @param set  The particle set of the dataset.
+     * @param attr The attribute.
+     *
+     * @return The tooltip text, or null if the attribute never holds a number.
+     */
+    private static String numericHint(ParticleSet set,
+                                      IAttribute attr) {
+        var range = set.getNumericRange(attr);
+        if (range.isEmpty()) {
+            return null;
+        }
+        String unit = attr.getUnit();
+        String suffix = unit != null && !unit.isBlank() ? " " + unit.trim() : "";
+        var sb = new StringBuilder();
+        if (range.isSingleValue()) {
+            sb.append(I18n.msg("gui.dataset.filter.range.single", GlobalResources.formatNumber(range.min)));
+        } else {
+            sb.append(I18n.msg("gui.dataset.filter.range",
+                               GlobalResources.formatNumber(range.min),
+                               GlobalResources.formatNumber(range.max)));
+        }
+        sb.append(suffix);
+        if (range.missing > 0) {
+            sb.append("\n").append(I18n.msg("gui.dataset.filter.range.missing", range.missing));
+        }
+        return sb.toString();
+    }
+
+    /**
      * Lists the values a categorical column can take, for the hint tooltip of the value field.
      * <p>
      * The list is capped: a column whose values are all different would otherwise fill the tooltip
@@ -418,9 +467,9 @@ public class DatasetFiltersWindow extends GenericDialog {
      *
      * @return The tooltip text, or null if there is nothing to say about this attribute.
      */
-    private static String valuesHint(ParticleSet set,
-                                     IAttribute attr) {
-        if (set == null || !(attr instanceof AttributeUCD ucdAttr) || !attr.isStringAttribute()) {
+    private static String categoricalHint(ParticleSet set,
+                                          IAttribute attr) {
+        if (!(attr instanceof AttributeUCD ucdAttr)) {
             return null;
         }
         var sample = set.getCategoricalValues(ucdAttr.ucd);

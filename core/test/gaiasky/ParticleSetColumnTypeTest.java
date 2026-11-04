@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.record.ParticleStar;
+import gaiasky.util.filter.attrib.AttributeDistance;
+import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.ucd.UCD;
 import org.junit.Assert;
 import org.junit.Test;
@@ -128,6 +130,59 @@ public class ParticleSetColumnTypeTest {
         var after = set.getCategoricalValues(CLASS);
         Assert.assertNotSame(before, after);
         Assert.assertEquals("hilda", after.values.get(0));
+    }
+
+    @Test
+    public void theRangeSkipsMissingCells() {
+        var set = set(null, star("trojan", 2f), star("hilda", null), star("main belt", 7.5f));
+
+        var range = set.getNumericRange(new AttributeUCD(MAG, false));
+        Assert.assertFalse(range.isEmpty());
+        Assert.assertEquals(2d, range.min, 1e-9);
+        Assert.assertEquals(7.5d, range.max, 1e-9);
+        Assert.assertEquals(2, range.count);
+        // A missing cell is not a zero, or the minimum would be a value no record has.
+        Assert.assertEquals(1, range.missing);
+        Assert.assertFalse(range.isSingleValue());
+    }
+
+    @Test
+    public void aSingleValueRangeSaysSo() {
+        var set = set(null, star("trojan", 3f), star("hilda", 3f));
+        var range = set.getNumericRange(new AttributeUCD(MAG, false));
+        Assert.assertTrue(range.isSingleValue());
+        Assert.assertEquals(3d, range.min, 1e-9);
+    }
+
+    @Test
+    public void aTextColumnHasNoRange() {
+        var set = set(null, star("trojan", 1f), star("hilda", 1f));
+        // The class column holds text: the range must be empty rather than a range of hash codes.
+        Assert.assertTrue(set.getNumericRange(new AttributeUCD(CLASS, true)).isEmpty());
+        Assert.assertTrue(set.sampleNumericRange(new AttributeUCD(new UCD(null, "nope", null, 5), false)).isEmpty());
+    }
+
+    @Test
+    public void builtInAttributesHaveARangeToo() {
+        // All the test records hold the same coordinates, so the distance is a single value.
+        var set = set(null, star("trojan", 1f), star("hilda", 1f));
+        var range = set.getNumericRange(new AttributeDistance());
+        Assert.assertEquals(2, range.count);
+        Assert.assertTrue(range.isSingleValue());
+        Assert.assertEquals(range.min, range.max, 0d);
+    }
+
+    @Test
+    public void theRangeIsCachedUntilTheDataChanges() {
+        var attr = new AttributeUCD(MAG, false);
+        var set = set(null, star("trojan", 1f), star("hilda", 4f));
+        Assert.assertSame(set.getNumericRange(attr), set.getNumericRange(attr));
+
+        var before = set.getNumericRange(attr);
+        set.setData(new ArrayList<>(List.of(star("hilda", 9f))), false);
+        var after = set.getNumericRange(attr);
+        Assert.assertNotSame(before, after);
+        Assert.assertEquals(9d, after.max, 1e-9);
     }
 
     @Test

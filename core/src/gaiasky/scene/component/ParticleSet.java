@@ -35,6 +35,8 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.KeplerianElements;
 import gaiasky.util.filter.FilterRule;
+import gaiasky.util.filter.attrib.AttributeUCD;
+import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.render.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.ucd.UCD;
@@ -81,6 +83,9 @@ public class ParticleSet implements Component, IDisposable {
 
     /** Sampled values of the categorical columns, filled on demand. Cleared when the data changes. */
     private final ObjectMap<UCD, CategoricalValues> categoricalValueCache = new ObjectMap<>();
+
+    /** Sampled ranges of the numeric columns and attributes, filled on demand. Cleared when the data changes. */
+    private final ObjectMap<String, NumericRange> numericRangeCache = new ObjectMap<>();
 
     /**
      * This flag enables muting particle rendering.
@@ -452,8 +457,9 @@ public class ParticleSet implements Component, IDisposable {
     public void setData(List<IParticleRecord> pointData,
                         boolean regenerateIndex) {
         this.pointData = pointData;
-        // The sampled values describe the data that just went away.
+        // The sampled values and ranges describe the data that just went away.
         categoricalValueCache.clear();
+        numericRangeCache.clear();
 
         // Regenerate index.
         if (regenerateIndex)
@@ -590,6 +596,112 @@ public class ParticleSet implements Component, IDisposable {
             values.truncate(max);
         }
         return new CategoricalValues(values, truncated);
+    }
+
+    /**
+     * The range of the numeric values of a column or attribute, as far as they were sampled.
+     */
+    public static class NumericRange {
+        /** Lowest value found. */
+        public final double min;
+        /** Highest value found. */
+        public final double max;
+        /** Number of records that carry a numeric value. */
+        public final long count;
+        /** Number of records with no numeric value (missing cell, null, or text). */
+        public final long missing;
+
+        public NumericRange(double min,
+                            double max,
+                            long count,
+                            long missing) {
+            this.min = min;
+            this.max = max;
+            this.count = count;
+            this.missing = missing;
+        }
+
+        public static final NumericRange EMPTY = new NumericRange(Double.NaN, Double.NaN, 0, 0);
+
+        public boolean isEmpty() {
+            return count == 0;
+        }
+
+        /** True if every numeric value is the same, so the column holds a single value. **/
+        public boolean isSingleValue() {
+            return count > 0 && min == max;
+        }
+    }
+
+    /**
+     * Collects the range of the values of a numeric column or attribute, and remembers the result.
+     * The scan is a single pass over the records, so it is cached: it is meant to be run once per
+     * attribute, not once per evaluation or per rule edit.
+     *
+     * @param attr The attribute or column.
+     *
+     * @return The range, or {@link NumericRange#EMPTY} if no record carries a number.
+     */
+    public NumericRange getNumericRange(IAttribute attr) {
+        if (attr == null || pointData == null || pointData.isEmpty()) {
+            return NumericRange.EMPTY;
+        }
+        String key = attributeKey(attr);
+        var cached = numericRangeCache.get(key);
+        if (cached != null) {
+            return cached;
+        }
+        var range = sampleNumericRange(attr);
+        numericRangeCache.put(key, range);
+        return range;
+    }
+
+    /**
+     * Collects the range of the values of a numeric column or attribute without caching the result.
+     * <p>
+     * Non-numeric cells count as missing rather than as zero, so a column with gaps does not report a
+     * minimum of 0 that no record has.
+     *
+     * @param attr The attribute or column.
+     *
+     * @return The range found, with the number of records that had no numeric value.
+     */
+    public NumericRange sampleNumericRange(IAttribute attr) {
+        if (attr == null || pointData == null || pointData.isEmpty()) {
+            return NumericRange.EMPTY;
+        }
+        boolean isUcd = attr instanceof AttributeUCD;
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
+        long count = 0;
+        long missing = 0;
+        for (var bean : pointData) {
+            // A UCD column goes through the extra map directly: IAttribute.getNumber turns text into
+            // a hash code, which is meaningless here.
+            double v = isUcd ? numberOrNaN(bean.getExtra(((AttributeUCD) attr).ucd)) : attr.getNumber(bean);
+            if (Double.isNaN(v)) {
+                missing++;
+                continue;
+            }
+            if (v < min) {
+                min = v;
+            }
+            if (v > max) {
+                max = v;
+            }
+            count++;
+        }
+        return count == 0 ? NumericRange.EMPTY : new NumericRange(min, max, count, missing);
+    }
+
+    private static double numberOrNaN(Object o) {
+        return o instanceof Number n ? n.doubleValue() : Double.NaN;
+    }
+
+    private static String attributeKey(IAttribute attr) {
+        // The class name, not toString(): the labels go through I18n and are not stable keys. A UCD
+        // column is the only attribute with more than one instance behind a class.
+        return attr instanceof AttributeUCD ucdAttr ? AttributeUCD.class.getName() + ":" + ucdAttr.ucd.colName : attr.getClass().getName();
     }
 
     /**
