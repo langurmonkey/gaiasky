@@ -827,7 +827,8 @@ public class IntMesh implements Disposable {
                        int offset,
                        int count,
                        boolean autoBind) {
-        if (count == 0)
+        // Nothing to draw, and a negative count would reach glDrawArrays/glDrawElements.
+        if (count <= 0)
             return;
 
         if (autoBind)
@@ -883,7 +884,10 @@ public class IntMesh implements Disposable {
                        int count,
                        int instanceCount,
                        boolean autoBind) {
-        if (count == 0)
+        // The instance count is -1 when the renderer has none for this renderable, which happens when
+        // nothing was buffered for it. glDrawArraysInstanced(-1) is not a skipped draw but a crash in
+        // the driver.
+        if (count <= 0 || instanceCount <= 0)
             return;
 
         if (autoBind)

@@ -1048,9 +1048,11 @@ public class DataModule extends APIModule implements IObserver, DataAPI {
                     synchronized (focusView) {
                         focusView.setEntity(entity);
                         if (focusView.isSet()) {
-                            ObjectMap.Keys<UCD> ucds = focusView.getSet().data().getFirst().extraKeys();
+                            var set = focusView.getSet();
+                            ObjectMap.Keys<UCD> ucds = set.data().getFirst().extraKeys();
                             for (UCD ucd : ucds)
-                                if (ucd.colName.equalsIgnoreCase(name)) return new AttributeUCD(ucd);
+                                if (ucd.colName.equalsIgnoreCase(name))
+                                    return new AttributeUCD(ucd, set.isCategoricalColumn(ucd));
                         }
                     }
                 }

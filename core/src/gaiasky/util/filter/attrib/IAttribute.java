@@ -55,4 +55,16 @@ public sealed interface IAttribute permits AttributeAbsmag, AttributeAppmag, Att
      */
     boolean isNumberAttribute();
 
+    /**
+     * Checks whether this attribute holds categorical (string) values.
+     * <p>
+     * A categorical value cannot be ordered, so a filter rule over it may only test equality. Only
+     * the extra catalogue columns can be categorical; every built-in attribute is numeric.
+     *
+     * @return True if the attribute is categorical.
+     */
+    default boolean isStringAttribute() {
+        return false;
+    }
+
 }

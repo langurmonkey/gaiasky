@@ -12,9 +12,17 @@ import gaiasky.util.ucd.UCD;
 
 public final class AttributeUCD implements IAttribute {
     public UCD ucd;
+    /** Whether the column holds text rather than numbers. Decided once, from the dataset. **/
+    private final boolean categorical;
 
     public AttributeUCD(UCD ucd) {
+        this(ucd, false);
+    }
+
+    public AttributeUCD(UCD ucd,
+                        boolean categorical) {
         this.ucd = ucd;
+        this.categorical = categorical;
     }
 
     @Override
@@ -56,5 +64,10 @@ public final class AttributeUCD implements IAttribute {
     @Override
     public boolean isNumberAttribute() {
         return false;
+    }
+
+    @Override
+    public boolean isStringAttribute() {
+        return categorical;
     }
 }

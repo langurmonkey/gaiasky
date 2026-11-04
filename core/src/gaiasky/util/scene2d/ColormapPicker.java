@@ -399,7 +399,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                     if (first.hasExtra()) {
                         ObjectMap.Keys<UCD> ucds = first.extraKeys();
                         for (UCD ucd : ucds)
-                            attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
+                            attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd, set.isCategoricalColumn(ucd))));
                     }
                 }
             }

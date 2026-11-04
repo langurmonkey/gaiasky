@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
@@ -41,7 +42,9 @@ public class OwnTextField extends TextField {
     private Drawable clearDrawable;
     private float clearX, clearY, clearW, clearH;
 
-    private EventListener validatorListener, validatorTooltipListener;
+    private EventListener validatorListener;
+    private final Array<EventListener> validatorTooltipListeners = new Array<>(false, 2);
+    private EventListener hintTooltip;
 
     public OwnTextField(@Null String text, Skin skin) {
         super(text, new TextFieldStyle(skin.get(TextFieldStyle.class)));
@@ -103,20 +106,58 @@ public class OwnTextField extends TextField {
         }
     }
 
+    /**
+     * Sets a hint tooltip for the field, replacing any previous one. Passing null removes it.
+     *
+     * @param text The tooltip text, or null for none.
+     */
+    public void setHintTooltip(@Null String text) {
+        if (hintTooltip != null) {
+            removeListener(hintTooltip);
+            hintTooltip = null;
+        }
+        if (text != null && !text.isEmpty()) {
+            hintTooltip = new OwnTextTooltip(text, skin);
+            addListener(hintTooltip);
+        }
+    }
+
+    /**
+     * Sets the validator. Passing null removes validation altogether.
+     * <p>
+     * Unhooking the listeners is not enough: the validator field itself has to go too, or
+     * {@link #isValid()} keeps rejecting text against a rule that no longer applies.
+     *
+     * @param validator The new validator, or null for none.
+     */
     public void setValidator(IValidator validator) {
-        if (validator == null) {
-            // Remove.
-            if (validatorListener != null) {
-                removeListener(validatorListener);
-                validatorListener = null;
-            }
-            if (validatorTooltipListener != null) {
-                removeListener(validatorTooltipListener);
-                validatorTooltipListener = null;
-            }
-        } else {
-            this.validator = validator;
+        removeValidatorListeners();
+        this.validator = validator;
+        if (validator != null) {
+            // The text in the field is what a failed validation reverts to, so start from it rather
+            // than from a value typed for whatever the field validated before.
+            String current = getText() != null ? getText() : "";
+            lastCorrectText = validator.validate(current) ? current : "";
             initValidator();
+        } else {
+            setToRegularColor();
+        }
+    }
+
+    /**
+     * Removes the listeners of the current validator, so that switching validators does not stack
+     * them up.
+     */
+    private void removeValidatorListeners() {
+        if (validatorListener != null) {
+            removeListener(validatorListener);
+            validatorListener = null;
+        }
+        if (validatorTooltipListeners.size > 0) {
+            for (var tooltip : validatorTooltipListeners) {
+                removeListener(tooltip);
+            }
+            validatorTooltipListeners.clear();
         }
     }
 
@@ -207,26 +248,17 @@ public class OwnTextField extends TextField {
 
     private void addValidatorTooltip(IValidator validator) {
         if (validator != null) {
-            var lis = validatorTooltipListener;
-            switch (validator) {
-                case FloatValidator fv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
-                                                                                        fv.getMinString(),
-                                                                                        fv.getMaxString()),
-                                                                                        skin));
-                case DoubleValidator dv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
-                                                                                         dv.getMinString(),
-                                                                                         dv.getMaxString()),
-                                                                                         skin));
-                case IntValidator iv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
-                                                                                      iv.getMinString(),
-                                                                                      iv.getMaxString()),
-                                                                                      skin));
-                case LongValidator lv -> addListener(lis = new OwnTextTooltip(I18n.msg("gui.validator.values",
-                                                                                       lv.getMinString(),
-                                                                                       lv.getMaxString()),
-                                                                                       skin));
-                default -> {
-                }
+            // The listener has to be kept, or a later setValidator cannot take the tooltip back down.
+            EventListener tooltip = switch (validator) {
+                case FloatValidator fv -> new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMinString(), fv.getMaxString()), skin);
+                case DoubleValidator dv -> new OwnTextTooltip(I18n.msg("gui.validator.values", dv.getMinString(), dv.getMaxString()), skin);
+                case IntValidator iv -> new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMinString(), iv.getMaxString()), skin);
+                case LongValidator lv -> new OwnTextTooltip(I18n.msg("gui.validator.values", lv.getMinString(), lv.getMaxString()), skin);
+                default -> null;
+            };
+            if (tooltip != null) {
+                addListener(tooltip);
+                validatorTooltipListeners.add(tooltip);
             }
             if (validator instanceof CallbackValidator cv) {
                 addValidatorTooltip(cv.getParent());

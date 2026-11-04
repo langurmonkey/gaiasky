@@ -12,8 +12,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.GlobalResources;
 import gaiasky.event.Event;
@@ -31,8 +34,10 @@ import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.KeplerianElements;
+import gaiasky.util.filter.FilterRule;
 import gaiasky.render.gdx.model.IntModel;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.ucd.UCD;
 import gaiasky.util.math.*;
 import net.jafama.FastMath;
 import uk.ac.starlink.table.ColumnInfo;
@@ -70,6 +75,12 @@ public class ParticleSet implements Component, IDisposable {
      * List of {@link uk.ac.starlink.table.ColumnInfo} objects for the data in this set.
      */
     public List<ColumnInfo> columnInfoList;
+
+    /** Number of distinct values collected for a categorical column before giving up. */
+    public static final int MAX_CATEGORICAL_VALUES = 32;
+
+    /** Sampled values of the categorical columns, filled on demand. Cleared when the data changes. */
+    private final ObjectMap<UCD, CategoricalValues> categoricalValueCache = new ObjectMap<>();
 
     /**
      * This flag enables muting particle rendering.
@@ -441,6 +452,8 @@ public class ParticleSet implements Component, IDisposable {
     public void setData(List<IParticleRecord> pointData,
                         boolean regenerateIndex) {
         this.pointData = pointData;
+        // The sampled values describe the data that just went away.
+        categoricalValueCache.clear();
 
         // Regenerate index.
         if (regenerateIndex)
@@ -452,6 +465,131 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setColumnInfoList(List<ColumnInfo> columnInfoList) {
         this.columnInfoList = columnInfoList;
+    }
+
+    /**
+     * Checks whether an extra column holds categorical (text) values.
+     * <p>
+     * The type is a property of the column, not of a record: the table metadata decides when the
+     * loader provides it, and the first record carrying the column otherwise.
+     *
+     * @param ucd The column.
+     *
+     * @return True if the column is categorical.
+     */
+    public boolean isCategoricalColumn(UCD ucd) {
+        if (ucd == null) {
+            return false;
+        }
+        if (columnInfoList != null) {
+            // The UCD carries the index of its column in the table, which is what columnInfoList is
+            // ordered by. Matching names is the fallback, as they are not guaranteed to be unique.
+            if (ucd.index >= 0 && ucd.index < columnInfoList.size()) {
+                var clazz = columnInfoList.get(ucd.index).getContentClass();
+                if (clazz != null) {
+                    return CharSequence.class.isAssignableFrom(clazz);
+                }
+            }
+            for (var ci : columnInfoList) {
+                if (ucd.colName != null && ucd.colName.equals(ci.getName())) {
+                    var clazz = ci.getContentClass();
+                    return clazz != null && CharSequence.class.isAssignableFrom(clazz);
+                }
+            }
+        }
+        if (pointData != null) {
+            for (var bean : pointData) {
+                Object val = bean.getExtra(ucd);
+                if (val != null) {
+                    return val instanceof CharSequence;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The distinct values of a categorical column, as far as they were sampled.
+     */
+    public static class CategoricalValues {
+        /** The values that were found, sorted case-insensitively. A blank cell is the empty string. */
+        public final Array<String> values;
+        /** True if the column holds more distinct values than the ones collected. */
+        public final boolean truncated;
+
+        public CategoricalValues(Array<String> values,
+                                 boolean truncated) {
+            this.values = values;
+            this.truncated = truncated;
+        }
+
+        public static final CategoricalValues EMPTY = new CategoricalValues(new Array<>(false, 0), false);
+
+        public boolean isEmpty() {
+            return values.size == 0;
+        }
+    }
+
+    /**
+     * Collects the distinct values of a categorical column, and remembers the result. This is meant to
+     * tell the user what a column can hold, not to be an exhaustive census: the scan stops as soon as
+     * one value more than the limit is found, so a column whose values are all different costs one
+     * pass over a handful of records instead of one over the whole dataset.
+     *
+     * @param ucd The column.
+     *
+     * @return The sampled values, or {@link CategoricalValues#EMPTY}.
+     */
+    public CategoricalValues getCategoricalValues(UCD ucd) {
+        if (ucd == null || pointData == null || pointData.isEmpty()) {
+            return CategoricalValues.EMPTY;
+        }
+        var cached = categoricalValueCache.get(ucd);
+        if (cached != null) {
+            return cached;
+        }
+        var sample = sampleCategoricalValues(ucd, MAX_CATEGORICAL_VALUES);
+        categoricalValueCache.put(ucd, sample);
+        return sample;
+    }
+
+    /**
+     * Collects the distinct values of a column without caching the result.
+     *
+     * @param ucd The column.
+     * @param max The number of distinct values to collect before giving up.
+     *
+     * @return The values found, sorted, with a flag telling whether there were more.
+     */
+    public CategoricalValues sampleCategoricalValues(UCD ucd,
+                                                    int max) {
+        if (ucd == null || pointData == null || pointData.isEmpty()) {
+            return CategoricalValues.EMPTY;
+        }
+        var found = new ObjectSet<String>(Math.min(max + 1, 64));
+        boolean truncated = false;
+        for (var bean : pointData) {
+            Object val = bean.getExtra(ucd);
+            if (val == null) {
+                continue;
+            }
+            // Trimmed and with integral numbers as their text, so that the values shown are exactly
+            // the categories a rule compares against.
+            found.add(FilterRule.asText(val));
+            if (found.size > max) {
+                truncated = true;
+                break;
+            }
+        }
+        var values = new Array<String>(found.size);
+        for (String v : found) {
+            values.add(v);
+        }
+        values.sort(String.CASE_INSENSITIVE_ORDER);
+        if (values.size > max) {
+            values.truncate(max);
+        }
+        return new CategoricalValues(values, truncated);
     }
 
     /**

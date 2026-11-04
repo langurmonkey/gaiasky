@@ -176,6 +176,14 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         }
     }
 
+    /**
+     * Gets the number of vertices or instances buffered for this renderable.
+     *
+     * @param renderable The renderable.
+     *
+     * @return The count, or -1 if nothing was ever buffered for it. Callers pass this straight to a
+     * draw call, so the mesh rejects a non-positive value instead of trusting it.
+     */
     protected int getCount(IRenderable renderable) {
         if (counts != null && counts.containsKey(renderable)) {
             return counts.get(renderable).first();
