@@ -236,11 +236,14 @@ public class ModelEntityRenderSystem {
                 // Pre-pass: writes the dust front into a target of its own, later composed into the
                 // scene depth. LEQUAL plus the write keeps the nearest of the volume's fragments.
                 mc.depthTestReadWrite();
-            } else if (volume.writeDepth) {
-                // Colour pass: no depth test or write. Occlusion is done in the shader against the
-                // stored front (see VolumeDepthMask); a test here would compare the volume with itself.
+            } else if (volume.writeDepth && mc.hasVolumeDepthThreshold()) {
+                // Colour pass of an occluding volume: no depth test or write. Its own front was
+                // composed into the scene depth, so a test here would compare the volume with itself
+                // (see VolumeDepthMask).
                 mc.depthTestDisable();
             } else {
+                // No occluding slot, so nothing of this volume reached the scene depth: the normal
+                // blend-mode test applies, and geometry in front of the volume hides it as usual.
                 mc.updateDepthTest();
             }
             batch.render(mc.instance, mc.env);

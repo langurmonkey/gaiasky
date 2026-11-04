@@ -22,6 +22,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.Volume;
+import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.render.gdx.IntModelBatch;
@@ -108,8 +109,9 @@ public class VolumeRenderer extends AbstractRenderSystem implements IObserver {
     }
 
     /**
-     * Depth-only pre-pass: one volume into a target of its own, then composed into the scene depth.
-     * The stored fronts let the colour pass tell its own dust from an occluder (see VolumeDepthMask).
+     * Depth-only pre-pass: one volume into a target of its own, then - for the volumes that declare
+     * an occluding slot - composed into the scene depth. The stored fronts let the colour pass tell
+     * its own dust from an occluder (see VolumeDepthMask).
      */
     private void renderDepthPass(List<IRenderable> renderables,
                                  ICamera camera,
@@ -138,9 +140,28 @@ public class VolumeRenderer extends AbstractRenderSystem implements IObserver {
             depthMask.restore();
         }
         // One fullscreen quad per volume: a minimum against what the scene depth already holds.
+        // Only volumes that declare an occluding slot are composed. Composing stamps the volume's
+        // own front into the scene depth, and every pass drawn after it is then rejected behind that
+        // front: a shader that writes its own depth for its whole silhouette - the volumetric aurora
+        // does - would erase the scene under it, and a volume with no threshold has nothing to hide
+        // in the first place. The mask is still filled for those volumes, because the colour pass
+        // uses it to clip against what is in front of them.
         for (var r : renderables) {
-            depthMask.compose(depthMask.texture(Mapper.volume.get(((Render) r).entity)));
+            var render = (Render) r;
+            if (!isOccluder(render)) {
+                continue;
+            }
+            depthMask.compose(depthMask.texture(Mapper.volume.get(render.entity)));
         }
+    }
+
+    /**
+     * Whether this volume declares at least one occluding slot, i.e. whether its front is allowed to
+     * hide what is drawn after it. See {@link ModelComponent#hasVolumeDepthThreshold()}.
+     */
+    private boolean isOccluder(Render render) {
+        var model = Mapper.model.get(render.entity);
+        return model != null && model.model != null && model.model.hasVolumeDepthThreshold();
     }
 
     /** Binds this volume's own front and the shared scene depth to its material. */

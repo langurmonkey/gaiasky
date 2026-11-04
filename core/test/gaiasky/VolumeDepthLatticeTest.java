@@ -119,12 +119,34 @@ public class VolumeDepthLatticeTest {
                           renderer.contains("depthMask.restore();"));
     }
 
+    /**
+     * Only a volume that declares an occluding slot may have its front composed into the scene depth,
+     * and only that one may skip the colour-pass depth test. A volume with no threshold - the aurora -
+     * would otherwise stamp its whole silhouette into the scene depth and erase what is behind it.
+     */
+    @Test
+    public void onlyOccludersReachTheSceneDepth()
+            throws IOException {
+        String renderer = read("core/src/gaiasky/scene/system/render/draw/VolumeRenderer.java");
+        String composeLoop = renderer.substring(renderer.indexOf("One fullscreen quad per volume"));
+        Assert.assertTrue("the compose must skip volumes that are not occluders",
+                          composeLoop.contains("if (!isOccluder(render))"));
+        String occluder = renderer.substring(renderer.indexOf("private boolean isOccluder("));
+        Assert.assertTrue("the occluder test must be the material's threshold",
+                          occluder.contains("model.model.hasVolumeDepthThreshold()"));
+
+        // The colour pass must agree with the compose: same predicate, same volumes.
+        String colour = read("core/src/gaiasky/scene/system/render/draw/model/ModelEntityRenderSystem.java");
+        Assert.assertTrue("the colour pass must only skip the depth test for occluders",
+                          colour.contains("} else if (volume.writeDepth && mc.hasVolumeDepthThreshold()) {"));
+    }
+
     /** The colour pass must not depth-test against its own front. */
     @Test
     public void theColourPassDoesNotTestAgainstItsOwnDepth()
             throws IOException {
         String renderer = read("core/src/gaiasky/scene/system/render/draw/model/ModelEntityRenderSystem.java");
-        String colourPass = renderer.substring(renderer.indexOf("} else if (volume.writeDepth) {"));
+        String colourPass = renderer.substring(renderer.indexOf("} else if (volume.writeDepth && mc.hasVolumeDepthThreshold()) {"));
         String branch = colourPass.substring(0, colourPass.indexOf("} else {"));
         Assert.assertTrue("the volume colour pass must not test or write depth",
                           branch.contains("mc.depthTestDisable();"));
@@ -132,6 +154,12 @@ public class VolumeDepthLatticeTest {
                            branch.contains("depthTestReadOnly"));
         Assert.assertFalse("the volume colour pass must not depth-test against its own front",
                            branch.contains("depthTestReadWrite"));
+
+        // And the other side of the branch: a volume whose front was not composed keeps the normal
+        // blend-mode test, so geometry in front of it still hides it.
+        String rest = colourPass.substring(colourPass.indexOf("} else {"));
+        Assert.assertTrue("a non-occluding volume must keep the blend-mode depth test",
+                          rest.substring(0, rest.indexOf("batch.render")).contains("mc.updateDepthTest();"));
     }
 
     private static int count(String haystack,

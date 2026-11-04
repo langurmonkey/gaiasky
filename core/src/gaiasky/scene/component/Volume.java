@@ -192,10 +192,18 @@ public class Volume implements Component, IDisposable {
      * The pre-pass front is composed into the scene depth, which occludes the passes that follow, and
      * kept per volume so the colour pass can tell its own dust from something in front and clip there.
      * <p>
+     * Only a volume whose material declares an occluding slot is composed: one with no positive
+     * threshold fills its mask - the colour pass needs it - but never hides what is drawn after it,
+     * and its colour pass keeps the normal blend-mode depth test, so geometry in front of the volume
+     * still hides the volume. This is what lets a shader that writes its own {@code gl_FragDepth} for
+     * its whole silhouette (the volumetric aurora) coexist with the pre-pass: it contributes a front
+     * to its own mask and nothing else.
+     * <p>
      * The pre-pass compiles the volume shader with {@code DEPTH_PASS} defined: it marches to the first
      * sample dense enough to occlude and returns, so the pass costs one ray step per pixel and only the
      * depth write survives the colour mask. A shader that does not know the define still renders, but
-     * its whole integration runs twice and it writes its own depth for the entire visible volume.
+     * its whole integration runs twice and it writes its own depth for the entire visible volume - for
+     * which reason such a volume should not declare a threshold it cannot honour.
      */
     public boolean writeDepth = true;
 

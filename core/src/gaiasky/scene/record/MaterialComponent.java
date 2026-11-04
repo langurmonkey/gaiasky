@@ -1295,21 +1295,31 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     /**
-     * Whether any volume slot of this material is configured as an occluder, i.e. carries a
-     * positive {@link #volumeDepthThreshold}. Only then does the depth-only pre-pass have anything
-     * to write, and only then can the volume shader be trusted to honour the pre-pass: a shader
-     * that predates it writes its own depth unconditionally and, run in the pre-pass, hides every
-     * pass that follows it.
+     * Whether any volume slot of this material is an occluder, i.e. resolves to a positive
+     * {@link #volumeDepthThreshold(int)}. Only then may the volume's front hide what is drawn after
+     * it, and only then is the volume shader trusted to honour the depth pre-pass: a shader that
+     * does not know it writes its own depth for the whole visible volume and would hide every pass
+     * that follows.
+     * <p>
+     * The resolved value is used, not just the array the scene named, because a generated volume
+     * derives its threshold from the fields it was built from (see
+     * {@link #setVolumeDepthThresholdDerived(int, float)}): a procedural galaxy never carries an
+     * explicit threshold, yet its dust occludes.
      *
      * @return True if at least one slot may write depth.
      */
     public boolean hasVolumeDepthThreshold() {
-        return hasVolumeDepthThreshold(volumeDepthThreshold);
+        for (int slot = 0; slot < 4; slot++) {
+            if (volumeDepthThreshold(slot) > 0f) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * Whether an array of per-slot depth thresholds contains an occluder. See
-     * {@link #hasVolumeDepthThreshold()}.
+     * Whether an explicit array of per-slot depth thresholds contains an occluder. Says nothing about
+     * the values derived from fields; see {@link #hasVolumeDepthThreshold()}.
      *
      * @param thresholds The thresholds, possibly null.
      *
