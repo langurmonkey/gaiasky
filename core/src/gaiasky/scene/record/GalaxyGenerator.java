@@ -15,6 +15,7 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.math.StdRandom;
 import net.jafama.FastMath;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
@@ -683,6 +684,218 @@ public class GalaxyGenerator {
         return top;
     }
 
+    /**
+     * Converts a hybrid galaxy into a JSON descriptor: the billboard entity with its compact emitters,
+     * and the child volume entity that carries the density fields of the diffuse channels.
+     *
+     * @param billboard The billboard entity of the pair.
+     * @param volume    The child volume entity of the pair.
+     *
+     * @return The descriptor, ready to be printed.
+     */
+    public JsonValue convertToHybridJson(Entity billboard,
+                                         Entity volume) {
+        var top = new JsonValue(ValueType.object);
+        var array = new JsonValue(ValueType.array);
+        top.addChild("objects", array);
+
+        array.addChild(convertToJson(billboard));
+        array.addChild(convertVolumeToJson(volume));
+        return top;
+    }
+
+    /**
+     * Converts the volume half of a hybrid galaxy into a JSON object.
+     * <p>
+     * A volume entity is a plain {@code Volume} archetype: a unit sphere scaled by the body size,
+     * with the galaxy shader and the field list that {@code VolumeInitializer} voxelises at load
+     * time. No material is written: a procedural volume without one gets a default material, which is
+     * exactly what this galaxy was built with.
+     *
+     * @param e The volume entity.
+     *
+     * @return The descriptor of the entity.
+     */
+    public JsonValue convertVolumeToJson(Entity e) {
+        var obj = new JsonValue(ValueType.object);
+
+        var base = Mapper.base.get(e);
+        var body = Mapper.body.get(e);
+        var graph = Mapper.graph.get(e);
+        var coord = Mapper.coordinates.get(e);
+        var fade = Mapper.fade.get(e);
+        var focus = Mapper.focus.get(e);
+        var modelComponent = Mapper.model.get(e);
+        var model = modelComponent != null ? modelComponent.model : null;
+        var render = Mapper.render.get(e);
+        var volume = Mapper.volume.get(e);
+
+        // Base
+        if (base.names.length == 1) {
+            obj.addChild("name", new JsonValue(base.getName()));
+        } else {
+            addArray(obj, "names", base.names);
+        }
+        obj.addChild("componentType", new JsonValue(ComponentTypes.ComponentType.values()[base.ct.getFirstOrdinal()].name()));
+        obj.addChild("archetype", new JsonValue("Volume"));
+        if (graph.parent != null) {
+            obj.addChild("parent", new JsonValue(Mapper.base.get(graph.parent).getName()));
+        }
+        // Body: the volume sizes itself by diameter, which is not what the billboard half means by
+        // sizePc. The two flag setters behind 'diameterPc' are what keep the two apart.
+        obj.addChild("diameterPc", new JsonValue(body.size * Constants.U_TO_PC));
+        obj.addChild("cameraCollision", new JsonValue(body.cameraCollision));
+        if (body.labelColor != null) {
+            addArray(obj, "labelColor", body.labelColor);
+        }
+        // Fade: with the galaxy, not with its own offset.
+        if (fade.fadePositionObjectName != null) {
+            obj.addChild("fadeObjectName", new JsonValue(fade.fadePositionObjectName));
+        }
+        if (fade.fadeOut != null) {
+            addArray(obj, "fadeOut", toPc(fade.fadeOut.values()));
+        }
+        // Focus: the volume is never a focus target, its parent is.
+        obj.addChild("focusable", new JsonValue(focus.focusable));
+        obj.addChild("halfResolutionBuffer", new JsonValue(render.halfResolutionBuffer));
+        // Model
+        if (model != null) {
+            var modelObj = new JsonValue(ValueType.object);
+            if (model.modelType != null) {
+                modelObj.addChild("type", new JsonValue(model.modelType.name().toLowerCase(Locale.ROOT)));
+            }
+            if (model.modelParams != null) {
+                var paramsObj = new JsonValue(ValueType.object);
+                for (var param : model.modelParams.entrySet()) {
+                    paramsObj.addChild(param.getKey(), toJsonValue(param.getValue()));
+                }
+                modelObj.addChild("params", paramsObj);
+            }
+            modelObj.addChild("culling", new JsonValue(model.culling));
+            modelObj.addChild("useColor", new JsonValue(model.isUseColor()));
+            if (model.getBlendMode() != null) {
+                modelObj.addChild("blendMode", new JsonValue(model.getBlendMode().name()));
+            }
+            obj.addChild("model", modelObj);
+        }
+        // Volume. Its attributes are flat in the object, not nested: that is how the attribute map
+        // declares them for the Volume component, and a "volume" block would be an unknown key.
+        obj.addChild("vertexShader", new JsonValue(volume.vertexShader));
+        obj.addChild("fragmentShader", new JsonValue(volume.fragmentShader));
+        obj.addChild("writeDepth", new JsonValue(volume.writeDepth));
+        addArray(obj, "iterations", volume.iterations);
+        var fields = fieldsToJson(volume.fields);
+        if (fields != null) {
+            obj.addChild("fields", fields);
+        }
+        // Coordinates: a child's position is an offset from its parent's.
+        var coordsObj = new JsonValue(ValueType.object);
+        var stc = (StaticCoordinates) coord.coordinates;
+        coordsObj.addChild("impl", new JsonValue(stc.getClass().getName()));
+        if (stc.getTransformName() != null) {
+            coordsObj.addChild("transformName", new JsonValue(stc.getTransformName()));
+        }
+        if (stc.getPosition() != null) {
+            addArray(coordsObj, "positionPc", stc.getPosition().cpy().scl(Constants.U_TO_PC).valuesD());
+        }
+        obj.addChild("coordinates", coordsObj);
+
+        return obj;
+    }
+
+    /**
+     * Serialises the density fields of a volume, each of them a complete {@link GalaxyAttributes}
+     * entry.
+     * <p>
+     * Every attribute is written, not only the ones that differ from the defaults: a field is a
+     * handful of numbers, and an export that reads back the same whichever defaults the next version
+     * of the generator happens to pick is worth the few extra lines.
+     *
+     * @param fields The fields, possibly null.
+     *
+     * @return The JSON array, or null if there is nothing to write.
+     */
+    public static JsonValue fieldsToJson(GalaxyAttributes[] fields) {
+        if (fields == null || fields.length == 0) {
+            return null;
+        }
+        var array = new JsonValue(ValueType.array);
+        for (var f : fields) {
+            var o = new JsonValue(ValueType.object);
+            o.addChild("impl", new JsonValue(GalaxyAttributes.class.getName()));
+            o.addChild("type", new JsonValue(f.type.name()));
+            o.addChild("distribution", new JsonValue(f.distribution.name()));
+            addArray(o, "baseColors", f.baseColors);
+            o.addChild("colorNoise", new JsonValue(f.colorNoise));
+            o.addChild("baseRadius", new JsonValue(f.baseRadius));
+            o.addChild("minRadius", new JsonValue(f.minRadius));
+            addArray(o, "translation", f.translation);
+            addArray(o, "scale", f.scale);
+            o.addChild("warpStrength", new JsonValue(f.warpStrength));
+            o.addChild("heightScale", new JsonValue(f.heightScale));
+            o.addChild("heightProfile", new JsonValue(f.heightProfile.name()));
+            addArray(o, "eccentricity", f.eccentricity);
+            o.addChild("aspect", new JsonValue(f.aspect));
+            o.addChild("baseAngle", new JsonValue(f.baseAngle));
+            addArray(o, "spiralDeltaPos", f.spiralDeltaPos);
+            o.addChild("numArms", new JsonValue(f.numArms));
+            o.addChild("armSigma", new JsonValue(f.armSigma));
+            o.addChild("laneWarp", new JsonValue(f.laneWarp));
+            o.addChild("laneRough", new JsonValue(f.laneRough));
+            o.addChild("laneNoiseScale", new JsonValue(f.laneNoiseScale));
+            o.addChild("noiseMask", new JsonValue(f.noiseMask));
+            // These two use 0 as "the default", and 0 is what an untouched field carries. The octave
+            // setter clamps to [1,8], so writing the sentinel would turn the default three octaves
+            // into one; leaving the key out keeps the field's own default, which is the same thing.
+            if (f.noiseMaskFreq != 0) {
+                o.addChild("noiseMaskFreq", new JsonValue(f.noiseMaskFreq));
+            }
+            if (f.noiseMaskOctaves != 0) {
+                o.addChild("noiseMaskOctaves", new JsonValue(f.noiseMaskOctaves));
+            }
+            o.addChild("intensity", new JsonValue(f.intensity));
+            o.addChild("occlusionThreshold", new JsonValue(f.occlusionThreshold));
+            array.addChild(o);
+        }
+        return array;
+    }
+
+    /**
+     * Converts a distance in internal units to parsecs. The fade distances are stored in internal
+     * units, so writing them raw would multiply them by {@link Constants#PC_TO_U} again on load.
+     *
+     * @param values The distances, in internal units.
+     *
+     * @return The same distances, in parsecs.
+     */
+    private static double[] toPc(double[] values) {
+        var out = new double[values.length];
+        for (int i = 0; i < values.length; i++) {
+            out[i] = values[i] * Constants.U_TO_PC;
+        }
+        return out;
+    }
+
+    /**
+     * Converts a model parameter to JSON, keeping the number type it was created with: the model
+     * builders read some of them as {@link Long} and cast, so a whole number written as a decimal
+     * would come back as a {@link Double} and throw.
+     *
+     * @param value The value.
+     *
+     * @return The JSON value.
+     */
+    private static JsonValue toJsonValue(Object value) {
+        return switch (value) {
+            case null -> new JsonValue(ValueType.nullValue);
+            case Boolean b -> new JsonValue(b);
+            case Long l -> new JsonValue(l);
+            case Number n -> new JsonValue(n.doubleValue());
+            case String s -> new JsonValue(s);
+            default -> new JsonValue(value.toString());
+        };
+    }
+
     public JsonValue convertToJson(Entity e) {
         var obj = new JsonValue(ValueType.object);
 
@@ -717,13 +930,13 @@ public class GalaxyGenerator {
         }
         // Fade
         if (fade.fadePositionObjectName != null) {
-            obj.addChild("fadeObjectname", new JsonValue(fade.fadePositionObjectName));
+            obj.addChild("fadeObjectName", new JsonValue(fade.fadePositionObjectName));
         }
         if (fade.fadeIn != null) {
-            addArray(obj, "fadeIn", fade.fadeIn.values());
+            addArray(obj, "fadeIn", toPc(fade.fadeIn.values()));
         }
         if (fade.fadeOut != null) {
-            addArray(obj, "fadeOut", fade.fadeOut.values());
+            addArray(obj, "fadeOut", toPc(fade.fadeOut.values()));
         }
         // Generation
         if (bb.procedural) {
@@ -799,7 +1012,7 @@ public class GalaxyGenerator {
         return obj;
     }
 
-    private <T> void addArray(JsonValue parent, String name, T arr) {
+    private static <T> void addArray(JsonValue parent, String name, T arr) {
         var obj = new JsonValue(ValueType.array);
 
         switch (arr) {

@@ -967,6 +967,10 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         setUseColor(usecolor);
     }
 
+    public boolean isUseColor() {
+        return useColor;
+    }
+
     public void setUseColor(String useColor) {
         try {
             this.useColor = Boolean.parseBoolean(useColor);

@@ -8,6 +8,7 @@
 package gaiasky.gui.window;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.JsonWriter;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -714,9 +716,12 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     @Override
     protected void onExport() {
-        // Every galaxy this window edits is hybrid, and the JSON writer still has no fields block to
-        // emit: an export here would write a galaxy that loads back as billboards only.
-        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.volume.unsupported"));
+        // Both halves go in one descriptor: the billboard entity, and the volume child that carries
+        // the density fields the raymarcher voxelises at load time.
+        var json = gen.convertToHybridJson(entityFull, entityDiffuse);
+        var string = json.toJson(JsonWriter.OutputType.json);
+        Gdx.app.getClipboard().setContents(string);
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.done"));
     }
 
     @Override
