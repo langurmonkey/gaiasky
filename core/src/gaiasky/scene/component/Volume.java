@@ -187,11 +187,15 @@ public class Volume implements Component, IDisposable {
      * Which volumes actually occlude is decided per slot, by
      * {@link gaiasky.scene.record.MaterialComponent#volumeDepthThreshold}: an emissive volume
      * such as gas normally carries no threshold and stays transparent to the depth buffer, while
-     * the absorbing one (dust) carries one, so only its dense lanes hide anything. With no
-     * threshold set on any slot this flag has no visible effect, and the pre-pass is wasted work.
+     * the absorbing one (dust) carries one, so only its dense lanes hide anything.
      * <p>
      * The pre-pass front is composed into the scene depth, which occludes the passes that follow, and
      * kept per volume so the colour pass can tell its own dust from something in front and clip there.
+     * <p>
+     * The pre-pass compiles the volume shader with {@code DEPTH_PASS} defined: it marches to the first
+     * sample dense enough to occlude and returns, so the pass costs one ray step per pixel and only the
+     * depth write survives the colour mask. A shader that does not know the define still renders, but
+     * its whole integration runs twice and it writes its own depth for the entire visible volume.
      */
     public boolean writeDepth = true;
 

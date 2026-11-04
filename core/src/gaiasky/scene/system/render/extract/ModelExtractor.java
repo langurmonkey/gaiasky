@@ -64,6 +64,9 @@ public class ModelExtractor extends AbstractExtractSystem {
                 // Volume models.
                 addToRender(render, RenderGroup.VOLUME);
                 var volume = Mapper.volume.get(entity);
+                // Every volume that writes depth takes part: the pre-pass fills the per-volume mask
+                // that this volume's colour pass tests against (see VolumeDepthMask), so skipping it
+                // leaves the colour pass with no mask to compare and it draws in front of the scene.
                 if (volume.writeDepth) {
                     // Depth-only pre-pass, run early enough to occlude the star, label and point
                     // passes. See RenderGroup.VOLUME_DEPTH and Volume#writeDepth.

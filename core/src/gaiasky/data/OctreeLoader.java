@@ -45,7 +45,7 @@ import net.jafama.FastMath;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -87,9 +87,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      **/
     private final BinaryDataProvider particleReader;
     /**
-     * Current number of stars that are loaded.
+     * Current number of stars that are loaded. Written from the render thread (when an octant is
+     * unloaded) and read from the loader thread (to decide whether to unload), hence volatile.
      **/
-    protected int nLoadedStars;
+    protected volatile int nLoadedStars;
     /**
      * The octant loading queue.
      **/
@@ -160,7 +161,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
         Comparator<OctreeNode> depthComparator = Comparator.comparingInt((OctreeNode o) -> o.depth);
         toLoadQueue = new PriorityBlockingQueue<>(LOAD_QUEUE_MAX_SIZE, depthComparator);
-        toUnloadQueue = new ArrayBlockingQueue<>(LOAD_QUEUE_MAX_SIZE);
+        // The unload queue is unbounded: its entries are nodes the octree already holds, so it cannot
+        // grow the scene, and a bounded one silently dropped octants that then could never be
+        // evicted, leaving the loaded-star count stuck above its limit.
+        toUnloadQueue = new LinkedBlockingQueue<>();
 
         maxLoadedIds = 50;
         idxLoadedIds = 0;
@@ -516,14 +520,13 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      */
     public void loadOctants(Array<OctreeNode> octants, Entity octreeWrapper, boolean immediate, AtomicBoolean abort) {
         if (octants.size > 0) {
+            // The index has to survive the loop: an abort rolls back from where the loading stopped.
             int i = 0;
-            OctreeNode octant = octants.get(0);
-            while (i < octants.size && !abort.get()) {
+            for (; i < octants.size && !abort.get(); i++) {
+                OctreeNode octant = octants.get(i);
                 if (!loadOctant(octant, octreeWrapper, false, true, immediate)) {
                     logger.warn("Octant not loaded: " + octant.pageId);
                 }
-                i += 1;
-                octant = octants.get(i);
             }
             flushLoadedIds();
 
@@ -711,7 +714,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                 while (!loader.toLoadQueue.isEmpty()) {
                     toLoad.clear();
                     int i = 0;
-                    while (loader.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
+                    while (loader.toLoadQueue.peek() != null && i < MAX_LOAD_CHUNK) {
                         OctreeNode octant = loader.toLoadQueue.poll();
                         toLoad.add(octant);
                         i++;
@@ -722,8 +725,9 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                         try {
                             loader.loadOctants(toLoad, octreeWrapper, false, abort);
                         } catch (Exception e) {
-                            // This will happen when the queue has been cleared during processing.
-                            logger.debug(I18n.msg("notif.loadingoctants.queue.clear"));
+                            // The queue may be cleared while processing. Anything else has to show up
+                            // in the log, so the throwable goes along with the message.
+                            logger.debug(I18n.msg("notif.loadingoctants.queue.clear"), e);
                         }
                     }
 
@@ -731,20 +735,26 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                     int nUnloaded = 0;
                     int nStars = loader.nLoadedStars;
                     if (running.get() && nStars >= loader.maxLoadedStars) //-V6007
-                        while (true) {
+                        while (nStars - nUnloaded >= loader.maxLoadedStars * 0.85) {
                             // Get first in queue (non-accessed for the longest time)
                             // and release it.
                             OctreeNode octant = loader.toUnloadQueue.poll();
-                            if (octant != null && octant.objects != null && octant.getStatus() == LoadStatus.LOADED) {
-                                loader.unloadOctant(octant, octreeWrapper);
+                            if (octant == null) {
+                                // Nothing left to release, and polling again would not change that.
+                                break;
                             }
-                            if (octant != null && octant.objects != null && !octant.objects.isEmpty()) {
-                                nUnloaded += octant.objects.getFirst()
-                                        .getStarCount();
-                                if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
-                                    break;
-                                }
+                            List<IOctreeObject> objects = octant.objects;
+                            if (objects == null || octant.getStatus() != LoadStatus.LOADED) {
+                                continue;
                             }
+                            // Count before unloading: unloadOctant clears the list on the render
+                            // thread, so reading it afterwards would race.
+                            int count = 0;
+                            for (var object : objects) {
+                                count += object.getStarCount();
+                            }
+                            loader.unloadOctant(octant, octreeWrapper);
+                            nUnloaded += count;
                         }
 
                     // Update constellations :S

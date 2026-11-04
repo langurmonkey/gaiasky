@@ -739,6 +739,16 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         setDepthTest(GL20.GL_NONE, false);
     }
 
+    /**
+     * Whether this model's material has a volume slot that writes depth in the pre-pass. See
+     * {@link MaterialComponent#hasVolumeDepthThreshold()}.
+     *
+     * @return True if the model takes part in the depth-only pre-pass.
+     */
+    public boolean hasVolumeDepthThreshold() {
+        return mtc != null && mtc.hasVolumeDepthThreshold();
+    }
+
     public void setDepthTest(int func,
                              boolean mask) {
         if (instance != null) {

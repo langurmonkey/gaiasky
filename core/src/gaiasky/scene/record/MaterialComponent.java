@@ -1295,6 +1295,39 @@ public final class MaterialComponent extends NamedComponent implements IObserver
     }
 
     /**
+     * Whether any volume slot of this material is configured as an occluder, i.e. carries a
+     * positive {@link #volumeDepthThreshold}. Only then does the depth-only pre-pass have anything
+     * to write, and only then can the volume shader be trusted to honour the pre-pass: a shader
+     * that predates it writes its own depth unconditionally and, run in the pre-pass, hides every
+     * pass that follows it.
+     *
+     * @return True if at least one slot may write depth.
+     */
+    public boolean hasVolumeDepthThreshold() {
+        return hasVolumeDepthThreshold(volumeDepthThreshold);
+    }
+
+    /**
+     * Whether an array of per-slot depth thresholds contains an occluder. See
+     * {@link #hasVolumeDepthThreshold()}.
+     *
+     * @param thresholds The thresholds, possibly null.
+     *
+     * @return True if at least one threshold is positive.
+     */
+    public static boolean hasVolumeDepthThreshold(double[] thresholds) {
+        if (thresholds == null) {
+            return false;
+        }
+        for (double threshold : thresholds) {
+            if (threshold > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * The depth threshold configured for the given volume slot, or 0 when the scene says nothing
      * about it, which means the slot never acts as an occluder.
      * <p>
