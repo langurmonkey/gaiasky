@@ -811,17 +811,23 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 id = ++objectId;
                             }
 
-                            String[] names;
+                            String[] names = null;
                             if (!ucdParser.NAME.isEmpty()) {
                                 Pair<UCD, String> namePair = getStringUcd(ucdParser.NAME, row);
-                                names = namePair != null ? new String[]{namePair.getSecond()} : new String[]{Long.toString(id)};
-                            } else {
+                                if (namePair != null) {
+                                    if (namePair.getSecond() != null) {
+                                        names = namePair.getSecond().split(Constants.nameSeparatorRegex);
+                                    }
+                                }
+                            }
+                            // Fall back to ID.
+                            if (names == null) {
                                 names = new String[]{Long.toString(id)};
                             }
 
                             ObjectMap<UCD, Object> extraAttributes = addExtraAttributes(ucdParser, row);
 
-                            var particle = new ParticleKepler(id, names[0], epoch, meanAnomaly, semiMajorAxis,
+                            var particle = new ParticleKepler(id, names, epoch, meanAnomaly, semiMajorAxis,
                                                               e, argOfPericenter, ascendingNode, inc, period, extraAttributes);
                             list.add(particle);
 

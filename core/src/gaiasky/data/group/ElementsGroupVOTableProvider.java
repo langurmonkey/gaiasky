@@ -190,6 +190,13 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
                         map.put(typeUCD, type);
                         map.put(obsUCD, nObs);
 
+                        String[] names;
+                        if (name != null) {
+                           names = name.split(Constants.nameSeparatorRegex);
+                        } else {
+                            names = new String[]{"N/A"};
+                        }
+
                         // Is the epoch uniform?
                         if (prevEpoch > 0 && epoch != prevEpoch) {
                             uniformEpoch = false;
@@ -197,7 +204,7 @@ public class ElementsGroupVOTableProvider implements IParticleGroupDataProvider 
                         prevEpoch = epoch;
 
                         var particle = new ParticleKepler(sourceId,
-                                                          name,
+                                                          names,
                                                           epoch,
                                                           meanAnomaly,
                                                           semiMajorAxis,

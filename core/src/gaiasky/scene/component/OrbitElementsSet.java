@@ -270,19 +270,21 @@ public class OrbitElementsSet implements Component {
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
                 ParticleKepler pb = (ParticleKepler) pointData.get(i);
-                if (pb.name() != null) {
-                    var name = pb.name();
-                    var nlc = TextUtils.normalizeName(name);
-                    if (nlc == null || nlc.isEmpty()) {
-                        continue;
-                    }
-                    index.put(nlc, i);
-                    if (I18n.hasLocalizedVersion(nlc)) {
-                        var loc = I18n.localize(nlc, name);
-                        var locNorm = TextUtils.normalizeName(loc);
-                        if (locNorm != null && !locNorm.equals(nlc)) {
-                            // We still use root locale here, by design.
-                            index.put(locNorm, i);
+                if (pb.names() != null) {
+                    var names = pb.names();
+                    for (var name : names) {
+                        var nlc = TextUtils.normalizeName(name);
+                        if (nlc == null || nlc.isEmpty()) {
+                            continue;
+                        }
+                        index.put(nlc, i);
+                        if (I18n.hasLocalizedVersion(nlc)) {
+                            var loc = I18n.localize(nlc, name);
+                            var locNorm = TextUtils.normalizeName(loc);
+                            if (locNorm != null && !locNorm.equals(nlc)) {
+                                // We still use root locale here, by design.
+                                index.put(locNorm, i);
+                            }
                         }
                     }
                 }

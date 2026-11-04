@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.TextUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.KeplerianElements;
@@ -22,7 +23,7 @@ import gaiasky.util.ucd.UCD;
  * Record class to store particles of all kinds.
  *
  * @param id              The particle identifier.
- * @param name            The name or designation.
+ * @param names            The name and/or designation.
  * @param epoch           The epoch in JD.
  * @param meanAnomaly     The mean anomaly, in degrees.
  * @param semiMajorAxis   The semi-major axis, in km.
@@ -34,7 +35,7 @@ import gaiasky.util.ucd.UCD;
  * @param extra           Map with extra attributes.
  */
 public record ParticleKepler(long id,
-                             String name,
+                             String[] names,
                              double epoch,
                              double meanAnomaly,
                              double semiMajorAxis,
@@ -115,12 +116,13 @@ public record ParticleKepler(long id,
 
     @Override
     public String[] names() {
-        return new String[]{name};
+        return names;
     }
 
     @Override
     public String namesConcat() {
-        return name;
+        return TextUtils.concatenate(Constants.nameSeparator,
+                                     names);
     }
 
     @Override
@@ -132,7 +134,20 @@ public record ParticleKepler(long id,
     @Override
     public boolean hasName(String candidate,
                            boolean matchCase) {
-        return matchCase ? candidate.equals(name) : candidate.equalsIgnoreCase(name);
+        if (names == null) {
+            return false;
+        } else {
+            for (String name : names) {
+                if (matchCase) {
+                    if (name.equals(candidate))
+                        return true;
+                } else {
+                    if (name.equalsIgnoreCase(candidate))
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
