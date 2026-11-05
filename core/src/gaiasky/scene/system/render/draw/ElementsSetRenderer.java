@@ -124,21 +124,31 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                 float[] colorNoiseContainer = new float[3];
                 float[] baseColor = utils.getColor(body, hl);
 
+                int numChildren = eSet != null && graph.children != null ? graph.children.size : 0;
+                int numOwn = pointData != null ? pointData.size() : 0;
+                // Upper bound of the instances this entity can produce: the children that carry a body
+                // representation, plus the particles of its own list. Both go into a single mesh,
+                // because they share the model and the draw call. Building one mesh per source left
+                // the offset pointing at the first one while the instances were written into the
+                // second, so the draw call read a buffer that had never been filled.
+                int capacity = numChildren + numOwn;
                 int numParticlesAdded = 0;
-                if (eSet != null && graph.children != null && graph.children.size > 0) {
-                    int n = graph.children.size;
+
+                if (capacity > 0) {
                     int offset = addMeshData(model,
                                              model.numVertices,
-                                             n,
+                                             capacity,
                                              model.numIndices,
                                              ModelType.QUAD,
                                              primitive);
                     setModel(offset, model);
                     setOffset(render, offset);
                     curr = meshes.get(offset);
-                    model.ensureInstanceAttribsSize(n * curr.instanceSize);
+                    curr.instanceIdx = 0;
+                    model.ensureInstanceAttribsSize(capacity * curr.instanceSize);
+                }
 
-
+                if (capacity > 0 && numChildren > 0) {
                     Array<Entity> children = graph.children;
                     for (var child : children) {
                         if (Mapper.trajectory.has(child)) {
@@ -193,20 +203,8 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     }
                 }
                 // Check own list.
-                if (pointData != null && !pointData.isEmpty()) {
-                    int n = pointData.size();
-                    int offset = addMeshData(model,
-                                             model.numVertices,
-                                             n,
-                                             model.numIndices,
-                                             ModelType.QUAD,
-                                             primitive);
-                    setModel(offset, model);
-                    setOffset(render, offset);
-                    curr = meshes.get(offset);
-                    model.ensureInstanceAttribsSize(n * curr.instanceSize);
-
-                    for (int i = 0; i < n; i++) {
+                if (capacity > 0 && numOwn > 0) {
+                    for (int i = 0; i < numOwn; i++) {
                         if (set == null || utils.filter(i, set, desc) && set.isVisible(i)) {
                             var p = pointData.get(i);
                             var k = (ParticleKepler) p;
@@ -239,15 +237,22 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     }
                 }
 
-                // Global (divisor=0) vertices (position, uv?) plus optional indices
-                curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
-                if (model.numIndices > 0) {
-                    curr.mesh.setIndices(model.indices, 0, model.numIndices);
+                if (capacity > 0) {
+                    // Global (divisor=0) vertices (position, uv?) plus optional indices
+                    curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
+                    if (model.numIndices > 0) {
+                        curr.mesh.setIndices(model.indices, 0, model.numIndices);
+                    }
+                    // Per instance (divisor=1) attributes. Only the instances actually written are
+                    // uploaded, and only those are drawn. Anything past them is out of the buffer:
+                    // undefined values that some drivers return as zeros and others as stale memory.
+                    curr.instanceCount = Math.min(numParticlesAdded, capacity);
+                    setCount(render, curr.instanceCount);
+                    curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, curr.instanceCount * curr.instanceSize);
+                } else {
+                    // Nothing to buffer. Drop the bookkeeping so this renderable draws nothing.
+                    setOffset(render, -1);
                 }
-                // Per instance (divisor=1) vertices
-                int count = numParticlesAdded * curr.instanceSize;
-                setCount(render, numParticlesAdded);
-                curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, count);
                 model.instanceAttributes = null;
 
                 setInGpu(render, true);
@@ -265,9 +270,12 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                 var diffuseScattering = set != null ? set.ambientLight : 0f;
 
                 var offset = getOffset(render);
-                if (offset < 0) return;
+                if (offset < 0 || offset >= meshes.size) {
+                    // No mesh for this renderable. Skip it, but not the rest of the group.
+                    continue;
+                }
                 curr = meshes.get(offset);
-                if (curr != null) {
+                if (curr != null && curr.instanceCount > 0) {
                     if (textureArray != null) {
                         textureArray.bind(0);
                     }
@@ -310,7 +318,7 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
 
                     try {
                         int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
-                        curr.mesh.render(shaderProgram, primitive, 0, count, getCount(render));
+                        curr.mesh.render(shaderProgram, primitive, 0, count, curr.instanceCount);
                     } catch (IllegalArgumentException e) {
                         logger.error(e, "Render exception");
                     }
@@ -391,6 +399,11 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                 int offset = getOffset(render);
                 if (offset >= 0) {
                     clearMeshData(offset);
+                    if (offset < models.size) {
+                        // Free the model slot too, so the next build reuses this index instead of
+                        // shifting the models array away from the meshes.
+                        models.set(offset, null);
+                    }
                 }
                 setOffset(render, -1);
                 setInGpu(render, false);

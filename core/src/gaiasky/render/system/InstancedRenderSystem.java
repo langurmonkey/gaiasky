@@ -141,7 +141,13 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     protected void setModel(int offset,
                             InstancedModel model) {
         if (offset >= 0) {
-            models.insert(offset, model);
+            if (offset < models.size && models.get(offset) == null) {
+                // Slot freed by a dispose: reuse it. Inserting would shift every model after it while
+                // the meshes stay put, so an offset would stop matching its model.
+                models.set(offset, model);
+            } else {
+                models.insert(offset, model);
+            }
         }
     }
 

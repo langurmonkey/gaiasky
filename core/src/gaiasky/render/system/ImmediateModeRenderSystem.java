@@ -150,7 +150,14 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
                 initOffset(renderable);
                 offsets.get(renderable).add(offset);
             } else {
+                // A negative offset means "forget this renderable". The counts describe the meshes
+                // being dropped, so they go too: keeping them made every rebuild append a new count
+                // while getCount() kept returning the first one, and the renderer then drew that
+                // stale number of instances from a buffer that had been filled with fewer.
                 offsets.remove(renderable);
+                if (counts != null) {
+                    counts.remove(renderable);
+                }
             }
         }
     }
@@ -288,6 +295,12 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         public int indexIdx;
         public int numVertices;
         public int capacity;
+        /**
+         * Number of instances actually uploaded to the mesh. This, and only this, is safe to pass to
+         * a draw call: anything above it reads past the end of the instance buffer, which is
+         * undefined and driver-dependent (zeros for some, stale memory for others).
+         */
+        public int instanceCount;
         protected int indexVert;
         protected int[] indices;
 
@@ -297,6 +310,7 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
             indexIdx = 0;
             indexVert = 0;
             numVertices = 0;
+            instanceCount = 0;
         }
 
         public void dispose() {
