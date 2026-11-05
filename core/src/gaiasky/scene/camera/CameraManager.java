@@ -17,9 +17,11 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.data.util.GlobalResources;
 import gaiasky.util.Nature;
 import gaiasky.util.camera.CameraUtils;
@@ -31,7 +33,11 @@ import gaiasky.util.math.Vector3Q;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
+import java.util.Locale;
+
 public class CameraManager implements ICamera, IObserver {
+    private static final Logger.Log logger = Logger.getLogger(CameraManager.class);
+
     private final ICamera[] cameras;
     /**
      * Last position, for working out velocity
@@ -376,12 +382,31 @@ public class CameraManager implements ICamera, IObserver {
             } else {
                 setClosest(closestBody.getDistToCamera() < closestParticle.getClosestDistToCamera() ? closestBody : closestParticle);
             }
+        } else {
+            // Nothing around: clear it, or the label keeps naming the last object seen, and the
+            // "new closest" event would not fire when the same object is the closest again later.
+            setClosest(null);
+            previousClosest = null;
         }
 
         IFocus newClosest = getClosest();
         EventManager.publish(Event.CAMERA_CLOSEST_INFO, this, newClosest, getClosestBody(), getClosestParticle());
 
+        // The value is consumed: the extraction pass of this frame rebuilds it from the objects that
+        // actually get rendered. Keeping it across frames is what let a faded-out object own the
+        // camera speed ceiling indefinitely.
+        current.resetClosestBody();
+
         if (newClosest != null && !newClosest.equals(previousClosest)) {
+            // The closest object sets the camera speed ceiling, so when it looks wrong this line is
+            // the first thing to look at.
+            if (newClosest instanceof FocusView cv && cv != null && cv.getEntity() != null) {
+                var cvBase = Mapper.base.get(cv.getEntity());
+                logger.debug(String.format(Locale.ROOT, "Closest: %s, %.3f AU, opacity %.4f",
+                                           newClosest.getName(),
+                                           newClosest.getDistToCamera() * Constants.U_TO_AU,
+                                           cvBase != null ? cvBase.opacity : -1f));
+            }
             EventManager.publish(Event.CAMERA_NEW_CLOSEST, this, newClosest);
             if (newClosest instanceof FocusView) {
                 focusView.setEntity(((FocusView) newClosest).getEntity());
@@ -532,6 +557,11 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public void checkClosestBody(Entity entity) {
         current.checkClosestBody(entity);
+    }
+
+    @Override
+    public void resetClosestBody() {
+        current.resetClosestBody();
     }
 
     @Override

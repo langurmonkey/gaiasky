@@ -1672,15 +1672,47 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
+     * Distance used when there is no body to measure against. Large enough that the speed mapping
+     * saturates at its ceiling, which is what "nothing nearby" should mean.
+     **/
+    static final double NO_CLOSEST_BODY_DISTANCE = 1.0e20;
+
+    /**
+     * Converts a body's distance to the camera and elevation into the distance the speed scaling uses.
+     * Non-finite inputs yield {@link #NO_CLOSEST_BODY_DISTANCE}: a NaN here reaches the velocity clamp,
+     * where every comparison is false and the camera stops translating altogether.
+     *
+     * @param distToCamera Distance from the camera to the body.
+     * @param elevation    Elevation of the camera above the body's surface.
+     * @param billboard    Whether the body is a billboard, which needs extra clearance.
+     *
+     * @return The distance used for the speed scaling.
+     */
+    static double closestBodyDistance(double distToCamera,
+                                      double elevation,
+                                      boolean billboard) {
+        if (!Double.isFinite(distToCamera) || !Double.isFinite(elevation)) {
+            return NO_CLOSEST_BODY_DISTANCE;
+        }
+        double distance = distToCamera - (elevation + MIN_DIST);
+        if (!Double.isFinite(distance)) {
+            return NO_CLOSEST_BODY_DISTANCE;
+        }
+        return distance * (billboard ? 15.0 : 1.0);
+    }
+
+    /**
      * For bodies, we just get the distance minus the elevation plus the minimum distance.
      *
      * @return The raw (unsmoothed) distance to the closest body.
      */
     private double getClosestBodyDistance() {
-        return closestBody != null ?
-                (closestBody.getDistToCamera() - (closestBody.getElevationAt(pos, false) + MIN_DIST))
-                        * (closestBody.isBillboard() ? 15.0 : 1.0)
-                : 1.0e40;
+        if (closestBody == null || !closestBody.isValid()) {
+            return NO_CLOSEST_BODY_DISTANCE;
+        }
+        return closestBodyDistance(closestBody.getDistToCamera(),
+                                   closestBody.getElevationAt(pos, false),
+                                   closestBody.isBillboard());
     }
 
     /**

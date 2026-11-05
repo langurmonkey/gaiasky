@@ -196,6 +196,14 @@ public interface ICamera {
      */
     void checkClosestBody(Entity entity);
 
+    /**
+     * Forgets the closest body. Called once per frame, after the value has been used and before the
+     * extraction pass, so that the closest body is always rebuilt from the objects that are actually
+     * rendered this frame. Without this, an object that stops being rendered (faded out, culled, or
+     * not updated) stays the closest forever.
+     */
+    void resetClosestBody();
+
     IFocus getClosestBody();
 
     IFocus getSecondClosestBody();

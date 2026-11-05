@@ -412,6 +412,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
+    public void resetClosestBody() {
+        super.resetClosestBody();
+        secondClosest.clearEntity();
+    }
+
+    @Override
     public IFocus getSecondClosestBody() {
         return secondClosest;
     }

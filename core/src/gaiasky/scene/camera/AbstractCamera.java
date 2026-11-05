@@ -293,17 +293,42 @@ public abstract class AbstractCamera implements ICamera {
         this.shift.set(shift);
     }
 
+    /**
+     * Orders two bodies by clearance, i.e. distance minus radius. A candidate with a non-finite
+     * distance or radius never wins, and a non-finite incumbent is always replaced: NaN compares false
+     * against everything, so a body with a degenerate position would otherwise keep the closest slot
+     * for the rest of the session and pin the camera speed to a meaningless value.
+     *
+     * @param candidateDistance Distance from the camera to the candidate.
+     * @param candidateRadius   Radius of the candidate.
+     * @param currentDistance   Distance from the camera to the current closest body.
+     * @param currentRadius     Radius of the current closest body.
+     *
+     * @return Whether the candidate is closer than the current closest body.
+     */
+    static boolean isCloser(double candidateDistance,
+                            double candidateRadius,
+                            double currentDistance,
+                            double currentRadius) {
+        if (!Double.isFinite(candidateDistance) || !Double.isFinite(candidateRadius)) {
+            return false;
+        }
+        if (!Double.isFinite(currentDistance) || !Double.isFinite(currentRadius)) {
+            return true;
+        }
+        return candidateDistance - candidateRadius < currentDistance - currentRadius;
+    }
+
     @Override
     public synchronized void checkClosestBody(IFocus cb) {
         if (cb instanceof FocusView candidate) {
             // A copy can never be the closest
             if (!cb.isCopy() && !Mapper.tagNoClosest.has(candidate.getEntity())) {
-                if (closestBody.getEntity() == null) {
+                var current = closestBody.isValid() ? closestBody : null;
+                double currentDistance = current != null ? current.getDistToCamera() : Double.POSITIVE_INFINITY;
+                double currentRadius = current != null ? current.getRadius() : 0.0;
+                if (isCloser(cb.getDistToCamera(), cb.getRadius(), currentDistance, currentRadius)) {
                     closestBody.setEntity(candidate.getEntity());
-                } else {
-                    if (closestBody.getDistToCamera() - closestBody.getRadius() > cb.getDistToCamera() - cb.getRadius()) {
-                        closestBody.setEntity(candidate.getEntity());
-                    }
                 }
             }
         }
@@ -313,20 +338,26 @@ public abstract class AbstractCamera implements ICamera {
         // A copy can never be the closest
         var base = Mapper.base.get(cb);
         var body = Mapper.body.get(cb);
-        if (!base.copy && !Mapper.tagNoClosest.has(cb) && body.cameraCollision) {
-            if (!closestBody.isValid()) {
-                closestBody.setEntity(cb);
-            } else {
-                double distMinusRadius = closestBody.getDistToCamera() - closestBody.getRadius();
-                Entity prev = closestBody.getEntity();
+        if (base != null && body != null && !base.copy && !Mapper.tagNoClosest.has(cb) && body.cameraCollision) {
+            Entity prev = closestBody.getEntity();
+            double currentDistance = closestBody.isValid() ? closestBody.getDistToCamera() : Double.POSITIVE_INFINITY;
+            double currentRadius = closestBody.isValid() ? closestBody.getRadius() : 0.0;
 
-                // Change and test.
-                closestBody.setEntity(cb);
-                if (distMinusRadius < closestBody.getDistToCamera() - closestBody.getRadius()) {
+            // Change and test: the candidate's radius is only readable once it is set.
+            closestBody.setEntity(cb);
+            if (!isCloser(body.distToCamera, closestBody.getRadius(), currentDistance, currentRadius)) {
+                if (prev != null) {
                     closestBody.setEntity(prev);
+                } else {
+                    closestBody.clearEntity();
                 }
             }
         }
+    }
+
+    @Override
+    public synchronized void resetClosestBody() {
+        closestBody.clearEntity();
     }
 
     @Override

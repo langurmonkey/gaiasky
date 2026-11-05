@@ -192,12 +192,49 @@ public class GraphUpdater extends AbstractUpdateSystem {
             // Some elements (orbital element sets, octrees) process their own children.
             // But: not in the case of a copy!
             boolean processChildren = Mapper.tagCopy.has(entity) || !(Mapper.tagNoProcessChildren.has(entity) || (ds != null && !GaiaSky.instance.isOn(base.ct)));
-            if (processChildren && graph.children != null && opacity > 0) {
+            if (processChildren && graph.children != null) {
                 // Go down a level
                 for (int i = 0; i < graph.children.size; i++) {
                     Entity child = graph.children.get(i);
-                    update(child, time, graph.translation, getChildrenOpacity(entity, child, base, fade, opacity));
+                    float childOpacity = getChildrenOpacity(entity, child, base, fade, opacity);
+                    if (childOpacity > 0) {
+                        update(child, time, graph.translation, childOpacity);
+                    } else {
+                        // A transparent child is not traversed, so nothing below it is updated any
+                        // more: its entities keep the opacity and the distance they last had. Both
+                        // the extraction pass and the closest-body query read those fields, so the
+                        // subtree has to be told explicitly that it is invisible.
+                        hideSubtree(child, childOpacity);
+                    }
                 }
+            }
+        }
+    }
+
+    /**
+     * Propagates a transparent opacity to a subtree that is no longer updated. The opacity and the
+     * distance of an entity are only refreshed while its parent chain is traversed; once it is not,
+     * an entity that was last seen with a non-zero opacity stays "visible" for the extraction pass
+     * and keeps competing for the closest body with a frozen distance, which pins the camera speed
+     * scaling to a value that has nothing to do with where the camera is.
+     *
+     * @param entity  The root of the subtree to hide.
+     * @param opacity The opacity to propagate. Zero or negative.
+     */
+    static void hideSubtree(Entity entity,
+                            float opacity) {
+        var base = Mapper.base.get(entity);
+        if (base == null || base.opacity == opacity) {
+            // Already propagated on an earlier frame.
+            return;
+        }
+        base.opacity = opacity;
+
+        var graph = Mapper.graph.get(entity);
+        // Sets that process their own children (particle groups, octrees) are left alone.
+        if (graph != null && graph.children != null && !Mapper.tagNoProcessChildren.has(entity)) {
+            for (int i = 0; i < graph.children.size; i++) {
+                hideSubtree(graph.children.get(i), opacity);
             }
         }
     }
