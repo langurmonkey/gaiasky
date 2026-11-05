@@ -132,6 +132,8 @@ public class CPUGalaxyVolumeGeneratorTest {
         sphere.distribution = GalaxyAttributes.Distribution.SPHERE;
         sphere.baseRadius = 1f;
         sphere.heightScale = 1f;
+        // No inner hole: a spheroid with minRadius set has an empty core by design.
+        sphere.minRadius = 0f;
         var shape = GalaxyShape.from(VolumeLayout.packFields(List.of(sphere), 1), 0);
         var out = new GalaxyDensityField.Sample();
 
@@ -312,13 +314,28 @@ public class CPUGalaxyVolumeGeneratorTest {
     @Test
     public void emissiveSlotIsBrightestAtTheCore() {
         var grid = smallGrid();
-        ByteBuffer bytes = CPUGalaxyVolumeGenerator.voxelise(List.of(gas()), grid, new float[14]);
+        var field = gas();
+        // No inner hole: minRadius is the field's inner edge, so a field that has one has an empty
+        // core and the brightest voxel sits on the edge instead.
+        field.minRadius = 0f;
+        ByteBuffer bytes = CPUGalaxyVolumeGenerator.voxelise(List.of(field), grid, new float[14]);
         // The galaxy is centred in the box, so the middle voxel of the grid is the core.
         int cx = grid.nx / 2, cy = grid.ny / 2, cz = grid.nz / 2;
         int core = bytes.get(((cz * grid.ny + cy) * grid.nx + cx) * 4 + 3) & 0xff;
         int corner = bytes.get(3) & 0xff;
         Assert.assertTrue("the core (" + core + ") should be brighter than a corner (" + corner + ")",
                           core > corner);
+    }
+
+    @Test
+    public void innerRadiusEmptiesTheCore() {
+        var grid = smallGrid();
+        var field = gas();
+        Assert.assertTrue(field.minRadius > 0f);
+        ByteBuffer bytes = CPUGalaxyVolumeGenerator.voxelise(List.of(field), grid, new float[14]);
+        int cx = grid.nx / 2, cy = grid.ny / 2, cz = grid.nz / 2;
+        int core = bytes.get(((cz * grid.ny + cy) * grid.nx + cx) * 4 + 3) & 0xff;
+        Assert.assertEquals("minRadius leaves the middle of the box empty", 0, core);
     }
 
     @Test

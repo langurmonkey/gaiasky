@@ -59,6 +59,12 @@ public final class VoxelGrid {
         double voxelPc = quality.voxelSizePc;
         long budget = quality.voxelBudget;
 
+        // A NaN or infinite span would reach the grid dims and the shader uniforms: fall back to
+        // the smallest grid instead of letting the rounding below produce a degenerate one.
+        if (!(spanPc > 0.0) || Double.isInfinite(spanPc)) {
+            spanPc = voxelPc * MIN_LATERAL;
+        }
+
         int lateral = alignUp(clamp((int) Math.round(spanPc / voxelPc), MIN_LATERAL, MAX_LATERAL));
         int vertical = verticalFor(lateral, aspect);
 

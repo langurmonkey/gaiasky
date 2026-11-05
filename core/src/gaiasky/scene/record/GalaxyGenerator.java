@@ -285,7 +285,9 @@ public class GalaxyGenerator {
 
                 // Gas
                 var gas = generateBase(GAS, distribution);
-                gas.setBaseRadius(rand.nextDouble(1.5, 2.2));
+                // baseRadius is a fraction of the object radius, and a volume is clipped by it, so
+                // the gas fills the object instead of spilling past it.
+                gas.setBaseRadius(1.0);
                 gas.setMinRadius(0.0);
                 gas.setScale(new double[]{1.0, rand.nextDouble(0.1, 2.0), 1.0});
 
@@ -305,7 +307,10 @@ public class GalaxyGenerator {
                 var minRadius = rand.nextDouble(0.08, 0.15);
                 var spiralDeltaPos = generateSpiralDeltaPos(dustDistribution);
                 var numArms = (rand.nextFloat() > 0.35f ? 2L : 4L) * (gm == GalaxyMorphology.Sc ? 2L : 1L);
-                var armSigma = rand.nextDouble(0.25, 0.45) / numArms;
+                var armSigma = rand.nextDouble(0.25, 0.45);
+                // The gas is the broad component: sharing the stars' sigma gives arms narrower than
+                // the voxel grid, and the gas renders as thin lanes instead of as a diffuse arm.
+                var gasArmSigma = rand.nextDouble(0.22, 0.5);
 
                 // Stars
                 var stars = generateBase(STAR, starDistribution);
@@ -337,14 +342,18 @@ public class GalaxyGenerator {
                 // GAS
                 var gas = generateBase(GAS, gasDistribution);
                 gas.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
-                gas.setMinRadius(minRadius);
+                gas.setArmSigma(gasArmSigma);
+                // The gas has no inner edge: a hole in the middle is the bulge's presence, and the
+                // bulge is not always there. The arms still fade in over an inner disc, which is an
+                // anti-aliasing term of the field and not a physical cut.
+                gas.setMinRadius(0.0);
                 gas.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // BULGE
                 var bulge = generateBase(BULGE, SPHERE);
                 bulge.setMinRadius(0.0);
                 bulge.setBaseRadius(minRadius + 0.05);
-                bulge.setColorNoise(0.09);
+                bulge.setColorNoise(0.22);
 
 
                 specFull = new BillboardDataset[]{stars, hii};
@@ -363,7 +372,9 @@ public class GalaxyGenerator {
                 var eccentricity = rand.nextDouble(0.2, 0.3);
                 var spiralDeltaPos = generateSpiralDeltaPos(dustDistribution);
                 var numArms = (rand.nextFloat() > 0.35f ? 2L : 4L) * (gm == GalaxyMorphology.SBc ? 2L : 1L);
-                var armSigma = rand.nextDouble(0.25, 0.45) / numArms;
+                var armSigma = rand.nextDouble(0.25, 0.45);
+                // See the spiral branch: the gas gets its own, broader sigma.
+                var gasArmSigma = rand.nextDouble(0.22, 0.5);
 
                 // Stars
                 var stars = generateBase(STAR, starDistribution);
@@ -395,7 +406,9 @@ public class GalaxyGenerator {
                 // GAS
                 var gas = generateBase(GAS, gasDistribution);
                 gas.setSpiralData(spiralAngle, eccentricity, spiralDeltaPos, numArms, armSigma);
-                gas.setMinRadius(minRadius / 2.0);
+                gas.setArmSigma(gasArmSigma);
+                // See the spiral branch: the gas keeps its centre, the bar is what may be there.
+                gas.setMinRadius(0.0);
                 gas.setHeightParameters(warpStrength, heightScale, heightProfile);
 
                 // BAR
@@ -433,9 +446,11 @@ public class GalaxyGenerator {
                 // Gas (scattered, clumpy distribution)
                 var gas = generateBase(GAS, IRREGULAR);
                 gas.setIntensity(gas.intensity * rand.nextDouble(3.0, 8.0));
-                gas.setMinRadius(rand.nextDouble(0.1, 0.3));
+                // The gas of an irregular has no inner edge either; the sky is not behind a bulge.
+                gas.setMinRadius(0.0);
                 gas.setScale(scale);
-                gas.setBaseRadius(rand.nextDouble(1.0, 2.0));
+                // A fraction of the object radius, as everywhere else.
+                gas.setBaseRadius(rand.nextDouble(0.7, 1.0));
                 gas.setSizeNoiseScale(sizeScale);
                 gas.setSize(gas.size * rand.nextDouble(3.2, 5.0));
 
@@ -473,6 +488,24 @@ public class GalaxyGenerator {
             bd.setDepthMask(false);
             // Use FBM perlin noise.
             bd.setSizeNoiseScale(-rand.nextDouble(10.0, 25.0));
+        }
+        if (type == GAS || type == DUST) {
+            // The diffuse channels always get clumped: an analytic field without it is a smooth
+            // mathematical surface, which is what makes these galaxies read as synthetic.
+            var mask = rand.nextDouble(0.55, 0.85);
+            bd.setNoiseMask(mask);
+            bd.setNoiseMaskFreq(rand.nextDouble(5.0, 12.0));
+            bd.setNoiseMaskOctaves((long) rand.nextInt(3, 5));
+            // The mask removes density where the noise is in a trough, so it lowers the mean; the
+            // intensity has to make up for that or the clumped field comes out dimmer.
+            bd.setIntensity(bd.intensity * (1.0 + mask * 0.5));
+        } else if (type == BULGE) {
+            // A stellar population is smoother than the gas, but not a solid: at the resolution of a
+            // volume the crest of the bulge is thousands of pixels across, and an exact spheroid
+            // there is the clearest tell of a synthetic galaxy. Milder and coarser than the gas.
+            bd.setNoiseMask(rand.nextDouble(0.15, 0.3));
+            bd.setNoiseMaskFreq(rand.nextDouble(3.0, 7.0));
+            bd.setNoiseMaskOctaves((long) rand.nextInt(2, 4));
         }
         return bd;
     }
@@ -537,7 +570,7 @@ public class GalaxyGenerator {
             case HII -> 1.0;
             case DUST -> rand.nextDouble(0.03, 0.08);
             case GAS -> rand.nextGaussian(0.011, 0.0002);
-            case BULGE -> rand.nextDouble(0.5, 1.2);
+            case BULGE -> rand.nextDouble(0.8, 2.2);
             case POINT -> rand.nextGaussian(0.01, 0.001);
         };
     }
@@ -565,7 +598,9 @@ public class GalaxyGenerator {
      * We take the middle values, so 60% for spirals, 40% for barred spirals, and 25% for lenticulars.
      */
     private double generateWarpStrength(GalaxyMorphology m) {
-        var w = rand.nextDouble(GAS.warpStrength[0] * 0.6f, GAS.warpStrength[1] * 0.6f);
+        // Upper part of the range: a warp near zero is invisible next to a 0.03-thick disk.
+        var w = rand.nextDouble(GAS.warpStrength[0] + 0.25 * (GAS.warpStrength[1] - GAS.warpStrength[0]),
+                                GAS.warpStrength[1]);
         return switch (m) {
             case Sa, Sb, Sc -> rand.nextDouble() < 0.6 ? w : 0.0;
             case SBa, SBb, SBc -> rand.nextDouble() < 0.4 ? w : 0.0;
@@ -593,19 +628,22 @@ public class GalaxyGenerator {
     }
 
     private double generateSpiralAngle(GalaxyMorphology m, Distribution d) {
+        // The pitch is 0.1 * the stored value, so the floor of 500 - 50 degrees - is the flattest
+        // arm the generator draws. Below it the arms are open enough to read as spokes rather than
+        // as spiral arms, in both the field and the particles.
         if (d == SPIRAL) {
             return switch (m) {
-                case Sc, SBc -> rand.nextDouble(190.0, 300.0);
-                case Sb, SBb -> rand.nextDouble(300.0, 500.0);
-                case Sa, SBa -> rand.nextDouble(500.0, 1000.0);
-                default -> rand.nextDouble(50.0, 1000.0);
+                case Sc, SBc -> rand.nextDouble(500.0, 600.0);
+                case Sb, SBb -> rand.nextDouble(600.0, 750.0);
+                case Sa, SBa -> rand.nextDouble(750.0, 850.0);
+                default -> rand.nextDouble(500.0, 850.0);
             };
         } else if (d == Distribution.SPIRAL_LOG) {
             return switch (m) {
                 case Sc -> rand.nextDouble(500.0, 630.0);
                 case Sb -> rand.nextDouble(630.0, 770.0);
-                case Sa -> rand.nextDouble(750.0, 870.0);
-                default -> rand.nextDouble(50.0, 1000.0);
+                case Sa -> rand.nextDouble(750.0, 850.0);
+                default -> rand.nextDouble(500.0, 850.0);
             };
         }
         return -1;

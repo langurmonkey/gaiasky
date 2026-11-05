@@ -52,8 +52,8 @@ public final class GalaxyDensityField {
     public static final float LANE_ROUGH_FREQ = 4.0f;
     /** Octaves summed into the ragged edge. Mirrors {@code GX_LANE_ROUGH_OCTAVES}. **/
     public static final int LANE_ROUGH_OCTAVES = 4;
-    /** Highest frequency the grid can carry, in cycles per voxel. Mirrors {@code GX_NOISE_MAX_LOD}. **/
-    public static final float NOISE_MAX_LOD = 0.35f;
+    /** Highest frequency the grid can carry smoothly, in cycles per voxel. Mirrors {@code GX_NOISE_MAX_LOD}. **/
+    public static final float NOISE_MAX_LOD = 0.15f;
     /** Displacement of the lane edge at laneRough = 1. Mirrors {@code GX_LANE_ROUGH_SIGMA}. **/
     public static final float LANE_ROUGH_SIGMA = 3.0f;
     /** Feature stretch along the lane. Mirrors {@code GX_LANE_STRETCH}. **/
@@ -68,6 +68,13 @@ public final class GalaxyDensityField {
     public static final float DUST_CONTRAST = 4.0f;
     /** Dust slab thickness relative to the gas one. Mirrors {@code GX_DUST_HEIGHT}. **/
     public static final float DUST_HEIGHT = 0.5f;
+    /** Scale of the bulge's exponential envelope. Mirrors {@code GX_BULGE_SCALE}. **/
+    public static final float BULGE_SCALE = 0.32f;
+    /**
+     * Radius, in units of baseRadius, inside which the azimuthal structure fades out. Mirrors
+     * {@code GX_ARM_START}: an anti-aliasing term, not a physical inner edge.
+     **/
+    public static final float ARM_START = 0.12f;
     /** Luma weights of the offline pipeline. Mirrors {@code GX_LUMA}. **/
     public static final float LUMA_R = 0.2126f, LUMA_G = 0.7152f, LUMA_B = 0.0722f;
 
@@ -362,7 +369,8 @@ public final class GalaxyDensityField {
         float freq = (s.noiseMaskFreq > 0f ? s.noiseMaskFreq : 10f) / Math.max(s.baseRadius, 1e-6f);
         int octaves = s.noiseMaskOctaves > 0 ? Math.min(s.noiseMaskOctaves, 8) : 3;
         float n = noiseFbm(px * freq, py * freq, pz * freq, freq * cell, octaves);
-        float clump = smoothstep(0.32f, 0.68f, n);
+        // Wide band; see gxNoiseMask for why it is not [0.32, 0.68].
+        float clump = smoothstep(0.18f, 0.82f, n);
         return clamp(1f - s.noiseMask * (1f - clump), 0f, 1f);
     }
 
@@ -380,7 +388,7 @@ public final class GalaxyDensityField {
                              float px,
                              float py,
                              float pz) {
-        float ringIn = clamp(s.minRadius, 0f, DUST_RING_OUT - DUST_RING_FADE);
+        float ringIn = Math.min(minRn(s), DUST_RING_OUT - DUST_RING_FADE);
         float ring = smoothstep(ringIn, ringIn + DUST_RING_FADE, rnCyl)
                 * (1f - smoothstep(DUST_RING_OUT - DUST_RING_FADE, DUST_RING_OUT, rnCyl));
         float d = disk * ring * arm * arm * clumps(px, py, pz, s.baseRadius);
@@ -390,7 +398,10 @@ public final class GalaxyDensityField {
     /** Radial density profile, normalised radius in. Mirrors {@code gxRadial}. **/
     static float radial(GalaxyShape s,
                         float rn) {
-        if (s.distribution == GalaxyShape.SPHERE || s.distribution == GalaxyShape.ELLIPSOID) {
+        if (s.distribution == GalaxyShape.SPHERE) {
+            // The bulge: an exponential envelope. Mirrors GX_BULGE_SCALE.
+            return (float) Math.exp(-rn / BULGE_SCALE) * taper(rn, 0.85f);
+        } else if (s.distribution == GalaxyShape.ELLIPSOID) {
             return (1f + 1.5f * (float) Math.exp(-rn * rn / 0.0625f)) * taper(rn, 0.75f);
         } else if (s.distribution == GalaxyShape.SPHERE_GAUSS || s.distribution == GalaxyShape.DISK_GAUSS) {
             return (float) Math.exp(-0.5f * rn * rn / 0.1225f);
@@ -421,6 +432,11 @@ public final class GalaxyDensityField {
             out.g = mix(c[7], c[10], t - 2f);
             out.b = mix(c[8], c[11], t - 2f);
         }
+    }
+
+    /** Inner radius, normalised by baseRadius like {@code rn}. Mirrors {@code gxMinRn}. **/
+    static float minRn(GalaxyShape s) {
+        return Math.max(0f, Math.min(s.minRadius / Math.max(s.baseRadius, 1e-6f), 0.98f));
     }
 
     /** Effective radius, normalised by baseRadius. Mirrors {@code gxRadius}. **/
@@ -463,6 +479,10 @@ public final class GalaxyDensityField {
         if (rn > 1.2f) {
             return;
         }
+        // Inner edge, as in the shader: minRadius is an absolute fraction of the object radius.
+        if (rn < minRn(s)) {
+            return;
+        }
 
         float density;
         float r = (float) Math.sqrt(px * px + pz * pz);
@@ -473,7 +493,7 @@ public final class GalaxyDensityField {
                 float disk = (float) Math.exp(-rnCyl / DISK_SCALE) * taper(rnCyl, 0.8f);
                 // No azimuthal structure inside the arm start radius: a log spiral's angular
                 // frequency grows without bound as r -> 0, which would alias into radial spokes.
-                float armWeight = smoothstep(0f, 2f * Math.max(s.minRadius, 0.02f), rnCyl);
+                float armWeight = smoothstep(0f, 2f * Math.max(minRn(s), ARM_START), rnCyl);
                 float warp = laneWarp(s, px, py, pz);
                 // Only the dust gets the ragged edge: the gas keeps the analytic arms.
                 float rough = s.isDust() ? dustRoughness(s, px, py, pz, r, warp, cell) : 0f;

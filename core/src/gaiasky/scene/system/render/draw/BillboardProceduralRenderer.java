@@ -192,8 +192,8 @@ public class BillboardProceduralRenderer extends AbstractRenderSystem implements
             computeShader.setUniform("u_baseAngle", dataset.baseAngle);
             computeShader.setUniformUint("u_numArms", dataset.numArms);
             computeShader.setUniform("u_armSigma", dataset.armSigma);
-            if (dataset.spiralDeltaPos != null)
-                computeShader.setUniform("u_sprialDeltaPos", dataset.spiralDeltaPos[0], dataset.spiralDeltaPos[1]);
+            // The previous mesh shader took a spiral delta offset; the particle sampler samples the
+            // analytic field, which ignores it, so there is no uniform to set.
 
             // Dataset and ref-sys transformations.
             addDatasetTransformUniform(dataset);

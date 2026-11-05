@@ -95,7 +95,10 @@ public class VoxelGridTest {
 
         Assert.assertEquals(0.06, gas.volumeVerticalHalfExtent(), 1e-6);
         Assert.assertEquals(0.12, bulge.volumeVerticalHalfExtent(), 1e-6);
-        Assert.assertEquals(0.12, bulge.volumeLateralHalfExtent(), 1e-6);
+        // The box is the object's radius for every field; a field of baseRadius 0.12 fills the
+        // inner 12 % of it.
+        Assert.assertEquals(1.0, gas.volumeLateralHalfExtent(), 1e-6);
+        Assert.assertEquals(1.0, bulge.volumeLateralHalfExtent(), 1e-6);
 
         var union = GalaxyAttributes.volumeGrid(List.of(gas, bulge), 20_400, GraphicsQuality.NORMAL);
         var gasOnly = GalaxyAttributes.volumeGrid(List.of(gas), 20_400, GraphicsQuality.NORMAL);

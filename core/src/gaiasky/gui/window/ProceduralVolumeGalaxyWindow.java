@@ -224,6 +224,13 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
             var body = bodyOf(entity);
             if (body != null) {
                 body.setSize(entity == entityDiffuse ? internalSize * 2.0 : internalSize);
+                // The billboard half follows its body size on its own, every frame. The volume does
+                // not: its shader scales the box by the material's body size, so the material has to
+                // be told, or the volume keeps the diameter it was voxelised at.
+                var model = Mapper.model.get(entity);
+                if (model != null && model.model != null) {
+                    model.model.updateSize(body.size);
+                }
             }
         }
     }
@@ -439,11 +446,19 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         detail.add(heightProfileLabel).left().padRight(pad20).padBottom(pad18);
         detail.add(heightProfile).left().padBottom(pad18).row();
 
-        // Radial profile
-        addSlider(detail, fieldSlider("gui.galaxy.ds.radius.base", 0.1f, 2.0f, 0.01f, field.baseRadius,
-                                      v -> field.baseRadius = v));
-        addSlider(detail, fieldSlider("gui.galaxy.ds.radius.min", 0f, 0.95f, 0.01f, field.minRadius,
-                                      v -> field.minRadius = v));
+        // Radial profile: min and base radius side by side, as in the billboard pane, and with the
+        // same ranges: baseRadius is a fraction of the object radius in both channel types, and a
+        // volume cannot use a value above 1 at all - its box ends there.
+        var radialTable = new Table(skin);
+        var minRadius = fieldSlider("gui.galaxy.ds.radius.min", field.type.minRadius[0], field.type.minRadius[1],
+                                    0.01f, field.minRadius, v -> field.minRadius = v);
+        minRadius.setWidth(HALF_WIDTH_BOX);
+        var baseRadius = fieldSlider("gui.galaxy.ds.radius.base", field.type.baseRadius[0], field.type.baseRadius[1],
+                                     0.01f, field.baseRadius, v -> field.baseRadius = v);
+        baseRadius.setWidth(HALF_WIDTH_BOX);
+        radialTable.add(minRadius).left().padRight(PAD5);
+        radialTable.add(baseRadius).left();
+        detail.add(radialTable).colspan(2).left().padBottom(pad18).row();
 
         // Arms
         var arms = fieldSlider("gui.galaxy.ds.arm.number", 0f, 8f, 1f, field.numArms,
@@ -471,7 +486,9 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         detail.add(eccTable).colspan(2).left().padBottom(pad18).row();
 
         // Vertical structure
-        addSlider(detail, fieldSlider("gui.galaxy.ds.warp", 0f, 1.0f, 0.01f, field.warpStrength,
+        // The range is the channel type's: a warp is a magnitude, and past 0.15 it folds the disk
+        // instead of bending it.
+        addSlider(detail, fieldSlider("gui.galaxy.ds.warp", field.type.warpStrength[0], field.type.warpStrength[1], 0.001f, field.warpStrength,
                                       v -> field.warpStrength = v));
         addSlider(detail, fieldSlider("gui.galaxy.ds.height.scale", 0f, 0.5f, 0.005f, field.heightScale,
                                       v -> field.heightScale = v));
@@ -500,7 +517,10 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                       v -> field.intensity = v));
 
         // Volume-only knobs: the sprite path has no equivalent for any of these.
-        addSlider(detail, fieldSlider("gui.galaxy.field.lane.warp", -0.5f, 0.5f, 0.01f, field.laneWarp,
+        // The arm warp is a phase displacement of the centreline in fractions of the arm spacing:
+        // past 0.15 the arms stop reading as arms and start reading as a braid. The sign only
+        // mirrors the bend, so the range is not signed.
+        addSlider(detail, fieldSlider("gui.galaxy.field.lane.warp", 0f, 0.15f, 0.005f, field.laneWarp,
                                       v -> field.laneWarp = v));
         addSlider(detail, fieldSlider("gui.galaxy.field.lane.rough", 0f, 3f, 0.01f, field.laneRough,
                                       v -> field.laneRough = v));
@@ -541,13 +561,15 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
      * @return The slider, configured and listening. It is not added to any table: some of them share
      *         a row.
      */
-    private OwnSliderPlus fieldSlider(String key,
-                                      float min,
-                                      float max,
-                                      float step,
-                                      float value,
-                                      FieldConsumer setter) {
-        var slider = new OwnSliderPlus(I18n.msg(key), min, max, step, skin);
+    private OwnSliderReset fieldSlider(String key,
+                                       float min,
+                                       float max,
+                                       float step,
+                                       float value,
+                                       FieldConsumer setter) {
+        // The reset value is the one the field was drawn or edited to when the pane was built, so
+        // the button undoes the edits made to this pane, not the whole generation.
+        var slider = new OwnSliderReset(I18n.msg(key), min, max, step, value, skin);
         tip(slider, key);
         slider.setWidth(FULL_WIDTH_BOX);
         // Before the listener: setting the value fires it, and the field is already at that value.
@@ -574,12 +596,13 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
      *
      * @return The slider, ready to be added.
      */
-    private OwnSliderPlus angleSlider(GalaxyAttributes field) {
-        var baseAngle = new OwnSliderPlus(I18n.msg("gui.galaxy.ds.angle"),
-                                          field.type.baseAngle[0],
-                                          field.type.baseAngle[1],
-                                          true,
-                                          skin);
+    private OwnSliderReset angleSlider(GalaxyAttributes field) {
+        var baseAngle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.angle"),
+                                           field.type.baseAngle[0],
+                                           field.type.baseAngle[1],
+                                           true,
+                                           field.baseAngle,
+                                           skin);
         tip(baseAngle, "gui.galaxy.ds.angle");
         baseAngle.setLogarithmicExponent(1.2);
         baseAngle.setValueLabelTransform(TENTHS_TO_DEGREES);
@@ -598,7 +621,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
 
     /** Adds a slider on its own row, spanning both columns of the pane. **/
     private void addSlider(Table table,
-                           OwnSliderPlus slider) {
+                           OwnSliderReset slider) {
         table.add(slider).colspan(2).left().padBottom(pad18).row();
     }
 

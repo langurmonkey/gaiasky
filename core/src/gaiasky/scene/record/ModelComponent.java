@@ -636,14 +636,19 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
-    private boolean sizeSet = false;
+    /**
+     * Size last written into the materials. A cached value rather than a one-shot flag: the body
+     * size of a procedural volume changes when its diameter slider moves, and the shader scales the
+     * box it marches by this size, so it has to follow.
+     */
+    private double sizeSet = Double.NaN;
 
     public void updateSizeKm(double sizeInternal) {
         updateSize(sizeInternal * Constants.U_TO_KM);
     }
 
     public void updateSize(double sizeInternal) {
-        if (!sizeSet && instance != null) {
+        if (instance != null && sizeInternal != sizeSet) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
@@ -655,7 +660,7 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
                     mat.set(new FloatAttribute(FloatAttribute.BodySize, (float) sizeInternal));
                 }
             }
-            sizeSet = true;
+            sizeSet = sizeInternal;
         }
 
     }

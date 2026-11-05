@@ -49,6 +49,11 @@
 #define GX_DISK_SCALE 0.33
 // Vertical slab is cut at this many scale heights, where its density is below 1/255.
 #define GX_VERTICAL_TAIL 3.0
+// Lateral half-extent of the box the field is voxelised in, in galaxy space. Fixed, and equal to the
+// object's radius: baseRadius is a fraction of the object in both renderers, so the box must not
+// follow it. While it did, a field always filled its own box and baseRadius only rescaled the
+// profile, so a volume at 0.5 looked exactly like one at 1.0.
+#define GX_BOX_RADIUS 1.0
 
 // Shape parameters of one distribution. Mirrors the BillboardDataset.ChannelType fields one
 // to one, so a descriptor needs no new keys: the numbers that drove the particle sampler are
@@ -294,9 +299,17 @@ float gxClumps(vec3 p, float base) {
 // octaves summed on top of it.
 #define GX_LANE_ROUGH_FREQ 4.0
 #define GX_LANE_ROUGH_OCTAVES 4
-// Highest frequency the grid can carry, in cycles per voxel. Past this the noise aliases, so
-// octaves above it are clamped down to it rather than dropped. Shared by every noise field here.
-#define GX_NOISE_MAX_LOD 0.35
+// Highest frequency the grid can carry *smoothly*, in cycles per voxel. Octaves above it are clamped
+// down to it rather than dropped, so a fine request degrades to a coarse field instead of
+// disappearing. Shared by every noise field here.
+//
+// 0.15 is a bit under seven voxels per period. It used to be 0.35 - fewer than three voxels per
+// period, i.e. at the sampling limit - and that is where the volume's blocky noise came from: a
+// value-noise cell only three voxels wide reconstructs, through the trilinear filtering of the
+// volume texture, as a faceted lattice, and the mask's remap is a threshold, so the lattice came out
+// as blocks aligned with the voxel grid at any display resolution. Closer to Nyquist buys detail
+// that the grid cannot store anyway.
+#define GX_NOISE_MAX_LOD 0.15
 // Displacement of the lane edge at laneRough = 1, in units of the arm sigma. The fbm is summed with
 // weights 1, 1/2, 1/4..., so its range is well inside [0,1] and this is the peak, not the typical.
 #define GX_LANE_ROUGH_SIGMA 3.0
@@ -311,11 +324,12 @@ float gxLaneScale(in GalaxyShape s) {
 }
 
 // Value-noise fbm in [0,1]: `octaves` octaves, the first at the frequency already folded into `q`.
-// `lod` is that first frequency in cycles per voxel, and it is what the grid is checked against:
-// an octave that would alias is clamped to the highest the grid can hold, and the octaves after it
-// are dropped as duplicates. Clamping rather than fading matters - a fade with a hard cutoff makes
-// a coarse grid drop the term entirely, so the parameter silently stops doing anything instead of
-// getting smoother. Renormalised by the weights, so the range does not depend on the octave count.
+// `lod` is that first frequency in cycles per voxel, and it is what the grid is checked against: an
+// octave that would exceed GX_NOISE_MAX_LOD is clamped down to it, and the octaves after it are
+// dropped. The later octaves are dropped rather than clamped along with it because octaves at the
+// same frequency and different phase are independent draws of the same band, which averages them
+// back towards the mean - a flat mask instead of a smoother one. Renormalised by the weights, so the
+// range does not depend on the octave count.
 float gxNoiseFbm(vec3 q, float lod, int octaves) {
     float maxMul = lod > 1.0e-9 ? GX_NOISE_MAX_LOD / lod : 1.0e9;
     float sum = 0.0;
@@ -401,7 +415,13 @@ float gxNoiseMask(in GalaxyShape s, vec3 p, float cell) {
     float n = gxNoiseFbm(p * freq, freq * cell, octaves);
     // Remap so the low end is a plateau: the fbm sits mostly near 0.5, and a linear remap would
     // thin the whole field evenly instead of leaving clumps and emptying the space between them.
-    float clump = smoothstep(0.32, 0.68, n);
+    // The band is wide on purpose. It used to be [0.32, 0.68], and a *single* octave of value noise -
+    // which is what a high frequency degrades to, see gxNoiseFbm - is broadly distributed rather than
+    // concentrated, so that band put a quarter of the voxels on the empty plateau and a quarter on the
+    // full one. Two plateaus and one transition is a hard-edged picture: the isocontour of the
+    // threshold is what you see, and on a barely representable field its isocontour is the voxel
+    // lattice. [0.18, 0.82] leaves under a tenth at each end, so almost every voxel is on the slope.
+    float clump = smoothstep(0.18, 0.82, n);
     return clamp(1.0 - s.noiseMask * (1.0 - clump), 0.0, 1.0);
 }
 
@@ -451,13 +471,18 @@ float gxHeightScale(in GalaxyShape s) {
     return s.channel == GX_CHANNEL_DUST ? GX_DUST_HEIGHT * s.heightScale : s.heightScale;
 }
 
+// Inner radius, normalised by baseRadius like rn. minRadius is an absolute fraction of the object
+// radius - what the particle generators take it for - so it has to be divided by baseRadius here,
+// or a field with baseRadius < 1 gets a hole smaller than the one its own particles have.
+float gxMinRn(in GalaxyShape s) {
+    return clamp(s.minRadius / max(s.baseRadius, 1e-6), 0.0, 0.98);
+}
+
 // Dust density inside the flat branch. `disk` and `arm` are the gas terms, already evaluated.
-// `s.minRadius` is the field's own inner radius, normalised by baseRadius like rnCyl: it is where
-// the lanes start, and 0 means they reach the core. It used to be a constant (0.25) here, which is
-// why setting minRadius on a dust field did nothing beyond moving the arm modulation: the ring cut
-// the dust out of the middle regardless.
+// `s.minRadius` is the field's own inner radius: it is where the lanes start, and 0 means they
+// reach the core.
 float gxDustDensity(in GalaxyShape s, float rnCyl, float disk, float arm, vec3 p, float cell) {
-    float ringIn = clamp(s.minRadius, 0.0, GX_DUST_RING_OUT - GX_DUST_RING_FADE);
+    float ringIn = clamp(gxMinRn(s), 0.0, GX_DUST_RING_OUT - GX_DUST_RING_FADE);
     float ring = smoothstep(ringIn, ringIn + GX_DUST_RING_FADE, rnCyl)
             * (1.0 - smoothstep(GX_DUST_RING_OUT - GX_DUST_RING_FADE, GX_DUST_RING_OUT, rnCyl));
     float d = disk * ring * arm * arm * gxClumps(p, s.baseRadius);
@@ -465,11 +490,18 @@ float gxDustDensity(in GalaxyShape s, float rnCyl, float disk, float arm, vec3 p
     return pow(max(d, 0.0), GX_DUST_CONTRAST);
 }
 
+// Radial profile of the stellar bulge. Only the bulge uses GX_SPHERE, and a bulge is centrally
+// concentrated: an exponential envelope, so the core is a gradient rather than the flat plateau the
+// shared "nearly uniform sphere" gave it, which read as a solid ball with a rim.
+#define GX_BULGE_SCALE 0.32
+
 // Radial density profile, normalised radius in, relative density out.
 float gxRadial(in GalaxyShape s, float rn) {
-    if (s.distribution == GX_SPHERE || s.distribution == GX_ELLIPSOID) {
-        // Nearly uniform sphere with a soft rim and a mild core concentration, which is what
-        // the billboard sphere looks like once splatted.
+    if (s.distribution == GX_SPHERE) {
+        return exp(-rn / GX_BULGE_SCALE) * gxTaper(rn, 0.85);
+    } else if (s.distribution == GX_ELLIPSOID) {
+        // Nearly uniform spheroid with a soft rim and a mild core concentration, which is what the
+        // billboard spheroid looks like once splatted. Ellipticals and bars use this one.
         return (1.0 + 1.5 * exp(-rn * rn / 0.0625)) * gxTaper(rn, 0.75);
     } else if (s.distribution == GX_SPHERE_GAUSS || s.distribution == GX_DISK_GAUSS) {
         return exp(-0.5 * rn * rn / 0.1225);
@@ -508,12 +540,25 @@ float gxRadius(in GalaxyShape s, vec3 p) {
     return length(p) / base;
 }
 
+// Radius, in units of baseRadius, inside which the azimuthal structure is faded out. It is an
+// anti-aliasing term and not a physical edge: the arm phase is b * ln(r), so its angular frequency
+// grows without bound as r -> 0, and whatever the inner radius of the field says, the arms have to
+// be off over a fixed inner disc or they alias into spokes there.
+#define GX_ARM_START 0.12
+
 // The density field. Returns vec4(colour, density); see the note at the top of the file. `cell` is
 // the galaxy-space size of one voxel, used only to fade noise the grid cannot resolve.
 vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
     float base = max(s.baseRadius, 1e-6);
     float rn = gxRadius(s, p);
     if (rn > 1.2) {
+        return vec4(0.0);
+    }
+
+    // Inner edge. The particle generators start their distributions at minRadius, so the field has
+    // to as well, for every distribution and not only where a ring or an arm start happens to
+    // consult it.
+    if (rn < gxMinRn(s)) {
         return vec4(0.0);
     }
 
@@ -526,9 +571,8 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
         if (s.distribution == GX_SPIRAL || s.distribution == GX_SPIRAL_LOG) {
             float phi = atan(p.z, p.x);
             float disk = exp(-rnCyl / GX_DISK_SCALE) * gxTaper(rnCyl, 0.8);
-            // No azimuthal structure inside the arm start radius: a log spiral's angular
-            // frequency grows without bound as r -> 0, which would alias into radial spokes.
-            float armWeight = smoothstep(0.0, 2.0 * max(s.minRadius, 0.02), rnCyl);
+            // No azimuthal structure inside the arm start radius; see GX_ARM_START.
+            float armWeight = smoothstep(0.0, 2.0 * max(gxMinRn(s), GX_ARM_START), rnCyl);
             float warp = gxLaneWarp(s, p);
             // Only the dust gets the ragged edge: the gas keeps the analytic arms.
             float rough = s.channel == GX_CHANNEL_DUST ? gxDustRoughness(s, p, r, warp, cell) : 0.0;
@@ -582,19 +626,18 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
     return vec4(color, density);
 }
 
-// Half-extent of the box that contains the whole field, in galaxy space, laterally. Every profile
-// ends at baseRadius - gxTaper() reaches zero there - so that is the extent. This used to add the
-// arm spread on top, but the arms multiply a profile that is already zero at baseRadius, so the
-// margin was never filled; it only shrank every field by it.
+// Half-extent of the box that contains the whole field, in galaxy space, laterally. The object's
+// radius, not the field's: the box is the volume, and every field is placed inside it by its own
+// baseRadius. The same number is GX_BOX_RADIUS in GalaxyAttributes.volumeLateralHalfExtent().
 float gxLateralHalfExtent(in GalaxyShape s) {
-    return s.baseRadius;
+    return GX_BOX_RADIUS;
 }
 
-// Half-extent of the box vertically. Spheroids fill the lateral box, flat distributions only
-// reach the top of their slab plus the warp.
+// Half-extent of the box vertically. Spheroids are as tall as they are wide, flat distributions
+// only reach the top of their slab plus the warp.
 float gxVerticalHalfExtent(in GalaxyShape s) {
     if (!gxIsFlat(s)) {
-        return gxLateralHalfExtent(s);
+        return min(s.baseRadius, GX_BOX_RADIUS);
     }
     return GX_VERTICAL_TAIL * gxHeightScale(s) + abs(s.warpStrength);
 }

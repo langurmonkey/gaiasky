@@ -65,8 +65,9 @@ uniform float u_baseAngle;
 uniform int u_numArms;
 // Sigma across arm.
 uniform float u_armSigma;
-// Delta position for the spiral pattern.
-uniform vec2 u_sprialDeltaPos;
+// No spiral delta: the field declares it a no-op, so the sampler does not use it and the uniform
+// must not be declared here either - an unused uniform is stripped by the compiler and setting it
+// then logs "uniform not found".
 
 // Disks and co: warp.
 uniform float u_warpStrength;
@@ -159,7 +160,8 @@ vec3 positionSphere(inout uint state) {
 // Generates a new particle in a spherical gaussian distribution.
 vec3 positionSphereGauss(inout uint state) {
     // The radius of the distribution follows a gaussian.
-    float r = u_minRadius + (u_baseRadius - u_minRadius) * sqrt(ggaussian(state, 1.0) * 0.15);
+    // abs(): a gaussian draw is negative half the time and sqrt() of that is NaN.
+    float r = u_minRadius + (u_baseRadius - u_minRadius) * sqrt(abs(ggaussian(state, 1.0)) * 0.15);
     float theta = rand(state) * 6.2831853;
     float phi = acos(rand(state) * 2.0 - 1.0);
 
@@ -231,7 +233,8 @@ GalaxyShape gxFieldShape() {
     s.armSigma = u_armSigma;
     s.baseAngle = u_baseAngle;
     s.eccentricity = u_eccentricity;
-    s.spiralDeltaPos = u_sprialDeltaPos;
+    // The field ignores the spiral delta for both spirals; leaving it out keeps the uniform live.
+    s.spiralDeltaPos = vec2(0.0);
     s.aspect = u_aspect;
     s.warpStrength = u_warpStrength;
     s.heightScale = u_heightScale;
@@ -257,34 +260,38 @@ GalaxyShape gxFieldShape() {
     return s;
 }
 
-// Radius of an exponential disk of scale h = GX_DISK_SCALE * base, truncated at base, by Newton on
-// the closed-form CDF F(x) = 1 - e^-x (1 + x), x = r/h.
-float gxSampleDiskRadius(inout uint state) {
-    float R = max(u_baseRadius, 1e-6);
+// Radius of an exponential disk of scale h = GX_DISK_SCALE * base, truncated at base and starting at
+// minR, by Newton on the closed-form CDF F(x) = 1 - e^-x (1 + x), x = r/h.
+float gxSampleDiskRadius(inout uint state, float R, float minR) {
     float h = GX_DISK_SCALE * R;
     float xMax = R / h;
     float fMax = 1.0 - exp(-xMax) * (1.0 + xMax);
-    float target = rand(state) * fMax;
+    float xMin = clamp(minR / h, 0.0, xMax);
+    float fMin = 1.0 - exp(-xMin) * (1.0 + xMin);
+    float target = fMin + rand(state) * (fMax - fMin);
     // A Rayleigh draw is the same shape without the (1 + x) factor, so it starts within a few
     // percent of the answer.
     float x = sqrt(-2.0 * log(max(1.0 - target / fMax, 1e-6)));
     for (int i = 0; i < 3; i++) {
         float e = exp(-x);
         float f = 1.0 - e * (1.0 + x) - target;
-        x = clamp(x - f / max(x * e, 1e-6), 0.0, xMax);
+        x = clamp(x - f / max(x * e, 1e-6), xMin, xMax);
     }
-    return x * h;
+    return clamp(x * h, minR, R);
 }
 
 vec3 positionSpiralField(inout uint state) {
     GalaxyShape s = gxFieldShape();
     float R = max(u_baseRadius, 1e-6);
+    // minRadius is an absolute fraction of the object radius, as in the field: the particles start
+    // where the volume's inner edge is.
+    float minR = clamp(u_minRadius, 0.0, R);
 
     // Radius: accepted against the field's rim taper. 16 tries leaves the fallback unused even at
     // the widest disk the sampler can be handed.
     float r = 0.0;
     for (int i = 0; i < 16; i++) {
-        r = gxSampleDiskRadius(state);
+        r = gxSampleDiskRadius(state, R, minR);
         if (rand(state) < gxTaper(r / R, 0.8)) {
             break;
         }
@@ -295,8 +302,9 @@ vec3 positionSpiralField(inout uint state) {
     float period = 6.2831853 / arms;
     float b = gxPitchB(s.baseAngle);
     float sigma = max(u_armSigma * GX_ARM_WIDTH * R, 1e-5);
-    // No azimuthal structure left of the arm start radius, as in the field.
-    float armWeight = smoothstep(0.0, 2.0 * max(u_minRadius, 0.02), rn);
+    // No azimuthal structure left of the arm start radius, as in the field: an anti-aliasing term
+    // that does not follow minRadius, which is 0 for the gas.
+    float armWeight = smoothstep(0.0, 2.0 * max(minR / R, GX_ARM_START), rn);
 
     float phi;
     if (rand(state) < 0.78 * armWeight) {
@@ -369,7 +377,8 @@ vec3 positionDiskGauss(inout uint state) {
     float theta = rand(state) * 6.2831853;
 
     // The radius of the distribution is 1
-    float r = u_minRadius + (u_baseRadius - u_minRadius) * sqrt(ggaussian(state, 1.0) * 0.15);
+    // abs(): a gaussian draw is negative half the time and sqrt() of that is NaN.
+    float r = u_minRadius + (u_baseRadius - u_minRadius) * sqrt(abs(ggaussian(state, 1.0)) * 0.15);
 
     // Cartesian coordinates in ZX plane
     float z = r * cos(theta);
@@ -463,6 +472,12 @@ void main() {
     if (i >= u_count) return;
 
     uint state = (uint(gl_GlobalInvocationID.x) * 747796405u + 2891336453u) * u_seed;
+    // Seed 0 makes every state 0, which is a fixed point of the xorshift (see rand()) and used to
+    // hang the whole dispatch. Fall back to a zero-free hash of the index so the particles are
+    // still distinct and the galaxy is still a galaxy.
+    if (state == 0u) {
+        state = uint(gl_GlobalInvocationID.x) * 2654435761u + 1u;
+    }
 
     int distribution = int(u_distribution);
     vec3 pos;

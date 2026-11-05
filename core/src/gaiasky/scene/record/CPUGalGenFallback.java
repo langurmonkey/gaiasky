@@ -42,6 +42,8 @@ public class CPUGalGenFallback {
     private static final double GX_DISK_SCALE = 0.33;
     /** Width of an arm, as a fraction of baseRadius. Mirrors GX_ARM_WIDTH. **/
     private static final double GX_ARM_WIDTH = 0.2;
+    /** Inner disc the azimuthal structure fades out over. Mirrors GX_ARM_START. **/
+    private static final double GX_ARM_START = 0.12;
     private final ThreadLocal<RNG> rngHolder;
     private final double sizeFactor;
 
@@ -160,9 +162,15 @@ public class CPUGalGenFallback {
             // compute initial state: mix i and globalSeed
             // Use same constants but in signed ints
             long a = Integer.toUnsignedLong(747796405);
-            long b = Integer.toUnsignedLong(289133645);
+            // 2891336453: the shader's constant. This said 289133645, so the CPU fallback placed
+            // its particles with a different generator than the GPU it is standing in for.
+            long b = 2891336453L;
             long s = ((Integer.toUnsignedLong(i) * a + b) * Integer.toUnsignedLong(globalSeed)) & 0xFFFFFFFFL;
             int seed = (int) s;
+            if (seed == 0) {
+                // Same fallback as the shader: a zero state would freeze this generator.
+                seed = (int) ((Integer.toUnsignedLong(i) * 2654435761L + 1L) & 0xFFFFFFFFL);
+            }
 
             var rng = rngHolder.get();
             rng.setSeed(seed);
@@ -235,9 +243,13 @@ public class CPUGalGenFallback {
                 tasks.add(() -> {
                     for (int i = chunkStart; i < chunkEnd; i++) {
                         long a = Integer.toUnsignedLong(747796405);
-                        long b = Integer.toUnsignedLong(289133645);
+                        long b = 2891336453L;
                         long s = ((Integer.toUnsignedLong(i) * a + b) * Integer.toUnsignedLong(globalSeed)) & 0xFFFFFFFFL;
                         int seed = (int) s;
+                        if (seed == 0) {
+                            // See the single-threaded path: a zero state freezes the xorshift.
+                            seed = (int) ((Integer.toUnsignedLong(i) * 2654435761L + 1L) & 0xFFFFFFFFL);
+                        }
 
                         var rng = rngHolder.get();
                         rng.setSeed(seed);
@@ -358,7 +370,9 @@ public class CPUGalGenFallback {
     }
 
     private double[] positionSphereGauss(RNG rng, BillboardDataset ds) {
-        double r = ds.minRadius + (ds.baseRadius - ds.minRadius) * FastMath.sqrt(rng.ggaussian(1.0f) * 0.15);
+        // abs(): a gaussian draw is negative half the time and sqrt() of that is NaN, which used to
+        // leave half the particles of these distributions with NaN positions.
+        double r = ds.minRadius + (ds.baseRadius - ds.minRadius) * FastMath.sqrt(FastMath.abs(rng.ggaussian(1.0f)) * 0.15);
         double theta = rng.rand() * (2.0 * FastMath.PI);
         double phi = FastMath.acos(rng.rand() * 2.0 - 1.0);
         double x = r * FastMath.sin(phi) * FastMath.cos(theta);
@@ -394,7 +408,8 @@ public class CPUGalGenFallback {
 
     private double[] positionDiskGauss(RNG rng, BillboardDataset ds) {
         double theta = rng.rand() * (2.0 * FastMath.PI);
-        double r = ds.minRadius + (ds.baseRadius - ds.minRadius) * FastMath.sqrt(rng.ggaussian(1.0f) * 0.15f);
+        // abs(): see positionSphereGauss.
+        double r = ds.minRadius + (ds.baseRadius - ds.minRadius) * FastMath.sqrt(FastMath.abs(rng.ggaussian(1.0f)) * 0.15f);
         double z = r * FastMath.cos(theta);
         double x = r * FastMath.sin(theta);
         double y = computeY(rng, ds, x, z);
@@ -449,19 +464,23 @@ public class CPUGalGenFallback {
         double h = GX_DISK_SCALE * base;
         double xMax = base / h;
         double fMax = 1.0 - FastMath.exp(-xMax) * (1.0 + xMax);
+        // minRadius is an absolute fraction of the object radius, as in the field.
+        double minR = FastMath.max(0.0, FastMath.min(ds.minRadius, base));
+        double xMin = FastMath.max(0.0, FastMath.min(minR / h, xMax));
+        double fMin = 1.0 - FastMath.exp(-xMin) * (1.0 + xMin);
 
         // Radius: exponential-disk marginal, accepted against the field's rim taper.
         double r = 0.0;
         for (int attempt = 0; attempt < 16; attempt++) {
-            double target = rng.rand() * fMax;
+            double target = fMin + rng.rand() * (fMax - fMin);
             // A Rayleigh draw is the same shape without the (1 + x) factor.
             double x = FastMath.sqrt(-2.0 * FastMath.log(FastMath.max(1.0 - target / fMax, 1e-6)));
             for (int i = 0; i < 3; i++) {
                 double e = FastMath.exp(-x);
                 double f = 1.0 - e * (1.0 + x) - target;
-                x = FastMath.max(0.0, FastMath.min(x - f / FastMath.max(x * e, 1e-6), xMax));
+                x = FastMath.max(xMin, FastMath.min(x - f / FastMath.max(x * e, 1e-6), xMax));
             }
-            r = x * h;
+            r = FastMath.max(minR, FastMath.min(x * h, base));
             if (rng.rand() < gxTaper(r / base, 0.8)) {
                 break;
             }
@@ -475,7 +494,8 @@ public class CPUGalGenFallback {
         double pitchDeg = MathUtilsDouble.clamp(ds.baseAngle * 0.1, 0.0, 85.0);
         double b = FastMath.tan(FastMath.toRadians(pitchDeg));
         double sigma = FastMath.max(ds.armSigma * GX_ARM_WIDTH * base, 1e-5);
-        double armWeight = MathUtilsDouble.smoothstep(0.0, 2.0 * FastMath.max(ds.minRadius, 0.02), rn);
+        // See the field: the arm fade-in does not follow minRadius.
+        double armWeight = MathUtilsDouble.smoothstep(0.0, 2.0 * FastMath.max(minR / base, GX_ARM_START), rn);
 
         double phi;
         if (rng.rand() < 0.78 * armWeight) {
@@ -553,7 +573,9 @@ public class CPUGalGenFallback {
         private int state;
 
         public void setSeed(int seed) {
-            this.state = seed;
+            // Zero is a fixed point of the xorshift: the state would stay zero and gaussian()
+            // would spin forever. Mirrors the guard in distributions.glsl.
+            this.state = seed == 0 ? 0x9E3779B9 : seed;
         }
 
         // ---------- Basic RNG ----------
@@ -565,12 +587,18 @@ public class CPUGalGenFallback {
         }
 
         public double gaussian() {
-            double u, v, s;
-            do {
+            double u = 0.0, v = 0.0, s = 0.0;
+            for (int i = 0; i < 32; i++) {
                 u = rand() * 2.0 - 1.0;
                 v = rand() * 2.0 - 1.0;
                 s = u * u + v * v;
-            } while (s >= 1.0 || s == 0.0);
+                if (s < 1.0 && s > 0.0) {
+                    break;
+                }
+            }
+            if (!(s < 1.0 && s > 0.0)) {
+                return 0.0;
+            }
             s = FastMath.sqrt(-2.0 * FastMath.log(s) / s);
             return u * s;
         }

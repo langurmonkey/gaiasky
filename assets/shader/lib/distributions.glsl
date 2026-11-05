@@ -5,17 +5,35 @@ float rand(inout uint state) {
     state ^= state << 13;
     state ^= state >> 17;
     state ^= state << 5;
+    // Zero is a fixed point of a xorshift: a zero state stays zero and rand() returns 0 forever.
+    // That used to freeze the rejection loop in gaussian(), which hangs the whole dispatch - a
+    // lost GPU, not a bad value. Stepping off the fixed point is cheaper than proving it cannot
+    // happen: an even seed makes (i * 747796405u + 2891336453u) * u_seed wrap to 0 for some i.
+    if (state == 0u) {
+        state = 0x9E3779B9u;
+    }
     return float(state & 0x00FFFFFFu) / 16777216.0;
 }
 
 float gaussian(inout uint state) {
     float u, v, s;
 
-    do {
+    // Bounded: a rejection loop with no way out is a GPU hang waiting for a degenerate state.
+    u = 0.0;
+    v = 0.0;
+    s = 0.0;
+    for (int i = 0; i < 32; i++) {
         u = rand(state) * 2.0 - 1.0;// [-1, 1]
         v = rand(state) * 2.0 - 1.0;// [-1, 1]
         s = u * u + v * v;
-    } while (s >= 1.0 || s == 0.0);
+        if (s < 1.0 && s > 0.0) {
+            break;
+        }
+    }
+    if (!(s < 1.0 && s > 0.0)) {
+        // Cannot happen with the guard in rand(), but a 0 here beats an infinite loop.
+        return 0.0;
+    }
 
     s = sqrt(-2.0 * log(s) / s);
     return u * s;// Returns ~N(0,1)

@@ -10,6 +10,7 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
+import gaiasky.render.gdx.graphics.GalaxyDensityField;
 import gaiasky.render.gdx.graphics.VolumeGenerator;
 import gaiasky.render.gdx.graphics.VolumeCalibration;
 import gaiasky.render.gdx.graphics.VolumeLayout;
@@ -148,6 +149,10 @@ public class VolumeInitializer extends AbstractInitSystem {
         var modelComponent = model.model;
         String entityName = name(entity);
         double sizePc = body.size * Constants.U_TO_PC;
+        // The box the shader marches is the unit box scaled by the material's body size, so a volume
+        // regenerated after the diameter changed has to be told the new one: the grid below follows
+        // it, and so must the material, or the volume comes back at the old extent.
+        modelComponent.updateSize(body.size);
         // Coalesce: every press of Generate posts one of these, and each one evaluates the whole
         // grid twice per slot. Queueing a second copy of the same work turns a slow click into a
         // long stall of the render thread.
@@ -353,6 +358,7 @@ public class VolumeInitializer extends AbstractInitSystem {
         logger.info(String.format(Locale.ROOT, "Voxelising slot %d: %d fields, %s, %s, %s",
                                   slot, fields.size(), grid, generator.name(),
                                   VolumeLayout.canReuse(previous, grid) ? "refilling the slot's texture" : "new texture"));
+        reportClampedMaskFrequency(fields, grid);
         VolumeTexture texture = generator.generate(fields, grid, previous);
         if (texture == null) {
             // Already reported by the generator. Whatever the slot held stays bound: showing the
@@ -375,6 +381,38 @@ public class VolumeInitializer extends AbstractInitSystem {
             return;
         }
         volume.setGeneratedVolume(slot, texture);
+    }
+
+    /**
+     * Reports the fields whose clump frequency the grid cannot carry. The shaders clamp it to
+     * {@link GalaxyDensityField#NOISE_MAX_LOD} cycles per voxel and the frequency slider knows
+     * nothing about the grid, so without this line a value above the limit silently does nothing
+     * beyond making the clumps as fine as the resolution allows.
+     */
+    private static void reportClampedMaskFrequency(List<GalaxyAttributes> fields,
+                                                   VoxelGrid grid) {
+        double lateralHalf = 0.0;
+        for (var f : fields) {
+            lateralHalf = Math.max(lateralHalf, f.volumeLateralHalfExtent());
+        }
+        if (!(lateralHalf > 0.0)) {
+            return;
+        }
+        // The mask frequency is in cycles per baseRadius, so the limit scales with the field's own
+        // size within the box, which is set against the box by baseRadius.
+        double voxelsPerUnit = grid.nx / (2.0 * lateralHalf);
+        for (var f : fields) {
+            if (f.noiseMask <= 0f) {
+                continue;
+            }
+            double requested = f.noiseMaskFreq > 0f ? f.noiseMaskFreq : 10.0;
+            double carried = GalaxyDensityField.NOISE_MAX_LOD * voxelsPerUnit * Math.max(f.baseRadius, 1e-6);
+            if (requested > carried) {
+                logger.info(String.format(Locale.ROOT,
+                                          "Field %s: clump frequency %.1f is above what this grid can carry (%.1f cycles per base radius at %d voxels across the box), so it is clamped. A higher volume quality or a larger galaxy gets finer clumps.",
+                                          f.type, requested, carried, grid.nx));
+            }
+        }
     }
 
     /**

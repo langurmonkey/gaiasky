@@ -53,26 +53,27 @@ public class GalaxyAttributes {
      */
     public float colorNoise = 0.08f;
     /**
-     * Base radius of this field. 1 is the default radius, but you can make this component spread out wider or thinner by changing this.
+     * Outer radius of this field, as a fraction of the object radius. 1 fills the object, 0.5 covers
+     * half of it. It is a size in both channel types: the particle generators place their particles
+     * within it, and the volume places the field within the object's box. Values above 1 have no
+     * meaning for a volume, whose box ends at the object's radius.
      */
     public float baseRadius = 1;
     /**
-     * Minimum radius of this field, in [0,1], where 0 is the very centre and 1 is {@link #baseRadius}.
+     * Minimum radius of this field, as a fraction of the object radius - the same quantity the
+     * particle generators take it for, and the same space as {@link #baseRadius}.
      * <p>
-     * What it does depends on the channel, because the density field is analytic rather than sampled
-     * from particles:
+     * It is the field's inner edge, in every channel and every distribution: the volume cuts the
+     * density below it ({@code gxMinRn()}), and the particle generators start their distributions
+     * there. Beyond that, the flat distributions use it twice:
      * <ul>
      *     <li>A {@code DUST} field is a ring of lanes whose inner edge is this radius: 0 lets the dust
-     *     reach the core, and the default 0.01 nearly so. (The inner edge used to be a constant
-     *     0.25 in {@code gxDustDensity()}, which is why setting this on a dust field only moved the
-     *     arm modulation and the lanes stayed where they were.)</li>
+     *     reach the core, and the default 0.01 nearly so.</li>
      *     <li>Any other flat distribution uses it as the radius at which the azimuthal arm structure
-     *     fades in, over {@code 0..2 * minRadius}. The radial profile is unaffected, so the disk of
-     *     a spiral still peaks at the centre whatever this says.</li>
-     *     <li>Spheroids ignore it: their profile is normalised on {@link #baseRadius} alone.</li>
+     *     fades in, over {@code 0..2 * minRadius}.</li>
      * </ul>
      */
-    public float minRadius = 0.01f;
+    public float minRadius = 0.0f;
 
     /**
      * Translation vector for this field.
@@ -296,8 +297,9 @@ public class GalaxyAttributes {
      * below the bulge it shares the emissive slot with, quantises to a byte of zero almost
      * everywhere, and the galaxy renders with a bulge and no gas at all.
      * <p>
-     * Every volumetric channel therefore starts at a unit density weight, and the volume editors are
-     * what vary it. The values in {@code GalaxyGenerator} stay what they always were: sprite alphas.
+     * Every volumetric channel therefore starts from a density weight that says how bright it is
+     * next to the others in its slot, and the volume editors are what vary it from there. The values
+     * in {@code GalaxyGenerator} stay what they always were: sprite alphas.
      *
      * @param type The channel of the field.
      *
@@ -305,7 +307,13 @@ public class GalaxyAttributes {
      */
     public static float initialVolumeIntensity(ChannelType type) {
         return switch (type) {
-            case GAS, BULGE -> 1.0f;
+            case GAS -> 1.0f;
+            // The bulge shares the emissive slot with the gas, and a slot is normalised by its own
+            // mean, so only the ratio between the two reaches the screen. 0.3 is the Milky Way's
+            // measured one: its emissive texture is "gas at 0.7, bulge at 0.2" (see
+            // VolumeCalibration.MW_EMISSIVE_MEAN_LUMA). At parity the bulge filled a fifth of the
+            // radius with a saturated plateau and the gas was left as a halo around it.
+            case BULGE -> 0.3f;
             // Dust is the occluding slot, and its stored peak is this intensity, so 1 puts a fully
             // opaque lane centre at the disposal of the occlusion threshold.
             case DUST -> 1.0f;
@@ -315,6 +323,16 @@ public class GalaxyAttributes {
 
     /** Vertical tail of the density field, in scale heights. Mirrors {@code GX_VERTICAL_TAIL}. **/
     private static final double GX_VERTICAL_TAIL = 3.0;
+    /**
+     * Lateral half-extent of the box a field is voxelised in, in galaxy space: the object's radius.
+     * Mirrors {@code GX_BOX_RADIUS}.
+     * <p>
+     * Fixed rather than derived from {@link #baseRadius}. While it followed the field, a volume
+     * always filled its own box, so changing {@code baseRadius} only rescaled the profile and the
+     * particle and volume channels disagreed about what the number meant. Now both take
+     * {@code baseRadius} for a fraction of the object radius.
+     **/
+    private static final double GX_BOX_RADIUS = 1.0;
     /** Dust slab thickness, as a fraction of {@link #heightScale}. Mirrors {@code GX_DUST_HEIGHT}. **/
     private static final double GX_DUST_HEIGHT = 0.5;
 
@@ -365,25 +383,27 @@ public class GalaxyAttributes {
     }
 
     /**
-     * Half-extent of this field laterally, in galaxy space.
+     * Half-extent of the box this field is voxelised in, laterally, in galaxy space.
      * <p>
-     * Mirrors {@code gxLateralHalfExtent()} in {@code assets/shader/lib/galaxy.glsl}. Absolute units,
-     * not normalised: the fields sharing a slot have their own {@link #baseRadius}, so their boxes
-     * have to be unioned in a common space.
-     * <p>
-     * Every profile ends at {@link #baseRadius} - the taper of the disk, the ellipsoid metric of the
-     * spheroids - so that is the whole extent. It used to add a margin for the arm spread, but the
-     * arms multiply a profile that is already zero at {@code baseRadius}, so the margin was never
-     * filled: it only shrank every field by it, and left the volume's rim short of the particles'.
+     * Mirrors {@code gxLateralHalfExtent()} in {@code assets/shader/lib/galaxy.glsl}. This is the
+     * object's radius and not the field's: a field of {@code baseRadius} 0.5 is placed in the inner
+     * half of it, exactly as a particle generator with the same number places its particles. When
+     * this returned {@code baseRadius} the box followed the field, so every field filled its own box
+     * and {@code baseRadius} changed nothing but the normalisation - which is why the volume and the
+     * billboards disagreed about the meaning of the same slider.
      */
     public double volumeLateralHalfExtent() {
-        return baseRadius;
+        return GX_BOX_RADIUS;
     }
 
-    /** Half-extent of this field vertically, in galaxy space. Mirrors {@code gxVerticalHalfExtent()}. **/
+    /**
+     * Half-extent of the box this field is voxelised in, vertically, in galaxy space. Mirrors
+     * {@code gxVerticalHalfExtent()}: flat distributions fill their slab, spheroids are as tall as
+     * their own radius, and neither goes past the lateral box.
+     **/
     public double volumeVerticalHalfExtent() {
         if (!(distribution.isFlat() || distribution.isBar())) {
-            return volumeLateralHalfExtent();
+            return Math.min(baseRadius, GX_BOX_RADIUS);
         }
         return GX_VERTICAL_TAIL * effectiveHeightScale() + Math.abs(warpStrength);
     }
@@ -421,9 +441,11 @@ public class GalaxyAttributes {
         }
         double deg = MathUtilsDouble.clamp(baseAngle * 0.1, 0.0, 85.0);
         double b = Math.tan(Math.toRadians(deg));
-        // r runs from minRadius * baseRadius to baseRadius, so ln(r / (0.1 * baseRadius)) goes from
-        // ln(10 * minRadius) to ln(10) and the difference is ln(1 / minRadius).
-        return Math.toDegrees(b * Math.log(1.0 / MathUtilsDouble.clamp(minRadius, 1e-4, 1.0)));
+        // minRadius is absolute, so the arm runs from r = minRadius to r = baseRadius; in units of
+        // baseRadius that is minRadius / baseRadius to 1, and the sweep is b * ln(baseRadius /
+        // minRadius).
+        double inner = MathUtilsDouble.clamp(minRadius / Math.max(baseRadius, 1e-6), 1e-4, 1.0);
+        return Math.toDegrees(b * Math.log(1.0 / inner));
     }
 
     /**
@@ -935,10 +957,18 @@ public class GalaxyAttributes {
         public float[] intensity;
         /** Minimum radius range. **/
         public float[] minRadius = new float[]{0.0f, 0.4f};
-        /** Base radius range. **/
-        public float[] baseRadius = new float[]{0.8f, 2.0f};
-        /** Warp strength range. **/
-        public final float[] warpStrength = new float[]{-0.1f, 0.1f};
+        /**
+         * Base radius range, as a fraction of the object radius. Capped at 1 because that is the
+         * edge of the volume's box and the only value a volume can use: the particle channels could
+         * carry on past it, but then the same slider would mean two different things again.
+         **/
+        public float[] baseRadius = new float[]{0.05f, 1.0f};
+        /**
+         * Warp strength range: the displacement of the disk plane at the rim, as a fraction of
+         * baseRadius. It is a magnitude, so it is not signed; past 0.15 the disk stops reading as a
+         * warped plane and starts reading as a folded sheet.
+         */
+        public final float[] warpStrength = new float[]{0.0f, 0.15f};
 
         /** Base angle [deg] range, for {@link Distribution#SPIRAL}, {@link Distribution#SPIRAL_LOG}, and {@link Distribution#CONE}. **/
         public float[] baseAngle = new float[]{0f, 1000f};
