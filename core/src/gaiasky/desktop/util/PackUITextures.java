@@ -19,6 +19,8 @@ public class PackUITextures {
         TexturePacker.Settings settings = new TexturePacker.Settings();
         settings.scale[0] = 1.5f;
         settings.jpegQuality = 0.95f;
+        settings.maxWidth = 2048;
+        settings.maxHeight = 2048;
         settings.filterMag = Texture.TextureFilter.Linear;
         settings.filterMin = Texture.TextureFilter.Linear;
 
