@@ -252,10 +252,11 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                 if (model.numIndices > 0) {
                     curr.mesh.setIndices(model.indices, 0, model.numIndices);
                 }
-                // Per instance (divisor=1) vertices
-                int count = numParticlesAdded * curr.instanceSize;
-                setCount(render, numParticlesAdded);
-                curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, count);
+                // Per instance (divisor=1) vertices. Only the instances actually written are
+                // uploaded, and only those are drawn: anything past them is outside the buffer.
+                curr.instanceCount = Math.min(numParticlesAdded, n);
+                setCount(render, curr.instanceCount);
+                curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, curr.instanceCount * curr.instanceSize);
                 model.instanceAttributes = null;
 
                 setInGpu(render, true);
@@ -264,8 +265,13 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             /*
              * RENDER
              */
-            curr = meshes.get(getOffset(render));
-            if (curr != null) {
+            int offset = getOffset(render);
+            if (offset < 0 || offset >= meshes.size) {
+                // No mesh for this renderable, either disposed or never built.
+                return;
+            }
+            curr = meshes.get(offset);
+            if (curr != null && curr.instanceCount > 0) {
                 // Only quads are textured.
                 if (set.textureArray != null && !set.isWireframe()) {
                     set.textureArray.bind(0);
@@ -326,7 +332,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                     Gdx.gl30.glEnable(GL30.GL_CULL_FACE);
                     Gdx.gl30.glCullFace(GL30.GL_BACK);
                     int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
-                    curr.mesh.render(shaderProgram, set.modelPrimitive, 0, count, getCount(render));
+                    curr.mesh.render(shaderProgram, set.modelPrimitive, 0, count, curr.instanceCount);
                     Gdx.gl30.glDisable(GL30.GL_CULL_FACE);
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
@@ -368,8 +374,15 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             int offset = getOffset(renderable);
             if (offset >= 0) {
                 clearMeshData(offset);
-                models.set(offset, null);
+                if (offset < models.size) {
+                    // Free the model slot too, so the next build reuses this index instead of
+                    // shifting the models array away from the meshes.
+                    models.set(offset, null);
+                }
             }
+            // Forget the offset and the count, or the rebuild appends a second pair while
+            // getCount() keeps returning the first one.
+            setOffset(renderable, -1);
             if (inGpu != null)
                 inGpu.remove(renderable);
         }

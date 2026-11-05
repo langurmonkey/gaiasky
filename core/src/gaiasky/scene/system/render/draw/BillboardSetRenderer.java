@@ -164,10 +164,11 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
         if (model.numIndices > 0) {
             curr.mesh.setIndices(model.indices, 0, model.numIndices);
         }
-        // Per instance (divisor=1) vertices
-        int size = count * curr.instanceSize;
-        setCount(render, count);
-        curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, size);
+        // Per instance (divisor=1) vertices. Only the instances actually written are uploaded, and
+        // only those are drawn: anything past them is outside the buffer.
+        curr.instanceCount = count;
+        setCount(render, curr.instanceCount);
+        curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, curr.instanceCount * curr.instanceSize);
         model.instanceAttributes = null;
 
         setInGpu(render, true);
@@ -229,11 +230,16 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
             int qualityIndex = GaiaSky.settings().graphics.quality.ordinal();
 
             var offsets = getOffsets(render);
+            if (offsets == null) {
+                // Nothing buffered for this renderable (disposed or not yet built).
+                shaderProgram.end();
+                return;
+            }
             for (int i = 0; i < offsets.size; i++) {
                 var offset = offsets.get(i);
-                curr = meshes.get(offset);
+                curr = offset >= 0 && offset < meshes.size ? meshes.get(offset) : null;
 
-                if (curr != null) {
+                if (curr != null && i < billboard.datasets.length && curr.instanceCount > 0) {
                     BillboardDataset dataset = billboard.datasets[i];
                     // Blend mode
                     switch (dataset.blending) {
@@ -271,7 +277,7 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
                     Gdx.gl20.glDepthMask(dataset.depthMask);
                     // Render mesh
                     int count = curr.mesh.getNumIndices() > 0 ? curr.mesh.getNumIndices() : curr.mesh.getNumVertices();
-                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, count, getCounts(render).get(i));
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, count, curr.instanceCount);
                 }
             }
             shaderProgram.end();
@@ -287,10 +293,29 @@ public class BillboardSetRenderer extends InstancedRenderSystem implements IObse
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
             IRenderable renderable = (IRenderable) data[0];
-            int offset = getOffset(renderable);
-            if (offset >= 0) {
-                clearMeshData(offset);
-                models.set(offset, null);
+            // A renderable may own one mesh per dataset, so all of them have to go.
+            var renderableOffsets = getOffsets(renderable);
+            if (renderableOffsets != null) {
+                for (int i = 0; i < renderableOffsets.size; i++) {
+                    int offset = renderableOffsets.get(i);
+                    if (offset >= 0) {
+                        clearMeshData(offset);
+                        if (offset < models.size) {
+                            models.set(offset, null);
+                        }
+                    }
+                }
+            }
+            // Forget the offsets and the counts, or the rebuild appends a second set of them while
+            // the draw loop still walks the first.
+            setOffset(renderable, -1);
+
+            // The data is gone, so the next frame has to rebuild it.
+            if (renderable instanceof Render r) {
+                var set = Mapper.billboardSet.get(r.entity);
+                if (set != null) {
+                    set.setLoadStatus(LoadStatus.NOT_LOADED);
+                }
             }
         }
     }

@@ -180,10 +180,11 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 uploadVariabilityTexture(render, hl, set, sizeFactor, set.data());
                 // Global (divisor=0) vertices (position, uv)
                 curr.mesh.setVertices(model.vertices, 0, model.numVertices * model.modelVertexSize);
-                // Per instance (divisor=1) vertices
-                int count = numStarsAdded * curr.instanceSize;
-                setCount(render, numStarsAdded);
-                curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, count);
+                // Per instance (divisor=1) vertices. Only the instances actually written are
+                // uploaded, and only those are drawn: anything past them is outside the buffer.
+                curr.instanceCount = Math.min(numStarsAdded, n);
+                setCount(render, curr.instanceCount);
+                curr.mesh.setInstanceAttribs(model.instanceAttributes, 0, curr.instanceCount * curr.instanceSize);
 
                 setInGpu(render, true);
             }
@@ -191,8 +192,13 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
             /*
              * RENDER
              */
-            curr = meshes.get(getOffset(render));
-            if (curr != null) {
+            int offset = getOffset(render);
+            if (offset < 0 || offset >= meshes.size) {
+                // No mesh for this renderable, either disposed or never built.
+                return;
+            }
+            curr = meshes.get(offset);
+            if (curr != null && curr.instanceCount > 0) {
                 var datasetPointScale = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
                 // Bind data texture (variability)
@@ -237,7 +243,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 }
 
                 try {
-                    curr.mesh.render(shaderProgram, GL30.GL_TRIANGLES, 0, model.numVertices, getCount(render));
+                    curr.mesh.render(shaderProgram, GL30.GL_TRIANGLES, 0, model.numVertices, curr.instanceCount);
                 } catch (IllegalArgumentException e) {
                     logger.error(e, "Render exception");
                 }
@@ -375,9 +381,16 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                 int offset = getOffset(renderable);
                 if (offset >= 0) {
                     clearMeshData(offset);
-                    models.set(offset, null);
-                    inGpu.remove(renderable);
+                    if (offset < models.size) {
+                        // Free the model slot too, so the next build reuses this index instead of
+                        // shifting the models array away from the meshes.
+                        models.set(offset, null);
+                    }
                 }
+                // Forget the offset and the count, or the rebuild appends a second pair while
+                // getCount() keeps returning the first one.
+                setOffset(renderable, -1);
+                inGpu.remove(renderable);
                 if (variabilityTextures.containsKey((Render) renderable)) {
                     variabilityTextures.get((Render) renderable).dispose();
                     variabilityTextures.remove((Render) renderable);
