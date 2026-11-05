@@ -229,13 +229,19 @@ float gxPitchB(float baseAngle) {
     return tan(radians(deg));
 }
 
+// Angle of the arm centreline at radius r: theta = b * ln(r / r0). This one relation is shared by
+// the field and by the particle sampler, which is what puts the two sets of arms on top of each
+// other instead of merely at a similar pitch.
+float gxArmTheta(in GalaxyShape s, float r) {
+    float b = gxPitchB(s.baseAngle);
+    return b * log(max(r / (0.1 * max(s.baseRadius, 1e-6)), 1e-4));
+}
+
 // Angular distance to the nearest arm centreline, wrapped to the arm period. `warp` displaces the
 // centreline by a fraction of the period; see gxLaneWarp.
 float gxArmDelta(in GalaxyShape s, float r, float phi, float warp) {
-    float b = gxPitchB(s.baseAngle);
     float arms = float(max(s.numArms, 1));
-    // Arm centreline: theta = b * ln(r / r0), the same relation the particle sampler uses.
-    float theta = b * log(max(r / (0.1 * max(s.baseRadius, 1e-6)), 1e-4));
+    float theta = gxArmTheta(s, r);
     float period = 6.2831853 / arms;
     return mod(phi - theta - warp * period + 0.5 * period, period) - 0.5 * period;
 }
@@ -576,11 +582,12 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
     return vec4(color, density);
 }
 
-// Half-extent of the box that contains the whole field, in galaxy space, laterally. Covers the
-// arm spread beyond baseRadius - only flat distributions have arms, so only they pay for it.
+// Half-extent of the box that contains the whole field, in galaxy space, laterally. Every profile
+// ends at baseRadius - gxTaper() reaches zero there - so that is the extent. This used to add the
+// arm spread on top, but the arms multiply a profile that is already zero at baseRadius, so the
+// margin was never filled; it only shrank every field by it.
 float gxLateralHalfExtent(in GalaxyShape s) {
-    float spread = gxIsFlat(s) ? clamp(GX_VERTICAL_TAIL * s.armSigma * GX_ARM_WIDTH, 0.0, 0.2) : 0.0;
-    return s.baseRadius * (1.0 + spread);
+    return s.baseRadius;
 }
 
 // Half-extent of the box vertically. Spheroids fill the lateral box, flat distributions only

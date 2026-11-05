@@ -38,6 +38,10 @@ import static gaiasky.scene.record.GalaxyAttributes.Distribution.SPIRAL_LOG;
  */
 public class CPUGalGenFallback {
     protected static final Logger.Log logger = Logger.getLogger(CPUGalGenFallback.class);
+    /** Scale radius of the field's exponential disk, as a fraction of baseRadius. Mirrors GX_DISK_SCALE. **/
+    private static final double GX_DISK_SCALE = 0.33;
+    /** Width of an arm, as a fraction of baseRadius. Mirrors GX_ARM_WIDTH. **/
+    private static final double GX_ARM_WIDTH = 0.2;
     private final ThreadLocal<RNG> rngHolder;
     private final double sizeFactor;
 
@@ -166,8 +170,8 @@ public class CPUGalGenFallback {
             // Choose distribution and compute position in dataset local coordinates.
             Distribution distribution = ds.distribution;
             double[] pos = switch (distribution) {
-                case SPIRAL_LOG -> positionLogSpiral(rng, ds);
-                case SPIRAL -> positionDensityWave(rng, ds);
+                // Both spirals are one field in the volume, so both are one sampler here.
+                case SPIRAL_LOG, SPIRAL -> positionSpiralField(rng, ds);
                 case BAR -> positionBar(rng, ds);
                 case ELLIPSOID -> positionEllipsoid(rng, ds);
                 case SPHERE, IRREGULAR -> positionSphere(rng, ds);
@@ -240,8 +244,8 @@ public class CPUGalGenFallback {
 
                         // Compute particle position
                         double[] pos = switch (ds.distribution) {
-                            case SPIRAL_LOG -> positionLogSpiral(rng, ds);
-                            case SPIRAL -> positionDensityWave(rng, ds);
+                            // Both spirals are one field in the volume, so both are one sampler here.
+                            case SPIRAL_LOG, SPIRAL -> positionSpiralField(rng, ds);
                             case BAR -> positionBar(rng, ds);
                             case ELLIPSOID -> positionEllipsoid(rng, ds);
                             case SPHERE, IRREGULAR -> positionSphere(rng, ds);
@@ -343,6 +347,8 @@ public class CPUGalGenFallback {
     private double[] positionSphere(RNG rng, BillboardDataset ds) {
         double r0 = (ds.baseRadius - ds.minRadius);
         double r = ds.minRadius + (r0 + (rng.rand() - 0.5) * 0.3) * FastMath.sqrt(rng.rand());
+        // The variation must not push particles past baseRadius; see the GLSL sampler.
+        r = FastMath.min(r, ds.baseRadius);
         double theta = rng.rand() * (2.0 * FastMath.PI);
         double phi = FastMath.acos(rng.rand() * 2.0 - 1.0);
         double x = r * FastMath.sin(phi) * FastMath.cos(theta);
@@ -371,13 +377,15 @@ public class CPUGalGenFallback {
         double dirY = FastMath.cos(phi);
         double dirZ = FastMath.sin(phi) * FastMath.sin(theta);
         double r = ds.minRadius + (ds.baseRadius - ds.minRadius) * FastMath.pow(rng.rand(), 1.0 / 3.0);
-        r += (rng.rand() - 0.5) * 0.1 * ds.baseRadius;
+        r = FastMath.min(r + (rng.rand() - 0.5) * 0.1 * ds.baseRadius, ds.baseRadius);
         return new double[]{r * dirX, r * dirY - 0.5, r * dirZ};
     }
 
     private double[] positionDisk(RNG rng, BillboardDataset ds) {
         double theta = rng.rand() * (2.0 * FastMath.PI);
         double r = ds.minRadius + (ds.baseRadius - ds.minRadius + (rng.rand() - 0.5f) * 0.3f) * FastMath.sqrt(rng.rand());
+        // The variation must not push particles past baseRadius; see the GLSL sampler.
+        r = FastMath.min(r, ds.baseRadius);
         double z = r * FastMath.cos(theta);
         double x = r * FastMath.sin(theta);
         double y = computeY(rng, ds, x, z);
@@ -425,112 +433,63 @@ public class CPUGalGenFallback {
         return new double[]{x, y, z};
     }
 
-    // density wave -> "spiral" approximation
-    private double[] positionDensityWave(RNG rng, BillboardDataset ds) {
-        final int numEllipses = 200;
-        int ellipseIndex = (int) (rng.rand() * numEllipses);
-        double t = (ellipseIndex + 0.5f) / numEllipses;
-        double min = ds.minRadius;
-        double max = 1.0f - min;
-        double ellipse_r = ds.baseRadius * (min + max * t);
-        double a = ellipse_r;
-        double b = ellipse_r * (1.0 - ds.eccentricity[0]);
-        double pitchRad = FastMath.toRadians(ds.baseAngle) * t;
-        double cosPitch = FastMath.cos(pitchRad), sinPitch = FastMath.sin(pitchRad);
-        double ellipse_angle = rng.rand() * 2.0 * FastMath.PI;
-        double x_ellipse = a * FastMath.cos(ellipse_angle);
-        double z_ellipse = b * FastMath.sin(ellipse_angle);
-        double x = x_ellipse * cosPitch + z_ellipse * sinPitch;
-        double z = -x_ellipse * sinPitch + z_ellipse * cosPitch;
-        x += ds.spiralDeltaPos[0] * t;
-        z += ds.spiralDeltaPos[1] * t;
-        x += rng.gaussian() * (ds.baseRadius * 0.015);
-        z += rng.gaussian() * (ds.baseRadius * 0.015);
-        if (rng.rand() > 0.7f) {
-            double[] v = new double[]{x, z};
-            double r = FastMath.hypot(v[0], v[1]);
-            double nnx = v[0] / (r + 1e-9) * (r + (rng.rand() * 2.0 - 1.0) * 0.2);
-            double nnz = v[1] / (r + 1e-9) * (r + (rng.rand() * 2.0 - 1.0) * 0.2);
-            x = nnx;
-            z = nnz;
-        }
-        double y = computeY(rng, ds, x, z);
-        return new double[]{x, y, z};
+    /** Soft outer rim of the field, as in gxTaper(). **/
+    private static double gxTaper(double rn, double start) {
+        return 1.0 - MathUtilsDouble.smoothstep(start, 1.0, rn);
     }
 
-    private double[] positionDensityWaveOne(RNG rng, BillboardDataset ds) {
-        final int numLayers = 200;
-        int layerIndex = (int) (rng.rand() * numLayers);
-        double t = (layerIndex + 0.5f) / numLayers;
-        double min = ds.minRadius;
-        double max = 1.0f - min;
-        double radius = ds.baseRadius * (min + max * t);
-        double angle = rng.rand() * 2.0 * FastMath.PI;
-        double armAngle = angle % (2.0943951); // 120 degrees
-        double x_arm = radius * FastMath.cos(armAngle);
-        double z_arm = radius * FastMath.sin(armAngle);
-        double pitchRad = FastMath.toRadians(ds.baseAngle) * t;
-        double cosPitch = FastMath.cos(pitchRad), sinPitch = FastMath.sin(pitchRad);
-        double x = x_arm * cosPitch + z_arm * sinPitch;
-        double z = -x_arm * sinPitch + z_arm * cosPitch;
-        x += ds.spiralDeltaPos[0] * t;
-        z += ds.spiralDeltaPos[1] * t;
-        x += rng.gaussian() * (ds.baseRadius * 0.015);
-        z += rng.gaussian() * (ds.baseRadius * 0.015);
-        if (rng.rand() > 0.7f) {
-            double[] v = new double[]{x, z};
-            double r = FastMath.hypot(v[0], v[1]);
-            double nnx = v[0] / (r + 1e-9) * (r + (rng.rand() * 2.0 - 1.0) * 0.2);
-            double nnz = v[1] / (r + 1e-9) * (r + (rng.rand() * 2.0 - 1.0) * 0.2);
-            x = nnx;
-            z = nnz;
-        }
-        double y = computeY(rng, ds, x, z);
-        return new double[]{x, y, z};
-    }
+    /**
+     * The volume's own spiral sampler. Mirrors {@code positionSpiralField()} in
+     * {@code galgen.billboard.comp.glsl}, which samples the analytic field
+     * ({@code galaxyDensity()}) instead of approximating it, so the particles of a channel land
+     * where that channel's volume has material.
+     */
+    private double[] positionSpiralField(RNG rng, BillboardDataset ds) {
+        double base = FastMath.max(ds.baseRadius, 1e-6);
+        double h = GX_DISK_SCALE * base;
+        double xMax = base / h;
+        double fMax = 1.0 - FastMath.exp(-xMax) * (1.0 + xMax);
 
-    // Logarithmic spiral (approximate)
-    private double[] positionLogSpiral(RNG rng, BillboardDataset ds) {
-        double r_min = ds.minRadius;
-        double r_max = ds.baseRadius;
-        double pitchDeg = MathUtilsDouble.clamp(ds.baseAngle * 0.1, 0.0, 100.0);
+        // Radius: exponential-disk marginal, accepted against the field's rim taper.
+        double r = 0.0;
+        for (int attempt = 0; attempt < 16; attempt++) {
+            double target = rng.rand() * fMax;
+            // A Rayleigh draw is the same shape without the (1 + x) factor.
+            double x = FastMath.sqrt(-2.0 * FastMath.log(FastMath.max(1.0 - target / fMax, 1e-6)));
+            for (int i = 0; i < 3; i++) {
+                double e = FastMath.exp(-x);
+                double f = 1.0 - e * (1.0 + x) - target;
+                x = FastMath.max(0.0, FastMath.min(x - f / FastMath.max(x * e, 1e-6), xMax));
+            }
+            r = x * h;
+            if (rng.rand() < gxTaper(r / base, 0.8)) {
+                break;
+            }
+        }
+
+        // Azimuth: the arm component with the field's weight, spread across the centreline; the
+        // rest is the inter-arm veil, uniform in angle.
+        double rn = r / base;
+        double arms = FastMath.max(ds.numArms, 1);
+        double period = 2.0 * FastMath.PI / arms;
+        double pitchDeg = MathUtilsDouble.clamp(ds.baseAngle * 0.1, 0.0, 85.0);
         double b = FastMath.tan(FastMath.toRadians(pitchDeg));
-        double armWidth = 0.2f * ds.baseRadius;
-        final int MAX_ATTEMPTS = 10;
-        for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-            double r = r_min + rng.rand() * (r_max - r_min);
-            double radius_factor = 1.0 - 0.3 * (r - r_min) / (r_max - r_min);
-            if (rng.rand() > radius_factor) {
-                r = r_min + rng.rand() * (r_max - r_min);
-            }
-            r = r_min + (r_max - r_min) * FastMath.pow(rng.rand(), FastMath.max(0.0, FastMath.min(1.0, (r - r_min) / (r_max - r_min))));
-            int armIndex = (int) (rng.rand() * ds.numArms);
-            double armOffset = armIndex * 2.0 * FastMath.PI / ds.numArms;
-            double spiralAngle = b * FastMath.log(FastMath.max(1e-6, r / (0.1 * ds.baseRadius))) + armOffset;
+        double sigma = FastMath.max(ds.armSigma * GX_ARM_WIDTH * base, 1e-5);
+        double armWeight = MathUtilsDouble.smoothstep(0.0, 2.0 * FastMath.max(ds.minRadius, 0.02), rn);
 
-            double base_pattern = (FastMath.sin((spiralAngle + armIndex * 1.618) * 13.0)
-                    + FastMath.cos((spiralAngle + armIndex * 1.618) * 9.0) + 1.0) / 2.0;
-            double probability = FastMath.max(0.0, FastMath.min(1.0, base_pattern));
-            if (rng.rand() <= probability || attempt == MAX_ATTEMPTS - 1) {
-                double radialDirx = FastMath.cos(spiralAngle), radialDiry = FastMath.sin(spiralAngle);
-                double tangentX = (-radialDiry - b * radialDirx);
-                double tangentY = (radialDirx - b * radialDiry);
-                double len = FastMath.hypot(tangentX, tangentY);
-                if (len > 1e-9) {
-                    tangentX /= len;
-                    tangentY /= len;
-                }
-                double sigma = ds.armSigma;
-                double gaussianSpread = rng.gaussian() * sigma;
-                double[] armSpread = new double[]{gaussianSpread * armWidth * tangentX, gaussianSpread * armWidth * tangentY};
-                double x = r * FastMath.cos(spiralAngle) + armSpread[0];
-                double z = r * FastMath.sin(spiralAngle) + armSpread[1];
-                double y = computeY(rng, ds, x, z);
-                return new double[]{x, y, z};
-            }
+        double phi;
+        if (rng.rand() < 0.78 * armWeight) {
+            double armOffset = FastMath.floor(rng.rand() * arms) * period;
+            double dPhi = rng.gaussian() * sigma * FastMath.sqrt(1.0 + b * b) / FastMath.max(r, 1e-5);
+            phi = b * FastMath.log(FastMath.max(r / (0.1 * base), 1e-4)) + armOffset + dPhi;
+        } else {
+            phi = rng.rand() * 2.0 * FastMath.PI;
         }
-        // fallback
-        return positionDisk(rng, ds);
+
+        double x = r * FastMath.cos(phi);
+        double z = r * FastMath.sin(phi);
+        double y = computeY(rng, ds, x, z);
+        return new double[]{x, y, z};
     }
 
     private int pickLayer(RNG rng, BillboardDataset ds) {

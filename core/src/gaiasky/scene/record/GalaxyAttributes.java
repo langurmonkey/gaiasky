@@ -315,8 +315,6 @@ public class GalaxyAttributes {
 
     /** Vertical tail of the density field, in scale heights. Mirrors {@code GX_VERTICAL_TAIL}. **/
     private static final double GX_VERTICAL_TAIL = 3.0;
-    /** Arm width, in units of {@link #baseRadius}. Mirrors {@code GX_ARM_WIDTH}. **/
-    private static final double GX_ARM_WIDTH = 0.2;
     /** Dust slab thickness, as a fraction of {@link #heightScale}. Mirrors {@code GX_DUST_HEIGHT}. **/
     private static final double GX_DUST_HEIGHT = 0.5;
 
@@ -372,12 +370,14 @@ public class GalaxyAttributes {
      * Mirrors {@code gxLateralHalfExtent()} in {@code assets/shader/lib/galaxy.glsl}. Absolute units,
      * not normalised: the fields sharing a slot have their own {@link #baseRadius}, so their boxes
      * have to be unioned in a common space.
+     * <p>
+     * Every profile ends at {@link #baseRadius} - the taper of the disk, the ellipsoid metric of the
+     * spheroids - so that is the whole extent. It used to add a margin for the arm spread, but the
+     * arms multiply a profile that is already zero at {@code baseRadius}, so the margin was never
+     * filled: it only shrank every field by it, and left the volume's rim short of the particles'.
      */
     public double volumeLateralHalfExtent() {
-        if (!(distribution.isFlat() || distribution.isBar())) {
-            return baseRadius;
-        }
-        return baseRadius * (1.0 + MathUtilsDouble.clamp(GX_VERTICAL_TAIL * armSigma * GX_ARM_WIDTH, 0.0, 0.2));
+        return baseRadius;
     }
 
     /** Half-extent of this field vertically, in galaxy space. Mirrors {@code gxVerticalHalfExtent()}. **/

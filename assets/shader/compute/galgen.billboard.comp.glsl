@@ -90,6 +90,9 @@ uniform uint u_heightProfile;
 uniform mat4 u_baseTransform;
 
 #include <shader/lib/distributions.glsl>
+// The analytic galaxy field. The spiral sampler below samples it instead of approximating it, so
+// the particles of a channel land where that channel's volume has material.
+#include <shader/lib/galaxy.glsl>
 
 float computeY(inout uint state, vec2 xz) {
     float profileFactor;
@@ -140,6 +143,9 @@ vec3 positionSphere(inout uint state) {
     // The radius of the distribution times a random number, with some variation.
     float r_0 = u_baseRadius - u_minRadius;
     float r = u_minRadius + (r_0 + (rand(state) - 0.5) * 0.3) * sqrt(rand(state));
+    // The variation must not push particles past baseRadius, which is the outer edge the volume
+    // of the same galaxy tapers to.
+    r = min(r, u_baseRadius);
     float theta = rand(state) * 6.2831853;
     float phi = acos(rand(state) * 2.0 - 1.0);
 
@@ -186,136 +192,127 @@ vec3 positionCone(inout uint state, float coneAngleDeg) {
     float r = u_minRadius + (u_baseRadius - u_minRadius) * pow(rand(state), 1.0 / 3.0);
     // (cube root ensures uniform density in 3D volume)
 
-    // Add small random variation to radius if desired
-    r += (rand(state) - 0.5) * 0.1 * u_baseRadius;
+    // Add small random variation to radius if desired, without leaving the distribution's radius.
+    r = min(r + (rand(state) - 0.5) * 0.1 * u_baseRadius, u_baseRadius);
 
     return r * dir - vec3(0.0, 0.5, 0.0);
 }
 
-// Density wave using discrete ellipses, leading to a natural spiral pattern with 2 arms.
-vec3 positionDensityWave2(inout uint state, float pitchAngleDeg, float ec, vec2 displacement) {
-    // Discrete ellipses parameters
-    const uint numEllipses = 200u;
+// ---- Shared spiral sampler ----
+//
+// Both spiral distributions describe the same thing in the volume: galaxyDensity() treats
+// GX_SPIRAL and GX_SPIRAL_LOG identically (see its flat branch), so the samplers must be one
+// function, and that function must sample that field rather than an approximation of it. The field
+// is, for a flat spiral,
+//
+//     rho(r, phi) = exp(-rn / GX_DISK_SCALE) * gxTaper(rn, 0.8) * (0.22 + 0.78 * gxArmFactor())
+//
+// and this samples it factor by factor:
+//
+//   - radius: the marginal of an exponential disk in r is rho(r) ∝ r exp(-r/h), whose CDF has a
+//     closed form; it is inverted with Newton. The rim taper is applied as an acceptance test, so
+//     the particles and the volume fade out at the same radius.
+//   - azimuth: the 0.22 inter-arm veil and the 0.78 arm are split by a coin flip, and the in-arm
+//     position is spread across the centreline with the same sigma and the same perpendicular
+//     metric gxArmFactor() uses. The arm angle itself comes from gxArmTheta(), so the two sets of
+//     arms are on the same curve.
+//
+// The vertical structure is left to computeY(), which is the particle side's own slab.
+// Lane warp, lane roughness and the noise mask are volume-only: they are not mirrored here, so a
+// field with those set no longer matches its particles exactly.
 
-    // Select which ellipse to use
-    uint ellipseIndex = uint(rand(state) * float(numEllipses));
-    float t = (float(ellipseIndex) + 0.5) / float(numEllipses);// 0 to 1
-
-    // Ellipse radius increases from center outward
-    float min = u_minRadius;
-    float max = 1.0 - min;
-    float ellipse_r = u_baseRadius * (min + max * t);
-
-    // Ellipse dimensions in XZ plane
-    float a = ellipse_r;
-    float b = ellipse_r * (1.0 - ec);
-
-    // Rotate ellipse around Y axis by pitch angle - each ellipse has different rotation!
-    float pitchRad = radians(pitchAngleDeg) * t;// Tilt increases with radius
-    float cosPitch = cos(pitchRad);
-    float sinPitch = sin(pitchRad);
-
-    // Random position on ellipse circumference in XZ plane
-    float ellipse_angle = rand(state) * 6.2831853;
-
-    // Position on unrotated ellipse in XZ plane
-    float x_ellipse = a * cos(ellipse_angle);
-    float z_ellipse = b * sin(ellipse_angle);
-
-    // Rotate ellipse around Y axis - this is where the spiral comes from!
-    float x = x_ellipse * cosPitch + z_ellipse * sinPitch;
-    float z = -x_ellipse * sinPitch + z_ellipse * cosPitch;
-
-    // Apply progressive displacement - smallest ellipse has none, largest has full disp
-    x += displacement.x * t;
-    z += displacement.y * t;
-
-    // Position randomness
-    x += gaussian(state) * (u_baseRadius * 0.015);
-    z += gaussian(state) * (u_baseRadius * 0.015);
-
-    // Apply random displacement.
-    if (rand(state) > 0.6) {
-        vec2 v = vec2(x, z);
-        float r = length(v);
-        v = normalize(v) * (r + (rand(state) * 2.0 - 1.0) * 0.2);
-        x = v.x;
-        z = v.y;
+// The uniforms of this draw, as the shape the field functions take.
+GalaxyShape gxFieldShape() {
+    GalaxyShape s;
+    s.distribution = u_distribution == D_SPIRAL_LOG ? GX_SPIRAL_LOG : GX_SPIRAL;
+    s.baseRadius = u_baseRadius;
+    s.minRadius = u_minRadius;
+    s.numArms = u_numArms;
+    s.armSigma = u_armSigma;
+    s.baseAngle = u_baseAngle;
+    s.eccentricity = u_eccentricity;
+    s.spiralDeltaPos = u_sprialDeltaPos;
+    s.aspect = u_aspect;
+    s.warpStrength = u_warpStrength;
+    s.heightScale = u_heightScale;
+    s.heightProfile = int(u_heightProfile);
+    s.colorNoise = 0.0;
+    s.weight = 1.0;
+    s.laneWarp = 0.0;
+    s.laneNoiseScale = 0.0;
+    s.laneRough = 0.0;
+    s.noiseMask = 0.0;
+    s.noiseMaskFreq = 0.0;
+    s.noiseMaskOctaves = 0;
+    // Same order as GX_CHANNEL_*, except POINT, which is 5 in the field and 6 here.
+    s.channel = u_type == TYPE_DUST ? GX_CHANNEL_DUST
+              : u_type == TYPE_BULGE ? GX_CHANNEL_BULGE
+              : u_type == TYPE_GAS ? GX_CHANNEL_GAS
+              : u_type == TYPE_HII ? GX_CHANNEL_HII
+              : u_type == TYPE_POINT ? GX_CHANNEL_POINT
+              : GX_CHANNEL_STAR;
+    for (int i = 0; i < 4; i++) {
+        s.baseColors[i] = vec3(0.0);
     }
-
-    // Add height (Y)
-    float y = computeY(state, vec2(x, z));
-
-    return vec3(x, y, z);
+    return s;
 }
 
-// Density wave using concentric squircles, leading to a spiral pattern.
-vec3 positionDensityWave4(inout uint state, float pitchAngleDeg, float ec, vec2 displacement) {
-    // Discrete squircles parameters
-    const uint numSquircles = 200u;// Number of concentric squircles
-
-    // Select which squircle to use
-    uint squircleIndex = uint(rand(state) * float(numSquircles));
-    float t = (float(squircleIndex) + 0.5) / float(numSquircles);// 0 to 1
-
-    // Squircle radius increases from center outward
-    float min = u_minRadius * 0.5;
-    float max = 1.0 - min;
-    float squircle_r = u_baseRadius * (min + max * t);
-
-    // Squircle exponent (2 for smoother transition, larger for more square-like)
-    float n = 3.0;// Adjust n for squircle shape (2 = circle, higher = more square-like)
-
-    // Random position on squircle boundary
-    float squircle_angle = rand(state) * 6.2831853;// Random angle in [0, 2*PI]
-
-    // Squircle boundary equation for x and z coordinates
-    float cos_angle = cos(squircle_angle);
-    float sin_angle = sin(squircle_angle);
-
-    // Apply squircle formula to get the coordinates on the boundary
-    float x_squircle = squircle_r * sign(cos_angle) * pow(abs(cos_angle), 1.0 / n);
-    float z_squircle = squircle_r * sign(sin_angle) * pow(abs(sin_angle), 1.0 / n);
-
-    // Apply rotation around Y-axis (to tilt the squircle)
-    float pitchRad = radians(pitchAngleDeg) * t;
-    float cosPitch = cos(pitchRad);
-    float sinPitch = sin(pitchRad);
-
-    // Rotate the squircle coordinates (tilt in the XZ plane)
-    float x = x_squircle * cosPitch + z_squircle * sinPitch;
-    float z = -x_squircle * sinPitch + z_squircle * cosPitch;
-
-    // Apply progressive displacement for each squircle
-    x += displacement.x * t;
-    z += displacement.y * t;
-
-    // Position randomness
-    x += gaussian(state) * (u_baseRadius * 0.015);
-    z += gaussian(state) * (u_baseRadius * 0.015);
-
-    // Apply random displacement based on distance from the center
-    if (rand(state) > 0.7) {
-        vec2 v = vec2(x, z);
-        float r = length(v);
-        v = normalize(v) * (r + (rand(state) * 2.0 - 1.0) * 0.2);
-        x = v.x;
-        z = v.y;
+// Radius of an exponential disk of scale h = GX_DISK_SCALE * base, truncated at base, by Newton on
+// the closed-form CDF F(x) = 1 - e^-x (1 + x), x = r/h.
+float gxSampleDiskRadius(inout uint state) {
+    float R = max(u_baseRadius, 1e-6);
+    float h = GX_DISK_SCALE * R;
+    float xMax = R / h;
+    float fMax = 1.0 - exp(-xMax) * (1.0 + xMax);
+    float target = rand(state) * fMax;
+    // A Rayleigh draw is the same shape without the (1 + x) factor, so it starts within a few
+    // percent of the answer.
+    float x = sqrt(-2.0 * log(max(1.0 - target / fMax, 1e-6)));
+    for (int i = 0; i < 3; i++) {
+        float e = exp(-x);
+        float f = 1.0 - e * (1.0 + x) - target;
+        x = clamp(x - f / max(x * e, 1e-6), 0.0, xMax);
     }
-
-    // Add height (Y)
-    float y = computeY(state, vec2(x, z));
-
-    return vec3(x, y, z);
+    return x * h;
 }
 
-// Density wave positions with 2 or 4 arms.
-vec3 positionDensityWave(inout uint state, int numArms, float pitchAngleDeg, float ec, vec2 displacement) {
-    if (numArms == 4) {
-        return positionDensityWave4(state, pitchAngleDeg, ec, displacement);
+vec3 positionSpiralField(inout uint state) {
+    GalaxyShape s = gxFieldShape();
+    float R = max(u_baseRadius, 1e-6);
+
+    // Radius: accepted against the field's rim taper. 16 tries leaves the fallback unused even at
+    // the widest disk the sampler can be handed.
+    float r = 0.0;
+    for (int i = 0; i < 16; i++) {
+        r = gxSampleDiskRadius(state);
+        if (rand(state) < gxTaper(r / R, 0.8)) {
+            break;
+        }
+    }
+
+    float rn = r / R;
+    float arms = float(max(u_numArms, 1));
+    float period = 6.2831853 / arms;
+    float b = gxPitchB(s.baseAngle);
+    float sigma = max(u_armSigma * GX_ARM_WIDTH * R, 1e-5);
+    // No azimuthal structure left of the arm start radius, as in the field.
+    float armWeight = smoothstep(0.0, 2.0 * max(u_minRadius, 0.02), rn);
+
+    float phi;
+    if (rand(state) < 0.78 * armWeight) {
+        float armOffset = floor(rand(state) * arms) * period;
+        // Angular spread that gives a perpendicular offset sigma: a log spiral of pitch b spends
+        // r / sqrt(1 + b^2) of arc length per unit of angle.
+        float dPhi = gaussian(state) * sigma * sqrt(1.0 + b * b) / max(r, 1e-5);
+        phi = gxArmTheta(s, r) + armOffset + dPhi;
     } else {
-        return positionDensityWave2(state, pitchAngleDeg, ec, displacement);
+        phi = rand(state) * 6.2831853;
     }
+
+    float x = r * cos(phi);
+    float z = r * sin(phi);
+    float y = computeY(state, vec2(x, z));
+    return vec3(x, y, z);
 }
 
 // Positions on an ellipsoid.
@@ -350,8 +347,11 @@ vec3 positionDisk(inout uint state) {
     // Random angle [0, 2π)
     float theta = rand(state) * 6.2831853;
 
-    // The radius of the distribution is baseRadius, with some variation.
+    // The radius of the distribution is baseRadius, with some variation that is clamped back into
+    // it: the volume of the same galaxy tapers to zero at baseRadius, so a particle beyond it has
+    // no gas to sit in.
     float r = u_minRadius +  (u_baseRadius - u_minRadius + (rand(state) - 0.5) * 0.3) * sqrt(rand(state));
+    r = min(r, u_baseRadius);
 
     // Cartesian coordinates in ZX plane
     float z = r * cos(theta);
@@ -379,84 +379,6 @@ vec3 positionDiskGauss(inout uint state) {
     float y = computeY(state, vec2(x, z));
 
     return vec3(x, y, z);
-
-}
-
-// Generates artificial logarithmic spiral arms and background particles
-vec3 positionLogSpiral(inout uint state, float pitchAngleDeg, uint numArms, float armSigma) {
-    // Internal parameters
-    float r_min = u_minRadius;// Minimum radius to avoid particles in the very center
-    float r_max = u_baseRadius;// Maximum radius for spiral arm
-
-    // Logarithmic spiral factor from pitch angle
-    float pitchDeg = clamp(pitchAngleDeg * 0.1, 0.0, 100.0);
-    float b = tan(radians(pitchDeg));
-
-    float armWidth = 0.2 * u_baseRadius;// Width of the arm (controls how "thick" the arm is)
-
-    // CLUMPING: Try multiple times to find a valid position
-    const int MAX_ATTEMPTS = 10;
-    bool found_valid_position = false;
-    float r, spiralAngle, armOffset;
-    int armIndex;
-
-    for (int attempt = 0; attempt < MAX_ATTEMPTS && !found_valid_position; attempt++) {
-        // Generate candidate position
-        r = r_min + rand(state) * (r_max - r_min);
-        // Density falloff with radius
-        float radius_factor = 1.0 - 0.3 * (r - r_min) / (r_max - r_min);// 30% reduction at outer edge
-        if (rand(state) > radius_factor) {
-            // Try again or use alternative position
-            r = r_min + rand(state) * (r_max - r_min);// Simple retry
-        }
-
-        r = r_min + (r_max - r_min) * pow(rand(state), mix(1.0, 2.0, (r - r_min) / (r_max - r_min)));
-        armIndex = int(rand(state) * float(numArms));
-        armOffset = float(armIndex) * 6.2831853 / float(numArms);
-        spiralAngle = b * log(r / (0.1 * u_baseRadius)) + armOffset;
-
-        // CLUMPING: Check if we should place a particle here
-        const float clump_freq1 = 13.0;
-        const float clump_freq2 = 9.0;
-        const float clump_bias = 0.0;
-        float arm_phase = float(armIndex) * 1.618;
-
-        // Create clump pattern
-        float base_pattern = (sin((spiralAngle + arm_phase) * clump_freq1) +
-        cos((spiralAngle + arm_phase) * clump_freq2) + 1.0) / 2.0;
-
-        // Apply bias and convert to probability
-        float probability = clamp(base_pattern + clump_bias, 0.0, 1.0);
-
-        // Check if this position should be kept
-        if (rand(state) <= probability) {
-            found_valid_position = true;
-        }
-
-        // If we didn't find a valid position after max attempts, use the last one
-        // This ensures we always return a position
-
-        // Compute tangent and normal directions.
-        vec2 radialDir = vec2(cos(spiralAngle), sin(spiralAngle));
-        vec2 tangentDir = normalize(vec2(-radialDir.y - b * radialDir.x, radialDir.x - b * radialDir.y));
-
-        // Stdev for arm spread.
-        float sigma = armSigma;
-
-        // Your existing Gaussian spread
-        float gaussianSpread = gaussian(state) * sigma;
-        vec2 armSpread = gaussianSpread * armWidth * tangentDir;
-
-        // Combine both displacements
-        vec2 totalDisplacement = armSpread;
-
-        // Convert to Cartesian coordinates
-        float x = r * cos(spiralAngle) + totalDisplacement.x;
-        float z = r * sin(spiralAngle) + totalDisplacement.y;
-        float y = computeY(state, vec2(x, z));
-
-        return vec3(x, y, z);
-    }
 }
 
 vec3 positionBar(inout uint state, float aspect) {
@@ -544,10 +466,9 @@ void main() {
 
     int distribution = int(u_distribution);
     vec3 pos;
-    if (distribution == D_SPIRAL_LOG) {
-        pos = positionLogSpiral(state, u_baseAngle, u_numArms, u_armSigma);
-    } else if (distribution == D_SPIRAL) {
-        pos = positionDensityWave(state, u_numArms, u_baseAngle, u_eccentricity.x, u_sprialDeltaPos);
+    if (distribution == D_SPIRAL_LOG || distribution == D_SPIRAL) {
+        // Both spirals are one field in the volume, so both are one sampler here.
+        pos = positionSpiralField(state);
     } else if (distribution == D_DISK) {
         pos = positionDisk(state);
     } else if (distribution == D_BAR) {
