@@ -351,7 +351,13 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
                                 return true;
                             }
                             case Keys.TAB -> {
-                                // Next focus, do nothing
+                                // A field of this dialog may consume TAB itself (candidate lists in
+                                // the search dialogs); it stops the event then, so it never reaches
+                                // this listener and the focus stays put.
+                                focusCycle(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)
+                                        || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT));
+                                // Do not propagate to parents
+                                event.stop();
                                 return true;
                             }
                             default -> {
@@ -479,6 +485,9 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
 
         addOwnListeners();
         touch();
+
+        // TAB must stay in this dialog; focusCycle() takes over from the toolkit's traversal.
+        disableFocusTraversal();
 
         // Focus first
         focusFirstInputWidget();
@@ -744,6 +753,46 @@ public abstract class GenericDialog extends CollapsibleWindow implements IScreen
         if (!inputWidgets.isEmpty()) {
             stage.setKeyboardFocus(inputWidgets.get(0));
         }
+    }
+
+    /**
+     * Turns off the toolkit's built-in TAB traversal on every text field of this dialog.
+     * <p>
+     * That traversal is stage-wide, not window-wide: it searches every text field of every
+     * visible window, so with more than one dialog open TAB can hand the focus to a field of
+     * another window. {@link #focusCycle(boolean)} replaces it, scoped to this dialog.
+     */
+    private void disableFocusTraversal() {
+        var inputWidgets = GuiUtils.getInputWidgets(this, new Array<>());
+        for (var widget : inputWidgets) {
+            if (widget instanceof TextField textField) {
+                textField.setFocusTraversal(false);
+            }
+        }
+    }
+
+    /**
+     * Moves the keyboard focus to the next (or previous) input widget of this dialog's current
+     * tab, wrapping around. Replaces the toolkit's stage-wide focus traversal.
+     *
+     * @param back Whether to move backwards.
+     * @return Whether the focus was moved.
+     */
+    public boolean focusCycle(boolean back) {
+        var inputWidgets = GuiUtils.getInputWidgets(getCurrentContentContainer(), new Array<>());
+        if (inputWidgets.isEmpty()) {
+            return false;
+        }
+        var focus = stage.getKeyboardFocus();
+        int index = focus == null ? -1 : inputWidgets.indexOf(focus, true);
+        if (back) {
+            index = index <= 0 ? inputWidgets.size - 1 : index - 1;
+        } else {
+            index = (index + 1) % inputWidgets.size;
+        }
+        stage.setKeyboardFocus(inputWidgets.get(index));
+        GuiUtils.ensureScrollVisible(inputWidgets.get(index));
+        return true;
     }
 
     public Table getContent() {

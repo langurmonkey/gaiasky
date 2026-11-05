@@ -136,10 +136,14 @@ public class SearchDialog extends GenericDialog {
                     } else if (code == Keys.TAB && Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && candidateCount() > 0) {
                         cIdx = cIdx - 1 < 0 ? candidateCount() - 1 : cIdx - 1;
                         selectMatch();
+                        // TAB belongs to the candidate list here, not to the dialog's focus cycle
+                        ie.stop();
                         return true;
                     } else if (code == Keys.TAB && !Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && candidateCount() > 0) {
                         cIdx = (cIdx + 1) % candidateCount();
                         selectMatch();
+                        // TAB belongs to the candidate list here, not to the dialog's focus cycle
+                        ie.stop();
                         return true;
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed

@@ -113,11 +113,15 @@ public class ObjectDebugWindow extends GenericDialog implements IObserver {
                     } else if (code == Input.Keys.TAB && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && matchingSize > 0) {
                         cIdx = cIdx - 1 < 0 ? matchingSize - 1 : cIdx - 1;
                         selectMatch();
-                        return false;
+                        // TAB belongs to the candidate list here, not to the dialog's focus cycle
+                        ie.stop();
+                        return true;
                     } else if (code == Input.Keys.TAB && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && matchingSize > 0) {
                         cIdx = (cIdx + 1) % matchingSize;
                         selectMatch();
-                        return false;
+                        // TAB belongs to the candidate list here, not to the dialog's focus cycle
+                        ie.stop();
+                        return true;
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
                         currentInputText = searchInput.getText();
