@@ -192,20 +192,18 @@ public class GraphUpdater extends AbstractUpdateSystem {
             // Some elements (orbital element sets, octrees) process their own children.
             // But: not in the case of a copy!
             boolean processChildren = Mapper.tagCopy.has(entity) || !(Mapper.tagNoProcessChildren.has(entity) || (ds != null && !GaiaSky.instance.isOn(base.ct)));
-            if (processChildren && graph.children != null) {
-                // Go down a level
+            boolean hasChildren = processChildren && graph.children != null;
+            if (hasChildren && opacity > 0) {
+                // Go down a level.
                 for (int i = 0; i < graph.children.size; i++) {
                     Entity child = graph.children.get(i);
-                    float childOpacity = getChildrenOpacity(entity, child, base, fade, opacity);
-                    if (childOpacity > 0) {
-                        update(child, time, graph.translation, childOpacity);
-                    } else {
-                        // A transparent child is not traversed, so nothing below it is updated any
-                        // more: its entities keep the opacity and the distance they last had. Both
-                        // the extraction pass and the closest-body query read those fields, so the
-                        // subtree has to be told explicitly that it is invisible.
-                        hideSubtree(child, childOpacity);
-                    }
+                    update(child, time, graph.translation, getChildrenOpacity(entity, child, base, fade, opacity));
+                }
+            } else if (hasChildren) {
+                // A subtree under a transparent parent is not traversed. Its children keep the opacity
+                // and the distance they last had, so it is told explicitly that it is invisible.
+                for (int i = 0; i < graph.children.size; i++) {
+                    hideSubtree(graph.children.get(i), opacity);
                 }
             }
         }
