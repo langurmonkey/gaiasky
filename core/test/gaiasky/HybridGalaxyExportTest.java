@@ -18,6 +18,7 @@ import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.StaticCoordinates;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3Q;
 import org.junit.Assert;
 import org.junit.Test;
@@ -218,17 +219,42 @@ public class HybridGalaxyExportTest {
     }
 
     @Test
-    public void theVolumeEntityNamesItsParentAndSizesItselfByDiameter() {
+    public void theVolumeEntityNamesItsParentAndSizesItselfByRadius() {
         var json = volumeJson();
 
         Assert.assertEquals("Volume", json.getString("archetype"));
         Assert.assertEquals("A test galaxy (VOLUME)", json.getString("name"));
         Assert.assertEquals("A test galaxy", json.getString("parent"));
         Assert.assertEquals("Galaxies", json.getString("componentType"));
-        // 2 * 10 kpc, in parsecs: the body size is a diameter, so no radius flag on the way in.
-        Assert.assertEquals(20000.0, json.getDouble("diameterPc"), 1e-3);
+        // The body size is a 20 kpc diameter; sizePc is a radius, so half of it. Same key and same
+        // meaning as the billboard half, which is what keeps the two halves at the same extent.
+        Assert.assertEquals(10000.0, json.getDouble("sizePc"), 1e-3);
+        Assert.assertNull(json.get("diameterPc"));
         Assert.assertFalse(json.getBoolean("cameraCollision"));
         Assert.assertFalse(json.getBoolean("focusable"));
+    }
+
+    @Test
+    public void theVolumeHalfSpanMatchesTheBillboardHalf() {
+        var parent = billboardEntity("A test galaxy");
+        var billboardJson = new GalaxyGenerator().convertToJson(parent);
+        var volumeJson = new GalaxyGenerator().convertVolumeToJson(volumeEntity("A test galaxy (VOLUME)", parent, fields()));
+
+        Assert.assertEquals(billboardJson.getDouble("sizePc"), volumeJson.getDouble("sizePc"), 1e-3);
+    }
+
+    @Test
+    public void theVolumeExportsItsReferenceSystemTransform() {
+        var volume = volumeEntity("A test galaxy (VOLUME)", billboardEntity("A test galaxy"), fields());
+        var trf = new RefSysTransform();
+        trf.setTransformMatrix(new Matrix4D(new float[] {0.5f, 0.5f, 0.5f, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}));
+        volume.add(trf);
+
+        var json = new GalaxyGenerator().convertVolumeToJson(volume);
+        var matrix = json.get("transformMatrix");
+        Assert.assertNotNull("the volume has to carry the tilt of the galaxy it belongs to", matrix);
+        Assert.assertEquals(16, matrix.size);
+        Assert.assertEquals(1.0, matrix.get(5).asDouble(), 1e-6);
     }
 
     @Test
@@ -236,7 +262,7 @@ public class HybridGalaxyExportTest {
         var components = attributeMap();
         // The volume entity is a Volume archetype, so its keys resolve through those components.
         Set<String> known = new HashSet<>();
-        for (String c : List.of("Base", "Body", "GraphNode", "Render", "Coordinates", "Fade", "Focus", "Model", "Volume")) {
+        for (String c : List.of("Base", "Body", "GraphNode", "Render", "Coordinates", "Fade", "Focus", "Model", "Volume", "RefSysTransform")) {
             known.addAll(attributesOf(components, c));
         }
 
@@ -336,8 +362,8 @@ public class HybridGalaxyExportTest {
         var text = GalaxyGenerator.toJsonString(new GalaxyGenerator().convertToHybridJson(parent, volume));
         var objects = new JsonReader().parse(text).get("objects");
         // Written as integers these come back as int[]/Long, and no setPositionPc(int[]) or
-        // setDiameterPc(Long) exists: the attribute is dropped on load.
+        // setSizePc(Long) exists: the attribute is dropped on load.
         Assert.assertTrue(objects.get(0).get("coordinates").get("positionPc").child.isDouble());
-        Assert.assertTrue(objects.get(1).get("diameterPc").isDouble());
+        Assert.assertTrue(objects.get(1).get("sizePc").isDouble());
     }
 }

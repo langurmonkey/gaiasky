@@ -762,6 +762,7 @@ public class GalaxyGenerator {
         var body = Mapper.body.get(e);
         var graph = Mapper.graph.get(e);
         var coord = Mapper.coordinates.get(e);
+        var trf = Mapper.transform.get(e);
         var fade = Mapper.fade.get(e);
         var focus = Mapper.focus.get(e);
         var modelComponent = Mapper.model.get(e);
@@ -780,9 +781,11 @@ public class GalaxyGenerator {
         if (graph.parent != null) {
             obj.addChild("parent", new JsonValue(Mapper.base.get(graph.parent).getName()));
         }
-        // Body: the volume sizes itself by diameter, which is not what the billboard half means by
-        // sizePc. The two flag setters behind 'diameterPc' are what keep the two apart.
-        obj.addChild("diameterPc", new JsonValue(body.size * Constants.U_TO_PC));
+        // Body: same key and same meaning as the billboard half. The volume keeps its size as a
+        // diameter in internal units (sizeIsRadiusFlag cleared), while sizePc is a radius, so the
+        // factor has to be applied here or the two halves of the galaxy come out at different sizes.
+        double radiusPc = body.size * (body.sizeIsRadiusFlag ? 1.0 : 0.5) * Constants.U_TO_PC;
+        obj.addChild("sizePc", new JsonValue(radiusPc));
         obj.addChild("cameraCollision", new JsonValue(body.cameraCollision));
         if (body.labelColor != null) {
             addArray(obj, "labelColor", body.labelColor);
@@ -826,6 +829,15 @@ public class GalaxyGenerator {
         var fields = fieldsToJson(volume.fields);
         if (fields != null) {
             obj.addChild("fields", fields);
+        }
+        // Reference system transform: the volume has to be written with the same tilt the billboard
+        // half carries, or the gas is drawn in a different orientation from its own stars.
+        if (trf != null) {
+            if (trf.transformName != null) {
+                obj.addChild("transformName", new JsonValue(trf.transformName));
+            } else if (trf.matrix != null) {
+                addArray(obj, "transformMatrix", trf.matrix.val);
+            }
         }
         // Coordinates: a child's position is an offset from its parent's.
         var coordsObj = new JsonValue(ValueType.object);
