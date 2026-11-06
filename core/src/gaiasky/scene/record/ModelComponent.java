@@ -754,6 +754,17 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         return mtc != null && mtc.hasVolumeDepthThreshold();
     }
 
+    /**
+     * Whether the shader of this volume has a depth mask bound, so that it clips the ray against the
+     * scene depth itself and needs no fixed-function depth test. See
+     * {@link MaterialComponent#hasVolumeDepthMask()}.
+     *
+     * @return True if the depth mask is bound.
+     */
+    public boolean hasVolumeDepthMask() {
+        return mtc != null && mtc.hasVolumeDepthMask();
+    }
+
     public void setDepthTest(int func,
                              boolean mask) {
         if (instance != null) {

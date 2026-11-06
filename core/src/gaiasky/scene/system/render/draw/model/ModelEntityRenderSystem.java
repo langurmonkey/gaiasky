@@ -241,9 +241,17 @@ public class ModelEntityRenderSystem {
                 // composed into the scene depth, so a test here would compare the volume with itself
                 // (see VolumeDepthMask).
                 mc.depthTestDisable();
+            } else if (mc.hasVolumeDepthMask()) {
+                // Colour pass of a volume that does not occlude. No depth test, and above all no
+                // depth write: the shader clips the ray against the scene depth (u_volumeSceneDepth)
+                // instead of comparing the proxy surface, so gas in front of a farther occluder still
+                // emits and only what lies behind it is cut. The write must stay off, because with no
+                // occluding slot the shader never finds a sample dense enough and stores the far
+                // plane - which would overwrite the depth of everything this volume is drawn over
+                // (a planet, say) and let the labels and orbits behind it show through.
+                mc.depthTestDisable();
             } else {
-                // No occluding slot, so nothing of this volume reached the scene depth: the normal
-                // blend-mode test applies, and geometry in front of the volume hides it as usual.
+                // No mask bound, so the shader cannot clip: fall back to the blend-mode test.
                 mc.updateDepthTest();
             }
             batch.render(mc.instance, mc.env);

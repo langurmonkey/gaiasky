@@ -1470,6 +1470,18 @@ public final class MaterialComponent extends NamedComponent implements IObserver
      * @param scaleX Mask texels per fragment, x.
      * @param scaleY Mask texels per fragment, y.
      */
+    /**
+     * Whether a volume depth mask is currently bound, i.e. whether the shader can tell this volume's
+     * own front from an occluder. When it is, the shader clips the ray itself and the fixed-function
+     * depth test is redundant - and wrong, as it compares the proxy surface. See
+     * {@link gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem#renderVolume}.
+     *
+     * @return True if {@code u_volumeDepthMaskScale} carries a usable scale.
+     */
+    public boolean hasVolumeDepthMask() {
+        return volumeDepthTex != null && volumeSceneDepthTex != null && volumeDepthScaleX > 0f;
+    }
+
     public void setVolumeDepthMask(Texture own,
                                    Texture scene,
                                    float scaleX,
