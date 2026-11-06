@@ -31,7 +31,7 @@ public class EntityUtils {
      * @return The vector with the position.
      */
     public static Vector3Q getAbsolutePosition(Entity entity, Vector3Q out) {
-        if (entity != null) {
+        if (entity != null && Mapper.body.has(entity)) {
             var body = Mapper.body.get(entity);
             out.set(body.pos);
 
