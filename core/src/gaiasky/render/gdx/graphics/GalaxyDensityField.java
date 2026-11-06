@@ -293,7 +293,14 @@ public final class GalaxyDensityField {
         float b = pitchB(s.baseAngle);
         float d = armDelta(s, r, phi, warp);
         float sigma = Math.max(s.armSigma * ARM_WIDTH * base, 1e-4f);
-        float perpendicular = Math.abs(d) * r / (float) Math.sqrt(1.0 + b * b) + rough * sigma;
+        // The displacement goes on the *signed* angular distance, so a whole lane shifts sideways by
+        // the same amount on both of its flanks. Folding the distance to a magnitude first makes the
+        // two flanks move in opposite senses (towards or away from the centreline together), and
+        // since the ridge is at zero of the sum, a negative displacement puts it at a constant
+        // |d| on *either* side of the centreline - one lane becomes two - while a positive one
+        // drives it past the ridge and the lane just dims. That is the split, and the loss of most
+        // of the field's peak density.
+        float perpendicular = d * r / (float) Math.sqrt(1.0 + b * b) + rough * sigma;
         return (float) Math.exp(-0.5f * perpendicular * perpendicular / (sigma * sigma));
     }
 

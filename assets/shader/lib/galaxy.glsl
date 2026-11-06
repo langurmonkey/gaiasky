@@ -260,8 +260,11 @@ float gxArmFactor(in GalaxyShape s, float r, float phi, float warp, float rough)
     float d = gxArmDelta(s, r, phi, warp);
     float sigma = max(s.armSigma * GX_ARM_WIDTH * base, 1e-4);
     // Turn the angular distance into a linear one: a log spiral of pitch b has perpendicular
-    // spacing r/sqrt(1+b^2) per unit of angle.
-    float perpendicular = abs(d) * r / sqrt(1.0 + b * b) + rough * sigma;
+    // spacing r/sqrt(1+b^2) per unit of angle. The displacement goes on the signed distance, so a
+    // lane shifts sideways by the same amount on both flanks; folding it to a magnitude first would
+    // move the two flanks in opposite senses, and a negative `rough` would then put the ridge at a
+    // constant |d| on either side of the centreline - one lane drawn as two.
+    float perpendicular = d * r / sqrt(1.0 + b * b) + rough * sigma;
     return exp(-0.5 * perpendicular * perpendicular / (sigma * sigma));
 }
 

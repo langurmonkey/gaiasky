@@ -962,7 +962,7 @@ public class GalaxyAttributes {
          * edge of the volume's box and the only value a volume can use: the particle channels could
          * carry on past it, but then the same slider would mean two different things again.
          **/
-        public float[] baseRadius = new float[]{0.05f, 1.0f};
+        public float[] baseRadius = new float[]{0.05f, 1.2f};
         /**
          * Warp strength range: the displacement of the disk plane at the rim, as a fraction of
          * baseRadius. It is a magnitude, so it is not signed; past 0.15 the disk stops reading as a
@@ -1088,8 +1088,13 @@ public class GalaxyAttributes {
         /** An irregular distribution. **/
         IRREGULAR;
 
+        /**
+         * @return Whether the distribution is a flat one: it has a vertical profile, a warp and a
+         *         cylindrical radial profile. Includes the bar, as {@code gxIsFlat} in
+         *         {@code galaxy.glsl} and {@code GalaxyDensityField#isFlat} do.
+         */
         public boolean isFlat() {
-            return this == DISK || this == DISK_GAUSS || this == SPIRAL || this == SPIRAL_LOG;
+            return this == DISK || this == DISK_GAUSS || this == SPIRAL || this == SPIRAL_LOG || this == BAR;
         }
 
         public boolean isAnySpiral() {

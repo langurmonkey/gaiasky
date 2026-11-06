@@ -427,24 +427,32 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         detail.add(distributionLabel).left().padRight(pad20).padBottom(pad18);
         detail.add(distribution).left().padBottom(pad18).row();
 
-        // Height profile
-        var heightProfile = new OwnSelectBox<HeightProfile>(skin);
-        heightProfile.setItems(HeightProfile.values());
-        heightProfile.setWidth(HALF_WIDTH_BOX);
-        heightProfile.setSelected(field.heightProfile);
-        heightProfile.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event,
-                                Actor actor) {
-                field.heightProfile = heightProfile.getSelected();
-                markFieldsDirty();
-            }
-        });
-        tip(heightProfile, "gui.galaxy.ds.height.profile");
-        var heightProfileLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.height.profile"), skin);
-        heightProfileLabel.setWidth(HALF_WIDTH_BOX);
-        detail.add(heightProfileLabel).left().padRight(pad20).padBottom(pad18);
-        detail.add(heightProfile).left().padBottom(pad18).row();
+        // Only the controls the chosen distribution reads are built: the field model is a switch, and
+        // a knob that writes a parameter no branch reads looks like a broken knob. The billboard pane
+        // gates its own controls on the same predicates.
+        var dist = field.distribution;
+
+        // Height profile. Only the flat distributions have a vertical profile at all: a sphere, an
+        // ellipsoid, a cone or an irregular field is shaped by its radial profile alone.
+        if (dist.isFlat()) {
+            var heightProfile = new OwnSelectBox<HeightProfile>(skin);
+            heightProfile.setItems(HeightProfile.values());
+            heightProfile.setWidth(HALF_WIDTH_BOX);
+            heightProfile.setSelected(field.heightProfile);
+            heightProfile.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event,
+                                    Actor actor) {
+                    field.heightProfile = heightProfile.getSelected();
+                    markFieldsDirty();
+                }
+            });
+            tip(heightProfile, "gui.galaxy.ds.height.profile");
+            var heightProfileLabel = new OwnLabel(I18n.msg("gui.galaxy.ds.height.profile"), skin);
+            heightProfileLabel.setWidth(HALF_WIDTH_BOX);
+            detail.add(heightProfileLabel).left().padRight(pad20).padBottom(pad18);
+            detail.add(heightProfile).left().padBottom(pad18).row();
+        }
 
         // Radial profile: min and base radius side by side, as in the billboard pane, and with the
         // same ranges: baseRadius is a fraction of the object radius in both channel types, and a
@@ -460,38 +468,49 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         radialTable.add(baseRadius).left();
         detail.add(radialTable).colspan(2).left().padBottom(pad18).row();
 
-        // Arms
-        var arms = fieldSlider("gui.galaxy.ds.arm.number", 0f, 8f, 1f, field.numArms,
-                               v -> field.numArms = Math.round(v));
-        arms.setNumberFormatter(new DecimalFormat("##0"));
-        addSlider(detail, arms);
-        addSlider(detail, fieldSlider("gui.galaxy.ds.arm.sigma", 0.05f, 1.5f, 0.01f, field.armSigma,
-                                      v -> field.armSigma = v));
-        detail.add(angleSlider(field)).colspan(2).left().padBottom(pad18).row();
+        // Arms. The two spirals are the only distributions whose density has an azimuthal
+        // modulation. The cone is the exception: its base angle is a half-angle, not a pitch, so it
+        // gets a slider with that meaning instead.
+        if (dist.isAnySpiral()) {
+            var arms = fieldSlider("gui.galaxy.ds.arm.number", 0f, 8f, 1f, field.numArms,
+                                   v -> field.numArms = Math.round(v));
+            arms.setNumberFormatter(new DecimalFormat("##0"));
+            addSlider(detail, arms);
+            addSlider(detail, fieldSlider("gui.galaxy.ds.arm.sigma", 0.01f, 1.5f, 0.01f, field.armSigma,
+                                          v -> field.armSigma = v));
+            detail.add(angleSlider(field)).colspan(2).left().padBottom(pad18).row();
+        } else if (dist == Distribution.CONE) {
+            detail.add(coneAngleSlider(field)).colspan(2).left().padBottom(pad18).row();
+        }
 
-        // Ellipsoid: eccentricity per axis, then the bar aspect.
-        var eccTable = new Table(skin);
-        var eccX = fieldSlider("gui.galaxy.ds.eccentricity.x", -0.95f, 0.95f, 0.01f, field.eccentricity[0],
-                               v -> field.eccentricity[0] = v);
-        eccX.setWidth(THIRD_WIDTH_BOX);
-        var eccY = fieldSlider("gui.galaxy.ds.eccentricity.y", -0.95f, 0.95f, 0.01f, field.eccentricity[1],
-                               v -> field.eccentricity[1] = v);
-        eccY.setWidth(THIRD_WIDTH_BOX);
-        var aspect = fieldSlider("gui.galaxy.ds.aspect", 0.1f, 3.0f, 0.01f, field.aspect,
-                                 v -> field.aspect = v);
-        aspect.setWidth(THIRD_WIDTH_BOX);
-        eccTable.add(eccX).left().padRight(PAD5);
-        eccTable.add(eccY).left().padRight(PAD5);
-        eccTable.add(aspect).left();
-        detail.add(eccTable).colspan(2).left().padBottom(pad18).row();
+        // Flattening and aspect. The ellipsoid is the only distribution that scales its radius per
+        // axis, and so the only one that reads the two flattening values; the bar is the only one
+        // with an aspect ratio. Neither reads the other's parameter.
+        if (dist.isEllipsoid()) {
+            var eccTable = new Table(skin);
+            var eccX = fieldSlider("gui.galaxy.ds.eccentricity.x", -0.95f, 0.95f, 0.01f, field.eccentricity[0],
+                                   v -> field.eccentricity[0] = v);
+            eccX.setWidth(HALF_WIDTH_BOX);
+            var eccY = fieldSlider("gui.galaxy.ds.eccentricity.y", -0.95f, 0.95f, 0.01f, field.eccentricity[1],
+                                   v -> field.eccentricity[1] = v);
+            eccY.setWidth(HALF_WIDTH_BOX);
+            eccTable.add(eccX).left().padRight(PAD5);
+            eccTable.add(eccY).left();
+            detail.add(eccTable).colspan(2).left().padBottom(pad18).row();
+        } else if (dist.isBar()) {
+            addSlider(detail, fieldSlider("gui.galaxy.ds.aspect", 0.1f, 3.0f, 0.01f, field.aspect,
+                                          v -> field.aspect = v));
+        }
 
-        // Vertical structure
-        // The range is the channel type's: a warp is a magnitude, and past 0.15 it folds the disk
-        // instead of bending it.
-        addSlider(detail, fieldSlider("gui.galaxy.ds.warp", field.type.warpStrength[0], field.type.warpStrength[1], 0.001f, field.warpStrength,
-                                      v -> field.warpStrength = v));
-        addSlider(detail, fieldSlider("gui.galaxy.ds.height.scale", 0f, 0.5f, 0.005f, field.heightScale,
-                                      v -> field.heightScale = v));
+        // Vertical structure: the warp and the sech^2 slab only exist in the flat branch.
+        if (dist.isFlat()) {
+            // The range is the channel type's: a warp is a magnitude, and past 0.15 it folds the disk
+            // instead of bending it.
+            addSlider(detail, fieldSlider("gui.galaxy.ds.warp", field.type.warpStrength[0], field.type.warpStrength[1], 0.001f, field.warpStrength,
+                                          v -> field.warpStrength = v));
+            addSlider(detail, fieldSlider("gui.galaxy.ds.height.scale", 0f, 0.5f, 0.005f, field.heightScale,
+                                          v -> field.heightScale = v));
+        }
 
         // Colors and color noise
         var colorsTable = new Table(skin);
@@ -516,21 +535,29 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         addSlider(detail, fieldSlider("gui.galaxy.ds.intensity", 0f, 5f, 0.01f, field.intensity,
                                       v -> field.intensity = v));
 
-        // Volume-only knobs: the sprite path has no equivalent for any of these.
-        // The arm warp is a phase displacement of the centreline in fractions of the arm spacing:
-        // past 0.15 the arms stop reading as arms and start reading as a braid. The sign only
-        // mirrors the bend, so the range is not signed.
-        addSlider(detail, fieldSlider("gui.galaxy.field.lane.warp", 0f, 0.15f, 0.005f, field.laneWarp,
-                                      v -> field.laneWarp = v));
-        addSlider(detail, fieldSlider("gui.galaxy.field.lane.rough", 0f, 3f, 0.01f, field.laneRough,
-                                      v -> field.laneRough = v));
-        addSlider(detail, fieldSlider("gui.galaxy.field.lane.noise.scale", 0.1f, 10f, 0.1f, field.laneNoiseScale,
-                                      v -> field.laneNoiseScale = v));
+        // Volume-only knobs: the sprite path has no equivalent for any of these. The arm warp and
+        // the roughness displace the arm centreline, so they only mean something where there is an
+        // arm to displace.
+        if (dist.isAnySpiral()) {
+            // The arm warp is a phase displacement of the centreline in fractions of the arm spacing:
+            // past 0.15 the arms stop reading as arms and start reading as a braid. The sign only
+            // mirrors the bend, so the range is not signed.
+            addSlider(detail, fieldSlider("gui.galaxy.field.lane.warp", 0f, 1f, 0.005f, field.laneWarp,
+                                          v -> field.laneWarp = v));
+            // The frequency is shared by the warp and the ragged edge, so it sits between them.
+            addSlider(detail, fieldSlider("gui.galaxy.field.lane.noise.scale", 0.1f, 20f, 0.1f, field.laneNoiseScale,
+                                          v -> field.laneNoiseScale = v));
+            // Only dust has an edge to roughen (GalaxyDensityField#sample).
+            if (field.isOcclusive()) {
+                addSlider(detail, fieldSlider("gui.galaxy.field.lane.rough", 0f, 3f, 0.01f, field.laneRough,
+                                              v -> field.laneRough = v));
+            }
+        }
         addSlider(detail, fieldSlider("gui.galaxy.field.noise.mask", 0f, 1f, 0.01f, field.noiseMask,
                                       v -> field.noiseMask = v));
         addSlider(detail, fieldSlider("gui.galaxy.field.noise.mask.freq", 0f, 40f, 0.5f, field.noiseMaskFreq,
                                       v -> field.noiseMaskFreq = v));
-        var octaves = fieldSlider("gui.galaxy.field.noise.mask.octaves", 0f, 8f, 1f, field.noiseMaskOctaves,
+        var octaves = fieldSlider("gui.galaxy.field.noise.mask.octaves", 0f, 4f, 1f, field.noiseMaskOctaves,
                                   v -> field.noiseMaskOctaves = Math.round(v));
         octaves.setNumberFormatter(new DecimalFormat("##0"));
         addSlider(detail, octaves);
@@ -617,6 +644,32 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
             }
         });
         return baseAngle;
+    }
+
+    /**
+     * The base angle of a cone field. The field model clamps it to [1, 60] degrees and uses it as
+     * the half-angle of the cone, so the arm slider - logarithmic, labelled as a pitch, and ranging
+     * over the whole pitch range - would both mislabel it and allow values that do nothing.
+     *
+     * @param field The field to edit.
+     *
+     * @return The slider, configured and listening.
+     */
+    private OwnSliderReset coneAngleSlider(GalaxyAttributes field) {
+        // Stored in tenths of a degree, like the arm pitch; shown in degrees.
+        var angle = new OwnSliderReset(I18n.msg("gui.galaxy.ds.cone.angle"), 1f, 60f, 0.5f, field.baseAngle * 0.1f, skin);
+        tip(angle, "gui.galaxy.ds.cone.angle");
+        angle.setWidth(FULL_WIDTH_BOX);
+        angle.setValue(field.baseAngle * 0.1f);
+        angle.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event,
+                                Actor actor) {
+                field.baseAngle = angle.getValue() * 10f;
+                markFieldsDirty();
+            }
+        });
+        return angle;
     }
 
     /** Adds a slider on its own row, spanning both columns of the pane. **/
