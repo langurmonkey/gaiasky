@@ -220,8 +220,8 @@ vec3 positionCone(inout uint state, float coneAngleDeg) {
 //     arms are on the same curve.
 //
 // The vertical structure is left to computeY(), which is the particle side's own slab.
-// Lane warp, lane roughness and the noise mask are volume-only: they are not mirrored here, so a
-// field with those set no longer matches its particles exactly.
+// The lane warp, the lane substructure and the noise mask are volume-only: they are not mirrored
+// here, so a field with those set no longer matches its particles exactly.
 
 // The uniforms of this draw, as the shape the field functions take.
 GalaxyShape gxFieldShape() {
@@ -243,7 +243,10 @@ GalaxyShape gxFieldShape() {
     s.weight = 1.0;
     s.laneWarp = 0.0;
     s.laneNoiseScale = 0.0;
-    s.laneRough = 0.0;
+    // The billboards sample the density model, never the dust substructure, which the volume adds.
+    s.filamentContrast = 0.0;
+    s.filamentScale = 0.0;
+    s.filamentThreshold = 0.0;
     s.noiseMask = 0.0;
     s.noiseMaskFreq = 0.0;
     s.noiseMaskOctaves = 0;

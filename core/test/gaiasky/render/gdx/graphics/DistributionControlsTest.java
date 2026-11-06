@@ -48,7 +48,6 @@ public class DistributionControlsTest {
         f.noiseMask = 0f;
         f.laneWarp = 0f;
         f.laneNoiseScale = 1f;
-        f.laneRough = 0f;
         return f;
     }
 
@@ -190,17 +189,17 @@ public class DistributionControlsTest {
                 plain.type = channel;
                 var warped = new GalaxyAttributes(plain);
                 warped.laneWarp = 0.8f;
-                var rough = new GalaxyAttributes(plain);
-                rough.laneRough = 2f;
+                var stranded = new GalaxyAttributes(plain);
+                stranded.filamentContrast = 0.9f;
 
                 boolean spiral = d.isAnySpiral();
-                // The arm warp displaces the centreline of both channel types; the ragged edge is
-                // only applied to the dust, which is the only field with an occluding edge.
+                // The arm warp displaces the centreline of both channel types; the strands are only
+                // cut into the dust, which is the only field with lanes to break up.
                 Assert.assertEquals(d + "/" + channel + " reads an arm warp it has no use for",
                                     spiral ? 1 : 0, Math.abs(total(plain) - total(warped)) > 1e-6 ? 1 : 0);
-                boolean roughLive = spiral && channel == ChannelType.DUST;
-                Assert.assertEquals(d + "/" + channel + " reads a lane roughness it has no use for",
-                                    roughLive ? 1 : 0, Math.abs(total(plain) - total(rough)) > 1e-6 ? 1 : 0);
+                boolean strandsLive = spiral && channel == ChannelType.DUST;
+                Assert.assertEquals(d + "/" + channel + " reads a lane substructure it has no use for",
+                                    strandsLive ? 1 : 0, Math.abs(total(plain) - total(stranded)) > 1e-6 ? 1 : 0);
             }
         }
     }

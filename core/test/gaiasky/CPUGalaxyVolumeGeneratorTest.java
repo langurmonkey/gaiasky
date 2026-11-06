@@ -94,7 +94,9 @@ public class CPUGalaxyVolumeGeneratorTest {
         field.laneWarp = 0.06f;
         field.noiseMask = 0.7f;
         field.laneNoiseScale = 1.5f;
-        field.laneRough = 0.35f;
+        field.filamentContrast = 0.7f;
+        field.filamentScale = 14f;
+        field.filamentThreshold = 0.35f;
         field.noiseMaskFreq = 12f;
         field.noiseMaskOctaves = 5;
 
@@ -121,7 +123,9 @@ public class CPUGalaxyVolumeGeneratorTest {
         Assert.assertEquals(field.laneWarp, shape.laneWarp, 0f);
         Assert.assertEquals(field.noiseMask, shape.noiseMask, 0f);
         Assert.assertEquals(field.laneNoiseScale, shape.laneNoiseScale, 0f);
-        Assert.assertEquals(field.laneRough, shape.laneRough, 0f);
+        Assert.assertEquals(field.filamentContrast, shape.filamentContrast, 0f);
+        Assert.assertEquals(field.filamentScale, shape.filamentScale, 0f);
+        Assert.assertEquals(field.filamentThreshold, shape.filamentThreshold, 0f);
         Assert.assertEquals(field.noiseMaskFreq, shape.noiseMaskFreq, 0f);
         Assert.assertEquals(field.noiseMaskOctaves, shape.noiseMaskOctaves);
     }

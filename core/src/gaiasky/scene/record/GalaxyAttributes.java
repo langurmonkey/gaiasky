@@ -173,22 +173,44 @@ public class GalaxyAttributes {
     public int noiseMaskOctaves = 0;
 
     /**
-     * Frequency multiplier of {@link #laneWarp} and {@link #laneRough}. Zero or less means 1. Not
-     * applied to the noise mask, which has its own frequency.
+     * Frequency multiplier of {@link #laneWarp}. Zero or less means 1. Not applied to the noise mask
+     * or to the lane substructure, which have their own frequencies.
      */
     public float laneNoiseScale = 1.0f;
 
     /**
-     * Amplitude of the ragged edge of the dust lanes, in units of {@code armSigma}: 1 displaces the
-     * edge by a few sigma at the peaks. Only {@link ChannelType#DUST} uses it.
+     * Depth of the substructure inside a dust lane, in [0,1]: how far the gaps between its strands
+     * drop below the lane's own density. Only {@link ChannelType#DUST} in a spiral uses it.
      * <p>
-     * The displacement is summed over four octaves starting at a few cycles per {@code baseRadius},
-     * so the silhouette of a lane varies at every scale the voxel grid can carry. A single octave -
-     * or a smooth function - moves the whole edge up and down together, which is what makes a lane
-     * read as a deformed liquid surface rather than as a ragged one. Pair it with
-     * {@link #noiseMask}, which does the breaking.
+     * {@link #laneWarp} moves the centreline of a lane, so it can make it meander but not texturise
+     * it: its cross-section is a Gaussian of a fixed width and a fixed peak. This is the missing
+     * axis. It multiplies the lane's density by a field thresholded into
+     * strands, so 0 leaves the lane smooth and a value near 1 leaves it as strands separated by
+     * gaps of two orders of magnitude - which is what a real lane is. Values in between keep a veil
+     * of material between the strands, so the lane stays continuous.
+     * <p>
+     * It lowers the mean dust density, so raise {@link #intensity} to compensate.
+     *
+     * @see #filamentScale
+     * @see #filamentThreshold
      */
-    public float laneRough = 0.0f;
+    public float filamentContrast = 0.88f;
+
+    /**
+     * Frequency of {@link #filamentContrast} across the lane, in cycles per {@code baseRadius}.
+     * Zero or less means 20.
+     * <p>
+     * A strand is long along the lane and thin across it, so this is what sets its width, and it is
+     * independent of {@link #laneNoiseScale}, which sets the scale of the warp. Past roughly 24 the
+     * grid cannot carry the pattern and the strands alias into beads.
+     */
+    public float filamentScale = 20.0f;
+
+    /**
+     * Level, in [0,1] of the noise field behind {@link #filamentContrast}, above which a point is
+     * inside a strand. Higher values keep fewer, thinner strands and empty more of the lane.
+     */
+    public float filamentThreshold = 0.50f;
 
     /**
      * The intensity factor.
@@ -270,7 +292,9 @@ public class GalaxyAttributes {
         this.noiseMaskFreq = other.noiseMaskFreq;
         this.noiseMaskOctaves = other.noiseMaskOctaves;
         this.laneNoiseScale = other.laneNoiseScale;
-        this.laneRough = other.laneRough;
+        this.filamentContrast = other.filamentContrast;
+        this.filamentScale = other.filamentScale;
+        this.filamentThreshold = other.filamentThreshold;
         this.intensity = other.intensity;
         this.occlusionThreshold = other.occlusionThreshold;
     }
@@ -337,7 +361,7 @@ public class GalaxyAttributes {
     private static final double GX_DUST_HEIGHT = 0.5;
 
     /** Length in floats of one field in the packed uniform of {@code galgen.volume.comp.glsl}. **/
-    public static final int FIELD_STRIDE = 36;
+    public static final int FIELD_STRIDE = 37;
     /**
      * Maximum number of fields summed into one volume slot. Mirrors {@code GX_MAX_FIELDS} in
      * {@code assets/shader/lib/galaxy.glsl}. Each slot gets its own packed array, so a galaxy can
@@ -356,7 +380,8 @@ public class GalaxyAttributes {
      * @param offset Where this field starts.
      */
     public void packFields(float[] out, int offset) {
-        out[offset] = distribution.ordinal();
+        // One spiral in the volume: the second name has no branch of its own in the field model.
+        out[offset] = distribution.toVolumeDistribution().ordinal();
         out[offset + 1] = baseRadius;
         out[offset + 2] = minRadius;
         out[offset + 3] = numArms;
@@ -377,9 +402,11 @@ public class GalaxyAttributes {
         out[offset + 29] = laneWarp;
         out[offset + 30] = noiseMask;
         out[offset + 31] = laneNoiseScale;
-        out[offset + 32] = laneRough;
-        out[offset + 33] = noiseMaskFreq;
-        out[offset + 34] = (float) noiseMaskOctaves;
+        out[offset + 32] = noiseMaskFreq;
+        out[offset + 33] = (float) noiseMaskOctaves;
+        out[offset + 34] = filamentContrast;
+        out[offset + 35] = filamentScale;
+        out[offset + 36] = filamentThreshold;
     }
 
     /**
@@ -657,30 +684,28 @@ public class GalaxyAttributes {
         this.noiseMaskOctaves = MathUtilsDouble.clamp(noiseMaskOctaves.intValue(), 1, 8);
     }
 
-    public void setLaneRough(Double laneRough) {
-        this.laneRough = MathUtilsDouble.clamp(laneRough.floatValue(), 0f, 4f);
+    public void setFilamentContrast(Double filamentContrast) {
+        this.filamentContrast = MathUtilsDouble.clamp(filamentContrast.floatValue(), 0f, 0.98f);
     }
 
-    public void setLaneRough(Long laneRough) {
-        setLaneRough(laneRough.doubleValue());
+    public void setFilamentContrast(Long filamentContrast) {
+        setFilamentContrast(filamentContrast.doubleValue());
     }
 
-    /**
-     * Sets the lane perturbations in one go: warp, roughness and frequency scale, from one to three
-     * values. Missing ones are left as they are.
-     *
-     * @param v The values.
-     */
-    public void setLaneNoise(double[] v) {
-        if (v.length > 0) setLaneWarp(v[0]);
-        if (v.length > 1) setLaneRough(v[1]);
-        if (v.length > 2) setLaneNoiseScale(v[2]);
+    public void setFilamentScale(Double filamentScale) {
+        this.filamentScale = MathUtilsDouble.clamp(filamentScale.floatValue(), 0f, 64f);
     }
 
-    public void setLaneNoise(int[] v) {
-        if (v.length > 0) setLaneWarp((double) v[0]);
-        if (v.length > 1) setLaneRough((double) v[1]);
-        if (v.length > 2) setLaneNoiseScale((double) v[2]);
+    public void setFilamentScale(Long filamentScale) {
+        setFilamentScale(filamentScale.doubleValue());
+    }
+
+    public void setFilamentThreshold(Double filamentThreshold) {
+        this.filamentThreshold = MathUtilsDouble.clamp(filamentThreshold.floatValue(), 0f, 0.99f);
+    }
+
+    public void setFilamentThreshold(Long filamentThreshold) {
+        setFilamentThreshold(filamentThreshold.doubleValue());
     }
 
     /**
@@ -962,7 +987,7 @@ public class GalaxyAttributes {
          * edge of the volume's box and the only value a volume can use: the particle channels could
          * carry on past it, but then the same slider would mean two different things again.
          **/
-        public float[] baseRadius = new float[]{0.05f, 1.2f};
+        public float[] baseRadius = new float[]{0.05f, 1.6f};
         /**
          * Warp strength range: the displacement of the disk plane at the rim, as a fraction of
          * baseRadius. It is a magnitude, so it is not signed; past 0.15 the disk stops reading as a
@@ -1107,6 +1132,21 @@ public class GalaxyAttributes {
 
         public boolean isLogarithmicSpiral() {
             return this == SPIRAL_LOG;
+        }
+
+        /**
+         * This distribution as the volume pipeline knows it.
+         * <p>
+         * The field model draws both spirals with the same curve - {@code gxArmFactor}, a
+         * logarithmic spiral of the field's own pitch - so a volume has one spiral, and
+         * {@link #SPIRAL_LOG} collapses onto {@link #SPIRAL}. The particle path keeps the two apart
+         * (they differ in how a dust sprite is scaled), so this is applied only where a
+         * {@link GalaxyAttributes} becomes a density field.
+         *
+         * @return The distribution to store in the volume pipeline.
+         */
+        public Distribution toVolumeDistribution() {
+            return isLogarithmicSpiral() ? SPIRAL : this;
         }
 
         public boolean isEllipsoid() {

@@ -61,6 +61,10 @@ public class GalaxySpec {
                 continue;
             }
             var field = new GalaxyAttributes(dataset);
+            // The field model has one spiral, so the volume half of a galaxy never names the second
+            // one: SPIRAL_LOG collapses onto SPIRAL (Distribution#toVolumeDistribution). The billboard
+            // datasets keep it, since a dust sprite is scaled differently in each.
+            field.distribution = field.distribution.toVolumeDistribution();
             // The dataset's intensity is a sprite alpha; a field's is a density weight. See
             // GalaxyAttributes.initialVolumeIntensity.
             field.intensity = GalaxyAttributes.initialVolumeIntensity(field.type);

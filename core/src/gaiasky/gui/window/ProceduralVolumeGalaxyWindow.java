@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -346,6 +347,10 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         table.add(editedHint).left().padLeft(pad10).padBottom(fieldsDirty ? pad10 : 0f).row();
 
         for (var field : fields) {
+            // The volume pipeline has one spiral (Distribution#toVolumeDistribution): a field loaded
+            // from a file that names the second one becomes the first, so the header, the selector
+            // and the next export all agree on the only spiral this pane can produce.
+            field.distribution = field.distribution.toVolumeDistribution();
             // On the header rather than at the end of the editors, as in the billboard pane: the
             // control that removes the field sits next to the one that expands it.
             var delete = new OwnTextIconButton("", skin, "rubbish");
@@ -406,11 +411,24 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
             detail.add(occlusion).colspan(2).left().padBottom(pad18).row();
         }
 
-        // Distribution
+        // Distribution. One spiral only: the field model draws both of them with the same curve, so
+        // a second entry would be the same thing under another name (the billboard pane keeps both).
+        var distributions = new Array<Distribution>();
+        for (var d : Distribution.values()) {
+            if (!d.isLogarithmicSpiral()) {
+                distributions.add(d);
+            }
+        }
         var distribution = new OwnSelectBox<ComboBoxBean<Distribution>>(skin);
-        distribution.setItems(ComboBoxBean.getValues(Distribution.class));
+        distribution.setItems(ComboBoxBean.getValues(distributions));
         distribution.setWidth(HALF_WIDTH_BOX);
-        distribution.setSelectedIndex(field.distribution.ordinal());
+        // By value, not by ordinal: the list is filtered, so the two no longer coincide.
+        for (var item : distribution.getItems()) {
+            if (item.value == field.distribution) {
+                distribution.setSelected(item);
+                break;
+            }
+        }
         distribution.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event,
@@ -535,22 +553,28 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         addSlider(detail, fieldSlider("gui.galaxy.ds.intensity", 0f, 5f, 0.01f, field.intensity,
                                       v -> field.intensity = v));
 
-        // Volume-only knobs: the sprite path has no equivalent for any of these. The arm warp and
-        // the roughness displace the arm centreline, so they only mean something where there is an
-        // arm to displace.
+        // Volume-only knobs: the sprite path has no equivalent for any of these. The arm warp
+        // displaces the arm centreline, so it only means something where there is an arm.
         if (dist.isAnySpiral()) {
             // The arm warp is a phase displacement of the centreline in fractions of the arm spacing:
             // past 0.15 the arms stop reading as arms and start reading as a braid. The sign only
             // mirrors the bend, so the range is not signed.
             addSlider(detail, fieldSlider("gui.galaxy.field.lane.warp", 0f, 1f, 0.005f, field.laneWarp,
                                           v -> field.laneWarp = v));
-            // The frequency is shared by the warp and the ragged edge, so it sits between them.
             addSlider(detail, fieldSlider("gui.galaxy.field.lane.noise.scale", 0.1f, 20f, 0.1f, field.laneNoiseScale,
                                           v -> field.laneNoiseScale = v));
-            // Only dust has an edge to roughen (GalaxyDensityField#sample).
+            // Only the dust of a spiral has lanes to break up (GalaxyDensityField#sample).
             if (field.isOcclusive()) {
-                addSlider(detail, fieldSlider("gui.galaxy.field.lane.rough", 0f, 3f, 0.01f, field.laneRough,
-                                              v -> field.laneRough = v));
+                // The strands inside the lane. Contrast is what the gaps drop to, so 0 is a smooth
+                // lane and the default reproduces the look the field had before it was a knob.
+                addSlider(detail, fieldSlider("gui.galaxy.field.lane.filament.contrast", 0f, 0.98f, 0.01f, field.filamentContrast,
+                                              v -> field.filamentContrast = v));
+                // Frequency across the lane, in cycles per baseRadius. Past ~24 the grid cannot carry
+                // it and the strands alias into beads.
+                addSlider(detail, fieldSlider("gui.galaxy.field.lane.filament.scale", 1f, 32f, 0.5f, field.filamentScale,
+                                              v -> field.filamentScale = v));
+                addSlider(detail, fieldSlider("gui.galaxy.field.lane.filament.threshold", 0f, 0.95f, 0.01f, field.filamentThreshold,
+                                              v -> field.filamentThreshold = v));
             }
         }
         addSlider(detail, fieldSlider("gui.galaxy.field.noise.mask", 0f, 1f, 0.01f, field.noiseMask,

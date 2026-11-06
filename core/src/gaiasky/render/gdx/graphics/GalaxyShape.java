@@ -23,6 +23,7 @@ public final class GalaxyShape {
     /** Distribution ids. Must match the {@code GX_*} constants and the {@code Distribution} ordinals. **/
     public static final int SPHERE = 0, DISK = 1, SPIRAL = 2, SPIRAL_LOG = 3, BAR = 4, ELLIPSOID = 5,
             DISK_GAUSS = 6, SPHERE_GAUSS = 7, CONE = 8, IRREGULAR = 9;
+    /** {@code SPIRAL_LOG} is reserved: the volume packs it as {@code SPIRAL} ({@code Distribution#toVolumeDistribution}). **/
     /** Height profile ids. Must match the {@code GX_HEIGHT_*} constants and the ordinals. **/
     public static final int HEIGHT_CONSTANT = 0, HEIGHT_LINEAR_INC = 1, HEIGHT_LINEAR_DEC = 2,
             HEIGHT_SMOOTH_INC = 3, HEIGHT_SMOOTH_DEC = 4;
@@ -51,7 +52,12 @@ public final class GalaxyShape {
     public final float noiseMaskFreq;
     public final int noiseMaskOctaves;
     public final float laneNoiseScale;
-    public final float laneRough;
+    /** Depth of the substructure inside a dust lane, in [0,1]. **/
+    public final float filamentContrast;
+    /** Frequency of that substructure across the lane, in cycles per baseRadius. **/
+    public final float filamentScale;
+    /** Level of the field above which a point is inside a strand. **/
+    public final float filamentThreshold;
     /** Four colour stops, core first, three components each. **/
     public final float[] baseColors = new float[12];
 
@@ -76,9 +82,11 @@ public final class GalaxyShape {
         laneWarp = d[o + 29];
         noiseMask = d[o + 30];
         laneNoiseScale = d[o + 31];
-        laneRough = d[o + 32];
-        noiseMaskFreq = d[o + 33];
-        noiseMaskOctaves = Math.round(d[o + 34]);
+        noiseMaskFreq = d[o + 32];
+        noiseMaskOctaves = Math.round(d[o + 33]);
+        filamentContrast = d[o + 34];
+        filamentScale = d[o + 35];
+        filamentThreshold = d[o + 36];
     }
 
     /**

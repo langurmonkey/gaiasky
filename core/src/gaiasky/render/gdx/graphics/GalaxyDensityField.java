@@ -48,18 +48,24 @@ public final class GalaxyDensityField {
     public static final float VERTICAL_TAIL = 3.0f;
     /** Frequency of the lane warp, in cycles per baseRadius. Mirrors {@code GX_LANE_FREQ}. **/
     public static final float LANE_FREQ = 2.4f;
-    /** Lowest frequency of the ragged dust edge. Mirrors {@code GX_LANE_ROUGH_FREQ}. **/
-    public static final float LANE_ROUGH_FREQ = 4.0f;
-    /** Octaves summed into the ragged edge. Mirrors {@code GX_LANE_ROUGH_OCTAVES}. **/
-    public static final int LANE_ROUGH_OCTAVES = 4;
     /** Highest frequency the grid can carry smoothly, in cycles per voxel. Mirrors {@code GX_NOISE_MAX_LOD}. **/
     public static final float NOISE_MAX_LOD = 0.15f;
-    /** Displacement of the lane edge at laneRough = 1. Mirrors {@code GX_LANE_ROUGH_SIGMA}. **/
-    public static final float LANE_ROUGH_SIGMA = 3.0f;
-    /** Feature stretch along the lane. Mirrors {@code GX_LANE_STRETCH}. **/
-    public static final float LANE_STRETCH = 2.5f;
-    /** Vertical flattening of the lane noise. Mirrors {@code GX_LANE_FLATTEN}. **/
-    public static final float LANE_FLATTEN = 0.35f;
+    /** Default frequency of the substructure inside a dust lane, in cycles per baseRadius across it. Mirrors {@code GX_DUST_FILAMENT_FREQ}. **/
+    public static final float DUST_FILAMENT_FREQ = 20.0f;
+    /** How many times longer a filament is along the lane than across it. Mirrors {@code GX_DUST_FILAMENT_STRETCH}. **/
+    public static final float DUST_FILAMENT_STRETCH = 3.0f;
+    /** Vertical flattening of the filament field. Mirrors {@code GX_DUST_FILAMENT_FLATTEN}. **/
+    public static final float DUST_FILAMENT_FLATTEN = 0.35f;
+    /** Octaves of the filament field. Mirrors {@code GX_DUST_FILAMENT_OCTAVES}. **/
+    public static final int DUST_FILAMENT_OCTAVES = 2;
+    /** Default level above which a point is inside a strand, in [0,1]. Mirrors {@code GX_DUST_FILAMENT_THRESHOLD}. **/
+    public static final float DUST_FILAMENT_THRESHOLD = 0.50f;
+    /** Width of the transition into a strand. Mirrors {@code GX_DUST_FILAMENT_BAND}. **/
+    public static final float DUST_FILAMENT_BAND = 0.18f;
+    /** Density left between the strands at the default contrast, as a fraction of the lane's. Mirrors {@code GX_DUST_FILAMENT_VEIL}. **/
+    public static final float DUST_FILAMENT_VEIL = 0.12f;
+    /** Lattice displacement of the dust clumping, in lattice cells: independent from the gas one. Mirrors {@code GX_DUST_CLUMP_SEED}. **/
+    public static final float DUST_CLUMP_SEED = 1.0f;
     /** Outer edge of the dust ring. Mirrors {@code GX_DUST_RING_OUT}. **/
     public static final float DUST_RING_OUT = 0.95f;
     /** Width of the radial fade at both edges of the dust ring. Mirrors {@code GX_DUST_RING_FADE}. **/
@@ -287,30 +293,34 @@ public final class GalaxyDensityField {
     static float armFactor(GalaxyShape s,
                            float r,
                            float phi,
-                           float warp,
-                           float rough) {
+                           float warp) {
         float base = Math.max(s.baseRadius, 1e-6f);
         float b = pitchB(s.baseAngle);
         float d = armDelta(s, r, phi, warp);
         float sigma = Math.max(s.armSigma * ARM_WIDTH * base, 1e-4f);
-        // The displacement goes on the *signed* angular distance, so a whole lane shifts sideways by
-        // the same amount on both of its flanks. Folding the distance to a magnitude first makes the
-        // two flanks move in opposite senses (towards or away from the centreline together), and
-        // since the ridge is at zero of the sum, a negative displacement puts it at a constant
-        // |d| on *either* side of the centreline - one lane becomes two - while a positive one
-        // drives it past the ridge and the lane just dims. That is the split, and the loss of most
-        // of the field's peak density.
-        float perpendicular = d * r / (float) Math.sqrt(1.0 + b * b) + rough * sigma;
+        // Turn the angular distance into a linear one: a log spiral of pitch b has perpendicular
+        // spacing r/sqrt(1+b^2) per unit of angle.
+        float perpendicular = d * r / (float) Math.sqrt(1.0 + b * b);
         return (float) Math.exp(-0.5f * perpendicular * perpendicular / (sigma * sigma));
     }
 
-    /** Clumping of the disk, roughly [0.55, 1.45] with a mean of 1. Mirrors {@code gxClumps}. **/
+    /**
+     * Clumping of the disk, roughly [0.55, 1.45] with a mean of 1. Mirrors {@code gxClumps}.
+     * <p>
+     * {@code seed} displaces the lattice, so two fields sampled at the same point get independent
+     * draws of the same statistics. The gas uses 0 and the dust 1: sharing one realisation puts the
+     * dust exactly where the gas is brightest, and since the marcher emits the gas first and
+     * absorbs it second at the same sample, the two cancel and the lane reads flat.
+     */
     static float clumps(float px,
                         float py,
                         float pz,
-                        float base) {
+                        float base,
+                        float seed) {
         float f = 5.0f / base;
-        return 0.55f + 0.9f * noise3(px * f, py * f, pz * f);
+        return 0.55f + 0.9f * noise3(px * f + seed * 37.31f,
+                                     py * f + seed * 11.73f,
+                                     pz * f + seed * 63.19f);
     }
 
     /** Multiplier of the lane noise frequency: 0 or less means 1. Mirrors {@code gxLaneScale}. **/
@@ -318,7 +328,11 @@ public final class GalaxyDensityField {
         return s.laneNoiseScale > 0f ? s.laneNoiseScale : 1f;
     }
 
-    /** Lane noise in [0,1], sampled in the spiral's own frame. Mirrors {@code gxLaneNoise}. **/
+    /**
+     * Lane noise in [0,1], sampled in the spiral's own frame: {@code stretch} is how many times
+     * longer a feature is along the lane than across it, and {@code flatten} compresses it
+     * vertically. Mirrors {@code gxLaneNoise}.
+     */
     static float laneNoise(GalaxyShape s,
                            float px,
                            float py,
@@ -327,14 +341,56 @@ public final class GalaxyDensityField {
                            float warp,
                            float freq,
                            int octaves,
-                           float cell) {
+                           float cell,
+                           float stretch,
+                           float flatten) {
         float base = Math.max(s.baseRadius, 1e-6f);
         float b = pitchB(s.baseAngle);
         float q1 = (float) Math.sqrt(1.0 + b * b);
         float along = r * q1;
         float across = armDelta(s, r, (float) Math.atan2(pz, px), warp) * r / q1;
-        float f = freq * laneScale(s) / base;
-        return noiseFbm(along / LANE_STRETCH * f, across * f, py * LANE_FLATTEN * f, f * cell, octaves);
+        // `freq` already carries whatever slider it comes from: the callers apply laneScale()
+        // themselves, so a field whose frequency is its own (the dust filaments) stays decoupled.
+        float f = freq / base;
+        return noiseFbm(along / stretch * f, across * f, py * flatten * f, f * cell, octaves);
+    }
+
+    /**
+     * Substructure inside a dust lane, as a multiplier on its density, in {@code [1 - contrast,1]}.
+     * Mirrors {@code gxDustFilaments}.
+     * <p>
+     * The lane's cross-section is otherwise constant along its length: {@link #armFactor} is a
+     * Gaussian of the distance to the centreline with a fixed width and a fixed peak, so moving the
+     * centreline - which is all the warp does - can make it meander but never make it textured.
+     * This is the missing axis. It is sampled in the same frame as the lane noise, so
+     * its features are long along the flow and thin across it, and it is thresholded rather than
+     * scaled: a real lane is dense strands separated by gaps of two orders of magnitude, and a
+     * multiplier bounded away from zero can only dim it. The veil - what
+     * {@link GalaxyShape#filamentContrast} leaves between the strands - keeps the lane continuous.
+     * <p>
+     * Applied to the spiral dust only. A gas disk has no lanes to break up: it is a smooth
+     * exponential, and its structure is the clumping of the whole disk, not of an arm.
+     * <p>
+     * Its frequency is its own and not {@link GalaxyShape#laneNoiseScale}, which sets the scale of
+     * the warp: turning one up must not braid the arms or bead the strands.
+     */
+    static float dustFilaments(GalaxyShape s,
+                               float px,
+                               float py,
+                               float pz,
+                               float r,
+                               float warp,
+                               float cell) {
+        float contrast = clamp(s.filamentContrast, 0f, 0.98f);
+        if (contrast <= 0f) {
+            return 1f;
+        }
+        float freq = s.filamentScale > 0f ? s.filamentScale : DUST_FILAMENT_FREQ;
+        float threshold = clamp(s.filamentThreshold, 0f, 0.99f);
+        float n = laneNoise(s, px, py, pz, r, warp, freq, DUST_FILAMENT_OCTAVES, cell,
+                            DUST_FILAMENT_STRETCH, DUST_FILAMENT_FLATTEN);
+        float fil = smoothstep(threshold, threshold + DUST_FILAMENT_BAND, n);
+        return mix(1f - contrast, 1f, fil * fil);
     }
 
     /** Displacement of the arm phase, in fractions of the arm period. Mirrors {@code gxLaneWarp}. **/
@@ -347,21 +403,6 @@ public final class GalaxyDensityField {
         }
         float freq = LANE_FREQ * laneScale(s) / Math.max(s.baseRadius, 1e-6f);
         return s.laneWarp * (2f * noise3(px * freq, py * freq, pz * freq) - 1f);
-    }
-
-    /** Displacement of the dust lane edge, in units of the arm sigma. Mirrors {@code gxDustRoughness}. **/
-    static float dustRoughness(GalaxyShape s,
-                               float px,
-                               float py,
-                               float pz,
-                               float r,
-                               float warp,
-                               float cell) {
-        if (s.laneRough <= 0f) {
-            return 0f;
-        }
-        float n = laneNoise(s, px, py, pz, r, warp, LANE_ROUGH_FREQ, LANE_ROUGH_OCTAVES, cell);
-        return LANE_ROUGH_SIGMA * s.laneRough * (2f * n - 1f);
     }
 
     /** 3D noise mask in [0,1], multiplied into the density of any field. Mirrors {@code gxNoiseMask}. **/
@@ -398,7 +439,7 @@ public final class GalaxyDensityField {
         float ringIn = Math.min(minRn(s), DUST_RING_OUT - DUST_RING_FADE);
         float ring = smoothstep(ringIn, ringIn + DUST_RING_FADE, rnCyl)
                 * (1f - smoothstep(DUST_RING_OUT - DUST_RING_FADE, DUST_RING_OUT, rnCyl));
-        float d = disk * ring * arm * arm * clumps(px, py, pz, s.baseRadius);
+        float d = disk * ring * arm * arm * clumps(px, py, pz, s.baseRadius, DUST_CLUMP_SEED);
         return (float) Math.pow(Math.max(d, 0f), DUST_CONTRAST);
     }
 
@@ -502,13 +543,14 @@ public final class GalaxyDensityField {
                 // frequency grows without bound as r -> 0, which would alias into radial spokes.
                 float armWeight = smoothstep(0f, 2f * Math.max(minRn(s), ARM_START), rnCyl);
                 float warp = laneWarp(s, px, py, pz);
-                // Only the dust gets the ragged edge: the gas keeps the analytic arms.
-                float rough = s.isDust() ? dustRoughness(s, px, py, pz, r, warp, cell) : 0f;
-                float arm = mix(1f, armFactor(s, r, phi, warp, rough), armWeight);
+                float arm = mix(1f, armFactor(s, r, phi, warp), armWeight);
                 if (s.isDust()) {
-                    density = dustDensity(s, rnCyl, disk, arm, px, py, pz);
+                    // The strands inside the lane, not the lane's shape: they modulate the finished
+                    // dust profile, after its own contrast.
+                    density = dustDensity(s, rnCyl, disk, arm, px, py, pz)
+                            * dustFilaments(s, px, py, pz, r, warp, cell);
                 } else {
-                    density = disk * (0.22f + 0.78f * arm) * clumps(px, py, pz, base);
+                    density = disk * (0.22f + 0.78f * arm) * clumps(px, py, pz, base, 0f);
                 }
             } else {
                 density = radial(s, rnCyl);

@@ -312,7 +312,7 @@ public class HybridGalaxyExportTest {
         Assert.assertEquals(12, dust.get("baseColors").size);
         Assert.assertEquals(2, dust.get("eccentricity").size);
         Assert.assertEquals(3, dust.get("scale").size);
-        Assert.assertNotNull(dust.get("laneRough"));
+        Assert.assertNotNull(dust.get("filamentContrast"));
         // Zero means "the default" for these two, and one octave is not three.
         Assert.assertNull(dust.get("noiseMaskOctaves"));
         Assert.assertNull(gas.get("noiseMaskFreq"));
