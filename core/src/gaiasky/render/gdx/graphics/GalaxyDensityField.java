@@ -42,6 +42,13 @@ import java.util.Arrays;
 public final class GalaxyDensityField {
     /** Width of the arm, in units of baseRadius. Mirrors {@code GX_ARM_WIDTH}. **/
     public static final float ARM_WIDTH = 0.2f;
+    /** Narrowest and widest the lane width taper may take an arm, as a multiple of its width. Mirrors {@code GX_ARM_WIDTH_MIN/MAX}. **/
+    public static final float ARM_WIDTH_MIN = 0.4f;
+    public static final float ARM_WIDTH_MAX = 3.0f;
+    /** How far the lane width taper swings the width between the centre and the rim, per unit of taper. Mirrors {@code GX_LANE_TAPER_GAIN}. **/
+    public static final float LANE_TAPER_GAIN = 1.5f;
+    /** How much a taper of 1 stretches the dust's radial envelope, so that the lanes it widens outward exist above the alpha floor. Mirrors {@code GX_DUST_TAPER_EXTENT}. **/
+    public static final float DUST_TAPER_EXTENT = 1.0f;
     /** Scale radius of the exponential disk, in units of baseRadius. Mirrors {@code GX_DISK_SCALE}. **/
     public static final float DISK_SCALE = 0.33f;
     /** Vertical slab is cut at this many scale heights. Mirrors {@code GX_VERTICAL_TAIL}. **/
@@ -289,6 +296,47 @@ public final class GalaxyDensityField {
         return mod(phi - theta - warp * period + 0.5f * period, period) - 0.5f * period;
     }
 
+    /**
+     * Multiple of the arm width at a radius, from {@link GalaxyShape#laneWidthTaper}. Mirrors
+     * {@code gxArmWidthMultiplier}.
+     * <p>
+     * Two-sided and swinging by {@link #LANE_TAPER_GAIN}: {@code 2^(taper * (2 * rn - 1) * gain)}, so
+     * a taper of 1 takes the width down to about a third at the centre and up to nearly three times
+     * at the rim, and -1 does the mirror image.
+     * <p>
+     * Widening the outer lanes only shows if there is dust out there to widen. The dust envelope is
+     * {@code exp(-rn / DISK_SCALE)} raised to {@link #DUST_CONTRAST}, so on the plain envelope it is
+     * under one 8-bit step past {@code rn ~ 0.45} and the widened lanes would be quantised away. A
+     * positive taper therefore also stretches the envelope ({@link #dustDiskScale}); a negative one
+     * does not need to, since it widens the part of the disk that is bright anyway.
+     * <p>
+     * Only the dust uses it, since only dust forms lanes; the gas takes the arm width as it is.
+     */
+    static float armWidthMultiplier(GalaxyShape s,
+                                    float r) {
+        float taper = s.laneWidthTaper;
+        if (taper == 0f || !s.isDust()) {
+            return 1f;
+        }
+        float base = Math.max(s.baseRadius, 1e-6f);
+        float rn = clamp(r / base, 0f, 1f);
+        float m = (float) Math.pow(2.0, taper * (2f * rn - 1f) * LANE_TAPER_GAIN);
+        return clamp(m, ARM_WIDTH_MIN, ARM_WIDTH_MAX);
+    }
+
+    /**
+     * Scale radius of a dust envelope, stretched by a positive {@link GalaxyShape#laneWidthTaper}.
+     * Every other channel gets the plain one: the gas disk is smooth along the whole radius and has
+     * no lanes to keep visible.
+     **/
+    static float dustDiskScale(GalaxyShape s) {
+        if (!s.isDust()) {
+            return DISK_SCALE;
+        }
+        float taper = Math.max(s.laneWidthTaper, 0f);
+        return DISK_SCALE * (1f + DUST_TAPER_EXTENT * taper);
+    }
+
     /** Value of the arm modulation at a point, in [0,1]. Mirrors {@code gxArmFactor}. **/
     static float armFactor(GalaxyShape s,
                            float r,
@@ -297,7 +345,7 @@ public final class GalaxyDensityField {
         float base = Math.max(s.baseRadius, 1e-6f);
         float b = pitchB(s.baseAngle);
         float d = armDelta(s, r, phi, warp);
-        float sigma = Math.max(s.armSigma * ARM_WIDTH * base, 1e-4f);
+        float sigma = Math.max(s.armSigma * ARM_WIDTH * base * armWidthMultiplier(s, r), 1e-4f);
         // Turn the angular distance into a linear one: a log spiral of pitch b has perpendicular
         // spacing r/sqrt(1+b^2) per unit of angle.
         float perpendicular = d * r / (float) Math.sqrt(1.0 + b * b);
@@ -538,7 +586,7 @@ public final class GalaxyDensityField {
             float rnCyl = r / base;
             if (s.distribution == GalaxyShape.SPIRAL || s.distribution == GalaxyShape.SPIRAL_LOG) {
                 float phi = (float) Math.atan2(pz, px);
-                float disk = (float) Math.exp(-rnCyl / DISK_SCALE) * taper(rnCyl, 0.8f);
+                float disk = (float) Math.exp(-rnCyl / dustDiskScale(s)) * taper(rnCyl, 0.8f);
                 // No azimuthal structure inside the arm start radius: a log spiral's angular
                 // frequency grows without bound as r -> 0, which would alias into radial spokes.
                 float armWeight = smoothstep(0f, 2f * Math.max(minRn(s), ARM_START), rnCyl);

@@ -179,6 +179,27 @@ public class GalaxyAttributes {
     public float laneNoiseScale = 1.0f;
 
     /**
+     * How the width of a dust lane changes along the arm, in [-1,1]. Zero keeps it constant. A
+     * positive value thins the lanes at the centre and widens them outward, a negative one does the
+     * mirror image.
+     * <p>
+     * The width is scaled by {@code 2^(taper * (2 * rn - 1) * 1.5)}: a taper of 1 takes it down to
+     * about a third at the centre and up to nearly three times at the rim.
+     * <p>
+     * Widening the outer lanes only shows if there is dust out there to widen, and the dust envelope
+     * is {@code exp(-rn / 0.33)} raised to the fourth power: on the plain envelope the lanes fall
+     * under one 8-bit step past {@code rn ≈ 0.45}, so a widened lane out there would be quantised
+     * away and all the outward half of the slider would do is thin what is visible. A positive taper
+     * therefore also stretches the envelope (out to twice the scale radius at 1), which is what
+     * makes the outer lanes thick and bright instead of merely wide. A negative one does not need to:
+     * it thickens the part of the disk that is bright anyway.
+     * <p>
+     * Only {@link ChannelType#DUST} in a spiral uses it: the gas is a smooth exponential along the
+     * whole disk and its width is not a lane's.
+     */
+    public float laneWidthTaper = 0.0f;
+
+    /**
      * Depth of the substructure inside a dust lane, in [0,1]: how far the gaps between its strands
      * drop below the lane's own density. Only {@link ChannelType#DUST} in a spiral uses it.
      * <p>
@@ -292,6 +313,7 @@ public class GalaxyAttributes {
         this.noiseMaskFreq = other.noiseMaskFreq;
         this.noiseMaskOctaves = other.noiseMaskOctaves;
         this.laneNoiseScale = other.laneNoiseScale;
+        this.laneWidthTaper = other.laneWidthTaper;
         this.filamentContrast = other.filamentContrast;
         this.filamentScale = other.filamentScale;
         this.filamentThreshold = other.filamentThreshold;
@@ -361,7 +383,7 @@ public class GalaxyAttributes {
     private static final double GX_DUST_HEIGHT = 0.5;
 
     /** Length in floats of one field in the packed uniform of {@code galgen.volume.comp.glsl}. **/
-    public static final int FIELD_STRIDE = 37;
+    public static final int FIELD_STRIDE = 38;
     /**
      * Maximum number of fields summed into one volume slot. Mirrors {@code GX_MAX_FIELDS} in
      * {@code assets/shader/lib/galaxy.glsl}. Each slot gets its own packed array, so a galaxy can
@@ -407,6 +429,7 @@ public class GalaxyAttributes {
         out[offset + 34] = filamentContrast;
         out[offset + 35] = filamentScale;
         out[offset + 36] = filamentThreshold;
+        out[offset + 37] = laneWidthTaper;
     }
 
     /**
@@ -670,6 +693,14 @@ public class GalaxyAttributes {
 
     public void setLaneNoiseScale(Long laneNoiseScale) {
         this.laneNoiseScale = laneNoiseScale.floatValue();
+    }
+
+    public void setLaneWidthTaper(Double laneWidthTaper) {
+        this.laneWidthTaper = MathUtilsDouble.clamp(laneWidthTaper.floatValue(), -1f, 1f);
+    }
+
+    public void setLaneWidthTaper(Long laneWidthTaper) {
+        setLaneWidthTaper(laneWidthTaper.doubleValue());
     }
 
     public void setNoiseMaskFreq(Double noiseMaskFreq) {

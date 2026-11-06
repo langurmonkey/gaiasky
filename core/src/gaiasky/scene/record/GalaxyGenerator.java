@@ -920,6 +920,7 @@ public class GalaxyGenerator {
             o.addChild("filamentContrast", new JsonValue(f.filamentContrast));
             o.addChild("filamentScale", new JsonValue(f.filamentScale));
             o.addChild("filamentThreshold", new JsonValue(f.filamentThreshold));
+            o.addChild("laneWidthTaper", new JsonValue(f.laneWidthTaper));
             o.addChild("laneNoiseScale", new JsonValue(f.laneNoiseScale));
             o.addChild("noiseMask", new JsonValue(f.noiseMask));
             // These two use 0 as "the default", and 0 is what an untouched field carries. The octave

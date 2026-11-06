@@ -44,8 +44,16 @@
 #define GX_HEIGHT_SMOOTH_INC 3
 #define GX_HEIGHT_SMOOTH_DEC 4
 
-// Width of the arm in units of baseRadius, as in the particle generator (armWidth = 0.2 * baseRadius).
+// Width of the arm in units of baseRadius, as in the particle generator (armWidth = 0.2 * baseRadius),
+// and the range the lane width taper may scale it to.
 #define GX_ARM_WIDTH 0.2
+#define GX_ARM_WIDTH_MIN 0.4
+#define GX_ARM_WIDTH_MAX 3.0
+// How far the lane width taper swings the width between the centre and the rim, per unit of taper,
+// and how much a taper of 1 stretches the dust's radial envelope so that the lanes it widens outward
+// exist above the alpha floor.
+#define GX_LANE_TAPER_GAIN 1.5
+#define GX_DUST_TAPER_EXTENT 1.0
 // Scale radius of the exponential disk, in units of baseRadius.
 #define GX_DISK_SCALE 0.33
 // Vertical slab is cut at this many scale heights, where its density is below 1/255.
@@ -116,6 +124,10 @@ struct GalaxyShape {
     float filamentScale;
     // Level above which a point of that field is inside a strand, in [0,1].
     float filamentThreshold;
+    // How the width of a dust lane changes along the arm, in [-1,1]: positive thins the lanes at
+    // the centre and widens them outward, negative the other way round. Only the spiral dust uses
+    // it; see gxArmWidthMultiplier.
+    float laneWidthTaper;
 };
 
 // Channel ids. These must match the BillboardDataset.ChannelType ordinals.
@@ -136,10 +148,10 @@ struct GalaxyShape {
 // GX_MAX_FIELDS is the number of fields summed into ONE slot, and each slot gets its own packed
 // array, so a galaxy can carry up to 2 * GX_MAX_FIELDS fields. Fields are baked into the slot's
 // texture, so this costs nothing per frame: it only multiplies the voxeliser's work at generation
-// time. 8 * 37 = 296 floats is a quarter of the 1024 components a GL 4.3 compute shader is
+// time. 8 * 38 = 304 floats is a quarter of the 1024 components a GL 4.3 compute shader is
 // guaranteed to get, so the limit is the authoring model, not the hardware.
 #define GX_MAX_FIELDS 8
-#define GX_FIELD_STRIDE 37
+#define GX_FIELD_STRIDE 38
 #define GX_FIELD_ARRAY (GX_MAX_FIELDS * GX_FIELD_STRIDE)
 #define GX_F_DISTRIBUTION 0
 #define GX_F_BASE_RADIUS 1
@@ -167,6 +179,7 @@ struct GalaxyShape {
 #define GX_F_FILAMENT_CONTRAST 34
 #define GX_F_FILAMENT_SCALE 35
 #define GX_F_FILAMENT_THRESHOLD 36
+#define GX_F_LANE_WIDTH_TAPER 37
 
 // Rebuilds one shape from `d` starting at float `o`.
 GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
@@ -194,6 +207,7 @@ GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
     s.filamentContrast = d[o + GX_F_FILAMENT_CONTRAST];
     s.filamentScale = d[o + GX_F_FILAMENT_SCALE];
     s.filamentThreshold = d[o + GX_F_FILAMENT_THRESHOLD];
+    s.laneWidthTaper = d[o + GX_F_LANE_WIDTH_TAPER];
     for (int i = 0; i < 4; i++) {
         int b = o + GX_F_BASE_COLORS + 3 * i;
         s.baseColors[i] = vec3(d[b], d[b + 1], d[b + 2]);
@@ -262,12 +276,38 @@ float gxArmDelta(in GalaxyShape s, float r, float phi, float warp) {
     return mod(phi - theta - warp * period + 0.5 * period, period) - 0.5 * period;
 }
 
-// Value of the arm modulation at a point, in [0,1]: 1 on the arm centreline, 0 far from it.
+// Multiple of the arm width at a radius, from laneWidthTaper. Two-sided and swinging by
+// GX_LANE_TAPER_GAIN: 2^(taper * (2 * rn - 1) * gain), so a taper of 1 takes the width down to about
+// a third at the centre and up to nearly three times at the rim, and -1 does the mirror image.
+//
+// Widening the outer lanes only shows if there is dust out there to widen: the envelope is
+// exp(-rn / GX_DISK_SCALE) raised to GX_DUST_CONTRAST, so on the plain envelope it is under one
+// 8-bit step past rn ~ 0.45 and the widened lanes would be quantised away. A positive taper
+// therefore also stretches the envelope (gxDustDiskScale). Only the dust uses it, since only dust
+// forms lanes; the gas takes the arm width as it is.
+float gxArmWidthMultiplier(in GalaxyShape s, float r) {
+    if (s.laneWidthTaper == 0.0 || s.channel != GX_CHANNEL_DUST) {
+        return 1.0;
+    }
+    float rn = clamp(r / max(s.baseRadius, 1e-6), 0.0, 1.0);
+    return clamp(pow(2.0, s.laneWidthTaper * (2.0 * rn - 1.0) * GX_LANE_TAPER_GAIN),
+                 GX_ARM_WIDTH_MIN, GX_ARM_WIDTH_MAX);
+}
+
+// Scale radius of a dust envelope, stretched by a positive laneWidthTaper. Every other channel gets
+// the plain one: the gas disk is smooth along the whole radius and has no lanes to keep visible.
+float gxDustDiskScale(in GalaxyShape s) {
+    if (s.channel != GX_CHANNEL_DUST) {
+        return GX_DISK_SCALE;
+    }
+    return GX_DISK_SCALE * (1.0 + GX_DUST_TAPER_EXTENT * max(s.laneWidthTaper, 0.0));
+}
+
 float gxArmFactor(in GalaxyShape s, float r, float phi, float warp) {
     float base = max(s.baseRadius, 1e-6);
     float b = gxPitchB(s.baseAngle);
     float d = gxArmDelta(s, r, phi, warp);
-    float sigma = max(s.armSigma * GX_ARM_WIDTH * base, 1e-4);
+    float sigma = max(s.armSigma * GX_ARM_WIDTH * base * gxArmWidthMultiplier(s, r), 1e-4);
     // Turn the angular distance into a linear one: a log spiral of pitch b has perpendicular
     // spacing r/sqrt(1+b^2) per unit of angle.
     float perpendicular = d * r / sqrt(1.0 + b * b);
@@ -610,7 +650,7 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
         float rnCyl = r / base;
         if (s.distribution == GX_SPIRAL || s.distribution == GX_SPIRAL_LOG) {
             float phi = atan(p.z, p.x);
-            float disk = exp(-rnCyl / GX_DISK_SCALE) * gxTaper(rnCyl, 0.8);
+            float disk = exp(-rnCyl / gxDustDiskScale(s)) * gxTaper(rnCyl, 0.8);
             // No azimuthal structure inside the arm start radius; see GX_ARM_START.
             float armWeight = smoothstep(0.0, 2.0 * max(gxMinRn(s), GX_ARM_START), rnCyl);
             float warp = gxLaneWarp(s, p);

@@ -565,6 +565,10 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
                                           v -> field.laneNoiseScale = v));
             // Only the dust of a spiral has lanes to break up (GalaxyDensityField#sample).
             if (field.isOcclusive()) {
+                // Width along the arm: positive thins the centre and thickens the outskirts, and
+                // stretches the dust envelope so those outer lanes exist at all; negative mirrors it.
+                addSlider(detail, fieldSlider("gui.galaxy.field.lane.width.taper", -1f, 1f, 0.01f, field.laneWidthTaper,
+                                              v -> field.laneWidthTaper = v));
                 // The strands inside the lane. Contrast is what the gaps drop to, so 0 is a smooth
                 // lane and the default reproduces the look the field had before it was a knob.
                 addSlider(detail, fieldSlider("gui.galaxy.field.lane.filament.contrast", 0f, 0.98f, 0.01f, field.filamentContrast,

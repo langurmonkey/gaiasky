@@ -305,7 +305,7 @@ public class DustSubstructureTest {
         Assert.assertEquals(0.5f, s.filamentContrast, 0f);
         Assert.assertEquals(12f, s.filamentScale, 0f);
         Assert.assertEquals(0.3f, s.filamentThreshold, 0f);
-        Assert.assertEquals(GalaxyAttributes.FIELD_STRIDE, 37);
+        Assert.assertEquals(GalaxyAttributes.FIELD_STRIDE, 38);
     }
 
     @Test

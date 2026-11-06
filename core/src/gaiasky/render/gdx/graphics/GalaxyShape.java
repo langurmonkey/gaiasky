@@ -58,6 +58,8 @@ public final class GalaxyShape {
     public final float filamentScale;
     /** Level of the field above which a point is inside a strand. **/
     public final float filamentThreshold;
+    /** How the width of a dust lane changes along the arm, in [-1,1]. **/
+    public final float laneWidthTaper;
     /** Four colour stops, core first, three components each. **/
     public final float[] baseColors = new float[12];
 
@@ -87,6 +89,7 @@ public final class GalaxyShape {
         filamentContrast = d[o + 34];
         filamentScale = d[o + 35];
         filamentThreshold = d[o + 36];
+        laneWidthTaper = d[o + 37];
     }
 
     /**
