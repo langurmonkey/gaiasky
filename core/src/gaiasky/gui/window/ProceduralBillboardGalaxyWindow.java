@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.JsonWriter;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -198,7 +197,7 @@ public class ProceduralBillboardGalaxyWindow extends AbstractGalaxyGenWindow {
     @Override
     protected void onExport() {
         var json = gen.convertToJson(entityFull, entityHalf);
-        var string = json.toJson(JsonWriter.OutputType.json);
+        var string = GalaxyGenerator.toJsonString(json);
         Gdx.app.getClipboard().setContents(string);
         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.done"));
     }

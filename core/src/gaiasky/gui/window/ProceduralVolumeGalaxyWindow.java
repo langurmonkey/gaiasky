@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.JsonWriter;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -29,6 +28,7 @@ import gaiasky.scene.record.GalaxyAttributes;
 import gaiasky.scene.record.GalaxyAttributes.ChannelType;
 import gaiasky.scene.record.GalaxyAttributes.Distribution;
 import gaiasky.scene.record.GalaxyAttributes.HeightProfile;
+import gaiasky.scene.record.GalaxyGenerator;
 import gaiasky.scene.record.GalaxyGenerator.GalaxyMorphology;
 import gaiasky.scene.system.initialize.VolumeInitializer;
 import gaiasky.scene.view.FocusView;
@@ -742,7 +742,7 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
         // Both halves go in one descriptor: the billboard entity, and the volume child that carries
         // the density fields the raymarcher voxelises at load time.
         var json = gen.convertToHybridJson(entityFull, entityDiffuse);
-        var string = json.toJson(JsonWriter.OutputType.json);
+        var string = GalaxyGenerator.toJsonString(json);
         Gdx.app.getClipboard().setContents(string);
         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.galaxy.export.done"));
     }

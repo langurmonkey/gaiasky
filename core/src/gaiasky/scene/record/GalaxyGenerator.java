@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonValue.ValueType;
+import com.badlogic.gdx.utils.JsonWriter;
 import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
@@ -853,6 +854,24 @@ public class GalaxyGenerator {
      *
      * @return The JSON array, or null if there is nothing to write.
      */
+    /**
+     * Serialises a descriptor for export.
+     * <p>
+     * Deliberately not {@link JsonValue#toJson(JsonWriter.OutputType)}: that path prints a whole
+     * double as an integer literal ({@code 0.0} becomes {@code 0}, see
+     * {@code JsonValue.toJson(OutputType, Writer)}), so {@code positionPc} and every other
+     * {@code double} attribute comes back from the file as a {@code Long}/{@code int[]} and the
+     * loader finds no {@code setPositionPc(double[])}. Pretty printing keeps the decimal point,
+     * and is easier to read and hand-edit besides.
+     *
+     * @param json The descriptor.
+     *
+     * @return The JSON text.
+     */
+    public static String toJsonString(JsonValue json) {
+        return json.prettyPrint(JsonWriter.OutputType.json, 120);
+    }
+
     public static JsonValue fieldsToJson(GalaxyAttributes[] fields) {
         if (fields == null || fields.length == 0) {
             return null;

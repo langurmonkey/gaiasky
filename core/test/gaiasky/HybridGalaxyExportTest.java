@@ -328,4 +328,16 @@ public class HybridGalaxyExportTest {
         var parsed = new JsonReader().parse(text);
         Assert.assertEquals(2, parsed.get("objects").size);
     }
+
+    @Test
+    public void wholeNumbersAreExportedAsDoubles() {
+        var parent = billboardEntity("A test galaxy");
+        var volume = volumeEntity("A test galaxy (VOLUME)", parent, fields());
+        var text = GalaxyGenerator.toJsonString(new GalaxyGenerator().convertToHybridJson(parent, volume));
+        var objects = new JsonReader().parse(text).get("objects");
+        // Written as integers these come back as int[]/Long, and no setPositionPc(int[]) or
+        // setDiameterPc(Long) exists: the attribute is dropped on load.
+        Assert.assertTrue(objects.get(0).get("coordinates").get("positionPc").child.isDouble());
+        Assert.assertTrue(objects.get(1).get("diameterPc").isDouble());
+    }
 }

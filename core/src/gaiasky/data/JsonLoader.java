@@ -404,34 +404,119 @@ public class JsonLoader extends AbstractSceneLoader {
     }
 
     private boolean set(JsonValue attribute, Object instance, Object value, Class<?> valueClass, Class<?> instanceClass) {
-        String methodName = "set" + TextUtils.propertyToMethodName(attribute.name);
-        Method m = searchMethod(methodName, valueClass, instanceClass);
-        if (m != null) {
-            try {
-                m.invoke(instance, value);
-            } catch (ReflectionException e) {
-                logger.error(e);
-                return false;
-            }
-            return true;
-        } else {
+        var call = resolve("set", attribute, instanceClass, value, valueClass);
+        if (call == null) {
             return false;
         }
+        try {
+            call.method.invoke(instance, call.argument);
+        } catch (ReflectionException e) {
+            logger.error(e);
+            return false;
+        }
+        return true;
     }
 
     private boolean update(JsonValue attribute, Object instance, Object value, Class<?> valueClass, Class<?> instanceClass) {
-        String methodName = "update" + TextUtils.propertyToMethodName(attribute.name);
-        Method m = searchMethod(methodName, valueClass, instanceClass);
-        if (m != null) {
-            try {
-                m.invoke(instance, value);
-            } catch (ReflectionException e) {
-                throw new RuntimeException(e);
-            }
-            return true;
-        } else {
+        var call = resolve("update", attribute, instanceClass, value, valueClass);
+        if (call == null) {
             return false;
         }
+        try {
+            call.method.invoke(instance, call.argument);
+        } catch (ReflectionException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
+
+    /** A resolved method and the argument to pass to it, already converted to the parameter type. */
+    private record Call(Method method, Object argument) {
+    }
+
+    /**
+     * Resolves the {@code setX}/{@code updateX} method for an attribute and converts the value to
+     * its parameter type when the exact signature is missing.
+     * <p>
+     * JSON has one number type, so a whole double arrives as an integer literal: {@code [0, 0, 0]}
+     * parses as an {@code int[]} and {@code 1} as a {@code Long}. Neither finds
+     * {@code setPositionPc(double[])} or {@code setDiameterPc(Double)}, and the attribute is
+     * dropped. That happens with any file that does not keep the decimal point - hand-edited ones,
+     * and everything written by {@link JsonValue#toJson} before {@link
+     * gaiasky.scene.record.GalaxyGenerator#toJsonString} existed.
+     */
+    private Call resolve(String op, JsonValue attribute, Class<?> instanceClass, Object value, Class<?> valueClass) {
+        String methodName = op + TextUtils.propertyToMethodName(attribute.name);
+        Method m = searchMethod(methodName, valueClass, instanceClass);
+        if (m != null) {
+            return new Call(m, value);
+        }
+        for (Class<?> clazz = instanceClass; clazz != null; clazz = clazz.getSuperclass()) {
+            for (Method candidate : ClassReflection.getDeclaredMethods(clazz)) {
+                if (!candidate.getName().equals(methodName) || candidate.getParameterTypes().length != 1) {
+                    continue;
+                }
+                Object converted = coerce(value, candidate.getParameterTypes()[0]);
+                if (converted != null) {
+                    return new Call(candidate, converted);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Converts a numeric value to the given parameter type, or returns null if it cannot.
+     *
+     * @param value  The value, a boxed number or a primitive array.
+     * @param target The parameter type, primitive or boxed.
+     *
+     * @return The converted value, or null if not convertible.
+     */
+    private Object coerce(Object value, Class<?> target) {
+        if (value == null) {
+            return null;
+        }
+        if (target.isInstance(value)) {
+            return value;
+        }
+        if (value instanceof Number num) {
+            return toNumber(num, target);
+        }
+        if (value.getClass().isArray() && target.isArray() && target.getComponentType().isPrimitive()) {
+            int n = java.lang.reflect.Array.getLength(value);
+            Object out = java.lang.reflect.Array.newInstance(target.getComponentType(), n);
+            for (int i = 0; i < n; i++) {
+                Object element = java.lang.reflect.Array.get(value, i);
+                if (!(element instanceof Number num)) {
+                    return null;
+                }
+                Object converted = toNumber(num, target.getComponentType());
+                if (converted == null) {
+                    return null;
+                }
+                java.lang.reflect.Array.set(out, i, converted);
+            }
+            return out;
+        }
+        return null;
+    }
+
+    private Object toNumber(Number num, Class<?> target) {
+        if (target == double.class || target == Double.class) {
+            return num.doubleValue();
+        } else if (target == float.class || target == Float.class) {
+            return num.floatValue();
+        } else if (target == long.class || target == Long.class) {
+            return num.longValue();
+        } else if (target == int.class || target == Integer.class) {
+            return num.intValue();
+        } else if (target == short.class || target == Short.class) {
+            return num.shortValue();
+        } else if (target == byte.class || target == Byte.class) {
+            return num.byteValue();
+        }
+        return null;
     }
 
     /**
