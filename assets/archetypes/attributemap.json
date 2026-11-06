@@ -25,6 +25,10 @@
         "description": "Static opacity value. Typically, this gets overwritten internally in the update process.",
         "unit": "Double"
       },
+      "inheritOpacity": {
+        "description": "Whether this object inherits the opacity of its parent. Set to false for objects whose brightness must not follow an ancestor's distance fade: the opacity then comes from the parent's visibility instead, so the object keeps its own opacity while the parent is faded out but still disappears when the parent or its dataset is switched off. Volumes need it, because unlike billboards they multiply their colour by this opacity.",
+        "unit": "Boolean"
+      },
       "componentType": {
         "description": "The content type string (or list) for this object. Content types control the visibility of objects. Examples of content types are 'Planets', 'Asteroids', 'Stars', 'Labels', etc.",
         "unit": "String | String[]",

@@ -244,6 +244,18 @@ public class HybridGalaxyExportTest {
     }
 
     @Test
+    public void theVolumeDoesNotInheritTheFadeOfItsAncestors() {
+        var json = volumeJson();
+
+        // Inheriting the parent's opacity makes the gas follow an ancestor's distance fade, and
+        // nbg-hook fades in between 1 and 8 kpc from the Sun: the volume is invisible from inside
+        // the Milky Way while its billboards are not. 'inheritOpacity: false' takes the parent's
+        // visibility instead, which still hides it when the dataset is switched off.
+        Assert.assertTrue(json.has("inheritOpacity"));
+        Assert.assertFalse(json.getBoolean("inheritOpacity"));
+    }
+
+    @Test
     public void theVolumeExportsItsReferenceSystemTransform() {
         var volume = volumeEntity("A test galaxy (VOLUME)", billboardEntity("A test galaxy"), fields());
         var trf = new RefSysTransform();

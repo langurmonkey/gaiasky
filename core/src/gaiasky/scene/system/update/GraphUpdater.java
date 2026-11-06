@@ -146,7 +146,17 @@ public class GraphUpdater extends AbstractUpdateSystem {
             body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
 
             // Update opacity.
-            if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
+            if (!base.inheritOpacity) {
+                // Opted out of the parent's opacity: it comes from the parent's visibility instead,
+                // so a faded-out ancestor does not erase this entity but switching it off still
+                // does. Its own fade, if any, still applies on top of that.
+                var parentBase = graph.parent != null ? Mapper.base.get(graph.parent) : null;
+                base.opacity = parentBase != null ? parentBase.getVisibilityOpacityFactor() : 1;
+                if (fade != null) {
+                    updateFadeDistance(entity, body, fade);
+                    updateFadeOpacity(base, fade);
+                }
+            } else if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
                 // If the bottom part of our fade in is mapped to a value
                 // greater than zero, we do not use the parent opacity; the
                 // children's fadeInMap attribute takes precedence.
@@ -193,17 +203,22 @@ public class GraphUpdater extends AbstractUpdateSystem {
             // But: not in the case of a copy!
             boolean processChildren = Mapper.tagCopy.has(entity) || !(Mapper.tagNoProcessChildren.has(entity) || (ds != null && !GaiaSky.instance.isOn(base.ct)));
             boolean hasChildren = processChildren && graph.children != null;
-            if (hasChildren && opacity > 0) {
-                // Go down a level.
+            if (hasChildren) {
+                // A subtree under a transparent parent is not traversed: its children keep the
+                // opacity and the distance they last had, so they are told explicitly that they are
+                // invisible. An entity that does not inherit the parent's opacity is the exception:
+                // its opacity does not come from here, so it is visited even then, or its own fade
+                // would never run and it would stay hidden.
                 for (int i = 0; i < graph.children.size; i++) {
                     Entity child = graph.children.get(i);
-                    update(child, time, graph.translation, getChildrenOpacity(entity, child, base, fade, opacity));
-                }
-            } else if (hasChildren) {
-                // A subtree under a transparent parent is not traversed. Its children keep the opacity
-                // and the distance they last had, so it is told explicitly that it is invisible.
-                for (int i = 0; i < graph.children.size; i++) {
-                    hideSubtree(graph.children.get(i), opacity);
+                    float childOpacity = getChildrenOpacity(entity, child, base, fade, opacity);
+                    var childBase = Mapper.base.get(child);
+                    if (opacity > 0 || (childBase != null && !childBase.inheritOpacity)) {
+                        // Go down a level.
+                        update(child, time, graph.translation, childOpacity);
+                    } else {
+                        hideSubtree(child, opacity);
+                    }
                 }
             }
         }
@@ -244,7 +259,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
                                      float opacity) {
         if (Mapper.billboardSet.has(entity) && Mapper.tagBackgroundModel.has(child)) {
             return 1 - base.opacity;
-        } else if (fade != null) {
+        } else if (fade != null || !base.inheritOpacity) {
+            // What this entity actually has, not what it was handed: an entity that does not
+            // inherit the parent's opacity keeps its own effective value.
             return base.opacity;
         } else {
             return opacity;

@@ -78,6 +78,15 @@ public class Base implements Component, ICopy {
     public boolean copy;
 
     /**
+     * Whether this entity takes its opacity from its parent's opacity. When false, it takes it from
+     * the parent's <em>visibility</em> instead: a faded-out ancestor (a dataset whose fade-in is
+     * driven by the distance to the camera, for instance) no longer erases it, while turning that
+     * ancestor or its dataset off still hides it. The entity is also visited while the parent's
+     * opacity is zero, since its own opacity does not come from there.
+     */
+    public boolean inheritOpacity = true;
+
+    /**
      * Extra attributes.
      */
     public ObjectMap<String, Object> attributes;
@@ -97,6 +106,12 @@ public class Base implements Component, ICopy {
     public void setNames(String[] names) {
         this.names = names;
         updateLocalizedName();
+    }
+
+    public void setInheritOpacity(Boolean inheritOpacity) {
+        if (inheritOpacity != null) {
+            this.inheritOpacity = inheritOpacity;
+        }
     }
 
     /**

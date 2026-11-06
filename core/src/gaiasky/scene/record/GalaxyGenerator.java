@@ -797,6 +797,13 @@ public class GalaxyGenerator {
         if (fade.fadeOut != null) {
             addArray(obj, "fadeOut", toPc(fade.fadeOut.values()));
         }
+        // The volume is the only child of a galaxy whose brightness is multiplied by Base#opacity
+        // (ModelEntityRenderSystem#renderVolume); the billboards ignore it. Inheriting the parent's
+        // opacity therefore lets an ancestor's distance fade erase the volume: NBG's nbg-hook fades
+        // in between 1 and 8 kpc from the Sun, so every volume under it was invisible from inside
+        // the Milky Way. 'inheritOpacity' makes it follow the parent's visibility instead, which
+        // keeps it drawn while the ancestor is faded out and hides it when the ancestor is off.
+        obj.addChild("inheritOpacity", new JsonValue(false));
         // Focus: the volume is never a focus target, its parent is.
         obj.addChild("focusable", new JsonValue(focus.focusable));
         obj.addChild("halfResolutionBuffer", new JsonValue(render.halfResolutionBuffer));

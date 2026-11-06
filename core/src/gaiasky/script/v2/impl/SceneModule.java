@@ -1201,6 +1201,11 @@ public class SceneModule extends APIModule implements IObserver, SceneAPI {
         var baseVolume = Mapper.base.get(entityVolume);
         baseVolume.setName(name + " (VOLUME)");
         baseVolume.setComponentType(ComponentTypes.ComponentType.Galaxies);
+        // A volume multiplies its colour by its opacity, so it must not inherit its parent's: an
+        // ancestor whose distance fade has driven it to zero would erase the gas while its
+        // billboards keep drawing. It follows the parent's visibility instead, which still hides it
+        // when the parent is switched off.
+        baseVolume.inheritOpacity = false;
 
         var bodyVolume = Mapper.body.get(entityVolume);
         bodyVolume.cameraCollision = false;
