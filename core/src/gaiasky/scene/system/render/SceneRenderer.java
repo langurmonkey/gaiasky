@@ -469,8 +469,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 system.addPostRunnables(colorMaskOnR);
             }
             case PARTICLE_EFFECTS -> {
-                // Stateless, velocity-stretched quads generated on the GPU. The former line-based
-                // ParticleEffectsRenderer is left in the tree, unused, until this one is proven.
+                // Stateless, velocity-stretched quads generated on the GPU.
                 system = new ParticleStreakRenderer(this, PARTICLE_EFFECTS, alphas, renderAssets.particleStreakShaders);
                 system.addPreRunnables(additiveBlendR, noDepthTestR);
                 system.addPostRunnables(regularBlendR);

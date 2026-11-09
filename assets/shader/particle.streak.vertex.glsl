@@ -51,8 +51,10 @@ uniform float u_alpha;
     #include <shader/lib/gravwaves.glsl>
 #endif // gravitationalWaves
 
-// 0 at the head of the streak, 1 at the tail.
-out float v_t;
+// Distance behind the head of the streak, in widths: 0 at the head, v_len at the tail.
+out float v_s;
+// Length of the streak, in widths.
+out float v_len;
 // Across the streak, in [-1, 1].
 out float v_x;
 out float v_a;
@@ -84,7 +86,8 @@ void main() {
     // is degenerate and every interpolant is unused.
     if (hc.w <= u_near || tc.w <= u_near) {
         gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
-        v_t = 0.0;
+        v_s = 0.0;
+        v_len = 0.0;
         v_x = 0.0;
         v_a = 0.0;
         v_col = vec3(1.0);
@@ -101,10 +104,20 @@ void main() {
     float l = min(len, u_maxPx);
     float w = u_widthPx * (0.55 + 0.9 * a_rand.x);
 
+    // The quad starts half a width behind the head, so the round cap of the head is not cut off by
+    // the quad's own edge, and runs to the tail. Distances along the quad are measured in widths,
+    // which is the unit the fragment shader needs to keep the head round however long the streak is.
+    float cap = 0.5 * w;
+    float s = -cap + (l + cap) * c.y;
+
+    // The head is a little wider than the trail, which is what turns the brighter end of the streak
+    // into a bead instead of into one more bright pixel of the line.
+    float hw = 1.0 + 0.75 * (1.0 - c.y);
+
     // Place the corner in pixels and go back to clip space at the head's depth. Using the head's
     // depth for the whole quad keeps it from being clipped by the near plane halfway along, and the
     // effect is drawn without depth testing anyway.
-    vec2 sp = hs + nrm * (0.5 * w * c.x) + dir * (l * c.y);
+    vec2 sp = hs + nrm * (0.5 * w * hw * c.x) + dir * s;
     vec2 ndc = sp / u_res * 2.0 - 1.0;
     gl_Position = vec4(ndc * hc.w, hc.z, hc.w);
 
@@ -116,7 +129,8 @@ void main() {
     float lenFade = smoothstep(0.0, 1.0, len / max(u_minPx, 1e-3));
 
     v_a = u_alpha * fade * mix(0.35, 1.0, a_rand.y) * lenFade;
-    v_t = c.y;
+    v_s = s / w;
+    v_len = l / w;
     v_x = c.x;
     // Nearly white, with a hint of blue and a little variation per particle.
     v_col = mix(vec3(0.80, 0.88, 1.0), vec3(1.0, 0.98, 0.94), a_rand.y);
