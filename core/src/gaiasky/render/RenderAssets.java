@@ -51,7 +51,7 @@ public class RenderAssets {
     private final GlobalResources globalResources;
     public ExtShaderProgram distanceFieldFontShader;
     public ExtShaderProgram[] billboardShaders, galShaders, spriteShaders, pointShaders, lineCpuShaders, lineQuadCpuShaders, lineQuadGpuShaders,
-            primitiveGpuShaders, billboardGroupShaders, billboardProceduralShaders, billboardProceduralCpuShaders, particleEffectShaders, particleGroupShaders,
+            primitiveGpuShaders, billboardGroupShaders, billboardProceduralShaders, billboardProceduralCpuShaders, particleEffectShaders, particleStreakShaders, particleGroupShaders,
             particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, orbitElemShaders;
     public IntModelBatch mbSimple, mbSimpleAdditive, mbVertexDiffuse, mbSimpleStarSurface, mbSimpleThruster,
             mbSimpleGrid, mbSimpleRecGrid, mbPBR, mbPBRDust, mbPBRDepth, mbPBROpaque,
@@ -61,7 +61,7 @@ public class RenderAssets {
     public BitmapFont fontDistanceField;
     public ExtSpriteBatch spriteBatch, fontBatch;
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleGroupExtBillboardDesc, particleGroupExtModelDesc,
-            variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
+            variableGroupDesc, particleEffectDesc, particleStreakDesc, orbitElemDesc, pointDesc, lineCpuDesc, lineQuadCpuDesc, lineQuadGpuDesc, primitiveGpuDesc,
             billboardGroupDesc, billboardProceduralDesc, billboardProceduralCpuDesc, galDesc, spriteDesc, billboardDesc;
 
     private final boolean compute;
@@ -170,6 +170,8 @@ public class RenderAssets {
         galDesc = loadShaderExt(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShaderExt(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl",
                                            TextUtils.concatAll("particle.effect", names), defines);
+        particleStreakDesc = loadShaderExt(manager, "shader/particle.streak.vertex.glsl", "shader/particle.streak.fragment.glsl",
+                                           TextUtils.concatAll("particle.streak", names), defines);
         orbitElemDesc = loadShaderExt(manager,
                                       "shader/particle.group.elements.quad.vertex.glsl",
                                       "shader/particle.group.quad.fragment.glsl",
@@ -368,6 +370,11 @@ public class RenderAssets {
          * PARTICLE EFFECT - default and relativistic
          */
         particleEffectShaders = fetchShaderProgramExt(manager, particleEffectDesc, TextUtils.concatAll("particle.effect", names));
+
+        /*
+         * PARTICLE STREAKS - default and relativistic
+         */
+        particleStreakShaders = fetchShaderProgramExt(manager, particleStreakDesc, TextUtils.concatAll("particle.streak", names));
 
         /*
          * PARTICLE GROUP (TRI) - default and relativistic
