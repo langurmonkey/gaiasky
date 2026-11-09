@@ -2,6 +2,10 @@
 ###############
 assets/cert
 
+# Notes directory #
+###################
+notes
+
 # Compiled source #
 ###################
 *.com
