@@ -566,19 +566,14 @@ public class ProceduralVolumeGalaxyWindow extends AbstractGalaxyGenWindow {
             // Only the dust of a spiral has lanes to break up (GalaxyDensityField#sample).
             if (field.isOcclusive()) {
                 // Width along the arm: positive thins the centre and thickens the outskirts, and
-                // stretches the dust envelope so those outer lanes exist at all; negative mirrors it.
+                // stretches the dust envelope so those outer lanes are above the alpha floor;
+                // negative mirrors it.
                 addSlider(detail, fieldSlider("gui.galaxy.field.lane.width.taper", -1f, 1f, 0.01f, field.laneWidthTaper,
                                               v -> field.laneWidthTaper = v));
-                // The strands inside the lane. Contrast is what the gaps drop to, so 0 is a smooth
-                // lane and the default reproduces the look the field had before it was a knob.
-                addSlider(detail, fieldSlider("gui.galaxy.field.lane.filament.contrast", 0f, 0.98f, 0.01f, field.filamentContrast,
-                                              v -> field.filamentContrast = v));
-                // Frequency across the lane, in cycles per baseRadius. Past ~24 the grid cannot carry
-                // it and the strands alias into beads.
-                addSlider(detail, fieldSlider("gui.galaxy.field.lane.filament.scale", 1f, 32f, 0.5f, field.filamentScale,
-                                              v -> field.filamentScale = v));
-                addSlider(detail, fieldSlider("gui.galaxy.field.lane.filament.threshold", 0f, 0.95f, 0.01f, field.filamentThreshold,
-                                              v -> field.filamentThreshold = v));
+                // Structure inside the lane: zero-mean, so it rearranges the dust instead of dimming
+                // it, and it is the only knob here that works fine-grained.
+                addSlider(detail, fieldSlider("gui.galaxy.field.lane.structure", 0f, 1f, 0.01f, field.armStructure,
+                                              v -> field.armStructure = v));
             }
         }
         addSlider(detail, fieldSlider("gui.galaxy.field.noise.mask", 0f, 1f, 0.01f, field.noiseMask,

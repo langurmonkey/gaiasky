@@ -48,12 +48,33 @@
 // and the range the lane width taper may scale it to.
 #define GX_ARM_WIDTH 0.2
 #define GX_ARM_WIDTH_MIN 0.4
-#define GX_ARM_WIDTH_MAX 3.0
-// How far the lane width taper swings the width between the centre and the rim, per unit of taper,
-// and how much a taper of 1 stretches the dust's radial envelope so that the lanes it widens outward
-// exist above the alpha floor.
-#define GX_LANE_TAPER_GAIN 1.5
-#define GX_DUST_TAPER_EXTENT 1.0
+// Widest a lane may become, as a multiple of its nominal width, whatever the taper.
+#define GX_ARM_WIDTH_MAX 8.0
+// Radial span, in fractions of baseRadius, over which the width taper is measured: the part of the
+// disk the dust occupies, not the whole nominal one.
+#define GX_LANE_TAPER_INNER 0.10
+#define GX_LANE_TAPER_OUTER 0.75
+// Log2 ratio of the lane width between the two ends of that span, per unit of taper, and how much a
+// taper of 1 stretches the dust's radial envelope so that the lanes it widens outward exist above
+// the alpha floor.
+#define GX_LANE_TAPER_GAIN 3.0
+#define GX_DUST_TAPER_EXTENT 2.0
+
+// Amount of structure inside a lane, at an armStructure of 1: the peak sideways displacement of the
+// ridge in lane sigmas, the peak modulation of the density as a fraction of the lane's, and the
+// correlation lengths of the field along the arm, across the lane (two of them, see
+// gxArmStructureShift and gxArmStructureTexture) and vertically, in baseRadius.
+//
+// The structure is sampled in the arm frame and is zero-mean on both counts, so it moves and
+// redistributes dust instead of removing it: a thresholded mask with a floor cannot do that, it can
+// only dim the lane until nothing is left. The across-correlations are what make it read as arms
+// with structure rather than as noise: long along the flow, short across it.
+#define GX_ARM_STRUCTURE_SHIFT 1.2
+#define GX_ARM_STRUCTURE_GAIN 0.85
+#define GX_ARM_STRUCTURE_ALONG 0.12
+#define GX_ARM_STRUCTURE_ACROSS 0.02
+#define GX_ARM_STRUCTURE_GRAIN 0.025
+#define GX_ARM_STRUCTURE_VERTICAL 0.012
 // Scale radius of the exponential disk, in units of baseRadius.
 #define GX_DISK_SCALE 0.33
 // Vertical slab is cut at this many scale heights, where its density is below 1/255.
@@ -113,21 +134,16 @@ struct GalaxyShape {
     float noiseMaskFreq;
     // Number of octaves summed into the mask.
     int noiseMaskOctaves;
-    // Frequency multiplier of the lane warp. 0 or less means 1. The noise mask and the dust
-    // substructure have frequencies of their own.
+    // Frequency multiplier of the lane warp. 0 or less means 1. The noise mask has a frequency of
+    // its own.
     float laneNoiseScale;
-    // Depth of the substructure inside a dust lane, in [0,1]: how far the gaps between its strands
-    // drop below the lane's density. Only the spiral dust uses it; see gxDustFilaments.
-    float filamentContrast;
-    // Frequency of that substructure across the lane, in cycles per baseRadius. Independent of
-    // laneNoiseScale, which sets the scale of the warp.
-    float filamentScale;
-    // Level above which a point of that field is inside a strand, in [0,1].
-    float filamentThreshold;
     // How the width of a dust lane changes along the arm, in [-1,1]: positive thins the lanes at
     // the centre and widens them outward, negative the other way round. Only the spiral dust uses
     // it; see gxArmWidthMultiplier.
     float laneWidthTaper;
+    // Amount of structure inside the lanes, in [0,1]: 0 leaves them smooth arcs, 1 gives them kinks,
+    // spurs and lumps. Only the spiral dust uses it; see gxArmStructureShift.
+    float armStructure;
 };
 
 // Channel ids. These must match the BillboardDataset.ChannelType ordinals.
@@ -148,10 +164,10 @@ struct GalaxyShape {
 // GX_MAX_FIELDS is the number of fields summed into ONE slot, and each slot gets its own packed
 // array, so a galaxy can carry up to 2 * GX_MAX_FIELDS fields. Fields are baked into the slot's
 // texture, so this costs nothing per frame: it only multiplies the voxeliser's work at generation
-// time. 8 * 38 = 304 floats is a quarter of the 1024 components a GL 4.3 compute shader is
+// time. 8 * 36 = 288 floats is a quarter of the 1024 components a GL 4.3 compute shader is
 // guaranteed to get, so the limit is the authoring model, not the hardware.
 #define GX_MAX_FIELDS 8
-#define GX_FIELD_STRIDE 38
+#define GX_FIELD_STRIDE 36
 #define GX_FIELD_ARRAY (GX_MAX_FIELDS * GX_FIELD_STRIDE)
 #define GX_F_DISTRIBUTION 0
 #define GX_F_BASE_RADIUS 1
@@ -176,10 +192,8 @@ struct GalaxyShape {
 #define GX_F_LANE_NOISE_SCALE 31
 #define GX_F_NOISE_MASK_FREQ 32
 #define GX_F_NOISE_MASK_OCTAVES 33
-#define GX_F_FILAMENT_CONTRAST 34
-#define GX_F_FILAMENT_SCALE 35
-#define GX_F_FILAMENT_THRESHOLD 36
-#define GX_F_LANE_WIDTH_TAPER 37
+#define GX_F_LANE_WIDTH_TAPER 34
+#define GX_F_ARM_STRUCTURE 35
 
 // Rebuilds one shape from `d` starting at float `o`.
 GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
@@ -204,10 +218,8 @@ GalaxyShape gxUnpack(in float d[GX_FIELD_ARRAY], int o) {
     s.laneNoiseScale = d[o + GX_F_LANE_NOISE_SCALE];
     s.noiseMaskFreq = d[o + GX_F_NOISE_MASK_FREQ];
     s.noiseMaskOctaves = int(d[o + GX_F_NOISE_MASK_OCTAVES] + 0.5);
-    s.filamentContrast = d[o + GX_F_FILAMENT_CONTRAST];
-    s.filamentScale = d[o + GX_F_FILAMENT_SCALE];
-    s.filamentThreshold = d[o + GX_F_FILAMENT_THRESHOLD];
     s.laneWidthTaper = d[o + GX_F_LANE_WIDTH_TAPER];
+    s.armStructure = d[o + GX_F_ARM_STRUCTURE];
     for (int i = 0; i < 4; i++) {
         int b = o + GX_F_BASE_COLORS + 3 * i;
         s.baseColors[i] = vec3(d[b], d[b + 1], d[b + 2]);
@@ -276,22 +288,28 @@ float gxArmDelta(in GalaxyShape s, float r, float phi, float warp) {
     return mod(phi - theta - warp * period + 0.5 * period, period) - 0.5 * period;
 }
 
-// Multiple of the arm width at a radius, from laneWidthTaper. Two-sided and swinging by
-// GX_LANE_TAPER_GAIN: 2^(taper * (2 * rn - 1) * gain), so a taper of 1 takes the width down to about
-// a third at the centre and up to nearly three times at the rim, and -1 does the mirror image.
+// Multiple of the arm width at a radius, from laneWidthTaper. The taper is measured over the radial
+// span the dust occupies (GX_LANE_TAPER_INNER..GX_LANE_TAPER_OUTER), not over the whole nominal disk:
+// the envelope is exp(-rn / GX_DISK_SCALE) raised to GX_DUST_CONTRAST and the voxels are 8-bit alpha
+// normalised by the field peak, so a span measured from the centre to the rim puts the widening of a
+// positive taper in the outer fifth of the radius, where the field is under one step and a wider
+// lane is still zero.
 //
-// Widening the outer lanes only shows if there is dust out there to widen: the envelope is
-// exp(-rn / GX_DISK_SCALE) raised to GX_DUST_CONTRAST, so on the plain envelope it is under one
-// 8-bit step past rn ~ 0.45 and the widened lanes would be quantised away. A positive taper
-// therefore also stretches the envelope (gxDustDiskScale). Only the dust uses it, since only dust
-// forms lanes; the gas takes the arm width as it is.
+// Two-sided: 2^(taper * (2 * u - 1) * gain), u the position in that span, so a taper of 1 takes the
+// width down to a seventh at the centre and up to seven times at the outer end, and -1 mirrors it.
+// The width saturates at a fifth of the disk (1 / armSigma times the nominal), so a field with wide
+// arms cannot turn its lanes into the disk itself. A positive taper also stretches the envelope
+// (gxDustDiskScale); only the dust uses any of it, since only dust forms lanes.
 float gxArmWidthMultiplier(in GalaxyShape s, float r) {
     if (s.laneWidthTaper == 0.0 || s.channel != GX_CHANNEL_DUST) {
         return 1.0;
     }
     float rn = clamp(r / max(s.baseRadius, 1e-6), 0.0, 1.0);
-    return clamp(pow(2.0, s.laneWidthTaper * (2.0 * rn - 1.0) * GX_LANE_TAPER_GAIN),
-                 GX_ARM_WIDTH_MIN, GX_ARM_WIDTH_MAX);
+    float u = clamp((rn - GX_LANE_TAPER_INNER) / (GX_LANE_TAPER_OUTER - GX_LANE_TAPER_INNER), 0.0, 1.0);
+    float m = pow(2.0, s.laneWidthTaper * (2.0 * u - 1.0) * GX_LANE_TAPER_GAIN);
+    // A lane may not be wider than a fifth of the disk, but arms already wider keep their width.
+    float widest = max(1.0, min(GX_ARM_WIDTH_MAX, 1.0 / max(s.armSigma, 1.0 / GX_ARM_WIDTH_MAX)));
+    return clamp(m, GX_ARM_WIDTH_MIN, widest);
 }
 
 // Scale radius of a dust envelope, stretched by a positive laneWidthTaper. Every other channel gets
@@ -303,15 +321,65 @@ float gxDustDiskScale(in GalaxyShape s) {
     return GX_DISK_SCALE * (1.0 + GX_DUST_TAPER_EXTENT * max(s.laneWidthTaper, 0.0));
 }
 
-float gxArmFactor(in GalaxyShape s, float r, float phi, float warp) {
+// Defined below, next to the noise mask.
+float gxNoiseFbm(vec3 q, float lod, int octaves);
+
+// The arm modulation, with the ridge displaced sideways by `shift` lane sigmas. The displacement goes
+// on the signed distance, so the whole cross-section moves instead of the two flanks being pulled
+// apart.
+float gxArmFactor(in GalaxyShape s, float r, float phi, float warp, float shift) {
     float base = max(s.baseRadius, 1e-6);
     float b = gxPitchB(s.baseAngle);
     float d = gxArmDelta(s, r, phi, warp);
     float sigma = max(s.armSigma * GX_ARM_WIDTH * base * gxArmWidthMultiplier(s, r), 1e-4);
     // Turn the angular distance into a linear one: a log spiral of pitch b has perpendicular
     // spacing r/sqrt(1+b^2) per unit of angle.
-    float perpendicular = d * r / sqrt(1.0 + b * b);
+    float perpendicular = d * r / sqrt(1.0 + b * b) + shift * sigma;
     return exp(-0.5 * perpendicular * perpendicular / (sigma * sigma));
+}
+
+float gxArmFactor(in GalaxyShape s, float r, float phi, float warp) {
+    return gxArmFactor(s, r, phi, warp, 0.0);
+}
+
+// Sideways displacement of a dust lane ridge, in lane sigmas, from s.armStructure. Sampled in the
+// arm frame, so features are long along the flow and short across it, with an across-correlation of
+// a few lane widths: a displacement whose correlation length is shorter than the lane smears its
+// cross-section instead of moving it, which loses density rather than adding structure.
+float gxArmStructureShift(in GalaxyShape s, vec3 p, float r, float phi, float warp, float cell) {
+    if (s.armStructure <= 0.0) {
+        return 0.0;
+    }
+    float base = max(s.baseRadius, 1e-6);
+    float b = gxPitchB(s.baseAngle);
+    float q1 = sqrt(1.0 + b * b);
+    float sigma = max(s.armSigma * GX_ARM_WIDTH * base * gxArmWidthMultiplier(s, r), 1e-4);
+    float w = max(3.0 * sigma, GX_ARM_STRUCTURE_ACROSS);
+    float along = r * q1;
+    float across = gxArmDelta(s, r, phi, warp) * r / q1;
+    float n = gxNoiseFbm(vec3(along / GX_ARM_STRUCTURE_ALONG, across / w, p.y / GX_ARM_STRUCTURE_VERTICAL),
+                         cell / w, 2);
+    return s.armStructure * GX_ARM_STRUCTURE_SHIFT * (2.0 * n - 1.0);
+}
+
+// The density modulation of s.armStructure, as a multiplier in [0,2]. Applied to the finished density
+// and not to the arm factor: the dust carries the arm term raised to the eighth power (arm squared
+// inside a fourth-power contrast), so a modulation put before that is either flattened to nothing or
+// blown up. Its across-correlation is fixed and small - four voxels at the default resolution - so it
+// varies inside a lane, not only along it.
+float gxArmStructureTexture(in GalaxyShape s, vec3 p, float r, float phi, float warp, float cell) {
+    if (s.armStructure <= 0.0) {
+        return 1.0;
+    }
+    float b = gxPitchB(s.baseAngle);
+    float q1 = sqrt(1.0 + b * b);
+    float along = r * q1;
+    float across = gxArmDelta(s, r, phi, warp) * r / q1;
+    float n = gxNoiseFbm(vec3(along / GX_ARM_STRUCTURE_ALONG + 11.7,
+                              across / GX_ARM_STRUCTURE_GRAIN - 4.3,
+                              p.y / GX_ARM_STRUCTURE_VERTICAL),
+                         cell / GX_ARM_STRUCTURE_GRAIN, 2);
+    return max(0.0, 1.0 + s.armStructure * GX_ARM_STRUCTURE_GAIN * (2.0 * n - 1.0));
 }
 
 // Two-octave value noise in [0,1], for the substructure that stops the field from looking
@@ -356,36 +424,6 @@ float gxClumps(vec3 p, float base, float seed) {
 // that the grid cannot store anyway.
 #define GX_NOISE_MAX_LOD 0.15
 
-// ---- Substructure inside a dust lane ----
-//
-// The cross-section of a lane is constant along its length: gxArmFactor is a Gaussian of the
-// distance to the centreline with a fixed width and a fixed peak, so the warp, which only moves the
-// centreline, can make a lane meander but never texturise it. This is the missing axis. It is sampled in the same frame as the lane noise above, so its features come out
-// long along the flow and thin across it, and it is thresholded rather than scaled: a real lane is
-// dense strands separated by gaps of two orders of magnitude, and a multiplier bounded away from
-// zero can only dim the whole lane. The veil keeps the lane continuous between the strands.
-//
-// Only the spiral dust uses it: a gas disk has no lanes to break up, and its structure is the
-// clumping of the whole disk (gxClumps), which is isotropic and belongs to no arm.
-//
-// Frequency across the lane, in cycles per baseRadius, when the field does not set one. The grid can
-// carry 0.15 cycles per voxel smoothly, i.e. about 24 cycles per baseRadius at the default
-// resolution, and this is the first octave only; the LOD clamp in gxNoiseFbm handles the rest.
-// Unlike the warp, the strands have their own frequency (filamentScale): a single knob for both
-// would braid the arms when what is wanted is a finer grain.
-#define GX_DUST_FILAMENT_FREQ 20.0
-// How many times longer a strand is along the lane than across it, and how much flatter it is
-// vertically.
-#define GX_DUST_FILAMENT_STRETCH 3.0
-#define GX_DUST_FILAMENT_FLATTEN 0.35
-#define GX_DUST_FILAMENT_OCTAVES 2
-// Default level above which a point is inside a strand, and the width of the transition into it. The
-// fbm sits around 0.5, so this keeps roughly half of the lane and empties the rest.
-#define GX_DUST_FILAMENT_THRESHOLD 0.50
-#define GX_DUST_FILAMENT_BAND 0.18
-// Density left between the strands when filamentContrast is at its default of 0.88, i.e. what the
-// default veil is; a field writes its own contrast.
-#define GX_DUST_FILAMENT_VEIL 0.12
 // Lattice displacement of the dust clumping, in lattice cells. The gas uses 0.
 #define GX_DUST_CLUMP_SEED 1.0
 
@@ -422,28 +460,6 @@ float gxNoiseFbm(vec3 q, float lod, int octaves) {
     return sum / weight;
 }
 
-// Lane noise in [0,1], sampled in the spiral's own frame: along the arm (the arc length, which for a
-// log spiral is linear in r), across it (the same perpendicular distance gxArmFactor uses, wrapped
-// at the arm period so that every lane gets its own pattern) and vertically. The along-arm
-// coordinate is compressed, and y too, so features come out stretched along the lane.
-//
-// Warping the cartesian position instead does not work: the along-arm direction rotates with the
-// position, and once the lane curves that rotation dominates the displacement and the field comes
-// back isotropic. `stretch` is how many times longer a feature is along the lane than across it,
-// and `flatten` compresses it vertically.
-float gxLaneNoise(in GalaxyShape s, vec3 p, float r, float warp, float freq, int octaves, float cell,
-                  float stretch, float flatten) {
-    float base = max(s.baseRadius, 1e-6);
-    float b = gxPitchB(s.baseAngle);
-    float q1 = sqrt(1.0 + b * b);
-    float along = r * q1;
-    float across = gxArmDelta(s, r, atan(p.z, p.x), warp) * r / q1;
-    // `freq` already carries whatever slider it comes from: the callers apply gxLaneScale()
-    // themselves, so a field whose frequency is its own (the dust filaments) stays decoupled.
-    float f = freq / base;
-    return gxNoiseFbm(vec3(along / stretch, across, p.y * flatten) * f, f * cell, octaves);
-}
-
 // Displacement of the arm phase at this point, in fractions of the arm period. Two octaves of value
 // noise: the warp is the coarsest structure in the field, far above the voxel size at any quality,
 // so it needs neither the extra octaves nor the grid check.
@@ -453,22 +469,6 @@ float gxLaneWarp(in GalaxyShape s, vec3 p) {
     }
     float freq = GX_LANE_FREQ * gxLaneScale(s) / max(s.baseRadius, 1e-6);
     return s.laneWarp * (2.0 * gxNoise3(p * freq) - 1.0);
-}
-
-// Substructure inside a dust lane, as a multiplier on its density, in [1 - contrast,1]. See the note
-// above the GX_DUST_FILAMENT_* constants: long thin strands along the lane, separated by empty gaps,
-// with a veil left between them so that the lane stays continuous.
-float gxDustFilaments(in GalaxyShape s, vec3 p, float r, float warp, float cell) {
-    float contrast = clamp(s.filamentContrast, 0.0, 0.98);
-    if (contrast <= 0.0) {
-        return 1.0;
-    }
-    float freq = s.filamentScale > 0.0 ? s.filamentScale : GX_DUST_FILAMENT_FREQ;
-    float threshold = clamp(s.filamentThreshold, 0.0, 0.99);
-    float n = gxLaneNoise(s, p, r, warp, freq, GX_DUST_FILAMENT_OCTAVES, cell,
-                          GX_DUST_FILAMENT_STRETCH, GX_DUST_FILAMENT_FLATTEN);
-    float fil = smoothstep(threshold, threshold + GX_DUST_FILAMENT_BAND, n);
-    return mix(1.0 - contrast, 1.0, fil * fil);
 }
 
 // ---- 3D noise mask ----
@@ -654,10 +654,12 @@ vec4 galaxyDensity(vec3 p, in GalaxyShape s, float cell) {
             // No azimuthal structure inside the arm start radius; see GX_ARM_START.
             float armWeight = smoothstep(0.0, 2.0 * max(gxMinRn(s), GX_ARM_START), rnCyl);
             float warp = gxLaneWarp(s, p);
-            float arm = mix(1.0, gxArmFactor(s, r, phi, warp), armWeight);
+            float shift = s.channel == GX_CHANNEL_DUST
+                    ? gxArmStructureShift(s, p, r, phi, warp, cell) : 0.0;
+            float arm = mix(1.0, gxArmFactor(s, r, phi, warp, shift), armWeight);
             if (s.channel == GX_CHANNEL_DUST) {
-                // The strands inside the lane, after the lane's own contrast.
-                density = gxDustDensity(s, rnCyl, disk, arm, p, cell) * gxDustFilaments(s, p, r, warp, cell);
+                density = gxDustDensity(s, rnCyl, disk, arm, p, cell)
+                        * gxArmStructureTexture(s, p, r, phi, warp, cell);
             } else {
                 density = disk * (0.22 + 0.78 * arm) * gxClumps(p, base, 0.0);
             }

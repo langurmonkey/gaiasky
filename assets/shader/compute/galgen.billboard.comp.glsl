@@ -244,10 +244,7 @@ GalaxyShape gxFieldShape() {
     s.laneWarp = 0.0;
     s.laneNoiseScale = 0.0;
     s.laneWidthTaper = 0.0;
-    // The billboards sample the density model, never the dust substructure, which the volume adds.
-    s.filamentContrast = 0.0;
-    s.filamentScale = 0.0;
-    s.filamentThreshold = 0.0;
+    s.armStructure = 0.0;
     s.noiseMask = 0.0;
     s.noiseMaskFreq = 0.0;
     s.noiseMaskOctaves = 0;

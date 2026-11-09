@@ -183,16 +183,15 @@ public class GalaxyAttributes {
      * positive value thins the lanes at the centre and widens them outward, a negative one does the
      * mirror image.
      * <p>
-     * The width is scaled by {@code 2^(taper * (2 * rn - 1) * 1.5)}: a taper of 1 takes it down to
-     * about a third at the centre and up to nearly three times at the rim.
+     * The taper is measured over the radial span the dust occupies, from a tenth to three quarters of
+     * {@code baseRadius}, rather than over the whole nominal disk: the voxels are 8-bit alpha
+     * normalised by the field peak, and a widening that lands where the field is under one step
+     * changes nothing on screen. Measured over that span, a taper of 1 takes the width down to about
+     * a seventh at the centre and up to seven times at the outer end.
      * <p>
-     * Widening the outer lanes only shows if there is dust out there to widen, and the dust envelope
-     * is {@code exp(-rn / 0.33)} raised to the fourth power: on the plain envelope the lanes fall
-     * under one 8-bit step past {@code rn ≈ 0.45}, so a widened lane out there would be quantised
-     * away and all the outward half of the slider would do is thin what is visible. A positive taper
-     * therefore also stretches the envelope (out to twice the scale radius at 1), which is what
-     * makes the outer lanes thick and bright instead of merely wide. A negative one does not need to:
-     * it thickens the part of the disk that is bright anyway.
+     * It also saturates at a fifth of {@code baseRadius}, so it cannot turn a lane into the whole
+     * disk, and a positive taper stretches the dust envelope (to twice its scale radius at 1) so
+     * that the lanes it widens outward are above the quantisation floor instead of merely wider.
      * <p>
      * Only {@link ChannelType#DUST} in a spiral uses it: the gas is a smooth exponential along the
      * whole disk and its width is not a lane's.
@@ -200,38 +199,19 @@ public class GalaxyAttributes {
     public float laneWidthTaper = 0.0f;
 
     /**
-     * Depth of the substructure inside a dust lane, in [0,1]: how far the gaps between its strands
-     * drop below the lane's own density. Only {@link ChannelType#DUST} in a spiral uses it.
+     * Amount of structure inside the lanes, in [0,1]. Zero leaves the lanes as smooth arcs. A value
+     * of 1 gives them kinks, spurs and lumps: it shifts each ridge sideways by up to about a lane
+     * width and modulates the density within the lane, from a field that is long along the arm and
+     * short across it. Only {@link ChannelType#DUST} in a spiral uses it.
      * <p>
-     * {@link #laneWarp} moves the centreline of a lane, so it can make it meander but not texturise
-     * it: its cross-section is a Gaussian of a fixed width and a fixed peak. This is the missing
-     * axis. It multiplies the lane's density by a field thresholded into
-     * strands, so 0 leaves the lane smooth and a value near 1 leaves it as strands separated by
-     * gaps of two orders of magnitude - which is what a real lane is. Values in between keep a veil
-     * of material between the strands, so the lane stays continuous.
-     * <p>
-     * It lowers the mean dust density, so raise {@link #intensity} to compensate.
-     *
-     * @see #filamentScale
-     * @see #filamentThreshold
+     * Both effects are zero-mean, so this redistributes the dust rather than removing it, which is
+     * what a thresholded mask cannot do: it redraws the lane instead of erasing it. The stored
+     * brightness still moves by up to about a third at full strength, because the dust contrast
+     * raises the density to a power, so raise or lower {@link #intensity} to taste. The sideways
+     * shift moves the whole cross-section, and its correlation length across the lane is a few lane
+     * widths, so the lane wanders instead of being pulled apart.
      */
-    public float filamentContrast = 0.88f;
-
-    /**
-     * Frequency of {@link #filamentContrast} across the lane, in cycles per {@code baseRadius}.
-     * Zero or less means 20.
-     * <p>
-     * A strand is long along the lane and thin across it, so this is what sets its width, and it is
-     * independent of {@link #laneNoiseScale}, which sets the scale of the warp. Past roughly 24 the
-     * grid cannot carry the pattern and the strands alias into beads.
-     */
-    public float filamentScale = 20.0f;
-
-    /**
-     * Level, in [0,1] of the noise field behind {@link #filamentContrast}, above which a point is
-     * inside a strand. Higher values keep fewer, thinner strands and empty more of the lane.
-     */
-    public float filamentThreshold = 0.50f;
+    public float armStructure = 0.0f;
 
     /**
      * The intensity factor.
@@ -314,9 +294,7 @@ public class GalaxyAttributes {
         this.noiseMaskOctaves = other.noiseMaskOctaves;
         this.laneNoiseScale = other.laneNoiseScale;
         this.laneWidthTaper = other.laneWidthTaper;
-        this.filamentContrast = other.filamentContrast;
-        this.filamentScale = other.filamentScale;
-        this.filamentThreshold = other.filamentThreshold;
+        this.armStructure = other.armStructure;
         this.intensity = other.intensity;
         this.occlusionThreshold = other.occlusionThreshold;
     }
@@ -383,7 +361,7 @@ public class GalaxyAttributes {
     private static final double GX_DUST_HEIGHT = 0.5;
 
     /** Length in floats of one field in the packed uniform of {@code galgen.volume.comp.glsl}. **/
-    public static final int FIELD_STRIDE = 38;
+    public static final int FIELD_STRIDE = 36;
     /**
      * Maximum number of fields summed into one volume slot. Mirrors {@code GX_MAX_FIELDS} in
      * {@code assets/shader/lib/galaxy.glsl}. Each slot gets its own packed array, so a galaxy can
@@ -426,10 +404,8 @@ public class GalaxyAttributes {
         out[offset + 31] = laneNoiseScale;
         out[offset + 32] = noiseMaskFreq;
         out[offset + 33] = (float) noiseMaskOctaves;
-        out[offset + 34] = filamentContrast;
-        out[offset + 35] = filamentScale;
-        out[offset + 36] = filamentThreshold;
-        out[offset + 37] = laneWidthTaper;
+        out[offset + 34] = laneWidthTaper;
+        out[offset + 35] = armStructure;
     }
 
     /**
@@ -703,6 +679,14 @@ public class GalaxyAttributes {
         setLaneWidthTaper(laneWidthTaper.doubleValue());
     }
 
+    public void setArmStructure(Double armStructure) {
+        this.armStructure = MathUtilsDouble.clamp(armStructure.floatValue(), 0f, 1f);
+    }
+
+    public void setArmStructure(Long armStructure) {
+        setArmStructure(armStructure.doubleValue());
+    }
+
     public void setNoiseMaskFreq(Double noiseMaskFreq) {
         this.noiseMaskFreq = noiseMaskFreq.floatValue();
     }
@@ -713,30 +697,6 @@ public class GalaxyAttributes {
 
     public void setNoiseMaskOctaves(Long noiseMaskOctaves) {
         this.noiseMaskOctaves = MathUtilsDouble.clamp(noiseMaskOctaves.intValue(), 1, 8);
-    }
-
-    public void setFilamentContrast(Double filamentContrast) {
-        this.filamentContrast = MathUtilsDouble.clamp(filamentContrast.floatValue(), 0f, 0.98f);
-    }
-
-    public void setFilamentContrast(Long filamentContrast) {
-        setFilamentContrast(filamentContrast.doubleValue());
-    }
-
-    public void setFilamentScale(Double filamentScale) {
-        this.filamentScale = MathUtilsDouble.clamp(filamentScale.floatValue(), 0f, 64f);
-    }
-
-    public void setFilamentScale(Long filamentScale) {
-        setFilamentScale(filamentScale.doubleValue());
-    }
-
-    public void setFilamentThreshold(Double filamentThreshold) {
-        this.filamentThreshold = MathUtilsDouble.clamp(filamentThreshold.floatValue(), 0f, 0.99f);
-    }
-
-    public void setFilamentThreshold(Long filamentThreshold) {
-        setFilamentThreshold(filamentThreshold.doubleValue());
     }
 
     /**

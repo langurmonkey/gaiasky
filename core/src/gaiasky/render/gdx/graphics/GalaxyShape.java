@@ -52,14 +52,10 @@ public final class GalaxyShape {
     public final float noiseMaskFreq;
     public final int noiseMaskOctaves;
     public final float laneNoiseScale;
-    /** Depth of the substructure inside a dust lane, in [0,1]. **/
-    public final float filamentContrast;
-    /** Frequency of that substructure across the lane, in cycles per baseRadius. **/
-    public final float filamentScale;
-    /** Level of the field above which a point is inside a strand. **/
-    public final float filamentThreshold;
     /** How the width of a dust lane changes along the arm, in [-1,1]. **/
     public final float laneWidthTaper;
+    /** Amount of structure inside the lanes, in [0,1]. **/
+    public final float armStructure;
     /** Four colour stops, core first, three components each. **/
     public final float[] baseColors = new float[12];
 
@@ -86,10 +82,8 @@ public final class GalaxyShape {
         laneNoiseScale = d[o + 31];
         noiseMaskFreq = d[o + 32];
         noiseMaskOctaves = Math.round(d[o + 33]);
-        filamentContrast = d[o + 34];
-        filamentScale = d[o + 35];
-        filamentThreshold = d[o + 36];
-        laneWidthTaper = d[o + 37];
+        laneWidthTaper = d[o + 34];
+        armStructure = d[o + 35];
     }
 
     /**

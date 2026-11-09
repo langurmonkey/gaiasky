@@ -74,7 +74,8 @@ public class FieldPackingTest {
         Assert.assertEquals(2.5f, packed[o + 31], 0f);  // GX_F_LANE_NOISE_SCALE
         Assert.assertEquals(14f, packed[o + 32], 0f);   // GX_F_NOISE_MASK_FREQ
         Assert.assertEquals(5f, packed[o + 33], 0f);    // GX_F_NOISE_MASK_OCTAVES
-        Assert.assertEquals(0f, packed[o + 37], 0f);    // GX_F_LANE_WIDTH_TAPER, unset
+        Assert.assertEquals(0f, packed[o + 34], 0f);    // GX_F_LANE_WIDTH_TAPER, unset
+        Assert.assertEquals(0f, packed[o + 35], 0f);    // GX_F_ARM_STRUCTURE, unset
         // Nothing outside this field's window was touched.
         Assert.assertEquals(0f, packed[o + GalaxyAttributes.FIELD_STRIDE - 1 + 1], 0f);
         Assert.assertEquals(0f, packed[0], 0f);

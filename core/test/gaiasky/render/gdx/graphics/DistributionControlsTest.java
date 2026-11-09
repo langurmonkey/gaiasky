@@ -189,17 +189,22 @@ public class DistributionControlsTest {
                 plain.type = channel;
                 var warped = new GalaxyAttributes(plain);
                 warped.laneWarp = 0.8f;
-                var stranded = new GalaxyAttributes(plain);
-                stranded.filamentContrast = 0.9f;
+                var tapered = new GalaxyAttributes(plain);
+                tapered.laneWidthTaper = 1f;
+                var structured = new GalaxyAttributes(plain);
+                structured.armStructure = 1f;
 
                 boolean spiral = d.isAnySpiral();
-                // The arm warp displaces the centreline of both channel types; the strands are only
-                // cut into the dust, which is the only field with lanes to break up.
+                // The arm warp displaces the centreline of both channel types; the width taper and
+                // the structure only reach the dust, which is the only field with lanes to shape.
                 Assert.assertEquals(d + "/" + channel + " reads an arm warp it has no use for",
                                     spiral ? 1 : 0, Math.abs(total(plain) - total(warped)) > 1e-6 ? 1 : 0);
-                boolean strandsLive = spiral && channel == ChannelType.DUST;
-                Assert.assertEquals(d + "/" + channel + " reads a lane substructure it has no use for",
-                                    strandsLive ? 1 : 0, Math.abs(total(plain) - total(stranded)) > 1e-6 ? 1 : 0);
+                boolean taperLive = spiral && channel == ChannelType.DUST;
+                Assert.assertEquals(d + "/" + channel + " reads a lane width taper it has no use for",
+                                    taperLive ? 1 : 0, Math.abs(total(plain) - total(tapered)) > 1e-6 ? 1 : 0);
+                boolean structureLive = spiral && channel == ChannelType.DUST;
+                Assert.assertEquals(d + "/" + channel + " reads an arm structure it has no use for",
+                                    structureLive ? 1 : 0, Math.abs(total(plain) - total(structured)) > 1e-6 ? 1 : 0);
             }
         }
     }
