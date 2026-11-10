@@ -679,11 +679,11 @@ public class ModelEntityRenderSystem {
             cloud.cloud.mc.updateCamPos(camPos);
             cloud.cloud.mc.updateCloudShell(body.size, cloud.cloud);
             // The proxy draws its far wall, which sits behind everything the clouds cover, so a
-            // depth test on it would reject exactly the pixels the volume belongs on, and there is
-            // nothing meaningful to write either. Occlusion is done in the shader instead: against
-            // the planet sphere analytically, and against the scene depth, which is bound here from
-            // the full-resolution buffer so that terrain standing above the base of the layer, a
-            // nearer body or anything else already drawn clips the march.
+            // depth test on it would reject exactly the pixels the layer belongs on, and there is
+            // nothing worth writing either: see the note in the fragment shader. Occlusion is done
+            // in the shader instead, against the planet sphere analytically and against the scene
+            // depth, which is bound below from the full-resolution buffer so that terrain standing
+            // above the base of the layer, or a nearer body, clips the march.
             cloud.cloud.mc.depthTestDisable();
             Texture sceneDepth = sceneDepthTexture(rc);
             if (sceneDepth != null) {

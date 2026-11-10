@@ -120,10 +120,17 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
      **/
     public double volumetricThicknessKm = -1;
     /**
-     * Default thickness of a volumetric layer, as a fraction of the planet radius. 1.5% is about
-     * 95 km on Earth.
+     * Default thickness of a volumetric layer, as a fraction of the planet radius. 1 % is about
+     * 64 km on Earth.
+     * <p>
+     * This is the marching slab, not the cloud: the deck itself occupies a band inside it (see
+     * {@code VC_BASE} in {@code assets/shader/cloud/volumetric.glsl}), with clear air below and
+     * above. A real deck is 2-15 km thick, which is a fifth of a percent of the radius and has no
+     * room for structure, so the slab is exaggerated; but exaggerating it to the point where the
+     * band reaches the ground makes the clouds look like fog on the surface, so 1 % is the
+     * compromise.
      **/
-    public static final double DEFAULT_VOLUMETRIC_THICKNESS = 0.015;
+    public static final double DEFAULT_VOLUMETRIC_THICKNESS = 0.010;
     /** Mode type. **/
     public ModelType modelType = ModelType.UVSPHERE;
     /** Model parameters. **/

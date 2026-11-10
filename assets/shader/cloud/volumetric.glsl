@@ -2,7 +2,7 @@
 #define GLSL_CLOUD_VOLUMETRIC
 
 /*
- * Volumetric clouds (M1). See notes/gaiasky-volumetric-clouds-brief.md.
+ * Volumetric clouds shader.
  *
  * Marches the layer between the planet surface and the top of the cloud volume, in the object's own
  * frame. The horizontal placement comes from the cloud map the shell already uses, sampled *at every
@@ -27,19 +27,35 @@
  * comes from a coverage channel plus noise rather than a baked four-channel map (M2).
  */
 
-// Vertical optical depth of a fully covered column, relative to the layer thickness.
-#define VC_TAU 3.2
+// Vertical optical depth of a fully covered column, relative to the slab thickness. The deck only
+// fills VC_BAND_MEAN of the slab (see vcDensity), so the extinction inside the band is scaled up by
+// 1 / VC_BAND_MEAN to compensate: 3.2 / 0.42. A fully covered column then attenuates what it always
+// did, and the confinement costs nothing in opacity.
+#define VC_TAU 7.6
 // Dual-lobe Henyey-Greenstein.
 #define VC_G_FORWARD 0.60
 #define VC_G_BACK -0.25
 // Single-scattering albedo of the droplets.
 #define VC_ALBEDO 0.95
+// Gain and anisotropy of the in-scattering term. See vcPhase.
+#define VC_PHASE_GAIN 3.0
+#define VC_PHASE_ANISO 0.30
 // Cheap stand-in for multiple scattering: without it the thick parts read as grey smoke.
 #define VC_MULTIPLE_SCATTERING 0.45
 // Ambient and sky light, so the night side is dark but not black and the underside of the layer
 // stays visible when the sun is on the other side.
 #define VC_AMBIENT 0.14
 #define VC_SKY_UNDERSIDE 0.32
+// The deck floats inside the slab. The slab is a marching volume; the cloud is a band within it, and
+// this is the bottom of that band as a fraction of the slab's thickness. Without a gap the density is
+// non-zero at the very bottom, which puts cloud on the ground: on screen it reads as fog lying on the
+// planet, and from close range the camera ends up inside the cloud rather than under it.
+#define VC_BASE 0.24
+// Thickness of the band, as a fraction of the slab, before the variation below.
+#define VC_BAND 0.52
+// Mean fraction of the slab actually occupied by the band, used to keep the column's optical depth
+// unchanged by the confinement (see VC_TAU).
+#define VC_BAND_MEAN 0.42
 // Marching budget.
 #define VC_MAX_STEPS 24
 #define VC_SUN_STEPS 4
@@ -49,6 +65,15 @@
 // Longest stretch of a ray that is marched, in layer thicknesses: a horizon view from the ground
 // crosses dozens, and past the first few the column is already opaque.
 #define VC_MAX_PATH 8.0
+// Coverage contrast. The map is a *fraction* of a satellite pixel that is cloudy, and a cloud is not
+// a fraction of a cloud: where it exists it is opaque, and where it does not it is not there at all.
+// Taken literally, a 40 % pixel becomes a 40 % opaque white veil, and a veil over the ocean is a grey
+// blue wash rather than a cloud - which is what makes the deck look like pale paint over the surface
+// and brilliant white only where the ray happens to cross a lot of it. So the middle of the range is
+// pushed out: below VC_COV_LO is clear sky, above VC_COV_HI is solid cloud, and only the edge between
+// them is partial. Positions come from the map, opacity does not.
+#define VC_COV_LO 0.12
+#define VC_COV_HI 0.55
 // Pedestal of the coverage map: cloud maps are drawn to be composited, so their background sits
 // above zero and their clouds nowhere near one. The Earth cubemap bottoms out at 0 and its clouds
 // peak at about 0.8. Leaving the pedestal in matters more than it looks: the march multiplies
@@ -136,7 +161,8 @@ vec2 vcEquirect(vec3 dir) {
 // the pedestal is removed.
 float vcCoverage(vec3 dir, float lod) {
     vec4 c = fetchCloudColorLod(vcEquirect(dir), lod);
-    return saturate((c.a * luma(c.rgb) - VC_COVERAGE_BASE) / (1.0 - VC_COVERAGE_BASE));
+    float raw = saturate((c.a * luma(c.rgb) - VC_COVERAGE_BASE) / (1.0 - VC_COVERAGE_BASE));
+    return smoothstep(VC_COV_LO, VC_COV_HI, raw);
 }
 
 // Mip level for the coverage lookups. It has to be computed here, once per fragment, from values
@@ -178,6 +204,23 @@ float vcDensity(vec3 p, float u, float cov) {
     // kilometres up the whole deck is three or four blobs. Cu at 35 km across with 8 km detail is
     // what puts many clouds in view at that range and still holds up from orbit.
     vec3 q = p / u_kmToU;
+
+    // Is the point inside the deck at all? Cheapest test first: the band comes from two octaves of a
+    // low-frequency field, the shape field below from three to seven, and in a slab that is only half
+    // filled with cloud most samples answer here. Both edges of the band come from that one field, so
+    // a cloud mass has a lumpy bottom and a lumpy top rather than a floor and a lid - flat edges are
+    // what make a band read as a slab, and a slab whose floor is on the ground reads as fog on the
+    // ground. The scale is tens of kilometres, the scale at which a real cloud field varies in height.
+    float lump = vcFbm(vec3(q.x, q.y * 2.0, q.z) / 90.0 + 21.0, 2) * 0.5 + 0.5;
+    float base = VC_BASE + 0.10 * lump;
+    float span = VC_BAND * (0.55 + 0.70 * lump);
+    float top = min(base + span, 0.99);
+    // Soft at both ends: a sixth of the band at the bottom and a fifth at the top.
+    float profile = smoothstep(base, base + 0.16 * span, u) * (1.0 - smoothstep(top - 0.20 * span, top, u));
+    if (profile <= 0.0) {
+        return 0.0;
+    }
+
     // The shape field is filtered by distance the way a texture is: 35 km features are half a pixel
     // across at the disc, and a threshold on a field finer than a pixel can only give grain. Far out
     // the field is coarse and its spread is stretched back, because a narrow field is a switch.
@@ -228,15 +271,6 @@ float vcDensity(vec3 p, float u, float cov) {
         return 0.0;
     }
 
-    // Where this column's cloud ends, vertically. Low frequency, so a cloud mass has a lumpy top
-    // rather than a ceiling at one altitude - from the side and from above, that is most of what
-    // reads as volume.
-    float top = 0.40 + 0.55 * (vcFbm(vec3(q.x, q.y * 2.0, q.z) / 90.0 + 21.0, 2) * 0.5 + 0.5);
-    float profile = smoothstep(0.0, 0.10, u) * (1.0 - smoothstep(top - 0.30, top, u));
-    if (profile <= 0.0) {
-        return 0.0;
-    }
-
     d *= 0.65 + 0.70 * (vcFbm(q / 12.0 + 11.2, 2) * 0.5 + 0.5);
 
     // Erosion, at four kilometres and at one, each faded out at the altitude where it stops being
@@ -264,10 +298,19 @@ float vcDensityLight(vec3 p, float cov) {
     if (cov <= 0.002) {
         return 0.0;
     }
+    // Same band as the view ray, but with a flat base and top instead of the lumpy ones: a shadow
+    // ray is short and the term it feeds is soft, so a constant band is enough, and recomputing the
+    // height field here would double the price of the shadow. Without any band at all, samples taken
+    // above the deck would still count as occluding and every cloud would be too dark.
+    float u = (length(p) - u_cloudShell.x) / max(u_cloudShell.w, 1e-9);
+    float band = smoothstep(VC_BASE - 0.06, VC_BASE + 0.06, u) * (1.0 - smoothstep(0.90, 0.99, u));
+    if (band <= 0.0) {
+        return 0.0;
+    }
     vec3 q = p / u_kmToU;
     float shape = vcFbm(vec3(q.x, q.y * 1.4, q.z) / 35.0 + 3.7, 2) * 0.5 + 0.5;
     float floorv = 0.75 * pow(1.0 - cov, 1.6);
-    return saturate((shape - floorv) / max(1.0 - floorv, 1e-3));
+    return band * saturate((shape - floorv) / max(1.0 - floorv, 1e-3));
 }
 
 // Optical depth from p towards the sun. `planetShadow` is 0 when the planet stands between the
@@ -323,7 +366,22 @@ float vcHg(float mu, float g) {
 // path gives with the same map: at 3pi the two lobes left the disc a grey veil, and the earlier
 // experiment at 4pi looked washed out only because the sun direction was inverted.
 float vcPhase(float mu) {
-    return 5.0 * PI * (2.0 * vcHg(mu, VC_G_FORWARD) + vcHg(mu, VC_G_BACK));
+    // In-scattering as a function of angle between the view ray and the light.
+    //
+    // The single-scattering lobe is the wrong shape for a cloud deck. Its normalised form peaks at
+    // ~28 and falls to ~0.015 between the front and the back - a factor of two thousand - so any gain
+    // that puts the forward cone at white leaves everything else nearly black. A deck of droplets at
+    // an albedo of 0.95 does not do that: the photons scatter tens of times before leaving, so the
+    // emergent radiance is close to isotropic with a mild forward bias, which is why clouds are the
+    // brightest thing in a satellite image from every angle.
+    //
+    // So the lobe is kept for the shape and flattened hard: `dual` is normalised to a mean of one
+    // over the sphere (it integrates to 3), and blending it heavily with a constant does the job the
+    // scattering orders this does not trace would have done. What is left varies by well under a
+    // factor of two, apart from the forward cone, which is allowed to go over and clip - that is the
+    // silver lining, and it is meant to be blown out.
+    float dual = (2.0 * vcHg(mu, VC_G_FORWARD) + vcHg(mu, VC_G_BACK)) * (4.0 * PI / 3.0);
+    return VC_PHASE_GAIN * mix(1.0, dual, VC_PHASE_ANISO);
 }
 
 // Whether the volumetric path is used for this fragment.
@@ -511,6 +569,17 @@ void vcRender() {
     if (alpha < 0.004) {
         discard;
     }
+
+    // No depth is written, and the reason is the atmosphere. It is drawn after this pass, on purpose,
+    // so that aerial perspective lands on top of the deck; and its own fragment writes the depth of
+    // the shell radius, which is farther than any cloud front. Write the cloud's real depth here and
+    // every atmosphere fragment behind it fails its depth test, which is a black band between the
+    // deck and the sky above it - the atmosphere is not drawn at all in the region the proxy covers,
+    // opaque or not. Nothing else in the frame is drawn after this pass that would want to be
+    // occluded by it, so the write was buying an unused ordering and costing the sky. Doing it
+    // properly needs the cloud to write into its own depth target and the atmosphere to composite
+    // against a copy of the scene depth taken before this pass, which is what VolumeDepthMask does
+    // for the volume path; that is the way to get it back.
 
     // Straight alpha; opacity fades the coverage, not the colour, so a faded cloud goes transparent
     // instead of turning grey.
