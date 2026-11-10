@@ -41,8 +41,11 @@
 #define VC_AMBIENT 0.22
 #define VC_SKY_UNDERSIDE 0.50
 // Marching budget.
-#define VC_MAX_STEPS 64
-#define VC_SUN_STEPS 6
+#define VC_MAX_STEPS 24
+#define VC_SUN_STEPS 4
+// Upper bound on the optical depth a shadow ray is allowed to search for. Past about four, the
+// two-stream transmission below is under a few per cent and the rest of the ray cannot be seen.
+#define VC_SUN_OD_MAX 4.0
 // Longest stretch of a ray that is marched, in layer thicknesses: a horizon view from the ground
 // crosses dozens, and past the first few the column is already opaque.
 #define VC_MAX_PATH 8.0
@@ -156,6 +159,11 @@ float vcAlt = 0.0;
 float vcFar = 0.0;
 
 // Density at p for a coverage of cov, in [0, 1]. `u` is the height fraction in the layer.
+//
+// Ordered cheapest-first. The shape field is what decides whether there is anything here at all, so
+// it goes first and the two fields below it - the top of the column and the fine detail - are only
+// evaluated when the shape cut has already said there is cloud. In a thin layer most samples are
+// empty, and for those this turns eight noise octaves into four.
 float vcDensity(vec3 p, float u, float cov) {
     if (cov <= 0.002) {
         return 0.0;
@@ -169,17 +177,19 @@ float vcDensity(vec3 p, float u, float cov) {
     // The shape field is filtered by distance the way a texture is: 35 km features are half a pixel
     // across at the disc, and a threshold on a field finer than a pixel can only give grain. Far out
     // the field is coarse and its spread is stretched back, because a narrow field is a switch.
-    float shapeNear = vcFbm(vec3(q.x, q.y * 1.4, q.z) / 35.0 + 3.7, 4) * 0.5 + 0.5;
-    float shapeFar = saturate((vcFbm(vec3(q.x, q.y * 1.4, q.z) / 140.0 + 3.7, 3) * 0.5 + 0.5 - 0.5) * 1.9 + 0.5);
-    float shape = mix(shapeNear, shapeFar, vcFar);
-    float detail = vcFbm(q / 12.0 + 11.2, 2) * 0.5 + 0.5;
-    // Where this column's cloud ends, vertically. Low frequency, so a cloud mass has a lumpy top
-    // rather than a ceiling at one altitude - from the side and from above, that is most of what
-    // reads as volume.
-    float top = 0.40 + 0.55 * (vcFbm(vec3(q.x, q.y * 2.0, q.z) / 90.0 + 21.0, 2) * 0.5 + 0.5);
-    float profile = smoothstep(0.0, 0.10, u) * (1.0 - smoothstep(top - 0.30, top, u));
-    if (profile <= 0.0) {
-        return 0.0;
+    // Branch, not blend: `vcFar` is a function of the camera only, so it is constant across the
+    // primitive and the two branches almost never meet inside a warp. Evaluating both and mixing
+    // costs seven octaves where three or four are needed.
+    vec3 qs = vec3(q.x, q.y * 1.4, q.z);
+    float shape;
+    if (vcFar >= 0.999) {
+        shape = saturate((vcFbm(qs / 140.0 + 3.7, 3) * 0.5 + 0.5 - 0.5) * 1.9 + 0.5);
+    } else if (vcFar <= 0.001) {
+        shape = vcFbm(qs / 35.0 + 3.7, 4) * 0.5 + 0.5;
+    } else {
+        shape = mix(vcFbm(qs / 35.0 + 3.7, 4) * 0.5 + 0.5,
+                    saturate((vcFbm(qs / 140.0 + 3.7, 3) * 0.5 + 0.5 - 0.5) * 1.9 + 0.5),
+                    vcFar);
     }
 
     // Two mappings of coverage to mass, blended by distance.
@@ -197,7 +207,20 @@ float vcDensity(vec3 p, float u, float cov) {
     float dNear = saturate((shape - floorv) / max(1.0 - floorv, 1e-3));
     float dFar = cov * (0.45 + 0.90 * shape);
     float d = mix(dNear, dFar, vcFar);
-    d *= 0.65 + 0.70 * detail;
+    if (d <= 0.0) {
+        return 0.0;
+    }
+
+    // Where this column's cloud ends, vertically. Low frequency, so a cloud mass has a lumpy top
+    // rather than a ceiling at one altitude - from the side and from above, that is most of what
+    // reads as volume.
+    float top = 0.40 + 0.55 * (vcFbm(vec3(q.x, q.y * 2.0, q.z) / 90.0 + 21.0, 2) * 0.5 + 0.5);
+    float profile = smoothstep(0.0, 0.10, u) * (1.0 - smoothstep(top - 0.30, top, u));
+    if (profile <= 0.0) {
+        return 0.0;
+    }
+
+    d *= 0.65 + 0.70 * (vcFbm(q / 12.0 + 11.2, 2) * 0.5 + 0.5);
 
     // Erosion, at four kilometres and at one, each faded out at the altitude where it stops being
     // more than a sub-pixel shimmer. Each on its own schedule: four kilometre detail is still worth
@@ -214,6 +237,20 @@ float vcDensity(vec3 p, float u, float cov) {
         d *= mix(1.0, saturate(1.9 * f2 - 0.25), nearB);
     }
     return saturate(d) * profile;
+}
+
+// Density for a shadow ray, in [0, 1]. Two octaves of the same shape field and the same cut, and
+// nothing else: the shadow term goes through a transmission curve that is not sensitive to the
+// fine structure, and a shadow ray that costs as much as a view sample doubles the price of the
+// whole march. Same field, same threshold, so a sample that is empty for the view is empty here.
+float vcDensityLight(vec3 p, float cov) {
+    if (cov <= 0.002) {
+        return 0.0;
+    }
+    vec3 q = p / u_kmToU;
+    float shape = vcFbm(vec3(q.x, q.y * 1.4, q.z) / 35.0 + 3.7, 2) * 0.5 + 0.5;
+    float floorv = 0.75 * pow(1.0 - cov, 1.6);
+    return saturate((shape - floorv) / max(1.0 - floorv, 1e-3));
 }
 
 // Optical depth from p towards the sun. `planetShadow` is 0 when the planet stands between the
@@ -234,10 +271,17 @@ float vcSunOpticalDepth(vec3 p, vec3 sunDir, float lod, out float planetShadow) 
     float tEnd = min(vcSphereIntersect(p, sunDir, u_cloudShell.z).y, thick * 4.0);
     float stepLen = max(tEnd, 1e-6) / float(VC_SUN_STEPS);
     float t = stepLen * 0.5;
+    // The optical depth is accumulated in kilometres and compared against a budget in kilometres:
+    // VC_SUN_OD_MAX / (VC_TAU / thick) is the depth at which the transmission has fallen below the
+    // point where the rest of the ray can be seen.
+    float odMax = VC_SUN_OD_MAX * thick / VC_TAU;
     float od = 0.0;
     for (int i = 0; i < VC_SUN_STEPS; i++) {
         vec3 q = p + sunDir * t;
-        od += vcDensity(q, (length(q) - u_cloudShell.x) / thick, vcCoverage(normalize(q), lod)) * stepLen;
+        od += vcDensityLight(q, vcCoverage(normalize(q), lod)) * stepLen;
+        if (od >= odMax) {
+            return od;
+        }
         t += stepLen;
     }
     return od;
@@ -321,7 +365,7 @@ void vcRender() {
     #endif // pointLightsFlag
 
     float rayLen = t1 - t0;
-    int nSteps = clamp(int(ceil(rayLen / max(thick * 0.16, 1e-12))), 12, VC_MAX_STEPS);
+    int nSteps = clamp(int(ceil(rayLen / max(thick * 0.33, 1e-12))), 8, VC_MAX_STEPS);
     float stepLen = rayLen / float(nSteps);
     // A grazing ray steps through the map every `stepLen`, which can be several texels: filter down
     // to the spacing of the samples, or the march aliases into grain along the limb.
