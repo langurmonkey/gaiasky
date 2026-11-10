@@ -143,7 +143,10 @@ public class ModelExtractor extends AbstractExtractSystem {
                         cloud.cloud != null &&
                         isInRender(render, RenderGroup.MODEL_PBR, RenderGroup.MODEL_PBR_TESS) &&
                         !coord.timeOverflow) {
-                    addToRender(render, RenderGroup.MODEL_CLOUD);
+                    // Volumetric clouds are a pass of their own, drawn before the atmosphere, and
+                    // they replace the shell rather than adding to it: the same shader draws either
+                    // the shell or the march, so drawing the body in both groups would draw it twice.
+                    addToRender(render, cloud.cloud.volumetric ? RenderGroup.MODEL_CLOUD_VOLUMETRIC : RenderGroup.MODEL_CLOUD);
                 }
             }
         }

@@ -44,23 +44,38 @@ in vec3 v_ambientLight;
 #include <shader/lib/luma.glsl>
 
 // CLOUD TEXTURE
+// fetchCloudColor picks its mip level from the derivatives of its argument, so it only works in
+// uniform control flow. fetchCloudColorLod takes the level explicitly, for the volumetric march,
+// where the number of iterations differs per fragment and the derivatives would be garbage.
 #if defined(svtIndirectionDiffuseTextureFlag)
 #include <shader/lib/svt.glsl>
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord));
+}
+vec4 fetchCloudColorLod(vec2 texCoord, float lod) {
+    return textureLod(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord), lod);
 }
 #elif defined(diffuseCubemapFlag)
 #include <shader/lib/cubemap.glsl>
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_diffuseCubemap, UVtoXYZ(texCoord));
 }
+vec4 fetchCloudColorLod(vec2 texCoord, float lod) {
+    return textureLod(u_diffuseCubemap, UVtoXYZ(texCoord), lod);
+}
 #elif defined(diffuseTextureFlag)
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_diffuseTexture, texCoord);
 }
+vec4 fetchCloudColorLod(vec2 texCoord, float lod) {
+    return textureLod(u_diffuseTexture, texCoord, lod);
+}
 #else
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return defaultValue;
+}
+vec4 fetchCloudColorLod(vec2 texCoord, float lod) {
+    return vec4(0.0);
 }
 #endif// diffuseCubemapFlag && diffuseTextureFlag
 
@@ -117,6 +132,12 @@ layout(location = 1) out vec4 layerBuffer;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
+// Volumetric clouds: marched between the planet surface and the shell, in place of the surface
+// shading below when the material asks for it (u_cloudVolumetric). See
+// assets/shader/cloud/volumetric.glsl and the cloud brief in notes/. Included unconditionally so
+// that every cloud shares one compiled program and the choice is a uniform, not a define.
+#include <shader/cloud/volumetric.glsl>
+
 float cloudLimbFade(vec3 viewDir, vec3 normal, float fadePixels) {
     // The rim value at the silhouette
     float rim = 1.0 - max(0.0001, dot(viewDir, normal));
@@ -132,6 +153,13 @@ float cloudLimbFade(vec3 viewDir, vec3 normal, float fadePixels) {
 }
 
 void main() {
+    // Volumetric path, when the cloud asked for it. It writes its own colour and alpha; the shell
+    // code below is the path for every body that did not opt in.
+    if (vcEnabled()) {
+        vcRender();
+        return;
+    }
+
     vec2 g_texCoord0 = v_texCoord0;
 
     vec4 cloud = fetchCloudColor(g_texCoord0, vec4(0.0, 0.0, 0.0, 0.0));

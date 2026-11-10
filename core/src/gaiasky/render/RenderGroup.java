@@ -166,6 +166,12 @@ public enum RenderGroup {
      **/
     BILLBOARD_STAR(5500),
     /**
+     * Volumetric clouds, raymarched. Drawn before the atmosphere, so that aerial perspective is
+     * applied on top of them rather than the other way round. See
+     * {@code gaiasky.scene.record.CloudComponent#volumetric}.
+     **/
+    MODEL_CLOUD_VOLUMETRIC(5900),
+    /**
      * Atmospheres of planets.
      **/
     MODEL_ATM(6000),

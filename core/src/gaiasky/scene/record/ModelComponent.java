@@ -1105,6 +1105,48 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
         }
     }
 
+    /**
+     * Writes the geometry of a volumetric cloud layer into the material, for
+     * {@code assets/shader/cloud/volumetric.glsl}. All four values are in internal units, in the
+     * object's frame: the march intersects the planet sphere and the shell there, because that is
+     * the frame {@code u_cameraPos} and {@code v_fragPosWorld} already live in.
+     *
+     * @param bodySize Diameter of the body the clouds belong to, in internal units.
+     * @param cloud    The cloud component. Its layer thickness, model radius and size are read, all
+     *                 of which place the layer.
+     */
+    public void updateCloudShell(double bodySize,
+                                 CloudComponent cloud) {
+        // body.size is a *diameter* in internal units (12742 km for Earth: the loader doubles the
+        // catalogue radius). The cloud model sphere, with "diameter": 2.0, has a radius of one model
+        // unit, so its world radius is the cloud size itself.
+        double planetRadius = bodySize * 0.5;
+        double thickness = Math.max(cloud.getVolumetricThickness(planetRadius), planetRadius * 1.0e-5);
+        double top = planetRadius + thickness;
+
+        // The proxy mesh has to enclose the layer, or the top of the volume gets no fragments at
+        // all and the clouds end at whatever the authored shell radius was. The authored cloud size
+        // is a shell a few kilometres above the surface, far below a layer worth marching, so the
+        // mesh is grown to the top of the layer here; the transform is rebuilt from cloud.size on
+        // the next frame.
+        double required = top / Math.max(cloud.modelRadius, 1e-3);
+        if (cloud.size < required) {
+            cloud.size = (float) required;
+        }
+
+        for (Material mat : instance.materials) {
+            Vector4Attribute a = (Vector4Attribute) mat.get(Vector4Attribute.CloudShell);
+            if (a == null) {
+                a = new Vector4Attribute(Vector4Attribute.CloudShell, new float[4]);
+                mat.set(a);
+            }
+            a.value[0] = (float) planetRadius;
+            a.value[1] = (float) planetRadius;
+            a.value[2] = (float) top;
+            a.value[3] = (float) thickness;
+        }
+    }
+
     public void updateRelativisticEffects(ICamera camera) {
         updateRelativisticEffects(camera, -1);
     }

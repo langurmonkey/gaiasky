@@ -13,6 +13,13 @@ import net.jafama.FastMath;
 public class Vector4Attribute extends Attribute {
     public static final String HtermsAlias = "hterms";
     public static final int Hterms = register(HtermsAlias);
+    /**
+     * Geometry of a volumetric cloud layer, in internal units in the cloud object's frame:
+     * {@code (planetRadius, layerBaseRadius, layerTopRadius, layerThickness)}. See
+     * {@code assets/shader/cloud/volumetric.glsl}.
+     **/
+    public static final String CloudShellAlias = "cloudShell";
+    public static final int CloudShell = register(CloudShellAlias);
     public float[] value;
 
     public Vector4Attribute(int index) {

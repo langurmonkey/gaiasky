@@ -449,6 +449,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     };
             case MODEL_CLOUD -> // MODEL CLOUDS
                     system = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
+            case MODEL_CLOUD_VOLUMETRIC -> // VOLUMETRIC CLOUDS (RAYMARCHED)
+                    // Same model batch as the shell: the march is a branch of the same shader on a
+                    // uniform, so there is no second program and no second batch.
+                    system = new ModelRenderer(this, MODEL_CLOUD_VOLUMETRIC, alphas, renderAssets.mbCloud);
             case MODEL_PBR_TRANSPARENT -> // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
                     system = new ModelRenderer(this, MODEL_PBR_TRANSPARENT, alphas, renderAssets.mbPBR);
             case LINE_LATE -> {

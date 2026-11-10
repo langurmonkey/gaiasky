@@ -589,7 +589,7 @@ public class ModelEntityRenderSystem {
         if (renderGroup == RenderGroup.MODEL_ATM) {
             // Atmosphere
             renderAtmosphere(entity, body, model, scaffolding, batch, atmosphere, sceneRenderer.alphas[ComponentType.Atmospheres.ordinal()], rc);
-        } else if (renderGroup == RenderGroup.MODEL_CLOUD) {
+        } else if (renderGroup == RenderGroup.MODEL_CLOUD || renderGroup == RenderGroup.MODEL_CLOUD_VOLUMETRIC) {
             // Clouds
             renderClouds(entity, base, model, cloud, batch, sceneRenderer.alphas[ComponentType.Clouds.ordinal()], t);
         } else {
@@ -659,13 +659,29 @@ public class ModelEntityRenderSystem {
                              double t) {
         // Update cull face depending on distance.
         var body = Mapper.body.get(entity);
-        cloud.cloud.updateCullFace(body.distToCamera);
+        if (!cloud.cloud.volumetric) {
+            cloud.cloud.updateCullFace(body.distToCamera);
+        }
         cloud.cloud.touch(model);
         ICamera cam = GaiaSky.instance.getICamera();
         cloud.cloud.mc.updateRelativisticEffects(cam);
         cloud.cloud.mc.updateBlendMode(alpha * base.opacity);
         cloud.cloud.mc.updateEclipsingBodyUniforms(entity);
         cloud.cloud.mc.updateCloudUniforms(body);
+
+        if (cloud.cloud.volumetric) {
+            // The march runs in the object's frame, and takes the camera as `camera - object`, the
+            // same construction the volume path uses (renderVolume).
+            focusView.setEntity(entity);
+            focusView.getPredictedPosition(v3b2, GaiaSky.instance.time, cam, true);
+            var camPos = v3b1.set(GaiaSky.instance.getCameraManager().getPos()).sub(v3b2).put(v3f1);
+            cloud.cloud.mc.updateCamPos(camPos);
+            cloud.cloud.mc.updateCloudShell(body.size, cloud.cloud);
+            // The proxy draws its far wall, which sits behind everything the clouds cover, so a
+            // depth test on it would reject exactly the pixels the volume belongs on, and there is
+            // nothing meaningful to write either. Occlusion is analytic, in the shader.
+            cloud.cloud.mc.depthTestDisable();
+        }
 
         batch.render(cloud.cloud.mc.instance, model.model.env);
     }

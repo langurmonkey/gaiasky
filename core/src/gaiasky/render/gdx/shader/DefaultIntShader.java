@@ -58,6 +58,9 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_simuTime;
     // Atmosphere and volumes
     public final int u_cameraPos;
+    // Volumetric clouds: (planetRadius, layerBaseRadius, layerTopRadius, layerThickness), internal units.
+    public final int u_cloudShell;
+    public final int u_cloudVolumetric;
     // VR
     public final int u_vrScale;
     public final int u_vrOffset;
@@ -319,6 +322,9 @@ public class DefaultIntShader extends BaseIntShader {
         u_vrOffset = register(Inputs.vrOffset, Setters.vrOffset);
         // Atmosphere and volumes
         u_cameraPos = register(Inputs.cameraPos, Setters.cameraPos);
+        // Volumetric clouds.
+        u_cloudShell = register(Inputs.cloudShell, Setters.cloudShell);
+        u_cloudVolumetric = register(Inputs.cloudVolumetric, Setters.cloudVolumetric);
         // Eclipses
         u_eclipseOutlines = register(Inputs.eclipseOutlines, Setters.eclipseOutlines);
         u_eclipsingBodyPos = register(Inputs.eclipsingBodyPos, Setters.eclipsingBodyPos);
@@ -1059,6 +1065,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform bones = new Uniform("u_bones");
 
         public final static Uniform cameraPos = new Uniform("u_cameraPos", Vector3Attribute.CameraPos);
+        public final static Uniform cloudShell = new Uniform("u_cloudShell", Vector4Attribute.CloudShell);
+        public final static Uniform cloudVolumetric = new Uniform("u_cloudVolumetric", FloatAttribute.CloudVolumetric);
 
         public final static Uniform eclipseOutlines = new Uniform("u_eclipseOutlines", IntAttribute.EclipseOutlines);
         public final static Uniform eclipsingBodyPos = new Uniform("u_eclipsingBodyPos", Vector3Attribute.EclipsingBodyPos);
@@ -1269,6 +1277,29 @@ public class DefaultIntShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 shader.set(inputID, tmpM.set(renderable.worldTransform).inv().transpose());
+            }
+        };
+        public final static Setter cloudVolumetric = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                // Absent means "not volumetric", so that clouds which do not opt in need not set it.
+                var a = (FloatAttribute) combinedAttributes.get(FloatAttribute.CloudVolumetric);
+                shader.set(inputID, a == null ? 0f : a.value);
+            }
+        };
+        public final static Setter cloudShell = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector4Attribute.CloudShell)) {
+                    float[] v = ((Vector4Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector4Attribute.CloudShell)))).value;
+                    shader.set(inputID, v[0], v[1], v[2], v[3]);
+                }
             }
         };
         public final static Setter cameraPos = new Setter() {
