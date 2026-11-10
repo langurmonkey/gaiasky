@@ -28,18 +28,18 @@
  */
 
 // Vertical optical depth of a fully covered column, relative to the layer thickness.
-#define VC_TAU 7.0
+#define VC_TAU 3.2
 // Dual-lobe Henyey-Greenstein.
 #define VC_G_FORWARD 0.60
 #define VC_G_BACK -0.25
 // Single-scattering albedo of the droplets.
 #define VC_ALBEDO 0.95
 // Cheap stand-in for multiple scattering: without it the thick parts read as grey smoke.
-#define VC_MULTIPLE_SCATTERING 0.50
+#define VC_MULTIPLE_SCATTERING 0.45
 // Ambient and sky light, so the night side is dark but not black and the underside of the layer
 // stays visible when the sun is on the other side.
-#define VC_AMBIENT 0.22
-#define VC_SKY_UNDERSIDE 0.50
+#define VC_AMBIENT 0.14
+#define VC_SKY_UNDERSIDE 0.32
 // Marching budget.
 #define VC_MAX_STEPS 24
 #define VC_SUN_STEPS 4
@@ -50,14 +50,18 @@
 // crosses dozens, and past the first few the column is already opaque.
 #define VC_MAX_PATH 8.0
 // Pedestal of the coverage map: cloud maps are drawn to be composited, so their background sits
-// above zero (0.07 for the Earth cubemap) and their clouds nowhere near one.
-#define VC_COVERAGE_BASE 0.06
-// Width of the cloud map, in texels, for picking a mip level (see vcCoverageLod). The maps in use
-// are 8192x4096 equirectangular, or a cubemap of six 2048x2048 faces, but what they *resolve* is
-// coarser: a satellite cloud composite is drawn down to a few tens of kilometres, and sampling it
-// texel by texel from orbit only adds grain. Half the width is the level where the map stops
-// carrying signal.
-#define VC_MAP_WIDTH 4096.0
+// above zero and their clouds nowhere near one. The Earth cubemap bottoms out at 0 and its clouds
+// peak at about 0.8. Leaving the pedestal in matters more than it looks: the march multiplies
+// coverage by the optical depth of a *full* column, so a 3 % pedestal over 95 km is already a tenth
+// of a unit of optical depth everywhere, and the whole layer becomes a grey veil over ground the map
+// says is clear.
+#define VC_COVERAGE_BASE 0.10
+// Width of the cloud map, in texels, expressed the equirectangular way: how many texels it takes to
+// go all the way round. A cubemap of six 2048x2048 faces resolves 2048 texels per 90 degrees, which
+// is the same angular resolution as an 8192x4096 equirectangular map, so both cases land here.
+// Getting this wrong by a factor of two costs one mip level, which close up is the difference
+// between a cloud and a smudge.
+#define VC_MAP_WIDTH 8192.0
 
 // (planetRadius, layerBaseRadius, layerTopRadius, thickness), in internal units, object frame.
 uniform vec4 u_cloudShell;
@@ -204,8 +208,21 @@ float vcDensity(vec3 p, float u, float cov) {
     // coverage does not: the blurred map has lost the high values that were doing the covering, and
     // the disc comes out either grainy or under-cast, never matching the map it came from.
     float floorv = 0.75 * pow(1.0 - cov, 1.6);
-    float dNear = saturate((shape - floorv) / max(1.0 - floorv, 1e-3));
-    float dFar = cov * (0.45 + 0.90 * shape);
+    // Gated by the coverage: the cut on its own is a property of the field, not of the weather, so
+    // without the gate the top quarter of the noise field is cloud over ground the map says is clear,
+    // which is a thin white wash over every desert close up. The gate only bites below a fifth of a
+    // column, so a well covered column still keeps the cut's holes and its ragged edges.
+    float gate = smoothstep(0.0, 0.20, cov);
+    float dNear = gate * saturate((shape - floorv) / max(1.0 - floorv, 1e-3));
+    // Far out the density is chosen so that the column comes out exactly as opaque as the coverage
+    // says it is: a tenth-covered column attenuates a tenth of the light, a fully covered one is
+    // opaque. The optical depth that does that is -log(1 - cov), so the mean density is that divided
+    // by VC_TAU, and the shape field is applied as a factor of mean one rather than as the density
+    // itself. Anything proportional to the coverage instead - cov times a constant - is too opaque at
+    // low coverage and too translucent at high, which is why a 10 % pedestal of the map used to read
+    // as a 30 % white veil over desert the map says is clear.
+    float tauTarget = -log(max(1.0 - cov, 0.004));
+    float dFar = (tauTarget / VC_TAU) * (0.50 + shape);
     float d = mix(dNear, dFar, vcFar);
     if (d <= 0.0) {
         return 0.0;
@@ -296,16 +313,55 @@ float vcHg(float mu, float g) {
 // Dual-lobe Henyey-Greenstein. A single forward lobe, used raw, is far too dark away from the
 // forward direction, which is why a single-scattering cloud reads brown; the wide backward lobe is
 // what makes clouds white when the sun is behind the camera, which is how they are seen from the
-// ground most of the time. The 3pi normalisation keeps a lit cloud just under white: at 4pi it
-// saturates and the shading disappears into a flat milky disc, and at 2pi the clouds read as a grey
-// veil over the surface.
+// ground most of the time.
+//
+// The normalisation is a fudge, and it has to be: a single forward lobe is a few hundredths of a
+// steradian wide, so, normalised to unit energy, it makes a cloud almost black except within a few
+// degrees of the sun. Real clouds are bright from everywhere because a photon scatters ten or twenty
+// times before it leaves, which this shader models with the crude term below rather than by tracing
+// it. The factor is set so that a lit top reads white against the planet, which is what the shell
+// path gives with the same map: at 3pi the two lobes left the disc a grey veil, and the earlier
+// experiment at 4pi looked washed out only because the sun direction was inverted.
 float vcPhase(float mu) {
-    return 3.0 * PI * (2.0 * vcHg(mu, VC_G_FORWARD) + vcHg(mu, VC_G_BACK));
+    return 5.0 * PI * (2.0 * vcHg(mu, VC_G_FORWARD) + vcHg(mu, VC_G_BACK));
 }
 
 // Whether the volumetric path is used for this fragment.
 bool vcEnabled() {
     return u_cloudVolumetric >= 0.5;
+}
+
+// Scene depth, so that real geometry in front of the layer clips the march instead of being painted
+// over: terrain that stands above the base of the layer, a nearer body, the surface itself when the
+// ray would otherwise run past it. Same pair of uniforms as the volume path
+// (TextureAttribute.VolumeSceneDepth and Vector2Attribute.VolumeDepthMaskScale), bound per frame
+// from the full-resolution buffer by ModelEntityRenderSystem.renderClouds. A scale of zero means
+// nothing is bound - the uniform is then never set - and no clipping happens.
+uniform sampler2D u_volumeSceneDepth;
+uniform vec2 u_volumeDepthMaskScale;
+
+// Distance along this fragment's ray at which the scene occludes the layer, or 0 if nothing does.
+//
+// The buffer stores logarithmic depth (see shader/lib/logdepthbuff.glsl): getDepthValue rebuilds
+// this fragment's own value from gl_FragCoord.w, exactly as the shell path writes it into
+// gl_FragDepth, so the two numbers compare like with like. Anything nearer than the far wall of the
+// proxy is nearer than everything the layer can cover, which is why the comparison is against the
+// wall and not against the entry point.
+float vcOcclusionDistance() {
+    if (u_volumeDepthMaskScale.x <= 0.0) {
+        return 0.0;
+    }
+    ivec2 texel = ivec2(gl_FragCoord.xy * u_volumeDepthMaskScale);
+    float scene = texelFetch(u_volumeSceneDepth, texel, 0).r;
+    float mine = getDepthValue(u_cameraNearFar.y, u_cameraK);
+    // 1e-5 is above the quantum of a 24-bit depth buffer.
+    if (!(scene < mine - 1.0e-5)) {
+        return 0.0;
+    }
+    // The buffer holds view depth; the march is parametrised by distance along the ray.
+    float viewDist = 1.0 / recoverWValue(scene, u_cameraNearFar.y, u_cameraK);
+    float rayScale = length(v_fragPosWorld - u_cameraPosition.xyz) * gl_FragCoord.w;
+    return viewDist * rayScale;
 }
 
 // Marches the layer and writes the fragment outputs. Straight alpha: the average radiance of the
@@ -324,7 +380,12 @@ void vcRender() {
 
     // Mip level for the map, before any discard: derivatives need the whole quad.
     float lod = vcCoverageLod(ro, rd, R1);
-    vcAlt = (length(u_cameraPosition.xyz) - R1) / thick;
+    // Camera altitude in layer thicknesses, from the ray origin in the object frame. Not from
+    // u_cameraPosition.xyz: that uniform carries the camera's position in the frame in which the
+    // camera is the origin, so it is zero for every fragment - which made every fragment read as
+    // "just above the layer", paying for kilometre-scale erosion from orbit and never switching over
+    // to the far-field shape field.
+    vcAlt = (length(ro) - R1) / thick;
     vcFar = smoothstep(3.0, 10.0, vcAlt);
 
     // Entry and exit of the volume. Expressly not the surface of the proxy mesh: the analytic sphere
@@ -342,6 +403,15 @@ void vcRender() {
     if (tPlanet.x > 0.0) {
         t1 = min(t1, tPlanet.x);
     }
+    // Stop at whatever the scene has already drawn nearer than the far wall, and give up entirely if
+    // that is in front of the layer: terrain above the base, a nearer body, another cloud layer.
+    float occl = vcOcclusionDistance();
+    if (occl > 0.0) {
+        if (occl <= t0) {
+            discard;
+        }
+        t1 = min(t1, occl);
+    }
     if (t1 <= t0) {
         discard;
     }
@@ -349,11 +419,18 @@ void vcRender() {
 
     // Sun. M1 uses the first directional light, which is the planet case; the point-light fallback
     // covers scenes where the star is a point light.
+    //
+    // u_dirLights[].direction is the direction the light *travels* - from the star towards the scene,
+    // as the PBR shader and the shell cloud shader both assume when they negate it. The vector the
+    // march needs points the other way, towards the sun: used unnegated it sent every shadow ray into
+    // the planet, so the whole lit hemisphere counted as eclipsed and only the ambient terms survived,
+    // and it flipped the sign of mu, evaluating the phase function in the wrong hemisphere. The
+    // point-light branch below is already a to-the-light vector and needs no negation.
     vec3 sunDir = vec3(0.0, 1.0, 0.0);
     vec3 sunCol = vec3(0.0);
     #ifdef directionalLightsFlag
     if (numDirectionalLights > 0) {
-        sunDir = normalize(transpose(rot) * u_dirLights[0].direction);
+        sunDir = normalize(transpose(rot) * (-u_dirLights[0].direction));
         sunCol = u_dirLights[0].color;
     }
     #endif // directionalLightsFlag
@@ -367,6 +444,17 @@ void vcRender() {
     float rayLen = t1 - t0;
     int nSteps = clamp(int(ceil(rayLen / max(thick * 0.33, 1e-12))), 8, VC_MAX_STEPS);
     float stepLen = rayLen / float(nSteps);
+
+    // Coverage, one fetch. Seen from orbit the layer is a sliver a couple of pixels thick, so the
+    // column over a pixel is the column where the ray crosses the top of the layer, and taking it
+    // there is not an approximation but the right answer - and a far smoother one than integrating it
+    // from eight samples spaced farther apart than the features of the map, which is what turned the
+    // disc into white sand. The single fetch is only wrong where the layer has depth on screen, and
+    // there the per-sample path below takes over; `vcFar` is a function of the camera, so the branch
+    // is coherent across the whole primitive.
+    float lodRay = lod;
+    float covRay = vcCoverage(normalize(ro + rd * t0), lodRay);
+
     // A grazing ray steps through the map every `stepLen`, which can be several texels: filter down
     // to the spacing of the samples, or the march aliases into grain along the limb.
     lod = max(lod, log2(max(stepLen / (2.0 * PI * R / VC_MAP_WIDTH), 1.0)));
@@ -387,8 +475,9 @@ void vcRender() {
             break;
         }
         vec3 p = ro + rd * t;
-        // Coverage at the sample's own place on the sphere, not once per ray.
-        float cov = vcCoverage(normalize(p), lod);
+        // Coverage at the sample's own place on the sphere when the layer has depth on screen, and
+        // the single entry fetch when it does not (see above).
+        float cov = vcFar > 0.5 ? covRay : vcCoverage(normalize(p), lod);
         float d = vcDensity(p, (length(p) - R) / thick, cov);
         if (d > 0.001) {
             float sigma = VC_TAU / thick * d;
@@ -398,7 +487,7 @@ void vcRender() {
             // The shadow ray reads the map one mip coarser than the view ray: the shadow term goes
             // through an exponential, so a 30 km wobble in the coverage along that ray turns into
             // per-pixel grain over the whole lit face.
-            float od = vcSunOpticalDepth(p, sunDir, lod + 1.0, planetShadow);
+            float od = vcSunOpticalDepth(p, sunDir, max(lod, lodRay) + 1.0, planetShadow);
             // Two-stream transmission, 1 / (1 + tau), rather than exp(-tau): a slab's diffuse
             // transmission falls steeply near a lit face and slowly deep inside, and the exponential
             // - which is all steepness - turns the same wobble into salt and pepper.

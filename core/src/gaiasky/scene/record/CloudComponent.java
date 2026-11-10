@@ -91,6 +91,9 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
      * The material component associated to the same model.
      **/
     public MaterialComponent materialComponent;
+    // Scene depth bound to the marched material, cached. See setSceneDepth().
+    private Texture sceneDepthTex;
+    private float sceneDepthScaleX, sceneDepthScaleY;
     // Cubemap.
     public CubemapComponent diffuseCubemap;
     // Virtual texture.
@@ -302,6 +305,34 @@ public final class CloudComponent extends NamedComponent implements IMaterialPro
                 ((IntAttribute) Objects.requireNonNull(material.get(IntAttribute.CullFace))).value = GL20.GL_NONE;
             }
         }
+    }
+
+    /**
+     * Binds the full-resolution scene depth to the marched material, so the march stops at whatever
+     * is already drawn in front of the layer. Attributes as the volume path uses them
+     * ({@link MaterialComponent#setVolumeDepthMask}): the depth in
+     * {@code TextureAttribute.VolumeSceneDepth}, the texels per fragment in
+     * {@code Vector2Attribute.VolumeDepthMaskScale}. Cached, because the attributes are set on the
+     * material and adding them every frame would recompile.
+     *
+     * @param scene  The scene depth texture.
+     * @param scaleX Mask texels per fragment, x. 1 for a full-resolution pass.
+     * @param scaleY Mask texels per fragment, y.
+     */
+    public void setSceneDepth(Texture scene,
+                              float scaleX,
+                              float scaleY) {
+        if (material == null || scene == null) {
+            return;
+        }
+        if (scene == sceneDepthTex && scaleX == sceneDepthScaleX && scaleY == sceneDepthScaleY) {
+            return;
+        }
+        sceneDepthTex = scene;
+        sceneDepthScaleX = scaleX;
+        sceneDepthScaleY = scaleY;
+        material.set(new TextureAttribute(TextureAttribute.VolumeSceneDepth, scene));
+        material.set(new Vector2Attribute(Vector2Attribute.VolumeDepthMaskScale, new Vector2(scaleX, scaleY)));
     }
 
     public void initMaterial(Model model) {

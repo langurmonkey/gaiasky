@@ -206,7 +206,7 @@ public class SVTRenderPass extends RenderPass {
                 var m = Mapper.model.get(e);
                 var c = Mapper.cloud.get(e);
                 if (c.cloud.hasSVT()) {
-                    sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPBRSvtDetection, 1f, 0);
+                    sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPBRSvtDetection, 1f, 0, null);
                     rendered++;
                 }
             }

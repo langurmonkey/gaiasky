@@ -591,7 +591,7 @@ public class ModelEntityRenderSystem {
             renderAtmosphere(entity, body, model, scaffolding, batch, atmosphere, sceneRenderer.alphas[ComponentType.Atmospheres.ordinal()], rc);
         } else if (renderGroup == RenderGroup.MODEL_CLOUD || renderGroup == RenderGroup.MODEL_CLOUD_VOLUMETRIC) {
             // Clouds
-            renderClouds(entity, base, model, cloud, batch, sceneRenderer.alphas[ComponentType.Clouds.ordinal()], t);
+            renderClouds(entity, base, model, cloud, batch, sceneRenderer.alphas[ComponentType.Clouds.ordinal()], t, rc);
         } else {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
@@ -656,7 +656,8 @@ public class ModelEntityRenderSystem {
                              Cloud cloud,
                              IntModelBatch batch,
                              float alpha,
-                             double t) {
+                             double t,
+                             RenderingContext rc) {
         // Update cull face depending on distance.
         var body = Mapper.body.get(entity);
         if (!cloud.cloud.volumetric) {
@@ -679,11 +680,36 @@ public class ModelEntityRenderSystem {
             cloud.cloud.mc.updateCloudShell(body.size, cloud.cloud);
             // The proxy draws its far wall, which sits behind everything the clouds cover, so a
             // depth test on it would reject exactly the pixels the volume belongs on, and there is
-            // nothing meaningful to write either. Occlusion is analytic, in the shader.
+            // nothing meaningful to write either. Occlusion is done in the shader instead: against
+            // the planet sphere analytically, and against the scene depth, which is bound here from
+            // the full-resolution buffer so that terrain standing above the base of the layer, a
+            // nearer body or anything else already drawn clips the march.
             cloud.cloud.mc.depthTestDisable();
+            Texture sceneDepth = sceneDepthTexture(rc);
+            if (sceneDepth != null) {
+                // The cloud pass runs at full resolution, so one texel per fragment.
+                cloud.cloud.setSceneDepth(sceneDepth, 1f, 1f);
+            }
         }
 
         batch.render(cloud.cloud.mc.instance, model.model.env);
+    }
+
+    /**
+     * The depth buffer of the full-resolution pass, which holds everything drawn so far this frame.
+     *
+     * @param rc The rendering context, may be null for passes that draw off-screen (e.g. the SVT
+     *           detection pass), in which case there is no scene depth to clip against.
+     *
+     * @return The depth texture, or null when unavailable.
+     */
+    private Texture sceneDepthTexture(RenderingContext rc) {
+        var pingPong = rc != null && rc.ppb != null ? rc.ppb.pp : null;
+        if (pingPong == null || pingPong.getCombinedBuffer() == null) {
+            return null;
+        }
+        var full = pingPong.getCombinedBuffer().getFullBuffer();
+        return full == null ? null : full.getDepthBufferTexture();
     }
 
     /**
