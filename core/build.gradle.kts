@@ -116,8 +116,8 @@ tasks.withType<Javadoc>().configureEach {
     destinationDir = layout.buildDirectory.dir("docs/javadoc").get().asFile
     val options = options as StandardJavadocDocletOptions
     options.docTitle = "Gaia Sky Javadoc"
-    options.header = "<strong><a href='https://gaiasky.space'>Gaia Sky</a></strong> | <a href='http://docs.gaiasky.space'>docs</a> | <a href='https://codeberg.org/gaiasky/'>source</a> "
-    options.bottom = "<a href='https://gaiasky.space'>Gaia Sky website</a> | <a href='http://docs.gaiasky.space'>Project documentation</a> | <a href='https://codeberg.org/gaiasky/'>Code repository</a>"
+    options.header = "<strong><a href='https://gaiasky.space'>Gaia Sky</a></strong> | <a href='https://docs.gaiasky.space'>docs</a> | <a href='https://codeberg.org/gaiasky/'>source</a> "
+    options.bottom = "<a href='https://gaiasky.space'>Gaia Sky website</a> | <a href='https://docs.gaiasky.space'>Project documentation</a> | <a href='https://codeberg.org/gaiasky/'>Code repository</a>"
     options.windowTitle = "Gaia Sky Javadoc"
 }
 

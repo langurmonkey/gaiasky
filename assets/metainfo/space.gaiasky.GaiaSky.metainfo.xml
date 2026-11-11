@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>space.gaiasky.GaiaSky</id>
   <url type="homepage">https://gaiasky.space</url>
-  <url type="help">http://docs.gaiasky.space</url>
+  <url type="help">https://docs.gaiasky.space</url>
   <url type="bugtracker">https://codeberg.org/gaiasky/gaiasky/issues</url>
 
   <branding>
