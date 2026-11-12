@@ -36,7 +36,7 @@ public class OrbitComponent {
     public double i;
     /**
      * The reference plane the elements are expressed in. Defaults to {@link OrbitReference#INHERITED},
-     * which keeps the historical behaviour of deriving it from the trajectory's transform function or
+     * which keeps the historical behavior of deriving it from the trajectory's transform function or
      * the parent's orientation.
      **/
     public OrbitReference reference = OrbitReference.INHERITED;
