@@ -36,6 +36,12 @@ public class Trajectory implements Component {
     public Vector3D curr;
     public double alpha;
     public Matrix4D localTransformD = new Matrix4D();
+    /**
+     * Resolved reference frame for trajectories whose orbital elements declare their reference plane
+     * explicitly (see {@link gaiasky.scene.record.OrbitComponent#reference}). Null when not computed
+     * yet, and unused for the inherited reference. The plane is constant, so it is resolved once.
+     **/
+    public Matrix4D referenceFrame;
     public String provider;
     public Double multiplier = 1.0d;
     public Class<? extends IOrbitDataProvider> providerClass;

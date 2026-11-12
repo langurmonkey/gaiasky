@@ -10,6 +10,7 @@ package gaiasky.scene.record;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.KeplerianElements;
+import gaiasky.util.coord.OrbitReference;
 import gaiasky.util.math.Vector3D;
 import net.jafama.FastMath;
 
@@ -33,6 +34,18 @@ public class OrbitComponent {
     public double e;
     /** Inclination, angle between the reference plane and the orbital plane, in degrees. **/
     public double i;
+    /**
+     * The reference plane the elements are expressed in. Defaults to {@link OrbitReference#INHERITED},
+     * which keeps the historical behaviour of deriving it from the trajectory's transform function or
+     * the parent's orientation.
+     **/
+    public OrbitReference reference = OrbitReference.INHERITED;
+    /**
+     * Optional explicit pole of the reference plane, as {right ascension, declination} in degrees.
+     * Overrides the pole that {@link #reference} would derive, and is the only way to express a
+     * {@link OrbitReference#LAPLACE} plane, which cannot be derived from the parent.
+     **/
+    public double[] referencePole;
     /** Longitude of the ascending node in degrees. **/
     public double ascendingNode;
     /** Argument of perihelion in degrees. **/
@@ -74,6 +87,44 @@ public class OrbitComponent {
 
     public void setInclination(Double i) {
         this.i = i;
+    }
+
+    /**
+     * Sets the reference plane of the elements from its name.
+     *
+     * @param reference One of INHERITED (default), PARENT_EQUATOR, PARENT_ORBITAL_PLANE, ECLIPTIC
+     *                  or LAPLACE, case-insensitive. Unknown values are reported and leave the
+     *                  reference untouched.
+     */
+    public void setReference(String reference) {
+        var r = OrbitReference.fromString(reference);
+        if (r == null) {
+            logger.warn("Unknown orbit reference '" + reference + "'. Valid values are INHERITED, "
+                                + "PARENT_EQUATOR, PARENT_ORBITAL_PLANE, ECLIPTIC and LAPLACE. Keeping " + this.reference + ".");
+        } else {
+            this.reference = r;
+        }
+    }
+
+    public void setReference(OrbitReference reference) {
+        this.reference = reference != null ? reference : OrbitReference.INHERITED;
+    }
+
+    /**
+     * Sets the explicit pole of the reference plane.
+     *
+     * @param pole Right ascension and declination of the pole, in degrees.
+     */
+    public void setReferencePole(double[] pole) {
+        this.referencePole = pole;
+    }
+
+    /**
+     * Whether the elements declare their reference plane explicitly, in which case the transform
+     * function and the parent's orientation are not used.
+     */
+    public boolean hasExplicitReference() {
+        return reference != null && reference != OrbitReference.INHERITED;
     }
 
     public void setAscendingNode(Double ascendingNode) {

@@ -19,6 +19,7 @@ import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.OrbitFrames;
 import gaiasky.util.math.Matrix4D;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -112,11 +113,16 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
 
         graph.translation.setToTranslation(localTransformD);
         if (trajectory.newMethod) {
-            if (transformFunction != null) {
-                localTransformD.mul(transformFunction);
-            }
-            if (transformFunction == null && parentGraph != null && parentGraph.orientation != null) {
-                localTransformD.mul(parentGraph.orientation);
+            var frame = explicitReferenceFrame(trajectory, graph);
+            if (frame != null) {
+                localTransformD.mul(frame);
+            } else {
+                if (transformFunction != null) {
+                    localTransformD.mul(transformFunction);
+                }
+                if (transformFunction == null && parentGraph != null && parentGraph.orientation != null) {
+                    localTransformD.mul(parentGraph.orientation);
+                }
             }
             if (trajectory.model.isExtrasolar()) {
                 localTransformD.rotate(0, 1, 0, 90);
@@ -124,15 +130,42 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         } else if (trajectory.oc != null) {
             OrbitComponent oc = trajectory.oc;
 
-            if (transformFunction == null && parentGraph != null && parentGraph.orientation != null)
-                localTransformD.mul(parentGraph.orientation);
-            if (transformFunction != null)
-                localTransformD.mul(transformFunction);
+            var frame = explicitReferenceFrame(trajectory, graph);
+            if (frame != null) {
+                localTransformD.mul(frame);
+            } else {
+                if (transformFunction == null && parentGraph != null && parentGraph.orientation != null)
+                    localTransformD.mul(parentGraph.orientation);
+                if (transformFunction != null)
+                    localTransformD.mul(transformFunction);
+            }
 
             localTransformD.rotate(0, 1, 0, oc.argOfPericenter)
                     .rotate(0, 0, 1, oc.i)
                     .rotate(0, 1, 0, oc.ascendingNode);
         }
         localTransformD.putIn(graph.localTransform);
+    }
+
+    /**
+     * Resolves and caches the reference frame of a trajectory whose elements name their reference
+     * plane explicitly. Returns null when the elements inherit their frame, in which case the caller
+     * keeps using the transform function and the parent's orientation.
+     * <p>
+     * The frame is resolved at the epoch of the elements, J2000, and cached: it depends on the pole of
+     * a plane, which does not move over the timescales of the scene.
+     */
+    private Matrix4D explicitReferenceFrame(Trajectory trajectory,
+                                            GraphNode graph) {
+        if (trajectory.oc == null || !trajectory.oc.hasExplicitReference()) {
+            return null;
+        }
+        if (trajectory.referenceFrame == null) {
+            trajectory.referenceFrame = OrbitFrames.resolve(trajectory.oc,
+                                                            graph.parent,
+                                                            Instant.ofEpochMilli(AstroUtils.J2000_MS),
+                                                            new Matrix4D());
+        }
+        return trajectory.referenceFrame;
     }
 }

@@ -37,15 +37,12 @@ public class MeshBookkeepingTest {
         protected void initVertices() {
         }
 
-        @Override
         protected void addAttributesDivisor1(Array<VertexAttribute> attributes, int primitive) {
         }
 
-        @Override
         protected void offsets0(MeshData curr, InstancedRenderSystem.InstancedModel model) {
         }
 
-        @Override
         protected void offsets1(MeshData curr, InstancedRenderSystem.InstancedModel model) {
         }
 

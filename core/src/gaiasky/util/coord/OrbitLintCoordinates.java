@@ -25,6 +25,8 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     OrbitComponent orbitalParams;
     PointCloudData data;
     Matrix4D transform;
+    /** Resolved reference frame for elements that declare their own reference plane. **/
+    Matrix4D referenceFrame;
     Vector3D aux = new Vector3D();
 
     public OrbitLintCoordinates() {
@@ -97,7 +99,17 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         Matrix4D transformFunction = getTransformFunction();
         Matrix4D parentOrientation = getParentOrientation();
 
-        if (transformFunction == null && parentOrientation != null) {
+        if (orbitalParams.hasExplicitReference()) {
+            // The elements name their own reference plane: resolve it once and use it, ignoring the
+            // transform function and the parent's orientation.
+            if (referenceFrame == null) {
+                referenceFrame = OrbitFrames.resolve(orbitalParams,
+                                                     entity != null ? Mapper.graph.get(entity).parent : null,
+                                                     Instant.ofEpochMilli(AstroUtils.J2000_MS),
+                                                     new Matrix4D());
+            }
+            transform.set(referenceFrame);
+        } else if (transformFunction == null && parentOrientation != null) {
             transform.set(parentOrientation);
         } else if (transformFunction != null) {
             transform.set(transformFunction);
