@@ -131,11 +131,7 @@ public final class OrbitFrames {
         var rc = orientation != null ? orientation.rotationComponent : null;
         if (rc != null) {
             var scaffolding = Mapper.modelScaffolding.get(parent);
-            var refPlane = Coordinates.getTransformD(scaffolding != null ? scaffolding.refPlaneTransform : null);
-            var m = new Matrix4D().idt()
-                    .rotate(0, 1, 0, (float) rc.ascendingNode)
-                    .mul(refPlane)
-                    .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
+            var m = rc.getOrientation(scaffolding != null ? scaffolding.refPlaneTransform : null, new Matrix4D());
             return pole.set(0, 1, 0).mul(m).nor();
         }
         // No rotation model: fall back to the orientation of the parent, which for a body without

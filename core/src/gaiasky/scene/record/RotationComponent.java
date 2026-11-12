@@ -10,7 +10,12 @@ package gaiasky.scene.record;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.OrbitFrames;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.time.ITimeFrameProvider;
+
+import java.util.Arrays;
 
 public class RotationComponent implements IUpdatable<RotationComponent> {
     /**
@@ -41,6 +46,14 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
      * The meridian (hour) angle at the epoch J2000.0, in degrees
      **/
     public double meridianAngle;
+    /**
+     * Pole of the rotation axis, as {right ascension, declination} in degrees in the equatorial frame
+     * of J2000. When present it supersedes {@link #ascendingNode}, {@link #inclination} and
+     * {@link #axialTilt}, and the body is oriented straight from the published pole. Note that the
+     * pole carries the sense of the rotation: a retrograde body has a negative {@link #period} about
+     * its north pole, rather than the opposite pole and a positive period.
+     **/
+    public double[] pole;
 
     public RotationComponent() {
         this.angle = 0;
@@ -136,28 +149,73 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
         setMeridianAngle(ma);
     }
 
+    /**
+     * Sets the pole of the rotation axis.
+     *
+     * @param pole Right ascension and declination of the pole, in degrees, in the equatorial frame of
+     *             J2000.
+     */
+    public void setPole(double[] pole) {
+        this.pole = pole != null && pole.length >= 2 ? new double[]{pole[0], pole[1]} : null;
+    }
+
+    /**
+     * Whether the body declares its rotation pole explicitly, in which case the ascending node, the
+     * inclination and the axial tilt are not used.
+     */
+    public boolean hasExplicitPole() {
+        return pole != null && pole.length >= 2;
+    }
+
+    /**
+     * Builds the orientation of the body, the matrix that takes its local axes into the equatorial
+     * frame of the scene. The Y axis of the result is the rotation axis of the body.
+     *
+     * @param refPlaneTransform Name of the reference-plane transform of the body, only used when no
+     *                          explicit pole is given.
+     * @param out               The matrix to write the result into.
+     *
+     * @return The output matrix.
+     */
+    public Matrix4D getOrientation(String refPlaneTransform, Matrix4D out) {
+        if (hasExplicitPole()) {
+            // The pole is given in the equatorial frame already, so the reference plane of the body
+            // plays no part: it only ever mattered to reach that frame from the orbital one.
+            return OrbitFrames.fromPole(pole[0], pole[1], out);
+        }
+        return out.idt()
+                .rotate(0, 1, 0, (float) ascendingNode)
+                .mul(Coordinates.getTransformD(refPlaneTransform))
+                .rotate(0, 0, 1, (float) (inclination + axialTilt));
+    }
+
     @Override
     public String toString() {
-        return "{" + "angVel=" + angularVelocity + ", angle=" + angle + ", period=" + period + ", axialTilt=" + axialTilt + ", inclination=" + inclination + ", ascendingNode=" + ascendingNode + ", meridianAngle=" + meridianAngle + '}';
+        return "{" + "angVel=" + angularVelocity + ", angle=" + angle + ", period=" + period + ", axialTilt=" + axialTilt + ", inclination=" + inclination + ", ascendingNode=" + ascendingNode + ", meridianAngle=" + meridianAngle + ", pole=" + Arrays.toString(pole) + '}';
     }
 
     public void copyFrom(RotationComponent other) {
-        if (other.period > 0) {
+        if (other.pole != null) {
+            this.pole = other.pole.clone();
+        }
+        // Unset fields are zero, so only zero is left alone. Anything else, including the negative
+        // period of a retrograde body, is copied.
+        if (other.period != 0) {
             this.period = other.period;
         }
-        if (other.angularVelocity > 0) {
+        if (other.angularVelocity != 0) {
             this.angularVelocity = other.angularVelocity;
         }
-        if (other.axialTilt > 0) {
+        if (other.axialTilt != 0) {
             this.axialTilt = other.axialTilt;
         }
-        if (other.inclination > 0) {
+        if (other.inclination != 0) {
             this.inclination = other.inclination;
         }
-        if (other.ascendingNode > 0) {
+        if (other.ascendingNode != 0) {
             this.ascendingNode = other.ascendingNode;
         }
-        if (other.meridianAngle > 0) {
+        if (other.meridianAngle != 0) {
             this.meridianAngle = other.meridianAngle;
         }
     }
@@ -176,6 +234,7 @@ public class RotationComponent implements IUpdatable<RotationComponent> {
         clone.inclination = inclination;
         clone.meridianAngle = meridianAngle;
         clone.period = period;
+        clone.pole = pole != null ? pole.clone() : null;
         return clone;
     }
 }

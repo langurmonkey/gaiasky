@@ -29,6 +29,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Matrix4D;
 import gaiasky.util.math.Vector3D;
 import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
@@ -66,6 +67,8 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
     Vector3 aux;
     Vector3D aux3, aux1;
+    /** Scratch matrix, for the orientation of bodies that declare their pole. **/
+    private final Matrix4D auxM = new Matrix4D();
 
     public AtmosphereComponent() {
         localTransform = new Matrix4();
@@ -206,6 +209,29 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
     }
 
     /**
+     * Maps a vector from the scene frame into the frame of the rotating body, which is what the
+     * scattering shader needs when the camera sits on the ground.
+     *
+     * @param v                         The vector to transform in place.
+     * @param rc                        The rotation component of the body.
+     * @param inverseRefPlaneTransform  Name of the inverse reference-plane transform of the body.
+     */
+    private void toPlanetFrame(Vector3D v,
+                               RotationComponent rc,
+                               String inverseRefPlaneTransform) {
+        if (rc.hasExplicitPole()) {
+            // Inverse of the orientation the model updater builds from the pole, then the spin.
+            rc.getOrientation(null, auxM).inv();
+            v.mul(auxM).rotate(-rc.angle, 0, 1, 0);
+        } else {
+            v.rotate(-rc.ascendingNode, 0, 1, 0)
+                    .mul(Coordinates.getTransformD(inverseRefPlaneTransform))
+                    .rotate(-rc.inclination - rc.axialTilt, 0, 0, 1)
+                    .rotate(-rc.angle, 0, 1, 0);
+        }
+    }
+
+    /**
      * Updates the atmospheric scattering shader parameters.
      *
      * @param mat           The material to update.
@@ -300,10 +326,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         // Planet position
         if (ground && rc != null) {
             // Camera position must be corrected using the rotation angle of the planet
-            aux3.rotate(-rc.ascendingNode, 0, 1, 0)
-                    .mul(Coordinates.getTransformD(inverseRefPlaneTransform))
-                    .rotate(-rc.inclination - rc.axialTilt, 0, 0, 1)
-                    .rotate(-rc.angle, 0, 1, 0);
+            toPlanetFrame(aux3, rc, inverseRefPlaneTransform);
         }
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.PlanetPos))).value.set(aux3.put(aux));
         // CameraPos = -PlanetPos
@@ -319,10 +342,7 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
         aux3.nor();
         if (ground && rc != null) {
             // Camera position must be corrected using the rotation angle of the planet
-            aux3.rotate(-rc.ascendingNode, 0, 1, 0)
-                    .mul(Coordinates.getTransformD(inverseRefPlaneTransform))
-                    .rotate(-rc.inclination - rc.axialTilt, 0, 0, 1)
-                    .rotate(-rc.angle, 0, 1, 0);
+            toPlanetFrame(aux3, rc, inverseRefPlaneTransform);
         }
         ((Vector3Attribute) Objects.requireNonNull(mat.get(Vector3Attribute.LightPos))).value.set(aux3.put(aux));
 

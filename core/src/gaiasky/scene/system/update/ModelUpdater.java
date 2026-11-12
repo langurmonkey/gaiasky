@@ -215,15 +215,23 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
             } else if (rigidRotation != null) {
                 // Planets and moons have rotation components
-                graph.translation.setToTranslation(localTransform)
-                        .scl(size * sizeFactor)
-                        .rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
-                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
-                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt))
-                        .rotate(0, 1, 0, (float) rigidRotation.angle);
-                graph.orientation.idt().rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
-                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
-                        .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt));
+                graph.translation.setToTranslation(localTransform);
+                if (rigidRotation.hasExplicitPole()) {
+                    // The orientation comes straight from the pole, so the legacy triple of node,
+                    // reference plane and tilt plays no part.
+                    graph.orientation.set(rigidRotation.getOrientation(scaffolding.refPlaneTransform, MD4));
+                    localTransform.scl(size * sizeFactor)
+                            .mul(MD4.rotate(0, 1, 0, (float) rigidRotation.angle).putIn(MF4));
+                } else {
+                    localTransform.scl(size * sizeFactor)
+                            .rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
+                            .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
+                            .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt))
+                            .rotate(0, 1, 0, (float) rigidRotation.angle);
+                    graph.orientation.idt().rotate(0, 1, 0, (float) rigidRotation.ascendingNode)
+                            .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
+                            .rotate(0, 0, 1, (float) (rigidRotation.inclination + rigidRotation.axialTilt));
+                }
             } else {
                 // The rest of bodies are just sitting there, in their reference system
                 graph.translation.setToTranslation(localTransform)
