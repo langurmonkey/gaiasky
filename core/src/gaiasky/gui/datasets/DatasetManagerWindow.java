@@ -14,11 +14,8 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -69,9 +66,10 @@ public class DatasetManagerWindow extends GenericDialog {
     private final List<Map<String, Button>> buttonMap;
     private final List<Pair<Dataset, Actor>> selectionOrder;
     private final Color highlight;
+    /** Current filter. **/
+    private OwnTextField filter;
     /** Whether to show the data location file picker. **/
     private final boolean dataLocation;
-    private final DecimalFormat nf;
     /** The download service, which contains the actual download pipeline. **/
     private DatasetDownloadService downloadService;
     private final Set<DatasetWatcher> watchers;
@@ -106,7 +104,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                                                                  serverDd.numUpdates) : ""),
               skin,
               stage);
-        this.nf = new DecimalFormat("##0.0");
+        DecimalFormat nf = new DecimalFormat("##0.0");
         this.serverDd = serverDd;
         this.highlight = ColorUtils.gYellowC;
         this.watchers = new HashSet<>();
@@ -365,7 +363,7 @@ public class DatasetManagerWindow extends GenericDialog {
         var leftContent = new Table(skin);
         var leftTable = new Table(skin);
 
-        var filter = new OwnTextField("", skin, "big");
+        filter = new OwnTextField("", skin, "big");
         filter.setMessageText(I18n.msg("gui.filter"));
         filter.setWidth(width * 0.5f);
         filter.addListener(new ChangeListener() {
@@ -1346,6 +1344,29 @@ public class DatasetManagerWindow extends GenericDialog {
 
     @Override
     protected void cancel() {
+    }
+
+    @Override
+    public GenericDialog show(Stage stage,
+                              Action action) {
+        var gd = super.show(stage, action);
+
+        // Set focus to filter.
+        if (filter != null) {
+            stage.setKeyboardFocus(filter);
+        }
+        return gd;
+    }
+
+    @Override
+    public GenericDialog show(Stage stage) {
+        var gd = super.show(stage);
+
+        // Set focus to filter.
+        if (filter != null) {
+            stage.setKeyboardFocus(filter);
+        }
+        return gd;
     }
 
     @Override
