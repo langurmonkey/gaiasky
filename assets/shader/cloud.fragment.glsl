@@ -132,12 +132,6 @@ layout(location = 1) out vec4 layerBuffer;
 #include <shader/lib/ssr.frag.glsl>
 #endif // ssrFlag
 
-// Volumetric clouds: marched between the planet surface and the shell, in place of the surface
-// shading below when the material asks for it (u_cloudVolumetric). See
-// assets/shader/cloud/volumetric.glsl and the cloud brief in notes/. Included unconditionally so
-// that every cloud shares one compiled program and the choice is a uniform, not a define.
-#include <shader/cloud/volumetric.glsl>
-
 float cloudLimbFade(vec3 viewDir, vec3 normal, float fadePixels) {
     // The rim value at the silhouette
     float rim = 1.0 - max(0.0001, dot(viewDir, normal));
@@ -151,6 +145,13 @@ float cloudLimbFade(vec3 viewDir, vec3 normal, float fadePixels) {
 
     return factor;
 }
+
+// Volumetric clouds: marched between the planet surface and the shell, in place of the surface
+// shading below when the material asks for it (u_cloudVolumetric). See
+// assets/shader/cloud/volumetric.glsl and the cloud brief in notes/. Included unconditionally so
+// that every cloud shares one compiled program and the choice is a uniform, not a define. It comes
+// after cloudLimbFade(), which the far-field end of its transition reuses.
+#include <shader/cloud/volumetric.glsl>
 
 void main() {
     // Volumetric path, when the cloud asked for it. It writes its own colour and alpha; the shell
@@ -167,12 +168,15 @@ void main() {
 
     // Eclipses
     #ifdef eclipsingBodyFlag
-        vec3 lightDirection;
-        if (any(notEqual(u_dirLights[0].color, vec3(0.0)))) {
-            lightDirection = -u_dirLights[0].direction;
-        } else {
+        // Guarded per light type: with point lights only, u_dirLights does not exist.
+        #ifdef directionalLightsFlag
+        vec3 lightDirection = -u_dirLights[0].direction;
+        if (all(equal(u_dirLights[0].color, vec3(0.0)))) {
             lightDirection = normalize(u_pointLights[0].position - v_fragPosWorld);
         }
+        #else
+        vec3 lightDirection = normalize(u_pointLights[0].position - v_fragPosWorld);
+        #endif // directionalLightsFlag
         float eclshdw;
         vec3 diffractionTint;
         int outline;
