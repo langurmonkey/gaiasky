@@ -198,10 +198,8 @@ public class TLEParser {
         final double secondsPerDay = 86400.0;
         double meanMotionRadPerSec = 2.0 * Math.PI * meanMotion / secondsPerDay;
 
-        // Kepler's Third Law
-        double semiMajorAxis = Math.cbrt(mu / (meanMotionRadPerSec * meanMotionRadPerSec));
-
-        return semiMajorAxis;
+        // Kepler's Third Law, semi-major axis.
+        return Math.cbrt(mu / (meanMotionRadPerSec * meanMotionRadPerSec));
     }
 
     /**
@@ -214,12 +212,10 @@ public class TLEParser {
     private double parseEpoch(String epoch) {
         int year = Integer.parseInt(epoch.substring(0, 2));
         double day = Double.parseDouble(epoch.substring(2));
-
         // Per TLE standard, 00-56 => 2000+, 57-99 => 1900+
         year += (year < 57) ? 2000 : 1900;
-
         var jd = AstroUtils.getJulianDateUTC(year, 1, 1, 0, 0, 0, 0);
-
-        return jd + day;
+        // TLE day-of-year is 1-based: day 1.0 is Jan 1 00:00. Hence, we need to subtract one.
+        return jd + (day - 1.0);
     }
 }
