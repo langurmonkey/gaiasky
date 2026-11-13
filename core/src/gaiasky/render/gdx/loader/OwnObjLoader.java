@@ -179,13 +179,25 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
 
         IntModelData data = new IntModelData();
 
+        // Centre of the whole file, used to project texture coordinates for groups
+        // that have none. Shared by all groups so that they map coherently.
+        float[] centre = modelCentre();
+
         for (int g = 0; g < numGroups; g++) {
             Group group = groups.get(g);
             IntArray faces = group.faces;
             int numElements = faces.size;
             int numFaces = group.numFaces;
             boolean hasNorms = group.hasNorms;
-            boolean hasUVs = group.hasUVs;
+            // A mesh without texture coordinates cannot be textured: the vertex
+            // buffer would be built without a_texCoord0, the attribute would stay at
+            // its default and every fragment of the group would sample the same texel
+            // of whatever texture gets attached later. When the file has no vt
+            // entries, project spherical coordinates instead, so that a material
+            // supplied from outside (see ModelComponent.setMaterial) has somewhere to
+            // land.
+            boolean generateUVs = !group.hasUVs;
+            boolean hasUVs = group.hasUVs || generateUVs;
             // Normals computed in-loader (no vn entries in the file) are
             // indexed by vertex index, not by a normal index in the face.
             float[] computedNormals = group.computedNormals;
@@ -213,10 +225,21 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
                     }
                 }
                 if (hasUVs) {
-                    int uvIndex = faces.get(i++) * 2;
-                    finalVerts[vi++] = uvs.get(uvIndex++);
-                    finalVerts[vi++] = uvs.get(uvIndex);
+                    if (generateUVs) {
+                        // There is no uv index in the face data of this group.
+                        int v3 = vertIdx * 3;
+                        finalVerts[vi++] = sphericalU(verts.get(v3), verts.get(v3 + 2), centre);
+                        finalVerts[vi++] = sphericalV(verts.get(v3), verts.get(v3 + 1), verts.get(v3 + 2), centre);
+                    } else {
+                        int uvIndex = faces.get(i++) * 2;
+                        finalVerts[vi++] = uvs.get(uvIndex++);
+                        finalVerts[vi++] = uvs.get(uvIndex);
+                    }
                 }
+            }
+
+            if (generateUVs) {
+                fixSeam(finalVerts, numFaces, hasNorms);
             }
 
             int numIndices = numFaces * 3 >= Integer.MAX_VALUE ? 0 : numFaces * 3;
@@ -278,6 +301,99 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             groups.clear();
 
         return data;
+    }
+
+    /**
+     * Centre of the model's bounding box, in model units, from the vertex array.
+     */
+    private float[] modelCentre() {
+        final float[] c = new float[]{0f, 0f, 0f};
+        final int n = verts.size / 3;
+        if (n == 0) {
+            return c;
+        }
+        float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE, minZ = Float.MAX_VALUE;
+        float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE, maxZ = -Float.MAX_VALUE;
+        for (int i = 0; i < n; i++) {
+            final float x = verts.get(i * 3);
+            final float y = verts.get(i * 3 + 1);
+            final float z = verts.get(i * 3 + 2);
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+            minZ = Math.min(minZ, z);
+            maxZ = Math.max(maxZ, z);
+        }
+        c[0] = (minX + maxX) * 0.5f;
+        c[1] = (minY + maxY) * 0.5f;
+        c[2] = (minZ + maxZ) * 0.5f;
+        return c;
+    }
+
+    /**
+     * Longitude of a vertex about the model centre, in [0, 1]. Measured from +X
+     * towards -Z, which is the direction the libgdx sphere primitive sweeps, so a
+     * model textured through this loads with the same orientation as the equivalent
+     * procedural sphere.
+     */
+    private static float sphericalU(float x,
+                                    float z,
+                                    float[] centre) {
+        final float u = 0.5f + (float) (Math.atan2(centre[2] - z, x - centre[0]) / (2.0 * Math.PI));
+        return u < 0f ? u + 1f : u;
+    }
+
+    /**
+     * Latitude of a vertex about the model centre, in [0, 1] from the north pole
+     * (v = 0) to the south pole (v = 1), matching an equirectangular map stored with
+     * north at the top.
+     */
+    private static float sphericalV(float x,
+                                    float y,
+                                    float z,
+                                    float[] centre) {
+        final float dx = x - centre[0], dy = y - centre[1], dz = z - centre[2];
+        final float r = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (r < 1e-12f) {
+            return 0.5f;
+        }
+        return (float) (Math.acos(Math.max(-1f, Math.min(1f, dy / r))) / Math.PI);
+    }
+
+    /**
+     * Removes the wrap-around of a generated longitude field. A triangle that
+     * straddles u = 0 has corners at both ends of [0, 1] and would stretch the whole
+     * texture across itself; shifting the offending corners by a whole turn puts the
+     * face back together. The textures wrap, so u outside [0, 1] is harmless.
+     *
+     * @param finalVerts The vertex buffer, already expanded to per-corner vertices.
+     * @param numFaces   Number of triangles in it.
+     * @param hasNorms   Whether each vertex carries a normal, which sets the stride.
+     */
+    private static void fixSeam(float[] finalVerts,
+                                int numFaces,
+                                boolean hasNorms) {
+        final int stride = 3 + (hasNorms ? 3 : 0) + 2;
+        for (int f = 0; f < numFaces; f++) {
+            final int b = f * 3 * stride;
+            final int u0 = b + stride - 2;
+            final int u1 = u0 + stride;
+            final int u2 = u1 + stride;
+            final float ref = finalVerts[u0];
+            final float d1 = finalVerts[u1] - ref;
+            final float d2 = finalVerts[u2] - ref;
+            if (d1 > 0.5f) {
+                finalVerts[u1] -= 1f;
+            } else if (d1 < -0.5f) {
+                finalVerts[u1] += 1f;
+            }
+            if (d2 > 0.5f) {
+                finalVerts[u2] -= 1f;
+            } else if (d2 < -0.5f) {
+                finalVerts[u2] += 1f;
+            }
+        }
     }
 
     /**
