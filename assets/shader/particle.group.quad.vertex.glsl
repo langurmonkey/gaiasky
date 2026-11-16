@@ -136,10 +136,12 @@ void main() {
 
     v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
-    // The size is in the same space as 'pos', which is compressed by 'vrScale' for far-away
-    // catalogues, so it has to be compressed too or nearby and distant particles in the same
-    // catalogue would not look the same size.
-    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist) / vrScale;
+    // 'a_size * u_sizeFactor' is in uncompressed units, while 'dist' is measured in the compressed
+    // space. The limits are tangents of angles, so they only mean the right thing against the
+    // uncompressed distance: the whole clamp has to happen there, and the result compressed once at
+    // the end so that the size lives in the same space as 'pos'.
+    float distU = dist * vrScale;
+    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * distU, u_sizeLimits.y * distU) / vrScale;
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

@@ -133,16 +133,17 @@ void main() {
 
     v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
-    // See the quad shader: the size lives in the same space as 'pos', which is compressed by
-    // 'vrScale' for far-away catalogues.
-    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist) / vrScale;
+    // See the quad shader: the clamp must be evaluated in uncompressed units and the result
+    // compressed once, so that the size lives in the same space as 'pos'.
+    float distU = dist * vrScale;
+    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * distU, u_sizeLimits.y * distU) / vrScale;
 
     // Position.
     vec4 vert_pos = vec4(a_position.xyz * particleSize, a_position.w);
     vert_pos.xyz += pos;
     vec4 gpos = u_projView * vert_pos;
 
-    gl_Position = gpos * u_vrScale;
+    gl_Position = gpos * vrScale;
 
     v_uv = a_texCoord0;
     v_textureIndex = a_textureIndex;
