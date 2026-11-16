@@ -118,6 +118,28 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static final double MAX_SPEED_SCALING = 2.0e16;
 
     /**
+     * Distance at which the speed curve stops being linear in the distance to the nearest reference
+     * and starts to grow more slowly. Ten astronomical units, in metres: the curve is unchanged
+     * around the solar system bodies, and only bends outwards of it.
+     */
+    private static final double SPEED_SCALE_FAR_KNEE_M = 10.0 * Constants.AU_TO_U * Constants.U_TO_M;
+
+
+    /**
+     * Exponent of the speed curve above {@link #SPEED_SCALE_FAR_KNEE_M}.
+     * <p>
+     * Linear scaling makes the camera cross the distance to its reference in a constant ~7.7 s at
+     * any scale, so the one thing that changes when the reference goes from a planet to a star is
+     * the distance, and with it the speed, by five orders of magnitude. A sub-linear exponent keeps
+     * the local feel - the curve below the knee is untouched, and above it the two branches agree in
+     * value at the knee - while making the far field slower: the time to cross the reference
+     * distance grows as {@code (d / 1 AU)^(1 - exponent)}, i.e. from ~8 s in the solar system to
+     * ~50 s at one parsec and ~140 s at one kiloparsec. Raise it towards 1 to get closer to the old
+     * behaviour, lower it to slow the interstellar regime further.
+     */
+    private static final double SPEED_SCALE_FAR_EXPONENT = 0.93d;
+
+    /**
      * Lower bound of the factor that slows the rotation as the focus fills the screen. Without a
      * floor, the camera cannot be turned at all when it is very close to a surface.
      */
@@ -1895,6 +1917,40 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
+     * Maps the distance to the nearest reference object to a speed scaling. Kept separate from
+     * {@link #speedScaling(double)} so that the curve can be tested without a camera.
+     * <p>
+     * Linear up to {@link #SPEED_SCALE_FAR_KNEE_M}, then a power law with
+     * {@link #SPEED_SCALE_FAR_EXPONENT}. The two branches meet at the knee, and both are scale
+     * invariant: the knee is converted to units with the current {@link Constants#M_TO_U}, so the
+     * curve means the same physical distance at every distance scale factor.
+     *
+     * @param distance     Distance to the nearest reference, in internal units.
+     * @param distSmoothUp Distance at which the linear part of the curve saturates, in internal
+     *                     units.
+     *
+     * @return The speed scaling, in internal units per second.
+     */
+    static double distanceToSpeedScale(double distance,
+                                       double distSmoothUp) {
+        if (!Double.isFinite(distance) || distance <= 0 || !Double.isFinite(distSmoothUp) || distSmoothUp <= 0) {
+            return 0;
+        }
+
+        double linear = MAX_SPEED_SCALING * distance / distSmoothUp;
+        double knee = SPEED_SCALE_FAR_KNEE_M * Constants.M_TO_U;
+        if (distance <= knee || knee <= 0 || knee >= distSmoothUp) {
+            return FastMath.min(linear, MAX_SPEED_SCALING);
+        }
+
+        // Value of the linear branch at the knee, so that the curve is continuous.
+        double atKnee = MAX_SPEED_SCALING * knee / distSmoothUp;
+        double far = atKnee * Math.pow(distance / knee, SPEED_SCALE_FAR_EXPONENT);
+
+        return FastMath.min(far, MAX_SPEED_SCALING);
+    }
+
+    /**
      * The speed scaling function.
      *
      * @param min The minimum speed.
@@ -1909,11 +1965,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             return FastMath.max(altitudeToSpeedScale(dist), min) * GaiaSky.settings().scene.camera.speed * Constants.DISTANCE_SCALE_FACTOR;
         }
 
-        // Far from any surface: keep the original linear mapping.
-        var distanceMap = MathUtilsDouble.flint(smoothedDistance, 0, DIST_SMOOTH_UP, 0, MAX_SPEED_SCALING);
+        // Far from any surface: linear near, sub-linear once out of the solar system.
+        double distanceMap = smoothedDistance >= 0 ? distanceToSpeedScale(smoothedDistance, DIST_SMOOTH_UP) : 0;
 
-        return smoothedDistance >= 0 ? (Math.max(distanceMap,
-                                                 min) * GaiaSky.settings().scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
+        return distanceMap > 0 ? (Math.max(distanceMap,
+                                           min) * GaiaSky.settings().scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
     }
 
     /**
