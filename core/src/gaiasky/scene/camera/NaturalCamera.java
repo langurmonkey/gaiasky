@@ -395,6 +395,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static final double DISTANCE_SMOOTHING_TAU = 0.1d;
 
     /**
+     * Maximum relative growth of the speed scaling, in e-folds per second. The scaling is linear in
+     * the smoothed distance, so this caps how fast the top speed can rise when the reference object
+     * changes: about 4.5x per second, i.e. roughly 5 seconds to go from the solar system to the
+     * interstellar regime.
+     */
+    private static final double DISTANCE_MAX_GROWTH_RATE = 1.5d;
+
+    /**
      * Raw (unsmoothed) distance to the closest body, in internal units.
      */
     private double rawBodyDistance = Double.MAX_VALUE;
@@ -1672,8 +1680,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Distance used when there is no body to measure against. Large enough that the speed mapping
-     * saturates at its ceiling, which is what "nothing nearby" should mean.
+     * Sentinel for "no object to measure against this frame". Deliberately far past the saturation
+     * distance of the speed mapping, so that it can never be mistaken for a real measurement: see
+     * {@link #updateSmoothedDistances(double)}, which holds the previous distance instead of feeding
+     * this through the filter.
      **/
     static final double NO_CLOSEST_BODY_DISTANCE = 1.0e20;
 
@@ -1774,7 +1784,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Advances the exponential low-pass filters of the raw distances. This must be called exactly
+     * Advances the exponential low-pass filter of the raw distance. This must be called exactly
      * once per frame, so that the filtering does not depend on the number of times
      * {@link #speedScaling(double)} is invoked.
      *
@@ -1783,31 +1793,59 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void updateSmoothedDistances(double dt) {
         double raw = computeRawDistances();
 
-        if (!Double.isFinite(raw)) {
-            raw = 0;
+        // A frame with no object to measure against is "unknown", not "infinitely far". Feeding the
+        // sentinel through the filter multiplied the speed - which is linear in this distance - by
+        // the ratio between the sentinel and the last real reference in a single frame: 1e20 units is
+        // 650 times the saturation distance, so the exponential cannot reject it, it can only decay
+        // it, and with DISTANCE_SMOOTHING_TAU that takes seconds at the top speed. Bodies are only
+        // registered as the closest one when they are extracted, i.e. when they are actually drawn
+        // (ModelExtractor, ParticleExtractor), so this happens routinely when leaving a system and
+        // the bodies fade out or are culled. Holding the last value keeps the speed where it was.
+        if (!Double.isFinite(raw) || raw >= NO_CLOSEST_BODY_DISTANCE) {
+            if (smoothedDistance < 0 || !Double.isFinite(smoothedDistance)) {
+                smoothedDistance = 0;
+            }
+            return;
         }
 
-        double alpha = smoothingAlpha(DISTANCE_SMOOTHING_TAU, dt);
+        // Everything past the saturation point maps to the same speed, so keeping magnitudes that
+        // large in the filter serves no purpose.
+        raw = FastMath.min(raw, DIST_SMOOTH_UP);
 
         if (smoothedDistance < 0 || !Double.isFinite(smoothedDistance)) {
             // First frame: initialize.
             smoothedDistance = raw;
-        } else {
-            smoothedDistance += (raw - smoothedDistance) * alpha;
+            return;
         }
 
-        // Same treatment for the star distance, so that both filters share the same time constant.
-        if (!Double.isFinite(rawStarDistance)) {
-            rawStarDistance = smoothedDistance;
-        }
-        if (smoothedStarDistance < 0 || !Double.isFinite(smoothedStarDistance)) {
-            smoothedStarDistance = rawStarDistance;
-        } else {
-            smoothedStarDistance += (rawStarDistance - smoothedStarDistance) * alpha;
-        }
+        double alpha = smoothingAlpha(DISTANCE_SMOOTHING_TAU, dt);
+        double next = smoothedDistance + (raw - smoothedDistance) * alpha;
+
+        smoothedDistance = limitGrowth(smoothedDistance, next, dt);
     }
 
-    private double smoothedStarDistance = -1;
+    /**
+     * Bounds the relative growth of a smoothed distance. The speed scaling is linear in this
+     * distance, so bounding its growth bounds the growth of the speed: no change of reference (a
+     * planet fading out, a star group swapping its nearest star, the closest body becoming the
+     * nearest star) can multiply the speed by more than {@code e^DISTANCE_MAX_GROWTH_RATE} per
+     * second. The decay is deliberately left unbounded - slowing down when something gets closer
+     * has to be immediate.
+     *
+     * @param current The current smoothed distance.
+     * @param next    The distance the filter wants to move to.
+     * @param dt      The frame delta time, in seconds.
+     *
+     * @return The next distance, with its growth limited.
+     */
+    static double limitGrowth(double current,
+                              double next,
+                              double dt) {
+        if (dt <= 0 || current <= 0 || !Double.isFinite(current) || !Double.isFinite(next)) {
+            return next;
+        }
+        return FastMath.min(next, current * FastMath.exp(DISTANCE_MAX_GROWTH_RATE * dt));
+    }
 
     /**
      * For stars, we implement a smoothing radius.
