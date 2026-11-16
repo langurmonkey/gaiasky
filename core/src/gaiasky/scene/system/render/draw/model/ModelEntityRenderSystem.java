@@ -38,6 +38,28 @@ import java.util.Objects;
 
 public class ModelEntityRenderSystem {
 
+    /**
+     * Whether the atmosphere opacity is faded out with the angular size of the planet, i.e. with
+     * the distance to it. This dates from before the scattering rework, when a distant planet with
+     * a closed FOV showed artifacts (the old atmosphere softening hack); the unified integrator and
+     * the depth written from the planet center may have made it unnecessary.
+     * <p>
+     * Set to {@code false} to disable the fade entirely and always use the full atmosphere opacity:
+     * that is the experiment. What to look for with it off: a planet far enough for its disc to be
+     * a few pixels, with the FOV closed, growing a bright ring or halo around the disc, or a color
+     * shift over the disc itself.
+     */
+    private static final boolean ATMOSPHERE_FADE_WITH_DISTANCE = true;
+    /**
+     * Angular size, in radians, below which the atmosphere is fully transparent. This is the
+     * "solid angle" of the body, i.e. size / distance, without the FOV factor.
+     */
+    private static final double ATMOSPHERE_FADE_IN_ANGLE = 0.0035;
+    /**
+     * Angular size, in radians, above which the atmosphere is fully opaque.
+     */
+    private static final double ATMOSPHERE_FADE_FULL_ANGLE = 0.009;
+
     private final ParticleUtils utils;
     private final SceneRenderer sceneRenderer;
     private final FocusView focusView;
@@ -560,6 +582,20 @@ public class ModelEntityRenderSystem {
     }
 
     /**
+     * Computes the opacity multiplier of the atmosphere of a planet from its angular size.
+     *
+     * @param solidAngle The angular size of the body, in radians (size / distance).
+     *
+     * @return The opacity multiplier in [0,1]. Always 1 if the distance fade is disabled.
+     */
+    static float atmosphereDistanceFade(double solidAngle) {
+        if (!ATMOSPHERE_FADE_WITH_DISTANCE) {
+            return 1f;
+        }
+        return (float) MathUtilsDouble.flint(solidAngle, ATMOSPHERE_FADE_IN_ANGLE, ATMOSPHERE_FADE_FULL_ANGLE, 0, 1);
+    }
+
+    /**
      * Renders a planet.
      *
      * @param entity       The entity.
@@ -595,7 +631,7 @@ public class ModelEntityRenderSystem {
         } else {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
-                float atmOpacity = (float) MathUtilsDouble.flint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
+                float atmOpacity = atmosphereDistanceFade(body.solidAngle);
                 if (GaiaSky.settings().scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0 && rc != null) {
                     var graph = Mapper.graph.get(entity);
                     var rotation = Mapper.orientation.get(entity).rotationComponent;
@@ -632,9 +668,9 @@ public class ModelEntityRenderSystem {
                                  float alpha,
                                  RenderingContext rc) {
 
-        // Atmosphere fades in between 1 and 2 degrees of view angle apparent
+        // Atmosphere fades in with the angular size of the planet, if the fade is enabled.
         ICamera cam = GaiaSky.instance.getICamera();
-        float atmOpacity = (float) MathUtilsDouble.flint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
+        float atmOpacity = atmosphereDistanceFade(body.solidAngle);
         if (atmOpacity > 0) {
             var graph = Mapper.graph.get(entity);
             var orientation = Mapper.orientation.get(entity);
