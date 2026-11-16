@@ -18,6 +18,7 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
     private Texture fullDepth;
     private Texture halfDepth;
     private final Vector2 zFarK = new Vector2();
+    private float nearScene = 0f;
 
     public BlendFullHalfResFilter() {
         super(ShaderLoader.fromFile("screenspace", "fullhalfresblend"));
@@ -38,6 +39,15 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
         setParam(Param.ZFarK, zFarK);
     }
 
+    /**
+     * Distance, in internal units, below which a pixel counts as near-scene geometry in the
+     * composite. Must be given in units, so that the caller converts it from a physical distance.
+     */
+    public void setNearScene(float nearScene) {
+        this.nearScene = nearScene;
+        setParam(Param.NearScene, nearScene);
+    }
+
 
     @Override
     public void rebind() {
@@ -46,6 +56,7 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
         setParams(Param.FullDepth, u_texture2);
         setParams(Param.HalfDepth, u_texture3);
         setParams(Param.ZFarK, zFarK);
+        setParams(Param.NearScene, nearScene);
         endParams();
     }
 
@@ -63,7 +74,8 @@ public final class BlendFullHalfResFilter extends Filter<BlendFullHalfResFilter>
         Half("u_texture1", 0),
         FullDepth("u_texture2", 0),
         HalfDepth("u_texture3", 0),
-        ZFarK("u_zFarK", 2);
+        ZFarK("u_zFarK", 2),
+        NearScene("u_nearScene", 1);
         // @formatter:on
 
         private final String mnemonic;

@@ -237,8 +237,22 @@ float emptyBrickSteps(vec3 uvw, vec3 rayDir, vec3 boundsMin, vec3 boundsMax, sam
     vec3 nextBoundary = floor(b) + max(sign(g), vec3(0.0));
     // An axis the ray is parallel to cannot bound the exit, and 0/0 is a NaN that would poison the
     // min(): give it a denominator it cannot divide by and a distance that cannot win.
-    vec3 safeG = sign(g) * max(abs(g), vec3(1.0e-20));
-    vec3 distanceToBoundary = (nextBoundary - b) / safeG + step(abs(g), vec3(1.0e-12)) * 1.0e30;
+    //
+    // Which axis is parallel has to be decided on the *direction*, not on g. g is bricks per
+    // internal unit, i.e. it carries the box's size in internal units, and those scale with
+    // Constants.DISTANCE_SCALE_FACTOR: the same galaxy gives g ~ 1e-10 at scale 1 and ~1e-14 at
+    // 1e4. A fixed threshold on g therefore changes meaning with the scale factor - and once every
+    // axis falls below it, all three boundaries become 1e30, the exit distance overflows the
+    // remaining steps and the ray is *terminated at the first sample that lands in an empty brick*.
+    // That cut the gas off at the brick lattice: the staircase silhouette and the black slabs
+    // above, below and at the edges of the disk, at scale 1e2 and over, and nowhere at 1e1.
+    // rayDir is normalised and dimensionless, so a threshold on it means the same thing at every
+    // scale. The denominator is kept non-zero wherever the direction is not parallel, so the
+    // division below can never produce an inf or a NaN.
+    vec3 parallel = step(abs(rayDir), vec3(1.0e-6));
+    vec3 safeG = sign(g) * max(abs(g), vec3(1.0e-30));
+    safeG = mix(safeG, vec3(1.0), parallel);
+    vec3 distanceToBoundary = mix((nextBoundary - b) / safeG, vec3(1.0e30), parallel);
     float exitDistance = min(min(distanceToBoundary.x, distanceToBoundary.y), distanceToBoundary.z);
 
     // Round up, so the caller never lands a sample inside the brick it is leaving.

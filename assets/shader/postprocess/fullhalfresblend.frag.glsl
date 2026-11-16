@@ -10,6 +10,11 @@ uniform sampler2D u_texture2;
 uniform sampler2D u_texture3;
 // Z-far and K values for depth buffer.
 uniform vec2 u_zFarK;
+// Distance, in internal units, below which a pixel counts as near-scene geometry: what the volume's
+// composed front and the kpc-scale bodies behind it must not be mistaken for. Comes from the CPU in
+// metres times M_TO_U, so it means the same physical distance at every DISTANCE_SCALE_FACTOR; the
+// 1e5 internal units it replaces were 670 AU on the desktop and 0.067 AU at scale 1e4.
+uniform float u_nearScene;
 
 in vec2 v_texCoords;
 layout(location = 0) out vec4 fragColor;
@@ -30,7 +35,7 @@ void main() {
     // not geometry. The half-resolution pass runs before it, so depthHalf holds real geometry only:
     // where the full-resolution depth is close but the half-resolution one is not, the only thing in
     // front is an atmosphere, and the half-resolution content behind it belongs in the result.
-    if (depthFull < 1e5 && depthHalf < 1e5) {
+    if (depthFull < u_nearScene && depthHalf < u_nearScene) {
         fragColor = vec4(fullRes, 1.0);
     } else {
         fragColor = vec4(clamp(fullRes + halfRes, 0.0, 1.0), 1.0);
