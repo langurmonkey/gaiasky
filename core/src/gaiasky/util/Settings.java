@@ -1273,7 +1273,7 @@ public class Settings extends SettingsObject {
 
         /** The factor by which to scale the distance units in desktop mode. Usually 1. **/
         @JsonIgnore
-        public double distanceScaleDesktop = 1.0;
+        public double distanceScaleDesktop = 1.0e4;
 
         /** The factor by which to scale the distance units in VR mode. **/
         @JsonIgnore

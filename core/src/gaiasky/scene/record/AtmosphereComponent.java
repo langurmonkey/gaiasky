@@ -286,8 +286,21 @@ public final class AtmosphereComponent extends NamedComponent implements IUpdata
 
         translation.put(aux3);
         if (vrOffset != null) {
-            aux1.set(vrOffset).scl(Constants.U_TO_M);
-            aux3.sub(aux1);
+            // vrOffset is in internal units (XrViewManager scales it by M_TO_U): subtracting a
+            // metres-valued copy here displaced the atmosphere camera by 1e9/S per unit of eye
+            // offset, i.e. about 3 km per 3 cm of eye offset at scale 1e4.
+            aux3.sub(vrOffset);
+        }
+
+        // Distance from the eye to the planet centre, in internal units. The atmosphere writes it as
+        // its fragment depth: see atm.fragment.glsl for why it must be a distance in units and why
+        // it is the planet centre. Only the sky pass needs it - the ground shader has its own depth.
+        if (!ground) {
+            float depthDist = (float) aux3.len();
+            if (mat.has(AtmosphereAttribute.DepthDist))
+                ((AtmosphereAttribute) Objects.requireNonNull(mat.get(AtmosphereAttribute.DepthDist))).value = depthDist;
+            else
+                mat.set(new AtmosphereAttribute(AtmosphereAttribute.DepthDist, depthDist));
         }
 
         // Normalization factor scales camera position to normalized units (inner radius = 1.0).

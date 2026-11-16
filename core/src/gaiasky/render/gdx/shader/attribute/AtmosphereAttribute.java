@@ -18,6 +18,9 @@ public class AtmosphereAttribute extends FloatAttribute {
     public static final int OuterRadius = register(OuterRadiusAlias);
     public static final String InnerRadiusAlias = "innerRadius";
     public static final int InnerRadius = register(InnerRadiusAlias);
+    /** Distance from the eye to the planet centre, in internal units. Written as the fragment depth. **/
+    public static final String DepthDistAlias = "depthDist";
+    public static final int DepthDist = register(DepthDistAlias);
     public static final String KrESunAlias = "krESun";
     public static final int KrESun = register(KrESunAlias);
     public static final String KmESunAlias = "kmESun";

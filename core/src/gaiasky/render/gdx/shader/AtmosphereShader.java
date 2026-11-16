@@ -51,6 +51,8 @@ public class AtmosphereShader extends BaseIntShader {
     public final int fCameraHeight;
     public final int fOuterRadius;
     public final int fInnerRadius;
+    /** Distance from the eye to the planet centre, in internal units. Written as the atmosphere's depth. **/
+    public final int depthDist;
     public final int fKrESun;
     public final int fKmESun;
     public final int fKr4PI;
@@ -141,6 +143,7 @@ public class AtmosphereShader extends BaseIntShader {
         fCameraHeight = register(Inputs.cameraHeight, Setters.cameraHeight);
         fOuterRadius = register(Inputs.outerRadius, Setters.outerRadius);
         fInnerRadius = register(Inputs.innerRadius, Setters.innerRadius);
+        depthDist = register(Inputs.depthDist, Setters.depthDist);
         fKrESun = register(Inputs.krESun, Setters.krESun);
         fKmESun = register(Inputs.kmESun, Setters.kmESun);
         fKr4PI = register(Inputs.kr4PI, Setters.kr4PI);
@@ -380,6 +383,7 @@ public class AtmosphereShader extends BaseIntShader {
         public final static Uniform outerRadius = new Uniform("fOuterRadius");
         public final static Uniform innerRadius = new Uniform("fInnerRadius");
         public final static Uniform innerRadius2 = new Uniform("fInnerRadius2");
+        public final static Uniform depthDist = new Uniform("u_depthDist");
         public final static Uniform krESun = new Uniform("fKrESun");
         public final static Uniform kmESun = new Uniform("fKmESun");
         public final static Uniform kr4PI = new Uniform("fKr4PI");
@@ -648,6 +652,22 @@ public class AtmosphereShader extends BaseIntShader {
                             IntRenderable renderable,
                             Attributes combinedAttributes) {
                 shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.InnerRadius)))).value);
+            }
+        };
+
+        public final static Setter depthDist = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader,
+                                    int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader,
+                            int inputID,
+                            IntRenderable renderable,
+                            Attributes combinedAttributes) {
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.DepthDist)))).value);
             }
         };
 
