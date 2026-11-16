@@ -136,7 +136,10 @@ void main() {
 
     v_col = vec4(a_color.rgb, a_color.a * u_alpha * fadeFactor);
 
-    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
+    // The size is in the same space as 'pos', which is compressed by 'vrScale' for far-away
+    // catalogues, so it has to be compressed too or nearby and distant particles in the same
+    // catalogue would not look the same size.
+    float particleSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist) / vrScale;
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

@@ -294,7 +294,10 @@ public class ElementsSetRenderer extends InstancedRenderSystem implements IObser
                     shaderProgram.setUniformf("u_falloff", getProfileDecay(shadingType, profileDecay));
                     shaderProgram.setUniformf("u_sizeLimits", (float) (sizeLimits[0] * sizeFactor),
                                               (float) (sizeLimits[1] * sizeFactor));
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (sizeFactor / Constants.DISTANCE_SCALE_FACTOR));
+                    // The size is a nominal length in local units and the shader multiplies it by the
+                    // distance factor (u_vrScale), so that it scales like the positions and the
+                    // angular size stays the same whatever the distance scale factor is.
+                    shaderProgram.setUniformf("u_sizeFactor", (float) sizeFactor);
 
                     // Shading type.
                     setShadingTypeUniforms(shaderProgram, camera, shadingType, sphericalPower, diffuseScattering, graph);
