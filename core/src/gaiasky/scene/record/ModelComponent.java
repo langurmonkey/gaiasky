@@ -479,16 +479,28 @@ public final class ModelComponent extends NamedComponent implements Disposable, 
     }
 
     /**
-     * Initialises the model or texture if LAZY_X_INIT is on
+     * Initialises the model or texture if LAZY_X_INIT is on.
+     * <p>
+     * A material attached <em>after</em> {@link #doneLoading} ran - a procedural volume gets one
+     * from {@link gaiasky.scene.system.initialize.VolumeInitializer}, which finds no material in
+     * the scene and creates it - is not initialised by anyone else. With lazy texture
+     * initialisation off ({@code config.vr.yaml}, as opposed to {@code config.yaml}, sets
+     * {@code lazyTexture: false}) {@code doneLoading} had no material to build, so this method used
+     * to be the only other place that could: gating it on the lazy flag left such a material
+     * permanently unbuilt, and the "run when the material is ready" queue of
+     * {@link MaterialComponent#whenMaterialInitialized} never fired. For a volume that means no
+     * generated textures, no {@code volumeNFlag} and nothing drawn at all, without a warning.
      */
     public void touch(Matrix4 localTransform) {
-        if (GaiaSky.settings().scene.initialization.lazyTexture && mtc != null && !mtc.texInitialised) {
+        if (mtc != null && !mtc.texInitialised) {
             if (!mtc.texLoading) {
                 mtc.initialize(name, manager);
                 mtc.texLoading = true;
             } else if (mtc.isFinishedLoading(manager)) {
                 GaiaSky.postRunnable(() -> {
-                    mtc.initMaterial(manager, instance, cc, culling);
+                    if (instance != null) {
+                        mtc.initMaterial(manager, instance, cc, culling);
+                    }
                 });
                 mtc.texLoading = false;
                 mtc.texInitialised = true;
