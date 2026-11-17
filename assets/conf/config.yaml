@@ -499,6 +499,13 @@ program:
     # Data descriptor file location.
     # This can also point to a local repository description file (use file://).
     dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-03060501.json.gz
+  # macOS-specific settings.
+  macos:
+    # Enable the gaiasky:// URL protocol handler.
+    # On macOS this requires initialising AWT, which takes over NSApplication: the native
+    # window controls (close, minimise, zoom) stop responding and the title bar switches to
+    # the light appearance. Only enable it if you need the URL protocol.
+    urlProtocol: false
 
 #
 # Controls configuration

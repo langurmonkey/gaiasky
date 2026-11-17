@@ -157,25 +157,13 @@ public class GaiaSkyDesktop {
             // Check java version.
             javaVersionCheck();
 
-            // Respond to custom URL protocol `gaiasky://` on macOS
+            // macOS specifics.
             if (SysUtils.isMac()) {
-                // GLFW async is required on macOS so that AWT can
-                // continue to process macOS application events.
+                // GLFW async lets the GLFW event loop run off the main thread, which
+                // AppKit reserves for itself. Needed with and without AWT.
+                // Must be set before GLFW is initialised (in init()), but it does not
+                // depend on the configuration, so it is safe to do here.
                 Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
-
-                // macOS URL events arrive through StartupNotification
-                // rather than as command-line arguments.
-                try {
-                    StartupNotification.registerStartupListener(argument -> {
-                        if (URLProtocolHandler.isDatasetUrl(argument)) {
-                            if (!SingleInstanceManager.forwardToRunningInstance(argument)) {
-                                URLProtocolHandler.setPendingUrl(argument);
-                            }
-                        }
-                    });
-                } catch (Throwable ignored) {
-                    // Not running under an install4j launcher (dev runs, etc.).
-                }
             }
 
             // Single-instance handling. If a Gaia Sky instance is already
@@ -231,6 +219,12 @@ public class GaiaSkyDesktop {
             // Force deactivation of safe graphics mode.
             if (cliArgs.noSafeMode) {
                 gsd.settings.program.safeMode = false;
+            }
+
+            // Respond to custom URL protocol `gaiasky://` on macOS. This needs the
+            // configuration, and must happen before the window is created.
+            if (SysUtils.isMac() && gsd.settings.program.macos.urlProtocol) {
+                initMacosUrlProtocol();
             }
 
             // Initialize I18n.
@@ -379,6 +373,27 @@ public class GaiaSkyDesktop {
         System.setProperty("properties.file", props);
 
         return overwrite || !userConfExists;
+    }
+
+    /**
+     * Registers the `gaiasky://` URL protocol handler on macOS. This goes through install4j's
+     * {@link StartupNotification}, which uses {@code java.awt.Desktop}: AWT takes over
+     * NSApplication, so the native window controls (close, minimise, zoom) stop responding and
+     * the title bar switches to the light appearance. Only called when
+     * {@code program::macos::urlProtocol} is enabled in the configuration.
+     */
+    private static void initMacosUrlProtocol() {
+        try {
+            StartupNotification.registerStartupListener(argument -> {
+                if (URLProtocolHandler.isDatasetUrl(argument)) {
+                    if (!SingleInstanceManager.forwardToRunningInstance(argument)) {
+                        URLProtocolHandler.setPendingUrl(argument);
+                    }
+                }
+            });
+        } catch (Throwable ignored) {
+            // Not running under an install4j launcher (dev runs, etc.).
+        }
     }
 
     /**

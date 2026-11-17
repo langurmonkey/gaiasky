@@ -2461,6 +2461,8 @@ public class Settings extends SettingsObject {
         public String locale;
         public UpdateSettings update;
         public UrlSettings url;
+        /** macOS-specific settings. **/
+        public MacosSettings macos = new MacosSettings();
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
 
         /** The recommended datasets, as a list of keys. **/
@@ -2638,6 +2640,7 @@ public class Settings extends SettingsObject {
             c.recursiveGrid = this.recursiveGrid.clone();
             c.url = this.url.clone();
             c.update = this.update.clone();
+            c.macos = this.macos.clone();
             return c;
         }
 
@@ -2653,6 +2656,7 @@ public class Settings extends SettingsObject {
             recursiveGrid.setParent(s);
             url.setParent(s);
             update.setParent(s);
+            macos.setParent(s);
 
         }
 
@@ -3512,6 +3516,37 @@ public class Settings extends SettingsObject {
             @Override
             public UrlSettings clone() {
                 return (UrlSettings) super.clone();
+            }
+
+            @Override
+            protected void setParentRecursive(SettingsObject s) {
+            }
+
+            @Override
+            protected void setupListeners() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+
+            @Override
+            public void apply() {
+            }
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class MacosSettings extends SettingsObject {
+            /**
+             * Enable the `gaiasky://` URL protocol handler. This initialises AWT, which takes over
+             * NSApplication: the native window controls (close, minimise, zoom) stop responding
+             * and the title bar switches to the light appearance. Disabled by default.
+             */
+            public boolean urlProtocol = false;
+
+            @Override
+            public MacosSettings clone() {
+                return (MacosSettings) super.clone();
             }
 
             @Override
