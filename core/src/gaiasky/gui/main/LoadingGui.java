@@ -26,10 +26,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.iface.NotificationsInterface;
 import gaiasky.gui.vr.FixedScreenViewport;
+import gaiasky.render.gdx.loader.OwnTextureLoader;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.TextUtils;
 import gaiasky.util.TipsGenerator;
-import gaiasky.render.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
@@ -55,14 +55,18 @@ public class LoadingGui extends AbstractGui {
     private long lastTipTime;
     private long funnyTextTime = 1400;
 
-    public LoadingGui(Skin skin, Graphics graphics, Float unitsPerPixel, Boolean vr) {
+    public LoadingGui(Skin skin,
+                      Graphics graphics,
+                      Float unitsPerPixel,
+                      Boolean vr) {
         super(graphics, unitsPerPixel);
         this.vr = vr;
         this.skin = skin;
     }
 
     @Override
-    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+    public void initialize(AssetManager assetManager,
+                           SpriteBatch sb) {
         interfaces = new Array<>();
         float pad32 = 32f;
         float pad10 = 10f;
@@ -87,6 +91,7 @@ public class LoadingGui extends AbstractGui {
         stack.setFillParent(true);
         if (!vr) {
             Texture tex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
+            tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             Image bgImage = new Image(tex);
             bgImage.setScaling(Scaling.fit);
             bgImage.setAlign(Align.center);
@@ -196,7 +201,8 @@ public class LoadingGui extends AbstractGui {
     }
 
     @Override
-    public void render(int rw, int rh) {
+    public void render(int rw,
+                       int rh) {
         clearScreen();
         super.render(rw, rh);
     }
@@ -247,7 +253,9 @@ public class LoadingGui extends AbstractGui {
     }
 
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void notify(Event event,
+                       Object source,
+                       Object... data) {
         // Empty by default
         if (Objects.requireNonNull(event) == Event.UI_SCALE_RECOMPUTE_CMD) {
             int height;

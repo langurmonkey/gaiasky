@@ -328,6 +328,7 @@ public class WelcomeGui extends AbstractGui {
             // Prepare the background image.
             if (bgTex == null) {
                 bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
+                bgTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             }
 
             Image bgImage = new Image(bgTex);
