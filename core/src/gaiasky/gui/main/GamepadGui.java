@@ -89,7 +89,7 @@ public class GamepadGui extends AbstractGui {
 
     private TopInfoInterface topLine;
     private CameraInfoInterface focusInterface;
-    private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome, debugInfo;
+    private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome, starDistanceScaling, debugInfo;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop;
     private OwnTextButton timeUp;
@@ -399,8 +399,11 @@ public class GamepadGui extends AbstractGui {
 
         // CAMERA
         var camera = GaiaSky.instance.getICamera();
-        Actor[][] cameraModel = new Actor[4][10];
+        Actor[][] cameraModel = new Actor[4][11];
         model.add(cameraModel);
+        // Row index in the camera table. Not every row is navigable, so it does not always match
+        // the model: the VR branch below adds two read-only rows.
+        int camRow = 0;
 
         Table camT = new Table(skin);
         camT.setSize(tw1, th);
@@ -415,7 +418,7 @@ public class GamepadGui extends AbstractGui {
                 cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
             }
             cameraMode = new OwnSelectBox<>(skin, "big");
-            cameraModel[0][0] = cameraMode;
+            cameraModel[0][camRow++] = cameraMode;
             cameraMode.setWidth(ww);
             cameraMode.setItems(cameraOptions);
             cameraMode.setSelectedIndex(cam.getMode().ordinal());
@@ -435,7 +438,7 @@ public class GamepadGui extends AbstractGui {
             // Cinematic
             Label cinematicLabel = new Label(I18n.msg("gui.camera.cinematic"), skin, "header-raw");
             cinematic = new OwnCheckBox("", skin, 0f);
-            cameraModel[0][1] = cinematic;
+            cameraModel[0][camRow++] = cinematic;
             cinematic.setChecked(GaiaSky.settings().scene.camera.cinematic);
             cinematic.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -450,7 +453,7 @@ public class GamepadGui extends AbstractGui {
             // FOV
             Label fovLabel = new Label(I18n.msg("gui.camera.fov"), skin, "header-raw");
             fovSlider = new OwnSliderPlus("", Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin, "header-raw");
-            cameraModel[0][2] = fovSlider;
+            cameraModel[0][camRow++] = fovSlider;
             fovSlider.setValueSuffix("°");
             fovSlider.setName("field of view");
             fovSlider.setWidth(ww);
@@ -471,6 +474,9 @@ public class GamepadGui extends AbstractGui {
             cameraFocusLabel = new OwnLabel(focusString, skin, "header");
             camT.add(focusLabel).right().padBottom(pad20).padRight(pad20);
             camT.add(cameraFocusLabel).left().padBottom(pad20).row();
+
+            // The two rows above are read-only, they are not part of the navigation model.
+            camRow = 2;
         }
 
         // Speed
@@ -483,13 +489,29 @@ public class GamepadGui extends AbstractGui {
                                                          Constants.MAX_CAM_SPEED,
                                                          skin,
                                                          "header-raw");
-        cameraModel[0][3] = camSpeedSlider;
+        cameraModel[0][camRow++] = camSpeedSlider;
         camSpeedSlider.setName("camera speed");
         camSpeedSlider.setWidth(ww);
         camSpeedSlider.setMappedValue(GaiaSky.settings().scene.camera.speed);
         camSpeedSlider.connect(Event.CAMERA_SPEED_CMD);
         camT.add(speedLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camSpeedSlider).left().padBottom(pad20).row();
+
+        // Use star distances to compute the speed scaling
+        OwnLabel starDistanceScalingLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.distance.scaling"), skin);
+        starDistanceScaling = new OwnCheckBox("", skin);
+        cameraModel[0][camRow++] = starDistanceScaling;
+        starDistanceScaling.setName("star distance scaling");
+        starDistanceScaling.setChecked(GaiaSky.settings().scene.camera.starDistanceScaling);
+        starDistanceScaling.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                GaiaSky.settings().scene.camera.starDistanceScaling = starDistanceScaling.isChecked();
+                return true;
+            }
+            return false;
+        });
+        camT.add(starDistanceScalingLabel).right().padBottom(pad20).padRight(pad20);
+        camT.add(starDistanceScaling).left().padBottom(pad20).row();
 
         // Rot
         Label rotationLabel = new Label(I18n.msg("gui.rotation.speed"), skin, "header-raw");
@@ -501,7 +523,7 @@ public class GamepadGui extends AbstractGui {
                                                        Constants.MAX_ROT_SPEED,
                                                        skin,
                                                        "header-raw");
-        cameraModel[0][4] = camRotSlider;
+        cameraModel[0][camRow++] = camRotSlider;
         camRotSlider.setName("rotate speed");
         camRotSlider.setWidth(ww);
         camRotSlider.setMappedValue(GaiaSky.settings().scene.camera.rotate);
@@ -519,7 +541,7 @@ public class GamepadGui extends AbstractGui {
                                                         Constants.MAX_TURN_SPEED,
                                                         skin,
                                                         "header-raw");
-        cameraModel[0][5] = camTurnSlider;
+        cameraModel[0][camRow++] = camTurnSlider;
         camTurnSlider.setName("turn speed");
         camTurnSlider.setWidth(ww);
         camTurnSlider.setMappedValue(GaiaSky.settings().scene.camera.turn);
@@ -530,7 +552,7 @@ public class GamepadGui extends AbstractGui {
         // Focus marker
         OwnLabel crosshairFocusLabel = new OwnLabel(I18n.msg("gui.ui.crosshair.focus"), skin);
         crosshairFocus = new OwnCheckBox("", skin);
-        cameraModel[0][6] = crosshairFocus;
+        cameraModel[0][camRow++] = crosshairFocus;
         crosshairFocus.setName("ch focus");
         crosshairFocus.setChecked(GaiaSky.settings().scene.crosshair.focus);
         crosshairFocus.addListener((event) -> {
@@ -545,7 +567,7 @@ public class GamepadGui extends AbstractGui {
         // Closest marker
         OwnLabel crosshairClosestLabel = new OwnLabel(I18n.msg("gui.ui.crosshair.closest"), skin);
         crosshairClosest = new OwnCheckBox("", skin);
-        cameraModel[0][7] = crosshairClosest;
+        cameraModel[0][camRow++] = crosshairClosest;
         crosshairClosest.setName("ch closest");
         crosshairClosest.setChecked(GaiaSky.settings().scene.crosshair.closest);
         crosshairClosest.addListener((event) -> {
@@ -560,7 +582,7 @@ public class GamepadGui extends AbstractGui {
         // Home marker
         OwnLabel crosshairHomeLabel = new OwnLabel(I18n.msg("gui.ui.crosshair.home"), skin);
         crosshairHome = new OwnCheckBox("", skin);
-        cameraModel[0][8] = crosshairHome;
+        cameraModel[0][camRow++] = crosshairHome;
         crosshairHome.setName("ch home");
         crosshairHome.setChecked(GaiaSky.settings().scene.crosshair.home);
         crosshairHome.addListener((event) -> {
@@ -578,7 +600,7 @@ public class GamepadGui extends AbstractGui {
 
             Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
-            cameraModel[0][9] = button3d;
+            cameraModel[0][camRow] = button3d;
             button3d.setChecked(GaiaSky.settings().program.modeStereo.active);
             String[] hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode", true);
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
@@ -603,7 +625,7 @@ public class GamepadGui extends AbstractGui {
 
             Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
-            cameraModel[1][9] = buttonDome;
+            cameraModel[1][camRow] = buttonDome;
             buttonDome.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPlanetariumOn());
             String[] hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium", true);
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
@@ -629,7 +651,7 @@ public class GamepadGui extends AbstractGui {
 
             Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
-            cameraModel[2][9] = buttonCubemap;
+            cameraModel[2][camRow] = buttonCubemap;
             buttonCubemap.setProgrammaticChangeEvents(false);
             buttonCubemap.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isPanoramaOn());
             String[] hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360", true);
@@ -656,7 +678,7 @@ public class GamepadGui extends AbstractGui {
 
             Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
             buttonOrthoSphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
-            cameraModel[3][9] = buttonOrthoSphere;
+            cameraModel[3][camRow] = buttonOrthoSphere;
             buttonOrthoSphere.setProgrammaticChangeEvents(false);
             buttonOrthoSphere.setChecked(GaiaSky.settings().program.modeCubemap.active && GaiaSky.settings().program.modeCubemap.isOrthosphereOn());
             String[] hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere", true);
