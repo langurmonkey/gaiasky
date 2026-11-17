@@ -50,11 +50,12 @@ float scale(float fCos) {
 
 // Finds the nearest intersection of a ray with a sphere centered at the origin.
 // Used to clip the ray to the outer atmosphere boundary.
+// This version uses a stable ray/sphere entry: avoids the B*B - 4*C cancellation that eats the
+// whole limb band once the camera is a few hundred radii away.
 float getNearIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
-    float B = 2.0 * dot(pos, ray);
-    float C = distance2 - radius2;
-    float fDet = max(0.0, B * B - 4.0 * C);
-    return 0.5 * (-B - sqrt(fDet));
+    vec3 c = cross(pos, ray);
+    float b2 = dot(c, c);                    // squared impact parameter
+    return max(0.0, -dot(pos, ray) - sqrt(max(radius2 - b2, 0.0)));
 }
 
 // UNIFIED ATMOSPHERE INTEGRATOR

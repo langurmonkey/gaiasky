@@ -49,7 +49,7 @@ public class ModelEntityRenderSystem {
      * a few pixels, with the FOV closed, growing a bright ring or halo around the disc, or a color
      * shift over the disc itself.
      */
-    private static final boolean ATMOSPHERE_FADE_WITH_DISTANCE = true;
+    private static final boolean ATMOSPHERE_FADE_WITH_DISTANCE = false;
     /**
      * Angular size, in radians, below which the atmosphere is fully transparent. This is the
      * "solid angle" of the body, i.e. size / distance, without the FOV factor.
