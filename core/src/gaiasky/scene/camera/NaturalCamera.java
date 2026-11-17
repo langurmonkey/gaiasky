@@ -331,6 +331,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double distFromFocus = -1;
 
     /**
+     * Unit vector from the camera to the centre of the focus, computed at the beginning of the
+     * current frame together with {@link #distFromFocus}. Unlike {@link #focusDirection}, it is not
+     * affected by surface mode. Used by {@link #updateVelocity(double, double, double)} to prevent
+     * the camera from stepping past the focus object.
+     */
+    private final Vector3D camToFocusDir = new Vector3D();
+
+    /**
+     * Set by {@link #updateVelocity(double, double, double)} when the current step lands the camera
+     * exactly on the focus clearance sphere. {@link #updatePosition(double, double, double)} zeroes
+     * the velocity after taking the step, so no motion is left over to bounce the camera back.
+     */
+    private boolean stopAfterStep = false;
+
+    /**
      * Time (in seconds) since the last rotation input arrived. Reset by {@link
      * #addAmount(Vector3D, double, boolean)} and the {@code setXxx} methods.
      */
@@ -712,6 +727,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                 .sub(pos);
                         // Store it in the field, so the rotation slowdown uses the same value.
                         this.distFromFocus = camObj.lenDouble();
+                        camToFocusDir.set(camObj)
+                                .nor();
 
                         // Surface mode activates when we're at 1.8 radii from the focus object, and it is a planet. Camera can't be tracking an object.
                         surfaceModeFlag.set(
@@ -1344,6 +1361,38 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
 
             vel.clamp(0, multiplier * speedMultiplier);
+
+            // While the speed-up multiplier is active a single step must not carry the camera past the
+            // focus object, or it crosses it and the radius clamp parks it on the far side. Solid
+            // objects keep one radius of clearance (two radii from the centre) so the focus stays in
+            // view. Without the multiplier none of this applies: the regular radius clamp already
+            // prevents going below the surface, and landing has to work.
+            if (speedMultiplier > 1 && parent.mode.equals(CameraMode.FOCUS_MODE) && distFromFocus > 0 && dt > 0) {
+                double stopDist = focus.isSolidObject() ? focus.getRadius() * 2.0 : focus.getRadius();
+                double remaining = distFromFocus - stopDist;
+                double approach = vel.dot(camToFocusDir);
+                if (approach > 0) {
+                    if (remaining > 0 && approach * dt > remaining) {
+                        // The step would cross the stop sphere. Prevent the overshoot by scaling the
+                        // whole velocity so the camera lands exactly on it: killing the velocity
+                        // instead would leave the camera a full step away (which, at speed-up speeds,
+                        // is a large fraction of the way), where it would then re-accelerate and
+                        // stall in a jitter. Scaling never reverses the velocity, so nothing bounces.
+                        vel.scl(remaining / (approach * dt));
+                        // The velocity is huge here (one step), and the focus direction it is projected
+                        // onto on the next frame can change (in surface mode it is the pointer
+                        // direction), which would send the camera back at full speed. Wipe it out once
+                        // the step is taken.
+                        stopAfterStep = true;
+                    } else if (remaining <= 0) {
+                        // Already inside the clearance band (landed, surface mode, or an object
+                        // without a solid clamp). Forbid getting closer, but let it move away and
+                        // sideways.
+                        vel.add(aux2.set(camToFocusDir)
+                                        .scl(-approach));
+                    }
+                }
+            }
         }
     }
 
@@ -1354,12 +1403,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                   double multiplier,
                                   double speedScaling) {
 
+        stopAfterStep = false;
         updateVelocity(dt, multiplier, speedScaling);
         // Aux1 is the step to take
         aux1b.set(vel)
                 .scl(dt);
         // Aux2 contains the new position
         pos.add(aux1b);
+
+        if (stopAfterStep) {
+            // The camera has just landed on the focus clearance sphere: kill all motion so it stays
+            // there. Without this the velocity of that last step survives, and the next frame it is
+            // re-projected onto the current focus direction (the pointer direction in surface mode),
+            // which shoots the camera away from the focus.
+            vel.setZero();
+        }
 
         accel.setZero();
 
