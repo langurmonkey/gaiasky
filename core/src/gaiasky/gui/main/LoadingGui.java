@@ -32,10 +32,7 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.TipsGenerator;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextIconButton;
-import gaiasky.util.scene2d.OwnTextTooltip;
-import gaiasky.util.scene2d.Separator;
+import gaiasky.util.scene2d.*;
 
 import java.util.Objects;
 
@@ -92,7 +89,7 @@ public class LoadingGui extends AbstractGui {
         if (!vr) {
             Texture tex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
             tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-            Image bgImage = new Image(tex);
+            Image bgImage = new OwnImage(tex, false);
             bgImage.setScaling(Scaling.fit);
             bgImage.setAlign(Align.center);
             // Background in layer 0.

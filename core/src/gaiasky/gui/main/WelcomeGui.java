@@ -331,7 +331,7 @@ public class WelcomeGui extends AbstractGui {
                 bgTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             }
 
-            Image bgImage = new Image(bgTex);
+            Image bgImage = new OwnImage(bgTex, false);
             bgImage.setScaling(Scaling.fit);
             bgImage.setAlign(Align.center);
 
@@ -376,8 +376,9 @@ public class WelcomeGui extends AbstractGui {
         // Central table
         if (bgTex == null) {
             bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
+                bgTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         }
-        Image bgImage = new Image(bgTex);
+        Image bgImage = new OwnImage(bgTex, false);
         bgImage.setScaling(Scaling.fit);
         bgImage.setAlign(Align.center);
 
