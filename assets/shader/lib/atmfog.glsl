@@ -10,18 +10,24 @@
     #endif // LIB_ATMSCAT
     uniform float u_fogDensity;
     uniform vec3 u_fogCol;
+    // Internal units per km. Comes from Constants.KM_TO_U on the material, it is not a constant of
+    // the shader: the distance scale factor changes it (1e-6 normally, 1e-2 with a scale of 1e4).
+    uniform float u_kmToU;
 
     in vec3 o_fragPosition;
     in float o_fragHeight;
 
+    // Fog e-folding distance, in km, and the height over which it fades out.
+    const float FOG_NORM_KM = 400.0;
+    const float FOG_HEIGHT_KM = 32.0;
+
     vec3 applyFog(in vec3 fragColor, in vec3 rayDir,  in vec3 sunDir, in float NL) {
         if (u_fogDensity > 0.0) {
-            #define U_TO_KM 1.0e6
-            // Distance normalization factor depends on the size of the planet (inner atmosphere radius)
-            float normFactor = clamp(fInnerRadius * U_TO_KM / 40.0, 20.0, 400.0);
-            // Normalize distance to 100 Km
-            float distance = length(o_fragPosition) * U_TO_KM / normFactor;
-            float fragHeight = 1.0 - clamp(o_fragHeight * U_TO_KM / (normFactor * 0.08), 0.0, 1.0);
+            // o_fragPosition and o_fragHeight are in internal units, so they need the real factor.
+            // This used to be a hardcoded 1e6, which is only right when the distance scale is 1.
+            float uToKm = u_kmToU > 0.0 ? 1.0 / u_kmToU : 1.0e6;
+            float distance = length(o_fragPosition) * uToKm / FOG_NORM_KM;
+            float fragHeight = 1.0 - clamp(o_fragHeight * uToKm / FOG_HEIGHT_KM, 0.0, 1.0);
             float camHeight = 1.0 - clamp((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius), 0.0, 1.0);
             float fogDensity = u_fogDensity * 0.15;
 
