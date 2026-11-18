@@ -110,7 +110,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnCheckBox ssr;
     private OwnCheckBox eclipses;
     private OwnCheckBox eclipseOutlines;
-    private OwnCheckBox starSpheres;
     private OwnCheckBox starDistanceScaling;
     private OwnCheckBox motionTrails;
     private OwnCheckBox shaderCache;
@@ -1206,11 +1205,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 glowTexIndex = p2.getSecond();
             }
 
-            // Render stars as spheres
-            var starSpheresLabel = new OwnLabel(I18n.msg("gui.ui.scene.star.spheres"), skin);
-            starSpheres = new OwnCheckBox("", skin);
-            starSpheres.setChecked(settings.scene.star.renderStarSpheres);
-
             // Star glow over objects
             OwnLabel glowOverObjectsLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
             var glowOverObjects = new OwnCheckBox("", skin);
@@ -1230,7 +1224,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             // Add labels
             labels.add(starIndexLabel, glowIndexLabel);
-            labels.add(starSpheresLabel, starDistanceScalingLabel, glowOverObjectsLabel);
+            labels.add(starDistanceScalingLabel, glowOverObjectsLabel);
 
             // Add to table
             starsTable.add(glowOverObjectsLabel).left().padRight(pad34).padBottom(pad10);
@@ -1245,8 +1239,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 starsTable.add(glowIndexLabel).left().padRight(pad34).padBottom(pad10);
                 starsTable.add(p2.getFirst()).left().padRight(pad18).padBottom(pad10).row();
             }
-            starsTable.add(starSpheresLabel).left().padRight(pad34).padBottom(pad10);
-            starsTable.add(starSpheres).left().padRight(pad18).padBottom(pad10).row();
             starsTable.add(starDistanceScalingLabel).left().padRight(pad34).padBottom(pad10);
             starsTable.add(starDistanceScaling).left().padRight(pad18).padBottom(pad10).row();
 
@@ -3350,9 +3342,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // We just deactivated eclipses!
             EventManager.publish(Event.ECLIPSES_CMD, this, eclipses.isChecked());
         }
-
-        // Star spheres
-        settings.scene.star.renderStarSpheres = starSpheres.isChecked();
 
         // Particle motion trails effect
         settings.scene.particleGroups.motionTrails = motionTrails.isChecked();

@@ -82,7 +82,6 @@
       "components": [
         "Hip*",
         "Distance*",
-        "Model",
         "ModelScaffolding"
       ],
       "aliases": [
@@ -345,7 +344,6 @@
       "parent": "GenericCatalog",
       "components": [
         "StarSet",
-        "Model",
         "Label",
         "Line*",
         "Focus",

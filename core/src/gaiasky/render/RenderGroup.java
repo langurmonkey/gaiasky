@@ -110,10 +110,6 @@ public enum RenderGroup {
      */
     MODEL_PROCEDURAL_TESS(1910),
     /**
-     * Model star.
-     **/
-    MODEL_VERT_STAR(2100),
-    /**
      * A particle group defined by orbital elements.
      **/
     ORBITAL_ELEMENTS_GROUP(2105),

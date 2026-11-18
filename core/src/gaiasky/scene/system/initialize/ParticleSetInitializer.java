@@ -28,7 +28,6 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.record.ParticleType;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.task.ParticleSetUpdaterTask;
 import gaiasky.scene.view.LabelView;
@@ -339,14 +338,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // We need the sorting data ALWAYS, not only when numLabels > 0.
         // We use them to draw the close-up stars.
         initSortingData(entity, set);
-
-        var model = Mapper.model.get(entity);
-
-        // Star set.
-        model.renderConsumer = ModelEntityRenderSystem::renderParticleStarSetModel;
-
-        // Load model in main thread
-        GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
     }
 
     public void computeMinMeanMaxDistances(ParticleSet set) {

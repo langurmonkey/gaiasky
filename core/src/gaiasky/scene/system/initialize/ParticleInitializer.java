@@ -12,7 +12,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
-import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -26,7 +25,6 @@ import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
-import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
@@ -100,9 +98,6 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         if (Mapper.hip.has(entity)) {
             var dist = Mapper.distance.get(entity);
             setUpStar(entity, body, celestial, mag, extra, dist, coordinates);
-            var model = Mapper.model.get(entity);
-            model.renderConsumer = ModelEntityRenderSystem::renderParticleStarModel;
-            utils.initModel(AssetBean.manager(), model);
         } else {
             setUpParticle(entity, body, celestial, mag, extra, coordinates);
         }

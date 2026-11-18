@@ -54,7 +54,7 @@ public class RenderAssets {
             lineQuadCpuShaders, lineQuadGpuShaders,
             primitiveGpuShaders, billboardGroupShaders, billboardProceduralShaders, billboardProceduralCpuShaders, particleStreakShaders, particleGroupShaders,
             particleGroupExtBillboardShaders, particleGroupExtModelShaders, starGroupShaders, variableGroupShaders, orbitElemShaders;
-    public IntModelBatch mbSimple, mbSimpleAdditive, mbVertexDiffuse, mbSimpleStarSurface, mbSimpleThruster,
+    public IntModelBatch mbSimple, mbSimpleAdditive, mbVertexDiffuse, mbSimpleThruster,
             mbSimpleGrid, mbSimpleRecGrid, mbPBR, mbPBRDust, mbPBRDepth, mbPBROpaque,
             mbPBRSvtDetection, mbPBRTessellation, mbPBRTessellationProcedural, mbPBRTessellationOpaque, mbPBRTessellationSvtDetection,
             mbPBRTessellationDepth, mbSkybox, mbAtmosphere, mbCloud;
@@ -234,8 +234,6 @@ public class RenderAssets {
                      new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/grid.fragment.glsl"));
         manager.load("simple-recgrid", RelativisticShaderProvider.class,
                      new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/gridrec.fragment.glsl"));
-        manager.load("simple-starsurface", RelativisticShaderProvider.class,
-                     new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
         manager.load("simple-thruster", GroundShaderProvider.class,
                      new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/thruster.fragment.glsl"));
 
@@ -430,7 +428,6 @@ public class RenderAssets {
         IntShaderProvider simpleDiffuse = manager.get("per-vertex-diffuse");
         IntShaderProvider simpleGrid = manager.get("simple-grid");
         IntShaderProvider simpleRecGrid = manager.get("simple-recgrid");
-        IntShaderProvider simpleStarSurface = manager.get("simple-starsurface");
         IntShaderProvider simpleThruster = manager.get("simple-thruster");
 
         // Per-pixel lighting shaders
@@ -470,7 +467,6 @@ public class RenderAssets {
         mbSimple = new IntModelBatch(simple);
         mbSimpleAdditive = new IntModelBatch(simpleAdditive);
         mbVertexDiffuse = new IntModelBatch(simpleDiffuse);
-        mbSimpleStarSurface = new IntModelBatch(simpleStarSurface);
         mbSimpleThruster = new IntModelBatch(simpleThruster);
         mbSimpleGrid = new IntModelBatch(simpleGrid);
         mbSimpleRecGrid = new IntModelBatch(simpleRecGrid);

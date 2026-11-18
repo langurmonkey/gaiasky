@@ -7,10 +7,6 @@
 
 package gaiasky.scene.system.render.draw;
 
-import com.badlogic.gdx.Gdx;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
@@ -20,11 +16,10 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.render.gdx.IntModelBatch;
-import gaiasky.render.gdx.shader.provider.RelativisticShaderProvider;
 
 import java.util.List;
 
-public class ModelRenderer extends AbstractRenderSystem implements IObserver {
+public class ModelRenderer extends AbstractRenderSystem {
 
     private final ModelEntityRenderSystem renderObject;
     protected IntModelBatch batch;
@@ -40,7 +35,6 @@ public class ModelRenderer extends AbstractRenderSystem implements IObserver {
         super(sceneRenderer, rg, alphas, null);
         this.batch = batch;
         this.renderObject = new ModelEntityRenderSystem(sceneRenderer);
-        EventManager.instance.subscribe(this, Event.SHADER_RELOAD_CMD);
     }
 
     @Override
@@ -62,18 +56,5 @@ public class ModelRenderer extends AbstractRenderSystem implements IObserver {
 
     protected boolean mustRender() {
         return true;
-    }
-
-    @Override
-    public void notify(Event event, Object source, Object... data) {
-        if (event == Event.SHADER_RELOAD_CMD) {
-           if (batch != null && getRenderGroup() == RenderGroup.MODEL_VERT_STAR) {
-               // Dispose batch.
-               batch.dispose();
-               // Reload star surface model batch.
-               var shaderProvider = new RelativisticShaderProvider(Gdx.files.internal("shader/starsurface.vertex.glsl"), Gdx.files.internal("shader/starsurface.fragment.glsl"));
-               batch = new IntModelBatch(shaderProvider);
-           }
-        }
     }
 }

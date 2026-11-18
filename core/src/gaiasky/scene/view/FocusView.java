@@ -1111,7 +1111,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public boolean isModel() {
-        return isValid() && Mapper.modelScaffolding.has(entity);
+        // Stars carry ModelScaffolding (its size scale feeds the billboards) but no Model.
+        return isValid() && Mapper.modelScaffolding.has(entity) && Mapper.model.has(entity);
     }
 
     public boolean isBillboard() {

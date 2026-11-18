@@ -72,10 +72,6 @@ public class ParticleExtractor extends AbstractExtractSystem {
 
         if (body.solidAngleApparent >= GaiaSky.settings().scene.star.threshold.point) {
             addToRender(render, RenderGroup.BILLBOARD_STAR);
-            if (GaiaSky.settings().scene.star.renderStarSpheres && body.distToCamera < Mapper.distance.get(entity).distance * Mapper.modelScaffolding.get(entity).sizeScaleFactor) {
-                camera.checkClosestBody(entity);
-                addToRender(render, RenderGroup.MODEL_VERT_STAR);
-            }
         }
         boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
         if (hasPm && body.solidAngleApparent >= GaiaSky.settings().scene.star.threshold.point / GaiaSky.settings().scene.properMotion.number) {

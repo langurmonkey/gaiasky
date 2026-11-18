@@ -8,36 +8,17 @@
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.*;
-import gaiasky.scene.record.ModelComponent;
-import gaiasky.scene.record.ModelType;
-import gaiasky.util.Bits;
 import gaiasky.util.DatasetCard;
-import gaiasky.util.ModelCache;
-import gaiasky.util.Pair;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.render.gdx.model.IntModel;
-import gaiasky.render.gdx.model.IntModelInstance;
-import gaiasky.render.gdx.shader.Environment;
-import gaiasky.render.gdx.shader.Material;
-import gaiasky.render.gdx.shader.attribute.BlendingAttribute;
-import gaiasky.render.gdx.shader.attribute.ColorAttribute;
-import gaiasky.render.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3D;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 public class ParticleUtils {
 
@@ -145,42 +126,5 @@ public class ParticleUtils {
             particleSet.focusPositionSph.set((float) (MathUtilsDouble.radDeg * posSph.x), (float) (MathUtilsDouble.radDeg * posSph.y));
             particleSet.updateFocus(GaiaSky.instance.getICamera());
         }
-    }
-
-    /**
-     * Initializes the star model.
-     *
-     * @param manager The asset manager.
-     * @param model   The model component.
-     */
-    public void initModel(AssetManager manager, Model model) {
-        if (model == null) {
-            throw new RuntimeException("The incoming star model component can't be null!");
-        }
-
-        Map<String, Object> params = new TreeMap<>();
-        params.put("quality", 120L);
-        params.put("diameter", 1d);
-        params.put("flip", false);
-
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(ModelType.SPHERE, params, Bits.indices(Usage.Position, Usage.Normal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
-        IntModel intModel = pair.getFirst();
-        Material mat = pair.getSecond().get("base");
-        mat.clear();
-        // Only to activate view vector (camera position)
-        mat.set(new ColorAttribute(ColorAttribute.Specular));
-        mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
-        Matrix4 modelTransform = new Matrix4();
-
-        model.model = new ModelComponent(false);
-        model.model.initialize(null);
-        model.model.env = new Environment();
-        model.model.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        model.model.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
-        model.model.instance = new IntModelInstance(intModel, modelTransform);
-        // Relativistic effects
-        if (GaiaSky.settings().runtime.relativisticAberration)
-            model.model.rec.setUpRelativisticEffectsMaterial(model.model.instance.materials);
-        model.model.setModelInitialized(true);
     }
 }

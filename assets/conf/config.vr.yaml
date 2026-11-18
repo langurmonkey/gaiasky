@@ -146,8 +146,6 @@ scene:
     motionTrails: false
   # Star settings.
   star:
-    # Render star spheres.
-    renderStarSpheres: false
     # Star brightness factor.
     brightness: 2.0
     # Modulate the brightness of stars.

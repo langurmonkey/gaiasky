@@ -401,8 +401,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 // Blending controlled by shadingType in the renderer.
 
             }
-            case MODEL_VERT_STAR -> // MODEL STARS
-                    system = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbSimpleStarSurface);
             case FONT_LABEL -> // LABELS
                     system = new TextRenderer(this,
                                               FONT_LABEL,

@@ -21,20 +21,16 @@ import gaiasky.render.ShadowMapImpl;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
-import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.record.AtmosphereComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
 import gaiasky.render.gdx.IntModelBatch;
 import gaiasky.render.gdx.model.gltf.scene3d.attributes.CascadeShadowMapAttribute;
-import gaiasky.render.gdx.shader.attribute.ColorAttribute;
 import gaiasky.render.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3Q;
 import net.jafama.FastMath;
-
-import java.util.Objects;
 
 public class ModelEntityRenderSystem {
 
@@ -60,7 +56,6 @@ public class ModelEntityRenderSystem {
      */
     private static final double ATMOSPHERE_FADE_FULL_ANGLE = 0.009;
 
-    private final ParticleUtils utils;
     private final SceneRenderer sceneRenderer;
     private final FocusView focusView;
     private final Vector3Q v3b1 = new Vector3Q(), v3b2 = new Vector3Q();
@@ -70,7 +65,6 @@ public class ModelEntityRenderSystem {
         this.sceneRenderer = sr;
         this.focusView = new FocusView();
         this.focusView.setScene(GaiaSky.instance.scene);
-        this.utils = new ParticleUtils();
     }
 
     /**
@@ -437,102 +431,6 @@ public class ModelEntityRenderSystem {
         mc.updateDepthTest();
         mc.instance.transform.set(graph.localTransform);
         modelBatch.render(mc.instance, mc.env);
-    }
-
-    /**
-     * Renders the model of a single star or particle.
-     *
-     * @param entity       The entity.
-     * @param model        The model component.
-     * @param batch        The model batch.
-     * @param alpha        The model alpha.
-     * @param t            The time, in seconds, since the start of the session.
-     * @param rc           The rendering context.
-     * @param renderGroup  The render group.
-     * @param shadow       Whether to prepare the shadow environment.
-     * @param relativistic Whether to apply relativistic effects.
-     */
-    public void renderParticleStarSetModel(Entity entity,
-                                           Model model,
-                                           IntModelBatch batch,
-                                           float alpha,
-                                           double t,
-                                           RenderingContext rc,
-                                           RenderGroup renderGroup,
-                                           boolean shadow,
-                                           boolean relativistic) {
-        var set = Mapper.starSet.get(entity);
-        if (set.indices == null) {
-            return;
-        }
-        var mc = model.model;
-
-        if (mc != null && mc.isModelInitialised()) {
-            mc.touch();
-            if (set.proximity.updating[0] != null) {
-                float opacity = (float) MathUtilsDouble.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
-                if (alpha * opacity > 0) {
-                    mc.updateBlendMode(alpha * opacity);
-                    mc.updateDepthTest();
-                    float[] col = set.proximity.updating[0].col;
-                    ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(col[0], col[1], col[2], 1f);
-                    ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
-                    // Local transform
-                    double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
-                    int idx = set.proximity.updating[0].index;
-                    // We need to fetch the position again, for the camera position is different in stereoscopic mode.
-                    var pos = set.fetchPosition(set.get(idx), GaiaSky.instance.getICamera().getPos(), v3b1, set.currDeltaYears);
-                    mc.instance.transform.idt().translate((float) pos.x.doubleValue(), (float) pos.y.doubleValue(), (float) pos.z.doubleValue()).scl(
-                            (float) (set.getRadius(set.indices[0]) * 2d * variableScaling));
-                    if (relativistic) {
-                        mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
-                    }
-                    batch.render(mc.instance, mc.env);
-                }
-            }
-        }
-    }
-
-    /**
-     * Renders the model of a single star or particle.
-     *
-     * @param entity       The entity.
-     * @param model        The model component.
-     * @param batch        The model batch.
-     * @param alpha        The model alpha.
-     * @param t            The time, in seconds, since the start of the session.
-     * @param rc           The rendering context.
-     * @param renderGroup  The render group.
-     * @param shadow       Whether to prepare the shadow environment.
-     * @param relativistic Whether to apply relativistic effects.
-     */
-    public void renderParticleStarModel(Entity entity,
-                                        Model model,
-                                        IntModelBatch batch,
-                                        float alpha,
-                                        double t,
-                                        RenderingContext rc,
-                                        RenderGroup renderGroup,
-                                        boolean shadow,
-                                        boolean relativistic) {
-        var body = Mapper.body.get(entity);
-        var graph = Mapper.graph.get(entity);
-        var extra = Mapper.extra.get(entity);
-        var dist = Mapper.distance.get(entity);
-        var scaffolding = Mapper.modelScaffolding.get(entity);
-
-        ModelComponent mc = model.model;
-        var cc = body.color;
-
-        double thresholdDistance = dist.distance * scaffolding.sizeScaleFactor;
-        float opacity = (float) MathUtilsDouble.flint(body.distToCamera, thresholdDistance / 50f, thresholdDistance, 1f, 0f);
-        ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(cc[0], cc[1], cc[2], 1f);
-        ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
-        mc.updateDepthTest();
-        mc.update(alpha * opacity, relativistic);
-        // Local transform
-        graph.translation.setToTranslation(mc.instance.transform).scl((float) (extra.radius * 2d) * scaffolding.sizeScaleFactor);
-        batch.render(mc.instance, mc.env);
     }
 
     /**

@@ -69,9 +69,6 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
             } else {
                 addToRender(render, RenderGroup.STAR_GROUP);
             }
-            if (GaiaSky.settings().scene.star.renderStarSpheres) {
-                addToRender(render, RenderGroup.MODEL_VERT_STAR);
-            }
             if (GaiaSky.settings().scene.star.group.billboard) {
                 addToRender(render, RenderGroup.BILLBOARD_STAR);
             }
