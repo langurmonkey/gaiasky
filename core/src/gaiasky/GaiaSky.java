@@ -887,19 +887,25 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         };
         Timer.schedule(logAttributes, 5);
 
-        // In VR, scale satellites.
-        if (cliArgs.vr && settings.scene.distanceScaleVr < 1.0e5) {
-            final var scaleGaia = new Task() {
-                @Override
-                public void run() {
-                    var satellites = scene.findEntitiesByFamily(scene.getFamilies().satellites);
-                    for (var satellite : satellites) {
-                        var base = Mapper.base.get(satellite);
-                        gaiaSkyAssets.scriptingInterface.setObjectSizeScaling(base.getName(), Constants.DISTANCE_SCALE_FACTOR / 10.0);
+        // In VR, scale satellites up so they stay visible. The factor is 1e3 at the 1e4 base
+        // distance scale and drops tenfold per extra order of magnitude; below 1 nothing is scaled.
+        if (cliArgs.vr) {
+            final double vrBaseScale = 1.0e4;
+            final double decadesAboveBase = Math.max(0.0, Math.log10(Constants.DISTANCE_SCALE_FACTOR / vrBaseScale));
+            final double satelliteScale = Math.max(1.0, (vrBaseScale / 10.0) / Math.pow(10.0, decadesAboveBase));
+            if (satelliteScale > 1.0) {
+                final var scaleGaia = new Task() {
+                    @Override
+                    public void run() {
+                        var satellites = scene.findEntitiesByFamily(scene.getFamilies().satellites);
+                        for (var satellite : satellites) {
+                            var base = Mapper.base.get(satellite);
+                            gaiaSkyAssets.scriptingInterface.setObjectSizeScaling(base.getName(), satelliteScale);
+                        }
                     }
-                }
-            };
-            Timer.schedule(scaleGaia, 10);
+                };
+                Timer.schedule(scaleGaia, 10);
+            }
         }
 
         // Initial report.
