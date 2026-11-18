@@ -888,7 +888,7 @@ public final class GaiaSky implements ApplicationListener, IObserver {
         Timer.schedule(logAttributes, 5);
 
         // In VR, scale satellites.
-        if (cliArgs.vr) {
+        if (cliArgs.vr && settings.scene.distanceScaleVr < 1.0e5) {
             final var scaleGaia = new Task() {
                 @Override
                 public void run() {
