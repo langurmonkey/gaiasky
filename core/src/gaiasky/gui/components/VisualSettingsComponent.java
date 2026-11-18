@@ -187,7 +187,9 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         lightingGroup.addActor(ambientLight);
         lightingGroup.addActor(lineWidth);
         lightingGroup.addActor(labelSize);
-        lightingGroup.addActor(elevMult);
+        if (!GaiaSky.settings().scene.renderer.elevation.type.isNone()) {
+            lightingGroup.addActor(elevMult);
+        }
         lightingGroup.addActor(resetDefaults);
 
         component = lightingGroup;
