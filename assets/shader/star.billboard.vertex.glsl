@@ -26,16 +26,10 @@ uniform float u_th_angle_point;
 // Varyings
 out vec4 v_color;
 out vec2 v_uv;
-// World-space axes of the quad and direction to the camera. The fragment shader
-// needs them to rebuild a world-space surface normal, so the star surface is
-// anchored to the star and not to the screen.
+// World-space axes of the quad and direction to the camera, to rebuild a world-space surface normal.
 out vec3 v_right;
 out vec3 v_up;
 out vec3 v_view;
-// World-anchored sky plane and latitude, for the chromosphere and the corona.
-out vec3 v_skyRight;
-out vec3 v_skyUp;
-out float v_cosLat;
 
 void main() {
     // Solid angle threshold
@@ -66,13 +60,7 @@ void main() {
 
     gl_Position = gpos;
 
-    // Sampling basis: the quad's own world-space axes, exactly as computed by
-    // the billboard snippet above. Using the camera-derived up vector (and not a
-    // fixed world axis) is what makes the screen->normal map a real world-space
-    // normal: if the basis were built from dir alone, all three vectors would
-    // rotate with dir, the map would be camera-independent, and the surface
-    // pattern would slide over the disc as the camera moves instead of staying
-    // anchored to the star.
+    // Sampling basis from the camera up vector, so the normal map is a real world-space normal.
     vec3 dir = normalize(pos);
     if (isnan(u_camUp.x)) {
         // CUBEMAP: global orientation, same convention as the snippet.
@@ -85,15 +73,4 @@ void main() {
     }
     v_up = cross(dir, v_right);
     v_view = -dir;
-
-    // Sky-anchored basis, built from the spin axis (world Y) and the star
-    // direction only. It does not depend on the camera up vector, so patterns
-    // sampled with it stay fixed on the celestial sphere when the camera rolls.
-    vec3 spinAxis = vec3(0.0, 1.0, 0.0);
-    vec3 skyRef = abs(dir.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : spinAxis;
-    v_skyRight = normalize(cross(skyRef, dir));
-    v_skyUp = cross(dir, v_skyRight);
-    // Sine of the latitude of the star direction: tells the corona where its
-    // equatorial plane is.
-    v_cosLat = dot(dir, spinAxis);
 }
