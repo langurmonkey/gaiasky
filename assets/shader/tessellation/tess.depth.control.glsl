@@ -11,8 +11,6 @@ in vec3 v_normal[gl_MaxPatchVertices];
 out vec3 l_normal[N_VERTICES];
 
 
-#define U_TO_KM 1.0E6
-
 void main(){
     #define id gl_InvocationID
     if(id == 0){

@@ -11,7 +11,9 @@ in vec3 v_normal[gl_MaxPatchVertices];
 out vec3 l_normal[N_VERTICES];
 
 
-#define U_TO_KM 1.0E6
+// Internal units per km, from Constants.KM_TO_U. It is not a constant of the shader:
+// the distance scale factor changes it (1e-6 normally, 1e-2 with a scale of 1e4).
+uniform float u_kmToU;
 
 vec3 center(vec3 p1, vec3 p2){
     return (p1 + p2) / 2.0;
@@ -26,7 +28,9 @@ float tessellationLevel(vec3 center){
     const float tessellationFactor = 300;
     const float tessellationSlope = 1.0;
 
-    float d = length(center) * U_TO_KM;
+    // Distance to the camera in real km, so the level is the same at any distance scale.
+    float uToKm = u_kmToU > 0.0 ? 1.0 / u_kmToU : 1.0e6;
+    float d = length(center) * uToKm;
     return mix(0.0, float(gl_MaxTessGenLevel), tessellationFactor / pow(d, tessellationSlope));
 }
 
